@@ -48,18 +48,18 @@ class AppLocalizationsEl extends AppLocalizations {
   String get searchButton => 'Αναζήτηση';
 
   @override
-  String get searchCriteriaTitle => 'Search criteria';
+  String get searchCriteriaTitle => 'Κριτήρια αναζήτησης';
 
   @override
-  String get searchCriteriaOpen => 'Search';
+  String get searchCriteriaOpen => 'Αναζήτηση';
 
   @override
   String searchCriteriaRadiusBadge(String km) {
-    return 'Within $km km';
+    return 'Εντός $km km';
   }
 
   @override
-  String get searchCriteriaTapToSearch => 'Tap to start searching';
+  String get searchCriteriaTapToSearch => 'Πατήστε για αναζήτηση';
 
   @override
   String get noResults => 'Δεν βρέθηκαν βενζινάδικα.';
@@ -148,31 +148,31 @@ class AppLocalizationsEl extends AppLocalizations {
   String get cancel => 'Ακύρωση';
 
   @override
-  String get countryChangeTitle => 'Switch country?';
+  String get countryChangeTitle => 'Αλλαγή χώρας;';
 
   @override
   String countryChangeBody(String country) {
-    return 'Switching to $country will change:';
+    return 'Η μετάβαση σε $country θα αλλάξει:';
   }
 
   @override
-  String get countryChangeCurrency => 'Currency';
+  String get countryChangeCurrency => 'Νόμισμα';
 
   @override
-  String get countryChangeDistance => 'Distance';
+  String get countryChangeDistance => 'Απόσταση';
 
   @override
-  String get countryChangeVolume => 'Volume';
+  String get countryChangeVolume => 'Όγκος';
 
   @override
-  String get countryChangePricePerUnit => 'Price format';
+  String get countryChangePricePerUnit => 'Μορφή τιμής';
 
   @override
   String get countryChangeNote =>
-      'Existing favorites and fill-up logs are not rewritten; only new entries use the new units.';
+      'Τα υπάρχοντα αγαπημένα και τα αρχεία ανεφοδιασμού δεν επαναγράφονται· μόνο νέες εγγραφές χρησιμοποιούν τις νέες μονάδες.';
 
   @override
-  String get countryChangeConfirm => 'Switch';
+  String get countryChangeConfirm => 'Αλλαγή';
 
   @override
   String get delete => 'Διαγραφή';
@@ -391,108 +391,110 @@ class AppLocalizationsEl extends AppLocalizations {
   String get reportBug => 'Αναφορά σφάλματος / Πρόταση λειτουργίας';
 
   @override
-  String get reportThisIssue => 'Report this issue';
+  String get reportThisIssue => 'Αναφορά προβλήματος';
 
   @override
-  String get reportAlreadySent => 'You already reported this issue.';
+  String get reportAlreadySent => 'Έχετε ήδη αναφέρει αυτό το πρόβλημα.';
 
   @override
-  String get reportConsentTitle => 'Report to GitHub?';
+  String get reportConsentTitle => 'Αναφορά στο GitHub;';
 
   @override
   String get reportConsentBody =>
-      'This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.';
+      'Θα ανοίξει ένα δημόσιο ζήτημα GitHub με τις παρακάτω λεπτομέρειες σφάλματος. Δεν συμπεριλαμβάνονται συντεταγμένες GPS, κλειδιά API ή προσωπικά δεδομένα.';
 
   @override
-  String get reportConsentConfirm => 'Open GitHub';
+  String get reportConsentConfirm => 'Άνοιγμα GitHub';
 
   @override
-  String get reportConsentCancel => 'Cancel';
+  String get reportConsentCancel => 'Ακύρωση';
 
   @override
-  String get configProfileSection => 'Profile';
+  String get configProfileSection => 'Προφίλ';
 
   @override
-  String get configActiveProfile => 'Active profile';
+  String get configActiveProfile => 'Ενεργό προφίλ';
 
   @override
-  String get configPreferredFuel => 'Preferred fuel';
+  String get configPreferredFuel => 'Προτιμώμενο καύσιμο';
 
   @override
-  String get configCountry => 'Country';
+  String get configCountry => 'Χώρα';
 
   @override
-  String get configRouteSegment => 'Route segment';
+  String get configRouteSegment => 'Τμήμα διαδρομής';
 
   @override
-  String get configApiKeysSection => 'API keys';
+  String get configApiKeysSection => 'Κλειδιά API';
 
   @override
-  String get configTankerkoenigKey => 'Tankerkoenig API key';
+  String get configTankerkoenigKey => 'Κλειδί API Tankerkoenig';
 
   @override
-  String get configApiKeyConfigured => 'Configured';
+  String get configApiKeyConfigured => 'Ρυθμισμένο';
 
   @override
-  String get configApiKeyNotSet => 'Not set (demo mode)';
+  String get configApiKeyNotSet => 'Μη ορισμένο (λειτουργία επίδειξης)';
 
   @override
-  String get configApiKeyCommunity => 'Default (community key)';
+  String get configApiKeyCommunity => 'Προεπιλογή (κοινοτικό κλειδί)';
 
   @override
-  String get searchLocationPlaceholder => 'Address, postal code or city';
+  String get searchLocationPlaceholder =>
+      'Διεύθυνση, ταχυδρομικός κώδικας ή πόλη';
 
   @override
-  String get configEvKey => 'EV charging API key';
+  String get configEvKey => 'Κλειδί API φόρτισης EV';
 
   @override
-  String get configEvKeyCustom => 'Custom key';
+  String get configEvKeyCustom => 'Προσαρμοσμένο κλειδί';
 
   @override
-  String get configEvKeyShared => 'Default (shared)';
+  String get configEvKeyShared => 'Προεπιλογή (κοινόχρηστο)';
 
   @override
-  String get configCloudSyncSection => 'Cloud Sync';
+  String get configCloudSyncSection => 'Συγχρονισμός Cloud';
 
   @override
-  String get configTankSyncConnected => 'Connected';
+  String get configTankSyncConnected => 'Συνδεδεμένο';
 
   @override
-  String get configTankSyncDisabled => 'Disabled';
+  String get configTankSyncDisabled => 'Απενεργοποιημένο';
 
   @override
-  String get configAuthMode => 'Auth mode';
+  String get configAuthMode => 'Τρόπος ταυτοποίησης';
 
   @override
-  String get configAuthEmail => 'Email (persistent)';
+  String get configAuthEmail => 'Email (μόνιμο)';
 
   @override
-  String get configAuthAnonymous => 'Anonymous (device-only)';
+  String get configAuthAnonymous => 'Ανώνυμο (μόνο συσκευή)';
 
   @override
-  String get configDatabase => 'Database';
+  String get configDatabase => 'Βάση δεδομένων';
 
   @override
-  String get configPrivacySummary => 'Privacy summary';
+  String get configPrivacySummary => 'Σύνοψη απορρήτου';
 
   @override
   String configPrivacySummarySynced(Object authNote) {
-    return '• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• $authNote';
+    return '• Τα αγαπημένα, οι ειδοποιήσεις και οι αποκρυμμένοι σταθμοί συγχρονίζονται στη δική σας ιδιωτική βάση δεδομένων\n• Η θέση GPS και τα κλειδιά API δεν φεύγουν ποτέ από τη συσκευή σας\n• $authNote';
   }
 
   @override
   String get configPrivacySummaryLocal =>
-      '• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage';
+      '• Όλα τα δεδομένα αποθηκεύονται τοπικά μόνο σε αυτή τη συσκευή\n• Δεν αποστέλλονται δεδομένα σε κανέναν διακομιστή\n• Τα κλειδιά API κρυπτογραφούνται στην ασφαλή αποθήκευση της συσκευής';
 
   @override
-  String get configAuthNoteEmail => 'Email account enables cross-device access';
+  String get configAuthNoteEmail =>
+      'Ο λογαριασμός email επιτρέπει πρόσβαση από πολλές συσκευές';
 
   @override
   String get configAuthNoteAnonymous =>
-      'Anonymous account — data tied to this device';
+      'Ανώνυμος λογαριασμός — τα δεδομένα συνδέονται με αυτή τη συσκευή';
 
   @override
-  String get configNone => 'None';
+  String get configNone => 'Κανένα';
 
   @override
   String get privacyPolicy => 'Πολιτική Απορρήτου';
@@ -533,19 +535,19 @@ class AppLocalizationsEl extends AppLocalizations {
       'Λειτουργία επίδειξης. Ρυθμίστε το κλειδί API στις ρυθμίσεις.';
 
   @override
-  String get demoModeBannerAction => 'Get live prices';
+  String get demoModeBannerAction => 'Λήψη ζωντανών τιμών';
 
   @override
   String get sortDistance => 'Απόσταση';
 
   @override
-  String get sortOpen24h => '24h';
+  String get sortOpen24h => '24ω';
 
   @override
-  String get sortRating => 'Rating';
+  String get sortRating => 'Αξιολόγηση';
 
   @override
-  String get sortPriceDistance => 'Price/km';
+  String get sortPriceDistance => 'Τιμή/km';
 
   @override
   String get cheap => 'φθηνό';
@@ -1001,21 +1003,23 @@ class AppLocalizationsEl extends AppLocalizations {
   String get allDataDeleted => 'Όλα τα δεδομένα διακομιστή διαγράφηκαν';
 
   @override
-  String get forgetAllSyncedTripsButton => 'Forget all synced trips';
+  String get forgetAllSyncedTripsButton =>
+      'Διαγραφή όλων των συγχρονισμένων διαδρομών';
 
   @override
-  String get forgetAllSyncedTripsConfirmTitle => 'Forget all synced trips?';
+  String get forgetAllSyncedTripsConfirmTitle =>
+      'Διαγραφή όλων των συγχρονισμένων διαδρομών;';
 
   @override
   String get forgetAllSyncedTripsConfirmBody =>
-      'Every trip summary and detail blob will be removed from the server. Your local trip history on this device won\'t be affected.\n\nThis action cannot be undone.';
+      'Κάθε σύνοψη διαδρομής και αναλυτικά δεδομένα θα αφαιρεθούν από τον διακομιστή. Το τοπικό ιστορικό διαδρομών σε αυτή τη συσκευή δεν θα επηρεαστεί.\n\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί.';
 
   @override
-  String get forgetAllSyncedTripsConfirmAction => 'Forget all';
+  String get forgetAllSyncedTripsConfirmAction => 'Διαγραφή όλων';
 
   @override
   String get forgetAllSyncedTripsSuccess =>
-      'All synced trips removed from server';
+      'Όλες οι συγχρονισμένες διαδρομές αφαιρέθηκαν από τον διακομιστή';
 
   @override
   String get disconnectConfirm => 'Αποσύνδεση TankSync;';
@@ -1063,48 +1067,48 @@ class AppLocalizationsEl extends AppLocalizations {
   String get close => 'Κλείσιμο';
 
   @override
-  String get account => 'Account';
+  String get account => 'Λογαριασμός';
 
   @override
-  String get continueAsGuest => 'Continue as guest';
+  String get continueAsGuest => 'Συνέχεια ως επισκέπτης';
 
   @override
-  String get createAccount => 'Create account';
+  String get createAccount => 'Δημιουργία λογαριασμού';
 
   @override
-  String get signIn => 'Sign in';
+  String get signIn => 'Σύνδεση';
 
   @override
-  String get upgradeToEmail => 'Create email account';
+  String get upgradeToEmail => 'Δημιουργία λογαριασμού email';
 
   @override
-  String get savedRoutes => 'Saved Routes';
+  String get savedRoutes => 'Αποθηκευμένες διαδρομές';
 
   @override
-  String get noSavedRoutes => 'No saved routes';
+  String get noSavedRoutes => 'Δεν υπάρχουν αποθηκευμένες διαδρομές';
 
   @override
   String get noSavedRoutesHint =>
-      'Search along a route and save it for quick access later.';
+      'Αναζητήστε κατά μήκος μιας διαδρομής και αποθηκεύστε την για γρήγορη πρόσβαση αργότερα.';
 
   @override
-  String get saveRoute => 'Save route';
+  String get saveRoute => 'Αποθήκευση διαδρομής';
 
   @override
-  String get routeName => 'Route name';
+  String get routeName => 'Όνομα διαδρομής';
 
   @override
   String itineraryDeleted(String name) {
-    return '$name deleted';
+    return 'Το $name διαγράφηκε';
   }
 
   @override
   String loadingRoute(String name) {
-    return 'Loading route: $name';
+    return 'Φόρτωση διαδρομής: $name';
   }
 
   @override
-  String get refreshFailed => 'Refresh failed. Please try again.';
+  String get refreshFailed => 'Αποτυχία ανανέωσης. Παρακαλώ δοκιμάστε ξανά.';
 
   @override
   String get deleteProfileTitle => 'Delete profile?';
@@ -1152,214 +1156,220 @@ class AppLocalizationsEl extends AppLocalizations {
   String get errorUnknown => 'An unexpected error occurred.';
 
   @override
-  String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
+  String get onboardingWelcomeHint =>
+      'Ρυθμίστε την εφαρμογή σε μερικά γρήγορα βήματα.';
 
   @override
   String get onboardingApiKeyDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Εγγραφείτε για δωρεάν κλειδί API ή παραλείψτε για εξερεύνηση με δεδομένα επίδειξης.';
 
   @override
-  String get onboardingComplete => 'All set!';
+  String get onboardingComplete => 'Όλα έτοιμα!';
 
   @override
   String get onboardingCompleteHint =>
-      'You can change these settings anytime in your profile.';
+      'Μπορείτε να αλλάξετε αυτές τις ρυθμίσεις ανά πάσα στιγμή στο προφίλ σας.';
 
   @override
-  String get onboardingBack => 'Back';
+  String get onboardingBack => 'Πίσω';
 
   @override
-  String get onboardingNext => 'Next';
+  String get onboardingNext => 'Επόμενο';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => 'Παράλειψη';
 
   @override
-  String get onboardingFinish => 'Get started';
+  String get onboardingFinish => 'Ξεκινήστε';
 
   @override
   String crossBorderNearby(String country) {
-    return '$country is nearby';
+    return 'Η $country είναι κοντά';
   }
 
   @override
   String crossBorderDistance(int km) {
-    return '~$km km to border';
+    return '~$km km στα σύνορα';
   }
 
   @override
   String crossBorderAvgPrice(String price, int count) {
-    return 'Avg here: $price EUR ($count stations)';
+    return 'Μέση τιμή εδώ: $price EUR ($count σταθμοί)';
   }
 
   @override
-  String get allPricesView => 'All prices';
+  String get allPricesView => 'Όλες οι τιμές';
 
   @override
-  String get compactView => 'Compact';
+  String get compactView => 'Συμπαγής';
 
   @override
-  String get switchToAllPricesView => 'Switch to all-prices view';
+  String get switchToAllPricesView => 'Εναλλαγή στην προβολή όλων των τιμών';
 
   @override
-  String get switchToCompactView => 'Switch to compact view';
+  String get switchToCompactView => 'Εναλλαγή στη συμπαγή προβολή';
 
   @override
-  String get unavailable => 'N/A';
+  String get unavailable => 'Μ/Δ';
 
   @override
-  String get outOfStock => 'Out of stock';
+  String get outOfStock => 'Εξαντλημένο';
 
   @override
-  String get gdprTitle => 'Your Privacy';
+  String get gdprTitle => 'Το απόρρητό σας';
 
   @override
   String get gdprSubtitle =>
-      'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
+      'Αυτή η εφαρμογή σέβεται το απόρρητό σας. Επιλέξτε ποια δεδομένα θέλετε να κοινοποιήσετε. Μπορείτε να αλλάξετε αυτές τις ρυθμίσεις ανά πάσα στιγμή.';
 
   @override
-  String get gdprLocationTitle => 'Location Access';
+  String get gdprLocationTitle => 'Πρόσβαση τοποθεσίας';
 
   @override
   String get gdprLocationDescription =>
-      'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
+      'Οι συντεταγμένες σας αποστέλλονται στο API τιμών καυσίμων για εύρεση κοντινών σταθμών. Τα δεδομένα τοποθεσίας δεν αποθηκεύονται ποτέ σε διακομιστή και δεν χρησιμοποιούνται για παρακολούθηση.';
 
   @override
   String get gdprLocationShort =>
-      'Find nearby fuel stations using your location';
+      'Εύρεση κοντινών σταθμών καυσίμων με βάση την τοποθεσία σας';
 
   @override
-  String get gdprErrorReportingTitle => 'Error Reporting';
+  String get gdprErrorReportingTitle => 'Αναφορά σφαλμάτων';
 
   @override
   String get gdprErrorReportingDescription =>
-      'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
+      'Ανώνυμες αναφορές σφαλμάτων βοηθούν στη βελτίωση της εφαρμογής. Δεν περιλαμβάνονται προσωπικά δεδομένα. Οι αναφορές αποστέλλονται μέσω Sentry μόνο όταν είναι ρυθμισμένο.';
 
   @override
   String get gdprErrorReportingShort =>
-      'Send anonymous crash reports to improve the app';
+      'Αποστολή ανώνυμων αναφορών σφαλμάτων για βελτίωση της εφαρμογής';
 
   @override
-  String get gdprCloudSyncTitle => 'Cloud Sync';
+  String get gdprCloudSyncTitle => 'Συγχρονισμός Cloud';
 
   @override
   String get gdprCloudSyncDescription =>
-      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+      'Συγχρονισμός αγαπημένων και ειδοποιήσεων σε συσκευές μέσω TankSync. Χρησιμοποιεί ανώνυμη ταυτοποίηση. Τα δεδομένα σας κρυπτογραφούνται κατά τη μεταφορά.';
 
   @override
-  String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
+  String get gdprCloudSyncShort =>
+      'Συγχρονισμός αγαπημένων και ειδοποιήσεων σε συσκευές';
 
   @override
   String get gdprLegalBasis =>
-      'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
+      'Νομική βάση: Άρθρο 6(1)(α) GDPR (Συγκατάθεση). Μπορείτε να ανακαλέσετε τη συγκατάθεση ανά πάσα στιγμή στις Ρυθμίσεις.';
 
   @override
-  String get gdprAcceptAll => 'Accept All';
+  String get gdprAcceptAll => 'Αποδοχή όλων';
 
   @override
-  String get gdprAcceptSelected => 'Accept Selected';
+  String get gdprAcceptSelected => 'Αποδοχή επιλεγμένων';
 
   @override
   String get gdprSettingsHint =>
-      'You can change your privacy choices at any time.';
+      'Μπορείτε να αλλάξετε τις επιλογές απορρήτου σας ανά πάσα στιγμή.';
 
   @override
-  String get routeSaved => 'Route saved!';
+  String get routeSaved => 'Η διαδρομή αποθηκεύτηκε!';
 
   @override
-  String get routeSaveFailed => 'Failed to save route';
+  String get routeSaveFailed => 'Αποτυχία αποθήκευσης διαδρομής';
 
   @override
-  String get sqlCopied => 'SQL copied to clipboard';
+  String get sqlCopied => 'SQL αντιγράφηκε στο πρόχειρο';
 
   @override
-  String get connectionDataCopied => 'Connection data copied';
+  String get connectionDataCopied => 'Δεδομένα σύνδεσης αντιγράφηκαν';
 
   @override
-  String get accountDeleted => 'Account deleted. Local data preserved.';
+  String get accountDeleted =>
+      'Ο λογαριασμός διαγράφηκε. Τα τοπικά δεδομένα διατηρήθηκαν.';
 
   @override
-  String get switchedToAnonymous => 'Switched to anonymous session';
+  String get switchedToAnonymous => 'Μετάβαση σε ανώνυμη σύνδεση';
 
   @override
   String failedToSwitch(String error) {
-    return 'Failed to switch: $error';
+    return 'Αποτυχία εναλλαγής: $error';
   }
 
   @override
-  String get topicUrlCopied => 'Topic URL copied';
+  String get topicUrlCopied => 'URL θέματος αντιγράφηκε';
 
   @override
-  String get testNotificationSent => 'Test notification sent!';
+  String get testNotificationSent => 'Δοκιμαστική ειδοποίηση στάλθηκε!';
 
   @override
-  String get testNotificationFailed => 'Failed to send test notification';
+  String get testNotificationFailed =>
+      'Αποτυχία αποστολής δοκιμαστικής ειδοποίησης';
 
   @override
-  String get pushUpdateFailed => 'Failed to update push notification setting';
+  String get pushUpdateFailed =>
+      'Αποτυχία ενημέρωσης ρύθμισης push ειδοποιήσεων';
 
   @override
-  String get connectedAsGuest => 'Connected as guest';
+  String get connectedAsGuest => 'Συνδεδεμένος ως επισκέπτης';
 
   @override
-  String get accountCreated => 'Account created!';
+  String get accountCreated => 'Ο λογαριασμός δημιουργήθηκε!';
 
   @override
-  String get signedIn => 'Signed in!';
+  String get signedIn => 'Συνδεθήκατε!';
 
   @override
   String stationHidden(String name) {
-    return '$name hidden';
+    return 'Ο σταθμός $name αποκρύφτηκε';
   }
 
   @override
   String removedFromFavoritesName(String name) {
-    return '$name removed from favorites';
+    return 'Το $name αφαιρέθηκε από τα αγαπημένα';
   }
 
   @override
   String invalidApiKey(String error) {
-    return 'Invalid API key: $error';
+    return 'Μη έγκυρο κλειδί API: $error';
   }
 
   @override
-  String get invalidQrCode => 'Invalid QR code format';
+  String get invalidQrCode => 'Μη έγκυρη μορφή QR κώδικα';
 
   @override
   String get invalidQrCodeTankSync =>
-      'Invalid QR code — expected TankSync format';
+      'Μη έγκυρος QR κώδικας — αναμενόμενη μορφή TankSync';
 
   @override
-  String get tankSyncConnected => 'TankSync connected!';
+  String get tankSyncConnected => 'TankSync συνδέθηκε!';
 
   @override
-  String get syncCompleted => 'Sync completed — data refreshed';
+  String get syncCompleted =>
+      'Συγχρονισμός ολοκληρώθηκε — τα δεδομένα ανανεώθηκαν';
 
   @override
-  String get deviceCodeCopied => 'Device code copied';
+  String get deviceCodeCopied => 'Κωδικός συσκευής αντιγράφηκε';
 
   @override
-  String get undo => 'Undo';
+  String get undo => 'Αναίρεση';
 
   @override
   String invalidPostalCode(String length, String label) {
-    return 'Please enter a valid $length-digit $label';
+    return 'Παρακαλώ εισάγετε έγκυρο $label $length ψηφίων';
   }
 
   @override
-  String get freshnessAgo => 'ago';
+  String get freshnessAgo => 'πριν';
 
   @override
-  String get freshnessStale => 'Stale';
+  String get freshnessStale => 'Παλιό';
 
   @override
   String freshnessBadgeSemantics(String age) {
-    return 'Data freshness: $age';
+    return 'Ανανέωση δεδομένων: $age';
   }
 
   @override
   String brandLogoLabel(String brand) {
-    return '$brand logo';
+    return 'Λογότυπο $brand';
   }
 
   @override
@@ -1367,51 +1377,51 @@ class AppLocalizationsEl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Rate $count stars',
-      one: 'Rate 1 star',
+      other: 'Βαθμολογία $count αστέρια',
+      one: 'Βαθμολογία 1 αστέρι',
     );
     return '$_temp0';
   }
 
   @override
-  String get passwordStrengthWeak => 'Weak';
+  String get passwordStrengthWeak => 'Αδύναμος';
 
   @override
-  String get passwordStrengthFair => 'Fair';
+  String get passwordStrengthFair => 'Μέτριος';
 
   @override
-  String get passwordStrengthStrong => 'Strong';
+  String get passwordStrengthStrong => 'Ισχυρός';
 
   @override
-  String get passwordReqMinLength => 'At least 8 characters';
+  String get passwordReqMinLength => 'Τουλάχιστον 8 χαρακτήρες';
 
   @override
-  String get passwordReqUppercase => 'At least 1 uppercase letter';
+  String get passwordReqUppercase => 'Τουλάχιστον 1 κεφαλαίο γράμμα';
 
   @override
-  String get passwordReqLowercase => 'At least 1 lowercase letter';
+  String get passwordReqLowercase => 'Τουλάχιστον 1 πεζό γράμμα';
 
   @override
-  String get passwordReqDigit => 'At least 1 number';
+  String get passwordReqDigit => 'Τουλάχιστον 1 αριθμός';
 
   @override
-  String get passwordReqSpecial => 'At least 1 special character';
+  String get passwordReqSpecial => 'Τουλάχιστον 1 ειδικός χαρακτήρας';
 
   @override
-  String get passwordTooWeak => 'Password does not meet all requirements';
+  String get passwordTooWeak => 'Ο κωδικός δεν πληροί όλες τις απαιτήσεις';
 
   @override
-  String get brandFilterAll => 'All';
+  String get brandFilterAll => 'Όλα';
 
   @override
-  String get brandFilterNoHighway => 'No highway';
+  String get brandFilterNoHighway => 'Χωρίς αυτοκινητόδρομο';
 
   @override
   String get swipeTutorialMessage =>
-      'Swipe right to navigate, swipe left to remove';
+      'Σύρετε δεξιά για πλοήγηση, σύρετε αριστερά για αφαίρεση';
 
   @override
-  String get swipeTutorialDismiss => 'Got it';
+  String get swipeTutorialDismiss => 'Κατάλαβα';
 
   @override
   String get alertStatsActive => 'Ενεργές';
@@ -1423,100 +1433,102 @@ class AppLocalizationsEl extends AppLocalizations {
   String get alertStatsThisWeek => 'Αυτή την εβδομάδα';
 
   @override
-  String get privacyDashboardTitle => 'Privacy Dashboard';
+  String get privacyDashboardTitle => 'Πίνακας ελέγχου απορρήτου';
 
   @override
-  String get privacyDashboardSubtitle => 'View, export, or delete your data';
+  String get privacyDashboardSubtitle =>
+      'Προβολή, εξαγωγή ή διαγραφή των δεδομένων σας';
 
   @override
   String get privacyDashboardBanner =>
-      'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
+      'Τα δεδομένα σας ανήκουν σε εσάς. Εδώ μπορείτε να δείτε όσα αποθηκεύει αυτή η εφαρμογή, να τα εξαγάγετε ή να τα διαγράψετε.';
 
   @override
-  String get privacyLocalData => 'Data on this device';
+  String get privacyLocalData => 'Δεδομένα σε αυτή τη συσκευή';
 
   @override
-  String get privacyIgnoredStations => 'Ignored stations';
+  String get privacyIgnoredStations => 'Αποκρυμμένοι σταθμοί';
 
   @override
-  String get privacyRatings => 'Station ratings';
+  String get privacyRatings => 'Αξιολογήσεις σταθμών';
 
   @override
-  String get privacyPriceHistory => 'Price history stations';
+  String get privacyPriceHistory => 'Σταθμοί ιστορικού τιμών';
 
   @override
-  String get privacyProfiles => 'Search profiles';
+  String get privacyProfiles => 'Προφίλ αναζήτησης';
 
   @override
-  String get privacyItineraries => 'Saved routes';
+  String get privacyItineraries => 'Αποθηκευμένες διαδρομές';
 
   @override
-  String get privacyCacheEntries => 'Cache entries';
+  String get privacyCacheEntries => 'Εγγραφές προσωρινής μνήμης';
 
   @override
-  String get privacyApiKey => 'API key stored';
+  String get privacyApiKey => 'Αποθηκευμένο κλειδί API';
 
   @override
-  String get privacyEvApiKey => 'EV API key stored';
+  String get privacyEvApiKey => 'Αποθηκευμένο κλειδί API EV';
 
   @override
-  String get privacyEstimatedSize => 'Estimated storage';
+  String get privacyEstimatedSize => 'Εκτιμώμενος χώρος';
 
   @override
-  String get privacySyncedData => 'Cloud sync (TankSync)';
+  String get privacySyncedData => 'Συγχρονισμός cloud (TankSync)';
 
   @override
   String get privacySyncDisabled =>
-      'Cloud sync is disabled. All data stays on this device only.';
+      'Ο συγχρονισμός cloud είναι απενεργοποιημένος. Όλα τα δεδομένα παραμένουν μόνο σε αυτή τη συσκευή.';
 
   @override
-  String get privacySyncMode => 'Sync mode';
+  String get privacySyncMode => 'Λειτουργία συγχρονισμού';
 
   @override
-  String get privacySyncUserId => 'User ID';
+  String get privacySyncUserId => 'ID χρήστη';
 
   @override
   String get privacySyncDescription =>
-      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+      'Όταν ο συγχρονισμός είναι ενεργός, αγαπημένα, ειδοποιήσεις, αποκρυμμένοι σταθμοί και αξιολογήσεις αποθηκεύονται επίσης στον διακομιστή TankSync.';
 
   @override
-  String get privacyViewServerData => 'View server data';
+  String get privacyViewServerData => 'Προβολή δεδομένων διακομιστή';
 
   @override
-  String get privacyExportButton => 'Export all data as JSON';
+  String get privacyExportButton => 'Εξαγωγή όλων των δεδομένων ως JSON';
 
   @override
-  String get privacyExportSuccess => 'Data exported to clipboard';
+  String get privacyExportSuccess => 'Τα δεδομένα εξήχθησαν στο πρόχειρο';
 
   @override
-  String get privacyExportCsvButton => 'Export all data as CSV';
+  String get privacyExportCsvButton => 'Εξαγωγή όλων των δεδομένων ως CSV';
 
   @override
-  String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
+  String get privacyExportCsvSuccess =>
+      'Τα δεδομένα CSV εξήχθησαν στο πρόχειρο';
 
   @override
-  String get privacyDeleteButton => 'Delete all data';
+  String get privacyDeleteButton => 'Διαγραφή όλων των δεδομένων';
 
   @override
   String privacyCopyErrorLog(int count) {
-    return 'Copy error log to clipboard ($count)';
+    return 'Αντιγραφή αρχείου καταγραφής σφαλμάτων στο πρόχειρο ($count)';
   }
 
   @override
-  String get privacyDeleteTitle => 'Delete all data?';
+  String get privacyDeleteTitle => 'Διαγραφή όλων των δεδομένων;';
 
   @override
   String get privacyDeleteBody =>
-      'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
+      'Αυτό θα διαγράψει μόνιμα:\n\n- Όλα τα αγαπημένα και τα δεδομένα σταθμών\n- Όλα τα προφίλ αναζήτησης\n- Όλες τις ειδοποιήσεις τιμών\n- Όλο το ιστορικό τιμών\n- Όλα τα δεδομένα προσωρινής μνήμης\n- Το κλειδί API σας\n- Όλες τις ρυθμίσεις εφαρμογής\n\nΗ εφαρμογή θα επαναφερθεί στην αρχική της κατάσταση. Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.';
 
   @override
-  String get privacyDeleteConfirm => 'Delete everything';
+  String get privacyDeleteConfirm => 'Διαγραφή όλων';
 
   @override
-  String get yes => 'Yes';
+  String get yes => 'Ναι';
 
   @override
-  String get no => 'No';
+  String get no => 'Όχι';
 
   @override
   String get amenities => 'Amenities';
@@ -1546,26 +1558,26 @@ class AppLocalizationsEl extends AppLocalizations {
   String get amenityEv => 'EV';
 
   @override
-  String get paymentMethods => 'Payment methods';
+  String get paymentMethods => 'Μέθοδοι πληρωμής';
 
   @override
-  String get paymentMethodCash => 'Cash';
+  String get paymentMethodCash => 'Μετρητά';
 
   @override
-  String get paymentMethodCard => 'Card';
+  String get paymentMethodCard => 'Κάρτα';
 
   @override
-  String get paymentMethodContactless => 'Contactless';
+  String get paymentMethodContactless => 'Ανέπαφη';
 
   @override
-  String get paymentMethodFuelCard => 'Fuel Card';
+  String get paymentMethodFuelCard => 'Κάρτα καυσίμων';
 
   @override
-  String get paymentMethodApp => 'App';
+  String get paymentMethodApp => 'Εφαρμογή';
 
   @override
   String payWithApp(String app) {
-    return 'Pay with $app';
+    return 'Πληρωμή με $app';
   }
 
   @override
@@ -1575,49 +1587,49 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String ecoScoreTooltip(String avg) {
-    return 'Compared to the rolling average over your last 3 fill-ups ($avg L/100 km).';
+    return 'Σε σύγκριση με τον κυλιόμενο μέσο όρο των τελευταίων 3 ανεφοδιασμών σας ($avg L/100 km).';
   }
 
   @override
   String ecoScoreSemantics(String value, String delta) {
-    return 'Consumption $value L/100 km, $delta versus your rolling average';
+    return 'Κατανάλωση $value L/100 km, $delta σε σχέση με τον κυλιόμενο μέσο σας';
   }
 
   @override
-  String get drivingMode => 'Driving Mode';
+  String get drivingMode => 'Λειτουργία οδήγησης';
 
   @override
-  String get drivingExit => 'Exit';
+  String get drivingExit => 'Έξοδος';
 
   @override
-  String get drivingNearestStation => 'Nearest';
+  String get drivingNearestStation => 'Πλησιέστερος';
 
   @override
-  String get drivingTapToUnlock => 'Tap to unlock';
+  String get drivingTapToUnlock => 'Πατήστε για ξεκλείδωμα';
 
   @override
-  String get drivingSafetyTitle => 'Safety Notice';
+  String get drivingSafetyTitle => 'Ειδοποίηση ασφαλείας';
 
   @override
   String get drivingSafetyMessage =>
-      'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
+      'Μην χειρίζεστε την εφαρμογή κατά την οδήγηση. Σταματήστε σε ασφαλές σημείο πριν αλληλεπιδράσετε με την οθόνη. Ο οδηγός είναι υπεύθυνος για την ασφαλή λειτουργία του οχήματος ανά πάσα στιγμή.';
 
   @override
-  String get drivingSafetyAccept => 'I understand';
+  String get drivingSafetyAccept => 'Κατανοώ';
 
   @override
-  String get voiceAnnouncementsTitle => 'Voice Announcements';
+  String get voiceAnnouncementsTitle => 'Φωνητικές ανακοινώσεις';
 
   @override
   String get voiceAnnouncementsDescription =>
-      'Announce nearby cheap stations while driving';
+      'Ανακοίνωση κοντινών φθηνών σταθμών κατά την οδήγηση';
 
   @override
-  String get voiceAnnouncementsEnabled => 'Enable voice announcements';
+  String get voiceAnnouncementsEnabled => 'Ενεργοποίηση φωνητικών ανακοινώσεων';
 
   @override
   String voiceAnnouncementThreshold(String price) {
-    return 'Only below $price';
+    return 'Μόνο κάτω από $price';
   }
 
   @override
@@ -1627,14 +1639,14 @@ class AppLocalizationsEl extends AppLocalizations {
     String fuelType,
     String price,
   ) {
-    return '$station, $distance kilometers ahead, $fuelType $price';
+    return '$station, $distance χιλιόμετρα μπροστά, $fuelType $price';
   }
 
   @override
-  String get voiceAnnouncementProximityRadius => 'Announcement radius';
+  String get voiceAnnouncementProximityRadius => 'Ακτίνα ανακοίνωσης';
 
   @override
-  String get voiceAnnouncementCooldown => 'Repeat interval';
+  String get voiceAnnouncementCooldown => 'Διάστημα επανάληψης';
 
   @override
   String get nearestStations => 'Kontinoteroi stathmoi';
@@ -1644,602 +1656,604 @@ class AppLocalizationsEl extends AppLocalizations {
       'Vreite tous kontinoterous stathmous me tin trexousa topothesia sas';
 
   @override
-  String get consumptionLogTitle => 'Fuel consumption';
+  String get consumptionLogTitle => 'Κατανάλωση καυσίμου';
 
   @override
-  String get consumptionLogMenuTitle => 'Consumption log';
+  String get consumptionLogMenuTitle => 'Αρχείο κατανάλωσης';
 
   @override
   String get consumptionLogMenuSubtitle =>
-      'Track fill-ups and calculate L/100km';
+      'Παρακολούθηση ανεφοδιασμών και υπολογισμός L/100km';
 
   @override
-  String get consumptionStatsTitle => 'Consumption stats';
+  String get consumptionStatsTitle => 'Στατιστικά κατανάλωσης';
 
   @override
-  String get addFillUp => 'Add fill-up';
+  String get addFillUp => 'Προσθήκη ανεφοδιασμού';
 
   @override
-  String get noFillUpsTitle => 'No fill-ups yet';
+  String get noFillUpsTitle => 'Δεν υπάρχουν ανεφοδιασμοί';
 
   @override
   String get noFillUpsSubtitle =>
-      'Log your first fill-up to start tracking consumption.';
+      'Καταγράψτε τον πρώτο ανεφοδιασμό για να ξεκινήσετε την παρακολούθηση κατανάλωσης.';
 
   @override
-  String get fillUpDate => 'Date';
+  String get fillUpDate => 'Ημερομηνία';
 
   @override
-  String get liters => 'Liters';
+  String get liters => 'Λίτρα';
 
   @override
-  String get odometerKm => 'Odometer (km)';
+  String get odometerKm => 'Χιλιόμετρα (km)';
 
   @override
-  String get notesOptional => 'Notes (optional)';
+  String get notesOptional => 'Σημειώσεις (προαιρετικό)';
 
   @override
-  String get stationPreFilled => 'Station pre-filled';
+  String get stationPreFilled => 'Σταθμός προεπιλεγμένος';
 
   @override
-  String get statAvgConsumption => 'Avg L/100km';
+  String get statAvgConsumption => 'Μέση L/100km';
 
   @override
-  String get statAvgCostPerKm => 'Avg cost/km';
+  String get statAvgCostPerKm => 'Μέσο κόστος/km';
 
   @override
-  String get statTotalLiters => 'Total liters';
+  String get statTotalLiters => 'Συνολικά λίτρα';
 
   @override
-  String get statTotalSpent => 'Total spent';
+  String get statTotalSpent => 'Συνολικές δαπάνες';
 
   @override
-  String get statFillUpCount => 'Fill-ups';
+  String get statFillUpCount => 'Ανεφοδιασμοί';
 
   @override
-  String get fieldRequired => 'Required';
+  String get fieldRequired => 'Απαιτείται';
 
   @override
-  String get fieldInvalidNumber => 'Invalid number';
+  String get fieldInvalidNumber => 'Μη έγκυρος αριθμός';
 
   @override
-  String get carbonDashboardTitle => 'Carbon dashboard';
+  String get carbonDashboardTitle => 'Πίνακας αποτυπώματος άνθρακα';
 
   @override
-  String get carbonEmptyTitle => 'No data yet';
+  String get carbonEmptyTitle => 'Δεν υπάρχουν δεδομένα ακόμα';
 
   @override
   String get carbonEmptySubtitle =>
-      'Log fill-ups to see your carbon dashboard.';
+      'Καταγράψτε ανεφοδιασμούς για να δείτε τον πίνακα αποτυπώματος άνθρακα.';
 
   @override
-  String get carbonSummaryTotalCost => 'Total cost';
+  String get carbonSummaryTotalCost => 'Συνολικό κόστος';
 
   @override
-  String get carbonSummaryTotalCo2 => 'Total CO2';
+  String get carbonSummaryTotalCo2 => 'Συνολικό CO2';
 
   @override
-  String get monthlyCostsTitle => 'Monthly costs';
+  String get monthlyCostsTitle => 'Μηνιαίο κόστος';
 
   @override
-  String get monthlyEmissionsTitle => 'Monthly CO2 emissions';
+  String get monthlyEmissionsTitle => 'Μηνιαίες εκπομπές CO2';
 
   @override
-  String get vehiclesTitle => 'My vehicles';
+  String get vehiclesTitle => 'Τα οχήματά μου';
 
   @override
-  String get vehiclesMenuTitle => 'My vehicles';
+  String get vehiclesMenuTitle => 'Τα οχήματά μου';
 
   @override
-  String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+  String get vehiclesMenuSubtitle => 'Μπαταρία, βύσματα, προτιμήσεις φόρτισης';
 
   @override
   String get vehiclesEmptyMessage =>
-      'Add your car to filter by connector and estimate charging costs.';
+      'Προσθέστε το αυτοκίνητό σας για φιλτράρισμα κατά βύσμα και εκτίμηση κόστους φόρτισης.';
 
   @override
-  String get vehiclesWizardTitle => 'My vehicles (optional)';
+  String get vehiclesWizardTitle => 'Τα οχήματά μου (προαιρετικό)';
 
   @override
   String get vehiclesWizardSubtitle =>
-      'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.';
+      'Προσθέστε το αυτοκίνητό σας για προεπλήρωση του αρχείου κατανάλωσης και ενεργοποίηση φίλτρων βυσμάτων EV. Μπορείτε να το παραλείψετε και να προσθέσετε οχήματα αργότερα.';
 
   @override
-  String get vehiclesWizardNoneYet => 'No vehicle configured yet.';
+  String get vehiclesWizardNoneYet => 'Δεν έχει ρυθμιστεί κανένα όχημα ακόμα.';
 
   @override
   String vehiclesWizardYoursList(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count vehicles',
-      one: '1 vehicle',
+      other: '$count οχήματα',
+      one: '1 όχημα',
     );
-    return 'You have $_temp0:';
+    return 'Έχετε $_temp0:';
   }
 
   @override
   String get vehiclesWizardSkipHint =>
-      'Skip to finish setup — you can add vehicles anytime from Settings.';
+      'Παράλειψη για ολοκλήρωση ρύθμισης — μπορείτε να προσθέσετε οχήματα ανά πάσα στιγμή από τις Ρυθμίσεις.';
 
   @override
-  String get fillUpVehicleLabel => 'Vehicle';
+  String get fillUpVehicleLabel => 'Όχημα';
 
   @override
-  String get fillUpVehicleNone => 'No vehicle';
+  String get fillUpVehicleNone => 'Χωρίς όχημα';
 
   @override
-  String get fillUpVehicleRequired => 'Vehicle is required';
+  String get fillUpVehicleRequired => 'Το όχημα είναι υποχρεωτικό';
 
   @override
-  String get reportScanError => 'Report scan error';
+  String get reportScanError => 'Αναφορά σφάλματος σάρωσης';
 
   @override
-  String get pickStationTitle => 'Pick a station';
+  String get pickStationTitle => 'Επιλογή σταθμού';
 
   @override
   String get pickStationHelper =>
-      'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.';
+      'Ξεκινήστε τον ανεφοδιασμό από γνωστό σταθμό για αυτόματη συμπλήρωση τιμών, μάρκας και τύπου καυσίμου.';
 
   @override
   String get pickStationEmpty =>
-      'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.';
+      'Δεν υπάρχουν αγαπημένοι σταθμοί ακόμα — προσθέστε μερικούς από Αναζήτηση ή Αγαπημένα, ή παραλείψτε και συμπληρώστε χειροκίνητα.';
 
   @override
-  String get pickStationSkip => 'Skip — add without a station';
+  String get pickStationSkip => 'Παράλειψη — προσθήκη χωρίς σταθμό';
 
   @override
-  String get scanPump => 'Scan pump';
+  String get scanPump => 'Σάρωση αντλίας';
 
   @override
-  String get scanPayment => 'Scan payment QR';
+  String get scanPayment => 'Σάρωση QR πληρωμής';
 
   @override
-  String get qrPaymentBeneficiary => 'Beneficiary';
+  String get qrPaymentBeneficiary => 'Δικαιούχος';
 
   @override
-  String get qrPaymentAmount => 'Amount';
+  String get qrPaymentAmount => 'Ποσό';
 
   @override
-  String get qrPaymentEpcTitle => 'SEPA payment';
+  String get qrPaymentEpcTitle => 'Πληρωμή SEPA';
 
   @override
-  String get qrPaymentEpcEmpty => 'No fields decoded';
+  String get qrPaymentEpcEmpty => 'Δεν αποκωδικοποιήθηκαν πεδία';
 
   @override
-  String get qrPaymentOpenInBank => 'Open in bank app';
+  String get qrPaymentOpenInBank => 'Άνοιγμα σε εφαρμογή τράπεζας';
 
   @override
-  String get qrPaymentLaunchFailed => 'No app available to open this code';
+  String get qrPaymentLaunchFailed =>
+      'Δεν υπάρχει εφαρμογή για άνοιγμα αυτού του κώδικα';
 
   @override
-  String get qrPaymentUnknownTitle => 'Unrecognised code';
+  String get qrPaymentUnknownTitle => 'Μη αναγνωρισμένος κώδικας';
 
   @override
-  String get qrPaymentCopyRaw => 'Copy raw text';
+  String get qrPaymentCopyRaw => 'Αντιγραφή ακατέργαστου κειμένου';
 
   @override
-  String get qrPaymentCopiedRaw => 'Copied to clipboard';
+  String get qrPaymentCopiedRaw => 'Αντιγράφηκε στο πρόχειρο';
 
   @override
-  String get qrPaymentReport => 'Report this scan';
+  String get qrPaymentReport => 'Αναφορά αυτής της σάρωσης';
 
   @override
   String get qrPaymentEpcCopied =>
-      'Bank details copied — paste into your banking app';
+      'Στοιχεία τράπεζας αντιγράφηκαν — επικολλήστε στην τραπεζική σας εφαρμογή';
 
   @override
-  String get qrScannerGuidance => 'Point the camera at a QR code';
+  String get qrScannerGuidance => 'Στρέψτε την κάμερα σε έναν QR κώδικα';
 
   @override
   String get qrScannerPermissionDenied =>
-      'Camera access is needed to scan QR codes.';
+      'Απαιτείται πρόσβαση στην κάμερα για σάρωση QR κωδίκων.';
 
   @override
   String get qrScannerPermissionPermanentlyDenied =>
-      'Camera access was denied. Open settings to grant it.';
+      'Η πρόσβαση στην κάμερα αρνήθηκε. Ανοίξτε τις ρυθμίσεις για να την εκχωρήσετε.';
 
   @override
-  String get qrScannerRetryPermission => 'Try again';
+  String get qrScannerRetryPermission => 'Δοκιμάστε ξανά';
 
   @override
-  String get qrScannerOpenSettings => 'Open settings';
+  String get qrScannerOpenSettings => 'Άνοιγμα ρυθμίσεων';
 
   @override
   String get qrScannerTimeout =>
-      'No QR code detected. Move closer or try again.';
+      'Δεν εντοπίστηκε QR κώδικας. Πλησιάστε ή δοκιμάστε ξανά.';
 
   @override
-  String get qrScannerRetry => 'Try again';
+  String get qrScannerRetry => 'Δοκιμάστε ξανά';
 
   @override
-  String get torchOn => 'Turn flash on';
+  String get torchOn => 'Ενεργοποίηση φλας';
 
   @override
-  String get torchOff => 'Turn flash off';
+  String get torchOff => 'Απενεργοποίηση φλας';
 
   @override
-  String get obdNoAdapter => 'No OBD2 adapter in range';
+  String get obdNoAdapter => 'Δεν βρέθηκε προσαρμογέας OBD2 σε εμβέλεια';
 
   @override
-  String get obdOdometerUnavailable => 'Could not read odometer';
+  String get obdOdometerUnavailable => 'Αδύνατη ανάγνωση χιλιομετρητή';
 
   @override
   String get obdPermissionDenied =>
-      'Grant Bluetooth permission in system settings';
+      'Εκχωρήστε άδεια Bluetooth στις ρυθμίσεις συστήματος';
 
   @override
   String get obdAdapterUnresponsive =>
-      'Adapter didn\'t answer — turn the ignition on and retry';
+      'Ο προσαρμογέας δεν ανταποκρίθηκε — ανάψτε τη μίζα και δοκιμάστε ξανά';
 
   @override
-  String get obdPickerTitle => 'Pick an OBD2 adapter';
+  String get obdPickerTitle => 'Επιλογή προσαρμογέα OBD2';
 
   @override
-  String get obdPickerScanning => 'Scanning for adapters…';
+  String get obdPickerScanning => 'Σάρωση για προσαρμογείς…';
 
   @override
-  String get obdPickerConnecting => 'Connecting…';
+  String get obdPickerConnecting => 'Σύνδεση…';
 
   @override
-  String get themeSettingTitle => 'Theme';
+  String get themeSettingTitle => 'Θέμα';
 
   @override
-  String get themeModeLight => 'Light';
+  String get themeModeLight => 'Φωτεινό';
 
   @override
-  String get themeModeDark => 'Dark';
+  String get themeModeDark => 'Σκοτεινό';
 
   @override
-  String get themeModeSystem => 'Follow system';
+  String get themeModeSystem => 'Ακολουθεί σύστημα';
 
   @override
-  String get tripRecordingTitle => 'Recording trip';
+  String get tripRecordingTitle => 'Καταγραφή διαδρομής';
 
   @override
-  String get tripSummaryTitle => 'Trip summary';
+  String get tripSummaryTitle => 'Σύνοψη διαδρομής';
 
   @override
-  String get tripMetricDistance => 'Distance';
+  String get tripMetricDistance => 'Απόσταση';
 
   @override
-  String get tripMetricSpeed => 'Speed';
+  String get tripMetricSpeed => 'Ταχύτητα';
 
   @override
-  String get tripMetricFuelUsed => 'Fuel used';
+  String get tripMetricFuelUsed => 'Καύσιμο που χρησιμοποιήθηκε';
 
   @override
-  String get tripMetricAvgConsumption => 'Avg';
+  String get tripMetricAvgConsumption => 'Μέση';
 
   @override
-  String get tripMetricElapsed => 'Elapsed';
+  String get tripMetricElapsed => 'Χρόνος';
 
   @override
-  String get tripMetricOdometer => 'Odometer';
+  String get tripMetricOdometer => 'Χιλιόμετρα';
 
   @override
-  String get tripStop => 'Stop recording';
+  String get tripStop => 'Διακοπή καταγραφής';
 
   @override
-  String get tripPause => 'Pause';
+  String get tripPause => 'Παύση';
 
   @override
-  String get tripResume => 'Resume';
+  String get tripResume => 'Συνέχεια';
 
   @override
-  String get tripBannerRecording => 'Recording trip';
+  String get tripBannerRecording => 'Καταγραφή διαδρομής';
 
   @override
-  String get tripBannerPaused => 'Trip paused — tap to resume';
+  String get tripBannerPaused => 'Διαδρομή σε παύση — πατήστε για συνέχεια';
 
   @override
-  String get navConsumption => 'Consumption';
+  String get navConsumption => 'Κατανάλωση';
 
   @override
-  String get vehicleBaselineSectionTitle => 'Baseline calibration';
+  String get vehicleBaselineSectionTitle => 'Βαθμονόμηση βάσης';
 
   @override
   String get vehicleBaselineEmpty =>
-      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.';
+      'Δεν υπάρχουν δείγματα ακόμα — ξεκινήστε ένα ταξίδι OBD2 για να αρχίσετε να μαθαίνετε το καυσιμοκατανάλωσης αυτού του οχήματος.';
 
   @override
   String get vehicleBaselineProgress =>
-      'Learned from samples across driving situations.';
+      'Εκμαθήθηκε από δείγματα σε διαφορετικές οδηγικές καταστάσεις.';
 
   @override
-  String get vehicleBaselineReset => 'Reset driving-situation baseline';
+  String get vehicleBaselineReset => 'Επαναφορά βάσης οδηγικών καταστάσεων';
 
   @override
   String get vehicleBaselineResetConfirmTitle =>
-      'Reset driving-situation baseline?';
+      'Επαναφορά βάσης οδηγικών καταστάσεων;';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
-      'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
+      'Αυτό διαγράφει κάθε εκμαθημένο δείγμα για αυτό το όχημα. Θα επιστρέψετε στις προεπιλογές μέχρι νέα ταξίδια να συμπληρώσουν ξανά το προφίλ.';
 
   @override
-  String get vehicleAdapterSectionTitle => 'OBD2 adapter';
+  String get vehicleAdapterSectionTitle => 'Προσαρμογέας OBD2';
 
   @override
   String get vehicleAdapterEmpty =>
-      'No adapter paired. Pair one so the app can reconnect automatically next time.';
+      'Δεν έχει συζευχθεί κανένας προσαρμογέας. Συζεύξτε έναν για αυτόματη επανασύνδεση την επόμενη φορά.';
 
   @override
-  String get vehicleAdapterUnnamed => 'Unknown adapter';
+  String get vehicleAdapterUnnamed => 'Άγνωστος προσαρμογέας';
 
   @override
-  String get vehicleAdapterPair => 'Pair adapter';
+  String get vehicleAdapterPair => 'Σύζευξη προσαρμογέα';
 
   @override
-  String get vehicleAdapterForget => 'Forget adapter';
+  String get vehicleAdapterForget => 'Αποζεύξη προσαρμογέα';
 
   @override
-  String get achievementsTitle => 'Achievements';
+  String get achievementsTitle => 'Επιτεύγματα';
 
   @override
-  String get achievementFirstTrip => 'First trip';
+  String get achievementFirstTrip => 'Πρώτο ταξίδι';
 
   @override
-  String get achievementFirstTripDesc => 'Record your first OBD2 trip.';
+  String get achievementFirstTripDesc => 'Καταγράψτε το πρώτο σας ταξίδι OBD2.';
 
   @override
-  String get achievementFirstFillUp => 'First fill-up';
+  String get achievementFirstFillUp => 'Πρώτος ανεφοδιασμός';
 
   @override
-  String get achievementFirstFillUpDesc => 'Log your first fill-up.';
+  String get achievementFirstFillUpDesc =>
+      'Καταγράψτε τον πρώτο σας ανεφοδιασμό.';
 
   @override
-  String get achievementTenTrips => '10 trips';
+  String get achievementTenTrips => '10 ταξίδια';
 
   @override
-  String get achievementTenTripsDesc => 'Record 10 OBD2 trips.';
+  String get achievementTenTripsDesc => 'Καταγράψτε 10 ταξίδια OBD2.';
 
   @override
-  String get achievementZeroHarsh => 'Smooth driver';
+  String get achievementZeroHarsh => 'Ομαλός οδηγός';
 
   @override
   String get achievementZeroHarshDesc =>
-      'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+      'Ολοκληρώστε ένα ταξίδι 10 km ή περισσότερο χωρίς απότομο φρενάρισμα ή επιτάχυνση.';
 
   @override
-  String get achievementEcoWeek => 'Eco week';
+  String get achievementEcoWeek => 'Οικολογική εβδομάδα';
 
   @override
   String get achievementEcoWeekDesc =>
-      'Drive 7 consecutive days with at least one smooth trip each day.';
+      'Οδηγήστε 7 συνεχόμενες ημέρες με τουλάχιστον ένα ομαλό ταξίδι κάθε μέρα.';
 
   @override
-  String get achievementPriceWin => 'Price win';
+  String get achievementPriceWin => 'Καλή τιμή';
 
   @override
   String get achievementPriceWinDesc =>
-      'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+      'Καταγράψτε ανεφοδιασμό που υπερβαίνει τον μέσο όρο 30 ημερών του σταθμού κατά 5% ή περισσότερο.';
 
   @override
-  String get syncBaselinesToggleTitle => 'Share learned vehicle profiles';
+  String get syncBaselinesToggleTitle =>
+      'Κοινοποίηση εκμαθημένων προφίλ οχημάτων';
 
   @override
   String get syncBaselinesToggleSubtitle =>
-      'Upload per-vehicle consumption baselines so a second device can reuse them.';
+      'Μεταφόρτωση βάσεων κατανάλωσης ανά όχημα ώστε μια δεύτερη συσκευή να μπορεί να τις χρησιμοποιήσει.';
 
   @override
-  String get obd2StatusConnected => 'OBD2 adapter: connected';
+  String get obd2StatusConnected => 'Προσαρμογέας OBD2: συνδεδεμένος';
 
   @override
-  String get obd2StatusAttempting => 'OBD2 adapter: connecting';
+  String get obd2StatusAttempting => 'Προσαρμογέας OBD2: σύνδεση';
 
   @override
-  String get obd2StatusUnreachable => 'OBD2 adapter: unreachable';
+  String get obd2StatusUnreachable => 'Προσαρμογέας OBD2: μη προσβάσιμος';
 
   @override
   String get obd2StatusPermissionDenied =>
-      'OBD2 adapter: Bluetooth permission needed';
+      'Προσαρμογέας OBD2: απαιτείται άδεια Bluetooth';
 
   @override
-  String get obd2StatusConnectedBody => 'Ready to record a trip.';
+  String get obd2StatusConnectedBody => 'Έτοιμος για καταγραφή ταξιδιού.';
 
   @override
-  String get obd2StatusAttemptingBody => 'Connecting in the background…';
+  String get obd2StatusAttemptingBody => 'Σύνδεση στο παρασκήνιο…';
 
   @override
   String get obd2StatusUnreachableBody =>
-      'Adapter out of range or already in use by another app.';
+      'Ο προσαρμογέας είναι εκτός εμβέλειας ή χρησιμοποιείται ήδη από άλλη εφαρμογή.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
-      'Grant Bluetooth permission in system settings to reconnect automatically.';
+      'Εκχωρήστε άδεια Bluetooth στις ρυθμίσεις συστήματος για αυτόματη επανασύνδεση.';
 
   @override
-  String get obd2StatusNoAdapter => 'No adapter paired';
+  String get obd2StatusNoAdapter => 'Δεν έχει συζευχθεί προσαρμογέας';
 
   @override
-  String get obd2StatusForget => 'Forget adapter';
+  String get obd2StatusForget => 'Αποζεύξη προσαρμογέα';
 
   @override
-  String get tripHistoryTitle => 'Trip history';
+  String get tripHistoryTitle => 'Ιστορικό ταξιδιών';
 
   @override
-  String get tripHistoryEmptyTitle => 'No trips yet';
+  String get tripHistoryEmptyTitle => 'Δεν υπάρχουν ταξίδια ακόμα';
 
   @override
   String get tripHistoryEmptySubtitle =>
-      'Connect an OBD2 adapter and record a trip to start building your driving history.';
+      'Συνδέστε έναν προσαρμογέα OBD2 και καταγράψτε ένα ταξίδι για να ξεκινήσετε την ιστορία οδήγησής σας.';
 
   @override
-  String get tripHistoryUnknownDate => 'Unknown date';
+  String get tripHistoryUnknownDate => 'Άγνωστη ημερομηνία';
 
   @override
-  String get situationIdle => 'Idle';
+  String get situationIdle => 'Ρελαντί';
 
   @override
-  String get situationStopAndGo => 'Stop & go';
+  String get situationStopAndGo => 'Σταμάτημα & εκκίνηση';
 
   @override
-  String get situationUrban => 'Urban';
+  String get situationUrban => 'Αστικό';
 
   @override
-  String get situationHighway => 'Highway';
+  String get situationHighway => 'Αυτοκινητόδρομος';
 
   @override
-  String get situationDecel => 'Decelerating';
+  String get situationDecel => 'Επιβράδυνση';
 
   @override
-  String get situationClimbing => 'Climbing / loaded';
+  String get situationClimbing => 'Ανηφόρα / φορτωμένο';
 
   @override
-  String get situationHardAccel => 'Hard accel';
+  String get situationHardAccel => 'Δυνατή επιτάχυνση';
 
   @override
-  String get situationFuelCut => 'Fuel cut — coast';
+  String get situationFuelCut => 'Διακοπή καυσίμου — αδράνεια';
 
   @override
-  String get tripSaveAsFillUp => 'Save as fill-up';
+  String get tripSaveAsFillUp => 'Αποθήκευση ως ανεφοδιασμός';
 
   @override
-  String get tripSaveRecording => 'Save trip';
+  String get tripSaveRecording => 'Αποθήκευση ταξιδιού';
 
   @override
-  String get tripDiscard => 'Discard';
+  String get tripDiscard => 'Απόρριψη';
 
   @override
   String obdOdometerRead(int km) {
-    return 'Odometer read: $km km';
+    return 'Ανάγνωση χιλιομετρητή: $km km';
   }
 
   @override
-  String get vehicleFuelNotSet => 'Not set';
+  String get vehicleFuelNotSet => 'Μη ορισμένο';
 
   @override
-  String get wizardVehicleTapToEdit => 'Tap to edit';
+  String get wizardVehicleTapToEdit => 'Πατήστε για επεξεργασία';
 
   @override
-  String get wizardVehicleDefaultBadge => 'Default';
+  String get wizardVehicleDefaultBadge => 'Προεπιλογή';
 
   @override
   String get wizardProfileChoiceHint =>
-      'Choose how you want to use the app. You can change this later in Settings.';
+      'Επιλέξτε πώς θέλετε να χρησιμοποιήσετε την εφαρμογή. Μπορείτε να το αλλάξετε αργότερα στις Ρυθμίσεις.';
 
   @override
   String get wizardProfileChoiceFooter =>
-      'You can change your choice any time from Settings → Use mode.';
+      'Μπορείτε να αλλάξετε την επιλογή σας ανά πάσα στιγμή από Ρυθμίσεις → Λειτουργία χρήσης.';
 
   @override
-  String get wizardProfileBasicName => 'Basic';
+  String get wizardProfileBasicName => 'Βασικό';
 
   @override
   String get wizardProfileBasicDescription =>
-      'Cheapest fuel and EV charging prices nearby. Favorites and price alerts.';
+      'Φθηνότερα καύσιμα και τιμές φόρτισης EV κοντά σας. Αγαπημένα και ειδοποιήσεις τιμών.';
 
   @override
-  String get wizardProfileMediumName => 'Medium';
+  String get wizardProfileMediumName => 'Μεσαίο';
 
   @override
   String get wizardProfileMediumDescription =>
-      'Everything in Basic, plus track your fuel fill-ups and EV charging by hand.';
+      'Όλα του Βασικού, συν χειροκίνητη παρακολούθηση ανεφοδιασμών καυσίμου και φόρτισης EV.';
 
   @override
-  String get wizardProfileFullName => 'Full';
+  String get wizardProfileFullName => 'Πλήρες';
 
   @override
   String get wizardProfileFullDescription =>
-      'Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.';
+      'Όλα του Μεσαίου, συν αυτόματη καταγραφή ταξιδιών OBD2, βαθμολογίες οδήγησης και κάρτες πιστότητας.';
 
   @override
-  String get wizardProfileCustomName => 'Custom';
+  String get wizardProfileCustomName => 'Προσαρμοσμένο';
 
   @override
   String get wizardProfileCustomDescription =>
-      'Your own combination of features. Tweak each toggle below.';
+      'Ο δικός σας συνδυασμός λειτουργιών. Προσαρμόστε κάθε διακόπτη παρακάτω.';
 
   @override
   String get useModeSectionHint =>
-      'Right-size the app to how you actually use it. Picking a preset enables the matching set of features.';
+      'Προσαρμόστε την εφαρμογή στον τρόπο που τη χρησιμοποιείτε. Η επιλογή προεπιλογής ενεργοποιεί το αντίστοιχο σύνολο λειτουργιών.';
 
   @override
   String get useModeCustomSettingsDescription =>
-      'Your feature mix doesn\'t match any preset. Pick one above to overwrite, or keep customising individual features in the section below.';
+      'Ο συνδυασμός λειτουργιών σας δεν αντιστοιχεί σε καμία προεπιλογή. Επιλέξτε μία παραπάνω για αντικατάσταση ή συνεχίστε την προσαρμογή.';
 
   @override
   String useModeSwitchedSnack(String profile) {
-    return 'Use mode set to $profile.';
+    return 'Λειτουργία χρήσης ορίστηκε σε $profile.';
   }
 
   @override
-  String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
+  String get profileDefaultVehicleLabel => 'Προεπιλεγμένο όχημα (προαιρετικό)';
 
   @override
-  String get profileDefaultVehicleNone => 'No default';
+  String get profileDefaultVehicleNone => 'Χωρίς προεπιλογή';
 
   @override
   String get profileFuelFromVehicleHint =>
-      'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
+      'Ο τύπος καυσίμου προκύπτει από το προεπιλεγμένο όχημά σας. Αφαιρέστε το όχημα για άμεση επιλογή καυσίμου.';
 
   @override
-  String get consumptionNoVehicleTitle => 'Add a vehicle first';
+  String get consumptionNoVehicleTitle => 'Προσθέστε πρώτα ένα όχημα';
 
   @override
   String get consumptionNoVehicleBody =>
-      'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.';
+      'Οι ανεφοδιασμοί αποδίδονται σε ένα όχημα. Προσθέστε το αυτοκίνητό σας για να ξεκινήσετε την καταγραφή κατανάλωσης.';
 
   @override
-  String get vehicleAdd => 'Add vehicle';
+  String get vehicleAdd => 'Προσθήκη οχήματος';
 
   @override
-  String get vehicleAddTitle => 'Add vehicle';
+  String get vehicleAddTitle => 'Προσθήκη οχήματος';
 
   @override
-  String get vehicleEditTitle => 'Edit vehicle';
+  String get vehicleEditTitle => 'Επεξεργασία οχήματος';
 
   @override
-  String get vehicleDeleteTitle => 'Delete vehicle?';
+  String get vehicleDeleteTitle => 'Διαγραφή οχήματος;';
 
   @override
   String vehicleDeleteMessage(String name) {
-    return 'Remove \"$name\" from your profiles?';
+    return 'Αφαίρεση \"$name\" από τα προφίλ σας;';
   }
 
   @override
-  String get vehicleNameLabel => 'Name';
+  String get vehicleNameLabel => 'Όνομα';
 
   @override
-  String get vehicleNameHint => 'e.g. My Tesla Model 3';
+  String get vehicleNameHint => 'π.χ. Το Tesla μου Model 3';
 
   @override
-  String get vehicleTypeCombustion => 'Combustion';
+  String get vehicleTypeCombustion => 'Εσωτερικής καύσης';
 
   @override
-  String get vehicleTypeHybrid => 'Hybrid';
+  String get vehicleTypeHybrid => 'Υβριδικό';
 
   @override
-  String get vehicleTypeEv => 'Electric';
+  String get vehicleTypeEv => 'Ηλεκτρικό';
 
   @override
-  String get vehicleEvSectionTitle => 'Electric';
+  String get vehicleEvSectionTitle => 'Ηλεκτρικό';
 
   @override
-  String get vehicleCombustionSectionTitle => 'Combustion';
+  String get vehicleCombustionSectionTitle => 'Εσωτερικής καύσης';
 
   @override
-  String get vehicleBatteryLabel => 'Battery capacity (kWh)';
+  String get vehicleBatteryLabel => 'Χωρητικότητα μπαταρίας (kWh)';
 
   @override
-  String get vehicleMaxChargeLabel => 'Max charging power (kW)';
+  String get vehicleMaxChargeLabel => 'Μέγιστη ισχύς φόρτισης (kW)';
 
   @override
-  String get vehicleConnectorsLabel => 'Supported connectors';
+  String get vehicleConnectorsLabel => 'Υποστηριζόμενα βύσματα';
 
   @override
-  String get vehicleMinSocLabel => 'Min SoC %';
+  String get vehicleMinSocLabel => 'Ελάχιστο SoC %';
 
   @override
-  String get vehicleMaxSocLabel => 'Max SoC %';
+  String get vehicleMaxSocLabel => 'Μέγιστο SoC %';
 
   @override
-  String get vehicleTankLabel => 'Tank capacity (L)';
+  String get vehicleTankLabel => 'Χωρητικότητα ντεπόζιτου (L)';
 
   @override
-  String get vehiclePreferredFuelLabel => 'Preferred fuel';
+  String get vehiclePreferredFuelLabel => 'Προτιμώμενο καύσιμο';
 
   @override
   String get connectorType2 => 'Type 2';
@@ -2260,64 +2274,64 @@ class AppLocalizationsEl extends AppLocalizations {
   String get connectorType1 => 'Type 1';
 
   @override
-  String get connectorThreePin => '3-pin';
+  String get connectorThreePin => '3 ακίδων';
 
   @override
-  String get evShowOnMap => 'Show EV stations';
+  String get evShowOnMap => 'Εμφάνιση σταθμών EV';
 
   @override
-  String get evAvailableOnly => 'Available only';
+  String get evAvailableOnly => 'Μόνο διαθέσιμοι';
 
   @override
-  String get evMinPower => 'Min power';
+  String get evMinPower => 'Ελάχιστη ισχύς';
 
   @override
-  String get evMaxPower => 'Max power';
+  String get evMaxPower => 'Μέγιστη ισχύς';
 
   @override
-  String get evOperator => 'Operator';
+  String get evOperator => 'Πάροχος';
 
   @override
-  String get evLastUpdate => 'Last update';
+  String get evLastUpdate => 'Τελευταία ενημέρωση';
 
   @override
-  String get evStatusAvailable => 'Available';
+  String get evStatusAvailable => 'Διαθέσιμος';
 
   @override
-  String get evStatusOccupied => 'Occupied';
+  String get evStatusOccupied => 'Κατειλημμένος';
 
   @override
-  String get evStatusOutOfOrder => 'Out of order';
+  String get evStatusOutOfOrder => 'Εκτός λειτουργίας';
 
   @override
-  String get openOnlyFilter => 'Open only';
+  String get openOnlyFilter => 'Μόνο ανοιχτοί';
 
   @override
-  String get saveAsDefaults => 'Save as my defaults';
+  String get saveAsDefaults => 'Αποθήκευση ως προεπιλογές μου';
 
   @override
-  String get criteriaSavedToProfile => 'Saved as defaults';
+  String get criteriaSavedToProfile => 'Αποθηκεύτηκε ως προεπιλογές';
 
   @override
-  String get profileNotFound => 'No active profile';
+  String get profileNotFound => 'Δεν υπάρχει ενεργό προφίλ';
 
   @override
-  String get updatingFavorites => 'Updating your favorites...';
+  String get updatingFavorites => 'Ενημέρωση αγαπημένων...';
 
   @override
-  String get fetchingLatestPrices => 'Fetching the latest prices';
+  String get fetchingLatestPrices => 'Λήψη τελευταίων τιμών';
 
   @override
-  String get noDataAvailable => 'No data';
+  String get noDataAvailable => 'Δεν υπάρχουν δεδομένα';
 
   @override
-  String get configAndPrivacy => 'Configuration & Privacy';
+  String get configAndPrivacy => 'Ρυθμίσεις & Απόρρητο';
 
   @override
-  String get searchToSeeMap => 'Search to see stations on the map';
+  String get searchToSeeMap => 'Αναζητήστε για να δείτε σταθμούς στον χάρτη';
 
   @override
-  String get evPowerAny => 'Any';
+  String get evPowerAny => 'Οποιαδήποτε';
 
   @override
   String evPowerKw(int kw) {
@@ -2325,504 +2339,515 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get sectionProfile => 'Profile';
+  String get sectionProfile => 'Προφίλ';
 
   @override
-  String get sectionLocation => 'Location';
+  String get sectionLocation => 'Τοποθεσία';
 
   @override
-  String get tooltipBack => 'Back';
+  String get tooltipBack => 'Πίσω';
 
   @override
-  String get tooltipClose => 'Close';
+  String get tooltipClose => 'Κλείσιμο';
 
   @override
-  String get tooltipClearSearch => 'Clear search input';
+  String get tooltipClearSearch => 'Εκκαθάριση αναζήτησης';
 
   @override
-  String get tooltipUseGps => 'Use GPS location';
+  String get tooltipUseGps => 'Χρήση τοποθεσίας GPS';
 
   @override
-  String get tooltipShowPassword => 'Show password';
+  String get tooltipShowPassword => 'Εμφάνιση κωδικού';
 
   @override
-  String get tooltipHidePassword => 'Hide password';
+  String get tooltipHidePassword => 'Απόκρυψη κωδικού';
 
   @override
-  String get evConnectorsLabel => 'Available connectors';
+  String get evConnectorsLabel => 'Διαθέσιμα βύσματα';
 
   @override
-  String get evConnectorsNone => 'No connector information';
+  String get evConnectorsNone => 'Δεν υπάρχουν πληροφορίες βυσμάτων';
 
   @override
-  String get switchToEmail => 'Switch to email';
+  String get switchToEmail => 'Εναλλαγή σε email';
 
   @override
   String get switchToEmailSubtitle =>
-      'Keep data, add sign-in from other devices';
+      'Διατήρηση δεδομένων, σύνδεση από άλλες συσκευές';
 
   @override
-  String get switchToAnonymousAction => 'Switch to anonymous';
+  String get switchToAnonymousAction => 'Εναλλαγή σε ανώνυμο';
 
   @override
   String get switchToAnonymousSubtitle =>
-      'Keep local data, use new anonymous session';
+      'Διατήρηση τοπικών δεδομένων, νέα ανώνυμη σύνδεση';
 
   @override
-  String get linkDevice => 'Link device';
+  String get linkDevice => 'Σύνδεση συσκευής';
 
   @override
-  String get shareDatabase => 'Share database';
+  String get shareDatabase => 'Κοινοποίηση βάσης δεδομένων';
 
   @override
-  String get disconnectAction => 'Disconnect';
+  String get disconnectAction => 'Αποσύνδεση';
 
   @override
-  String get disconnectSubtitle => 'Stop syncing (local data kept)';
+  String get disconnectSubtitle =>
+      'Διακοπή συγχρονισμού (τα τοπικά δεδομένα διατηρούνται)';
 
   @override
-  String get deleteAccountAction => 'Delete account';
+  String get deleteAccountAction => 'Διαγραφή λογαριασμού';
 
   @override
-  String get deleteAccountSubtitle => 'Remove all server data permanently';
+  String get deleteAccountSubtitle =>
+      'Μόνιμη αφαίρεση όλων των δεδομένων διακομιστή';
 
   @override
-  String get localOnly => 'Local only';
+  String get localOnly => 'Μόνο τοπικά';
 
   @override
   String get localOnlySubtitle =>
-      'Optional: sync favorites, alerts, and ratings across devices';
+      'Προαιρετικό: συγχρονισμός αγαπημένων, ειδοποιήσεων και αξιολογήσεων σε συσκευές';
 
   @override
-  String get setupCloudSync => 'Set up cloud sync';
+  String get setupCloudSync => 'Ρύθμιση συγχρονισμού cloud';
 
   @override
-  String get disconnectTitle => 'Disconnect TankSync?';
+  String get disconnectTitle => 'Αποσύνδεση TankSync;';
 
   @override
   String get disconnectBody =>
-      'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
+      'Ο συγχρονισμός cloud θα απενεργοποιηθεί. Τα τοπικά σας δεδομένα (αγαπημένα, ειδοποιήσεις, ιστορικό) διατηρούνται σε αυτή τη συσκευή. Τα δεδομένα διακομιστή δεν διαγράφονται.';
 
   @override
-  String get deleteAccountTitle => 'Delete account?';
+  String get deleteAccountTitle => 'Διαγραφή λογαριασμού;';
 
   @override
   String get deleteAccountBody =>
-      'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
+      'Αυτό διαγράφει μόνιμα όλα τα δεδομένα σας από τον διακομιστή (αγαπημένα, ειδοποιήσεις, αξιολογήσεις, διαδρομές). Τα τοπικά δεδομένα σε αυτή τη συσκευή διατηρούνται.\n\nΔεν μπορεί να αναιρεθεί.';
 
   @override
-  String get switchToAnonymousTitle => 'Switch to anonymous?';
+  String get switchToAnonymousTitle => 'Εναλλαγή σε ανώνυμο;';
 
   @override
   String get switchToAnonymousBody =>
-      'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
+      'Θα αποσυνδεθείτε από τον λογαριασμό email σας και θα συνεχίσετε με νέα ανώνυμη σύνδεση.\n\nΤα τοπικά σας δεδομένα (αγαπημένα, ειδοποιήσεις) διατηρούνται σε αυτή τη συσκευή και θα συγχρονιστούν στον νέο ανώνυμο λογαριασμό.';
 
   @override
-  String get switchAction => 'Switch';
+  String get switchAction => 'Εναλλαγή';
 
   @override
   String get helpBannerCriteria =>
-      'Your profile defaults are pre-filled. Adjust criteria below to refine your search.';
+      'Οι προεπιλογές προφίλ σας έχουν προεπιληρωθεί. Προσαρμόστε τα κριτήρια παρακάτω για βελτίωση της αναζήτησης.';
 
   @override
   String get helpBannerAlerts =>
-      'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+      'Ορίστε κατώτατο όριο τιμής για έναν σταθμό. Θα ειδοποιηθείτε όταν οι τιμές πέσουν κάτω από αυτό. Ο έλεγχος γίνεται κάθε 30 λεπτά.';
 
   @override
   String get helpBannerConsumption =>
-      'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.';
+      'Καταγράψτε κάθε ανεφοδιασμό για παρακολούθηση πραγματικής κατανάλωσης και αποτυπώματος CO₂. Σύρετε αριστερά για διαγραφή.';
 
   @override
   String get helpBannerVehicles =>
-      'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.';
+      'Προσθέστε τα οχήματά σας για σωστή προεπιλογή ανεφοδιασμών και καυσίμων. Το πρώτο όχημα γίνεται η προεπιλογή.';
 
   @override
-  String get syncNow => 'Sync now';
+  String get syncNow => 'Συγχρονισμός τώρα';
 
   @override
-  String get onboardingPreferencesTitle => 'Your preferences';
+  String get onboardingPreferencesTitle => 'Οι προτιμήσεις σας';
 
   @override
-  String get onboardingZipHelper => 'Used when GPS is unavailable';
+  String get onboardingZipHelper =>
+      'Χρησιμοποιείται όταν το GPS δεν είναι διαθέσιμο';
 
   @override
-  String get onboardingRadiusHelper => 'Larger radius = more results';
+  String get onboardingRadiusHelper =>
+      'Μεγαλύτερη ακτίνα = περισσότερα αποτελέσματα';
 
   @override
   String get onboardingPrivacy =>
-      'These settings are stored only on your device and never shared.';
+      'Αυτές οι ρυθμίσεις αποθηκεύονται μόνο στη συσκευή σας και δεν κοινοποιούνται ποτέ.';
 
   @override
-  String get onboardingLandingTitle => 'Home screen';
+  String get onboardingLandingTitle => 'Αρχική οθόνη';
 
   @override
   String get onboardingLandingHint =>
-      'Choose which screen opens when you launch the app.';
+      'Επιλέξτε ποια οθόνη ανοίγει κατά την εκκίνηση της εφαρμογής.';
 
   @override
   String get iosAutoRecordOnboardingTitle =>
-      'Stay out of the app — but don\'t quit it.';
+      'Μείνετε εκτός εφαρμογής — αλλά μην την κλείσετε.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Title =>
-      'Open Sparkilo once after each reboot.';
+      'Ανοίξτε το Sparkilo μία φορά μετά από κάθε επανεκκίνηση.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Body =>
-      'Apple wakes Sparkilo only after you\'ve opened it at least once since the phone restarted. After that, your trips record automatically.';
+      'Η Apple εκκινεί το Sparkilo μόνο αφού το έχετε ανοίξει τουλάχιστον μία φορά από τότε που επανεκκινήθηκε το τηλέφωνο. Μετά από αυτό, τα ταξίδια σας καταγράφονται αυτόματα.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Title =>
-      'Don\'t swipe Sparkilo away in the app switcher.';
+      'Μην κλείνετε το Sparkilo από τον διαχειριστή εφαρμογών.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Body =>
-      '\"Force-quit\" tells iOS to stop relaunching the app. Your trips will stop recording until you open Sparkilo again.';
+      'Η \"Αναγκαστική έξοδος\" λέει στο iOS να σταματήσει να εκκινεί ξανά την εφαρμογή. Τα ταξίδια σας θα σταματήσουν να καταγράφονται μέχρι να ανοίξετε ξανά το Sparkilo.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Title =>
-      'When iOS asks for \"Always\" location, please say yes.';
+      'Όταν το iOS ζητά τοποθεσία \"Πάντα\", παρακαλώ πείτε ναι.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Body =>
-      'The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.';
+      'Η εφεδρεία που καταγράφει το ταξίδι σας όταν ο προσαρμογέας OBD2 είναι αργός χρειάζεται τοποθεσία παρασκηνίου. Δεν τη μοιραζόμαστε ποτέ.';
 
   @override
-  String get scanReceipt => 'Scan receipt';
+  String get scanReceipt => 'Σάρωση απόδειξης';
 
   @override
   String get obdConnect => 'OBD-II';
 
   @override
-  String get stationTypeFuel => 'Fuel';
+  String get stationTypeFuel => 'Καύσιμο';
 
   @override
   String get stationTypeEv => 'EV';
 
   @override
-  String get brandFilterHighway => 'Highway';
+  String get brandFilterHighway => 'Αυτοκινητόδρομος';
 
   @override
-  String get ratingModeLocal => 'Local';
+  String get ratingModeLocal => 'Τοπικό';
 
   @override
-  String get ratingModePrivate => 'Private';
+  String get ratingModePrivate => 'Ιδιωτικό';
 
   @override
-  String get ratingModeShared => 'Shared';
+  String get ratingModeShared => 'Κοινόχρηστο';
 
   @override
-  String get ratingDescLocal => 'Ratings saved on this device only';
+  String get ratingDescLocal =>
+      'Αξιολογήσεις αποθηκευμένες μόνο σε αυτή τη συσκευή';
 
   @override
   String get ratingDescPrivate =>
-      'Synced with your database (not visible to others)';
+      'Συγχρονισμένο με τη βάση δεδομένων σας (δεν φαίνεται σε άλλους)';
 
   @override
-  String get ratingDescShared => 'Visible to all users of your database';
+  String get ratingDescShared =>
+      'Ορατό σε όλους τους χρήστες της βάσης δεδομένων σας';
 
   @override
   String get errorNoEvApiKey =>
-      'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
+      'Το κλειδί API OpenChargeMap δεν έχει ρυθμιστεί. Προσθέστε ένα στις Ρυθμίσεις για αναζήτηση σταθμών φόρτισης EV.';
 
   @override
   String errorUpstreamCertExpired(String host) {
-    return 'The data provider ($host) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact $host.';
+    return 'Ο πάροχος δεδομένων ($host) παρέχει ληγμένο ή μη έγκυρο πιστοποιητικό TLS. Η εφαρμογή δεν μπορεί να φορτώσει δεδομένα από αυτή την πηγή μέχρι ο πάροχος να το διορθώσει. Επικοινωνήστε με τον $host.';
   }
 
   @override
-  String get offlineLabel => 'Offline';
+  String get offlineLabel => 'Εκτός σύνδεσης';
 
   @override
   String fallbackSummary(String failed, String current) {
-    return '$failed unavailable. Using $current.';
+    return '$failed μη διαθέσιμο. Χρήση $current.';
   }
 
   @override
-  String get errorTitleApiKey => 'API key required';
+  String get errorTitleApiKey => 'Απαιτείται κλειδί API';
 
   @override
-  String get errorTitleLocation => 'Location unavailable';
+  String get errorTitleLocation => 'Τοποθεσία μη διαθέσιμη';
 
   @override
   String get errorHintNoStations =>
-      'Try increasing the search radius or search a different location.';
+      'Δοκιμάστε να αυξήσετε την ακτίνα αναζήτησης ή αναζητήστε διαφορετική τοποθεσία.';
 
   @override
-  String get errorHintApiKey => 'Configure your API key in Settings.';
+  String get errorHintApiKey => 'Ρυθμίστε το κλειδί API στις Ρυθμίσεις.';
 
   @override
   String get errorHintConnection =>
-      'Check your internet connection and try again.';
+      'Ελέγξτε τη σύνδεση στο διαδίκτυο και δοκιμάστε ξανά.';
 
   @override
   String get errorHintRouting =>
-      'Route calculation failed. Check your internet connection and try again.';
+      'Αποτυχία υπολογισμού διαδρομής. Ελέγξτε τη σύνδεση στο διαδίκτυο και δοκιμάστε ξανά.';
 
   @override
   String get errorHintFallback =>
-      'Try again or search by postal code / city name.';
+      'Δοκιμάστε ξανά ή αναζητήστε με ταχυδρομικό κώδικα / όνομα πόλης.';
 
   @override
-  String get alertsLoadErrorTitle => 'Couldn\'t load your alerts';
+  String get alertsLoadErrorTitle => 'Αδύνατη φόρτωση ειδοποιήσεων';
 
   @override
-  String get alertsBackgroundCheckErrorTitle => 'Alert background check failed';
+  String get alertsBackgroundCheckErrorTitle =>
+      'Αποτυχία ελέγχου ειδοποίησης παρασκηνίου';
 
   @override
-  String get detailsLabel => 'Details';
+  String get detailsLabel => 'Λεπτομέρειες';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Αφαίρεση';
 
   @override
-  String get showKey => 'Show key';
+  String get showKey => 'Εμφάνιση κλειδιού';
 
   @override
-  String get hideKey => 'Hide key';
+  String get hideKey => 'Απόκρυψη κλειδιού';
 
   @override
-  String get syncOptionalTitle => 'TankSync is optional';
+  String get syncOptionalTitle => 'Το TankSync είναι προαιρετικό';
 
   @override
   String get syncOptionalDescription =>
-      'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).';
+      'Η εφαρμογή λειτουργεί πλήρως χωρίς συγχρονισμό cloud. Το TankSync σας επιτρέπει να συγχρονίσετε αγαπημένα, ειδοποιήσεις και αξιολογήσεις σε συσκευές μέσω Supabase (διαθέσιμο δωρεάν πλάνο).';
 
   @override
-  String get syncHowToConnectQuestion => 'How would you like to connect?';
+  String get syncHowToConnectQuestion => 'Πώς θέλετε να συνδεθείτε;';
 
   @override
-  String get syncCreateOwnTitle => 'Create my own database';
+  String get syncCreateOwnTitle => 'Δημιουργία δικής μου βάσης δεδομένων';
 
   @override
   String get syncCreateOwnSubtitle =>
-      'Free Supabase project — we\'ll guide you step by step';
+      'Δωρεάν έργο Supabase — θα σας καθοδηγήσουμε βήμα προς βήμα';
 
   @override
-  String get syncJoinExistingTitle => 'Join an existing database';
+  String get syncJoinExistingTitle => 'Σύνδεση σε υπάρχουσα βάση δεδομένων';
 
   @override
   String get syncJoinExistingSubtitle =>
-      'Scan QR code from the database owner or paste credentials';
+      'Σάρωση QR κώδικα από τον ιδιοκτήτη ή επικόλληση διαπιστευτηρίων';
 
   @override
-  String get syncChooseAccountType => 'Choose your account type';
+  String get syncChooseAccountType => 'Επιλέξτε τύπο λογαριασμού';
 
   @override
-  String get syncAccountTypeAnonymous => 'Anonymous';
+  String get syncAccountTypeAnonymous => 'Ανώνυμο';
 
   @override
   String get syncAccountTypeAnonymousDesc =>
-      'Instant, no email needed. Data tied to this device.';
+      'Άμεσο, δεν απαιτείται email. Δεδομένα συνδεδεμένα με αυτή τη συσκευή.';
 
   @override
-  String get syncAccountTypeEmail => 'Email Account';
+  String get syncAccountTypeEmail => 'Λογαριασμός Email';
 
   @override
   String get syncAccountTypeEmailDesc =>
-      'Sign in from any device. Recover data if phone is lost.';
+      'Σύνδεση από οποιαδήποτε συσκευή. Ανάκτηση δεδομένων αν χαθεί το τηλέφωνο.';
 
   @override
-  String get syncHaveAccountSignIn => 'Already have an account? Sign in';
+  String get syncHaveAccountSignIn => 'Έχετε ήδη λογαριασμό; Συνδεθείτε';
 
   @override
-  String get syncCreateNewAccount => 'Create new account';
+  String get syncCreateNewAccount => 'Δημιουργία νέου λογαριασμού';
 
   @override
-  String get syncTestConnection => 'Test Connection';
+  String get syncTestConnection => 'Δοκιμή σύνδεσης';
 
   @override
-  String get syncTestingConnection => 'Testing...';
+  String get syncTestingConnection => 'Δοκιμή...';
 
   @override
-  String get syncConnectButton => 'Connect';
+  String get syncConnectButton => 'Σύνδεση';
 
   @override
-  String get syncConnectingButton => 'Connecting...';
+  String get syncConnectingButton => 'Σύνδεση...';
 
   @override
-  String get syncDatabaseReady => 'Database ready!';
+  String get syncDatabaseReady => 'Η βάση δεδομένων είναι έτοιμη!';
 
   @override
-  String get syncDatabaseNeedsSetup => 'Database needs setup';
+  String get syncDatabaseNeedsSetup => 'Η βάση δεδομένων χρειάζεται ρύθμιση';
 
   @override
-  String get syncTableStatusOk => 'OK';
+  String get syncTableStatusOk => 'ΟΚ';
 
   @override
-  String get syncTableStatusMissing => 'Missing';
+  String get syncTableStatusMissing => 'Λείπει';
 
   @override
   String get syncSqlEditorInstructions =>
-      'Copy the SQL below and run it in your Supabase SQL Editor (Dashboard → SQL Editor → New Query → Paste → Run)';
+      'Αντιγράψτε το SQL παρακάτω και εκτελέστε το στον επεξεργαστή SQL Supabase (Dashboard → SQL Editor → New Query → Επικόλληση → Εκτέλεση)';
 
   @override
-  String get syncCopySqlButton => 'Copy SQL to clipboard';
+  String get syncCopySqlButton => 'Αντιγραφή SQL στο πρόχειρο';
 
   @override
-  String get syncRecheckSchemaButton => 'Re-check schema';
+  String get syncRecheckSchemaButton => 'Επανέλεγχος σχήματος';
 
   @override
-  String get syncDoneButton => 'Done';
+  String get syncDoneButton => 'Τέλος';
 
   @override
   String syncSignedInAs(String email) {
-    return 'Signed in as $email';
+    return 'Συνδεδεμένος ως $email';
   }
 
   @override
   String get syncEmailDescription =>
-      'Your data syncs across all devices with this email.';
+      'Τα δεδομένα σας συγχρονίζονται σε όλες τις συσκευές με αυτό το email.';
 
   @override
-  String get syncSwitchToAnonymousTitle => 'Switch to anonymous';
+  String get syncSwitchToAnonymousTitle => 'Εναλλαγή σε ανώνυμο';
 
   @override
   String get syncSwitchToAnonymousDesc =>
-      'Continue without email, new anonymous session';
+      'Συνέχεια χωρίς email, νέα ανώνυμη σύνδεση';
 
   @override
-  String get syncGuestDescription => 'Anonymous, no email needed.';
+  String get syncGuestDescription => 'Ανώνυμο, δεν απαιτείται email.';
 
   @override
-  String get syncOrDivider => 'or';
+  String get syncOrDivider => 'ή';
 
   @override
-  String get syncHowToSyncQuestion => 'How would you like to sync?';
+  String get syncHowToSyncQuestion => 'Πώς θέλετε να συγχρονίσετε;';
 
   @override
   String get syncOfflineDescription =>
-      'Your app works fully offline. Cloud sync is optional.';
+      'Η εφαρμογή λειτουργεί πλήρως εκτός σύνδεσης. Ο συγχρονισμός cloud είναι προαιρετικός.';
 
   @override
-  String get syncModeCommunityTitle => 'Sparkilo Community';
+  String get syncModeCommunityTitle => 'Κοινότητα Sparkilo';
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Share favorites & ratings with all users';
+      'Κοινοποίηση αγαπημένων & αξιολογήσεων με όλους τους χρήστες';
 
   @override
-  String get syncModePrivateTitle => 'Private Database';
+  String get syncModePrivateTitle => 'Ιδιωτική βάση δεδομένων';
 
   @override
-  String get syncModePrivateSubtitle => 'Your own Supabase — full data control';
+  String get syncModePrivateSubtitle =>
+      'Το δικό σας Supabase — πλήρης έλεγχος δεδομένων';
 
   @override
-  String get syncModeGroupTitle => 'Join a Group';
+  String get syncModeGroupTitle => 'Σύνδεση σε ομάδα';
 
   @override
-  String get syncModeGroupSubtitle => 'Family or friends shared database';
+  String get syncModeGroupSubtitle =>
+      'Κοινόχρηστη βάση δεδομένων οικογένειας ή φίλων';
 
   @override
-  String get syncPrivacyShared => 'Shared';
+  String get syncPrivacyShared => 'Κοινόχρηστο';
 
   @override
-  String get syncPrivacyPrivate => 'Private';
+  String get syncPrivacyPrivate => 'Ιδιωτικό';
 
   @override
-  String get syncPrivacyGroup => 'Group';
+  String get syncPrivacyGroup => 'Ομάδα';
 
   @override
-  String get syncStayOfflineButton => 'Stay offline';
+  String get syncStayOfflineButton => 'Παραμονή εκτός σύνδεσης';
 
   @override
-  String get syncSuccessTitle => 'Successfully connected!';
+  String get syncSuccessTitle => 'Επιτυχής σύνδεση!';
 
   @override
-  String get syncSuccessDescription => 'Your data will now sync automatically.';
+  String get syncSuccessDescription =>
+      'Τα δεδομένα σας θα συγχρονίζονται πλέον αυτόματα.';
 
   @override
-  String get syncWizardTitleConnect => 'Connect TankSync';
+  String get syncWizardTitleConnect => 'Σύνδεση TankSync';
 
   @override
-  String get syncSetupTitleYourDatabase => 'Your database';
+  String get syncSetupTitleYourDatabase => 'Η βάση δεδομένων σας';
 
   @override
-  String get syncSetupTitleJoinGroup => 'Join a group';
+  String get syncSetupTitleJoinGroup => 'Σύνδεση σε ομάδα';
 
   @override
-  String get syncSetupTitleAccount => 'Your account';
+  String get syncSetupTitleAccount => 'Ο λογαριασμός σας';
 
   @override
-  String get syncWizardBack => 'Back';
+  String get syncWizardBack => 'Πίσω';
 
   @override
-  String get syncWizardNext => 'Next';
+  String get syncWizardNext => 'Επόμενο';
 
   @override
   String syncWizardStepOfSteps(int current, int total) {
-    return 'Step $current of $total';
+    return 'Βήμα $current από $total';
   }
 
   @override
-  String get syncWizardCreateSupabaseTitle => 'Create a Supabase project';
+  String get syncWizardCreateSupabaseTitle => 'Δημιουργία έργου Supabase';
 
   @override
   String get syncWizardCreateSupabaseInstructions =>
-      '1. Tap \"Open Supabase\" below\n2. Create a free account (if you don\'t have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start';
+      '1. Πατήστε \"Άνοιγμα Supabase\" παρακάτω\n2. Δημιουργήστε δωρεάν λογαριασμό (εάν δεν έχετε)\n3. Κάντε κλικ στο \"New Project\"\n4. Επιλέξτε όνομα και περιοχή\n5. Περιμένετε ~2 λεπτά για εκκίνηση';
 
   @override
-  String get syncWizardOpenSupabase => 'Open Supabase';
+  String get syncWizardOpenSupabase => 'Άνοιγμα Supabase';
 
   @override
-  String get syncWizardEnableAnonTitle => 'Enable Anonymous Sign-ins';
+  String get syncWizardEnableAnonTitle => 'Ενεργοποίηση ανώνυμης σύνδεσης';
 
   @override
   String get syncWizardEnableAnonInstructions =>
-      '1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"';
+      '1. Στον πίνακα ελέγχου Supabase:\n   Authentication → Providers\n2. Βρείτε το \"Anonymous Sign-ins\"\n3. Ενεργοποιήστε το\n4. Κάντε κλικ στο \"Save\"';
 
   @override
-  String get syncWizardOpenAuthSettings => 'Open Auth Settings';
+  String get syncWizardOpenAuthSettings => 'Άνοιγμα ρυθμίσεων ταυτοποίησης';
 
   @override
-  String get syncWizardCopyCredentialsTitle => 'Copy your credentials';
+  String get syncWizardCopyCredentialsTitle => 'Αντιγραφή διαπιστευτηρίων';
 
   @override
   String get syncWizardCopyCredentialsInstructions =>
-      '1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below';
+      '1. Μεταβείτε στο Settings → API στον πίνακα ελέγχου\n2. Αντιγράψτε το \"Project URL\"\n3. Αντιγράψτε το κλειδί \"anon public\"\n4. Επικολλήστε τα παρακάτω';
 
   @override
-  String get syncWizardOpenApiSettings => 'Open API Settings';
+  String get syncWizardOpenApiSettings => 'Άνοιγμα ρυθμίσεων API';
 
   @override
-  String get syncWizardSupabaseUrlLabel => 'Supabase URL';
+  String get syncWizardSupabaseUrlLabel => 'URL Supabase';
 
   @override
   String get syncWizardSupabaseUrlHint => 'https://your-project.supabase.co';
 
   @override
-  String get syncWizardJoinExistingTitle => 'Join an existing database';
+  String get syncWizardJoinExistingTitle =>
+      'Σύνδεση σε υπάρχουσα βάση δεδομένων';
 
   @override
-  String get syncWizardScanQrCode => 'Scan QR Code';
+  String get syncWizardScanQrCode => 'Σάρωση QR κώδικα';
 
   @override
   String get syncWizardAskOwnerQr =>
-      'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)';
+      'Ζητήστε από τον ιδιοκτήτη να σας δείξει τον QR κώδικά του\n(Ρυθμίσεις → TankSync → Κοινοποίηση)';
 
   @override
   String get syncWizardAskOwnerQrShort =>
-      'Ask the database owner to show their QR code';
+      'Ζητήστε από τον ιδιοκτήτη να σας δείξει τον QR κώδικά του';
 
   @override
-  String get syncWizardEnterManuallyTitle => 'Enter manually';
+  String get syncWizardEnterManuallyTitle => 'Χειροκίνητη εισαγωγή';
 
   @override
-  String get syncWizardOrEnterManually => 'or enter manually';
+  String get syncWizardOrEnterManually => 'ή εισάγετε χειροκίνητα';
 
   @override
   String get syncWizardUrlHelperText =>
-      'Whitespace and line breaks removed automatically';
+      'Κενά και αλλαγές γραμμής αφαιρούνται αυτόματα';
 
   @override
   String get syncCredentialsPrivateHint =>
-      'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.';
+      'Εισάγετε τα διαπιστευτήρια του έργου Supabase. Μπορείτε να τα βρείτε στον πίνακα ελέγχου στο Settings > API.';
 
   @override
-  String get syncCredentialsDatabaseUrlLabel => 'Database URL';
+  String get syncCredentialsDatabaseUrlLabel => 'URL βάσης δεδομένων';
 
   @override
-  String get syncCredentialsAccessKeyLabel => 'Access Key';
+  String get syncCredentialsAccessKeyLabel => 'Κλειδί πρόσβασης';
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
@@ -2831,259 +2856,261 @@ class AppLocalizationsEl extends AppLocalizations {
   String get authEmailLabel => 'Email';
 
   @override
-  String get authPasswordLabel => 'Password';
+  String get authPasswordLabel => 'Κωδικός';
 
   @override
-  String get authConfirmPasswordLabel => 'Confirm password';
+  String get authConfirmPasswordLabel => 'Επιβεβαίωση κωδικού';
 
   @override
-  String get authPleaseEnterEmail => 'Please enter your email';
+  String get authPleaseEnterEmail => 'Παρακαλώ εισάγετε το email σας';
 
   @override
-  String get authInvalidEmail => 'Invalid email address';
+  String get authInvalidEmail => 'Μη έγκυρη διεύθυνση email';
 
   @override
-  String get authPasswordsDoNotMatch => 'Passwords do not match';
+  String get authPasswordsDoNotMatch => 'Οι κωδικοί δεν ταιριάζουν';
 
   @override
-  String get authConnectAnonymously => 'Connect anonymously';
+  String get authConnectAnonymously => 'Ανώνυμη σύνδεση';
 
   @override
-  String get authCreateAccountAndConnect => 'Create account & connect';
+  String get authCreateAccountAndConnect => 'Δημιουργία λογαριασμού & σύνδεση';
 
   @override
-  String get authSignInAndConnect => 'Sign in & connect';
+  String get authSignInAndConnect => 'Σύνδεση & σύνδεση';
 
   @override
-  String get authAnonymousSegment => 'Anonymous';
+  String get authAnonymousSegment => 'Ανώνυμο';
 
   @override
   String get authEmailSegment => 'Email';
 
   @override
   String get authAnonymousDescription =>
-      'Instant access, no email needed. Data tied to this device.';
+      'Άμεση πρόσβαση, δεν απαιτείται email. Δεδομένα συνδεδεμένα με αυτή τη συσκευή.';
 
   @override
   String get authEmailDescription =>
-      'Sign in from any device. Recover your data if your phone is lost.';
+      'Σύνδεση από οποιαδήποτε συσκευή. Ανάκτηση δεδομένων αν χαθεί το τηλέφωνο.';
 
   @override
   String get authSyncAcrossDevices =>
-      'Sync data automatically across all your devices.';
+      'Αυτόματος συγχρονισμός δεδομένων σε όλες τις συσκευές σας.';
 
   @override
-  String get authNewHereCreateAccount => 'New here? Create account';
+  String get authNewHereCreateAccount => 'Νέος χρήστης; Δημιουργία λογαριασμού';
 
   @override
-  String get ntfyCardTitle => 'Push Notifications (ntfy.sh)';
+  String get ntfyCardTitle => 'Push ειδοποιήσεις (ntfy.sh)';
 
   @override
-  String get ntfyEnableTitle => 'Enable ntfy.sh push';
+  String get ntfyEnableTitle => 'Ενεργοποίηση ntfy.sh push';
 
   @override
-  String get ntfyEnableSubtitle => 'Receive price alerts via ntfy.sh';
+  String get ntfyEnableSubtitle => 'Λήψη ειδοποιήσεων τιμών μέσω ntfy.sh';
 
   @override
-  String get ntfyTopicUrlLabel => 'Topic URL';
+  String get ntfyTopicUrlLabel => 'URL θέματος';
 
   @override
-  String get ntfyCopyTopicUrlTooltip => 'Copy topic URL';
+  String get ntfyCopyTopicUrlTooltip => 'Αντιγραφή URL θέματος';
 
   @override
-  String get ntfySendTestButton => 'Send test notification';
+  String get ntfySendTestButton => 'Αποστολή δοκιμαστικής ειδοποίησης';
 
   @override
   String get ntfyFdroidHint =>
-      'Install the ntfy app from F-Droid to receive push notifications on your device.';
+      'Εγκαταστήστε την εφαρμογή ntfy από το F-Droid για λήψη push ειδοποιήσεων στη συσκευή σας.';
 
   @override
   String get ntfyConnectFirstHint =>
-      'Connect TankSync first to enable push notifications.';
+      'Συνδεθείτε πρώτα στο TankSync για ενεργοποίηση push ειδοποιήσεων.';
 
   @override
-  String get linkDeviceScreenTitle => 'Link Device';
+  String get linkDeviceScreenTitle => 'Σύνδεση συσκευής';
 
   @override
-  String get linkDeviceThisDeviceLabel => 'This device';
+  String get linkDeviceThisDeviceLabel => 'Αυτή η συσκευή';
 
   @override
   String get linkDeviceShareCodeHint =>
-      'Share this code with your other device:';
+      'Μοιραστείτε αυτόν τον κωδικό με την άλλη συσκευή σας:';
 
   @override
-  String get linkDeviceNotConnected => 'Not connected';
+  String get linkDeviceNotConnected => 'Μη συνδεδεμένο';
 
   @override
-  String get linkDeviceCopyCodeTooltip => 'Copy code';
+  String get linkDeviceCopyCodeTooltip => 'Αντιγραφή κωδικού';
 
   @override
-  String get linkDeviceImportSectionTitle => 'Import from another device';
+  String get linkDeviceImportSectionTitle => 'Εισαγωγή από άλλη συσκευή';
 
   @override
   String get linkDeviceImportDescription =>
-      'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.';
+      'Εισάγετε τον κωδικό συσκευής από την άλλη συσκευή σας για εισαγωγή αγαπημένων, ειδοποιήσεων, οχημάτων και αρχείου κατανάλωσης. Κάθε συσκευή διατηρεί το δικό της προφίλ και τις προεπιλογές.';
 
   @override
-  String get linkDeviceCodeFieldLabel => 'Device code';
+  String get linkDeviceCodeFieldLabel => 'Κωδικός συσκευής';
 
   @override
-  String get linkDeviceCodeFieldHint => 'Paste the UUID from other device';
+  String get linkDeviceCodeFieldHint =>
+      'Επικολλήστε το UUID από την άλλη συσκευή';
 
   @override
-  String get linkDeviceImportButton => 'Import data';
+  String get linkDeviceImportButton => 'Εισαγωγή δεδομένων';
 
   @override
-  String get linkDeviceHowItWorksTitle => 'How it works';
+  String get linkDeviceHowItWorksTitle => 'Πώς λειτουργεί';
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.';
+      '1. Στη Συσκευή Α: αντιγράψτε τον κωδικό συσκευής παραπάνω\n2. Στη Συσκευή Β: επικολλήστε τον στο πεδίο \"Κωδικός συσκευής\"\n3. Πατήστε \"Εισαγωγή δεδομένων\" για συγχώνευση αγαπημένων, ειδοποιήσεων, οχημάτων και αρχείων κατανάλωσης\n4. Και οι δύο συσκευές θα έχουν όλα τα συνδυασμένα δεδομένα\n\nΚάθε συσκευή διατηρεί τη δική της ανώνυμη ταυτότητα και το δικό της προφίλ (προτιμώμενο καύσιμο, προεπιλεγμένο όχημα, αρχική οθόνη). Τα δεδομένα συγχωνεύονται, δεν μεταφέρονται.';
 
   @override
-  String get vehicleSetActive => 'Set active';
+  String get vehicleSetActive => 'Ορισμός ως ενεργό';
 
   @override
-  String get swipeHide => 'Hide';
+  String get swipeHide => 'Απόκρυψη';
 
   @override
-  String get evChargingSection => 'EV Charging';
+  String get evChargingSection => 'Φόρτιση EV';
 
   @override
-  String get fuelStationsSection => 'Fuel Stations';
+  String get fuelStationsSection => 'Πρατήρια καυσίμων';
 
   @override
-  String get yourRating => 'Your rating';
+  String get yourRating => 'Η αξιολόγησή σας';
 
   @override
-  String get noStorageUsed => 'No storage used';
+  String get noStorageUsed => 'Δεν χρησιμοποιείται αποθηκευτικός χώρος';
 
   @override
-  String get aboutReportBug => 'Report a bug / Suggest a feature';
+  String get aboutReportBug => 'Αναφορά σφάλματος / Πρόταση λειτουργίας';
 
   @override
-  String get aboutSupportProject => 'Support this project';
+  String get aboutSupportProject => 'Υποστήριξη αυτού του έργου';
 
   @override
   String get aboutSupportDescription =>
-      'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.';
+      'Αυτή η εφαρμογή είναι δωρεάν, ανοιχτού κώδικα και χωρίς διαφημίσεις. Αν τη βρίσκετε χρήσιμη, σκεφτείτε να υποστηρίξετε τον προγραμματιστή.';
 
   @override
   String get luxembourgRegulatedPricesNotice =>
-      'Luxembourg fuel prices are government-regulated and uniform nationwide.';
+      'Οι τιμές καυσίμων στο Λουξεμβούργο είναι κυβερνητικά ρυθμιζόμενες και ομοιόμορφες σε όλη τη χώρα.';
 
   @override
-  String get luxembourgFuelUnleaded95 => 'Unleaded 95';
+  String get luxembourgFuelUnleaded95 => 'Αμόλυβδη 95';
 
   @override
-  String get luxembourgFuelUnleaded98 => 'Unleaded 98';
+  String get luxembourgFuelUnleaded98 => 'Αμόλυβδη 98';
 
   @override
-  String get luxembourgFuelDiesel => 'Diesel';
+  String get luxembourgFuelDiesel => 'Πετρέλαιο';
 
   @override
   String get luxembourgFuelLpg => 'LPG';
 
   @override
   String get luxembourgPricesUnavailable =>
-      'Luxembourg regulated prices are unavailable.';
+      'Οι ρυθμιζόμενες τιμές Λουξεμβούργου δεν είναι διαθέσιμες.';
 
   @override
-  String get reportIssueTitle => 'Report a problem';
+  String get reportIssueTitle => 'Αναφορά προβλήματος';
 
   @override
-  String get enterCorrection => 'Please enter the correction';
+  String get enterCorrection => 'Παρακαλώ εισάγετε τη διόρθωση';
 
   @override
   String get reportNoBackendAvailable =>
-      'The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.';
+      'Η αναφορά δεν μπόρεσε να σταλεί: δεν έχει ρυθμιστεί υπηρεσία αναφοράς για αυτή τη χώρα. Ενεργοποιήστε το TankSync στις Ρυθμίσεις για αποστολή αναφορών κοινότητας.';
 
   @override
-  String get correctName => 'Correct station name';
+  String get correctName => 'Σωστό όνομα σταθμού';
 
   @override
-  String get correctAddress => 'Correct address';
+  String get correctAddress => 'Σωστή διεύθυνση';
 
   @override
-  String get wrongE85Price => 'Wrong E85 price';
+  String get wrongE85Price => 'Λανθασμένη τιμή E85';
 
   @override
-  String get wrongE98Price => 'Wrong Super 98 price';
+  String get wrongE98Price => 'Λανθασμένη τιμή Super 98';
 
   @override
-  String get wrongLpgPrice => 'Wrong LPG price';
+  String get wrongLpgPrice => 'Λανθασμένη τιμή LPG';
 
   @override
-  String get wrongStationName => 'Wrong station name';
+  String get wrongStationName => 'Λανθασμένο όνομα σταθμού';
 
   @override
-  String get wrongStationAddress => 'Wrong address';
+  String get wrongStationAddress => 'Λανθασμένη διεύθυνση';
 
   @override
-  String get independentStation => 'Independent station';
+  String get independentStation => 'Ανεξάρτητος σταθμός';
 
   @override
-  String get serviceRemindersSection => 'Service reminders';
+  String get serviceRemindersSection => 'Υπενθυμίσεις σέρβις';
 
   @override
-  String get serviceRemindersEmpty => 'No reminders yet — pick a preset above.';
+  String get serviceRemindersEmpty =>
+      'Δεν υπάρχουν υπενθυμίσεις ακόμα — επιλέξτε μια προεπιλογή παραπάνω.';
 
   @override
-  String get addServiceReminder => 'Add reminder';
+  String get addServiceReminder => 'Προσθήκη υπενθύμισης';
 
   @override
-  String get serviceReminderPresetOil => 'Oil (15,000 km)';
+  String get serviceReminderPresetOil => 'Λάδι (15.000 km)';
 
   @override
-  String get serviceReminderPresetOilLabel => 'Oil change';
+  String get serviceReminderPresetOilLabel => 'Αλλαγή λαδιού';
 
   @override
-  String get serviceReminderPresetTires => 'Tires (20,000 km)';
+  String get serviceReminderPresetTires => 'Ελαστικά (20.000 km)';
 
   @override
-  String get serviceReminderPresetTiresLabel => 'Tires';
+  String get serviceReminderPresetTiresLabel => 'Ελαστικά';
 
   @override
-  String get serviceReminderPresetInspection => 'Inspection (30,000 km)';
+  String get serviceReminderPresetInspection => 'Επιθεώρηση (30.000 km)';
 
   @override
-  String get serviceReminderPresetInspectionLabel => 'Inspection';
+  String get serviceReminderPresetInspectionLabel => 'Επιθεώρηση';
 
   @override
-  String get serviceReminderLabel => 'Label';
+  String get serviceReminderLabel => 'Ετικέτα';
 
   @override
-  String get serviceReminderInterval => 'Interval (km)';
+  String get serviceReminderInterval => 'Διάστημα (km)';
 
   @override
-  String get serviceReminderLastService => 'Last service';
+  String get serviceReminderLastService => 'Τελευταίο σέρβις';
 
   @override
-  String get serviceReminderMarkDone => 'Mark as done';
+  String get serviceReminderMarkDone => 'Επισήμανση ως ολοκληρωμένο';
 
   @override
-  String get serviceReminderDueTitle => 'Service due';
+  String get serviceReminderDueTitle => 'Σέρβις σε αναμονή';
 
   @override
   String serviceReminderDueBody(String label, int kmOver) {
-    return '$label is due — $kmOver km past the interval.';
+    return 'Το $label είναι σε αναμονή — $kmOver km μετά το διάστημα.';
   }
 
   @override
   String get southKoreaApiKeyRequired =>
-      'Register at OPINET to get a free API key';
+      'Εγγραφείτε στο OPINET για δωρεάν κλειδί API';
 
   @override
   String get southKoreaApiProvider => 'OPINET (KNOC)';
 
   @override
-  String get chileApiKeyRequired => 'Register at CNE to get a free API key';
+  String get chileApiKeyRequired => 'Εγγραφείτε στο CNE για δωρεάν κλειδί API';
 
   @override
   String get chileApiProvider => 'CNE Bencina en Linea';
 
   @override
-  String get vinConfirmTitle => 'Is this your car?';
+  String get vinConfirmTitle => 'Είναι αυτό το αυτοκίνητό σας;';
 
   @override
   String vinConfirmBody(
@@ -3094,473 +3121,481 @@ class AppLocalizationsEl extends AppLocalizations {
     String cylinders,
     String fuel,
   ) {
-    return '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
+    return '$year $make $model — ${displacement}L, $cylinders κύλινδροι, $fuel';
   }
 
   @override
   String get vinPartialInfoNote =>
-      'Partial info (offline). You can edit below.';
+      'Μερικές πληροφορίες (εκτός σύνδεσης). Μπορείτε να επεξεργαστείτε παρακάτω.';
 
   @override
-  String get vinDecodeError => 'Couldn\'t decode this VIN';
+  String get vinDecodeError => 'Αδύνατη αποκωδικοποίηση αυτού του VIN';
 
   @override
-  String get vinInvalidFormat => 'Invalid VIN format';
+  String get vinInvalidFormat => 'Μη έγκυρη μορφή VIN';
 
   @override
-  String get obd2PauseBannerTitle => 'OBD2 connection lost — recording paused';
+  String get obd2PauseBannerTitle =>
+      'Η σύνδεση OBD2 χάθηκε — η καταγραφή έχει παυτεί';
 
   @override
-  String get obd2PauseBannerResume => 'Resume recording';
+  String get obd2PauseBannerResume => 'Συνέχεια καταγραφής';
 
   @override
-  String get obd2PauseBannerEnd => 'End recording';
+  String get obd2PauseBannerEnd => 'Τέλος καταγραφής';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
+    return 'Βαθμονόμηση κατανάλωσης ενημερώθηκε για $vehicleName — η ακρίβεια βελτιώθηκε κατά $percent%';
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset volumetric efficiency?';
+  String get veResetConfirmTitle => 'Επαναφορά ογκομετρικής απόδοσης;';
 
   @override
   String get veResetConfirmBody =>
-      'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.';
+      'Αυτό θα απορρίψει την εκμαθημένη ογκομετρική απόδοση (η_v) και θα επαναφέρει την προεπιλεγμένη τιμή (0.85). Οι εκτιμήσεις ροής καυσίμου θα επιστρέψουν στη σταθερά κατασκευαστή μέχρι ο βαθμονομητής να συλλέξει νέα δείγματα.';
 
   @override
-  String get alertsRadiusSectionTitle => 'Radius alerts';
+  String get alertsRadiusSectionTitle => 'Ειδοποιήσεις ακτίνας';
 
   @override
-  String get alertsRadiusAdd => 'Add radius alert';
+  String get alertsRadiusAdd => 'Προσθήκη ειδοποίησης ακτίνας';
 
   @override
-  String get alertsRadiusEmptyTitle => 'No radius alerts yet';
+  String get alertsRadiusEmptyTitle =>
+      'Δεν υπάρχουν ειδοποιήσεις ακτίνας ακόμα';
 
   @override
-  String get alertsRadiusEmptyCta => 'Create a radius alert';
+  String get alertsRadiusEmptyCta => 'Δημιουργία ειδοποίησης ακτίνας';
 
   @override
-  String get alertsRadiusCreateTitle => 'Create radius alert';
+  String get alertsRadiusCreateTitle => 'Δημιουργία ειδοποίησης ακτίνας';
 
   @override
-  String get alertsRadiusLabelHint => 'Label (e.g. Home diesel)';
+  String get alertsRadiusLabelHint => 'Ετικέτα (π.χ. Diesel σπίτι)';
 
   @override
-  String get alertsRadiusFuelType => 'Fuel type';
+  String get alertsRadiusFuelType => 'Τύπος καυσίμου';
 
   @override
-  String get alertsRadiusThreshold => 'Threshold (€/L)';
+  String get alertsRadiusThreshold => 'Κατώφλι (€/L)';
 
   @override
-  String get alertsRadiusKm => 'Radius (km)';
+  String get alertsRadiusKm => 'Ακτίνα (km)';
 
   @override
-  String get alertsRadiusCenterGps => 'Use my location';
+  String get alertsRadiusCenterGps => 'Χρήση τοποθεσίας μου';
 
   @override
-  String get alertsRadiusCenterPostalCode => 'Postal code';
+  String get alertsRadiusCenterPostalCode => 'Ταχυδρομικός κώδικας';
 
   @override
-  String get alertsRadiusSave => 'Save';
+  String get alertsRadiusSave => 'Αποθήκευση';
 
   @override
-  String get alertsRadiusCancel => 'Cancel';
+  String get alertsRadiusCancel => 'Ακύρωση';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
+  String get alertsRadiusDeleteConfirm => 'Διαγραφή ειδοποίησης ακτίνας;';
 
   @override
   String obd2ConnectedTooltip(String adapterName) {
-    return 'OBD2 connected: $adapterName';
+    return 'OBD2 συνδεδεμένο: $adapterName';
   }
 
   @override
-  String get obd2PairChipTooltip => 'Pair an OBD2 adapter';
+  String get obd2PairChipTooltip => 'Σύζευξη προσαρμογέα OBD2';
 
   @override
   String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel dropped at nearby stations';
+    return 'Η τιμή $fuelLabel έπεσε σε κοντινούς σταθμούς';
   }
 
   @override
   String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount stations dropped by up to $maxDropCents¢ in the last hour';
+    return '$stationCount σταθμοί μείωσαν κατά έως $maxDropCents¢ την τελευταία ώρα';
   }
 
   @override
-  String get fillUpSavedSnackbar => 'Fill-up saved';
+  String get fillUpSavedSnackbar => 'Ο ανεφοδιασμός αποθηκεύτηκε';
 
   @override
-  String get radiusAlertsEntryTitle => 'Radius alerts & statistics';
+  String get radiusAlertsEntryTitle => 'Ειδοποιήσεις ακτίνας & στατιστικά';
 
   @override
   String get radiusAlertsEntrySubtitle =>
-      'Get notified when prices drop near you';
+      'Ειδοποίηση όταν πέφτουν οι τιμές κοντά σας';
 
   @override
-  String get notFoundTitle => 'Page not found';
+  String get notFoundTitle => 'Η σελίδα δεν βρέθηκε';
 
   @override
   String notFoundBody(String location) {
-    return '\"$location\" not found.';
+    return 'Το \"$location\" δεν βρέθηκε.';
   }
 
   @override
-  String get notFoundHomeButton => 'Home';
+  String get notFoundHomeButton => 'Αρχική';
 
   @override
   String get consumptionTabHiddenNotice =>
-      'The Consumption tab was hidden by your profile settings.';
+      'Η καρτέλα Κατανάλωσης έχει αποκρυφτεί από τις ρυθμίσεις προφίλ σας.';
 
   @override
   String get swipeBetweenTabsHint =>
-      'Tip: swipe left or right to switch between tabs.';
+      'Συμβουλή: σύρετε αριστερά ή δεξιά για εναλλαγή μεταξύ καρτελών.';
 
   @override
-  String get discardChangesTitle => 'Discard changes?';
+  String get discardChangesTitle => 'Απόρριψη αλλαγών;';
 
   @override
   String get discardChangesBody =>
-      'You have unsaved changes. Leaving now will discard them.';
+      'Έχετε αποθηκεύτές αλλαγές. Η έξοδος τώρα θα τις απορρίψει.';
 
   @override
-  String get discardChangesConfirm => 'Discard';
+  String get discardChangesConfirm => 'Απόρριψη';
 
   @override
-  String get discardChangesKeepEditing => 'Keep editing';
+  String get discardChangesKeepEditing => 'Συνέχεια επεξεργασίας';
 
   @override
-  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
+  String get tankSyncSectionSubtitle =>
+      'Συγχρονισμός cloud σε όλες τις συσκευές σας';
 
   @override
-  String get achievementSmoothDriver => 'Smooth streak';
+  String get achievementSmoothDriver => 'Σερί ομαλής οδήγησης';
 
   @override
   String get achievementSmoothDriverDesc =>
-      'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+      'Οδηγήστε 5 συνεχόμενα ταξίδια με βαθμολογία ομαλής οδήγησης 80 ή παραπάνω.';
 
   @override
-  String get achievementColdStartAware => 'Cold-start aware';
+  String get achievementColdStartAware => 'Συνειδητός ψυχρής εκκίνησης';
 
   @override
   String get achievementColdStartAwareDesc =>
-      'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+      'Διατηρήστε το κόστος καυσίμου ψυχρής εκκίνησης ενός ολόκληρου μήνα κάτω από 2% του συνολικού καυσίμου — συνδυάστε σύντομα ταξίδια.';
 
   @override
-  String get achievementHighwayMaster => 'Highway master';
+  String get achievementHighwayMaster => 'Μάστορας αυτοκινητοδρόμου';
 
   @override
   String get achievementHighwayMasterDesc =>
-      'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+      'Ολοκληρώστε ένα ταξίδι 30+ km σε σταθερή ταχύτητα με βαθμολογία ομαλής οδήγησης 90 ή παραπάνω.';
 
   @override
-  String get authErrorNoNetwork => 'No network connection. Try again later.';
+  String get authErrorNoNetwork =>
+      'Δεν υπάρχει σύνδεση δικτύου. Δοκιμάστε αργότερα.';
 
   @override
   String get authErrorInvalidCredentials =>
-      'Invalid email or password. Check your credentials.';
+      'Μη έγκυρο email ή κωδικός. Ελέγξτε τα διαπιστευτήριά σας.';
 
   @override
   String get authErrorUserAlreadyExists =>
-      'This email is already registered. Try signing in instead.';
+      'Αυτό το email είναι ήδη εγγεγραμμένο. Δοκιμάστε να συνδεθείτε.';
 
   @override
   String get authErrorEmailNotConfirmed =>
-      'Please check your email and confirm your account first.';
+      'Παρακαλώ ελέγξτε το email σας και επιβεβαιώστε πρώτα τον λογαριασμό σας.';
 
   @override
-  String get authErrorGeneric => 'Sign-in failed. Please try again.';
+  String get authErrorGeneric => 'Αποτυχία σύνδεσης. Παρακαλώ δοκιμάστε ξανά.';
 
   @override
   String get autoRecordConsentBadgeLabel =>
-      'Background location — for auto-record only';
+      'Τοποθεσία παρασκηνίου — μόνο για αυτόματη καταγραφή';
 
   @override
-  String get autoRecordConsentExplanationTitle => 'About this permission';
+  String get autoRecordConsentExplanationTitle => 'Σχετικά με αυτή την άδεια';
 
   @override
   String get autoRecordConsentExplanationBody =>
-      'Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.';
+      'Η αυτόματη καταγραφή χρειάζεται τοποθεσία παρασκηνίου για ανίχνευση εκκίνησης οδήγησης όταν η εφαρμογή είναι κλειστή. Αυτή η άδεια χρησιμοποιείται μόνο για αυτόματη καταγραφή — η αναζήτηση σταθμών και η κεντράρισμα χάρτη χρησιμοποιούν ξεχωριστή άδεια τοποθεσίας προσκηνίου.';
 
   @override
-  String get autoRecordConsentExplanationCloseButton => 'Got it';
+  String get autoRecordConsentExplanationCloseButton => 'Κατάλαβα';
 
   @override
-  String get autoRecordConsentExplanationTooltip => 'What does this mean?';
+  String get autoRecordConsentExplanationTooltip => 'Τι σημαίνει αυτό;';
 
   @override
   String get autoRecordConsentRevokeAction =>
-      'Tap to manage in system settings';
+      'Πατήστε για διαχείριση στις ρυθμίσεις συστήματος';
 
   @override
-  String get autoRecordSectionTitle => 'Auto-record';
+  String get autoRecordSectionTitle => 'Αυτόματη καταγραφή';
 
   @override
-  String get autoRecordToggleLabel => 'Auto-record trips';
+  String get autoRecordToggleLabel => 'Αυτόματη καταγραφή ταξιδιών';
 
   @override
   String get autoRecordStatusActiveLabel =>
-      'Auto-record will activate the next time you enter the car.';
+      'Η αυτόματη καταγραφή θα ενεργοποιηθεί την επόμενη φορά που θα μπείτε στο αυτοκίνητο.';
 
   @override
   String get autoRecordStatusNeedsPairingLabel =>
-      'Pair an OBD2 adapter to enable auto-record.';
+      'Συζεύξτε προσαρμογέα OBD2 για ενεργοποίηση αυτόματης καταγραφής.';
 
   @override
   String get autoRecordStatusNeedsBackgroundLocationLabel =>
-      'Allow background location so auto-record keeps running with the screen off.';
+      'Επιτρέψτε την τοποθεσία παρασκηνίου για να συνεχίζει η αυτόματη καταγραφή με σβηστή οθόνη.';
 
   @override
-  String get autoRecordStatusPairAdapterCta => 'Pair an adapter';
+  String get autoRecordStatusPairAdapterCta => 'Σύζευξη προσαρμογέα';
 
   @override
-  String get autoRecordSpeedThresholdLabel => 'Start speed (km/h)';
+  String get autoRecordSpeedThresholdLabel => 'Ταχύτητα εκκίνησης (km/h)';
 
   @override
   String get autoRecordSaveDelayLabel =>
-      'Save delay after disconnect (seconds)';
+      'Καθυστέρηση αποθήκευσης μετά την αποσύνδεση (δευτερόλεπτα)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Paired adapter';
+  String get autoRecordPairedAdapterLabel => 'Συζευγμένος προσαρμογέας';
 
   @override
   String get autoRecordPairedAdapterNone =>
-      'No adapter paired. Pair one via the OBD2 onboarding first.';
+      'Δεν έχει συζευχθεί προσαρμογέας. Συζεύξτε έναν πρώτα μέσω του OBD2 onboarding.';
 
   @override
-  String get autoRecordBackgroundLocationLabel => 'Background location allowed';
+  String get autoRecordBackgroundLocationLabel =>
+      'Τοποθεσία παρασκηνίου επιτρέπεται';
 
   @override
-  String get autoRecordBackgroundLocationRequest => 'Request permission';
+  String get autoRecordBackgroundLocationRequest => 'Αίτηση άδειας';
 
   @override
   String get autoRecordBackgroundLocationRationaleTitle =>
-      'Why \"Allow all the time\"?';
+      'Γιατί \"Πάντα να επιτρέπεται\";';
 
   @override
   String get autoRecordBackgroundLocationRationaleBody =>
-      'Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.';
+      'Η αυτόματη καταγραφή μεταδίδει συντεταγμένες GPS από την υπηρεσία OBD-II προσκηνίου ενώ η οθόνη είναι σβηστή, ώστε η διαδρομή ταξιδιού να παραμένει ακριβής. Το Android απαιτεί την επιλογή \"Πάντα να επιτρέπεται\" για να συνεχίζει να λειτουργεί μετά το κλείδωμα της συσκευής.';
 
   @override
-  String get autoRecordBackgroundLocationOpenSettings => 'Open settings';
+  String get autoRecordBackgroundLocationOpenSettings => 'Άνοιγμα ρυθμίσεων';
 
   @override
   String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
-      'Location permission required';
+      'Απαιτείται άδεια τοποθεσίας';
 
   @override
   String get autoRecordBackgroundLocationRequestFailedSnackbar =>
-      'Could not request background location';
+      'Αδύνατη αίτηση τοποθεσίας παρασκηνίου';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Clear counter';
+  String get autoRecordBadgeClearTooltip => 'Εκκαθάριση μετρητή';
 
   @override
   String get autoRecordPairAdapterLinkText =>
-      'Pair an adapter in the section below to enable auto-recording';
+      'Συζεύξτε έναν προσαρμογέα στην παρακάτω ενότητα για ενεργοποίηση αυτόματης καταγραφής';
 
   @override
-  String get exportBackupTooltip => 'Export backup';
+  String get exportBackupTooltip => 'Εξαγωγή αντιγράφου ασφαλείας';
 
   @override
-  String get exportBackupReady => 'Backup ready — pick a destination';
+  String get exportBackupReady =>
+      'Αντίγραφο ασφαλείας έτοιμο — επιλέξτε προορισμό';
 
   @override
-  String get exportBackupFailed => 'Backup export failed — please try again';
+  String get exportBackupFailed =>
+      'Αποτυχία εξαγωγής αντιγράφου — παρακαλώ δοκιμάστε ξανά';
 
   @override
-  String get brokenMapChipVerifying => 'MAP sensor verifying…';
+  String get brokenMapChipVerifying => 'Επαλήθευση αισθητήρα MAP…';
 
   @override
-  String get brokenMapChipDisclaimer => 'MAP readings suspicious';
+  String get brokenMapChipDisclaimer => 'Ύποπτες ενδείξεις MAP';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.';
+      'Ο αισθητήρας MAP διαβάζει εσφαλμένα — οι ενδείξεις καυσίμου μπορεί να είναι 50–80% χαμηλότερες. Δοκιμάστε διαφορετικό προσαρμογέα.';
 
   @override
   String get brokenMapBannerHardDisable =>
-      'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.';
+      'Αναξιόπιστος αισθητήρας MAP. Εμφάνιση μέσων ανεφοδιασμού αντί για ζωντανή ροή καυσίμου.';
 
   @override
   String brokenMapOverlayVerified(String confidence) {
-    return 'MAP sensor: verified ($confidence)';
+    return 'Αισθητήρας MAP: επαληθευμένος ($confidence)';
   }
 
   @override
   String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP sensor: verifying ($confidence)';
+    return 'Αισθητήρας MAP: επαλήθευση ($confidence)';
   }
 
   @override
   String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP sensor: suspicious ($confidence)';
+    return 'Αισθητήρας MAP: ύποπτος ($confidence)';
   }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin%';
+    return 'Αισθητήρας MAP: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin% (verified)';
+    return 'Αισθητήρας MAP: $posterior% ± $margin% (επαληθευμένος)';
   }
 
   @override
-  String get brokenMapDiagnosticsCardTitle => 'MAP sensor diagnostics';
+  String get brokenMapDiagnosticsCardTitle => 'Διαγνωστικά αισθητήρα MAP';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return 'Broken-MAP confidence: $posterior% ± $margin%';
+    return 'Εμπιστοσύνη βλάβης MAP: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '$count observations recorded';
+    return '$count παρατηρήσεις καταγράφηκαν';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => 'Verified clean';
+  String get brokenMapDiagnosticsVerifiedBadge => 'Επαληθευμένα καθαρό';
 
   @override
   String get brokenMapDiagnosticsBeliefNone =>
-      'This vehicle\'s MAP sensor hasn\'t been observed yet.';
+      'Ο αισθητήρας MAP αυτού του οχήματος δεν έχει παρατηρηθεί ακόμα.';
 
   @override
-  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklisted adapters';
+  String get brokenMapDiagnosticsBlocklistHeading =>
+      'Αποκλεισμένοι προσαρμογείς';
 
   @override
   String get brokenMapDiagnosticsBlocklistEmpty =>
-      'No adapters are blocklisted.';
+      'Δεν υπάρχουν αποκλεισμένοι προσαρμογείς.';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '$adapter — flagged $percent% broken';
+    return '$adapter — επισημάνθηκε $percent% βλαβερός';
   }
 
   @override
-  String get brokenMapDiagnosticsClearButton => 'Clear';
+  String get brokenMapDiagnosticsClearButton => 'Εκκαθάριση';
 
   @override
-  String get brokenMapRevPromptTitle => 'Rev the engine';
+  String get brokenMapRevPromptTitle => 'Ανεβάστε στροφές';
 
   @override
   String get brokenMapRevPromptBody =>
-      'Briefly blip the throttle so the app can check the MAP sensor responds.';
+      'Πατήστε σύντομα το γκάζι για να ελέγξει η εφαρμογή αν ο αισθητήρας MAP ανταποκρίνεται.';
 
   @override
-  String get brokenMapRevPromptConfirm => 'Done — I revved';
+  String get brokenMapRevPromptConfirm => 'Έγινε — ανέβασα στροφές';
 
   @override
-  String get calibrationAdvancedTitle => 'Advanced calibration';
+  String get calibrationAdvancedTitle => 'Σύνθετη βαθμονόμηση';
 
   @override
-  String get calibrationDisplacementLabel => 'Engine displacement (cc)';
+  String get calibrationDisplacementLabel => 'Κυβισμός κινητήρα (cc)';
 
   @override
   String get calibrationVolumetricEfficiencyLabel =>
-      'Volumetric efficiency (η_v)';
+      'Ογκομετρική απόδοση (η_v)';
 
   @override
-  String get calibrationAfrLabel => 'Air-to-fuel ratio (AFR)';
+  String get calibrationAfrLabel => 'Αναλογία αέρα-καυσίμου (AFR)';
 
   @override
-  String get calibrationFuelDensityLabel => 'Fuel density (g/L)';
+  String get calibrationFuelDensityLabel => 'Πυκνότητα καυσίμου (g/L)';
 
   @override
-  String get calibrationSourceDetected => '(detected from VIN)';
+  String get calibrationSourceDetected => '(ανιχνεύτηκε από VIN)';
 
   @override
   String calibrationSourceCatalog(String makeModel) {
-    return '(catalog: $makeModel)';
+    return '(κατάλογος: $makeModel)';
   }
 
   @override
-  String get calibrationSourceDefault => '(default)';
+  String get calibrationSourceDefault => '(προεπιλογή)';
 
   @override
-  String get calibrationSourceManual => '(manual)';
+  String get calibrationSourceManual => '(χειροκίνητο)';
 
   @override
-  String get calibrationResetToDetected => 'Reset to detected value';
+  String get calibrationResetToDetected => 'Επαναφορά σε ανιχνευμένη τιμή';
 
   @override
   String calibrationLearnerStatusCalibrated(String eta, int samples) {
-    return 'η_v: $eta (calibrated, $samples samples)';
+    return 'η_v: $eta (βαθμονομημένο, $samples δείγματα)';
   }
 
   @override
   String calibrationLearnerStatusLearning(String eta, int samples) {
-    return 'η_v: $eta (learning, $samples samples)';
+    return 'η_v: $eta (εκμάθηση, $samples δείγματα)';
   }
 
   @override
   String get calibrationLearnerStatusNoSamples =>
-      'η_v: 0.85 (default — no plein-complet yet)';
+      'η_v: 0.85 (προεπιλογή — δεν υπάρχει πλήρης ανεφοδιασμός ακόμα)';
 
   @override
-  String get calibrationResetLearner => 'Reset learner';
+  String get calibrationResetLearner => 'Επαναφορά εκπαιδευτή';
 
   @override
-  String get calibrationBasisAtkinson => 'Atkinson cycle';
+  String get calibrationBasisAtkinson => 'Κύκλος Atkinson';
 
   @override
   String get calibrationBasisVnt => 'VNT diesel + DI';
 
   @override
-  String get calibrationBasisTurboDi => 'Turbocharged + DI';
+  String get calibrationBasisTurboDi => 'Υπερτροφοδοτούμενο + DI';
 
   @override
-  String get calibrationBasisTurbo => 'Turbocharged';
+  String get calibrationBasisTurbo => 'Υπερτροφοδοτούμενο';
 
   @override
-  String get calibrationBasisNaDi => 'Naturally aspirated + DI';
+  String get calibrationBasisNaDi => 'Φυσικής αναπνοής + DI';
 
   @override
   String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
-    return '(catalog: $makeModel — $basis default)';
+    return '(κατάλογος: $makeModel — προεπιλογή $basis)';
   }
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {
-    return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
+    return 'Το $makeModel σας επισημαίνεται ως diesel αλλά αντιστοιχεί σε καταχώρηση βενζίνης. Πατήστε για ενημέρωση.';
   }
 
   @override
-  String get catalogReresolveSnackbarAction => 'Update';
+  String get catalogReresolveSnackbarAction => 'Ενημέρωση';
 
   @override
-  String get consumptionTabFuel => 'Fuel';
+  String get consumptionTabFuel => 'Καύσιμο';
 
   @override
-  String get consumptionTabCharging => 'Charging';
+  String get consumptionTabCharging => 'Φόρτιση';
 
   @override
-  String get noChargingLogsTitle => 'No charging logs yet';
+  String get noChargingLogsTitle => 'Δεν υπάρχουν αρχεία φόρτισης ακόμα';
 
   @override
   String get noChargingLogsSubtitle =>
-      'Log your first charging session to start tracking EUR/100 km and kWh/100 km.';
+      'Καταγράψτε την πρώτη σας συνεδρία φόρτισης για παρακολούθηση EUR/100 km και kWh/100 km.';
 
   @override
-  String get addChargingLog => 'Log charging';
+  String get addChargingLog => 'Καταγραφή φόρτισης';
 
   @override
-  String get addChargingLogTitle => 'Log charging session';
+  String get addChargingLogTitle => 'Καταγραφή συνεδρίας φόρτισης';
 
   @override
-  String get chargingKwh => 'Energy (kWh)';
+  String get chargingKwh => 'Ενέργεια (kWh)';
 
   @override
-  String get chargingCost => 'Total cost';
+  String get chargingCost => 'Συνολικό κόστος';
 
   @override
-  String get chargingTimeMin => 'Charge time (min)';
+  String get chargingTimeMin => 'Χρόνος φόρτισης (λεπτά)';
 
   @override
-  String get chargingStationName => 'Station (optional)';
+  String get chargingStationName => 'Σταθμός (προαιρετικό)';
 
   @override
   String chargingEurPer100km(String value) {
@@ -3573,152 +3608,156 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get chargingDerivedHelper => 'Need a previous log to compare';
+  String get chargingDerivedHelper =>
+      'Απαιτείται προηγούμενη εγγραφή για σύγκριση';
 
   @override
-  String get chargingLogButtonLabel => 'Log charging';
+  String get chargingLogButtonLabel => 'Καταγραφή φόρτισης';
 
   @override
-  String get chargingCostTrendTitle => 'Charging cost trend';
+  String get chargingCostTrendTitle => 'Τάση κόστους φόρτισης';
 
   @override
-  String get chargingEfficiencyTitle => 'Efficiency (kWh/100 km)';
+  String get chargingEfficiencyTitle => 'Απόδοση (kWh/100 km)';
 
   @override
-  String get chargingChartsEmpty => 'Not enough data yet';
+  String get chargingChartsEmpty => 'Δεν υπάρχουν αρκετά δεδομένα ακόμα';
 
   @override
-  String get chargingChartsMonthAxis => 'Month';
+  String get chargingChartsMonthAxis => 'Μήνας';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Community Wait Times';
+  String get gdprCommunityWaitTimeTitle => 'Χρόνοι αναμονής κοινότητας';
 
   @override
   String get gdprCommunityWaitTimeShort =>
-      'Anonymously share station wait times';
+      'Ανώνυμη κοινοποίηση χρόνων αναμονής στον σταθμό';
 
   @override
   String get gdprCommunityWaitTimeDescription =>
-      'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
+      'Ανώνυμη κοινοποίηση της άφιξης και αναχώρησής σας από σταθμό καυσίμων για εμφάνιση τυπικών χρόνων αναμονής. Δεν μεταφορτώνονται συντεταγμένες τοποθεσίας — μόνο το αναγνωριστικό σταθμού.';
 
   @override
-  String get consoFeatureGroupTitle => 'Conso';
+  String get consoFeatureGroupTitle => 'Κατανάλωση';
 
   @override
   String get consoFeatureGroupDescription =>
-      'Track your consumption — manual fill-ups, or automatic OBD2 trip recording.';
+      'Παρακολουθήστε την κατανάλωση — χειροκίνητοι ανεφοδιασμοί ή αυτόματη καταγραφή ταξιδιών OBD2.';
 
   @override
-  String get consoModeOff => 'Off';
+  String get consoModeOff => 'Ανενεργό';
 
   @override
-  String get consoModeFuel => 'Fuel';
+  String get consoModeFuel => 'Καύσιμο';
 
   @override
-  String get consoModeFuelAndTrips => 'Fuel + Trips';
+  String get consoModeFuelAndTrips => 'Καύσιμο + Ταξίδια';
 
   @override
   String get consoModeOffDescription =>
-      'No Conso tab and no Conso settings section.';
+      'Χωρίς καρτέλα Κατανάλωσης και χωρίς ενότητα ρυθμίσεων Κατανάλωσης.';
 
   @override
   String get consoModeFuelDescription =>
-      'Manual fill-ups only. Useful without an OBD2 adapter.';
+      'Μόνο χειροκίνητοι ανεφοδιασμοί. Χρήσιμο χωρίς προσαρμογέα OBD2.';
 
   @override
   String get consoModeFuelAndTripsDescription =>
-      'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+      'Προσθέτει αυτόματη καταγραφή ταξιδιών OBD2. Απαιτεί συζευγμένο προσαρμογέα.';
 
   @override
-  String get consoSubsectionVehicles => 'My vehicles';
+  String get consoSubsectionVehicles => 'Τα οχήματά μου';
 
   @override
-  String get consoSubsectionTrajets => 'Trips (OBD2)';
+  String get consoSubsectionTrajets => 'Ταξίδια (OBD2)';
 
   @override
-  String get consoSubsectionToggles => 'Driving';
+  String get consoSubsectionToggles => 'Οδήγηση';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count partial fills pending plein complet — not in average',
-      one: '1 partial fill pending plein complet — not in average',
+      other:
+          '$count μερικοί ανεφοδιασμοί σε αναμονή — δεν περιλαμβάνονται στον μέσο',
+      one: '1 μερικός ανεφοδιασμός σε αναμονή — δεν περιλαμβάνεται στον μέσο',
     );
     return '$_temp0';
   }
 
   @override
   String consumptionStatsCorrectionShareHint(int percent) {
-    return '$percent% of fuel from auto-corrections — review entries';
+    return '$percent% καυσίμου από αυτόματες διορθώσεις — ελέγξτε τις εγγραφές';
   }
 
   @override
-  String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
+  String get fillUpCorrectionLabel =>
+      'Αυτόματη διόρθωση — πατήστε για επεξεργασία';
 
   @override
-  String get fillUpCorrectionEditTitle => 'Edit auto-correction';
+  String get fillUpCorrectionEditTitle => 'Επεξεργασία αυτόματης διόρθωσης';
 
   @override
   String get fillUpCorrectionEditExplainer =>
-      'This entry was auto-generated to close the gap between recorded trips and pumped fuel. Adjust the values if you know the actual figures.';
+      'Αυτή η εγγραφή δημιουργήθηκε αυτόματα για κάλυψη της διαφοράς μεταξύ καταγεγραμμένων ταξιδιών και αντλημένου καυσίμου. Προσαρμόστε τις τιμές αν γνωρίζετε τα ακριβή στοιχεία.';
 
   @override
-  String get fillUpCorrectionDelete => 'Delete correction';
+  String get fillUpCorrectionDelete => 'Διαγραφή διόρθωσης';
 
   @override
-  String get fillUpCorrectionStation => 'Station name (optional)';
+  String get fillUpCorrectionStation => 'Όνομα σταθμού (προαιρετικό)';
 
   @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
+  String get greeceApiProvider => 'Παρατηρητήριο Τιμών (Ελλάδα)';
 
   @override
   String get greeceCommunityApiNotice =>
-      'Powered by the community-maintained fuelpricesgr API';
+      'Τροφοδοτείται από το API fuelpricesgr που συντηρεί η κοινότητα';
 
   @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Romania)';
+  String get romaniaApiProvider => 'Monitorul Prețurilor (Ρουμανία)';
 
   @override
   String get romaniaScrapingNotice =>
-      'Powered by pretcarburant.ro (Competition Council + ANPC)';
+      'Τροφοδοτείται από το pretcarburant.ro (Συμβούλιο Ανταγωνισμού + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
-    return '$country stations $km km away — €$price/L cheaper';
+    return 'Σταθμοί $country $km km μακριά — $price€/L φθηνότεροι';
   }
 
   @override
-  String get crossBorderTapToSwitch => 'Tap to switch country';
+  String get crossBorderTapToSwitch => 'Πατήστε για εναλλαγή χώρας';
 
   @override
-  String get crossBorderDismissTooltip => 'Dismiss';
+  String get crossBorderDismissTooltip => 'Απόρριψη';
 
   @override
-  String get insightCardTitle => 'Top wasteful behaviours';
+  String get insightCardTitle => 'Πιο σπάταλες συμπεριφορές';
 
   @override
-  String get insightEmptyState => 'No notable inefficiencies — keep it up!';
+  String get insightEmptyState =>
+      'Δεν υπάρχουν αξιοσημείωτες ανεπάρκειες — συνεχίστε έτσι!';
 
   @override
   String insightHighRpm(String pctTime, String liters) {
-    return 'Engine over 3000 RPM ($pctTime% of trip): wasted $liters L';
+    return 'Κινητήρας πάνω από 3000 RPM ($pctTime% ταξιδιού): σπατάλη $liters L';
   }
 
   @override
   String insightHardAccel(String count, String liters) {
-    return '$count hard accelerations: wasted $liters L';
+    return '$count δυνατές επιταχύνσεις: σπατάλη $liters L';
   }
 
   @override
   String insightIdling(String pctTime, String liters) {
-    return 'Idling ($pctTime% of trip): wasted $liters L';
+    return 'Ρελαντί ($pctTime% ταξιδιού): σπατάλη $liters L';
   }
 
   @override
   String insightSubtitlePctOfTrip(String pctTime) {
-    return '$pctTime% of trip';
+    return '$pctTime% ταξιδιού';
   }
 
   @override
@@ -3728,788 +3767,805 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String insightLowGear(String minutes) {
-    return 'Labouring in low gear ($minutes min)';
+    return 'Βαριά φόρτωση σε χαμηλή ταχύτητα ($minutes λεπτά)';
   }
 
   @override
-  String get drivingScoreCardTitle => 'Driving score';
+  String get drivingScoreCardTitle => 'Βαθμολογία οδήγησης';
 
   @override
   String get drivingScoreCardOutOf => '/100';
 
   @override
   String get drivingScoreCardSubtitle =>
-      'Composite score from idling, hard accelerations, hard braking, and high-RPM time. A \'better than X% of past trips\' comparison will land in a follow-up release.';
+      'Σύνθετη βαθμολογία από ρελαντί, δυνατές επιταχύνσεις, δυνατό φρενάρισμα και χρόνο υψηλών στροφών. Η σύγκριση \"καλύτερος από X% των προηγούμενων ταξιδιών\" θα έρθει σε επόμενη ενημέρωση.';
 
   @override
   String drivingScoreCardSemanticsLabel(String score) {
-    return 'Driving score $score out of 100';
+    return 'Βαθμολογία οδήγησης $score από 100';
   }
 
   @override
-  String get drivingScorePenaltyIdling => 'Idling';
+  String get drivingScorePenaltyIdling => 'Ρελαντί';
 
   @override
-  String get drivingScorePenaltyHardAccel => 'Hard accelerations';
+  String get drivingScorePenaltyHardAccel => 'Δυνατές επιταχύνσεις';
 
   @override
-  String get drivingScorePenaltyHardBrake => 'Hard braking';
+  String get drivingScorePenaltyHardBrake => 'Δυνατό φρενάρισμα';
 
   @override
-  String get drivingScorePenaltyHighRpm => 'High RPM';
+  String get drivingScorePenaltyHighRpm => 'Υψηλές στροφές';
 
   @override
-  String get drivingScorePenaltyFullThrottle => 'Full throttle';
+  String get drivingScorePenaltyFullThrottle => 'Πλήρες γκάζι';
 
   @override
-  String get ecoRouteOption => 'Eco';
+  String get ecoRouteOption => 'Οικονομικό';
 
   @override
   String ecoRouteSavings(String liters) {
-    return '≈ $liters L saved';
+    return '≈ $liters L εξοικονόμηση';
   }
 
   @override
   String get ecoRouteHint =>
-      'Smarter drive — favours steady highway over zigzag shortcuts.';
+      'Πιο έξυπνη οδήγηση — προτιμά σταθερό αυτοκινητόδρομο αντί για λαβυρινθώδεις συντομεύσεις.';
 
   @override
-  String get favoritesShareAction => 'Share';
+  String get favoritesShareAction => 'Κοινοποίηση';
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Sparkilo — favourites on $date';
+    return 'Sparkilo — αγαπημένα στις $date';
   }
 
   @override
-  String get favoritesShareError => 'Couldn\'t generate share image';
+  String get favoritesShareError => 'Αδύνατη δημιουργία εικόνας κοινοποίησης';
 
   @override
-  String get featureManagementSectionTitle => 'Feature management';
+  String get featureManagementSectionTitle => 'Διαχείριση λειτουργιών';
 
   @override
   String get featureManagementSectionSubtitle =>
-      'Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.';
+      'Ενεργοποίηση ή απενεργοποίηση μεμονωμένων λειτουργιών. Ορισμένες λειτουργίες εξαρτώνται από άλλες — οι διακόπτες είναι απενεργοποιημένοι μέχρι να πληρούνται οι προαπαιτούμενες.';
 
   @override
-  String get featureLabel_obd2TripRecording => 'OBD2 trip recording';
+  String get featureLabel_obd2TripRecording => 'Καταγραφή ταξιδιών OBD2';
 
   @override
   String get featureDescription_obd2TripRecording =>
-      'Capture trips automatically over OBD2.';
+      'Αυτόματη καταγραφή ταξιδιών μέσω OBD2.';
 
   @override
   String get featureLabel_gamification => 'Gamification';
 
   @override
   String get featureDescription_gamification =>
-      'Driving scores and earned badges.';
+      'Βαθμολογίες οδήγησης και εξαργυρωμένα σήματα.';
 
   @override
-  String get featureLabel_hapticEcoCoach => 'Haptic eco-coach';
+  String get featureLabel_hapticEcoCoach => 'Απτικός οδηγός eco';
 
   @override
   String get featureDescription_hapticEcoCoach =>
-      'Real-time haptic feedback during a trip.';
+      'Απτική ανατροφοδότηση σε πραγματικό χρόνο κατά τη διάρκεια ταξιδιού.';
 
   @override
   String get featureLabel_tankSync => 'TankSync';
 
   @override
-  String get featureDescription_tankSync => 'Cross-device sync via Supabase.';
+  String get featureDescription_tankSync =>
+      'Συγχρονισμός μεταξύ συσκευών μέσω Supabase.';
 
   @override
-  String get featureLabel_consumptionAnalytics => 'Consumption analytics';
+  String get featureLabel_consumptionAnalytics => 'Ανάλυση κατανάλωσης';
 
   @override
   String get featureDescription_consumptionAnalytics =>
-      'Fill-up and trip analysis tab.';
+      'Καρτέλα ανάλυσης ανεφοδιασμών και ταξιδιών.';
 
   @override
-  String get featureLabel_baselineSync => 'Baseline sync';
+  String get featureLabel_baselineSync => 'Συγχρονισμός βάσης';
 
   @override
   String get featureDescription_baselineSync =>
-      'Sync driving baselines via TankSync.';
+      'Συγχρονισμός βάσεων οδήγησης μέσω TankSync.';
 
   @override
-  String get featureLabel_unifiedSearchResults => 'Unified search results';
+  String get featureLabel_unifiedSearchResults =>
+      'Ενοποιημένα αποτελέσματα αναζήτησης';
 
   @override
   String get featureDescription_unifiedSearchResults =>
-      'Single result list combining fuel and EV stations.';
+      'Ενιαία λίστα αποτελεσμάτων που συνδυάζει σταθμούς καυσίμων και EV.';
 
   @override
-  String get featureLabel_priceAlerts => 'Price alerts';
+  String get featureLabel_priceAlerts => 'Ειδοποιήσεις τιμών';
 
   @override
   String get featureDescription_priceAlerts =>
-      'Threshold-based price-drop notifications.';
+      'Ειδοποιήσεις πτώσης τιμής βάσει κατωφλίου.';
 
   @override
-  String get featureLabel_priceHistory => 'Price history';
+  String get featureLabel_priceHistory => 'Ιστορικό τιμών';
 
   @override
   String get featureDescription_priceHistory =>
-      '30-day price charts on station details.';
+      'Γραφήματα τιμών 30 ημερών στις λεπτομέρειες σταθμού.';
 
   @override
-  String get featureLabel_routePlanning => 'Route planning';
+  String get featureLabel_routePlanning => 'Σχεδιασμός διαδρομής';
 
   @override
   String get featureDescription_routePlanning =>
-      'Cheapest stop along your route.';
+      'Φθηνότερη στάση κατά μήκος της διαδρομής σας.';
 
   @override
-  String get featureLabel_evCharging => 'EV charging';
+  String get featureLabel_evCharging => 'Φόρτιση EV';
 
   @override
   String get featureDescription_evCharging =>
-      'Charging stations via OpenChargeMap.';
+      'Σταθμοί φόρτισης μέσω OpenChargeMap.';
 
   @override
-  String get featureLabel_glideCoach => 'Glide-coach';
+  String get featureLabel_glideCoach => 'Οδηγός glide';
 
   @override
   String get featureDescription_glideCoach =>
-      'Hypermiling guidance using OSM traffic signals.';
+      'Καθοδήγηση hypermiling με σήματα κυκλοφορίας OSM.';
 
   @override
-  String get featureLabel_gpsTripPath => 'GPS trip path';
+  String get featureLabel_gpsTripPath => 'Διαδρομή GPS ταξιδιού';
 
   @override
   String get featureDescription_gpsTripPath =>
-      'Persist GPS path samples alongside each trip.';
+      'Αποθήκευση δειγμάτων διαδρομής GPS μαζί με κάθε ταξίδι.';
 
   @override
-  String get featureLabel_autoRecord => 'Auto-record';
+  String get featureLabel_autoRecord => 'Αυτόματη καταγραφή';
 
   @override
   String get featureDescription_autoRecord =>
-      'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+      'Αυτόματη έναρξη ταξιδιού όταν ο προσαρμογέας OBD2 συνδέεται σε κινούμενο όχημα.';
 
   @override
-  String get featureLabel_showFuel => 'Show fuel stations';
+  String get featureLabel_showFuel => 'Εμφάνιση σταθμών καυσίμων';
 
   @override
   String get featureDescription_showFuel =>
-      'Display petrol/diesel station results in search and on the map.';
+      'Εμφάνιση αποτελεσμάτων σταθμών βενζίνης/diesel στην αναζήτηση και τον χάρτη.';
 
   @override
-  String get featureLabel_showElectric => 'Show charging stations';
+  String get featureLabel_showElectric => 'Εμφάνιση σταθμών φόρτισης';
 
   @override
   String get featureDescription_showElectric =>
-      'Display EV charging stations in search and on the map.';
+      'Εμφάνιση σταθμών φόρτισης EV στην αναζήτηση και τον χάρτη.';
 
   @override
-  String get featureLabel_showConsumptionTab => 'Consumption tab';
+  String get featureLabel_showConsumptionTab => 'Καρτέλα κατανάλωσης';
 
   @override
   String get featureDescription_showConsumptionTab =>
-      'Show the consumption analytics tab in the bottom navigation.';
+      'Εμφάνιση καρτέλας ανάλυσης κατανάλωσης στην κάτω πλοήγηση.';
 
   @override
   String get featureBlockedEnable_gamification =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
   String get featureBlockedEnable_consumptionAnalytics =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
-  String get featureBlockedEnable_baselineSync => 'Enable TankSync first';
+  String get featureBlockedEnable_baselineSync =>
+      'Ενεργοποιήστε πρώτα το TankSync';
 
   @override
   String get featureBlockedEnable_glideCoach =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
   String get featureBlockedEnable_gpsTripPath =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
   String get featureBlockedEnable_autoRecord =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
-  String get featureBlockedEnable_showFuel => 'Prerequisites not met';
+  String get featureBlockedEnable_showFuel =>
+      'Δεν πληρούνται οι προαπαιτούμενες';
 
   @override
-  String get featureBlockedEnable_showElectric => 'Prerequisites not met';
+  String get featureBlockedEnable_showElectric =>
+      'Δεν πληρούνται οι προαπαιτούμενες';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+  String get featureLabel_tflitePricePrediction => 'Πρόβλεψη τιμής TFLite';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+      'Μοντέλο πρόβλεψης τιμών στη συσκευή — η εκτέλεση γίνεται τοπικά· χαρακτηριστικά και προβλέψεις δεν φεύγουν ποτέ από τη συσκευή.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
-      'Enable price history first';
+      'Ενεργοποιήστε πρώτα το ιστορικό τιμών';
 
   @override
-  String get featureLabel_fuelCalculator => 'Fuel calculator';
+  String get featureLabel_fuelCalculator => 'Αριθμομηχανή καυσίμου';
 
   @override
   String get featureDescription_fuelCalculator =>
-      'Reachable fuel-cost calculator from the search results.';
+      'Αριθμομηχανή κόστους καυσίμου από τα αποτελέσματα αναζήτησης.';
 
   @override
-  String get featureLabel_carbonDashboard => 'Carbon dashboard';
+  String get featureLabel_carbonDashboard => 'Πίνακας αποτυπώματος άνθρακα';
 
   @override
   String get featureDescription_carbonDashboard =>
-      'CO2 footprint dashboard reachable from the Consumption tab.';
+      'Πίνακας αποτυπώματος CO2 από την καρτέλα Κατανάλωσης.';
 
   @override
-  String get featureLabel_experimentalOemPids => 'Experimental OEM PIDs';
+  String get featureLabel_experimentalOemPids => 'Πειραματικά OEM PIDs';
 
   @override
   String get featureDescription_experimentalOemPids =>
-      'Read exact tank litres via manufacturer-specific PIDs on supported adapters.';
+      'Ανάγνωση ακριβών λίτρων ντεπόζιτου μέσω PIDs κατασκευαστή σε υποστηριζόμενους προσαρμογείς.';
 
   @override
   String get featureBlockedEnable_experimentalOemPids =>
-      'Enable OBD2 trip recording first';
+      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
-  String get featureLabel_paymentQrScan => 'Scan payment QR';
+  String get featureLabel_paymentQrScan => 'Σάρωση QR πληρωμής';
 
   @override
   String get featureDescription_paymentQrScan =>
-      'Scan-to-pay QR reader on the station detail screen.';
+      'Αναγνώστης QR για πληρωμή στην οθόνη λεπτομερειών σταθμού.';
 
   @override
-  String get featureLabel_communityPriceReports => 'Community price reports';
+  String get featureLabel_communityPriceReports => 'Αναφορές τιμών κοινότητας';
 
   @override
   String get featureDescription_communityPriceReports =>
-      'Report a station price from the station detail screen.';
+      'Αναφορά τιμής σταθμού από την οθόνη λεπτομερειών.';
 
   @override
-  String get feedbackConsentTitle => 'Send report to GitHub?';
+  String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';
 
   @override
   String get feedbackConsentBody =>
-      'This creates a public ticket on our GitHub repository with your photo and the OCR text. No personal data (location, account id) is sent. Continue?';
+      'Αυτό δημιουργεί δημόσιο ticket στο αποθετήριο GitHub μας με τη φωτογραφία και το κείμενο OCR. Δεν αποστέλλονται προσωπικά δεδομένα (τοποθεσία, αναγνωριστικό λογαριασμού). Συνέχεια;';
 
   @override
-  String get feedbackConsentContinue => 'Continue';
+  String get feedbackConsentContinue => 'Συνέχεια';
 
   @override
-  String get feedbackConsentCancel => 'Cancel';
+  String get feedbackConsentCancel => 'Ακύρωση';
 
   @override
-  String get feedbackConsentLater => 'Later';
+  String get feedbackConsentLater => 'Αργότερα';
 
   @override
-  String get feedbackTokenSectionTitle => 'Bad-scan feedback (GitHub)';
+  String get feedbackTokenSectionTitle => 'Σχόλια κακής σάρωσης (GitHub)';
 
   @override
   String get feedbackTokenDescription =>
-      'To automatically open a GitHub ticket from a failed scan, paste a GitHub PAT (`public_repo` scope on the tankstellen repository). Otherwise manual sharing remains available.';
+      'Για αυτόματο άνοιγμα GitHub ticket από αποτυχημένη σάρωση, επικολλήστε GitHub PAT (εύρος `public_repo` στο αποθετήριο tankstellen). Αλλιώς παραμένει διαθέσιμη η χειροκίνητη κοινοποίηση.';
 
   @override
-  String get feedbackTokenStatusSet => 'Token configured';
+  String get feedbackTokenStatusSet => 'Token ρυθμισμένο';
 
   @override
-  String get feedbackTokenStatusUnset => 'No token';
+  String get feedbackTokenStatusUnset => 'Χωρίς token';
 
   @override
-  String get feedbackTokenSet => 'Set';
+  String get feedbackTokenSet => 'Ορισμός';
 
   @override
-  String get feedbackTokenClear => 'Clear';
+  String get feedbackTokenClear => 'Εκκαθάριση';
 
   @override
   String get feedbackTokenDialogTitle => 'GitHub PAT';
 
   @override
-  String get feedbackTokenFieldLabel => 'Personal Access Token';
+  String get feedbackTokenFieldLabel => 'Προσωπικό κλειδί πρόσβασης';
 
   @override
-  String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
+  String get fillUpReconciliationVerifiedBadgeLabel =>
+      'Επαληθευμένο από προσαρμογέα';
 
   @override
   String get fillUpReconciliationVarianceDialogTitle =>
-      'Doesn\'t match adapter reading';
+      'Δεν ταιριάζει με την ανάγνωση προσαρμογέα';
 
   @override
   String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
-    return 'Your entry: $userL L. Adapter says: $adapterL L (delta from before/after fuel-level capture). Use adapter value?';
+    return 'Η εγγραφή σας: $userL L. Ο προσαρμογέας λέει: $adapterL L (διαφορά από δείγμα πριν/μετά στάθμης καυσίμου). Χρήση τιμής προσαρμογέα;';
   }
 
   @override
-  String get fillUpReconciliationVarianceDialogKeepMine => 'Keep my entry';
+  String get fillUpReconciliationVarianceDialogKeepMine =>
+      'Διατήρηση εγγραφής μου';
 
   @override
   String get fillUpReconciliationVarianceDialogUseAdapter =>
-      'Use adapter value';
+      'Χρήση τιμής προσαρμογέα';
 
   @override
-  String get scanReceiptNoData => 'No receipt data found — try again';
+  String get scanReceiptNoData =>
+      'Δεν βρέθηκαν δεδομένα απόδειξης — δοκιμάστε ξανά';
 
   @override
   String get scanReceiptSuccess =>
-      'Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.';
+      'Η απόδειξη σαρώθηκε — επαληθεύστε τις τιμές. Πατήστε «Αναφορά σφάλματος σάρωσης» παρακάτω αν κάτι είναι λάθος.';
 
   @override
   String scanReceiptFailed(String error) {
-    return 'Scan failed: $error';
+    return 'Αποτυχία σάρωσης: $error';
   }
 
   @override
-  String get scanPumpUnreadable => 'Pump display not readable — try again';
+  String get scanPumpUnreadable =>
+      'Η οθόνη αντλίας δεν είναι αναγνώσιμη — δοκιμάστε ξανά';
 
   @override
-  String get scanPumpSuccess => 'Pump display scanned — verify the values.';
+  String get scanPumpSuccess =>
+      'Η οθόνη αντλίας σαρώθηκε — επαληθεύστε τις τιμές.';
 
   @override
   String scanPumpFailed(String error) {
-    return 'Pump scan failed: $error';
+    return 'Αποτυχία σάρωσης αντλίας: $error';
   }
 
   @override
-  String get badScanReportTitle => 'Report a scan error';
+  String get badScanReportTitle => 'Αναφορά σφάλματος σάρωσης';
 
   @override
-  String get badScanReportTitleReceipt => 'Report a scan error — Receipt';
+  String get badScanReportTitleReceipt =>
+      'Αναφορά σφάλματος σάρωσης — Απόδειξη';
 
   @override
   String get badScanReportTitlePumpDisplay =>
-      'Report a scan error — Pump display';
+      'Αναφορά σφάλματος σάρωσης — Οθόνη αντλίας';
 
   @override
-  String get pumpScanFailureTitle => 'Display unreadable';
+  String get pumpScanFailureTitle => 'Μη αναγνώσιμη οθόνη';
 
   @override
   String get pumpScanFailureBody =>
-      'The scan couldn\'t read the pump display. What would you like to do?';
+      'Η σάρωση δεν μπόρεσε να διαβάσει την οθόνη αντλίας. Τι θέλετε να κάνετε;';
 
   @override
-  String get pumpScanFailureCorrectManually => 'Correct manually';
+  String get pumpScanFailureCorrectManually => 'Χειροκίνητη διόρθωση';
 
   @override
-  String get pumpScanFailureReport => 'Report';
+  String get pumpScanFailureReport => 'Αναφορά';
 
   @override
-  String get pumpScanFailureRemove => 'Remove photo';
+  String get pumpScanFailureRemove => 'Αφαίρεση φωτογραφίας';
 
   @override
   String get badScanReportHint =>
-      'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
+      'Θα μοιραστούμε τη φωτογραφία απόδειξης και και τα δύο σύνολα τιμών ώστε η επόμενη έκδοση να μάθει αυτή τη διάταξη.';
 
   @override
-  String get badScanReportShareAction => 'Share report + photo';
+  String get badScanReportShareAction => 'Κοινοποίηση αναφοράς + φωτογραφίας';
 
   @override
-  String get badScanReportFieldBrandLayout => 'Brand layout';
+  String get badScanReportFieldBrandLayout => 'Διάταξη μάρκας';
 
   @override
-  String get badScanReportFieldTotal => 'Total';
+  String get badScanReportFieldTotal => 'Σύνολο';
 
   @override
-  String get badScanReportFieldPricePerLiter => 'Price/L';
+  String get badScanReportFieldPricePerLiter => 'Τιμή/L';
 
   @override
-  String get badScanReportFieldStation => 'Station';
+  String get badScanReportFieldStation => 'Σταθμός';
 
   @override
-  String get badScanReportFieldFuel => 'Fuel';
+  String get badScanReportFieldFuel => 'Καύσιμο';
 
   @override
-  String get badScanReportFieldDate => 'Date';
+  String get badScanReportFieldDate => 'Ημερομηνία';
 
   @override
-  String get badScanReportHeaderField => 'Field';
+  String get badScanReportHeaderField => 'Πεδίο';
 
   @override
-  String get badScanReportHeaderScanned => 'Scanned';
+  String get badScanReportHeaderScanned => 'Σαρωμένο';
 
   @override
-  String get badScanReportHeaderYouTyped => 'You typed';
+  String get badScanReportHeaderYouTyped => 'Εισαγάγατε';
 
   @override
-  String get badScanReportCreateTicket => 'Create issue';
+  String get badScanReportCreateTicket => 'Δημιουργία ζητήματος';
 
   @override
-  String get badScanReportOpenInBrowser => 'Open in browser';
+  String get badScanReportOpenInBrowser => 'Άνοιγμα στον περιηγητή';
 
   @override
-  String get badScanReportFallbackToShare => 'Submission failed — manual share';
+  String get badScanReportFallbackToShare =>
+      'Αποτυχία υποβολής — χειροκίνητη κοινοποίηση';
 
   @override
-  String get fillUpSectionWhatTitle => 'What you filled';
+  String get fillUpSectionWhatTitle => 'Τι ανεφοδιαστήκατε';
 
   @override
-  String get fillUpSectionWhatSubtitle => 'Fuel, amount, price';
+  String get fillUpSectionWhatSubtitle => 'Καύσιμο, ποσότητα, τιμή';
 
   @override
-  String get fillUpSectionWhereTitle => 'Where you were';
+  String get fillUpSectionWhereTitle => 'Πού βρισκόσαστε';
 
   @override
-  String get fillUpSectionWhereSubtitle => 'Station, odometer, notes';
+  String get fillUpSectionWhereSubtitle => 'Σταθμός, χιλιόμετρα, σημειώσεις';
 
   @override
-  String get fillUpImportFromLabel => 'Import from…';
+  String get fillUpImportFromLabel => 'Εισαγωγή από…';
 
   @override
-  String get fillUpImportSheetTitle => 'Import fill-up data';
+  String get fillUpImportSheetTitle => 'Εισαγωγή δεδομένων ανεφοδιασμού';
 
   @override
-  String get fillUpImportReceiptLabel => 'Receipt';
+  String get fillUpImportReceiptLabel => 'Απόδειξη';
 
   @override
   String get fillUpImportReceiptDescription =>
-      'Scan a paper receipt with the camera';
+      'Σάρωση χάρτινης απόδειξης με κάμερα';
 
   @override
-  String get fillUpImportPumpLabel => 'Pump display';
+  String get fillUpImportPumpLabel => 'Οθόνη αντλίας';
 
   @override
   String get fillUpImportPumpDescription =>
-      'Read Betrag / Preis from the pump LCD';
+      'Ανάγνωση Betrag / Preis από την οθόνη LCD αντλίας';
 
   @override
-  String get fillUpImportObdLabel => 'OBD-II adapter';
+  String get fillUpImportObdLabel => 'Προσαρμογέας OBD-II';
 
   @override
   String get fillUpImportObdDescription =>
-      'Read odometer from the OBD-II port over Bluetooth';
+      'Ανάγνωση χιλιομετρητή από τη θύρα OBD-II μέσω Bluetooth';
 
   @override
-  String get fillUpPricePerLiterLabel => 'Price per liter';
+  String get fillUpPricePerLiterLabel => 'Τιμή ανά λίτρο';
 
   @override
-  String get vehicleHeaderPlateLabel => 'Plate';
+  String get vehicleHeaderPlateLabel => 'Πινακίδα';
 
   @override
-  String get vehicleHeaderUntitled => 'New vehicle';
+  String get vehicleHeaderUntitled => 'Νέο όχημα';
 
   @override
-  String get vehicleSectionIdentityTitle => 'Identity';
+  String get vehicleSectionIdentityTitle => 'Ταυτότητα';
 
   @override
-  String get vehicleSectionIdentitySubtitle => 'Name & VIN';
+  String get vehicleSectionIdentitySubtitle => 'Όνομα & VIN';
 
   @override
-  String get vehicleSectionDrivetrainTitle => 'Drivetrain';
+  String get vehicleSectionDrivetrainTitle => 'Κινητήρας';
 
   @override
-  String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
+  String get vehicleSectionDrivetrainSubtitle =>
+      'Τρόπος κίνησης αυτού του οχήματος';
 
   @override
-  String get calibrationModeLabel => 'Calibration mode';
+  String get calibrationModeLabel => 'Λειτουργία βαθμονόμησης';
 
   @override
-  String get calibrationModeRule => 'Rule-based';
+  String get calibrationModeRule => 'Βάσει κανόνων';
 
   @override
-  String get calibrationModeFuzzy => 'Fuzzy';
+  String get calibrationModeFuzzy => 'Ασαφής';
 
   @override
   String get calibrationModeTooltip =>
-      'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
+      'Η βαθμονόμηση βάσει κανόνων αντιστοιχεί κάθε δείγμα οδήγησης σε μία ακριβώς κατάσταση. Η ασαφής το κατανέμει σε όλες ανάλογα με την καταλληλότητα — πιο ομαλό γύρω στα 60 km/h ή σε μεταβαλλόμενες κλίσεις, αλλά πιο αργό να γεμίσει όλα τα κουβάδια.';
 
   @override
-  String get profileGamificationToggleTitle => 'Show achievements & scores';
+  String get profileGamificationToggleTitle =>
+      'Εμφάνιση επιτευγμάτων & βαθμολογιών';
 
   @override
   String get profileGamificationToggleSubtitle =>
-      'When off, badges, scores and trophy icons are hidden across the app.';
+      'Όταν είναι ανενεργό, σήματα, βαθμολογίες και εικονίδια τροπαίων αποκρύπτονται από ολόκληρη την εφαρμογή.';
 
   @override
-  String get gpsDiagnosticsTitle => 'GPS sampling diagnostics';
+  String get gpsDiagnosticsTitle => 'Διαγνωστικά δειγματοληψίας GPS';
 
   @override
   String gpsDiagnosticsHeader(String count, String span, int gaps) {
     String _temp0 = intl.Intl.pluralLogic(
       gaps,
       locale: localeName,
-      other: '$gaps gaps',
-      one: '1 gap',
-      zero: 'no gaps',
+      other: '$gaps κενά',
+      one: '1 κενό',
+      zero: 'χωρίς κενά',
     );
-    return '$count samples · $span · $_temp0';
+    return '$count δείγματα · $span · $_temp0';
   }
 
   @override
   String gpsDiagnosticsCadence(int ms) {
-    return 'Median interval: $ms ms';
+    return 'Διάμεσο διάστημα: $ms ms';
   }
 
   @override
   String get gpsDiagnosticsExplain =>
-      'Captured during recording to verify GPS cadence under phone-sleep.';
+      'Καταγράφηκε κατά τη διάρκεια εγγραφής για επαλήθευση ρυθμού GPS κατά την αδρανοποίηση τηλεφώνου.';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Driving';
+  String get hapticEcoCoachSectionTitle => 'Οδήγηση';
 
   @override
-  String get hapticEcoCoachSettingTitle => 'Real-time eco coaching';
+  String get hapticEcoCoachSettingTitle => 'Eco coaching σε πραγματικό χρόνο';
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Gentle haptic + on-screen tip when you floor it during cruise';
+      'Ήπια απτική + συμβουλή οθόνης όταν πατάτε γκάζι στη ζώνη κρουαζιέρας';
 
   @override
   String get hapticEcoCoachSnackBarMessage =>
-      'Easy on the throttle — coasting saves more';
+      'Ελαφρύτερο γκάζι — η αδράνεια εξοικονομεί περισσότερα';
 
   @override
-  String get anonKeyLabel => 'Anon Key';
+  String get anonKeyLabel => 'Κλειδί Anon';
 
   @override
-  String get anonKeyHideTooltip => 'Hide key';
+  String get anonKeyHideTooltip => 'Απόκρυψη κλειδιού';
 
   @override
-  String get anonKeyShowTooltip => 'Show key to verify';
+  String get anonKeyShowTooltip => 'Εμφάνιση κλειδιού για επαλήθευση';
 
   @override
   String anonKeyTooLong(int length) {
-    return 'Key is too long ($length chars) — check for extra text';
+    return 'Το κλειδί είναι πολύ μεγάλο ($length χαρακτήρες) — ελέγξτε για επιπλέον κείμενο';
   }
 
   @override
   String anonKeyLooksCorrect(int length) {
-    return 'Key looks correct ($length chars)';
+    return 'Το κλειδί φαίνεται σωστό ($length χαρακτήρες)';
   }
 
   @override
   String get anonKeyShouldBeJwt =>
-      'Key should be a JWT (header.payload.signature)';
+      'Το κλειδί πρέπει να είναι JWT (header.payload.signature)';
 
   @override
   String anonKeyMayBeTruncated(int length) {
-    return 'Key may be truncated ($length of ~208 expected chars)';
+    return 'Το κλειδί μπορεί να είναι κομμένο ($length από ~208 αναμενόμενους χαρακτήρες)';
   }
 
   @override
-  String get anonKeyExceedsMax => 'Key exceeds maximum length';
+  String get anonKeyExceedsMax => 'Το κλειδί υπερβαίνει το μέγιστο μήκος';
 
   @override
-  String get qrShareTitle => 'Share your database';
+  String get qrShareTitle => 'Κοινοποίηση βάσης δεδομένων σας';
 
   @override
-  String get qrShareSubtitle => 'Others can scan this QR code to connect';
+  String get qrShareSubtitle =>
+      'Άλλοι μπορούν να σαρώσουν αυτόν τον QR κώδικα για σύνδεση';
 
   @override
-  String get qrShareCopyAsText => 'Copy as text';
+  String get qrShareCopyAsText => 'Αντιγραφή ως κείμενο';
 
   @override
-  String get authInfoTitle => 'Why create an account?';
+  String get authInfoTitle => 'Γιατί να δημιουργήσω λογαριασμό;';
 
   @override
   String get authInfoBenefit1 =>
-      '• Sync favorites, alerts, and saved routes across devices';
+      '• Συγχρονισμός αγαπημένων, ειδοποιήσεων και αποθηκευμένων διαδρομών σε συσκευές';
 
   @override
   String get authInfoBenefit2 =>
-      '• Prepare a route on your phone, use it in your car';
+      '• Προετοιμάστε διαδρομή στο τηλέφωνό σας, χρησιμοποιήστε την στο αυτοκίνητο';
 
   @override
-  String get authInfoBenefit3 => '• No data is shared with third parties';
+  String get authInfoBenefit3 => '• Δεν κοινοποιούνται δεδομένα σε τρίτους';
 
   @override
-  String get authInfoBenefit4 => '• You can delete your account at any time';
+  String get authInfoBenefit4 =>
+      '• Μπορείτε να διαγράψετε τον λογαριασμό σας ανά πάσα στιγμή';
 
   @override
   String get privacyLocalDataEmpty =>
-      'Nothing stored yet. Add a favorite or set a price alert to see entries here.';
+      'Τίποτα αποθηκευμένο ακόμα. Προσθέστε ένα αγαπημένο ή ορίστε ειδοποίηση τιμής για εμφάνιση εγγραφών εδώ.';
 
   @override
-  String get privacyHideEmptyRows => 'Hide empty rows';
+  String get privacyHideEmptyRows => 'Απόκρυψη κενών γραμμών';
 
   @override
   String privacyShowEmptyRows(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show $count empty rows',
-      one: 'Show $count empty row',
+      other: 'Εμφάνιση $count κενών γραμμών',
+      one: 'Εμφάνιση $count κενής γραμμής',
     );
     return '$_temp0';
   }
 
   @override
-  String get apiKeySetupTitle => 'API key setup (optional)';
+  String get apiKeySetupTitle => 'Ρύθμιση κλειδιού API (προαιρετικό)';
 
   @override
   String get apiKeySetupDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Εγγραφείτε για δωρεάν κλειδί API ή παραλείψτε για εξερεύνηση με δεδομένα επίδειξης.';
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '$provider Registration';
+    return 'Εγγραφή $provider';
   }
 
   @override
   String apiKeyTerms(String provider) {
-    return 'By entering an API key you accept the terms of $provider. Data redistribution is prohibited.';
+    return 'Εισάγοντας κλειδί API αποδέχεστε τους όρους του $provider. Απαγορεύεται η αναδιανομή δεδομένων.';
   }
 
   @override
-  String get calculatorDistanceHint => 'e.g. 150';
+  String get calculatorDistanceHint => 'π.χ. 150';
 
   @override
-  String get calculatorConsumptionHint => 'e.g. 7.0';
+  String get calculatorConsumptionHint => 'π.χ. 7.0';
 
   @override
-  String get calculatorPriceHint => 'e.g. 1.899';
+  String get calculatorPriceHint => 'π.χ. 1.899';
 
   @override
-  String get routeStrategyLabel => 'Strategy:';
+  String get routeStrategyLabel => 'Στρατηγική:';
 
   @override
-  String get routeStrategyUniform => 'Uniform';
+  String get routeStrategyUniform => 'Ομοιόμορφη';
 
   @override
-  String get routeStrategyBalanced => 'Balanced';
+  String get routeStrategyBalanced => 'Ισορροπημένη';
 
   @override
-  String get glideCoachBetaTitle => 'Glide-coach beta (experimental)';
+  String get glideCoachBetaTitle => 'Οδηγός glide beta (πειραματικό)';
 
   @override
   String get glideCoachBetaSubtitle =>
-      'Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.';
+      'Ήπια απτική κατά την επιβράδυνση μπροστά σε κόκκινο φανάρι. Ανενεργό εξ ορισμού — κίνδυνος απόσπασης προσοχής.';
 
   @override
-  String get consentSyncTripsTitle => 'Sync trip recordings';
+  String get consentSyncTripsTitle => 'Συγχρονισμός καταγεγραμμένων ταξιδιών';
 
   @override
   String get consentSyncTripsSubtitle =>
-      'Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.';
+      'Δημιουργία αντιγράφων ταξιδιών OBD2 + GPS στο TankSync. Μεταξύ συσκευών, προαιρετικό.';
 
   @override
   String get consentSyncTripsDisabledHint =>
-      'Enable Cloud Sync above to back up trips.';
+      'Ενεργοποιήστε τον Συγχρονισμό Cloud παραπάνω για δημιουργία αντιγράφων ταξιδιών.';
 
   @override
-  String get consentHideDetails => 'Hide details';
+  String get consentHideDetails => 'Απόκρυψη λεπτομερειών';
 
   @override
-  String get consentShowDetails => 'Show details';
+  String get consentShowDetails => 'Εμφάνιση λεπτομερειών';
 
   @override
-  String get dialogOk => 'OK';
+  String get dialogOk => 'ΟΚ';
 
   @override
-  String get invalidLinkTitle => 'Invalid link';
+  String get invalidLinkTitle => 'Μη έγκυρος σύνδεσμος';
 
   @override
   String invalidLinkBody(String path) {
-    return 'The link \"$path\" is not valid.';
+    return 'Ο σύνδεσμος \"$path\" δεν είναι έγκυρος.';
   }
 
   @override
-  String get home => 'Home';
+  String get home => 'Αρχική';
 
   @override
-  String get loyaltySettingsTitle => 'Fuel club cards';
+  String get loyaltySettingsTitle => 'Κάρτες καυσίμων';
 
   @override
   String get loyaltySettingsSubtitle =>
-      'Apply your loyalty discount to displayed prices';
+      'Εφαρμογή έκπτωσης πιστότητας στις εμφανιζόμενες τιμές';
 
   @override
-  String get loyaltyMenuTitle => 'Fuel club cards';
+  String get loyaltyMenuTitle => 'Κάρτες καυσίμων';
 
   @override
   String get loyaltyMenuSubtitle =>
-      'Apply per-litre discounts from Total, Aral, Shell, …';
+      'Εφαρμογή εκπτώσεων ανά λίτρο από Total, Aral, Shell, …';
 
   @override
-  String get loyaltyAddCard => 'Add card';
+  String get loyaltyAddCard => 'Προσθήκη κάρτας';
 
   @override
-  String get loyaltyAddCardSheetTitle => 'Add fuel club card';
+  String get loyaltyAddCardSheetTitle => 'Προσθήκη κάρτας καυσίμων';
 
   @override
-  String get loyaltyBrandLabel => 'Brand';
+  String get loyaltyBrandLabel => 'Μάρκα';
 
   @override
-  String get loyaltyCardLabelLabel => 'Label (optional)';
+  String get loyaltyCardLabelLabel => 'Ετικέτα (προαιρετικό)';
 
   @override
-  String get loyaltyDiscountLabel => 'Discount (per litre)';
+  String get loyaltyDiscountLabel => 'Έκπτωση (ανά λίτρο)';
 
   @override
-  String get loyaltyDiscountInvalid => 'Enter a positive number';
+  String get loyaltyDiscountInvalid => 'Εισάγετε θετικό αριθμό';
 
   @override
-  String get loyaltyDeleteConfirmTitle => 'Delete card?';
+  String get loyaltyDeleteConfirmTitle => 'Διαγραφή κάρτας;';
 
   @override
   String get loyaltyDeleteConfirmBody =>
-      'This card will stop applying its discount.';
+      'Αυτή η κάρτα θα σταματήσει να εφαρμόζει την έκπτωσή της.';
 
   @override
-  String get loyaltyEmptyTitle => 'No fuel club cards yet';
+  String get loyaltyEmptyTitle => 'Δεν υπάρχουν κάρτες καυσίμων ακόμα';
 
   @override
   String get loyaltyEmptyBody =>
-      'Add a card to apply your per-litre discount to matching stations automatically.';
+      'Προσθέστε κάρτα για αυτόματη εφαρμογή έκπτωσης ανά λίτρο στους αντίστοιχους σταθμούς.';
 
   @override
   String get loyaltyBadgePrefix => '−';
 
   @override
-  String get maintenanceSignalIdleRpmCreepTitle => 'Idle RPM creep detected';
+  String get maintenanceSignalIdleRpmCreepTitle =>
+      'Ανίχνευση αύξησης ρελαντί RPM';
 
   @override
   String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
-    return 'Idle RPM has crept up by $percent% over your last $tripCount trips. Possible early sign of a clogged air filter or sensor drift.';
+    return 'Οι στροφές ρελαντί έχουν αυξηθεί κατά $percent% στα τελευταία $tripCount ταξίδια. Πιθανό πρώιμο σημάδι βουλωμένου φίλτρου αέρα ή μετατόπισης αισθητήρα.';
   }
 
   @override
   String get maintenanceSignalMafDeviationTitle =>
-      'Possible intake restriction';
+      'Πιθανός περιορισμός εισαγωγής';
 
   @override
   String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
-    return 'Cruise fuel rate has dropped by $percent% over your last $tripCount trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.';
+    return 'Η ροή καυσίμου κρουαζιέρας έχει μειωθεί κατά $percent% στα τελευταία $tripCount ταξίδια. Πιθανό σημάδι βουλωμένου φίλτρου αέρα ή περιορισμένης εισαγωγής — αξίζει έλεγχο.';
   }
 
   @override
-  String get maintenanceActionDismiss => 'Dismiss';
+  String get maintenanceActionDismiss => 'Απόρριψη';
 
   @override
-  String get maintenanceActionSnooze => 'Snooze 30 days';
+  String get maintenanceActionSnooze => 'Αναβολή 30 ημέρες';
 
   @override
-  String get consumptionMonthlyInsightsTitle => 'This month vs last month';
+  String get consumptionMonthlyInsightsTitle => 'Αυτός ο μήνας vs προηγούμενος';
 
   @override
-  String get consumptionMonthlyTripsLabel => 'Trips';
+  String get consumptionMonthlyTripsLabel => 'Ταξίδια';
 
   @override
-  String get consumptionMonthlyDriveTimeLabel => 'Drive time';
+  String get consumptionMonthlyDriveTimeLabel => 'Χρόνος οδήγησης';
 
   @override
-  String get consumptionMonthlyDistanceLabel => 'Distance';
+  String get consumptionMonthlyDistanceLabel => 'Απόσταση';
 
   @override
-  String get consumptionMonthlyAvgConsumptionLabel => 'Avg consumption';
+  String get consumptionMonthlyAvgConsumptionLabel => 'Μέση κατανάλωση';
 
   @override
   String get consumptionMonthlyComparisonNotReliable =>
-      'Need at least 3 trips per month for comparison';
+      'Απαιτούνται τουλάχιστον 3 ταξίδια ανά μήνα για σύγκριση';
 
   @override
-  String get obd2CapabilitySectionTitle => 'Adapter capabilities';
+  String get obd2CapabilitySectionTitle => 'Δυνατότητες προσαρμογέα';
 
   @override
-  String get obd2CapabilityStandardOnly => 'Standard';
+  String get obd2CapabilityStandardOnly => 'Τυπικό';
 
   @override
   String get obd2CapabilityOemPids => 'OEM PIDs';
@@ -4519,98 +4575,100 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get obd2CapabilityUpgradeHintStandard =>
-      'For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).';
+      'Για ακριβή λίτρα-στο-ντεπόζιτο σε Peugeot/Citroën, η εφαρμογή υποστηρίζει OBDLink MX+/LX/CX (τσιπ STN).';
 
   @override
-  String get obd2DebugOverlayEnabledSnack => 'OBD2 diagnostic overlay enabled';
+  String get obd2DebugOverlayEnabledSnack =>
+      'Διαγνωστική επικάλυψη OBD2 ενεργοποιήθηκε';
 
   @override
   String get obd2DebugOverlayDisabledSnack =>
-      'OBD2 diagnostic overlay disabled';
+      'Διαγνωστική επικάλυψη OBD2 απενεργοποιήθηκε';
 
   @override
-  String get obd2DebugOverlayClearButton => 'Clear';
+  String get obd2DebugOverlayClearButton => 'Εκκαθάριση';
 
   @override
-  String get obd2DebugOverlayCloseButton => 'Close';
+  String get obd2DebugOverlayCloseButton => 'Κλείσιμο';
 
   @override
-  String get obd2DebugOverlayTitle => 'OBD2 breadcrumbs';
+  String get obd2DebugOverlayTitle => 'Ίχνη OBD2';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
-    return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
+    return 'Δεν ήταν δυνατή η επαφή με \'$adapterName\' — επιλέξτε άλλον προσαρμογέα';
   }
 
   @override
-  String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
+  String get onboardingObd2StepTitle => 'Σύνδεση προσαρμογέα OBD2';
 
   @override
   String get onboardingObd2StepBody =>
-      'Plug your OBD2 adapter into the car\'s port and turn the ignition on. We\'ll read the VIN and fill in engine details for you.';
+      'Συνδέστε τον προσαρμογέα OBD2 στη θύρα του αυτοκινήτου και ανάψτε τη μίζα. Θα διαβάσουμε το VIN και θα συμπληρώσουμε τα στοιχεία κινητήρα για εσάς.';
 
   @override
-  String get onboardingObd2ConnectButton => 'Connect adapter';
+  String get onboardingObd2ConnectButton => 'Σύνδεση προσαρμογέα';
 
   @override
-  String get onboardingObd2SkipButton => 'Maybe later';
+  String get onboardingObd2SkipButton => 'Ίσως αργότερα';
 
   @override
-  String get onboardingObd2ReadingVin => 'Reading VIN…';
+  String get onboardingObd2ReadingVin => 'Ανάγνωση VIN…';
 
   @override
   String get onboardingObd2VinReadFailed =>
-      'Couldn\'t read VIN — enter manually';
+      'Αδύνατη ανάγνωση VIN — εισάγετε χειροκίνητα';
 
   @override
   String get onboardingObd2ConnectFailed =>
-      'Couldn\'t connect to the adapter. You can retry or skip.';
+      'Αδύνατη σύνδεση με τον προσαρμογέα. Μπορείτε να δοκιμάσετε ξανά ή να παραλείψετε.';
 
   @override
-  String get onboardingPickUseMode => 'Pick a use mode to continue.';
+  String get onboardingPickUseMode =>
+      'Επιλέξτε λειτουργία χρήσης για συνέχεια.';
 
   @override
-  String get alertsRadiusFrequencyLabel => 'Check frequency';
+  String get alertsRadiusFrequencyLabel => 'Συχνότητα ελέγχου';
 
   @override
-  String get alertsRadiusFrequencyDaily => 'Once a day';
+  String get alertsRadiusFrequencyDaily => 'Μία φορά την ημέρα';
 
   @override
-  String get alertsRadiusFrequencyTwiceDaily => 'Twice a day';
+  String get alertsRadiusFrequencyTwiceDaily => 'Δύο φορές την ημέρα';
 
   @override
-  String get alertsRadiusFrequencyThriceDaily => 'Three times a day';
+  String get alertsRadiusFrequencyThriceDaily => 'Τρεις φορές την ημέρα';
 
   @override
-  String get alertsRadiusFrequencyFourTimesDaily => 'Four times a day';
+  String get alertsRadiusFrequencyFourTimesDaily => 'Τέσσερις φορές την ημέρα';
 
   @override
-  String get radiusAlertPickOnMap => 'Pick on map';
+  String get radiusAlertPickOnMap => 'Επιλογή στον χάρτη';
 
   @override
-  String get radiusAlertMapPickerTitle => 'Pick alert center';
+  String get radiusAlertMapPickerTitle => 'Επιλογή κέντρου ειδοποίησης';
 
   @override
-  String get radiusAlertMapPickerConfirm => 'Confirm';
+  String get radiusAlertMapPickerConfirm => 'Επιβεβαίωση';
 
   @override
-  String get radiusAlertMapPickerCancel => 'Cancel';
+  String get radiusAlertMapPickerCancel => 'Ακύρωση';
 
   @override
   String get radiusAlertMapPickerHint =>
-      'Drag the map to position the alert center';
+      'Σύρετε τον χάρτη για τοποθέτηση κέντρου ειδοποίησης';
 
   @override
-  String get radiusAlertCenterFromMap => 'Map location';
+  String get radiusAlertCenterFromMap => 'Τοποθεσία χάρτη';
 
   @override
   String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel near $label';
+    return '$fuelLabel κοντά στο $label';
   }
 
   @override
   String radiusAlertNotificationBody(String price, String threshold) {
-    return 'A station is at $price € (target: $threshold €)';
+    return 'Ένας σταθμός έχει $price € (στόχος: $threshold €)';
   }
 
   @override
@@ -4620,49 +4678,49 @@ class AppLocalizationsEl extends AppLocalizations {
   String get refuelUnitPerKwh => '/kWh';
 
   @override
-  String get refuelUnitPerSession => '/session';
+  String get refuelUnitPerSession => '/συνεδρία';
 
   @override
-  String get speedConsumptionCardTitle => 'Consumption by speed';
+  String get speedConsumptionCardTitle => 'Κατανάλωση ανά ταχύτητα';
 
   @override
-  String get speedBandIdleJam => 'Idle / jam';
+  String get speedBandIdleJam => 'Ρελαντί / μποτιλιάρισμα';
 
   @override
-  String get speedBandUrban => 'Urban (10–50)';
+  String get speedBandUrban => 'Αστικό (10–50)';
 
   @override
-  String get speedBandSuburban => 'Suburban (50–80)';
+  String get speedBandSuburban => 'Προαστιακό (50–80)';
 
   @override
-  String get speedBandRural => 'Rural (80–100)';
+  String get speedBandRural => 'Επαρχιακό (80–100)';
 
   @override
-  String get speedBandMotorwaySlow => 'Eco-cruise (100–115)';
+  String get speedBandMotorwaySlow => 'Οικονομική κρουαζιέρα (100–115)';
 
   @override
-  String get speedBandMotorway => 'Motorway (115–130)';
+  String get speedBandMotorway => 'Αυτοκινητόδρομος (115–130)';
 
   @override
-  String get speedBandMotorwayFast => 'Motorway fast (130+)';
+  String get speedBandMotorwayFast => 'Γρήγορος αυτοκινητόδρομος (130+)';
 
   @override
   String get speedConsumptionInsufficientData =>
-      'Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.';
+      'Καταγράψτε 30+ λεπτά ταξιδιών με τον προσαρμογέα OBD2 για ξεκλείδωμα της ανάλυσης ταχύτητας/κατανάλωσης.';
 
   @override
   String speedConsumptionTimeShare(int percent) {
-    return '$percent % of driving';
+    return '$percent % οδήγησης';
   }
 
   @override
-  String get speedConsumptionNeedMoreData => 'Need more data';
+  String get speedConsumptionNeedMoreData => 'Απαιτούνται περισσότερα δεδομένα';
 
   @override
-  String get splashLoadingLabel => 'Loading Sparkilo';
+  String get splashLoadingLabel => 'Φόρτωση Sparkilo';
 
   @override
-  String get tankLevelTitle => 'Tank level';
+  String get tankLevelTitle => 'Στάθμη ντεπόζιτου';
 
   @override
   String tankLevelLitersFormat(String litres) {
@@ -4671,115 +4729,117 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String tankLevelRangeFormat(String kilometres) {
-    return '≈ $kilometres km of range';
+    return '≈ $kilometres km αυτονομία';
   }
 
   @override
   String tankLevelLastFillUpFormat(String date, String count) {
-    return 'Last fill-up: $date · $count trip(s) since';
+    return 'Τελευταίος ανεφοδιασμός: $date · $count ταξίδι(α) από τότε';
   }
 
   @override
-  String get tankLevelMethodObd2 => 'OBD2 measured';
+  String get tankLevelMethodObd2 => 'Μέτρηση OBD2';
 
   @override
-  String get tankLevelMethodDistanceFallback => 'distance-based estimate';
+  String get tankLevelMethodDistanceFallback => 'εκτίμηση βάσει απόστασης';
 
   @override
-  String get tankLevelMethodMixed => 'mixed measurement';
+  String get tankLevelMethodMixed => 'μεικτή μέτρηση';
 
   @override
-  String get tankLevelEmptyNoFillUp => 'Log a fill-up to see your tank level';
+  String get tankLevelEmptyNoFillUp =>
+      'Καταγράψτε ανεφοδιασμό για εμφάνιση στάθμης ντεπόζιτου';
 
   @override
-  String get tankLevelDetailSheetTitle => 'Trips since last fill-up';
+  String get tankLevelDetailSheetTitle =>
+      'Ταξίδια από τον τελευταίο ανεφοδιασμό';
 
   @override
-  String get addFillUpIsFullTankLabel => 'Full tank';
+  String get addFillUpIsFullTankLabel => 'Πλήρες ντεπόζιτο';
 
   @override
   String get addFillUpIsFullTankSubtitle =>
-      'Tank filled to the brim — uncheck if this was a partial fill';
+      'Το ντεπόζιτο γέμισε ως επάνω — αποεπιλέξτε αν ήταν μερικός ανεφοδιασμός';
 
   @override
-  String get themeCardTitle => 'Theme';
+  String get themeCardTitle => 'Θέμα';
 
   @override
-  String get themeCardSubtitleSystem => 'System';
+  String get themeCardSubtitleSystem => 'Σύστημα';
 
   @override
-  String get themeCardSubtitleLight => 'Light';
+  String get themeCardSubtitleLight => 'Φωτεινό';
 
   @override
-  String get themeCardSubtitleDark => 'Dark';
+  String get themeCardSubtitleDark => 'Σκοτεινό';
 
   @override
-  String get themeSettingsScreenTitle => 'Theme';
+  String get themeSettingsScreenTitle => 'Θέμα';
 
   @override
-  String get themeSettingsSystemLabel => 'Follow system';
+  String get themeSettingsSystemLabel => 'Ακολουθεί σύστημα';
 
   @override
-  String get themeSettingsLightLabel => 'Light';
+  String get themeSettingsLightLabel => 'Φωτεινό';
 
   @override
-  String get themeSettingsDarkLabel => 'Dark';
+  String get themeSettingsDarkLabel => 'Σκοτεινό';
 
   @override
   String get themeSettingsSystemDescription =>
-      'Match the current device appearance.';
+      'Αντιστοιχεί στην τρέχουσα εμφάνιση συσκευής.';
 
   @override
   String get themeSettingsLightDescription =>
-      'Bright backgrounds — best for daytime use.';
+      'Φωτεινά φόντα — ιδανικό για χρήση κατά τη διάρκεια της ημέρας.';
 
   @override
   String get themeSettingsDarkDescription =>
-      'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
+      'Σκοτεινά φόντα — πιο ευχάριστο για τα μάτια τη νύχτα και εξοικονομεί μπαταρία σε οθόνες OLED.';
 
   @override
   String get themeSettingsEcoLabel => 'Eco';
 
   @override
   String get themeSettingsEcoDescription =>
-      'The app\'s signature green look — bright and easy to read, with softly green-tinted backgrounds.';
+      'Η χαρακτηριστική πράσινη εμφάνιση της εφαρμογής — φωτεινή και ευανάγνωστη, με απαλά πρασινωπά φόντα.';
 
   @override
-  String get throttleRpmHistogramTitle => 'How you used the engine';
+  String get throttleRpmHistogramTitle => 'Πώς χρησιμοποιήσατε τον κινητήρα';
 
   @override
-  String get throttleRpmHistogramThrottleSection => 'Throttle position';
+  String get throttleRpmHistogramThrottleSection => 'Θέση γκαζιού';
 
   @override
-  String get throttleRpmHistogramRpmSection => 'Engine RPM';
+  String get throttleRpmHistogramRpmSection => 'RPM κινητήρα';
 
   @override
-  String get throttleRpmHistogramThrottleCoast => 'Coast (0–25%)';
+  String get throttleRpmHistogramThrottleCoast => 'Αδράνεια (0–25%)';
 
   @override
-  String get throttleRpmHistogramThrottleLight => 'Light (25–50%)';
+  String get throttleRpmHistogramThrottleLight => 'Ελαφρύ (25–50%)';
 
   @override
-  String get throttleRpmHistogramThrottleFirm => 'Firm (50–75%)';
+  String get throttleRpmHistogramThrottleFirm => 'Μέτριο (50–75%)';
 
   @override
-  String get throttleRpmHistogramThrottleWide => 'Wide-open (75–100%)';
+  String get throttleRpmHistogramThrottleWide => 'Πλήρες (75–100%)';
 
   @override
-  String get throttleRpmHistogramRpmIdle => 'Idle (≤900)';
+  String get throttleRpmHistogramRpmIdle => 'Ρελαντί (≤900)';
 
   @override
-  String get throttleRpmHistogramRpmCruise => 'Cruise (901–2000)';
+  String get throttleRpmHistogramRpmCruise => 'Κρουαζιέρα (901–2000)';
 
   @override
-  String get throttleRpmHistogramRpmSpirited => 'Spirited (2001–3000)';
+  String get throttleRpmHistogramRpmSpirited => 'Δυναμικό (2001–3000)';
 
   @override
-  String get throttleRpmHistogramRpmHard => 'Hard (>3000)';
+  String get throttleRpmHistogramRpmHard => 'Σκληρό (>3000)';
 
   @override
   String get throttleRpmHistogramEmpty =>
-      'No throttle or RPM samples in this trip.';
+      'Δεν υπάρχουν δείγματα γκαζιού ή RPM σε αυτό το ταξίδι.';
 
   @override
   String throttleRpmHistogramBarShare(String pct) {
@@ -4787,30 +4847,31 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get trajetsTabLabel => 'Trips';
+  String get trajetsTabLabel => 'Ταξίδια';
 
   @override
-  String get trajetsStartRecordingButton => 'Start recording';
+  String get trajetsStartRecordingButton => 'Έναρξη καταγραφής';
 
   @override
-  String get trajetsResumeRecordingButton => 'Resume recording';
+  String get trajetsResumeRecordingButton => 'Συνέχεια καταγραφής';
 
   @override
   String get tripStartProgressConnectingAdapter =>
-      'Connecting to OBD2 adapter…';
+      'Σύνδεση σε προσαρμογέα OBD2…';
 
   @override
-  String get tripStartProgressReadingVehicleData => 'Reading vehicle data…';
+  String get tripStartProgressReadingVehicleData =>
+      'Ανάγνωση δεδομένων οχήματος…';
 
   @override
-  String get tripStartProgressStartingRecording => 'Starting recording…';
+  String get tripStartProgressStartingRecording => 'Έναρξη καταγραφής…';
 
   @override
-  String get trajetsEmptyStateTitle => 'No trips yet';
+  String get trajetsEmptyStateTitle => 'Δεν υπάρχουν ταξίδια ακόμα';
 
   @override
   String get trajetsEmptyStateBody =>
-      'Tap Start recording to begin logging your drives.';
+      'Πατήστε Έναρξη καταγραφής για να ξεκινήσετε την καταγραφή των οδηγήσεών σας.';
 
   @override
   String trajetsRowDistance(String km) {
@@ -4819,7 +4880,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String trajetsRowDuration(String minutes) {
-    return '$minutes min';
+    return '$minutes λεπτά';
   }
 
   @override
@@ -4828,339 +4889,343 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get trajetDetailSummaryTitle => 'Summary';
+  String get trajetDetailSummaryTitle => 'Σύνοψη';
 
   @override
-  String get trajetDetailFieldDate => 'Date';
+  String get trajetDetailFieldDate => 'Ημερομηνία';
 
   @override
-  String get trajetDetailFieldVehicle => 'Vehicle';
+  String get trajetDetailFieldVehicle => 'Όχημα';
 
   @override
-  String get trajetDetailFieldAdapter => 'OBD2 adapter';
+  String get trajetDetailFieldAdapter => 'Προσαρμογέας OBD2';
 
   @override
-  String get trajetDetailFieldDistance => 'Distance';
+  String get trajetDetailFieldDistance => 'Απόσταση';
 
   @override
-  String get trajetDetailFieldDuration => 'Duration';
+  String get trajetDetailFieldDuration => 'Διάρκεια';
 
   @override
-  String get trajetDetailFieldAvgConsumption => 'Avg consumption';
+  String get trajetDetailFieldAvgConsumption => 'Μέση κατανάλωση';
 
   @override
-  String get trajetDetailFieldFuelUsed => 'Fuel used';
+  String get trajetDetailFieldFuelUsed => 'Καύσιμο που χρησιμοποιήθηκε';
 
   @override
-  String get trajetDetailFieldFuelCost => 'Fuel cost';
+  String get trajetDetailFieldFuelCost => 'Κόστος καυσίμου';
 
   @override
-  String get trajetDetailFieldAvgSpeed => 'Avg speed';
+  String get trajetDetailFieldAvgSpeed => 'Μέση ταχύτητα';
 
   @override
-  String get trajetDetailFieldMaxSpeed => 'Max speed';
+  String get trajetDetailFieldMaxSpeed => 'Μέγιστη ταχύτητα';
 
   @override
   String get trajetDetailFieldValueUnknown => '—';
 
   @override
-  String get trajetDetailChartSpeed => 'Speed (km/h)';
+  String get trajetDetailChartSpeed => 'Ταχύτητα (km/h)';
 
   @override
-  String get trajetDetailChartFuelRate => 'Fuel rate (L/h)';
+  String get trajetDetailChartFuelRate => 'Ροή καυσίμου (L/h)';
 
   @override
   String get trajetDetailChartRpm => 'RPM';
 
   @override
-  String get trajetDetailChartEngineLoad => 'Engine load (%)';
+  String get trajetDetailChartEngineLoad => 'Φόρτωση κινητήρα (%)';
 
   @override
-  String get trajetsRowColdStartChip => 'Cold start';
+  String get trajetsRowColdStartChip => 'Ψυχρή εκκίνηση';
 
   @override
   String get trajetsRowColdStartTooltip =>
-      'Engine didn\'t reach operating temperature during this trip — fuel consumption was higher than usual.';
+      'Ο κινητήρας δεν έφτασε σε θερμοκρασία λειτουργίας κατά τη διάρκεια αυτού του ταξιδιού — η κατανάλωση καυσίμου ήταν υψηλότερη από το συνηθισμένο.';
 
   @override
-  String get trajetDetailChartEmpty => 'No samples recorded';
+  String get trajetDetailChartEmpty => 'Δεν καταγράφηκαν δείγματα';
 
   @override
-  String get trajetDetailShareAction => 'Share';
+  String get trajetDetailShareAction => 'Κοινοποίηση';
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Sparkilo — trip on $date';
+    return 'Sparkilo — ταξίδι στις $date';
   }
 
   @override
-  String get trajetDetailShareError => 'Couldn\'t generate share image';
+  String get trajetDetailShareError =>
+      'Αδύνατη δημιουργία εικόνας κοινοποίησης';
 
   @override
-  String get trajetDetailDeleteAction => 'Delete';
+  String get trajetDetailDeleteAction => 'Διαγραφή';
 
   @override
-  String get trajetDetailDeleteConfirmTitle => 'Delete this trip?';
+  String get trajetDetailDeleteConfirmTitle => 'Διαγραφή αυτού του ταξιδιού;';
 
   @override
   String get trajetDetailDeleteConfirmBody =>
-      'This trip will be permanently removed from your history.';
+      'Αυτό το ταξίδι θα αφαιρεθεί μόνιμα από το ιστορικό σας.';
 
   @override
-  String get trajetDetailDeleteConfirmCancel => 'Cancel';
+  String get trajetDetailDeleteConfirmCancel => 'Ακύρωση';
 
   @override
-  String get trajetDetailDeleteConfirmConfirm => 'Delete';
+  String get trajetDetailDeleteConfirmConfirm => 'Διαγραφή';
 
   @override
   String get tripRecordingObd2NotResponding =>
-      'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
+      'Ο προσαρμογέας OBD2 είναι συνδεδεμένος αλλά δεν επιστρέφει δεδομένα. Δοκιμάστε διαφορετικό προσαρμογέα ή ελέγξτε το πρωτόκολλο διαγνωστικού του οχήματος.';
 
   @override
-  String get tripLengthCardTitle => 'Consumption by trip length';
+  String get tripLengthCardTitle => 'Κατανάλωση ανά μήκος ταξιδιού';
 
   @override
-  String get tripLengthBucketShort => 'Short (<5 km)';
+  String get tripLengthBucketShort => 'Σύντομο (<5 km)';
 
   @override
-  String get tripLengthBucketMedium => 'Medium (5–25 km)';
+  String get tripLengthBucketMedium => 'Μεσαίο (5–25 km)';
 
   @override
-  String get tripLengthBucketLong => 'Long (>25 km)';
+  String get tripLengthBucketLong => 'Μεγάλο (>25 km)';
 
   @override
-  String get tripLengthBucketNeedMoreData => 'Need more data';
+  String get tripLengthBucketNeedMoreData => 'Απαιτούνται περισσότερα δεδομένα';
 
   @override
   String tripLengthBucketTripCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count trips',
-      one: '1 trip',
-      zero: 'no trips',
+      other: '$count ταξίδια',
+      one: '1 ταξίδι',
+      zero: 'κανένα ταξίδι',
     );
     return '$_temp0';
   }
 
   @override
-  String get tripPathCardTitle => 'Trip path';
+  String get tripPathCardTitle => 'Διαδρομή ταξιδιού';
 
   @override
-  String get tripPathCardSubtitle => 'GPS-recorded route';
+  String get tripPathCardSubtitle => 'Διαδρομή καταγεγραμμένη με GPS';
 
   @override
-  String get tripPathLegendTitle => 'Consumption';
+  String get tripPathLegendTitle => 'Κατανάλωση';
 
   @override
-  String get tripPathLegendEfficient => 'Efficient (< 6 L/100km)';
+  String get tripPathLegendEfficient => 'Αποδοτική (< 6 L/100km)';
 
   @override
-  String get tripPathLegendBorderline => 'Borderline (6–10 L/100km)';
+  String get tripPathLegendBorderline => 'Οριακή (6–10 L/100km)';
 
   @override
-  String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
+  String get tripPathLegendWasteful => 'Σπάταλη (≥ 10 L/100km)';
 
   @override
   String get tripRecordingPinTooltip =>
-      'Pinning keeps the screen on — uses more battery';
+      'Η καρφίτσωση κρατά την οθόνη αναμμένη — χρησιμοποιεί περισσότερη μπαταρία';
 
   @override
-  String get tripRecordingPinSemanticOn => 'Unpin recording form';
+  String get tripRecordingPinSemanticOn => 'Αποκαρφίτσωση φόρμας καταγραφής';
 
   @override
-  String get tripRecordingPinSemanticOff => 'Pin recording form';
+  String get tripRecordingPinSemanticOff => 'Καρφίτσωση φόρμας καταγραφής';
 
   @override
-  String get tripRecordingPinHelpTooltip => 'What does pin do?';
+  String get tripRecordingPinHelpTooltip => 'Τι κάνει η καρφίτσωση;';
 
   @override
-  String get tripRecordingPinHelpTitle => 'About pin';
+  String get tripRecordingPinHelpTitle => 'Σχετικά με την καρφίτσωση';
 
   @override
   String get tripRecordingPinHelpBody =>
-      'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.';
+      'Η καρφίτσωση κρατά την οθόνη αναμμένη και αποκρύπτει τις γραμμές συστήματος ώστε η φόρμα να παραμένει αναγνώσιμη σε βάση ταμπλό. Πατήστε ξανά για απελευθέρωση. Απελευθερώνεται αυτόματα όταν σταματά το ταξίδι.';
 
   @override
   String get tripRecordingResumeHintMessage =>
-      'Recording continues in the background. Tap the red banner at the top of any screen to return.';
+      'Η καταγραφή συνεχίζεται στο παρασκήνιο. Πατήστε το κόκκινο banner στην κορυφή οποιασδήποτε οθόνης για επιστροφή.';
 
   @override
   String get tripBannerOpenFromConsumptionTab =>
-      'Open the active trip from the Conso tab';
+      'Ανοίξτε το ενεργό ταξίδι από την καρτέλα Κατανάλωση';
 
   @override
   String get tripRecordingUnpinnedWarning =>
-      'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.';
+      'Καρφιτσώστε την οθόνη για να διατηρείτε το GPS ενεργό κατά τη διάρκεια του ταξιδιού — Το Android μπορεί να περιορίσει το GPS κατά την αδρανοποίηση.';
 
   @override
-  String get unifiedFilterFuel => 'Fuel';
+  String get unifiedFilterFuel => 'Καύσιμο';
 
   @override
   String get unifiedFilterEv => 'EV';
 
   @override
-  String get unifiedFilterBoth => 'Both';
+  String get unifiedFilterBoth => 'Και τα δύο';
 
   @override
-  String get unifiedNoResultsForFilter => 'No results match this filter';
+  String get unifiedNoResultsForFilter =>
+      'Δεν υπάρχουν αποτελέσματα για αυτό το φίλτρο';
 
   @override
-  String get searchFailedSnackbar => 'Search failed — please try again';
+  String get searchFailedSnackbar =>
+      'Αποτυχία αναζήτησης — παρακαλώ δοκιμάστε ξανά';
 
   @override
-  String get vinLabel => 'VIN (optional)';
+  String get vinLabel => 'VIN (προαιρετικό)';
 
   @override
-  String get vinDecodeTooltip => 'Decode VIN';
+  String get vinDecodeTooltip => 'Αποκωδικοποίηση VIN';
 
   @override
-  String get vinConfirmAction => 'Yes, auto-fill';
+  String get vinConfirmAction => 'Ναι, αυτόματη συμπλήρωση';
 
   @override
-  String get vinModifyAction => 'Modify manually';
+  String get vinModifyAction => 'Χειροκίνητη τροποποίηση';
 
   @override
-  String get veResetAction => 'Reset volumetric efficiency';
+  String get veResetAction => 'Επαναφορά ογκομετρικής απόδοσης';
 
   @override
-  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+  String get vehicleReadVinFromCarButton => 'Ανάγνωση VIN από αυτοκίνητο';
 
   @override
   String get vehicleReadVinFromCarTooltip =>
-      'Read VIN from the paired OBD2 adapter';
+      'Ανάγνωση VIN από συζευγμένο προσαρμογέα OBD2';
 
   @override
   String get vehicleReadVinFailedUnsupportedSnackbar =>
-      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
+      'VIN μη διαθέσιμο (Mode 09 PID 02 δεν υποστηρίζεται σε οχήματα πριν το 2005)';
 
   @override
   String get vehicleReadVinFailedGenericSnackbar =>
-      'VIN read failed — please enter manually';
+      'Αποτυχία ανάγνωσης VIN — παρακαλώ εισάγετε χειροκίνητα';
 
   @override
   String get vehicleReadVinNoAdapterHint =>
-      'Pair an OBD2 adapter first to read VIN automatically';
+      'Συζεύξτε πρώτα έναν προσαρμογέα OBD2 για αυτόματη ανάγνωση VIN';
 
   @override
-  String get pickerButtonLabel => 'Pick from catalog';
+  String get pickerButtonLabel => 'Επιλογή από κατάλογο';
 
   @override
-  String get pickerSearchHint => 'Search make or model';
+  String get pickerSearchHint => 'Αναζήτηση μάρκας ή μοντέλου';
 
   @override
-  String get pickerHelpText => 'Pre-fill from 50+ supported vehicles';
+  String get pickerHelpText => 'Προεπλήρωση από 50+ υποστηριζόμενα οχήματα';
 
   @override
-  String get pickerEmptyResults => 'No matches';
+  String get pickerEmptyResults => 'Δεν βρέθηκαν αποτελέσματα';
 
   @override
-  String get pickerCancel => 'Cancel';
+  String get pickerCancel => 'Ακύρωση';
 
   @override
-  String get pickerLoading => 'Loading catalog…';
+  String get pickerLoading => 'Φόρτωση καταλόγου…';
 
   @override
-  String get vinInfoTooltip => 'What is a VIN?';
+  String get vinInfoTooltip => 'Τι είναι το VIN;';
 
   @override
-  String get vinInfoSectionWhatTitle => 'What is a VIN?';
+  String get vinInfoSectionWhatTitle => 'Τι είναι το VIN;';
 
   @override
   String get vinInfoSectionWhatBody =>
-      'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.';
+      'Ο Αριθμός Αναγνώρισης Οχήματος είναι ένας κωδικός 17 χαρακτήρων μοναδικός για το αυτοκίνητό σας. Είναι σφραγισμένος στο πλαίσιο και τυπωμένος στην άδεια κυκλοφορίας σας.';
 
   @override
-  String get vinInfoSectionWhyTitle => 'Why we ask';
+  String get vinInfoSectionWhyTitle => 'Γιατί το ζητάμε';
 
   @override
   String get vinInfoSectionWhyBody =>
-      'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.';
+      'Η αποκωδικοποίηση του VIN προσυμπληρώνει αυτόματα κυβισμό κινητήρα, αριθμό κυλίνδρων, έτος κατασκευής, κύριο τύπο καυσίμου και μικτό βάρος — εξοικονομώντας σας την αναζήτηση τεχνικών χαρακτηριστικών. Ο υπολογισμός ροής καυσίμου OBD2 χρησιμοποιεί αυτές τις τιμές για ακριβή αριθμό κατανάλωσης.';
 
   @override
-  String get vinInfoSectionPrivacyTitle => 'Privacy';
+  String get vinInfoSectionPrivacyTitle => 'Απόρρητο';
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+      'Το VIN σας αποθηκεύεται μόνο τοπικά στην κρυπτογραφημένη αποθήκευση της εφαρμογής — δεν μεταφορτώνεται ποτέ στους διακομιστές Sparkilo. Η βάση δεδομένων NHTSA vPIC υποβάλλεται σε ερώτημα με το VIN αλλά επιστρέφει μόνο ανώνυμες τεχνικές προδιαγραφές· η NHTSA δεν συνδέει το VIN με προσωπικά δεδομένα. Χωρίς δίκτυο, η αναζήτηση εκτός σύνδεσης επιστρέφει μόνο κατασκευαστή και χώρα.';
 
   @override
-  String get vinInfoSectionWhereTitle => 'Where to find it';
+  String get vinInfoSectionWhereTitle => 'Πού να το βρείτε';
 
   @override
   String get vinInfoSectionWhereBody =>
-      'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).';
+      'Κοιτάξτε μέσα από το παρμπρίζ στην κάτω αριστερή γωνία στην πλευρά του οδηγού, ελέγξτε το αυτοκόλλητο στο πλαίσιο της πόρτας οδηγού όταν είναι ανοιχτή, ή διαβάστε το από την άδεια κυκλοφορίας σας.';
 
   @override
-  String get vinInfoDismiss => 'Got it';
+  String get vinInfoDismiss => 'Κατάλαβα';
 
   @override
   String get vinConfirmPrivacyNote =>
-      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Sparkilo servers.';
+      'Αναζητήσαμε το VIN σας στη δωρεάν βάση δεδομένων οχημάτων της NHTSA — τίποτα δεν στάλθηκε στους διακομιστές Sparkilo.';
 
   @override
-  String get gdprVinOnlineDecodeTitle => 'VIN online decode';
+  String get gdprVinOnlineDecodeTitle => 'Αποκωδικοποίηση VIN online';
 
   @override
   String get gdprVinOnlineDecodeShort =>
-      'Decode the VIN via NHTSA\'s free public service';
+      'Αποκωδικοποίηση VIN μέσω της δωρεάν δημόσιας υπηρεσίας NHTSA';
 
   @override
   String get gdprVinOnlineDecodeDescription =>
-      'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.';
+      'Όταν συζεύγνυτε έναν προσαρμογέα, το VIN του οχήματός σας διαβάζεται τοπικά για αναγνώριση του αυτοκινήτου. Ενεργοποιώντας αυτό αποστέλλεται το 17-χαρακτηρο VIN στη δωρεάν υπηρεσία vPIC της NHTSA για αναζήτηση πρόσθετων στοιχείων (μοντέλο, κυβισμός, τύπος καυσίμου). Το VIN είναι τα μόνα δεδομένα που αποστέλλονται — καμία άλλη πληροφορία δεν φεύγει από τη συσκευή σας.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(detected)';
+  String get vehicleDetectedFromVinBadge => '(ανιχνεύτηκε)';
 
   @override
   String vehicleDetectedFromVinSnackbar(String summary) {
-    return 'Detected from VIN: $summary. Apply?';
+    return 'Ανιχνεύτηκε από VIN: $summary. Εφαρμογή;';
   }
 
   @override
-  String get vehicleDetectedFromVinApply => 'Apply';
+  String get vehicleDetectedFromVinApply => 'Εφαρμογή';
 
   @override
   String waitTimeHint(int minutes) {
-    return '~$minutes min wait';
+    return '~$minutes λεπτά αναμονή';
   }
 
   @override
-  String get waitTimeTrackStart => 'Track my wait';
+  String get waitTimeTrackStart => 'Παρακολούθηση αναμονής μου';
 
   @override
-  String get waitTimeTrackEnd => 'I\'m leaving';
+  String get waitTimeTrackEnd => 'Φεύγω';
 
   @override
   String waitTimeElapsedShort(int minutes) {
-    return '$minutes min so far';
+    return '$minutes λεπτά μέχρι τώρα';
   }
 
   @override
-  String get widgetHelpSectionTitle => 'Home-screen widget';
+  String get widgetHelpSectionTitle => 'Widget αρχικής οθόνης';
 
   @override
   String get widgetHelpIntro =>
-      'Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.';
+      'Προσθέστε το widget SparKilo στην αρχική οθόνη σας για εμφάνιση τιμών καυσίμων και φόρτισης με μια ματιά.';
 
   @override
   String get widgetHelpAdd =>
-      'Add it from your launcher\'s widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.';
+      'Προσθέστε το από τον επιλογέα widget του launcher — πατήστε παρατεταμένα σε κενή περιοχή της αρχικής οθόνης, επιλέξτε Widget και βρείτε το SparKilo.';
 
   @override
   String get widgetHelpTap =>
-      'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.';
+      'Πατήστε σταθμό στο widget για άνοιγμά του στην εφαρμογή. Πατήστε το εικονίδιο ανανέωσης για ενημέρωση τιμών.';
 
   @override
   String get widgetHelpConfigure =>
-      'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
+      'Στο Android, πατήστε παρατεταμένα το widget και επιλέξτε Επαναρύθμιση για αλλαγή προφίλ, χρώματος και περιεχομένου.';
 
   @override
-  String get widgetVariantDefault => 'Current price only';
+  String get widgetVariantDefault => 'Μόνο τρέχουσα τιμή';
 
   @override
-  String get widgetVariantPredictive => 'Predictive: best time to fill';
+  String get widgetVariantPredictive =>
+      'Προβλεπτικό: καλύτερη στιγμή για ανεφοδιασμό';
 
   @override
-  String get widgetPredictiveNowPrefix => 'now';
+  String get widgetPredictiveNowPrefix => 'τώρα';
 }
