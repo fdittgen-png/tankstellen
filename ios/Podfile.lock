@@ -1,5 +1,5 @@
 PODS:
-  - app_badge_plus (1.2.9):
+  - app_badge_plus (1.2.10):
     - Flutter
   - app_links (7.0.0):
     - Flutter
@@ -91,14 +91,17 @@ PODS:
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
-  - Sentry/HybridSDK (8.58.1)
-  - sentry_flutter (9.19.0):
+  - Sentry/HybridSDK (8.58.2)
+  - sentry_flutter (9.20.0):
     - Flutter
     - FlutterMacOS
-    - Sentry/HybridSDK (= 8.58.1)
+    - Sentry/HybridSDK (= 8.58.2)
   - share_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - sqflite_darwin (0.0.4):
     - Flutter
     - FlutterMacOS
   - TensorFlowLiteC (2.12.0):
@@ -152,6 +155,7 @@ DEPENDENCIES:
   - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
   - tflite_flutter (from `.symlinks/plugins/tflite_flutter/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
@@ -218,6 +222,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  sqflite_darwin:
+    :path: ".symlinks/plugins/sqflite_darwin/darwin"
   tflite_flutter:
     :path: ".symlinks/plugins/tflite_flutter/ios"
   url_launcher_ios:
@@ -228,7 +234,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/workmanager_apple/ios"
 
 SPEC CHECKSUMS:
-  app_badge_plus: 6032bcb1e31689948ff63404c5d6f118001a9dee
+  app_badge_plus: 09939f19a075cc742cc155d8ed85e6d8601f0104
   app_links: a754cbec3c255bd4bbb4d236ecc06f28cd9a7ce8
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
@@ -258,10 +264,11 @@ SPEC CHECKSUMS:
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  Sentry: 958d9619ceccf6abb8c4736003fa336dac1a80a7
-  sentry_flutter: bdfd7a7b8931c4ecefa37fde9e44a15cd0af30b1
+  Sentry: de29b881e83bd91cf99a927f82f1fd86bfb39db2
+  sentry_flutter: cbb414ef141b64f901bc1ba32daa871349510ce4
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
+  sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   TensorFlowLiteC: 20785a69299185a379ba9852b6625f00afd7984a
   TensorFlowLiteSwift: 3a4928286e9e35bdd3e17970f48e53c80d25e793
   tflite_flutter: 64b192e11352fe36943ab6656e1d49207f1a5595
