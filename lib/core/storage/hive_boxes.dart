@@ -150,15 +150,33 @@ class HiveBoxes {
         'Hive migration: $boxName migrated to encrypted (${entries.length} entries)');
   }
 
-  /// Initialize all Hive boxes for the main isolate.
+  /// Boxes only read by deep OBD2 / trip / badge / snapshot / glide
+  /// features — none is needed to paint the landing search screen, so
+  /// [initDeferred] opens them *after* the first frame (#1794).
+  static const _deferredBoxes = {
+    obd2Baselines,
+    obd2TripHistory,
+    achievements,
+    obd2SupportedPids,
+    serviceReminders,
+    obd2PausedTrips,
+    obd2ActiveTrip,
+    priceSnapshots,
+    trafficSignalsCache,
+  };
+
+  static Future<void>? _deferredInit;
+
+  /// Initialize the Hive boxes required to paint the first frame.
   ///
-  /// #1764 — every box opens on the cold-start critical path before the
-  /// first frame. No box depends on another being open, so the two
-  /// phases below run their disk I/O concurrently via [Future.wait]
-  /// rather than awaiting ~30 `openBox` calls one at a time: the
-  /// encrypted-box migration probe is one parallel batch, and the real
-  /// opens are another. Every box is still open before `init()` returns,
-  /// so there is no "box not open" risk for any reader.
+  /// #1764 — the encrypted-box migration probe and the box opens each
+  /// run their disk I/O concurrently via [Future.wait] rather than
+  /// awaiting ~30 `openBox` calls one at a time.
+  ///
+  /// #1794 — only the boxes the landing screen needs open here. The
+  /// nine deep-feature boxes in [_deferredBoxes] move to [initDeferred],
+  /// which the app-initializer kicks after the first frame. Every box
+  /// `init()` opens is still open before it returns.
   static Future<void> init() async {
     await Hive.initFlutter();
     final cipher = await _loadCipher();
@@ -177,10 +195,9 @@ class HiveBoxes {
       }
     }));
 
-    // Phase 2 — open every box in one parallel batch. The 6 encrypted
-    // boxes and the unencrypted domain boxes have no inter-box ordering
-    // dependency, so a single Future.wait collapses what used to be ~18
-    // sequential awaits into one I/O-bound wait.
+    // Phase 2 — open the first-frame-critical boxes in one parallel
+    // batch: the 6 encrypted domain boxes plus the three unencrypted
+    // boxes the landing path / background isolate need immediately.
     await Future.wait<Box<dynamic>>([
       Hive.openBox(settings, encryptionCipher: cipher),
       Hive.openBox(profiles, encryptionCipher: cipher),
@@ -188,44 +205,25 @@ class HiveBoxes {
       Hive.openBox(cache, encryptionCipher: cipher),
       Hive.openBox(priceHistory, encryptionCipher: cipher),
       Hive.openBox(alerts, encryptionCipher: cipher),
-      // #769 — OBD2 baselines are unencrypted JSON strings; low
-      // sensitivity and opened once at startup like the other boxes.
-      Hive.openBox<String>(obd2Baselines),
-      // #726 — OBD2 trip history: rolling log of finalised trips.
-      Hive.openBox<String>(obd2TripHistory),
-      // #781 — gamification badges: one entry per earned badge.
-      Hive.openBox<String>(achievements),
-      // #811 — supported-PID bitmap cache (per VIN, or make:model:year
-      // fallback). Values are JSON-encoded `List<int>` of PID indices,
-      // mirroring the storage idiom used by the other OBD2 boxes so
-      // we don't need a custom adapter.
-      Hive.openBox<String>(obd2SupportedPids),
-      // #584 — odometer-based service reminders: one entry per reminder.
-      Hive.openBox<String>(serviceReminders),
-      // #797 — partial OBD2 trips paused by a BT drop. Same string-typed
-      // JSON pattern as [obd2TripHistory] so one box adapter covers both.
-      Hive.openBox<String>(obd2PausedTrips),
-      // #1303 — write-through snapshot of the currently-recording trip.
-      // Single-entry box; the provider rewrites on a 5-second debounce
-      // and the recovery service reads it on next cold start.
-      Hive.openBox<String>(obd2ActiveTrip),
-      // #579 — rolling price snapshots for the velocity detector.
-      Hive.openBox<String>(priceSnapshots),
-      // #1105 — isolate error spool: background-isolate errors written
-      // here while Riverpod is unavailable, drained by the foreground
-      // initialiser into TraceRecorder. Unencrypted so the BG isolate
-      // can write before consent / keychain unlock.
+      // #1105 — isolate error spool: the background isolate writes here
+      // before Riverpod is available, so it must be open immediately.
       Hive.openBox<String>(isolateErrorSpool),
-      // #1125 — glide-coach OSM traffic-signal cache (phase 1).
-      Hive.openBox<String>(trafficSignalsCache),
-      // #1373 — central feature-flag set (phase 1).
+      // #1373 — central feature-flag set: read during the first build.
       Hive.openBox<dynamic>(featureFlags),
-      // #1517 — active "use mode" profile (Basic / Medium / Full /
-      // Custom). Tiny box, always one entry; opened next to feature_flags
-      // since the two systems collaborate at startup.
+      // #1517 — active "use mode" profile: gates the first route.
       Hive.openBox<dynamic>(appProfile),
     ]);
   }
+
+  /// Opens the deep-feature boxes ([_deferredBoxes]) that the landing
+  /// screen does not need (#1794).
+  ///
+  /// Idempotent — the result is cached, so every post-first-frame
+  /// reader of a deferred box can `await HiveBoxes.initDeferred()` to
+  /// be sure its box is open without re-running the opens.
+  static Future<void> initDeferred() => _deferredInit ??= Future.wait(
+        _deferredBoxes.map((name) => Hive.openBox<String>(name)),
+      );
 
   /// Initialize Hive in a background isolate with proper encryption.
   static Future<void> initInIsolate() async {
