@@ -107,9 +107,6 @@ gate is already tested elsewhere.
 - **The 5 shell-screen test files** — they look duplicative on the
   surface but each tests a different gating signal (responsive width,
   vehicle presence, feature flags). Keep all five.
-- **v2 feature-management tests** (`test/features/feature_management/v2/`)
-   — the v2 layer (#1562) is a parallel compatibility surface; its tests
-  shadow v1 behaviour intentionally. Remove only when v1 is sunset.
 
 ---
 
