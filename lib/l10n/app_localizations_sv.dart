@@ -48,18 +48,18 @@ class AppLocalizationsSv extends AppLocalizations {
   String get searchButton => 'Sök';
 
   @override
-  String get searchCriteriaTitle => 'Search criteria';
+  String get searchCriteriaTitle => 'Sökkriterier';
 
   @override
-  String get searchCriteriaOpen => 'Search';
+  String get searchCriteriaOpen => 'Sök';
 
   @override
   String searchCriteriaRadiusBadge(String km) {
-    return 'Within $km km';
+    return 'Inom $km km';
   }
 
   @override
-  String get searchCriteriaTapToSearch => 'Tap to start searching';
+  String get searchCriteriaTapToSearch => 'Tryck för att börja söka';
 
   @override
   String get noResults => 'Inga bensinstationer hittades.';
@@ -149,31 +149,31 @@ class AppLocalizationsSv extends AppLocalizations {
   String get cancel => 'Avbryt';
 
   @override
-  String get countryChangeTitle => 'Switch country?';
+  String get countryChangeTitle => 'Byta land?';
 
   @override
   String countryChangeBody(String country) {
-    return 'Switching to $country will change:';
+    return 'Byte till $country ändrar:';
   }
 
   @override
-  String get countryChangeCurrency => 'Currency';
+  String get countryChangeCurrency => 'Valuta';
 
   @override
-  String get countryChangeDistance => 'Distance';
+  String get countryChangeDistance => 'Avstånd';
 
   @override
-  String get countryChangeVolume => 'Volume';
+  String get countryChangeVolume => 'Volym';
 
   @override
-  String get countryChangePricePerUnit => 'Price format';
+  String get countryChangePricePerUnit => 'Prisformat';
 
   @override
   String get countryChangeNote =>
-      'Existing favorites and fill-up logs are not rewritten; only new entries use the new units.';
+      'Befintliga favoriter och tankningsloggar skrivs inte om; bara nya poster använder de nya enheterna.';
 
   @override
-  String get countryChangeConfirm => 'Switch';
+  String get countryChangeConfirm => 'Byt';
 
   @override
   String get delete => 'Ta bort';
@@ -392,108 +392,109 @@ class AppLocalizationsSv extends AppLocalizations {
   String get reportBug => 'Rapportera fel / Föreslå funktion';
 
   @override
-  String get reportThisIssue => 'Report this issue';
+  String get reportThisIssue => 'Rapportera detta problem';
 
   @override
-  String get reportAlreadySent => 'You already reported this issue.';
+  String get reportAlreadySent => 'Du har redan rapporterat det här problemet.';
 
   @override
-  String get reportConsentTitle => 'Report to GitHub?';
+  String get reportConsentTitle => 'Rapportera till GitHub?';
 
   @override
   String get reportConsentBody =>
-      'This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.';
+      'Det här öppnar ett offentligt GitHub-ärende med felinformationen nedan. Inga GPS-koordinater, API-nycklar eller personuppgifter ingår.';
 
   @override
-  String get reportConsentConfirm => 'Open GitHub';
+  String get reportConsentConfirm => 'Öppna GitHub';
 
   @override
-  String get reportConsentCancel => 'Cancel';
+  String get reportConsentCancel => 'Avbryt';
 
   @override
-  String get configProfileSection => 'Profile';
+  String get configProfileSection => 'Profil';
 
   @override
-  String get configActiveProfile => 'Active profile';
+  String get configActiveProfile => 'Aktiv profil';
 
   @override
-  String get configPreferredFuel => 'Preferred fuel';
+  String get configPreferredFuel => 'Favoritbränsle';
 
   @override
-  String get configCountry => 'Country';
+  String get configCountry => 'Land';
 
   @override
-  String get configRouteSegment => 'Route segment';
+  String get configRouteSegment => 'Ruttsegment';
 
   @override
-  String get configApiKeysSection => 'API keys';
+  String get configApiKeysSection => 'API-nycklar';
 
   @override
-  String get configTankerkoenigKey => 'Tankerkoenig API key';
+  String get configTankerkoenigKey => 'Tankerkoenig API-nyckel';
 
   @override
-  String get configApiKeyConfigured => 'Configured';
+  String get configApiKeyConfigured => 'Konfigurerad';
 
   @override
-  String get configApiKeyNotSet => 'Not set (demo mode)';
+  String get configApiKeyNotSet => 'Inte inställd (demoläge)';
 
   @override
-  String get configApiKeyCommunity => 'Default (community key)';
+  String get configApiKeyCommunity => 'Standard (community-nyckel)';
 
   @override
-  String get searchLocationPlaceholder => 'Address, postal code or city';
+  String get searchLocationPlaceholder => 'Adress, postnummer eller ort';
 
   @override
-  String get configEvKey => 'EV charging API key';
+  String get configEvKey => 'EV-laddnings-API-nyckel';
 
   @override
-  String get configEvKeyCustom => 'Custom key';
+  String get configEvKeyCustom => 'Anpassad nyckel';
 
   @override
-  String get configEvKeyShared => 'Default (shared)';
+  String get configEvKeyShared => 'Standard (delad)';
 
   @override
-  String get configCloudSyncSection => 'Cloud Sync';
+  String get configCloudSyncSection => 'Molnsynkronisering';
 
   @override
-  String get configTankSyncConnected => 'Connected';
+  String get configTankSyncConnected => 'Ansluten';
 
   @override
-  String get configTankSyncDisabled => 'Disabled';
+  String get configTankSyncDisabled => 'Inaktiverad';
 
   @override
-  String get configAuthMode => 'Auth mode';
+  String get configAuthMode => 'Autentiseringsläge';
 
   @override
-  String get configAuthEmail => 'Email (persistent)';
+  String get configAuthEmail => 'E-post (beständig)';
 
   @override
-  String get configAuthAnonymous => 'Anonymous (device-only)';
+  String get configAuthAnonymous => 'Anonym (endast denna enhet)';
 
   @override
-  String get configDatabase => 'Database';
+  String get configDatabase => 'Databas';
 
   @override
-  String get configPrivacySummary => 'Privacy summary';
+  String get configPrivacySummary => 'Integritetsöversikt';
 
   @override
   String configPrivacySummarySynced(Object authNote) {
-    return '• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• $authNote';
+    return '• Favoriter, aviseringar och ignorerade stationer synkas till din privata databas\n• GPS-position och API-nycklar lämnar aldrig din enhet\n• $authNote';
   }
 
   @override
   String get configPrivacySummaryLocal =>
-      '• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage';
+      '• All data lagras lokalt på den här enheten\n• Ingen data skickas till någon server\n• API-nycklar krypterade i enhetens säkra lagring';
 
   @override
-  String get configAuthNoteEmail => 'Email account enables cross-device access';
+  String get configAuthNoteEmail =>
+      'E-postkonto möjliggör åtkomst från flera enheter';
 
   @override
   String get configAuthNoteAnonymous =>
-      'Anonymous account — data tied to this device';
+      'Anonymt konto – data kopplad till den här enheten';
 
   @override
-  String get configNone => 'None';
+  String get configNone => 'Ingen';
 
   @override
   String get privacyPolicy => 'Integritetspolicy';
@@ -534,7 +535,7 @@ class AppLocalizationsSv extends AppLocalizations {
       'Demoläge. Konfigurera API-nyckel i inställningar.';
 
   @override
-  String get demoModeBannerAction => 'Get live prices';
+  String get demoModeBannerAction => 'Hämta riktiga priser';
 
   @override
   String get sortDistance => 'Avstånd';
@@ -543,10 +544,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sortOpen24h => '24h';
 
   @override
-  String get sortRating => 'Rating';
+  String get sortRating => 'Betyg';
 
   @override
-  String get sortPriceDistance => 'Price/km';
+  String get sortPriceDistance => 'Pris/km';
 
   @override
   String get cheap => 'billig';
@@ -998,21 +999,21 @@ class AppLocalizationsSv extends AppLocalizations {
   String get allDataDeleted => 'All serverdata borttagen';
 
   @override
-  String get forgetAllSyncedTripsButton => 'Forget all synced trips';
+  String get forgetAllSyncedTripsButton => 'Glöm alla synkade resor';
 
   @override
-  String get forgetAllSyncedTripsConfirmTitle => 'Forget all synced trips?';
+  String get forgetAllSyncedTripsConfirmTitle => 'Glöm alla synkade resor?';
 
   @override
   String get forgetAllSyncedTripsConfirmBody =>
-      'Every trip summary and detail blob will be removed from the server. Your local trip history on this device won\'t be affected.\n\nThis action cannot be undone.';
+      'Alla resesammanfattningar och detaljblobbar tas bort från servern. Din lokala resehistorik på den här enheten påverkas inte.\n\nDen här åtgärden kan inte ångras.';
 
   @override
-  String get forgetAllSyncedTripsConfirmAction => 'Forget all';
+  String get forgetAllSyncedTripsConfirmAction => 'Glöm alla';
 
   @override
   String get forgetAllSyncedTripsSuccess =>
-      'All synced trips removed from server';
+      'Alla synkade resor borttagna från servern';
 
   @override
   String get disconnectConfirm => 'Koppla från TankSync?';
@@ -1060,48 +1061,48 @@ class AppLocalizationsSv extends AppLocalizations {
   String get close => 'Stäng';
 
   @override
-  String get account => 'Account';
+  String get account => 'Konto';
 
   @override
-  String get continueAsGuest => 'Continue as guest';
+  String get continueAsGuest => 'Fortsätt som gäst';
 
   @override
-  String get createAccount => 'Create account';
+  String get createAccount => 'Skapa konto';
 
   @override
-  String get signIn => 'Sign in';
+  String get signIn => 'Logga in';
 
   @override
-  String get upgradeToEmail => 'Create email account';
+  String get upgradeToEmail => 'Skapa e-postkonto';
 
   @override
-  String get savedRoutes => 'Saved Routes';
+  String get savedRoutes => 'Sparade rutter';
 
   @override
-  String get noSavedRoutes => 'No saved routes';
+  String get noSavedRoutes => 'Inga sparade rutter';
 
   @override
   String get noSavedRoutesHint =>
-      'Search along a route and save it for quick access later.';
+      'Sök längs en rutt och spara den för snabb åtkomst senare.';
 
   @override
-  String get saveRoute => 'Save route';
+  String get saveRoute => 'Spara rutt';
 
   @override
-  String get routeName => 'Route name';
+  String get routeName => 'Ruttnamn';
 
   @override
   String itineraryDeleted(String name) {
-    return '$name deleted';
+    return '$name raderad';
   }
 
   @override
   String loadingRoute(String name) {
-    return 'Loading route: $name';
+    return 'Laddar rutt: $name';
   }
 
   @override
-  String get refreshFailed => 'Refresh failed. Please try again.';
+  String get refreshFailed => 'Uppdatering misslyckades. Försök igen.';
 
   @override
   String get deleteProfileTitle => 'Delete profile?';
@@ -1149,214 +1150,216 @@ class AppLocalizationsSv extends AppLocalizations {
   String get errorUnknown => 'An unexpected error occurred.';
 
   @override
-  String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
+  String get onboardingWelcomeHint => 'Konfigurera appen i några snabba steg.';
 
   @override
   String get onboardingApiKeyDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Registrera dig för en gratis API-nyckel, eller hoppa över för att utforska appen med demodata.';
 
   @override
-  String get onboardingComplete => 'All set!';
+  String get onboardingComplete => 'Klart!';
 
   @override
   String get onboardingCompleteHint =>
-      'You can change these settings anytime in your profile.';
+      'Du kan ändra dessa inställningar när som helst i din profil.';
 
   @override
-  String get onboardingBack => 'Back';
+  String get onboardingBack => 'Tillbaka';
 
   @override
-  String get onboardingNext => 'Next';
+  String get onboardingNext => 'Nästa';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => 'Hoppa över';
 
   @override
-  String get onboardingFinish => 'Get started';
+  String get onboardingFinish => 'Kom igång';
 
   @override
   String crossBorderNearby(String country) {
-    return '$country is nearby';
+    return '$country är i närheten';
   }
 
   @override
   String crossBorderDistance(int km) {
-    return '~$km km to border';
+    return '~$km km till gränsen';
   }
 
   @override
   String crossBorderAvgPrice(String price, int count) {
-    return 'Avg here: $price EUR ($count stations)';
+    return 'Snittpris här: $price EUR ($count stationer)';
   }
 
   @override
-  String get allPricesView => 'All prices';
+  String get allPricesView => 'Alla priser';
 
   @override
-  String get compactView => 'Compact';
+  String get compactView => 'Kompakt';
 
   @override
-  String get switchToAllPricesView => 'Switch to all-prices view';
+  String get switchToAllPricesView => 'Byt till alla priser-vy';
 
   @override
-  String get switchToCompactView => 'Switch to compact view';
+  String get switchToCompactView => 'Byt till kompaktvy';
 
   @override
   String get unavailable => 'N/A';
 
   @override
-  String get outOfStock => 'Out of stock';
+  String get outOfStock => 'Slut i lager';
 
   @override
-  String get gdprTitle => 'Your Privacy';
+  String get gdprTitle => 'Din integritet';
 
   @override
   String get gdprSubtitle =>
-      'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
+      'Den här appen respekterar din integritet. Välj vilken data du vill dela. Du kan ändra dessa inställningar när som helst.';
 
   @override
-  String get gdprLocationTitle => 'Location Access';
+  String get gdprLocationTitle => 'Platsåtkomst';
 
   @override
   String get gdprLocationDescription =>
-      'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
+      'Dina koordinater skickas till bränslepris-API:et för att hitta närliggande stationer. Platsdata lagras aldrig på en server och används inte för spårning.';
 
   @override
   String get gdprLocationShort =>
-      'Find nearby fuel stations using your location';
+      'Hitta närliggande bränslestationer med din plats';
 
   @override
-  String get gdprErrorReportingTitle => 'Error Reporting';
+  String get gdprErrorReportingTitle => 'Felrapportering';
 
   @override
   String get gdprErrorReportingDescription =>
-      'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
+      'Anonyma kraschrapporter hjälper till att förbättra appen. Inga personuppgifter ingår. Rapporter skickas via Sentry endast när det är konfigurerat.';
 
   @override
   String get gdprErrorReportingShort =>
-      'Send anonymous crash reports to improve the app';
+      'Skicka anonyma kraschrapporter för att förbättra appen';
 
   @override
-  String get gdprCloudSyncTitle => 'Cloud Sync';
+  String get gdprCloudSyncTitle => 'Molnsynkronisering';
 
   @override
   String get gdprCloudSyncDescription =>
-      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+      'Synka favoriter och aviseringar mellan enheter via TankSync. Använder anonym autentisering. Din data är krypterad under överföring.';
 
   @override
-  String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
+  String get gdprCloudSyncShort =>
+      'Synka favoriter och aviseringar mellan enheter';
 
   @override
   String get gdprLegalBasis =>
-      'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
+      'Rättslig grund: Art. 6(1)(a) GDPR (Samtycke). Du kan återkalla samtycket när som helst i Inställningar.';
 
   @override
-  String get gdprAcceptAll => 'Accept All';
+  String get gdprAcceptAll => 'Acceptera alla';
 
   @override
-  String get gdprAcceptSelected => 'Accept Selected';
+  String get gdprAcceptSelected => 'Acceptera valda';
 
   @override
   String get gdprSettingsHint =>
-      'You can change your privacy choices at any time.';
+      'Du kan ändra dina integritetsinställningar när som helst.';
 
   @override
-  String get routeSaved => 'Route saved!';
+  String get routeSaved => 'Rutt sparad!';
 
   @override
-  String get routeSaveFailed => 'Failed to save route';
+  String get routeSaveFailed => 'Det gick inte att spara rutten';
 
   @override
-  String get sqlCopied => 'SQL copied to clipboard';
+  String get sqlCopied => 'SQL kopierat till urklipp';
 
   @override
-  String get connectionDataCopied => 'Connection data copied';
+  String get connectionDataCopied => 'Anslutningsdata kopierad';
 
   @override
-  String get accountDeleted => 'Account deleted. Local data preserved.';
+  String get accountDeleted => 'Konto raderat. Lokal data bevarad.';
 
   @override
-  String get switchedToAnonymous => 'Switched to anonymous session';
+  String get switchedToAnonymous => 'Bytte till anonym session';
 
   @override
   String failedToSwitch(String error) {
-    return 'Failed to switch: $error';
+    return 'Byte misslyckades: $error';
   }
 
   @override
-  String get topicUrlCopied => 'Topic URL copied';
+  String get topicUrlCopied => 'Ämnes-URL kopierad';
 
   @override
-  String get testNotificationSent => 'Test notification sent!';
+  String get testNotificationSent => 'Testavisering skickad!';
 
   @override
-  String get testNotificationFailed => 'Failed to send test notification';
+  String get testNotificationFailed => 'Det gick inte att skicka testavisering';
 
   @override
-  String get pushUpdateFailed => 'Failed to update push notification setting';
+  String get pushUpdateFailed =>
+      'Det gick inte att uppdatera push-aviseringsinställning';
 
   @override
-  String get connectedAsGuest => 'Connected as guest';
+  String get connectedAsGuest => 'Ansluten som gäst';
 
   @override
-  String get accountCreated => 'Account created!';
+  String get accountCreated => 'Konto skapat!';
 
   @override
-  String get signedIn => 'Signed in!';
+  String get signedIn => 'Inloggad!';
 
   @override
   String stationHidden(String name) {
-    return '$name hidden';
+    return '$name dold';
   }
 
   @override
   String removedFromFavoritesName(String name) {
-    return '$name removed from favorites';
+    return '$name borttagen från favoriter';
   }
 
   @override
   String invalidApiKey(String error) {
-    return 'Invalid API key: $error';
+    return 'Ogiltig API-nyckel: $error';
   }
 
   @override
-  String get invalidQrCode => 'Invalid QR code format';
+  String get invalidQrCode => 'Ogiltigt QR-kodsformat';
 
   @override
   String get invalidQrCodeTankSync =>
-      'Invalid QR code — expected TankSync format';
+      'Ogiltig QR-kod – förväntat TankSync-format';
 
   @override
-  String get tankSyncConnected => 'TankSync connected!';
+  String get tankSyncConnected => 'TankSync ansluten!';
 
   @override
-  String get syncCompleted => 'Sync completed — data refreshed';
+  String get syncCompleted => 'Synkronisering klar – data uppdaterad';
 
   @override
-  String get deviceCodeCopied => 'Device code copied';
+  String get deviceCodeCopied => 'Enhetskod kopierad';
 
   @override
-  String get undo => 'Undo';
+  String get undo => 'Ångra';
 
   @override
   String invalidPostalCode(String length, String label) {
-    return 'Please enter a valid $length-digit $label';
+    return 'Ange ett giltigt $length-siffrigt $label';
   }
 
   @override
-  String get freshnessAgo => 'ago';
+  String get freshnessAgo => 'sedan';
 
   @override
-  String get freshnessStale => 'Stale';
+  String get freshnessStale => 'Inaktuell';
 
   @override
   String freshnessBadgeSemantics(String age) {
-    return 'Data freshness: $age';
+    return 'Datafräschhet: $age';
   }
 
   @override
   String brandLogoLabel(String brand) {
-    return '$brand logo';
+    return '$brand-logotyp';
   }
 
   @override
@@ -1364,51 +1367,51 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Rate $count stars',
-      one: 'Rate 1 star',
+      other: 'Ge $count stjärnor',
+      one: 'Ge 1 stjärna',
     );
     return '$_temp0';
   }
 
   @override
-  String get passwordStrengthWeak => 'Weak';
+  String get passwordStrengthWeak => 'Svagt';
 
   @override
-  String get passwordStrengthFair => 'Fair';
+  String get passwordStrengthFair => 'Godkänt';
 
   @override
-  String get passwordStrengthStrong => 'Strong';
+  String get passwordStrengthStrong => 'Starkt';
 
   @override
-  String get passwordReqMinLength => 'At least 8 characters';
+  String get passwordReqMinLength => 'Minst 8 tecken';
 
   @override
-  String get passwordReqUppercase => 'At least 1 uppercase letter';
+  String get passwordReqUppercase => 'Minst 1 versal';
 
   @override
-  String get passwordReqLowercase => 'At least 1 lowercase letter';
+  String get passwordReqLowercase => 'Minst 1 gemen';
 
   @override
-  String get passwordReqDigit => 'At least 1 number';
+  String get passwordReqDigit => 'Minst 1 siffra';
 
   @override
-  String get passwordReqSpecial => 'At least 1 special character';
+  String get passwordReqSpecial => 'Minst 1 specialtecken';
 
   @override
-  String get passwordTooWeak => 'Password does not meet all requirements';
+  String get passwordTooWeak => 'Lösenordet uppfyller inte alla krav';
 
   @override
-  String get brandFilterAll => 'All';
+  String get brandFilterAll => 'Alla';
 
   @override
-  String get brandFilterNoHighway => 'No highway';
+  String get brandFilterNoHighway => 'Ingen motorväg';
 
   @override
   String get swipeTutorialMessage =>
-      'Swipe right to navigate, swipe left to remove';
+      'Svep höger för att navigera, svep vänster för att ta bort';
 
   @override
-  String get swipeTutorialDismiss => 'Got it';
+  String get swipeTutorialDismiss => 'Förstått';
 
   @override
   String get alertStatsActive => 'Aktiva';
@@ -1420,100 +1423,101 @@ class AppLocalizationsSv extends AppLocalizations {
   String get alertStatsThisWeek => 'Denna vecka';
 
   @override
-  String get privacyDashboardTitle => 'Privacy Dashboard';
+  String get privacyDashboardTitle => 'Integritetspanel';
 
   @override
-  String get privacyDashboardSubtitle => 'View, export, or delete your data';
+  String get privacyDashboardSubtitle =>
+      'Visa, exportera eller radera din data';
 
   @override
   String get privacyDashboardBanner =>
-      'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
+      'Din data tillhör dig. Här kan du se allt som appen lagrar, exportera det eller radera det.';
 
   @override
-  String get privacyLocalData => 'Data on this device';
+  String get privacyLocalData => 'Data på den här enheten';
 
   @override
-  String get privacyIgnoredStations => 'Ignored stations';
+  String get privacyIgnoredStations => 'Ignorerade stationer';
 
   @override
-  String get privacyRatings => 'Station ratings';
+  String get privacyRatings => 'Stationsbetyg';
 
   @override
-  String get privacyPriceHistory => 'Price history stations';
+  String get privacyPriceHistory => 'Prishistorik-stationer';
 
   @override
-  String get privacyProfiles => 'Search profiles';
+  String get privacyProfiles => 'Sökprofiler';
 
   @override
-  String get privacyItineraries => 'Saved routes';
+  String get privacyItineraries => 'Sparade rutter';
 
   @override
-  String get privacyCacheEntries => 'Cache entries';
+  String get privacyCacheEntries => 'Cacheposter';
 
   @override
-  String get privacyApiKey => 'API key stored';
+  String get privacyApiKey => 'API-nyckel lagrad';
 
   @override
-  String get privacyEvApiKey => 'EV API key stored';
+  String get privacyEvApiKey => 'EV API-nyckel lagrad';
 
   @override
-  String get privacyEstimatedSize => 'Estimated storage';
+  String get privacyEstimatedSize => 'Uppskattad lagring';
 
   @override
-  String get privacySyncedData => 'Cloud sync (TankSync)';
+  String get privacySyncedData => 'Molnsynk (TankSync)';
 
   @override
   String get privacySyncDisabled =>
-      'Cloud sync is disabled. All data stays on this device only.';
+      'Molnsynkronisering är inaktiverad. All data stannar på den här enheten.';
 
   @override
-  String get privacySyncMode => 'Sync mode';
+  String get privacySyncMode => 'Synkläge';
 
   @override
-  String get privacySyncUserId => 'User ID';
+  String get privacySyncUserId => 'Användar-ID';
 
   @override
   String get privacySyncDescription =>
-      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+      'När synkronisering är aktiverad lagras favoriter, aviseringar, ignorerade stationer och betyg även på TankSync-servern.';
 
   @override
-  String get privacyViewServerData => 'View server data';
+  String get privacyViewServerData => 'Visa serverdata';
 
   @override
-  String get privacyExportButton => 'Export all data as JSON';
+  String get privacyExportButton => 'Exportera all data som JSON';
 
   @override
-  String get privacyExportSuccess => 'Data exported to clipboard';
+  String get privacyExportSuccess => 'Data exporterad till urklipp';
 
   @override
-  String get privacyExportCsvButton => 'Export all data as CSV';
+  String get privacyExportCsvButton => 'Exportera all data som CSV';
 
   @override
-  String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
+  String get privacyExportCsvSuccess => 'CSV-data exporterad till urklipp';
 
   @override
-  String get privacyDeleteButton => 'Delete all data';
+  String get privacyDeleteButton => 'Radera all data';
 
   @override
   String privacyCopyErrorLog(int count) {
-    return 'Copy error log to clipboard ($count)';
+    return 'Kopiera fellogg till urklipp ($count)';
   }
 
   @override
-  String get privacyDeleteTitle => 'Delete all data?';
+  String get privacyDeleteTitle => 'Radera all data?';
 
   @override
   String get privacyDeleteBody =>
-      'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
+      'Det här raderar permanent:\n\n- Alla favoriter och stationsdata\n- Alla sökprofiler\n- Alla prisaviseringar\n- All prishistorik\n- All cachad data\n- Din API-nyckel\n- Alla appinställningar\n\nAppen återställs till ursprungligt läge. Den här åtgärden kan inte ångras.';
 
   @override
-  String get privacyDeleteConfirm => 'Delete everything';
+  String get privacyDeleteConfirm => 'Radera allt';
 
   @override
-  String get yes => 'Yes';
+  String get yes => 'Ja';
 
   @override
-  String get no => 'No';
+  String get no => 'Nej';
 
   @override
   String get amenities => 'Amenities';
@@ -1543,26 +1547,26 @@ class AppLocalizationsSv extends AppLocalizations {
   String get amenityEv => 'EV';
 
   @override
-  String get paymentMethods => 'Payment methods';
+  String get paymentMethods => 'Betalningsmetoder';
 
   @override
-  String get paymentMethodCash => 'Cash';
+  String get paymentMethodCash => 'Kontant';
 
   @override
-  String get paymentMethodCard => 'Card';
+  String get paymentMethodCard => 'Kort';
 
   @override
-  String get paymentMethodContactless => 'Contactless';
+  String get paymentMethodContactless => 'Kontaktlös';
 
   @override
-  String get paymentMethodFuelCard => 'Fuel Card';
+  String get paymentMethodFuelCard => 'Bränslekort';
 
   @override
   String get paymentMethodApp => 'App';
 
   @override
   String payWithApp(String app) {
-    return 'Pay with $app';
+    return 'Betala med $app';
   }
 
   @override
@@ -1572,49 +1576,49 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String ecoScoreTooltip(String avg) {
-    return 'Compared to the rolling average over your last 3 fill-ups ($avg L/100 km).';
+    return 'Jämfört med det rullande snittet för dina senaste 3 tankningar ($avg L/100 km).';
   }
 
   @override
   String ecoScoreSemantics(String value, String delta) {
-    return 'Consumption $value L/100 km, $delta versus your rolling average';
+    return 'Förbrukning $value L/100 km, $delta jämfört med ditt rullande snitt';
   }
 
   @override
-  String get drivingMode => 'Driving Mode';
+  String get drivingMode => 'Körläge';
 
   @override
-  String get drivingExit => 'Exit';
+  String get drivingExit => 'Avsluta';
 
   @override
-  String get drivingNearestStation => 'Nearest';
+  String get drivingNearestStation => 'Närmast';
 
   @override
-  String get drivingTapToUnlock => 'Tap to unlock';
+  String get drivingTapToUnlock => 'Tryck för att låsa upp';
 
   @override
-  String get drivingSafetyTitle => 'Safety Notice';
+  String get drivingSafetyTitle => 'Säkerhetsmeddelande';
 
   @override
   String get drivingSafetyMessage =>
-      'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
+      'Använd inte appen under körning. Kör av vägen till en säker plats innan du interagerar med skärmen. Föraren ansvarar alltid för säker körning.';
 
   @override
-  String get drivingSafetyAccept => 'I understand';
+  String get drivingSafetyAccept => 'Jag förstår';
 
   @override
-  String get voiceAnnouncementsTitle => 'Voice Announcements';
+  String get voiceAnnouncementsTitle => 'Röstmeddelanden';
 
   @override
   String get voiceAnnouncementsDescription =>
-      'Announce nearby cheap stations while driving';
+      'Meddela om billiga stationer i närheten under körning';
 
   @override
-  String get voiceAnnouncementsEnabled => 'Enable voice announcements';
+  String get voiceAnnouncementsEnabled => 'Aktivera röstmeddelanden';
 
   @override
   String voiceAnnouncementThreshold(String price) {
-    return 'Only below $price';
+    return 'Endast under $price';
   }
 
   @override
@@ -1624,14 +1628,14 @@ class AppLocalizationsSv extends AppLocalizations {
     String fuelType,
     String price,
   ) {
-    return '$station, $distance kilometers ahead, $fuelType $price';
+    return '$station, $distance kilometer framåt, $fuelType $price';
   }
 
   @override
-  String get voiceAnnouncementProximityRadius => 'Announcement radius';
+  String get voiceAnnouncementProximityRadius => 'Aviseringsradie';
 
   @override
-  String get voiceAnnouncementCooldown => 'Repeat interval';
+  String get voiceAnnouncementCooldown => 'Upprepningsintervall';
 
   @override
   String get nearestStations => 'Narmaste stationer';
@@ -1641,590 +1645,591 @@ class AppLocalizationsSv extends AppLocalizations {
       'Hitta de narmaste stationerna med din nuvarande position';
 
   @override
-  String get consumptionLogTitle => 'Fuel consumption';
+  String get consumptionLogTitle => 'Bränsleförbrukning';
 
   @override
-  String get consumptionLogMenuTitle => 'Consumption log';
+  String get consumptionLogMenuTitle => 'Förbrukningslogg';
 
   @override
   String get consumptionLogMenuSubtitle =>
-      'Track fill-ups and calculate L/100km';
+      'Logga tankningar och beräkna L/100km';
 
   @override
-  String get consumptionStatsTitle => 'Consumption stats';
+  String get consumptionStatsTitle => 'Förbrukningsstatistik';
 
   @override
-  String get addFillUp => 'Add fill-up';
+  String get addFillUp => 'Lägg till tankning';
 
   @override
-  String get noFillUpsTitle => 'No fill-ups yet';
+  String get noFillUpsTitle => 'Inga tankningar ännu';
 
   @override
   String get noFillUpsSubtitle =>
-      'Log your first fill-up to start tracking consumption.';
+      'Logga din första tankning för att börja spåra förbrukning.';
 
   @override
-  String get fillUpDate => 'Date';
+  String get fillUpDate => 'Datum';
 
   @override
-  String get liters => 'Liters';
+  String get liters => 'Liter';
 
   @override
-  String get odometerKm => 'Odometer (km)';
+  String get odometerKm => 'Vägmätare (km)';
 
   @override
-  String get notesOptional => 'Notes (optional)';
+  String get notesOptional => 'Anteckningar (valfritt)';
 
   @override
-  String get stationPreFilled => 'Station pre-filled';
+  String get stationPreFilled => 'Station förifylld';
 
   @override
-  String get statAvgConsumption => 'Avg L/100km';
+  String get statAvgConsumption => 'Sn. L/100km';
 
   @override
-  String get statAvgCostPerKm => 'Avg cost/km';
+  String get statAvgCostPerKm => 'Sn. kostnad/km';
 
   @override
-  String get statTotalLiters => 'Total liters';
+  String get statTotalLiters => 'Totalt liter';
 
   @override
-  String get statTotalSpent => 'Total spent';
+  String get statTotalSpent => 'Totalt spenderat';
 
   @override
-  String get statFillUpCount => 'Fill-ups';
+  String get statFillUpCount => 'Tankningar';
 
   @override
-  String get fieldRequired => 'Required';
+  String get fieldRequired => 'Obligatorisk';
 
   @override
-  String get fieldInvalidNumber => 'Invalid number';
+  String get fieldInvalidNumber => 'Ogiltigt tal';
 
   @override
-  String get carbonDashboardTitle => 'Carbon dashboard';
+  String get carbonDashboardTitle => 'Koldioxidpanel';
 
   @override
-  String get carbonEmptyTitle => 'No data yet';
+  String get carbonEmptyTitle => 'Ingen data ännu';
 
   @override
   String get carbonEmptySubtitle =>
-      'Log fill-ups to see your carbon dashboard.';
+      'Logga tankningar för att se din koldioxidpanel.';
 
   @override
-  String get carbonSummaryTotalCost => 'Total cost';
+  String get carbonSummaryTotalCost => 'Total kostnad';
 
   @override
   String get carbonSummaryTotalCo2 => 'Total CO2';
 
   @override
-  String get monthlyCostsTitle => 'Monthly costs';
+  String get monthlyCostsTitle => 'Månadskostnader';
 
   @override
-  String get monthlyEmissionsTitle => 'Monthly CO2 emissions';
+  String get monthlyEmissionsTitle => 'Månatliga CO2-utsläpp';
 
   @override
-  String get vehiclesTitle => 'My vehicles';
+  String get vehiclesTitle => 'Mina fordon';
 
   @override
-  String get vehiclesMenuTitle => 'My vehicles';
+  String get vehiclesMenuTitle => 'Mina fordon';
 
   @override
   String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+      'Batteri, kontakter, laddningsinställningar';
 
   @override
   String get vehiclesEmptyMessage =>
-      'Add your car to filter by connector and estimate charging costs.';
+      'Lägg till din bil för att filtrera efter kontakttyp och uppskatta laddningskostnader.';
 
   @override
-  String get vehiclesWizardTitle => 'My vehicles (optional)';
+  String get vehiclesWizardTitle => 'Mina fordon (valfritt)';
 
   @override
   String get vehiclesWizardSubtitle =>
-      'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.';
+      'Lägg till din bil för att förifylla förbrukningsloggen och aktivera EV-kontaktfilter. Du kan hoppa över detta och lägga till fordon senare.';
 
   @override
-  String get vehiclesWizardNoneYet => 'No vehicle configured yet.';
+  String get vehiclesWizardNoneYet => 'Inget fordon konfigurerat ännu.';
 
   @override
   String vehiclesWizardYoursList(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count vehicles',
-      one: '1 vehicle',
+      other: '$count fordon',
+      one: '1 fordon',
     );
-    return 'You have $_temp0:';
+    return 'Du har $_temp0:';
   }
 
   @override
   String get vehiclesWizardSkipHint =>
-      'Skip to finish setup — you can add vehicles anytime from Settings.';
+      'Hoppa över för att slutföra konfiguration – du kan lägga till fordon när som helst från Inställningar.';
 
   @override
-  String get fillUpVehicleLabel => 'Vehicle';
+  String get fillUpVehicleLabel => 'Fordon';
 
   @override
-  String get fillUpVehicleNone => 'No vehicle';
+  String get fillUpVehicleNone => 'Inget fordon';
 
   @override
-  String get fillUpVehicleRequired => 'Vehicle is required';
+  String get fillUpVehicleRequired => 'Fordon krävs';
 
   @override
-  String get reportScanError => 'Report scan error';
+  String get reportScanError => 'Rapportera skanningsfel';
 
   @override
-  String get pickStationTitle => 'Pick a station';
+  String get pickStationTitle => 'Välj en station';
 
   @override
   String get pickStationHelper =>
-      'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.';
+      'Starta tankningen från en känd station så fylls priser, märke och bränsletyp i automatiskt.';
 
   @override
   String get pickStationEmpty =>
-      'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.';
+      'Inga favoritstationer ännu – lägg till några från Sök eller Favoriter, eller hoppa över och fyll i manuellt.';
 
   @override
-  String get pickStationSkip => 'Skip — add without a station';
+  String get pickStationSkip => 'Hoppa över – lägg till utan station';
 
   @override
-  String get scanPump => 'Scan pump';
+  String get scanPump => 'Skanna pump';
 
   @override
-  String get scanPayment => 'Scan payment QR';
+  String get scanPayment => 'Skanna betalnings-QR';
 
   @override
-  String get qrPaymentBeneficiary => 'Beneficiary';
+  String get qrPaymentBeneficiary => 'Mottagare';
 
   @override
-  String get qrPaymentAmount => 'Amount';
+  String get qrPaymentAmount => 'Belopp';
 
   @override
-  String get qrPaymentEpcTitle => 'SEPA payment';
+  String get qrPaymentEpcTitle => 'SEPA-betalning';
 
   @override
-  String get qrPaymentEpcEmpty => 'No fields decoded';
+  String get qrPaymentEpcEmpty => 'Inga fält avkodade';
 
   @override
-  String get qrPaymentOpenInBank => 'Open in bank app';
+  String get qrPaymentOpenInBank => 'Öppna i bankapp';
 
   @override
-  String get qrPaymentLaunchFailed => 'No app available to open this code';
+  String get qrPaymentLaunchFailed =>
+      'Ingen app tillgänglig för att öppna den här koden';
 
   @override
-  String get qrPaymentUnknownTitle => 'Unrecognised code';
+  String get qrPaymentUnknownTitle => 'Okänd kod';
 
   @override
-  String get qrPaymentCopyRaw => 'Copy raw text';
+  String get qrPaymentCopyRaw => 'Kopiera råtext';
 
   @override
-  String get qrPaymentCopiedRaw => 'Copied to clipboard';
+  String get qrPaymentCopiedRaw => 'Kopierat till urklipp';
 
   @override
-  String get qrPaymentReport => 'Report this scan';
+  String get qrPaymentReport => 'Rapportera denna skanning';
 
   @override
   String get qrPaymentEpcCopied =>
-      'Bank details copied — paste into your banking app';
+      'Bankuppgifter kopierade – klistra in i din bankapp';
 
   @override
-  String get qrScannerGuidance => 'Point the camera at a QR code';
+  String get qrScannerGuidance => 'Rikta kameran mot en QR-kod';
 
   @override
   String get qrScannerPermissionDenied =>
-      'Camera access is needed to scan QR codes.';
+      'Kameraåtkomst krävs för att skanna QR-koder.';
 
   @override
   String get qrScannerPermissionPermanentlyDenied =>
-      'Camera access was denied. Open settings to grant it.';
+      'Kameraåtkomst nekades. Öppna inställningar för att bevilja den.';
 
   @override
-  String get qrScannerRetryPermission => 'Try again';
+  String get qrScannerRetryPermission => 'Försök igen';
 
   @override
-  String get qrScannerOpenSettings => 'Open settings';
+  String get qrScannerOpenSettings => 'Öppna inställningar';
 
   @override
   String get qrScannerTimeout =>
-      'No QR code detected. Move closer or try again.';
+      'Ingen QR-kod hittades. Flytta närmare eller försök igen.';
 
   @override
-  String get qrScannerRetry => 'Try again';
+  String get qrScannerRetry => 'Försök igen';
 
   @override
-  String get torchOn => 'Turn flash on';
+  String get torchOn => 'Slå på blixt';
 
   @override
-  String get torchOff => 'Turn flash off';
+  String get torchOff => 'Slå av blixt';
 
   @override
-  String get obdNoAdapter => 'No OBD2 adapter in range';
+  String get obdNoAdapter => 'Ingen OBD2-adapter i närheten';
 
   @override
-  String get obdOdometerUnavailable => 'Could not read odometer';
+  String get obdOdometerUnavailable => 'Kunde inte läsa vägmätaren';
 
   @override
   String get obdPermissionDenied =>
-      'Grant Bluetooth permission in system settings';
+      'Bevilja Bluetooth-behörighet i systeminställningarna';
 
   @override
   String get obdAdapterUnresponsive =>
-      'Adapter didn\'t answer — turn the ignition on and retry';
+      'Adaptern svarade inte – slå på tändningen och försök igen';
 
   @override
-  String get obdPickerTitle => 'Pick an OBD2 adapter';
+  String get obdPickerTitle => 'Välj en OBD2-adapter';
 
   @override
-  String get obdPickerScanning => 'Scanning for adapters…';
+  String get obdPickerScanning => 'Söker efter adaptrar…';
 
   @override
-  String get obdPickerConnecting => 'Connecting…';
+  String get obdPickerConnecting => 'Ansluter…';
 
   @override
-  String get themeSettingTitle => 'Theme';
+  String get themeSettingTitle => 'Tema';
 
   @override
-  String get themeModeLight => 'Light';
+  String get themeModeLight => 'Ljust';
 
   @override
-  String get themeModeDark => 'Dark';
+  String get themeModeDark => 'Mörkt';
 
   @override
-  String get themeModeSystem => 'Follow system';
+  String get themeModeSystem => 'Följ system';
 
   @override
-  String get tripRecordingTitle => 'Recording trip';
+  String get tripRecordingTitle => 'Spelar in resa';
 
   @override
-  String get tripSummaryTitle => 'Trip summary';
+  String get tripSummaryTitle => 'Resesammanfattning';
 
   @override
-  String get tripMetricDistance => 'Distance';
+  String get tripMetricDistance => 'Sträcka';
 
   @override
-  String get tripMetricSpeed => 'Speed';
+  String get tripMetricSpeed => 'Hastighet';
 
   @override
-  String get tripMetricFuelUsed => 'Fuel used';
+  String get tripMetricFuelUsed => 'Bränsle använt';
 
   @override
-  String get tripMetricAvgConsumption => 'Avg';
+  String get tripMetricAvgConsumption => 'Snitt';
 
   @override
-  String get tripMetricElapsed => 'Elapsed';
+  String get tripMetricElapsed => 'Förfluten tid';
 
   @override
-  String get tripMetricOdometer => 'Odometer';
+  String get tripMetricOdometer => 'Vägmätare';
 
   @override
-  String get tripStop => 'Stop recording';
+  String get tripStop => 'Stoppa inspelning';
 
   @override
-  String get tripPause => 'Pause';
+  String get tripPause => 'Pausa';
 
   @override
-  String get tripResume => 'Resume';
+  String get tripResume => 'Återuppta';
 
   @override
-  String get tripBannerRecording => 'Recording trip';
+  String get tripBannerRecording => 'Spelar in resa';
 
   @override
-  String get tripBannerPaused => 'Trip paused — tap to resume';
+  String get tripBannerPaused => 'Resa pausad – tryck för att återuppta';
 
   @override
-  String get navConsumption => 'Consumption';
+  String get navConsumption => 'Förbrukning';
 
   @override
-  String get vehicleBaselineSectionTitle => 'Baseline calibration';
+  String get vehicleBaselineSectionTitle => 'Grundkalibrering';
 
   @override
   String get vehicleBaselineEmpty =>
-      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.';
+      'Inga prover ännu – starta en OBD2-resa för att börja lära känna fordonets bränsleprofil.';
 
   @override
   String get vehicleBaselineProgress =>
-      'Learned from samples across driving situations.';
+      'Lärt från prover över olika körsituationer.';
 
   @override
-  String get vehicleBaselineReset => 'Reset driving-situation baseline';
+  String get vehicleBaselineReset => 'Återställ körsituationsgräns';
 
   @override
   String get vehicleBaselineResetConfirmTitle =>
-      'Reset driving-situation baseline?';
+      'Återställ körsituationsgräns?';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
-      'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
+      'Det här raderar alla inlärda prover för detta fordon. Du faller tillbaka till kallstartsstandarderna tills nya resor fyller profilen igen.';
 
   @override
-  String get vehicleAdapterSectionTitle => 'OBD2 adapter';
+  String get vehicleAdapterSectionTitle => 'OBD2-adapter';
 
   @override
   String get vehicleAdapterEmpty =>
-      'No adapter paired. Pair one so the app can reconnect automatically next time.';
+      'Ingen adapter ihopparad. Para ihop en så att appen kan återansluta automatiskt nästa gång.';
 
   @override
-  String get vehicleAdapterUnnamed => 'Unknown adapter';
+  String get vehicleAdapterUnnamed => 'Okänd adapter';
 
   @override
-  String get vehicleAdapterPair => 'Pair adapter';
+  String get vehicleAdapterPair => 'Para ihop adapter';
 
   @override
-  String get vehicleAdapterForget => 'Forget adapter';
+  String get vehicleAdapterForget => 'Glöm adapter';
 
   @override
-  String get achievementsTitle => 'Achievements';
+  String get achievementsTitle => 'Prestationer';
 
   @override
-  String get achievementFirstTrip => 'First trip';
+  String get achievementFirstTrip => 'Första resan';
 
   @override
-  String get achievementFirstTripDesc => 'Record your first OBD2 trip.';
+  String get achievementFirstTripDesc => 'Spela in din första OBD2-resa.';
 
   @override
-  String get achievementFirstFillUp => 'First fill-up';
+  String get achievementFirstFillUp => 'Första tankningen';
 
   @override
-  String get achievementFirstFillUpDesc => 'Log your first fill-up.';
+  String get achievementFirstFillUpDesc => 'Logga din första tankning.';
 
   @override
-  String get achievementTenTrips => '10 trips';
+  String get achievementTenTrips => '10 resor';
 
   @override
-  String get achievementTenTripsDesc => 'Record 10 OBD2 trips.';
+  String get achievementTenTripsDesc => 'Spela in 10 OBD2-resor.';
 
   @override
-  String get achievementZeroHarsh => 'Smooth driver';
+  String get achievementZeroHarsh => 'Mjuk förare';
 
   @override
   String get achievementZeroHarshDesc =>
-      'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+      'Genomför en resa på 10 km eller mer utan hård inbromsning eller acceleration.';
 
   @override
-  String get achievementEcoWeek => 'Eco week';
+  String get achievementEcoWeek => 'Ekovecka';
 
   @override
   String get achievementEcoWeekDesc =>
-      'Drive 7 consecutive days with at least one smooth trip each day.';
+      'Kör 7 dagar i rad med minst en mjuk resa varje dag.';
 
   @override
-  String get achievementPriceWin => 'Price win';
+  String get achievementPriceWin => 'Prisvinst';
 
   @override
   String get achievementPriceWinDesc =>
-      'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+      'Logga en tankning som slår stationens 30-dagarssnitt med 5 % eller mer.';
 
   @override
-  String get syncBaselinesToggleTitle => 'Share learned vehicle profiles';
+  String get syncBaselinesToggleTitle => 'Dela inlärda fordonsprofiler';
 
   @override
   String get syncBaselinesToggleSubtitle =>
-      'Upload per-vehicle consumption baselines so a second device can reuse them.';
+      'Ladda upp förbrukningsgränser per fordon så att en andra enhet kan återanvända dem.';
 
   @override
-  String get obd2StatusConnected => 'OBD2 adapter: connected';
+  String get obd2StatusConnected => 'OBD2-adapter: ansluten';
 
   @override
-  String get obd2StatusAttempting => 'OBD2 adapter: connecting';
+  String get obd2StatusAttempting => 'OBD2-adapter: ansluter';
 
   @override
-  String get obd2StatusUnreachable => 'OBD2 adapter: unreachable';
+  String get obd2StatusUnreachable => 'OBD2-adapter: onåbar';
 
   @override
   String get obd2StatusPermissionDenied =>
-      'OBD2 adapter: Bluetooth permission needed';
+      'OBD2-adapter: Bluetooth-behörighet krävs';
 
   @override
-  String get obd2StatusConnectedBody => 'Ready to record a trip.';
+  String get obd2StatusConnectedBody => 'Redo att spela in en resa.';
 
   @override
-  String get obd2StatusAttemptingBody => 'Connecting in the background…';
+  String get obd2StatusAttemptingBody => 'Ansluter i bakgrunden…';
 
   @override
   String get obd2StatusUnreachableBody =>
-      'Adapter out of range or already in use by another app.';
+      'Adapter utom räckhåll eller används redan av en annan app.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
-      'Grant Bluetooth permission in system settings to reconnect automatically.';
+      'Bevilja Bluetooth-behörighet i systeminställningarna för att återansluta automatiskt.';
 
   @override
-  String get obd2StatusNoAdapter => 'No adapter paired';
+  String get obd2StatusNoAdapter => 'Ingen adapter ihopparad';
 
   @override
-  String get obd2StatusForget => 'Forget adapter';
+  String get obd2StatusForget => 'Glöm adapter';
 
   @override
-  String get tripHistoryTitle => 'Trip history';
+  String get tripHistoryTitle => 'Resehistorik';
 
   @override
-  String get tripHistoryEmptyTitle => 'No trips yet';
+  String get tripHistoryEmptyTitle => 'Inga resor ännu';
 
   @override
   String get tripHistoryEmptySubtitle =>
-      'Connect an OBD2 adapter and record a trip to start building your driving history.';
+      'Anslut en OBD2-adapter och spela in en resa för att börja bygga din körhistorik.';
 
   @override
-  String get tripHistoryUnknownDate => 'Unknown date';
+  String get tripHistoryUnknownDate => 'Okänt datum';
 
   @override
-  String get situationIdle => 'Idle';
+  String get situationIdle => 'Tomgång';
 
   @override
-  String get situationStopAndGo => 'Stop & go';
+  String get situationStopAndGo => 'Stopp och kör';
 
   @override
-  String get situationUrban => 'Urban';
+  String get situationUrban => 'Stadstrafik';
 
   @override
-  String get situationHighway => 'Highway';
+  String get situationHighway => 'Motorväg';
 
   @override
-  String get situationDecel => 'Decelerating';
+  String get situationDecel => 'Retarderar';
 
   @override
-  String get situationClimbing => 'Climbing / loaded';
+  String get situationClimbing => 'Backkörning / lastad';
 
   @override
-  String get situationHardAccel => 'Hard accel';
+  String get situationHardAccel => 'Hård acceleration';
 
   @override
-  String get situationFuelCut => 'Fuel cut — coast';
+  String get situationFuelCut => 'Bränslebrytare – frifart';
 
   @override
-  String get tripSaveAsFillUp => 'Save as fill-up';
+  String get tripSaveAsFillUp => 'Spara som tankning';
 
   @override
-  String get tripSaveRecording => 'Save trip';
+  String get tripSaveRecording => 'Spara resa';
 
   @override
-  String get tripDiscard => 'Discard';
+  String get tripDiscard => 'Kasta';
 
   @override
   String obdOdometerRead(int km) {
-    return 'Odometer read: $km km';
+    return 'Vägmätare avläst: $km km';
   }
 
   @override
-  String get vehicleFuelNotSet => 'Not set';
+  String get vehicleFuelNotSet => 'Ej inställt';
 
   @override
-  String get wizardVehicleTapToEdit => 'Tap to edit';
+  String get wizardVehicleTapToEdit => 'Tryck för att redigera';
 
   @override
-  String get wizardVehicleDefaultBadge => 'Default';
+  String get wizardVehicleDefaultBadge => 'Standard';
 
   @override
   String get wizardProfileChoiceHint =>
-      'Choose how you want to use the app. You can change this later in Settings.';
+      'Välj hur du vill använda appen. Du kan ändra detta senare i Inställningar.';
 
   @override
   String get wizardProfileChoiceFooter =>
-      'You can change your choice any time from Settings → Use mode.';
+      'Du kan ändra ditt val när som helst från Inställningar → Användningsläge.';
 
   @override
-  String get wizardProfileBasicName => 'Basic';
+  String get wizardProfileBasicName => 'Grundläggande';
 
   @override
   String get wizardProfileBasicDescription =>
-      'Cheapest fuel and EV charging prices nearby. Favorites and price alerts.';
+      'Billigaste bränsle och EV-laddningspriser i närheten. Favoriter och prisaviseringar.';
 
   @override
-  String get wizardProfileMediumName => 'Medium';
+  String get wizardProfileMediumName => 'Mellannivå';
 
   @override
   String get wizardProfileMediumDescription =>
-      'Everything in Basic, plus track your fuel fill-ups and EV charging by hand.';
+      'Allt i Grundläggande, plus spåra dina tankningar och EV-laddningar manuellt.';
 
   @override
   String get wizardProfileFullName => 'Full';
 
   @override
   String get wizardProfileFullDescription =>
-      'Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.';
+      'Allt i Mellannivå, plus automatisk OBD2-reseinspelning, körpoäng och lojalitetskort.';
 
   @override
-  String get wizardProfileCustomName => 'Custom';
+  String get wizardProfileCustomName => 'Anpassad';
 
   @override
   String get wizardProfileCustomDescription =>
-      'Your own combination of features. Tweak each toggle below.';
+      'Din egen kombination av funktioner. Justera varje reglage nedan.';
 
   @override
   String get useModeSectionHint =>
-      'Right-size the app to how you actually use it. Picking a preset enables the matching set of features.';
+      'Anpassa appen efter hur du faktiskt använder den. Att välja en förinställning aktiverar den matchande uppsättningen funktioner.';
 
   @override
   String get useModeCustomSettingsDescription =>
-      'Your feature mix doesn\'t match any preset. Pick one above to overwrite, or keep customising individual features in the section below.';
+      'Din funktionsmix matchar ingen förinställning. Välj en ovan för att skriva över, eller fortsätt anpassa enskilda funktioner i avsnittet nedan.';
 
   @override
   String useModeSwitchedSnack(String profile) {
-    return 'Use mode set to $profile.';
+    return 'Användningsläge inställt på $profile.';
   }
 
   @override
-  String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
+  String get profileDefaultVehicleLabel => 'Standardfordon (valfritt)';
 
   @override
-  String get profileDefaultVehicleNone => 'No default';
+  String get profileDefaultVehicleNone => 'Inget standard';
 
   @override
   String get profileFuelFromVehicleHint =>
-      'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
+      'Bränsletyp hämtas från ditt standardfordon. Rensa fordonet för att välja bränsle direkt.';
 
   @override
-  String get consumptionNoVehicleTitle => 'Add a vehicle first';
+  String get consumptionNoVehicleTitle => 'Lägg till ett fordon först';
 
   @override
   String get consumptionNoVehicleBody =>
-      'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.';
+      'Tankningar kopplas till ett fordon. Lägg till din bil för att börja logga förbrukning.';
 
   @override
-  String get vehicleAdd => 'Add vehicle';
+  String get vehicleAdd => 'Lägg till fordon';
 
   @override
-  String get vehicleAddTitle => 'Add vehicle';
+  String get vehicleAddTitle => 'Lägg till fordon';
 
   @override
-  String get vehicleEditTitle => 'Edit vehicle';
+  String get vehicleEditTitle => 'Redigera fordon';
 
   @override
-  String get vehicleDeleteTitle => 'Delete vehicle?';
+  String get vehicleDeleteTitle => 'Radera fordon?';
 
   @override
   String vehicleDeleteMessage(String name) {
-    return 'Remove \"$name\" from your profiles?';
+    return 'Ta bort \"$name\" från dina profiler?';
   }
 
   @override
-  String get vehicleNameLabel => 'Name';
+  String get vehicleNameLabel => 'Namn';
 
   @override
-  String get vehicleNameHint => 'e.g. My Tesla Model 3';
+  String get vehicleNameHint => 't.ex. Min Tesla Model 3';
 
   @override
-  String get vehicleTypeCombustion => 'Combustion';
+  String get vehicleTypeCombustion => 'Förbränning';
 
   @override
   String get vehicleTypeHybrid => 'Hybrid';
 
   @override
-  String get vehicleTypeEv => 'Electric';
+  String get vehicleTypeEv => 'Elektrisk';
 
   @override
-  String get vehicleEvSectionTitle => 'Electric';
+  String get vehicleEvSectionTitle => 'Elektrisk';
 
   @override
-  String get vehicleCombustionSectionTitle => 'Combustion';
+  String get vehicleCombustionSectionTitle => 'Förbränning';
 
   @override
-  String get vehicleBatteryLabel => 'Battery capacity (kWh)';
+  String get vehicleBatteryLabel => 'Batterikapacitet (kWh)';
 
   @override
-  String get vehicleMaxChargeLabel => 'Max charging power (kW)';
+  String get vehicleMaxChargeLabel => 'Max laddeffekt (kW)';
 
   @override
-  String get vehicleConnectorsLabel => 'Supported connectors';
+  String get vehicleConnectorsLabel => 'Stödda kontakter';
 
   @override
   String get vehicleMinSocLabel => 'Min SoC %';
@@ -2233,10 +2238,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get vehicleMaxSocLabel => 'Max SoC %';
 
   @override
-  String get vehicleTankLabel => 'Tank capacity (L)';
+  String get vehicleTankLabel => 'Tankvolym (L)';
 
   @override
-  String get vehiclePreferredFuelLabel => 'Preferred fuel';
+  String get vehiclePreferredFuelLabel => 'Favoritbränsle';
 
   @override
   String get connectorType2 => 'Type 2';
@@ -2257,64 +2262,64 @@ class AppLocalizationsSv extends AppLocalizations {
   String get connectorType1 => 'Type 1';
 
   @override
-  String get connectorThreePin => '3-pin';
+  String get connectorThreePin => '3-stift';
 
   @override
-  String get evShowOnMap => 'Show EV stations';
+  String get evShowOnMap => 'Visa EV-stationer';
 
   @override
-  String get evAvailableOnly => 'Available only';
+  String get evAvailableOnly => 'Endast tillgängliga';
 
   @override
-  String get evMinPower => 'Min power';
+  String get evMinPower => 'Min effekt';
 
   @override
-  String get evMaxPower => 'Max power';
+  String get evMaxPower => 'Max effekt';
 
   @override
-  String get evOperator => 'Operator';
+  String get evOperator => 'Operatör';
 
   @override
-  String get evLastUpdate => 'Last update';
+  String get evLastUpdate => 'Senast uppdaterad';
 
   @override
-  String get evStatusAvailable => 'Available';
+  String get evStatusAvailable => 'Tillgänglig';
 
   @override
-  String get evStatusOccupied => 'Occupied';
+  String get evStatusOccupied => 'Upptagen';
 
   @override
-  String get evStatusOutOfOrder => 'Out of order';
+  String get evStatusOutOfOrder => 'Ur funktion';
 
   @override
-  String get openOnlyFilter => 'Open only';
+  String get openOnlyFilter => 'Endast öppna';
 
   @override
-  String get saveAsDefaults => 'Save as my defaults';
+  String get saveAsDefaults => 'Spara som mina standardinställningar';
 
   @override
-  String get criteriaSavedToProfile => 'Saved as defaults';
+  String get criteriaSavedToProfile => 'Sparat som standardinställningar';
 
   @override
-  String get profileNotFound => 'No active profile';
+  String get profileNotFound => 'Ingen aktiv profil';
 
   @override
-  String get updatingFavorites => 'Updating your favorites...';
+  String get updatingFavorites => 'Uppdaterar dina favoriter...';
 
   @override
-  String get fetchingLatestPrices => 'Fetching the latest prices';
+  String get fetchingLatestPrices => 'Hämtar de senaste priserna';
 
   @override
-  String get noDataAvailable => 'No data';
+  String get noDataAvailable => 'Ingen data';
 
   @override
-  String get configAndPrivacy => 'Configuration & Privacy';
+  String get configAndPrivacy => 'Konfiguration och integritet';
 
   @override
-  String get searchToSeeMap => 'Search to see stations on the map';
+  String get searchToSeeMap => 'Sök för att se stationer på kartan';
 
   @override
-  String get evPowerAny => 'Any';
+  String get evPowerAny => 'Valfri';
 
   @override
   String evPowerKw(int kw) {
@@ -2322,209 +2327,209 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get sectionProfile => 'Profile';
+  String get sectionProfile => 'Profil';
 
   @override
-  String get sectionLocation => 'Location';
+  String get sectionLocation => 'Plats';
 
   @override
-  String get tooltipBack => 'Back';
+  String get tooltipBack => 'Tillbaka';
 
   @override
-  String get tooltipClose => 'Close';
+  String get tooltipClose => 'Stäng';
 
   @override
-  String get tooltipClearSearch => 'Clear search input';
+  String get tooltipClearSearch => 'Rensa sökinmatning';
 
   @override
-  String get tooltipUseGps => 'Use GPS location';
+  String get tooltipUseGps => 'Använd GPS-plats';
 
   @override
-  String get tooltipShowPassword => 'Show password';
+  String get tooltipShowPassword => 'Visa lösenord';
 
   @override
-  String get tooltipHidePassword => 'Hide password';
+  String get tooltipHidePassword => 'Dölj lösenord';
 
   @override
-  String get evConnectorsLabel => 'Available connectors';
+  String get evConnectorsLabel => 'Tillgängliga kontakter';
 
   @override
-  String get evConnectorsNone => 'No connector information';
+  String get evConnectorsNone => 'Ingen kontaktinformation';
 
   @override
-  String get switchToEmail => 'Switch to email';
+  String get switchToEmail => 'Byt till e-post';
 
   @override
   String get switchToEmailSubtitle =>
-      'Keep data, add sign-in from other devices';
+      'Behåll data, lägg till inloggning från andra enheter';
 
   @override
-  String get switchToAnonymousAction => 'Switch to anonymous';
+  String get switchToAnonymousAction => 'Byt till anonym';
 
   @override
   String get switchToAnonymousSubtitle =>
-      'Keep local data, use new anonymous session';
+      'Behåll lokal data, använd ny anonym session';
 
   @override
-  String get linkDevice => 'Link device';
+  String get linkDevice => 'Länka enhet';
 
   @override
-  String get shareDatabase => 'Share database';
+  String get shareDatabase => 'Dela databas';
 
   @override
-  String get disconnectAction => 'Disconnect';
+  String get disconnectAction => 'Koppla från';
 
   @override
-  String get disconnectSubtitle => 'Stop syncing (local data kept)';
+  String get disconnectSubtitle => 'Stoppa synkronisering (lokal data bevaras)';
 
   @override
-  String get deleteAccountAction => 'Delete account';
+  String get deleteAccountAction => 'Radera konto';
 
   @override
-  String get deleteAccountSubtitle => 'Remove all server data permanently';
+  String get deleteAccountSubtitle => 'Ta bort all serverdata permanent';
 
   @override
-  String get localOnly => 'Local only';
+  String get localOnly => 'Endast lokalt';
 
   @override
   String get localOnlySubtitle =>
-      'Optional: sync favorites, alerts, and ratings across devices';
+      'Valfritt: synka favoriter, aviseringar och betyg mellan enheter';
 
   @override
-  String get setupCloudSync => 'Set up cloud sync';
+  String get setupCloudSync => 'Konfigurera molnsynkronisering';
 
   @override
-  String get disconnectTitle => 'Disconnect TankSync?';
+  String get disconnectTitle => 'Koppla från TankSync?';
 
   @override
   String get disconnectBody =>
-      'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
+      'Molnsynkronisering inaktiveras. Din lokala data (favoriter, aviseringar, historik) bevaras på den här enheten. Serverdata raderas inte.';
 
   @override
-  String get deleteAccountTitle => 'Delete account?';
+  String get deleteAccountTitle => 'Radera konto?';
 
   @override
   String get deleteAccountBody =>
-      'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
+      'Det här raderar permanent all din data från servern (favoriter, aviseringar, betyg, rutter). Lokal data på den här enheten bevaras.\n\nDet här kan inte ångras.';
 
   @override
-  String get switchToAnonymousTitle => 'Switch to anonymous?';
+  String get switchToAnonymousTitle => 'Byt till anonym?';
 
   @override
   String get switchToAnonymousBody =>
-      'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
+      'Du loggas ut från ditt e-postkonto och fortsätter med en ny anonym session.\n\nDin lokala data (favoriter, aviseringar) bevaras på den här enheten och synkas till det nya anonyma kontot.';
 
   @override
-  String get switchAction => 'Switch';
+  String get switchAction => 'Byt';
 
   @override
   String get helpBannerCriteria =>
-      'Your profile defaults are pre-filled. Adjust criteria below to refine your search.';
+      'Dina profilstandarder är förifyllda. Justera kriterierna nedan för att förfina din sökning.';
 
   @override
   String get helpBannerAlerts =>
-      'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+      'Ange ett prisgränsvärde för en station. Du aviseras när priserna sjunker under det. Kontroller sker var 30:e minut.';
 
   @override
   String get helpBannerConsumption =>
-      'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.';
+      'Logga varje tankning för att spåra din verkliga förbrukning och CO₂-avtryck. Svep vänster för att ta bort en post.';
 
   @override
   String get helpBannerVehicles =>
-      'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.';
+      'Lägg till dina fordon så att tankningar och bränslepreferenser fylls i korrekt. Det första fordonet blir ditt standardfordon.';
 
   @override
-  String get syncNow => 'Sync now';
+  String get syncNow => 'Synka nu';
 
   @override
-  String get onboardingPreferencesTitle => 'Your preferences';
+  String get onboardingPreferencesTitle => 'Dina inställningar';
 
   @override
-  String get onboardingZipHelper => 'Used when GPS is unavailable';
+  String get onboardingZipHelper => 'Används när GPS inte är tillgänglig';
 
   @override
-  String get onboardingRadiusHelper => 'Larger radius = more results';
+  String get onboardingRadiusHelper => 'Större radie = fler resultat';
 
   @override
   String get onboardingPrivacy =>
-      'These settings are stored only on your device and never shared.';
+      'Dessa inställningar lagras bara på din enhet och delas aldrig.';
 
   @override
-  String get onboardingLandingTitle => 'Home screen';
+  String get onboardingLandingTitle => 'Startskärm';
 
   @override
   String get onboardingLandingHint =>
-      'Choose which screen opens when you launch the app.';
+      'Välj vilken skärm som öppnas när du startar appen.';
 
   @override
   String get iosAutoRecordOnboardingTitle =>
-      'Stay out of the app — but don\'t quit it.';
+      'Håll dig utanför appen – men stäng den inte.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Title =>
-      'Open Sparkilo once after each reboot.';
+      'Öppna Sparkilo en gång efter varje omstart.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Body =>
-      'Apple wakes Sparkilo only after you\'ve opened it at least once since the phone restarted. After that, your trips record automatically.';
+      'Apple väcker Sparkilo bara efter att du har öppnat den minst en gång sedan telefonen startades om. Sedan spelas dina resor in automatiskt.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Title =>
-      'Don\'t swipe Sparkilo away in the app switcher.';
+      'Svep inte bort Sparkilo i appväxlaren.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Body =>
-      '\"Force-quit\" tells iOS to stop relaunching the app. Your trips will stop recording until you open Sparkilo again.';
+      '\"Tvångsstäng\" säger åt iOS att sluta starta om appen. Dina resor slutar spelas in tills du öppnar Sparkilo igen.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Title =>
-      'When iOS asks for \"Always\" location, please say yes.';
+      'När iOS frågar om \"Alltid\" plats, säg ja.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Body =>
-      'The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.';
+      'Reservfunktionen som spelar in din resa när OBD2-adaptern är långsam behöver bakgrundsplats. Vi delar den aldrig.';
 
   @override
-  String get scanReceipt => 'Scan receipt';
+  String get scanReceipt => 'Skanna kvitto';
 
   @override
   String get obdConnect => 'OBD-II';
 
   @override
-  String get stationTypeFuel => 'Fuel';
+  String get stationTypeFuel => 'Bränsle';
 
   @override
   String get stationTypeEv => 'EV';
 
   @override
-  String get brandFilterHighway => 'Highway';
+  String get brandFilterHighway => 'Motorväg';
 
   @override
-  String get ratingModeLocal => 'Local';
+  String get ratingModeLocal => 'Lokal';
 
   @override
-  String get ratingModePrivate => 'Private';
+  String get ratingModePrivate => 'Privat';
 
   @override
-  String get ratingModeShared => 'Shared';
+  String get ratingModeShared => 'Delad';
 
   @override
-  String get ratingDescLocal => 'Ratings saved on this device only';
+  String get ratingDescLocal => 'Betyg sparas endast på den här enheten';
 
   @override
   String get ratingDescPrivate =>
-      'Synced with your database (not visible to others)';
+      'Synkas med din databas (inte synlig för andra)';
 
   @override
-  String get ratingDescShared => 'Visible to all users of your database';
+  String get ratingDescShared => 'Synlig för alla användare av din databas';
 
   @override
   String get errorNoEvApiKey =>
-      'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
+      'OpenChargeMap API-nyckel är inte konfigurerad. Lägg till en i Inställningar för att söka EV-laddningsstationer.';
 
   @override
   String errorUpstreamCertExpired(String host) {
-    return 'The data provider ($host) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact $host.';
+    return 'Dataleverantören ($host) tillhandahåller ett utgånget eller ogiltigt TLS-certifikat. Appen kan inte ladda data från den här källan förrän leverantören åtgärdar det. Kontakta $host.';
   }
 
   @override
@@ -2532,254 +2537,255 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String fallbackSummary(String failed, String current) {
-    return '$failed unavailable. Using $current.';
+    return '$failed otillgänglig. Använder $current.';
   }
 
   @override
-  String get errorTitleApiKey => 'API key required';
+  String get errorTitleApiKey => 'API-nyckel krävs';
 
   @override
-  String get errorTitleLocation => 'Location unavailable';
+  String get errorTitleLocation => 'Plats otillgänglig';
 
   @override
   String get errorHintNoStations =>
-      'Try increasing the search radius or search a different location.';
+      'Prova att öka sökradien eller sök på en annan plats.';
 
   @override
-  String get errorHintApiKey => 'Configure your API key in Settings.';
+  String get errorHintApiKey => 'Konfigurera din API-nyckel i Inställningar.';
 
   @override
   String get errorHintConnection =>
-      'Check your internet connection and try again.';
+      'Kontrollera din internetanslutning och försök igen.';
 
   @override
   String get errorHintRouting =>
-      'Route calculation failed. Check your internet connection and try again.';
+      'Ruttberäkning misslyckades. Kontrollera din internetanslutning och försök igen.';
 
   @override
   String get errorHintFallback =>
-      'Try again or search by postal code / city name.';
+      'Försök igen eller sök med postnummer eller ortnamn.';
 
   @override
-  String get alertsLoadErrorTitle => 'Couldn\'t load your alerts';
+  String get alertsLoadErrorTitle => 'Det gick inte att ladda dina aviseringar';
 
   @override
-  String get alertsBackgroundCheckErrorTitle => 'Alert background check failed';
+  String get alertsBackgroundCheckErrorTitle =>
+      'Bakgrundskontroll av aviseringar misslyckades';
 
   @override
-  String get detailsLabel => 'Details';
+  String get detailsLabel => 'Detaljer';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Ta bort';
 
   @override
-  String get showKey => 'Show key';
+  String get showKey => 'Visa nyckel';
 
   @override
-  String get hideKey => 'Hide key';
+  String get hideKey => 'Dölj nyckel';
 
   @override
-  String get syncOptionalTitle => 'TankSync is optional';
+  String get syncOptionalTitle => 'TankSync är valfritt';
 
   @override
   String get syncOptionalDescription =>
-      'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).';
+      'Din app fungerar fullt ut utan molnsynkronisering. TankSync låter dig synka favoriter, aviseringar och betyg mellan enheter med Supabase (kostnadsfri nivå tillgänglig).';
 
   @override
-  String get syncHowToConnectQuestion => 'How would you like to connect?';
+  String get syncHowToConnectQuestion => 'Hur vill du ansluta?';
 
   @override
-  String get syncCreateOwnTitle => 'Create my own database';
+  String get syncCreateOwnTitle => 'Skapa min egen databas';
 
   @override
   String get syncCreateOwnSubtitle =>
-      'Free Supabase project — we\'ll guide you step by step';
+      'Kostnadsfritt Supabase-projekt – vi guidar dig steg för steg';
 
   @override
-  String get syncJoinExistingTitle => 'Join an existing database';
+  String get syncJoinExistingTitle => 'Gå med i en befintlig databas';
 
   @override
   String get syncJoinExistingSubtitle =>
-      'Scan QR code from the database owner or paste credentials';
+      'Skanna QR-kod från databasägaren eller klistra in uppgifter';
 
   @override
-  String get syncChooseAccountType => 'Choose your account type';
+  String get syncChooseAccountType => 'Välj din kontotyp';
 
   @override
-  String get syncAccountTypeAnonymous => 'Anonymous';
+  String get syncAccountTypeAnonymous => 'Anonym';
 
   @override
   String get syncAccountTypeAnonymousDesc =>
-      'Instant, no email needed. Data tied to this device.';
+      'Direkt, ingen e-post krävs. Data kopplad till den här enheten.';
 
   @override
-  String get syncAccountTypeEmail => 'Email Account';
+  String get syncAccountTypeEmail => 'E-postkonto';
 
   @override
   String get syncAccountTypeEmailDesc =>
-      'Sign in from any device. Recover data if phone is lost.';
+      'Logga in från vilken enhet som helst. Återfå data om telefonen förloras.';
 
   @override
-  String get syncHaveAccountSignIn => 'Already have an account? Sign in';
+  String get syncHaveAccountSignIn => 'Har du redan ett konto? Logga in';
 
   @override
-  String get syncCreateNewAccount => 'Create new account';
+  String get syncCreateNewAccount => 'Skapa nytt konto';
 
   @override
-  String get syncTestConnection => 'Test Connection';
+  String get syncTestConnection => 'Testa anslutning';
 
   @override
-  String get syncTestingConnection => 'Testing...';
+  String get syncTestingConnection => 'Testar...';
 
   @override
-  String get syncConnectButton => 'Connect';
+  String get syncConnectButton => 'Anslut';
 
   @override
-  String get syncConnectingButton => 'Connecting...';
+  String get syncConnectingButton => 'Ansluter...';
 
   @override
-  String get syncDatabaseReady => 'Database ready!';
+  String get syncDatabaseReady => 'Databasen är redo!';
 
   @override
-  String get syncDatabaseNeedsSetup => 'Database needs setup';
+  String get syncDatabaseNeedsSetup => 'Databasen behöver konfigureras';
 
   @override
   String get syncTableStatusOk => 'OK';
 
   @override
-  String get syncTableStatusMissing => 'Missing';
+  String get syncTableStatusMissing => 'Saknas';
 
   @override
   String get syncSqlEditorInstructions =>
-      'Copy the SQL below and run it in your Supabase SQL Editor (Dashboard → SQL Editor → New Query → Paste → Run)';
+      'Kopiera SQL:en nedan och kör den i din Supabase SQL-editor (Instrumentpanel → SQL-editor → Ny fråga → Klistra in → Kör)';
 
   @override
-  String get syncCopySqlButton => 'Copy SQL to clipboard';
+  String get syncCopySqlButton => 'Kopiera SQL till urklipp';
 
   @override
-  String get syncRecheckSchemaButton => 'Re-check schema';
+  String get syncRecheckSchemaButton => 'Kontrollera schema igen';
 
   @override
-  String get syncDoneButton => 'Done';
+  String get syncDoneButton => 'Klar';
 
   @override
   String syncSignedInAs(String email) {
-    return 'Signed in as $email';
+    return 'Inloggad som $email';
   }
 
   @override
   String get syncEmailDescription =>
-      'Your data syncs across all devices with this email.';
+      'Din data synkas på alla enheter med den här e-postadressen.';
 
   @override
-  String get syncSwitchToAnonymousTitle => 'Switch to anonymous';
+  String get syncSwitchToAnonymousTitle => 'Byt till anonym';
 
   @override
   String get syncSwitchToAnonymousDesc =>
-      'Continue without email, new anonymous session';
+      'Fortsätt utan e-post, ny anonym session';
 
   @override
-  String get syncGuestDescription => 'Anonymous, no email needed.';
+  String get syncGuestDescription => 'Anonym, ingen e-post krävs.';
 
   @override
-  String get syncOrDivider => 'or';
+  String get syncOrDivider => 'eller';
 
   @override
-  String get syncHowToSyncQuestion => 'How would you like to sync?';
+  String get syncHowToSyncQuestion => 'Hur vill du synka?';
 
   @override
   String get syncOfflineDescription =>
-      'Your app works fully offline. Cloud sync is optional.';
+      'Din app fungerar fullt ut offline. Molnsynkronisering är valfritt.';
 
   @override
   String get syncModeCommunityTitle => 'Sparkilo Community';
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Share favorites & ratings with all users';
+      'Dela favoriter och betyg med alla användare';
 
   @override
-  String get syncModePrivateTitle => 'Private Database';
+  String get syncModePrivateTitle => 'Privat databas';
 
   @override
-  String get syncModePrivateSubtitle => 'Your own Supabase — full data control';
+  String get syncModePrivateSubtitle => 'Din egen Supabase – full datakontroll';
 
   @override
-  String get syncModeGroupTitle => 'Join a Group';
+  String get syncModeGroupTitle => 'Gå med i en grupp';
 
   @override
-  String get syncModeGroupSubtitle => 'Family or friends shared database';
+  String get syncModeGroupSubtitle => 'Delad databas för familj eller vänner';
 
   @override
-  String get syncPrivacyShared => 'Shared';
+  String get syncPrivacyShared => 'Delad';
 
   @override
-  String get syncPrivacyPrivate => 'Private';
+  String get syncPrivacyPrivate => 'Privat';
 
   @override
-  String get syncPrivacyGroup => 'Group';
+  String get syncPrivacyGroup => 'Grupp';
 
   @override
-  String get syncStayOfflineButton => 'Stay offline';
+  String get syncStayOfflineButton => 'Fortsätt offline';
 
   @override
-  String get syncSuccessTitle => 'Successfully connected!';
+  String get syncSuccessTitle => 'Anslutningen lyckades!';
 
   @override
-  String get syncSuccessDescription => 'Your data will now sync automatically.';
+  String get syncSuccessDescription => 'Din data synkas nu automatiskt.';
 
   @override
-  String get syncWizardTitleConnect => 'Connect TankSync';
+  String get syncWizardTitleConnect => 'Anslut TankSync';
 
   @override
-  String get syncSetupTitleYourDatabase => 'Your database';
+  String get syncSetupTitleYourDatabase => 'Din databas';
 
   @override
-  String get syncSetupTitleJoinGroup => 'Join a group';
+  String get syncSetupTitleJoinGroup => 'Gå med i en grupp';
 
   @override
-  String get syncSetupTitleAccount => 'Your account';
+  String get syncSetupTitleAccount => 'Ditt konto';
 
   @override
-  String get syncWizardBack => 'Back';
+  String get syncWizardBack => 'Tillbaka';
 
   @override
-  String get syncWizardNext => 'Next';
+  String get syncWizardNext => 'Nästa';
 
   @override
   String syncWizardStepOfSteps(int current, int total) {
-    return 'Step $current of $total';
+    return 'Steg $current av $total';
   }
 
   @override
-  String get syncWizardCreateSupabaseTitle => 'Create a Supabase project';
+  String get syncWizardCreateSupabaseTitle => 'Skapa ett Supabase-projekt';
 
   @override
   String get syncWizardCreateSupabaseInstructions =>
-      '1. Tap \"Open Supabase\" below\n2. Create a free account (if you don\'t have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start';
+      '1. Tryck på \"Öppna Supabase\" nedan\n2. Skapa ett kostnadsfritt konto (om du inte har ett)\n3. Klicka på \"Nytt projekt\"\n4. Välj ett namn och en region\n5. Vänta ~2 minuter på att det startar';
 
   @override
-  String get syncWizardOpenSupabase => 'Open Supabase';
+  String get syncWizardOpenSupabase => 'Öppna Supabase';
 
   @override
-  String get syncWizardEnableAnonTitle => 'Enable Anonymous Sign-ins';
+  String get syncWizardEnableAnonTitle => 'Aktivera anonyma inloggningar';
 
   @override
   String get syncWizardEnableAnonInstructions =>
-      '1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"';
+      '1. I din Supabase-instrumentpanel:\n   Autentisering → Leverantörer\n2. Hitta \"Anonyma inloggningar\"\n3. Växla till PÅ\n4. Klicka på \"Spara\"';
 
   @override
-  String get syncWizardOpenAuthSettings => 'Open Auth Settings';
+  String get syncWizardOpenAuthSettings => 'Öppna autentiseringsinställningar';
 
   @override
-  String get syncWizardCopyCredentialsTitle => 'Copy your credentials';
+  String get syncWizardCopyCredentialsTitle => 'Kopiera dina uppgifter';
 
   @override
   String get syncWizardCopyCredentialsInstructions =>
-      '1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below';
+      '1. Gå till Inställningar → API i din instrumentpanel\n2. Kopiera \"Projekt-URL\"\n3. Kopiera \"anon public\"-nyckeln\n4. Klistra in dem nedan';
 
   @override
-  String get syncWizardOpenApiSettings => 'Open API Settings';
+  String get syncWizardOpenApiSettings => 'Öppna API-inställningar';
 
   @override
   String get syncWizardSupabaseUrlLabel => 'Supabase URL';
@@ -2788,192 +2794,192 @@ class AppLocalizationsSv extends AppLocalizations {
   String get syncWizardSupabaseUrlHint => 'https://your-project.supabase.co';
 
   @override
-  String get syncWizardJoinExistingTitle => 'Join an existing database';
+  String get syncWizardJoinExistingTitle => 'Gå med i en befintlig databas';
 
   @override
-  String get syncWizardScanQrCode => 'Scan QR Code';
+  String get syncWizardScanQrCode => 'Skanna QR-kod';
 
   @override
   String get syncWizardAskOwnerQr =>
-      'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)';
+      'Be databasägaren att visa sin QR-kod\n(Inställningar → TankSync → Dela)';
 
   @override
   String get syncWizardAskOwnerQrShort =>
-      'Ask the database owner to show their QR code';
+      'Be databasägaren att visa sin QR-kod';
 
   @override
-  String get syncWizardEnterManuallyTitle => 'Enter manually';
+  String get syncWizardEnterManuallyTitle => 'Ange manuellt';
 
   @override
-  String get syncWizardOrEnterManually => 'or enter manually';
+  String get syncWizardOrEnterManually => 'eller ange manuellt';
 
   @override
   String get syncWizardUrlHelperText =>
-      'Whitespace and line breaks removed automatically';
+      'Blanksteg och radbrytningar tas bort automatiskt';
 
   @override
   String get syncCredentialsPrivateHint =>
-      'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.';
+      'Ange dina Supabase-projektuppgifter. Du hittar dem i din instrumentpanel under Inställningar > API.';
 
   @override
-  String get syncCredentialsDatabaseUrlLabel => 'Database URL';
+  String get syncCredentialsDatabaseUrlLabel => 'Databas-URL';
 
   @override
-  String get syncCredentialsAccessKeyLabel => 'Access Key';
+  String get syncCredentialsAccessKeyLabel => 'Åtkomstnyckel';
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
 
   @override
-  String get authEmailLabel => 'Email';
+  String get authEmailLabel => 'E-post';
 
   @override
-  String get authPasswordLabel => 'Password';
+  String get authPasswordLabel => 'Lösenord';
 
   @override
-  String get authConfirmPasswordLabel => 'Confirm password';
+  String get authConfirmPasswordLabel => 'Bekräfta lösenord';
 
   @override
-  String get authPleaseEnterEmail => 'Please enter your email';
+  String get authPleaseEnterEmail => 'Ange din e-postadress';
 
   @override
-  String get authInvalidEmail => 'Invalid email address';
+  String get authInvalidEmail => 'Ogiltig e-postadress';
 
   @override
-  String get authPasswordsDoNotMatch => 'Passwords do not match';
+  String get authPasswordsDoNotMatch => 'Lösenorden stämmer inte överens';
 
   @override
-  String get authConnectAnonymously => 'Connect anonymously';
+  String get authConnectAnonymously => 'Anslut anonymt';
 
   @override
-  String get authCreateAccountAndConnect => 'Create account & connect';
+  String get authCreateAccountAndConnect => 'Skapa konto och anslut';
 
   @override
-  String get authSignInAndConnect => 'Sign in & connect';
+  String get authSignInAndConnect => 'Logga in och anslut';
 
   @override
-  String get authAnonymousSegment => 'Anonymous';
+  String get authAnonymousSegment => 'Anonym';
 
   @override
-  String get authEmailSegment => 'Email';
+  String get authEmailSegment => 'E-post';
 
   @override
   String get authAnonymousDescription =>
-      'Instant access, no email needed. Data tied to this device.';
+      'Direkt åtkomst, ingen e-post krävs. Data kopplad till den här enheten.';
 
   @override
   String get authEmailDescription =>
-      'Sign in from any device. Recover your data if your phone is lost.';
+      'Logga in från vilken enhet som helst. Återfå din data om telefonen förloras.';
 
   @override
   String get authSyncAcrossDevices =>
-      'Sync data automatically across all your devices.';
+      'Synka data automatiskt på alla dina enheter.';
 
   @override
-  String get authNewHereCreateAccount => 'New here? Create account';
+  String get authNewHereCreateAccount => 'Ny här? Skapa konto';
 
   @override
-  String get ntfyCardTitle => 'Push Notifications (ntfy.sh)';
+  String get ntfyCardTitle => 'Push-aviseringar (ntfy.sh)';
 
   @override
-  String get ntfyEnableTitle => 'Enable ntfy.sh push';
+  String get ntfyEnableTitle => 'Aktivera ntfy.sh push';
 
   @override
-  String get ntfyEnableSubtitle => 'Receive price alerts via ntfy.sh';
+  String get ntfyEnableSubtitle => 'Få prisaviseringar via ntfy.sh';
 
   @override
-  String get ntfyTopicUrlLabel => 'Topic URL';
+  String get ntfyTopicUrlLabel => 'Ämnes-URL';
 
   @override
-  String get ntfyCopyTopicUrlTooltip => 'Copy topic URL';
+  String get ntfyCopyTopicUrlTooltip => 'Kopiera ämnes-URL';
 
   @override
-  String get ntfySendTestButton => 'Send test notification';
+  String get ntfySendTestButton => 'Skicka testavisering';
 
   @override
   String get ntfyFdroidHint =>
-      'Install the ntfy app from F-Droid to receive push notifications on your device.';
+      'Installera ntfy-appen från F-Droid för att ta emot push-aviseringar på din enhet.';
 
   @override
   String get ntfyConnectFirstHint =>
-      'Connect TankSync first to enable push notifications.';
+      'Anslut TankSync först för att aktivera push-aviseringar.';
 
   @override
-  String get linkDeviceScreenTitle => 'Link Device';
+  String get linkDeviceScreenTitle => 'Länka enhet';
 
   @override
-  String get linkDeviceThisDeviceLabel => 'This device';
+  String get linkDeviceThisDeviceLabel => 'Den här enheten';
 
   @override
   String get linkDeviceShareCodeHint =>
-      'Share this code with your other device:';
+      'Dela den här koden med din andra enhet:';
 
   @override
-  String get linkDeviceNotConnected => 'Not connected';
+  String get linkDeviceNotConnected => 'Ej ansluten';
 
   @override
-  String get linkDeviceCopyCodeTooltip => 'Copy code';
+  String get linkDeviceCopyCodeTooltip => 'Kopiera kod';
 
   @override
-  String get linkDeviceImportSectionTitle => 'Import from another device';
+  String get linkDeviceImportSectionTitle => 'Importera från en annan enhet';
 
   @override
   String get linkDeviceImportDescription =>
-      'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.';
+      'Ange enhetskoden från din andra enhet för att importera favoriter, aviseringar, fordon och förbrukningslogg. Varje enhet behåller sin egen profil och standardinställningar.';
 
   @override
-  String get linkDeviceCodeFieldLabel => 'Device code';
+  String get linkDeviceCodeFieldLabel => 'Enhetskod';
 
   @override
-  String get linkDeviceCodeFieldHint => 'Paste the UUID from other device';
+  String get linkDeviceCodeFieldHint => 'Klistra in UUID från annan enhet';
 
   @override
-  String get linkDeviceImportButton => 'Import data';
+  String get linkDeviceImportButton => 'Importera data';
 
   @override
-  String get linkDeviceHowItWorksTitle => 'How it works';
+  String get linkDeviceHowItWorksTitle => 'Hur det fungerar';
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.';
+      '1. På Enhet A: kopiera enhetskoden ovan\n2. På Enhet B: klistra in den i fältet \"Enhetskod\"\n3. Tryck på \"Importera data\" för att slå samman favoriter, aviseringar, fordon och förbrukningsloggar\n4. Båda enheterna får all kombinerad data\n\nVarje enhet behåller sin egen anonyma identitet och sin egen profil (favoritbränsle, standardfordon, startskärm). Data slås samman, inte flyttas.';
 
   @override
-  String get vehicleSetActive => 'Set active';
+  String get vehicleSetActive => 'Ange som aktiv';
 
   @override
-  String get swipeHide => 'Hide';
+  String get swipeHide => 'Dölj';
 
   @override
-  String get evChargingSection => 'EV Charging';
+  String get evChargingSection => 'EV-laddning';
 
   @override
-  String get fuelStationsSection => 'Fuel Stations';
+  String get fuelStationsSection => 'Bränslestationer';
 
   @override
-  String get yourRating => 'Your rating';
+  String get yourRating => 'Ditt betyg';
 
   @override
-  String get noStorageUsed => 'No storage used';
+  String get noStorageUsed => 'Inget lagringsutrymme används';
 
   @override
-  String get aboutReportBug => 'Report a bug / Suggest a feature';
+  String get aboutReportBug => 'Rapportera ett fel / Föreslå en funktion';
 
   @override
-  String get aboutSupportProject => 'Support this project';
+  String get aboutSupportProject => 'Stöd det här projektet';
 
   @override
   String get aboutSupportDescription =>
-      'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.';
+      'Den här appen är gratis, öppen källkod och har inga annonser. Om du tycker den är användbar kan du överväga att stödja utvecklaren.';
 
   @override
   String get luxembourgRegulatedPricesNotice =>
-      'Luxembourg fuel prices are government-regulated and uniform nationwide.';
+      'Luxemburgs bränslepriser är statligt reglerade och enhetliga i hela landet.';
 
   @override
-  String get luxembourgFuelUnleaded95 => 'Unleaded 95';
+  String get luxembourgFuelUnleaded95 => 'Blyfri 95';
 
   @override
-  String get luxembourgFuelUnleaded98 => 'Unleaded 98';
+  String get luxembourgFuelUnleaded98 => 'Blyfri 98';
 
   @override
   String get luxembourgFuelDiesel => 'Diesel';
@@ -2983,104 +2989,106 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get luxembourgPricesUnavailable =>
-      'Luxembourg regulated prices are unavailable.';
+      'Luxemburgs reglerade priser är inte tillgängliga.';
 
   @override
-  String get reportIssueTitle => 'Report a problem';
+  String get reportIssueTitle => 'Rapportera ett problem';
 
   @override
-  String get enterCorrection => 'Please enter the correction';
+  String get enterCorrection => 'Ange korrigeringen';
 
   @override
   String get reportNoBackendAvailable =>
-      'The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.';
+      'Rapporten kunde inte skickas: ingen rapporteringstjänst är konfigurerad för det här landet. Aktivera TankSync i Inställningar för att skicka community-rapporter.';
 
   @override
-  String get correctName => 'Correct station name';
+  String get correctName => 'Korrekt stationsnamn';
 
   @override
-  String get correctAddress => 'Correct address';
+  String get correctAddress => 'Korrekt adress';
 
   @override
-  String get wrongE85Price => 'Wrong E85 price';
+  String get wrongE85Price => 'Fel E85-pris';
 
   @override
-  String get wrongE98Price => 'Wrong Super 98 price';
+  String get wrongE98Price => 'Fel Super 98-pris';
 
   @override
-  String get wrongLpgPrice => 'Wrong LPG price';
+  String get wrongLpgPrice => 'Fel LPG-pris';
 
   @override
-  String get wrongStationName => 'Wrong station name';
+  String get wrongStationName => 'Fel stationsnamn';
 
   @override
-  String get wrongStationAddress => 'Wrong address';
+  String get wrongStationAddress => 'Fel adress';
 
   @override
-  String get independentStation => 'Independent station';
+  String get independentStation => 'Oberoende station';
 
   @override
-  String get serviceRemindersSection => 'Service reminders';
+  String get serviceRemindersSection => 'Servicepåminnelser';
 
   @override
-  String get serviceRemindersEmpty => 'No reminders yet — pick a preset above.';
+  String get serviceRemindersEmpty =>
+      'Inga påminnelser ännu – välj en förinställning ovan.';
 
   @override
-  String get addServiceReminder => 'Add reminder';
+  String get addServiceReminder => 'Lägg till påminnelse';
 
   @override
-  String get serviceReminderPresetOil => 'Oil (15,000 km)';
+  String get serviceReminderPresetOil => 'Olja (15 000 km)';
 
   @override
-  String get serviceReminderPresetOilLabel => 'Oil change';
+  String get serviceReminderPresetOilLabel => 'Oljebyte';
 
   @override
-  String get serviceReminderPresetTires => 'Tires (20,000 km)';
+  String get serviceReminderPresetTires => 'Däck (20 000 km)';
 
   @override
-  String get serviceReminderPresetTiresLabel => 'Tires';
+  String get serviceReminderPresetTiresLabel => 'Däck';
 
   @override
-  String get serviceReminderPresetInspection => 'Inspection (30,000 km)';
+  String get serviceReminderPresetInspection => 'Besiktning (30 000 km)';
 
   @override
-  String get serviceReminderPresetInspectionLabel => 'Inspection';
+  String get serviceReminderPresetInspectionLabel => 'Besiktning';
 
   @override
-  String get serviceReminderLabel => 'Label';
+  String get serviceReminderLabel => 'Etikett';
 
   @override
-  String get serviceReminderInterval => 'Interval (km)';
+  String get serviceReminderInterval => 'Intervall (km)';
 
   @override
-  String get serviceReminderLastService => 'Last service';
+  String get serviceReminderLastService => 'Senaste service';
 
   @override
-  String get serviceReminderMarkDone => 'Mark as done';
+  String get serviceReminderMarkDone => 'Markera som klar';
 
   @override
-  String get serviceReminderDueTitle => 'Service due';
+  String get serviceReminderDueTitle => 'Service förfaller';
 
   @override
   String serviceReminderDueBody(String label, int kmOver) {
-    return '$label is due — $kmOver km past the interval.';
+    return '$label förfaller – $kmOver km förbi intervallet.';
   }
 
   @override
   String get southKoreaApiKeyRequired =>
-      'Register at OPINET to get a free API key';
+      'Registrera dig på OPINET för att få en gratis API-nyckel';
 
   @override
   String get southKoreaApiProvider => 'OPINET (KNOC)';
 
   @override
-  String get chileApiKeyRequired => 'Register at CNE to get a free API key';
+  String get chileApiKeyRequired =>
+      'Registrera dig på CNE för att få en gratis API-nyckel';
 
   @override
   String get chileApiProvider => 'CNE Bencina en Linea';
 
   @override
-  String get vinConfirmTitle => 'Is this your car?';
+  String get vinConfirmTitle => 'Är det här din bil?';
 
   @override
   String vinConfirmBody(
@@ -3096,468 +3104,473 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get vinPartialInfoNote =>
-      'Partial info (offline). You can edit below.';
+      'Partiell information (offline). Du kan redigera nedan.';
 
   @override
-  String get vinDecodeError => 'Couldn\'t decode this VIN';
+  String get vinDecodeError => 'Kunde inte avkoda detta VIN';
 
   @override
-  String get vinInvalidFormat => 'Invalid VIN format';
+  String get vinInvalidFormat => 'Ogiltigt VIN-format';
 
   @override
-  String get obd2PauseBannerTitle => 'OBD2 connection lost — recording paused';
+  String get obd2PauseBannerTitle =>
+      'OBD2-anslutning förlorad – inspelning pausad';
 
   @override
-  String get obd2PauseBannerResume => 'Resume recording';
+  String get obd2PauseBannerResume => 'Återuppta inspelning';
 
   @override
-  String get obd2PauseBannerEnd => 'End recording';
+  String get obd2PauseBannerEnd => 'Avsluta inspelning';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
+    return 'Förbrukningskalibrering uppdaterad för $vehicleName – noggrannheten förbättrad med $percent%';
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset volumetric efficiency?';
+  String get veResetConfirmTitle => 'Återställ volymetrisk effektivitet?';
 
   @override
   String get veResetConfirmBody =>
-      'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.';
+      'Det här kasserar den inlärda volymetriska effektiviteten (η_v) och återställer standardvärdet (0,85). Bränsleflödesuppskattningar på resenivå faller tillbaka på tillverkarens konstant tills kalibratorn samlar nya prover från kommande resor.';
 
   @override
-  String get alertsRadiusSectionTitle => 'Radius alerts';
+  String get alertsRadiusSectionTitle => 'Radiebaserade aviseringar';
 
   @override
-  String get alertsRadiusAdd => 'Add radius alert';
+  String get alertsRadiusAdd => 'Lägg till radieavisering';
 
   @override
-  String get alertsRadiusEmptyTitle => 'No radius alerts yet';
+  String get alertsRadiusEmptyTitle => 'Inga radiebaserade aviseringar ännu';
 
   @override
-  String get alertsRadiusEmptyCta => 'Create a radius alert';
+  String get alertsRadiusEmptyCta => 'Skapa en radieavisering';
 
   @override
-  String get alertsRadiusCreateTitle => 'Create radius alert';
+  String get alertsRadiusCreateTitle => 'Skapa radieavisering';
 
   @override
-  String get alertsRadiusLabelHint => 'Label (e.g. Home diesel)';
+  String get alertsRadiusLabelHint => 'Etikett (t.ex. Hemma diesel)';
 
   @override
-  String get alertsRadiusFuelType => 'Fuel type';
+  String get alertsRadiusFuelType => 'Bränsletyp';
 
   @override
-  String get alertsRadiusThreshold => 'Threshold (€/L)';
+  String get alertsRadiusThreshold => 'Gränsvärde (€/L)';
 
   @override
-  String get alertsRadiusKm => 'Radius (km)';
+  String get alertsRadiusKm => 'Radie (km)';
 
   @override
-  String get alertsRadiusCenterGps => 'Use my location';
+  String get alertsRadiusCenterGps => 'Använd min plats';
 
   @override
-  String get alertsRadiusCenterPostalCode => 'Postal code';
+  String get alertsRadiusCenterPostalCode => 'Postnummer';
 
   @override
-  String get alertsRadiusSave => 'Save';
+  String get alertsRadiusSave => 'Spara';
 
   @override
-  String get alertsRadiusCancel => 'Cancel';
+  String get alertsRadiusCancel => 'Avbryt';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
+  String get alertsRadiusDeleteConfirm => 'Radera radieavisering?';
 
   @override
   String obd2ConnectedTooltip(String adapterName) {
-    return 'OBD2 connected: $adapterName';
+    return 'OBD2 ansluten: $adapterName';
   }
 
   @override
-  String get obd2PairChipTooltip => 'Pair an OBD2 adapter';
+  String get obd2PairChipTooltip => 'Para ihop en OBD2-adapter';
 
   @override
   String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel dropped at nearby stations';
+    return '$fuelLabel sjönk vid närliggande stationer';
   }
 
   @override
   String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount stations dropped by up to $maxDropCents¢ in the last hour';
+    return '$stationCount stationer sjönk med upp till $maxDropCents¢ under den senaste timmen';
   }
 
   @override
-  String get fillUpSavedSnackbar => 'Fill-up saved';
+  String get fillUpSavedSnackbar => 'Tankning sparad';
 
   @override
-  String get radiusAlertsEntryTitle => 'Radius alerts & statistics';
+  String get radiusAlertsEntryTitle =>
+      'Radiebaserade aviseringar och statistik';
 
   @override
   String get radiusAlertsEntrySubtitle =>
-      'Get notified when prices drop near you';
+      'Bli aviserad när priserna sjunker nära dig';
 
   @override
-  String get notFoundTitle => 'Page not found';
+  String get notFoundTitle => 'Sidan hittades inte';
 
   @override
   String notFoundBody(String location) {
-    return '\"$location\" not found.';
+    return '\"$location\" hittades inte.';
   }
 
   @override
-  String get notFoundHomeButton => 'Home';
+  String get notFoundHomeButton => 'Hem';
 
   @override
   String get consumptionTabHiddenNotice =>
-      'The Consumption tab was hidden by your profile settings.';
+      'Förbrukningsfliken är dold av dina profilinställningar.';
 
   @override
   String get swipeBetweenTabsHint =>
-      'Tip: swipe left or right to switch between tabs.';
+      'Tips: svep vänster eller höger för att byta mellan flikar.';
 
   @override
-  String get discardChangesTitle => 'Discard changes?';
+  String get discardChangesTitle => 'Kasta ändringar?';
 
   @override
   String get discardChangesBody =>
-      'You have unsaved changes. Leaving now will discard them.';
+      'Du har osparade ändringar. Om du lämnar nu kastas de.';
 
   @override
-  String get discardChangesConfirm => 'Discard';
+  String get discardChangesConfirm => 'Kasta';
 
   @override
-  String get discardChangesKeepEditing => 'Keep editing';
+  String get discardChangesKeepEditing => 'Fortsätt redigera';
 
   @override
-  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
+  String get tankSyncSectionSubtitle =>
+      'Molnsynkronisering på alla dina enheter';
 
   @override
-  String get achievementSmoothDriver => 'Smooth streak';
+  String get achievementSmoothDriver => 'Mjukserie';
 
   @override
   String get achievementSmoothDriverDesc =>
-      'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+      'Kör 5 resor i rad med ett mjukkörningspoäng på 80 eller högre.';
 
   @override
-  String get achievementColdStartAware => 'Cold-start aware';
+  String get achievementColdStartAware => 'Kallstartmedveten';
 
   @override
   String get achievementColdStartAwareDesc =>
-      'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+      'Håll hela en månads kallstartsbränslekostnad under 2 % av totalt bränsle – kombinera korta resor.';
 
   @override
-  String get achievementHighwayMaster => 'Highway master';
+  String get achievementHighwayMaster => 'Motorvägsmästare';
 
   @override
   String get achievementHighwayMasterDesc =>
-      'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+      'Genomför en resa på 30 km+ i jämn hastighet med ett mjukkörningspoäng på 90 eller högre.';
 
   @override
-  String get authErrorNoNetwork => 'No network connection. Try again later.';
+  String get authErrorNoNetwork =>
+      'Ingen nätverksanslutning. Försök igen senare.';
 
   @override
   String get authErrorInvalidCredentials =>
-      'Invalid email or password. Check your credentials.';
+      'Ogiltig e-post eller lösenord. Kontrollera dina uppgifter.';
 
   @override
   String get authErrorUserAlreadyExists =>
-      'This email is already registered. Try signing in instead.';
+      'Den här e-postadressen är redan registrerad. Prova att logga in istället.';
 
   @override
   String get authErrorEmailNotConfirmed =>
-      'Please check your email and confirm your account first.';
+      'Kontrollera din e-post och bekräfta ditt konto först.';
 
   @override
-  String get authErrorGeneric => 'Sign-in failed. Please try again.';
+  String get authErrorGeneric => 'Inloggningen misslyckades. Försök igen.';
 
   @override
   String get autoRecordConsentBadgeLabel =>
-      'Background location — for auto-record only';
+      'Bakgrundsplats – endast för autoinspelning';
 
   @override
-  String get autoRecordConsentExplanationTitle => 'About this permission';
+  String get autoRecordConsentExplanationTitle => 'Om den här behörigheten';
 
   @override
   String get autoRecordConsentExplanationBody =>
-      'Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.';
+      'Autoinspelning behöver bakgrundsplats för att identifiera när du börjar köra med appen stängd. Den här behörigheten används enbart av autoinspelning – stationssökning och kartcentrering använder en separat förgrundsbehörighet.';
 
   @override
-  String get autoRecordConsentExplanationCloseButton => 'Got it';
+  String get autoRecordConsentExplanationCloseButton => 'Förstått';
 
   @override
-  String get autoRecordConsentExplanationTooltip => 'What does this mean?';
+  String get autoRecordConsentExplanationTooltip => 'Vad betyder det här?';
 
   @override
   String get autoRecordConsentRevokeAction =>
-      'Tap to manage in system settings';
+      'Tryck för att hantera i systeminställningar';
 
   @override
-  String get autoRecordSectionTitle => 'Auto-record';
+  String get autoRecordSectionTitle => 'Autoinspelning';
 
   @override
-  String get autoRecordToggleLabel => 'Auto-record trips';
+  String get autoRecordToggleLabel => 'Spela in resor automatiskt';
 
   @override
   String get autoRecordStatusActiveLabel =>
-      'Auto-record will activate the next time you enter the car.';
+      'Autoinspelning aktiveras nästa gång du sätter dig i bilen.';
 
   @override
   String get autoRecordStatusNeedsPairingLabel =>
-      'Pair an OBD2 adapter to enable auto-record.';
+      'Para ihop en OBD2-adapter för att aktivera autoinspelning.';
 
   @override
   String get autoRecordStatusNeedsBackgroundLocationLabel =>
-      'Allow background location so auto-record keeps running with the screen off.';
+      'Tillåt bakgrundsplats så att autoinspelning fortsätter köra med skärmen av.';
 
   @override
-  String get autoRecordStatusPairAdapterCta => 'Pair an adapter';
+  String get autoRecordStatusPairAdapterCta => 'Para ihop en adapter';
 
   @override
-  String get autoRecordSpeedThresholdLabel => 'Start speed (km/h)';
+  String get autoRecordSpeedThresholdLabel => 'Starthastighet (km/h)';
 
   @override
   String get autoRecordSaveDelayLabel =>
-      'Save delay after disconnect (seconds)';
+      'Sparfördröjning efter frånkoppling (sekunder)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Paired adapter';
+  String get autoRecordPairedAdapterLabel => 'Ihopparad adapter';
 
   @override
   String get autoRecordPairedAdapterNone =>
-      'No adapter paired. Pair one via the OBD2 onboarding first.';
+      'Ingen adapter ihopparad. Para ihop en via OBD2-introduktionen först.';
 
   @override
-  String get autoRecordBackgroundLocationLabel => 'Background location allowed';
+  String get autoRecordBackgroundLocationLabel => 'Bakgrundsplats tillåten';
 
   @override
-  String get autoRecordBackgroundLocationRequest => 'Request permission';
+  String get autoRecordBackgroundLocationRequest => 'Begär behörighet';
 
   @override
   String get autoRecordBackgroundLocationRationaleTitle =>
-      'Why \"Allow all the time\"?';
+      'Varför \"Tillåt alltid\"?';
 
   @override
   String get autoRecordBackgroundLocationRationaleBody =>
-      'Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.';
+      'Autoinspelning strömmar GPS-koordinater från OBD-II-förgrundsservicen med skärmen av så att reserutten förblir korrekt. Android kräver alternativet \"Tillåt alltid\" för att det ska fortsätta fungera efter att enheten låses.';
 
   @override
-  String get autoRecordBackgroundLocationOpenSettings => 'Open settings';
+  String get autoRecordBackgroundLocationOpenSettings => 'Öppna inställningar';
 
   @override
   String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
-      'Location permission required';
+      'Platsbehörighet krävs';
 
   @override
   String get autoRecordBackgroundLocationRequestFailedSnackbar =>
-      'Could not request background location';
+      'Kunde inte begära bakgrundsplats';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Clear counter';
+  String get autoRecordBadgeClearTooltip => 'Rensa räknare';
 
   @override
   String get autoRecordPairAdapterLinkText =>
-      'Pair an adapter in the section below to enable auto-recording';
+      'Para ihop en adapter i avsnittet nedan för att aktivera autoinspelning';
 
   @override
-  String get exportBackupTooltip => 'Export backup';
+  String get exportBackupTooltip => 'Exportera säkerhetskopia';
 
   @override
-  String get exportBackupReady => 'Backup ready — pick a destination';
+  String get exportBackupReady => 'Säkerhetskopia klar – välj ett mål';
 
   @override
-  String get exportBackupFailed => 'Backup export failed — please try again';
+  String get exportBackupFailed =>
+      'Export av säkerhetskopia misslyckades – försök igen';
 
   @override
-  String get brokenMapChipVerifying => 'MAP sensor verifying…';
+  String get brokenMapChipVerifying => 'MAP-sensor verifierar…';
 
   @override
-  String get brokenMapChipDisclaimer => 'MAP readings suspicious';
+  String get brokenMapChipDisclaimer => 'MAP-avläsningar misstänkta';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.';
+      'MAP-sensor läser felaktigt – bränslevisningar kan vara 50–80 % för låga. Prova en annan adapter.';
 
   @override
   String get brokenMapBannerHardDisable =>
-      'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.';
+      'MAP-sensor otillförlitlig. Visar tankningssnitt istället för direktbränsleflöde.';
 
   @override
   String brokenMapOverlayVerified(String confidence) {
-    return 'MAP sensor: verified ($confidence)';
+    return 'MAP-sensor: verifierad ($confidence)';
   }
 
   @override
   String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP sensor: verifying ($confidence)';
+    return 'MAP-sensor: verifierar ($confidence)';
   }
 
   @override
   String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP sensor: suspicious ($confidence)';
+    return 'MAP-sensor: misstänkt ($confidence)';
   }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin%';
+    return 'MAP-sensor: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin% (verified)';
+    return 'MAP-sensor: $posterior% ± $margin% (verifierad)';
   }
 
   @override
-  String get brokenMapDiagnosticsCardTitle => 'MAP sensor diagnostics';
+  String get brokenMapDiagnosticsCardTitle => 'MAP-sensordiagnostik';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return 'Broken-MAP confidence: $posterior% ± $margin%';
+    return 'Trasig-MAP-konfidens: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '$count observations recorded';
+    return '$count observationer registrerade';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => 'Verified clean';
+  String get brokenMapDiagnosticsVerifiedBadge => 'Verifierat ren';
 
   @override
   String get brokenMapDiagnosticsBeliefNone =>
-      'This vehicle\'s MAP sensor hasn\'t been observed yet.';
+      'Det här fordonets MAP-sensor har inte observerats ännu.';
 
   @override
-  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklisted adapters';
+  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklistade adaptrar';
 
   @override
   String get brokenMapDiagnosticsBlocklistEmpty =>
-      'No adapters are blocklisted.';
+      'Inga adaptrar är blocklistade.';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '$adapter — flagged $percent% broken';
+    return '$adapter – flaggad $percent% trasig';
   }
 
   @override
-  String get brokenMapDiagnosticsClearButton => 'Clear';
+  String get brokenMapDiagnosticsClearButton => 'Rensa';
 
   @override
-  String get brokenMapRevPromptTitle => 'Rev the engine';
+  String get brokenMapRevPromptTitle => 'Varva motorn';
 
   @override
   String get brokenMapRevPromptBody =>
-      'Briefly blip the throttle so the app can check the MAP sensor responds.';
+      'Tryck kort på gasen så att appen kan kontrollera att MAP-sensorn svarar.';
 
   @override
-  String get brokenMapRevPromptConfirm => 'Done — I revved';
+  String get brokenMapRevPromptConfirm => 'Klar – jag varvade';
 
   @override
-  String get calibrationAdvancedTitle => 'Advanced calibration';
+  String get calibrationAdvancedTitle => 'Avancerad kalibrering';
 
   @override
-  String get calibrationDisplacementLabel => 'Engine displacement (cc)';
+  String get calibrationDisplacementLabel => 'Motorvolym (cc)';
 
   @override
   String get calibrationVolumetricEfficiencyLabel =>
-      'Volumetric efficiency (η_v)';
+      'Volymetrisk effektivitet (η_v)';
 
   @override
-  String get calibrationAfrLabel => 'Air-to-fuel ratio (AFR)';
+  String get calibrationAfrLabel => 'Luft-bränsle-förhållande (AFR)';
 
   @override
-  String get calibrationFuelDensityLabel => 'Fuel density (g/L)';
+  String get calibrationFuelDensityLabel => 'Bränsletäthet (g/L)';
 
   @override
-  String get calibrationSourceDetected => '(detected from VIN)';
+  String get calibrationSourceDetected => '(detekterad från VIN)';
 
   @override
   String calibrationSourceCatalog(String makeModel) {
-    return '(catalog: $makeModel)';
+    return '(katalog: $makeModel)';
   }
 
   @override
-  String get calibrationSourceDefault => '(default)';
+  String get calibrationSourceDefault => '(standard)';
 
   @override
-  String get calibrationSourceManual => '(manual)';
+  String get calibrationSourceManual => '(manuell)';
 
   @override
-  String get calibrationResetToDetected => 'Reset to detected value';
+  String get calibrationResetToDetected => 'Återställ till detekterat värde';
 
   @override
   String calibrationLearnerStatusCalibrated(String eta, int samples) {
-    return 'η_v: $eta (calibrated, $samples samples)';
+    return 'η_v: $eta (kalibrerad, $samples prover)';
   }
 
   @override
   String calibrationLearnerStatusLearning(String eta, int samples) {
-    return 'η_v: $eta (learning, $samples samples)';
+    return 'η_v: $eta (lär sig, $samples prover)';
   }
 
   @override
   String get calibrationLearnerStatusNoSamples =>
-      'η_v: 0.85 (default — no plein-complet yet)';
+      'η_v: 0,85 (standard – ingen full tankning ännu)';
 
   @override
-  String get calibrationResetLearner => 'Reset learner';
+  String get calibrationResetLearner => 'Återställ inlärning';
 
   @override
-  String get calibrationBasisAtkinson => 'Atkinson cycle';
+  String get calibrationBasisAtkinson => 'Atkinson-cykel';
 
   @override
   String get calibrationBasisVnt => 'VNT diesel + DI';
 
   @override
-  String get calibrationBasisTurboDi => 'Turbocharged + DI';
+  String get calibrationBasisTurboDi => 'Turboladdad + DI';
 
   @override
-  String get calibrationBasisTurbo => 'Turbocharged';
+  String get calibrationBasisTurbo => 'Turboladdad';
 
   @override
-  String get calibrationBasisNaDi => 'Naturally aspirated + DI';
+  String get calibrationBasisNaDi => 'Naturligt aspirerad + DI';
 
   @override
   String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
-    return '(catalog: $makeModel — $basis default)';
+    return '(katalog: $makeModel — $basis standard)';
   }
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {
-    return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
+    return 'Din $makeModel är markerad som diesel men matchar en bensinpost i katalogen. Tryck för att uppdatera.';
   }
 
   @override
-  String get catalogReresolveSnackbarAction => 'Update';
+  String get catalogReresolveSnackbarAction => 'Uppdatera';
 
   @override
-  String get consumptionTabFuel => 'Fuel';
+  String get consumptionTabFuel => 'Bränsle';
 
   @override
-  String get consumptionTabCharging => 'Charging';
+  String get consumptionTabCharging => 'Laddning';
 
   @override
-  String get noChargingLogsTitle => 'No charging logs yet';
+  String get noChargingLogsTitle => 'Inga laddningsloggar ännu';
 
   @override
   String get noChargingLogsSubtitle =>
-      'Log your first charging session to start tracking EUR/100 km and kWh/100 km.';
+      'Logga din första laddningssession för att börja spåra EUR/100 km och kWh/100 km.';
 
   @override
-  String get addChargingLog => 'Log charging';
+  String get addChargingLog => 'Logga laddning';
 
   @override
-  String get addChargingLogTitle => 'Log charging session';
+  String get addChargingLogTitle => 'Logga laddningssession';
 
   @override
-  String get chargingKwh => 'Energy (kWh)';
+  String get chargingKwh => 'Energi (kWh)';
 
   @override
-  String get chargingCost => 'Total cost';
+  String get chargingCost => 'Total kostnad';
 
   @override
-  String get chargingTimeMin => 'Charge time (min)';
+  String get chargingTimeMin => 'Laddningstid (min)';
 
   @override
-  String get chargingStationName => 'Station (optional)';
+  String get chargingStationName => 'Station (valfritt)';
 
   @override
   String chargingEurPer100km(String value) {
@@ -3570,152 +3583,154 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get chargingDerivedHelper => 'Need a previous log to compare';
+  String get chargingDerivedHelper => 'Behöver en tidigare logg för jämförelse';
 
   @override
-  String get chargingLogButtonLabel => 'Log charging';
+  String get chargingLogButtonLabel => 'Logga laddning';
 
   @override
-  String get chargingCostTrendTitle => 'Charging cost trend';
+  String get chargingCostTrendTitle => 'Laddningskostnadstrend';
 
   @override
-  String get chargingEfficiencyTitle => 'Efficiency (kWh/100 km)';
+  String get chargingEfficiencyTitle => 'Effektivitet (kWh/100 km)';
 
   @override
-  String get chargingChartsEmpty => 'Not enough data yet';
+  String get chargingChartsEmpty => 'Inte tillräckligt med data ännu';
 
   @override
-  String get chargingChartsMonthAxis => 'Month';
+  String get chargingChartsMonthAxis => 'Månad';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Community Wait Times';
+  String get gdprCommunityWaitTimeTitle => 'Community-väntetider';
 
   @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anonymously share station wait times';
+  String get gdprCommunityWaitTimeShort => 'Dela stationsväntetider anonymt';
 
   @override
   String get gdprCommunityWaitTimeDescription =>
-      'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
+      'Dela anonymt när du anländer till och lämnar en bränslestation så att appen kan visa typiska väntetider. Inga platskoordinater laddas upp – bara stations-ID:t.';
 
   @override
-  String get consoFeatureGroupTitle => 'Conso';
+  String get consoFeatureGroupTitle => 'Förbrukning';
 
   @override
   String get consoFeatureGroupDescription =>
-      'Track your consumption — manual fill-ups, or automatic OBD2 trip recording.';
+      'Spåra din förbrukning – manuella tankningar eller automatisk OBD2-reseinspelning.';
 
   @override
-  String get consoModeOff => 'Off';
+  String get consoModeOff => 'Av';
 
   @override
-  String get consoModeFuel => 'Fuel';
+  String get consoModeFuel => 'Bränsle';
 
   @override
-  String get consoModeFuelAndTrips => 'Fuel + Trips';
+  String get consoModeFuelAndTrips => 'Bränsle + Resor';
 
   @override
   String get consoModeOffDescription =>
-      'No Conso tab and no Conso settings section.';
+      'Ingen förbrukningsflik och inga förbrukningsinställningar.';
 
   @override
   String get consoModeFuelDescription =>
-      'Manual fill-ups only. Useful without an OBD2 adapter.';
+      'Endast manuella tankningar. Användbart utan OBD2-adapter.';
 
   @override
   String get consoModeFuelAndTripsDescription =>
-      'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+      'Lägger till automatisk OBD2-reseinspelning. Kräver en ihopparad adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'My vehicles';
+  String get consoSubsectionVehicles => 'Mina fordon';
 
   @override
-  String get consoSubsectionTrajets => 'Trips (OBD2)';
+  String get consoSubsectionTrajets => 'Resor (OBD2)';
 
   @override
-  String get consoSubsectionToggles => 'Driving';
+  String get consoSubsectionToggles => 'Körning';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count partial fills pending plein complet — not in average',
-      one: '1 partial fill pending plein complet — not in average',
+      other:
+          '$count deldel tankningar väntar på full tankning – inte i snittet',
+      one: '1 deldel tankning väntar på full tankning – inte i snittet',
     );
     return '$_temp0';
   }
 
   @override
   String consumptionStatsCorrectionShareHint(int percent) {
-    return '$percent% of fuel from auto-corrections — review entries';
+    return '$percent% av bränslet från autokorrigeringar – granska poster';
   }
 
   @override
-  String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
+  String get fillUpCorrectionLabel =>
+      'Autokorrigering – tryck för att redigera';
 
   @override
-  String get fillUpCorrectionEditTitle => 'Edit auto-correction';
+  String get fillUpCorrectionEditTitle => 'Redigera autokorrigering';
 
   @override
   String get fillUpCorrectionEditExplainer =>
-      'This entry was auto-generated to close the gap between recorded trips and pumped fuel. Adjust the values if you know the actual figures.';
+      'Den här posten genererades automatiskt för att stänga gapet mellan inspelade resor och tankat bränsle. Justera värdena om du känner till de faktiska siffrorna.';
 
   @override
-  String get fillUpCorrectionDelete => 'Delete correction';
+  String get fillUpCorrectionDelete => 'Radera korrigering';
 
   @override
-  String get fillUpCorrectionStation => 'Station name (optional)';
+  String get fillUpCorrectionStation => 'Stationsnamn (valfritt)';
 
   @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
+  String get greeceApiProvider => 'Paratiritirio Timon (Grekland)';
 
   @override
   String get greeceCommunityApiNotice =>
-      'Powered by the community-maintained fuelpricesgr API';
+      'Drivs av det communityunderhållna fuelpricesgr API';
 
   @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Romania)';
+  String get romaniaApiProvider => 'Monitorul Prețurilor (Rumänien)';
 
   @override
   String get romaniaScrapingNotice =>
-      'Powered by pretcarburant.ro (Competition Council + ANPC)';
+      'Drivs av pretcarburant.ro (Konkurrensrådet + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
-    return '$country stations $km km away — €$price/L cheaper';
+    return '$country-stationer $km km bort – €$price/L billigare';
   }
 
   @override
-  String get crossBorderTapToSwitch => 'Tap to switch country';
+  String get crossBorderTapToSwitch => 'Tryck för att byta land';
 
   @override
-  String get crossBorderDismissTooltip => 'Dismiss';
+  String get crossBorderDismissTooltip => 'Avfärda';
 
   @override
-  String get insightCardTitle => 'Top wasteful behaviours';
+  String get insightCardTitle => 'Mest slösaktiga beteenden';
 
   @override
-  String get insightEmptyState => 'No notable inefficiencies — keep it up!';
+  String get insightEmptyState =>
+      'Inga anmärkningsvärda ineffektiviteter – fortsätt så!';
 
   @override
   String insightHighRpm(String pctTime, String liters) {
-    return 'Engine over 3000 RPM ($pctTime% of trip): wasted $liters L';
+    return 'Motor över 3000 RPM ($pctTime% av resan): slösade $liters L';
   }
 
   @override
   String insightHardAccel(String count, String liters) {
-    return '$count hard accelerations: wasted $liters L';
+    return '$count hårda accelerationer: slösade $liters L';
   }
 
   @override
   String insightIdling(String pctTime, String liters) {
-    return 'Idling ($pctTime% of trip): wasted $liters L';
+    return 'Tomgång ($pctTime% av resan): slösade $liters L';
   }
 
   @override
   String insightSubtitlePctOfTrip(String pctTime) {
-    return '$pctTime% of trip';
+    return '$pctTime% av resan';
   }
 
   @override
@@ -3725,889 +3740,895 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String insightLowGear(String minutes) {
-    return 'Labouring in low gear ($minutes min)';
+    return 'Kör tungt i låg växel ($minutes min)';
   }
 
   @override
-  String get drivingScoreCardTitle => 'Driving score';
+  String get drivingScoreCardTitle => 'Körpoäng';
 
   @override
   String get drivingScoreCardOutOf => '/100';
 
   @override
   String get drivingScoreCardSubtitle =>
-      'Composite score from idling, hard accelerations, hard braking, and high-RPM time. A \'better than X% of past trips\' comparison will land in a follow-up release.';
+      'Sammansatt poäng från tomgång, hårda accelerationer, hård inbromsning och tid vid högt RPM. En jämförelse \'bättre än X% av tidigare resor\' kommer i en kommande release.';
 
   @override
   String drivingScoreCardSemanticsLabel(String score) {
-    return 'Driving score $score out of 100';
+    return 'Körpoäng $score av 100';
   }
 
   @override
-  String get drivingScorePenaltyIdling => 'Idling';
+  String get drivingScorePenaltyIdling => 'Tomgång';
 
   @override
-  String get drivingScorePenaltyHardAccel => 'Hard accelerations';
+  String get drivingScorePenaltyHardAccel => 'Hårda accelerationer';
 
   @override
-  String get drivingScorePenaltyHardBrake => 'Hard braking';
+  String get drivingScorePenaltyHardBrake => 'Hård inbromsning';
 
   @override
-  String get drivingScorePenaltyHighRpm => 'High RPM';
+  String get drivingScorePenaltyHighRpm => 'Högt RPM';
 
   @override
-  String get drivingScorePenaltyFullThrottle => 'Full throttle';
+  String get drivingScorePenaltyFullThrottle => 'Fullgas';
 
   @override
   String get ecoRouteOption => 'Eco';
 
   @override
   String ecoRouteSavings(String liters) {
-    return '≈ $liters L saved';
+    return '≈ $liters L sparade';
   }
 
   @override
   String get ecoRouteHint =>
-      'Smarter drive — favours steady highway over zigzag shortcuts.';
+      'Smartare körning – föredrar jämn motorväg framför slingrande genvägar.';
 
   @override
-  String get favoritesShareAction => 'Share';
+  String get favoritesShareAction => 'Dela';
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Sparkilo — favourites on $date';
+    return 'Sparkilo — favoriter den $date';
   }
 
   @override
-  String get favoritesShareError => 'Couldn\'t generate share image';
+  String get favoritesShareError => 'Kunde inte generera delningsbild';
 
   @override
-  String get featureManagementSectionTitle => 'Feature management';
+  String get featureManagementSectionTitle => 'Funktionshantering';
 
   @override
   String get featureManagementSectionSubtitle =>
-      'Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.';
+      'Slå på eller av enskilda funktioner. Vissa funktioner är beroende av andra – reglage är inaktiverade tills förutsättningarna är uppfyllda.';
 
   @override
-  String get featureLabel_obd2TripRecording => 'OBD2 trip recording';
+  String get featureLabel_obd2TripRecording => 'OBD2-reseinspelning';
 
   @override
   String get featureDescription_obd2TripRecording =>
-      'Capture trips automatically over OBD2.';
+      'Registrera resor automatiskt via OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
+  String get featureLabel_gamification => 'Spelifiering';
 
   @override
-  String get featureDescription_gamification =>
-      'Driving scores and earned badges.';
+  String get featureDescription_gamification => 'Körpoäng och uppnådda märken.';
 
   @override
-  String get featureLabel_hapticEcoCoach => 'Haptic eco-coach';
+  String get featureLabel_hapticEcoCoach => 'Haptisk ecocoach';
 
   @override
   String get featureDescription_hapticEcoCoach =>
-      'Real-time haptic feedback during a trip.';
+      'Realtids-haptisk feedback under en resa.';
 
   @override
   String get featureLabel_tankSync => 'TankSync';
 
   @override
-  String get featureDescription_tankSync => 'Cross-device sync via Supabase.';
+  String get featureDescription_tankSync =>
+      'Synkronisering mellan enheter via Supabase.';
 
   @override
-  String get featureLabel_consumptionAnalytics => 'Consumption analytics';
+  String get featureLabel_consumptionAnalytics => 'Förbrukningsanalys';
 
   @override
   String get featureDescription_consumptionAnalytics =>
-      'Fill-up and trip analysis tab.';
+      'Fliken för analys av tankningar och resor.';
 
   @override
-  String get featureLabel_baselineSync => 'Baseline sync';
+  String get featureLabel_baselineSync => 'Grundsynk';
 
   @override
   String get featureDescription_baselineSync =>
-      'Sync driving baselines via TankSync.';
+      'Synka körningsgränser via TankSync.';
 
   @override
-  String get featureLabel_unifiedSearchResults => 'Unified search results';
+  String get featureLabel_unifiedSearchResults => 'Enhetliga sökresultat';
 
   @override
   String get featureDescription_unifiedSearchResults =>
-      'Single result list combining fuel and EV stations.';
+      'Enkel resultatlista som kombinerar bränsle- och EV-stationer.';
 
   @override
-  String get featureLabel_priceAlerts => 'Price alerts';
+  String get featureLabel_priceAlerts => 'Prisaviseringar';
 
   @override
   String get featureDescription_priceAlerts =>
-      'Threshold-based price-drop notifications.';
+      'Tröskelbaserade aviseringar om prissänkningar.';
 
   @override
-  String get featureLabel_priceHistory => 'Price history';
+  String get featureLabel_priceHistory => 'Prishistorik';
 
   @override
   String get featureDescription_priceHistory =>
-      '30-day price charts on station details.';
+      '30-dagars prisdiagram på stationsdetaljer.';
 
   @override
-  String get featureLabel_routePlanning => 'Route planning';
+  String get featureLabel_routePlanning => 'Ruttplanering';
 
   @override
   String get featureDescription_routePlanning =>
-      'Cheapest stop along your route.';
+      'Billigaste stopp längs din rutt.';
 
   @override
-  String get featureLabel_evCharging => 'EV charging';
+  String get featureLabel_evCharging => 'EV-laddning';
 
   @override
   String get featureDescription_evCharging =>
-      'Charging stations via OpenChargeMap.';
+      'Laddningsstationer via OpenChargeMap.';
 
   @override
   String get featureLabel_glideCoach => 'Glide-coach';
 
   @override
   String get featureDescription_glideCoach =>
-      'Hypermiling guidance using OSM traffic signals.';
+      'Hypermiling-vägledning med OSM-trafiksignaler.';
 
   @override
-  String get featureLabel_gpsTripPath => 'GPS trip path';
+  String get featureLabel_gpsTripPath => 'GPS-resespår';
 
   @override
   String get featureDescription_gpsTripPath =>
-      'Persist GPS path samples alongside each trip.';
+      'Spara GPS-spårprover tillsammans med varje resa.';
 
   @override
-  String get featureLabel_autoRecord => 'Auto-record';
+  String get featureLabel_autoRecord => 'Autoinspelning';
 
   @override
   String get featureDescription_autoRecord =>
-      'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+      'Starta automatiskt en resa när OBD2-adaptern ansluter till ett rörligt fordon.';
 
   @override
-  String get featureLabel_showFuel => 'Show fuel stations';
+  String get featureLabel_showFuel => 'Visa bränslestationer';
 
   @override
   String get featureDescription_showFuel =>
-      'Display petrol/diesel station results in search and on the map.';
+      'Visa bensin-/dieselstationer i sökning och på kartan.';
 
   @override
-  String get featureLabel_showElectric => 'Show charging stations';
+  String get featureLabel_showElectric => 'Visa laddningsstationer';
 
   @override
   String get featureDescription_showElectric =>
-      'Display EV charging stations in search and on the map.';
+      'Visa EV-laddningsstationer i sökning och på kartan.';
 
   @override
-  String get featureLabel_showConsumptionTab => 'Consumption tab';
+  String get featureLabel_showConsumptionTab => 'Förbrukningsflik';
 
   @override
   String get featureDescription_showConsumptionTab =>
-      'Show the consumption analytics tab in the bottom navigation.';
+      'Visa förbrukningsanalysfliken i bottennavigeringen.';
 
   @override
   String get featureBlockedEnable_gamification =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
   String get featureBlockedEnable_consumptionAnalytics =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
-  String get featureBlockedEnable_baselineSync => 'Enable TankSync first';
+  String get featureBlockedEnable_baselineSync => 'Aktivera TankSync först';
 
   @override
   String get featureBlockedEnable_glideCoach =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
   String get featureBlockedEnable_gpsTripPath =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
   String get featureBlockedEnable_autoRecord =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
-  String get featureBlockedEnable_showFuel => 'Prerequisites not met';
+  String get featureBlockedEnable_showFuel => 'Förutsättningar ej uppfyllda';
 
   @override
-  String get featureBlockedEnable_showElectric => 'Prerequisites not met';
+  String get featureBlockedEnable_showElectric =>
+      'Förutsättningar ej uppfyllda';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+  String get featureLabel_tflitePricePrediction => 'TFLite-prisprognoser';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+      'Prismodell på enheten – slutledning sker lokalt; egenskaper och förutsägelser lämnar aldrig enheten.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
-      'Enable price history first';
+      'Aktivera prishistorik först';
 
   @override
-  String get featureLabel_fuelCalculator => 'Fuel calculator';
+  String get featureLabel_fuelCalculator => 'Bränsleräknare';
 
   @override
   String get featureDescription_fuelCalculator =>
-      'Reachable fuel-cost calculator from the search results.';
+      'Räknare för bränslekostnad inom räckhåll från sökresultaten.';
 
   @override
-  String get featureLabel_carbonDashboard => 'Carbon dashboard';
+  String get featureLabel_carbonDashboard => 'Koldioxidpanel';
 
   @override
   String get featureDescription_carbonDashboard =>
-      'CO2 footprint dashboard reachable from the Consumption tab.';
+      'CO2-avtryckspanel nåbar från förbrukningsfliken.';
 
   @override
-  String get featureLabel_experimentalOemPids => 'Experimental OEM PIDs';
+  String get featureLabel_experimentalOemPids => 'Experimentella OEM PID:ar';
 
   @override
   String get featureDescription_experimentalOemPids =>
-      'Read exact tank litres via manufacturer-specific PIDs on supported adapters.';
+      'Läs exakta tankvolymer via tillverkarsspecifika PID:ar på stödda adaptrar.';
 
   @override
   String get featureBlockedEnable_experimentalOemPids =>
-      'Enable OBD2 trip recording first';
+      'Aktivera OBD2-reseinspelning först';
 
   @override
-  String get featureLabel_paymentQrScan => 'Scan payment QR';
+  String get featureLabel_paymentQrScan => 'Skanna betalnings-QR';
 
   @override
   String get featureDescription_paymentQrScan =>
-      'Scan-to-pay QR reader on the station detail screen.';
+      'QR-läsare för betalning på stationsdetaljskärmen.';
 
   @override
-  String get featureLabel_communityPriceReports => 'Community price reports';
+  String get featureLabel_communityPriceReports => 'Community-prisrapporter';
 
   @override
   String get featureDescription_communityPriceReports =>
-      'Report a station price from the station detail screen.';
+      'Rapportera ett stationspris från stationsdetaljskärmen.';
 
   @override
-  String get feedbackConsentTitle => 'Send report to GitHub?';
+  String get feedbackConsentTitle => 'Skicka rapport till GitHub?';
 
   @override
   String get feedbackConsentBody =>
-      'This creates a public ticket on our GitHub repository with your photo and the OCR text. No personal data (location, account id) is sent. Continue?';
+      'Det här skapar ett offentligt ärende på vårt GitHub-förråd med ditt foto och OCR-texten. Ingen persondata (plats, konto-id) skickas. Fortsätt?';
 
   @override
-  String get feedbackConsentContinue => 'Continue';
+  String get feedbackConsentContinue => 'Fortsätt';
 
   @override
-  String get feedbackConsentCancel => 'Cancel';
+  String get feedbackConsentCancel => 'Avbryt';
 
   @override
-  String get feedbackConsentLater => 'Later';
+  String get feedbackConsentLater => 'Senare';
 
   @override
-  String get feedbackTokenSectionTitle => 'Bad-scan feedback (GitHub)';
+  String get feedbackTokenSectionTitle => 'Feedback om dålig skanning (GitHub)';
 
   @override
   String get feedbackTokenDescription =>
-      'To automatically open a GitHub ticket from a failed scan, paste a GitHub PAT (`public_repo` scope on the tankstellen repository). Otherwise manual sharing remains available.';
+      'För att automatiskt öppna ett GitHub-ärende från en misslyckad skanning, klistra in en GitHub PAT (scope `public_repo` på tankstellen-förrådet). Annars finns manuell delning tillgänglig.';
 
   @override
-  String get feedbackTokenStatusSet => 'Token configured';
+  String get feedbackTokenStatusSet => 'Token konfigurerad';
 
   @override
-  String get feedbackTokenStatusUnset => 'No token';
+  String get feedbackTokenStatusUnset => 'Ingen token';
 
   @override
-  String get feedbackTokenSet => 'Set';
+  String get feedbackTokenSet => 'Ange';
 
   @override
-  String get feedbackTokenClear => 'Clear';
+  String get feedbackTokenClear => 'Rensa';
 
   @override
   String get feedbackTokenDialogTitle => 'GitHub PAT';
 
   @override
-  String get feedbackTokenFieldLabel => 'Personal Access Token';
+  String get feedbackTokenFieldLabel => 'Personlig åtkomsttoken';
 
   @override
-  String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
+  String get fillUpReconciliationVerifiedBadgeLabel => 'Verifierad av adapter';
 
   @override
   String get fillUpReconciliationVarianceDialogTitle =>
-      'Doesn\'t match adapter reading';
+      'Stämmer inte med adapteravläsning';
 
   @override
   String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
-    return 'Your entry: $userL L. Adapter says: $adapterL L (delta from before/after fuel-level capture). Use adapter value?';
+    return 'Din post: $userL L. Adaptern säger: $adapterL L (delta från bränslenivå före/efter). Använd adaptervärdet?';
   }
 
   @override
-  String get fillUpReconciliationVarianceDialogKeepMine => 'Keep my entry';
+  String get fillUpReconciliationVarianceDialogKeepMine => 'Behåll min post';
 
   @override
   String get fillUpReconciliationVarianceDialogUseAdapter =>
-      'Use adapter value';
+      'Använd adaptervärde';
 
   @override
-  String get scanReceiptNoData => 'No receipt data found — try again';
+  String get scanReceiptNoData => 'Ingen kvittodata hittades – försök igen';
 
   @override
   String get scanReceiptSuccess =>
-      'Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.';
+      'Kvitto skannat – kontrollera värdena. Tryck på \"Rapportera skanningsfel\" nedan om något är fel.';
 
   @override
   String scanReceiptFailed(String error) {
-    return 'Scan failed: $error';
+    return 'Skanning misslyckades: $error';
   }
 
   @override
-  String get scanPumpUnreadable => 'Pump display not readable — try again';
+  String get scanPumpUnreadable => 'Pumpdisplayen är inte läsbar – försök igen';
 
   @override
-  String get scanPumpSuccess => 'Pump display scanned — verify the values.';
+  String get scanPumpSuccess => 'Pumpdisplay skannad – kontrollera värdena.';
 
   @override
   String scanPumpFailed(String error) {
-    return 'Pump scan failed: $error';
+    return 'Pumpskanning misslyckades: $error';
   }
 
   @override
-  String get badScanReportTitle => 'Report a scan error';
+  String get badScanReportTitle => 'Rapportera ett skanningsfel';
 
   @override
-  String get badScanReportTitleReceipt => 'Report a scan error — Receipt';
+  String get badScanReportTitleReceipt =>
+      'Rapportera ett skanningsfel – Kvitto';
 
   @override
   String get badScanReportTitlePumpDisplay =>
-      'Report a scan error — Pump display';
+      'Rapportera ett skanningsfel – Pumpdisplay';
 
   @override
-  String get pumpScanFailureTitle => 'Display unreadable';
+  String get pumpScanFailureTitle => 'Display oläslig';
 
   @override
   String get pumpScanFailureBody =>
-      'The scan couldn\'t read the pump display. What would you like to do?';
+      'Skanningen kunde inte läsa pumpdisplayen. Vad vill du göra?';
 
   @override
-  String get pumpScanFailureCorrectManually => 'Correct manually';
+  String get pumpScanFailureCorrectManually => 'Korrigera manuellt';
 
   @override
-  String get pumpScanFailureReport => 'Report';
+  String get pumpScanFailureReport => 'Rapportera';
 
   @override
-  String get pumpScanFailureRemove => 'Remove photo';
+  String get pumpScanFailureRemove => 'Ta bort foto';
 
   @override
   String get badScanReportHint =>
-      'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
+      'Vi delar kvittofotot och båda uppsättningarna av värden så att nästa version kan lära sig den här layouten.';
 
   @override
-  String get badScanReportShareAction => 'Share report + photo';
+  String get badScanReportShareAction => 'Dela rapport + foto';
 
   @override
-  String get badScanReportFieldBrandLayout => 'Brand layout';
+  String get badScanReportFieldBrandLayout => 'Märkeslayout';
 
   @override
-  String get badScanReportFieldTotal => 'Total';
+  String get badScanReportFieldTotal => 'Totalt';
 
   @override
-  String get badScanReportFieldPricePerLiter => 'Price/L';
+  String get badScanReportFieldPricePerLiter => 'Pris/L';
 
   @override
   String get badScanReportFieldStation => 'Station';
 
   @override
-  String get badScanReportFieldFuel => 'Fuel';
+  String get badScanReportFieldFuel => 'Bränsle';
 
   @override
-  String get badScanReportFieldDate => 'Date';
+  String get badScanReportFieldDate => 'Datum';
 
   @override
-  String get badScanReportHeaderField => 'Field';
+  String get badScanReportHeaderField => 'Fält';
 
   @override
-  String get badScanReportHeaderScanned => 'Scanned';
+  String get badScanReportHeaderScanned => 'Skannat';
 
   @override
-  String get badScanReportHeaderYouTyped => 'You typed';
+  String get badScanReportHeaderYouTyped => 'Du skrev';
 
   @override
-  String get badScanReportCreateTicket => 'Create issue';
+  String get badScanReportCreateTicket => 'Skapa ärende';
 
   @override
-  String get badScanReportOpenInBrowser => 'Open in browser';
+  String get badScanReportOpenInBrowser => 'Öppna i webbläsare';
 
   @override
-  String get badScanReportFallbackToShare => 'Submission failed — manual share';
+  String get badScanReportFallbackToShare =>
+      'Inlämning misslyckades – manuell delning';
 
   @override
-  String get fillUpSectionWhatTitle => 'What you filled';
+  String get fillUpSectionWhatTitle => 'Vad du tankade';
 
   @override
-  String get fillUpSectionWhatSubtitle => 'Fuel, amount, price';
+  String get fillUpSectionWhatSubtitle => 'Bränsle, mängd, pris';
 
   @override
-  String get fillUpSectionWhereTitle => 'Where you were';
+  String get fillUpSectionWhereTitle => 'Var du var';
 
   @override
-  String get fillUpSectionWhereSubtitle => 'Station, odometer, notes';
+  String get fillUpSectionWhereSubtitle => 'Station, vägmätare, anteckningar';
 
   @override
-  String get fillUpImportFromLabel => 'Import from…';
+  String get fillUpImportFromLabel => 'Importera från…';
 
   @override
-  String get fillUpImportSheetTitle => 'Import fill-up data';
+  String get fillUpImportSheetTitle => 'Importera tankningsdata';
 
   @override
-  String get fillUpImportReceiptLabel => 'Receipt';
+  String get fillUpImportReceiptLabel => 'Kvitto';
 
   @override
   String get fillUpImportReceiptDescription =>
-      'Scan a paper receipt with the camera';
+      'Skanna ett papperskvitto med kameran';
 
   @override
-  String get fillUpImportPumpLabel => 'Pump display';
+  String get fillUpImportPumpLabel => 'Pumpdisplay';
 
   @override
   String get fillUpImportPumpDescription =>
-      'Read Betrag / Preis from the pump LCD';
+      'Läs Betrag / Preis från pump-LCD:n';
 
   @override
-  String get fillUpImportObdLabel => 'OBD-II adapter';
+  String get fillUpImportObdLabel => 'OBD-II-adapter';
 
   @override
   String get fillUpImportObdDescription =>
-      'Read odometer from the OBD-II port over Bluetooth';
+      'Läs vägmätare från OBD-II-porten via Bluetooth';
 
   @override
-  String get fillUpPricePerLiterLabel => 'Price per liter';
+  String get fillUpPricePerLiterLabel => 'Pris per liter';
 
   @override
-  String get vehicleHeaderPlateLabel => 'Plate';
+  String get vehicleHeaderPlateLabel => 'Registreringsskylt';
 
   @override
-  String get vehicleHeaderUntitled => 'New vehicle';
+  String get vehicleHeaderUntitled => 'Nytt fordon';
 
   @override
-  String get vehicleSectionIdentityTitle => 'Identity';
+  String get vehicleSectionIdentityTitle => 'Identitet';
 
   @override
-  String get vehicleSectionIdentitySubtitle => 'Name & VIN';
+  String get vehicleSectionIdentitySubtitle => 'Namn och VIN';
 
   @override
-  String get vehicleSectionDrivetrainTitle => 'Drivetrain';
+  String get vehicleSectionDrivetrainTitle => 'Drivlina';
 
   @override
-  String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
+  String get vehicleSectionDrivetrainSubtitle => 'Hur detta fordon drivs';
 
   @override
-  String get calibrationModeLabel => 'Calibration mode';
+  String get calibrationModeLabel => 'Kalibreringsläge';
 
   @override
-  String get calibrationModeRule => 'Rule-based';
+  String get calibrationModeRule => 'Regelbaserat';
 
   @override
   String get calibrationModeFuzzy => 'Fuzzy';
 
   @override
   String get calibrationModeTooltip =>
-      'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
+      'Regelbaserat tilldelar varje körprov exakt en situation. Fuzzy sprider det över alla efter hur väl var och en passar – jämnare runt 60 km/h eller vid varierande lutningar, men långsammare att fylla alla hinkar.';
 
   @override
-  String get profileGamificationToggleTitle => 'Show achievements & scores';
+  String get profileGamificationToggleTitle => 'Visa prestationer och poäng';
 
   @override
   String get profileGamificationToggleSubtitle =>
-      'When off, badges, scores and trophy icons are hidden across the app.';
+      'När av döljs märken, poäng och troféikoner i hela appen.';
 
   @override
-  String get gpsDiagnosticsTitle => 'GPS sampling diagnostics';
+  String get gpsDiagnosticsTitle => 'GPS-samplingdiagnostik';
 
   @override
   String gpsDiagnosticsHeader(String count, String span, int gaps) {
     String _temp0 = intl.Intl.pluralLogic(
       gaps,
       locale: localeName,
-      other: '$gaps gaps',
-      one: '1 gap',
-      zero: 'no gaps',
+      other: '$gaps luckor',
+      one: '1 lucka',
+      zero: 'inga luckor',
     );
-    return '$count samples · $span · $_temp0';
+    return '$count prover · $span · $_temp0';
   }
 
   @override
   String gpsDiagnosticsCadence(int ms) {
-    return 'Median interval: $ms ms';
+    return 'Medianintervall: $ms ms';
   }
 
   @override
   String get gpsDiagnosticsExplain =>
-      'Captured during recording to verify GPS cadence under phone-sleep.';
+      'Inspelat under inspelning för att verifiera GPS-kadensen under telefonsömn.';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Driving';
+  String get hapticEcoCoachSectionTitle => 'Körning';
 
   @override
-  String get hapticEcoCoachSettingTitle => 'Real-time eco coaching';
+  String get hapticEcoCoachSettingTitle => 'Realtids-ecocoachning';
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Gentle haptic + on-screen tip when you floor it during cruise';
+      'Mjuk haptik + on-screen-tips när du gäspar under krysshastighet';
 
   @override
   String get hapticEcoCoachSnackBarMessage =>
-      'Easy on the throttle — coasting saves more';
+      'Varsamt med gasen – frihjul sparar mer';
 
   @override
-  String get anonKeyLabel => 'Anon Key';
+  String get anonKeyLabel => 'Anon-nyckel';
 
   @override
-  String get anonKeyHideTooltip => 'Hide key';
+  String get anonKeyHideTooltip => 'Dölj nyckel';
 
   @override
-  String get anonKeyShowTooltip => 'Show key to verify';
+  String get anonKeyShowTooltip => 'Visa nyckel för verifiering';
 
   @override
   String anonKeyTooLong(int length) {
-    return 'Key is too long ($length chars) — check for extra text';
+    return 'Nyckeln är för lång ($length tecken) – kontrollera om det finns extra text';
   }
 
   @override
   String anonKeyLooksCorrect(int length) {
-    return 'Key looks correct ($length chars)';
+    return 'Nyckeln ser korrekt ut ($length tecken)';
   }
 
   @override
   String get anonKeyShouldBeJwt =>
-      'Key should be a JWT (header.payload.signature)';
+      'Nyckeln bör vara en JWT (header.payload.signature)';
 
   @override
   String anonKeyMayBeTruncated(int length) {
-    return 'Key may be truncated ($length of ~208 expected chars)';
+    return 'Nyckeln kan vara trunkerad ($length av ~208 förväntade tecken)';
   }
 
   @override
-  String get anonKeyExceedsMax => 'Key exceeds maximum length';
+  String get anonKeyExceedsMax => 'Nyckeln överstiger maximal längd';
 
   @override
-  String get qrShareTitle => 'Share your database';
+  String get qrShareTitle => 'Dela din databas';
 
   @override
-  String get qrShareSubtitle => 'Others can scan this QR code to connect';
+  String get qrShareSubtitle =>
+      'Andra kan skanna den här QR-koden för att ansluta';
 
   @override
-  String get qrShareCopyAsText => 'Copy as text';
+  String get qrShareCopyAsText => 'Kopiera som text';
 
   @override
-  String get authInfoTitle => 'Why create an account?';
+  String get authInfoTitle => 'Varför skapa ett konto?';
 
   @override
   String get authInfoBenefit1 =>
-      '• Sync favorites, alerts, and saved routes across devices';
+      '• Synka favoriter, aviseringar och sparade rutter mellan enheter';
 
   @override
   String get authInfoBenefit2 =>
-      '• Prepare a route on your phone, use it in your car';
+      '• Förbered en rutt på din telefon, använd den i bilen';
 
   @override
-  String get authInfoBenefit3 => '• No data is shared with third parties';
+  String get authInfoBenefit3 => '• Ingen data delas med tredje part';
 
   @override
-  String get authInfoBenefit4 => '• You can delete your account at any time';
+  String get authInfoBenefit4 => '• Du kan radera ditt konto när som helst';
 
   @override
   String get privacyLocalDataEmpty =>
-      'Nothing stored yet. Add a favorite or set a price alert to see entries here.';
+      'Inget lagrat ännu. Lägg till en favorit eller ange en prisavisering för att se poster här.';
 
   @override
-  String get privacyHideEmptyRows => 'Hide empty rows';
+  String get privacyHideEmptyRows => 'Dölj tomma rader';
 
   @override
   String privacyShowEmptyRows(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show $count empty rows',
-      one: 'Show $count empty row',
+      other: 'Visa $count tomma rader',
+      one: 'Visa $count tom rad',
     );
     return '$_temp0';
   }
 
   @override
-  String get apiKeySetupTitle => 'API key setup (optional)';
+  String get apiKeySetupTitle => 'API-nyckelinställning (valfritt)';
 
   @override
   String get apiKeySetupDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Registrera dig för en gratis API-nyckel, eller hoppa över för att utforska appen med demodata.';
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '$provider Registration';
+    return '$provider Registrering';
   }
 
   @override
   String apiKeyTerms(String provider) {
-    return 'By entering an API key you accept the terms of $provider. Data redistribution is prohibited.';
+    return 'Genom att ange en API-nyckel accepterar du villkoren för $provider. Vidaredistribution av data är förbjuden.';
   }
 
   @override
-  String get calculatorDistanceHint => 'e.g. 150';
+  String get calculatorDistanceHint => 't.ex. 150';
 
   @override
-  String get calculatorConsumptionHint => 'e.g. 7.0';
+  String get calculatorConsumptionHint => 't.ex. 7,0';
 
   @override
-  String get calculatorPriceHint => 'e.g. 1.899';
+  String get calculatorPriceHint => 't.ex. 1,899';
 
   @override
-  String get routeStrategyLabel => 'Strategy:';
+  String get routeStrategyLabel => 'Strategi:';
 
   @override
-  String get routeStrategyUniform => 'Uniform';
+  String get routeStrategyUniform => 'Enhetlig';
 
   @override
-  String get routeStrategyBalanced => 'Balanced';
+  String get routeStrategyBalanced => 'Balanserad';
 
   @override
-  String get glideCoachBetaTitle => 'Glide-coach beta (experimental)';
+  String get glideCoachBetaTitle => 'Glide-coach beta (experimentell)';
 
   @override
   String get glideCoachBetaSubtitle =>
-      'Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.';
+      'Subtil haptik vid inbromsning inför rött ljus. Av som standard – risk för distraktion.';
 
   @override
-  String get consentSyncTripsTitle => 'Sync trip recordings';
+  String get consentSyncTripsTitle => 'Synka reseinspelningar';
 
   @override
   String get consentSyncTripsSubtitle =>
-      'Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.';
+      'Säkerhetskopiera OBD2- och GPS-resor till TankSync. Mellan enheter, opt-in.';
 
   @override
   String get consentSyncTripsDisabledHint =>
-      'Enable Cloud Sync above to back up trips.';
+      'Aktivera Molnsynkronisering ovan för att säkerhetskopiera resor.';
 
   @override
-  String get consentHideDetails => 'Hide details';
+  String get consentHideDetails => 'Dölj detaljer';
 
   @override
-  String get consentShowDetails => 'Show details';
+  String get consentShowDetails => 'Visa detaljer';
 
   @override
   String get dialogOk => 'OK';
 
   @override
-  String get invalidLinkTitle => 'Invalid link';
+  String get invalidLinkTitle => 'Ogiltig länk';
 
   @override
   String invalidLinkBody(String path) {
-    return 'The link \"$path\" is not valid.';
+    return 'Länken \"$path\" är inte giltig.';
   }
 
   @override
-  String get home => 'Home';
+  String get home => 'Hem';
 
   @override
-  String get loyaltySettingsTitle => 'Fuel club cards';
+  String get loyaltySettingsTitle => 'Bränsleklubbskort';
 
   @override
   String get loyaltySettingsSubtitle =>
-      'Apply your loyalty discount to displayed prices';
+      'Tillämpa din lojalitetsrabatt på visade priser';
 
   @override
-  String get loyaltyMenuTitle => 'Fuel club cards';
+  String get loyaltyMenuTitle => 'Bränsleklubbskort';
 
   @override
   String get loyaltyMenuSubtitle =>
-      'Apply per-litre discounts from Total, Aral, Shell, …';
+      'Tillämpa per-liters-rabatter från Total, Aral, Shell, …';
 
   @override
-  String get loyaltyAddCard => 'Add card';
+  String get loyaltyAddCard => 'Lägg till kort';
 
   @override
-  String get loyaltyAddCardSheetTitle => 'Add fuel club card';
+  String get loyaltyAddCardSheetTitle => 'Lägg till bränsleklubbskort';
 
   @override
-  String get loyaltyBrandLabel => 'Brand';
+  String get loyaltyBrandLabel => 'Märke';
 
   @override
-  String get loyaltyCardLabelLabel => 'Label (optional)';
+  String get loyaltyCardLabelLabel => 'Etikett (valfritt)';
 
   @override
-  String get loyaltyDiscountLabel => 'Discount (per litre)';
+  String get loyaltyDiscountLabel => 'Rabatt (per liter)';
 
   @override
-  String get loyaltyDiscountInvalid => 'Enter a positive number';
+  String get loyaltyDiscountInvalid => 'Ange ett positivt tal';
 
   @override
-  String get loyaltyDeleteConfirmTitle => 'Delete card?';
+  String get loyaltyDeleteConfirmTitle => 'Radera kort?';
 
   @override
   String get loyaltyDeleteConfirmBody =>
-      'This card will stop applying its discount.';
+      'Det här kortet slutar tillämpa sin rabatt.';
 
   @override
-  String get loyaltyEmptyTitle => 'No fuel club cards yet';
+  String get loyaltyEmptyTitle => 'Inga bränsleklubbskort ännu';
 
   @override
   String get loyaltyEmptyBody =>
-      'Add a card to apply your per-litre discount to matching stations automatically.';
+      'Lägg till ett kort för att automatiskt tillämpa din per-liters-rabatt på matchande stationer.';
 
   @override
   String get loyaltyBadgePrefix => '−';
 
   @override
-  String get maintenanceSignalIdleRpmCreepTitle => 'Idle RPM creep detected';
+  String get maintenanceSignalIdleRpmCreepTitle =>
+      'Krypande tomgångsvarv detekterat';
 
   @override
   String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
-    return 'Idle RPM has crept up by $percent% over your last $tripCount trips. Possible early sign of a clogged air filter or sensor drift.';
+    return 'Tomgångsvarven har krypat upp med $percent% under dina senaste $tripCount resor. Möjligt tidigt tecken på igensatt luftfilter eller sensordrift.';
   }
 
   @override
-  String get maintenanceSignalMafDeviationTitle =>
-      'Possible intake restriction';
+  String get maintenanceSignalMafDeviationTitle => 'Möjlig intagsbegränsning';
 
   @override
   String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
-    return 'Cruise fuel rate has dropped by $percent% over your last $tripCount trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.';
+    return 'Bränsleflödet vid kryssning har sjunkit med $percent% under dina senaste $tripCount resor. Möjligt tecken på igensatt luftfilter eller begränsat intag – värt en genomgång.';
   }
 
   @override
-  String get maintenanceActionDismiss => 'Dismiss';
+  String get maintenanceActionDismiss => 'Avfärda';
 
   @override
-  String get maintenanceActionSnooze => 'Snooze 30 days';
+  String get maintenanceActionSnooze => 'Snooze 30 dagar';
 
   @override
-  String get consumptionMonthlyInsightsTitle => 'This month vs last month';
+  String get consumptionMonthlyInsightsTitle =>
+      'Den här månaden jämfört med förra månaden';
 
   @override
-  String get consumptionMonthlyTripsLabel => 'Trips';
+  String get consumptionMonthlyTripsLabel => 'Resor';
 
   @override
-  String get consumptionMonthlyDriveTimeLabel => 'Drive time';
+  String get consumptionMonthlyDriveTimeLabel => 'Körtid';
 
   @override
-  String get consumptionMonthlyDistanceLabel => 'Distance';
+  String get consumptionMonthlyDistanceLabel => 'Sträcka';
 
   @override
-  String get consumptionMonthlyAvgConsumptionLabel => 'Avg consumption';
+  String get consumptionMonthlyAvgConsumptionLabel => 'Sn. förbrukning';
 
   @override
   String get consumptionMonthlyComparisonNotReliable =>
-      'Need at least 3 trips per month for comparison';
+      'Behöver minst 3 resor per månad för jämförelse';
 
   @override
-  String get obd2CapabilitySectionTitle => 'Adapter capabilities';
+  String get obd2CapabilitySectionTitle => 'Adapterfunktioner';
 
   @override
   String get obd2CapabilityStandardOnly => 'Standard';
 
   @override
-  String get obd2CapabilityOemPids => 'OEM PIDs';
+  String get obd2CapabilityOemPids => 'OEM PID:ar';
 
   @override
   String get obd2CapabilityFullCan => 'Full CAN';
 
   @override
   String get obd2CapabilityUpgradeHintStandard =>
-      'For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).';
+      'För exakta liter i tanken på Peugeot/Citroën stöder appen OBDLink MX+/LX/CX (STN-chip).';
 
   @override
-  String get obd2DebugOverlayEnabledSnack => 'OBD2 diagnostic overlay enabled';
+  String get obd2DebugOverlayEnabledSnack => 'OBD2-diagnostikoverlay aktiverad';
 
   @override
   String get obd2DebugOverlayDisabledSnack =>
-      'OBD2 diagnostic overlay disabled';
+      'OBD2-diagnostikoverlay inaktiverad';
 
   @override
-  String get obd2DebugOverlayClearButton => 'Clear';
+  String get obd2DebugOverlayClearButton => 'Rensa';
 
   @override
-  String get obd2DebugOverlayCloseButton => 'Close';
+  String get obd2DebugOverlayCloseButton => 'Stäng';
 
   @override
-  String get obd2DebugOverlayTitle => 'OBD2 breadcrumbs';
+  String get obd2DebugOverlayTitle => 'OBD2-brödsmulor';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
-    return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
+    return 'Kunde inte nå \'$adapterName\' – välj en annan adapter';
   }
 
   @override
-  String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
+  String get onboardingObd2StepTitle => 'Anslut din OBD2-adapter';
 
   @override
   String get onboardingObd2StepBody =>
-      'Plug your OBD2 adapter into the car\'s port and turn the ignition on. We\'ll read the VIN and fill in engine details for you.';
+      'Koppla din OBD2-adapter till bilens port och slå på tändningen. Vi läser VIN och fyller i motordetaljer åt dig.';
 
   @override
-  String get onboardingObd2ConnectButton => 'Connect adapter';
+  String get onboardingObd2ConnectButton => 'Anslut adapter';
 
   @override
-  String get onboardingObd2SkipButton => 'Maybe later';
+  String get onboardingObd2SkipButton => 'Kanske senare';
 
   @override
-  String get onboardingObd2ReadingVin => 'Reading VIN…';
+  String get onboardingObd2ReadingVin => 'Läser VIN…';
 
   @override
   String get onboardingObd2VinReadFailed =>
-      'Couldn\'t read VIN — enter manually';
+      'Kunde inte läsa VIN – ange manuellt';
 
   @override
   String get onboardingObd2ConnectFailed =>
-      'Couldn\'t connect to the adapter. You can retry or skip.';
+      'Kunde inte ansluta till adaptern. Du kan försöka igen eller hoppa över.';
 
   @override
-  String get onboardingPickUseMode => 'Pick a use mode to continue.';
+  String get onboardingPickUseMode =>
+      'Välj ett användningsläge för att fortsätta.';
 
   @override
-  String get alertsRadiusFrequencyLabel => 'Check frequency';
+  String get alertsRadiusFrequencyLabel => 'Kontrollfrekvens';
 
   @override
-  String get alertsRadiusFrequencyDaily => 'Once a day';
+  String get alertsRadiusFrequencyDaily => 'En gång om dagen';
 
   @override
-  String get alertsRadiusFrequencyTwiceDaily => 'Twice a day';
+  String get alertsRadiusFrequencyTwiceDaily => 'Två gånger om dagen';
 
   @override
-  String get alertsRadiusFrequencyThriceDaily => 'Three times a day';
+  String get alertsRadiusFrequencyThriceDaily => 'Tre gånger om dagen';
 
   @override
-  String get alertsRadiusFrequencyFourTimesDaily => 'Four times a day';
+  String get alertsRadiusFrequencyFourTimesDaily => 'Fyra gånger om dagen';
 
   @override
-  String get radiusAlertPickOnMap => 'Pick on map';
+  String get radiusAlertPickOnMap => 'Välj på kartan';
 
   @override
-  String get radiusAlertMapPickerTitle => 'Pick alert center';
+  String get radiusAlertMapPickerTitle => 'Välj aviseringscenter';
 
   @override
-  String get radiusAlertMapPickerConfirm => 'Confirm';
+  String get radiusAlertMapPickerConfirm => 'Bekräfta';
 
   @override
-  String get radiusAlertMapPickerCancel => 'Cancel';
+  String get radiusAlertMapPickerCancel => 'Avbryt';
 
   @override
   String get radiusAlertMapPickerHint =>
-      'Drag the map to position the alert center';
+      'Dra kartan för att placera aviseringscentret';
 
   @override
-  String get radiusAlertCenterFromMap => 'Map location';
+  String get radiusAlertCenterFromMap => 'Kartplats';
 
   @override
   String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel near $label';
+    return '$fuelLabel nära $label';
   }
 
   @override
   String radiusAlertNotificationBody(String price, String threshold) {
-    return 'A station is at $price € (target: $threshold €)';
+    return 'En station ligger på $price € (mål: $threshold €)';
   }
 
   @override
@@ -4620,46 +4641,46 @@ class AppLocalizationsSv extends AppLocalizations {
   String get refuelUnitPerSession => '/session';
 
   @override
-  String get speedConsumptionCardTitle => 'Consumption by speed';
+  String get speedConsumptionCardTitle => 'Förbrukning per hastighet';
 
   @override
-  String get speedBandIdleJam => 'Idle / jam';
+  String get speedBandIdleJam => 'Tomgång / kö';
 
   @override
-  String get speedBandUrban => 'Urban (10–50)';
+  String get speedBandUrban => 'Stad (10–50)';
 
   @override
-  String get speedBandSuburban => 'Suburban (50–80)';
+  String get speedBandSuburban => 'Förort (50–80)';
 
   @override
-  String get speedBandRural => 'Rural (80–100)';
+  String get speedBandRural => 'Landsbygd (80–100)';
 
   @override
-  String get speedBandMotorwaySlow => 'Eco-cruise (100–115)';
+  String get speedBandMotorwaySlow => 'Eco-kryssning (100–115)';
 
   @override
-  String get speedBandMotorway => 'Motorway (115–130)';
+  String get speedBandMotorway => 'Motorväg (115–130)';
 
   @override
-  String get speedBandMotorwayFast => 'Motorway fast (130+)';
+  String get speedBandMotorwayFast => 'Motorväg snabb (130+)';
 
   @override
   String get speedConsumptionInsufficientData =>
-      'Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.';
+      'Spela in 30+ minuter resor med OBD2-adaptern för att låsa upp hastighets-/förbrukningsanalysen.';
 
   @override
   String speedConsumptionTimeShare(int percent) {
-    return '$percent % of driving';
+    return '$percent % av körningen';
   }
 
   @override
-  String get speedConsumptionNeedMoreData => 'Need more data';
+  String get speedConsumptionNeedMoreData => 'Behöver mer data';
 
   @override
-  String get splashLoadingLabel => 'Loading Sparkilo';
+  String get splashLoadingLabel => 'Laddar Sparkilo';
 
   @override
-  String get tankLevelTitle => 'Tank level';
+  String get tankLevelTitle => 'Tanknivå';
 
   @override
   String tankLevelLitersFormat(String litres) {
@@ -4668,115 +4689,116 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String tankLevelRangeFormat(String kilometres) {
-    return '≈ $kilometres km of range';
+    return '≈ $kilometres km räckvidd';
   }
 
   @override
   String tankLevelLastFillUpFormat(String date, String count) {
-    return 'Last fill-up: $date · $count trip(s) since';
+    return 'Senaste tankning: $date · $count resa(or) sedan';
   }
 
   @override
-  String get tankLevelMethodObd2 => 'OBD2 measured';
+  String get tankLevelMethodObd2 => 'OBD2-mätt';
 
   @override
-  String get tankLevelMethodDistanceFallback => 'distance-based estimate';
+  String get tankLevelMethodDistanceFallback => 'distansbaserad uppskattning';
 
   @override
-  String get tankLevelMethodMixed => 'mixed measurement';
+  String get tankLevelMethodMixed => 'blandad mätning';
 
   @override
-  String get tankLevelEmptyNoFillUp => 'Log a fill-up to see your tank level';
+  String get tankLevelEmptyNoFillUp =>
+      'Logga en tankning för att se din tanknivå';
 
   @override
-  String get tankLevelDetailSheetTitle => 'Trips since last fill-up';
+  String get tankLevelDetailSheetTitle => 'Resor sedan senaste tankning';
 
   @override
   String get addFillUpIsFullTankLabel => 'Full tank';
 
   @override
   String get addFillUpIsFullTankSubtitle =>
-      'Tank filled to the brim — uncheck if this was a partial fill';
+      'Tanken fylld till brädden – avmarkera om det var en deltankning';
 
   @override
-  String get themeCardTitle => 'Theme';
+  String get themeCardTitle => 'Tema';
 
   @override
   String get themeCardSubtitleSystem => 'System';
 
   @override
-  String get themeCardSubtitleLight => 'Light';
+  String get themeCardSubtitleLight => 'Ljust';
 
   @override
-  String get themeCardSubtitleDark => 'Dark';
+  String get themeCardSubtitleDark => 'Mörkt';
 
   @override
-  String get themeSettingsScreenTitle => 'Theme';
+  String get themeSettingsScreenTitle => 'Tema';
 
   @override
-  String get themeSettingsSystemLabel => 'Follow system';
+  String get themeSettingsSystemLabel => 'Följ system';
 
   @override
-  String get themeSettingsLightLabel => 'Light';
+  String get themeSettingsLightLabel => 'Ljust';
 
   @override
-  String get themeSettingsDarkLabel => 'Dark';
+  String get themeSettingsDarkLabel => 'Mörkt';
 
   @override
   String get themeSettingsSystemDescription =>
-      'Match the current device appearance.';
+      'Matcha den aktuella enhetens utseende.';
 
   @override
   String get themeSettingsLightDescription =>
-      'Bright backgrounds — best for daytime use.';
+      'Ljusa bakgrunder – bäst för dagtidsanvändning.';
 
   @override
   String get themeSettingsDarkDescription =>
-      'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
+      'Mörka bakgrunder – skonsamt för ögonen på natten och sparar batteri på OLED-skärmar.';
 
   @override
   String get themeSettingsEcoLabel => 'Eco';
 
   @override
   String get themeSettingsEcoDescription =>
-      'The app\'s signature green look — bright and easy to read, with softly green-tinted backgrounds.';
+      'Appens signaturgröna utseende – ljust och lättläst med mjukt gröntonade bakgrunder.';
 
   @override
-  String get throttleRpmHistogramTitle => 'How you used the engine';
+  String get throttleRpmHistogramTitle => 'Hur du använde motorn';
 
   @override
-  String get throttleRpmHistogramThrottleSection => 'Throttle position';
+  String get throttleRpmHistogramThrottleSection => 'Gaspedalens position';
 
   @override
-  String get throttleRpmHistogramRpmSection => 'Engine RPM';
+  String get throttleRpmHistogramRpmSection => 'Motorvarv';
 
   @override
-  String get throttleRpmHistogramThrottleCoast => 'Coast (0–25%)';
+  String get throttleRpmHistogramThrottleCoast => 'Frihjul (0–25%)';
 
   @override
-  String get throttleRpmHistogramThrottleLight => 'Light (25–50%)';
+  String get throttleRpmHistogramThrottleLight => 'Lätt (25–50%)';
 
   @override
-  String get throttleRpmHistogramThrottleFirm => 'Firm (50–75%)';
+  String get throttleRpmHistogramThrottleFirm => 'Fast (50–75%)';
 
   @override
-  String get throttleRpmHistogramThrottleWide => 'Wide-open (75–100%)';
+  String get throttleRpmHistogramThrottleWide => 'Fullgas (75–100%)';
 
   @override
-  String get throttleRpmHistogramRpmIdle => 'Idle (≤900)';
+  String get throttleRpmHistogramRpmIdle => 'Tomgång (≤900)';
 
   @override
-  String get throttleRpmHistogramRpmCruise => 'Cruise (901–2000)';
+  String get throttleRpmHistogramRpmCruise => 'Kryssning (901–2000)';
 
   @override
-  String get throttleRpmHistogramRpmSpirited => 'Spirited (2001–3000)';
+  String get throttleRpmHistogramRpmSpirited => 'Livlig (2001–3000)';
 
   @override
-  String get throttleRpmHistogramRpmHard => 'Hard (>3000)';
+  String get throttleRpmHistogramRpmHard => 'Hård (>3000)';
 
   @override
   String get throttleRpmHistogramEmpty =>
-      'No throttle or RPM samples in this trip.';
+      'Inga gas- eller RPM-prover i den här resan.';
 
   @override
   String throttleRpmHistogramBarShare(String pct) {
@@ -4784,30 +4806,30 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get trajetsTabLabel => 'Trips';
+  String get trajetsTabLabel => 'Resor';
 
   @override
-  String get trajetsStartRecordingButton => 'Start recording';
+  String get trajetsStartRecordingButton => 'Starta inspelning';
 
   @override
-  String get trajetsResumeRecordingButton => 'Resume recording';
+  String get trajetsResumeRecordingButton => 'Återuppta inspelning';
 
   @override
   String get tripStartProgressConnectingAdapter =>
-      'Connecting to OBD2 adapter…';
+      'Ansluter till OBD2-adapter…';
 
   @override
-  String get tripStartProgressReadingVehicleData => 'Reading vehicle data…';
+  String get tripStartProgressReadingVehicleData => 'Läser fordonsdata…';
 
   @override
-  String get tripStartProgressStartingRecording => 'Starting recording…';
+  String get tripStartProgressStartingRecording => 'Startar inspelning…';
 
   @override
-  String get trajetsEmptyStateTitle => 'No trips yet';
+  String get trajetsEmptyStateTitle => 'Inga resor ännu';
 
   @override
   String get trajetsEmptyStateBody =>
-      'Tap Start recording to begin logging your drives.';
+      'Tryck på Starta inspelning för att börja logga dina körningar.';
 
   @override
   String trajetsRowDistance(String km) {
@@ -4825,339 +4847,340 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get trajetDetailSummaryTitle => 'Summary';
+  String get trajetDetailSummaryTitle => 'Sammanfattning';
 
   @override
-  String get trajetDetailFieldDate => 'Date';
+  String get trajetDetailFieldDate => 'Datum';
 
   @override
-  String get trajetDetailFieldVehicle => 'Vehicle';
+  String get trajetDetailFieldVehicle => 'Fordon';
 
   @override
-  String get trajetDetailFieldAdapter => 'OBD2 adapter';
+  String get trajetDetailFieldAdapter => 'OBD2-adapter';
 
   @override
-  String get trajetDetailFieldDistance => 'Distance';
+  String get trajetDetailFieldDistance => 'Sträcka';
 
   @override
-  String get trajetDetailFieldDuration => 'Duration';
+  String get trajetDetailFieldDuration => 'Varaktighet';
 
   @override
-  String get trajetDetailFieldAvgConsumption => 'Avg consumption';
+  String get trajetDetailFieldAvgConsumption => 'Sn. förbrukning';
 
   @override
-  String get trajetDetailFieldFuelUsed => 'Fuel used';
+  String get trajetDetailFieldFuelUsed => 'Bränsle använt';
 
   @override
-  String get trajetDetailFieldFuelCost => 'Fuel cost';
+  String get trajetDetailFieldFuelCost => 'Bränslekostnad';
 
   @override
-  String get trajetDetailFieldAvgSpeed => 'Avg speed';
+  String get trajetDetailFieldAvgSpeed => 'Sn. hastighet';
 
   @override
-  String get trajetDetailFieldMaxSpeed => 'Max speed';
+  String get trajetDetailFieldMaxSpeed => 'Maxhastighet';
 
   @override
   String get trajetDetailFieldValueUnknown => '—';
 
   @override
-  String get trajetDetailChartSpeed => 'Speed (km/h)';
+  String get trajetDetailChartSpeed => 'Hastighet (km/h)';
 
   @override
-  String get trajetDetailChartFuelRate => 'Fuel rate (L/h)';
+  String get trajetDetailChartFuelRate => 'Bränsleflöde (L/h)';
 
   @override
   String get trajetDetailChartRpm => 'RPM';
 
   @override
-  String get trajetDetailChartEngineLoad => 'Engine load (%)';
+  String get trajetDetailChartEngineLoad => 'Motorbelastning (%)';
 
   @override
-  String get trajetsRowColdStartChip => 'Cold start';
+  String get trajetsRowColdStartChip => 'Kallstart';
 
   @override
   String get trajetsRowColdStartTooltip =>
-      'Engine didn\'t reach operating temperature during this trip — fuel consumption was higher than usual.';
+      'Motorn nådde inte driftstemperatur under den här resan – bränsleförbrukningen var högre än normalt.';
 
   @override
-  String get trajetDetailChartEmpty => 'No samples recorded';
+  String get trajetDetailChartEmpty => 'Inga prover inspelade';
 
   @override
-  String get trajetDetailShareAction => 'Share';
+  String get trajetDetailShareAction => 'Dela';
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Sparkilo — trip on $date';
+    return 'Sparkilo — resa den $date';
   }
 
   @override
-  String get trajetDetailShareError => 'Couldn\'t generate share image';
+  String get trajetDetailShareError => 'Kunde inte generera delningsbild';
 
   @override
-  String get trajetDetailDeleteAction => 'Delete';
+  String get trajetDetailDeleteAction => 'Radera';
 
   @override
-  String get trajetDetailDeleteConfirmTitle => 'Delete this trip?';
+  String get trajetDetailDeleteConfirmTitle => 'Radera den här resan?';
 
   @override
   String get trajetDetailDeleteConfirmBody =>
-      'This trip will be permanently removed from your history.';
+      'Den här resan tas bort permanent från din historik.';
 
   @override
-  String get trajetDetailDeleteConfirmCancel => 'Cancel';
+  String get trajetDetailDeleteConfirmCancel => 'Avbryt';
 
   @override
-  String get trajetDetailDeleteConfirmConfirm => 'Delete';
+  String get trajetDetailDeleteConfirmConfirm => 'Radera';
 
   @override
   String get tripRecordingObd2NotResponding =>
-      'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
+      'OBD2-adapter ansluten men returnerar ingen data. Prova en annan adapter eller kontrollera fordonets diagnostikprotokoll.';
 
   @override
-  String get tripLengthCardTitle => 'Consumption by trip length';
+  String get tripLengthCardTitle => 'Förbrukning per reselängd';
 
   @override
-  String get tripLengthBucketShort => 'Short (<5 km)';
+  String get tripLengthBucketShort => 'Kort (<5 km)';
 
   @override
-  String get tripLengthBucketMedium => 'Medium (5–25 km)';
+  String get tripLengthBucketMedium => 'Medel (5–25 km)';
 
   @override
-  String get tripLengthBucketLong => 'Long (>25 km)';
+  String get tripLengthBucketLong => 'Lång (>25 km)';
 
   @override
-  String get tripLengthBucketNeedMoreData => 'Need more data';
+  String get tripLengthBucketNeedMoreData => 'Behöver mer data';
 
   @override
   String tripLengthBucketTripCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count trips',
-      one: '1 trip',
-      zero: 'no trips',
+      other: '$count resor',
+      one: '1 resa',
+      zero: 'inga resor',
     );
     return '$_temp0';
   }
 
   @override
-  String get tripPathCardTitle => 'Trip path';
+  String get tripPathCardTitle => 'Resespår';
 
   @override
-  String get tripPathCardSubtitle => 'GPS-recorded route';
+  String get tripPathCardSubtitle => 'GPS-inspelad rutt';
 
   @override
-  String get tripPathLegendTitle => 'Consumption';
+  String get tripPathLegendTitle => 'Förbrukning';
 
   @override
-  String get tripPathLegendEfficient => 'Efficient (< 6 L/100km)';
+  String get tripPathLegendEfficient => 'Effektiv (< 6 L/100km)';
 
   @override
-  String get tripPathLegendBorderline => 'Borderline (6–10 L/100km)';
+  String get tripPathLegendBorderline => 'Gränsvärde (6–10 L/100km)';
 
   @override
-  String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
+  String get tripPathLegendWasteful => 'Slösaktigt (≥ 10 L/100km)';
 
   @override
   String get tripRecordingPinTooltip =>
-      'Pinning keeps the screen on — uses more battery';
+      'Nålning håller skärmen på – förbrukar mer batteri';
 
   @override
-  String get tripRecordingPinSemanticOn => 'Unpin recording form';
+  String get tripRecordingPinSemanticOn => 'Lossa inspelningsformulär';
 
   @override
-  String get tripRecordingPinSemanticOff => 'Pin recording form';
+  String get tripRecordingPinSemanticOff => 'Nåla inspelningsformulär';
 
   @override
-  String get tripRecordingPinHelpTooltip => 'What does pin do?';
+  String get tripRecordingPinHelpTooltip => 'Vad gör nålning?';
 
   @override
-  String get tripRecordingPinHelpTitle => 'About pin';
+  String get tripRecordingPinHelpTitle => 'Om nålning';
 
   @override
   String get tripRecordingPinHelpBody =>
-      'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.';
+      'Nålning håller skärmen på och döljer systemfält så att formuläret förblir läsbart på ett instrumentbordsfäste. Tryck igen för att lossa. Lossas automatiskt när resan slutar.';
 
   @override
   String get tripRecordingResumeHintMessage =>
-      'Recording continues in the background. Tap the red banner at the top of any screen to return.';
+      'Inspelning fortsätter i bakgrunden. Tryck på det röda bandet längst upp på valfri skärm för att återgå.';
 
   @override
   String get tripBannerOpenFromConsumptionTab =>
-      'Open the active trip from the Conso tab';
+      'Öppna den aktiva resan från förbrukningsfliken';
 
   @override
   String get tripRecordingUnpinnedWarning =>
-      'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.';
+      'Nåla skärmen för att hålla GPS aktivt under resan – Android kan begränsa GPS under viloläge.';
 
   @override
-  String get unifiedFilterFuel => 'Fuel';
+  String get unifiedFilterFuel => 'Bränsle';
 
   @override
   String get unifiedFilterEv => 'EV';
 
   @override
-  String get unifiedFilterBoth => 'Both';
+  String get unifiedFilterBoth => 'Båda';
 
   @override
-  String get unifiedNoResultsForFilter => 'No results match this filter';
+  String get unifiedNoResultsForFilter =>
+      'Inga resultat matchar det här filtret';
 
   @override
-  String get searchFailedSnackbar => 'Search failed — please try again';
+  String get searchFailedSnackbar => 'Sökning misslyckades – försök igen';
 
   @override
-  String get vinLabel => 'VIN (optional)';
+  String get vinLabel => 'VIN (valfritt)';
 
   @override
-  String get vinDecodeTooltip => 'Decode VIN';
+  String get vinDecodeTooltip => 'Avkoda VIN';
 
   @override
-  String get vinConfirmAction => 'Yes, auto-fill';
+  String get vinConfirmAction => 'Ja, fyll i automatiskt';
 
   @override
-  String get vinModifyAction => 'Modify manually';
+  String get vinModifyAction => 'Ändra manuellt';
 
   @override
-  String get veResetAction => 'Reset volumetric efficiency';
+  String get veResetAction => 'Återställ volymetrisk effektivitet';
 
   @override
-  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+  String get vehicleReadVinFromCarButton => 'Läs VIN från bilen';
 
   @override
   String get vehicleReadVinFromCarTooltip =>
-      'Read VIN from the paired OBD2 adapter';
+      'Läs VIN från den ihopparade OBD2-adaptern';
 
   @override
   String get vehicleReadVinFailedUnsupportedSnackbar =>
-      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
+      'VIN inte tillgängligt (Mode 09 PID 02 stöds inte på fordon tillverkade före 2005)';
 
   @override
   String get vehicleReadVinFailedGenericSnackbar =>
-      'VIN read failed — please enter manually';
+      'VIN-läsning misslyckades – ange manuellt';
 
   @override
   String get vehicleReadVinNoAdapterHint =>
-      'Pair an OBD2 adapter first to read VIN automatically';
+      'Para ihop en OBD2-adapter först för att läsa VIN automatiskt';
 
   @override
-  String get pickerButtonLabel => 'Pick from catalog';
+  String get pickerButtonLabel => 'Välj från katalog';
 
   @override
-  String get pickerSearchHint => 'Search make or model';
+  String get pickerSearchHint => 'Sök märke eller modell';
 
   @override
-  String get pickerHelpText => 'Pre-fill from 50+ supported vehicles';
+  String get pickerHelpText => 'Förifylla från 50+ stödda fordon';
 
   @override
-  String get pickerEmptyResults => 'No matches';
+  String get pickerEmptyResults => 'Inga träffar';
 
   @override
-  String get pickerCancel => 'Cancel';
+  String get pickerCancel => 'Avbryt';
 
   @override
-  String get pickerLoading => 'Loading catalog…';
+  String get pickerLoading => 'Laddar katalog…';
 
   @override
-  String get vinInfoTooltip => 'What is a VIN?';
+  String get vinInfoTooltip => 'Vad är ett VIN?';
 
   @override
-  String get vinInfoSectionWhatTitle => 'What is a VIN?';
+  String get vinInfoSectionWhatTitle => 'Vad är ett VIN?';
 
   @override
   String get vinInfoSectionWhatBody =>
-      'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.';
+      'Fordonets identifikationsnummer är en 17-teckens kod som är unik för din bil. Det är instämplat på chassit och tryckt på ditt fordonsregistreringsdokument.';
 
   @override
-  String get vinInfoSectionWhyTitle => 'Why we ask';
+  String get vinInfoSectionWhyTitle => 'Varför vi frågar';
 
   @override
   String get vinInfoSectionWhyBody =>
-      'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.';
+      'Avkodning av VIN fyller automatiskt i motorvolym, cylinderantal, årsmodell, primär bränsletyp och totalvikt – vilket sparar dig från att manuellt leta upp tekniska specifikationer. OBD2-bränsleflödesberäkningen använder dessa värden för att ge dig korrekta förbrukningssiffror.';
 
   @override
-  String get vinInfoSectionPrivacyTitle => 'Privacy';
+  String get vinInfoSectionPrivacyTitle => 'Integritet';
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+      'Ditt VIN lagras enbart lokalt i appens krypterade lagring – det laddas aldrig upp till Sparkilo-servrar. NHTSA vPIC-databasen söks med VIN men returnerar enbart anonyma tekniska specifikationer; NHTSA kopplar inte VIN till några personuppgifter. Utan nätverk returnerar en offline-sökning enbart tillverkare och land.';
 
   @override
-  String get vinInfoSectionWhereTitle => 'Where to find it';
+  String get vinInfoSectionWhereTitle => 'Var du hittar det';
 
   @override
   String get vinInfoSectionWhereBody =>
-      'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).';
+      'Titta genom vindrutan i nedre vänstra hörnet på förarens sida, kontrollera dörramsklistermärket på förarsidan när dörren är öppen, eller läs av det på ditt fordonsregistreringsdokument (kort / Carte Grise).';
 
   @override
-  String get vinInfoDismiss => 'Got it';
+  String get vinInfoDismiss => 'Förstått';
 
   @override
   String get vinConfirmPrivacyNote =>
-      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Sparkilo servers.';
+      'Vi slog upp ditt VIN i NHTSA:s kostnadsfria fordonsregister – ingenting skickades till Sparkilo-servrar.';
 
   @override
-  String get gdprVinOnlineDecodeTitle => 'VIN online decode';
+  String get gdprVinOnlineDecodeTitle => 'VIN online-avkodning';
 
   @override
   String get gdprVinOnlineDecodeShort =>
-      'Decode the VIN via NHTSA\'s free public service';
+      'Avkoda VIN via NHTSA:s kostnadsfria offentliga tjänst';
 
   @override
   String get gdprVinOnlineDecodeDescription =>
-      'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.';
+      'När du parar ihop en adapter läses ditt fordons VIN lokalt för att identifiera bilen. Aktivering av detta skickar det 17-teckens VIN till NHTSA:s kostnadsfria vPIC-tjänst för att slå upp ytterligare detaljer (modell, motorvolym, bränsletyp). VIN är den enda datan som skickas – ingen annan information lämnar din enhet.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(detected)';
+  String get vehicleDetectedFromVinBadge => '(detekterad)';
 
   @override
   String vehicleDetectedFromVinSnackbar(String summary) {
-    return 'Detected from VIN: $summary. Apply?';
+    return 'Detekterad från VIN: $summary. Tillämpa?';
   }
 
   @override
-  String get vehicleDetectedFromVinApply => 'Apply';
+  String get vehicleDetectedFromVinApply => 'Tillämpa';
 
   @override
   String waitTimeHint(int minutes) {
-    return '~$minutes min wait';
+    return '~$minutes min väntetid';
   }
 
   @override
-  String get waitTimeTrackStart => 'Track my wait';
+  String get waitTimeTrackStart => 'Spåra min väntetid';
 
   @override
-  String get waitTimeTrackEnd => 'I\'m leaving';
+  String get waitTimeTrackEnd => 'Jag lämnar';
 
   @override
   String waitTimeElapsedShort(int minutes) {
-    return '$minutes min so far';
+    return '$minutes min hittills';
   }
 
   @override
-  String get widgetHelpSectionTitle => 'Home-screen widget';
+  String get widgetHelpSectionTitle => 'Hemskärmswidget';
 
   @override
   String get widgetHelpIntro =>
-      'Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.';
+      'Lägg till SparKilo-widgeten på din hemskärm för att se bränsle- och laddningspriser snabbt.';
 
   @override
   String get widgetHelpAdd =>
-      'Add it from your launcher\'s widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.';
+      'Lägg till den från din launchers widgetväljare – håll länge på ett tomt område på hemskärmen, välj Widgets och hitta SparKilo.';
 
   @override
   String get widgetHelpTap =>
-      'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.';
+      'Tryck på en station i widgeten för att öppna den i appen. Tryck på uppdateringsikonen för att uppdatera priser.';
 
   @override
   String get widgetHelpConfigure =>
-      'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
+      'På Android, håll länge på widgeten och välj Konfigurera om för att ändra profil, färg och innehåll.';
 
   @override
-  String get widgetVariantDefault => 'Current price only';
+  String get widgetVariantDefault => 'Endast aktuellt pris';
 
   @override
-  String get widgetVariantPredictive => 'Predictive: best time to fill';
+  String get widgetVariantPredictive => 'Prediktiv: bästa tid att tanka';
 
   @override
-  String get widgetPredictiveNowPrefix => 'now';
+  String get widgetPredictiveNowPrefix => 'nu';
 }
