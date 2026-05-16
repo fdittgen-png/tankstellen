@@ -53,6 +53,18 @@ part 'psa_fuel_level_provider.g.dart';
 /// Tests override this with a service backed by a fake transport so
 /// they can exercise the gate + decoder pipe without touching real
 /// Bluetooth.
+///
+/// ### Completion path (#1705, investigated 2026-05-16)
+///
+/// The decoder ([PsaFuelLevelCanDecoder]) is complete — this seam is
+/// the only gap. To wire it: have `Obd2ConnectionService` (already a
+/// provider — `obd2Connection`) hold and expose its active
+/// `Obd2Service?` (it constructs one per connection in `connect()`),
+/// then point this provider at that instead of `null`. No hardware is
+/// needed for the wiring — only validating the decoder's big-endian
+/// `0x0E6` assumption against a real PSA trace is hardware-blocked.
+/// This is the same `Obd2Service`-ownership problem as epic #1665. The
+/// keep / remove decision is tracked by #1705.
 @riverpod
 Obd2Service? psaFuelLevelObd2Service(Ref ref) => null;
 
