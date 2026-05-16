@@ -13,6 +13,7 @@ import '../../../feature_management/domain/consumption_tab_visibility.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../sync/presentation/widgets/ntfy_setup.dart';
+import '../../../widget/presentation/widget_help_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/feature_management_section.dart';
@@ -168,6 +169,17 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
           ],
+
+          // #1806 — home-screen widget help. The Android widget's
+          // per-widget config is OS-mediated (long-press → Reconfigure)
+          // and can't be launched from the app, so this section is the
+          // in-app discoverable surface for it.
+          _FoldableSection(
+            icon: Icons.widgets_outlined,
+            title: l?.widgetHelpSectionTitle ?? 'Home-screen widget',
+            child: const WidgetHelpSection(),
+          ),
+          const SizedBox(height: 8),
 
           // Storage & Cache
           _FoldableSection(
