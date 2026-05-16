@@ -29,6 +29,7 @@ import 'all_prices_station_card.dart';
 import 'brand_filter_chips.dart';
 import 'cross_border_banner.dart';
 import 'ev_station_card.dart';
+import 'mixed_results_filter_chips.dart';
 import 'sort_selector.dart';
 import 'swipeable_station_card.dart';
 
@@ -174,6 +175,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
               .where((s) => !ignoredIds.contains(s.id))
               .toList(),
         ),
+        // #1784 — Fuel/EV/Both kind selector + EV connector & power
+        // filters. Renders nothing for a fuel-only result set.
+        const MixedResultsFilterChips(),
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async => onRefresh(),

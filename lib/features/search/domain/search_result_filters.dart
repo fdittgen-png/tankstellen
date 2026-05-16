@@ -1,4 +1,6 @@
+import '../../vehicle/domain/entities/vehicle_profile.dart' show ConnectorType;
 import 'entities/brand_registry.dart';
+import 'entities/search_result_item.dart';
 import 'entities/station.dart';
 import 'entities/station_amenity.dart';
 
@@ -64,6 +66,35 @@ List<Station> applyAmenityAndStatusFilters(
 
   if (openOnly) {
     result = result.where((s) => s.isOpen).toList();
+  }
+
+  return result;
+}
+
+/// Applies the EV-only filters — connector type and minimum charging
+/// power — to a list of [EVStationResult]s (#1784).
+///
+/// An empty [connectorTypes] set and a [minPowerKw] of `0` are each
+/// no-ops. A station passes the connector filter when it offers **any**
+/// of the selected connector types (OR semantics — the user is asking
+/// "can I plug in here"). These filters apply only to EV rows;
+/// `filteredSortedSearchResults` never routes fuel rows through them.
+List<EVStationResult> applyEvFilters(
+  List<EVStationResult> evResults, {
+  required Set<ConnectorType> connectorTypes,
+  required double minPowerKw,
+}) {
+  var result = evResults;
+
+  if (connectorTypes.isNotEmpty) {
+    result = result
+        .where((r) =>
+            r.station.connectors.any((c) => connectorTypes.contains(c.type)))
+        .toList();
+  }
+
+  if (minPowerKw > 0) {
+    result = result.where((r) => r.maxPowerKW >= minPowerKw).toList();
   }
 
   return result;

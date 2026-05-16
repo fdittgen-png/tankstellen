@@ -235,9 +235,11 @@ String _$fuelStationsHash() => r'5238084b6dd78061bafabf616c603bcf7b03077b';
 /// rebuild that passes the same `raw` list reads the cached list for
 /// free.
 ///
-/// Fuel-specific filters apply only to fuel items; EV items pass through
-/// the filters untouched and are appended after the filtered fuel items
-/// (preserving the legacy fuel-first ordering before the sort).
+/// Per-kind filters never cross kinds (#1784): the brand / amenity /
+/// open filters apply only to fuel rows; the EV connector / min-power
+/// filters apply only to EV rows. The `ResultKind` filter then drops a
+/// whole kind when the user narrows to Fuel-only or EV-only. Fuel rows
+/// lead the list, preserving the fuel-first ordering before the sort.
 
 @ProviderFor(filteredSortedSearchResults)
 final filteredSortedSearchResultsProvider =
@@ -253,9 +255,11 @@ final filteredSortedSearchResultsProvider =
 /// rebuild that passes the same `raw` list reads the cached list for
 /// free.
 ///
-/// Fuel-specific filters apply only to fuel items; EV items pass through
-/// the filters untouched and are appended after the filtered fuel items
-/// (preserving the legacy fuel-first ordering before the sort).
+/// Per-kind filters never cross kinds (#1784): the brand / amenity /
+/// open filters apply only to fuel rows; the EV connector / min-power
+/// filters apply only to EV rows. The `ResultKind` filter then drops a
+/// whole kind when the user narrows to Fuel-only or EV-only. Fuel rows
+/// lead the list, preserving the fuel-first ordering before the sort.
 
 final class FilteredSortedSearchResultsProvider
     extends
@@ -275,9 +279,11 @@ final class FilteredSortedSearchResultsProvider
   /// rebuild that passes the same `raw` list reads the cached list for
   /// free.
   ///
-  /// Fuel-specific filters apply only to fuel items; EV items pass through
-  /// the filters untouched and are appended after the filtered fuel items
-  /// (preserving the legacy fuel-first ordering before the sort).
+  /// Per-kind filters never cross kinds (#1784): the brand / amenity /
+  /// open filters apply only to fuel rows; the EV connector / min-power
+  /// filters apply only to EV rows. The `ResultKind` filter then drops a
+  /// whole kind when the user narrows to Fuel-only or EV-only. Fuel rows
+  /// lead the list, preserving the fuel-first ordering before the sort.
   FilteredSortedSearchResultsProvider._({
     required FilteredSortedSearchResultsFamily super.from,
     required List<SearchResultItem> super.argument,
@@ -332,7 +338,7 @@ final class FilteredSortedSearchResultsProvider
 }
 
 String _$filteredSortedSearchResultsHash() =>
-    r'276f6a2813fbd035a3bd486b3532695dc06d52bd';
+    r'769ef688454b77cf258638042978c4d964093cfa';
 
 /// The [raw] search results after the ignored / brand / amenity / open
 /// filters and the active sort — memoised (#1762).
@@ -344,9 +350,11 @@ String _$filteredSortedSearchResultsHash() =>
 /// rebuild that passes the same `raw` list reads the cached list for
 /// free.
 ///
-/// Fuel-specific filters apply only to fuel items; EV items pass through
-/// the filters untouched and are appended after the filtered fuel items
-/// (preserving the legacy fuel-first ordering before the sort).
+/// Per-kind filters never cross kinds (#1784): the brand / amenity /
+/// open filters apply only to fuel rows; the EV connector / min-power
+/// filters apply only to EV rows. The `ResultKind` filter then drops a
+/// whole kind when the user narrows to Fuel-only or EV-only. Fuel rows
+/// lead the list, preserving the fuel-first ordering before the sort.
 
 final class FilteredSortedSearchResultsFamily extends $Family
     with
@@ -373,9 +381,11 @@ final class FilteredSortedSearchResultsFamily extends $Family
   /// rebuild that passes the same `raw` list reads the cached list for
   /// free.
   ///
-  /// Fuel-specific filters apply only to fuel items; EV items pass through
-  /// the filters untouched and are appended after the filtered fuel items
-  /// (preserving the legacy fuel-first ordering before the sort).
+  /// Per-kind filters never cross kinds (#1784): the brand / amenity /
+  /// open filters apply only to fuel rows; the EV connector / min-power
+  /// filters apply only to EV rows. The `ResultKind` filter then drops a
+  /// whole kind when the user narrows to Fuel-only or EV-only. Fuel rows
+  /// lead the list, preserving the fuel-first ordering before the sort.
 
   FilteredSortedSearchResultsProvider call(List<SearchResultItem> raw) =>
       FilteredSortedSearchResultsProvider._(argument: raw, from: this);
