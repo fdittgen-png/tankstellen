@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -6,7 +7,10 @@ import '../utils/brand_logo_mapper.dart';
 /// Displays a brand logo for a fuel station, with automatic fallback
 /// to a generic fuel pump icon when no logo is available or loading fails.
 ///
-/// Uses [BrandLogoMapper] to resolve brand names to logo URLs.
+/// Uses [BrandLogoMapper] to resolve brand names to logo URLs. Logos are
+/// disk-cached and decoded at the display size (#1761): a logo is
+/// fetched and decoded once, then reused from disk across scroll-away
+/// and app restarts instead of re-downloading.
 class BrandLogo extends StatelessWidget {
   /// The brand name (e.g. "Shell", "TotalEnergies", "ARAL").
   final String brand;
@@ -32,39 +36,42 @@ class BrandLogo extends StatelessWidget {
     return Semantics(
       label: l10n?.brandLogoLabel(brand) ?? '$brand logo',
       image: true,
-      child: url == null ? _fallbackIcon(theme) : _networkLogo(url, theme),
+      child: url == null
+          ? _fallbackIcon(theme)
+          : _networkLogo(context, url, theme),
     );
   }
 
-  Widget _networkLogo(String url, ThemeData theme) {
+  Widget _networkLogo(BuildContext context, String url, ThemeData theme) {
+    // Decode at the display target size — brand logos are routinely
+    // shipped far larger than the 48dp slot, so decoding at full
+    // resolution wasted memory on every card (#1761).
+    final cachePx = (size * MediaQuery.devicePixelRatioOf(context)).round();
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: Image.network(
-        url,
+      child: CachedNetworkImage(
+        imageUrl: url,
         width: size,
         height: size,
         fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => _fallbackIcon(theme),
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return SizedBox(
-            width: size,
-            height: size,
-            child: Center(
-              child: SizedBox(
-                width: size * 0.5,
-                height: size * 0.5,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              ),
-            ),
-          );
-        },
+        memCacheWidth: cachePx,
+        memCacheHeight: cachePx,
+        placeholder: (context, _) => _placeholder(theme),
+        errorWidget: (context, _, _) => _fallbackIcon(theme),
+      ),
+    );
+  }
+
+  /// Calm static placeholder shown while the logo loads — a soft
+  /// surface-coloured box. A spinner is overkill for a 48dp slot and
+  /// would animate indefinitely.
+  Widget _placeholder(ThemeData theme) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
       ),
     );
   }
