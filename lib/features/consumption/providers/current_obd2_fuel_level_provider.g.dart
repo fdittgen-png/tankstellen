@@ -40,14 +40,22 @@ part of 'current_obd2_fuel_level_provider.dart';
 ///   * no active vehicle profile, or its [tankCapacityL] is null /
 ///     non-positive (we can't convert).
 ///
-/// OEM-PID native-litres path (#1615): when the `experimentalOemPids`
-/// flag is on and an OEM-capable adapter resolved a manufacturer table,
-/// the trip-recording fuel sampler populates
-/// [TripLiveReading.fuelLevelLitres] with the exact litres read via the
-/// OEM-PID registry. This provider prefers that native source and skips
-/// the percent×capacity conversion entirely. When the field is null
-/// (flag off, incapable adapter, or no table for the VIN) the coarse
-/// percent×capacity path below runs unchanged.
+/// Native-litres precedence (most accurate first):
+///   1. PSA passive-CAN (#1616) — when a `passiveCanCapable` STN-chip
+///      adapter is listening to the instrument-cluster broadcast,
+///      [psaFuelLevelProvider] streams exact litres decoded straight
+///      off the CAN bus. This is the highest-fidelity source; it wins.
+///   2. OEM-PID native litres (#1615) — when the `experimentalOemPids`
+///      flag is on and an OEM-capable adapter resolved a manufacturer
+///      table, the trip-recording fuel sampler populates
+///      [TripLiveReading.fuelLevelLitres] with exact litres read via
+///      the OEM-PID registry.
+///   3. The coarse `percent × tankCapacityL` conversion below.
+///
+/// Each native source is skipped when absent (no passive-CAN stream /
+/// flag off / incapable adapter / no table for the VIN), so the chain
+/// degrades cleanly to the percent path with no behaviour change for
+/// adapters that surface neither.
 
 @ProviderFor(currentObd2FuelLevelLitres)
 final currentObd2FuelLevelLitresProvider =
@@ -85,14 +93,22 @@ final currentObd2FuelLevelLitresProvider =
 ///   * no active vehicle profile, or its [tankCapacityL] is null /
 ///     non-positive (we can't convert).
 ///
-/// OEM-PID native-litres path (#1615): when the `experimentalOemPids`
-/// flag is on and an OEM-capable adapter resolved a manufacturer table,
-/// the trip-recording fuel sampler populates
-/// [TripLiveReading.fuelLevelLitres] with the exact litres read via the
-/// OEM-PID registry. This provider prefers that native source and skips
-/// the percent×capacity conversion entirely. When the field is null
-/// (flag off, incapable adapter, or no table for the VIN) the coarse
-/// percent×capacity path below runs unchanged.
+/// Native-litres precedence (most accurate first):
+///   1. PSA passive-CAN (#1616) — when a `passiveCanCapable` STN-chip
+///      adapter is listening to the instrument-cluster broadcast,
+///      [psaFuelLevelProvider] streams exact litres decoded straight
+///      off the CAN bus. This is the highest-fidelity source; it wins.
+///   2. OEM-PID native litres (#1615) — when the `experimentalOemPids`
+///      flag is on and an OEM-capable adapter resolved a manufacturer
+///      table, the trip-recording fuel sampler populates
+///      [TripLiveReading.fuelLevelLitres] with exact litres read via
+///      the OEM-PID registry.
+///   3. The coarse `percent × tankCapacityL` conversion below.
+///
+/// Each native source is skipped when absent (no passive-CAN stream /
+/// flag off / incapable adapter / no table for the VIN), so the chain
+/// degrades cleanly to the percent path with no behaviour change for
+/// adapters that surface neither.
 
 final class CurrentObd2FuelLevelLitresProvider
     extends $FunctionalProvider<double?, double?, double?>
@@ -129,14 +145,22 @@ final class CurrentObd2FuelLevelLitresProvider
   ///   * no active vehicle profile, or its [tankCapacityL] is null /
   ///     non-positive (we can't convert).
   ///
-  /// OEM-PID native-litres path (#1615): when the `experimentalOemPids`
-  /// flag is on and an OEM-capable adapter resolved a manufacturer table,
-  /// the trip-recording fuel sampler populates
-  /// [TripLiveReading.fuelLevelLitres] with the exact litres read via the
-  /// OEM-PID registry. This provider prefers that native source and skips
-  /// the percent×capacity conversion entirely. When the field is null
-  /// (flag off, incapable adapter, or no table for the VIN) the coarse
-  /// percent×capacity path below runs unchanged.
+  /// Native-litres precedence (most accurate first):
+  ///   1. PSA passive-CAN (#1616) — when a `passiveCanCapable` STN-chip
+  ///      adapter is listening to the instrument-cluster broadcast,
+  ///      [psaFuelLevelProvider] streams exact litres decoded straight
+  ///      off the CAN bus. This is the highest-fidelity source; it wins.
+  ///   2. OEM-PID native litres (#1615) — when the `experimentalOemPids`
+  ///      flag is on and an OEM-capable adapter resolved a manufacturer
+  ///      table, the trip-recording fuel sampler populates
+  ///      [TripLiveReading.fuelLevelLitres] with exact litres read via
+  ///      the OEM-PID registry.
+  ///   3. The coarse `percent × tankCapacityL` conversion below.
+  ///
+  /// Each native source is skipped when absent (no passive-CAN stream /
+  /// flag off / incapable adapter / no table for the VIN), so the chain
+  /// degrades cleanly to the percent path with no behaviour change for
+  /// adapters that surface neither.
   CurrentObd2FuelLevelLitresProvider._()
     : super(
         from: null,
@@ -171,4 +195,4 @@ final class CurrentObd2FuelLevelLitresProvider
 }
 
 String _$currentObd2FuelLevelLitresHash() =>
-    r'993b6f89c0a10892656fcca6866851a0d485418d';
+    r'fec0b6d479dc3aef8c8c5256a58b5fb3e16994fe';

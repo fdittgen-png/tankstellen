@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/providers/current_obd2_fuel_level_provider.dart';
+import 'package:tankstellen/features/consumption/providers/psa_fuel_level_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
@@ -68,12 +69,20 @@ void main() {
   ProviderContainer makeContainer({
     required TripRecordingState tripState,
     VehicleProfile? activeVehicle,
+    Stream<double>? psaCanStream,
   }) {
     final c = ProviderContainer(overrides: [
       tripRecordingProvider
           .overrideWith(() => _ManualTripRecording(tripState)),
       activeVehicleProfileProvider
           .overrideWith(() => _StubActiveVehicle(activeVehicle)),
+      // #1616 — when a test drives the PSA passive-CAN path, override
+      // the stream provider directly with a canned stream. Tests that
+      // omit this exercise the real provider, whose production
+      // `psaFuelLevelObd2Service` seam is null → empty stream → the
+      // passive-CAN branch falls through (the absent-stream fallback).
+      if (psaCanStream != null)
+        psaFuelLevelProvider.overrideWith((ref) => psaCanStream),
     ]);
     addTearDown(c.dispose);
     return c;
@@ -293,6 +302,76 @@ void main() {
       // reading" and the percent×capacity fallback takes over.
       final c = makeContainer(
         tripState: recordingWith(fuelLevelPercent: 50, fuelLevelLitres: -1),
+        activeVehicle: vehicleWithCapacity,
+      );
+
+      expect(
+        c.read(currentObd2FuelLevelLitresProvider),
+        closeTo(25, 0.0001),
+      );
+    });
+  });
+
+  group('currentObd2FuelLevelLitresProvider — PSA passive-CAN (#1616)', () {
+    test('a live passive-CAN stream surfaces its exact decoded litres', () async {
+      // A passiveCan-capable STN-chip adapter decodes litres straight
+      // off the instrument-cluster broadcast — the highest-fidelity
+      // source. 50 % × 50 L would be 25 L; the CAN read wins.
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelPercent: 50),
+        activeVehicle: vehicleWithCapacity,
+        psaCanStream: Stream<double>.value(38.5),
+      );
+      // Drain the stream's first event so the StreamProvider holds a
+      // value before the synchronous badge-provider read.
+      // Keep the autoDispose StreamProvider alive across the await so
+      // it isn't torn down before the canned stream emits.
+      c.listen(psaFuelLevelProvider, (_, _) {});
+      await c.read(psaFuelLevelProvider.future);
+
+      expect(c.read(currentObd2FuelLevelLitresProvider), 38.5);
+    });
+
+    test('passive-CAN litres win over the OEM-PID litres', () async {
+      // Both native sources present — passive-CAN is the more accurate
+      // tier, so it takes precedence over the OEM-PID value.
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelPercent: 50, fuelLevelLitres: 41.5),
+        activeVehicle: vehicleWithCapacity,
+        psaCanStream: Stream<double>.value(39.0),
+      );
+      // Keep the autoDispose StreamProvider alive across the await so
+      // it isn't torn down before the canned stream emits.
+      c.listen(psaFuelLevelProvider, (_, _) {});
+      await c.read(psaFuelLevelProvider.future);
+
+      expect(c.read(currentObd2FuelLevelLitresProvider), 39.0);
+    });
+
+    test('a negative passive-CAN value falls through to the OEM litres',
+        () async {
+      // Defensive: a corrupt/negative CAN decode is "no reading" — the
+      // next source (OEM-PID litres) takes over.
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelPercent: 50, fuelLevelLitres: 41.5),
+        activeVehicle: vehicleWithCapacity,
+        psaCanStream: Stream<double>.value(-1),
+      );
+      // Keep the autoDispose StreamProvider alive across the await so
+      // it isn't torn down before the canned stream emits.
+      c.listen(psaFuelLevelProvider, (_, _) {});
+      await c.read(psaFuelLevelProvider.future);
+
+      expect(c.read(currentObd2FuelLevelLitresProvider), 41.5);
+    });
+
+    test('no passive-CAN stream → the chain falls through unchanged', () {
+      // The default (no override) provider has a null
+      // `psaFuelLevelObd2Service` seam → empty stream → the passive-CAN
+      // branch is skipped and the percent×capacity path runs (#1616
+      // absent-stream fallback). 50 % × 50 L = 25 L.
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelPercent: 50),
         activeVehicle: vehicleWithCapacity,
       );
 

@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../vehicle/providers/vehicle_providers.dart';
+import 'psa_fuel_level_provider.dart';
 import 'trip_recording_provider.dart';
 
 part 'current_obd2_fuel_level_provider.g.dart';
@@ -37,18 +38,35 @@ part 'current_obd2_fuel_level_provider.g.dart';
 ///   * no active vehicle profile, or its [tankCapacityL] is null /
 ///     non-positive (we can't convert).
 ///
-/// OEM-PID native-litres path (#1615): when the `experimentalOemPids`
-/// flag is on and an OEM-capable adapter resolved a manufacturer table,
-/// the trip-recording fuel sampler populates
-/// [TripLiveReading.fuelLevelLitres] with the exact litres read via the
-/// OEM-PID registry. This provider prefers that native source and skips
-/// the percent×capacity conversion entirely. When the field is null
-/// (flag off, incapable adapter, or no table for the VIN) the coarse
-/// percent×capacity path below runs unchanged.
+/// Native-litres precedence (most accurate first):
+///   1. PSA passive-CAN (#1616) — when a `passiveCanCapable` STN-chip
+///      adapter is listening to the instrument-cluster broadcast,
+///      [psaFuelLevelProvider] streams exact litres decoded straight
+///      off the CAN bus. This is the highest-fidelity source; it wins.
+///   2. OEM-PID native litres (#1615) — when the `experimentalOemPids`
+///      flag is on and an OEM-capable adapter resolved a manufacturer
+///      table, the trip-recording fuel sampler populates
+///      [TripLiveReading.fuelLevelLitres] with exact litres read via
+///      the OEM-PID registry.
+///   3. The coarse `percent × tankCapacityL` conversion below.
+///
+/// Each native source is skipped when absent (no passive-CAN stream /
+/// flag off / incapable adapter / no table for the VIN), so the chain
+/// degrades cleanly to the percent path with no behaviour change for
+/// adapters that surface neither.
 @riverpod
 double? currentObd2FuelLevelLitres(Ref ref) {
   final tripState = ref.watch(tripRecordingProvider);
   if (!tripState.isActive) return null;
+
+  // #1616 — prefer the PSA passive-CAN native-litres stream. The
+  // `StreamProvider`'s `.value` is the latest decoded litres, or null
+  // before the first frame / when the stream is empty (no
+  // passiveCan-capable adapter, or the live-service seam is unset in
+  // production). A negative value is treated defensively as "no
+  // reading" and falls through.
+  final canLitres = ref.watch(psaFuelLevelProvider).value;
+  if (canLitres != null && canLitres >= 0) return canLitres;
 
   // #1615 — prefer the exact OEM-PID litres when present. A negative
   // value is treated as "no reading" (defensive) and falls through to
