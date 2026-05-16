@@ -68,15 +68,22 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
       _checkOk(response.data);
 
       final stationsJson = response.data['stations'] as List<dynamic>? ?? [];
-      final stations = stationsJson
-          .map((j) => Station.fromJson(Map<String, dynamic>.from(j as Map)))
-          // #753 — scope ids with the `de-` country prefix so a German
-          // UUID can never collide with another country's numeric id
-          // (FR `12345`, AT `12345`, ES `IDEESS`, IT registry id).
-          // [_stripCountryPrefix] strips the prefix before any call back
-          // out to Tankerkönig.
-          .map((s) => s.copyWith(id: _withCountryPrefix(s.id)))
-          .toList();
+      // #1775 — apply the `de-` country prefix to the id *inside* the
+      // decoded map, so each entry decodes to its final `Station` in a
+      // single `fromJson` — no second `.map` + per-station `copyWith`
+      // shell. (A `compute()` isolate, as the Argentina CSV service
+      // uses, is not worth it here: isolate spawn + result
+      // serialisation would cost more than parsing ~100 small JSON
+      // objects on the UI isolate.)
+      final stations = stationsJson.map((j) {
+        final map = Map<String, dynamic>.from(j as Map);
+        // #753 — scope ids with the `de-` country prefix so a German
+        // UUID can never collide with another country's numeric id
+        // (FR `12345`, AT `12345`, ES `IDEESS`, IT registry id). The
+        // prefix is stripped before any call back out to Tankerkönig.
+        map['id'] = _withCountryPrefix(map['id'] as String);
+        return Station.fromJson(map);
+      }).toList();
 
       return ServiceResult(
         data: stations,
