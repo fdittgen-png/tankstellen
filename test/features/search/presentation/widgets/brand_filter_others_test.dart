@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/search/presentation/widgets/brand_filter_chips.dart';
+import 'package:tankstellen/features/search/domain/search_result_filters.dart';
 
 /// Regression guard for #469 — the "Others" brand filter was reported
 /// to leak stations whose brand string matches a known brand in the

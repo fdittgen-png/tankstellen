@@ -59,64 +59,6 @@ Map<String, Map<FuelType, bool>> _computeCheapestFlagsFor(
   return (minP, maxP);
 }
 
-List<SearchResultItem> _sortSearchResults(
-  List<SearchResultItem> items,
-  SortMode sortMode,
-  WidgetRef ref,
-) {
-  final sorted = List<SearchResultItem>.from(items);
-  final fuelType = ref.read(selectedFuelTypeProvider);
-
-  if (sorted.every((item) => item is EVStationResult)) {
-    sorted.sort((a, b) => a.dist.compareTo(b.dist));
-    return sorted;
-  }
-
-  switch (sortMode) {
-    case SortMode.distance:
-      sorted.sort((a, b) => a.dist.compareTo(b.dist));
-    case SortMode.price:
-      sorted.sort((a, b) {
-        final sa = a is FuelStationResult ? a.station : null;
-        final sb = b is FuelStationResult ? b.station : null;
-        if (sa != null && sb != null) return compareByPrice(sa, sb, fuelType);
-        return a.dist.compareTo(b.dist);
-      });
-    case SortMode.name:
-      sorted.sort((a, b) {
-        final sa = a is FuelStationResult ? a.station : null;
-        final sb = b is FuelStationResult ? b.station : null;
-        if (sa != null && sb != null) return compareByName(sa, sb);
-        return a.displayName.compareTo(b.displayName);
-      });
-    case SortMode.open24h:
-      sorted.sort((a, b) {
-        final sa = a is FuelStationResult ? a.station : null;
-        final sb = b is FuelStationResult ? b.station : null;
-        if (sa != null && sb != null) return compareByOpen24h(sa, sb);
-        return a.dist.compareTo(b.dist);
-      });
-    case SortMode.rating:
-      final ratings = ref.read(stationRatingsProvider);
-      sorted.sort((a, b) {
-        final sa = a is FuelStationResult ? a.station : null;
-        final sb = b is FuelStationResult ? b.station : null;
-        if (sa != null && sb != null) return compareByRating(sa, sb, ratings);
-        return a.dist.compareTo(b.dist);
-      });
-    case SortMode.priceDistance:
-      sorted.sort((a, b) {
-        final sa = a is FuelStationResult ? a.station : null;
-        final sb = b is FuelStationResult ? b.station : null;
-        if (sa != null && sb != null) {
-          return compareByPriceDistance(sa, sb, fuelType);
-        }
-        return a.dist.compareTo(b.dist);
-      });
-  }
-  return sorted;
-}
-
 /// Collapsible section that wraps [BrandFilterChips] inside an expandable
 /// toggle. When collapsed, only a "Brands" label with a chevron is shown.
 class _CollapsibleBrandFilters extends ConsumerWidget {

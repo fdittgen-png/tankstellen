@@ -1,11 +1,18 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/utils/price_utils.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/search_result_item.dart';
 import '../domain/entities/station.dart';
+import '../domain/search_result_filters.dart';
+import '../presentation/widgets/sort_selector.dart';
+import 'brand_filter_provider.dart';
+import 'ignored_stations_provider.dart';
 import 'search_provider.dart';
+import 'search_screen_ui_provider.dart';
+import 'station_rating_provider.dart';
 
 part 'search_filters_provider.g.dart';
 
@@ -65,4 +72,118 @@ List<Station> fuelStations(Ref ref) {
       .whereType<FuelStationResult>()
       .map((r) => r.station)
       .toList();
+}
+
+/// The [raw] search results after the ignored / brand / amenity / open
+/// filters and the active sort — memoised (#1762).
+///
+/// The pipeline previously ran inline in `SearchResultsList.build()` and
+/// re-executed on every rebuild. Keyed on the raw result set ([raw]) and
+/// watching the filter / sort providers, it recomputes only when the
+/// result set or a filter / sort input actually changes; an unrelated
+/// rebuild that passes the same `raw` list reads the cached list for
+/// free.
+///
+/// Fuel-specific filters apply only to fuel items; EV items pass through
+/// the filters untouched and are appended after the filtered fuel items
+/// (preserving the legacy fuel-first ordering before the sort).
+@riverpod
+List<SearchResultItem> filteredSortedSearchResults(
+  Ref ref,
+  List<SearchResultItem> raw,
+) {
+  final ignoredIds = ref.watch(ignoredStationsProvider);
+  final selectedBrands = ref.watch(selectedBrandsProvider);
+  final excludeHighway = ref.watch(excludeHighwayStationsProvider);
+  final requiredAmenities = ref.watch(selectedAmenitiesProvider);
+  final openOnly = ref.watch(openOnlyFilterProvider);
+  final sortMode = ref.watch(selectedSortModeProvider);
+  final fuelType = ref.watch(selectedFuelTypeProvider);
+  final ratings = ref.watch(stationRatingsProvider);
+
+  final afterIgnored =
+      raw.where((s) => !ignoredIds.contains(s.id)).toList();
+  final fuelItems = afterIgnored.whereType<FuelStationResult>().toList();
+  final evItems = afterIgnored.whereType<EVStationResult>().toList();
+
+  final fuelFiltered = applyAmenityAndStatusFilters(
+    applyBrandFilter(
+      fuelItems.map((r) => r.station).toList(),
+      selectedBrands: selectedBrands,
+      excludeHighway: excludeHighway,
+    ),
+    requiredAmenities: requiredAmenities,
+    openOnly: openOnly,
+  );
+  final filteredFuelIds = fuelFiltered.map((s) => s.id).toSet();
+  final filtered = <SearchResultItem>[
+    ...fuelItems.where((r) => filteredFuelIds.contains(r.station.id)),
+    ...evItems,
+  ];
+
+  return sortSearchResults(filtered, sortMode, fuelType, ratings);
+}
+
+/// Pure sort over a unified results list (#1762).
+///
+/// Takes the resolved fuel type and ratings as values rather than
+/// reading them from a `WidgetRef`, so it is directly unit-testable.
+/// An all-EV list always sorts by distance; otherwise [sortMode]
+/// applies to fuel rows and EV rows fall back to distance.
+List<SearchResultItem> sortSearchResults(
+  List<SearchResultItem> items,
+  SortMode sortMode,
+  FuelType fuelType,
+  Map<String, int> ratings,
+) {
+  final sorted = List<SearchResultItem>.from(items);
+
+  // An all-EV list has no fuel-specific sort key — always by distance.
+  if (sorted.every((item) => item is EVStationResult)) {
+    sorted.sort((a, b) => a.dist.compareTo(b.dist));
+    return sorted;
+  }
+
+  switch (sortMode) {
+    case SortMode.distance:
+      sorted.sort((a, b) => a.dist.compareTo(b.dist));
+    case SortMode.price:
+      sorted.sort((a, b) {
+        final sa = a is FuelStationResult ? a.station : null;
+        final sb = b is FuelStationResult ? b.station : null;
+        if (sa != null && sb != null) return compareByPrice(sa, sb, fuelType);
+        return a.dist.compareTo(b.dist);
+      });
+    case SortMode.name:
+      sorted.sort((a, b) {
+        final sa = a is FuelStationResult ? a.station : null;
+        final sb = b is FuelStationResult ? b.station : null;
+        if (sa != null && sb != null) return compareByName(sa, sb);
+        return a.displayName.compareTo(b.displayName);
+      });
+    case SortMode.open24h:
+      sorted.sort((a, b) {
+        final sa = a is FuelStationResult ? a.station : null;
+        final sb = b is FuelStationResult ? b.station : null;
+        if (sa != null && sb != null) return compareByOpen24h(sa, sb);
+        return a.dist.compareTo(b.dist);
+      });
+    case SortMode.rating:
+      sorted.sort((a, b) {
+        final sa = a is FuelStationResult ? a.station : null;
+        final sb = b is FuelStationResult ? b.station : null;
+        if (sa != null && sb != null) return compareByRating(sa, sb, ratings);
+        return a.dist.compareTo(b.dist);
+      });
+    case SortMode.priceDistance:
+      sorted.sort((a, b) {
+        final sa = a is FuelStationResult ? a.station : null;
+        final sb = b is FuelStationResult ? b.station : null;
+        if (sa != null && sb != null) {
+          return compareByPriceDistance(sa, sb, fuelType);
+        }
+        return a.dist.compareTo(b.dist);
+      });
+  }
+  return sorted;
 }

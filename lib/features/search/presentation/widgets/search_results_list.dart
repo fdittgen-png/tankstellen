@@ -8,7 +8,6 @@ import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
-import '../../../../core/utils/price_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/staggered_fade_in.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -141,36 +140,13 @@ class SearchResultsList extends ConsumerWidget {
           child: RefreshIndicator(
             onRefresh: () async => onRefresh(),
             child: Builder(builder: (context) {
-              // Filter out ignored stations
-              final afterIgnored = result.data
-                  .where((s) => !ignoredIds.contains(s.id))
-                  .toList();
-
-              // Apply fuel-specific filters to fuel items; EV items pass through.
-              final selectedBrands = ref.watch(selectedBrandsProvider);
-              final excludeHighway = ref.watch(excludeHighwayStationsProvider);
-              final requiredAmenities = ref.watch(selectedAmenitiesProvider);
-              final openOnly = ref.watch(openOnlyFilterProvider);
-
-              // Split into fuel + EV, filter fuel items, then recombine.
-              final fuelItems = afterIgnored.whereType<FuelStationResult>().toList();
-              final evItems = afterIgnored.whereType<EVStationResult>().toList();
-              final fuelFiltered = applyAmenityAndStatusFilters(
-                applyBrandFilter(
-                  fuelItems.map((r) => r.station).toList(),
-                  selectedBrands: selectedBrands,
-                  excludeHighway: excludeHighway,
-                ),
-                requiredAmenities: requiredAmenities,
-                openOnly: openOnly,
-              );
-              final filteredFuelIds = fuelFiltered.map((s) => s.id).toSet();
-              final filtered = <SearchResultItem>[
-                ...fuelItems.where((r) => filteredFuelIds.contains(r.station.id)),
-                ...evItems,
-              ];
-
-              final sorted = _sortSearchResults(filtered, sortMode, ref);
+              // #1762 — the ignored/brand/amenity/open filter chain and
+              // the sort are memoised in `filteredSortedSearchResults`,
+              // keyed on this result set; an unrelated rebuild that
+              // passes the same `result.data` reuses the cached list
+              // instead of re-running the whole pipeline.
+              final sorted =
+                  ref.watch(filteredSortedSearchResultsProvider(result.data));
               final fuelOnly = _fuelStationsFrom(sorted);
               final allPrices = ref.watch(allPricesViewEnabledProvider);
               final cheapestMap = allPrices
