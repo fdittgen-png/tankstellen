@@ -23,5 +23,9 @@
   "@onboardingObd2VinReadFailed": {
     "description": "Banner shown on the next manual vehicle step when the OBD2 adapter connected but the VIN could not be read (#816)."
   },
-  "onboardingObd2ConnectFailed": "Couldn't connect to the adapter. You can retry or skip."
+  "onboardingObd2ConnectFailed": "Couldn't connect to the adapter. You can retry or skip.",
+  "onboardingPickUseMode": "Pick a use mode to continue.",
+  "@onboardingPickUseMode": {
+    "description": "Error shown when the user taps the onboarding wizard's Next button on the first step without choosing a use mode (#1691)."
+  }
 }

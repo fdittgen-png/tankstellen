@@ -123,10 +123,10 @@ class _OnboardingWizardScreenState
     // enter the next step with a null `activeAppProfileProvider`.
     if (currentStep == 0 &&
         ref.read(activeAppProfileProvider) == null) {
-      // English-only for now; ARB string to follow in a follow-up.
       SnackBarHelper.showError(
         context,
-        'Pick a use mode to continue.',
+        AppLocalizations.of(context)?.onboardingPickUseMode ??
+            'Pick a use mode to continue.',
       );
       return;
     }
