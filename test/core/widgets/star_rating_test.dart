@@ -142,4 +142,53 @@ void main() {
       expect(tappedRating, 1);
     });
   });
+
+  // #1687 — each star is an icon-only tappable affordance; before this
+  // fix the tap target was the bare ~28-32 dp icon glyph and a screen
+  // reader announced nothing.
+  group('StarRating accessibility (#1687)', () {
+    Widget harness() => MaterialApp(
+          home: Scaffold(
+            body: StarRating(rating: 2, onRatingChanged: (_) {}),
+          ),
+        );
+
+    testWidgets('each star has at least a 48dp tap target', (tester) async {
+      await tester.pumpWidget(harness());
+
+      final boxes = tester
+          .widgetList<SizedBox>(
+            find.descendant(
+              of: find.byType(StarRating),
+              matching: find.byType(SizedBox),
+            ),
+          )
+          .where((b) => (b.width ?? 0) >= 48 && (b.height ?? 0) >= 48)
+          .toList();
+      expect(boxes.length, 5);
+    });
+
+    testWidgets('star tap targets meet the Android tap-target guideline',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(harness());
+
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      handle.dispose();
+    });
+
+    testWidgets('each star exposes a button semantics label', (tester) async {
+      await tester.pumpWidget(harness());
+
+      // Bare harness has no AppLocalizations → the fallback label.
+      for (var n = 1; n <= 5; n++) {
+        final semantics = tester.widgetList<Semantics>(find.byType(Semantics));
+        final star = semantics.where(
+          (s) => s.properties.label == 'Rate $n stars',
+        );
+        expect(star.length, 1, reason: 'star $n missing its semantics label');
+        expect(star.first.properties.button, isTrue);
+      }
+    });
+  });
 }

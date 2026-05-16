@@ -632,6 +632,22 @@
       }
     }
   },
+  "brandLogoLabel": "{brand} logo",
+  "@brandLogoLabel": {
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      }
+    }
+  },
+  "ratingStarLabel": "{count, plural, =1{Rate 1 star} other{Rate {count} stars}}",
+  "@ratingStarLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "passwordStrengthWeak": "Weak",
   "passwordStrengthFair": "Fair",
   "passwordStrengthStrong": "Strong",

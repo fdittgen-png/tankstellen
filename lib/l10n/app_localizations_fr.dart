@@ -1362,6 +1362,22 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String brandLogoLabel(String brand) {
+    return 'Logo $brand';
+  }
+
+  @override
+  String ratingStarLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Noter $count étoiles',
+      one: 'Noter 1 étoile',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get passwordStrengthWeak => 'Weak';
 
   @override
