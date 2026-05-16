@@ -93,10 +93,14 @@ class ProfileScreen extends ConsumerWidget {
           // mode, etc.) is preserved; re-enabling the feature surfaces
           // the section with the prior configuration intact.
           if (tankSyncOn) ...[
-            const _FoldableSection(
+            _FoldableSection(
               icon: Icons.cloud_outlined,
-              title: 'TankSync',
-              child: TankSyncSection(),
+              title: 'TankSync', // i18n-ignore: brand name
+              // #1696 — a localized descriptive subtitle so the
+              // brand-named section isn't an unexplained label.
+              subtitle: l?.tankSyncSectionSubtitle ??
+                  'Cloud sync across your devices',
+              child: const TankSyncSection(),
             ),
             const SizedBox(height: 8),
           ],
@@ -231,17 +235,23 @@ class ProfileScreen extends ConsumerWidget {
 class _FoldableSection extends StatelessWidget {
   final IconData icon;
   final String title;
+
+  /// Optional one-line description shown under [title] (#1696) — e.g.
+  /// explaining a brand-named section like "TankSync".
+  final String? subtitle;
   final Widget child;
 
   const _FoldableSection({
     required this.icon,
     required this.title,
+    this.subtitle,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final subtitleText = subtitle;
     return Card(
       margin: EdgeInsets.zero,
       child: ExpansionTile(
@@ -249,6 +259,14 @@ class _FoldableSection extends StatelessWidget {
         title: Text(title,
             style: theme.textTheme.titleSmall
                 ?.copyWith(fontWeight: FontWeight.bold)),
+        subtitle: subtitleText == null
+            ? null
+            : Text(
+                subtitleText,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
         initiallyExpanded: false,
         shape: const Border(),
         collapsedShape: const Border(),

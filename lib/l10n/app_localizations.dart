@@ -1118,11 +1118,17 @@ abstract class AppLocalizations {
   /// **'Location permission denied. You can search by postal code.'**
   String get locationDenied;
 
-  /// No description provided for @demoModeBanner.
+  /// Demo-mode banner content shown for API-key countries with no key configured. Jargon-free per #1696 — names neither 'API key' nor any technical term.
   ///
   /// In en, this message translates to:
-  /// **'Demo mode. Configure API key in settings for live prices.'**
+  /// **'Demo mode — showing sample prices.'**
   String get demoModeBanner;
+
+  /// Action button on the demo-mode banner — opens Settings where live prices can be set up. Jargon-free wording (#1696).
+  ///
+  /// In en, this message translates to:
+  /// **'Get live prices'**
+  String get demoModeBannerAction;
 
   /// No description provided for @sortDistance.
   ///
@@ -5989,6 +5995,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep editing'**
   String get discardChangesKeepEditing;
+
+  /// Subtitle under the 'TankSync' settings section header — explains what the (brand-named) feature does so it isn't an unexplained label (#1696).
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync across your devices'**
+  String get tankSyncSectionSubtitle;
 
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///

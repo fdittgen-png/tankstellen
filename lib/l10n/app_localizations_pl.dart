@@ -534,6 +534,9 @@ class AppLocalizationsPl extends AppLocalizations {
       'Tryb demo. Skonfiguruj klucz API w ustawieniach.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Odległość';
 
   @override
@@ -3208,6 +3211,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

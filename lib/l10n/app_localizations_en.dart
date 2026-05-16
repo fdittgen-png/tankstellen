@@ -527,8 +527,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Location permission denied. You can search by postal code.';
 
   @override
-  String get demoModeBanner =>
-      'Demo mode. Configure API key in settings for live prices.';
+  String get demoModeBanner => 'Demo mode — showing sample prices.';
+
+  @override
+  String get demoModeBannerAction => 'Get live prices';
 
   @override
   String get sortDistance => 'Distance';
@@ -3201,6 +3203,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

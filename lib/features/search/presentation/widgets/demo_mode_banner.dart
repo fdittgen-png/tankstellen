@@ -17,16 +17,28 @@ class DemoModeBanner extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     if (country.requiresApiKey && !storage.hasApiKey()) {
+      // #1696 — jargon-free copy: the banner names neither "API key"
+      // nor any technical term; the user just learns prices are sample
+      // data and that Settings is where live prices are turned on.
       return MaterialBanner(
+        // #1696 — `forceActionsBelow` keeps the action on its own row.
+        // In the default single-row layout the action button takes its
+        // intrinsic width and the content `Expanded` gets whatever is
+        // left; in a narrow pane (e.g. the wide-screen two-pane search
+        // layout) that leftover collapses to a few pixels and the
+        // content text wraps one glyph per line — an 800+ dp tall
+        // banner. Dropping the action below gives the content the full
+        // banner width at every size.
+        forceActionsBelow: true,
         content: Text(
           '${country.flag} ${country.name} — '
-          '${l10n?.demoModeBanner ?? 'Demo mode. Configure API key in settings for live prices.'}',
+          '${l10n?.demoModeBanner ?? 'Demo mode — showing sample prices.'}',
         ),
         leading: const Icon(Icons.science_outlined),
         actions: [
           TextButton(
             onPressed: () => context.go('/profile'),
-            child: Text(l10n?.apiKeySetup ?? 'Setup'),
+            child: Text(l10n?.demoModeBannerAction ?? 'Get live prices'),
           ),
         ],
       );

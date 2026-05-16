@@ -211,7 +211,14 @@
   "refreshPrices": "Refresh prices",
   "station": "Station",
   "locationDenied": "Location permission denied. You can search by postal code.",
-  "demoModeBanner": "Demo mode. Configure API key in settings for live prices.",
+  "demoModeBanner": "Demo mode — showing sample prices.",
+  "@demoModeBanner": {
+    "description": "Demo-mode banner content shown for API-key countries with no key configured. Jargon-free per #1696 — names neither 'API key' nor any technical term."
+  },
+  "demoModeBannerAction": "Get live prices",
+  "@demoModeBannerAction": {
+    "description": "Action button on the demo-mode banner — opens Settings where live prices can be set up. Jargon-free wording (#1696)."
+  },
   "sortDistance": "Distance",
   "sortOpen24h": "24h",
   "sortRating": "Rating",
@@ -1515,5 +1522,9 @@
   "discardChangesKeepEditing": "Keep editing",
   "@discardChangesKeepEditing": {
     "description": "Dismiss action on the unsaved-changes dialog — stays on the form (#1693)."
+  },
+  "tankSyncSectionSubtitle": "Cloud sync across your devices",
+  "@tankSyncSectionSubtitle": {
+    "description": "Subtitle under the 'TankSync' settings section header — explains what the (brand-named) feature does so it isn't an unexplained label (#1696)."
   }
 }

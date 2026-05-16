@@ -533,6 +533,9 @@ class AppLocalizationsHr extends AppLocalizations {
       'Demo način. Konfigurirajte API ključ u postavkama.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Udaljenost';
 
   @override
@@ -3205,6 +3208,9 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

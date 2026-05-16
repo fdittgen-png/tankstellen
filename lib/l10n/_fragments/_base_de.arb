@@ -198,7 +198,8 @@
   "refreshPrices": "Preise aktualisieren",
   "station": "Tankstelle",
   "locationDenied": "Standortfreigabe abgelehnt. Sie können per PLZ suchen.",
-  "demoModeBanner": "Demo-Modus. API-Schlüssel in den Einstellungen eingeben.",
+  "demoModeBanner": "Demo-Modus – Beispielpreise werden angezeigt.",
+  "demoModeBannerAction": "Live-Preise aktivieren",
   "sortDistance": "Entfernung",
   "sortOpen24h": "24h",
   "sortRating": "Bewertung",
@@ -1249,5 +1250,6 @@
   "discardChangesTitle": "Änderungen verwerfen?",
   "discardChangesBody": "Du hast nicht gespeicherte Änderungen. Wenn du jetzt gehst, gehen sie verloren.",
   "discardChangesConfirm": "Verwerfen",
-  "discardChangesKeepEditing": "Weiter bearbeiten"
+  "discardChangesKeepEditing": "Weiter bearbeiten",
+  "tankSyncSectionSubtitle": "Cloud-Synchronisierung über deine Geräte hinweg"
 }

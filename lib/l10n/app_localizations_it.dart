@@ -535,6 +535,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Modalità demo. Configura la chiave API nelle impostazioni.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Distanza';
 
   @override
@@ -3209,6 +3212,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

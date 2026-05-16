@@ -531,8 +531,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Autorisation de localisation refusée. Vous pouvez chercher par code postal.';
 
   @override
-  String get demoModeBanner =>
-      'Mode démo. Configurez la clé API dans les paramètres.';
+  String get demoModeBanner => 'Mode démo – prix d\'exemple affichés.';
+
+  @override
+  String get demoModeBannerAction => 'Activer les prix réels';
 
   @override
   String get sortDistance => 'Distance';
@@ -3232,6 +3234,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Continuer la modification';
+
+  @override
+  String get tankSyncSectionSubtitle =>
+      'Synchronisation cloud entre vos appareils';
 
   @override
   String get achievementSmoothDriver => 'Série souple';

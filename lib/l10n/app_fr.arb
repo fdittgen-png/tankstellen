@@ -234,7 +234,8 @@
   "refreshPrices": "Actualiser les prix",
   "station": "Station",
   "locationDenied": "Autorisation de localisation refusée. Vous pouvez chercher par code postal.",
-  "demoModeBanner": "Mode démo. Configurez la clé API dans les paramètres.",
+  "demoModeBanner": "Mode démo – prix d'exemple affichés.",
+  "demoModeBannerAction": "Activer les prix réels",
   "sortDistance": "Distance",
   "cheap": "bon marché",
   "expensive": "cher",
@@ -1370,5 +1371,6 @@
   "discardChangesTitle": "Abandonner les modifications ?",
   "discardChangesBody": "Vous avez des modifications non enregistrées. Quitter maintenant les supprimera.",
   "discardChangesConfirm": "Abandonner",
-  "discardChangesKeepEditing": "Continuer la modification"
+  "discardChangesKeepEditing": "Continuer la modification",
+  "tankSyncSectionSubtitle": "Synchronisation cloud entre vos appareils"
 }

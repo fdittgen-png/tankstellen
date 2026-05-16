@@ -535,6 +535,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Modo de demonstração. Configure a chave API nas definições.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Distância';
 
   @override
@@ -3209,6 +3212,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

@@ -532,6 +532,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get demoModeBanner => 'Demorežiim. Seadistage API võti seadetes.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Kaugus';
 
   @override
@@ -3203,6 +3206,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';
