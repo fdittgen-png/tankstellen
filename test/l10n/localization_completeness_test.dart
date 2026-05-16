@@ -222,6 +222,56 @@ void main() {
               'English for French users (#1439)');
     });
 
+    // #1699 — all 22 partial locales were brought to 100% coverage of
+    // the app_en.arb template (en/de/fr were already complete). This
+    // gate keeps it that way: it emits the untranslated-messages report
+    // to the CI log and FAILS if any locale regresses, so a new
+    // app_en.arb key added without a translation in every
+    // app_<locale>.arb is caught before merge rather than silently
+    // falling back to English in production.
+    test('every locale ARB is fully translated — no coverage '
+        'regressions (#1699)', () {
+      final missingReport = <String, List<String>>{};
+
+      for (final file in arbFiles) {
+        if (file.path.contains('app_en.arb')) continue;
+
+        final locale = _extractLocale(file.path);
+        final arb =
+            jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+        final localeKeys =
+            arb.keys.where((k) => !k.startsWith('@')).toSet();
+
+        final missing = referenceKeys.difference(localeKeys);
+        if (missing.isNotEmpty) {
+          missingReport[locale] = missing.toList()..sort();
+        }
+      }
+
+      // Untranslated-messages report — always emitted to the CI log.
+      if (missingReport.isEmpty) {
+        // ignore: avoid_print
+        print('Translation coverage: all ${arbFiles.length - 1} locales '
+            'at 100% of ${referenceKeys.length} app_en.arb keys.');
+      } else {
+        final buffer = StringBuffer(
+            'Translation coverage regression — locales below 100%:\n');
+        for (final entry in missingReport.entries) {
+          buffer.writeln('  ${entry.key}: ${entry.value.length} '
+              'untranslated — ${entry.value.join(", ")}');
+        }
+        // ignore: avoid_print
+        print(buffer.toString());
+      }
+
+      expect(missingReport, isEmpty,
+          reason: 'Every locale ARB must contain every app_en.arb key. '
+              'All offered locales reached 100% coverage in #1699; a key '
+              'added to app_en.arb must be translated into every '
+              'app_<locale>.arb in the same change. See the printed '
+              'report above for the untranslated keys.');
+    });
+
     test('no locale has extra keys not in app_en.arb', () {
       final extraReport = <String, List<String>>{};
 
