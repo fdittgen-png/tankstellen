@@ -5154,3 +5154,5290 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get widgetPredictiveNowPrefix => 'now';
 }
+
+/// The translations for English (`en_XA`).
+class AppLocalizationsEnXa extends AppLocalizationsEn {
+  AppLocalizationsEnXa() : super('en_XA');
+
+  @override
+  String get appTitle => '⟦Šƥářķîłó ····⟧';
+
+  @override
+  String get search => '⟦Šéářçĥ ···⟧';
+
+  @override
+  String get favorites => '⟦Ƒáṽóřîŧéš ····⟧';
+
+  @override
+  String get map => '⟦Ṁáƥ ·⟧';
+
+  @override
+  String get profile => '⟦Ƥřóƒîłé ···⟧';
+
+  @override
+  String get settings => '⟦Šéŧŧîñǧš ····⟧';
+
+  @override
+  String get gpsLocation => '⟦ǦƤŠ Łóçáŧîóñ ·····⟧';
+
+  @override
+  String get zipCode => '⟦Ƥóšŧáł çóđé ·····⟧';
+
+  @override
+  String get zipCodeHint => '⟦é.ǧ. 10115 ·⟧';
+
+  @override
+  String get fuelType => '⟦Ƒúéł ŧýƥé ····⟧';
+
+  @override
+  String get searchRadius => '⟦Řáđîúš ···⟧';
+
+  @override
+  String get searchNearby => '⟦Ñéářƀý šŧáŧîóñš ······⟧';
+
+  @override
+  String get searchButton => '⟦Šéářçĥ ···⟧';
+
+  @override
+  String get searchCriteriaTitle => '⟦Šéářçĥ çřîŧéřîá ······⟧';
+
+  @override
+  String get searchCriteriaOpen => '⟦Šéářçĥ ···⟧';
+
+  @override
+  String searchCriteriaRadiusBadge(String km) {
+    return '⟦Ŵîŧĥîñ $km ķɱ ····⟧';
+  }
+
+  @override
+  String get searchCriteriaTapToSearch => '⟦Ŧáƥ ŧó šŧářŧ šéářçĥîñǧ ·········⟧';
+
+  @override
+  String get noResults => '⟦Ñó šŧáŧîóñš ƒóúñđ. ·······⟧';
+
+  @override
+  String get startSearch => '⟦Šéářçĥ ŧó ƒîñđ ƒúéł šŧáŧîóñš. ···········⟧';
+
+  @override
+  String get open => '⟦Óƥéñ ··⟧';
+
+  @override
+  String get closed => '⟦Çłóšéđ ···⟧';
+
+  @override
+  String distance(String distance) {
+    return '⟦$distance áŵáý ··⟧';
+  }
+
+  @override
+  String get price => '⟦Ƥřîçé ··⟧';
+
+  @override
+  String get prices => '⟦Ƥřîçéš ···⟧';
+
+  @override
+  String get address => '⟦Áđđřéšš ···⟧';
+
+  @override
+  String get openingHours => '⟦Óƥéñîñǧ ĥóúřš ·····⟧';
+
+  @override
+  String get open24h => '⟦Óƥéñ 24 ĥóúřš ····⟧';
+
+  @override
+  String get navigate => '⟦Ñáṽîǧáŧé ····⟧';
+
+  @override
+  String get retry => '⟦Ŧřý áǧáîñ ····⟧';
+
+  @override
+  String get apiKeySetup => '⟦ÁƤÎ ķéý šéŧúƥ ·····⟧';
+
+  @override
+  String get apiKeyDescription =>
+      '⟦Řéǧîšŧéř óñçé ƒóř á ƒřéé ÁƤÎ ķéý. ············⟧';
+
+  @override
+  String get apiKeyLabel => '⟦ÁƤÎ Ķéý ···⟧';
+
+  @override
+  String get register => '⟦Řéǧîšŧřáŧîóñ ·····⟧';
+
+  @override
+  String get continueButton => '⟦Çóñŧîñúé ····⟧';
+
+  @override
+  String get welcome => '⟦Šƥářķîłó ····⟧';
+
+  @override
+  String get welcomeSubtitle =>
+      '⟦Ƒîñđ ŧĥé çĥéáƥéšŧ ƒúéł ñéář ýóú. ············⟧';
+
+  @override
+  String get profileName => '⟦Ƥřóƒîłé ñáɱé ·····⟧';
+
+  @override
+  String get preferredFuel => '⟦Ƥřéƒéřřéđ ƒúéł ······⟧';
+
+  @override
+  String get defaultRadius => '⟦Đéƒáúłŧ řáđîúš ······⟧';
+
+  @override
+  String get landingScreen => '⟦Šŧářŧ šçřééñ ·····⟧';
+
+  @override
+  String get homeZip => '⟦Ĥóɱé ƥóšŧáł çóđé ······⟧';
+
+  @override
+  String get newProfile => '⟦Ñéŵ ƥřóƒîłé ·····⟧';
+
+  @override
+  String get editProfile => '⟦Éđîŧ ƥřóƒîłé ·····⟧';
+
+  @override
+  String get save => '⟦Šáṽé ··⟧';
+
+  @override
+  String get cancel => '⟦Çáñçéł ···⟧';
+
+  @override
+  String get countryChangeTitle => '⟦Šŵîŧçĥ çóúñŧřý? ······⟧';
+
+  @override
+  String countryChangeBody(String country) {
+    return '⟦Šŵîŧçĥîñǧ ŧó $country ŵîłł çĥáñǧé: ·········⟧';
+  }
+
+  @override
+  String get countryChangeCurrency => '⟦Çúřřéñçý ····⟧';
+
+  @override
+  String get countryChangeDistance => '⟦Đîšŧáñçé ····⟧';
+
+  @override
+  String get countryChangeVolume => '⟦Ṽółúɱé ···⟧';
+
+  @override
+  String get countryChangePricePerUnit => '⟦Ƥřîçé ƒóřɱáŧ ·····⟧';
+
+  @override
+  String get countryChangeNote =>
+      '⟦Éẋîšŧîñǧ ƒáṽóřîŧéš áñđ ƒîłł-úƥ łóǧš ářé ñóŧ řéŵřîŧŧéñ; óñłý ñéŵ éñŧřîéš úšé ŧĥé ñéŵ úñîŧš. ·································⟧';
+
+  @override
+  String get countryChangeConfirm => '⟦Šŵîŧçĥ ···⟧';
+
+  @override
+  String get delete => '⟦Đéłéŧé ···⟧';
+
+  @override
+  String get activate => '⟦Áçŧîṽáŧé ····⟧';
+
+  @override
+  String get configured => '⟦Çóñƒîǧúřéđ ·····⟧';
+
+  @override
+  String get notConfigured => '⟦Ñóŧ çóñƒîǧúřéđ ······⟧';
+
+  @override
+  String get about => '⟦Áƀóúŧ ··⟧';
+
+  @override
+  String get openSource => '⟦Óƥéñ Šóúřçé (ṀÎŦ Łîçéñšé) ·········⟧';
+
+  @override
+  String get sourceCode => '⟦Šóúřçé çóđé óñ ǦîŧĤúƀ ········⟧';
+
+  @override
+  String get noFavorites => '⟦Ñó ƒáṽóřîŧéš ýéŧ ······⟧';
+
+  @override
+  String get noFavoritesHint =>
+      '⟦Ŧáƥ ŧĥé šŧář óñ á šŧáŧîóñ ŧó šáṽé îŧ áš á ƒáṽóřîŧé. ··················⟧';
+
+  @override
+  String get language => '⟦Łáñǧúáǧé ····⟧';
+
+  @override
+  String get country => '⟦Çóúñŧřý ···⟧';
+
+  @override
+  String get demoMode => '⟦Đéɱó ɱóđé — šáɱƥłé đáŧá šĥóŵñ. ··········⟧';
+
+  @override
+  String get setupLiveData => '⟦Šéŧ úƥ ƒóř łîṽé đáŧá ·······⟧';
+
+  @override
+  String get freeNoKey => '⟦Ƒřéé — ñó ķéý ñééđéđ ·······⟧';
+
+  @override
+  String get apiKeyRequired => '⟦ÁƤÎ ķéý řéɋúîřéđ ······⟧';
+
+  @override
+  String get skipWithoutKey => '⟦Çóñŧîñúé ŵîŧĥóúŧ ķéý ········⟧';
+
+  @override
+  String get dataTransparency => '⟦Đáŧá ŧřáñšƥářéñçý ·······⟧';
+
+  @override
+  String get storageAndCache => '⟦Šŧóřáǧé & çáçĥé ·····⟧';
+
+  @override
+  String get clearCache => '⟦Çłéář çáçĥé ·····⟧';
+
+  @override
+  String get clearAllData => '⟦Đéłéŧé áłł đáŧá ······⟧';
+
+  @override
+  String get errorLog => '⟦Éřřóř łóǧ ····⟧';
+
+  @override
+  String stationsFound(int count) {
+    return '⟦$count šŧáŧîóñš ƒóúñđ ······⟧';
+  }
+
+  @override
+  String get whatIsShared => '⟦Ŵĥáŧ îš šĥářéđ — áñđ ŵîŧĥ ŵĥóɱ? ··········⟧';
+
+  @override
+  String get gpsCoordinates => '⟦ǦƤŠ çóóřđîñáŧéš ······⟧';
+
+  @override
+  String get gpsReason =>
+      '⟦Šéñŧ ŵîŧĥ éṽéřý łóçáŧîóñ šéářçĥ ŧó ƒîñđ ñéářƀý šŧáŧîóñš. ·····················⟧';
+
+  @override
+  String get postalCodeData => '⟦Ƥóšŧáł çóđé ·····⟧';
+
+  @override
+  String get postalReason =>
+      '⟦Çóñṽéřŧéđ ŧó çóóřđîñáŧéš ṽîá ǧéóçóđîñǧ šéřṽîçé. ··················⟧';
+
+  @override
+  String get mapViewport => '⟦Ṁáƥ ṽîéŵƥóřŧ ·····⟧';
+
+  @override
+  String get mapReason =>
+      '⟦Ṁáƥ ŧîłéš ářé łóáđéđ ƒřóɱ ŧĥé ŧîłé šéřṽéř. Ñó ƥéřšóñáł đáŧá îš ŧřáñšɱîŧŧéđ. ···························⟧';
+
+  @override
+  String get apiKeyData => '⟦ÁƤÎ Ķéý ···⟧';
+
+  @override
+  String get apiKeyReason =>
+      '⟦Ýóúř ƥéřšóñáł ķéý îš šéñŧ ŵîŧĥ éṽéřý ÁƤÎ řéɋúéšŧ. Îŧ îš łîñķéđ ŧó ýóúř éɱáîł. ···························⟧';
+
+  @override
+  String get notShared => '⟦ÑÓŦ šĥářéđ: ····⟧';
+
+  @override
+  String get searchHistory => '⟦Šéářçĥ ĥîšŧóřý ······⟧';
+
+  @override
+  String get favoritesData => '⟦Ƒáṽóřîŧéš ····⟧';
+
+  @override
+  String get profileNames => '⟦Ƥřóƒîłé ñáɱéš ·····⟧';
+
+  @override
+  String get homeZipData => '⟦Ĥóɱé ŽÎƤ ···⟧';
+
+  @override
+  String get usageData => '⟦Úšáǧé đáŧá ····⟧';
+
+  @override
+  String get privacyBanner =>
+      '⟦Ŧĥîš áƥƥ ĥáš ñó šéřṽéř. Áłł đáŧá šŧáýš óñ ýóúř đéṽîçé. Ñó áñáłýŧîçš, ñó ŧřáçķîñǧ, ñó áđš. ·······························⟧';
+
+  @override
+  String get storageUsage => '⟦Šŧóřáǧé úšáǧé óñ ŧĥîš đéṽîçé ···········⟧';
+
+  @override
+  String get settingsLabel => '⟦Šéŧŧîñǧš ····⟧';
+
+  @override
+  String get profilesStored => '⟦ƥřóƒîłéš šŧóřéđ ······⟧';
+
+  @override
+  String get stationsMarked => '⟦šŧáŧîóñš ɱářķéđ ······⟧';
+
+  @override
+  String get cachedResponses => '⟦çáçĥéđ řéšƥóñšéš ·······⟧';
+
+  @override
+  String get total => '⟦Ŧóŧáł ··⟧';
+
+  @override
+  String get cacheManagement => '⟦Çáçĥé ɱáñáǧéɱéñŧ ·······⟧';
+
+  @override
+  String get cacheDescription =>
+      '⟦Ŧĥé çáçĥé šŧóřéš ÁƤÎ řéšƥóñšéš ƒóř ƒášŧéř łóáđîñǧ áñđ óƒƒłîñé áççéšš. ··························⟧';
+
+  @override
+  String get stationSearch => '⟦Šŧáŧîóñ šéářçĥ ······⟧';
+
+  @override
+  String get stationDetails => '⟦Šŧáŧîóñ đéŧáîłš ······⟧';
+
+  @override
+  String get priceQuery => '⟦Ƥřîçé ɋúéřý ·····⟧';
+
+  @override
+  String get zipGeocoding => '⟦Ƥóšŧáł çóđé ǧéóçóđîñǧ ·········⟧';
+
+  @override
+  String minutes(int n) {
+    return '⟦$n ɱîñúŧéš ···⟧';
+  }
+
+  @override
+  String hours(int n) {
+    return '⟦$n ĥóúřš ··⟧';
+  }
+
+  @override
+  String get clearCacheTitle => '⟦Çłéář çáçĥé? ·····⟧';
+
+  @override
+  String get clearCacheBody =>
+      '⟦Çáçĥéđ šéářçĥ řéšúłŧš áñđ ƥřîçéš ŵîłł ƀé đéłéŧéđ. Ƥřóƒîłéš, ƒáṽóřîŧéš áñđ šéŧŧîñǧš ářé ƥřéšéřṽéđ. ····································⟧';
+
+  @override
+  String get clearCacheButton => '⟦Çłéář çáçĥé ·····⟧';
+
+  @override
+  String get deleteAllTitle => '⟦Đéłéŧé áłł đáŧá? ······⟧';
+
+  @override
+  String get deleteAllBody =>
+      '⟦Ŧĥîš ƥéřɱáñéñŧłý đéłéŧéš áłł ƥřóƒîłéš, ƒáṽóřîŧéš, ÁƤÎ ķéý, šéŧŧîñǧš, áñđ çáçĥé. Ŧĥé áƥƥ ŵîłł řéšéŧ. ····································⟧';
+
+  @override
+  String get deleteAllButton => '⟦Đéłéŧé áłł ····⟧';
+
+  @override
+  String get entries => '⟦éñŧřîéš ···⟧';
+
+  @override
+  String get cacheEmpty => '⟦Çáçĥé îš éɱƥŧý ·····⟧';
+
+  @override
+  String get noStorage => '⟦Ñó šŧóřáǧé úšéđ ······⟧';
+
+  @override
+  String get apiKeyNote =>
+      '⟦Ƒřéé řéǧîšŧřáŧîóñ. Đáŧá ƒřóɱ ǧóṽéřñɱéñŧ ƥřîçé ŧřáñšƥářéñçý áǧéñçîéš. ···························⟧';
+
+  @override
+  String get apiKeyFormatError =>
+      '⟦Îñṽáłîđ ƒóřɱáŧ — éẋƥéçŧéđ ÚÚÎĐ (8-4-4-4-12) ···········⟧';
+
+  @override
+  String get supportProject => '⟦Šúƥƥóřŧ ŧĥîš ƥřóĵéçŧ ········⟧';
+
+  @override
+  String get supportDescription =>
+      '⟦Ŧĥîš áƥƥ îš ƒřéé, óƥéñ šóúřçé, áñđ ĥáš ñó áđš. Îƒ ýóú ƒîñđ îŧ úšéƒúł, çóñšîđéř šúƥƥóřŧîñǧ ŧĥé đéṽéłóƥéř. ····································⟧';
+
+  @override
+  String get reportBug => '⟦Řéƥóřŧ á ƀúǧ / Šúǧǧéšŧ á ƒéáŧúřé ···········⟧';
+
+  @override
+  String get reportThisIssue => '⟦Řéƥóřŧ ŧĥîš îššúé ·······⟧';
+
+  @override
+  String get reportAlreadySent =>
+      '⟦Ýóú áłřéáđý řéƥóřŧéđ ŧĥîš îššúé. ············⟧';
+
+  @override
+  String get reportConsentTitle => '⟦Řéƥóřŧ ŧó ǦîŧĤúƀ? ······⟧';
+
+  @override
+  String get reportConsentBody =>
+      '⟦Ŧĥîš ŵîłł óƥéñ á ƥúƀłîç ǦîŧĤúƀ îššúé ŵîŧĥ ŧĥé éřřóř đéŧáîłš ƀéłóŵ. Ñó ǦƤŠ çóóřđîñáŧéš, ÁƤÎ ķéýš, óř ƥéřšóñáł đáŧá ářé îñçłúđéđ. ··············································⟧';
+
+  @override
+  String get reportConsentConfirm => '⟦Óƥéñ ǦîŧĤúƀ ·····⟧';
+
+  @override
+  String get reportConsentCancel => '⟦Çáñçéł ···⟧';
+
+  @override
+  String get configProfileSection => '⟦Ƥřóƒîłé ···⟧';
+
+  @override
+  String get configActiveProfile => '⟦Áçŧîṽé ƥřóƒîłé ······⟧';
+
+  @override
+  String get configPreferredFuel => '⟦Ƥřéƒéřřéđ ƒúéł ······⟧';
+
+  @override
+  String get configCountry => '⟦Çóúñŧřý ···⟧';
+
+  @override
+  String get configRouteSegment => '⟦Řóúŧé šéǧɱéñŧ ·····⟧';
+
+  @override
+  String get configApiKeysSection => '⟦ÁƤÎ ķéýš ···⟧';
+
+  @override
+  String get configTankerkoenigKey => '⟦Ŧáñķéřķóéñîǧ ÁƤÎ ķéý ········⟧';
+
+  @override
+  String get configApiKeyConfigured => '⟦Çóñƒîǧúřéđ ·····⟧';
+
+  @override
+  String get configApiKeyNotSet => '⟦Ñóŧ šéŧ (đéɱó ɱóđé) ······⟧';
+
+  @override
+  String get configApiKeyCommunity => '⟦Đéƒáúłŧ (çóɱɱúñîŧý ķéý) ·········⟧';
+
+  @override
+  String get searchLocationPlaceholder =>
+      '⟦Áđđřéšš, ƥóšŧáł çóđé óř çîŧý ··········⟧';
+
+  @override
+  String get configEvKey => '⟦ÉṼ çĥářǧîñǧ ÁƤÎ ķéý ·······⟧';
+
+  @override
+  String get configEvKeyCustom => '⟦Çúšŧóɱ ķéý ····⟧';
+
+  @override
+  String get configEvKeyShared => '⟦Đéƒáúłŧ (šĥářéđ) ······⟧';
+
+  @override
+  String get configCloudSyncSection => '⟦Çłóúđ Šýñç ····⟧';
+
+  @override
+  String get configTankSyncConnected => '⟦Çóññéçŧéđ ····⟧';
+
+  @override
+  String get configTankSyncDisabled => '⟦Đîšáƀłéđ ····⟧';
+
+  @override
+  String get configAuthMode => '⟦Áúŧĥ ɱóđé ····⟧';
+
+  @override
+  String get configAuthEmail => '⟦Éɱáîł (ƥéřšîšŧéñŧ) ·······⟧';
+
+  @override
+  String get configAuthAnonymous => '⟦Áñóñýɱóúš (đéṽîçé-óñłý) ·········⟧';
+
+  @override
+  String get configDatabase => '⟦Đáŧáƀášé ····⟧';
+
+  @override
+  String get configPrivacySummary => '⟦Ƥřîṽáçý šúɱɱářý ······⟧';
+
+  @override
+  String configPrivacySummarySynced(Object authNote) {
+    return '⟦• Ƒáṽóřîŧéš, áłéřŧš, áñđ îǧñóřéđ šŧáŧîóñš ářé šýñçéđ ŧó ýóúř ƥřîṽáŧé đáŧáƀášé\n• ǦƤŠ ƥóšîŧîóñ áñđ ÁƤÎ ķéýš ñéṽéř łéáṽé ýóúř đéṽîçé\n• $authNote ···············································⟧';
+  }
+
+  @override
+  String get configPrivacySummaryLocal =>
+      '⟦• Áłł đáŧá îš šŧóřéđ łóçáłłý óñ ŧĥîš đéṽîçé óñłý\n• Ñó đáŧá îš šéñŧ ŧó áñý šéřṽéř\n• ÁƤÎ ķéýš éñçřýƥŧéđ îñ đéṽîçé šéçúřé šŧóřáǧé ············································⟧';
+
+  @override
+  String get configAuthNoteEmail =>
+      '⟦Éɱáîł áççóúñŧ éñáƀłéš çřóšš-đéṽîçé áççéšš ················⟧';
+
+  @override
+  String get configAuthNoteAnonymous =>
+      '⟦Áñóñýɱóúš áççóúñŧ — đáŧá ŧîéđ ŧó ŧĥîš đéṽîçé ················⟧';
+
+  @override
+  String get configNone => '⟦Ñóñé ··⟧';
+
+  @override
+  String get privacyPolicy => '⟦Ƥřîṽáçý Ƥółîçý ······⟧';
+
+  @override
+  String get fuels => '⟦Ƒúéłš ··⟧';
+
+  @override
+  String get services => '⟦Šéřṽîçéš ····⟧';
+
+  @override
+  String get zone => '⟦Žóñé ··⟧';
+
+  @override
+  String get highway => '⟦Ĥîǧĥŵáý ···⟧';
+
+  @override
+  String get localStation => '⟦Łóçáł šŧáŧîóñ ·····⟧';
+
+  @override
+  String get lastUpdate => '⟦Łášŧ úƥđáŧé ·····⟧';
+
+  @override
+  String get automate24h => '⟦24ĥ/24 — Áúŧóɱáŧé ····⟧';
+
+  @override
+  String get refreshPrices => '⟦Řéƒřéšĥ ƥřîçéš ······⟧';
+
+  @override
+  String get station => '⟦Šŧáŧîóñ ···⟧';
+
+  @override
+  String get locationDenied =>
+      '⟦Łóçáŧîóñ ƥéřɱîššîóñ đéñîéđ. Ýóú çáñ šéářçĥ ƀý ƥóšŧáł çóđé. ······················⟧';
+
+  @override
+  String get demoModeBanner =>
+      '⟦Đéɱó ɱóđé — šĥóŵîñǧ šáɱƥłé ƥřîçéš. ············⟧';
+
+  @override
+  String get demoModeBannerAction => '⟦Ǧéŧ łîṽé ƥřîçéš ······⟧';
+
+  @override
+  String get sortDistance => '⟦Đîšŧáñçé ····⟧';
+
+  @override
+  String get sortOpen24h => '⟦24ĥ⟧';
+
+  @override
+  String get sortRating => '⟦Řáŧîñǧ ···⟧';
+
+  @override
+  String get sortPriceDistance => '⟦Ƥřîçé/ķɱ ···⟧';
+
+  @override
+  String get cheap => '⟦çĥéáƥ ··⟧';
+
+  @override
+  String get expensive => '⟦éẋƥéñšîṽé ····⟧';
+
+  @override
+  String stationsOnMap(int count) {
+    return '⟦$count šŧáŧîóñš ····⟧';
+  }
+
+  @override
+  String get loadingFavorites =>
+      '⟦Łóáđîñǧ ƒáṽóřîŧéš...\nŠéářçĥ ƒóř šŧáŧîóñš ƒîřšŧ ŧó šáṽé đáŧá. ······················⟧';
+
+  @override
+  String get reportPrice => '⟦Řéƥóřŧ ƥřîçé ·····⟧';
+
+  @override
+  String get whatsWrong => '⟦Ŵĥáŧ\'š ŵřóñǧ? ·····⟧';
+
+  @override
+  String get correctPrice => '⟦Çóřřéçŧ ƥřîçé (é.ǧ. 1.459) ······⟧';
+
+  @override
+  String get sendReport => '⟦Šéñđ řéƥóřŧ ·····⟧';
+
+  @override
+  String get reportSent => '⟦Řéƥóřŧ šéñŧ. Ŧĥáñķ ýóú! ········⟧';
+
+  @override
+  String get enterValidPrice => '⟦Ƥłéášé éñŧéř á ṽáłîđ ƥřîçé ··········⟧';
+
+  @override
+  String get cacheCleared => '⟦Çáçĥé çłéářéđ. ·····⟧';
+
+  @override
+  String get yourPosition => '⟦Ýóúř ƥóšîŧîóñ ·····⟧';
+
+  @override
+  String get positionUnknown => '⟦Ƥóšîŧîóñ úñķñóŵñ ·······⟧';
+
+  @override
+  String get distancesFromCenter =>
+      '⟦Đîšŧáñçéš ƒřóɱ šéářçĥ çéñŧéř ···········⟧';
+
+  @override
+  String get autoUpdatePosition => '⟦Áúŧó-úƥđáŧé ƥóšîŧîóñ ········⟧';
+
+  @override
+  String get autoUpdateDescription =>
+      '⟦Řéƒřéšĥ ǦƤŠ ƥóšîŧîóñ ƀéƒóřé éáçĥ šéářçĥ ···············⟧';
+
+  @override
+  String get location => '⟦Łóçáŧîóñ ····⟧';
+
+  @override
+  String get switchProfileTitle => '⟦Çóúñŧřý çĥáñǧéđ ······⟧';
+
+  @override
+  String switchProfilePrompt(String country, String profile) {
+    return '⟦Ýóú ářé ñóŵ îñ $country. Šŵîŧçĥ ŧó ƥřóƒîłé \"$profile\"? ············⟧';
+  }
+
+  @override
+  String switchedToProfile(String profile, String country) {
+    return '⟦Šŵîŧçĥéđ ŧó ƥřóƒîłé \"$profile\" ($country) ········⟧';
+  }
+
+  @override
+  String get noProfileForCountryTitle =>
+      '⟦Ñó ƥřóƒîłé ƒóř ŧĥîš çóúñŧřý ··········⟧';
+
+  @override
+  String noProfileForCountry(String country) {
+    return '⟦Ýóú ářé îñ $country, ƀúŧ ñó ƥřóƒîłé îš çóñƒîǧúřéđ ƒóř îŧ. Çřéáŧé óñé îñ Šéŧŧîñǧš. ·························⟧';
+  }
+
+  @override
+  String get autoSwitchProfile => '⟦Áúŧó-šŵîŧçĥ ƥřóƒîłé ········⟧';
+
+  @override
+  String get autoSwitchDescription =>
+      '⟦Áúŧóɱáŧîçáłłý šŵîŧçĥ ƥřóƒîłé ŵĥéñ çřóššîñǧ ƀóřđéřš ····················⟧';
+
+  @override
+  String get switchProfile => '⟦Šŵîŧçĥ ···⟧';
+
+  @override
+  String get dismiss => '⟦Đîšɱîšš ···⟧';
+
+  @override
+  String get profileCountry => '⟦Çóúñŧřý ···⟧';
+
+  @override
+  String get profileLanguage => '⟦Łáñǧúáǧé ····⟧';
+
+  @override
+  String get settingsStorageDetail => '⟦ÁƤÎ ķéý, áçŧîṽé ƥřóƒîłé ·········⟧';
+
+  @override
+  String get allFuels => '⟦Áłł ·⟧';
+
+  @override
+  String get priceAlerts => '⟦Ƥřîçé Áłéřŧš ·····⟧';
+
+  @override
+  String get noPriceAlerts => '⟦Ñó ƥřîçé áłéřŧš ······⟧';
+
+  @override
+  String get noPriceAlertsHint =>
+      '⟦Çřéáŧé áñ áłéřŧ ƒřóɱ á šŧáŧîóñ\'š đéŧáîł ƥáǧé. ················⟧';
+
+  @override
+  String alertDeleted(String name) {
+    return '⟦Áłéřŧ \"$name\" đéłéŧéđ ·····⟧';
+  }
+
+  @override
+  String get createAlert => '⟦Çřéáŧé Ƥřîçé Áłéřŧ ·······⟧';
+
+  @override
+  String currentPrice(String price) {
+    return '⟦Çúřřéñŧ ƥřîçé: $price ·····⟧';
+  }
+
+  @override
+  String get targetPrice => '⟦Ŧářǧéŧ ƥřîçé (ÉÚŘ) ······⟧';
+
+  @override
+  String get enterPrice => '⟦Ƥłéášé éñŧéř á ƥřîçé ········⟧';
+
+  @override
+  String get invalidPrice => '⟦Îñṽáłîđ ƥřîçé ·····⟧';
+
+  @override
+  String get priceTooHigh => '⟦Ƥřîçé ŧóó ĥîǧĥ ·····⟧';
+
+  @override
+  String get create => '⟦Çřéáŧé ···⟧';
+
+  @override
+  String get alertCreated => '⟦Ƥřîçé áłéřŧ çřéáŧéđ ········⟧';
+
+  @override
+  String get wrongE5Price => '⟦Ŵřóñǧ Šúƥéř É5 ƥřîçé ·······⟧';
+
+  @override
+  String get wrongE10Price => '⟦Ŵřóñǧ Šúƥéř É10 ƥřîçé ·······⟧';
+
+  @override
+  String get wrongDieselPrice => '⟦Ŵřóñǧ Đîéšéł ƥřîçé ·······⟧';
+
+  @override
+  String get wrongStatusOpen => '⟦Šĥóŵñ áš óƥéñ, ƀúŧ çłóšéđ ·········⟧';
+
+  @override
+  String get wrongStatusClosed => '⟦Šĥóŵñ áš çłóšéđ, ƀúŧ óƥéñ ·········⟧';
+
+  @override
+  String get searchAlongRouteLabel => '⟦Áłóñǧ řóúŧé ·····⟧';
+
+  @override
+  String get searchEvStations =>
+      '⟦Šéářçĥ ŧó ƒîñđ ÉṼ çĥářǧîñǧ šŧáŧîóñš ··············⟧';
+
+  @override
+  String get allStations => '⟦Áłł šŧáŧîóñš ·····⟧';
+
+  @override
+  String get bestStops => '⟦Ɓéšŧ šŧóƥš ····⟧';
+
+  @override
+  String get openInMaps => '⟦Óƥéñ îñ Ṁáƥš ·····⟧';
+
+  @override
+  String get noStationsAlongRoute =>
+      '⟦Ñó šŧáŧîóñš ƒóúñđ áłóñǧ řóúŧé ···········⟧';
+
+  @override
+  String get evOperational => '⟦Óƥéřáŧîóñáł ·····⟧';
+
+  @override
+  String get evStatusUnknown => '⟦Šŧáŧúš úñķñóŵñ ······⟧';
+
+  @override
+  String evConnectors(int count) {
+    return '⟦Çóññéçŧóřš ($count ƥóîñŧš) ·······⟧';
+  }
+
+  @override
+  String get evNoConnectors => '⟦Ñó çóññéçŧóř đéŧáîłš áṽáîłáƀłé ············⟧';
+
+  @override
+  String get evUsageCost => '⟦Úšáǧé çóšŧ ····⟧';
+
+  @override
+  String get evPricingUnavailable =>
+      '⟦Ƥřîçîñǧ ñóŧ áṽáîłáƀłé ƒřóɱ ƥřóṽîđéř ··············⟧';
+
+  @override
+  String get evLastUpdated => '⟦Łášŧ úƥđáŧéđ ·····⟧';
+
+  @override
+  String get evUnknown => '⟦Úñķñóŵñ ···⟧';
+
+  @override
+  String get evDataAttribution =>
+      '⟦Đáŧá ƒřóɱ ÓƥéñÇĥářǧéṀáƥ (çóɱɱúñîŧý-šóúřçéđ) ·················⟧';
+
+  @override
+  String get evStatusDisclaimer =>
+      '⟦Šŧáŧúš ɱáý ñóŧ řéƒłéçŧ řéáł-ŧîɱé áṽáîłáƀîłîŧý. Ŧáƥ řéƒřéšĥ ŧó ǧéŧ ŧĥé łáŧéšŧ đáŧá. ······························⟧';
+
+  @override
+  String get evNavigateToStation => '⟦Ñáṽîǧáŧé ŧó šŧáŧîóñ ········⟧';
+
+  @override
+  String get evRefreshStatus => '⟦Řéƒřéšĥ šŧáŧúš ······⟧';
+
+  @override
+  String get evStatusUpdated => '⟦Šŧáŧúš úƥđáŧéđ ······⟧';
+
+  @override
+  String get evStationNotFound =>
+      '⟦Çóúłđ ñóŧ řéƒřéšĥ — šŧáŧîóñ ñóŧ ƒóúñđ ñéářƀý ················⟧';
+
+  @override
+  String get addedToFavorites => '⟦Áđđéđ ŧó ƒáṽóřîŧéš ·······⟧';
+
+  @override
+  String get removedFromFavorites => '⟦Řéɱóṽéđ ƒřóɱ ƒáṽóřîŧéš ·········⟧';
+
+  @override
+  String get addFavorite => '⟦Áđđ ŧó ƒáṽóřîŧéš ······⟧';
+
+  @override
+  String get removeFavorite => '⟦Řéɱóṽé ƒřóɱ ƒáṽóřîŧéš ·········⟧';
+
+  @override
+  String get currentLocation => '⟦Çúřřéñŧ łóçáŧîóñ ·······⟧';
+
+  @override
+  String get gpsError => '⟦ǦƤŠ éřřóř ····⟧';
+
+  @override
+  String get couldNotResolve =>
+      '⟦Çóúłđ ñóŧ řéšółṽé šŧářŧ óř đéšŧîñáŧîóñ ···············⟧';
+
+  @override
+  String get start => '⟦Šŧářŧ ··⟧';
+
+  @override
+  String get destination => '⟦Đéšŧîñáŧîóñ ·····⟧';
+
+  @override
+  String get cityAddressOrGps => '⟦Çîŧý, áđđřéšš, óř ǦƤŠ ·······⟧';
+
+  @override
+  String get cityOrAddress => '⟦Çîŧý óř áđđřéšš ······⟧';
+
+  @override
+  String get useGps => '⟦Úšé ǦƤŠ ···⟧';
+
+  @override
+  String get stop => '⟦Šŧóƥ ··⟧';
+
+  @override
+  String stopN(int n) {
+    return '⟦Šŧóƥ $n ··⟧';
+  }
+
+  @override
+  String get addStop => '⟦Áđđ šŧóƥ ···⟧';
+
+  @override
+  String get searchAlongRoute => '⟦Šéářçĥ áłóñǧ řóúŧé ·······⟧';
+
+  @override
+  String get cheapest => '⟦Çĥéáƥéšŧ ····⟧';
+
+  @override
+  String nStations(int count) {
+    return '⟦$count šŧáŧîóñš ····⟧';
+  }
+
+  @override
+  String nBest(int count) {
+    return '⟦$count ƀéšŧ ··⟧';
+  }
+
+  @override
+  String get fuelPricesTankerkoenig =>
+      '⟦Ƒúéł ƥřîçéš (Ŧáñķéřķóéñîǧ) ··········⟧';
+
+  @override
+  String get requiredForFuelSearch =>
+      '⟦Řéɋúîřéđ ƒóř ƒúéł ƥřîçé šéářçĥ îñ Ǧéřɱáñý ················⟧';
+
+  @override
+  String get evChargingOpenChargeMap =>
+      '⟦ÉṼ Çĥářǧîñǧ (ÓƥéñÇĥářǧéṀáƥ) ··········⟧';
+
+  @override
+  String get customKey => '⟦Çúšŧóɱ ķéý ····⟧';
+
+  @override
+  String get appDefaultKey => '⟦Áƥƥ đéƒáúłŧ ķéý ······⟧';
+
+  @override
+  String get optionalOverrideKey =>
+      '⟦Óƥŧîóñáł: óṽéřřîđé ŧĥé ƀúîłŧ-îñ áƥƥ ķéý ŵîŧĥ ýóúř óŵñ ···················⟧';
+
+  @override
+  String get requiredForEvSearch =>
+      '⟦Řéɋúîřéđ ƒóř ÉṼ çĥářǧîñǧ šŧáŧîóñ šéářçĥ ···············⟧';
+
+  @override
+  String get edit => '⟦Éđîŧ ··⟧';
+
+  @override
+  String get fuelPricesApiKey => '⟦Ƒúéł ƥřîçéš ÁƤÎ Ķéý ·······⟧';
+
+  @override
+  String get tankerkoenigApiKey => '⟦Ŧáñķéřķóéñîǧ ÁƤÎ Ķéý ········⟧';
+
+  @override
+  String get evChargingApiKey => '⟦ÉṼ Çĥářǧîñǧ ÁƤÎ Ķéý ·······⟧';
+
+  @override
+  String get openChargeMapApiKey => '⟦ÓƥéñÇĥářǧéṀáƥ ÁƤÎ Ķéý ·········⟧';
+
+  @override
+  String get routeSegment => '⟦Řóúŧé šéǧɱéñŧ ·····⟧';
+
+  @override
+  String showCheapestEveryNKm(int km) {
+    return '⟦Šĥóŵ çĥéáƥéšŧ šŧáŧîóñ éṽéřý $km ķɱ áłóñǧ řóúŧé ················⟧';
+  }
+
+  @override
+  String get avoidHighways => '⟦Áṽóîđ ĥîǧĥŵáýš ······⟧';
+
+  @override
+  String get avoidHighwaysDesc =>
+      '⟦Řóúŧé çáłçúłáŧîóñ áṽóîđš ŧółł řóáđš áñđ ĥîǧĥŵáýš ···················⟧';
+
+  @override
+  String get showFuelStations => '⟦Šĥóŵ ƒúéł šŧáŧîóñš ·······⟧';
+
+  @override
+  String get showFuelStationsDesc =>
+      '⟦Îñçłúđé ǧáš, đîéšéł, ŁƤǦ, ÇÑǦ šŧáŧîóñš ··············⟧';
+
+  @override
+  String get showEvStations => '⟦Šĥóŵ ÉṼ çĥářǧîñǧ šŧáŧîóñš ··········⟧';
+
+  @override
+  String get showEvStationsDesc =>
+      '⟦Îñçłúđé éłéçŧřîç çĥářǧîñǧ šŧáŧîóñš îñ šéářçĥ řéšúłŧš ·····················⟧';
+
+  @override
+  String get noStationsAlongThisRoute =>
+      '⟦Ñó šŧáŧîóñš ƒóúñđ áłóñǧ ŧĥîš řóúŧé. ·············⟧';
+
+  @override
+  String get fuelCostCalculator => '⟦Ƒúéł Çóšŧ Çáłçúłáŧóř ········⟧';
+
+  @override
+  String get distanceKm => '⟦Đîšŧáñçé (ķɱ) ·····⟧';
+
+  @override
+  String get consumptionL100km => '⟦Çóñšúɱƥŧîóñ (Ł/100ķɱ) ······⟧';
+
+  @override
+  String get fuelPriceEurL => '⟦Ƒúéł ƥřîçé (ÉÚŘ/Ł) ······⟧';
+
+  @override
+  String get tripCost => '⟦Ŧřîƥ Çóšŧ ····⟧';
+
+  @override
+  String get fuelNeeded => '⟦Ƒúéł ñééđéđ ·····⟧';
+
+  @override
+  String get totalCost => '⟦Ŧóŧáł çóšŧ ····⟧';
+
+  @override
+  String get enterCalcValues =>
+      '⟦Éñŧéř đîšŧáñçé, çóñšúɱƥŧîóñ, áñđ ƥřîçé ŧó çáłçúłáŧé ŧřîƥ çóšŧ ·······················⟧';
+
+  @override
+  String get priceHistory => '⟦Ƥřîçé Ĥîšŧóřý ·····⟧';
+
+  @override
+  String get noPriceHistory => '⟦Ñó ƥřîçé ĥîšŧóřý ýéŧ ········⟧';
+
+  @override
+  String get noHourlyData => '⟦Ñó ĥóúřłý đáŧá ·····⟧';
+
+  @override
+  String get noStatistics => '⟦Ñó šŧáŧîšŧîçš áṽáîłáƀłé ·········⟧';
+
+  @override
+  String get statMin => '⟦Ṁîñ ·⟧';
+
+  @override
+  String get statMax => '⟦Ṁáẋ ·⟧';
+
+  @override
+  String get statAvg => '⟦Áṽǧ ·⟧';
+
+  @override
+  String get showAllFuelTypes => '⟦Šĥóŵ áłł ƒúéł ŧýƥéš ·······⟧';
+
+  @override
+  String get connected => '⟦Çóññéçŧéđ ····⟧';
+
+  @override
+  String get notConnected => '⟦Ñóŧ çóññéçŧéđ ·····⟧';
+
+  @override
+  String get connectTankSync => '⟦Çóññéçŧ ŦáñķŠýñç ·······⟧';
+
+  @override
+  String get disconnectTankSync => '⟦Đîšçóññéçŧ ŦáñķŠýñç ········⟧';
+
+  @override
+  String get viewMyData => '⟦Ṽîéŵ ɱý đáŧá ·····⟧';
+
+  @override
+  String get optionalCloudSync =>
+      '⟦Óƥŧîóñáł çłóúđ šýñç ƒóř áłéřŧš, ƒáṽóřîŧéš, áñđ ƥúšĥ ñóŧîƒîçáŧîóñš ·························⟧';
+
+  @override
+  String get tapToUpdateGps => '⟦Ŧáƥ ŧó úƥđáŧé ǦƤŠ ƥóšîŧîóñ ··········⟧';
+
+  @override
+  String get gpsAutoUpdateHint =>
+      '⟦ǦƤŠ ƥóšîŧîóñ îš áçɋúîřéđ áúŧóɱáŧîçáłłý ŵĥéñ ýóú šéářçĥ. Ýóú çáñ áłšó úƥđáŧé îŧ ɱáñúáłłý ĥéřé. ···································⟧';
+
+  @override
+  String get clearGpsConfirm =>
+      '⟦Çłéář ŧĥé šŧóřéđ ǦƤŠ ƥóšîŧîóñ? Ýóú çáñ úƥđáŧé îŧ áǧáîñ áŧ áñý ŧîɱé. ························⟧';
+
+  @override
+  String get pageNotFound => '⟦Ƥáǧé ñóŧ ƒóúñđ ·····⟧';
+
+  @override
+  String get deleteAllServerData => '⟦Đéłéŧé áłł šéřṽéř đáŧá ·········⟧';
+
+  @override
+  String get deleteServerDataConfirm => '⟦Đéłéŧé áłł šéřṽéř đáŧá? ·········⟧';
+
+  @override
+  String get deleteEverything => '⟦Đéłéŧé éṽéřýŧĥîñǧ ·······⟧';
+
+  @override
+  String get allDataDeleted => '⟦Áłł šéřṽéř đáŧá đéłéŧéđ ·········⟧';
+
+  @override
+  String get forgetAllSyncedTripsButton =>
+      '⟦Ƒóřǧéŧ áłł šýñçéđ ŧřîƥš ·········⟧';
+
+  @override
+  String get forgetAllSyncedTripsConfirmTitle =>
+      '⟦Ƒóřǧéŧ áłł šýñçéđ ŧřîƥš? ·········⟧';
+
+  @override
+  String get forgetAllSyncedTripsConfirmBody =>
+      '⟦Éṽéřý ŧřîƥ šúɱɱářý áñđ đéŧáîł ƀłóƀ ŵîłł ƀé řéɱóṽéđ ƒřóɱ ŧĥé šéřṽéř. Ýóúř łóçáł ŧřîƥ ĥîšŧóřý óñ ŧĥîš đéṽîçé ŵóñ\'ŧ ƀé áƒƒéçŧéđ.\n\nŦĥîš áçŧîóñ çáññóŧ ƀé úñđóñé. ························································⟧';
+
+  @override
+  String get forgetAllSyncedTripsConfirmAction => '⟦Ƒóřǧéŧ áłł ····⟧';
+
+  @override
+  String get forgetAllSyncedTripsSuccess =>
+      '⟦Áłł šýñçéđ ŧřîƥš řéɱóṽéđ ƒřóɱ šéřṽéř ··············⟧';
+
+  @override
+  String get disconnectConfirm => '⟦Đîšçóññéçŧ ŦáñķŠýñç? ········⟧';
+
+  @override
+  String get disconnect => '⟦Đîšçóññéçŧ ·····⟧';
+
+  @override
+  String get myServerData => '⟦Ṁý šéřṽéř đáŧá ·····⟧';
+
+  @override
+  String get anonymousUuid => '⟦Áñóñýɱóúš ÚÚÎĐ ······⟧';
+
+  @override
+  String get server => '⟦Šéřṽéř ···⟧';
+
+  @override
+  String get syncedData => '⟦Šýñçéđ đáŧá ·····⟧';
+
+  @override
+  String get pushTokens => '⟦Ƥúšĥ ŧóķéñš ·····⟧';
+
+  @override
+  String get priceReports => '⟦Ƥřîçé řéƥóřŧš ·····⟧';
+
+  @override
+  String get totalItems => '⟦Ŧóŧáł îŧéɱš ·····⟧';
+
+  @override
+  String get estimatedSize => '⟦Éšŧîɱáŧéđ šîžé ······⟧';
+
+  @override
+  String get viewRawJson => '⟦Ṽîéŵ řáŵ đáŧá áš ĴŠÓÑ ········⟧';
+
+  @override
+  String get exportJson => '⟦Éẋƥóřŧ áš ĴŠÓÑ (çłîƥƀóářđ) ·········⟧';
+
+  @override
+  String get jsonCopied => '⟦ĴŠÓÑ çóƥîéđ ŧó çłîƥƀóářđ ·········⟧';
+
+  @override
+  String get rawDataJson => '⟦Řáŵ đáŧá (ĴŠÓÑ) ·····⟧';
+
+  @override
+  String get close => '⟦Çłóšé ··⟧';
+
+  @override
+  String get account => '⟦Áççóúñŧ ···⟧';
+
+  @override
+  String get continueAsGuest => '⟦Çóñŧîñúé áš ǧúéšŧ ·······⟧';
+
+  @override
+  String get createAccount => '⟦Çřéáŧé áççóúñŧ ······⟧';
+
+  @override
+  String get signIn => '⟦Šîǧñ îñ ···⟧';
+
+  @override
+  String get upgradeToEmail => '⟦Çřéáŧé éɱáîł áççóúñŧ ········⟧';
+
+  @override
+  String get savedRoutes => '⟦Šáṽéđ Řóúŧéš ·····⟧';
+
+  @override
+  String get noSavedRoutes => '⟦Ñó šáṽéđ řóúŧéš ······⟧';
+
+  @override
+  String get noSavedRoutesHint =>
+      '⟦Šéářçĥ áłóñǧ á řóúŧé áñđ šáṽé îŧ ƒóř ɋúîçķ áççéšš łáŧéř. ····················⟧';
+
+  @override
+  String get saveRoute => '⟦Šáṽé řóúŧé ····⟧';
+
+  @override
+  String get routeName => '⟦Řóúŧé ñáɱé ····⟧';
+
+  @override
+  String itineraryDeleted(String name) {
+    return '⟦$name đéłéŧéđ ···⟧';
+  }
+
+  @override
+  String loadingRoute(String name) {
+    return '⟦Łóáđîñǧ řóúŧé: $name ·····⟧';
+  }
+
+  @override
+  String get refreshFailed =>
+      '⟦Řéƒřéšĥ ƒáîłéđ. Ƥłéášé ŧřý áǧáîñ. ············⟧';
+
+  @override
+  String get deleteProfileTitle => '⟦Đéłéŧé ƥřóƒîłé? ······⟧';
+
+  @override
+  String get deleteProfileBody =>
+      '⟦Ŧĥîš ƥřóƒîłé áñđ îŧš šéŧŧîñǧš ŵîłł ƀé ƥéřɱáñéñŧłý đéłéŧéđ. Ŧĥîš çáññóŧ ƀé úñđóñé. ······························⟧';
+
+  @override
+  String get deleteProfileConfirm => '⟦Đéłéŧé ƥřóƒîłé ······⟧';
+
+  @override
+  String get errorNetwork =>
+      '⟦Ñéŧŵóřķ éřřóř. Çĥéçķ ýóúř çóññéçŧîóñ. ··············⟧';
+
+  @override
+  String get errorServer =>
+      '⟦Šéřṽéř éřřóř. Ƥłéášé ŧřý áǧáîñ łáŧéř. ··············⟧';
+
+  @override
+  String get errorTimeout =>
+      '⟦Çóññéçŧîóñ ŧîɱéđ óúŧ. Ƥłéášé ŧřý áǧáîñ. ··············⟧';
+
+  @override
+  String get errorNoConnection => '⟦Ñó îñŧéřñéŧ çóññéçŧîóñ. ·········⟧';
+
+  @override
+  String get errorApiKey =>
+      '⟦Îñṽáłîđ ÁƤÎ ķéý. Çĥéçķ ýóúř šéŧŧîñǧš. ··············⟧';
+
+  @override
+  String get errorLocation =>
+      '⟦Çóúłđ ñóŧ đéŧéřɱîñé ýóúř łóçáŧîóñ. ·············⟧';
+
+  @override
+  String get errorNoApiKey =>
+      '⟦Ñó ÁƤÎ ķéý çóñƒîǧúřéđ. Ǧó ŧó Šéŧŧîñǧš ŧó áđđ óñé. ·················⟧';
+
+  @override
+  String get errorAllServicesFailed =>
+      '⟦Çóúłđ ñóŧ łóáđ đáŧá. Çĥéçķ ýóúř çóññéçŧîóñ áñđ ŧřý áǧáîñ. ·····················⟧';
+
+  @override
+  String get errorCache =>
+      '⟦Łóçáł đáŧá éřřóř. Ŧřý çłéářîñǧ ŧĥé çáçĥé. ···············⟧';
+
+  @override
+  String get errorCancelled => '⟦Řéɋúéšŧ ŵáš çáñçéłłéđ. ·········⟧';
+
+  @override
+  String get errorUnknown => '⟦Áñ úñéẋƥéçŧéđ éřřóř óççúřřéđ. ···········⟧';
+
+  @override
+  String get onboardingWelcomeHint =>
+      '⟦Šéŧ úƥ ŧĥé áƥƥ îñ á ƒéŵ ɋúîçķ šŧéƥš. ············⟧';
+
+  @override
+  String get onboardingApiKeyDescription =>
+      '⟦Řéǧîšŧéř ƒóř á ƒřéé ÁƤÎ ķéý, óř šķîƥ ŧó éẋƥłóřé ŧĥé áƥƥ ŵîŧĥ đéɱó đáŧá. ·························⟧';
+
+  @override
+  String get onboardingComplete => '⟦Áłł šéŧ! ···⟧';
+
+  @override
+  String get onboardingCompleteHint =>
+      '⟦Ýóú çáñ çĥáñǧé ŧĥéšé šéŧŧîñǧš áñýŧîɱé îñ ýóúř ƥřóƒîłé. ····················⟧';
+
+  @override
+  String get onboardingBack => '⟦Ɓáçķ ··⟧';
+
+  @override
+  String get onboardingNext => '⟦Ñéẋŧ ··⟧';
+
+  @override
+  String get onboardingSkip => '⟦Šķîƥ ··⟧';
+
+  @override
+  String get onboardingFinish => '⟦Ǧéŧ šŧářŧéđ ·····⟧';
+
+  @override
+  String crossBorderNearby(String country) {
+    return '⟦$country îš ñéářƀý ····⟧';
+  }
+
+  @override
+  String crossBorderDistance(int km) {
+    return '⟦~$km ķɱ ŧó ƀóřđéř ·····⟧';
+  }
+
+  @override
+  String crossBorderAvgPrice(String price, int count) {
+    return '⟦Áṽǧ ĥéřé: $price ÉÚŘ ($count šŧáŧîóñš) ········⟧';
+  }
+
+  @override
+  String get allPricesView => '⟦Áłł ƥřîçéš ····⟧';
+
+  @override
+  String get compactView => '⟦Çóɱƥáçŧ ···⟧';
+
+  @override
+  String get switchToAllPricesView => '⟦Šŵîŧçĥ ŧó áłł-ƥřîçéš ṽîéŵ ·········⟧';
+
+  @override
+  String get switchToCompactView => '⟦Šŵîŧçĥ ŧó çóɱƥáçŧ ṽîéŵ ·········⟧';
+
+  @override
+  String get unavailable => '⟦Ñ/Á ·⟧';
+
+  @override
+  String get outOfStock => '⟦Óúŧ óƒ šŧóçķ ·····⟧';
+
+  @override
+  String get gdprTitle => '⟦Ýóúř Ƥřîṽáçý ·····⟧';
+
+  @override
+  String get gdprSubtitle =>
+      '⟦Ŧĥîš áƥƥ řéšƥéçŧš ýóúř ƥřîṽáçý. Çĥóóšé ŵĥîçĥ đáŧá ýóú ŵáñŧ ŧó šĥářé. Ýóú çáñ çĥáñǧé ŧĥéšé šéŧŧîñǧš áñýŧîɱé. ·······································⟧';
+
+  @override
+  String get gdprLocationTitle => '⟦Łóçáŧîóñ Áççéšš ······⟧';
+
+  @override
+  String get gdprLocationDescription =>
+      '⟦Ýóúř çóóřđîñáŧéš ářé šéñŧ ŧó ŧĥé ƒúéł ƥřîçé ÁƤÎ ŧó ƒîñđ ñéářƀý šŧáŧîóñš. Łóçáŧîóñ đáŧá îš ñéṽéř šŧóřéđ óñ á šéřṽéř áñđ îš ñóŧ úšéđ ƒóř ŧřáçķîñǧ. ····················································⟧';
+
+  @override
+  String get gdprLocationShort =>
+      '⟦Ƒîñđ ñéářƀý ƒúéł šŧáŧîóñš úšîñǧ ýóúř łóçáŧîóñ ··················⟧';
+
+  @override
+  String get gdprErrorReportingTitle => '⟦Éřřóř Řéƥóřŧîñǧ ······⟧';
+
+  @override
+  String get gdprErrorReportingDescription =>
+      '⟦Áñóñýɱóúš çřášĥ řéƥóřŧš ĥéłƥ îɱƥřóṽé ŧĥé áƥƥ. Ñó ƥéřšóñáł đáŧá îš îñçłúđéđ. Řéƥóřŧš ářé šéñŧ ṽîá Šéñŧřý óñłý ŵĥéñ çóñƒîǧúřéđ. ··············································⟧';
+
+  @override
+  String get gdprErrorReportingShort =>
+      '⟦Šéñđ áñóñýɱóúš çřášĥ řéƥóřŧš ŧó îɱƥřóṽé ŧĥé áƥƥ ··················⟧';
+
+  @override
+  String get gdprCloudSyncTitle => '⟦Çłóúđ Šýñç ····⟧';
+
+  @override
+  String get gdprCloudSyncDescription =>
+      '⟦Šýñç ƒáṽóřîŧéš áñđ áłéřŧš áçřóšš đéṽîçéš ṽîá ŦáñķŠýñç. Úšéš áñóñýɱóúš áúŧĥéñŧîçáŧîóñ. Ýóúř đáŧá îš éñçřýƥŧéđ îñ ŧřáñšîŧ. ·············································⟧';
+
+  @override
+  String get gdprCloudSyncShort =>
+      '⟦Šýñç ƒáṽóřîŧéš áñđ áłéřŧš áçřóšš đéṽîçéš ················⟧';
+
+  @override
+  String get gdprLegalBasis =>
+      '⟦Łéǧáł ƀášîš: Ářŧ. 6(1)(á) ǦĐƤŘ (Çóñšéñŧ). Ýóú çáñ ŵîŧĥđřáŵ çóñšéñŧ áñýŧîɱé îñ Šéŧŧîñǧš. ····························⟧';
+
+  @override
+  String get gdprAcceptAll => '⟦Áççéƥŧ Áłł ····⟧';
+
+  @override
+  String get gdprAcceptSelected => '⟦Áççéƥŧ Šéłéçŧéđ ······⟧';
+
+  @override
+  String get gdprSettingsHint =>
+      '⟦Ýóú çáñ çĥáñǧé ýóúř ƥřîṽáçý çĥóîçéš áŧ áñý ŧîɱé. ··················⟧';
+
+  @override
+  String get routeSaved => '⟦Řóúŧé šáṽéđ! ·····⟧';
+
+  @override
+  String get routeSaveFailed => '⟦Ƒáîłéđ ŧó šáṽé řóúŧé ········⟧';
+
+  @override
+  String get sqlCopied => '⟦ŠɊŁ çóƥîéđ ŧó çłîƥƀóářđ ·········⟧';
+
+  @override
+  String get connectionDataCopied => '⟦Çóññéçŧîóñ đáŧá çóƥîéđ ·········⟧';
+
+  @override
+  String get accountDeleted =>
+      '⟦Áççóúñŧ đéłéŧéđ. Łóçáł đáŧá ƥřéšéřṽéđ. ··············⟧';
+
+  @override
+  String get switchedToAnonymous =>
+      '⟦Šŵîŧçĥéđ ŧó áñóñýɱóúš šéššîóñ ············⟧';
+
+  @override
+  String failedToSwitch(String error) {
+    return '⟦Ƒáîłéđ ŧó šŵîŧçĥ: $error ······⟧';
+  }
+
+  @override
+  String get topicUrlCopied => '⟦Ŧóƥîç ÚŘŁ çóƥîéđ ······⟧';
+
+  @override
+  String get testNotificationSent => '⟦Ŧéšŧ ñóŧîƒîçáŧîóñ šéñŧ! ·········⟧';
+
+  @override
+  String get testNotificationFailed =>
+      '⟦Ƒáîłéđ ŧó šéñđ ŧéšŧ ñóŧîƒîçáŧîóñ ·············⟧';
+
+  @override
+  String get pushUpdateFailed =>
+      '⟦Ƒáîłéđ ŧó úƥđáŧé ƥúšĥ ñóŧîƒîçáŧîóñ šéŧŧîñǧ ·················⟧';
+
+  @override
+  String get connectedAsGuest => '⟦Çóññéçŧéđ áš ǧúéšŧ ·······⟧';
+
+  @override
+  String get accountCreated => '⟦Áççóúñŧ çřéáŧéđ! ······⟧';
+
+  @override
+  String get signedIn => '⟦Šîǧñéđ îñ! ····⟧';
+
+  @override
+  String stationHidden(String name) {
+    return '⟦$name ĥîđđéñ ···⟧';
+  }
+
+  @override
+  String removedFromFavoritesName(String name) {
+    return '⟦$name řéɱóṽéđ ƒřóɱ ƒáṽóřîŧéš ·········⟧';
+  }
+
+  @override
+  String invalidApiKey(String error) {
+    return '⟦Îñṽáłîđ ÁƤÎ ķéý: $error ······⟧';
+  }
+
+  @override
+  String get invalidQrCode => '⟦Îñṽáłîđ ɊŘ çóđé ƒóřɱáŧ ·········⟧';
+
+  @override
+  String get invalidQrCodeTankSync =>
+      '⟦Îñṽáłîđ ɊŘ çóđé — éẋƥéçŧéđ ŦáñķŠýñç ƒóřɱáŧ ················⟧';
+
+  @override
+  String get tankSyncConnected => '⟦ŦáñķŠýñç çóññéçŧéđ! ········⟧';
+
+  @override
+  String get syncCompleted => '⟦Šýñç çóɱƥłéŧéđ — đáŧá řéƒřéšĥéđ ············⟧';
+
+  @override
+  String get deviceCodeCopied => '⟦Đéṽîçé çóđé çóƥîéđ ·······⟧';
+
+  @override
+  String get undo => '⟦Úñđó ··⟧';
+
+  @override
+  String invalidPostalCode(String length, String label) {
+    return '⟦Ƥłéášé éñŧéř á ṽáłîđ $length-đîǧîŧ $label ··········⟧';
+  }
+
+  @override
+  String get freshnessAgo => '⟦áǧó ·⟧';
+
+  @override
+  String get freshnessStale => '⟦Šŧáłé ··⟧';
+
+  @override
+  String freshnessBadgeSemantics(String age) {
+    return '⟦Đáŧá ƒřéšĥñéšš: $age ······⟧';
+  }
+
+  @override
+  String brandLogoLabel(String brand) {
+    return '⟦$brand łóǧó ··⟧';
+  }
+
+  @override
+  String ratingStarLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Rate $count stars',
+      one: 'Rate 1 star',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get passwordStrengthWeak => '⟦Ŵéáķ ··⟧';
+
+  @override
+  String get passwordStrengthFair => '⟦Ƒáîř ··⟧';
+
+  @override
+  String get passwordStrengthStrong => '⟦Šŧřóñǧ ···⟧';
+
+  @override
+  String get passwordReqMinLength => '⟦Áŧ łéášŧ 8 çĥářáçŧéřš ········⟧';
+
+  @override
+  String get passwordReqUppercase => '⟦Áŧ łéášŧ 1 úƥƥéřçášé łéŧŧéř ··········⟧';
+
+  @override
+  String get passwordReqLowercase => '⟦Áŧ łéášŧ 1 łóŵéřçášé łéŧŧéř ··········⟧';
+
+  @override
+  String get passwordReqDigit => '⟦Áŧ łéášŧ 1 ñúɱƀéř ······⟧';
+
+  @override
+  String get passwordReqSpecial => '⟦Áŧ łéášŧ 1 šƥéçîáł çĥářáçŧéř ··········⟧';
+
+  @override
+  String get passwordTooWeak =>
+      '⟦Ƥáššŵóřđ đóéš ñóŧ ɱééŧ áłł řéɋúîřéɱéñŧš ···············⟧';
+
+  @override
+  String get brandFilterAll => '⟦Áłł ·⟧';
+
+  @override
+  String get brandFilterNoHighway => '⟦Ñó ĥîǧĥŵáý ····⟧';
+
+  @override
+  String get swipeTutorialMessage =>
+      '⟦Šŵîƥé řîǧĥŧ ŧó ñáṽîǧáŧé, šŵîƥé łéƒŧ ŧó řéɱóṽé ·················⟧';
+
+  @override
+  String get swipeTutorialDismiss => '⟦Ǧóŧ îŧ ··⟧';
+
+  @override
+  String get alertStatsActive => '⟦Áçŧîṽé ···⟧';
+
+  @override
+  String get alertStatsToday => '⟦Ŧóđáý ··⟧';
+
+  @override
+  String get alertStatsThisWeek => '⟦Ŧĥîš ŵééķ ····⟧';
+
+  @override
+  String get privacyDashboardTitle => '⟦Ƥřîṽáçý Đášĥƀóářđ ·······⟧';
+
+  @override
+  String get privacyDashboardSubtitle =>
+      '⟦Ṽîéŵ, éẋƥóřŧ, óř đéłéŧé ýóúř đáŧá ············⟧';
+
+  @override
+  String get privacyDashboardBanner =>
+      '⟦Ýóúř đáŧá ƀéłóñǧš ŧó ýóú. Ĥéřé ýóú çáñ šéé éṽéřýŧĥîñǧ ŧĥîš áƥƥ šŧóřéš, éẋƥóřŧ îŧ, óř đéłéŧé îŧ. ·································⟧';
+
+  @override
+  String get privacyLocalData => '⟦Đáŧá óñ ŧĥîš đéṽîçé ·······⟧';
+
+  @override
+  String get privacyIgnoredStations => '⟦Îǧñóřéđ šŧáŧîóñš ·······⟧';
+
+  @override
+  String get privacyRatings => '⟦Šŧáŧîóñ řáŧîñǧš ······⟧';
+
+  @override
+  String get privacyPriceHistory => '⟦Ƥřîçé ĥîšŧóřý šŧáŧîóñš ·········⟧';
+
+  @override
+  String get privacyProfiles => '⟦Šéářçĥ ƥřóƒîłéš ······⟧';
+
+  @override
+  String get privacyItineraries => '⟦Šáṽéđ řóúŧéš ·····⟧';
+
+  @override
+  String get privacyCacheEntries => '⟦Çáçĥé éñŧřîéš ·····⟧';
+
+  @override
+  String get privacyApiKey => '⟦ÁƤÎ ķéý šŧóřéđ ·····⟧';
+
+  @override
+  String get privacyEvApiKey => '⟦ÉṼ ÁƤÎ ķéý šŧóřéđ ······⟧';
+
+  @override
+  String get privacyEstimatedSize => '⟦Éšŧîɱáŧéđ šŧóřáǧé ·······⟧';
+
+  @override
+  String get privacySyncedData => '⟦Çłóúđ šýñç (ŦáñķŠýñç) ········⟧';
+
+  @override
+  String get privacySyncDisabled =>
+      '⟦Çłóúđ šýñç îš đîšáƀłéđ. Áłł đáŧá šŧáýš óñ ŧĥîš đéṽîçé óñłý. ·····················⟧';
+
+  @override
+  String get privacySyncMode => '⟦Šýñç ɱóđé ····⟧';
+
+  @override
+  String get privacySyncUserId => '⟦Úšéř ÎĐ ···⟧';
+
+  @override
+  String get privacySyncDescription =>
+      '⟦Ŵĥéñ šýñç îš éñáƀłéđ, ƒáṽóřîŧéš, áłéřŧš, îǧñóřéđ šŧáŧîóñš, áñđ řáŧîñǧš ářé áłšó šŧóřéđ óñ ŧĥé ŦáñķŠýñç šéřṽéř. ········································⟧';
+
+  @override
+  String get privacyViewServerData => '⟦Ṽîéŵ šéřṽéř đáŧá ······⟧';
+
+  @override
+  String get privacyExportButton => '⟦Éẋƥóřŧ áłł đáŧá áš ĴŠÓÑ ·········⟧';
+
+  @override
+  String get privacyExportSuccess => '⟦Đáŧá éẋƥóřŧéđ ŧó çłîƥƀóářđ ··········⟧';
+
+  @override
+  String get privacyExportCsvButton => '⟦Éẋƥóřŧ áłł đáŧá áš ÇŠṼ ········⟧';
+
+  @override
+  String get privacyExportCsvSuccess =>
+      '⟦ÇŠṼ đáŧá éẋƥóřŧéđ ŧó çłîƥƀóářđ ············⟧';
+
+  @override
+  String get privacyDeleteButton => '⟦Đéłéŧé áłł đáŧá ······⟧';
+
+  @override
+  String privacyCopyErrorLog(int count) {
+    return '⟦Çóƥý éřřóř łóǧ ŧó çłîƥƀóářđ ($count) ··········⟧';
+  }
+
+  @override
+  String get privacyDeleteTitle => '⟦Đéłéŧé áłł đáŧá? ······⟧';
+
+  @override
+  String get privacyDeleteBody =>
+      '⟦Ŧĥîš ŵîłł ƥéřɱáñéñŧłý đéłéŧé:\n\n- Áłł ƒáṽóřîŧéš áñđ šŧáŧîóñ đáŧá\n- Áłł šéářçĥ ƥřóƒîłéš\n- Áłł ƥřîçé áłéřŧš\n- Áłł ƥřîçé ĥîšŧóřý\n- Áłł çáçĥéđ đáŧá\n- Ýóúř ÁƤÎ ķéý\n- Áłł áƥƥ šéŧŧîñǧš\n\nŦĥé áƥƥ ŵîłł řéšéŧ ŧó îŧš îñîŧîáł šŧáŧé. Ŧĥîš áçŧîóñ çáññóŧ ƀé úñđóñé. ······················································································⟧';
+
+  @override
+  String get privacyDeleteConfirm => '⟦Đéłéŧé éṽéřýŧĥîñǧ ·······⟧';
+
+  @override
+  String get yes => '⟦Ýéš ·⟧';
+
+  @override
+  String get no => '⟦Ñó ·⟧';
+
+  @override
+  String get amenities => '⟦Áɱéñîŧîéš ····⟧';
+
+  @override
+  String get amenityShop => '⟦Šĥóƥ ··⟧';
+
+  @override
+  String get amenityCarWash => '⟦Çář Ŵášĥ ···⟧';
+
+  @override
+  String get amenityAirPump => '⟦Áîř ·⟧';
+
+  @override
+  String get amenityToilet => '⟦ŴÇ ·⟧';
+
+  @override
+  String get amenityRestaurant => '⟦Ƒóóđ ··⟧';
+
+  @override
+  String get amenityAtm => '⟦ÁŦṀ ·⟧';
+
+  @override
+  String get amenityWifi => '⟦ŴîƑî ··⟧';
+
+  @override
+  String get amenityEv => '⟦ÉṼ ·⟧';
+
+  @override
+  String get paymentMethods => '⟦Ƥáýɱéñŧ ɱéŧĥóđš ······⟧';
+
+  @override
+  String get paymentMethodCash => '⟦Çášĥ ··⟧';
+
+  @override
+  String get paymentMethodCard => '⟦Çářđ ··⟧';
+
+  @override
+  String get paymentMethodContactless => '⟦Çóñŧáçŧłéšš ·····⟧';
+
+  @override
+  String get paymentMethodFuelCard => '⟦Ƒúéł Çářđ ····⟧';
+
+  @override
+  String get paymentMethodApp => '⟦Áƥƥ ·⟧';
+
+  @override
+  String payWithApp(String app) {
+    return '⟦Ƥáý ŵîŧĥ $app ···⟧';
+  }
+
+  @override
+  String ecoScoreConsumption(String value) {
+    return '⟦$value Ł/100 ķɱ ·⟧';
+  }
+
+  @override
+  String ecoScoreTooltip(String avg) {
+    return '⟦Çóɱƥářéđ ŧó ŧĥé řółłîñǧ áṽéřáǧé óṽéř ýóúř łášŧ 3 ƒîłł-úƥš ($avg Ł/100 ķɱ). ······················⟧';
+  }
+
+  @override
+  String ecoScoreSemantics(String value, String delta) {
+    return '⟦Çóñšúɱƥŧîóñ $value Ł/100 ķɱ, $delta ṽéřšúš ýóúř řółłîñǧ áṽéřáǧé ·················⟧';
+  }
+
+  @override
+  String get drivingMode => '⟦Đřîṽîñǧ Ṁóđé ·····⟧';
+
+  @override
+  String get drivingExit => '⟦Éẋîŧ ··⟧';
+
+  @override
+  String get drivingNearestStation => '⟦Ñéářéšŧ ···⟧';
+
+  @override
+  String get drivingTapToUnlock => '⟦Ŧáƥ ŧó úñłóçķ ·····⟧';
+
+  @override
+  String get drivingSafetyTitle => '⟦Šáƒéŧý Ñóŧîçé ·····⟧';
+
+  @override
+  String get drivingSafetyMessage =>
+      '⟦Đó ñóŧ óƥéřáŧé ŧĥé áƥƥ ŵĥîłé đřîṽîñǧ. Ƥúłł óṽéř ŧó á šáƒé łóçáŧîóñ ƀéƒóřé îñŧéřáçŧîñǧ ŵîŧĥ ŧĥé šçřééñ. Ŧĥé đřîṽéř îš řéšƥóñšîƀłé ƒóř šáƒé óƥéřáŧîóñ óƒ ŧĥé ṽéĥîçłé áŧ áłł ŧîɱéš. ································································⟧';
+
+  @override
+  String get drivingSafetyAccept => '⟦Î úñđéřšŧáñđ ·····⟧';
+
+  @override
+  String get voiceAnnouncementsTitle => '⟦Ṽóîçé Áññóúñçéɱéñŧš ········⟧';
+
+  @override
+  String get voiceAnnouncementsDescription =>
+      '⟦Áññóúñçé ñéářƀý çĥéáƥ šŧáŧîóñš ŵĥîłé đřîṽîñǧ ··················⟧';
+
+  @override
+  String get voiceAnnouncementsEnabled =>
+      '⟦Éñáƀłé ṽóîçé áññóúñçéɱéñŧš ···········⟧';
+
+  @override
+  String voiceAnnouncementThreshold(String price) {
+    return '⟦Óñłý ƀéłóŵ $price ····⟧';
+  }
+
+  @override
+  String voiceAnnouncementCheapFuel(
+    String station,
+    String distance,
+    String fuelType,
+    String price,
+  ) {
+    return '⟦$station, $distance ķîłóɱéŧéřš áĥéáđ, $fuelType $price ·······⟧';
+  }
+
+  @override
+  String get voiceAnnouncementProximityRadius =>
+      '⟦Áññóúñçéɱéñŧ řáđîúš ········⟧';
+
+  @override
+  String get voiceAnnouncementCooldown => '⟦Řéƥéáŧ îñŧéřṽáł ······⟧';
+
+  @override
+  String get nearestStations => '⟦Ñéářéšŧ šŧáŧîóñš ·······⟧';
+
+  @override
+  String get nearestStationsHint =>
+      '⟦Ƒîñđ ŧĥé çłóšéšŧ šŧáŧîóñš úšîñǧ ýóúř çúřřéñŧ łóçáŧîóñ ·····················⟧';
+
+  @override
+  String get consumptionLogTitle => '⟦Ƒúéł çóñšúɱƥŧîóñ ·······⟧';
+
+  @override
+  String get consumptionLogMenuTitle => '⟦Çóñšúɱƥŧîóñ łóǧ ······⟧';
+
+  @override
+  String get consumptionLogMenuSubtitle =>
+      '⟦Ŧřáçķ ƒîłł-úƥš áñđ çáłçúłáŧé Ł/100ķɱ ············⟧';
+
+  @override
+  String get consumptionStatsTitle => '⟦Çóñšúɱƥŧîóñ šŧáŧš ·······⟧';
+
+  @override
+  String get addFillUp => '⟦Áđđ ƒîłł-úƥ ····⟧';
+
+  @override
+  String get noFillUpsTitle => '⟦Ñó ƒîłł-úƥš ýéŧ ·····⟧';
+
+  @override
+  String get noFillUpsSubtitle =>
+      '⟦Łóǧ ýóúř ƒîřšŧ ƒîłł-úƥ ŧó šŧářŧ ŧřáçķîñǧ çóñšúɱƥŧîóñ. ····················⟧';
+
+  @override
+  String get fillUpDate => '⟦Đáŧé ··⟧';
+
+  @override
+  String get liters => '⟦Łîŧéřš ···⟧';
+
+  @override
+  String get odometerKm => '⟦Óđóɱéŧéř (ķɱ) ·····⟧';
+
+  @override
+  String get notesOptional => '⟦Ñóŧéš (óƥŧîóñáł) ······⟧';
+
+  @override
+  String get stationPreFilled => '⟦Šŧáŧîóñ ƥřé-ƒîłłéđ ·······⟧';
+
+  @override
+  String get statAvgConsumption => '⟦Áṽǧ Ł/100ķɱ ···⟧';
+
+  @override
+  String get statAvgCostPerKm => '⟦Áṽǧ çóšŧ/ķɱ ····⟧';
+
+  @override
+  String get statTotalLiters => '⟦Ŧóŧáł łîŧéřš ·····⟧';
+
+  @override
+  String get statTotalSpent => '⟦Ŧóŧáł šƥéñŧ ·····⟧';
+
+  @override
+  String get statFillUpCount => '⟦Ƒîłł-úƥš ···⟧';
+
+  @override
+  String get fieldRequired => '⟦Řéɋúîřéđ ····⟧';
+
+  @override
+  String get fieldInvalidNumber => '⟦Îñṽáłîđ ñúɱƀéř ······⟧';
+
+  @override
+  String get carbonDashboardTitle => '⟦Çářƀóñ đášĥƀóářđ ·······⟧';
+
+  @override
+  String get carbonEmptyTitle => '⟦Ñó đáŧá ýéŧ ····⟧';
+
+  @override
+  String get carbonEmptySubtitle =>
+      '⟦Łóǧ ƒîłł-úƥš ŧó šéé ýóúř çářƀóñ đášĥƀóářđ. ···············⟧';
+
+  @override
+  String get carbonSummaryTotalCost => '⟦Ŧóŧáł çóšŧ ····⟧';
+
+  @override
+  String get carbonSummaryTotalCo2 => '⟦Ŧóŧáł ÇÓ2 ···⟧';
+
+  @override
+  String get monthlyCostsTitle => '⟦Ṁóñŧĥłý çóšŧš ·····⟧';
+
+  @override
+  String get monthlyEmissionsTitle => '⟦Ṁóñŧĥłý ÇÓ2 éɱîššîóñš ········⟧';
+
+  @override
+  String get vehiclesTitle => '⟦Ṁý ṽéĥîçłéš ·····⟧';
+
+  @override
+  String get vehiclesMenuTitle => '⟦Ṁý ṽéĥîçłéš ·····⟧';
+
+  @override
+  String get vehiclesMenuSubtitle =>
+      '⟦Ɓáŧŧéřý, çóññéçŧóřš, çĥářǧîñǧ ƥřéƒéřéñçéš ················⟧';
+
+  @override
+  String get vehiclesEmptyMessage =>
+      '⟦Áđđ ýóúř çář ŧó ƒîłŧéř ƀý çóññéçŧóř áñđ éšŧîɱáŧé çĥářǧîñǧ çóšŧš. ························⟧';
+
+  @override
+  String get vehiclesWizardTitle => '⟦Ṁý ṽéĥîçłéš (óƥŧîóñáł) ········⟧';
+
+  @override
+  String get vehiclesWizardSubtitle =>
+      '⟦Áđđ ýóúř çář ŧó ƥřé-ƒîłł ŧĥé çóñšúɱƥŧîóñ łóǧ áñđ éñáƀłé ÉṼ çóññéçŧóř ƒîłŧéřš. Ýóú çáñ šķîƥ ŧĥîš áñđ áđđ ṽéĥîçłéš łáŧéř. ···········································⟧';
+
+  @override
+  String get vehiclesWizardNoneYet => '⟦Ñó ṽéĥîçłé çóñƒîǧúřéđ ýéŧ. ··········⟧';
+
+  @override
+  String vehiclesWizardYoursList(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vehicles',
+      one: '1 vehicle',
+    );
+    return '⟦Ýóú ĥáṽé $_temp0: ···⟧';
+  }
+
+  @override
+  String get vehiclesWizardSkipHint =>
+      '⟦Šķîƥ ŧó ƒîñîšĥ šéŧúƥ — ýóú çáñ áđđ ṽéĥîçłéš áñýŧîɱé ƒřóɱ Šéŧŧîñǧš. ························⟧';
+
+  @override
+  String get fillUpVehicleLabel => '⟦Ṽéĥîçłé ···⟧';
+
+  @override
+  String get fillUpVehicleNone => '⟦Ñó ṽéĥîçłé ····⟧';
+
+  @override
+  String get fillUpVehicleRequired => '⟦Ṽéĥîçłé îš řéɋúîřéđ ········⟧';
+
+  @override
+  String get reportScanError => '⟦Řéƥóřŧ šçáñ éřřóř ·······⟧';
+
+  @override
+  String get pickStationTitle => '⟦Ƥîçķ á šŧáŧîóñ ·····⟧';
+
+  @override
+  String get pickStationHelper =>
+      '⟦Šŧářŧ ŧĥé ƒîłł-úƥ ƒřóɱ á ķñóŵñ šŧáŧîóñ šó ƥřîçéš, ƀřáñđ áñđ ƒúéł ŧýƥé ƒîłł ŧĥéɱšéłṽéš îñ. ································⟧';
+
+  @override
+  String get pickStationEmpty =>
+      '⟦Ñó ƒáṽóřîŧé šŧáŧîóñš ýéŧ — áđđ šóɱé ƒřóɱ Šéářçĥ óř Ƒáṽóřîŧéš, óř šķîƥ áñđ ƒîłł îñ ɱáñúáłłý. ································⟧';
+
+  @override
+  String get pickStationSkip => '⟦Šķîƥ — áđđ ŵîŧĥóúŧ á šŧáŧîóñ ··········⟧';
+
+  @override
+  String get scanPump => '⟦Šçáñ ƥúɱƥ ····⟧';
+
+  @override
+  String get scanPayment => '⟦Šçáñ ƥáýɱéñŧ ɊŘ ······⟧';
+
+  @override
+  String get qrPaymentBeneficiary => '⟦Ɓéñéƒîçîářý ·····⟧';
+
+  @override
+  String get qrPaymentAmount => '⟦Áɱóúñŧ ···⟧';
+
+  @override
+  String get qrPaymentEpcTitle => '⟦ŠÉƤÁ ƥáýɱéñŧ ·····⟧';
+
+  @override
+  String get qrPaymentEpcEmpty => '⟦Ñó ƒîéłđš đéçóđéđ ·······⟧';
+
+  @override
+  String get qrPaymentOpenInBank => '⟦Óƥéñ îñ ƀáñķ áƥƥ ······⟧';
+
+  @override
+  String get qrPaymentLaunchFailed =>
+      '⟦Ñó áƥƥ áṽáîłáƀłé ŧó óƥéñ ŧĥîš çóđé ·············⟧';
+
+  @override
+  String get qrPaymentUnknownTitle => '⟦Úñřéçóǧñîšéđ çóđé ·······⟧';
+
+  @override
+  String get qrPaymentCopyRaw => '⟦Çóƥý řáŵ ŧéẋŧ ·····⟧';
+
+  @override
+  String get qrPaymentCopiedRaw => '⟦Çóƥîéđ ŧó çłîƥƀóářđ ········⟧';
+
+  @override
+  String get qrPaymentReport => '⟦Řéƥóřŧ ŧĥîš šçáñ ······⟧';
+
+  @override
+  String get qrPaymentEpcCopied =>
+      '⟦Ɓáñķ đéŧáîłš çóƥîéđ — ƥášŧé îñŧó ýóúř ƀáñķîñǧ áƥƥ ··················⟧';
+
+  @override
+  String get qrScannerGuidance => '⟦Ƥóîñŧ ŧĥé çáɱéřá áŧ á ɊŘ çóđé ··········⟧';
+
+  @override
+  String get qrScannerPermissionDenied =>
+      '⟦Çáɱéřá áççéšš îš ñééđéđ ŧó šçáñ ɊŘ çóđéš. ···············⟧';
+
+  @override
+  String get qrScannerPermissionPermanentlyDenied =>
+      '⟦Çáɱéřá áççéšš ŵáš đéñîéđ. Óƥéñ šéŧŧîñǧš ŧó ǧřáñŧ îŧ. ···················⟧';
+
+  @override
+  String get qrScannerRetryPermission => '⟦Ŧřý áǧáîñ ····⟧';
+
+  @override
+  String get qrScannerOpenSettings => '⟦Óƥéñ šéŧŧîñǧš ·····⟧';
+
+  @override
+  String get qrScannerTimeout =>
+      '⟦Ñó ɊŘ çóđé đéŧéçŧéđ. Ṁóṽé çłóšéř óř ŧřý áǧáîñ. ················⟧';
+
+  @override
+  String get qrScannerRetry => '⟦Ŧřý áǧáîñ ····⟧';
+
+  @override
+  String get torchOn => '⟦Ŧúřñ ƒłášĥ óñ ·····⟧';
+
+  @override
+  String get torchOff => '⟦Ŧúřñ ƒłášĥ óƒƒ ·····⟧';
+
+  @override
+  String get obdNoAdapter => '⟦Ñó ÓƁĐ2 áđáƥŧéř îñ řáñǧé ·········⟧';
+
+  @override
+  String get obdOdometerUnavailable => '⟦Çóúłđ ñóŧ řéáđ óđóɱéŧéř ·········⟧';
+
+  @override
+  String get obdPermissionDenied =>
+      '⟦Ǧřáñŧ Ɓłúéŧóóŧĥ ƥéřɱîššîóñ îñ šýšŧéɱ šéŧŧîñǧš ··················⟧';
+
+  @override
+  String get obdAdapterUnresponsive =>
+      '⟦Áđáƥŧéř đîđñ\'ŧ áñšŵéř — ŧúřñ ŧĥé îǧñîŧîóñ óñ áñđ řéŧřý ···················⟧';
+
+  @override
+  String get obdPickerTitle => '⟦Ƥîçķ áñ ÓƁĐ2 áđáƥŧéř ·······⟧';
+
+  @override
+  String get obdPickerScanning => '⟦Šçáññîñǧ ƒóř áđáƥŧéřš… ·········⟧';
+
+  @override
+  String get obdPickerConnecting => '⟦Çóññéçŧîñǧ… ·····⟧';
+
+  @override
+  String get themeSettingTitle => '⟦Ŧĥéɱé ··⟧';
+
+  @override
+  String get themeModeLight => '⟦Łîǧĥŧ ··⟧';
+
+  @override
+  String get themeModeDark => '⟦Đářķ ··⟧';
+
+  @override
+  String get themeModeSystem => '⟦Ƒółłóŵ šýšŧéɱ ·····⟧';
+
+  @override
+  String get tripRecordingTitle => '⟦Řéçóřđîñǧ ŧřîƥ ······⟧';
+
+  @override
+  String get tripSummaryTitle => '⟦Ŧřîƥ šúɱɱářý ·····⟧';
+
+  @override
+  String get tripMetricDistance => '⟦Đîšŧáñçé ····⟧';
+
+  @override
+  String get tripMetricSpeed => '⟦Šƥééđ ··⟧';
+
+  @override
+  String get tripMetricFuelUsed => '⟦Ƒúéł úšéđ ····⟧';
+
+  @override
+  String get tripMetricAvgConsumption => '⟦Áṽǧ ·⟧';
+
+  @override
+  String get tripMetricElapsed => '⟦Éłáƥšéđ ···⟧';
+
+  @override
+  String get tripMetricOdometer => '⟦Óđóɱéŧéř ····⟧';
+
+  @override
+  String get tripStop => '⟦Šŧóƥ řéçóřđîñǧ ······⟧';
+
+  @override
+  String get tripPause => '⟦Ƥáúšé ··⟧';
+
+  @override
+  String get tripResume => '⟦Řéšúɱé ···⟧';
+
+  @override
+  String get tripBannerRecording => '⟦Řéçóřđîñǧ ŧřîƥ ······⟧';
+
+  @override
+  String get tripBannerPaused => '⟦Ŧřîƥ ƥáúšéđ — ŧáƥ ŧó řéšúɱé ·········⟧';
+
+  @override
+  String get navConsumption => '⟦Çóñšúɱƥŧîóñ ·····⟧';
+
+  @override
+  String get vehicleBaselineSectionTitle => '⟦Ɓášéłîñé çáłîƀřáŧîóñ ·········⟧';
+
+  @override
+  String get vehicleBaselineEmpty =>
+      '⟦Ñó šáɱƥłéš ýéŧ — šŧářŧ áñ ÓƁĐ2 ŧřîƥ ŧó ƀéǧîñ łéářñîñǧ ŧĥîš ṽéĥîçłé\'š ƒúéł ƥřóƒîłé. ·····························⟧';
+
+  @override
+  String get vehicleBaselineProgress =>
+      '⟦Łéářñéđ ƒřóɱ šáɱƥłéš áçřóšš đřîṽîñǧ šîŧúáŧîóñš. ··················⟧';
+
+  @override
+  String get vehicleBaselineReset =>
+      '⟦Řéšéŧ đřîṽîñǧ-šîŧúáŧîóñ ƀášéłîñé ·············⟧';
+
+  @override
+  String get vehicleBaselineResetConfirmTitle =>
+      '⟦Řéšéŧ đřîṽîñǧ-šîŧúáŧîóñ ƀášéłîñé? ·············⟧';
+
+  @override
+  String get vehicleBaselineResetConfirmBody =>
+      '⟦Ŧĥîš ŵîƥéš éṽéřý łéářñéđ šáɱƥłé ƒóř ŧĥîš ṽéĥîçłé. Ýóú\'łł đřîƒŧ ƀáçķ ŧó ŧĥé çółđ-šŧářŧ đéƒáúłŧš úñŧîł ñéŵ ŧřîƥš řéƒîłł ŧĥé ƥřóƒîłé. ················································⟧';
+
+  @override
+  String get vehicleAdapterSectionTitle => '⟦ÓƁĐ2 áđáƥŧéř ·····⟧';
+
+  @override
+  String get vehicleAdapterEmpty =>
+      '⟦Ñó áđáƥŧéř ƥáîřéđ. Ƥáîř óñé šó ŧĥé áƥƥ çáñ řéçóññéçŧ áúŧóɱáŧîçáłłý ñéẋŧ ŧîɱé. ····························⟧';
+
+  @override
+  String get vehicleAdapterUnnamed => '⟦Úñķñóŵñ áđáƥŧéř ······⟧';
+
+  @override
+  String get vehicleAdapterPair => '⟦Ƥáîř áđáƥŧéř ·····⟧';
+
+  @override
+  String get vehicleAdapterForget => '⟦Ƒóřǧéŧ áđáƥŧéř ······⟧';
+
+  @override
+  String get achievementsTitle => '⟦Áçĥîéṽéɱéñŧš ·····⟧';
+
+  @override
+  String get achievementFirstTrip => '⟦Ƒîřšŧ ŧřîƥ ····⟧';
+
+  @override
+  String get achievementFirstTripDesc =>
+      '⟦Řéçóřđ ýóúř ƒîřšŧ ÓƁĐ2 ŧřîƥ. ··········⟧';
+
+  @override
+  String get achievementFirstFillUp => '⟦Ƒîřšŧ ƒîłł-úƥ ·····⟧';
+
+  @override
+  String get achievementFirstFillUpDesc => '⟦Łóǧ ýóúř ƒîřšŧ ƒîłł-úƥ. ········⟧';
+
+  @override
+  String get achievementTenTrips => '⟦10 ŧřîƥš ··⟧';
+
+  @override
+  String get achievementTenTripsDesc => '⟦Řéçóřđ 10 ÓƁĐ2 ŧřîƥš. ······⟧';
+
+  @override
+  String get achievementZeroHarsh => '⟦Šɱóóŧĥ đřîṽéř ·····⟧';
+
+  @override
+  String get achievementZeroHarshDesc =>
+      '⟦Çóɱƥłéŧé á ŧřîƥ óƒ 10 ķɱ óř ɱóřé ŵîŧĥ ñó ĥářšĥ ƀřáķîñǧ óř áççéłéřáŧîóñ. ·························⟧';
+
+  @override
+  String get achievementEcoWeek => '⟦Éçó ŵééķ ···⟧';
+
+  @override
+  String get achievementEcoWeekDesc =>
+      '⟦Đřîṽé 7 çóñšéçúŧîṽé đáýš ŵîŧĥ áŧ łéášŧ óñé šɱóóŧĥ ŧřîƥ éáçĥ đáý. ·······················⟧';
+
+  @override
+  String get achievementPriceWin => '⟦Ƥřîçé ŵîñ ····⟧';
+
+  @override
+  String get achievementPriceWinDesc =>
+      '⟦Łóǧ á ƒîłł-úƥ ŧĥáŧ ƀéáŧš ŧĥé šŧáŧîóñ\'š 30-đáý áṽéřáǧé ƀý 5 % óř ɱóřé. ······················⟧';
+
+  @override
+  String get syncBaselinesToggleTitle =>
+      '⟦Šĥářé łéářñéđ ṽéĥîçłé ƥřóƒîłéš ············⟧';
+
+  @override
+  String get syncBaselinesToggleSubtitle =>
+      '⟦Úƥłóáđ ƥéř-ṽéĥîçłé çóñšúɱƥŧîóñ ƀášéłîñéš šó á šéçóñđ đéṽîçé çáñ řéúšé ŧĥéɱ. ····························⟧';
+
+  @override
+  String get obd2StatusConnected => '⟦ÓƁĐ2 áđáƥŧéř: çóññéçŧéđ ·········⟧';
+
+  @override
+  String get obd2StatusAttempting => '⟦ÓƁĐ2 áđáƥŧéř: çóññéçŧîñǧ ·········⟧';
+
+  @override
+  String get obd2StatusUnreachable => '⟦ÓƁĐ2 áđáƥŧéř: úñřéáçĥáƀłé ·········⟧';
+
+  @override
+  String get obd2StatusPermissionDenied =>
+      '⟦ÓƁĐ2 áđáƥŧéř: Ɓłúéŧóóŧĥ ƥéřɱîššîóñ ñééđéđ ················⟧';
+
+  @override
+  String get obd2StatusConnectedBody => '⟦Řéáđý ŧó řéçóřđ á ŧřîƥ. ········⟧';
+
+  @override
+  String get obd2StatusAttemptingBody =>
+      '⟦Çóññéçŧîñǧ îñ ŧĥé ƀáçķǧřóúñđ… ···········⟧';
+
+  @override
+  String get obd2StatusUnreachableBody =>
+      '⟦Áđáƥŧéř óúŧ óƒ řáñǧé óř áłřéáđý îñ úšé ƀý áñóŧĥéř áƥƥ. ···················⟧';
+
+  @override
+  String get obd2StatusPermissionDeniedBody =>
+      '⟦Ǧřáñŧ Ɓłúéŧóóŧĥ ƥéřɱîššîóñ îñ šýšŧéɱ šéŧŧîñǧš ŧó řéçóññéçŧ áúŧóɱáŧîçáłłý. ·····························⟧';
+
+  @override
+  String get obd2StatusNoAdapter => '⟦Ñó áđáƥŧéř ƥáîřéđ ·······⟧';
+
+  @override
+  String get obd2StatusForget => '⟦Ƒóřǧéŧ áđáƥŧéř ······⟧';
+
+  @override
+  String get tripHistoryTitle => '⟦Ŧřîƥ ĥîšŧóřý ·····⟧';
+
+  @override
+  String get tripHistoryEmptyTitle => '⟦Ñó ŧřîƥš ýéŧ ·····⟧';
+
+  @override
+  String get tripHistoryEmptySubtitle =>
+      '⟦Çóññéçŧ áñ ÓƁĐ2 áđáƥŧéř áñđ řéçóřđ á ŧřîƥ ŧó šŧářŧ ƀúîłđîñǧ ýóúř đřîṽîñǧ ĥîšŧóřý. ······························⟧';
+
+  @override
+  String get tripHistoryUnknownDate => '⟦Úñķñóŵñ đáŧé ·····⟧';
+
+  @override
+  String get situationIdle => '⟦Îđłé ··⟧';
+
+  @override
+  String get situationStopAndGo => '⟦Šŧóƥ & ǧó ···⟧';
+
+  @override
+  String get situationUrban => '⟦Úřƀáñ ··⟧';
+
+  @override
+  String get situationHighway => '⟦Ĥîǧĥŵáý ···⟧';
+
+  @override
+  String get situationDecel => '⟦Đéçéłéřáŧîñǧ ·····⟧';
+
+  @override
+  String get situationClimbing => '⟦Çłîɱƀîñǧ / łóáđéđ ······⟧';
+
+  @override
+  String get situationHardAccel => '⟦Ĥářđ áççéł ····⟧';
+
+  @override
+  String get situationFuelCut => '⟦Ƒúéł çúŧ — çóášŧ ·····⟧';
+
+  @override
+  String get tripSaveAsFillUp => '⟦Šáṽé áš ƒîłł-úƥ ·····⟧';
+
+  @override
+  String get tripSaveRecording => '⟦Šáṽé ŧřîƥ ····⟧';
+
+  @override
+  String get tripDiscard => '⟦Đîšçářđ ···⟧';
+
+  @override
+  String obdOdometerRead(int km) {
+    return '⟦Óđóɱéŧéř řéáđ: $km ķɱ ······⟧';
+  }
+
+  @override
+  String get vehicleFuelNotSet => '⟦Ñóŧ šéŧ ···⟧';
+
+  @override
+  String get wizardVehicleTapToEdit => '⟦Ŧáƥ ŧó éđîŧ ····⟧';
+
+  @override
+  String get wizardVehicleDefaultBadge => '⟦Đéƒáúłŧ ···⟧';
+
+  @override
+  String get wizardProfileChoiceHint =>
+      '⟦Çĥóóšé ĥóŵ ýóú ŵáñŧ ŧó úšé ŧĥé áƥƥ. Ýóú çáñ çĥáñǧé ŧĥîš łáŧéř îñ Šéŧŧîñǧš. ··························⟧';
+
+  @override
+  String get wizardProfileChoiceFooter =>
+      '⟦Ýóú çáñ çĥáñǧé ýóúř çĥóîçé áñý ŧîɱé ƒřóɱ Šéŧŧîñǧš → Úšé ɱóđé. ······················⟧';
+
+  @override
+  String get wizardProfileBasicName => '⟦Ɓášîç ··⟧';
+
+  @override
+  String get wizardProfileBasicDescription =>
+      '⟦Çĥéáƥéšŧ ƒúéł áñđ ÉṼ çĥářǧîñǧ ƥřîçéš ñéářƀý. Ƒáṽóřîŧéš áñđ ƥřîçé áłéřŧš. ···························⟧';
+
+  @override
+  String get wizardProfileMediumName => '⟦Ṁéđîúɱ ···⟧';
+
+  @override
+  String get wizardProfileMediumDescription =>
+      '⟦Éṽéřýŧĥîñǧ îñ Ɓášîç, ƥłúš ŧřáçķ ýóúř ƒúéł ƒîłł-úƥš áñđ ÉṼ çĥářǧîñǧ ƀý ĥáñđ. ···························⟧';
+
+  @override
+  String get wizardProfileFullName => '⟦Ƒúłł ··⟧';
+
+  @override
+  String get wizardProfileFullDescription =>
+      '⟦Éṽéřýŧĥîñǧ îñ Ṁéđîúɱ, ƥłúš áúŧóɱáŧîç ÓƁĐ2 ŧřîƥ řéçóřđîñǧ, đřîṽîñǧ šçóřéš, áñđ łóýáłŧý çářđš. ··································⟧';
+
+  @override
+  String get wizardProfileCustomName => '⟦Çúšŧóɱ ···⟧';
+
+  @override
+  String get wizardProfileCustomDescription =>
+      '⟦Ýóúř óŵñ çóɱƀîñáŧîóñ óƒ ƒéáŧúřéš. Ŧŵéáķ éáçĥ ŧóǧǧłé ƀéłóŵ. ······················⟧';
+
+  @override
+  String get useModeSectionHint =>
+      '⟦Řîǧĥŧ-šîžé ŧĥé áƥƥ ŧó ĥóŵ ýóú áçŧúáłłý úšé îŧ. Ƥîçķîñǧ á ƥřéšéŧ éñáƀłéš ŧĥé ɱáŧçĥîñǧ šéŧ óƒ ƒéáŧúřéš. ····································⟧';
+
+  @override
+  String get useModeCustomSettingsDescription =>
+      '⟦Ýóúř ƒéáŧúřé ɱîẋ đóéšñ\'ŧ ɱáŧçĥ áñý ƥřéšéŧ. Ƥîçķ óñé áƀóṽé ŧó óṽéřŵřîŧé, óř ķééƥ çúšŧóɱîšîñǧ îñđîṽîđúáł ƒéáŧúřéš îñ ŧĥé šéçŧîóñ ƀéłóŵ. ·················································⟧';
+
+  @override
+  String useModeSwitchedSnack(String profile) {
+    return '⟦Úšé ɱóđé šéŧ ŧó $profile. ·····⟧';
+  }
+
+  @override
+  String get profileDefaultVehicleLabel =>
+      '⟦Đéƒáúłŧ ṽéĥîçłé (óƥŧîóñáł) ··········⟧';
+
+  @override
+  String get profileDefaultVehicleNone => '⟦Ñó đéƒáúłŧ ····⟧';
+
+  @override
+  String get profileFuelFromVehicleHint =>
+      '⟦Ƒúéł ŧýƥé îš đéřîṽéđ ƒřóɱ ýóúř đéƒáúłŧ ṽéĥîçłé. Çłéář ŧĥé ṽéĥîçłé ŧó ƥîçķ á ƒúéł đîřéçŧłý. ·································⟧';
+
+  @override
+  String get consumptionNoVehicleTitle => '⟦Áđđ á ṽéĥîçłé ƒîřšŧ ·······⟧';
+
+  @override
+  String get consumptionNoVehicleBody =>
+      '⟦Ƒîłł-úƥš ářé áŧŧřîƀúŧéđ ŧó á ṽéĥîçłé. Áđđ ýóúř çář ŧó šŧářŧ łóǧǧîñǧ çóñšúɱƥŧîóñ. ·····························⟧';
+
+  @override
+  String get vehicleAdd => '⟦Áđđ ṽéĥîçłé ·····⟧';
+
+  @override
+  String get vehicleAddTitle => '⟦Áđđ ṽéĥîçłé ·····⟧';
+
+  @override
+  String get vehicleEditTitle => '⟦Éđîŧ ṽéĥîçłé ·····⟧';
+
+  @override
+  String get vehicleDeleteTitle => '⟦Đéłéŧé ṽéĥîçłé? ······⟧';
+
+  @override
+  String vehicleDeleteMessage(String name) {
+    return '⟦Řéɱóṽé \"$name\" ƒřóɱ ýóúř ƥřóƒîłéš? ··········⟧';
+  }
+
+  @override
+  String get vehicleNameLabel => '⟦Ñáɱé ··⟧';
+
+  @override
+  String get vehicleNameHint => '⟦é.ǧ. Ṁý Ŧéšłá Ṁóđéł 3 ······⟧';
+
+  @override
+  String get vehicleTypeCombustion => '⟦Çóɱƀúšŧîóñ ·····⟧';
+
+  @override
+  String get vehicleTypeHybrid => '⟦Ĥýƀřîđ ···⟧';
+
+  @override
+  String get vehicleTypeEv => '⟦Éłéçŧřîç ····⟧';
+
+  @override
+  String get vehicleEvSectionTitle => '⟦Éłéçŧřîç ····⟧';
+
+  @override
+  String get vehicleCombustionSectionTitle => '⟦Çóɱƀúšŧîóñ ·····⟧';
+
+  @override
+  String get vehicleBatteryLabel => '⟦Ɓáŧŧéřý çáƥáçîŧý (ķŴĥ) ········⟧';
+
+  @override
+  String get vehicleMaxChargeLabel => '⟦Ṁáẋ çĥářǧîñǧ ƥóŵéř (ķŴ) ········⟧';
+
+  @override
+  String get vehicleConnectorsLabel => '⟦Šúƥƥóřŧéđ çóññéçŧóřš ·········⟧';
+
+  @override
+  String get vehicleMinSocLabel => '⟦Ṁîñ ŠóÇ % ···⟧';
+
+  @override
+  String get vehicleMaxSocLabel => '⟦Ṁáẋ ŠóÇ % ···⟧';
+
+  @override
+  String get vehicleTankLabel => '⟦Ŧáñķ çáƥáçîŧý (Ł) ······⟧';
+
+  @override
+  String get vehiclePreferredFuelLabel => '⟦Ƥřéƒéřřéđ ƒúéł ······⟧';
+
+  @override
+  String get connectorType2 => '⟦Ŧýƥé 2 ··⟧';
+
+  @override
+  String get connectorCcs => '⟦ÇÇŠ ·⟧';
+
+  @override
+  String get connectorChademo => '⟦ÇĤÁđéṀÓ ···⟧';
+
+  @override
+  String get connectorTesla => '⟦Ŧéšłá ··⟧';
+
+  @override
+  String get connectorSchuko => '⟦Šçĥúķó ···⟧';
+
+  @override
+  String get connectorType1 => '⟦Ŧýƥé 1 ··⟧';
+
+  @override
+  String get connectorThreePin => '⟦3-ƥîñ ·⟧';
+
+  @override
+  String get evShowOnMap => '⟦Šĥóŵ ÉṼ šŧáŧîóñš ······⟧';
+
+  @override
+  String get evAvailableOnly => '⟦Áṽáîłáƀłé óñłý ······⟧';
+
+  @override
+  String get evMinPower => '⟦Ṁîñ ƥóŵéř ····⟧';
+
+  @override
+  String get evMaxPower => '⟦Ṁáẋ ƥóŵéř ····⟧';
+
+  @override
+  String get evOperator => '⟦Óƥéřáŧóř ····⟧';
+
+  @override
+  String get evLastUpdate => '⟦Łášŧ úƥđáŧé ·····⟧';
+
+  @override
+  String get evStatusAvailable => '⟦Áṽáîłáƀłé ····⟧';
+
+  @override
+  String get evStatusOccupied => '⟦Óççúƥîéđ ····⟧';
+
+  @override
+  String get evStatusOutOfOrder => '⟦Óúŧ óƒ óřđéř ·····⟧';
+
+  @override
+  String get openOnlyFilter => '⟦Óƥéñ óñłý ····⟧';
+
+  @override
+  String get saveAsDefaults => '⟦Šáṽé áš ɱý đéƒáúłŧš ·······⟧';
+
+  @override
+  String get criteriaSavedToProfile => '⟦Šáṽéđ áš đéƒáúłŧš ·······⟧';
+
+  @override
+  String get profileNotFound => '⟦Ñó áçŧîṽé ƥřóƒîłé ·······⟧';
+
+  @override
+  String get updatingFavorites => '⟦Úƥđáŧîñǧ ýóúř ƒáṽóřîŧéš... ·········⟧';
+
+  @override
+  String get fetchingLatestPrices => '⟦Ƒéŧçĥîñǧ ŧĥé łáŧéšŧ ƥřîçéš ··········⟧';
+
+  @override
+  String get noDataAvailable => '⟦Ñó đáŧá ···⟧';
+
+  @override
+  String get configAndPrivacy => '⟦Çóñƒîǧúřáŧîóñ & Ƥřîṽáçý ·········⟧';
+
+  @override
+  String get searchToSeeMap =>
+      '⟦Šéářçĥ ŧó šéé šŧáŧîóñš óñ ŧĥé ɱáƥ ············⟧';
+
+  @override
+  String get evPowerAny => '⟦Áñý ·⟧';
+
+  @override
+  String evPowerKw(int kw) {
+    return '⟦$kw ķŴ+ ·⟧';
+  }
+
+  @override
+  String get sectionProfile => '⟦Ƥřóƒîłé ···⟧';
+
+  @override
+  String get sectionLocation => '⟦Łóçáŧîóñ ····⟧';
+
+  @override
+  String get tooltipBack => '⟦Ɓáçķ ··⟧';
+
+  @override
+  String get tooltipClose => '⟦Çłóšé ··⟧';
+
+  @override
+  String get tooltipClearSearch => '⟦Çłéář šéářçĥ îñƥúŧ ·······⟧';
+
+  @override
+  String get tooltipUseGps => '⟦Úšé ǦƤŠ łóçáŧîóñ ······⟧';
+
+  @override
+  String get tooltipShowPassword => '⟦Šĥóŵ ƥáššŵóřđ ·····⟧';
+
+  @override
+  String get tooltipHidePassword => '⟦Ĥîđé ƥáššŵóřđ ·····⟧';
+
+  @override
+  String get evConnectorsLabel => '⟦Áṽáîłáƀłé çóññéçŧóřš ·········⟧';
+
+  @override
+  String get evConnectorsNone => '⟦Ñó çóññéçŧóř îñƒóřɱáŧîóñ ··········⟧';
+
+  @override
+  String get switchToEmail => '⟦Šŵîŧçĥ ŧó éɱáîł ······⟧';
+
+  @override
+  String get switchToEmailSubtitle =>
+      '⟦Ķééƥ đáŧá, áđđ šîǧñ-îñ ƒřóɱ óŧĥéř đéṽîçéš ···············⟧';
+
+  @override
+  String get switchToAnonymousAction => '⟦Šŵîŧçĥ ŧó áñóñýɱóúš ········⟧';
+
+  @override
+  String get switchToAnonymousSubtitle =>
+      '⟦Ķééƥ łóçáł đáŧá, úšé ñéŵ áñóñýɱóúš šéššîóñ ················⟧';
+
+  @override
+  String get linkDevice => '⟦Łîñķ đéṽîçé ·····⟧';
+
+  @override
+  String get shareDatabase => '⟦Šĥářé đáŧáƀášé ······⟧';
+
+  @override
+  String get disconnectAction => '⟦Đîšçóññéçŧ ·····⟧';
+
+  @override
+  String get disconnectSubtitle =>
+      '⟦Šŧóƥ šýñçîñǧ (łóçáł đáŧá ķéƥŧ) ···········⟧';
+
+  @override
+  String get deleteAccountAction => '⟦Đéłéŧé áççóúñŧ ······⟧';
+
+  @override
+  String get deleteAccountSubtitle =>
+      '⟦Řéɱóṽé áłł šéřṽéř đáŧá ƥéřɱáñéñŧłý ··············⟧';
+
+  @override
+  String get localOnly => '⟦Łóçáł óñłý ····⟧';
+
+  @override
+  String get localOnlySubtitle =>
+      '⟦Óƥŧîóñáł: šýñç ƒáṽóřîŧéš, áłéřŧš, áñđ řáŧîñǧš áçřóšš đéṽîçéš ·······················⟧';
+
+  @override
+  String get setupCloudSync => '⟦Šéŧ úƥ çłóúđ šýñç ······⟧';
+
+  @override
+  String get disconnectTitle => '⟦Đîšçóññéçŧ ŦáñķŠýñç? ········⟧';
+
+  @override
+  String get disconnectBody =>
+      '⟦Çłóúđ šýñç ŵîłł ƀé đîšáƀłéđ. Ýóúř łóçáł đáŧá (ƒáṽóřîŧéš, áłéřŧš, ĥîšŧóřý) îš ƥřéšéřṽéđ óñ ŧĥîš đéṽîçé. Šéřṽéř đáŧá îš ñóŧ đéłéŧéđ. ··············································⟧';
+
+  @override
+  String get deleteAccountTitle => '⟦Đéłéŧé áççóúñŧ? ······⟧';
+
+  @override
+  String get deleteAccountBody =>
+      '⟦Ŧĥîš ƥéřɱáñéñŧłý đéłéŧéš áłł ýóúř đáŧá ƒřóɱ ŧĥé šéřṽéř (ƒáṽóřîŧéš, áłéřŧš, řáŧîñǧš, řóúŧéš). Łóçáł đáŧá óñ ŧĥîš đéṽîçé îš ƥřéšéřṽéđ.\n\nŦĥîš çáññóŧ ƀé úñđóñé. ························································⟧';
+
+  @override
+  String get switchToAnonymousTitle => '⟦Šŵîŧçĥ ŧó áñóñýɱóúš? ········⟧';
+
+  @override
+  String get switchToAnonymousBody =>
+      '⟦Ýóú ŵîłł ƀé šîǧñéđ óúŧ óƒ ýóúř éɱáîł áççóúñŧ áñđ çóñŧîñúé ŵîŧĥ á ñéŵ áñóñýɱóúš šéššîóñ.\n\nÝóúř łóçáł đáŧá (ƒáṽóřîŧéš, áłéřŧš) îš ķéƥŧ óñ ŧĥîš đéṽîçé áñđ ŵîłł ƀé šýñçéđ ŧó ŧĥé ñéŵ áñóñýɱóúš áççóúñŧ. ······································································⟧';
+
+  @override
+  String get switchAction => '⟦Šŵîŧçĥ ···⟧';
+
+  @override
+  String get helpBannerCriteria =>
+      '⟦Ýóúř ƥřóƒîłé đéƒáúłŧš ářé ƥřé-ƒîłłéđ. Áđĵúšŧ çřîŧéřîá ƀéłóŵ ŧó řéƒîñé ýóúř šéářçĥ. ·······························⟧';
+
+  @override
+  String get helpBannerAlerts =>
+      '⟦Šéŧ á ƥřîçé ŧĥřéšĥółđ ƒóř á šŧáŧîóñ. Ýóú\'łł ƀé ñóŧîƒîéđ ŵĥéñ ƥřîçéš đřóƥ ƀéłóŵ îŧ. Çĥéçķš řúñ éṽéřý 30 ɱîñúŧéš. ·······································⟧';
+
+  @override
+  String get helpBannerConsumption =>
+      '⟦Łóǧ éṽéřý ƒîłł-úƥ ŧó ŧřáçķ ýóúř řéáł-ŵóřłđ çóñšúɱƥŧîóñ áñđ ÇÓ₂ ƒóóŧƥřîñŧ. Šŵîƥé łéƒŧ ŧó đéłéŧé áñ éñŧřý. ·····································⟧';
+
+  @override
+  String get helpBannerVehicles =>
+      '⟦Áđđ ýóúř ṽéĥîçłéš šó ƒîłł-úƥš áñđ ƒúéł ƥřéƒéřéñçéš đéƒáúłŧ çóřřéçŧłý. Ŧĥé ƒîřšŧ ṽéĥîçłé ƀéçóɱéš ýóúř đéƒáúłŧ. ·········································⟧';
+
+  @override
+  String get syncNow => '⟦Šýñç ñóŵ ···⟧';
+
+  @override
+  String get onboardingPreferencesTitle => '⟦Ýóúř ƥřéƒéřéñçéš ·······⟧';
+
+  @override
+  String get onboardingZipHelper =>
+      '⟦Úšéđ ŵĥéñ ǦƤŠ îš úñáṽáîłáƀłé ···········⟧';
+
+  @override
+  String get onboardingRadiusHelper =>
+      '⟦Łářǧéř řáđîúš = ɱóřé řéšúłŧš ··········⟧';
+
+  @override
+  String get onboardingPrivacy =>
+      '⟦Ŧĥéšé šéŧŧîñǧš ářé šŧóřéđ óñłý óñ ýóúř đéṽîçé áñđ ñéṽéř šĥářéđ. ·······················⟧';
+
+  @override
+  String get onboardingLandingTitle => '⟦Ĥóɱé šçřééñ ·····⟧';
+
+  @override
+  String get onboardingLandingHint =>
+      '⟦Çĥóóšé ŵĥîçĥ šçřééñ óƥéñš ŵĥéñ ýóú łáúñçĥ ŧĥé áƥƥ. ··················⟧';
+
+  @override
+  String get iosAutoRecordOnboardingTitle =>
+      '⟦Šŧáý óúŧ óƒ ŧĥé áƥƥ — ƀúŧ đóñ\'ŧ ɋúîŧ îŧ. ·············⟧';
+
+  @override
+  String get iosAutoRecordOnboardingBullet1Title =>
+      '⟦Óƥéñ Šƥářķîłó óñçé áƒŧéř éáçĥ řéƀóóŧ. ··············⟧';
+
+  @override
+  String get iosAutoRecordOnboardingBullet1Body =>
+      '⟦Áƥƥłé ŵáķéš Šƥářķîłó óñłý áƒŧéř ýóú\'ṽé óƥéñéđ îŧ áŧ łéášŧ óñçé šîñçé ŧĥé ƥĥóñé řéšŧářŧéđ. Áƒŧéř ŧĥáŧ, ýóúř ŧřîƥš řéçóřđ áúŧóɱáŧîçáłłý. ··················································⟧';
+
+  @override
+  String get iosAutoRecordOnboardingBullet2Title =>
+      '⟦Đóñ\'ŧ šŵîƥé Šƥářķîłó áŵáý îñ ŧĥé áƥƥ šŵîŧçĥéř. ·················⟧';
+
+  @override
+  String get iosAutoRecordOnboardingBullet2Body =>
+      '⟦\"Ƒóřçé-ɋúîŧ\" ŧéłłš îÓŠ ŧó šŧóƥ řéłáúñçĥîñǧ ŧĥé áƥƥ. Ýóúř ŧřîƥš ŵîłł šŧóƥ řéçóřđîñǧ úñŧîł ýóú óƥéñ Šƥářķîłó áǧáîñ. ·········································⟧';
+
+  @override
+  String get iosAutoRecordOnboardingBullet3Title =>
+      '⟦Ŵĥéñ îÓŠ ášķš ƒóř \"Áłŵáýš\" łóçáŧîóñ, ƥłéášé šáý ýéš. ··················⟧';
+
+  @override
+  String get iosAutoRecordOnboardingBullet3Body =>
+      '⟦Ŧĥé ƒáłłƀáçķ ŧĥáŧ řéçóřđš ýóúř ŧřîƥ ŵĥéñ ŧĥé ÓƁĐ2 áđáƥŧéř îš šłóŵ ñééđš ƀáçķǧřóúñđ łóçáŧîóñ. Ŵé ñéṽéř šĥářé îŧ. ·········································⟧';
+
+  @override
+  String get scanReceipt => '⟦Šçáñ řéçéîƥŧ ·····⟧';
+
+  @override
+  String get obdConnect => '⟦ÓƁĐ-ÎÎ ··⟧';
+
+  @override
+  String get stationTypeFuel => '⟦Ƒúéł ··⟧';
+
+  @override
+  String get stationTypeEv => '⟦ÉṼ ·⟧';
+
+  @override
+  String get brandFilterHighway => '⟦Ĥîǧĥŵáý ···⟧';
+
+  @override
+  String get ratingModeLocal => '⟦Łóçáł ··⟧';
+
+  @override
+  String get ratingModePrivate => '⟦Ƥřîṽáŧé ···⟧';
+
+  @override
+  String get ratingModeShared => '⟦Šĥářéđ ···⟧';
+
+  @override
+  String get ratingDescLocal =>
+      '⟦Řáŧîñǧš šáṽéđ óñ ŧĥîš đéṽîçé óñłý ·············⟧';
+
+  @override
+  String get ratingDescPrivate =>
+      '⟦Šýñçéđ ŵîŧĥ ýóúř đáŧáƀášé (ñóŧ ṽîšîƀłé ŧó óŧĥéřš) ··················⟧';
+
+  @override
+  String get ratingDescShared =>
+      '⟦Ṽîšîƀłé ŧó áłł úšéřš óƒ ýóúř đáŧáƀášé ··············⟧';
+
+  @override
+  String get errorNoEvApiKey =>
+      '⟦ÓƥéñÇĥářǧéṀáƥ ÁƤÎ ķéý ñóŧ çóñƒîǧúřéđ. Áđđ óñé îñ Šéŧŧîñǧš ŧó šéářçĥ ÉṼ çĥářǧîñǧ šŧáŧîóñš. ·································⟧';
+
+  @override
+  String errorUpstreamCertExpired(String host) {
+    return '⟦Ŧĥé đáŧá ƥřóṽîđéř ($host) îš šéřṽîñǧ áñ éẋƥîřéđ óř îñṽáłîđ ŦŁŠ çéřŧîƒîçáŧé. Ŧĥé áƥƥ çáññóŧ łóáđ đáŧá ƒřóɱ ŧĥîš šóúřçé úñŧîł ŧĥé ƥřóṽîđéř ƒîẋéš îŧ. Ƥłéášé çóñŧáçŧ $host. ·························································⟧';
+  }
+
+  @override
+  String get offlineLabel => '⟦Óƒƒłîñé ···⟧';
+
+  @override
+  String fallbackSummary(String failed, String current) {
+    return '⟦$failed úñáṽáîłáƀłé. Úšîñǧ $current. ·······⟧';
+  }
+
+  @override
+  String get errorTitleApiKey => '⟦ÁƤÎ ķéý řéɋúîřéđ ······⟧';
+
+  @override
+  String get errorTitleLocation => '⟦Łóçáŧîóñ úñáṽáîłáƀłé ·········⟧';
+
+  @override
+  String get errorHintNoStations =>
+      '⟦Ŧřý îñçřéášîñǧ ŧĥé šéářçĥ řáđîúš óř šéářçĥ á đîƒƒéřéñŧ łóçáŧîóñ. ························⟧';
+
+  @override
+  String get errorHintApiKey =>
+      '⟦Çóñƒîǧúřé ýóúř ÁƤÎ ķéý îñ Šéŧŧîñǧš. ·············⟧';
+
+  @override
+  String get errorHintConnection =>
+      '⟦Çĥéçķ ýóúř îñŧéřñéŧ çóññéçŧîóñ áñđ ŧřý áǧáîñ. ·················⟧';
+
+  @override
+  String get errorHintRouting =>
+      '⟦Řóúŧé çáłçúłáŧîóñ ƒáîłéđ. Çĥéçķ ýóúř îñŧéřñéŧ çóññéçŧîóñ áñđ ŧřý áǧáîñ. ···························⟧';
+
+  @override
+  String get errorHintFallback =>
+      '⟦Ŧřý áǧáîñ óř šéářçĥ ƀý ƥóšŧáł çóđé / çîŧý ñáɱé. ················⟧';
+
+  @override
+  String get alertsLoadErrorTitle => '⟦Çóúłđñ\'ŧ łóáđ ýóúř áłéřŧš ·········⟧';
+
+  @override
+  String get alertsBackgroundCheckErrorTitle =>
+      '⟦Áłéřŧ ƀáçķǧřóúñđ çĥéçķ ƒáîłéđ ············⟧';
+
+  @override
+  String get detailsLabel => '⟦Đéŧáîłš ···⟧';
+
+  @override
+  String get remove => '⟦Řéɱóṽé ···⟧';
+
+  @override
+  String get showKey => '⟦Šĥóŵ ķéý ···⟧';
+
+  @override
+  String get hideKey => '⟦Ĥîđé ķéý ···⟧';
+
+  @override
+  String get syncOptionalTitle => '⟦ŦáñķŠýñç îš óƥŧîóñáł ········⟧';
+
+  @override
+  String get syncOptionalDescription =>
+      '⟦Ýóúř áƥƥ ŵóřķš ƒúłłý ŵîŧĥóúŧ çłóúđ šýñç. ŦáñķŠýñç łéŧš ýóú šýñç ƒáṽóřîŧéš, áłéřŧš, áñđ řáŧîñǧš áçřóšš đéṽîçéš úšîñǧ Šúƥáƀášé (ƒřéé ŧîéř áṽáîłáƀłé). ······················································⟧';
+
+  @override
+  String get syncHowToConnectQuestion =>
+      '⟦Ĥóŵ ŵóúłđ ýóú łîķé ŧó çóññéçŧ? ···········⟧';
+
+  @override
+  String get syncCreateOwnTitle => '⟦Çřéáŧé ɱý óŵñ đáŧáƀášé ·········⟧';
+
+  @override
+  String get syncCreateOwnSubtitle =>
+      '⟦Ƒřéé Šúƥáƀášé ƥřóĵéçŧ — ŵé\'łł ǧúîđé ýóú šŧéƥ ƀý šŧéƥ ··················⟧';
+
+  @override
+  String get syncJoinExistingTitle => '⟦Ĵóîñ áñ éẋîšŧîñǧ đáŧáƀášé ··········⟧';
+
+  @override
+  String get syncJoinExistingSubtitle =>
+      '⟦Šçáñ ɊŘ çóđé ƒřóɱ ŧĥé đáŧáƀášé óŵñéř óř ƥášŧé çřéđéñŧîáłš ······················⟧';
+
+  @override
+  String get syncChooseAccountType => '⟦Çĥóóšé ýóúř áççóúñŧ ŧýƥé ·········⟧';
+
+  @override
+  String get syncAccountTypeAnonymous => '⟦Áñóñýɱóúš ····⟧';
+
+  @override
+  String get syncAccountTypeAnonymousDesc =>
+      '⟦Îñšŧáñŧ, ñó éɱáîł ñééđéđ. Đáŧá ŧîéđ ŧó ŧĥîš đéṽîçé. ··················⟧';
+
+  @override
+  String get syncAccountTypeEmail => '⟦Éɱáîł Áççóúñŧ ·····⟧';
+
+  @override
+  String get syncAccountTypeEmailDesc =>
+      '⟦Šîǧñ îñ ƒřóɱ áñý đéṽîçé. Řéçóṽéř đáŧá îƒ ƥĥóñé îš łóšŧ. ···················⟧';
+
+  @override
+  String get syncHaveAccountSignIn =>
+      '⟦Áłřéáđý ĥáṽé áñ áççóúñŧ? Šîǧñ îñ ············⟧';
+
+  @override
+  String get syncCreateNewAccount => '⟦Çřéáŧé ñéŵ áççóúñŧ ·······⟧';
+
+  @override
+  String get syncTestConnection => '⟦Ŧéšŧ Çóññéçŧîóñ ······⟧';
+
+  @override
+  String get syncTestingConnection => '⟦Ŧéšŧîñǧ... ···⟧';
+
+  @override
+  String get syncConnectButton => '⟦Çóññéçŧ ···⟧';
+
+  @override
+  String get syncConnectingButton => '⟦Çóññéçŧîñǧ... ·····⟧';
+
+  @override
+  String get syncDatabaseReady => '⟦Đáŧáƀášé řéáđý! ······⟧';
+
+  @override
+  String get syncDatabaseNeedsSetup => '⟦Đáŧáƀášé ñééđš šéŧúƥ ········⟧';
+
+  @override
+  String get syncTableStatusOk => '⟦ÓĶ ·⟧';
+
+  @override
+  String get syncTableStatusMissing => '⟦Ṁîššîñǧ ···⟧';
+
+  @override
+  String get syncSqlEditorInstructions =>
+      '⟦Çóƥý ŧĥé ŠɊŁ ƀéłóŵ áñđ řúñ îŧ îñ ýóúř Šúƥáƀášé ŠɊŁ Éđîŧóř (Đášĥƀóářđ → ŠɊŁ Éđîŧóř → Ñéŵ Ɋúéřý → Ƥášŧé → Řúñ) ····································⟧';
+
+  @override
+  String get syncCopySqlButton => '⟦Çóƥý ŠɊŁ ŧó çłîƥƀóářđ ········⟧';
+
+  @override
+  String get syncRecheckSchemaButton => '⟦Řé-çĥéçķ šçĥéɱá ······⟧';
+
+  @override
+  String get syncDoneButton => '⟦Đóñé ··⟧';
+
+  @override
+  String syncSignedInAs(String email) {
+    return '⟦Šîǧñéđ îñ áš $email ·····⟧';
+  }
+
+  @override
+  String get syncEmailDescription =>
+      '⟦Ýóúř đáŧá šýñçš áçřóšš áłł đéṽîçéš ŵîŧĥ ŧĥîš éɱáîł. ···················⟧';
+
+  @override
+  String get syncSwitchToAnonymousTitle => '⟦Šŵîŧçĥ ŧó áñóñýɱóúš ········⟧';
+
+  @override
+  String get syncSwitchToAnonymousDesc =>
+      '⟦Çóñŧîñúé ŵîŧĥóúŧ éɱáîł, ñéŵ áñóñýɱóúš šéššîóñ ··················⟧';
+
+  @override
+  String get syncGuestDescription => '⟦Áñóñýɱóúš, ñó éɱáîł ñééđéđ. ··········⟧';
+
+  @override
+  String get syncOrDivider => '⟦óř ·⟧';
+
+  @override
+  String get syncHowToSyncQuestion => '⟦Ĥóŵ ŵóúłđ ýóú łîķé ŧó šýñç? ·········⟧';
+
+  @override
+  String get syncOfflineDescription =>
+      '⟦Ýóúř áƥƥ ŵóřķš ƒúłłý óƒƒłîñé. Çłóúđ šýñç îš óƥŧîóñáł. ···················⟧';
+
+  @override
+  String get syncModeCommunityTitle => '⟦Šƥářķîłó Çóɱɱúñîŧý ········⟧';
+
+  @override
+  String get syncModeCommunitySubtitle =>
+      '⟦Šĥářé ƒáṽóřîŧéš & řáŧîñǧš ŵîŧĥ áłł úšéřš ···············⟧';
+
+  @override
+  String get syncModePrivateTitle => '⟦Ƥřîṽáŧé Đáŧáƀášé ·······⟧';
+
+  @override
+  String get syncModePrivateSubtitle =>
+      '⟦Ýóúř óŵñ Šúƥáƀášé — ƒúłł đáŧá çóñŧřół ··············⟧';
+
+  @override
+  String get syncModeGroupTitle => '⟦Ĵóîñ á Ǧřóúƥ ·····⟧';
+
+  @override
+  String get syncModeGroupSubtitle =>
+      '⟦Ƒáɱîłý óř ƒřîéñđš šĥářéđ đáŧáƀášé ·············⟧';
+
+  @override
+  String get syncPrivacyShared => '⟦Šĥářéđ ···⟧';
+
+  @override
+  String get syncPrivacyPrivate => '⟦Ƥřîṽáŧé ···⟧';
+
+  @override
+  String get syncPrivacyGroup => '⟦Ǧřóúƥ ··⟧';
+
+  @override
+  String get syncStayOfflineButton => '⟦Šŧáý óƒƒłîñé ·····⟧';
+
+  @override
+  String get syncSuccessTitle => '⟦Šúççéššƒúłłý çóññéçŧéđ! ·········⟧';
+
+  @override
+  String get syncSuccessDescription =>
+      '⟦Ýóúř đáŧá ŵîłł ñóŵ šýñç áúŧóɱáŧîçáłłý. ··············⟧';
+
+  @override
+  String get syncWizardTitleConnect => '⟦Çóññéçŧ ŦáñķŠýñç ·······⟧';
+
+  @override
+  String get syncSetupTitleYourDatabase => '⟦Ýóúř đáŧáƀášé ·····⟧';
+
+  @override
+  String get syncSetupTitleJoinGroup => '⟦Ĵóîñ á ǧřóúƥ ·····⟧';
+
+  @override
+  String get syncSetupTitleAccount => '⟦Ýóúř áççóúñŧ ·····⟧';
+
+  @override
+  String get syncWizardBack => '⟦Ɓáçķ ··⟧';
+
+  @override
+  String get syncWizardNext => '⟦Ñéẋŧ ··⟧';
+
+  @override
+  String syncWizardStepOfSteps(int current, int total) {
+    return '⟦Šŧéƥ $current óƒ $total ···⟧';
+  }
+
+  @override
+  String get syncWizardCreateSupabaseTitle =>
+      '⟦Çřéáŧé á Šúƥáƀášé ƥřóĵéçŧ ··········⟧';
+
+  @override
+  String get syncWizardCreateSupabaseInstructions =>
+      '⟦1. Ŧáƥ \"Óƥéñ Šúƥáƀášé\" ƀéłóŵ\n2. Çřéáŧé á ƒřéé áççóúñŧ (îƒ ýóú đóñ\'ŧ ĥáṽé óñé)\n3. Çłîçķ \"Ñéŵ Ƥřóĵéçŧ\"\n4. Çĥóóšé á ñáɱé áñđ řéǧîóñ\n5. Ŵáîŧ ~2 ɱîñúŧéš ƒóř îŧ ŧó šŧářŧ ··················································⟧';
+
+  @override
+  String get syncWizardOpenSupabase => '⟦Óƥéñ Šúƥáƀášé ·····⟧';
+
+  @override
+  String get syncWizardEnableAnonTitle =>
+      '⟦Éñáƀłé Áñóñýɱóúš Šîǧñ-îñš ··········⟧';
+
+  @override
+  String get syncWizardEnableAnonInstructions =>
+      '⟦1. Îñ ýóúř Šúƥáƀášé đášĥƀóářđ:\n   Áúŧĥéñŧîçáŧîóñ → Ƥřóṽîđéřš\n2. Ƒîñđ \"Áñóñýɱóúš Šîǧñ-îñš\"\n3. Ŧóǧǧłé îŧ ÓÑ\n4. Çłîçķ \"Šáṽé\" ······································⟧';
+
+  @override
+  String get syncWizardOpenAuthSettings => '⟦Óƥéñ Áúŧĥ Šéŧŧîñǧš ·······⟧';
+
+  @override
+  String get syncWizardCopyCredentialsTitle =>
+      '⟦Çóƥý ýóúř çřéđéñŧîáłš ·········⟧';
+
+  @override
+  String get syncWizardCopyCredentialsInstructions =>
+      '⟦1. Ǧó ŧó Šéŧŧîñǧš → ÁƤÎ îñ ýóúř đášĥƀóářđ\n2. Çóƥý ŧĥé \"Ƥřóĵéçŧ ÚŘŁ\"\n3. Çóƥý ŧĥé \"áñóñ ƥúƀłîç\" ķéý\n4. Ƥášŧé ŧĥéɱ ƀéłóŵ ····································⟧';
+
+  @override
+  String get syncWizardOpenApiSettings => '⟦Óƥéñ ÁƤÎ Šéŧŧîñǧš ·······⟧';
+
+  @override
+  String get syncWizardSupabaseUrlLabel => '⟦Šúƥáƀášé ÚŘŁ ·····⟧';
+
+  @override
+  String get syncWizardSupabaseUrlHint =>
+      '⟦ĥŧŧƥš://ýóúř-ƥřóĵéçŧ.šúƥáƀášé.çó ············⟧';
+
+  @override
+  String get syncWizardJoinExistingTitle =>
+      '⟦Ĵóîñ áñ éẋîšŧîñǧ đáŧáƀášé ··········⟧';
+
+  @override
+  String get syncWizardScanQrCode => '⟦Šçáñ ɊŘ Çóđé ·····⟧';
+
+  @override
+  String get syncWizardAskOwnerQr =>
+      '⟦Ášķ ŧĥé đáŧáƀášé óŵñéř ŧó šĥóŵ ýóú ŧĥéîř ɊŘ çóđé\n(Šéŧŧîñǧš → ŦáñķŠýñç → Šĥářé) ···························⟧';
+
+  @override
+  String get syncWizardAskOwnerQrShort =>
+      '⟦Ášķ ŧĥé đáŧáƀášé óŵñéř ŧó šĥóŵ ŧĥéîř ɊŘ çóđé ················⟧';
+
+  @override
+  String get syncWizardEnterManuallyTitle => '⟦Éñŧéř ɱáñúáłłý ······⟧';
+
+  @override
+  String get syncWizardOrEnterManually => '⟦óř éñŧéř ɱáñúáłłý ·······⟧';
+
+  @override
+  String get syncWizardUrlHelperText =>
+      '⟦Ŵĥîŧéšƥáçé áñđ łîñé ƀřéáķš řéɱóṽéđ áúŧóɱáŧîçáłłý ···················⟧';
+
+  @override
+  String get syncCredentialsPrivateHint =>
+      '⟦Éñŧéř ýóúř Šúƥáƀášé ƥřóĵéçŧ çřéđéñŧîáłš. Ýóú çáñ ƒîñđ ŧĥéɱ îñ ýóúř đášĥƀóářđ úñđéř Šéŧŧîñǧš > ÁƤÎ. ····································⟧';
+
+  @override
+  String get syncCredentialsDatabaseUrlLabel => '⟦Đáŧáƀášé ÚŘŁ ·····⟧';
+
+  @override
+  String get syncCredentialsAccessKeyLabel => '⟦Áççéšš Ķéý ····⟧';
+
+  @override
+  String get syncCredentialsAccessKeyHint =>
+      '⟦éýĴĥƀǦçîÓîĴÎÚžÎ1ÑîÎš... ·········⟧';
+
+  @override
+  String get authEmailLabel => '⟦Éɱáîł ··⟧';
+
+  @override
+  String get authPasswordLabel => '⟦Ƥáššŵóřđ ····⟧';
+
+  @override
+  String get authConfirmPasswordLabel => '⟦Çóñƒîřɱ ƥáššŵóřđ ·······⟧';
+
+  @override
+  String get authPleaseEnterEmail => '⟦Ƥłéášé éñŧéř ýóúř éɱáîł ·········⟧';
+
+  @override
+  String get authInvalidEmail => '⟦Îñṽáłîđ éɱáîł áđđřéšš ·········⟧';
+
+  @override
+  String get authPasswordsDoNotMatch => '⟦Ƥáššŵóřđš đó ñóŧ ɱáŧçĥ ·········⟧';
+
+  @override
+  String get authConnectAnonymously => '⟦Çóññéçŧ áñóñýɱóúšłý ········⟧';
+
+  @override
+  String get authCreateAccountAndConnect =>
+      '⟦Çřéáŧé áççóúñŧ & çóññéçŧ ·········⟧';
+
+  @override
+  String get authSignInAndConnect => '⟦Šîǧñ îñ & çóññéçŧ ······⟧';
+
+  @override
+  String get authAnonymousSegment => '⟦Áñóñýɱóúš ····⟧';
+
+  @override
+  String get authEmailSegment => '⟦Éɱáîł ··⟧';
+
+  @override
+  String get authAnonymousDescription =>
+      '⟦Îñšŧáñŧ áççéšš, ñó éɱáîł ñééđéđ. Đáŧá ŧîéđ ŧó ŧĥîš đéṽîçé. ·····················⟧';
+
+  @override
+  String get authEmailDescription =>
+      '⟦Šîǧñ îñ ƒřóɱ áñý đéṽîçé. Řéçóṽéř ýóúř đáŧá îƒ ýóúř ƥĥóñé îš łóšŧ. ·······················⟧';
+
+  @override
+  String get authSyncAcrossDevices =>
+      '⟦Šýñç đáŧá áúŧóɱáŧîçáłłý áçřóšš áłł ýóúř đéṽîçéš. ··················⟧';
+
+  @override
+  String get authNewHereCreateAccount => '⟦Ñéŵ ĥéřé? Çřéáŧé áççóúñŧ ·········⟧';
+
+  @override
+  String get ntfyCardTitle => '⟦Ƥúšĥ Ñóŧîƒîçáŧîóñš (ñŧƒý.šĥ) ··········⟧';
+
+  @override
+  String get ntfyEnableTitle => '⟦Éñáƀłé ñŧƒý.šĥ ƥúšĥ ·······⟧';
+
+  @override
+  String get ntfyEnableSubtitle =>
+      '⟦Řéçéîṽé ƥřîçé áłéřŧš ṽîá ñŧƒý.šĥ ············⟧';
+
+  @override
+  String get ntfyTopicUrlLabel => '⟦Ŧóƥîç ÚŘŁ ····⟧';
+
+  @override
+  String get ntfyCopyTopicUrlTooltip => '⟦Çóƥý ŧóƥîç ÚŘŁ ·····⟧';
+
+  @override
+  String get ntfySendTestButton => '⟦Šéñđ ŧéšŧ ñóŧîƒîçáŧîóñ ·········⟧';
+
+  @override
+  String get ntfyFdroidHint =>
+      '⟦Îñšŧáłł ŧĥé ñŧƒý áƥƥ ƒřóɱ Ƒ-Đřóîđ ŧó řéçéîṽé ƥúšĥ ñóŧîƒîçáŧîóñš óñ ýóúř đéṽîçé. ·····························⟧';
+
+  @override
+  String get ntfyConnectFirstHint =>
+      '⟦Çóññéçŧ ŦáñķŠýñç ƒîřšŧ ŧó éñáƀłé ƥúšĥ ñóŧîƒîçáŧîóñš. ····················⟧';
+
+  @override
+  String get linkDeviceScreenTitle => '⟦Łîñķ Đéṽîçé ·····⟧';
+
+  @override
+  String get linkDeviceThisDeviceLabel => '⟦Ŧĥîš đéṽîçé ·····⟧';
+
+  @override
+  String get linkDeviceShareCodeHint =>
+      '⟦Šĥářé ŧĥîš çóđé ŵîŧĥ ýóúř óŧĥéř đéṽîçé: ··············⟧';
+
+  @override
+  String get linkDeviceNotConnected => '⟦Ñóŧ çóññéçŧéđ ·····⟧';
+
+  @override
+  String get linkDeviceCopyCodeTooltip => '⟦Çóƥý çóđé ····⟧';
+
+  @override
+  String get linkDeviceImportSectionTitle =>
+      '⟦Îɱƥóřŧ ƒřóɱ áñóŧĥéř đéṽîçé ··········⟧';
+
+  @override
+  String get linkDeviceImportDescription =>
+      '⟦Éñŧéř ŧĥé đéṽîçé çóđé ƒřóɱ ýóúř óŧĥéř đéṽîçé ŧó îɱƥóřŧ îŧš ƒáṽóřîŧéš, áłéřŧš, ṽéĥîçłéš, áñđ çóñšúɱƥŧîóñ łóǧ. Éáçĥ đéṽîçé ķééƥš îŧš óŵñ ƥřóƒîłé áñđ đéƒáúłŧš. ·························································⟧';
+
+  @override
+  String get linkDeviceCodeFieldLabel => '⟦Đéṽîçé çóđé ·····⟧';
+
+  @override
+  String get linkDeviceCodeFieldHint =>
+      '⟦Ƥášŧé ŧĥé ÚÚÎĐ ƒřóɱ óŧĥéř đéṽîçé ············⟧';
+
+  @override
+  String get linkDeviceImportButton => '⟦Îɱƥóřŧ đáŧá ·····⟧';
+
+  @override
+  String get linkDeviceHowItWorksTitle => '⟦Ĥóŵ îŧ ŵóřķš ·····⟧';
+
+  @override
+  String get linkDeviceHowItWorksBody =>
+      '⟦1. Óñ Đéṽîçé Á: çóƥý ŧĥé đéṽîçé çóđé áƀóṽé\n2. Óñ Đéṽîçé Ɓ: ƥášŧé îŧ îñ ŧĥé \"Đéṽîçé çóđé\" ƒîéłđ\n3. Ŧáƥ \"Îɱƥóřŧ đáŧá\" ŧó ɱéřǧé ƒáṽóřîŧéš, áłéřŧš, ṽéĥîçłéš, áñđ çóñšúɱƥŧîóñ łóǧš\n4. Ɓóŧĥ đéṽîçéš ŵîłł ĥáṽé áłł çóɱƀîñéđ đáŧá\n\nÉáçĥ đéṽîçé ķééƥš îŧš óŵñ áñóñýɱóúš îđéñŧîŧý áñđ îŧš óŵñ ƥřóƒîłé (ƥřéƒéřřéđ ƒúéł, đéƒáúłŧ ṽéĥîçłé, łáñđîñǧ šçřééñ). Đáŧá îš ɱéřǧéđ, ñóŧ ɱóṽéđ. ····························································································································⟧';
+
+  @override
+  String get vehicleSetActive => '⟦Šéŧ áçŧîṽé ····⟧';
+
+  @override
+  String get swipeHide => '⟦Ĥîđé ··⟧';
+
+  @override
+  String get evChargingSection => '⟦ÉṼ Çĥářǧîñǧ ·····⟧';
+
+  @override
+  String get fuelStationsSection => '⟦Ƒúéł Šŧáŧîóñš ·····⟧';
+
+  @override
+  String get yourRating => '⟦Ýóúř řáŧîñǧ ·····⟧';
+
+  @override
+  String get noStorageUsed => '⟦Ñó šŧóřáǧé úšéđ ······⟧';
+
+  @override
+  String get aboutReportBug => '⟦Řéƥóřŧ á ƀúǧ / Šúǧǧéšŧ á ƒéáŧúřé ···········⟧';
+
+  @override
+  String get aboutSupportProject => '⟦Šúƥƥóřŧ ŧĥîš ƥřóĵéçŧ ········⟧';
+
+  @override
+  String get aboutSupportDescription =>
+      '⟦Ŧĥîš áƥƥ îš ƒřéé, óƥéñ šóúřçé, áñđ ĥáš ñó áđš. Îƒ ýóú ƒîñđ îŧ úšéƒúł, çóñšîđéř šúƥƥóřŧîñǧ ŧĥé đéṽéłóƥéř. ····································⟧';
+
+  @override
+  String get luxembourgRegulatedPricesNotice =>
+      '⟦Łúẋéɱƀóúřǧ ƒúéł ƥřîçéš ářé ǧóṽéřñɱéñŧ-řéǧúłáŧéđ áñđ úñîƒóřɱ ñáŧîóñŵîđé. ····························⟧';
+
+  @override
+  String get luxembourgFuelUnleaded95 => '⟦Úñłéáđéđ 95 ····⟧';
+
+  @override
+  String get luxembourgFuelUnleaded98 => '⟦Úñłéáđéđ 98 ····⟧';
+
+  @override
+  String get luxembourgFuelDiesel => '⟦Đîéšéł ···⟧';
+
+  @override
+  String get luxembourgFuelLpg => '⟦ŁƤǦ ·⟧';
+
+  @override
+  String get luxembourgPricesUnavailable =>
+      '⟦Łúẋéɱƀóúřǧ řéǧúłáŧéđ ƥřîçéš ářé úñáṽáîłáƀłé. ··················⟧';
+
+  @override
+  String get reportIssueTitle => '⟦Řéƥóřŧ á ƥřóƀłéɱ ······⟧';
+
+  @override
+  String get enterCorrection => '⟦Ƥłéášé éñŧéř ŧĥé çóřřéçŧîóñ ···········⟧';
+
+  @override
+  String get reportNoBackendAvailable =>
+      '⟦Ŧĥé řéƥóřŧ çóúłđ ñóŧ ƀé šéñŧ: ñó řéƥóřŧîñǧ šéřṽîçé îš çóñƒîǧúřéđ ƒóř ŧĥîš çóúñŧřý. Éñáƀłé ŦáñķŠýñç îñ Šéŧŧîñǧš ŧó šéñđ çóɱɱúñîŧý řéƥóřŧš. ···················································⟧';
+
+  @override
+  String get correctName => '⟦Çóřřéçŧ šŧáŧîóñ ñáɱé ········⟧';
+
+  @override
+  String get correctAddress => '⟦Çóřřéçŧ áđđřéšš ······⟧';
+
+  @override
+  String get wrongE85Price => '⟦Ŵřóñǧ É85 ƥřîçé ·····⟧';
+
+  @override
+  String get wrongE98Price => '⟦Ŵřóñǧ Šúƥéř 98 ƥřîçé ·······⟧';
+
+  @override
+  String get wrongLpgPrice => '⟦Ŵřóñǧ ŁƤǦ ƥřîçé ······⟧';
+
+  @override
+  String get wrongStationName => '⟦Ŵřóñǧ šŧáŧîóñ ñáɱé ·······⟧';
+
+  @override
+  String get wrongStationAddress => '⟦Ŵřóñǧ áđđřéšš ·····⟧';
+
+  @override
+  String get independentStation => '⟦Îñđéƥéñđéñŧ šŧáŧîóñ ········⟧';
+
+  @override
+  String get serviceRemindersSection => '⟦Šéřṽîçé řéɱîñđéřš ·······⟧';
+
+  @override
+  String get serviceRemindersEmpty =>
+      '⟦Ñó řéɱîñđéřš ýéŧ — ƥîçķ á ƥřéšéŧ áƀóṽé. ··············⟧';
+
+  @override
+  String get addServiceReminder => '⟦Áđđ řéɱîñđéř ·····⟧';
+
+  @override
+  String get serviceReminderPresetOil => '⟦Óîł (15,000 ķɱ) ··⟧';
+
+  @override
+  String get serviceReminderPresetOilLabel => '⟦Óîł çĥáñǧé ····⟧';
+
+  @override
+  String get serviceReminderPresetTires => '⟦Ŧîřéš (20,000 ķɱ) ···⟧';
+
+  @override
+  String get serviceReminderPresetTiresLabel => '⟦Ŧîřéš ··⟧';
+
+  @override
+  String get serviceReminderPresetInspection =>
+      '⟦Îñšƥéçŧîóñ (30,000 ķɱ) ·····⟧';
+
+  @override
+  String get serviceReminderPresetInspectionLabel => '⟦Îñšƥéçŧîóñ ·····⟧';
+
+  @override
+  String get serviceReminderLabel => '⟦Łáƀéł ··⟧';
+
+  @override
+  String get serviceReminderInterval => '⟦Îñŧéřṽáł (ķɱ) ·····⟧';
+
+  @override
+  String get serviceReminderLastService => '⟦Łášŧ šéřṽîçé ·····⟧';
+
+  @override
+  String get serviceReminderMarkDone => '⟦Ṁářķ áš đóñé ·····⟧';
+
+  @override
+  String get serviceReminderDueTitle => '⟦Šéřṽîçé đúé ·····⟧';
+
+  @override
+  String serviceReminderDueBody(String label, int kmOver) {
+    return '⟦$label îš đúé — $kmOver ķɱ ƥášŧ ŧĥé îñŧéřṽáł. ··········⟧';
+  }
+
+  @override
+  String get southKoreaApiKeyRequired =>
+      '⟦Řéǧîšŧéř áŧ ÓƤÎÑÉŦ ŧó ǧéŧ á ƒřéé ÁƤÎ ķéý ··············⟧';
+
+  @override
+  String get southKoreaApiProvider => '⟦ÓƤÎÑÉŦ (ĶÑÓÇ) ·····⟧';
+
+  @override
+  String get chileApiKeyRequired =>
+      '⟦Řéǧîšŧéř áŧ ÇÑÉ ŧó ǧéŧ á ƒřéé ÁƤÎ ķéý ·············⟧';
+
+  @override
+  String get chileApiProvider => '⟦ÇÑÉ Ɓéñçîñá éñ Łîñéá ········⟧';
+
+  @override
+  String get vinConfirmTitle => '⟦Îš ŧĥîš ýóúř çář? ······⟧';
+
+  @override
+  String vinConfirmBody(
+    String year,
+    String make,
+    String model,
+    String displacement,
+    String cylinders,
+    String fuel,
+  ) {
+    return '⟦$year $make $model — $displacementŁ, $cylinders-çýł, $fuel ··⟧';
+  }
+
+  @override
+  String get vinPartialInfoNote =>
+      '⟦Ƥářŧîáł îñƒó (óƒƒłîñé). Ýóú çáñ éđîŧ ƀéłóŵ. ···············⟧';
+
+  @override
+  String get vinDecodeError => '⟦Çóúłđñ\'ŧ đéçóđé ŧĥîš ṼÎÑ ·········⟧';
+
+  @override
+  String get vinInvalidFormat => '⟦Îñṽáłîđ ṼÎÑ ƒóřɱáŧ ·······⟧';
+
+  @override
+  String get obd2PauseBannerTitle =>
+      '⟦ÓƁĐ2 çóññéçŧîóñ łóšŧ — řéçóřđîñǧ ƥáúšéđ ··············⟧';
+
+  @override
+  String get obd2PauseBannerResume => '⟦Řéšúɱé řéçóřđîñǧ ·······⟧';
+
+  @override
+  String get obd2PauseBannerEnd => '⟦Éñđ řéçóřđîñǧ ·····⟧';
+
+  @override
+  String veCalibratedTitle(String vehicleName, String percent) {
+    return '⟦Çóñšúɱƥŧîóñ çáłîƀřáŧîóñ úƥđáŧéđ ƒóř $vehicleName — áççúřáçý îɱƥřóṽéđ ƀý $percent% ·······················⟧';
+  }
+
+  @override
+  String get veResetConfirmTitle =>
+      '⟦Řéšéŧ ṽółúɱéŧřîç éƒƒîçîéñçý? ···········⟧';
+
+  @override
+  String get veResetConfirmBody =>
+      '⟦Ŧĥîš ŵîłł đîšçářđ ŧĥé łéářñéđ ṽółúɱéŧřîç éƒƒîçîéñçý (η_ṽ) áñđ řéšŧóřé ŧĥé đéƒáúłŧ ṽáłúé (0.85). Ŧřîƥ-łéṽéł ƒúéł-ƒłóŵ éšŧîɱáŧéš ŵîłł ƒáłł ƀáçķ ŧó ŧĥé ɱáñúƒáçŧúřéř çóñšŧáñŧ úñŧîł ŧĥé çáłîƀřáŧóř çółłéçŧš ñéŵ šáɱƥłéš ƒřóɱ úƥçóɱîñǧ ŧřîƥš. ····················································································⟧';
+
+  @override
+  String get alertsRadiusSectionTitle => '⟦Řáđîúš áłéřŧš ·····⟧';
+
+  @override
+  String get alertsRadiusAdd => '⟦Áđđ řáđîúš áłéřŧ ······⟧';
+
+  @override
+  String get alertsRadiusEmptyTitle => '⟦Ñó řáđîúš áłéřŧš ýéŧ ········⟧';
+
+  @override
+  String get alertsRadiusEmptyCta => '⟦Çřéáŧé á řáđîúš áłéřŧ ········⟧';
+
+  @override
+  String get alertsRadiusCreateTitle => '⟦Çřéáŧé řáđîúš áłéřŧ ········⟧';
+
+  @override
+  String get alertsRadiusLabelHint => '⟦Łáƀéł (é.ǧ. Ĥóɱé đîéšéł) ········⟧';
+
+  @override
+  String get alertsRadiusFuelType => '⟦Ƒúéł ŧýƥé ····⟧';
+
+  @override
+  String get alertsRadiusThreshold => '⟦Ŧĥřéšĥółđ (€/Ł) ·····⟧';
+
+  @override
+  String get alertsRadiusKm => '⟦Řáđîúš (ķɱ) ····⟧';
+
+  @override
+  String get alertsRadiusCenterGps => '⟦Úšé ɱý łóçáŧîóñ ······⟧';
+
+  @override
+  String get alertsRadiusCenterPostalCode => '⟦Ƥóšŧáł çóđé ·····⟧';
+
+  @override
+  String get alertsRadiusSave => '⟦Šáṽé ··⟧';
+
+  @override
+  String get alertsRadiusCancel => '⟦Çáñçéł ···⟧';
+
+  @override
+  String get alertsRadiusDeleteConfirm => '⟦Đéłéŧé řáđîúš áłéřŧ? ········⟧';
+
+  @override
+  String obd2ConnectedTooltip(String adapterName) {
+    return '⟦ÓƁĐ2 çóññéçŧéđ: $adapterName ·····⟧';
+  }
+
+  @override
+  String get obd2PairChipTooltip => '⟦Ƥáîř áñ ÓƁĐ2 áđáƥŧéř ·······⟧';
+
+  @override
+  String velocityAlertTitle(String fuelLabel) {
+    return '⟦$fuelLabel đřóƥƥéđ áŧ ñéářƀý šŧáŧîóñš ··········⟧';
+  }
+
+  @override
+  String velocityAlertBody(int stationCount, int maxDropCents) {
+    return '⟦$stationCount šŧáŧîóñš đřóƥƥéđ ƀý úƥ ŧó $maxDropCents¢ îñ ŧĥé łášŧ ĥóúř ···············⟧';
+  }
+
+  @override
+  String get fillUpSavedSnackbar => '⟦Ƒîłł-úƥ šáṽéđ ·····⟧';
+
+  @override
+  String get radiusAlertsEntryTitle =>
+      '⟦Řáđîúš áłéřŧš & šŧáŧîšŧîçš ··········⟧';
+
+  @override
+  String get radiusAlertsEntrySubtitle =>
+      '⟦Ǧéŧ ñóŧîƒîéđ ŵĥéñ ƥřîçéš đřóƥ ñéář ýóú ··············⟧';
+
+  @override
+  String get notFoundTitle => '⟦Ƥáǧé ñóŧ ƒóúñđ ·····⟧';
+
+  @override
+  String notFoundBody(String location) {
+    return '⟦\"$location\" ñóŧ ƒóúñđ. ····⟧';
+  }
+
+  @override
+  String get notFoundHomeButton => '⟦Ĥóɱé ··⟧';
+
+  @override
+  String get consumptionTabHiddenNotice =>
+      '⟦Ŧĥé Çóñšúɱƥŧîóñ ŧáƀ ŵáš ĥîđđéñ ƀý ýóúř ƥřóƒîłé šéŧŧîñǧš. ·····················⟧';
+
+  @override
+  String get swipeBetweenTabsHint =>
+      '⟦Ŧîƥ: šŵîƥé łéƒŧ óř řîǧĥŧ ŧó šŵîŧçĥ ƀéŧŵééñ ŧáƀš. ·················⟧';
+
+  @override
+  String get discardChangesTitle => '⟦Đîšçářđ çĥáñǧéš? ······⟧';
+
+  @override
+  String get discardChangesBody =>
+      '⟦Ýóú ĥáṽé úñšáṽéđ çĥáñǧéš. Łéáṽîñǧ ñóŵ ŵîłł đîšçářđ ŧĥéɱ. ·····················⟧';
+
+  @override
+  String get discardChangesConfirm => '⟦Đîšçářđ ···⟧';
+
+  @override
+  String get discardChangesKeepEditing => '⟦Ķééƥ éđîŧîñǧ ·····⟧';
+
+  @override
+  String get tankSyncSectionSubtitle =>
+      '⟦Çłóúđ šýñç áçřóšš ýóúř đéṽîçéš ············⟧';
+
+  @override
+  String get achievementSmoothDriver => '⟦Šɱóóŧĥ šŧřéáķ ·····⟧';
+
+  @override
+  String get achievementSmoothDriverDesc =>
+      '⟦Đřîṽé 5 ŧřîƥš îñ á řóŵ ŵîŧĥ á šɱóóŧĥ-đřîṽîñǧ šçóřé óƒ 80 óř ĥîǧĥéř. ······················⟧';
+
+  @override
+  String get achievementColdStartAware => '⟦Çółđ-šŧářŧ áŵářé ······⟧';
+
+  @override
+  String get achievementColdStartAwareDesc =>
+      '⟦Ķééƥ á ŵĥółé ɱóñŧĥ\'š çółđ-šŧářŧ ƒúéł çóšŧ úñđéř 2 % óƒ ŧóŧáł ƒúéł — çóɱƀîñé šĥóřŧ ŧřîƥš. ······························⟧';
+
+  @override
+  String get achievementHighwayMaster => '⟦Ĥîǧĥŵáý ɱášŧéř ······⟧';
+
+  @override
+  String get achievementHighwayMasterDesc =>
+      '⟦Çóɱƥłéŧé á 30 ķɱ+ ŧřîƥ áŧ çóñšîšŧéñŧ šƥééđ ŵîŧĥ á šɱóóŧĥ-đřîṽîñǧ šçóřé óƒ 90 óř ĥîǧĥéř. ·····························⟧';
+
+  @override
+  String get authErrorNoNetwork =>
+      '⟦Ñó ñéŧŵóřķ çóññéçŧîóñ. Ŧřý áǧáîñ łáŧéř. ··············⟧';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      '⟦Îñṽáłîđ éɱáîł óř ƥáššŵóřđ. Çĥéçķ ýóúř çřéđéñŧîáłš. ···················⟧';
+
+  @override
+  String get authErrorUserAlreadyExists =>
+      '⟦Ŧĥîš éɱáîł îš áłřéáđý řéǧîšŧéřéđ. Ŧřý šîǧñîñǧ îñ îñšŧéáđ. ·····················⟧';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      '⟦Ƥłéášé çĥéçķ ýóúř éɱáîł áñđ çóñƒîřɱ ýóúř áççóúñŧ ƒîřšŧ. ·····················⟧';
+
+  @override
+  String get authErrorGeneric =>
+      '⟦Šîǧñ-îñ ƒáîłéđ. Ƥłéášé ŧřý áǧáîñ. ············⟧';
+
+  @override
+  String get autoRecordConsentBadgeLabel =>
+      '⟦Ɓáçķǧřóúñđ łóçáŧîóñ — ƒóř áúŧó-řéçóřđ óñłý ················⟧';
+
+  @override
+  String get autoRecordConsentExplanationTitle =>
+      '⟦Áƀóúŧ ŧĥîš ƥéřɱîššîóñ ·········⟧';
+
+  @override
+  String get autoRecordConsentExplanationBody =>
+      '⟦Áúŧó-řéçóřđ ñééđš ƀáçķǧřóúñđ łóçáŧîóñ ŧó đéŧéçŧ ŵĥéñ ýóú šŧářŧ đřîṽîñǧ ŵĥîłé ŧĥé áƥƥ îš çłóšéđ. Ŧĥîš ǧřáñŧ îš úšéđ óñłý ƀý áúŧó-řéçóřđ — šŧáŧîóñ šéářçĥ áñđ ɱáƥ çéñŧéřîñǧ úšé á šéƥářáŧé ƒóřéǧřóúñđ łóçáŧîóñ ǧřáñŧ. ··············································································⟧';
+
+  @override
+  String get autoRecordConsentExplanationCloseButton => '⟦Ǧóŧ îŧ ··⟧';
+
+  @override
+  String get autoRecordConsentExplanationTooltip =>
+      '⟦Ŵĥáŧ đóéš ŧĥîš ɱéáñ? ·······⟧';
+
+  @override
+  String get autoRecordConsentRevokeAction =>
+      '⟦Ŧáƥ ŧó ɱáñáǧé îñ šýšŧéɱ šéŧŧîñǧš ············⟧';
+
+  @override
+  String get autoRecordSectionTitle => '⟦Áúŧó-řéçóřđ ·····⟧';
+
+  @override
+  String get autoRecordToggleLabel => '⟦Áúŧó-řéçóřđ ŧřîƥš ·······⟧';
+
+  @override
+  String get autoRecordStatusActiveLabel =>
+      '⟦Áúŧó-řéçóřđ ŵîłł áçŧîṽáŧé ŧĥé ñéẋŧ ŧîɱé ýóú éñŧéř ŧĥé çář. ·····················⟧';
+
+  @override
+  String get autoRecordStatusNeedsPairingLabel =>
+      '⟦Ƥáîř áñ ÓƁĐ2 áđáƥŧéř ŧó éñáƀłé áúŧó-řéçóřđ. ···············⟧';
+
+  @override
+  String get autoRecordStatusNeedsBackgroundLocationLabel =>
+      '⟦Áłłóŵ ƀáçķǧřóúñđ łóçáŧîóñ šó áúŧó-řéçóřđ ķééƥš řúññîñǧ ŵîŧĥ ŧĥé šçřééñ óƒƒ. ····························⟧';
+
+  @override
+  String get autoRecordStatusPairAdapterCta => '⟦Ƥáîř áñ áđáƥŧéř ······⟧';
+
+  @override
+  String get autoRecordSpeedThresholdLabel => '⟦Šŧářŧ šƥééđ (ķɱ/ĥ) ······⟧';
+
+  @override
+  String get autoRecordSaveDelayLabel =>
+      '⟦Šáṽé đéłáý áƒŧéř đîšçóññéçŧ (šéçóñđš) ··············⟧';
+
+  @override
+  String get autoRecordPairedAdapterLabel => '⟦Ƥáîřéđ áđáƥŧéř ······⟧';
+
+  @override
+  String get autoRecordPairedAdapterNone =>
+      '⟦Ñó áđáƥŧéř ƥáîřéđ. Ƥáîř óñé ṽîá ŧĥé ÓƁĐ2 óñƀóářđîñǧ ƒîřšŧ. ·····················⟧';
+
+  @override
+  String get autoRecordBackgroundLocationLabel =>
+      '⟦Ɓáçķǧřóúñđ łóçáŧîóñ áłłóŵéđ ···········⟧';
+
+  @override
+  String get autoRecordBackgroundLocationRequest =>
+      '⟦Řéɋúéšŧ ƥéřɱîššîóñ ········⟧';
+
+  @override
+  String get autoRecordBackgroundLocationRationaleTitle =>
+      '⟦Ŵĥý \"Áłłóŵ áłł ŧĥé ŧîɱé\"? ········⟧';
+
+  @override
+  String get autoRecordBackgroundLocationRationaleBody =>
+      '⟦Áúŧó-řéçóřđ šŧřéáɱš ǦƤŠ çóóřđîñáŧéš ƒřóɱ ŧĥé ÓƁĐ-ÎÎ ƒóřéǧřóúñđ šéřṽîçé ŵĥîłé ŧĥé šçřééñ îš óƒƒ šó ýóúř ŧřîƥ řóúŧé šŧáýš áççúřáŧé. Áñđřóîđ řéɋúîřéš ŧĥé \"Áłłóŵ áłł ŧĥé ŧîɱé\" óƥŧîóñ ƒóř ŧĥáŧ ŧó ķééƥ ŵóřķîñǧ áƒŧéř ŧĥé đéṽîçé łóçķš. ···················································································⟧';
+
+  @override
+  String get autoRecordBackgroundLocationOpenSettings =>
+      '⟦Óƥéñ šéŧŧîñǧš ·····⟧';
+
+  @override
+  String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
+      '⟦Łóçáŧîóñ ƥéřɱîššîóñ řéɋúîřéđ ············⟧';
+
+  @override
+  String get autoRecordBackgroundLocationRequestFailedSnackbar =>
+      '⟦Çóúłđ ñóŧ řéɋúéšŧ ƀáçķǧřóúñđ łóçáŧîóñ ···············⟧';
+
+  @override
+  String get autoRecordBadgeClearTooltip => '⟦Çłéář çóúñŧéř ·····⟧';
+
+  @override
+  String get autoRecordPairAdapterLinkText =>
+      '⟦Ƥáîř áñ áđáƥŧéř îñ ŧĥé šéçŧîóñ ƀéłóŵ ŧó éñáƀłé áúŧó-řéçóřđîñǧ ·······················⟧';
+
+  @override
+  String get exportBackupTooltip => '⟦Éẋƥóřŧ ƀáçķúƥ ·····⟧';
+
+  @override
+  String get exportBackupReady =>
+      '⟦Ɓáçķúƥ řéáđý — ƥîçķ á đéšŧîñáŧîóñ ············⟧';
+
+  @override
+  String get exportBackupFailed =>
+      '⟦Ɓáçķúƥ éẋƥóřŧ ƒáîłéđ — ƥłéášé ŧřý áǧáîñ ··············⟧';
+
+  @override
+  String get brokenMapChipVerifying => '⟦ṀÁƤ šéñšóř ṽéřîƒýîñǧ… ········⟧';
+
+  @override
+  String get brokenMapChipDisclaimer => '⟦ṀÁƤ řéáđîñǧš šúšƥîçîóúš ·········⟧';
+
+  @override
+  String get brokenMapSnackbarUnreliable =>
+      '⟦ṀÁƤ šéñšóř řéáđš îñçóřřéçŧłý — ƒúéł řéáđîñǧš ɱáý ƀé 50–80% ŧóó łóŵ. Ŧřý á đîƒƒéřéñŧ áđáƥŧéř. ·······························⟧';
+
+  @override
+  String get brokenMapBannerHardDisable =>
+      '⟦ṀÁƤ šéñšóř úñřéłîáƀłé. Šĥóŵîñǧ ƒîłł-úƥ áṽéřáǧéš îñšŧéáđ óƒ łîṽé ƒúéł řáŧé. ···························⟧';
+
+  @override
+  String brokenMapOverlayVerified(String confidence) {
+    return '⟦ṀÁƤ šéñšóř: ṽéřîƒîéđ ($confidence) ········⟧';
+  }
+
+  @override
+  String brokenMapOverlayUnverified(String confidence) {
+    return '⟦ṀÁƤ šéñšóř: ṽéřîƒýîñǧ ($confidence) ········⟧';
+  }
+
+  @override
+  String brokenMapOverlaySuspicious(String confidence) {
+    return '⟦ṀÁƤ šéñšóř: šúšƥîçîóúš ($confidence) ·········⟧';
+  }
+
+  @override
+  String brokenMapOverlayPosterior(String posterior, String margin) {
+    return '⟦ṀÁƤ šéñšóř: $posterior% ± $margin% ····⟧';
+  }
+
+  @override
+  String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
+    return '⟦ṀÁƤ šéñšóř: $posterior% ± $margin% (ṽéřîƒîéđ) ········⟧';
+  }
+
+  @override
+  String get brokenMapDiagnosticsCardTitle =>
+      '⟦ṀÁƤ šéñšóř đîáǧñóšŧîçš ·········⟧';
+
+  @override
+  String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
+    return '⟦Ɓřóķéñ-ṀÁƤ çóñƒîđéñçé: $posterior% ± $margin% ·········⟧';
+  }
+
+  @override
+  String brokenMapDiagnosticsObservationCount(int count) {
+    return '⟦$count óƀšéřṽáŧîóñš řéçóřđéđ ·········⟧';
+  }
+
+  @override
+  String get brokenMapDiagnosticsVerifiedBadge => '⟦Ṽéřîƒîéđ çłéáñ ······⟧';
+
+  @override
+  String get brokenMapDiagnosticsBeliefNone =>
+      '⟦Ŧĥîš ṽéĥîçłé\'š ṀÁƤ šéñšóř ĥášñ\'ŧ ƀééñ óƀšéřṽéđ ýéŧ. ··················⟧';
+
+  @override
+  String get brokenMapDiagnosticsBlocklistHeading =>
+      '⟦Ɓłóçķłîšŧéđ áđáƥŧéřš ·········⟧';
+
+  @override
+  String get brokenMapDiagnosticsBlocklistEmpty =>
+      '⟦Ñó áđáƥŧéřš ářé ƀłóçķłîšŧéđ. ···········⟧';
+
+  @override
+  String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
+    return '⟦$adapter — ƒłáǧǧéđ $percent% ƀřóķéñ ······⟧';
+  }
+
+  @override
+  String get brokenMapDiagnosticsClearButton => '⟦Çłéář ··⟧';
+
+  @override
+  String get brokenMapRevPromptTitle => '⟦Řéṽ ŧĥé éñǧîñé ·····⟧';
+
+  @override
+  String get brokenMapRevPromptBody =>
+      '⟦Ɓřîéƒłý ƀłîƥ ŧĥé ŧĥřóŧŧłé šó ŧĥé áƥƥ çáñ çĥéçķ ŧĥé ṀÁƤ šéñšóř řéšƥóñđš. ··························⟧';
+
+  @override
+  String get brokenMapRevPromptConfirm => '⟦Đóñé — Î řéṽṽéđ ·····⟧';
+
+  @override
+  String get calibrationAdvancedTitle => '⟦Áđṽáñçéđ çáłîƀřáŧîóñ ·········⟧';
+
+  @override
+  String get calibrationDisplacementLabel =>
+      '⟦Éñǧîñé đîšƥłáçéɱéñŧ (çç) ·········⟧';
+
+  @override
+  String get calibrationVolumetricEfficiencyLabel =>
+      '⟦Ṽółúɱéŧřîç éƒƒîçîéñçý (η_ṽ) ·········⟧';
+
+  @override
+  String get calibrationAfrLabel => '⟦Áîř-ŧó-ƒúéł řáŧîó (ÁƑŘ) ········⟧';
+
+  @override
+  String get calibrationFuelDensityLabel => '⟦Ƒúéł đéñšîŧý (ǧ/Ł) ······⟧';
+
+  @override
+  String get calibrationSourceDetected => '⟦(đéŧéçŧéđ ƒřóɱ ṼÎÑ) ·······⟧';
+
+  @override
+  String calibrationSourceCatalog(String makeModel) {
+    return '⟦(çáŧáłóǧ: $makeModel) ···⟧';
+  }
+
+  @override
+  String get calibrationSourceDefault => '⟦(đéƒáúłŧ) ···⟧';
+
+  @override
+  String get calibrationSourceManual => '⟦(ɱáñúáł) ···⟧';
+
+  @override
+  String get calibrationResetToDetected =>
+      '⟦Řéšéŧ ŧó đéŧéçŧéđ ṽáłúé ·········⟧';
+
+  @override
+  String calibrationLearnerStatusCalibrated(String eta, int samples) {
+    return '⟦η_ṽ: $eta (çáłîƀřáŧéđ, $samples šáɱƥłéš) ········⟧';
+  }
+
+  @override
+  String calibrationLearnerStatusLearning(String eta, int samples) {
+    return '⟦η_ṽ: $eta (łéářñîñǧ, $samples šáɱƥłéš) ·······⟧';
+  }
+
+  @override
+  String get calibrationLearnerStatusNoSamples =>
+      '⟦η_ṽ: 0.85 (đéƒáúłŧ — ñó ƥłéîñ-çóɱƥłéŧ ýéŧ) ···········⟧';
+
+  @override
+  String get calibrationResetLearner => '⟦Řéšéŧ łéářñéř ·····⟧';
+
+  @override
+  String get calibrationBasisAtkinson => '⟦Áŧķîñšóñ çýçłé ······⟧';
+
+  @override
+  String get calibrationBasisVnt => '⟦ṼÑŦ đîéšéł + ĐÎ ·····⟧';
+
+  @override
+  String get calibrationBasisTurboDi => '⟦Ŧúřƀóçĥářǧéđ + ĐÎ ······⟧';
+
+  @override
+  String get calibrationBasisTurbo => '⟦Ŧúřƀóçĥářǧéđ ·····⟧';
+
+  @override
+  String get calibrationBasisNaDi => '⟦Ñáŧúřáłłý ášƥîřáŧéđ + ĐÎ ·········⟧';
+
+  @override
+  String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
+    return '⟦(çáŧáłóǧ: $makeModel — $basis đéƒáúłŧ) ······⟧';
+  }
+
+  @override
+  String catalogReresolveSnackbarMessage(String makeModel) {
+    return '⟦Ýóúř $makeModel îš ɱářķéđ áš đîéšéł ƀúŧ ɱáŧçĥéš á ƥéŧřół çáŧáłóǧ éñŧřý. Ŧáƥ ŧó úƥđáŧé. ···························⟧';
+  }
+
+  @override
+  String get catalogReresolveSnackbarAction => '⟦Úƥđáŧé ···⟧';
+
+  @override
+  String get consumptionTabFuel => '⟦Ƒúéł ··⟧';
+
+  @override
+  String get consumptionTabCharging => '⟦Çĥářǧîñǧ ····⟧';
+
+  @override
+  String get noChargingLogsTitle => '⟦Ñó çĥářǧîñǧ łóǧš ýéŧ ········⟧';
+
+  @override
+  String get noChargingLogsSubtitle =>
+      '⟦Łóǧ ýóúř ƒîřšŧ çĥářǧîñǧ šéššîóñ ŧó šŧářŧ ŧřáçķîñǧ ÉÚŘ/100 ķɱ áñđ ķŴĥ/100 ķɱ. ·························⟧';
+
+  @override
+  String get addChargingLog => '⟦Łóǧ çĥářǧîñǧ ·····⟧';
+
+  @override
+  String get addChargingLogTitle => '⟦Łóǧ çĥářǧîñǧ šéššîóñ ········⟧';
+
+  @override
+  String get chargingKwh => '⟦Éñéřǧý (ķŴĥ) ····⟧';
+
+  @override
+  String get chargingCost => '⟦Ŧóŧáł çóšŧ ····⟧';
+
+  @override
+  String get chargingTimeMin => '⟦Çĥářǧé ŧîɱé (ɱîñ) ······⟧';
+
+  @override
+  String get chargingStationName => '⟦Šŧáŧîóñ (óƥŧîóñáł) ·······⟧';
+
+  @override
+  String chargingEurPer100km(String value) {
+    return '⟦$value ÉÚŘ / 100 ķɱ ··⟧';
+  }
+
+  @override
+  String chargingKwhPer100km(String value) {
+    return '⟦$value ķŴĥ / 100 ķɱ ··⟧';
+  }
+
+  @override
+  String get chargingDerivedHelper =>
+      '⟦Ñééđ á ƥřéṽîóúš łóǧ ŧó çóɱƥářé ···········⟧';
+
+  @override
+  String get chargingLogButtonLabel => '⟦Łóǧ çĥářǧîñǧ ·····⟧';
+
+  @override
+  String get chargingCostTrendTitle => '⟦Çĥářǧîñǧ çóšŧ ŧřéñđ ········⟧';
+
+  @override
+  String get chargingEfficiencyTitle => '⟦Éƒƒîçîéñçý (ķŴĥ/100 ķɱ) ·······⟧';
+
+  @override
+  String get chargingChartsEmpty => '⟦Ñóŧ éñóúǧĥ đáŧá ýéŧ ·······⟧';
+
+  @override
+  String get chargingChartsMonthAxis => '⟦Ṁóñŧĥ ··⟧';
+
+  @override
+  String get gdprCommunityWaitTimeTitle => '⟦Çóɱɱúñîŧý Ŵáîŧ Ŧîɱéš ········⟧';
+
+  @override
+  String get gdprCommunityWaitTimeShort =>
+      '⟦Áñóñýɱóúšłý šĥářé šŧáŧîóñ ŵáîŧ ŧîɱéš ··············⟧';
+
+  @override
+  String get gdprCommunityWaitTimeDescription =>
+      '⟦Áñóñýɱóúšłý šĥářé ŵĥéñ ýóú ářřîṽé áŧ áñđ łéáṽé á ƒúéł šŧáŧîóñ šó ŧĥé áƥƥ çáñ šĥóŵ ŧýƥîçáł ŵáîŧ ŧîɱéš. Ñó łóçáŧîóñ çóóřđîñáŧéš ářé úƥłóáđéđ — óñłý ŧĥé šŧáŧîóñ ÎĐ. ···························································⟧';
+
+  @override
+  String get consoFeatureGroupTitle => '⟦Çóñšó ··⟧';
+
+  @override
+  String get consoFeatureGroupDescription =>
+      '⟦Ŧřáçķ ýóúř çóñšúɱƥŧîóñ — ɱáñúáł ƒîłł-úƥš, óř áúŧóɱáŧîç ÓƁĐ2 ŧřîƥ řéçóřđîñǧ. ···························⟧';
+
+  @override
+  String get consoModeOff => '⟦Óƒƒ ·⟧';
+
+  @override
+  String get consoModeFuel => '⟦Ƒúéł ··⟧';
+
+  @override
+  String get consoModeFuelAndTrips => '⟦Ƒúéł + Ŧřîƥš ····⟧';
+
+  @override
+  String get consoModeOffDescription =>
+      '⟦Ñó Çóñšó ŧáƀ áñđ ñó Çóñšó šéŧŧîñǧš šéçŧîóñ. ················⟧';
+
+  @override
+  String get consoModeFuelDescription =>
+      '⟦Ṁáñúáł ƒîłł-úƥš óñłý. Úšéƒúł ŵîŧĥóúŧ áñ ÓƁĐ2 áđáƥŧéř. ···················⟧';
+
+  @override
+  String get consoModeFuelAndTripsDescription =>
+      '⟦Áđđš áúŧóɱáŧîç ÓƁĐ2 ŧřîƥ řéçóřđîñǧ. Řéɋúîřéš á ƥáîřéđ áđáƥŧéř. ·······················⟧';
+
+  @override
+  String get consoSubsectionVehicles => '⟦Ṁý ṽéĥîçłéš ·····⟧';
+
+  @override
+  String get consoSubsectionTrajets => '⟦Ŧřîƥš (ÓƁĐ2) ····⟧';
+
+  @override
+  String get consoSubsectionToggles => '⟦Đřîṽîñǧ ···⟧';
+
+  @override
+  String consumptionStatsOpenWindowBanner(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count partial fills pending plein complet — not in average',
+      one: '1 partial fill pending plein complet — not in average',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String consumptionStatsCorrectionShareHint(int percent) {
+    return '⟦$percent% óƒ ƒúéł ƒřóɱ áúŧó-çóřřéçŧîóñš — řéṽîéŵ éñŧřîéš ·················⟧';
+  }
+
+  @override
+  String get fillUpCorrectionLabel =>
+      '⟦Áúŧó-çóřřéçŧîóñ — ŧáƥ ŧó éđîŧ ··········⟧';
+
+  @override
+  String get fillUpCorrectionEditTitle => '⟦Éđîŧ áúŧó-çóřřéçŧîóñ ········⟧';
+
+  @override
+  String get fillUpCorrectionEditExplainer =>
+      '⟦Ŧĥîš éñŧřý ŵáš áúŧó-ǧéñéřáŧéđ ŧó çłóšé ŧĥé ǧáƥ ƀéŧŵééñ řéçóřđéđ ŧřîƥš áñđ ƥúɱƥéđ ƒúéł. Áđĵúšŧ ŧĥé ṽáłúéš îƒ ýóú ķñóŵ ŧĥé áçŧúáł ƒîǧúřéš. ··················································⟧';
+
+  @override
+  String get fillUpCorrectionDelete => '⟦Đéłéŧé çóřřéçŧîóñ ·······⟧';
+
+  @override
+  String get fillUpCorrectionStation => '⟦Šŧáŧîóñ ñáɱé (óƥŧîóñáł) ·········⟧';
+
+  @override
+  String get greeceApiProvider => '⟦Ƥářáŧîřîŧîřîó Ŧîɱóñ (Ǧřééçé) ···········⟧';
+
+  @override
+  String get greeceCommunityApiNotice =>
+      '⟦Ƥóŵéřéđ ƀý ŧĥé çóɱɱúñîŧý-ɱáîñŧáîñéđ ƒúéłƥřîçéšǧř ÁƤÎ ·····················⟧';
+
+  @override
+  String get romaniaApiProvider =>
+      '⟦Ṁóñîŧóřúł Ƥřéțúřîłóř (Řóɱáñîá) ···········⟧';
+
+  @override
+  String get romaniaScrapingNotice =>
+      '⟦Ƥóŵéřéđ ƀý ƥřéŧçářƀúřáñŧ.řó (Çóɱƥéŧîŧîóñ Çóúñçîł + ÁÑƤÇ) ·····················⟧';
+
+  @override
+  String crossBorderCheaper(String country, String km, String price) {
+    return '⟦$country šŧáŧîóñš $km ķɱ áŵáý — €$price/Ł çĥéáƥéř ··········⟧';
+  }
+
+  @override
+  String get crossBorderTapToSwitch => '⟦Ŧáƥ ŧó šŵîŧçĥ çóúñŧřý ········⟧';
+
+  @override
+  String get crossBorderDismissTooltip => '⟦Đîšɱîšš ···⟧';
+
+  @override
+  String get insightCardTitle => '⟦Ŧóƥ ŵášŧéƒúł ƀéĥáṽîóúřš ·········⟧';
+
+  @override
+  String get insightEmptyState =>
+      '⟦Ñó ñóŧáƀłé îñéƒƒîçîéñçîéš — ķééƥ îŧ úƥ! ··············⟧';
+
+  @override
+  String insightHighRpm(String pctTime, String liters) {
+    return '⟦Éñǧîñé óṽéř 3000 ŘƤṀ ($pctTime% óƒ ŧřîƥ): ŵášŧéđ $liters Ł ············⟧';
+  }
+
+  @override
+  String insightHardAccel(String count, String liters) {
+    return '⟦$count ĥářđ áççéłéřáŧîóñš: ŵášŧéđ $liters Ł ···········⟧';
+  }
+
+  @override
+  String insightIdling(String pctTime, String liters) {
+    return '⟦Îđłîñǧ ($pctTime% óƒ ŧřîƥ): ŵášŧéđ $liters Ł ·········⟧';
+  }
+
+  @override
+  String insightSubtitlePctOfTrip(String pctTime) {
+    return '⟦$pctTime% óƒ ŧřîƥ ···⟧';
+  }
+
+  @override
+  String insightTrailingLitersWasted(String liters) {
+    return '⟦+$liters Ł⟧';
+  }
+
+  @override
+  String insightLowGear(String minutes) {
+    return '⟦Łáƀóúřîñǧ îñ łóŵ ǧéář ($minutes ɱîñ) ·········⟧';
+  }
+
+  @override
+  String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';
+
+  @override
+  String get drivingScoreCardOutOf => '⟦/100⟧';
+
+  @override
+  String get drivingScoreCardSubtitle =>
+      '⟦Çóɱƥóšîŧé šçóřé ƒřóɱ îđłîñǧ, ĥářđ áççéłéřáŧîóñš, ĥářđ ƀřáķîñǧ, áñđ ĥîǧĥ-ŘƤṀ ŧîɱé. Á \'ƀéŧŧéř ŧĥáñ Ẋ% óƒ ƥášŧ ŧřîƥš\' çóɱƥářîšóñ ŵîłł łáñđ îñ á ƒółłóŵ-úƥ řéłéášé. ························································⟧';
+
+  @override
+  String drivingScoreCardSemanticsLabel(String score) {
+    return '⟦Đřîṽîñǧ šçóřé $score óúŧ óƒ 100 ········⟧';
+  }
+
+  @override
+  String get drivingScorePenaltyIdling => '⟦Îđłîñǧ ···⟧';
+
+  @override
+  String get drivingScorePenaltyHardAccel => '⟦Ĥářđ áççéłéřáŧîóñš ········⟧';
+
+  @override
+  String get drivingScorePenaltyHardBrake => '⟦Ĥářđ ƀřáķîñǧ ·····⟧';
+
+  @override
+  String get drivingScorePenaltyHighRpm => '⟦Ĥîǧĥ ŘƤṀ ···⟧';
+
+  @override
+  String get drivingScorePenaltyFullThrottle => '⟦Ƒúłł ŧĥřóŧŧłé ·····⟧';
+
+  @override
+  String get ecoRouteOption => '⟦Éçó ·⟧';
+
+  @override
+  String ecoRouteSavings(String liters) {
+    return '⟦≈ $liters Ł šáṽéđ ···⟧';
+  }
+
+  @override
+  String get ecoRouteHint =>
+      '⟦Šɱářŧéř đřîṽé — ƒáṽóúřš šŧéáđý ĥîǧĥŵáý óṽéř žîǧžáǧ šĥóřŧçúŧš. ·······················⟧';
+
+  @override
+  String get favoritesShareAction => '⟦Šĥářé ··⟧';
+
+  @override
+  String favoritesShareSubject(String date) {
+    return '⟦Šƥářķîłó — ƒáṽóúřîŧéš óñ $date ·········⟧';
+  }
+
+  @override
+  String get favoritesShareError =>
+      '⟦Çóúłđñ\'ŧ ǧéñéřáŧé šĥářé îɱáǧé ···········⟧';
+
+  @override
+  String get featureManagementSectionTitle => '⟦Ƒéáŧúřé ɱáñáǧéɱéñŧ ········⟧';
+
+  @override
+  String get featureManagementSectionSubtitle =>
+      '⟦Ŧúřñ îñđîṽîđúáł ƒéáŧúřéš óñ óř óƒƒ. Šóɱé ƒéáŧúřéš đéƥéñđ óñ óŧĥéřš — šŵîŧçĥéš ářé đîšáƀłéđ úñŧîł ƥřéřéɋúîšîŧéš ářé ɱéŧ. ············································⟧';
+
+  @override
+  String get featureLabel_obd2TripRecording => '⟦ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ·······⟧';
+
+  @override
+  String get featureDescription_obd2TripRecording =>
+      '⟦Çáƥŧúřé ŧřîƥš áúŧóɱáŧîçáłłý óṽéř ÓƁĐ2. ··············⟧';
+
+  @override
+  String get featureLabel_gamification => '⟦Ǧáɱîƒîçáŧîóñ ·····⟧';
+
+  @override
+  String get featureDescription_gamification =>
+      '⟦Đřîṽîñǧ šçóřéš áñđ éářñéđ ƀáđǧéš. ·············⟧';
+
+  @override
+  String get featureLabel_hapticEcoCoach => '⟦Ĥáƥŧîç éçó-çóáçĥ ······⟧';
+
+  @override
+  String get featureDescription_hapticEcoCoach =>
+      '⟦Řéáł-ŧîɱé ĥáƥŧîç ƒééđƀáçķ đúřîñǧ á ŧřîƥ. ···············⟧';
+
+  @override
+  String get featureLabel_tankSync => '⟦ŦáñķŠýñç ····⟧';
+
+  @override
+  String get featureDescription_tankSync =>
+      '⟦Çřóšš-đéṽîçé šýñç ṽîá Šúƥáƀášé. ············⟧';
+
+  @override
+  String get featureLabel_consumptionAnalytics =>
+      '⟦Çóñšúɱƥŧîóñ áñáłýŧîçš ·········⟧';
+
+  @override
+  String get featureDescription_consumptionAnalytics =>
+      '⟦Ƒîłł-úƥ áñđ ŧřîƥ áñáłýšîš ŧáƀ. ···········⟧';
+
+  @override
+  String get featureLabel_baselineSync => '⟦Ɓášéłîñé šýñç ·····⟧';
+
+  @override
+  String get featureDescription_baselineSync =>
+      '⟦Šýñç đřîṽîñǧ ƀášéłîñéš ṽîá ŦáñķŠýñç. ··············⟧';
+
+  @override
+  String get featureLabel_unifiedSearchResults =>
+      '⟦Úñîƒîéđ šéářçĥ řéšúłŧš ·········⟧';
+
+  @override
+  String get featureDescription_unifiedSearchResults =>
+      '⟦Šîñǧłé řéšúłŧ łîšŧ çóɱƀîñîñǧ ƒúéł áñđ ÉṼ šŧáŧîóñš. ···················⟧';
+
+  @override
+  String get featureLabel_priceAlerts => '⟦Ƥřîçé áłéřŧš ·····⟧';
+
+  @override
+  String get featureDescription_priceAlerts =>
+      '⟦Ŧĥřéšĥółđ-ƀášéđ ƥřîçé-đřóƥ ñóŧîƒîçáŧîóñš. ················⟧';
+
+  @override
+  String get featureLabel_priceHistory => '⟦Ƥřîçé ĥîšŧóřý ·····⟧';
+
+  @override
+  String get featureDescription_priceHistory =>
+      '⟦30-đáý ƥřîçé çĥářŧš óñ šŧáŧîóñ đéŧáîłš. ··············⟧';
+
+  @override
+  String get featureLabel_routePlanning => '⟦Řóúŧé ƥłáññîñǧ ······⟧';
+
+  @override
+  String get featureDescription_routePlanning =>
+      '⟦Çĥéáƥéšŧ šŧóƥ áłóñǧ ýóúř řóúŧé. ············⟧';
+
+  @override
+  String get featureLabel_evCharging => '⟦ÉṼ çĥářǧîñǧ ·····⟧';
+
+  @override
+  String get featureDescription_evCharging =>
+      '⟦Çĥářǧîñǧ šŧáŧîóñš ṽîá ÓƥéñÇĥářǧéṀáƥ. ··············⟧';
+
+  @override
+  String get featureLabel_glideCoach => '⟦Ǧłîđé-çóáçĥ ·····⟧';
+
+  @override
+  String get featureDescription_glideCoach =>
+      '⟦Ĥýƥéřɱîłîñǧ ǧúîđáñçé úšîñǧ ÓŠṀ ŧřáƒƒîç šîǧñáłš. ··················⟧';
+
+  @override
+  String get featureLabel_gpsTripPath => '⟦ǦƤŠ ŧřîƥ ƥáŧĥ ·····⟧';
+
+  @override
+  String get featureDescription_gpsTripPath =>
+      '⟦Ƥéřšîšŧ ǦƤŠ ƥáŧĥ šáɱƥłéš áłóñǧšîđé éáçĥ ŧřîƥ. ·················⟧';
+
+  @override
+  String get featureLabel_autoRecord => '⟦Áúŧó-řéçóřđ ·····⟧';
+
+  @override
+  String get featureDescription_autoRecord =>
+      '⟦Áúŧóɱáŧîçáłłý šŧářŧ á ŧřîƥ ŵĥéñ ŧĥé ÓƁĐ2 áđáƥŧéř çóññéçŧš ŧó á ɱóṽîñǧ ṽéĥîçłé. ·····························⟧';
+
+  @override
+  String get featureLabel_showFuel => '⟦Šĥóŵ ƒúéł šŧáŧîóñš ·······⟧';
+
+  @override
+  String get featureDescription_showFuel =>
+      '⟦Đîšƥłáý ƥéŧřół/đîéšéł šŧáŧîóñ řéšúłŧš îñ šéářçĥ áñđ óñ ŧĥé ɱáƥ. ·······················⟧';
+
+  @override
+  String get featureLabel_showElectric => '⟦Šĥóŵ çĥářǧîñǧ šŧáŧîóñš ·········⟧';
+
+  @override
+  String get featureDescription_showElectric =>
+      '⟦Đîšƥłáý ÉṼ çĥářǧîñǧ šŧáŧîóñš îñ šéářçĥ áñđ óñ ŧĥé ɱáƥ. ····················⟧';
+
+  @override
+  String get featureLabel_showConsumptionTab => '⟦Çóñšúɱƥŧîóñ ŧáƀ ······⟧';
+
+  @override
+  String get featureDescription_showConsumptionTab =>
+      '⟦Šĥóŵ ŧĥé çóñšúɱƥŧîóñ áñáłýŧîçš ŧáƀ îñ ŧĥé ƀóŧŧóɱ ñáṽîǧáŧîóñ. ·······················⟧';
+
+  @override
+  String get featureBlockedEnable_gamification =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureBlockedEnable_hapticEcoCoach =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureBlockedEnable_consumptionAnalytics =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureBlockedEnable_baselineSync =>
+      '⟦Éñáƀłé ŦáñķŠýñç ƒîřšŧ ·········⟧';
+
+  @override
+  String get featureBlockedEnable_glideCoach =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureBlockedEnable_gpsTripPath =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureBlockedEnable_autoRecord =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureBlockedEnable_showFuel =>
+      '⟦Ƥřéřéɋúîšîŧéš ñóŧ ɱéŧ ·········⟧';
+
+  @override
+  String get featureBlockedEnable_showElectric =>
+      '⟦Ƥřéřéɋúîšîŧéš ñóŧ ɱéŧ ·········⟧';
+
+  @override
+  String get featureBlockedEnable_showConsumptionTab =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureLabel_tflitePricePrediction =>
+      '⟦ŦƑŁîŧé ƥřîçé ƥřéđîçŧîóñ ·········⟧';
+
+  @override
+  String get featureDescription_tflitePricePrediction =>
+      '⟦Óñ-đéṽîçé ƥřîçé ƒóřéçášŧ ɱóđéł — îñƒéřéñçé řúñš łóçáłłý; ƒéáŧúřéš áñđ ƥřéđîçŧîóñš ñéṽéř łéáṽé ŧĥé đéṽîçé. ·······································⟧';
+
+  @override
+  String get featureBlockedEnable_tflitePricePrediction =>
+      '⟦Éñáƀłé ƥřîçé ĥîšŧóřý ƒîřšŧ ··········⟧';
+
+  @override
+  String get featureLabel_fuelCalculator => '⟦Ƒúéł çáłçúłáŧóř ······⟧';
+
+  @override
+  String get featureDescription_fuelCalculator =>
+      '⟦Řéáçĥáƀłé ƒúéł-çóšŧ çáłçúłáŧóř ƒřóɱ ŧĥé šéářçĥ řéšúłŧš. ·····················⟧';
+
+  @override
+  String get featureLabel_carbonDashboard => '⟦Çářƀóñ đášĥƀóářđ ·······⟧';
+
+  @override
+  String get featureDescription_carbonDashboard =>
+      '⟦ÇÓ2 ƒóóŧƥřîñŧ đášĥƀóářđ řéáçĥáƀłé ƒřóɱ ŧĥé Çóñšúɱƥŧîóñ ŧáƀ. ·······················⟧';
+
+  @override
+  String get featureLabel_experimentalOemPids =>
+      '⟦Éẋƥéřîɱéñŧáł ÓÉṀ ƤÎĐš ·········⟧';
+
+  @override
+  String get featureDescription_experimentalOemPids =>
+      '⟦Řéáđ éẋáçŧ ŧáñķ łîŧřéš ṽîá ɱáñúƒáçŧúřéř-šƥéçîƒîç ƤÎĐš óñ šúƥƥóřŧéđ áđáƥŧéřš. ·····························⟧';
+
+  @override
+  String get featureBlockedEnable_experimentalOemPids =>
+      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
+
+  @override
+  String get featureLabel_paymentQrScan => '⟦Šçáñ ƥáýɱéñŧ ɊŘ ······⟧';
+
+  @override
+  String get featureDescription_paymentQrScan =>
+      '⟦Šçáñ-ŧó-ƥáý ɊŘ řéáđéř óñ ŧĥé šŧáŧîóñ đéŧáîł šçřééñ. ··················⟧';
+
+  @override
+  String get featureLabel_communityPriceReports =>
+      '⟦Çóɱɱúñîŧý ƥřîçé řéƥóřŧš ·········⟧';
+
+  @override
+  String get featureDescription_communityPriceReports =>
+      '⟦Řéƥóřŧ á šŧáŧîóñ ƥřîçé ƒřóɱ ŧĥé šŧáŧîóñ đéŧáîł šçřééñ. ····················⟧';
+
+  @override
+  String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';
+
+  @override
+  String get feedbackConsentBody =>
+      '⟦Ŧĥîš çřéáŧéš á ƥúƀłîç ŧîçķéŧ óñ óúř ǦîŧĤúƀ řéƥóšîŧóřý ŵîŧĥ ýóúř ƥĥóŧó áñđ ŧĥé ÓÇŘ ŧéẋŧ. Ñó ƥéřšóñáł đáŧá (łóçáŧîóñ, áççóúñŧ îđ) îš šéñŧ. Çóñŧîñúé? ····················································⟧';
+
+  @override
+  String get feedbackConsentContinue => '⟦Çóñŧîñúé ····⟧';
+
+  @override
+  String get feedbackConsentCancel => '⟦Çáñçéł ···⟧';
+
+  @override
+  String get feedbackConsentLater => '⟦Łáŧéř ··⟧';
+
+  @override
+  String get feedbackTokenSectionTitle =>
+      '⟦Ɓáđ-šçáñ ƒééđƀáçķ (ǦîŧĤúƀ) ·········⟧';
+
+  @override
+  String get feedbackTokenDescription =>
+      '⟦Ŧó áúŧóɱáŧîçáłłý óƥéñ á ǦîŧĤúƀ ŧîçķéŧ ƒřóɱ á ƒáîłéđ šçáñ, ƥášŧé á ǦîŧĤúƀ ƤÁŦ (`ƥúƀłîç_řéƥó` šçóƥé óñ ŧĥé ŧáñķšŧéłłéñ řéƥóšîŧóřý). Óŧĥéřŵîšé ɱáñúáł šĥářîñǧ řéɱáîñš áṽáîłáƀłé. ·······························································⟧';
+
+  @override
+  String get feedbackTokenStatusSet => '⟦Ŧóķéñ çóñƒîǧúřéđ ·······⟧';
+
+  @override
+  String get feedbackTokenStatusUnset => '⟦Ñó ŧóķéñ ···⟧';
+
+  @override
+  String get feedbackTokenSet => '⟦Šéŧ ·⟧';
+
+  @override
+  String get feedbackTokenClear => '⟦Çłéář ··⟧';
+
+  @override
+  String get feedbackTokenDialogTitle => '⟦ǦîŧĤúƀ ƤÁŦ ····⟧';
+
+  @override
+  String get feedbackTokenFieldLabel => '⟦Ƥéřšóñáł Áççéšš Ŧóķéñ ·········⟧';
+
+  @override
+  String get fillUpReconciliationVerifiedBadgeLabel =>
+      '⟦Ṽéřîƒîéđ ƀý áđáƥŧéř ········⟧';
+
+  @override
+  String get fillUpReconciliationVarianceDialogTitle =>
+      '⟦Đóéšñ\'ŧ ɱáŧçĥ áđáƥŧéř řéáđîñǧ ···········⟧';
+
+  @override
+  String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
+    return '⟦Ýóúř éñŧřý: $userL Ł. Áđáƥŧéř šáýš: $adapterL Ł (đéłŧá ƒřóɱ ƀéƒóřé/áƒŧéř ƒúéł-łéṽéł çáƥŧúřé). Úšé áđáƥŧéř ṽáłúé? ·································⟧';
+  }
+
+  @override
+  String get fillUpReconciliationVarianceDialogKeepMine =>
+      '⟦Ķééƥ ɱý éñŧřý ·····⟧';
+
+  @override
+  String get fillUpReconciliationVarianceDialogUseAdapter =>
+      '⟦Úšé áđáƥŧéř ṽáłúé ·······⟧';
+
+  @override
+  String get scanReceiptNoData =>
+      '⟦Ñó řéçéîƥŧ đáŧá ƒóúñđ — ŧřý áǧáîñ ············⟧';
+
+  @override
+  String get scanReceiptSuccess =>
+      '⟦Řéçéîƥŧ šçáññéđ — ṽéřîƒý ṽáłúéš. Ŧáƥ \"Řéƥóřŧ šçáñ éřřóř\" ƀéłóŵ îƒ áñýŧĥîñǧ îš óƒƒ. ·····························⟧';
+
+  @override
+  String scanReceiptFailed(String error) {
+    return '⟦Šçáñ ƒáîłéđ: $error ·····⟧';
+  }
+
+  @override
+  String get scanPumpUnreadable =>
+      '⟦Ƥúɱƥ đîšƥłáý ñóŧ řéáđáƀłé — ŧřý áǧáîñ ··············⟧';
+
+  @override
+  String get scanPumpSuccess =>
+      '⟦Ƥúɱƥ đîšƥłáý šçáññéđ — ṽéřîƒý ŧĥé ṽáłúéš. ···············⟧';
+
+  @override
+  String scanPumpFailed(String error) {
+    return '⟦Ƥúɱƥ šçáñ ƒáîłéđ: $error ······⟧';
+  }
+
+  @override
+  String get badScanReportTitle => '⟦Řéƥóřŧ á šçáñ éřřóř ·······⟧';
+
+  @override
+  String get badScanReportTitleReceipt =>
+      '⟦Řéƥóřŧ á šçáñ éřřóř — Řéçéîƥŧ ··········⟧';
+
+  @override
+  String get badScanReportTitlePumpDisplay =>
+      '⟦Řéƥóřŧ á šçáñ éřřóř — Ƥúɱƥ đîšƥłáý ············⟧';
+
+  @override
+  String get pumpScanFailureTitle => '⟦Đîšƥłáý úñřéáđáƀłé ········⟧';
+
+  @override
+  String get pumpScanFailureBody =>
+      '⟦Ŧĥé šçáñ çóúłđñ\'ŧ řéáđ ŧĥé ƥúɱƥ đîšƥłáý. Ŵĥáŧ ŵóúłđ ýóú łîķé ŧó đó? ·······················⟧';
+
+  @override
+  String get pumpScanFailureCorrectManually => '⟦Çóřřéçŧ ɱáñúáłłý ·······⟧';
+
+  @override
+  String get pumpScanFailureReport => '⟦Řéƥóřŧ ···⟧';
+
+  @override
+  String get pumpScanFailureRemove => '⟦Řéɱóṽé ƥĥóŧó ·····⟧';
+
+  @override
+  String get badScanReportHint =>
+      '⟦Ŵé\'łł šĥářé ŧĥé řéçéîƥŧ ƥĥóŧó áñđ ƀóŧĥ šéŧš óƒ ṽáłúéš šó ŧĥé ñéẋŧ ƀúîłđ çáñ łéářñ ŧĥîš łáýóúŧ. ··································⟧';
+
+  @override
+  String get badScanReportShareAction => '⟦Šĥářé řéƥóřŧ + ƥĥóŧó ·······⟧';
+
+  @override
+  String get badScanReportFieldBrandLayout => '⟦Ɓřáñđ łáýóúŧ ·····⟧';
+
+  @override
+  String get badScanReportFieldTotal => '⟦Ŧóŧáł ··⟧';
+
+  @override
+  String get badScanReportFieldPricePerLiter => '⟦Ƥřîçé/Ł ···⟧';
+
+  @override
+  String get badScanReportFieldStation => '⟦Šŧáŧîóñ ···⟧';
+
+  @override
+  String get badScanReportFieldFuel => '⟦Ƒúéł ··⟧';
+
+  @override
+  String get badScanReportFieldDate => '⟦Đáŧé ··⟧';
+
+  @override
+  String get badScanReportHeaderField => '⟦Ƒîéłđ ··⟧';
+
+  @override
+  String get badScanReportHeaderScanned => '⟦Šçáññéđ ···⟧';
+
+  @override
+  String get badScanReportHeaderYouTyped => '⟦Ýóú ŧýƥéđ ····⟧';
+
+  @override
+  String get badScanReportCreateTicket => '⟦Çřéáŧé îššúé ·····⟧';
+
+  @override
+  String get badScanReportOpenInBrowser => '⟦Óƥéñ îñ ƀřóŵšéř ······⟧';
+
+  @override
+  String get badScanReportFallbackToShare =>
+      '⟦Šúƀɱîššîóñ ƒáîłéđ — ɱáñúáł šĥářé ············⟧';
+
+  @override
+  String get fillUpSectionWhatTitle => '⟦Ŵĥáŧ ýóú ƒîłłéđ ······⟧';
+
+  @override
+  String get fillUpSectionWhatSubtitle => '⟦Ƒúéł, áɱóúñŧ, ƥřîçé ·······⟧';
+
+  @override
+  String get fillUpSectionWhereTitle => '⟦Ŵĥéřé ýóú ŵéřé ·····⟧';
+
+  @override
+  String get fillUpSectionWhereSubtitle =>
+      '⟦Šŧáŧîóñ, óđóɱéŧéř, ñóŧéš ·········⟧';
+
+  @override
+  String get fillUpImportFromLabel => '⟦Îɱƥóřŧ ƒřóɱ… ·····⟧';
+
+  @override
+  String get fillUpImportSheetTitle => '⟦Îɱƥóřŧ ƒîłł-úƥ đáŧá ·······⟧';
+
+  @override
+  String get fillUpImportReceiptLabel => '⟦Řéçéîƥŧ ···⟧';
+
+  @override
+  String get fillUpImportReceiptDescription =>
+      '⟦Šçáñ á ƥáƥéř řéçéîƥŧ ŵîŧĥ ŧĥé çáɱéřá ··············⟧';
+
+  @override
+  String get fillUpImportPumpLabel => '⟦Ƥúɱƥ đîšƥłáý ·····⟧';
+
+  @override
+  String get fillUpImportPumpDescription =>
+      '⟦Řéáđ Ɓéŧřáǧ / Ƥřéîš ƒřóɱ ŧĥé ƥúɱƥ ŁÇĐ ·············⟧';
+
+  @override
+  String get fillUpImportObdLabel => '⟦ÓƁĐ-ÎÎ áđáƥŧéř ·····⟧';
+
+  @override
+  String get fillUpImportObdDescription =>
+      '⟦Řéáđ óđóɱéŧéř ƒřóɱ ŧĥé ÓƁĐ-ÎÎ ƥóřŧ óṽéř Ɓłúéŧóóŧĥ ··················⟧';
+
+  @override
+  String get fillUpPricePerLiterLabel => '⟦Ƥřîçé ƥéř łîŧéř ······⟧';
+
+  @override
+  String get vehicleHeaderPlateLabel => '⟦Ƥłáŧé ··⟧';
+
+  @override
+  String get vehicleHeaderUntitled => '⟦Ñéŵ ṽéĥîçłé ·····⟧';
+
+  @override
+  String get vehicleSectionIdentityTitle => '⟦Îđéñŧîŧý ····⟧';
+
+  @override
+  String get vehicleSectionIdentitySubtitle => '⟦Ñáɱé & ṼÎÑ ···⟧';
+
+  @override
+  String get vehicleSectionDrivetrainTitle => '⟦Đřîṽéŧřáîñ ·····⟧';
+
+  @override
+  String get vehicleSectionDrivetrainSubtitle =>
+      '⟦Ĥóŵ ŧĥîš ṽéĥîçłé ɱóṽéš ·········⟧';
+
+  @override
+  String get calibrationModeLabel => '⟦Çáłîƀřáŧîóñ ɱóđé ·······⟧';
+
+  @override
+  String get calibrationModeRule => '⟦Řúłé-ƀášéđ ····⟧';
+
+  @override
+  String get calibrationModeFuzzy => '⟦Ƒúžžý ··⟧';
+
+  @override
+  String get calibrationModeTooltip =>
+      '⟦Řúłé-ƀášéđ áššîǧñš éáçĥ đřîṽîñǧ šáɱƥłé ŧó éẋáçŧłý óñé šîŧúáŧîóñ. Ƒúžžý šƥřéáđš îŧ áçřóšš áłł óƒ ŧĥéɱ ƀý ĥóŵ ŵéłł éáçĥ ƒîŧš — šɱóóŧĥéř ářóúñđ 60 ķɱ/ĥ óř çĥáñǧîñǧ ǧřáđîéñŧš, ƀúŧ šłóŵéř ŧó ƒîłł áłł ƀúçķéŧš. ········································································⟧';
+
+  @override
+  String get profileGamificationToggleTitle =>
+      '⟦Šĥóŵ áçĥîéṽéɱéñŧš & šçóřéš ··········⟧';
+
+  @override
+  String get profileGamificationToggleSubtitle =>
+      '⟦Ŵĥéñ óƒƒ, ƀáđǧéš, šçóřéš áñđ ŧřóƥĥý îçóñš ářé ĥîđđéñ áçřóšš ŧĥé áƥƥ. ························⟧';
+
+  @override
+  String get gpsDiagnosticsTitle => '⟦ǦƤŠ šáɱƥłîñǧ đîáǧñóšŧîçš ··········⟧';
+
+  @override
+  String gpsDiagnosticsHeader(String count, String span, int gaps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      gaps,
+      locale: localeName,
+      other: '$gaps gaps',
+      one: '1 gap',
+      zero: 'no gaps',
+    );
+    return '⟦$count šáɱƥłéš · $span · $_temp0 ···⟧';
+  }
+
+  @override
+  String gpsDiagnosticsCadence(int ms) {
+    return '⟦Ṁéđîáñ îñŧéřṽáł: $ms ɱš ·······⟧';
+  }
+
+  @override
+  String get gpsDiagnosticsExplain =>
+      '⟦Çáƥŧúřéđ đúřîñǧ řéçóřđîñǧ ŧó ṽéřîƒý ǦƤŠ çáđéñçé úñđéř ƥĥóñé-šłééƥ. ·························⟧';
+
+  @override
+  String get hapticEcoCoachSectionTitle => '⟦Đřîṽîñǧ ···⟧';
+
+  @override
+  String get hapticEcoCoachSettingTitle => '⟦Řéáł-ŧîɱé éçó çóáçĥîñǧ ·········⟧';
+
+  @override
+  String get hapticEcoCoachSettingSubtitle =>
+      '⟦Ǧéñŧłé ĥáƥŧîç + óñ-šçřééñ ŧîƥ ŵĥéñ ýóú ƒłóóř îŧ đúřîñǧ çřúîšé ······················⟧';
+
+  @override
+  String get hapticEcoCoachSnackBarMessage =>
+      '⟦Éášý óñ ŧĥé ŧĥřóŧŧłé — çóášŧîñǧ šáṽéš ɱóřé ···············⟧';
+
+  @override
+  String get anonKeyLabel => '⟦Áñóñ Ķéý ···⟧';
+
+  @override
+  String get anonKeyHideTooltip => '⟦Ĥîđé ķéý ···⟧';
+
+  @override
+  String get anonKeyShowTooltip => '⟦Šĥóŵ ķéý ŧó ṽéřîƒý ·······⟧';
+
+  @override
+  String anonKeyTooLong(int length) {
+    return '⟦Ķéý îš ŧóó łóñǧ ($length çĥářš) — çĥéçķ ƒóř éẋŧřá ŧéẋŧ ···············⟧';
+  }
+
+  @override
+  String anonKeyLooksCorrect(int length) {
+    return '⟦Ķéý łóóķš çóřřéçŧ ($length çĥářš) ·········⟧';
+  }
+
+  @override
+  String get anonKeyShouldBeJwt =>
+      '⟦Ķéý šĥóúłđ ƀé á ĴŴŦ (ĥéáđéř.ƥáýłóáđ.šîǧñáŧúřé) ·················⟧';
+
+  @override
+  String anonKeyMayBeTruncated(int length) {
+    return '⟦Ķéý ɱáý ƀé ŧřúñçáŧéđ ($length óƒ ~208 éẋƥéçŧéđ çĥářš) ··············⟧';
+  }
+
+  @override
+  String get anonKeyExceedsMax => '⟦Ķéý éẋçééđš ɱáẋîɱúɱ łéñǧŧĥ ··········⟧';
+
+  @override
+  String get qrShareTitle => '⟦Šĥářé ýóúř đáŧáƀášé ········⟧';
+
+  @override
+  String get qrShareSubtitle =>
+      '⟦Óŧĥéřš çáñ šçáñ ŧĥîš ɊŘ çóđé ŧó çóññéçŧ ··············⟧';
+
+  @override
+  String get qrShareCopyAsText => '⟦Çóƥý áš ŧéẋŧ ·····⟧';
+
+  @override
+  String get authInfoTitle => '⟦Ŵĥý çřéáŧé áñ áççóúñŧ? ········⟧';
+
+  @override
+  String get authInfoBenefit1 =>
+      '⟦• Šýñç ƒáṽóřîŧéš, áłéřŧš, áñđ šáṽéđ řóúŧéš áçřóšš đéṽîçéš ·····················⟧';
+
+  @override
+  String get authInfoBenefit2 =>
+      '⟦• Ƥřéƥářé á řóúŧé óñ ýóúř ƥĥóñé, úšé îŧ îñ ýóúř çář ·················⟧';
+
+  @override
+  String get authInfoBenefit3 =>
+      '⟦• Ñó đáŧá îš šĥářéđ ŵîŧĥ ŧĥîřđ ƥářŧîéš ··············⟧';
+
+  @override
+  String get authInfoBenefit4 =>
+      '⟦• Ýóú çáñ đéłéŧé ýóúř áççóúñŧ áŧ áñý ŧîɱé ··············⟧';
+
+  @override
+  String get privacyLocalDataEmpty =>
+      '⟦Ñóŧĥîñǧ šŧóřéđ ýéŧ. Áđđ á ƒáṽóřîŧé óř šéŧ á ƥřîçé áłéřŧ ŧó šéé éñŧřîéš ĥéřé. ···························⟧';
+
+  @override
+  String get privacyHideEmptyRows => '⟦Ĥîđé éɱƥŧý řóŵš ······⟧';
+
+  @override
+  String privacyShowEmptyRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show $count empty rows',
+      one: 'Show $count empty row',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get apiKeySetupTitle => '⟦ÁƤÎ ķéý šéŧúƥ (óƥŧîóñáł) ·········⟧';
+
+  @override
+  String get apiKeySetupDescription =>
+      '⟦Řéǧîšŧéř ƒóř á ƒřéé ÁƤÎ ķéý, óř šķîƥ ŧó éẋƥłóřé ŧĥé áƥƥ ŵîŧĥ đéɱó đáŧá. ·························⟧';
+
+  @override
+  String apiKeyRegistrationButton(String provider) {
+    return '⟦$provider Řéǧîšŧřáŧîóñ ·····⟧';
+  }
+
+  @override
+  String apiKeyTerms(String provider) {
+    return '⟦Ɓý éñŧéřîñǧ áñ ÁƤÎ ķéý ýóú áççéƥŧ ŧĥé ŧéřɱš óƒ $provider. Đáŧá řéđîšŧřîƀúŧîóñ îš ƥřóĥîƀîŧéđ. ······························⟧';
+  }
+
+  @override
+  String get calculatorDistanceHint => '⟦é.ǧ. 150 ·⟧';
+
+  @override
+  String get calculatorConsumptionHint => '⟦é.ǧ. 7.0 ·⟧';
+
+  @override
+  String get calculatorPriceHint => '⟦é.ǧ. 1.899 ·⟧';
+
+  @override
+  String get routeStrategyLabel => '⟦Šŧřáŧéǧý: ····⟧';
+
+  @override
+  String get routeStrategyUniform => '⟦Úñîƒóřɱ ···⟧';
+
+  @override
+  String get routeStrategyBalanced => '⟦Ɓáłáñçéđ ····⟧';
+
+  @override
+  String get glideCoachBetaTitle =>
+      '⟦Ǧłîđé-çóáçĥ ƀéŧá (éẋƥéřîɱéñŧáł) ············⟧';
+
+  @override
+  String get glideCoachBetaSubtitle =>
+      '⟦Šúƀŧłé ĥáƥŧîç ŵĥéñ šłóŵîñǧ đóŵñ áĥéáđ óƒ á řéđ łîǧĥŧ. Óƒƒ ƀý đéƒáúłŧ — đîšŧřáçŧîóñ řîšķ. ································⟧';
+
+  @override
+  String get consentSyncTripsTitle => '⟦Šýñç ŧřîƥ řéçóřđîñǧš ········⟧';
+
+  @override
+  String get consentSyncTripsSubtitle =>
+      '⟦Ɓáçķ úƥ ÓƁĐ2 + ǦƤŠ ŧřîƥš ŧó ŦáñķŠýñç. Çřóšš-đéṽîçé, óƥŧ-îñ. ···················⟧';
+
+  @override
+  String get consentSyncTripsDisabledHint =>
+      '⟦Éñáƀłé Çłóúđ Šýñç áƀóṽé ŧó ƀáçķ úƥ ŧřîƥš. ···············⟧';
+
+  @override
+  String get consentHideDetails => '⟦Ĥîđé đéŧáîłš ·····⟧';
+
+  @override
+  String get consentShowDetails => '⟦Šĥóŵ đéŧáîłš ·····⟧';
+
+  @override
+  String get dialogOk => '⟦ÓĶ ·⟧';
+
+  @override
+  String get invalidLinkTitle => '⟦Îñṽáłîđ łîñķ ·····⟧';
+
+  @override
+  String invalidLinkBody(String path) {
+    return '⟦Ŧĥé łîñķ \"$path\" îš ñóŧ ṽáłîđ. ········⟧';
+  }
+
+  @override
+  String get home => '⟦Ĥóɱé ··⟧';
+
+  @override
+  String get loyaltySettingsTitle => '⟦Ƒúéł çłúƀ çářđš ······⟧';
+
+  @override
+  String get loyaltySettingsSubtitle =>
+      '⟦Áƥƥłý ýóúř łóýáłŧý đîšçóúñŧ ŧó đîšƥłáýéđ ƥřîçéš ··················⟧';
+
+  @override
+  String get loyaltyMenuTitle => '⟦Ƒúéł çłúƀ çářđš ······⟧';
+
+  @override
+  String get loyaltyMenuSubtitle =>
+      '⟦Áƥƥłý ƥéř-łîŧřé đîšçóúñŧš ƒřóɱ Ŧóŧáł, Ářáł, Šĥéłł, … ··················⟧';
+
+  @override
+  String get loyaltyAddCard => '⟦Áđđ çářđ ···⟧';
+
+  @override
+  String get loyaltyAddCardSheetTitle => '⟦Áđđ ƒúéł çłúƀ çářđ ·······⟧';
+
+  @override
+  String get loyaltyBrandLabel => '⟦Ɓřáñđ ··⟧';
+
+  @override
+  String get loyaltyCardLabelLabel => '⟦Łáƀéł (óƥŧîóñáł) ······⟧';
+
+  @override
+  String get loyaltyDiscountLabel => '⟦Đîšçóúñŧ (ƥéř łîŧřé) ·······⟧';
+
+  @override
+  String get loyaltyDiscountInvalid => '⟦Éñŧéř á ƥóšîŧîṽé ñúɱƀéř ·········⟧';
+
+  @override
+  String get loyaltyDeleteConfirmTitle => '⟦Đéłéŧé çářđ? ·····⟧';
+
+  @override
+  String get loyaltyDeleteConfirmBody =>
+      '⟦Ŧĥîš çářđ ŵîłł šŧóƥ áƥƥłýîñǧ îŧš đîšçóúñŧ. ················⟧';
+
+  @override
+  String get loyaltyEmptyTitle => '⟦Ñó ƒúéł çłúƀ çářđš ýéŧ ········⟧';
+
+  @override
+  String get loyaltyEmptyBody =>
+      '⟦Áđđ á çářđ ŧó áƥƥłý ýóúř ƥéř-łîŧřé đîšçóúñŧ ŧó ɱáŧçĥîñǧ šŧáŧîóñš áúŧóɱáŧîçáłłý. ······························⟧';
+
+  @override
+  String get loyaltyBadgePrefix => '⟦−⟧';
+
+  @override
+  String get maintenanceSignalIdleRpmCreepTitle =>
+      '⟦Îđłé ŘƤṀ çřééƥ đéŧéçŧéđ ·········⟧';
+
+  @override
+  String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
+    return '⟦Îđłé ŘƤṀ ĥáš çřéƥŧ úƥ ƀý $percent% óṽéř ýóúř łášŧ $tripCount ŧřîƥš. Ƥóššîƀłé éářłý šîǧñ óƒ á çłóǧǧéđ áîř ƒîłŧéř óř šéñšóř đřîƒŧ. ······································⟧';
+  }
+
+  @override
+  String get maintenanceSignalMafDeviationTitle =>
+      '⟦Ƥóššîƀłé îñŧáķé řéšŧřîçŧîóñ ···········⟧';
+
+  @override
+  String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
+    return '⟦Çřúîšé ƒúéł řáŧé ĥáš đřóƥƥéđ ƀý $percent% óṽéř ýóúř łášŧ $tripCount ŧřîƥš. Ƥóššîƀłé šîǧñ óƒ á çłóǧǧéđ áîř ƒîłŧéř óř řéšŧřîçŧéđ îñŧáķé — ŵóřŧĥ á çĥéçķ-úƥ. ···············································⟧';
+  }
+
+  @override
+  String get maintenanceActionDismiss => '⟦Đîšɱîšš ···⟧';
+
+  @override
+  String get maintenanceActionSnooze => '⟦Šñóóžé 30 đáýš ·····⟧';
+
+  @override
+  String get consumptionMonthlyInsightsTitle =>
+      '⟦Ŧĥîš ɱóñŧĥ ṽš łášŧ ɱóñŧĥ ·········⟧';
+
+  @override
+  String get consumptionMonthlyTripsLabel => '⟦Ŧřîƥš ··⟧';
+
+  @override
+  String get consumptionMonthlyDriveTimeLabel => '⟦Đřîṽé ŧîɱé ····⟧';
+
+  @override
+  String get consumptionMonthlyDistanceLabel => '⟦Đîšŧáñçé ····⟧';
+
+  @override
+  String get consumptionMonthlyAvgConsumptionLabel =>
+      '⟦Áṽǧ çóñšúɱƥŧîóñ ······⟧';
+
+  @override
+  String get consumptionMonthlyComparisonNotReliable =>
+      '⟦Ñééđ áŧ łéášŧ 3 ŧřîƥš ƥéř ɱóñŧĥ ƒóř çóɱƥářîšóñ ·················⟧';
+
+  @override
+  String get obd2CapabilitySectionTitle => '⟦Áđáƥŧéř çáƥáƀîłîŧîéš ·········⟧';
+
+  @override
+  String get obd2CapabilityStandardOnly => '⟦Šŧáñđářđ ····⟧';
+
+  @override
+  String get obd2CapabilityOemPids => '⟦ÓÉṀ ƤÎĐš ···⟧';
+
+  @override
+  String get obd2CapabilityFullCan => '⟦Ƒúłł ÇÁÑ ···⟧';
+
+  @override
+  String get obd2CapabilityUpgradeHintStandard =>
+      '⟦Ƒóř éẋáçŧ łîŧřéš-îñ-ŧáñķ óñ Ƥéúǧéóŧ/Çîŧřóëñ, ŧĥé áƥƥ šúƥƥóřŧš ÓƁĐŁîñķ ṀẊ+/ŁẊ/ÇẊ (ŠŦÑ çĥîƥ). ·······························⟧';
+
+  @override
+  String get obd2DebugOverlayEnabledSnack =>
+      '⟦ÓƁĐ2 đîáǧñóšŧîç óṽéřłáý éñáƀłéđ ············⟧';
+
+  @override
+  String get obd2DebugOverlayDisabledSnack =>
+      '⟦ÓƁĐ2 đîáǧñóšŧîç óṽéřłáý đîšáƀłéđ ·············⟧';
+
+  @override
+  String get obd2DebugOverlayClearButton => '⟦Çłéář ··⟧';
+
+  @override
+  String get obd2DebugOverlayCloseButton => '⟦Çłóšé ··⟧';
+
+  @override
+  String get obd2DebugOverlayTitle => '⟦ÓƁĐ2 ƀřéáđçřúɱƀš ······⟧';
+
+  @override
+  String obd2PickerPinnedFallback(String adapterName) {
+    return '⟦Çóúłđñ\'ŧ řéáçĥ \'$adapterName\' — ƥîçķ áñóŧĥéř áđáƥŧéř ··············⟧';
+  }
+
+  @override
+  String get onboardingObd2StepTitle => '⟦Çóññéçŧ ýóúř ÓƁĐ2 áđáƥŧéř ·········⟧';
+
+  @override
+  String get onboardingObd2StepBody =>
+      '⟦Ƥłúǧ ýóúř ÓƁĐ2 áđáƥŧéř îñŧó ŧĥé çář\'š ƥóřŧ áñđ ŧúřñ ŧĥé îǧñîŧîóñ óñ. Ŵé\'łł řéáđ ŧĥé ṼÎÑ áñđ ƒîłł îñ éñǧîñé đéŧáîłš ƒóř ýóú. ···········································⟧';
+
+  @override
+  String get onboardingObd2ConnectButton => '⟦Çóññéçŧ áđáƥŧéř ······⟧';
+
+  @override
+  String get onboardingObd2SkipButton => '⟦Ṁáýƀé łáŧéř ·····⟧';
+
+  @override
+  String get onboardingObd2ReadingVin => '⟦Řéáđîñǧ ṼÎÑ… ·····⟧';
+
+  @override
+  String get onboardingObd2VinReadFailed =>
+      '⟦Çóúłđñ\'ŧ řéáđ ṼÎÑ — éñŧéř ɱáñúáłłý ············⟧';
+
+  @override
+  String get onboardingObd2ConnectFailed =>
+      '⟦Çóúłđñ\'ŧ çóññéçŧ ŧó ŧĥé áđáƥŧéř. Ýóú çáñ řéŧřý óř šķîƥ. ···················⟧';
+
+  @override
+  String get onboardingPickUseMode =>
+      '⟦Ƥîçķ á úšé ɱóđé ŧó çóñŧîñúé. ··········⟧';
+
+  @override
+  String get alertsRadiusFrequencyLabel => '⟦Çĥéçķ ƒřéɋúéñçý ······⟧';
+
+  @override
+  String get alertsRadiusFrequencyDaily => '⟦Óñçé á đáý ····⟧';
+
+  @override
+  String get alertsRadiusFrequencyTwiceDaily => '⟦Ŧŵîçé á đáý ····⟧';
+
+  @override
+  String get alertsRadiusFrequencyThriceDaily => '⟦Ŧĥřéé ŧîɱéš á đáý ······⟧';
+
+  @override
+  String get alertsRadiusFrequencyFourTimesDaily => '⟦Ƒóúř ŧîɱéš á đáý ······⟧';
+
+  @override
+  String get radiusAlertPickOnMap => '⟦Ƥîçķ óñ ɱáƥ ····⟧';
+
+  @override
+  String get radiusAlertMapPickerTitle => '⟦Ƥîçķ áłéřŧ çéñŧéř ·······⟧';
+
+  @override
+  String get radiusAlertMapPickerConfirm => '⟦Çóñƒîřɱ ···⟧';
+
+  @override
+  String get radiusAlertMapPickerCancel => '⟦Çáñçéł ···⟧';
+
+  @override
+  String get radiusAlertMapPickerHint =>
+      '⟦Đřáǧ ŧĥé ɱáƥ ŧó ƥóšîŧîóñ ŧĥé áłéřŧ çéñŧéř ···············⟧';
+
+  @override
+  String get radiusAlertCenterFromMap => '⟦Ṁáƥ łóçáŧîóñ ·····⟧';
+
+  @override
+  String radiusAlertNotificationTitle(String fuelLabel, String label) {
+    return '⟦$fuelLabel ñéář $label ··⟧';
+  }
+
+  @override
+  String radiusAlertNotificationBody(String price, String threshold) {
+    return '⟦Á šŧáŧîóñ îš áŧ $price € (ŧářǧéŧ: $threshold €) ········⟧';
+  }
+
+  @override
+  String get refuelUnitPerLiter => '⟦/Ł⟧';
+
+  @override
+  String get refuelUnitPerKwh => '⟦/ķŴĥ ·⟧';
+
+  @override
+  String get refuelUnitPerSession => '⟦/šéššîóñ ···⟧';
+
+  @override
+  String get speedConsumptionCardTitle => '⟦Çóñšúɱƥŧîóñ ƀý šƥééđ ········⟧';
+
+  @override
+  String get speedBandIdleJam => '⟦Îđłé / ĵáɱ ···⟧';
+
+  @override
+  String get speedBandUrban => '⟦Úřƀáñ (10–50) ··⟧';
+
+  @override
+  String get speedBandSuburban => '⟦Šúƀúřƀáñ (50–80) ····⟧';
+
+  @override
+  String get speedBandRural => '⟦Řúřáł (80–100) ··⟧';
+
+  @override
+  String get speedBandMotorwaySlow => '⟦Éçó-çřúîšé (100–115) ····⟧';
+
+  @override
+  String get speedBandMotorway => '⟦Ṁóŧóřŵáý (115–130) ····⟧';
+
+  @override
+  String get speedBandMotorwayFast => '⟦Ṁóŧóřŵáý ƒášŧ (130+) ·····⟧';
+
+  @override
+  String get speedConsumptionInsufficientData =>
+      '⟦Řéçóřđ 30+ ɱîñúŧéš óƒ ŧřîƥš ŵîŧĥ ŧĥé ÓƁĐ2 áđáƥŧéř ŧó úñłóçķ ŧĥé šƥééđ/çóñšúɱƥŧîóñ áñáłýšîš. ································⟧';
+
+  @override
+  String speedConsumptionTimeShare(int percent) {
+    return '⟦$percent % óƒ đřîṽîñǧ ····⟧';
+  }
+
+  @override
+  String get speedConsumptionNeedMoreData => '⟦Ñééđ ɱóřé đáŧá ·····⟧';
+
+  @override
+  String get splashLoadingLabel => '⟦Łóáđîñǧ Šƥářķîłó ·······⟧';
+
+  @override
+  String get tankLevelTitle => '⟦Ŧáñķ łéṽéł ····⟧';
+
+  @override
+  String tankLevelLitersFormat(String litres) {
+    return '⟦$litres Ł⟧';
+  }
+
+  @override
+  String tankLevelRangeFormat(String kilometres) {
+    return '⟦≈ $kilometres ķɱ óƒ řáñǧé ····⟧';
+  }
+
+  @override
+  String tankLevelLastFillUpFormat(String date, String count) {
+    return '⟦Łášŧ ƒîłł-úƥ: $date · $count ŧřîƥ(š) šîñçé ·········⟧';
+  }
+
+  @override
+  String get tankLevelMethodObd2 => '⟦ÓƁĐ2 ɱéášúřéđ ·····⟧';
+
+  @override
+  String get tankLevelMethodDistanceFallback =>
+      '⟦đîšŧáñçé-ƀášéđ éšŧîɱáŧé ·········⟧';
+
+  @override
+  String get tankLevelMethodMixed => '⟦ɱîẋéđ ɱéášúřéɱéñŧ ·······⟧';
+
+  @override
+  String get tankLevelEmptyNoFillUp =>
+      '⟦Łóǧ á ƒîłł-úƥ ŧó šéé ýóúř ŧáñķ łéṽéł ·············⟧';
+
+  @override
+  String get tankLevelDetailSheetTitle =>
+      '⟦Ŧřîƥš šîñçé łášŧ ƒîłł-úƥ ·········⟧';
+
+  @override
+  String get addFillUpIsFullTankLabel => '⟦Ƒúłł ŧáñķ ····⟧';
+
+  @override
+  String get addFillUpIsFullTankSubtitle =>
+      '⟦Ŧáñķ ƒîłłéđ ŧó ŧĥé ƀřîɱ — úñçĥéçķ îƒ ŧĥîš ŵáš á ƥářŧîáł ƒîłł ·····················⟧';
+
+  @override
+  String get themeCardTitle => '⟦Ŧĥéɱé ··⟧';
+
+  @override
+  String get themeCardSubtitleSystem => '⟦Šýšŧéɱ ···⟧';
+
+  @override
+  String get themeCardSubtitleLight => '⟦Łîǧĥŧ ··⟧';
+
+  @override
+  String get themeCardSubtitleDark => '⟦Đářķ ··⟧';
+
+  @override
+  String get themeSettingsScreenTitle => '⟦Ŧĥéɱé ··⟧';
+
+  @override
+  String get themeSettingsSystemLabel => '⟦Ƒółłóŵ šýšŧéɱ ·····⟧';
+
+  @override
+  String get themeSettingsLightLabel => '⟦Łîǧĥŧ ··⟧';
+
+  @override
+  String get themeSettingsDarkLabel => '⟦Đářķ ··⟧';
+
+  @override
+  String get themeSettingsSystemDescription =>
+      '⟦Ṁáŧçĥ ŧĥé çúřřéñŧ đéṽîçé áƥƥéářáñçé. ··············⟧';
+
+  @override
+  String get themeSettingsLightDescription =>
+      '⟦Ɓřîǧĥŧ ƀáçķǧřóúñđš — ƀéšŧ ƒóř đáýŧîɱé úšé. ···············⟧';
+
+  @override
+  String get themeSettingsDarkDescription =>
+      '⟦Đářķ ƀáçķǧřóúñđš — éášîéř óñ ŧĥé éýéš áŧ ñîǧĥŧ áñđ šáṽéš ƀáŧŧéřý óñ ÓŁÉĐ šçřééñš. ·····························⟧';
+
+  @override
+  String get themeSettingsEcoLabel => '⟦Éçó ·⟧';
+
+  @override
+  String get themeSettingsEcoDescription =>
+      '⟦Ŧĥé áƥƥ\'š šîǧñáŧúřé ǧřééñ łóóķ — ƀřîǧĥŧ áñđ éášý ŧó řéáđ, ŵîŧĥ šóƒŧłý ǧřééñ-ŧîñŧéđ ƀáçķǧřóúñđš. ··································⟧';
+
+  @override
+  String get throttleRpmHistogramTitle => '⟦Ĥóŵ ýóú úšéđ ŧĥé éñǧîñé ·········⟧';
+
+  @override
+  String get throttleRpmHistogramThrottleSection =>
+      '⟦Ŧĥřóŧŧłé ƥóšîŧîóñ ·······⟧';
+
+  @override
+  String get throttleRpmHistogramRpmSection => '⟦Éñǧîñé ŘƤṀ ····⟧';
+
+  @override
+  String get throttleRpmHistogramThrottleCoast => '⟦Çóášŧ (0–25%) ··⟧';
+
+  @override
+  String get throttleRpmHistogramThrottleLight => '⟦Łîǧĥŧ (25–50%) ··⟧';
+
+  @override
+  String get throttleRpmHistogramThrottleFirm => '⟦Ƒîřɱ (50–75%) ··⟧';
+
+  @override
+  String get throttleRpmHistogramThrottleWide => '⟦Ŵîđé-óƥéñ (75–100%) ····⟧';
+
+  @override
+  String get throttleRpmHistogramRpmIdle => '⟦Îđłé (≤900) ··⟧';
+
+  @override
+  String get throttleRpmHistogramRpmCruise => '⟦Çřúîšé (901–2000) ···⟧';
+
+  @override
+  String get throttleRpmHistogramRpmSpirited => '⟦Šƥîřîŧéđ (2001–3000) ····⟧';
+
+  @override
+  String get throttleRpmHistogramRpmHard => '⟦Ĥářđ (>3000) ··⟧';
+
+  @override
+  String get throttleRpmHistogramEmpty =>
+      '⟦Ñó ŧĥřóŧŧłé óř ŘƤṀ šáɱƥłéš îñ ŧĥîš ŧřîƥ. ··············⟧';
+
+  @override
+  String throttleRpmHistogramBarShare(String pct) {
+    return '⟦$pct%⟧';
+  }
+
+  @override
+  String get trajetsTabLabel => '⟦Ŧřîƥš ··⟧';
+
+  @override
+  String get trajetsStartRecordingButton => '⟦Šŧářŧ řéçóřđîñǧ ······⟧';
+
+  @override
+  String get trajetsResumeRecordingButton => '⟦Řéšúɱé řéçóřđîñǧ ·······⟧';
+
+  @override
+  String get tripStartProgressConnectingAdapter =>
+      '⟦Çóññéçŧîñǧ ŧó ÓƁĐ2 áđáƥŧéř… ··········⟧';
+
+  @override
+  String get tripStartProgressReadingVehicleData =>
+      '⟦Řéáđîñǧ ṽéĥîçłé đáŧá… ········⟧';
+
+  @override
+  String get tripStartProgressStartingRecording =>
+      '⟦Šŧářŧîñǧ řéçóřđîñǧ… ········⟧';
+
+  @override
+  String get trajetsEmptyStateTitle => '⟦Ñó ŧřîƥš ýéŧ ·····⟧';
+
+  @override
+  String get trajetsEmptyStateBody =>
+      '⟦Ŧáƥ Šŧářŧ řéçóřđîñǧ ŧó ƀéǧîñ łóǧǧîñǧ ýóúř đřîṽéš. ··················⟧';
+
+  @override
+  String trajetsRowDistance(String km) {
+    return '⟦$km ķɱ ·⟧';
+  }
+
+  @override
+  String trajetsRowDuration(String minutes) {
+    return '⟦$minutes ɱîñ ·⟧';
+  }
+
+  @override
+  String trajetsRowAvgConsumption(String value, String unit) {
+    return '⟦$value $unit⟧';
+  }
+
+  @override
+  String get trajetDetailSummaryTitle => '⟦Šúɱɱářý ···⟧';
+
+  @override
+  String get trajetDetailFieldDate => '⟦Đáŧé ··⟧';
+
+  @override
+  String get trajetDetailFieldVehicle => '⟦Ṽéĥîçłé ···⟧';
+
+  @override
+  String get trajetDetailFieldAdapter => '⟦ÓƁĐ2 áđáƥŧéř ·····⟧';
+
+  @override
+  String get trajetDetailFieldDistance => '⟦Đîšŧáñçé ····⟧';
+
+  @override
+  String get trajetDetailFieldDuration => '⟦Đúřáŧîóñ ····⟧';
+
+  @override
+  String get trajetDetailFieldAvgConsumption => '⟦Áṽǧ çóñšúɱƥŧîóñ ······⟧';
+
+  @override
+  String get trajetDetailFieldFuelUsed => '⟦Ƒúéł úšéđ ····⟧';
+
+  @override
+  String get trajetDetailFieldFuelCost => '⟦Ƒúéł çóšŧ ····⟧';
+
+  @override
+  String get trajetDetailFieldAvgSpeed => '⟦Áṽǧ šƥééđ ····⟧';
+
+  @override
+  String get trajetDetailFieldMaxSpeed => '⟦Ṁáẋ šƥééđ ····⟧';
+
+  @override
+  String get trajetDetailFieldValueUnknown => '⟦—⟧';
+
+  @override
+  String get trajetDetailChartSpeed => '⟦Šƥééđ (ķɱ/ĥ) ····⟧';
+
+  @override
+  String get trajetDetailChartFuelRate => '⟦Ƒúéł řáŧé (Ł/ĥ) ·····⟧';
+
+  @override
+  String get trajetDetailChartRpm => '⟦ŘƤṀ ·⟧';
+
+  @override
+  String get trajetDetailChartEngineLoad => '⟦Éñǧîñé łóáđ (%) ·····⟧';
+
+  @override
+  String get trajetsRowColdStartChip => '⟦Çółđ šŧářŧ ····⟧';
+
+  @override
+  String get trajetsRowColdStartTooltip =>
+      '⟦Éñǧîñé đîđñ\'ŧ řéáçĥ óƥéřáŧîñǧ ŧéɱƥéřáŧúřé đúřîñǧ ŧĥîš ŧřîƥ — ƒúéł çóñšúɱƥŧîóñ ŵáš ĥîǧĥéř ŧĥáñ úšúáł. ·····································⟧';
+
+  @override
+  String get trajetDetailChartEmpty => '⟦Ñó šáɱƥłéš řéçóřđéđ ········⟧';
+
+  @override
+  String get trajetDetailShareAction => '⟦Šĥářé ··⟧';
+
+  @override
+  String trajetDetailShareSubject(String date) {
+    return '⟦Šƥářķîłó — ŧřîƥ óñ $date ······⟧';
+  }
+
+  @override
+  String get trajetDetailShareError =>
+      '⟦Çóúłđñ\'ŧ ǧéñéřáŧé šĥářé îɱáǧé ···········⟧';
+
+  @override
+  String get trajetDetailDeleteAction => '⟦Đéłéŧé ···⟧';
+
+  @override
+  String get trajetDetailDeleteConfirmTitle => '⟦Đéłéŧé ŧĥîš ŧřîƥ? ······⟧';
+
+  @override
+  String get trajetDetailDeleteConfirmBody =>
+      '⟦Ŧĥîš ŧřîƥ ŵîłł ƀé ƥéřɱáñéñŧłý řéɱóṽéđ ƒřóɱ ýóúř ĥîšŧóřý. ·····················⟧';
+
+  @override
+  String get trajetDetailDeleteConfirmCancel => '⟦Çáñçéł ···⟧';
+
+  @override
+  String get trajetDetailDeleteConfirmConfirm => '⟦Đéłéŧé ···⟧';
+
+  @override
+  String get tripRecordingObd2NotResponding =>
+      '⟦ÓƁĐ2 áđáƥŧéř çóññéçŧéđ ƀúŧ ñóŧ řéŧúřñîñǧ đáŧá. Ŧřý á đîƒƒéřéñŧ áđáƥŧéř óř çĥéçķ ŧĥé ṽéĥîçłé\'š đîáǧñóšŧîç ƥřóŧóçół. ··········································⟧';
+
+  @override
+  String get tripLengthCardTitle => '⟦Çóñšúɱƥŧîóñ ƀý ŧřîƥ łéñǧŧĥ ··········⟧';
+
+  @override
+  String get tripLengthBucketShort => '⟦Šĥóřŧ (<5 ķɱ) ···⟧';
+
+  @override
+  String get tripLengthBucketMedium => '⟦Ṁéđîúɱ (5–25 ķɱ) ····⟧';
+
+  @override
+  String get tripLengthBucketLong => '⟦Łóñǧ (>25 ķɱ) ···⟧';
+
+  @override
+  String get tripLengthBucketNeedMoreData => '⟦Ñééđ ɱóřé đáŧá ·····⟧';
+
+  @override
+  String tripLengthBucketTripCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count trips',
+      one: '1 trip',
+      zero: 'no trips',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get tripPathCardTitle => '⟦Ŧřîƥ ƥáŧĥ ····⟧';
+
+  @override
+  String get tripPathCardSubtitle => '⟦ǦƤŠ-řéçóřđéđ řóúŧé ·······⟧';
+
+  @override
+  String get tripPathLegendTitle => '⟦Çóñšúɱƥŧîóñ ·····⟧';
+
+  @override
+  String get tripPathLegendEfficient => '⟦Éƒƒîçîéñŧ (< 6 Ł/100ķɱ) ·····⟧';
+
+  @override
+  String get tripPathLegendBorderline => '⟦Ɓóřđéřłîñé (6–10 Ł/100ķɱ) ······⟧';
+
+  @override
+  String get tripPathLegendWasteful => '⟦Ŵášŧéƒúł (≥ 10 Ł/100ķɱ) ·····⟧';
+
+  @override
+  String get tripRecordingPinTooltip =>
+      '⟦Ƥîññîñǧ ķééƥš ŧĥé šçřééñ óñ — úšéš ɱóřé ƀáŧŧéřý ·················⟧';
+
+  @override
+  String get tripRecordingPinSemanticOn => '⟦Úñƥîñ řéçóřđîñǧ ƒóřɱ ········⟧';
+
+  @override
+  String get tripRecordingPinSemanticOff => '⟦Ƥîñ řéçóřđîñǧ ƒóřɱ ·······⟧';
+
+  @override
+  String get tripRecordingPinHelpTooltip => '⟦Ŵĥáŧ đóéš ƥîñ đó? ······⟧';
+
+  @override
+  String get tripRecordingPinHelpTitle => '⟦Áƀóúŧ ƥîñ ····⟧';
+
+  @override
+  String get tripRecordingPinHelpBody =>
+      '⟦Ƥîñ ķééƥš ŧĥé šçřééñ óñ áñđ ĥîđéš šýšŧéɱ ƀářš šó ŧĥé ƒóřɱ šŧáýš řéáđáƀłé óñ á đášĥƀóářđ ɱóúñŧ. Ŧáƥ áǧáîñ ŧó řéłéášé. Áúŧó-řéłéášéš ŵĥéñ ŧĥé ŧřîƥ šŧóƥš. ······················································⟧';
+
+  @override
+  String get tripRecordingResumeHintMessage =>
+      '⟦Řéçóřđîñǧ çóñŧîñúéš îñ ŧĥé ƀáçķǧřóúñđ. Ŧáƥ ŧĥé řéđ ƀáññéř áŧ ŧĥé ŧóƥ óƒ áñý šçřééñ ŧó řéŧúřñ. ··································⟧';
+
+  @override
+  String get tripBannerOpenFromConsumptionTab =>
+      '⟦Óƥéñ ŧĥé áçŧîṽé ŧřîƥ ƒřóɱ ŧĥé Çóñšó ŧáƀ ··············⟧';
+
+  @override
+  String get tripRecordingUnpinnedWarning =>
+      '⟦Ƥîñ ŧĥé šçřééñ ŧó ķééƥ ǦƤŠ áçŧîṽé đúřîñǧ ŧĥé ŧřîƥ — Áñđřóîđ ɱáý ŧĥřóŧŧłé ǦƤŠ đúřîñǧ šłééƥ. ································⟧';
+
+  @override
+  String get unifiedFilterFuel => '⟦Ƒúéł ··⟧';
+
+  @override
+  String get unifiedFilterEv => '⟦ÉṼ ·⟧';
+
+  @override
+  String get unifiedFilterBoth => '⟦Ɓóŧĥ ··⟧';
+
+  @override
+  String get unifiedNoResultsForFilter =>
+      '⟦Ñó řéšúłŧš ɱáŧçĥ ŧĥîš ƒîłŧéř ···········⟧';
+
+  @override
+  String get searchFailedSnackbar =>
+      '⟦Šéářçĥ ƒáîłéđ — ƥłéášé ŧřý áǧáîñ ············⟧';
+
+  @override
+  String get vinLabel => '⟦ṼÎÑ (óƥŧîóñáł) ·····⟧';
+
+  @override
+  String get vinDecodeTooltip => '⟦Đéçóđé ṼÎÑ ····⟧';
+
+  @override
+  String get vinConfirmAction => '⟦Ýéš, áúŧó-ƒîłł ·····⟧';
+
+  @override
+  String get vinModifyAction => '⟦Ṁóđîƒý ɱáñúáłłý ······⟧';
+
+  @override
+  String get veResetAction => '⟦Řéšéŧ ṽółúɱéŧřîç éƒƒîçîéñçý ···········⟧';
+
+  @override
+  String get vehicleReadVinFromCarButton => '⟦Řéáđ ṼÎÑ ƒřóɱ çář ······⟧';
+
+  @override
+  String get vehicleReadVinFromCarTooltip =>
+      '⟦Řéáđ ṼÎÑ ƒřóɱ ŧĥé ƥáîřéđ ÓƁĐ2 áđáƥŧéř ··············⟧';
+
+  @override
+  String get vehicleReadVinFailedUnsupportedSnackbar =>
+      '⟦ṼÎÑ ñóŧ áṽáîłáƀłé (Ṁóđé 09 ƤÎĐ 02 úñšúƥƥóřŧéđ óñ ƥřé-2005 ṽéĥîçłéš) ·····················⟧';
+
+  @override
+  String get vehicleReadVinFailedGenericSnackbar =>
+      '⟦ṼÎÑ řéáđ ƒáîłéđ — ƥłéášé éñŧéř ɱáñúáłłý ··············⟧';
+
+  @override
+  String get vehicleReadVinNoAdapterHint =>
+      '⟦Ƥáîř áñ ÓƁĐ2 áđáƥŧéř ƒîřšŧ ŧó řéáđ ṼÎÑ áúŧóɱáŧîçáłłý ···················⟧';
+
+  @override
+  String get pickerButtonLabel => '⟦Ƥîçķ ƒřóɱ çáŧáłóǧ ·······⟧';
+
+  @override
+  String get pickerSearchHint => '⟦Šéářçĥ ɱáķé óř ɱóđéł ········⟧';
+
+  @override
+  String get pickerHelpText =>
+      '⟦Ƥřé-ƒîłł ƒřóɱ 50+ šúƥƥóřŧéđ ṽéĥîçłéš ·············⟧';
+
+  @override
+  String get pickerEmptyResults => '⟦Ñó ɱáŧçĥéš ····⟧';
+
+  @override
+  String get pickerCancel => '⟦Çáñçéł ···⟧';
+
+  @override
+  String get pickerLoading => '⟦Łóáđîñǧ çáŧáłóǧ… ······⟧';
+
+  @override
+  String get vinInfoTooltip => '⟦Ŵĥáŧ îš á ṼÎÑ? ·····⟧';
+
+  @override
+  String get vinInfoSectionWhatTitle => '⟦Ŵĥáŧ îš á ṼÎÑ? ·····⟧';
+
+  @override
+  String get vinInfoSectionWhatBody =>
+      '⟦Ŧĥé Ṽéĥîçłé Îđéñŧîƒîçáŧîóñ Ñúɱƀéř îš á 17-çĥářáçŧéř çóđé úñîɋúé ŧó ýóúř çář. Îŧ\'š šŧáɱƥéđ óñ ŧĥé çĥáššîš áñđ ƥřîñŧéđ óñ ýóúř ṽéĥîçłé řéǧîšŧřáŧîóñ đóçúɱéñŧ. ·························································⟧';
+
+  @override
+  String get vinInfoSectionWhyTitle => '⟦Ŵĥý ŵé ášķ ····⟧';
+
+  @override
+  String get vinInfoSectionWhyBody =>
+      '⟦Đéçóđîñǧ ŧĥé ṼÎÑ áúŧó-ƒîłłš éñǧîñé đîšƥłáçéɱéñŧ, çýłîñđéř çóúñŧ, ɱóđéł ýéář, ƥřîɱářý ƒúéł ŧýƥé, áñđ ǧřóšš ŵéîǧĥŧ — šáṽîñǧ ýóú ƒřóɱ łóóķîñǧ úƥ ŧéçĥñîçáł šƥéçš ɱáñúáłłý. Ŧĥé ÓƁĐ2 ƒúéł-řáŧé çáłçúłáŧîóñ úšéš ŧĥéšé ṽáłúéš ŧó ǧîṽé ýóú áççúřáŧé çóñšúɱƥŧîóñ ñúɱƀéřš. ·······························································································⟧';
+
+  @override
+  String get vinInfoSectionPrivacyTitle => '⟦Ƥřîṽáçý ···⟧';
+
+  @override
+  String get vinInfoSectionPrivacyBody =>
+      '⟦Ýóúř ṼÎÑ îš šŧóřéđ óñłý łóçáłłý îñ ŧĥé áƥƥ\'š éñçřýƥŧéđ šŧóřáǧé — îŧ\'š ñéṽéř úƥłóáđéđ ŧó Šƥářķîłó šéřṽéřš. Ŧĥé ÑĤŦŠÁ ṽƤÎÇ đáŧáƀášé îš ɋúéřîéđ ŵîŧĥ ŧĥé ṼÎÑ ƀúŧ řéŧúřñš óñłý áñóñýɱóúš ŧéçĥñîçáł šƥéçš; ÑĤŦŠÁ đóéš ñóŧ łîñķ ŧĥé ṼÎÑ ŧó áñý ƥéřšóñáł đáŧá. Ŵîŧĥóúŧ ñéŧŵóřķ, áñ óƒƒłîñé łóóķúƥ řéŧúřñš ɱáñúƒáçŧúřéř áñđ çóúñŧřý óñłý. ·····················································································································⟧';
+
+  @override
+  String get vinInfoSectionWhereTitle => '⟦Ŵĥéřé ŧó ƒîñđ îŧ ······⟧';
+
+  @override
+  String get vinInfoSectionWhereBody =>
+      '⟦Łóóķ ŧĥřóúǧĥ ŧĥé ŵîñđšĥîéłđ áŧ ŧĥé łóŵéř-łéƒŧ çóřñéř óñ ŧĥé đřîṽéř\'š šîđé, çĥéçķ ŧĥé đřîṽéř-šîđé đóóř-ƒřáɱé šŧîçķéř ŵĥéñ ŧĥé đóóř îš óƥéñ, óř řéáđ îŧ óƒƒ ýóúř ṽéĥîçłé řéǧîšŧřáŧîóñ đóçúɱéñŧ (çářđ / Çářŧé Ǧřîšé). ···········································································⟧';
+
+  @override
+  String get vinInfoDismiss => '⟦Ǧóŧ îŧ ··⟧';
+
+  @override
+  String get vinConfirmPrivacyNote =>
+      '⟦Ŵé łóóķéđ úƥ ýóúř ṼÎÑ óñ ÑĤŦŠÁ\'š ƒřéé ṽéĥîçłé đáŧáƀášé — ñóŧĥîñǧ šéñŧ ŧó Šƥářķîłó šéřṽéřš. ································⟧';
+
+  @override
+  String get gdprVinOnlineDecodeTitle => '⟦ṼÎÑ óñłîñé đéçóđé ·······⟧';
+
+  @override
+  String get gdprVinOnlineDecodeShort =>
+      '⟦Đéçóđé ŧĥé ṼÎÑ ṽîá ÑĤŦŠÁ\'š ƒřéé ƥúƀłîç šéřṽîçé ·················⟧';
+
+  @override
+  String get gdprVinOnlineDecodeDescription =>
+      '⟦Ŵĥéñ ýóú ƥáîř áñ áđáƥŧéř, ýóúř ṽéĥîçłé\'š ṼÎÑ îš řéáđ łóçáłłý ŧó îđéñŧîƒý ŧĥé çář. Éñáƀłîñǧ ŧĥîš šéñđš ŧĥé 17-çĥář ṼÎÑ ŧó ÑĤŦŠÁ\'š ƒřéé ṽƤÎÇ šéřṽîçé ŧó łóóķ úƥ áđđîŧîóñáł đéŧáîłš (ɱóđéł, éñǧîñé đîšƥłáçéɱéñŧ, ƒúéł ŧýƥé). Ŧĥé ṼÎÑ îš ŧĥé óñłý đáŧá šéñŧ — ñó óŧĥéř îñƒóřɱáŧîóñ łéáṽéš ýóúř đéṽîçé. ······································································································⟧';
+
+  @override
+  String get vehicleDetectedFromVinBadge => '⟦(đéŧéçŧéđ) ····⟧';
+
+  @override
+  String vehicleDetectedFromVinSnackbar(String summary) {
+    return '⟦Đéŧéçŧéđ ƒřóɱ ṼÎÑ: $summary. Áƥƥłý? ·········⟧';
+  }
+
+  @override
+  String get vehicleDetectedFromVinApply => '⟦Áƥƥłý ··⟧';
+
+  @override
+  String waitTimeHint(int minutes) {
+    return '⟦~$minutes ɱîñ ŵáîŧ ···⟧';
+  }
+
+  @override
+  String get waitTimeTrackStart => '⟦Ŧřáçķ ɱý ŵáîŧ ·····⟧';
+
+  @override
+  String get waitTimeTrackEnd => '⟦Î\'ɱ łéáṽîñǧ ····⟧';
+
+  @override
+  String waitTimeElapsedShort(int minutes) {
+    return '⟦$minutes ɱîñ šó ƒář ····⟧';
+  }
+
+  @override
+  String get widgetHelpSectionTitle => '⟦Ĥóɱé-šçřééñ ŵîđǧéŧ ·······⟧';
+
+  @override
+  String get widgetHelpIntro =>
+      '⟦Áđđ ŧĥé ŠƥářĶîłó ŵîđǧéŧ ŧó ýóúř ĥóɱé šçřééñ ŧó šéé ƒúéł áñđ çĥářǧîñǧ ƥřîçéš áŧ á ǧłáñçé. ································⟧';
+
+  @override
+  String get widgetHelpAdd =>
+      '⟦Áđđ îŧ ƒřóɱ ýóúř łáúñçĥéř\'š ŵîđǧéŧ ƥîçķéř — łóñǧ-ƥřéšš áñ éɱƥŧý ářéá óƒ ŧĥé ĥóɱé šçřééñ, çĥóóšé Ŵîđǧéŧš, áñđ ƒîñđ ŠƥářĶîłó. ············································⟧';
+
+  @override
+  String get widgetHelpTap =>
+      '⟦Ŧáƥ á šŧáŧîóñ îñ ŧĥé ŵîđǧéŧ ŧó óƥéñ îŧ îñ ŧĥé áƥƥ. Ŧáƥ ŧĥé řéƒřéšĥ îçóñ ŧó úƥđáŧé ƥřîçéš. ·······························⟧';
+
+  @override
+  String get widgetHelpConfigure =>
+      '⟦Óñ Áñđřóîđ, łóñǧ-ƥřéšš ŧĥé ŵîđǧéŧ áñđ çĥóóšé Řéçóñƒîǧúřé ŧó çĥáñǧé ŧĥé ƥřóƒîłé, çółóúř, áñđ çóñŧéñŧ. ····································⟧';
+
+  @override
+  String get widgetVariantDefault => '⟦Çúřřéñŧ ƥřîçé óñłý ·······⟧';
+
+  @override
+  String get widgetVariantPredictive =>
+      '⟦Ƥřéđîçŧîṽé: ƀéšŧ ŧîɱé ŧó ƒîłł ···········⟧';
+
+  @override
+  String get widgetPredictiveNowPrefix => '⟦ñóŵ ·⟧';
+}

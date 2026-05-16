@@ -121,6 +121,7 @@ abstract class AppLocalizations {
     Locale('de'),
     Locale('el'),
     Locale('en'),
+    Locale('en', 'XA'),
     Locale('es'),
     Locale('et'),
     Locale('fi'),
@@ -9362,6 +9363,18 @@ class _AppLocalizationsDelegate
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+country codes are specified.
+  switch (locale.languageCode) {
+    case 'en':
+      {
+        switch (locale.countryCode) {
+          case 'XA':
+            return AppLocalizationsEnXa();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'bg':
