@@ -3200,6 +3200,25 @@ class AppLocalizationsDe extends AppLocalizations {
       'Werde benachrichtigt, wenn die Preise in deiner Nähe fallen';
 
   @override
+  String get notFoundTitle => 'Seite nicht gefunden';
+
+  @override
+  String notFoundBody(String location) {
+    return '„$location“ nicht gefunden.';
+  }
+
+  @override
+  String get notFoundHomeButton => 'Startseite';
+
+  @override
+  String get consumptionTabHiddenNotice =>
+      'Der Verbrauch-Tab wurde durch deine Profileinstellungen ausgeblendet.';
+
+  @override
+  String get swipeBetweenTabsHint =>
+      'Tipp: Wische nach links oder rechts, um zwischen den Tabs zu wechseln.';
+
+  @override
   String get achievementSmoothDriver => 'Ruhige Serie';
 
   @override

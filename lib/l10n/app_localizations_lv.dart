@@ -3176,6 +3176,25 @@ class AppLocalizationsLv extends AppLocalizations {
       'Get notified when prices drop near you';
 
   @override
+  String get notFoundTitle => 'Page not found';
+
+  @override
+  String notFoundBody(String location) {
+    return '\"$location\" not found.';
+  }
+
+  @override
+  String get notFoundHomeButton => 'Home';
+
+  @override
+  String get consumptionTabHiddenNotice =>
+      'The Consumption tab was hidden by your profile settings.';
+
+  @override
+  String get swipeBetweenTabsHint =>
+      'Tip: swipe left or right to switch between tabs.';
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override

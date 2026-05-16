@@ -1470,5 +1470,30 @@
   "radiusAlertsEntrySubtitle": "Get notified when prices drop near you",
   "@radiusAlertsEntrySubtitle": {
     "description": "Subtitle of the radius-alerts navigation entry on the favorites Alerts tab — explains what radius alerts do (#1701)."
+  },
+  "notFoundTitle": "Page not found",
+  "@notFoundTitle": {
+    "description": "AppBar title of the go_router 404 / error screen shown when a route cannot be matched (#1690)."
+  },
+  "notFoundBody": "\"{location}\" not found.",
+  "@notFoundBody": {
+    "description": "Body of the 404 / page-not-found screen, naming the unmatched route location (#1690).",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "notFoundHomeButton": "Home",
+  "@notFoundHomeButton": {
+    "description": "Button on the 404 screen that returns the user to the home route (#1690)."
+  },
+  "consumptionTabHiddenNotice": "The Consumption tab was hidden by your profile settings.",
+  "@consumptionTabHiddenNotice": {
+    "description": "SnackBar shown when a profile change removes the Consumption tab at runtime and the bottom-nav selection jumps to Search — explains why the tab vanished (#1690)."
+  },
+  "swipeBetweenTabsHint": "Tip: swipe left or right to switch between tabs.",
+  "@swipeBetweenTabsHint": {
+    "description": "One-time first-run SnackBar hint that the bottom-nav tabs respond to a horizontal swipe gesture (#1690)."
   }
 }

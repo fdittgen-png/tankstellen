@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/storage/storage_providers.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../features/feature_management/application/feature_flags_provider.dart';
 import '../features/feature_management/domain/consumption_tab_visibility.dart';
@@ -70,6 +71,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(currentShellBranchProvider.notifier).set(_currentIndex);
+      // #1690 — one-time first-run hint that the tabs can be swiped
+      // between (the gesture is otherwise undiscoverable).
+      _maybeShowSwipeHint();
     });
 
     _iconControllers = List.generate(
@@ -156,6 +160,32 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     }
   }
 
+  /// SettingsStorage key for the one-time swipe-between-tabs hint.
+  static const String _swipeHintStorageKey = 'shell_swipe_hint_shown';
+
+  /// #1690 — surface a one-time hint that the tabs respond to a
+  /// horizontal swipe (an otherwise undiscoverable gesture). Shown once
+  /// ever, gated on a [SettingsStorage] flag; best-effort so a missing
+  /// settings box in a widget test simply skips the hint.
+  Future<void> _maybeShowSwipeHint() async {
+    try {
+      final settings = ref.read(settingsStorageProvider);
+      if (settings.getSetting(_swipeHintStorageKey) == true) return;
+      await settings.putSetting(_swipeHintStorageKey, true);
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          l10n?.swipeBetweenTabsHint ??
+              'Tip: swipe left or right to switch between tabs.',
+        ),
+        duration: const Duration(seconds: 5),
+      ));
+    } catch (e, st) {
+      debugPrint('ShellScreen: swipe hint skipped: $e\n$st');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Keep in sync with go_router's actual index (e.g. deep link or redirect)
@@ -197,9 +227,16 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // the nav bar and leaving `_currentIndex` pointing at it would
     // leave no item highlighted.
     if (!showConsumption && _currentIndex == kConsumptionBranchIndex) {
+      // #1690 — the tab vanishing + the selection jumping is silent
+      // and confusing; tell the user a profile change hid the tab.
+      final tabHiddenNotice = l10n?.consumptionTabHiddenNotice ??
+          'The Consumption tab was hidden by your profile settings.';
       safePostFrame(() {
         if (!mounted) return;
         if (_currentIndex != kConsumptionBranchIndex) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(tabHiddenNotice)),
+        );
         _goToPage(0);
       });
     }
