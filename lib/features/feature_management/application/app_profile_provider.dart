@@ -65,15 +65,17 @@ class ActiveAppProfile extends _$ActiveAppProfile {
   ///
   /// For [AppProfile.custom] this is a flag no-op — the user's set
   /// stays whatever it was last persisted. For the three preset
-  /// profiles, every Feature in [Feature.values] is either enabled (if
-  /// in the bundle) or disabled (if not), so re-selecting the same
-  /// profile is idempotent and switching profiles never leaves
-  /// stale-on flags around.
+  /// profiles the bundle is applied atomically via
+  /// [FeatureFlags.applyBundle]: the enabled set becomes exactly the
+  /// bundle, so re-selecting the same profile is idempotent and
+  /// switching profiles never leaves stale-on flags around.
   ///
-  /// Bundle application respects the dependency graph by walking
-  /// [Feature.values] in declaration order, which matches the
-  /// dependency order today (parents before children) — see the
-  /// declaration order comment on [Feature] for why this isn't fragile.
+  /// A preset bundle is applied as a whole, NOT feature-by-feature
+  /// through the prerequisite-guarded [FeatureFlags.enable] — a preset
+  /// deliberately includes dependents (e.g. `showConsumptionTab` in
+  /// Medium) whose `requires` edge is satisfied at the reachability
+  /// layer rather than the dependency graph; routing those through
+  /// `enable` crashed (#1765).
   Future<void> select(AppProfile profile) async {
     final repo = ref.read(appProfileRepositoryProvider);
     state = profile;
@@ -84,27 +86,7 @@ class ActiveAppProfile extends _$ActiveAppProfile {
     if (profile == AppProfile.custom) return;
 
     final bundle = appProfileBundles[profile] ?? <Feature>{};
-    final flags = ref.read(featureFlagsProvider.notifier);
-    final manifest = ref.read(featureManifestProvider);
-    // Two-pass apply: enable parents before children so the dependency
-    // graph never rejects an enable mid-bundle. We sort by topological
-    // depth — features with no `requires` first, then features whose
-    // requires are already in the bundle.
-    final sorted = _topologicalOrder(bundle, manifest.entries);
-    for (final feature in sorted) {
-      await flags.enable(feature);
-    }
-    // Disable everything not in the bundle. Walk in reverse topological
-    // order so children are disabled before their parents (parents are
-    // safe to disable at any time per the lazy-cascade contract, but
-    // reverse-order keeps the persisted set tidy after each step).
-    final toDisable = Feature.values
-        .where((f) => !bundle.contains(f))
-        .toList()
-        .reversed;
-    for (final feature in toDisable) {
-      await flags.disable(feature);
-    }
+    await ref.read(featureFlagsProvider.notifier).applyBundle(bundle);
   }
 
   /// Recomputes the active profile after an external feature-flag
@@ -126,31 +108,3 @@ class ActiveAppProfile extends _$ActiveAppProfile {
   }
 }
 
-/// Returns [features] in topological order so every feature comes after
-/// the features it `requires`. Used by `select()` to enable parents
-/// before children regardless of declaration order in [Feature].
-///
-/// The manifest's `assertNoCycles` invariant guarantees termination.
-List<Feature> _topologicalOrder(
-  Set<Feature> features,
-  Map<Feature, dynamic> manifestEntries,
-) {
-  final visited = <Feature>{};
-  final result = <Feature>[];
-  void visit(Feature node) {
-    if (visited.contains(node)) return;
-    visited.add(node);
-    final entry = manifestEntries[node];
-    if (entry != null) {
-      for (final required in entry.requires as Set<Feature>) {
-        if (features.contains(required)) visit(required);
-      }
-    }
-    result.add(node);
-  }
-
-  for (final f in features) {
-    visit(f);
-  }
-  return result;
-}

@@ -163,6 +163,30 @@ class FeatureFlags extends _$FeatureFlags {
     state = AsyncData(next);
   }
 
+  /// Replaces the entire enabled set with [bundle] — used to apply a
+  /// preset profile bundle atomically (#1517 / #1765).
+  ///
+  /// Unlike [enable], this does NOT run the per-feature prerequisite
+  /// guard: a preset bundle is a complete, intentional set, and a
+  /// preset deliberately includes dependents (e.g. `showConsumptionTab`
+  /// in the Medium bundle) whose manifest `requires` edge is satisfied
+  /// at the reachability layer, not the dependency graph. Routing a
+  /// bundle through [enable] crashed the moment a dependent's
+  /// prerequisite was absent from the bundle (#1765).
+  ///
+  /// Channel-unavailable features are dropped (#1674); the result is
+  /// exactly [bundle] minus those, so no stale-on flags survive a
+  /// profile switch.
+  Future<void> applyBundle(Set<Feature> bundle) async {
+    final manifest = ref.read(featureManifestProvider);
+    final channel = ref.read(buildChannelProvider);
+    // Await the in-flight build so the apply replaces the resolved set.
+    await future;
+    final next = _availableInChannel(bundle, manifest, channel);
+    await _persist(next);
+    state = AsyncData(next);
+  }
+
   /// True when [feature] is currently in the stored enabled set. Does NOT
   /// walk the dependency chain — when the manifest declares prerequisites
   /// for [feature] and the caller wants the user-visible "is this surface
