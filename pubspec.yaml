@@ -139,7 +139,14 @@ flutter:
   generate: true
 
   assets:
-    - assets/
+    # #1776 — `assets/` is deliberately NOT wildcarded. The launcher-icon
+    # source art + Play-Store listing graphics (icon*.png/svg,
+    # feature_graphic.png, play_store_icon_512.png — ~1.4 MB) live in
+    # assets/ but are build-time only: flutter_launcher_icons and the
+    # store-listing tooling read them from the source tree, never via
+    # rootBundle. `tanksync_config.json` is the only runtime-loaded file
+    # at the assets/ root, so it is listed explicitly.
+    - assets/tanksync_config.json
     - assets/models/
     - assets/receipt_overrides/index.json
     - assets/reference_vehicles/vehicles.json
