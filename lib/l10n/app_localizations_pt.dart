@@ -877,6 +877,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get routePlanningSection => 'Planejamento de rota';
 
   @override
+  String get routeMinSaving => 'Economia mínima';
+
+  @override
+  String get routeMinSavingOff => 'Desativado';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Mostrando todos os postos encontrados na rota';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Apenas postos dentro de $amount do mais barato da rota';
+  }
+
+  @override
   String get routeDetourBudget => 'Desvio máximo';
 
   @override

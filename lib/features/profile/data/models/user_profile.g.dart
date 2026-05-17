@@ -31,6 +31,8 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
   routeSegmentKm: (json['routeSegmentKm'] as num?)?.toDouble() ?? 50.0,
   avoidHighways: json['avoidHighways'] as bool? ?? false,
   routeDetourBudgetKm: (json['routeDetourBudgetKm'] as num?)?.toDouble() ?? 5.0,
+  minRouteSavingPerLiter:
+      (json['minRouteSavingPerLiter'] as num?)?.toDouble() ?? 0.0,
   showFuel: json['showFuel'] as bool? ?? true,
   showElectric: json['showElectric'] as bool? ?? true,
   ratingMode: json['ratingMode'] as String? ?? 'local',
@@ -65,6 +67,7 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
       'routeSegmentKm': instance.routeSegmentKm,
       'avoidHighways': instance.avoidHighways,
       'routeDetourBudgetKm': instance.routeDetourBudgetKm,
+      'minRouteSavingPerLiter': instance.minRouteSavingPerLiter,
       'showFuel': instance.showFuel,
       'showElectric': instance.showElectric,
       'ratingMode': instance.ratingMode,

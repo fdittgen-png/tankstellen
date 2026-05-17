@@ -268,6 +268,17 @@
   "evChargingApiKey": "API ključ EV punjenja",
   "openChargeMapApiKey": "API ključ OpenChargeMap",
   "routePlanningSection": "Planiranje rute",
+  "routeMinSaving": "Minimalna ušteda",
+  "routeMinSavingOff": "Isključeno",
+  "routeMinSavingOffCaption": "Prikazuju se sve postaje pronađene uz rutu",
+  "routeMinSavingCaption": "Samo postaje unutar {amount} od najjeftinije na ruti",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Maksimalni obilazak",
   "routeDetourBudgetCaption": "Prikaži postaje do {km} km od izravne rute",
   "@routeDetourBudgetCaption": {

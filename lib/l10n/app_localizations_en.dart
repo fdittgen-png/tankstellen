@@ -869,6 +869,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get routePlanningSection => 'Route planning';
 
   @override
+  String get routeMinSaving => 'Minimum saving';
+
+  @override
+  String get routeMinSavingOff => 'Off';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Showing every station found along the route';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Only stations within $amount of the route\'s cheapest';
+  }
+
+  @override
   String get routeDetourBudget => 'Maximum detour';
 
   @override
@@ -6099,6 +6114,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get routePlanningSection => '⟦Řóúŧé ƥłáññîñǧ ······⟧';
+
+  @override
+  String get routeMinSaving => '⟦Ṁîñîɱúɱ šáṽîñǧ ······⟧';
+
+  @override
+  String get routeMinSavingOff => '⟦Óƒƒ ·⟧';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      '⟦Šĥóŵîñǧ éṽéřý šŧáŧîóñ ƒóúñđ áłóñǧ ŧĥé řóúŧé ·················⟧';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return '⟦Óñłý šŧáŧîóñš ŵîŧĥîñ $amount óƒ ŧĥé řóúŧé\'š çĥéáƥéšŧ ·················⟧';
+  }
 
   @override
   String get routeDetourBudget => '⟦Ṁáẋîɱúɱ đéŧóúř ······⟧';

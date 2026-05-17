@@ -877,6 +877,21 @@ class AppLocalizationsLv extends AppLocalizations {
   String get routePlanningSection => 'Maršruta plānošana';
 
   @override
+  String get routeMinSaving => 'Minimālais ietaupījums';
+
+  @override
+  String get routeMinSavingOff => 'Izslēgts';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Tiek rādītas visas maršrutā atrastās stacijas';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Tikai stacijas $amount robežās no lētākās maršrutā';
+  }
+
+  @override
   String get routeDetourBudget => 'Maksimālais apvedceļš';
 
   @override

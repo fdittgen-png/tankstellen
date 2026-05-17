@@ -872,6 +872,21 @@ class AppLocalizationsNb extends AppLocalizations {
   String get routePlanningSection => 'Ruteplanlegging';
 
   @override
+  String get routeMinSaving => 'Minste besparelse';
+
+  @override
+  String get routeMinSavingOff => 'Av';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Viser alle stasjoner funnet langs ruten';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Bare stasjoner innenfor $amount av den billigste på ruten';
+  }
+
+  @override
   String get routeDetourBudget => 'Maksimal omvei';
 
   @override

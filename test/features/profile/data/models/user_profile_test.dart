@@ -25,4 +25,23 @@ void main() {
       expect(restored.routeDetourBudgetKm, 14);
     });
   });
+
+  group('UserProfile.minRouteSavingPerLiter (#1872)', () {
+    test('defaults to 0.0 — the minimum-saving filter is off', () {
+      const p = UserProfile(id: 'p1', name: 'Test');
+      expect(p.minRouteSavingPerLiter, 0.0);
+    });
+
+    test('legacy JSON without the key migrates to the 0.0 default', () {
+      final p = UserProfile.fromJson(const {'id': 'p1', 'name': 'Test'});
+      expect(p.minRouteSavingPerLiter, 0.0);
+    });
+
+    test('an explicit value survives a JSON round-trip', () {
+      const p =
+          UserProfile(id: 'p1', name: 'Test', minRouteSavingPerLiter: 0.08);
+      final restored = UserProfile.fromJson(p.toJson());
+      expect(restored.minRouteSavingPerLiter, 0.08);
+    });
+  });
 }

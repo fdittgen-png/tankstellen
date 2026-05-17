@@ -875,6 +875,20 @@ class AppLocalizationsSv extends AppLocalizations {
   String get routePlanningSection => 'Ruttplanering';
 
   @override
+  String get routeMinSaving => 'Minsta besparing';
+
+  @override
+  String get routeMinSavingOff => 'Av';
+
+  @override
+  String get routeMinSavingOffCaption => 'Visar alla stationer längs rutten';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Endast stationer inom $amount från den billigaste på rutten';
+  }
+
+  @override
   String get routeDetourBudget => 'Maximal omväg';
 
   @override

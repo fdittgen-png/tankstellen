@@ -398,6 +398,17 @@
   "evChargingApiKey": "EV Charging API Key",
   "openChargeMapApiKey": "OpenChargeMap API Key",
   "routePlanningSection": "Route planning",
+  "routeMinSaving": "Minimum saving",
+  "routeMinSavingOff": "Off",
+  "routeMinSavingOffCaption": "Showing every station found along the route",
+  "routeMinSavingCaption": "Only stations within {amount} of the route's cheapest",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Maximum detour",
   "routeDetourBudgetCaption": "Surface stations up to {km} km off your direct route",
   "@routeDetourBudgetCaption": {

@@ -379,6 +379,17 @@
   "evChargingApiKey": "E-Laden API-Schlüssel",
   "openChargeMapApiKey": "OpenChargeMap API-Schlüssel",
   "routePlanningSection": "Routenplanung",
+  "routeMinSaving": "Mindestersparnis",
+  "routeMinSavingOff": "Aus",
+  "routeMinSavingOffCaption": "Alle entlang der Route gefundenen Stationen werden angezeigt",
+  "routeMinSavingCaption": "Nur Stationen im Bereich von {amount} der günstigsten auf der Route",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Maximaler Umweg",
   "routeDetourBudgetCaption": "Stationen bis zu {km} km abseits der direkten Route anzeigen",
   "@routeDetourBudgetCaption": {

@@ -876,6 +876,21 @@ class AppLocalizationsCs extends AppLocalizations {
   String get routePlanningSection => 'Plánování trasy';
 
   @override
+  String get routeMinSaving => 'Minimální úspora';
+
+  @override
+  String get routeMinSavingOff => 'Vypnuto';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Zobrazují se všechny stanice nalezené na trase';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Pouze stanice do $amount od nejlevnější na trase';
+  }
+
+  @override
   String get routeDetourBudget => 'Maximální zajížďka';
 
   @override

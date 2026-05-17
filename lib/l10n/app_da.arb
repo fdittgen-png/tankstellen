@@ -268,6 +268,17 @@
   "evChargingApiKey": "EV-opladning API-nøgle",
   "openChargeMapApiKey": "OpenChargeMap API-nøgle",
   "routePlanningSection": "Ruteplanlægning",
+  "routeMinSaving": "Minimal besparelse",
+  "routeMinSavingOff": "Fra",
+  "routeMinSavingOffCaption": "Viser alle stationer fundet langs ruten",
+  "routeMinSavingCaption": "Kun stationer inden for {amount} af den billigste på ruten",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Maksimal omvej",
   "routeDetourBudgetCaption": "Vis stationer op til {km} km fra din direkte rute",
   "@routeDetourBudgetCaption": {

@@ -876,6 +876,21 @@ class AppLocalizationsRo extends AppLocalizations {
   String get routePlanningSection => 'Planificarea rutei';
 
   @override
+  String get routeMinSaving => 'Economie minimă';
+
+  @override
+  String get routeMinSavingOff => 'Dezactivat';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Se afișează toate stațiile găsite de-a lungul rutei';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Doar stații în limita a $amount față de cea mai ieftină de pe rută';
+  }
+
+  @override
   String get routeDetourBudget => 'Ocol maxim';
 
   @override

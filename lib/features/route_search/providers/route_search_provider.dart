@@ -47,6 +47,7 @@ class RouteSearchState extends _$RouteSearchState {
       final profile = ref.read(activeProfileProvider);
       final avoidHighways = profile?.avoidHighways ?? false;
       final segmentKm = profile?.routeSegmentKm ?? 50.0;
+      final minSaving = profile?.minRouteSavingPerLiter ?? 0.0;
       final routingService = RoutingService();
       debugPrint('RouteSearch: fetching route for ${waypoints.length} waypoints, avoidHighways=$avoidHighways, strategy=${strategyType.key}');
       final routeResult = await routingService.getRoute(waypoints, avoidHighways: avoidHighways);
@@ -71,6 +72,13 @@ class RouteSearchState extends _$RouteSearchState {
           queryStations: queryFn,
           maxDetourKm: searchRadiusKm,
         );
+      }
+
+      // 2b. #1872 — drop fuel stations that don't beat the route's
+      // cheapest by at least the user's minimum-saving threshold.
+      if (fuelType != FuelType.electric && minSaving > 0) {
+        allResults =
+            filterRouteResultsByMinSaving(allResults, fuelType, minSaving);
       }
 
       // 3. Identify cheapest fuel station
@@ -226,4 +234,36 @@ class RouteSearchState extends _$RouteSearchState {
   void clear() {
     state = const AsyncValue.data(null);
   }
+}
+
+/// Keeps only fuel stations priced within [minSaving] €/L of the
+/// cheapest station found along the route (#1872).
+///
+/// The cheapest priced station is the anchor; a station survives when
+/// its [fuelType] price is at most `cheapest + minSaving`. Stations
+/// with no price for [fuelType] are kept — an unknown price is not a
+/// reason to hide a stop — and the list is returned unchanged when no
+/// station carries a comparable price. EV results never reach here
+/// (the caller gates on a non-electric fuel type).
+List<SearchResultItem> filterRouteResultsByMinSaving(
+  List<SearchResultItem> results,
+  FuelType fuelType,
+  double minSaving,
+) {
+  double? cheapest;
+  for (final item in results) {
+    if (item is FuelStationResult) {
+      final price = item.station.priceFor(fuelType);
+      if (price != null && (cheapest == null || price < cheapest)) {
+        cheapest = price;
+      }
+    }
+  }
+  if (cheapest == null) return results;
+  final ceiling = cheapest + minSaving;
+  return results.where((item) {
+    if (item is! FuelStationResult) return true;
+    final price = item.station.priceFor(fuelType);
+    return price == null || price <= ceiling;
+  }).toList();
 }

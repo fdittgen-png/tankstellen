@@ -268,6 +268,17 @@
   "evChargingApiKey": "EV uzlādes API atslēga",
   "openChargeMapApiKey": "OpenChargeMap API atslēga",
   "routePlanningSection": "Maršruta plānošana",
+  "routeMinSaving": "Minimālais ietaupījums",
+  "routeMinSavingOff": "Izslēgts",
+  "routeMinSavingOffCaption": "Tiek rādītas visas maršrutā atrastās stacijas",
+  "routeMinSavingCaption": "Tikai stacijas {amount} robežās no lētākās maršrutā",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Maksimālais apvedceļš",
   "routeDetourBudgetCaption": "Rādīt stacijas līdz {km} km no tiešā maršruta",
   "@routeDetourBudgetCaption": {

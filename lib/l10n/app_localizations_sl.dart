@@ -873,6 +873,21 @@ class AppLocalizationsSl extends AppLocalizations {
   String get routePlanningSection => 'Načrtovanje poti';
 
   @override
+  String get routeMinSaving => 'Najmanjši prihranek';
+
+  @override
+  String get routeMinSavingOff => 'Izklopljeno';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Prikazane so vse postaje, najdene na poti';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Samo postaje znotraj $amount od najcenejše na poti';
+  }
+
+  @override
   String get routeDetourBudget => 'Največji obvoz';
 
   @override

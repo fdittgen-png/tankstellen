@@ -412,6 +412,17 @@
   "evChargingApiKey": "Clé API recharge EV",
   "openChargeMapApiKey": "Clé API OpenChargeMap",
   "routePlanningSection": "Planification d'itinéraire",
+  "routeMinSaving": "Économie minimale",
+  "routeMinSavingOff": "Désactivé",
+  "routeMinSavingOffCaption": "Affiche toutes les stations trouvées le long de l'itinéraire",
+  "routeMinSavingCaption": "Uniquement les stations dans une marge de {amount} de la moins chère de l'itinéraire",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Détour maximal",
   "routeDetourBudgetCaption": "Afficher les stations jusqu'à {km} km de votre itinéraire direct",
   "@routeDetourBudgetCaption": {

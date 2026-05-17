@@ -268,6 +268,17 @@
   "evChargingApiKey": "EV laadimise API võti",
   "openChargeMapApiKey": "OpenChargeMap API võti",
   "routePlanningSection": "Marsruudi planeerimine",
+  "routeMinSaving": "Minimaalne kokkuhoid",
+  "routeMinSavingOff": "Väljas",
+  "routeMinSavingOffCaption": "Kuvatakse kõik marsruudilt leitud jaamad",
+  "routeMinSavingCaption": "Ainult jaamad {amount} piires marsruudi odavaimast",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Maksimaalne ümbersõit",
   "routeDetourBudgetCaption": "Kuva jaamad kuni {km} km kaugusel otseteest",
   "@routeDetourBudgetCaption": {
