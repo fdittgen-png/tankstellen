@@ -105,18 +105,31 @@ class ReceiptScanService {
   Future<PumpDisplayScanOutcome?> scanPumpDisplay() async {
     final capture = await _capture();
     if (capture == null) return null;
+    return parsePumpDisplayImage(capture);
+  }
+
+  /// Runs OCR + parsing on an already-captured pump-display photo at
+  /// [path] (#1868).
+  ///
+  /// The #1868 in-app camera screen owns the capture (a framing
+  /// reticle `image_picker` cannot provide); it hands the captured
+  /// JPEG path here. Identical to [scanPumpDisplay] minus the capture
+  /// step — same #1860 contrast preprocessing, same "delete on OCR
+  /// failure, keep on success for the #953 bad-scan report" policy.
+  /// Returns null when OCR recognises no text.
+  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(String path) async {
     // #1860 — the pump path runs an extra grayscale + contrast pass so
     // ML Kit can read 7-segment LCDs and sky-washed displays. Scoped
     // here so the prose-receipt OCR is not affected.
-    final text = await _recognise(capture, enhanceContrast: true);
+    final text = await _recognise(path, enhanceContrast: true);
     if (text == null) {
-      await _tryDelete(capture);
+      await _tryDelete(path);
       return null;
     }
     return PumpDisplayScanOutcome(
       parse: _pumpParser.parse(text),
       ocrText: text,
-      imagePath: capture,
+      imagePath: path,
     );
   }
 

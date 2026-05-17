@@ -282,6 +282,60 @@ void main() {
     });
   });
 
+  group('ReceiptScanService.parsePumpDisplayImage (#1868)', () {
+    late ReceiptScanService service;
+    late _FakeRecognizer recognizer;
+
+    setUp(() {
+      recognizer = _FakeRecognizer();
+      service = ReceiptScanService(
+        picker: _FakePicker(),
+        recognizer: recognizer,
+        parser: _StubReceiptParser(const ReceiptParseResult()),
+        pumpParser: const _StubPumpDisplayParser(PumpDisplayParseResult(
+          liters: 40.0,
+          totalCost: 70.0,
+          pricePerLiter: 1.75,
+          confidence: 0.9,
+        )),
+      );
+    });
+
+    test('OCRs + parses an already-captured photo, keeping the file',
+        () async {
+      // #1868 — the in-app camera owns the capture; the service is
+      // handed the resulting path. No picker call.
+      final capture = await _createTempCapture();
+      recognizer.textToReturn = 'Betrag 70.00\nAbgabe 40.00\nPreis/L 1.75';
+
+      final outcome = await service.parsePumpDisplayImage(capture.path);
+
+      expect(outcome, isNotNull);
+      expect(outcome!.parse.liters, 40.0);
+      expect(outcome.imagePath, capture.path);
+      expect(outcome.ocrText, contains('Betrag'));
+      expect(recognizer.processCalls, 1);
+      expect(File(capture.path).existsSync(), isTrue,
+          reason: 'the photo must survive for the #953 bad-scan report.');
+
+      await File(capture.path).delete();
+      await capture.dir.delete(recursive: true);
+    });
+
+    test('returns null and deletes the capture when OCR fails', () async {
+      final capture = await _createTempCapture();
+      recognizer.errorToThrow = Exception('OCR exploded');
+
+      final outcome = await service.parsePumpDisplayImage(capture.path);
+
+      expect(outcome, isNull);
+      expect(File(capture.path).existsSync(), isFalse,
+          reason: 'an unreadable capture must not leak to disk.');
+
+      await capture.dir.delete(recursive: true);
+    });
+  });
+
   group('ReceiptScanService.dispose', () {
     test('closes the underlying text recognizer exactly once', () async {
       final recognizer = _FakeRecognizer();

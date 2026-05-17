@@ -4266,6 +4266,21 @@ class AppLocalizationsRo extends AppLocalizations {
       'Trimiterea a eșuat — partajare manuală';
 
   @override
+  String get pumpCameraHint =>
+      'Aliniază cele trei cifre de pe afișajul pompei în interiorul cadrului';
+
+  @override
+  String get pumpCameraCapture => 'Capturează';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Accesul la cameră este necesar pentru a scana afișajul pompei. Activează-l în setările dispozitivului.';
+
+  @override
+  String get pumpCameraError =>
+      'Camera nu a putut porni. Încearcă din nou sau introdu valorile manual.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Ce ați alimentat';
 
   @override

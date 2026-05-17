@@ -4236,6 +4236,21 @@ class AppLocalizationsSv extends AppLocalizations {
       'Inlämning misslyckades – manuell delning';
 
   @override
+  String get pumpCameraHint =>
+      'Rikta in de tre siffrorna på pumpdisplayen inom ramen';
+
+  @override
+  String get pumpCameraCapture => 'Ta bild';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Kameraåtkomst krävs för att skanna pumpdisplayen. Aktivera den i enhetens inställningar.';
+
+  @override
+  String get pumpCameraError =>
+      'Kameran kunde inte startas. Försök igen eller ange värdena manuellt.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Vad du tankade';
 
   @override

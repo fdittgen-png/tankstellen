@@ -4259,6 +4259,21 @@ class AppLocalizationsDe extends AppLocalizations {
       'Senden fehlgeschlagen — manuell teilen';
 
   @override
+  String get pumpCameraHint =>
+      'Richte die drei Zahlen der Zapfsäulenanzeige im Rahmen aus';
+
+  @override
+  String get pumpCameraCapture => 'Aufnehmen';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Für das Scannen der Zapfsäulenanzeige wird Kamerazugriff benötigt. Aktiviere ihn in den Geräteeinstellungen.';
+
+  @override
+  String get pumpCameraError =>
+      'Die Kamera konnte nicht gestartet werden. Versuche es erneut oder gib die Werte von Hand ein.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Was du getankt hast';
 
   @override

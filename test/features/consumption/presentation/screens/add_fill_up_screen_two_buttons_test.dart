@@ -23,7 +23,8 @@ import '../../../../helpers/pump_app.dart';
 ///   1. Two visible buttons (Receipt + Pump display) are present.
 ///   2. The OBD2 import path is NOT shown on this screen.
 ///   3. Tapping each button triggers the correct callback (Receipt
-///      hits scanReceipt, Pump display hits scanPumpDisplay).
+///      hits scanReceipt, Pump display hits parsePumpDisplayImage via
+///      the #1868 in-app camera capture).
 class _NoopRecognizer extends TextRecognizer {
   _NoopRecognizer();
 
@@ -75,7 +76,7 @@ class _RoutingScanService extends ReceiptScanService {
   }
 
   @override
-  Future<PumpDisplayScanOutcome?> scanPumpDisplay() async {
+  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(String path) async {
     pumpCalls++;
     return null;
   }
@@ -146,12 +147,17 @@ void main() {
           reason: 'Receipt button must NOT call scanPumpDisplay().');
     });
 
-    testWidgets('tapping Pump display invokes scanPumpDisplay only',
+    testWidgets('tapping Pump display invokes the pump-scan path only',
         (tester) async {
       final fake = _RoutingScanService();
       await pumpApp(
         tester,
-        AddFillUpScreen(scanService: fake),
+        AddFillUpScreen(
+          scanService: fake,
+          // #1868 — stub the in-app camera so the handler reaches
+          // parsePumpDisplayImage without launching a real camera.
+          pumpImageCapture: (_) async => '/tmp/fake-pump.jpg',
+        ),
         overrides: _withVehicle,
       );
 
@@ -161,7 +167,7 @@ void main() {
       }
 
       expect(fake.pumpCalls, 1,
-          reason: 'Pump display button must call scanPumpDisplay().');
+          reason: 'Pump display button must call parsePumpDisplayImage().');
       expect(fake.receiptCalls, 0,
           reason: 'Pump display button must NOT call scanReceipt().');
     });

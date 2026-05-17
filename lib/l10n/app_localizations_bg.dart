@@ -4270,6 +4270,21 @@ class AppLocalizationsBg extends AppLocalizations {
       'Изпращането не успя — ръчно споделяне';
 
   @override
+  String get pumpCameraHint =>
+      'Подравнете трите цифри от дисплея на колонката в рамката';
+
+  @override
+  String get pumpCameraCapture => 'Заснемане';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Необходим е достъп до камерата за сканиране на дисплея на колонката. Активирайте го в настройките на устройството.';
+
+  @override
+  String get pumpCameraError =>
+      'Камерата не можа да се стартира. Опитайте отново или въведете стойностите ръчно.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Какво сте заредили';
 
   @override

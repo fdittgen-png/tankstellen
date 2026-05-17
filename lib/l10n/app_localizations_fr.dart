@@ -4279,6 +4279,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de création — partage manuel';
 
   @override
+  String get pumpCameraHint =>
+      'Alignez les trois chiffres de l\'afficheur de la pompe dans le cadre';
+
+  @override
+  String get pumpCameraCapture => 'Capturer';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'L\'accès à la caméra est nécessaire pour scanner l\'afficheur de la pompe. Activez-le dans les réglages de l\'appareil.';
+
+  @override
+  String get pumpCameraError =>
+      'La caméra n\'a pas pu démarrer. Réessayez ou saisissez les valeurs manuellement.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Votre plein';
 
   @override

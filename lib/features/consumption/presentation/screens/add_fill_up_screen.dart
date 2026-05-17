@@ -25,6 +25,7 @@ import '../widgets/fill_up_no_vehicle_cta.dart';
 import '../widgets/fill_up_pinned_save_bar.dart';
 import '../widgets/fill_up_scan_handlers.dart';
 import '../widgets/fill_up_variance_prompt.dart';
+import 'pump_display_camera_screen.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -64,6 +65,12 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   @visibleForTesting
   final double? initialFuelLevelAfterL;
 
+  /// Test seam (#1868) — widget tests swap in a stub returning a
+  /// fixture image path instead of launching the in-app
+  /// [PumpDisplayCameraScreen]. Production callers leave this null.
+  @visibleForTesting
+  final Future<String?> Function(BuildContext)? pumpImageCapture;
+
   const AddFillUpScreen({
     super.key,
     this.stationId,
@@ -73,6 +80,7 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
     this.scanService,
     this.initialFuelLevelBeforeL,
     this.initialFuelLevelAfterL,
+    this.pumpImageCapture,
   });
 
   @override
@@ -230,7 +238,16 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         setFuelType: (f) => setState(() => _fuelType = f),
         setLastScan: (o) => setState(() => _lastScan = o),
         isMounted: () => mounted,
+        capturePumpImage: widget.pumpImageCapture ?? _capturePumpImage,
       );
+
+  /// Pushes the #1868 in-app camera screen and returns the captured
+  /// pump-display photo's path (null on cancel / camera unavailable).
+  Future<String?> _capturePumpImage(BuildContext context) {
+    return Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const PumpDisplayCameraScreen()),
+    );
+  }
 
   Future<void> _scanReceipt() => runReceiptScan(context, _buildScanHostState());
 

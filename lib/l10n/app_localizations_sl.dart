@@ -4243,6 +4243,21 @@ class AppLocalizationsSl extends AppLocalizations {
       'Oddaja ni uspela — ročno deljenje';
 
   @override
+  String get pumpCameraHint =>
+      'Poravnajte tri številke z zaslona točilne naprave znotraj okvira';
+
+  @override
+  String get pumpCameraCapture => 'Zajemi';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Za optično branje zaslona točilne naprave je potreben dostop do kamere. Omogočite ga v nastavitvah naprave.';
+
+  @override
+  String get pumpCameraError =>
+      'Kamere ni bilo mogoče zagnati. Poskusite znova ali vnesite vrednosti ročno.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Kaj ste natočili';
 
   @override

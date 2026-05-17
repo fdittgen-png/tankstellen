@@ -4259,6 +4259,21 @@ class AppLocalizationsIt extends AppLocalizations {
       'Invio non riuscito — condivisione manuale';
 
   @override
+  String get pumpCameraHint =>
+      'Allinea i tre numeri del display della pompa nel riquadro';
+
+  @override
+  String get pumpCameraCapture => 'Scatta';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'L\'accesso alla fotocamera è necessario per scansionare il display della pompa. Abilitalo nelle impostazioni del dispositivo.';
+
+  @override
+  String get pumpCameraError =>
+      'La fotocamera non si è avviata. Riprova o inserisci i valori manualmente.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Cosa hai rifornito';
 
   @override

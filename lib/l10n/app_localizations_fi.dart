@@ -4236,6 +4236,21 @@ class AppLocalizationsFi extends AppLocalizations {
       'Lähetys epäonnistui — manuaalinen jakaminen';
 
   @override
+  String get pumpCameraHint =>
+      'Aseta mittarin näytön kolme numeroa kehyksen sisään';
+
+  @override
+  String get pumpCameraCapture => 'Ota kuva';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Kameran käyttöoikeus tarvitaan mittarin näytön skannaamiseen. Ota se käyttöön laitteen asetuksista.';
+
+  @override
+  String get pumpCameraError =>
+      'Kameraa ei voitu käynnistää. Yritä uudelleen tai syötä arvot käsin.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mitä tankkasite';
 
   @override

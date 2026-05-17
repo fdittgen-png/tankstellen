@@ -4272,6 +4272,21 @@ class AppLocalizationsHu extends AppLocalizations {
       'Beküldés sikertelen — kézi megosztás';
 
   @override
+  String get pumpCameraHint =>
+      'Igazítsa a kút kijelzőjének három számát a kereten belülre';
+
+  @override
+  String get pumpCameraCapture => 'Rögzítés';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'A kút kijelzőjének beolvasásához kamera-hozzáférés szükséges. Engedélyezze az eszköz beállításaiban.';
+
+  @override
+  String get pumpCameraError =>
+      'A kamerát nem sikerült elindítani. Próbálja újra, vagy adja meg az értékeket kézzel.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mit tankolt';
 
   @override

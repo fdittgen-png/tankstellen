@@ -4274,6 +4274,21 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αποτυχία υποβολής — χειροκίνητη κοινοποίηση';
 
   @override
+  String get pumpCameraHint =>
+      'Ευθυγραμμίστε τους τρεις αριθμούς της οθόνης της αντλίας μέσα στο πλαίσιο';
+
+  @override
+  String get pumpCameraCapture => 'Λήψη';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Απαιτείται πρόσβαση στην κάμερα για τη σάρωση της οθόνης της αντλίας. Ενεργοποιήστε την στις ρυθμίσεις της συσκευής.';
+
+  @override
+  String get pumpCameraError =>
+      'Η κάμερα δεν μπόρεσε να ξεκινήσει. Δοκιμάστε ξανά ή εισαγάγετε τις τιμές χειροκίνητα.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Τι ανεφοδιαστήκατε';
 
   @override

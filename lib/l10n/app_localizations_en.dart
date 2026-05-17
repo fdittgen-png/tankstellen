@@ -4212,6 +4212,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get badScanReportFallbackToShare => 'Submission failed — manual share';
 
   @override
+  String get pumpCameraHint =>
+      'Line up the three pump-display numbers inside the frame';
+
+  @override
+  String get pumpCameraCapture => 'Capture';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Camera access is needed to scan the pump display. Enable it in your device settings.';
+
+  @override
+  String get pumpCameraError =>
+      'The camera couldn\'t start. Try again or enter the values by hand.';
+
+  @override
   String get fillUpSectionWhatTitle => 'What you filled';
 
   @override
@@ -9553,6 +9568,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get badScanReportFallbackToShare =>
       '⟦Šúƀɱîššîóñ ƒáîłéđ — ɱáñúáł šĥářé ············⟧';
+
+  @override
+  String get pumpCameraHint =>
+      '⟦Łîñé úƥ ŧĥé ŧĥřéé ƥúɱƥ-đîšƥłáý ñúɱƀéřš îñšîđé ŧĥé ƒřáɱé ·····················⟧';
+
+  @override
+  String get pumpCameraCapture => '⟦Çáƥŧúřé ···⟧';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      '⟦Çáɱéřá áççéšš îš ñééđéđ ŧó šçáñ ŧĥé ƥúɱƥ đîšƥłáý. Éñáƀłé îŧ îñ ýóúř đéṽîçé šéŧŧîñǧš. ·······························⟧';
+
+  @override
+  String get pumpCameraError =>
+      '⟦Ŧĥé çáɱéřá çóúłđñ\'ŧ šŧářŧ. Ŧřý áǧáîñ óř éñŧéř ŧĥé ṽáłúéš ƀý ĥáñđ. ·······················⟧';
 
   @override
   String get fillUpSectionWhatTitle => '⟦Ŵĥáŧ ýóú ƒîłłéđ ······⟧';

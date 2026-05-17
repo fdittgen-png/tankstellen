@@ -4265,6 +4265,21 @@ class AppLocalizationsLv extends AppLocalizations {
       'Iesniegšana neizdevās — manuāla kopīgošana';
 
   @override
+  String get pumpCameraHint =>
+      'Salāgojiet trīs degvielas uzpildes ekrāna ciparus rāmī';
+
+  @override
+  String get pumpCameraCapture => 'Uzņemt';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Lai skenētu uzpildes ekrānu, nepieciešama piekļuve kamerai. Iespējojiet to ierīces iestatījumos.';
+
+  @override
+  String get pumpCameraError =>
+      'Kameru neizdevās palaist. Mēģiniet vēlreiz vai ievadiet vērtības manuāli.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Ko jūs uzpildījāt';
 
   @override

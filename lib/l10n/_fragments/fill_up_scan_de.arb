@@ -26,5 +26,9 @@
   "badScanReportHeaderYouTyped": "Eingegeben",
   "badScanReportCreateTicket": "Ticket erstellen",
   "badScanReportOpenInBrowser": "Im Browser öffnen",
-  "badScanReportFallbackToShare": "Senden fehlgeschlagen — manuell teilen"
+  "badScanReportFallbackToShare": "Senden fehlgeschlagen — manuell teilen",
+  "pumpCameraHint": "Richte die drei Zahlen der Zapfsäulenanzeige im Rahmen aus",
+  "pumpCameraCapture": "Aufnehmen",
+  "pumpCameraPermissionDenied": "Für das Scannen der Zapfsäulenanzeige wird Kamerazugriff benötigt. Aktiviere ihn in den Geräteeinstellungen.",
+  "pumpCameraError": "Die Kamera konnte nicht gestartet werden. Versuche es erneut oder gib die Werte von Hand ein."
 }

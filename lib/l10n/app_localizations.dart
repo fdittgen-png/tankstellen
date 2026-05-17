@@ -7683,6 +7683,30 @@ abstract class AppLocalizations {
   /// **'Submission failed — manual share'**
   String get badScanReportFallbackToShare;
 
+  /// Hint shown over the in-app camera reticle for the pump-display capture (#1868).
+  ///
+  /// In en, this message translates to:
+  /// **'Line up the three pump-display numbers inside the frame'**
+  String get pumpCameraHint;
+
+  /// Label of the shutter button on the pump-display camera screen (#1868).
+  ///
+  /// In en, this message translates to:
+  /// **'Capture'**
+  String get pumpCameraCapture;
+
+  /// Shown when the camera permission is denied on the pump-display capture screen (#1868).
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is needed to scan the pump display. Enable it in your device settings.'**
+  String get pumpCameraPermissionDenied;
+
+  /// Shown when the in-app camera fails to initialise on the pump-display capture screen (#1868).
+  ///
+  /// In en, this message translates to:
+  /// **'The camera couldn\'t start. Try again or enter the values by hand.'**
+  String get pumpCameraError;
+
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///
   /// In en, this message translates to:

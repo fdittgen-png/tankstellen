@@ -4235,6 +4235,21 @@ class AppLocalizationsDa extends AppLocalizations {
       'Indsendelse mislykkedes — manuel deling';
 
   @override
+  String get pumpCameraHint =>
+      'Placer de tre tal fra standerdisplayet inden for rammen';
+
+  @override
+  String get pumpCameraCapture => 'Tag billede';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Kameraadgang er nødvendig for at scanne standerdisplayet. Aktivér det i enhedens indstillinger.';
+
+  @override
+  String get pumpCameraError =>
+      'Kameraet kunne ikke starte. Prøv igen, eller indtast værdierne manuelt.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Hvad du tankede';
 
   @override

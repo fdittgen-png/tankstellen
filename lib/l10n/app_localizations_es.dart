@@ -4270,6 +4270,21 @@ class AppLocalizationsEs extends AppLocalizations {
       'Error al enviar: uso compartido manual';
 
   @override
+  String get pumpCameraHint =>
+      'Alinea los tres números del surtidor dentro del marco';
+
+  @override
+  String get pumpCameraCapture => 'Capturar';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Se necesita acceso a la cámara para escanear el surtidor. Actívalo en los ajustes del dispositivo.';
+
+  @override
+  String get pumpCameraError =>
+      'La cámara no pudo iniciarse. Inténtalo de nuevo o introduce los valores a mano.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Qué repostaste';
 
   @override

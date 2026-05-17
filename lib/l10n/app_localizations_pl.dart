@@ -4255,6 +4255,21 @@ class AppLocalizationsPl extends AppLocalizations {
       'Przesyłanie nie powiodło się — ręczne udostępnienie';
 
   @override
+  String get pumpCameraHint =>
+      'Ustaw trzy liczby z wyświetlacza dystrybutora w ramce';
+
+  @override
+  String get pumpCameraCapture => 'Zrób zdjęcie';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Dostęp do aparatu jest potrzebny do zeskanowania wyświetlacza dystrybutora. Włącz go w ustawieniach urządzenia.';
+
+  @override
+  String get pumpCameraError =>
+      'Nie udało się uruchomić aparatu. Spróbuj ponownie lub wprowadź wartości ręcznie.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Co zatankowałeś';
 
   @override
