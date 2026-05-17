@@ -36,11 +36,11 @@ Every feature ladders up to one goal — **reduce what your car costs you, per k
 
 ### 1. Buy fuel for less money
 
-Live cross-country price comparison, route-aware "cheapest stop" planning, drop alerts, and 30-day price history with a "best time to fill" model. Cheap fuel is the easiest win — and the one drivers leave on the table the most.
+Live cross-country price comparison, route-aware "cheapest stop" planning, drop alerts, and 30-day price history with "best time to fill" guidance. Cheap fuel is the easiest win — and the one drivers leave on the table the most.
 
 ### 2. Burn less of it per kilometre
 
-Plug in any ELM327-compatible OBD-II adapter and the app starts coaching: live haptic eco-feedback, hard-acceleration and idling insights, gear-coaching for the wrong-gear moments, a per-trip driving score, and a throttle/RPM histogram showing where your engine actually lives. Behaviour change is harder than picking a station, but it pays out on every drive instead of every fill-up.
+Plug in any ELM327-compatible OBD-II adapter and the app starts coaching: live haptic eco-feedback, hard-acceleration and idling insights, a per-trip driving score, and a throttle/RPM histogram showing where your engine actually lives. Behaviour change is harder than picking a station, but it pays out on every drive instead of every fill-up.
 
 ### 3. See what you're really spending
 
@@ -58,7 +58,7 @@ Features that don't serve at least one of those three layers don't belong.
 - **Route-aware search** — uniform / cheapest / balanced strategies, "best stops" along a planned trip
 - **Cross-border suggestions** — when the next country over is meaningfully cheaper, the app says so
 - **Price alerts** — threshold-based notifications, evaluated by a background job
-- **Price history & predictions** — 30-day charts plus a "best time to fill" model from your local history
+- **Price history & predictions** — 30-day charts plus "best time to fill" guidance (a day-of-week + price-threshold heuristic) from your local history
 - **Brand filter** — Total / Esso / Shell / Aral, country-aware brand registry
 - **Favorites** — quick access with swipe-to-navigate / swipe-to-remove
 - **Home-screen widget** — current prices and a "predictive" variant without opening the app
@@ -67,7 +67,7 @@ Features that don't serve at least one of those three layers don't belong.
 ### Layer 2 — burning less
 
 - **OBD-II support** — any ELM327-compatible adapter (BLE classic + dual-mode, see the adapter registry)
-- **Auto-record** — pair adapter to vehicle, auto-connect on Bluetooth, auto-start on movement, auto-save on disconnect
+- **Auto-record** — pair adapter to vehicle, auto-connect on Bluetooth, auto-start on movement, auto-save on disconnect (Android-verified; iOS background-wake pending #1542)
 - **Trip recorder** — speed, fuel rate, RPM, throttle %, engine load (when supported), GPS path
 - **Trip detail view** — per-trip charts (speed, fuel rate, RPM, engine load) plus shareable PNG report
 - **Driving insights** — hard-accel waste, idling fuel, cold-start surcharge, low-gear coaching
@@ -92,7 +92,7 @@ Features that don't serve at least one of those three layers don't belong.
 - **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase)
 - **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant
 - **Accessibility** — meets Android tap-target and Apple Human Interface tap-target guidelines, semantic labels throughout
-- **Platform parity** — iOS and Android share the same Dart codebase; platform-specific surfaces (BLE OBD2, background tasks, widgets) live behind plugin interfaces, never inline `Platform.isIOS` branches
+- **Cross-platform architecture** — iOS and Android share the same Dart codebase; platform-specific surfaces (BLE OBD2, background tasks, widgets) live behind plugin interfaces, never inline `Platform.isIOS` branches. Android is the verified platform; the iOS background-wake path for auto-record is pending #1542
 
 ## Screenshots
 
