@@ -157,6 +157,49 @@ void main() {
       expect(material.shape, isA<CircleBorder>());
       expect(material.elevation, greaterThan(0));
     });
+
+    /// Returns the circular cradle Containers (#1885) — circular boxes
+    /// in the bar's own surface colour.
+    Iterable<Container> cradles(WidgetTester tester) {
+      final ctx = tester.element(find.byType(ShellBottomBar));
+      final barColor = Theme.of(ctx).colorScheme.surfaceContainerHighest;
+      return tester.widgetList<Container>(find.byType(Container)).where((c) {
+        final d = c.decoration;
+        return d is BoxDecoration &&
+            d.shape == BoxShape.circle &&
+            d.color == barColor;
+      });
+    }
+
+    testWidgets('portrait — the button is seated in a bar-coloured cradle',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: controllers(3),
+        isLandscape: false,
+        onTap: (_) {},
+      );
+      expect(cradles(tester), isNotEmpty,
+          reason: '#1885 — the centre button sits in a circular cradle '
+              'in the bar surface colour.');
+    });
+
+    testWidgets('landscape — no cradle (the bar is flat, no head-room)',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: controllers(3),
+        isLandscape: true,
+        onTap: (_) {},
+      );
+      expect(cradles(tester), isEmpty);
+    });
   });
 
   group('ShellBottomBar onTap', () {

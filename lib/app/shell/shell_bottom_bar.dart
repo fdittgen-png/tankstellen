@@ -40,9 +40,9 @@ class ShellBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final barHeight = isLandscape ? 48.0 : 64.0;
-    // Portrait: the centre button rises into a transparent strip above
-    // the coloured bar. Landscape keeps the bar flat — no head-room.
-    final rise = isLandscape ? 0.0 : 20.0;
+    // Portrait: the centre button rises into a bar-coloured cradle (see
+    // _centerButton, #1885). Landscape keeps the bar flat — no head-room.
+    final rise = isLandscape ? 0.0 : 24.0;
 
     final primaryIndex = items.indexWhere((i) => i.isPrimary);
 
@@ -98,8 +98,8 @@ class ShellBottomBar extends StatelessWidget {
           height: barHeight + rise,
           child: Stack(
             children: [
-              // Coloured bar pinned to the bottom; the top `rise` strip
-              // stays transparent so the button appears to float.
+              // Coloured bar pinned to the bottom. The top `rise` strip
+              // is where the centre button's cradle protrudes (#1885).
               Positioned(
                 left: 0,
                 right: 0,
@@ -177,12 +177,43 @@ class ShellBottomBar extends StatelessWidget {
   }
 
   /// The raised, primary-tinted centre button for the core action.
+  ///
+  /// Portrait (#1885): the button is seated in a circular *cradle* in
+  /// the bar's own surface colour. The cradle's lower half overlaps the
+  /// flat bar — same colour, so the seam vanishes — and its upper half
+  /// protrudes into the `rise` strip, so the bar appears to rise up and
+  /// embrace the button rather than the button floating on top of it.
+  /// Landscape has no head-room, so the button stays flat in the bar.
   Widget _centerButton(BuildContext context, int i) {
     final theme = Theme.of(context);
     final selected = i == currentIndex;
     final item = items[i];
     final controller = iconControllers[branchForSlot[i]];
     final diameter = isLandscape ? 40.0 : 56.0;
+
+    final button = Material(
+      color: theme.colorScheme.primary,
+      shape: const CircleBorder(),
+      elevation: 4,
+      shadowColor: Colors.black.withValues(alpha: 0.4),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () => onTap(i),
+        child: SizedBox(
+          width: diameter,
+          height: diameter,
+          child: Center(
+            child: ShellBounceIcon(
+              controller: controller,
+              selected: selected,
+              icon: selected ? item.filledIcon : item.outlinedIcon,
+              iconSize: isLandscape ? 22.0 : 28.0,
+              color: theme.colorScheme.onPrimary,
+            ),
+          ),
+        ),
+      ),
+    );
 
     return Semantics(
       label: item.label,
@@ -191,29 +222,33 @@ class ShellBottomBar extends StatelessWidget {
       excludeSemantics: true,
       child: Tooltip(
         message: item.label,
-        child: Material(
-          color: theme.colorScheme.primary,
-          shape: const CircleBorder(),
-          elevation: 4,
-          shadowColor: Colors.black.withValues(alpha: 0.4),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: () => onTap(i),
-            child: SizedBox(
-              width: diameter,
-              height: diameter,
-              child: Center(
-                child: ShellBounceIcon(
-                  controller: controller,
-                  selected: selected,
-                  icon: selected ? item.filledIcon : item.outlinedIcon,
-                  iconSize: isLandscape ? 22.0 : 28.0,
-                  color: theme.colorScheme.onPrimary,
-                ),
+        child: isLandscape
+            ? button
+            : Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Bar-coloured cradle — blends into the bar where it
+                  // overlaps, protrudes as a soft bump above it.
+                  Container(
+                    width: diameter + 20,
+                    height: diameter + 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.black.withValues(alpha: 0.4)
+                              : Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 10,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  button,
+                ],
               ),
-            ),
-          ),
-        ),
       ),
     );
   }
