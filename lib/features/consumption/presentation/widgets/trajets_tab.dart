@@ -149,8 +149,14 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 220),
         child: stage == null
-            ? FilledButton.icon(
+            // #1889 — an extended FAB so the record CTA matches the
+            // fuel tab's "Ajouter un plein" (soft light-green tonal
+            // style) instead of a heavy dark-green FilledButton.
+            // `heroTag: null` — it lives inline, so it must not
+            // contend for the screen-level FAB's hero tag.
+            ? FloatingActionButton.extended(
                 key: const Key('trajets_start_recording_button'),
+                heroTag: null,
                 onPressed: _onStartRecording,
                 icon: Icon(
                   isRecordingActive
