@@ -5001,6 +5001,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Opterećenje motora (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Grafikoni';
+
+  @override
   String get trajetsRowColdStartChip => 'Hladan start';
 
   @override

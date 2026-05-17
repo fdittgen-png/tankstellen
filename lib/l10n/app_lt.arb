@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Kuro norma (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Variklio apkrova (%)",
+  "trajetDetailChartsSection": "Diagramos",
   "trajetsRowColdStartChip": "Šaltasis paleidimas",
   "trajetsRowColdStartTooltip": "Variklis nepasiekė darbinės temperatūros šios kelionės metu — kuro suvartojimas buvo didesnis nei įprastai.",
   "trajetDetailChartEmpty": "Nėra įrašytų mėginių",

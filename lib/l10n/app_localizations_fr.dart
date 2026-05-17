@@ -5038,6 +5038,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Charge moteur (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Graphiques';
+
+  @override
   String get trajetsRowColdStartChip => 'Démarrage à froid';
 
   @override

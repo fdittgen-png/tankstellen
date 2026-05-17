@@ -5006,6 +5006,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Zaťaženie motora (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Grafy';
+
+  @override
   String get trajetsRowColdStartChip => 'Studený štart';
 
   @override

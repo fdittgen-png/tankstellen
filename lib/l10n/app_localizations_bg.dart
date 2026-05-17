@@ -5027,6 +5027,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Натоварване на двигателя (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Графики';
+
+  @override
   String get trajetsRowColdStartChip => 'Студен старт';
 
   @override

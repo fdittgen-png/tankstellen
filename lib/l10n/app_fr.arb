@@ -1782,6 +1782,7 @@
   "trajetDetailChartFuelRate": "Débit de carburant (L/h)",
   "trajetDetailChartRpm": "Régime (tr/min)",
   "trajetDetailChartEngineLoad": "Charge moteur (%)",
+  "trajetDetailChartsSection": "Graphiques",
   "trajetsRowColdStartChip": "Démarrage à froid",
   "trajetsRowColdStartTooltip": "Le moteur n'a pas atteint sa température de fonctionnement pendant ce trajet — la consommation a été plus élevée que d'habitude.",
   "trajetDetailChartEmpty": "Aucun échantillon enregistré",

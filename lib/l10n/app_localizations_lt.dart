@@ -5016,6 +5016,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Variklio apkrova (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Diagramos';
+
+  @override
   String get trajetsRowColdStartChip => 'Šaltasis paleidimas';
 
   @override

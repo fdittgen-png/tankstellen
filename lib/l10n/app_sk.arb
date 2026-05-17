@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Prietok paliva (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Zaťaženie motora (%)",
+  "trajetDetailChartsSection": "Grafy",
   "trajetsRowColdStartChip": "Studený štart",
   "trajetsRowColdStartTooltip": "Motor nedosiahol prevádzkovú teplotu počas tejto jazdy — spotreba paliva bola vyššia ako zvyčajne.",
   "trajetDetailChartEmpty": "Žiadne zaznamenané vzorky",

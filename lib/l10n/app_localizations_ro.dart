@@ -5021,6 +5021,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Sarcină motor (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Grafice';
+
+  @override
   String get trajetsRowColdStartChip => 'Pornire la rece';
 
   @override

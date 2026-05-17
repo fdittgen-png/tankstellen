@@ -5012,6 +5012,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Motorlast (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Diagramme';
+
+  @override
   String get trajetsRowColdStartChip => 'Kaltstart';
 
   @override

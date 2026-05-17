@@ -5002,6 +5002,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Motorbelasting (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Grafieken';
+
+  @override
   String get trajetsRowColdStartChip => 'Koude start';
 
   @override

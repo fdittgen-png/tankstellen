@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Protok goriva (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Opterećenje motora (%)",
+  "trajetDetailChartsSection": "Grafikoni",
   "trajetsRowColdStartChip": "Hladan start",
   "trajetsRowColdStartTooltip": "Motor nije dostigao radnu temperaturu za vrijeme ove vožnje — potrošnja goriva bila je viša od uobičajene.",
   "trajetDetailChartEmpty": "Nema snimljenih uzoraka",

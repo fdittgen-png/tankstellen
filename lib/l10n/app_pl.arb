@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Przepływ paliwa (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Obciążenie silnika (%)",
+  "trajetDetailChartsSection": "Wykresy",
   "trajetsRowColdStartChip": "Zimny start",
   "trajetsRowColdStartTooltip": "Silnik nie osiągnął temperatury roboczej podczas tej trasy — zużycie paliwa było wyższe niż zwykle.",
   "trajetDetailChartEmpty": "Brak zarejestrowanych próbek",

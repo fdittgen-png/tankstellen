@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Kütusemäär (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Mootori koormus (%)",
+  "trajetDetailChartsSection": "Graafikud",
   "trajetsRowColdStartChip": "Külmkäivitus",
   "trajetsRowColdStartTooltip": "Mootor ei jõudnud selle reisi jooksul töötemperatuurini — kütusekulu oli tavalisest kõrgem.",
   "trajetDetailChartEmpty": "Näidiseid pole salvestatud",

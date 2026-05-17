@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Debit combustibil (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Sarcină motor (%)",
+  "trajetDetailChartsSection": "Grafice",
   "trajetsRowColdStartChip": "Pornire la rece",
   "trajetsRowColdStartTooltip": "Motorul nu a atins temperatura de funcționare în această călătorie — consumul a fost mai mare decât de obicei.",
   "trajetDetailChartEmpty": "Niciun eșantion înregistrat",

@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Caudal de combustível (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Carga do motor (%)",
+  "trajetDetailChartsSection": "Gráficos",
   "trajetsRowColdStartChip": "Arranque a frio",
   "trajetsRowColdStartTooltip": "O motor não atingiu a temperatura de funcionamento durante esta viagem — o consumo de combustível foi superior ao normal.",
   "trajetDetailChartEmpty": "Sem amostras gravadas",

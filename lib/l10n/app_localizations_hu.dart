@@ -5028,6 +5028,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Motorterhelés (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Diagramok';
+
+  @override
   String get trajetsRowColdStartChip => 'Hidegindítás';
 
   @override

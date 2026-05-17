@@ -4958,6 +4958,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Engine load (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Charts';
+
+  @override
   String get trajetsRowColdStartChip => 'Cold start';
 
   @override
@@ -10332,6 +10335,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetDetailChartEngineLoad => '⟦Éñǧîñé łóáđ (%) ·····⟧';
+
+  @override
+  String get trajetDetailChartsSection => '⟦Çĥářŧš ···⟧';
 
   @override
   String get trajetsRowColdStartChip => '⟦Çółđ šŧářŧ ····⟧';

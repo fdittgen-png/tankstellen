@@ -4986,6 +4986,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Motorbelastning (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Diagram';
+
+  @override
   String get trajetsRowColdStartChip => 'Kallstart';
 
   @override

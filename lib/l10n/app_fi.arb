@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Polttoaineen kulutus (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Moottorin kuorma (%)",
+  "trajetDetailChartsSection": "Kaaviot",
   "trajetsRowColdStartChip": "Kylmäkäynnistys",
   "trajetsRowColdStartTooltip": "Moottori ei saavuttanut käyntölämpöä tällä matkalla — polttoaineen kulutus oli tavallista suurempi.",
   "trajetDetailChartEmpty": "Ei tallennettuja näytteitä",

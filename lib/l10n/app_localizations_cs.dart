@@ -4990,6 +4990,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Zatížení motoru (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Grafy';
+
+  @override
   String get trajetsRowColdStartChip => 'Studený start';
 
   @override

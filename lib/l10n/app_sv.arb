@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Bränsleflöde (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Motorbelastning (%)",
+  "trajetDetailChartsSection": "Diagram",
   "trajetsRowColdStartChip": "Kallstart",
   "trajetsRowColdStartTooltip": "Motorn nådde inte driftstemperatur under den här resan – bränsleförbrukningen var högre än normalt.",
   "trajetDetailChartEmpty": "Inga prover inspelade",

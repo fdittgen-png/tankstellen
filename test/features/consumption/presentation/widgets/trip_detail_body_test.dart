@@ -104,6 +104,11 @@ void main() {
   });
 
   group('TripDetailBody — always-mounted sections', () {
+    // #1895 — the per-trip charts now live inside a collapsible
+    // [ExpansionTile] that is collapsed by default, so their widgets
+    // are offstage on first frame. `maintainState: true` keeps them in
+    // the tree regardless of fold state, so `skipOffstage: false`
+    // asserts on mounting (the share-to-PNG boundary relies on this).
     testWidgets('mounts the summary card and the speed + fuel-rate charts',
         (tester) async {
       await _pump(
@@ -117,8 +122,10 @@ void main() {
       );
 
       expect(find.byType(TripSummaryCard), findsOneWidget);
-      expect(find.byType(TripDetailSpeedChart), findsOneWidget);
-      expect(find.byType(TripDetailFuelRateChart), findsOneWidget);
+      expect(find.byType(TripDetailSpeedChart, skipOffstage: false),
+          findsOneWidget);
+      expect(find.byType(TripDetailFuelRateChart, skipOffstage: false),
+          findsOneWidget);
     });
 
     testWidgets('renders the localized speed and fuel-rate section titles',
@@ -134,8 +141,53 @@ void main() {
       );
 
       // English locale (pumpApp default) — section titles come from ARB.
-      expect(find.text('Speed (km/h)'), findsOneWidget);
-      expect(find.text('Fuel rate (L/h)'), findsOneWidget);
+      expect(find.text('Speed (km/h)', skipOffstage: false), findsOneWidget);
+      expect(
+          find.text('Fuel rate (L/h)', skipOffstage: false), findsOneWidget);
+    });
+  });
+
+  // #1895 — the charts are grouped under one [ExpansionTile], collapsed
+  // by default so the trip summary + insight cards stay the focus.
+  group('TripDetailBody — charts fold (#1895)', () {
+    testWidgets('charts are collapsed (offstage) by default', (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      // The collapsible section header is on screen...
+      expect(find.text('Charts'), findsOneWidget);
+      // ...but the charts themselves are folded away (offstage).
+      expect(find.byType(TripDetailSpeedChart), findsNothing);
+      expect(find.byType(TripDetailSpeedChart, skipOffstage: false),
+          findsOneWidget);
+    });
+
+    testWidgets('tapping the section header reveals the charts',
+        (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      await tester.ensureVisible(find.text('Charts'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Charts'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TripDetailSpeedChart), findsOneWidget);
+      expect(find.byType(TripDetailFuelRateChart), findsOneWidget);
     });
   });
 
@@ -156,8 +208,11 @@ void main() {
         ),
       );
 
-      expect(find.byType(TripDetailRpmChart), findsOneWidget);
-      expect(find.text('RPM'), findsOneWidget);
+      // #1895 — charts live in a collapsed ExpansionTile; assert on
+      // mounting with skipOffstage so the gating logic is what's tested.
+      expect(find.byType(TripDetailRpmChart, skipOffstage: false),
+          findsOneWidget);
+      expect(find.text('RPM', skipOffstage: false), findsOneWidget);
     });
 
     testWidgets('hides the RPM chart when every sample has null rpm',
@@ -218,8 +273,12 @@ void main() {
         ),
       );
 
-      expect(find.byType(TripDetailEngineLoadChart), findsOneWidget);
-      expect(find.text('Engine load (%)'), findsOneWidget);
+      // #1895 — charts live in a collapsed ExpansionTile; assert on
+      // mounting with skipOffstage so the gating logic is what's tested.
+      expect(find.byType(TripDetailEngineLoadChart, skipOffstage: false),
+          findsOneWidget);
+      expect(
+          find.text('Engine load (%)', skipOffstage: false), findsOneWidget);
     });
 
     testWidgets(
@@ -277,6 +336,15 @@ void main() {
         ),
       );
 
+      // #1895 — expand the collapsible charts section so the chart
+      // widgets are laid out and `getTopLeft` returns real positions.
+      // ensureVisible first: with insight cards present the section
+      // header can sit below the 600-px test-surface fold.
+      await tester.ensureVisible(find.text('Charts'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Charts'));
+      await tester.pumpAndSettle();
+
       final summaryY =
           tester.getTopLeft(find.byType(TripSummaryCard)).dy;
       final speedY =
@@ -309,8 +377,10 @@ void main() {
       );
 
       expect(find.byType(TripSummaryCard), findsOneWidget);
-      expect(find.byType(TripDetailSpeedChart), findsOneWidget);
-      expect(find.byType(TripDetailFuelRateChart), findsOneWidget);
+      expect(find.byType(TripDetailSpeedChart, skipOffstage: false),
+          findsOneWidget);
+      expect(find.byType(TripDetailFuelRateChart, skipOffstage: false),
+          findsOneWidget);
     });
   });
 }

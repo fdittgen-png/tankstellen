@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Degvielas patēriņš (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Dzinēja slodze (%)",
+  "trajetDetailChartsSection": "Diagrammas",
   "trajetsRowColdStartChip": "Aukstais starts",
   "trajetsRowColdStartTooltip": "Dzinējs šī brauciena laikā nesasniedza darba temperatūru — degvielas patēriņš bija augstāks nekā parasti.",
   "trajetDetailChartEmpty": "Nav ierakstītu paraugu",
