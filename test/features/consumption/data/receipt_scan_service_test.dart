@@ -352,4 +352,64 @@ void main() {
       expect(bakeImageOrientation(garbage), isNull);
     });
   });
+
+  group('preprocessPumpDisplayForOcr (#1860)', () {
+    /// Scans every pixel and returns the min/max red-channel value —
+    /// on a grayscale image r == g == b, so this is the tonal range.
+    ({int min, int max}) luminanceSpan(img.Image im) {
+      var lo = 255;
+      var hi = 0;
+      for (final p in im) {
+        final v = p.r.round();
+        if (v < lo) lo = v;
+        if (v > hi) hi = v;
+      }
+      return (min: lo, max: hi);
+    }
+
+    test('stretches a low-contrast capture toward the full tonal range',
+        () {
+      // A washed-out display: every pixel sits in a narrow 100–140
+      // grey band. After preprocessing the band must span far more of
+      // the 0–255 range so the digits separate from the background.
+      final src = img.Image(width: 40, height: 40);
+      for (final p in src) {
+        final shade = p.y < 20 ? 100 : 140;
+        p.setRgb(shade, shade, shade);
+      }
+      final before = luminanceSpan(src);
+      expect(before.max - before.min, lessThan(60),
+          reason: 'fixture must start as a genuinely low-contrast image.');
+
+      final out = preprocessPumpDisplayForOcr(
+          Uint8List.fromList(img.encodeJpg(src)));
+      expect(out, isNotNull);
+      final after = luminanceSpan(img.decodeJpg(out!)!);
+      expect(after.max - after.min, greaterThan(150),
+          reason: 'normalise + contrast must widen the tonal range so a '
+              'washed-out 7-segment LCD becomes legible.');
+    });
+
+    test('bakes EXIF orientation upright — dimensions swap, like #1711',
+        () {
+      // An 80×40 image tagged orientation 6 displays as 40×80; the
+      // pump path must apply the same orientation bake the plain path
+      // does before it enhances contrast.
+      final src = img.Image(width: 80, height: 40);
+      img.fill(src, color: img.ColorRgb8(60, 60, 60));
+      src.exif.imageIfd['Orientation'] = 6;
+
+      final out = preprocessPumpDisplayForOcr(
+          Uint8List.fromList(img.encodeJpg(src)));
+      expect(out, isNotNull);
+      final decoded = img.decodeJpg(out!)!;
+      expect(decoded.width, 40);
+      expect(decoded.height, 80);
+    });
+
+    test('returns null for non-JPEG / garbage bytes', () {
+      final garbage = Uint8List.fromList(List.generate(64, (i) => i % 256));
+      expect(preprocessPumpDisplayForOcr(garbage), isNull);
+    });
+  });
 }
