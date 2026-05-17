@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -96,6 +97,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
             },
             tooltip: l10n?.refreshPrices ?? 'Refresh prices',
           ),
+        const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
       // #1441 — TabSwitcher lives inside the body so the AppBar height

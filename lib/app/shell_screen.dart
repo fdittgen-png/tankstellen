@@ -297,7 +297,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
             ShellNavRail(
               items: visibleDestinations,
               branchForSlot: branchForSlot,
-              currentIndex: selectedSlot < 0 ? 0 : selectedSlot,
+              // `null` when the active branch has no slot (Settings,
+              // reached from the app bar) — no rail item highlighted.
+              currentIndex: selectedSlot < 0 ? null : selectedSlot,
               iconControllers: _iconControllers,
               extended: screenSize == ScreenSize.expanded,
               onTap: onSlotTap,
@@ -318,7 +320,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       bottomNavigationBar: ShellBottomBar(
         items: visibleDestinations,
         branchForSlot: branchForSlot,
-        currentIndex: selectedSlot < 0 ? 0 : selectedSlot,
+        // `-1` when the active branch has no slot (Settings, reached
+        // from the app bar) — no bottom-bar tab highlighted.
+        currentIndex: selectedSlot,
         iconControllers: _iconControllers,
         isLandscape: isLandscape,
         onTap: onSlotTap,

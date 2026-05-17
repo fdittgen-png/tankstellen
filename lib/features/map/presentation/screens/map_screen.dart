@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/current_shell_branch_provider.dart';
+import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/presentation/widgets/driving_mode_fab.dart';
@@ -164,6 +165,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
           tooltip: l10n?.refreshPrices ?? 'Refresh prices',
         ),
         const EvToggleButton(),
+        const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
       floatingActionButton: const DrivingModeFab(),

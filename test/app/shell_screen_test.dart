@@ -333,12 +333,12 @@ void main() {
       );
       await tester.pump(const Duration(seconds: 1));
 
-      // Each nav item should have a Semantics node with the correct label
+      // Each bottom-bar nav item carries a Semantics label. Settings
+      // is no longer a tab (#1874) — it lives in the app bar.
       expect(find.bySemanticsLabel('Search'), findsOneWidget);
       expect(find.bySemanticsLabel('Map'), findsOneWidget);
       expect(find.bySemanticsLabel('Favorites'), findsOneWidget);
       expect(find.bySemanticsLabel('Consumption'), findsOneWidget);
-      expect(find.bySemanticsLabel('Settings'), findsOneWidget);
 
       handle.dispose();
     });

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/responsive_search_layout.dart';
+import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
@@ -136,6 +137,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           },
           tooltip: l10n?.refreshPrices ?? 'Refresh prices',
         ),
+        const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
       body: isWide

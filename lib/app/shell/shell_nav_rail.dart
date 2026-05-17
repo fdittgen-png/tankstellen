@@ -19,7 +19,10 @@ class ShellNavRail extends StatelessWidget {
   /// (#893) — the controllers stay aligned with the router branches,
   /// not the visible-slot positions.
   final List<int> branchForSlot;
-  final int currentIndex;
+
+  /// Selected visible slot, or `null` when the active branch has no
+  /// slot (the Settings/profile branch, reached from the app bar).
+  final int? currentIndex;
   final List<AnimationController> iconControllers;
   final bool extended;
   final ValueChanged<int> onTap;

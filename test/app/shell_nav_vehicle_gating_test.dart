@@ -115,7 +115,7 @@ void main() {
   group('ShellScreen — Conso gated on isConsumptionTabReachable', () {
     testWidgets(
       'Basic profile (no manualConsumption, no obd2) → Conso tab '
-      'HIDDEN (4 tabs total)',
+      'HIDDEN (3 destinations total)',
       (tester) async {
         // Basic bundle: visibility / search flags only.
         await _pumpShell(
@@ -130,10 +130,11 @@ void main() {
           },
         );
 
-        expect(find.text('Search'), findsOneWidget);
+        // Search is the icon-only centre button; Map/Favorites carry
+        // text labels. Settings is no longer a tab (#1874).
+        expect(find.byIcon(Icons.search), findsOneWidget);
         expect(find.text('Map'), findsOneWidget);
         expect(find.text('Favorites'), findsOneWidget);
-        expect(find.text('Settings'), findsOneWidget);
         expect(find.text('Consumption'), findsNothing,
             reason: 'Basic profile must not surface the Conso tab — '
                 'no consumption features are reachable.');
@@ -144,7 +145,7 @@ void main() {
 
     testWidgets(
       'Medium profile (manualConsumption + showConsumptionTab on) → '
-      'Conso tab VISIBLE (5 tabs total)',
+      'Conso tab VISIBLE (4 destinations total)',
       (tester) async {
         // `isConsumptionTabReachable` is
         // `showConsumptionTab && (manualConsumption || obd2TripRecording)`
@@ -167,11 +168,10 @@ void main() {
           },
         );
 
-        expect(find.text('Search'), findsOneWidget);
+        expect(find.byIcon(Icons.search), findsOneWidget);
         expect(find.text('Map'), findsOneWidget);
         expect(find.text('Favorites'), findsOneWidget);
         expect(find.text('Consumption'), findsOneWidget);
-        expect(find.text('Settings'), findsOneWidget);
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsOneWidget);
       },
