@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "U blizini nije pronađen OBD2 adapter. Provjerite je li priključen i uključen.",
   "obd2ErrorAdapterUnresponsive": "OBD2 adapter nije odgovorio. Uključite paljenje i pokušajte ponovno.",
   "obd2ErrorProtocolInitFailed": "OBD2 adapter poslao je neprepoznat odgovor. Možda nije kompatibilan — pokušajte s drugim adapterom.",
-  "obd2ErrorDisconnected": "OBD2 adapter se isključio. Ponovno se povežite i pokušajte ponovno."
+  "obd2ErrorDisconnected": "OBD2 adapter se isključio. Ponovno se povežite i pokušajte ponovno.",
+  "onboardingExploreDemoData": "Istraži s demo podacima"
 }

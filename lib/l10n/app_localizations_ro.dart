@@ -3305,6 +3305,9 @@ class AppLocalizationsRo extends AppLocalizations {
       'Adaptorul OBD2 s-a deconectat. Reconectați-vă și încercați din nou.';
 
   @override
+  String get onboardingExploreDemoData => 'Explorează cu date demo';
+
+  @override
   String get achievementSmoothDriver => 'Serie de condus lin';
 
   @override

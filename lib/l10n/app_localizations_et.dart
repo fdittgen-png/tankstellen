@@ -3280,6 +3280,9 @@ class AppLocalizationsEt extends AppLocalizations {
       'OBD2-adapter katkestas ühenduse. Ühendage uuesti ja proovige uuesti.';
 
   @override
+  String get onboardingExploreDemoData => 'Tutvu demoandmetega';
+
+  @override
   String get achievementSmoothDriver => 'Sujuv seeria';
 
   @override

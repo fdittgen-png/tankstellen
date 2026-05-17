@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Netoliese nerasta OBD2 adapterio. Įsitikinkite, kad jis prijungtas ir įjungtas.",
   "obd2ErrorAdapterUnresponsive": "OBD2 adapteris neatsakė. Įjunkite degimą ir bandykite dar kartą.",
   "obd2ErrorProtocolInitFailed": "OBD2 adapteris išsiuntė neatpažintą atsakymą. Jis gali būti nesuderinamas — pabandykite kitą adapterį.",
-  "obd2ErrorDisconnected": "OBD2 adapteris atsijungė. Prisijunkite iš naujo ir bandykite dar kartą."
+  "obd2ErrorDisconnected": "OBD2 adapteris atsijungė. Prisijunkite iš naujo ir bandykite dar kartą.",
+  "onboardingExploreDemoData": "Naršyti su demonstraciniais duomenimis"
 }

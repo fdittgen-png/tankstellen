@@ -3294,6 +3294,9 @@ class AppLocalizationsPl extends AppLocalizations {
       'Adapter OBD2 został odłączony. Połącz ponownie i spróbuj jeszcze raz.';
 
   @override
+  String get onboardingExploreDemoData => 'Przeglądaj z danymi demo';
+
+  @override
   String get achievementSmoothDriver => 'Seria płynnej jazdy';
 
   @override

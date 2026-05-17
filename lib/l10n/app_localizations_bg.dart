@@ -3310,6 +3310,9 @@ class AppLocalizationsBg extends AppLocalizations {
       'OBD2 адаптерът се изключи. Свържете се отново и опитайте пак.';
 
   @override
+  String get onboardingExploreDemoData => 'Разгледай с демоданни';
+
+  @override
   String get achievementSmoothDriver => 'Серия от плавно шофиране';
 
   @override

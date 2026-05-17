@@ -3304,6 +3304,9 @@ class AppLocalizationsLv extends AppLocalizations {
       'OBD2 adapteris atvienojās. Pievienojiet to vēlreiz un mēģiniet vēlreiz.';
 
   @override
+  String get onboardingExploreDemoData => 'Izpētīt ar demonstrācijas datiem';
+
+  @override
   String get achievementSmoothDriver => 'Maigā braukšana sērijā';
 
   @override

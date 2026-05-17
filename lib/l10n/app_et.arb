@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Läheduses ei leitud OBD2-adapterit. Veenduge, et see on ühendatud ja sisse lülitatud.",
   "obd2ErrorAdapterUnresponsive": "OBD2-adapter ei vastanud. Lülitage süüde sisse ja proovige uuesti.",
   "obd2ErrorProtocolInitFailed": "OBD2-adapter saatis tundmatu vastuse. See võib olla ühildumatu — proovige teist adapterit.",
-  "obd2ErrorDisconnected": "OBD2-adapter katkestas ühenduse. Ühendage uuesti ja proovige uuesti."
+  "obd2ErrorDisconnected": "OBD2-adapter katkestas ühenduse. Ühendage uuesti ja proovige uuesti.",
+  "onboardingExploreDemoData": "Tutvu demoandmetega"
 }

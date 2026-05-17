@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Nessun adattatore OBD2 trovato nelle vicinanze. Assicurati che sia collegato e acceso.",
   "obd2ErrorAdapterUnresponsive": "L'adattatore OBD2 non ha risposto. Inserisci il quadro e riprova.",
   "obd2ErrorProtocolInitFailed": "L'adattatore OBD2 ha inviato una risposta non riconosciuta. Potrebbe essere incompatibile: prova un altro adattatore.",
-  "obd2ErrorDisconnected": "L'adattatore OBD2 si è disconnesso. Riconnettilo e riprova."
+  "obd2ErrorDisconnected": "L'adattatore OBD2 si è disconnesso. Riconnettilo e riprova.",
+  "onboardingExploreDemoData": "Esplora con dati demo"
 }

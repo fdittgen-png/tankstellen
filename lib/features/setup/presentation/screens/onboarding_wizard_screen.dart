@@ -281,7 +281,13 @@ class _OnboardingWizardScreenState
       const PreferencesStep(),
       const LandingScreenStep(),
       if (country.requiresApiKey)
-        ApiKeyStep(apiKeyController: _apiKeyController),
+        ApiKeyStep(
+          apiKeyController: _apiKeyController,
+          onUseDemoData: () {
+            _apiKeyController.clear();
+            _skip(_apiKeyStepIndex);
+          },
+        ),
       const CompletionStep(),
     ];
   }

@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Nem található OBD2-adapter a közelben. Ellenőrizze, hogy be van-e dugva és be van-e kapcsolva.",
   "obd2ErrorAdapterUnresponsive": "Az OBD2-adapter nem válaszolt. Kapcsolja be a gyújtást, és próbálja újra.",
   "obd2ErrorProtocolInitFailed": "Az OBD2-adapter ismeretlen választ küldött. Lehet, hogy nem kompatibilis — próbáljon meg másik adaptert.",
-  "obd2ErrorDisconnected": "Az OBD2-adapter kapcsolata megszakadt. Csatlakozzon újra, és próbálja újra."
+  "obd2ErrorDisconnected": "Az OBD2-adapter kapcsolata megszakadt. Csatlakozzon újra, és próbálja újra.",
+  "onboardingExploreDemoData": "Felfedezés demóadatokkal"
 }

@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Ingen OBD2-adapter fundet i nærheden. Kontroller, at den er tilsluttet og tændt.",
   "obd2ErrorAdapterUnresponsive": "OBD2-adapteren svarede ikke. Slå tændingen til, og prøv igen.",
   "obd2ErrorProtocolInitFailed": "OBD2-adapteren sendte et ukendt svar. Den er muligvis inkompatibel — prøv en anden adapter.",
-  "obd2ErrorDisconnected": "OBD2-adapteren blev afbrudt. Tilslut igen, og prøv igen."
+  "obd2ErrorDisconnected": "OBD2-adapteren blev afbrudt. Tilslut igen, og prøv igen.",
+  "onboardingExploreDemoData": "Udforsk med demodata"
 }

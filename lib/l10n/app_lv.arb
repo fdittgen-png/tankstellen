@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Tuvumā nav atrasts OBD2 adapteris. Pārliecinieties, ka tas ir pievienots un ieslēgts.",
   "obd2ErrorAdapterUnresponsive": "OBD2 adapteris neatbildēja. Ieslēdziet aizdedzi un mēģiniet vēlreiz.",
   "obd2ErrorProtocolInitFailed": "OBD2 adapteris nosūtīja neatpazītu atbildi. Tas var nebūt saderīgs — izmēģiniet citu adapteri.",
-  "obd2ErrorDisconnected": "OBD2 adapteris atvienojās. Pievienojiet to vēlreiz un mēģiniet vēlreiz."
+  "obd2ErrorDisconnected": "OBD2 adapteris atvienojās. Pievienojiet to vēlreiz un mēģiniet vēlreiz.",
+  "onboardingExploreDemoData": "Izpētīt ar demonstrācijas datiem"
 }

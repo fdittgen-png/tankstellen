@@ -12,7 +12,14 @@ class ApiKeyStep extends ConsumerStatefulWidget {
   /// Controller for the API key text field, owned by the parent wizard.
   final TextEditingController apiKeyController;
 
-  const ApiKeyStep({super.key, required this.apiKeyController});
+  /// Skips API-key entry and continues into the app with demo data.
+  final VoidCallback onUseDemoData;
+
+  const ApiKeyStep({
+    super.key,
+    required this.apiKeyController,
+    required this.onUseDemoData,
+  });
 
   @override
   ConsumerState<ApiKeyStep> createState() => _ApiKeyStepState();
@@ -138,6 +145,15 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
+          ),
+          const SizedBox(height: 16),
+          // #1691 — explicit demo-mode CTA so the path to first value
+          // does not depend on the user guessing they can skip.
+          OutlinedButton.icon(
+            onPressed: widget.onUseDemoData,
+            icon: const Icon(Icons.explore_outlined),
+            label: Text(l10n?.onboardingExploreDemoData ??
+                'Explore with demo data'),
           ),
           const SizedBox(height: 16),
           if (country.attribution != null)

@@ -3290,6 +3290,9 @@ class AppLocalizationsHr extends AppLocalizations {
       'OBD2 adapter se isključio. Ponovno se povežite i pokušajte ponovno.';
 
   @override
+  String get onboardingExploreDemoData => 'Istraži s demo podacima';
+
+  @override
   String get achievementSmoothDriver => 'Niz mirnih vožnji';
 
   @override

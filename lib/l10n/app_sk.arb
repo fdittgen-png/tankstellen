@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "V blízkosti sa nenašiel žiadny adaptér OBD2. Skontrolujte, či je zapojený a zapnutý.",
   "obd2ErrorAdapterUnresponsive": "Adaptér OBD2 neodpovedal. Zapnite zapaľovanie a skúste to znova.",
   "obd2ErrorProtocolInitFailed": "Adaptér OBD2 odoslal nerozpoznanú odpoveď. Možno nie je kompatibilný — skúste iný adaptér.",
-  "obd2ErrorDisconnected": "Adaptér OBD2 sa odpojil. Pripojte sa znova a skúste to znova."
+  "obd2ErrorDisconnected": "Adaptér OBD2 sa odpojil. Pripojte sa znova a skúste to znova.",
+  "onboardingExploreDemoData": "Preskúmať s ukážkovými údajmi"
 }

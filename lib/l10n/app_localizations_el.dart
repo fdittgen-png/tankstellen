@@ -3309,6 +3309,9 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ο προσαρμογέας OBD2 αποσυνδέθηκε. Συνδεθείτε ξανά και δοκιμάστε πάλι.';
 
   @override
+  String get onboardingExploreDemoData => 'Εξερεύνηση με δοκιμαστικά δεδομένα';
+
+  @override
   String get achievementSmoothDriver => 'Σερί ομαλής οδήγησης';
 
   @override

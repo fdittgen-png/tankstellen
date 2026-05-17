@@ -3312,6 +3312,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'adaptateur OBD2 s\'est déconnecté. Reconnectez-le et réessayez.';
 
   @override
+  String get onboardingExploreDemoData => 'Explorer avec des données de démo';
+
+  @override
   String get achievementSmoothDriver => 'Série souple';
 
   @override

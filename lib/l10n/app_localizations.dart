@@ -6093,6 +6093,12 @@ abstract class AppLocalizations {
   /// **'The OBD2 adapter disconnected. Reconnect and try again.'**
   String get obd2ErrorDisconnected;
 
+  /// Onboarding API-key step — CTA to skip key entry and use demo data (#1691).
+  ///
+  /// In en, this message translates to:
+  /// **'Explore with demo data'**
+  String get onboardingExploreDemoData;
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:
