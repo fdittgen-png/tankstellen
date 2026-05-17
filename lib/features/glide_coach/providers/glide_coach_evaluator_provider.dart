@@ -7,20 +7,21 @@ import '../data/traffic_signal_repository.dart';
 import '../domain/entities/glide_coach_settings.dart';
 import '../domain/services/glide_coach_evaluator.dart';
 import '../domain/services/imminent_signal_detector.dart';
+import 'glide_coach_enabled_provider.dart';
 import 'glide_coach_settings_provider.dart';
 
 part 'glide_coach_evaluator_provider.g.dart';
 
 /// Provider for the glide-coach evaluator (#1125 phase 3b).
 ///
-/// Returns `null` when the compile-time master flag
-/// [`kGlideCoachEnabled`] is `false` — that's production today, and
+/// Returns `null` when [glideCoachEnabledProvider] is `false`
+/// (`Feature.glideCoach`, default-off) — that's production today, and
 /// every consumer (currently only `tripRecordingProvider`) early-outs
 /// on the null. Callers MUST treat null as "feature disabled, do
 /// nothing" rather than constructing their own evaluator; the layered
-/// kill-switch is the whole point.
+/// gate is the whole point.
 ///
-/// When the master flag is true, the provider wires:
+/// When the feature is enabled, the provider wires:
 ///   1. An [OsmTrafficSignalClient] (default Dio).
 ///   2. A [TrafficSignalRepository] backed by the
 ///      `traffic_signals_cache` Hive box (opened at startup by
@@ -38,8 +39,8 @@ part 'glide_coach_evaluator_provider.g.dart';
 /// no-ops on missing infrastructure.
 @Riverpod(keepAlive: true)
 GlideCoachEvaluator? glideCoachEvaluator(Ref ref) {
-  // Master kill-switch. Production today.
-  if (!kGlideCoachEnabled) return null;
+  // Feature gate (#1824) — central Feature.glideCoach, default-off.
+  if (!ref.watch(glideCoachEnabledProvider)) return null;
 
   // Defensive: the Overpass cache box is opened at app startup. A
   // widget test that didn't run the Hive bootstrapper hits this path

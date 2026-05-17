@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tankstellen/features/glide_coach/data/traffic_signal_repository.dart';
 import 'package:tankstellen/features/glide_coach/domain/entities/glide_coach_settings.dart';
 import 'package:tankstellen/features/glide_coach/providers/glide_coach_settings_provider.dart';
 
@@ -24,7 +23,7 @@ void main() {
     );
 
     test(
-      'master flag wins — kGlideCoachEnabled is false in production so '
+      'feature flag wins — Feature.glideCoach is off by default so '
       'setEnabled(true) MUST keep state.enabled at false',
       () async {
         final container = ProviderContainer();
@@ -35,26 +34,16 @@ void main() {
         );
         await notifier.setEnabled(true);
 
-        // Production today has kGlideCoachEnabled == false. The
-        // layered gate dictates that an opted-in user toggle MUST
-        // still surface as disabled in-memory until the master flag
-        // flips. This is the safety: a stale debug-build write or a
-        // future schema change cannot leak the feature on for users.
-        expect(
-          kGlideCoachEnabled,
-          isFalse,
-          reason:
-              'This test is meaningful only while the master flag is '
-              'false. If kGlideCoachEnabled is flipped to true in a '
-              'future PR, update this test to assert the new contract.',
-        );
+        // Feature.glideCoach is default-off (#1824). The layered gate
+        // dictates that an opted-in user toggle MUST still surface as
+        // disabled in-memory until the feature flag is enabled.
         expect(
           container.read(glideCoachSettingsProvider).enabled,
           isFalse,
           reason:
-              'kGlideCoachEnabled == false MUST gate state.enabled to '
+              'A disabled Feature.glideCoach MUST gate state.enabled to '
               'false even after setEnabled(true). The user toggle is '
-              'layered on top of the master flag, never below it.',
+              'layered on top of the feature flag, never below it.',
         );
       },
     );
@@ -123,17 +112,16 @@ void main() {
         container.read(glideCoachSettingsProvider);
         await Future<void>.delayed(Duration.zero);
 
-        // The persisted value is `true` — but the master flag is
-        // false in production, so the gated state stays false. When
-        // the master flag flips in a future PR, the same persisted
-        // value will surface as enabled without the user having to
-        // toggle again.
+        // The persisted value is `true` — but Feature.glideCoach is
+        // default-off, so the gated state stays false. Enabling the
+        // feature later surfaces the same persisted value as enabled
+        // without the user having to toggle again.
         expect(
           container.read(glideCoachSettingsProvider).enabled,
-          kGlideCoachEnabled,
+          isFalse,
           reason:
-              'Restored state must equal `persisted-true && master-flag` '
-              '— production today is false on both axes once gated.',
+              'Restored state must equal `persisted-true && feature-flag` '
+              '— with Feature.glideCoach off it gates to false.',
         );
       },
     );

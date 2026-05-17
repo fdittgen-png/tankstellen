@@ -228,10 +228,6 @@ void main() {
       expect(result.single.id, 'fresh');
     });
 
-    test('kGlideCoachEnabled remains false (placeholder feature flag)', () {
-      expect(kGlideCoachEnabled, isFalse);
-    });
-
     test('boxName matches the constant registered in HiveBoxes', () {
       expect(TrafficSignalRepository.boxName, 'traffic_signals_cache');
     });

@@ -9,7 +9,7 @@ import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/conso_mode.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../feature_management/domain/feature_dependency_graph.dart';
-import '../../../glide_coach/data/traffic_signal_repository.dart';
+import '../../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
@@ -89,7 +89,8 @@ class DrivingSettingsSection extends ConsumerWidget {
             leadingIcon: Icons.route_outlined,
             padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
           ),
-          if (kGlideCoachEnabled) const _GlideCoachToggleTile(),
+          if (ref.watch(glideCoachEnabledProvider))
+            const _GlideCoachToggleTile(),
         ],
 
         // 3. Driving sub-section — eco-coach + gamification + fuel-club.
@@ -134,9 +135,9 @@ class DrivingSettingsSection extends ConsumerWidget {
 
 /// Beta opt-in tile for the glide-coach haptic (#1125 phase 3b).
 ///
-/// Rendered only when the compile-time master flag
-/// [`kGlideCoachEnabled`] is true; the call site in
-/// [DrivingSettingsSection] gates visibility via `if (kGlideCoachEnabled)`.
+/// Rendered only when the `Feature.glideCoach` flag is enabled; the
+/// call site in [DrivingSettingsSection] gates visibility via
+/// `if (ref.watch(glideCoachEnabledProvider))`.
 class _GlideCoachToggleTile extends ConsumerWidget {
   const _GlideCoachToggleTile();
 

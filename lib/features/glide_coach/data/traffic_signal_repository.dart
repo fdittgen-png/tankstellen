@@ -6,10 +6,6 @@ import 'package:hive/hive.dart';
 import '../domain/entities/traffic_signal.dart';
 import 'osm_traffic_signal_client.dart';
 
-/// Master toggle for the glide-coach feature (#1125).
-/// TODO: migrate to central feature management once that system lands.
-const bool kGlideCoachEnabled = false;
-
 /// Default cache TTL for cached Overpass responses (#1125 phase 1).
 ///
 /// Public Overpass infrastructure is shared and the underlying OSM map
