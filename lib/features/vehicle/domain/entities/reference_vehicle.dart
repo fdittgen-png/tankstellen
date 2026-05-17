@@ -80,13 +80,18 @@ String? volumetricEfficiencyBasisKey(ReferenceVehicle v) {
 
 /// A single entry in the reference vehicle catalog (#950 phase 1).
 ///
-/// The catalog ships ~30 popular EU passenger cars compiled from
-/// 2015-2024 new-car registrations. Each entry pre-fills the engine
-/// quirks the OBD-II layer needs (volumetric efficiency, odometer PID
-/// strategy) so the user doesn't have to discover them by hand.
+/// The catalog ships ~250 of the best-selling European passenger cars
+/// of the last 25 years (≈1999-2024), one entry per model generation,
+/// keyed by the highest-volume engine of that generation (epic #1640).
+/// Each entry pre-fills the engine quirks the OBD-II layer needs
+/// (volumetric efficiency, induction type, odometer PID strategy) so
+/// the user doesn't have to discover them by hand.
 ///
-/// Phase 1 is data + provider only. The obd2_service consumer rewrite
-/// lands in phase 2; user [VehicleProfile] migration in phase 4.
+/// Sourcing strategy (#1642): generations are long-run European
+/// registration leaders across every supported market. It is one
+/// pan-European catalog rather than per-country files — the
+/// best-sellers overlap heavily across markets, so a single asset is
+/// simpler than maintaining French/German/other splits.
 ///
 /// All fields are `final` and the entity is immutable — the JSON asset
 /// is the source of truth at app startup.

@@ -46,16 +46,19 @@ void main() {
       );
     });
 
-    test('ships at least 30 entries (acceptance criterion from #950)',
+    test('ships the expanded best-sellers parc (>= 200 entries, #1640)',
         () async {
       final raw = await rootBundle
           .loadString('assets/reference_vehicles/vehicles.json');
       final entries = json.decode(raw) as List<dynamic>;
 
+      // Epic #1640 scaled the catalog from the original ~30 to the
+      // ~250 best-selling European cars of the last 25 years. The
+      // floor only ratchets up — never drop below 200.
       expect(
         entries.length,
-        greaterThanOrEqualTo(30),
-        reason: 'Catalog should ship the initial >= 30 popular EU cars',
+        greaterThanOrEqualTo(200),
+        reason: 'Catalog must ship the >= 200-entry best-sellers parc',
       );
     });
 
