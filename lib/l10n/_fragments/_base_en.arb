@@ -1542,5 +1542,33 @@
   "tankSyncSectionSubtitle": "Cloud sync across your devices",
   "@tankSyncSectionSubtitle": {
     "description": "Subtitle under the 'TankSync' settings section header — explains what the (brand-named) feature does so it isn't an unexplained label (#1696)."
+  },
+  "mapUnavailable": "Map unavailable",
+  "@mapUnavailable": {
+    "description": "Error-state text shown when the inline map fails to load (#1661)."
+  },
+  "routeNameHintExample": "e.g. Paris → Lyon",
+  "@routeNameHintExample": {
+    "description": "Hint text in the save-route name field — an example route (#1661)."
+  },
+  "priceStatsCurrent": "Current",
+  "@priceStatsCurrent": {
+    "description": "Label above the current fuel price in the price-stats card (#1662)."
+  },
+  "tankerkoenigApiKeyLabel": "Tankerkoenig API Key",
+  "@tankerkoenigApiKeyLabel": {
+    "description": "Field label in the fuel-prices API-key dialog; 'Tankerkoenig' is a brand (#1660)."
+  },
+  "openChargeMapApiKeyLabel": "OpenChargeMap API Key",
+  "@openChargeMapApiKeyLabel": {
+    "description": "Field label in the EV-charging API-key dialog; 'OpenChargeMap' is a brand (#1660)."
+  },
+  "tapToUpdateGpsPosition": "Tap to update GPS position",
+  "@tapToUpdateGpsPosition": {
+    "description": "Tappable hint row in the profile location section (#1660)."
+  },
+  "nameLabel": "Name",
+  "@nameLabel": {
+    "description": "Generic 'Name' field label in the profile rename dialog (#1660)."
   }
 }

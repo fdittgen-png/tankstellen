@@ -67,7 +67,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) => Center(
         child: Text(
-          'Map unavailable',
+          AppLocalizations.of(context)?.mapUnavailable ?? 'Map unavailable',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),

@@ -100,6 +100,7 @@ docs/guides/*
 !docs/guides/obd2-adapters.md
 !docs/guides/vehicle-catalog.md
 !docs/guides/vehicle-abstraction.md
+!docs/guides/i18n-hardcoded-worklist.md
 !docs/guides/driving-insights.md
 !docs/guides/auto-record.md
 !docs/guides/SCHEMA-BACKUP-XML.md

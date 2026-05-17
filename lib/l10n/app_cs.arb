@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Mapa není k dispozici",
+  "routeNameHintExample": "např. Paříž → Lyon",
+  "priceStatsCurrent": "Aktuální",
+  "tankerkoenigApiKeyLabel": "Klíč API Tankerkoenig",
+  "openChargeMapApiKeyLabel": "Klíč API OpenChargeMap",
+  "tapToUpdateGpsPosition": "Klepnutím aktualizujete polohu GPS",
+  "nameLabel": "Název"
 }

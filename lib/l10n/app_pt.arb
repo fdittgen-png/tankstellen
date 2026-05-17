@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Mapa indisponível",
+  "routeNameHintExample": "ex.: Paris → Lyon",
+  "priceStatsCurrent": "Atual",
+  "tankerkoenigApiKeyLabel": "Chave de API Tankerkoenig",
+  "openChargeMapApiKeyLabel": "Chave de API OpenChargeMap",
+  "tapToUpdateGpsPosition": "Toque para atualizar a posição de GPS",
+  "nameLabel": "Nome"
 }

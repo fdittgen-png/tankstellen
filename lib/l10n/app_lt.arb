@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Žemėlapis nepasiekiamas",
+  "routeNameHintExample": "pvz. Paryžius → Lionas",
+  "priceStatsCurrent": "Dabartinė",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig API raktas",
+  "openChargeMapApiKeyLabel": "OpenChargeMap API raktas",
+  "tapToUpdateGpsPosition": "Bakstelėkite, kad atnaujintumėte GPS padėtį",
+  "nameLabel": "Pavadinimas"
 }

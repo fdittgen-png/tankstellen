@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Kartan är inte tillgänglig",
+  "routeNameHintExample": "t.ex. Paris → Lyon",
+  "priceStatsCurrent": "Aktuell",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig API-nyckel",
+  "openChargeMapApiKeyLabel": "OpenChargeMap API-nyckel",
+  "tapToUpdateGpsPosition": "Tryck för att uppdatera GPS-position",
+  "nameLabel": "Namn"
 }

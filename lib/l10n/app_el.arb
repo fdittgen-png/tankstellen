@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Ο χάρτης δεν είναι διαθέσιμος",
+  "routeNameHintExample": "π.χ. Παρίσι → Λυών",
+  "priceStatsCurrent": "Τρέχουσα",
+  "tankerkoenigApiKeyLabel": "Κλειδί API Tankerkoenig",
+  "openChargeMapApiKeyLabel": "Κλειδί API OpenChargeMap",
+  "tapToUpdateGpsPosition": "Πατήστε για ενημέρωση της θέσης GPS",
+  "nameLabel": "Όνομα"
 }

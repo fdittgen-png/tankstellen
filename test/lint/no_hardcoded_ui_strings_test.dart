@@ -144,7 +144,6 @@ void main() {
   });
 }
 
-/// Pre-existing hard-coded-string count. Set by #1659; only decreases.
-/// The 11 remaining are all translatable UI text — see
-/// `docs/guides/i18n-hardcoded-worklist.md` for their feature mapping.
-const _baseline = 11;
+/// Hard-coded-string count. Driven to **0** by #1660–#1662 / #1664 —
+/// this is now a hard gate: any new violation fails CI. Never raise it.
+const _baseline = 0;

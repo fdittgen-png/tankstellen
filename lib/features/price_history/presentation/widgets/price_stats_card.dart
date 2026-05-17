@@ -116,7 +116,7 @@ class _CurrentWithTrend extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Current',
+          AppLocalizations.of(context)?.priceStatsCurrent ?? 'Current',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

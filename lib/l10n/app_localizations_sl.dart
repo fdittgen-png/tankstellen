@@ -3241,6 +3241,27 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tankSyncSectionSubtitle => 'Sinhronizacija v oblaku med napravami';
 
   @override
+  String get mapUnavailable => 'Zemljevid ni na voljo';
+
+  @override
+  String get routeNameHintExample => 'npr. Pariz → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Trenutno';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Ključ API Tankerkoenig';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'Ključ API OpenChargeMap';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Tapnite za posodobitev položaja GPS';
+
+  @override
+  String get nameLabel => 'Ime';
+
+  @override
   String get achievementSmoothDriver => 'Mirna serija';
 
   @override

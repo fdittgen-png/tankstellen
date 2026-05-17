@@ -3242,6 +3242,27 @@ class AppLocalizationsSv extends AppLocalizations {
       'Molnsynkronisering på alla dina enheter';
 
   @override
+  String get mapUnavailable => 'Kartan är inte tillgänglig';
+
+  @override
+  String get routeNameHintExample => 't.ex. Paris → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Aktuell';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API-nyckel';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API-nyckel';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Tryck för att uppdatera GPS-position';
+
+  @override
+  String get nameLabel => 'Namn';
+
+  @override
   String get achievementSmoothDriver => 'Mjukserie';
 
   @override

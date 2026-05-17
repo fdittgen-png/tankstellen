@@ -3259,6 +3259,28 @@ class AppLocalizationsRo extends AppLocalizations {
       'Sincronizare cloud pe dispozitivele dvs.';
 
   @override
+  String get mapUnavailable => 'Hartă indisponibilă';
+
+  @override
+  String get routeNameHintExample => 'de ex. Paris → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Curent';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Cheie API Tankerkoenig';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'Cheie API OpenChargeMap';
+
+  @override
+  String get tapToUpdateGpsPosition =>
+      'Atingeți pentru a actualiza poziția GPS';
+
+  @override
+  String get nameLabel => 'Nume';
+
+  @override
   String get achievementSmoothDriver => 'Serie de condus lin';
 
   @override

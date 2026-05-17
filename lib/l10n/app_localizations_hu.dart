@@ -3261,6 +3261,27 @@ class AppLocalizationsHu extends AppLocalizations {
       'Felhőszinkronizálás az eszközei között';
 
   @override
+  String get mapUnavailable => 'A térkép nem érhető el';
+
+  @override
+  String get routeNameHintExample => 'pl. Párizs → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Jelenlegi';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API-kulcs';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API-kulcs';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Koppintson a GPS-pozíció frissítéséhez';
+
+  @override
+  String get nameLabel => 'Név';
+
+  @override
   String get achievementSmoothDriver => 'Sima sorozat';
 
   @override

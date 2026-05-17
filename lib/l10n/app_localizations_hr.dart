@@ -3245,6 +3245,27 @@ class AppLocalizationsHr extends AppLocalizations {
       'Sinkronizacija u oblaku na svim uređajima';
 
   @override
+  String get mapUnavailable => 'Karta nije dostupna';
+
+  @override
+  String get routeNameHintExample => 'npr. Pariz → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Trenutačno';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API ključ';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API ključ';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Dodirnite za ažuriranje GPS položaja';
+
+  @override
+  String get nameLabel => 'Naziv';
+
+  @override
   String get achievementSmoothDriver => 'Niz mirnih vožnji';
 
   @override

@@ -3264,6 +3264,27 @@ class AppLocalizationsEl extends AppLocalizations {
       'Συγχρονισμός cloud σε όλες τις συσκευές σας';
 
   @override
+  String get mapUnavailable => 'Ο χάρτης δεν είναι διαθέσιμος';
+
+  @override
+  String get routeNameHintExample => 'π.χ. Παρίσι → Λυών';
+
+  @override
+  String get priceStatsCurrent => 'Τρέχουσα';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Κλειδί API Tankerkoenig';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'Κλειδί API OpenChargeMap';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Πατήστε για ενημέρωση της θέσης GPS';
+
+  @override
+  String get nameLabel => 'Όνομα';
+
+  @override
   String get achievementSmoothDriver => 'Σερί ομαλής οδήγησης';
 
   @override

@@ -1781,5 +1781,12 @@
   "widgetHelpConfigure": "Sur Android, appuyez longuement sur le widget et choisissez Reconfigurer pour changer le profil, la couleur et le contenu.",
   "widgetVariantDefault": "Prix actuel uniquement",
   "widgetVariantPredictive": "Prédictif : meilleur moment pour faire le plein",
-  "widgetPredictiveNowPrefix": "maintenant"
+  "widgetPredictiveNowPrefix": "maintenant",
+  "mapUnavailable": "Carte indisponible",
+  "routeNameHintExample": "p. ex. Paris → Lyon",
+  "priceStatsCurrent": "Actuel",
+  "tankerkoenigApiKeyLabel": "Clé API Tankerkoenig",
+  "openChargeMapApiKeyLabel": "Clé API OpenChargeMap",
+  "tapToUpdateGpsPosition": "Appuyez pour mettre à jour la position GPS",
+  "nameLabel": "Nom"
 }

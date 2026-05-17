@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Картата е недостъпна",
+  "routeNameHintExample": "напр. Париж → Лион",
+  "priceStatsCurrent": "Текуща",
+  "tankerkoenigApiKeyLabel": "API ключ за Tankerkoenig",
+  "openChargeMapApiKeyLabel": "API ключ за OpenChargeMap",
+  "tapToUpdateGpsPosition": "Докоснете, за да актуализирате GPS позицията",
+  "nameLabel": "Име"
 }

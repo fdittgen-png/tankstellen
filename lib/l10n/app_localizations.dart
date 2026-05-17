@@ -6015,6 +6015,48 @@ abstract class AppLocalizations {
   /// **'Cloud sync across your devices'**
   String get tankSyncSectionSubtitle;
 
+  /// Error-state text shown when the inline map fails to load (#1661).
+  ///
+  /// In en, this message translates to:
+  /// **'Map unavailable'**
+  String get mapUnavailable;
+
+  /// Hint text in the save-route name field — an example route (#1661).
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Paris → Lyon'**
+  String get routeNameHintExample;
+
+  /// Label above the current fuel price in the price-stats card (#1662).
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get priceStatsCurrent;
+
+  /// Field label in the fuel-prices API-key dialog; 'Tankerkoenig' is a brand (#1660).
+  ///
+  /// In en, this message translates to:
+  /// **'Tankerkoenig API Key'**
+  String get tankerkoenigApiKeyLabel;
+
+  /// Field label in the EV-charging API-key dialog; 'OpenChargeMap' is a brand (#1660).
+  ///
+  /// In en, this message translates to:
+  /// **'OpenChargeMap API Key'**
+  String get openChargeMapApiKeyLabel;
+
+  /// Tappable hint row in the profile location section (#1660).
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to update GPS position'**
+  String get tapToUpdateGpsPosition;
+
+  /// Generic 'Name' field label in the profile rename dialog (#1660).
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get nameLabel;
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:
