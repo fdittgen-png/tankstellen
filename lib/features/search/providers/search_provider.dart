@@ -130,14 +130,16 @@ class SearchState extends _$SearchState {
           );
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      // EV search runs concurrently with the fuel fetch — see
-      // finalizeUnifiedResult for the merge.
-      final evFuture = beginEvSearch(
-        ref,
-        lat: position.latitude,
-        lng: position.longitude,
-        radiusKm: resolved.radiusKm,
-      );
+      // #1866 — EV runs concurrently ONLY for an EV-intent search; a
+      // fuel search stays fuel-only (evFuture null → fuel-only feed).
+      final evFuture = isEvSearch(resolved.fuelType)
+          ? beginEvSearch(
+              ref,
+              lat: position.latitude,
+              lng: position.longitude,
+              radiusKm: resolved.radiusKm,
+            )
+          : null;
 
       // Reverse-geocode for a postal code (Prix-Carburants + co).
       final addr = await tryReverseGeocode(
@@ -197,12 +199,15 @@ class SearchState extends _$SearchState {
       if (!ref.mounted) return;
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final evFuture = beginEvSearch(
-        ref,
-        lat: coordsResult.data.lat,
-        lng: coordsResult.data.lng,
-        radiusKm: resolved.radiusKm,
-      );
+      // #1866 — EV merges only for an EV-intent search.
+      final evFuture = isEvSearch(resolved.fuelType)
+          ? beginEvSearch(
+              ref,
+              lat: coordsResult.data.lat,
+              lng: coordsResult.data.lng,
+              radiusKm: resolved.radiusKm,
+            )
+          : null;
 
       final cityName = await tryReverseGeocode(
         geocoding, coordsResult.data.lat, coordsResult.data.lng,
@@ -270,12 +275,15 @@ class SearchState extends _$SearchState {
       }
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final evFuture = beginEvSearch(
-        ref,
-        lat: lat,
-        lng: lng,
-        radiusKm: resolved.radiusKm,
-      );
+      // #1866 — EV merges only for an EV-intent search.
+      final evFuture = isEvSearch(resolved.fuelType)
+          ? beginEvSearch(
+              ref,
+              lat: lat,
+              lng: lng,
+              radiusKm: resolved.radiusKm,
+            )
+          : null;
 
       final params = SearchParams(
         lat: lat,

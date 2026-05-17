@@ -46,6 +46,16 @@ Future<void> autoUpdatePositionIfEnabled(Ref ref) async {
   );
 }
 
+/// True when [fuelType] denotes an EV charging search (#1866).
+///
+/// EV charging stations may only appear in the result feed when the
+/// user explicitly searched for them — `FuelType.electric` is that
+/// signal. Every other fuel type — including the `all` wildcard, which
+/// means "all *fuels*" — is a fuel search and must not merge EV
+/// results in. `SearchNotifier` gates [beginEvSearch] on this so a
+/// fuel search returns fuel stations only, and vice versa.
+bool isEvSearch(FuelType fuelType) => fuelType == FuelType.electric;
+
 /// Reverse-geocodes [lat], [lng] to a human-readable address. Returns
 /// `null` on failure (network error, no result) — every caller treats
 /// reverse geocoding as a non-fatal optional step. Errors are logged
@@ -112,14 +122,17 @@ Future<void> beginEvSearch(
       .searchNearby(lat: lat, lng: lng, radiusKm: radiusKm);
 }
 
-/// Awaits the concurrently-started [evFuture] and merges its outcome
-/// with [fuelResult] into the unified [SearchResultItem] feed (#1781 /
-/// #1782).
+/// Builds the final [SearchResultItem] feed so it always matches the
+/// search intent (#1866): a search is either a fuel search or an EV
+/// search, never both, so the two kinds are never mixed in one feed.
 ///
-/// When [evFuture] is `null` (unified search disabled) the fuel result
-/// is wrapped on its own. Partial-failure-tolerant: an EV-side error is
-/// folded into the merged result's `errors` while the fuel results
-/// still render — see [mergeFuelAndEvResults].
+///   * [evFuture] is `null` — a fuel search. [fuelResult] is wrapped on
+///     its own; no EV rows.
+///   * [evFuture] is non-null — an EV search. It is awaited and the EV
+///     outcome is returned alone; the [fuelResult] the caller still
+///     fetched is discarded so no fuel row leaks into an EV feed. An
+///     EV-side error becomes an empty result carrying that error so the
+///     freshness banner can still report the OpenChargeMap outage.
 Future<AsyncValue<ServiceResult<List<SearchResultItem>>>>
     finalizeUnifiedResult(
   Ref ref,
@@ -132,9 +145,28 @@ Future<AsyncValue<ServiceResult<List<SearchResultItem>>>>
   await evFuture;
   return AsyncValue.data(
     ref.read(eVSearchStateProvider).when(
-          data: (ev) => mergeFuelAndEvResults(fuel: fuelResult, ev: ev),
-          loading: () => mergeFuelAndEvResults(fuel: fuelResult),
-          error: (e, _) => mergeFuelAndEvResults(fuel: fuelResult, evError: e),
+          data: wrapEvResultAsSearchItems,
+          loading: _emptyEvSearchResult,
+          error: (e, _) => _emptyEvSearchResult(evError: e),
         ),
   );
 }
+
+/// An empty EV [SearchResultItem] feed, optionally carrying [evError]
+/// so an EV search that failed still surfaces the OpenChargeMap outage
+/// in the freshness / fallback banner (#1866).
+ServiceResult<List<SearchResultItem>> _emptyEvSearchResult({Object? evError}) =>
+    ServiceResult<List<SearchResultItem>>(
+      data: const [],
+      source: ServiceSource.openChargeMapApi,
+      fetchedAt: DateTime.now(),
+      errors: evError == null
+          ? const []
+          : [
+              ServiceError(
+                source: ServiceSource.openChargeMapApi,
+                message: evError.toString(),
+                occurredAt: DateTime.now(),
+              ),
+            ],
+    );

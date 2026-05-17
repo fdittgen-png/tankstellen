@@ -796,7 +796,7 @@ void main() {
     });
   });
 
-  group('EV dispatch — unified fuel + EV search', () {
+  group('EV dispatch — results match the search intent (#1866)', () {
     void stubFuel() {
       when(() => mockStationService.searchStations(any(),
               cancelToken: any(named: 'cancelToken')))
@@ -807,9 +807,11 @@ void main() {
               ));
     }
 
-    test('fetches fuel AND EV and merges both kinds into one list',
+    test('a fuel search returns fuel stations only — no EV rows leak in',
         () async {
       stubFuel();
+      // The EV fake WOULD return a charging station — the fuel search
+      // must still not surface it.
       final container = createContainerUnified(_OneStationEVSearchState());
 
       await container.read(searchStateProvider.notifier).searchByCoordinates(
@@ -819,17 +821,12 @@ void main() {
             radiusKm: 7.0,
           );
 
-      // Fuel service WAS called (not short-circuited by EV dispatch).
-      verify(() => mockStationService.searchStations(
-            any(),
-            cancelToken: any(named: 'cancelToken'),
-          )).called(1);
       final items = container.read(searchStateProvider).value!.data;
       expect(items.whereType<FuelStationResult>(), hasLength(1));
-      expect(items.whereType<EVStationResult>(), hasLength(1));
+      expect(items.whereType<EVStationResult>(), isEmpty);
     });
 
-    test('electric fuel type is no longer EV-exclusive under unified search',
+    test('an EV search returns EV stations only — no fuel rows leak in',
         () async {
       stubFuel();
       final container = createContainerUnified(_OneStationEVSearchState());
@@ -842,12 +839,11 @@ void main() {
           );
 
       final items = container.read(searchStateProvider).value!.data;
-      // Electric selected, yet fuel stations still appear alongside EV.
-      expect(items.whereType<FuelStationResult>(), hasLength(1));
       expect(items.whereType<EVStationResult>(), hasLength(1));
+      expect(items.whereType<FuelStationResult>(), isEmpty);
     });
 
-    test('EV failure is tolerated — fuel results survive, error recorded',
+    test('an EV search whose EV fetch fails records the OpenChargeMap error',
         () async {
       stubFuel();
       final container = createContainerUnified(_FailingEVSearchState());
@@ -855,13 +851,13 @@ void main() {
       await container.read(searchStateProvider.notifier).searchByCoordinates(
             lat: 52.52,
             lng: 13.41,
-            fuelType: FuelType.e10,
+            fuelType: FuelType.electric,
             radiusKm: 7.0,
           );
 
       final result = container.read(searchStateProvider).value!;
-      expect(result.data.whereType<FuelStationResult>(), hasLength(1));
-      expect(result.data.whereType<EVStationResult>(), isEmpty);
+      // EV search failed → empty feed; no fuel rows leak in to mask it.
+      expect(result.data, isEmpty);
       expect(
         result.errors.where((e) => e.source == ServiceSource.openChargeMapApi),
         hasLength(1),
