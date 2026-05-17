@@ -2,66 +2,149 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Guards against hardcoded user-facing strings in presentation code.
+/// Guards HARD RULE #1 — no hard-coded user-facing text.
 ///
-/// Detects `Text('literal')` and `Text("literal")` patterns in widget files
-/// that should use `AppLocalizations.of(context)?.key ?? 'fallback'` instead.
+/// Scans every UI sink across **all of `lib/`** for a bare string
+/// literal that should instead route through `AppLocalizations`:
 ///
-/// A baseline count is maintained so existing violations don't break CI,
-/// but new ones are caught.
+///   * `Text('literal')` / `const Text('literal')`
+///   * the named text parameters `hintText:` `labelText:` `helperText:`
+///     `errorText:` `semanticLabel:` `tooltip:` carrying a `'literal'`
+///
+/// `SnackBar` content and `AppBar` titles are `Text(...)` widgets, so
+/// the `Text(` sink already covers them.
+///
+/// ## What is NOT flagged (precision)
+///
+/// The literal must sit *immediately* after the sink (modulo `const`
+/// and whitespace). That single anchor rules out the bulk of false
+/// positives for free:
+///
+///   * the intentional fallback pattern `Text(l?.key ?? 'fallback')` —
+///     an expression precedes the literal, so it never matches;
+///   * string interpolation `Text('$count items')` — a `$` inside the
+///     literal disqualifies it;
+///   * enum / data-map keys (`'0104': pidName`, OBD2 PID tables) — a
+///     map key is `'k':`, never `sink('k')` or `param: 'k'`.
+///
+/// A literal is only treated as user-facing text when it *looks* like
+/// prose — it contains whitespace, or it is a capitalised word of four
+/// or more letters. Short lowercase tokens (route names, keys, asset
+/// ids) are skipped.
+///
+/// ## Exemptions — `// i18n-ignore: <reason>`
+///
+/// A genuinely non-translatable literal (brand / proper noun, URL,
+/// language-neutral format mask) may carry an inline
+/// `// i18n-ignore: <reason>` comment on the **same line**; the
+/// detector then skips that line. Every exemption MUST state a reason.
+/// The mechanism is documented in `docs/guides/ARB_FRAGMENTS.md`.
+///
+/// ## Baseline
+///
+/// [_baseline] is the count of pre-existing violations. Per CLAUDE.md
+/// it may only ever **decrease** — the target is **0** (epic #1657).
+/// Never raise it. The classified worklist of the remaining
+/// violations lives in `docs/guides/i18n-hardcoded-worklist.md`.
 void main() {
-  test('hardcoded Text() count does not increase', () {
-    final featuresDir = Directory('lib/features');
-    expect(featuresDir.existsSync(), isTrue);
+  // The UI sinks. Group 1 of each match is the quoted literal.
+  // A literal may not contain `$` (interpolation) or a newline.
+  const quoted = r"""('[^'$\n]*'|"[^"$\n]*")""";
+  final sinks = <RegExp>[
+    // Text('literal') / Text(const 'literal') — quote anchored right
+    // after `Text(`, so `Text(l?.x ?? '...')` cannot match.
+    RegExp('Text\\(\\s*(?:const\\s+)?$quoted\\s*[,)]'),
+    // Named UI-text parameters.
+    RegExp(
+      '\\b(?:hintText|labelText|helperText|errorText|semanticLabel|tooltip):'
+      '\\s*$quoted',
+    ),
+  ];
 
-    // Matches: Text('literal'), Text("literal"), title: 'literal', etc.
-    // Excludes: patterns with ?? (already using l10n fallback),
-    //           patterns with $ (string interpolation with variables),
-    //           patterns that reference l10n/l/AppLocalizations
-    final hardcodedTextPattern = RegExp(
-      r"""(?:const\s+)?Text\(\s*['"][A-Z][^'"$]*['"]\s*\)"""
-      r"""|(?:const\s+)?Text\(\s*['"][a-z][^'"$]{3,}['"]\s*\)""",
-    );
+  /// True when [literal] (quotes stripped) reads like user-facing prose
+  /// rather than an identifier, route name, key or asset id.
+  bool looksLikeProse(String literal) {
+    final text = literal.substring(1, literal.length - 1).trim();
+    if (text.length < 4) return false;
+    // URLs and asset paths are not translatable prose.
+    if (text.startsWith('http') || text.startsWith('assets/')) return false;
+    if (text.contains(RegExp(r'\s'))) return true;
+    // A single capitalised word of 4+ letters (e.g. "Cancel").
+    return RegExp(r'^[A-Z][a-zA-Z]{3,}$').hasMatch(text);
+  }
+
+  test('no new hard-coded user-facing strings (HARD RULE #1)', () {
+    final libDir = Directory('lib');
+    expect(libDir.existsSync(), isTrue);
 
     final violations = <String>[];
 
-    for (final entity in featuresDir.listSync(recursive: true)) {
+    for (final entity in libDir.listSync(recursive: true)) {
       if (entity is! File) continue;
       final path = entity.path.replaceAll(r'\', '/');
       if (!path.endsWith('.dart')) continue;
       if (path.endsWith('.g.dart')) continue;
       if (path.endsWith('.freezed.dart')) continue;
-      if (!path.contains('/presentation/')) continue;
+      // Generated localization output is not source.
+      if (path.contains('/l10n/app_localizations')) continue;
 
-      final lines = entity.readAsLinesSync();
-      for (int i = 0; i < lines.length; i++) {
-        final line = lines[i];
-        // Skip lines that already use l10n pattern
-        if (line.contains('??') || line.contains('l10n') || line.contains('AppLocalizations')) continue;
-        // Skip comments
-        if (line.trimLeft().startsWith('//')) continue;
+      final source = entity.readAsStringSync();
+      final lineStarts = <int>[0];
+      for (var i = 0; i < source.length; i++) {
+        if (source[i] == '\n') lineStarts.add(i + 1);
+      }
+      int lineOf(int offset) {
+        var lo = 0, hi = lineStarts.length - 1;
+        while (lo < hi) {
+          final mid = (lo + hi + 1) >> 1;
+          if (lineStarts[mid] <= offset) {
+            lo = mid;
+          } else {
+            hi = mid - 1;
+          }
+        }
+        return lo;
+      }
 
-        for (final match in hardcodedTextPattern.allMatches(line)) {
-          final text = match.group(0)!;
-          // Skip very short strings (likely identifiers, not UI text)
-          if (text.length < 12) continue;
-          violations.add('$path:${i + 1}: $text');
+      for (final sink in sinks) {
+        for (final match in sink.allMatches(source)) {
+          final literal = match.group(1)!;
+          if (!looksLikeProse(literal)) continue;
+          final firstLine = lineOf(match.start);
+          final lastLine = lineOf(match.end);
+          final spanEnd = lastLine + 1 < lineStarts.length
+              ? lineStarts[lastLine + 1]
+              : source.length;
+          // Inline exemption — the `// i18n-ignore:` comment may sit on
+          // the sink's opening line or on a wrapped literal line.
+          final span = source.substring(lineStarts[firstLine], spanEnd);
+          if (span.contains('// i18n-ignore:')) continue;
+          violations.add('$path:${firstLine + 1}: $literal');
         }
       }
     }
 
-    // Baseline: number of known hardcoded strings as of 2026-04-12.
-    // This number should only go DOWN over time as strings are localized.
-    // If this test fails, you added a new hardcoded string — use l10n instead.
-    const baseline = 120;
+    violations.sort();
+
+    // Baseline as of 2026-05-16 (#1659). Only ever decreases; target 0.
+    // See docs/guides/i18n-hardcoded-worklist.md for the classified
+    // remediation worklist.
+    const baseline = _baseline;
 
     expect(
       violations.length,
       lessThanOrEqualTo(baseline),
-      reason: 'Hardcoded user-facing strings increased! '
-          'Found ${violations.length} (baseline: $baseline).\n'
-          'New violations:\n${violations.take(20).join('\n')}\n'
-          'Use AppLocalizations.of(context)?.key ?? \'fallback\' instead.',
+      reason: 'Hard-coded user-facing strings increased to '
+          '${violations.length} (baseline: $baseline).\n'
+          'Route the new string through AppLocalizations, or — for a '
+          'brand / URL / format mask — add an inline '
+          '`// i18n-ignore: <reason>` comment.\n'
+          'Current violations:\n${violations.join('\n')}',
     );
   });
 }
+
+/// Pre-existing hard-coded-string count. Set by #1659; only decreases.
+/// The 11 remaining are all translatable UI text — see
+/// `docs/guides/i18n-hardcoded-worklist.md` for their feature mapping.
+const _baseline = 11;

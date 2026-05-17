@@ -36,9 +36,8 @@ class ProfileChoiceStep extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Brand wordmark stays untranslated — it's a proper noun.
           Text(
-            'Sparkilo',
+            'Sparkilo', // i18n-ignore: brand wordmark / proper noun
             style: theme.textTheme.headlineLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: const Color(0xFF2E7D32),

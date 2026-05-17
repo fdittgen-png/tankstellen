@@ -110,3 +110,50 @@ too large to review, too disruptive. Existing keys migrate opportunistically:
    being rerun).
 
 CI runs this test like any other unit test.
+
+## HARD RULE #1 — no hard-coded user-facing text
+
+Every string a user can see — `Text`, `Tooltip`, `SnackBar`, `hintText`,
+`labelText`, `helperText`, `semanticLabel`, button labels, dialog text,
+AppBar titles, user-facing error messages — **must** come from
+`AppLocalizations`. Add the key to a fragment (en + de) as above; never
+inline a translatable literal.
+
+### Enforcement — the hard-coded-text detector
+
+`test/lint/no_hardcoded_ui_strings_test.dart` scans every UI sink across
+all of `lib/` and fails when a bare string literal sits directly in one.
+It is precise by construction: the literal must be anchored immediately
+after the sink, so the intentional fallback pattern
+`Text(l?.key ?? 'fallback')`, string interpolation and enum / data-map
+keys are never flagged.
+
+The test carries a `_baseline` count of pre-existing violations. It may
+only ever **decrease** — the target is **0** (epic #1657). Never raise
+it. The remaining violations are classified, with their target ARB
+fragment, in `docs/guides/i18n-hardcoded-worklist.md`.
+
+### The `// i18n-ignore: <reason>` exemption
+
+A genuinely non-translatable literal may stay inline if it carries an
+inline `// i18n-ignore: <reason>` comment. The reason is mandatory. The
+comment may sit on the sink's opening line or on a wrapped literal line:
+
+```dart
+title: const Text('PayPal'), // i18n-ignore: brand / proper noun
+
+Text(
+  'Sparkilo', // i18n-ignore: brand wordmark / proper noun
+  style: ...,
+)
+```
+
+Only three categories qualify:
+
+- **Brands / proper nouns** — `GitHub`, `PayPal`, `Sparkilo`.
+- **URLs** — never localized.
+- **Language-neutral format masks / standardized acronyms** — `IBAN`,
+  `dd/MM/yyyy`.
+
+Anything a translator would render differently in another language is
+**not** exempt — give it an ARB key.
