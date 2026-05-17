@@ -3274,6 +3274,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get nameLabel => 'Naam';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Bluetooth-toestemming is vereist om verbinding te maken met een OBD2-adapter.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Schakel Bluetooth in en probeer het opnieuw.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Geen OBD2-adapter in de buurt gevonden. Controleer of deze is aangesloten en ingeschakeld.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'De OBD2-adapter reageerde niet. Zet het contact aan en probeer het opnieuw.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'De OBD2-adapter stuurde een niet-herkend antwoord. Mogelijk is deze incompatibel — probeer een andere adapter.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'De OBD2-adapter is losgekoppeld. Maak opnieuw verbinding en probeer het opnieuw.';
+
+  @override
   String get achievementSmoothDriver => 'Soepele reeks';
 
   @override

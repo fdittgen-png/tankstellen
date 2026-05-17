@@ -6057,6 +6057,42 @@ abstract class AppLocalizations {
   /// **'Name'**
   String get nameLabel;
 
+  /// User-facing OBD2 connection error: Bluetooth permission was denied (#1663).
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth permission is required to connect to an OBD2 adapter.'**
+  String get obd2ErrorPermissionDenied;
+
+  /// User-facing OBD2 connection error: the Bluetooth radio is off (#1663).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on Bluetooth and try again.'**
+  String get obd2ErrorBluetoothOff;
+
+  /// User-facing OBD2 connection error: scan found no adapter (#1663).
+  ///
+  /// In en, this message translates to:
+  /// **'No OBD2 adapter found nearby. Make sure it is plugged in and powered on.'**
+  String get obd2ErrorScanTimeout;
+
+  /// User-facing OBD2 connection error: the adapter never answered the init sequence (#1663).
+  ///
+  /// In en, this message translates to:
+  /// **'The OBD2 adapter did not respond. Turn the ignition on and try again.'**
+  String get obd2ErrorAdapterUnresponsive;
+
+  /// User-facing OBD2 connection error: the adapter's init string was unrecognised (#1663).
+  ///
+  /// In en, this message translates to:
+  /// **'The OBD2 adapter sent an unrecognized response. It may be incompatible — try a different adapter.'**
+  String get obd2ErrorProtocolInitFailed;
+
+  /// User-facing OBD2 connection error: the transport dropped mid-session (#1663).
+  ///
+  /// In en, this message translates to:
+  /// **'The OBD2 adapter disconnected. Reconnect and try again.'**
+  String get obd2ErrorDisconnected;
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:

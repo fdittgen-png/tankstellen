@@ -3285,6 +3285,30 @@ class AppLocalizationsEl extends AppLocalizations {
   String get nameLabel => 'Όνομα';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Απαιτείται άδεια Bluetooth για σύνδεση με προσαρμογέα OBD2.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Ενεργοποιήστε το Bluetooth και δοκιμάστε ξανά.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Δεν βρέθηκε προσαρμογέας OBD2 κοντά. Βεβαιωθείτε ότι είναι συνδεδεμένος και ενεργοποιημένος.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'Ο προσαρμογέας OBD2 δεν απάντησε. Ανοίξτε το διακόπτη ανάφλεξης και δοκιμάστε ξανά.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'Ο προσαρμογέας OBD2 έστειλε μη αναγνωρίσιμη απάντηση. Ίσως δεν είναι συμβατός — δοκιμάστε άλλον προσαρμογέα.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'Ο προσαρμογέας OBD2 αποσυνδέθηκε. Συνδεθείτε ξανά και δοκιμάστε πάλι.';
+
+  @override
   String get achievementSmoothDriver => 'Σερί ομαλής οδήγησης';
 
   @override

@@ -1570,5 +1570,29 @@
   "nameLabel": "Name",
   "@nameLabel": {
     "description": "Generic 'Name' field label in the profile rename dialog (#1660)."
+  },
+  "obd2ErrorPermissionDenied": "Bluetooth permission is required to connect to an OBD2 adapter.",
+  "@obd2ErrorPermissionDenied": {
+    "description": "User-facing OBD2 connection error: Bluetooth permission was denied (#1663)."
+  },
+  "obd2ErrorBluetoothOff": "Turn on Bluetooth and try again.",
+  "@obd2ErrorBluetoothOff": {
+    "description": "User-facing OBD2 connection error: the Bluetooth radio is off (#1663)."
+  },
+  "obd2ErrorScanTimeout": "No OBD2 adapter found nearby. Make sure it is plugged in and powered on.",
+  "@obd2ErrorScanTimeout": {
+    "description": "User-facing OBD2 connection error: scan found no adapter (#1663)."
+  },
+  "obd2ErrorAdapterUnresponsive": "The OBD2 adapter did not respond. Turn the ignition on and try again.",
+  "@obd2ErrorAdapterUnresponsive": {
+    "description": "User-facing OBD2 connection error: the adapter never answered the init sequence (#1663)."
+  },
+  "obd2ErrorProtocolInitFailed": "The OBD2 adapter sent an unrecognized response. It may be incompatible — try a different adapter.",
+  "@obd2ErrorProtocolInitFailed": {
+    "description": "User-facing OBD2 connection error: the adapter's init string was unrecognised (#1663)."
+  },
+  "obd2ErrorDisconnected": "The OBD2 adapter disconnected. Reconnect and try again.",
+  "@obd2ErrorDisconnected": {
+    "description": "User-facing OBD2 connection error: the transport dropped mid-session (#1663)."
   }
 }

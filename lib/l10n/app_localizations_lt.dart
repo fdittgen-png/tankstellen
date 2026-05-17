@@ -3278,6 +3278,30 @@ class AppLocalizationsLt extends AppLocalizations {
   String get nameLabel => 'Pavadinimas';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Norint prisijungti prie OBD2 adapterio, reikia „Bluetooth“ leidimo.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Įjunkite „Bluetooth“ ir bandykite dar kartą.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Netoliese nerasta OBD2 adapterio. Įsitikinkite, kad jis prijungtas ir įjungtas.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'OBD2 adapteris neatsakė. Įjunkite degimą ir bandykite dar kartą.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'OBD2 adapteris išsiuntė neatpažintą atsakymą. Jis gali būti nesuderinamas — pabandykite kitą adapterį.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'OBD2 adapteris atsijungė. Prisijunkite iš naujo ir bandykite dar kartą.';
+
+  @override
   String get achievementSmoothDriver => 'Sklandaus vairavimo serija';
 
   @override

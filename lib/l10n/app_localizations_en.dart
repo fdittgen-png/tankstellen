@@ -3245,6 +3245,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nameLabel => 'Name';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Bluetooth permission is required to connect to an OBD2 adapter.';
+
+  @override
+  String get obd2ErrorBluetoothOff => 'Turn on Bluetooth and try again.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'No OBD2 adapter found nearby. Make sure it is plugged in and powered on.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'The OBD2 adapter did not respond. Turn the ignition on and try again.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'The OBD2 adapter sent an unrecognized response. It may be incompatible — try a different adapter.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'The OBD2 adapter disconnected. Reconnect and try again.';
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override
@@ -8498,6 +8521,30 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get nameLabel => '⟦Ñáɱé ··⟧';
+
+  @override
+  String get obd2ErrorPermissionDenied =>
+      '⟦Ɓłúéŧóóŧĥ ƥéřɱîššîóñ îš řéɋúîřéđ ŧó çóññéçŧ ŧó áñ ÓƁĐ2 áđáƥŧéř. ·······················⟧';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      '⟦Ŧúřñ óñ Ɓłúéŧóóŧĥ áñđ ŧřý áǧáîñ. ············⟧';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      '⟦Ñó ÓƁĐ2 áđáƥŧéř ƒóúñđ ñéářƀý. Ṁáķé šúřé îŧ îš ƥłúǧǧéđ îñ áñđ ƥóŵéřéđ óñ. ·························⟧';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      '⟦Ŧĥé ÓƁĐ2 áđáƥŧéř đîđ ñóŧ řéšƥóñđ. Ŧúřñ ŧĥé îǧñîŧîóñ óñ áñđ ŧřý áǧáîñ. ························⟧';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      '⟦Ŧĥé ÓƁĐ2 áđáƥŧéř šéñŧ áñ úñřéçóǧñîžéđ řéšƥóñšé. Îŧ ɱáý ƀé îñçóɱƥáŧîƀłé — ŧřý á đîƒƒéřéñŧ áđáƥŧéř. ···································⟧';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      '⟦Ŧĥé ÓƁĐ2 áđáƥŧéř đîšçóññéçŧéđ. Řéçóññéçŧ áñđ ŧřý áǧáîñ. ····················⟧';
 
   @override
   String get achievementSmoothDriver => '⟦Šɱóóŧĥ šŧřéáķ ·····⟧';

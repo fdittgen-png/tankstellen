@@ -3256,6 +3256,30 @@ class AppLocalizationsEt extends AppLocalizations {
   String get nameLabel => 'Nimi';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'OBD2-adapteriga ühenduse loomiseks on vaja Bluetoothi luba.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Lülitage Bluetooth sisse ja proovige uuesti.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Läheduses ei leitud OBD2-adapterit. Veenduge, et see on ühendatud ja sisse lülitatud.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'OBD2-adapter ei vastanud. Lülitage süüde sisse ja proovige uuesti.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'OBD2-adapter saatis tundmatu vastuse. See võib olla ühildumatu — proovige teist adapterit.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'OBD2-adapter katkestas ühenduse. Ühendage uuesti ja proovige uuesti.';
+
+  @override
   String get achievementSmoothDriver => 'Sujuv seeria';
 
   @override

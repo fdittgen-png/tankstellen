@@ -11,6 +11,7 @@ import '../../data/obd2/adapter_registry.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/obd2/obd2_connection_service.dart';
 import '../../data/obd2/obd2_service.dart';
+import '../obd2_connection_error_l10n.dart';
 
 /// Modal bottom sheet that drives the full scan → pick → connect flow
 /// (#743). Caller opens it with [showObd2AdapterPicker]; the future
@@ -388,7 +389,9 @@ class _Obd2AdapterPickerSheetState
                 color: Theme.of(context).colorScheme.error, size: 48),
             const SizedBox(height: 8),
             Text(
-              _error?.message ?? 'Unknown error',
+              _error?.localizedMessage(l) ??
+                  l?.errorUnknown ??
+                  'Unknown error',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

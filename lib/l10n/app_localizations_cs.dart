@@ -3270,6 +3270,29 @@ class AppLocalizationsCs extends AppLocalizations {
   String get nameLabel => 'Název';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'K připojení k adaptéru OBD2 je nutné oprávnění Bluetooth.';
+
+  @override
+  String get obd2ErrorBluetoothOff => 'Zapněte Bluetooth a zkuste to znovu.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Poblíž nebyl nalezen žádný adaptér OBD2. Zkontrolujte, zda je zapojený a zapnutý.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'Adaptér OBD2 neodpověděl. Zapněte zapalování a zkuste to znovu.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'Adaptér OBD2 odeslal nerozpoznanou odpověď. Možná není kompatibilní — zkuste jiný adaptér.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'Adaptér OBD2 se odpojil. Připojte se znovu a zkuste to znovu.';
+
+  @override
   String get achievementSmoothDriver => 'Série plynulé jízdy';
 
   @override

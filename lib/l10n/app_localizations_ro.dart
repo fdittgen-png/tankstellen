@@ -3281,6 +3281,30 @@ class AppLocalizationsRo extends AppLocalizations {
   String get nameLabel => 'Nume';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Este necesară permisiunea Bluetooth pentru a vă conecta la un adaptor OBD2.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Activați Bluetooth și încercați din nou.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Nu s-a găsit niciun adaptor OBD2 în apropiere. Asigurați-vă că este conectat și pornit.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'Adaptorul OBD2 nu a răspuns. Porniți contactul și încercați din nou.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'Adaptorul OBD2 a trimis un răspuns nerecunoscut. Poate fi incompatibil — încercați alt adaptor.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'Adaptorul OBD2 s-a deconectat. Reconectați-vă și încercați din nou.';
+
+  @override
   String get achievementSmoothDriver => 'Serie de condus lin';
 
   @override
