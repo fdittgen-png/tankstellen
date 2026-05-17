@@ -1,6 +1,9 @@
 part of 'profile_edit_sheet.dart';
 
-/// Route-segment slider with a caption showing the km-between-stations value.
+/// Route-planning preferences — route-segment spacing and the maximum
+/// detour budget (#1602). The whole section is gated on
+/// `Feature.routePlanning` by the caller, so it is only built when the
+/// "along the route" search mode is reachable.
 class _RouteSegmentSection extends StatelessWidget {
   final ProfileEditState state;
   final ProfileEditController ctrl;
@@ -14,6 +17,9 @@ class _RouteSegmentSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Text(l10n?.routePlanningSection ?? 'Route planning',
+            style: theme.textTheme.titleSmall),
+        const SizedBox(height: 4),
         Row(
           children: [
             Text('${l10n?.routeSegment ?? "Route segment"}:'),
@@ -35,6 +41,33 @@ class _RouteSegmentSection extends StatelessWidget {
           child: Text(
             l10n?.showCheapestEveryNKm(state.routeSegmentKm.round()) ??
                 'Show cheapest station every ${state.routeSegmentKm.round()} km along route',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        Row(
+          children: [
+            Text('${l10n?.routeDetourBudget ?? "Maximum detour"}:'),
+            Expanded(
+              child: Slider(
+                value: state.routeDetourBudgetKm,
+                min: 2,
+                max: 25,
+                divisions: 23,
+                label: '${state.routeDetourBudgetKm.round()} km',
+                onChanged: ctrl.setRouteDetourBudgetKm,
+              ),
+            ),
+            Text('${state.routeDetourBudgetKm.round()} km'),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Text(
+            l10n?.routeDetourBudgetCaption(state.routeDetourBudgetKm.round()) ??
+                'Surface stations up to ${state.routeDetourBudgetKm.round()} '
+                    'km off your direct route',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -270,6 +303,7 @@ class _SaveDeleteActions extends StatelessWidget {
                 countryCode: state.countryCode,
                 languageCode: state.languageCode,
                 routeSegmentKm: state.routeSegmentKm,
+                routeDetourBudgetKm: state.routeDetourBudgetKm,
                 avoidHighways: state.avoidHighways,
                 ratingMode: state.ratingMode,
                 defaultVehicleId: state.defaultVehicleId,

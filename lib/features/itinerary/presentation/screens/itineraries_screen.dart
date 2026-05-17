@@ -13,6 +13,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/providers/search_mode_provider.dart';
 import '../../../search/domain/entities/search_mode.dart';
 import '../../providers/itinerary_provider.dart';
+import '../../../profile/providers/profile_provider.dart';
 
 class ItinerariesScreen extends ConsumerStatefulWidget {
   const ItinerariesScreen({super.key});
@@ -95,11 +96,15 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     // Set search mode to route
     ref.read(activeSearchModeProvider.notifier).set(SearchMode.route);
 
-    // Trigger route search with saved waypoints
+    // Trigger route search with saved waypoints. #1602 — the search
+    // corridor is the active profile's detour budget.
     final fuelType = FuelType.fromString(it.fuelType);
+    final detourBudgetKm =
+        ref.read(activeProfileProvider)?.routeDetourBudgetKm ?? 5.0;
     ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
       waypoints: waypoints,
       fuelType: fuelType,
+      searchRadiusKm: detourBudgetKm,
     );
 
     // Navigate to search screen

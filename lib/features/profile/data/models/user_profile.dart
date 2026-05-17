@@ -44,6 +44,13 @@ abstract class UserProfile with _$UserProfile {
     String? languageCode,
     @Default(50.0) double routeSegmentKm,
     @Default(false) bool avoidHighways,
+    /// Maximum detour (km) the user is willing to deviate from the
+    /// direct route when route-planning surfaces off-corridor stations
+    /// (#1602). Feeds `RouteSearchState.searchAlongRoute`'s
+    /// `searchRadiusKm` / `maxDetourKm`. The 5.0 km default matches the
+    /// prior hard-coded call-site default, so existing profiles see no
+    /// behaviour change.
+    @Default(5.0) double routeDetourBudgetKm,
     @Deprecated(
       'Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.',
     )

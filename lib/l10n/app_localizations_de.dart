@@ -873,6 +873,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API-Schlüssel';
 
   @override
+  String get routePlanningSection => 'Routenplanung';
+
+  @override
+  String get routeDetourBudget => 'Maximaler Umweg';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Stationen bis zu $km km abseits der direkten Route anzeigen';
+  }
+
+  @override
   String get routeSegment => 'Routenabschnitt';
 
   @override

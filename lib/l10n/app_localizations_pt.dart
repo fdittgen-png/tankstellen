@@ -874,6 +874,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get openChargeMapApiKey => 'Chave API OpenChargeMap';
 
   @override
+  String get routePlanningSection => 'Route planning';
+
+  @override
+  String get routeDetourBudget => 'Maximum detour';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Surface stations up to $km km off your direct route';
+  }
+
+  @override
   String get routeSegment => 'Segmento da rota';
 
   @override

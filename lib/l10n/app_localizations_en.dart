@@ -866,6 +866,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API Key';
 
   @override
+  String get routePlanningSection => 'Route planning';
+
+  @override
+  String get routeDetourBudget => 'Maximum detour';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Surface stations up to $km km off your direct route';
+  }
+
+  @override
   String get routeSegment => 'Route segment';
 
   @override
@@ -6085,6 +6096,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get openChargeMapApiKey => '⟦ÓƥéñÇĥářǧéṀáƥ ÁƤÎ Ķéý ·········⟧';
+
+  @override
+  String get routePlanningSection => '⟦Řóúŧé ƥłáññîñǧ ······⟧';
+
+  @override
+  String get routeDetourBudget => '⟦Ṁáẋîɱúɱ đéŧóúř ······⟧';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return '⟦Šúřƒáçé šŧáŧîóñš úƥ ŧó $km ķɱ óƒƒ ýóúř đîřéçŧ řóúŧé ··················⟧';
+  }
 
   @override
   String get routeSegment => '⟦Řóúŧé šéǧɱéñŧ ·····⟧';
