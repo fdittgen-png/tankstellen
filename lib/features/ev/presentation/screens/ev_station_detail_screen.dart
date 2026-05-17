@@ -216,10 +216,11 @@ class _RatingRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final rating = ref.watch(stationRatingProvider(stationId));
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Row(
       children: [
-        Text('Rating', style: theme.textTheme.titleSmall),
+        Text(l10n?.sortRating ?? 'Rating', style: theme.textTheme.titleSmall),
         const Spacer(),
         ...List.generate(5, (i) {
           final starIndex = i + 1;

@@ -147,7 +147,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           controller: controller,
           decoration: InputDecoration(
             labelText: l10n?.routeName ?? 'Route name',
-            hintText: 'e.g. Paris \u2192 Lyon',
+            hintText: l10n?.routeNameHintExample ?? 'e.g. Paris \u2192 Lyon',
           ),
           autofocus: true,
         ),
