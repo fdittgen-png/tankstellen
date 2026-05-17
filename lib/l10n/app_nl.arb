@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Brandstofverbruik (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Motorbelasting (%)",
+  "trajetDetailChartsSection": "Grafieken",
   "trajetsRowColdStartChip": "Koude start",
   "trajetsRowColdStartTooltip": "Motor bereikte de bedrijfstemperatuur niet tijdens deze rit — brandstofverbruik was hoger dan normaal.",
   "trajetDetailChartEmpty": "Geen steekproeven geregistreerd",

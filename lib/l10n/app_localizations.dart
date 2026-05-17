@@ -8979,6 +8979,12 @@ abstract class AppLocalizations {
   /// **'Engine load (%)'**
   String get trajetDetailChartEngineLoad;
 
+  /// Header of the collapsible section that groups all per-trip telemetry charts on the Trip detail screen (#1895). Collapsed by default — the trip summary and insight cards stay visible above it.
+  ///
+  /// In en, this message translates to:
+  /// **'Charts'**
+  String get trajetDetailChartsSection;
+
   /// Compact chip label rendered on the trip-history row when the trip's coldStartSurcharge flag is true (#1262 phase 3). Tells the user the engine never reached operating temperature, which raised fuel consumption.
   ///
   /// In en, this message translates to:

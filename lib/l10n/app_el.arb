@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Ροή καυσίμου (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Φόρτωση κινητήρα (%)",
+  "trajetDetailChartsSection": "Γραφήματα",
   "trajetsRowColdStartChip": "Ψυχρή εκκίνηση",
   "trajetsRowColdStartTooltip": "Ο κινητήρας δεν έφτασε σε θερμοκρασία λειτουργίας κατά τη διάρκεια αυτού του ταξιδιού — η κατανάλωση καυσίμου ήταν υψηλότερη από το συνηθισμένο.",
   "trajetDetailChartEmpty": "Δεν καταγράφηκαν δείγματα",

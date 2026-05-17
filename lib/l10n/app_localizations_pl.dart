@@ -5008,6 +5008,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Obciążenie silnika (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Wykresy';
+
+  @override
   String get trajetsRowColdStartChip => 'Zimny start';
 
   @override

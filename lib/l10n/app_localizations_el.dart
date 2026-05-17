@@ -5030,6 +5030,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Φόρτωση κινητήρα (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Γραφήματα';
+
+  @override
   String get trajetsRowColdStartChip => 'Ψυχρή εκκίνηση';
 
   @override

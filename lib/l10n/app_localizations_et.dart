@@ -4977,6 +4977,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Mootori koormus (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Graafikud';
+
+  @override
   String get trajetsRowColdStartChip => 'Külmkäivitus';
 
   @override

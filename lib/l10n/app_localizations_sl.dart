@@ -4990,6 +4990,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Obremenitev motorja (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Grafikoni';
+
+  @override
   String get trajetsRowColdStartChip => 'Hladen zagon';
 
   @override

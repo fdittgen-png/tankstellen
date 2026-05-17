@@ -220,24 +220,44 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
           GpsDiagnosticsCard(
             diagnostics: widget.entry.gpsSampleDiagnostics,
           ),
-        _ChartSection(
-          title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
-          chart: TripDetailSpeedChart(samples: widget.samples),
-        ),
-        _ChartSection(
-          title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
-          chart: TripDetailFuelRateChart(samples: widget.samples),
-        ),
-        if (hasRpmSamples)
-          _ChartSection(
-            title: l?.trajetDetailChartRpm ?? 'RPM',
-            chart: TripDetailRpmChart(samples: widget.samples),
+        // #1895 — the per-trip telemetry charts are folded into one
+        // collapsible section, collapsed by default, so the summary
+        // and insight cards above stay the focus on open. maintainState
+        // keeps the chart widgets in the tree while collapsed — the
+        // Share-to-PNG boundary and the widget tests both rely on every
+        // section being present regardless of fold state.
+        Card(
+          margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+          clipBehavior: Clip.antiAlias,
+          child: ExpansionTile(
+            title: Text(l?.trajetDetailChartsSection ?? 'Charts'),
+            initiallyExpanded: false,
+            maintainState: true,
+            shape: const Border(),
+            collapsedShape: const Border(),
+            childrenPadding: const EdgeInsets.only(bottom: 4),
+            children: [
+              _ChartSection(
+                title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
+                chart: TripDetailSpeedChart(samples: widget.samples),
+              ),
+              _ChartSection(
+                title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
+                chart: TripDetailFuelRateChart(samples: widget.samples),
+              ),
+              if (hasRpmSamples)
+                _ChartSection(
+                  title: l?.trajetDetailChartRpm ?? 'RPM',
+                  chart: TripDetailRpmChart(samples: widget.samples),
+                ),
+              if (hasEngineLoadSamples)
+                _ChartSection(
+                  title: l?.trajetDetailChartEngineLoad ?? 'Engine load (%)',
+                  chart: TripDetailEngineLoadChart(samples: widget.samples),
+                ),
+            ],
           ),
-        if (hasEngineLoadSamples)
-          _ChartSection(
-            title: l?.trajetDetailChartEngineLoad ?? 'Engine load (%)',
-            chart: TripDetailEngineLoadChart(samples: widget.samples),
-          ),
+        ),
       ],
     );
 

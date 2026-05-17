@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Flusso carburante (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Carico motore (%)",
+  "trajetDetailChartsSection": "Grafici",
   "trajetsRowColdStartChip": "Avviamento a freddo",
   "trajetsRowColdStartTooltip": "Il motore non ha raggiunto la temperatura di esercizio durante questo percorso — il consumo di carburante era più alto del solito.",
   "trajetDetailChartEmpty": "Nessun campione registrato",

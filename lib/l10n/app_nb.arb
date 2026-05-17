@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Drivstoffrate (L/t)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Motorbelastning (%)",
+  "trajetDetailChartsSection": "Diagrammer",
   "trajetsRowColdStartChip": "Kaldstart",
   "trajetsRowColdStartTooltip": "Motoren nådde ikke driftstemperatur under denne turen – drivstofforbruket var høyere enn vanlig.",
   "trajetDetailChartEmpty": "Ingen prøver registrert",

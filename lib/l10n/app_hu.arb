@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Üzemanyag-arány (L/h)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Motorterhelés (%)",
+  "trajetDetailChartsSection": "Diagramok",
   "trajetsRowColdStartChip": "Hidegindítás",
   "trajetsRowColdStartTooltip": "A motor nem érte el az üzemi hőmérsékletet ezen az úton — az üzemanyag-fogyasztás magasabb volt a szokásosnál.",
   "trajetDetailChartEmpty": "Nincsenek rögzített minták",

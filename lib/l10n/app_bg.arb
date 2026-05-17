@@ -1471,6 +1471,7 @@
   "trajetDetailChartFuelRate": "Горивен поток (л/ч)",
   "trajetDetailChartRpm": "RPM",
   "trajetDetailChartEngineLoad": "Натоварване на двигателя (%)",
+  "trajetDetailChartsSection": "Графики",
   "trajetsRowColdStartChip": "Студен старт",
   "trajetsRowColdStartTooltip": "Двигателят не достигна работна температура по време на пътуването — разходът на гориво е бил по-висок от обичайното.",
   "trajetDetailChartEmpty": "Не са записани проби",

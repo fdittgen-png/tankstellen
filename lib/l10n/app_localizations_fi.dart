@@ -4987,6 +4987,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Moottorin kuorma (%)';
 
   @override
+  String get trajetDetailChartsSection => 'Kaaviot';
+
+  @override
   String get trajetsRowColdStartChip => 'Kylmäkäynnistys';
 
   @override
