@@ -385,6 +385,96 @@ void main() {
           unorderedEquals(['vlinker-fs-classic', 'vlinker-bm-android-classic']));
     });
   });
+
+  group('catalog integrity (#1651)', () {
+    test('the registry ships at least 20 named adapter profiles', () {
+      // Epic #1641 grew the registry to the 20+ best-selling adapters.
+      // "Named" excludes the two generic-fallback profiles.
+      final named = registry.profiles
+          .where((p) => p.nameMatchers.isNotEmpty)
+          .toList();
+      expect(named.length, greaterThanOrEqualTo(20),
+          reason: 'registry must list >= 20 named adapters (#1641)');
+    });
+
+    test('profile ids are unique', () {
+      final ids = registry.profiles.map((p) => p.id).toList();
+      expect(ids.toSet().length, ids.length,
+          reason: 'every Obd2AdapterProfile.id must be unique');
+    });
+
+    test('no name matcher is ambiguous across profiles', () {
+      // A matcher owned by two profiles of the SAME transport makes
+      // `resolve` order-dependent and ambiguous. Sharing is allowed
+      // only for a BLE+Classic pair of the same adapter (e.g. SmartOBD
+      // ships both transports under one advertised name).
+      final owners = <String, List<Obd2AdapterProfile>>{};
+      for (final p in registry.profiles) {
+        for (final m in p.nameMatchers) {
+          owners.putIfAbsent(m, () => []).add(p);
+        }
+      }
+      final ambiguous = owners.entries.where((e) {
+        final transports = e.value.map((p) => p.transport).toSet();
+        // OK when each sharing profile has a distinct transport.
+        return transports.length != e.value.length;
+      }).toList();
+      expect(ambiguous, isEmpty,
+          reason: 'same-transport profiles share a matcher: '
+              '${ambiguous.map((e) => "${e.key} -> "
+                  "${e.value.map((p) => p.id)}").join(", ")}');
+    });
+
+    test('every generic (matcher-less) profile has a unique service UUID',
+        () {
+      // Matcher-less profiles resolve purely on the advertised service
+      // UUID; two of them sharing a UUID would be a non-deterministic
+      // fallback. Named profiles legitimately share the FFF0 family.
+      final genericUuids = registry.profiles
+          .where((p) => p.nameMatchers.isEmpty && p.serviceUuid.isNotEmpty)
+          .map((p) => p.serviceUuid.toLowerCase())
+          .toList();
+      expect(genericUuids.toSet().length, genericUuids.length,
+          reason: 'matcher-less fallback profiles must not share a '
+              'service UUID');
+    });
+
+    test('every profile carries a valid compatibility enum value', () {
+      for (final p in registry.profiles) {
+        expect(Obd2AdapterCompatibility.values, contains(p.compatibility),
+            reason: '${p.id} has an invalid compatibility value');
+      }
+    });
+
+    test('every BLE profile defines all three GATT UUIDs', () {
+      for (final p in registry.profiles
+          .where((p) => p.transport == BluetoothTransport.ble)) {
+        expect(p.serviceUuid, isNotEmpty, reason: '${p.id} serviceUuid');
+        expect(p.writeCharUuid, isNotEmpty, reason: '${p.id} writeCharUuid');
+        expect(p.notifyCharUuid, isNotEmpty,
+            reason: '${p.id} notifyCharUuid');
+      }
+    });
+
+    test('the #1641 best-seller additions resolve by name', () {
+      expect(
+          registry.resolve(_candidate(name: 'BlueDriver', services: []))?.id,
+          'bluedriver');
+      expect(
+          registry.resolve(_candidate(name: 'OBDLink LX', services: []))?.id,
+          'obdlink-lx');
+      expect(
+          registry.resolve(_candidate(name: 'OBDLink CX', services: []))?.id,
+          'obdlink-cx');
+      expect(
+          registry.resolve(_candidate(name: 'TopScan', services: []))?.id,
+          'topdon-topscan');
+      // The tightened MX matcher still catches the MX+.
+      expect(
+          registry.resolve(_candidate(name: 'OBDLink MX+', services: []))?.id,
+          'obdlink-mx');
+    });
+  });
 }
 
 Obd2AdapterCandidate _candidate({
