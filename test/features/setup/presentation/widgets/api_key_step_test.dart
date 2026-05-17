@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/api_key_step.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -136,7 +137,10 @@ void main() {
       // After debounce: green check.
       await tester.pump(const Duration(milliseconds: 600));
       final icon = tester.widget<Icon>(find.byIcon(Icons.check_circle));
-      expect(icon.color, Colors.green);
+      expect(
+        icon.color,
+        DarkModeColors.success(tester.element(find.byIcon(Icons.check_circle))),
+      );
       expect(find.byIcon(Icons.error_outline), findsNothing);
     });
 
@@ -153,7 +157,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
-      expect(icon.color, Colors.red);
+      expect(
+        icon.color,
+        DarkModeColors.error(tester.element(find.byIcon(Icons.error_outline))),
+      );
       expect(
         find.text('Invalid format — expected UUID (8-4-4-4-12)'),
         findsOneWidget,
@@ -175,7 +182,10 @@ void main() {
       // No `tester.pump` for a debounce — initState calls _evaluateFormat
       // directly. pumpApp already did pumpAndSettle.
       final icon = tester.widget<Icon>(find.byIcon(Icons.check_circle));
-      expect(icon.color, Colors.green);
+      expect(
+        icon.color,
+        DarkModeColors.success(tester.element(find.byIcon(Icons.check_circle))),
+      );
     });
 
     testWidgets(
@@ -190,7 +200,10 @@ void main() {
       );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
-      expect(icon.color, Colors.red);
+      expect(
+        icon.color,
+        DarkModeColors.error(tester.element(find.byIcon(Icons.error_outline))),
+      );
     });
 
     testWidgets(

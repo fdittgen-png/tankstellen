@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/consumption/domain/entities/eco_score.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
@@ -145,7 +146,10 @@ void main() {
       final shape = card.shape;
       expect(shape, isA<RoundedRectangleBorder>());
       final border = (shape! as RoundedRectangleBorder).side;
-      expect(border.color, Colors.orange.shade700);
+      expect(
+        border.color,
+        DarkModeColors.warning(tester.element(find.byType(Card))),
+      );
       expect(border.width, 4);
     });
 

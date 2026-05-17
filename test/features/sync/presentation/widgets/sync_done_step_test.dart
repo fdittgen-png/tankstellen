@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/sync_done_step.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -21,7 +22,10 @@ void main() {
     testWidgets('icon is the positive green cue at 64 px', (tester) async {
       await pumpApp(tester, const SyncDoneStep());
       final icon = tester.widget<Icon>(find.byIcon(Icons.check_circle));
-      expect(icon.color, Colors.green);
+      expect(
+        icon.color,
+        DarkModeColors.success(tester.element(find.byIcon(Icons.check_circle))),
+      );
       expect(icon.size, 64);
     });
 
