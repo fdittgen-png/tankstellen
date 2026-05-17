@@ -10,11 +10,11 @@ void main() {
   testWidgets('renders a settings gear icon with a localized tooltip',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: const Scaffold(
+        locale: Locale('en'),
+        home: Scaffold(
           appBar: _ActionBar(),
         ),
       ),
