@@ -67,52 +67,6 @@ ServiceResult<List<SearchResultItem>> wrapEvResultAsSearchItems(
   );
 }
 
-/// Merges a fuel and an EV [ServiceResult] into one mixed
-/// [SearchResultItem] feed for the unified fuel + EV search results
-/// (#1781 / #1782).
-///
-/// Fuel is the primary feed — its [ServiceResult.source] and
-/// `fetchedAt` are carried through, and fuel results lead the list.
-/// EV is additive and **partial-failure-tolerant**: when the EV side
-/// failed, [ev] is null and [evError] carries the cause (e.g. a
-/// keyless `NoEvApiKeyException`, the default for users without an
-/// OpenChargeMap key). The fuel results still render and the EV
-/// failure is recorded as a [ServiceError] so the status banner can
-/// surface "OpenChargeMap unavailable" without blanking the screen.
-///
-/// `isStale` and the `errors` list are unioned across both sides.
-ServiceResult<List<SearchResultItem>> mergeFuelAndEvResults({
-  required ServiceResult<List<Station>> fuel,
-  ServiceResult<List<ChargingStation>>? ev,
-  Object? evError,
-}) {
-  final items = <SearchResultItem>[
-    ...fuel.data.map((s) => FuelStationResult(s)),
-  ];
-  final errors = <ServiceError>[...fuel.errors];
-  var isStale = fuel.isStale;
-
-  if (ev != null) {
-    items.addAll(ev.data.map((cs) => EVStationResult(cs)));
-    errors.addAll(ev.errors);
-    isStale = isStale || ev.isStale;
-  } else if (evError != null) {
-    errors.add(ServiceError(
-      source: ServiceSource.openChargeMapApi,
-      message: evError.toString(),
-      occurredAt: DateTime.now(),
-    ));
-  }
-
-  return ServiceResult(
-    data: items,
-    source: fuel.source,
-    fetchedAt: fuel.fetchedAt,
-    isStale: isStale,
-    errors: errors,
-  );
-}
-
 /// Returns a copy of [result] with [stations] replacing `result.data`.
 /// Used after distance recalculation where only the station list
 /// changes — every other `ServiceResult` field (source, fetchedAt,
