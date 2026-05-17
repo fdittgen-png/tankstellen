@@ -4,6 +4,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+/// Thrown by [HiveBoxes.init] when a persistent box cannot be opened —
+/// its file is damaged beyond Hive's own crash recovery (#1686).
+///
+/// Box corruption is never resolved by silently deleting the file —
+/// favorites, profiles and price history are user data. The failure is
+/// surfaced to the startup error path so the app can show a recovery
+/// prompt instead of booting with data missing.
+class HiveCorruptionException implements Exception {
+  /// Human-readable detail of what failed.
+  final String message;
+
+  const HiveCorruptionException(this.message);
+
+  @override
+  String toString() => 'HiveCorruptionException: $message — the box file '
+      'is left on disk for recovery, not deleted.';
+}
+
 /// Shared Hive box names and initialization logic.
 ///
 /// All domain stores access their boxes through this class.
@@ -106,6 +124,16 @@ class HiveBoxes {
   };
   static const _hiveEncryptionKeyName = 'hive_encryption_key';
 
+  /// Meta box recording the schema version of each persistent box
+  /// (#1686). Unencrypted — it holds only small integers, no PII — and
+  /// is keyed by box name. Lets a future release detect and run a
+  /// schema migration instead of silently mis-reading old on-disk data.
+  static const String boxSchema = 'box_schema';
+
+  /// Current persistent-storage schema version. Bump when the on-disk
+  /// shape of any box changes; pair the bump with a migration step.
+  static const int currentSchemaVersion = 1;
+
   static Future<HiveAesCipher> _loadCipher() async {
     const secureStorage = FlutterSecureStorage();
     final existing = await secureStorage.read(key: _hiveEncryptionKeyName);
@@ -121,34 +149,65 @@ class HiveBoxes {
     return HiveAesCipher(key);
   }
 
-  static Future<void> _migrateToEncrypted(
+  /// One-time migration of a pre-encryption plaintext [boxName] into an
+  /// encrypted box (#1686).
+  ///
+  /// A box already written with the cipher opens cleanly — nothing to
+  /// do. When the cipher open fails, a plaintext open is attempted: a
+  /// box that still carries plaintext data is migrated; one that fails
+  /// the plaintext open too is damaged and is **left on disk
+  /// untouched** — corruption is never resolved by deleting user data.
+  /// A box Hive cannot open at all then surfaces in [init]'s Phase 2 as
+  /// a [HiveCorruptionException].
+  static Future<void> _migrateLegacyPlaintextBox(
       String boxName, HiveAesCipher cipher) async {
-    Box oldBox;
     try {
-      oldBox = await Hive.openBox('${boxName}_migration_check');
-      await oldBox.close();
-      await Hive.deleteBoxFromDisk('${boxName}_migration_check');
-      oldBox = await Hive.openBox(boxName);
+      final box = await Hive.openBox(boxName, encryptionCipher: cipher);
+      await box.close();
+      return; // Already encrypted, or a fresh install.
+    } catch (_) {
+      // Fall through — the box may be a pre-encryption plaintext box.
+    }
+
+    Box<dynamic> plain;
+    try {
+      plain = await Hive.openBox(boxName);
     } catch (e, st) { // ignore: unused_catch_stack
-      debugPrint('Hive migration: $boxName already encrypted or empty');
+      debugPrint('Hive: "$boxName" unreadable during the migration probe '
+          '— left on disk for Phase 2 to surface.');
       return;
     }
-    if (oldBox.isEmpty) {
-      await oldBox.close();
-      return;
-    }
-    final entries = Map<dynamic, dynamic>.from(oldBox.toMap());
-    await oldBox.close();
+
+    await _migrateToEncrypted(boxName, plain, cipher);
+  }
+
+  /// Copies an already-open plaintext [plain] box into an encrypted box
+  /// of the same name (#1686).
+  ///
+  /// The plaintext file is deleted only *after* its entries are held in
+  /// memory, so an interruption mid-migration cannot lose data — a
+  /// crash leaves the still-intact plaintext box, never an empty one.
+  static Future<void> _migrateToEncrypted(
+      String boxName, Box<dynamic> plain, HiveAesCipher cipher) async {
+    final entries = Map<dynamic, dynamic>.from(plain.toMap());
+    await plain.close();
+
     await Hive.deleteBoxFromDisk(boxName);
     final encryptedBox =
         await Hive.openBox(boxName, encryptionCipher: cipher);
-    for (final entry in entries.entries) {
-      await encryptedBox.put(entry.key, entry.value);
+    if (entries.isNotEmpty) {
+      await encryptedBox.putAll(entries);
     }
     await encryptedBox.close();
-    debugPrint(
-        'Hive migration: $boxName migrated to encrypted (${entries.length} entries)');
+    debugPrint('Hive: migrated "$boxName" to encrypted storage '
+        '(${entries.length} entries)');
   }
+
+  /// Test hook for [_migrateToEncrypted] (#1686).
+  @visibleForTesting
+  static Future<void> migrateToEncryptedForTest(
+          String boxName, Box<dynamic> plain, HiveAesCipher cipher) =>
+      _migrateToEncrypted(boxName, plain, cipher);
 
   /// Boxes only read by deep OBD2 / trip / badge / snapshot / glide
   /// features — none is needed to paint the landing search screen, so
@@ -181,39 +240,70 @@ class HiveBoxes {
     await Hive.initFlutter();
     final cipher = await _loadCipher();
 
-    // Phase 1 — probe the 6 encrypted boxes concurrently to detect a
-    // pre-encryption install that needs migrating. Each probe opens and
-    // closes its own box; the boxes are independent, so the probes (and
-    // any migration they trigger) run in parallel.
-    await Future.wait<void>(_encryptedBoxes.map((boxName) async {
-      try {
-        final box = await Hive.openBox(boxName, encryptionCipher: cipher);
-        await box.close();
-      } catch (e, st) { // ignore: unused_catch_stack
-        debugPrint('Hive: migrating $boxName to encrypted storage');
-        await _migrateToEncrypted(boxName, cipher);
-      }
-    }));
+    // Phase 1 — migrate any pre-encryption plaintext boxes. The probes
+    // are independent, so they (and any migration) run in parallel.
+    await Future.wait<void>(
+      _encryptedBoxes
+          .map((boxName) => _migrateLegacyPlaintextBox(boxName, cipher)),
+    );
 
     // Phase 2 — open the first-frame-critical boxes in one parallel
-    // batch: the 6 encrypted domain boxes plus the three unencrypted
-    // boxes the landing path / background isolate need immediately.
-    await Future.wait<Box<dynamic>>([
-      Hive.openBox(settings, encryptionCipher: cipher),
-      Hive.openBox(profiles, encryptionCipher: cipher),
-      Hive.openBox(favorites, encryptionCipher: cipher),
-      Hive.openBox(cache, encryptionCipher: cipher),
-      Hive.openBox(priceHistory, encryptionCipher: cipher),
-      Hive.openBox(alerts, encryptionCipher: cipher),
-      // #1105 — isolate error spool: the background isolate writes here
-      // before Riverpod is available, so it must be open immediately.
-      Hive.openBox<String>(isolateErrorSpool),
-      // #1373 — central feature-flag set: read during the first build.
-      Hive.openBox<dynamic>(featureFlags),
-      // #1517 — active "use mode" profile: gates the first route.
-      Hive.openBox<dynamic>(appProfile),
-    ]);
+    // batch: the 6 encrypted domain boxes plus the unencrypted boxes the
+    // landing path / background isolate need immediately.
+    //
+    // #1686 — a box file damaged beyond Hive's own crash recovery
+    // throws here. It is re-tagged as a HiveCorruptionException so the
+    // startup error path can prompt for recovery, rather than crashing
+    // on a raw HiveError or booting with the box silently missing.
+    try {
+      await Future.wait<Box<dynamic>>([
+        Hive.openBox(settings, encryptionCipher: cipher),
+        Hive.openBox(profiles, encryptionCipher: cipher),
+        Hive.openBox(favorites, encryptionCipher: cipher),
+        Hive.openBox(cache, encryptionCipher: cipher),
+        Hive.openBox(priceHistory, encryptionCipher: cipher),
+        Hive.openBox(alerts, encryptionCipher: cipher),
+        // #1105 — isolate error spool: the background isolate writes
+        // here before Riverpod is available, so it must be open now.
+        Hive.openBox<String>(isolateErrorSpool),
+        // #1373 — central feature-flag set: read during the first build.
+        Hive.openBox<dynamic>(featureFlags),
+        // #1517 — active "use mode" profile: gates the first route.
+        Hive.openBox<dynamic>(appProfile),
+        // #1686 — schema-version meta box. Unencrypted: small integers.
+        Hive.openBox<int>(boxSchema),
+      ]);
+      // HiveError is Hive's runtime storage-failure type (a damaged box
+      // file), not a programmer bug — re-tag it for the startup path.
+    } on HiveError catch (e) { // ignore: avoid_catching_errors
+      throw HiveCorruptionException(
+          'a storage box could not be opened (${e.message})');
+    }
+
+    // #1686 — stamp the current schema version for any box that lacks
+    // one, so a future release can detect and migrate old on-disk data.
+    await _ensureSchemaVersions();
   }
+
+  /// Records [currentSchemaVersion] for every encrypted domain box that
+  /// is not yet stamped (#1686). Existing stamps are left untouched — a
+  /// real schema migration owns bumping them.
+  static Future<void> _ensureSchemaVersions() async {
+    final schema = Hive.box<int>(boxSchema);
+    for (final boxName in _encryptedBoxes) {
+      if (schema.get(boxName) == null) {
+        await schema.put(boxName, currentSchemaVersion);
+      }
+    }
+  }
+
+  /// The recorded schema version of [boxName], or null when the box has
+  /// no stamp yet or the meta box is not open (#1686).
+  static int? schemaVersionOf(String boxName) {
+    if (!Hive.isBoxOpen(boxSchema)) return null;
+    return Hive.box<int>(boxSchema).get(boxName);
+  }
+
 
   /// Opens the deep-feature boxes ([_deferredBoxes]) that the landing
   /// screen does not need (#1794).
@@ -279,6 +369,8 @@ class HiveBoxes {
     // #579 — velocity detector snapshots. String-typed JSON so the
     // same one-adapter pattern covers unit tests + runtime.
     await Hive.openBox<String>(priceSnapshots);
+    // #1686 — schema-version meta box, mirrors the runtime open.
+    await Hive.openBox<int>(boxSchema);
   }
 
   /// Safely converts any Hive map to a typed map.
