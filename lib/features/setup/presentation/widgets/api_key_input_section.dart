@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/country/country_config.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Setup screen section: optional API key input with format validation and a
@@ -24,12 +25,12 @@ class ApiKeyInputSection extends StatelessWidget {
     required this.l10n,
   });
 
-  Widget? _buildFormatIndicator() {
+  Widget? _buildFormatIndicator(BuildContext context) {
     if (formatValid == null) return null;
     if (formatValid!) {
-      return const Icon(Icons.check_circle, color: Colors.green);
+      return Icon(Icons.check_circle, color: DarkModeColors.success(context));
     }
-    return const Icon(Icons.error_outline, color: Colors.red);
+    return Icon(Icons.error_outline, color: DarkModeColors.error(context));
   }
 
   @override
@@ -73,7 +74,7 @@ class ApiKeyInputSection extends StatelessWidget {
             hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
             prefixIcon: const Icon(Icons.key),
             border: const OutlineInputBorder(),
-            suffixIcon: _buildFormatIndicator(),
+            suffixIcon: _buildFormatIndicator(context),
             errorText: formatValid == false
                 ? (l10n?.apiKeyFormatError ??
                     'Invalid format — expected UUID (8-4-4-4-12)')

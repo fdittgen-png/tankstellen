@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Text field for entering a Supabase anon key with:
@@ -34,20 +35,20 @@ class AnonKeyField extends StatelessWidget {
     final isJwtFormat = controller.text.split('.').length == 3;
 
     String? helperText;
-    Color helperColor = Colors.orange;
+    Color helperColor = DarkModeColors.warning(context);
     if (keyLen > 0) {
       if (isTooLong) {
         helperText = l?.anonKeyTooLong(keyLen) ??
             'Key is too long ($keyLen chars) — check for extra text';
-        helperColor = Colors.red;
+        helperColor = DarkModeColors.error(context);
       } else if (isComplete && isJwtFormat) {
         helperText = l?.anonKeyLooksCorrect(keyLen) ??
             'Key looks correct ($keyLen chars)';
-        helperColor = Colors.green;
+        helperColor = DarkModeColors.success(context);
       } else if (!isJwtFormat && keyLen > 10) {
         helperText = l?.anonKeyShouldBeJwt ??
             'Key should be a JWT (header.payload.signature)';
-        helperColor = Colors.red;
+        helperColor = DarkModeColors.error(context);
       } else {
         helperText = l?.anonKeyMayBeTruncated(keyLen) ??
             'Key may be truncated ($keyLen of ~208 expected chars)';
@@ -69,7 +70,12 @@ class AnonKeyField extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 4),
                 child: Text(
                   '$keyLen',
-                  style: TextStyle(fontSize: 11, color: isComplete ? Colors.green : Colors.orange),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: isComplete
+                        ? DarkModeColors.success(context)
+                        : DarkModeColors.warning(context),
+                  ),
                 ),
               ),
             IconButton(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -62,7 +63,7 @@ class FillUpCard extends StatelessWidget {
     // and dark backgrounds. Picked shade 700 for the border + circle
     // background so the contrast vs. white text on the avatar stays
     // readable at smaller sizes.
-    final correctionColor = Colors.orange.shade700;
+    final correctionColor = DarkModeColors.warning(context);
     // #1401 phase 7b — only render the verified-by-adapter chip when
     // both fuel-level captures are present. Either missing → no chip.
     final isVerifiedByAdapter = FillUpVariance.hasAdapterCapture(fillUp);

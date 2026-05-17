@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/profile_provider.dart';
 
@@ -208,8 +209,8 @@ class _ConfigRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final statusColor = switch (status) {
-      _Status.ok => Colors.green,
-      _Status.warning => Colors.orange,
+      _Status.ok => DarkModeColors.success(context),
+      _Status.warning => DarkModeColors.warning(context),
       _Status.neutral => theme.colorScheme.onSurfaceVariant,
     };
 

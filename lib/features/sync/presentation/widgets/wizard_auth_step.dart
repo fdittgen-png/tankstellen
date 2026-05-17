@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/password_strength_indicator.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'wizard_option_card.dart';
@@ -112,14 +113,19 @@ class WizardAuthStep extends StatelessWidget {
         if (testResult != null) ...[
           const SizedBox(height: 12),
           Card(
-            color: testSuccess ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+            color: testSuccess
+                ? DarkModeColors.success(context).withValues(alpha: 0.1)
+                : DarkModeColors.error(context).withValues(alpha: 0.1),
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(testSuccess ? Icons.check_circle : Icons.error,
-                      color: testSuccess ? Colors.green : Colors.red, size: 20),
+                      color: testSuccess
+                          ? DarkModeColors.success(context)
+                          : DarkModeColors.error(context),
+                      size: 20),
                   const SizedBox(width: 8),
                   Expanded(child: Text(testResult!, style: theme.textTheme.bodySmall)),
                 ],

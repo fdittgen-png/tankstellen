@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/consumption_stats.dart';
 
@@ -198,7 +199,7 @@ class _CorrectionShareHint extends StatelessWidget {
     final theme = Theme.of(context);
     // Reuse the orange palette established by the correction fill-up
     // card (#1361) so the visual language stays consistent.
-    final orange = Colors.orange.shade700;
+    final orange = DarkModeColors.warning(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

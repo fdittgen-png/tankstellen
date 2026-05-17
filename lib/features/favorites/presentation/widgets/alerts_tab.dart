@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/storage/storage_keys.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -70,7 +71,7 @@ class AlertsTab extends StatelessWidget {
             background: Container(
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 24),
-              color: Colors.red,
+              color: DarkModeColors.error(context),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

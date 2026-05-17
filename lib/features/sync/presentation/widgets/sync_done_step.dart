@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Final step of the TankSync setup wizard — confirms a successful
@@ -20,8 +21,12 @@ class SyncDoneStep extends StatelessWidget {
           liveRegion: true,
           child: Column(
             children: [
-              const ExcludeSemantics(
-                child: Icon(Icons.check_circle, size: 64, color: Colors.green),
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.check_circle,
+                  size: 64,
+                  color: DarkModeColors.success(context),
+                ),
               ),
               const SizedBox(height: 16),
               Text(

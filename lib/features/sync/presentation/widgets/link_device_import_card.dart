@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/link_device_provider.dart';
 
@@ -102,7 +103,9 @@ class LinkDeviceImportCard extends ConsumerWidget {
               Text(
                 uiState.result!,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: uiState.isError ? Colors.red : Colors.green,
+                  color: uiState.isError
+                      ? DarkModeColors.error(context)
+                      : DarkModeColors.success(context),
                 ),
               ),
             ],

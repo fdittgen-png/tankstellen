@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../loyalty/providers/loyalty_provider.dart';
@@ -72,7 +73,7 @@ class SwipeableStationCard extends ConsumerWidget {
       secondaryBackground: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
-        color: Colors.orange.shade700,
+        color: DarkModeColors.warning(context),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

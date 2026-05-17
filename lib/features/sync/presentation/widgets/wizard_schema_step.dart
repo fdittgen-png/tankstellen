@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/sync/schema_verifier.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -37,7 +38,9 @@ class WizardSchemaStep extends StatelessWidget {
         Icon(
           allReady ? Icons.check_circle : Icons.warning_amber,
           size: 48,
-          color: allReady ? Colors.green : Colors.orange,
+          color: allReady
+              ? DarkModeColors.success(context)
+              : DarkModeColors.warning(context),
         ),
         const SizedBox(height: 16),
         Text(
@@ -55,7 +58,9 @@ class WizardSchemaStep extends StatelessWidget {
             dense: true,
             leading: Icon(
               schemaStatus![table] == true ? Icons.check_circle : Icons.cancel,
-              color: schemaStatus![table] == true ? Colors.green : Colors.red,
+              color: schemaStatus![table] == true
+                  ? DarkModeColors.success(context)
+                  : DarkModeColors.error(context),
               size: 18,
             ),
             title: Text(table, style: theme.textTheme.bodySmall),
@@ -65,7 +70,9 @@ class WizardSchemaStep extends StatelessWidget {
                   : (l10n?.syncTableStatusMissing ?? 'Missing'),
               style: TextStyle(
                 fontSize: 11,
-                color: schemaStatus![table] == true ? Colors.green : Colors.red,
+                color: schemaStatus![table] == true
+                    ? DarkModeColors.success(context)
+                    : DarkModeColors.error(context),
               ),
             ),
           ),

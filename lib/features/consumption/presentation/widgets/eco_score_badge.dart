@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/eco_score.dart';
 
@@ -21,7 +22,7 @@ class EcoScoreBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final (icon, color) = _styleFor(score.direction, theme);
+    final (icon, color) = _styleFor(context, score.direction, theme);
 
     final deltaText =
         '${score.deltaPercent >= 0 ? '+' : ''}${score.deltaPercent.toStringAsFixed(0)}%';
@@ -63,12 +64,16 @@ class EcoScoreBadge extends StatelessWidget {
     );
   }
 
-  (IconData, Color) _styleFor(EcoScoreDirection dir, ThemeData theme) {
+  (IconData, Color) _styleFor(
+    BuildContext context,
+    EcoScoreDirection dir,
+    ThemeData theme,
+  ) {
     switch (dir) {
       case EcoScoreDirection.improving:
-        return (Icons.arrow_downward, Colors.green.shade700);
+        return (Icons.arrow_downward, DarkModeColors.success(context));
       case EcoScoreDirection.worsening:
-        return (Icons.arrow_upward, Colors.orange.shade800);
+        return (Icons.arrow_upward, DarkModeColors.warning(context));
       case EcoScoreDirection.stable:
         return (Icons.arrow_forward, theme.colorScheme.onSurfaceVariant);
     }

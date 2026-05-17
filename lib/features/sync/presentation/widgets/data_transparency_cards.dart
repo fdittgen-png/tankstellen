@@ -153,7 +153,9 @@ class DataActionButtons extends StatelessWidget {
           const SizedBox(height: 8),
         ] else ...[
           FilledButton.icon(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+              backgroundColor: DarkModeColors.error(context),
+            ),
             onPressed: onDeleteAll,
             icon: const Icon(Icons.delete_forever),
             label: Text(l?.deleteAllServerData ?? 'Delete all server data'),
@@ -167,7 +169,9 @@ class DataActionButtons extends StatelessWidget {
           // above it.
           OutlinedButton.icon(
             key: const Key('forget_all_synced_trips_button'),
-            style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: DarkModeColors.error(context),
+            ),
             onPressed: onForgetAllTrips,
             icon: const Icon(Icons.history_toggle_off),
             label: Text(

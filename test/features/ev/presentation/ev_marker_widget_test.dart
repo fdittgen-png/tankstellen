@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/ev/presentation/widgets/ev_marker_widget.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
@@ -53,11 +54,26 @@ void main() {
       ],
     );
 
-    test('colorFor returns green for available, red for occupied,'
-        ' grey for unknown', () {
-      expect(EvMarkerWidget.colorFor(availableStation), Colors.green);
-      expect(EvMarkerWidget.colorFor(occupiedStation), Colors.red);
-      expect(EvMarkerWidget.colorFor(unknownStation), Colors.grey);
+    testWidgets('colorFor returns success for available, error for occupied,'
+        ' grey for unknown', (tester) async {
+      late BuildContext ctx;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(builder: (context) {
+            ctx = context;
+            return const SizedBox.shrink();
+          }),
+        ),
+      );
+      expect(
+        EvMarkerWidget.colorFor(ctx, availableStation),
+        DarkModeColors.success(ctx),
+      );
+      expect(
+        EvMarkerWidget.colorFor(ctx, occupiedStation),
+        DarkModeColors.error(ctx),
+      );
+      expect(EvMarkerWidget.colorFor(ctx, unknownStation), Colors.grey);
     });
 
     testWidgets('renders an ev_station icon and responds to tap',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -129,7 +130,7 @@ class _AlertListTile extends ConsumerWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
-        color: Colors.red,
+        color: DarkModeColors.error(context),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
@@ -226,7 +227,7 @@ class _RadiusAlertListTile extends ConsumerWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
-        color: Colors.red,
+        color: DarkModeColors.error(context),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {

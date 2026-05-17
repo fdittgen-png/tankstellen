@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/country/country_provider.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/api_key_validator.dart';
 
@@ -64,12 +65,12 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
     });
   }
 
-  Widget? _buildFormatIndicator() {
+  Widget? _buildFormatIndicator(BuildContext context) {
     if (_isFormatValid == null) return null;
     if (_isFormatValid!) {
-      return const Icon(Icons.check_circle, color: Colors.green);
+      return Icon(Icons.check_circle, color: DarkModeColors.success(context));
     }
-    return const Icon(Icons.error_outline, color: Colors.red);
+    return Icon(Icons.error_outline, color: DarkModeColors.error(context));
   }
 
   @override
@@ -131,7 +132,7 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
               hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
               prefixIcon: const Icon(Icons.key),
               border: const OutlineInputBorder(),
-              suffixIcon: _buildFormatIndicator(),
+              suffixIcon: _buildFormatIndicator(context),
               errorText: _isFormatValid == false
                   ? (l10n?.apiKeyFormatError ??
                       'Invalid format — expected UUID (8-4-4-4-12)')

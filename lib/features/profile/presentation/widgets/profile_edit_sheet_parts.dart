@@ -285,7 +285,7 @@ class _SaveDeleteActions extends StatelessWidget {
           OutlinedButton(
             onPressed: onConfirmDelete,
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red,
+              foregroundColor: DarkModeColors.error(context),
             ),
             child: Text(l10n?.delete ?? 'Delete'),
           ),

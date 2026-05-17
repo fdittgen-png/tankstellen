@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
@@ -169,7 +170,8 @@ class TripRecordingBanner extends ConsumerWidget {
     switch (band) {
       case ConsumptionBand.eco:
         return _BannerPalette(
-            background: Colors.green.shade600, foreground: Colors.white);
+            background: DarkModeColors.success(context),
+            foreground: Colors.white);
       case ConsumptionBand.normal:
         return _BannerPalette(
           background: Theme.of(context).colorScheme.primary,
@@ -177,10 +179,12 @@ class TripRecordingBanner extends ConsumerWidget {
         );
       case ConsumptionBand.heavy:
         return _BannerPalette(
-            background: Colors.amber.shade800, foreground: Colors.black);
+            background: DarkModeColors.warning(context),
+            foreground: Colors.black);
       case ConsumptionBand.veryHeavy:
         return _BannerPalette(
-            background: Colors.red.shade700, foreground: Colors.white);
+            background: DarkModeColors.error(context),
+            foreground: Colors.white);
       case ConsumptionBand.transient:
         return _BannerPalette(
             background: Colors.teal.shade400, foreground: Colors.white);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -202,18 +203,18 @@ class BrokenMapOverlayRow extends ConsumerWidget {
           text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
               'MAP sensor: $pePct% ± $marginPct%';
         }
-        color = Colors.greenAccent;
+        color = DarkModeColors.success(context);
         break;
       case BrokenMapBand.verifying:
         text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
             'MAP sensor: $pePct% ± $marginPct%';
-        color = Colors.amber;
+        color = DarkModeColors.warning(context);
         break;
       case BrokenMapBand.warning:
       case BrokenMapBand.hardDisable:
         text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
             'MAP sensor: $pePct% ± $marginPct%';
-        color = Colors.redAccent;
+        color = DarkModeColors.error(context);
         break;
     }
     return Padding(

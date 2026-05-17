@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -82,7 +83,7 @@ class FavoriteStationDismissible extends ConsumerWidget {
         child: Container(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 24),
-          color: Colors.red,
+          color: DarkModeColors.error(context),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

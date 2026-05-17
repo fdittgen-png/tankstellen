@@ -6,6 +6,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/ev/presentation/widgets/ev_map_overlay.dart';
 import 'package:tankstellen/features/ev/providers/ev_providers.dart';
@@ -101,7 +102,10 @@ void main() {
           matching: find.byType(Material),
         ).first,
       );
-      expect(material.color, Colors.green);
+      expect(
+        material.color,
+        DarkModeColors.success(tester.element(find.byIcon(Icons.ev_station))),
+      );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.ev_station));
       expect(icon.color, Colors.white);

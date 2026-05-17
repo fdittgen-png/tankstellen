@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/add_fill_up_validators.dart';
 import '../../domain/entities/fill_up.dart';
@@ -129,7 +130,7 @@ class _EditCorrectionFillUpSheetState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
-    final correctionColor = Colors.orange.shade700;
+    final correctionColor = DarkModeColors.warning(context);
     final dateStr =
         '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
 

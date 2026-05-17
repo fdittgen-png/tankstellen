@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../domain/entities/charging_station.dart';
 
 /// Visual marker representing an EV [ChargingStation] on the flutter_map.
@@ -21,14 +22,14 @@ class EvMarkerWidget extends StatelessWidget {
     this.onTap,
   });
 
-  static Color colorFor(ChargingStation station) {
+  static Color colorFor(BuildContext context, ChargingStation station) {
     if (station.connectors.isEmpty) return Colors.grey;
-    if (station.hasAvailableConnector) return Colors.green;
+    if (station.hasAvailableConnector) return DarkModeColors.success(context);
     final anyKnown = station.connectors.any(
       (c) => c.status != ConnectorStatus.unknown,
     );
     if (!anyKnown) return Colors.grey;
-    return Colors.red;
+    return DarkModeColors.error(context);
   }
 
   /// Build a flutter_map [Marker] for this station.
@@ -46,7 +47,7 @@ class EvMarkerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = colorFor(station);
+    final color = colorFor(context, station);
     final maxPower = station.maxPowerKw.round();
 
     return GestureDetector(

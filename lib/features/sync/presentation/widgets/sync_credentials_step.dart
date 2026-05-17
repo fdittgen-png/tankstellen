@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/sync/sync_config.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Credentials input step for private/join-existing sync modes.
@@ -104,7 +105,9 @@ class SyncCredentialsStep extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 4),
                     child: Text('$keyLen', style: TextStyle(fontSize: 10,
-                      color: keyLen >= 200 ? Colors.green : Colors.orange)),
+                      color: keyLen >= 200
+                          ? DarkModeColors.success(context)
+                          : DarkModeColors.warning(context))),
                   ),
                 IconButton(
                   icon: Icon(showKey ? Icons.visibility_off : Icons.visibility, size: 18),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/dark_mode_colors.dart';
+
 /// Reusable swipe-to-delete wrapper with red background and delete icon.
 ///
 /// Replaces 2 identical Dismissible implementations in AlertsScreen
@@ -24,7 +26,7 @@ class SwipeToDelete extends StatelessWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
-        color: Colors.red,
+        color: DarkModeColors.error(context),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) => onDismissed(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/domain/services/trip_length_aggregator.dart';
 
@@ -257,7 +258,7 @@ class _DeltaArrow extends StatelessWidget {
     return Icon(
       worse ? Icons.arrow_upward : Icons.arrow_downward,
       size: 16,
-      color: worse ? theme.colorScheme.error : Colors.green.shade700,
+      color: worse ? theme.colorScheme.error : DarkModeColors.success(context),
     );
   }
 }

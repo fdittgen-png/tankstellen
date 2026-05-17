@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/monthly_insights_aggregator.dart';
 
@@ -223,7 +224,7 @@ class _DeltaArrow extends StatelessWidget {
     final color = switch (sentiment) {
       _Sentiment.neutral => theme.colorScheme.onSurfaceVariant,
       _Sentiment.lowerIsBetter =>
-        up ? theme.colorScheme.error : Colors.green.shade700,
+        up ? theme.colorScheme.error : DarkModeColors.success(context),
     };
     return Icon(
       up ? Icons.arrow_upward : Icons.arrow_downward,

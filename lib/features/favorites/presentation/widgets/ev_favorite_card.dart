@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_station.dart';
 
@@ -79,13 +80,17 @@ class EvFavoriteCard extends StatelessWidget {
                           Icon(
                             Icons.power,
                             size: 14,
-                            color: available > 0 ? Colors.green : Colors.grey,
+                            color: available > 0
+                                ? DarkModeColors.success(context)
+                                : Colors.grey,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '$available/$total ${l10n?.evStatusAvailable ?? 'available'}',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: available > 0 ? Colors.green : null,
+                              color: available > 0
+                                  ? DarkModeColors.success(context)
+                                  : null,
                             ),
                           ),
                         ],

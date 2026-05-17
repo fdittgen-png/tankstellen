@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../theme/dark_mode_colors.dart';
 import '../utils/password_validator.dart';
 
 /// Visual password strength indicator with real-time requirement checklist.
@@ -25,9 +26,9 @@ class PasswordStrengthIndicator extends StatelessWidget {
     final requirements = PasswordValidator.validate(password);
 
     final color = switch (strength) {
-      PasswordStrength.weak => Colors.red,
-      PasswordStrength.fair => Colors.orange,
-      PasswordStrength.strong => Colors.green,
+      PasswordStrength.weak => DarkModeColors.error(context),
+      PasswordStrength.fair => DarkModeColors.warning(context),
+      PasswordStrength.strong => DarkModeColors.success(context),
     };
 
     final label = switch (strength) {
@@ -73,7 +74,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
               Icon(
                 req.met ? Icons.check_circle : Icons.circle_outlined,
                 size: 14,
-                color: req.met ? Colors.green : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                color: req.met ? DarkModeColors.success(context) : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
               const SizedBox(width: 6),
               Text(
