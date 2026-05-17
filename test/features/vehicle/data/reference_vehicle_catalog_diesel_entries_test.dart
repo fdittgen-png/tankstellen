@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/fuel_rate_estimator.dart'
+    as estimator;
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 
 /// Verifies the diesel-sibling entries added in #1396.
@@ -191,6 +193,56 @@ void main() {
         expect(hasDiesel, isTrue,
             reason:
                 '$make $model is missing the new diesel catalog row');
+      }
+    });
+  });
+
+  group('diesel-sibling audit (#1607)', () {
+    Future<List<ReferenceVehicle>> loadCatalog() async {
+      final raw = await rootBundle
+          .loadString('assets/reference_vehicles/vehicles.json');
+      return (json.decode(raw) as List<dynamic>)
+          .map((e) =>
+              ReferenceVehicle.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+
+    test('every catalog fuelType is one of the four known tokens',
+        () async {
+      const known = {'petrol', 'diesel', 'hybrid', 'electric'};
+      for (final v in await loadCatalog()) {
+        expect(known, contains(v.fuelType),
+            reason: '${v.make} ${v.model} ${v.generation} has an '
+                'unknown fuelType "${v.fuelType}"');
+      }
+    });
+
+    test('no diesel catalog entry resolves to petrol AFR / density',
+        () async {
+      // `obd2_service` resolves the stoichiometric constants for a
+      // catalog-backed vehicle with exactly
+      // `referenceVehicle.fuelType.toLowerCase() == 'diesel'`. Mirror
+      // that resolution here and assert every diesel row lands on the
+      // diesel constants — the silent petrol-default inheritance the
+      // diesel-sibling audit (#1396 → #1607) exists to kill.
+      final diesels = (await loadCatalog())
+          .where((v) => v.fuelType == 'diesel')
+          .toList();
+      expect(diesels.length, greaterThan(120),
+          reason: 'the #1607 audit should have grown the diesel parc');
+      for (final v in diesels) {
+        final isDiesel = v.fuelType.toLowerCase() == 'diesel';
+        final afr =
+            isDiesel ? estimator.kDieselAfr : estimator.kPetrolAfr;
+        final density = isDiesel
+            ? estimator.kDieselDensityGPerL
+            : estimator.kPetrolDensityGPerL;
+        expect(afr, estimator.kDieselAfr,
+            reason: '${v.make} ${v.model} ${v.generation} resolves to '
+                'petrol AFR');
+        expect(density, estimator.kDieselDensityGPerL,
+            reason: '${v.make} ${v.model} ${v.generation} resolves to '
+                'petrol density');
       }
     });
   });
