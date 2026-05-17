@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Klíč API Tankerkoenig",
   "evChargingApiKey": "Klíč API nabíjení EV",
   "openChargeMapApiKey": "Klíč API OpenChargeMap",
+  "routePlanningSection": "Plánování trasy",
+  "routeDetourBudget": "Maximální zajížďka",
+  "routeDetourBudgetCaption": "Zobrazit stanice až {km} km od přímé trasy",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Úsek trasy",
   "showCheapestEveryNKm": "Zobrazit nejlevnější stanici každých {km} km podél trasy",
   "avoidHighways": "Vyhnout se dálnicím",

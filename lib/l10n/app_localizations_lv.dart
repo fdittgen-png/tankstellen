@@ -874,14 +874,14 @@ class AppLocalizationsLv extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API atslēga';
 
   @override
-  String get routePlanningSection => 'Route planning';
+  String get routePlanningSection => 'Maršruta plānošana';
 
   @override
-  String get routeDetourBudget => 'Maximum detour';
+  String get routeDetourBudget => 'Maksimālais apvedceļš';
 
   @override
   String routeDetourBudgetCaption(int km) {
-    return 'Surface stations up to $km km off your direct route';
+    return 'Rādīt stacijas līdz $km km no tiešā maršruta';
   }
 
   @override

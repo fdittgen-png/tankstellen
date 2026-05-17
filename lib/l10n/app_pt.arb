@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Chave API Tankerkoenig",
   "evChargingApiKey": "Chave API carregamento EV",
   "openChargeMapApiKey": "Chave API OpenChargeMap",
+  "routePlanningSection": "Planejamento de rota",
+  "routeDetourBudget": "Desvio máximo",
+  "routeDetourBudgetCaption": "Mostrar postos até {km} km da sua rota direta",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Segmento da rota",
   "showCheapestEveryNKm": "Mostrar posto mais barato a cada {km} km ao longo da rota",
   "avoidHighways": "Evitar autoestradas",

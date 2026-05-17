@@ -872,14 +872,14 @@ class AppLocalizationsFi extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API-avain';
 
   @override
-  String get routePlanningSection => 'Route planning';
+  String get routePlanningSection => 'Reittisuunnittelu';
 
   @override
-  String get routeDetourBudget => 'Maximum detour';
+  String get routeDetourBudget => 'Suurin kiertotie';
 
   @override
   String routeDetourBudgetCaption(int km) {
-    return 'Surface stations up to $km km off your direct route';
+    return 'Näytä asemat enintään $km km päässä suorasta reitistä';
   }
 
   @override

@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Tankerkoenig API-nyckel",
   "evChargingApiKey": "EV-laddning API-nyckel",
   "openChargeMapApiKey": "OpenChargeMap API-nyckel",
+  "routePlanningSection": "Ruttplanering",
+  "routeDetourBudget": "Maximal omväg",
+  "routeDetourBudgetCaption": "Visa stationer upp till {km} km från din direkta rutt",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Ruttsegment",
   "showCheapestEveryNKm": "Visa billigaste station var {km}:e km längs rutten",
   "avoidHighways": "Undvik motorvägar",

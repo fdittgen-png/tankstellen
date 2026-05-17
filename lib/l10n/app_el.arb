@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Κλειδί API Tankerkoenig",
   "evChargingApiKey": "Κλειδί API φόρτισης EV",
   "openChargeMapApiKey": "Κλειδί API OpenChargeMap",
+  "routePlanningSection": "Σχεδιασμός διαδρομής",
+  "routeDetourBudget": "Μέγιστη παράκαμψη",
+  "routeDetourBudgetCaption": "Εμφάνιση σταθμών έως {km} χλμ από την άμεση διαδρομή σας",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Τμήμα διαδρομής",
   "showCheapestEveryNKm": "Εμφάνιση φθηνότερου σταθμού κάθε {km} χλμ κατά μήκος της διαδρομής",
   "avoidHighways": "Αποφυγή αυτοκινητοδρόμων",

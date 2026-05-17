@@ -876,14 +876,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API-kulcs';
 
   @override
-  String get routePlanningSection => 'Route planning';
+  String get routePlanningSection => 'Útvonaltervezés';
 
   @override
-  String get routeDetourBudget => 'Maximum detour';
+  String get routeDetourBudget => 'Maximális kerülő';
 
   @override
   String routeDetourBudgetCaption(int km) {
-    return 'Surface stations up to $km km off your direct route';
+    return 'Állomások megjelenítése legfeljebb $km km-re a közvetlen útvonaltól';
   }
 
   @override

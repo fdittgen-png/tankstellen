@@ -873,14 +873,14 @@ class AppLocalizationsRo extends AppLocalizations {
   String get openChargeMapApiKey => 'Cheie API OpenChargeMap';
 
   @override
-  String get routePlanningSection => 'Route planning';
+  String get routePlanningSection => 'Planificarea rutei';
 
   @override
-  String get routeDetourBudget => 'Maximum detour';
+  String get routeDetourBudget => 'Ocol maxim';
 
   @override
   String routeDetourBudgetCaption(int km) {
-    return 'Surface stations up to $km km off your direct route';
+    return 'Afișează stații până la $km km de ruta directă';
   }
 
   @override

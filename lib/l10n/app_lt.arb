@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Tankerkoenig API raktas",
   "evChargingApiKey": "EV įkrovimo API raktas",
   "openChargeMapApiKey": "OpenChargeMap API raktas",
+  "routePlanningSection": "Maršruto planavimas",
+  "routeDetourBudget": "Didžiausias apylankas",
+  "routeDetourBudgetCaption": "Rodyti stoteles iki {km} km nuo tiesioginio maršruto",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Maršruto segmentas",
   "showCheapestEveryNKm": "Rodyti pigiausią stotį kas {km} km palei maršrutą",
   "avoidHighways": "Vengti greitkelių",

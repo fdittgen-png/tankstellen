@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Tankerkoenig API võti",
   "evChargingApiKey": "EV laadimise API võti",
   "openChargeMapApiKey": "OpenChargeMap API võti",
+  "routePlanningSection": "Marsruudi planeerimine",
+  "routeDetourBudget": "Maksimaalne ümbersõit",
+  "routeDetourBudgetCaption": "Kuva jaamad kuni {km} km kaugusel otseteest",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Marsruudi segment",
   "showCheapestEveryNKm": "Näita odavaimat tanklat iga {km} km tagant marsruudil",
   "avoidHighways": "Väldi kiirteid",

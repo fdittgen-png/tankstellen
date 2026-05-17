@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Tankerkoenig API-kulcs",
   "evChargingApiKey": "EV töltés API-kulcs",
   "openChargeMapApiKey": "OpenChargeMap API-kulcs",
+  "routePlanningSection": "Útvonaltervezés",
+  "routeDetourBudget": "Maximális kerülő",
+  "routeDetourBudgetCaption": "Állomások megjelenítése legfeljebb {km} km-re a közvetlen útvonaltól",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Útvonalszakasz",
   "showCheapestEveryNKm": "Legolcsóbb kút mutatása {km} km-enként az útvonal mentén",
   "avoidHighways": "Autópályák elkerülése",

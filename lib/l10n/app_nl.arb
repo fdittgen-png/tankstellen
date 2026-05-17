@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Tankerkoenig API-sleutel",
   "evChargingApiKey": "EV-laden API-sleutel",
   "openChargeMapApiKey": "OpenChargeMap API-sleutel",
+  "routePlanningSection": "Routeplanning",
+  "routeDetourBudget": "Maximale omweg",
+  "routeDetourBudgetCaption": "Toon stations tot {km} km van je directe route",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Routesegment",
   "showCheapestEveryNKm": "Toon goedkoopste station elke {km} km langs de route",
   "avoidHighways": "Snelwegen vermijden",

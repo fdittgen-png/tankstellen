@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Cheie API Tankerkoenig",
   "evChargingApiKey": "Cheie API încărcare EV",
   "openChargeMapApiKey": "Cheie API OpenChargeMap",
+  "routePlanningSection": "Planificarea rutei",
+  "routeDetourBudget": "Ocol maxim",
+  "routeDetourBudgetCaption": "Afișează stații până la {km} km de ruta directă",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Segment rută",
   "showCheapestEveryNKm": "Arată cea mai ieftină stație la fiecare {km} km de-a lungul rutei",
   "avoidHighways": "Evită autostrăzile",

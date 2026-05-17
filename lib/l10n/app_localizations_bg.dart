@@ -874,14 +874,14 @@ class AppLocalizationsBg extends AppLocalizations {
   String get openChargeMapApiKey => 'API ключ OpenChargeMap';
 
   @override
-  String get routePlanningSection => 'Route planning';
+  String get routePlanningSection => 'Планиране на маршрут';
 
   @override
-  String get routeDetourBudget => 'Maximum detour';
+  String get routeDetourBudget => 'Максимално отклонение';
 
   @override
   String routeDetourBudgetCaption(int km) {
-    return 'Surface stations up to $km km off your direct route';
+    return 'Показване на станции до $km км от прекия маршрут';
   }
 
   @override

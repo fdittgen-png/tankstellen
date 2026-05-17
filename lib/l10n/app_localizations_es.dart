@@ -873,14 +873,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get openChargeMapApiKey => 'Clave API OpenChargeMap';
 
   @override
-  String get routePlanningSection => 'Route planning';
+  String get routePlanningSection => 'Planificación de ruta';
 
   @override
-  String get routeDetourBudget => 'Maximum detour';
+  String get routeDetourBudget => 'Desvío máximo';
 
   @override
   String routeDetourBudgetCaption(int km) {
-    return 'Surface stations up to $km km off your direct route';
+    return 'Mostrar estaciones hasta $km km de tu ruta directa';
   }
 
   @override
