@@ -40,7 +40,7 @@ Live cross-country price comparison, route-aware "cheapest stop" planning, drop 
 
 ### 2. Burn less of it per kilometre
 
-Plug in any ELM327-compatible OBD-II adapter and the app starts coaching: live haptic eco-feedback, hard-acceleration and idling insights, gear-coaching for the wrong-gear moments, a per-trip driving score, and a throttle/RPM histogram showing where your engine actually lives. Behaviour change is harder than picking a station, but it pays out on every drive instead of every fill-up.
+Plug in any ELM327-compatible OBD-II adapter and the app starts coaching: live haptic eco-feedback, hard-acceleration and idling insights, a per-trip driving score, and a throttle/RPM histogram showing where your engine actually lives. Behaviour change is harder than picking a station, but it pays out on every drive instead of every fill-up.
 
 ### 3. See what you're really spending
 
