@@ -45,6 +45,17 @@ class CountryConfig {
   /// Defaults to '€/L' for the EUR-zone metric countries.
   final String pricePerUnitSuffix;
 
+  /// Whether this country's station service runs against a verified
+  /// price feed (#1828).
+  ///
+  /// `false` for a country whose service still targets an unverified
+  /// best-guess endpoint. Such a country stays *registered* — a
+  /// station id carrying its prefix still resolves — but is hidden
+  /// from the user-facing country pickers (see [Countries.verified])
+  /// so the app never advertises a country whose live prices are
+  /// unproven. Flip to `true` once the endpoint is confirmed.
+  final bool verified;
+
   const CountryConfig({
     required this.code,
     required this.name,
@@ -71,6 +82,7 @@ class CountryConfig {
     this.distanceUnit = 'km',
     this.volumeUnit = 'L',
     this.pricePerUnitSuffix = '\u20ac/L',
+    this.verified = true,
   });
 }
 
@@ -417,6 +429,9 @@ class Countries {
     examplePostalCode: '04524',
     exampleCity: '서울',
     pricePerUnitSuffix: '₩/L',
+    // #1828 — OPINET endpoint path is a best guess, unverified
+    // against the live portal (#1823). Hidden from the picker.
+    verified: false,
   );
 
   /// Chile — CNE "Bencina en Línea" REST API (#596). ~6 000 service
@@ -451,6 +466,9 @@ class Countries {
     examplePostalCode: '8320000',
     exampleCity: 'Santiago',
     pricePerUnitSuffix: '\$/L',
+    // #1828 — CNE endpoint unverified against the live portal
+    // (#1823). Hidden from the picker.
+    verified: false,
   );
 
   /// Greece — Paratiritirio Timon (Fuel Price Observatory) via the
@@ -483,6 +501,9 @@ class Countries {
     },
     examplePostalCode: '10431',
     exampleCity: 'Αθήνα',
+    // #1828 — fixture-driven best-guess feed, unverified end-to-end.
+    // Hidden from the picker.
+    verified: false,
   );
 
   /// Romania — *Monitorul Prețurilor la Carburanți* (pretcarburant.ro),
@@ -524,14 +545,31 @@ class Countries {
     examplePostalCode: '010101',
     exampleCity: 'București',
     pricePerUnitSuffix: 'lei/L',
+    // #1828 — no documented public API; best-guess endpoint,
+    // unverified end-to-end. Hidden from the picker.
+    verified: false,
   );
 
-  /// All supported countries, ordered for display.
+  /// All registered countries, ordered for display.
+  ///
+  /// This is the source of truth for code that must resolve *every*
+  /// registered country — station-id prefix → country, the
+  /// registry-completeness assertion, geocoding scope. User-facing
+  /// country pickers must iterate [verified] instead.
   static const all = [
     germany, france, austria, spain, italy, denmark, argentina,
     portugal, unitedKingdom, australia, mexico, luxembourg, slovenia,
     southKorea, chile, greece, romania,
   ];
+
+  /// Countries safe to surface in the user-facing country pickers
+  /// (#1828) — [all] minus any whose station service still targets an
+  /// unverified best-guess endpoint ([CountryConfig.verified] false).
+  /// Keeps the app from advertising a country whose live prices are
+  /// unproven; a gated country stays in [all] so its data still
+  /// resolves where it already exists.
+  static final List<CountryConfig> verified =
+      all.where((c) => c.verified).toList(growable: false);
 
   /// Find country by ISO code.
   static CountryConfig? byCode(String code) {

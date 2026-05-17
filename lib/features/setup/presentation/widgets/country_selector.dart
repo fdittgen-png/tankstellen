@@ -30,7 +30,7 @@ class CountrySelector extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: Countries.all.map((c) {
+          children: Countries.verified.map((c) {
             final isSelected = c.code == selected.code;
             return Semantics(
               label: 'Country ${c.name}${isSelected ? ", selected" : ""}',

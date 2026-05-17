@@ -66,7 +66,7 @@ class CountryLanguageStep extends ConsumerWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: Countries.all.map((c) {
+            children: Countries.verified.map((c) {
               final isSelected = c.code == country.code;
               return Semantics(
                 label:

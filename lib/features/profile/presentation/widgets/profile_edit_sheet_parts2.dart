@@ -21,7 +21,7 @@ class _CountrySection extends StatelessWidget {
         Wrap(
           spacing: 6,
           runSpacing: 6,
-          children: Countries.all.map((c) {
+          children: Countries.verified.map((c) {
             return ChoiceChip(
               label: Text('${c.flag} ${c.name}'),
               selected: c.code == state.countryCode,

@@ -19,6 +19,52 @@ void main() {
     });
   });
 
+  group('Countries.verified (#1828)', () {
+    test('contains exactly the 13 verified-endpoint countries', () {
+      expect(Countries.verified.length, equals(13));
+      expect(
+        Countries.verified.map((c) => c.code).toSet(),
+        equals({
+          'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU',
+          'MX', 'LU', 'SI',
+        }),
+      );
+    });
+
+    test('excludes the 4 unverified-endpoint countries', () {
+      final codes = Countries.verified.map((c) => c.code).toSet();
+      for (final gated in ['KR', 'CL', 'GR', 'RO']) {
+        expect(codes, isNot(contains(gated)),
+            reason: '$gated has an unverified endpoint — must be gated');
+      }
+    });
+
+    test('a country is verified by default', () {
+      expect(Countries.germany.verified, isTrue);
+      expect(Countries.luxembourg.verified, isTrue);
+      expect(Countries.slovenia.verified, isTrue);
+    });
+
+    test('KR / CL / GR / RO are flagged unverified', () {
+      for (final c in [
+        Countries.southKorea,
+        Countries.chile,
+        Countries.greece,
+        Countries.romania,
+      ]) {
+        expect(c.verified, isFalse, reason: '${c.code} must be gated');
+      }
+    });
+
+    test('every verified country is still registered in all', () {
+      // Gating is picker-only — the service stays registered so a
+      // station id carrying the prefix still resolves.
+      for (final c in Countries.verified) {
+        expect(Countries.all, contains(c));
+      }
+    });
+  });
+
   group('Countries.byCode', () {
     test('returns correct config for DE', () {
       final de = Countries.byCode('DE');
