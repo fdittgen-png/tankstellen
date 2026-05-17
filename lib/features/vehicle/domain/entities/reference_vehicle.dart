@@ -53,6 +53,42 @@ double defaultVolumetricEfficiency(ReferenceVehicle v) {
   return v.directInjection ? 0.88 : 0.85;
 }
 
+/// A single point on a coarse volumetric-efficiency-vs-RPM curve
+/// (#1625): the engine's η_v at engine speed [rpm].
+@immutable
+class EtaVCurvePoint {
+  final int rpm;
+  final double etaV;
+  const EtaVCurvePoint(this.rpm, this.etaV);
+}
+
+/// Coarse 3-point η_v(rpm) curve for [v]'s engine class (#1625).
+///
+/// #1422 shipped a single cruise η_v per engine class
+/// ([defaultVolumetricEfficiency]); a flat value over-counts at idle
+/// and slightly over-counts near redline, where real volumetric
+/// efficiency tapers. This returns a coarse curve anchored on that
+/// cruise value:
+///
+///   * 1000 rpm — 0.92 × cruise (restricted low-rpm breathing);
+///   * 2500 rpm — the cruise value itself, so the fuel rate at a
+///     typical cruise RPM is unchanged from #1422;
+///   * 5000 rpm — 0.96 × cruise (mild high-rpm flow rolloff).
+///
+/// The taper *shape* is shared across classes — the class-specific
+/// magnitude lives in the cruise anchor — which keeps the curve a
+/// coarse, defensible refinement rather than a fabricated per-class
+/// dataset. `fuel_rate_estimator` interpolates it; a caller with no
+/// curve falls back to the flat cruise default.
+List<EtaVCurvePoint> etaVCurveFor(ReferenceVehicle v) {
+  final cruise = defaultVolumetricEfficiency(v);
+  return [
+    EtaVCurvePoint(1000, cruise * 0.92),
+    EtaVCurvePoint(2500, cruise),
+    EtaVCurvePoint(5000, cruise * 0.96),
+  ];
+}
+
 /// Optional human-readable basis for the helper-derived η_v default
 /// (#1422 phase 2).
 ///

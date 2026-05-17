@@ -512,11 +512,23 @@ class Obd2Service implements Obd2RawCommandPort {
     // VeLearner-converged users (samples > 0 keeps the stored value)
     // or users who explicitly typed a non-default value through the
     // calibration card.
-    final volumetricEfficiency = vehicle?.manualVolumetricEfficiencyOverride ??
-        _resolveProfileVolumetricEfficiency(vehicle, referenceVehicle) ??
+    final manualVe = vehicle?.manualVolumetricEfficiencyOverride;
+    final profileVe =
+        _resolveProfileVolumetricEfficiency(vehicle, referenceVehicle);
+    final volumetricEfficiency = manualVe ??
+        profileVe ??
         (referenceVehicle != null
             ? defaultVolumetricEfficiency(referenceVehicle)
             : estimator.kDefaultVolumetricEfficiency);
+    // #1625 — the per-engine-class η_v(rpm) curve the speed-density
+    // estimator interpolates. Applied ONLY when η_v came from the
+    // catalog default: a manual override or a learned profile value
+    // is a figure the user/learner pinned, so it is used flat. An
+    // empty curve makes the estimator fall back to [volumetricEfficiency].
+    final etaVCurve =
+        (manualVe == null && profileVe == null && referenceVehicle != null)
+            ? etaVCurveFor(referenceVehicle)
+            : const <EtaVCurvePoint>[];
     final isDiesel = vehicle != null
         ? estimator.isDieselProfile(vehicle)
         : referenceVehicle?.fuelType.toLowerCase() == 'diesel';
@@ -661,6 +673,7 @@ class Obd2Service implements Obd2RawCommandPort {
       volumetricEfficiency: volumetricEfficiency,
       afr: afr,
       fuelDensityGPerL: fuelDensityGPerL,
+      etaVCurve: etaVCurve,
     );
     if (rate == null) {
       breadcrumbCollector?.record(
@@ -754,6 +767,7 @@ class Obd2Service implements Obd2RawCommandPort {
     required double volumetricEfficiency,
     double afr = estimator.kPetrolAfr,
     double fuelDensityGPerL = estimator.kPetrolDensityGPerL,
+    List<EtaVCurvePoint> etaVCurve = const [],
   }) =>
       estimator.estimateFuelRateLPerHourFromMap(
         mapKpa: mapKpa,
@@ -763,6 +777,7 @@ class Obd2Service implements Obd2RawCommandPort {
         volumetricEfficiency: volumetricEfficiency,
         afr: afr,
         fuelDensityGPerL: fuelDensityGPerL,
+        etaVCurve: etaVCurve,
       );
 
   /// Read mass air flow in g/s. (#717)

@@ -1,3 +1,4 @@
+import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 
 /// Pure-math fuel-rate estimator + stoichiometric constants (#800,
@@ -80,6 +81,29 @@ double applyFuelTrimCorrection(
   return raw * (1.0 + (stft + ltft) / 100.0);
 }
 
+/// Linearly interpolates an η_v(rpm) curve (#1625) at engine speed
+/// [rpm].
+///
+/// The curve must be sorted ascending by `rpm` (as [etaVCurveFor]
+/// produces it). Engine speeds below the first point or above the
+/// last clamp to that point's η_v — extrapolating a coarse 3-point
+/// curve past its span would be guesswork. Returns `null` for an
+/// empty curve so callers can fall back to a flat cruise η_v.
+double? interpolateEtaV(List<EtaVCurvePoint> curve, double rpm) {
+  if (curve.isEmpty) return null;
+  if (rpm <= curve.first.rpm) return curve.first.etaV;
+  if (rpm >= curve.last.rpm) return curve.last.etaV;
+  for (var i = 0; i < curve.length - 1; i++) {
+    final a = curve[i];
+    final b = curve[i + 1];
+    if (rpm >= a.rpm && rpm <= b.rpm) {
+      final t = (rpm - a.rpm) / (b.rpm - a.rpm);
+      return a.etaV + (b.etaV - a.etaV) * t;
+    }
+  }
+  return curve.last.etaV; // defensive — unreachable for a sorted curve
+}
+
 /// Pure-math speed-density fuel-rate estimator (#800). Split out so
 /// unit tests can verify the formula without mocking the transport.
 ///
@@ -91,6 +115,13 @@ double applyFuelTrimCorrection(
 /// R = 287 J/(kg·K) is the specific gas constant for dry air.
 /// `RPM / 120` converts crank revolutions to intake strokes per
 /// second on a 4-stroke engine (one intake per 2 crank revs).
+///
+/// #1625 — when [etaVCurve] is non-empty the η_v term is interpolated
+/// from it at [rpm] (see [interpolateEtaV]) instead of using the flat
+/// [volumetricEfficiency]; an empty curve keeps the flat cruise value,
+/// so existing callers are unaffected. [volumetricEfficiency] remains
+/// the fallback whenever the curve yields nothing.
+///
 /// Returns null when any input is non-positive — the ideal gas law
 /// breaks down at 0 K / 0 pressure and callers should surface "no
 /// data" rather than a bogus number.
@@ -102,6 +133,7 @@ double? estimateFuelRateLPerHourFromMap({
   required double volumetricEfficiency,
   double afr = kPetrolAfr,
   double fuelDensityGPerL = kPetrolDensityGPerL,
+  List<EtaVCurvePoint> etaVCurve = const [],
 }) {
   final iatKelvin = iatCelsius + 273.15;
   if (mapKpa <= 0 ||
@@ -111,12 +143,14 @@ double? estimateFuelRateLPerHourFromMap({
       volumetricEfficiency <= 0) {
     return null;
   }
+  // #1625 — RPM-aware η_v when a curve is supplied, else the flat value.
+  final etaV = interpolateEtaV(etaVCurve, rpm) ?? volumetricEfficiency;
   final mapPa = mapKpa * 1000.0;
   final displacementM3 = engineDisplacementCc / 1_000_000.0;
   final intakesPerSecond = rpm / 120.0;
   // Kilograms of air per second (ideal gas law × VE).
   final airMassKgPerS =
-      (mapPa * displacementM3 * intakesPerSecond * volumetricEfficiency) /
+      (mapPa * displacementM3 * intakesPerSecond * etaV) /
           (_gasConstant * iatKelvin);
   final airMassGPerS = airMassKgPerS * 1000.0;
   return airMassGPerS * 3600.0 / (afr * fuelDensityGPerL);
