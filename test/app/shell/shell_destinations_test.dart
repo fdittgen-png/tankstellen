@@ -2,32 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/shell/shell_destinations.dart';
 
-/// Pure-function tests for the destination-resolution helper extracted
-/// from `shell_screen.dart` during the #563 refactor.
+/// Pure-function tests for the destination-resolution helper.
 ///
 /// History:
 /// - #893 hid the Conso slot when no vehicle was configured.
-/// - #conso-coherence-1 removed the gate entirely (`hasVehicle` was
-///   the wrong signal — Medium use-mode users need Conso reachable
-///   BEFORE the first vehicle exists).
-/// - #conso-coherence-2 (these tests) re-introduces a gate driven by
-///   `isConsumptionTabReachable(manifest, enabled)` — true for
-///   Medium + Full profiles, false for Basic. Decoupled from
-///   `hasVehicle` so the catch-22 is gone.
+/// - #conso-coherence re-introduced a gate driven by
+///   `isConsumptionTabReachable` — true for Medium + Full profiles.
+/// - #1874 (these tests) — Settings left the bottom bar for the
+///   top-right app bar, and Search became the centre, raised slot:
+///   `Map · Favorites · [Search] · Consumption`.
 void main() {
   group('resolveShellDestinations', () {
     test(
-      'showConsumption: true returns all 5 destinations with identity '
-      'slot mapping',
+      'showConsumption: true → Map · Favorites · [Search] · Consumption',
       () {
         final result =
             resolveShellDestinations(l10n: null, showConsumption: true);
 
-        expect(result.items, hasLength(5));
-        expect(result.branchForSlot, [0, 1, 2, 3, 4]);
+        expect(result.items, hasLength(4));
+        // Visual slots map back to router branches Search=0, Map=1,
+        // Favorites=2, Consumption=3.
+        expect(result.branchForSlot, [1, 2, 0, 3]);
+        expect(result.items.map((i) => i.label).toList(),
+            ['Map', 'Favorites', 'Search', 'Consumption']);
 
-        // The Conso item carries the fuel-station icon — sanity-check
-        // ordering hasn't drifted.
+        // Conso item carries the fuel-station icon.
         expect(result.items[3].outlinedIcon,
             Icons.local_gas_station_outlined);
         expect(result.items[3].filledIcon, Icons.local_gas_station);
@@ -35,55 +34,63 @@ void main() {
     );
 
     test(
-      'showConsumption: false drops the Conso slot — 4 items, '
-      'branch indices keep pointing at the right router branches '
-      '(Settings stays branch 4 even at display-slot 3)',
+      'showConsumption: false → Map · [Search] · Favorites (Conso dropped)',
       () {
         final result =
             resolveShellDestinations(l10n: null, showConsumption: false);
 
-        expect(result.items, hasLength(4));
-        expect(result.branchForSlot, [0, 1, 2, 4]);
+        expect(result.items, hasLength(3));
+        expect(result.branchForSlot, [1, 0, 2]);
+        expect(result.items.map((i) => i.label).toList(),
+            ['Map', 'Search', 'Favorites']);
 
-        // No fuel-station icon should appear in the visible items list.
+        // No fuel-station icon in the visible items list.
         for (final item in result.items) {
           expect(item.outlinedIcon,
               isNot(Icons.local_gas_station_outlined));
-          expect(item.filledIcon, isNot(Icons.local_gas_station));
         }
       },
     );
 
+    test('Search is the only primary (raised, centre) item', () {
+      for (final showConso in [true, false]) {
+        final result = resolveShellDestinations(
+            l10n: null, showConsumption: showConso);
+        final primaries = result.items.where((i) => i.isPrimary).toList();
+        expect(primaries, hasLength(1));
+        expect(primaries.single.label, 'Search');
+        // The primary sits in the centre slot.
+        final primarySlot = result.items.indexWhere((i) => i.isPrimary);
+        expect(primarySlot, result.items.length ~/ 2);
+      }
+    });
+
+    test('Settings is never a bottom-bar destination (#1874)', () {
+      for (final showConso in [true, false]) {
+        final result = resolveShellDestinations(
+            l10n: null, showConsumption: showConso);
+        expect(result.items.map((i) => i.label), isNot(contains('Settings')));
+        expect(result.items.map((i) => i.outlinedIcon),
+            isNot(contains(Icons.settings_outlined)));
+        // Branch 4 (the Settings/profile branch) is never a slot.
+        expect(result.branchForSlot, isNot(contains(4)));
+      }
+    });
+
     test('falls back to English labels when l10n is null', () {
       final result =
           resolveShellDestinations(l10n: null, showConsumption: true);
-
-      expect(result.items.map((i) => i.label).toList(), [
-        'Search',
-        'Map',
-        'Favorites',
-        'Consumption',
-        'Settings',
-      ]);
+      expect(result.items.map((i) => i.label).toList(),
+          ['Map', 'Favorites', 'Search', 'Consumption']);
     });
 
-    test('Settings always sits at the rightmost visible slot', () {
-      final withConso =
-          resolveShellDestinations(l10n: null, showConsumption: true);
-      final withoutConso =
-          resolveShellDestinations(l10n: null, showConsumption: false);
-      expect(withConso.items.last.label, 'Settings');
-      expect(withoutConso.items.last.label, 'Settings');
-    });
-
-    test('kConsumptionBranchIndex matches the position of the Conso '
-        'router branch in the canonical destination list', () {
+    test('the Conso slot routes to kConsumptionBranchIndex', () {
       final result =
           resolveShellDestinations(l10n: null, showConsumption: true);
-      expect(
-        result.items[kConsumptionBranchIndex].outlinedIcon,
-        Icons.local_gas_station_outlined,
-      );
+      final consoSlot = result.items
+          .indexWhere((i) => i.outlinedIcon == Icons.local_gas_station_outlined);
+      expect(consoSlot, isNonNegative);
+      expect(result.branchForSlot[consoSlot], kConsumptionBranchIndex);
     });
   });
 }

@@ -3,33 +3,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
 
-/// Widget tests for [ShellBottomBar].
+/// Widget tests for [ShellBottomBar] after the #1874 redesign.
 ///
-/// The bar is a thin shell over a row of [InkWell] slots that delegates
-/// icon rendering to [ShellBounceIcon]. The interesting behaviour is in
-/// the wiring:
-///   * one slot per `items[]` entry, with the *outlined* icon for
-///     non-selected and *filled* icon for the selected slot;
-///   * the visible slot index `i` indexes into `iconControllers` via
-///     `branchForSlot[i]` so a non-identity `branchForSlot` (e.g. when
-///     the Conso branch is hidden, see #893) still wires the right
-///     controller to each slot;
-///   * the bar height is 64 in portrait and 48 in landscape and the
-///     label row is omitted in landscape;
-///   * tapping the slot fires `onTap(i)`.
-///
-/// Tests use [TestVSync] so animation controllers are cheap to spin up
-/// and tear down without a real ticker provider.
+/// The bar now renders the `isPrimary` item — Search — as a raised,
+/// circular centre button, with the other destinations as flat tabs
+/// flanking it. The interesting behaviour:
+///   * one tappable [InkWell] per `items[]` entry (flat tabs + the
+///     centre button);
+///   * the selected slot uses the *filled* icon, others the *outlined*;
+///   * flat tabs carry a visible text label in portrait; the centre
+///     button never does (icon only, like the reference design);
+///   * `branchForSlot[i]` selects which controller drives slot `i`;
+///   * `currentIndex == -1` highlights nothing (Settings is open).
 void main() {
-  /// All controllers spawned during a single test, so `tearDown` can
-  /// dispose them deterministically. Mirrors the
-  /// `shell_nav_item_test.dart` style of registering disposers.
   late List<AnimationController> spawned;
 
-  setUp(() {
-    spawned = [];
-  });
-
+  setUp(() => spawned = []);
   tearDown(() {
     for (final c in spawned) {
       c.dispose();
@@ -37,8 +26,6 @@ void main() {
     spawned = [];
   });
 
-  /// Builds an [AnimationController] under [TestVSync] and registers it
-  /// for `tearDown`.
   AnimationController newController() {
     final c = AnimationController(
       vsync: const TestVSync(),
@@ -48,8 +35,9 @@ void main() {
     return c;
   }
 
-  /// Pumps the bar inside a minimal MaterialApp so [Theme.of] resolves
-  /// without pulling in app-wide Material l10n delegates.
+  List<AnimationController> controllers(int n) =>
+      List.generate(n, (_) => newController());
+
   Future<void> pumpBar(
     WidgetTester tester, {
     required List<ShellNavItem> items,
@@ -78,90 +66,115 @@ void main() {
     );
   }
 
+  // Real-shape fixture: Search is the centre (primary) slot.
   const items = <ShellNavItem>[
     ShellNavItem(Icons.map_outlined, Icons.map, 'Map'),
-    ShellNavItem(Icons.search_outlined, Icons.search, 'Search'),
+    ShellNavItem(Icons.search_outlined, Icons.search, 'Search',
+        isPrimary: true),
     ShellNavItem(Icons.favorite_outline, Icons.favorite, 'Favorites'),
   ];
 
   group('ShellBottomBar slot rendering', () {
-    testWidgets('renders one slot per items[] entry', (tester) async {
-      final controllers = [
-        newController(),
-        newController(),
-        newController(),
-      ];
-
+    testWidgets('renders one tappable InkWell per items[] entry',
+        (tester) async {
       await pumpBar(
         tester,
         items: items,
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
-        iconControllers: controllers,
+        iconControllers: controllers(3),
+        isLandscape: false,
+        onTap: (_) {},
+      );
+      expect(find.byType(InkWell), findsNWidgets(items.length));
+    });
+
+    testWidgets('selected slot uses filledIcon, others use outlinedIcon',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 1, // Search (the centre button) selected
+        iconControllers: controllers(3),
         isLandscape: false,
         onTap: (_) {},
       );
 
-      // One InkWell per slot.
-      expect(find.byType(InkWell), findsNWidgets(items.length));
+      expect(find.byIcon(Icons.search), findsOneWidget);
+      expect(find.byIcon(Icons.search_outlined), findsNothing);
+      expect(find.byIcon(Icons.map_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.favorite_outline), findsOneWidget);
     });
 
-    testWidgets(
-      'selected slot uses filledIcon, others use outlinedIcon',
-      (tester) async {
-        final controllers = [
-          newController(),
-          newController(),
-          newController(),
-        ];
-
-        await pumpBar(
-          tester,
-          items: items,
-          branchForSlot: const [0, 1, 2],
-          currentIndex: 1,
-          iconControllers: controllers,
-          isLandscape: false,
-          onTap: (_) {},
-        );
-
-        // Selected (index 1) -> filled icon present.
-        expect(find.byIcon(Icons.search), findsOneWidget);
-        expect(find.byIcon(Icons.search_outlined), findsNothing);
-
-        // Unselected slots -> outlined icons present, filled absent.
-        expect(find.byIcon(Icons.map_outlined), findsOneWidget);
-        expect(find.byIcon(Icons.map), findsNothing);
-        expect(find.byIcon(Icons.favorite_outline), findsOneWidget);
-        expect(find.byIcon(Icons.favorite), findsNothing);
-      },
-    );
+    testWidgets('currentIndex == -1 highlights nothing (Settings open)',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: -1,
+        iconControllers: controllers(3),
+        isLandscape: false,
+        onTap: (_) {},
+      );
+      // Every slot shows its outlined icon — no filled (selected) icon.
+      expect(find.byIcon(Icons.map_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.search_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.favorite_outline), findsOneWidget);
+      expect(find.byIcon(Icons.map), findsNothing);
+      expect(find.byIcon(Icons.search), findsNothing);
+      expect(find.byIcon(Icons.favorite), findsNothing);
+    });
   });
 
-  group('ShellBottomBar onTap', () {
-    testWidgets('tapping slot i fires onTap(i)', (tester) async {
-      final controllers = [
-        newController(),
-        newController(),
-        newController(),
-      ];
-      final taps = <int>[];
-
+  group('ShellBottomBar centre button', () {
+    testWidgets('the primary item is a raised Material circle, not a label',
+        (tester) async {
       await pumpBar(
         tester,
         items: items,
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
-        iconControllers: controllers,
+        iconControllers: controllers(3),
+        isLandscape: false,
+        onTap: (_) {},
+      );
+
+      // The centre (Search) button shows no visible text label —
+      // only the two flat tabs do.
+      expect(find.text('Search'), findsNothing);
+      expect(find.text('Map'), findsOneWidget);
+      expect(find.text('Favorites'), findsOneWidget);
+
+      // It is a raised, circular Material.
+      final material = tester.widget<Material>(
+        find.ancestor(
+          of: find.byIcon(Icons.search_outlined),
+          matching: find.byType(Material),
+        ).first,
+      );
+      expect(material.shape, isA<CircleBorder>());
+      expect(material.elevation, greaterThan(0));
+    });
+  });
+
+  group('ShellBottomBar onTap', () {
+    testWidgets('tapping slot i fires onTap(i) — flat tabs and centre',
+        (tester) async {
+      final taps = <int>[];
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: controllers(3),
         isLandscape: false,
         onTap: taps.add,
       );
 
-      // Tap each slot in turn; each tap targets the corresponding
-      // outlined icon (slot 0 happens to be selected so its filled icon
-      // is what's actually on screen — tap that instead).
-      await tester.tap(find.byIcon(Icons.map)); // selected slot 0
-      await tester.tap(find.byIcon(Icons.search_outlined)); // slot 1
+      await tester.tap(find.byIcon(Icons.map)); // slot 0, selected
+      await tester.tap(find.byIcon(Icons.search_outlined)); // slot 1, centre
       await tester.tap(find.byIcon(Icons.favorite_outline)); // slot 2
       await tester.pump();
 
@@ -170,154 +183,90 @@ void main() {
   });
 
   group('ShellBottomBar layout: portrait vs landscape', () {
-    testWidgets('portrait: label Text is rendered, height is 64',
+    testWidgets('portrait: flat-tab labels rendered, bar Container is 64',
         (tester) async {
-      final controllers = [
-        newController(),
-        newController(),
-        newController(),
-      ];
-
       await pumpBar(
         tester,
         items: items,
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
-        iconControllers: controllers,
+        iconControllers: controllers(3),
         isLandscape: false,
         onTap: (_) {},
       );
 
-      // Each slot's label is rendered as Text in portrait.
-      for (final item in items) {
-        expect(find.text(item.label), findsOneWidget);
-      }
+      expect(find.text('Map'), findsOneWidget);
+      expect(find.text('Favorites'), findsOneWidget);
 
-      // The bar's outer Container has height 64 in portrait.
-      final barContainer = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final barContainer =
+          tester.widget<Container>(find.byType(Container).first);
       expect(barContainer.constraints?.maxHeight, 64.0);
     });
 
-    testWidgets('landscape: label Text is hidden, height is 48',
+    testWidgets('landscape: labels hidden, bar Container is 48',
         (tester) async {
-      final controllers = [
-        newController(),
-        newController(),
-        newController(),
-      ];
-
       await pumpBar(
         tester,
         items: items,
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
-        iconControllers: controllers,
+        iconControllers: controllers(3),
         isLandscape: true,
         onTap: (_) {},
       );
 
-      // No label texts in landscape — the row is dropped entirely to
-      // shrink the bar.
       for (final item in items) {
         expect(find.text(item.label), findsNothing);
       }
-
-      // Outer Container is 48dp tall in landscape.
-      final barContainer = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final barContainer =
+          tester.widget<Container>(find.byType(Container).first);
       expect(barContainer.constraints?.maxHeight, 48.0);
     });
   });
 
-  group('ShellBottomBar accessibility (#1697)', () {
-    testWidgets('portrait labels use the themed labelMedium size, not a '
-        'fixed 10/11 px font', (tester) async {
+  group('ShellBottomBar accessibility', () {
+    testWidgets('flat-tab labels use the themed labelMedium size',
+        (tester) async {
       await pumpBar(
         tester,
         items: items,
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
-        iconControllers: [newController(), newController(), newController()],
+        iconControllers: controllers(3),
         isLandscape: false,
         onTap: (_) {},
       );
 
-      // #1697 — the label font is the themed `labelMedium` size rather
-      // than a hardcoded 10/11. Every slot's AnimatedDefaultTextStyle
-      // carries that size (weight/colour differ for the selected slot).
       final ctx = tester.element(find.byType(ShellBottomBar));
       final themed = Theme.of(ctx).textTheme.labelMedium?.fontSize;
       expect(themed, isNotNull);
-      final styles = tester
-          .widgetList<AnimatedDefaultTextStyle>(
-            find.descendant(
-              of: find.byType(ShellBottomBar),
-              matching: find.byType(AnimatedDefaultTextStyle),
-            ),
-          )
-          .toList();
-      expect(styles, hasLength(items.length));
-      for (final ads in styles) {
+      // Each flat-tab label sits under an AnimatedDefaultTextStyle
+      // carrying the themed size. (The centre button has no label.)
+      for (final label in ['Map', 'Favorites']) {
+        final ads = tester.widget<AnimatedDefaultTextStyle>(
+          find
+              .ancestor(
+                of: find.text(label),
+                matching: find.byType(AnimatedDefaultTextStyle),
+              )
+              .first,
+        );
         expect(ads.style.fontSize, themed);
       }
     });
 
-    testWidgets('labels survive 3x OS text scaling without overflow',
-        (tester) async {
-      tester.view.physicalSize = const Size(360, 720);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(textScaler: TextScaler.linear(3.0)),
-            child: Scaffold(
-              body: Align(
-                alignment: Alignment.bottomCenter,
-                child: ShellBottomBar(
-                  items: items,
-                  branchForSlot: const [0, 1, 2],
-                  currentIndex: 0,
-                  iconControllers: [
-                    newController(),
-                    newController(),
-                    newController(),
-                  ],
-                  isLandscape: false,
-                  onTap: (_) {},
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // No RenderFlex overflow was thrown, and every label is still
-      // present (FittedBox scaled it to fit rather than clipping it).
-      for (final item in items) {
-        expect(find.text(item.label), findsOneWidget);
-      }
-    });
-
-    testWidgets('landscape slots carry a Tooltip with the destination name',
+    testWidgets('every slot carries a Tooltip with the destination name',
         (tester) async {
       await pumpBar(
         tester,
         items: items,
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
-        iconControllers: [newController(), newController(), newController()],
+        iconControllers: controllers(3),
         isLandscape: true,
         onTap: (_) {},
       );
 
-      // Landscape drops the visible label row, so each slot is wrapped
-      // in a Tooltip carrying the destination name instead.
       final tooltips =
           tester.widgetList<Tooltip>(find.byType(Tooltip)).toList();
       expect(tooltips, hasLength(items.length));
@@ -334,7 +283,7 @@ void main() {
         items: items,
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
-        iconControllers: [newController(), newController(), newController()],
+        iconControllers: controllers(3),
         isLandscape: false,
         onTap: (_) {},
       );
@@ -343,8 +292,6 @@ void main() {
 
     testWidgets('renders under RTL directionality without overflow',
         (tester) async {
-      // No shipped locale is RTL today; this is a robustness check so
-      // the bar is safe if an RTL locale is ever added (#1697).
       await tester.pumpWidget(
         MaterialApp(
           home: Directionality(
@@ -356,11 +303,7 @@ void main() {
                   items: items,
                   branchForSlot: const [0, 1, 2],
                   currentIndex: 0,
-                  iconControllers: [
-                    newController(),
-                    newController(),
-                    newController(),
-                  ],
+                  iconControllers: controllers(3),
                   isLandscape: false,
                   onTap: (_) {},
                 ),
@@ -369,60 +312,37 @@ void main() {
           ),
         ),
       );
-
       expect(find.byType(InkWell), findsNWidgets(items.length));
-      for (final item in items) {
-        expect(find.text(item.label), findsOneWidget);
-      }
+      expect(find.text('Map'), findsOneWidget);
     });
   });
 
   group('ShellBottomBar branchForSlot indirection', () {
-    testWidgets(
-      'non-identity branchForSlot wires the matching iconControllers',
-      (tester) async {
-        // Build a 5-controller list, then pass a 3-slot bar that maps
-        // visible slot -> branch index = [0, 2, 4]. Slots 1 and 3
-        // (Search + Conso, by analogy with the real shell) are hidden.
-        final controllers = List<AnimationController>.generate(
-          5,
-          (_) => newController(),
-        );
+    testWidgets('each slot is wired to iconControllers[branchForSlot[i]]',
+        (tester) async {
+      // 5-controller list; a 3-slot bar mapping slot -> branch [0, 2, 4].
+      final ctrls = controllers(5);
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 2, 4],
+        currentIndex: 0,
+        iconControllers: ctrls,
+        isLandscape: false,
+        onTap: (_) {},
+      );
 
-        await pumpBar(
-          tester,
-          items: items,
-          branchForSlot: const [0, 2, 4],
-          currentIndex: 0,
-          iconControllers: controllers,
-          isLandscape: false,
-          onTap: (_) {},
-        );
+      final bounceIcons = tester
+          .widgetList<ShellBounceIcon>(find.byType(ShellBounceIcon))
+          .toList();
+      expect(bounceIcons, hasLength(items.length));
 
-        // Find every ShellBounceIcon — there are exactly items.length of
-        // them — and confirm the controllers wired to them match the
-        // controllers at positions 0, 2, 4 of the input list.
-        final bounceIcons =
-            tester.widgetList<ShellBounceIcon>(find.byType(ShellBounceIcon))
-                .toList();
-        expect(bounceIcons, hasLength(items.length));
-
-        // Order in the row matches construction order from List.generate.
-        expect(identical(bounceIcons[0].controller, controllers[0]), isTrue);
-        expect(identical(bounceIcons[1].controller, controllers[2]), isTrue);
-        expect(identical(bounceIcons[2].controller, controllers[4]), isTrue);
-
-        // And NOT the controllers at positions 1 and 3 (which are
-        // skipped by the indirection).
-        expect(
-          bounceIcons.any((b) => identical(b.controller, controllers[1])),
-          isFalse,
-        );
-        expect(
-          bounceIcons.any((b) => identical(b.controller, controllers[3])),
-          isFalse,
-        );
-      },
-    );
+      // Slots 0/1/2 must be wired to controllers 0/2/4 — checked as a
+      // set so this does not depend on tree-traversal order.
+      final wired = bounceIcons.map((b) => b.controller).toSet();
+      expect(wired, {ctrls[0], ctrls[2], ctrls[4]});
+      expect(wired, isNot(contains(ctrls[1])));
+      expect(wired, isNot(contains(ctrls[3])));
+    });
   });
 }

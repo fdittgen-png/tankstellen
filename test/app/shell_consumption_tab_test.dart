@@ -11,9 +11,8 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Seeds one vehicle + a Full-profile-equivalent feature set so the
 /// Conso tab is visible. The bottom-nav Conso gate is driven by
-/// `isConsumptionTabReachable` (#conso-coherence-2) — we need
-/// `obd2TripRecording` + `showConsumptionTab` on for these layout
-/// tests to keep asserting a 5-tab shell.
+/// `isConsumptionTabReachable` — `obd2TripRecording` +
+/// `showConsumptionTab` on keeps the Conso slot in the shell.
 class _OneVehicleList extends VehicleProfileList {
   @override
   List<VehicleProfile> build() => const [
@@ -33,16 +32,12 @@ class _FullProfileFlags extends FeatureFlags {
       };
 }
 
-/// #778: Consumption is a first-class destination — always visible,
-/// sitting between Favorites and Settings. Supersedes the #701
-/// flag-gated behaviour (which required a profile opt-in AND an
-/// existing vehicle to surface the tab).
-///
-/// The router registers 5 branches unconditionally, the shell always
-/// renders 5 nav items, and the order of the icons is fixed so the
-/// muscle-memory for Settings (now the rightmost) stays predictable.
+/// #1874: the bottom bar holds four destinations — `Map · Favorites ·
+/// [Search] · Consumption` — with Search the raised centre button.
+/// Settings is no longer a tab (it moved to the top-right app bar), so
+/// the bar never shows the settings icon.
 
-Future<List<IconData>> _pumpShellIcons(WidgetTester tester) async {
+Future<void> _pumpShell(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 800);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
@@ -98,57 +93,32 @@ Future<List<IconData>> _pumpShellIcons(WidgetTester tester) async {
     ),
   );
   await tester.pumpAndSettle();
-
-  final expected = [
-    [Icons.search_outlined, Icons.search],
-    [Icons.map_outlined, Icons.map],
-    [Icons.star_outline, Icons.star],
-    [Icons.local_gas_station_outlined, Icons.local_gas_station],
-    [Icons.settings_outlined, Icons.settings],
-  ];
-  final seen = <IconData>[];
-  for (final pair in expected) {
-    for (final i in pair) {
-      if (tester.widgetList(find.byIcon(i)).isNotEmpty) {
-        seen.add(i);
-        break;
-      }
-    }
-  }
-  return seen;
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('ShellScreen 5-tab layout (#778 — supersedes #701)', () {
-    testWidgets('always renders 5 destinations — Consumption is no '
-        'longer gated behind a profile flag', (tester) async {
-      final icons = await _pumpShellIcons(tester);
-      expect(icons, hasLength(5));
-    });
+  group('ShellScreen bottom-bar destinations (#1874)', () {
+    testWidgets('renders Map, Favorites, Search and Consumption — and '
+        'no Settings tab', (tester) async {
+      await _pumpShell(tester);
 
-    testWidgets('Consumption sits between Favorites and Settings — '
-        'the muscle-memory position for Settings (rightmost) is '
-        'preserved', (tester) async {
-      final icons = await _pumpShellIcons(tester);
-      // Favorites index < Consumption index < Settings index
-      final favIdx = icons.indexWhere(
-          (i) => i == Icons.star || i == Icons.star_outline);
-      final consIdx = icons.indexWhere((i) =>
-          i == Icons.local_gas_station ||
-          i == Icons.local_gas_station_outlined);
-      final settingsIdx = icons.indexWhere(
-          (i) => i == Icons.settings || i == Icons.settings_outlined);
-      expect(favIdx, isNonNegative);
-      expect(consIdx, favIdx + 1);
-      expect(settingsIdx, consIdx + 1);
+      // Search branch is active → its filled icon shows; the other
+      // three destinations show their outlined icons.
+      expect(find.byIcon(Icons.search), findsOneWidget);
+      expect(find.byIcon(Icons.map_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.star_outline), findsOneWidget);
+      expect(find.byIcon(Icons.local_gas_station_outlined), findsOneWidget);
+
+      // Settings is not a bottom-bar tab anymore.
+      expect(find.byIcon(Icons.settings), findsNothing);
+      expect(find.byIcon(Icons.settings_outlined), findsNothing);
     });
 
     testWidgets('tapping Consumption shows the consumption-tab branch',
         (tester) async {
-      await _pumpShellIcons(tester);
-      await tester.tap(find.text('Consumption'));
+      await _pumpShell(tester);
+      await tester.tap(find.byIcon(Icons.local_gas_station_outlined));
       await tester.pumpAndSettle();
       expect(find.text('Consumption'), findsWidgets);
     });

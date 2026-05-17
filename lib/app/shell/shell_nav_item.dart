@@ -4,13 +4,24 @@ import 'package:flutter/material.dart';
 ///
 /// Holds the outlined + filled icon pair plus the user-facing label.
 /// Library-private to the `shell/` subtree — the parent [ShellScreen]
-/// builds the canonical 5-item list and passes the visible subset down
-/// to [ShellNavRail] / [ShellBottomBar].
+/// builds the canonical destination list and passes the visible subset
+/// down to [ShellNavRail] / [ShellBottomBar].
 class ShellNavItem {
   final IconData outlinedIcon;
   final IconData filledIcon;
   final String label;
-  const ShellNavItem(this.outlinedIcon, this.filledIcon, this.label);
+
+  /// When true this is the app's core action (#1874 — Search) and the
+  /// bottom bar renders it as a raised, primary-tinted centre button
+  /// instead of a flat tab. Exactly one visible item is primary.
+  final bool isPrimary;
+
+  const ShellNavItem(
+    this.outlinedIcon,
+    this.filledIcon,
+    this.label, {
+    this.isPrimary = false,
+  });
 }
 
 /// A small icon that bounces (scale up → settle) when [controller]

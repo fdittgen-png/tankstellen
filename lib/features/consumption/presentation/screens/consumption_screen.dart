@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/tab_switcher.dart';
@@ -246,6 +247,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
             icon: const Icon(Icons.eco_outlined),
             onPressed: () => context.push('/carbon'),
           ),
+        const SettingsAppBarAction(),
       ],
       floatingActionButton: isTrajetsTab
           // Trajets tab hides the global FAB — the "Start recording"
