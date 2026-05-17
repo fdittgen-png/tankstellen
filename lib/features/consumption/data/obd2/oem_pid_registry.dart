@@ -1,5 +1,6 @@
 import 'adapter_capability.dart';
 import 'oem_pid_table.dart';
+import 'oem_pid_tables/opel_oem_pid_table.dart';
 import 'oem_pid_tables/psa_oem_pid_table.dart';
 
 /// Registry of [OemPidTable] implementations keyed by VIN WMI prefix
@@ -65,6 +66,7 @@ class OemPidRegistry {
   factory OemPidRegistry.withDefaults() => OemPidRegistry(
         tables: const [
           PsaOemPidTable(),
+          OpelOemPidTable(),
         ],
       );
 
