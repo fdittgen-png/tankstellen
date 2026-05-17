@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 
 void main() {
@@ -337,6 +338,90 @@ void main() {
         expect(items.length, 2);
         expect((items[0] as Map)['id'], 1);
       });
+    });
+  });
+
+  group('plaintext-to-encrypted migration safety (#1686)', () {
+    late Directory tmp;
+    late HiveAesCipher cipher;
+
+    setUp(() async {
+      tmp = await Directory.systemTemp.createTemp('hive_mig_test');
+      Hive.init(tmp.path);
+      cipher = HiveAesCipher(Hive.generateSecureKey());
+    });
+
+    tearDown(() async {
+      await Hive.close();
+      if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+    });
+
+    test('migrates a plaintext box into an encrypted box, preserving '
+        'every entry', () async {
+      final plain = await Hive.openBox('mig_data');
+      await plain.put('city', 'Lyon');
+      await plain.put('count', 7);
+
+      await HiveBoxes.migrateToEncryptedForTest('mig_data', plain, cipher);
+
+      // The box is now encrypted and the data survived intact.
+      final encrypted =
+          await Hive.openBox('mig_data', encryptionCipher: cipher);
+      expect(encrypted.get('city'), 'Lyon');
+      expect(encrypted.get('count'), 7);
+      await encrypted.close();
+    });
+
+    test('an empty plaintext box migrates without error', () async {
+      final plain = await Hive.openBox('mig_empty');
+
+      await HiveBoxes.migrateToEncryptedForTest('mig_empty', plain, cipher);
+
+      final encrypted =
+          await Hive.openBox('mig_empty', encryptionCipher: cipher);
+      expect(encrypted.isEmpty, isTrue);
+      await encrypted.close();
+    });
+
+    test('HiveCorruptionException carries its detail and states the '
+        'file is kept', () {
+      const e = HiveCorruptionException('favorites failed to open');
+      expect(e.message, 'favorites failed to open');
+      expect(e.toString(), contains('favorites failed to open'));
+      expect(e.toString(), contains('not deleted'));
+    });
+  });
+
+  group('schema versioning (#1686)', () {
+    late Directory tmp;
+
+    setUp(() async {
+      tmp = await Directory.systemTemp.createTemp('hive_schema_test');
+      Hive.init(tmp.path);
+    });
+
+    tearDown(() async {
+      await Hive.close();
+      if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+    });
+
+    test('currentSchemaVersion is a positive integer', () {
+      expect(HiveBoxes.currentSchemaVersion, greaterThan(0));
+    });
+
+    test('schemaVersionOf returns null when the meta box is not open', () {
+      expect(HiveBoxes.schemaVersionOf(HiveBoxes.favorites), isNull);
+    });
+
+    test('schemaVersionOf reads a stamped version', () async {
+      final schema = await Hive.openBox<int>(HiveBoxes.boxSchema);
+      await schema.put(HiveBoxes.favorites, HiveBoxes.currentSchemaVersion);
+
+      expect(
+        HiveBoxes.schemaVersionOf(HiveBoxes.favorites),
+        HiveBoxes.currentSchemaVersion,
+      );
+      expect(HiveBoxes.schemaVersionOf(HiveBoxes.cache), isNull);
     });
   });
 }
