@@ -24,16 +24,18 @@ void main() {
       );
     }
 
-    testWidgets('renders one ChoiceChip per supported country',
+    testWidgets('renders one ChoiceChip per verified country',
         (tester) async {
       await pumpSelector(
         tester,
-        selected: Countries.all.first,
+        selected: Countries.verified.first,
         onSelect: (_) {},
       );
+      // #1828 — the picker offers only verified countries, not every
+      // registered one.
       expect(
         find.byType(ChoiceChip),
-        findsNWidgets(Countries.all.length),
+        findsNWidgets(Countries.verified.length),
       );
     });
 
@@ -57,14 +59,14 @@ void main() {
     testWidgets('forwards taps to onSelect with the chosen country',
         (tester) async {
       CountryConfig? captured;
-      // Pick a country that is NOT Countries.all.first so we know the tap
-      // changed the selection.
-      final target = Countries.all.firstWhere(
-        (c) => c.code != Countries.all.first.code,
+      // Pick a verified country that is NOT the first one so we know
+      // the tap changed the selection.
+      final target = Countries.verified.firstWhere(
+        (c) => c.code != Countries.verified.first.code,
       );
       await pumpSelector(
         tester,
-        selected: Countries.all.first,
+        selected: Countries.verified.first,
         onSelect: (c) => captured = c,
       );
       await tester.ensureVisible(find.text('${target.flag} ${target.name}'));

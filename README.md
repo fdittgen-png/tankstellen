@@ -26,7 +26,7 @@
 
 <sub>iPhone listing currently in <strong>TestFlight beta</strong> — the App Store page will populate once Apple's first-build review clears.</sub>
 
-**A free, open-source companion app for cutting the running cost of your car.** 11 countries, 23 languages, privacy-first, no ads, no tracking.
+**A free, open-source companion app for cutting the running cost of your car.** 13 countries, 23 languages, privacy-first, no ads, no tracking.
 
 Sparkilo aggregates real-time fuel prices from official government APIs, plugs into your car's OBD-II port to see how it actually drives, and keeps a tidy log of every fill-up and trip so the savings stop being theoretical.
 
@@ -53,7 +53,7 @@ Features that don't serve at least one of those three layers don't belong.
 ### Layer 1 — buying cheaper
 
 - **Real-time prices** from each country's official government data source — no scraping
-- **11 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, UK, Argentina, Australia, Mexico
+- **13 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, Luxembourg, Slovenia, UK, Argentina, Australia, Mexico
 - **23 languages** — from Bulgarian to Swedish
 - **Route-aware search** — uniform / cheapest / balanced strategies, "best stops" along a planned trip
 - **Cross-border suggestions** — when the next country over is meaningfully cheaper, the app says so
