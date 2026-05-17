@@ -22,17 +22,24 @@ const FlexSchemeColor _forestGreen = FlexSchemeColor(
 class AppTheme {
   AppTheme._();
 
-  /// Default light theme (#1757) — calm forest green. Surfaces are a
-  /// soft green-tinted off-white rather than stark white, and the
-  /// accent is the icon's forest green, for a professional,
-  /// low-contrast feel.
+  /// Default light theme (#1757, retuned #1887) — calm forest green.
+  ///
+  /// #1887 — the previous tuning still read as a generic bright-day
+  /// light theme with a stark dark-green accent. The surface
+  /// green-tint is raised well up (`blendLevel` 14 → 26) so every
+  /// surface — scaffold, cards, chrome — is a deliberate soft
+  /// sage-green-tinted off-white. That carries the brand identity
+  /// across the whole app *and* narrows the jarring gap between the
+  /// forest-green filled surfaces and their background, so the accent
+  /// reads as part of a green family rather than a high-contrast
+  /// stamp on white. The forest-green accent itself is unchanged.
   static ThemeData light() {
     return FlexThemeData.light(
       colors: _forestGreen,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-      blendLevel: 14,
+      blendLevel: 26,
       subThemesData: const FlexSubThemesData(
-        blendOnLevel: 12,
+        blendOnLevel: 18,
         blendOnColors: false,
         useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
@@ -47,12 +54,16 @@ class AppTheme {
   }
 
   /// Dark theme — the forest-green palette adjusted for a dark surface,
-  /// kept coherent with [light] (#1757).
+  /// kept coherent with [light] (#1757, retuned #1887).
+  ///
+  /// #1887 — the surface green-tint is lifted (`blendLevel` 16 → 22)
+  /// in step with [light], so the dark surfaces carry the same
+  /// deliberate green identity rather than reading as neutral charcoal.
   static ThemeData dark() {
     return FlexThemeData.dark(
       colors: _forestGreen.toDark(28),
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-      blendLevel: 16,
+      blendLevel: 22,
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 20,
         useMaterial3Typography: true,
