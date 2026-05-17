@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Kartta ei käytettävissä",
+  "routeNameHintExample": "esim. Pariisi → Lyon",
+  "priceStatsCurrent": "Nykyinen",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig-API-avain",
+  "openChargeMapApiKeyLabel": "OpenChargeMap-API-avain",
+  "tapToUpdateGpsPosition": "Päivitä GPS-sijainti napauttamalla",
+  "nameLabel": "Nimi"
 }

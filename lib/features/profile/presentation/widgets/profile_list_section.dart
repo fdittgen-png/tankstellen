@@ -125,9 +125,9 @@ class ProfileListSection extends ConsumerWidget {
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Name',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.nameLabel ?? 'Name',
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [

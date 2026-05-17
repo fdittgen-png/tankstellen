@@ -3256,6 +3256,27 @@ class AppLocalizationsSk extends AppLocalizations {
       'Synchronizácia s cloudom naprieč vašimi zariadeniami';
 
   @override
+  String get mapUnavailable => 'Mapa nie je k dispozícii';
+
+  @override
+  String get routeNameHintExample => 'napr. Paríž → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Aktuálna';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Kľúč API Tankerkoenig';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'Kľúč API OpenChargeMap';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Ťuknutím aktualizujete polohu GPS';
+
+  @override
+  String get nameLabel => 'Názov';
+
+  @override
   String get achievementSmoothDriver => 'Séria plynulej jazdy';
 
   @override

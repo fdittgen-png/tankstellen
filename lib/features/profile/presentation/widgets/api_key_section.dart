@@ -162,9 +162,10 @@ class ApiKeySection extends ConsumerWidget {
         title: Text(AppLocalizations.of(context)?.fuelPricesApiKey ?? 'Fuel prices API Key'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Tankerkoenig API Key',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.tankerkoenigApiKeyLabel ??
+                'Tankerkoenig API Key',
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
@@ -200,9 +201,10 @@ class ApiKeySection extends ConsumerWidget {
         title: Text(AppLocalizations.of(context)?.evChargingApiKey ?? 'EV Charging API Key'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'OpenChargeMap API Key',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.openChargeMapApiKeyLabel ??
+                'OpenChargeMap API Key',
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [

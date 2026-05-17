@@ -1267,5 +1267,12 @@
   "discardChangesBody": "Du hast nicht gespeicherte Änderungen. Wenn du jetzt gehst, gehen sie verloren.",
   "discardChangesConfirm": "Verwerfen",
   "discardChangesKeepEditing": "Weiter bearbeiten",
-  "tankSyncSectionSubtitle": "Cloud-Synchronisierung über deine Geräte hinweg"
+  "tankSyncSectionSubtitle": "Cloud-Synchronisierung über deine Geräte hinweg",
+  "mapUnavailable": "Karte nicht verfügbar",
+  "routeNameHintExample": "z. B. Paris → Lyon",
+  "priceStatsCurrent": "Aktuell",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig-API-Schlüssel",
+  "openChargeMapApiKeyLabel": "OpenChargeMap-API-Schlüssel",
+  "tapToUpdateGpsPosition": "Zum Aktualisieren der GPS-Position tippen",
+  "nameLabel": "Name"
 }

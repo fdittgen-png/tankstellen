@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Karta nije dostupna",
+  "routeNameHintExample": "npr. Pariz → Lyon",
+  "priceStatsCurrent": "Trenutačno",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig API ključ",
+  "openChargeMapApiKeyLabel": "OpenChargeMap API ključ",
+  "tapToUpdateGpsPosition": "Dodirnite za ažuriranje GPS položaja",
+  "nameLabel": "Naziv"
 }

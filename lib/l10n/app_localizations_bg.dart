@@ -3265,6 +3265,28 @@ class AppLocalizationsBg extends AppLocalizations {
       'Облачна синхронизация между устройствата ви';
 
   @override
+  String get mapUnavailable => 'Картата е недостъпна';
+
+  @override
+  String get routeNameHintExample => 'напр. Париж → Лион';
+
+  @override
+  String get priceStatsCurrent => 'Текуща';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'API ключ за Tankerkoenig';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'API ключ за OpenChargeMap';
+
+  @override
+  String get tapToUpdateGpsPosition =>
+      'Докоснете, за да актуализирате GPS позицията';
+
+  @override
+  String get nameLabel => 'Име';
+
+  @override
   String get achievementSmoothDriver => 'Серия от плавно шофиране';
 
   @override

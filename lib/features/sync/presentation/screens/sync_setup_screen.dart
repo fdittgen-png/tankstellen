@@ -142,7 +142,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: _onBack,
-        tooltip: 'Back',
+        tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
       ),
       bodyPadding: EdgeInsets.zero,
       body: AnimatedSwitcher(

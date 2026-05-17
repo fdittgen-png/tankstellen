@@ -3256,6 +3256,28 @@ class AppLocalizationsLt extends AppLocalizations {
       'Debesų sinchronizavimas visuose įrenginiuose';
 
   @override
+  String get mapUnavailable => 'Žemėlapis nepasiekiamas';
+
+  @override
+  String get routeNameHintExample => 'pvz. Paryžius → Lionas';
+
+  @override
+  String get priceStatsCurrent => 'Dabartinė';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API raktas';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API raktas';
+
+  @override
+  String get tapToUpdateGpsPosition =>
+      'Bakstelėkite, kad atnaujintumėte GPS padėtį';
+
+  @override
+  String get nameLabel => 'Pavadinimas';
+
+  @override
   String get achievementSmoothDriver => 'Sklandaus vairavimo serija';
 
   @override

@@ -3258,6 +3258,28 @@ class AppLocalizationsLv extends AppLocalizations {
       'Mākoņa sinhronizācija starp jūsu ierīcēm';
 
   @override
+  String get mapUnavailable => 'Karte nav pieejama';
+
+  @override
+  String get routeNameHintExample => 'piem. Parīze → Liona';
+
+  @override
+  String get priceStatsCurrent => 'Pašreizējā';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API atslēga';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API atslēga';
+
+  @override
+  String get tapToUpdateGpsPosition =>
+      'Pieskarieties, lai atjauninātu GPS pozīciju';
+
+  @override
+  String get nameLabel => 'Nosaukums';
+
+  @override
   String get achievementSmoothDriver => 'Maigā braukšana sērijā';
 
   @override

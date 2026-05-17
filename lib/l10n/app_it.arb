@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Mappa non disponibile",
+  "routeNameHintExample": "es. Parigi → Lione",
+  "priceStatsCurrent": "Attuale",
+  "tankerkoenigApiKeyLabel": "Chiave API Tankerkoenig",
+  "openChargeMapApiKeyLabel": "Chiave API OpenChargeMap",
+  "tapToUpdateGpsPosition": "Tocca per aggiornare la posizione GPS",
+  "nameLabel": "Nome"
 }

@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Karte nav pieejama",
+  "routeNameHintExample": "piem. Parīze → Liona",
+  "priceStatsCurrent": "Pašreizējā",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig API atslēga",
+  "openChargeMapApiKeyLabel": "OpenChargeMap API atslēga",
+  "tapToUpdateGpsPosition": "Pieskarieties, lai atjauninātu GPS pozīciju",
+  "nameLabel": "Nosaukums"
 }

@@ -3237,6 +3237,27 @@ class AppLocalizationsNb extends AppLocalizations {
       'Skysynkronisering på tvers av enhetene dine';
 
   @override
+  String get mapUnavailable => 'Kart utilgjengelig';
+
+  @override
+  String get routeNameHintExample => 'f.eks. Paris → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Nåværende';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API-nøkkel';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API-nøkkel';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Trykk for å oppdatere GPS-posisjon';
+
+  @override
+  String get nameLabel => 'Navn';
+
+  @override
   String get achievementSmoothDriver => 'Jevn kjørerekke';
 
   @override

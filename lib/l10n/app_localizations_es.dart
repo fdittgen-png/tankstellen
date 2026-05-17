@@ -3260,6 +3260,27 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sincronización en la nube entre tus dispositivos';
 
   @override
+  String get mapUnavailable => 'Mapa no disponible';
+
+  @override
+  String get routeNameHintExample => 'p. ej. París → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Actual';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Clave de API de Tankerkoenig';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'Clave de API de OpenChargeMap';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Toca para actualizar la posición GPS';
+
+  @override
+  String get nameLabel => 'Nombre';
+
+  @override
   String get achievementSmoothDriver => 'Racha suave';
 
   @override

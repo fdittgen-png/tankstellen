@@ -79,7 +79,7 @@ class LocationSectionWidget extends ConsumerWidget {
                     size: 16, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Tap to update GPS position',
+                  l?.tapToUpdateGpsPosition ?? 'Tap to update GPS position',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.primary,
                   ),

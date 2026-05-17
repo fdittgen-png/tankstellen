@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Kaart niet beschikbaar",
+  "routeNameHintExample": "bijv. Parijs → Lyon",
+  "priceStatsCurrent": "Huidig",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig API-sleutel",
+  "openChargeMapApiKeyLabel": "OpenChargeMap API-sleutel",
+  "tapToUpdateGpsPosition": "Tik om GPS-positie bij te werken",
+  "nameLabel": "Naam"
 }

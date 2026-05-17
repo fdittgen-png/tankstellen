@@ -1268,6 +1268,13 @@
   "discardChangesConfirm": "Verwerfen",
   "discardChangesKeepEditing": "Weiter bearbeiten",
   "tankSyncSectionSubtitle": "Cloud-Synchronisierung über deine Geräte hinweg",
+  "mapUnavailable": "Karte nicht verfügbar",
+  "routeNameHintExample": "z. B. Paris → Lyon",
+  "priceStatsCurrent": "Aktuell",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig-API-Schlüssel",
+  "openChargeMapApiKeyLabel": "OpenChargeMap-API-Schlüssel",
+  "tapToUpdateGpsPosition": "Zum Aktualisieren der GPS-Position tippen",
+  "nameLabel": "Name",
   "achievementSmoothDriver": "Ruhige Serie",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."

@@ -3224,6 +3224,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
+  String get mapUnavailable => 'Map unavailable';
+
+  @override
+  String get routeNameHintExample => 'e.g. Paris → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Current';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API Key';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API Key';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Tap to update GPS position';
+
+  @override
+  String get nameLabel => 'Name';
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override
@@ -8455,6 +8476,28 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tankSyncSectionSubtitle =>
       '⟦Çłóúđ šýñç áçřóšš ýóúř đéṽîçéš ············⟧';
+
+  @override
+  String get mapUnavailable => '⟦Ṁáƥ úñáṽáîłáƀłé ······⟧';
+
+  @override
+  String get routeNameHintExample => '⟦é.ǧ. Ƥářîš → Łýóñ ·····⟧';
+
+  @override
+  String get priceStatsCurrent => '⟦Çúřřéñŧ ···⟧';
+
+  @override
+  String get tankerkoenigApiKeyLabel => '⟦Ŧáñķéřķóéñîǧ ÁƤÎ Ķéý ········⟧';
+
+  @override
+  String get openChargeMapApiKeyLabel => '⟦ÓƥéñÇĥářǧéṀáƥ ÁƤÎ Ķéý ·········⟧';
+
+  @override
+  String get tapToUpdateGpsPosition =>
+      '⟦Ŧáƥ ŧó úƥđáŧé ǦƤŠ ƥóšîŧîóñ ··········⟧';
+
+  @override
+  String get nameLabel => '⟦Ñáɱé ··⟧';
 
   @override
   String get achievementSmoothDriver => '⟦Šɱóóŧĥ šŧřéáķ ·····⟧';

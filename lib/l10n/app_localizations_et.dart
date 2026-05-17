@@ -3235,6 +3235,27 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tankSyncSectionSubtitle => 'Pilvsünkroonimine sinu seadmetes';
 
   @override
+  String get mapUnavailable => 'Kaart pole saadaval';
+
+  @override
+  String get routeNameHintExample => 'nt Pariis → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Praegune';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenigi API-võti';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMapi API-võti';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Puudutage GPS-asukoha värskendamiseks';
+
+  @override
+  String get nameLabel => 'Nimi';
+
+  @override
   String get achievementSmoothDriver => 'Sujuv seeria';
 
   @override

@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "Hartă indisponibilă",
+  "routeNameHintExample": "de ex. Paris → Lyon",
+  "priceStatsCurrent": "Curent",
+  "tankerkoenigApiKeyLabel": "Cheie API Tankerkoenig",
+  "openChargeMapApiKeyLabel": "Cheie API OpenChargeMap",
+  "tapToUpdateGpsPosition": "Atingeți pentru a actualiza poziția GPS",
+  "nameLabel": "Nume"
 }

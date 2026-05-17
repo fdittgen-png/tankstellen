@@ -1639,5 +1639,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapUnavailable": "A térkép nem érhető el",
+  "routeNameHintExample": "pl. Párizs → Lyon",
+  "priceStatsCurrent": "Jelenlegi",
+  "tankerkoenigApiKeyLabel": "Tankerkoenig API-kulcs",
+  "openChargeMapApiKeyLabel": "OpenChargeMap API-kulcs",
+  "tapToUpdateGpsPosition": "Koppintson a GPS-pozíció frissítéséhez",
+  "nameLabel": "Név"
 }

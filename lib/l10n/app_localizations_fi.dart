@@ -3240,6 +3240,27 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tankSyncSectionSubtitle => 'Pilvisynkronointi laitteidesi välillä';
 
   @override
+  String get mapUnavailable => 'Kartta ei käytettävissä';
+
+  @override
+  String get routeNameHintExample => 'esim. Pariisi → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Nykyinen';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig-API-avain';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap-API-avain';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Päivitä GPS-sijainti napauttamalla';
+
+  @override
+  String get nameLabel => 'Nimi';
+
+  @override
   String get achievementSmoothDriver => 'Tasainen putki';
 
   @override

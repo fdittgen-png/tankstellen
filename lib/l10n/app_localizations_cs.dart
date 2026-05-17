@@ -3249,6 +3249,27 @@ class AppLocalizationsCs extends AppLocalizations {
       'Cloudová synchronizace napříč zařízeními';
 
   @override
+  String get mapUnavailable => 'Mapa není k dispozici';
+
+  @override
+  String get routeNameHintExample => 'např. Paříž → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Aktuální';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Klíč API Tankerkoenig';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'Klíč API OpenChargeMap';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Klepnutím aktualizujete polohu GPS';
+
+  @override
+  String get nameLabel => 'Název';
+
+  @override
   String get achievementSmoothDriver => 'Série plynulé jízdy';
 
   @override

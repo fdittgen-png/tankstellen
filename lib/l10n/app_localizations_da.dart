@@ -3238,6 +3238,27 @@ class AppLocalizationsDa extends AppLocalizations {
       'Cloud-synkronisering på tværs af dine enheder';
 
   @override
+  String get mapUnavailable => 'Kort utilgængeligt';
+
+  @override
+  String get routeNameHintExample => 'f.eks. Paris → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Aktuel';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API-nøgle';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API-nøgle';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Tryk for at opdatere GPS-position';
+
+  @override
+  String get nameLabel => 'Navn';
+
+  @override
   String get achievementSmoothDriver => 'Blød stræk';
 
   @override

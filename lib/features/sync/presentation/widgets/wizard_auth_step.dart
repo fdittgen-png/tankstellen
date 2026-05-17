@@ -75,20 +75,20 @@ class WizardAuthStep extends StatelessWidget {
           const SizedBox(height: 16),
           TextField(
             controller: emailController,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.email),
+            decoration: InputDecoration(
+              labelText: l10n?.authEmailLabel ?? 'Email',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.email),
             ),
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 12),
           TextField(
             controller: passwordController,
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.lock),
+            decoration: InputDecoration(
+              labelText: l10n?.authPasswordLabel ?? 'Password',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.lock),
             ),
             obscureText: true,
             onChanged: (_) => onPasswordChanged?.call(),

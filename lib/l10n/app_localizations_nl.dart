@@ -3253,6 +3253,27 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tankSyncSectionSubtitle => 'Cloudsync op al je apparaten';
 
   @override
+  String get mapUnavailable => 'Kaart niet beschikbaar';
+
+  @override
+  String get routeNameHintExample => 'bijv. Parijs → Lyon';
+
+  @override
+  String get priceStatsCurrent => 'Huidig';
+
+  @override
+  String get tankerkoenigApiKeyLabel => 'Tankerkoenig API-sleutel';
+
+  @override
+  String get openChargeMapApiKeyLabel => 'OpenChargeMap API-sleutel';
+
+  @override
+  String get tapToUpdateGpsPosition => 'Tik om GPS-positie bij te werken';
+
+  @override
+  String get nameLabel => 'Naam';
+
+  @override
   String get achievementSmoothDriver => 'Soepele reeks';
 
   @override
