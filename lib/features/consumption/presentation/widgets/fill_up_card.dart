@@ -69,7 +69,13 @@ class FillUpCard extends StatelessWidget {
     final isVerifiedByAdapter = FillUpVariance.hasAdapterCapture(fillUp);
 
     final card = Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      // #1891 — a correction is a system-generated adjustment, not a
+      // real fill-up: it sits tighter so the actual fill-ups dominate
+      // the list.
+      margin: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: isCorrection ? 2 : 4,
+      ),
       // The outline gives a 4 px left border via shape; we paint the
       // rest of the card normally. Using `Card.shape` keeps the
       // material elevation/ink ripple intact (vs. wrapping in a
@@ -87,12 +93,19 @@ class FillUpCard extends StatelessWidget {
           : null,
       child: ListTile(
         onTap: onTap,
+        // #1891 — corrections render as a compact row; real fill-ups
+        // keep the full-size ListTile.
+        dense: isCorrection,
+        visualDensity:
+            isCorrection ? VisualDensity.compact : VisualDensity.standard,
         leading: CircleAvatar(
+          radius: isCorrection ? 16 : 20,
           backgroundColor: isCorrection
               ? correctionColor
               : theme.colorScheme.primaryContainer,
           child: Icon(
             isCorrection ? Icons.auto_fix_high : Icons.local_gas_station,
+            size: isCorrection ? 18 : 24,
             color: isCorrection
                 ? Colors.white
                 : theme.colorScheme.onPrimaryContainer,
@@ -102,8 +115,12 @@ class FillUpCard extends StatelessWidget {
           fillUp.stationName ?? fillUp.fuelType.apiValue.toUpperCase(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.titleSmall
-              ?.copyWith(fontWeight: FontWeight.bold),
+          // Corrections get lighter, smaller title type — they are
+          // secondary to the real fill-ups.
+          style: isCorrection
+              ? theme.textTheme.bodyMedium
+              : theme.textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
