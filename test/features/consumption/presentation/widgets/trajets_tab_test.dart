@@ -791,8 +791,9 @@ void main() {
 
         expect(find.text('Start recording'), findsOneWidget);
         expect(find.text('Resume recording'), findsNothing);
-        // FilledButton.icon renders the dot when no trip is active.
-        final button = tester.widget<FilledButton>(
+        // #1889 — the CTA is an extended FAB (matching the fuel tab's
+        // "add" button) and is enabled when no trip is active.
+        final button = tester.widget<FloatingActionButton>(
           find.byKey(const Key('trajets_start_recording_button')),
         );
         expect(button.onPressed, isNotNull);
