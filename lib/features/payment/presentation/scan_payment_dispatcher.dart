@@ -178,7 +178,7 @@ class ScanPaymentDispatcher {
       if (epc.iban != null && epc.iban!.isNotEmpty)
         ListTile(
           dense: true,
-          title: const Text('IBAN'),
+          title: const Text('IBAN'), // i18n-ignore: standardised banking acronym (language-neutral)
           subtitle: Text(epc.iban!),
         ),
       if (epc.amountEur != null)

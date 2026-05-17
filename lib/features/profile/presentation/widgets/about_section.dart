@@ -57,7 +57,7 @@ class AboutSection extends StatelessWidget {
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.code),
-            title: const Text('GitHub'),
+            title: const Text('GitHub'), // i18n-ignore: brand / proper noun
             subtitle: const Text('fdittgen-png/tankstellen'),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.githubRepoUrl),
@@ -100,7 +100,7 @@ class AboutSection extends StatelessWidget {
           ListTile(
             leading:
                 const Icon(Icons.payment, color: Color(0xFF003087)),
-            title: const Text('PayPal'),
+            title: const Text('PayPal'), // i18n-ignore: brand / proper noun
             subtitle: const Text('paypal.me/FlorianDITTGEN'),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.paypalUrl),
@@ -110,7 +110,7 @@ class AboutSection extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.account_balance_wallet,
                 color: Color(0xFF0075EB)),
-            title: const Text('Revolut'),
+            title: const Text('Revolut'), // i18n-ignore: brand / proper noun
             subtitle: const Text('revolut.me/floriamcep'),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.revolutUrl),
