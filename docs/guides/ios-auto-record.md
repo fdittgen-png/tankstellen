@@ -319,12 +319,16 @@ shippable:
       forward the option (verified by reading the FBP changelog).
       Major-version migration; budget a half-day for breaking-API
       cleanup in `lib/features/consumption/data/obd2/`.
-- [ ] **MFi adapter decision.** Are we adding an External Accessory
-      / classic-BT path for vLinker FS / OBDLink MX+, or restricting
-      iOS users to BLE adapters only? Document the decision in
-      docs/guides/obd2-adapters.md once it lands.
+- [x] **MFi adapter decision.** Resolved (#1542 phase 8): iOS is
+      BLE-only — Classic-BT ELM327 adapters are not MFi-certified, so
+      an External Accessory path is not buildable for them. No
+      classic-BT path is added; the decision + rationale is documented
+      under "Platform support — iOS vs Android" in
+      docs/guides/obd2-adapters.md.
 - [ ] **On-device verification spike.** Real iPhone + real BLE ELM327.
       Acceptance script in "Phase 5 — Device-test acceptance" above.
-- [ ] **Localise the onboarding copy** (block above) into the 23
-      locales the app already supports. ARB pass; no Dart needed
-      until the screen widget is wired.
+- [x] **Localise the onboarding copy** (block above) — done. The
+      `OnboardingIosStandbyStep` widget is wired into the onboarding
+      wizard and the `iosAutoRecordOnboarding*` ARB keys are present
+      across all supported locales (guarded by
+      `test/l10n/localization_completeness_test.dart`).

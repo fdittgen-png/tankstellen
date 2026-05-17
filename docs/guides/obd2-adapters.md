@@ -48,6 +48,31 @@ Each adapter row carries one of three states, sourced from the
   GATT profile / SPP transport is correct, but if you have one and
   it works (or doesn't), please open an issue so we can promote it.
 
+## Platform support — iOS vs Android (#1542 phase 8)
+
+**iOS supports BLE adapters only.** The `Transport` column in the
+table below distinguishes `BLE` from `Classic BT`:
+
+- **BLE** adapters work on **both Android and iOS**.
+- **Classic BT** (Bluetooth SPP) adapters work on **Android only**.
+
+This is an Apple platform constraint, not a project limitation. iOS
+does not let a third-party app open a Classic-Bluetooth SPP
+connection to an arbitrary device — the accessory must be
+MFi-certified and the app must talk to it through the External
+Accessory framework under Apple's Made-for-iPhone programme. ELM327
+Classic-BT adapters (vLinker FS, the BM-Android variant, BAFX,
+Konnwei, the generic SPP clones) are not MFi-certified, so **no
+amount of app-side work can reach them on iOS** — an External
+Accessory path is not buildable for these adapters.
+
+**Decision (#1542 phase 8):** iOS ships BLE-only adapter support;
+no External Accessory / classic-BT path is added. `flutter_blue_plus`
+on iOS surfaces only BLE peripherals, so the in-app adapter picker
+already shows the right subset with no platform branch. iOS users
+should buy a **BLE** adapter — e.g. vLinker FD/MC, OBDLink
+MX+/LX/CX, Veepeak BLE+, or any generic FFF0 ELM327 BLE clone.
+
 ## Supported adapters
 
 | Display name | Transport | Name matchers | Compatibility | Buy |
