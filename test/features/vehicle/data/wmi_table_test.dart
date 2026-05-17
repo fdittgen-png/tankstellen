@@ -148,4 +148,29 @@ void main() {
       }
     });
   });
+
+  group('wmi table coverage (#1627)', () {
+    test('the table ships the expanded fleet coverage (>= 250 WMIs)', () {
+      // #1627 grew the table from ~80 to broad real-world coverage.
+      // The floor only ratchets up.
+      expect(wmiTable.length, greaterThanOrEqualTo(250));
+    });
+
+    test('every WMI key is a valid 3-char VIN prefix', () {
+      // ISO 3779 excludes I / O / Q from the VIN alphabet.
+      final valid = RegExp(r'^[A-HJ-NPR-Z0-9]{3}$');
+      for (final key in wmiTable.keys) {
+        expect(valid.hasMatch(key), isTrue,
+            reason: '"$key" is not a valid 3-char WMI prefix');
+      }
+    });
+
+    test('previously vPIC-weak EU makes resolve offline (#1399)', () {
+      // #1399 flagged Dacia / Škoda / Opel as weak on vPIC — they must
+      // resolve from the offline table.
+      expect(lookup('UU1ABCDEFGH123456')?.brand, 'Dacia');
+      expect(lookup('TMBZZZ1234X123456')?.brand, 'Skoda');
+      expect(lookup('W0LZZZ1234X123456')?.brand, 'Opel');
+    });
+  });
 }
