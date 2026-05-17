@@ -244,6 +244,11 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                             EVStationResult() => EVStationCard(
                                 key: ValueKey('ev-${item.id}'),
                                 result: item,
+                                isFavorite: isFav,
+                                onFavoriteTap: () => ref
+                                    .read(favoritesProvider.notifier)
+                                    .toggle(item.id,
+                                        rawJson: item.station.toJson()),
                                 onTap: () => context.push('/ev-station',
                                     extra: item.station),
                               ),

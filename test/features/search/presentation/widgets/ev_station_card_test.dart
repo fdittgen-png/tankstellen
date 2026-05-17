@@ -129,5 +129,46 @@ void main() {
 
       expect(find.text('--'), findsOneWidget);
     });
+
+    group('favourite star (#1896)', () {
+      testWidgets('no star when onFavoriteTap is null', (tester) async {
+        await pumpApp(
+          tester,
+          const EVStationCard(result: EVStationResult(testStation)),
+        );
+        expect(find.byIcon(Icons.star), findsNothing);
+        expect(find.byIcon(Icons.star_border), findsNothing);
+      });
+
+      testWidgets('outlined star when not favourited; tap fires the callback',
+          (tester) async {
+        var tapped = 0;
+        await pumpApp(
+          tester,
+          EVStationCard(
+            result: const EVStationResult(testStation),
+            onFavoriteTap: () => tapped++,
+          ),
+        );
+        expect(find.byIcon(Icons.star_border), findsOneWidget);
+        expect(find.byIcon(Icons.star), findsNothing);
+
+        await tester.tap(find.byIcon(Icons.star_border));
+        expect(tapped, 1);
+      });
+
+      testWidgets('filled star when favourited', (tester) async {
+        await pumpApp(
+          tester,
+          EVStationCard(
+            result: const EVStationResult(testStation),
+            isFavorite: true,
+            onFavoriteTap: () {},
+          ),
+        );
+        expect(find.byIcon(Icons.star), findsOneWidget);
+        expect(find.byIcon(Icons.star_border), findsNothing);
+      });
+    });
   });
 }
