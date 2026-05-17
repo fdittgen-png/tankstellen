@@ -13,10 +13,18 @@ class EVStationCard extends StatelessWidget {
   final EVStationResult result;
   final VoidCallback? onTap;
 
+  /// Whether this charging station is favourited (#1896). When
+  /// [onFavoriteTap] is non-null the card renders a favourite star,
+  /// matching the fuel result cards.
+  final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
+
   const EVStationCard({
     super.key,
     required this.result,
     this.onTap,
+    this.isFavorite = false,
+    this.onFavoriteTap,
   });
 
   @override
@@ -152,6 +160,17 @@ class EVStationCard extends StatelessWidget {
                   EvConnectorChips(connectors: connectors),
                 ],
               ),
+              // #1896 — favourite star, matching the fuel result cards.
+              if (onFavoriteTap != null)
+                IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.star : Icons.star_border,
+                  ),
+                  color: isFavorite ? DarkModeColors.warning(context) : null,
+                  tooltip: l10n?.favorites ?? 'Favorites',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: onFavoriteTap,
+                ),
             ],
           ),
         ),

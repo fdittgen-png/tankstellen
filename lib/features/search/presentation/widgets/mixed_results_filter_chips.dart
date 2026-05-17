@@ -8,14 +8,17 @@ import '../../domain/entities/search_result_item.dart';
 import '../../providers/mixed_results_filter_provider.dart';
 import '../../providers/search_provider.dart';
 
-/// Filter chips for the unified fuel + EV results list (#1784):
-/// a Fuel / EV / Both kind selector, and — when EV rows are in the
-/// list — EV connector-type and minimum-power filters.
+/// EV connector-type and minimum-power filter chips for the search
+/// results list (#1784).
 ///
-/// The EV filter row is hidden when there are no EV results, or when
-/// the user has narrowed the list to Fuel-only, so it never shows
-/// filters that cannot affect anything. Only connector types actually
-/// present in the result set get a chip.
+/// Renders nothing unless the result set contains EV rows with at
+/// least one connector type — so it never shows filters that cannot
+/// affect anything. Only connector types actually present in the
+/// result set get a chip.
+///
+/// #1896 — the old Fuel / EV / Both *kind* selector is gone: since
+/// #1866 a search is strictly fuel **or** EV, so the result set is
+/// always single-kind and a kind selector could never do anything.
 class MixedResultsFilterChips extends ConsumerWidget {
   const MixedResultsFilterChips({super.key});
 
@@ -25,7 +28,6 @@ class MixedResultsFilterChips extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final kind = ref.watch(resultKindFilterProvider);
     final connectorFilter = ref.watch(evConnectorFilterProvider);
     final minPower = ref.watch(evMinPowerFilterProvider);
 
@@ -33,89 +35,48 @@ class MixedResultsFilterChips extends ConsumerWidget {
     // so the offered chips stay stable as the user toggles filters.
     final rawItems =
         ref.watch(searchStateProvider).value?.data ?? const <SearchResultItem>[];
-    // No EV rows at all (a fuel-only search) → the kind selector and
-    // EV filters have nothing to act on; render nothing.
-    if (!rawItems.any((i) => i is EVStationResult)) {
-      return const SizedBox.shrink();
-    }
 
     final availableConnectors = <ConnectorType>{
       for (final item in rawItems)
         if (item is EVStationResult)
           ...item.station.connectors.map((c) => c.type),
     };
+    // No EV rows / no connectors → nothing to filter.
+    if (availableConnectors.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    final showEvFilters =
-        kind != ResultKind.fuel && availableConnectors.isNotEmpty;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: Row(
-            children: [
-              _chip(
-                label: l10n?.unifiedFilterBoth ?? 'Both',
-                selected: kind == ResultKind.both,
-                onSelected: () => ref
-                    .read(resultKindFilterProvider.notifier)
-                    .set(ResultKind.both),
-              ),
-              const SizedBox(width: 6),
-              _chip(
-                label: l10n?.unifiedFilterFuel ?? 'Fuel',
-                selected: kind == ResultKind.fuel,
-                onSelected: () => ref
-                    .read(resultKindFilterProvider.notifier)
-                    .set(ResultKind.fuel),
-              ),
-              const SizedBox(width: 6),
-              _chip(
-                label: l10n?.unifiedFilterEv ?? 'EV',
-                selected: kind == ResultKind.ev,
-                onSelected: () => ref
-                    .read(resultKindFilterProvider.notifier)
-                    .set(ResultKind.ev),
-              ),
-            ],
-          ),
-        ),
-        if (showEvFilters)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
-            child: Row(
-              children: [
-                for (final preset in _powerPresets) ...[
-                  _chip(
-                    label: preset == 0
-                        ? (l10n?.evPowerAny ?? 'Any')
-                        : (l10n?.evPowerKw(preset.round()) ??
-                            '${preset.round()} kW+'),
-                    selected: minPower == preset,
-                    onSelected: () => ref
-                        .read(evMinPowerFilterProvider.notifier)
-                        .set(preset),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                for (final type in ConnectorType.values)
-                  if (availableConnectors.contains(type)) ...[
-                    _chip(
-                      label: _connectorLabel(type, l10n),
-                      selected: connectorFilter.contains(type),
-                      onSelected: () => ref
-                          .read(evConnectorFilterProvider.notifier)
-                          .toggle(type),
-                    ),
-                    const SizedBox(width: 6),
-                  ],
-              ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        children: [
+          for (final preset in _powerPresets) ...[
+            _chip(
+              label: preset == 0
+                  ? (l10n?.evPowerAny ?? 'Any')
+                  : (l10n?.evPowerKw(preset.round()) ??
+                      '${preset.round()} kW+'),
+              selected: minPower == preset,
+              onSelected: () => ref
+                  .read(evMinPowerFilterProvider.notifier)
+                  .set(preset),
             ),
-          ),
-      ],
+            const SizedBox(width: 6),
+          ],
+          for (final type in ConnectorType.values)
+            if (availableConnectors.contains(type)) ...[
+              _chip(
+                label: _connectorLabel(type, l10n),
+                selected: connectorFilter.contains(type),
+                onSelected: () => ref
+                    .read(evConnectorFilterProvider.notifier)
+                    .toggle(type),
+              ),
+              const SizedBox(width: 6),
+            ],
+        ],
+      ),
     );
   }
 
