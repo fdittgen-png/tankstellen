@@ -7,7 +7,6 @@ import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_settings_section.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
-import 'package:tankstellen/features/glide_coach/data/traffic_signal_repository.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/gamification_settings_tile.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
@@ -175,8 +174,8 @@ void main() {
   );
 
   testWidgets(
-    'glide-coach beta toggle stays invisible while the master flag '
-    'kGlideCoachEnabled is false (#1125 phase 3b)',
+    'glide-coach beta toggle stays invisible while Feature.glideCoach '
+    'is off by default (#1125 phase 3b / #1824)',
     (tester) async {
       await pumpApp(
         tester,
@@ -188,27 +187,15 @@ void main() {
         ],
       );
 
-      // The compile-time master flag is the user-facing safety: when
-      // it's false (production today), the entire toggle MUST stay
-      // invisible so users cannot accidentally enable a half-baked
-      // feature. Flipping the flag in a future release is the
-      // deliberate gate that makes the toggle appear.
-      expect(
-        kGlideCoachEnabled,
-        isFalse,
-        reason:
-            'This test pins the production contract. When the master '
-            'flag flips to true, replace this with a positive '
-            'findsOneWidget assertion instead of inverting it.',
-      );
+      // `_TestFeatureFlags` starts with no features enabled, so
+      // Feature.glideCoach is off — the toggle MUST stay invisible so
+      // users cannot accidentally enable a half-baked feature.
       expect(
         find.byKey(const Key('glideCoachToggle')),
         findsNothing,
         reason:
-            'kGlideCoachEnabled == false MUST hide the glide-coach '
-            'toggle entirely. Even users who would happily try the '
-            'beta cannot enable a half-baked feature until the master '
-            'flag flips after a driving-test cohort.',
+            'A disabled Feature.glideCoach MUST hide the glide-coach '
+            'toggle entirely.',
       );
     },
   );

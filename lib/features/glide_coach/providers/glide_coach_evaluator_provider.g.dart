@@ -10,14 +10,14 @@ part of 'glide_coach_evaluator_provider.dart';
 // ignore_for_file: type=lint, type=warning
 /// Provider for the glide-coach evaluator (#1125 phase 3b).
 ///
-/// Returns `null` when the compile-time master flag
-/// [`kGlideCoachEnabled`] is `false` — that's production today, and
+/// Returns `null` when [glideCoachEnabledProvider] is `false`
+/// (`Feature.glideCoach`, default-off) — that's production today, and
 /// every consumer (currently only `tripRecordingProvider`) early-outs
 /// on the null. Callers MUST treat null as "feature disabled, do
 /// nothing" rather than constructing their own evaluator; the layered
-/// kill-switch is the whole point.
+/// gate is the whole point.
 ///
-/// When the master flag is true, the provider wires:
+/// When the feature is enabled, the provider wires:
 ///   1. An [OsmTrafficSignalClient] (default Dio).
 ///   2. A [TrafficSignalRepository] backed by the
 ///      `traffic_signals_cache` Hive box (opened at startup by
@@ -39,14 +39,14 @@ final glideCoachEvaluatorProvider = GlideCoachEvaluatorProvider._();
 
 /// Provider for the glide-coach evaluator (#1125 phase 3b).
 ///
-/// Returns `null` when the compile-time master flag
-/// [`kGlideCoachEnabled`] is `false` — that's production today, and
+/// Returns `null` when [glideCoachEnabledProvider] is `false`
+/// (`Feature.glideCoach`, default-off) — that's production today, and
 /// every consumer (currently only `tripRecordingProvider`) early-outs
 /// on the null. Callers MUST treat null as "feature disabled, do
 /// nothing" rather than constructing their own evaluator; the layered
-/// kill-switch is the whole point.
+/// gate is the whole point.
 ///
-/// When the master flag is true, the provider wires:
+/// When the feature is enabled, the provider wires:
 ///   1. An [OsmTrafficSignalClient] (default Dio).
 ///   2. A [TrafficSignalRepository] backed by the
 ///      `traffic_signals_cache` Hive box (opened at startup by
@@ -73,14 +73,14 @@ final class GlideCoachEvaluatorProvider
     with $Provider<GlideCoachEvaluator?> {
   /// Provider for the glide-coach evaluator (#1125 phase 3b).
   ///
-  /// Returns `null` when the compile-time master flag
-  /// [`kGlideCoachEnabled`] is `false` — that's production today, and
+  /// Returns `null` when [glideCoachEnabledProvider] is `false`
+  /// (`Feature.glideCoach`, default-off) — that's production today, and
   /// every consumer (currently only `tripRecordingProvider`) early-outs
   /// on the null. Callers MUST treat null as "feature disabled, do
   /// nothing" rather than constructing their own evaluator; the layered
-  /// kill-switch is the whole point.
+  /// gate is the whole point.
   ///
-  /// When the master flag is true, the provider wires:
+  /// When the feature is enabled, the provider wires:
   ///   1. An [OsmTrafficSignalClient] (default Dio).
   ///   2. A [TrafficSignalRepository] backed by the
   ///      `traffic_signals_cache` Hive box (opened at startup by
@@ -131,4 +131,4 @@ final class GlideCoachEvaluatorProvider
 }
 
 String _$glideCoachEvaluatorHash() =>
-    r'e77d3eafbc0e1793f0e46d91190f16a08f24f140';
+    r'd7c577e5e6faf3c9f6a364238734ec2c284bbcc5';

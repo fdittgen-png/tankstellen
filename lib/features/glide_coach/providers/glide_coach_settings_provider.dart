@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../data/traffic_signal_repository.dart';
 import '../domain/entities/glide_coach_settings.dart';
+import 'glide_coach_enabled_provider.dart';
 
 part 'glide_coach_settings_provider.g.dart';
 
@@ -21,24 +21,21 @@ part 'glide_coach_settings_provider.g.dart';
 /// The feature has TWO independent off-switches that must both be true
 /// before any haptic fires:
 ///
-///   1. The compile-time master flag
-///      [`kGlideCoachEnabled`](../data/traffic_signal_repository.dart) —
-///      a hard kill-switch baked into the build. False in production
-///      today; flipping requires a code change + ship cycle.
+///   1. The central feature flag [Feature.glideCoach], read via
+///      [glideCoachEnabledProvider] — default-off in the manifest
+///      (#1824 migrated this off the old `kGlideCoachEnabled` const).
 ///   2. The user-facing toggle, surfaced as
 ///      [`GlideCoachSettings.enabled`] and persisted by this notifier.
 ///
-/// This notifier respects the master flag: when `kGlideCoachEnabled`
-/// is false, the resulting `enabled` value is forced to `false` even
-/// if the persisted user toggle is `true`. That guarantees a stale
-/// debug-build write (or a malicious / future schema change) cannot
-/// leak the feature on in production. The user toggle is layered on
-/// top of the master flag — never below it.
+/// This notifier respects the feature flag: when [Feature.glideCoach]
+/// is disabled, the resulting `enabled` value is forced to `false`
+/// even if the persisted user toggle is `true`. The user toggle is
+/// layered on top of the feature flag — never below it.
 ///
-/// `setEnabled(true)` will still WRITE to SharedPreferences when
-/// `kGlideCoachEnabled` is false (the value is preserved across builds
-/// so a future master-flag flip does not silently lose the user's
-/// historical opt-in), but the in-memory state stays gated.
+/// `setEnabled(true)` will still WRITE to SharedPreferences when the
+/// feature is disabled (the value is preserved so a later flag flip
+/// does not silently lose the user's historical opt-in), but the
+/// in-memory state stays gated.
 ///
 /// `setThrottleThreshold` and `setCooldown` are deliberately
 /// out-of-scope for this PR — the only UI surface in phase 3b is the
@@ -61,9 +58,9 @@ class GlideCoachSettingsNotifier extends _$GlideCoachSettingsNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final stored = prefs.getBool(prefsKey) ?? false;
-      // Master-flag wins over the persisted user toggle. See the class
-      // doc for the layered-gate rationale.
-      final effective = kGlideCoachEnabled ? stored : false;
+      // The Feature.glideCoach flag wins over the persisted user
+      // toggle. See the class doc for the layered-gate rationale.
+      final effective = ref.read(glideCoachEnabledProvider) ? stored : false;
       if (effective != state.enabled) {
         state = state.copyWith(enabled: effective);
       }
@@ -75,13 +72,13 @@ class GlideCoachSettingsNotifier extends _$GlideCoachSettingsNotifier {
   /// Flip the user-facing `enabled` toggle.
   ///
   /// Persists the requested value to SharedPreferences unconditionally
-  /// — preserving the user's historical opt-in across master-flag
+  /// — preserving the user's historical opt-in across feature-flag
   /// flips — but the in-memory `enabled` is gated by
-  /// [`kGlideCoachEnabled`]. With the master flag false (production
-  /// today) `state.enabled` stays `false` even after `setEnabled(true)`,
-  /// matching the layered-gate contract documented on the class.
+  /// [glideCoachEnabledProvider]. With [Feature.glideCoach] disabled
+  /// (production today) `state.enabled` stays `false` even after
+  /// `setEnabled(true)`, matching the layered-gate contract on the class.
   Future<void> setEnabled(bool value) async {
-    final effective = kGlideCoachEnabled ? value : false;
+    final effective = ref.read(glideCoachEnabledProvider) ? value : false;
     state = state.copyWith(enabled: effective);
     try {
       final prefs = await SharedPreferences.getInstance();

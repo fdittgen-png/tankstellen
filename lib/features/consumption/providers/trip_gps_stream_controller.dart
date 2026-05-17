@@ -8,8 +8,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../glide_coach/data/traffic_signal_repository.dart';
 import '../../glide_coach/domain/entities/glide_coach_advice.dart';
+import '../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../glide_coach/providers/glide_coach_evaluator_provider.dart';
 import '../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../data/obd2/trip_recording_controller.dart';
@@ -84,9 +84,8 @@ class TripGpsStreamController {
           );
           // #1125 phase 3b — opt-in glide-coach evaluation. The hook is
           // gated by:
-          //   1. The compile-time master flag kGlideCoachEnabled (false
-          //      in production; this branch compiles to a constant
-          //      no-op the optimiser can fully elide).
+          //   1. The central Feature.glideCoach flag (default-off in
+          //      production), read via glideCoachEnabledProvider.
           //   2. The user-facing toggle GlideCoachSettings.enabled.
           //   3. The presence of a recent throttle reading (cars
           //      without PID 0x11 — or a freshly-started trip whose
@@ -117,8 +116,8 @@ class TripGpsStreamController {
   /// Per-GPS-fix glide-coach evaluator hook (#1125 phase 3b).
   ///
   /// Layered gate (in order — each rejects the next):
-  ///   1. Compile-time `kGlideCoachEnabled` master flag. False in
-  ///      production today; the call is a constant-folded no-op.
+  ///   1. The central `Feature.glideCoach` flag (default-off in
+  ///      production), read via `glideCoachEnabledProvider`.
   ///   2. User-facing toggle from `GlideCoachSettings`.
   ///   3. Latest throttle reading from the controller's captured-sample
   ///      buffer (cars without PID 0x11 → null → evaluator returns
@@ -139,9 +138,8 @@ class TripGpsStreamController {
     TripRecordingController ctl,
     Position pos,
   ) async {
-    // Rule 1 — compile-time master flag. The constant gate makes this
-    // path constant-fold to nothing in a flag-false build.
-    if (!kGlideCoachEnabled) return;
+    // Rule 1 — the central Feature.glideCoach flag (#1824).
+    if (!_ref.read(glideCoachEnabledProvider)) return;
     try {
       // Rule 2 — user toggle. Defaults to false; even with the master
       // flag flipped, an opt-in is required.
