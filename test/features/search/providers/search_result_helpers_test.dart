@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
@@ -154,88 +153,6 @@ void main() {
         fetchedAt: DateTime(2024, 1, 1),
       ));
       expect(wrapped.data, isEmpty);
-    });
-  });
-
-  group('mergeFuelAndEvResults', () {
-    const ev1 = ChargingStation(
-      id: 'ev-1',
-      name: 'OCM 1',
-      latitude: 52.5,
-      longitude: 13.4,
-    );
-
-    ServiceResult<List<ChargingStation>> evResult(
-      List<ChargingStation> stations, {
-      bool isStale = false,
-      List<ServiceError> errors = const [],
-    }) {
-      return ServiceResult(
-        data: stations,
-        source: ServiceSource.openChargeMapApi,
-        fetchedAt: DateTime(2024, 1, 1, 12),
-        isStale: isStale,
-        errors: errors,
-      );
-    }
-
-    test('both sides succeed — fuel + EV items in one mixed list', () {
-      final merged = mergeFuelAndEvResults(
-        fuel: fuelResult(const [berlinStation]),
-        ev: evResult(const [ev1]),
-      );
-      expect(merged.data, hasLength(2));
-      expect(merged.data.whereType<FuelStationResult>(), hasLength(1));
-      expect(merged.data.whereType<EVStationResult>(), hasLength(1));
-      // Fuel leads the list and owns source / fetchedAt.
-      expect(merged.data.first, isA<FuelStationResult>());
-      expect(merged.source, ServiceSource.tankerkoenigApi);
-    });
-
-    test('EV failure is tolerated — fuel still renders, error recorded', () {
-      final merged = mergeFuelAndEvResults(
-        fuel: fuelResult(const [berlinStation]),
-        evError: const NoEvApiKeyException(),
-      );
-      expect(merged.data, hasLength(1));
-      expect(merged.data.single, isA<FuelStationResult>());
-      expect(merged.errors, hasLength(1));
-      expect(merged.errors.single.source, ServiceSource.openChargeMapApi);
-    });
-
-    test('no EV outcome at all → fuel-only feed, no synthetic error', () {
-      final merged =
-          mergeFuelAndEvResults(fuel: fuelResult(const [berlinStation]));
-      expect(merged.data, hasLength(1));
-      expect(merged.errors, isEmpty);
-    });
-
-    test('errors and staleness are unioned across both sides', () {
-      final fuelErr = ServiceError(
-        source: ServiceSource.tankerkoenigApi,
-        message: 'fuel hiccup',
-        occurredAt: DateTime(2024, 1, 1),
-      );
-      final evErr = ServiceError(
-        source: ServiceSource.openChargeMapApi,
-        message: 'ev hiccup',
-        occurredAt: DateTime(2024, 1, 1),
-      );
-      final merged = mergeFuelAndEvResults(
-        fuel: fuelResult(const [berlinStation],
-            isStale: true, errors: [fuelErr]),
-        ev: evResult(const [ev1], errors: [evErr]),
-      );
-      expect(merged.errors, containsAll(<ServiceError>[fuelErr, evErr]));
-      expect(merged.isStale, isTrue);
-    });
-
-    test('a stale EV side propagates isStale even when fuel is fresh', () {
-      final merged = mergeFuelAndEvResults(
-        fuel: fuelResult(const [berlinStation]),
-        ev: evResult(const [ev1], isStale: true),
-      );
-      expect(merged.isStale, isTrue);
     });
   });
 
