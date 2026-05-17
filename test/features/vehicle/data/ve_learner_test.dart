@@ -525,6 +525,37 @@ void main() {
       }
     });
   });
+
+  group('veConvergenceHalfWidth (#1626 convergence band)', () {
+    test('an unlearned profile (0 samples) reports the widest band', () {
+      expect(veConvergenceHalfWidth(0), 0.10);
+    });
+
+    test('the band narrows monotonically as samples accumulate', () {
+      var prev = veConvergenceHalfWidth(0);
+      for (var n = 1; n <= 30; n++) {
+        final v = veConvergenceHalfWidth(n);
+        expect(v, lessThanOrEqualTo(prev),
+            reason: 'band at $n samples ($v) must not exceed $n-1 ($prev)');
+        prev = v;
+      }
+    });
+
+    test('decays as 0.10 / (samples + 1)', () {
+      expect(veConvergenceHalfWidth(1), closeTo(0.05, 1e-9));
+      expect(veConvergenceHalfWidth(4), closeTo(0.02, 1e-9));
+    });
+
+    test('a long-calibrated profile keeps a small but non-zero band', () {
+      // Clamped floor — never implies zero uncertainty.
+      expect(veConvergenceHalfWidth(1000), 0.01);
+      expect(veConvergenceHalfWidth(9), closeTo(0.01, 1e-9));
+    });
+
+    test('a negative sample count is treated as zero (defensive)', () {
+      expect(veConvergenceHalfWidth(-5), 0.10);
+    });
+  });
 }
 
 /// In-memory trip history so the learner can exercise the time
