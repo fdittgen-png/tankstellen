@@ -94,9 +94,10 @@ class MonthlyInsightsCard extends StatelessWidget {
 
     return Card(
       key: const ValueKey('monthly_insights_card'),
-      margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      // #1893 — tighter margin/padding for Trajets-tab space efficiency.
+      margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -115,14 +116,14 @@ class MonthlyInsightsCard extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             tripsRow,
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             driveTimeRow,
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             distanceRow,
             if (consumptionRow != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               consumptionRow,
             ],
           ],
