@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
 import 'pump_display_parser.dart';
@@ -126,15 +127,45 @@ class ReceiptScanService {
     return image?.path;
   }
 
+  /// Runs ML Kit text recognition on the capture at [path].
+  ///
+  /// #1711 — `InputImage.fromFilePath` does not reliably honour a
+  /// JPEG's EXIF orientation tag, so a phone held in portrait while
+  /// photographing a landscape pump display delivered the image to the
+  /// recognizer rotated 90° — which ML Kit's general recognizer cannot
+  /// read, the dominant cause of the pump-display OCR failures. We OCR
+  /// an EXIF-upright temp copy and delete it immediately; the original
+  /// [path] is untouched for the bad-scan reporting flow.
   Future<String?> _recognise(String path) async {
+    String? uprightTemp;
     try {
-      final inputImage = InputImage.fromFilePath(path);
+      uprightTemp = await _writeUprightCopy(path);
+      final inputImage = InputImage.fromFilePath(uprightTemp ?? path);
       final recognized = await _recognizer.processImage(inputImage);
       final text = recognized.text;
       debugPrint('OCR text (${text.length} chars):\n$text');
       return text;
     } catch (e, st) {
       debugPrint('OCR scan failed: $e\n$st');
+      return null;
+    } finally {
+      if (uprightTemp != null) await _tryDelete(uprightTemp);
+    }
+  }
+
+  /// Decodes the JPEG at [path], bakes its EXIF orientation into the
+  /// pixels, and writes the upright result to a sibling temp file —
+  /// returns that temp path, or null when the image cannot be decoded
+  /// (the caller then OCRs the original unchanged).
+  Future<String?> _writeUprightCopy(String path) async {
+    try {
+      final upright = bakeImageOrientation(await File(path).readAsBytes());
+      if (upright == null) return null;
+      final tempPath = '$path.upright.jpg';
+      await File(tempPath).writeAsBytes(upright);
+      return tempPath;
+    } catch (e, st) {
+      debugPrint('OCR orientation-bake failed: $e\n$st');
       return null;
     }
   }
@@ -155,5 +186,30 @@ class ReceiptScanService {
 
   void dispose() {
     _recognizer.close();
+  }
+}
+
+/// Re-encodes [jpegBytes] with any EXIF orientation baked into the
+/// pixel data (#1711).
+///
+/// A camera capture stores the raw sensor orientation plus an EXIF tag
+/// describing how to rotate it for display. ML Kit's
+/// `InputImage.fromFilePath` does not reliably apply that tag, so a
+/// sideways capture reaches the recognizer rotated and OCR fails. This
+/// applies the rotation to the pixels and clears the tag, so the
+/// recognizer always sees an upright image.
+///
+/// Returns the upright JPEG bytes, or `null` when the input cannot be
+/// decoded as a JPEG — the caller then OCRs the original unchanged.
+Uint8List? bakeImageOrientation(Uint8List jpegBytes) {
+  try {
+    final decoded = img.decodeJpg(jpegBytes);
+    if (decoded == null) return null;
+    final upright = img.bakeOrientation(decoded);
+    return img.encodeJpg(upright, quality: 90);
+  } catch (e, st) {
+    // A malformed / non-JPEG file is not fatal — OCR the original.
+    debugPrint('bakeImageOrientation: decode failed: $e\n$st');
+    return null;
   }
 }

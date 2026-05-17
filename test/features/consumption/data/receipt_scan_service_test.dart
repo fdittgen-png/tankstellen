@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:tankstellen/features/consumption/data/pump_display_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
@@ -311,6 +313,43 @@ void main() {
       expect(outcome.parse.totalCost, 20);
       expect(outcome.ocrText, 'hello');
       expect(outcome.imagePath, '/tmp/x.jpg');
+    });
+  });
+
+  group('bakeImageOrientation (#1711)', () {
+    test('rotates an EXIF-orientation-6 image upright — dimensions swap',
+        () {
+      // An 80×40 landscape image tagged orientation 6 ("rotate 90° CW")
+      // displays as 40×80. Baking the rotation into the pixels must
+      // produce a 40×80 upright image — the fix for the sideways
+      // pump-display photos that ML Kit could not read.
+      final src = img.Image(width: 80, height: 40);
+      img.fill(src, color: img.ColorRgb8(40, 80, 120));
+      src.exif.imageIfd['Orientation'] = 6;
+      final tagged = Uint8List.fromList(img.encodeJpg(src));
+
+      final baked = bakeImageOrientation(tagged);
+      expect(baked, isNotNull);
+      final out = img.decodeJpg(baked!)!;
+      expect(out.width, 40);
+      expect(out.height, 80);
+    });
+
+    test('leaves an already-upright image unchanged in dimensions', () {
+      final src = img.Image(width: 100, height: 60);
+      img.fill(src, color: img.ColorRgb8(10, 20, 30));
+      final upright = Uint8List.fromList(img.encodeJpg(src));
+
+      final baked = bakeImageOrientation(upright);
+      expect(baked, isNotNull);
+      final out = img.decodeJpg(baked!)!;
+      expect(out.width, 100);
+      expect(out.height, 60);
+    });
+
+    test('returns null for non-JPEG / garbage bytes', () {
+      final garbage = Uint8List.fromList(List.generate(64, (i) => i % 256));
+      expect(bakeImageOrientation(garbage), isNull);
     });
   });
 }
