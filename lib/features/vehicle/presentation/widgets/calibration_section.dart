@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../data/ve_learner.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../domain/entities/vehicle_profile.dart';
 
@@ -359,12 +360,17 @@ class _CalibrationSectionState extends State<CalibrationSection> {
   }
 
   String _learnerStatus(AppLocalizations? l) {
-    final eta = _formatDouble(widget.profile.volumetricEfficiency);
     final samples = widget.profile.volumetricEfficiencySamples;
     if (samples == 0) {
       return l?.calibrationLearnerStatusNoSamples ??
           'η_v: 0.85 (default — no plein-complet yet)';
     }
+    // #1626 — show the ± convergence band so the user sees how settled
+    // the learned η_v is. Folded into the `eta` placeholder so the
+    // existing parameterised ARB strings need no signature change.
+    final etaValue = _formatDouble(widget.profile.volumetricEfficiency);
+    final band = _formatDouble(veConvergenceHalfWidth(samples));
+    final eta = '$etaValue ± $band';
     if (samples < 3) {
       return l?.calibrationLearnerStatusLearning(eta, samples) ??
           'η_v: $eta (learning, $samples samples)';
