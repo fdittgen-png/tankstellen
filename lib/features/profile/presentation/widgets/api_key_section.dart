@@ -5,6 +5,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class ApiKeySection extends ConsumerWidget {
@@ -136,7 +137,9 @@ class ApiKeySection extends ConsumerWidget {
           Icon(
             isConfigured ? Icons.check_circle : Icons.cancel,
             size: 16,
-            color: isConfigured ? Colors.green : Colors.red,
+            color: isConfigured
+                ? DarkModeColors.success(context)
+                : DarkModeColors.error(context),
           ),
           const SizedBox(width: 6),
           Text(subtitle),

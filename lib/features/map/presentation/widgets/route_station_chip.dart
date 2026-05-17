@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/utils/unit_formatter.dart';
@@ -113,7 +114,7 @@ class RouteStationChip extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         color: isSelected
                             ? selectedFg.withValues(alpha: 0.9)
-                            : Colors.green.shade700,
+                            : DarkModeColors.success(context),
                       ),
                     ),
                     Text(

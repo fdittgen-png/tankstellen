@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../theme/dark_mode_colors.dart';
 import '../service_result.dart';
 
 /// Compact badge showing data age and source with color-coded freshness.
@@ -19,7 +20,7 @@ class FreshnessBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final age = DateTime.now().difference(result.fetchedAt);
 
-    final _BadgeStyle style = _styleForAge(age, result.isStale);
+    final _BadgeStyle style = _styleForAge(context, age, result.isStale);
 
     final String label;
     if (result.isStale) {
@@ -61,25 +62,26 @@ class FreshnessBadge extends StatelessWidget {
     );
   }
 
-  static _BadgeStyle _styleForAge(Duration age, bool isStale) {
+  static _BadgeStyle _styleForAge(
+      BuildContext context, Duration age, bool isStale) {
     if (isStale || age.inMinutes > 15) {
-      return const _BadgeStyle(
+      return _BadgeStyle(
         icon: Icons.warning_amber_rounded,
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.red,
+        backgroundColor: DarkModeColors.error(context),
+        foregroundColor: DarkModeColors.error(context),
       );
     }
     if (age.inMinutes >= 5) {
-      return const _BadgeStyle(
+      return _BadgeStyle(
         icon: Icons.schedule,
-        backgroundColor: Colors.amber,
-        foregroundColor: Colors.amber,
+        backgroundColor: DarkModeColors.warning(context),
+        foregroundColor: DarkModeColors.warning(context),
       );
     }
-    return const _BadgeStyle(
+    return _BadgeStyle(
       icon: Icons.check_circle_outline,
-      backgroundColor: Colors.green,
-      foregroundColor: Colors.green,
+      backgroundColor: DarkModeColors.success(context),
+      foregroundColor: DarkModeColors.success(context),
     );
   }
 }

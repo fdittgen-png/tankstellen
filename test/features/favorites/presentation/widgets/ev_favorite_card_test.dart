@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_card.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
@@ -115,7 +116,10 @@ void main() {
         ),
       );
       final icon = tester.widget<Icon>(find.byIcon(Icons.power));
-      expect(icon.color, Colors.green);
+      expect(
+        icon.color,
+        DarkModeColors.success(tester.element(find.byIcon(Icons.power))),
+      );
     });
 
     testWidgets('availability icon is grey when none available',

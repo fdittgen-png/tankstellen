@@ -5,6 +5,7 @@ import '../../../sync/presentation/widgets/qr_share_widget.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -43,7 +44,7 @@ class TankSyncSection extends ConsumerWidget {
     final consent = ref.watch(gdprConsentProvider);
     return [
       ListTile(
-        leading: const Icon(Icons.cloud_done, color: Colors.green),
+        leading: Icon(Icons.cloud_done, color: DarkModeColors.success(context)),
         title: Text(syncConfig.modeName),
         subtitle: Text(
           syncConfig.hasEmail

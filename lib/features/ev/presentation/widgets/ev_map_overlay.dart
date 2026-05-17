@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/charging_station.dart';
 import '../../providers/ev_providers.dart';
@@ -80,7 +81,7 @@ class EvToggleButton extends ConsumerWidget {
     final shown = ref.watch(evShowOnMapProvider);
     final l10n = AppLocalizations.of(context);
     return Material(
-      color: shown ? Colors.green : Colors.white,
+      color: shown ? DarkModeColors.success(context) : Colors.white,
       shape: const CircleBorder(),
       elevation: 4,
       child: InkWell(

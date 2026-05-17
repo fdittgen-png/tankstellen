@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/sync/sync_config.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'sync_mode_card.dart';
 
@@ -51,7 +52,7 @@ class SyncModeStep extends StatelessWidget {
             subtitle: l10n?.syncModeCommunitySubtitle ??
                 'Share favorites & ratings with all users',
             privacyLabel: l10n?.syncPrivacyShared ?? 'Shared',
-            privacyColor: Colors.green,
+            privacyColor: DarkModeColors.success(context),
             onTap: () => onSelectMode(SyncMode.community),
           ),
         ),
@@ -81,7 +82,7 @@ class SyncModeStep extends StatelessWidget {
             subtitle: l10n?.syncModeGroupSubtitle ??
                 'Family or friends shared database',
             privacyLabel: l10n?.syncPrivacyGroup ?? 'Group',
-            privacyColor: Colors.orange,
+            privacyColor: DarkModeColors.warning(context),
             onTap: () => onSelectMode(SyncMode.joinExisting),
           ),
         ),

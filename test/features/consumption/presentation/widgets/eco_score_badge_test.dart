@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/consumption/domain/entities/eco_score.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/eco_score_badge.dart';
 
@@ -58,7 +59,10 @@ void main() {
         ),
       );
       final icon = tester.widget<Icon>(find.byIcon(Icons.arrow_downward));
-      expect(icon.color, Colors.green.shade700);
+      expect(
+        icon.color,
+        DarkModeColors.success(tester.element(find.byType(EcoScoreBadge))),
+      );
     });
 
     testWidgets('worsening → orange up-arrow', (tester) async {
@@ -69,7 +73,10 @@ void main() {
         ),
       );
       final icon = tester.widget<Icon>(find.byIcon(Icons.arrow_upward));
-      expect(icon.color, Colors.orange.shade800);
+      expect(
+        icon.color,
+        DarkModeColors.warning(tester.element(find.byType(EcoScoreBadge))),
+      );
     });
 
     testWidgets('stable → neutral forward-arrow', (tester) async {

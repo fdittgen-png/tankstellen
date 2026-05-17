@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/obd2_connection_state_provider.dart';
 
@@ -24,7 +25,7 @@ class Obd2StatusDot extends ConsumerWidget {
     final snapshot = ref.watch(obd2ConnectionStatusProvider);
     if (!snapshot.hasVisibleIndicator) return const SizedBox.shrink();
     final l = AppLocalizations.of(context);
-    final (color, semanticsLabel) = _styleFor(snapshot, l);
+    final (color, semanticsLabel) = _styleFor(context, snapshot, l);
     return Semantics(
       label: semanticsLabel,
       button: true,
@@ -48,28 +49,29 @@ class Obd2StatusDot extends ConsumerWidget {
   }
 
   (Color, String) _styleFor(
+    BuildContext context,
     Obd2ConnectionSnapshot s,
     AppLocalizations? l,
   ) {
     switch (s.state) {
       case Obd2ConnectionState.connected:
         return (
-          Colors.green.shade600,
+          DarkModeColors.success(context),
           l?.obd2StatusConnected ?? 'OBD2 adapter: connected',
         );
       case Obd2ConnectionState.attempting:
         return (
-          Colors.amber.shade700,
+          DarkModeColors.warning(context),
           l?.obd2StatusAttempting ?? 'OBD2 adapter: connecting',
         );
       case Obd2ConnectionState.unreachable:
         return (
-          Colors.red.shade700,
+          DarkModeColors.error(context),
           l?.obd2StatusUnreachable ?? 'OBD2 adapter: unreachable',
         );
       case Obd2ConnectionState.permissionDenied:
         return (
-          Colors.red.shade700,
+          DarkModeColors.error(context),
           l?.obd2StatusPermissionDenied ??
               'OBD2 adapter: Bluetooth permission needed',
         );

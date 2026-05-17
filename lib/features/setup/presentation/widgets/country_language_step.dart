@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'illustrations/globe_illustration.dart';
 
@@ -120,8 +121,8 @@ class CountryLanguageStep extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: country.requiresApiKey
-                              ? Colors.orange.shade100
-                              : Colors.green.shade100,
+                              ? DarkModeColors.warningSurface(context)
+                              : DarkModeColors.successSurface(context),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -132,8 +133,8 @@ class CountryLanguageStep extends ConsumerWidget {
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: country.requiresApiKey
-                                ? Colors.orange.shade800
-                                : Colors.green.shade800,
+                                ? DarkModeColors.warning(context)
+                                : DarkModeColors.success(context),
                           ),
                         ),
                       ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../../core/feedback/github_issue_reporter_provider.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Settings section for managing the optional GitHub PAT used by the
@@ -85,7 +86,9 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
               Icon(
                 _hasToken ? Icons.check_circle : Icons.cancel_outlined,
                 size: 16,
-                color: _hasToken ? Colors.green : theme.colorScheme.outline,
+                color: _hasToken
+                    ? DarkModeColors.success(context)
+                    : theme.colorScheme.outline,
               ),
               const SizedBox(width: 6),
               Text(

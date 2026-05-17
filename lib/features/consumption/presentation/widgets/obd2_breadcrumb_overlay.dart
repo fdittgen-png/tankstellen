@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/app_state_provider.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/obd2_breadcrumb_collector.dart';
 import '../../providers/obd2_breadcrumb_provider.dart';
@@ -196,14 +197,14 @@ class _BreadcrumbRow extends StatelessWidget {
     }
   }
 
-  Color get _color {
+  Color _color(BuildContext context) {
     switch (crumb.flag) {
       case Obd2BreadcrumbCollector.flagSuspiciousLow:
-        return Colors.amber;
+        return DarkModeColors.warning(context);
       case Obd2BreadcrumbCollector.flag5eVsMafDivergent:
-        return Colors.redAccent;
+        return DarkModeColors.error(context);
       default:
-        return Colors.greenAccent;
+        return DarkModeColors.success(context);
     }
   }
 
@@ -215,7 +216,7 @@ class _BreadcrumbRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _color;
+    final color = _color(context);
     final secondLine = StringBuffer()
       ..write('AFR=${_formatNum(crumb.afr, decimals: 1)} ')
       ..write('ρ=${_formatNum(crumb.fuelDensityGPerL, decimals: 0)} ')

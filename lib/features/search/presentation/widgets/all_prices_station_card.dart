@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -68,7 +69,9 @@ class AllPricesStationCard extends StatelessWidget {
                     height: 10,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: station.isOpen ? Colors.green : Colors.red,
+                      color: station.isOpen
+                          ? DarkModeColors.success(context)
+                          : DarkModeColors.error(context),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -89,8 +92,10 @@ class AllPricesStationCard extends StatelessWidget {
                         horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: station.isOpen
-                          ? Colors.green.withValues(alpha: 0.12)
-                          : Colors.red.withValues(alpha: 0.12),
+                          ? DarkModeColors.success(context)
+                              .withValues(alpha: 0.12)
+                          : DarkModeColors.error(context)
+                              .withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -100,7 +105,9 @@ class AllPricesStationCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: station.isOpen ? Colors.green : Colors.red,
+                        color: station.isOpen
+                            ? DarkModeColors.success(context)
+                            : DarkModeColors.error(context),
                       ),
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/alert_statistics_provider.dart';
 
@@ -29,7 +30,7 @@ class AlertStatisticsCard extends ConsumerWidget {
             _StatColumn(
               icon: Icons.today,
               iconColor: stats.triggeredToday > 0
-                  ? Colors.green
+                  ? DarkModeColors.success(context)
                   : theme.colorScheme.onSurfaceVariant,
               value: stats.triggeredToday.toString(),
               label: l10n?.alertStatsToday ?? 'Today',

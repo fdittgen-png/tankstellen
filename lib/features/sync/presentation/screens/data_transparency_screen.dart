@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/sync/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -85,7 +86,9 @@ class DataTransparencyScreen extends ConsumerWidget {
             child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+              backgroundColor: DarkModeColors.error(context),
+            ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(AppLocalizations.of(context)?.deleteEverything ?? 'Delete everything'),
           ),
@@ -124,7 +127,9 @@ class DataTransparencyScreen extends ConsumerWidget {
           ),
           FilledButton(
             key: const Key('forget_all_synced_trips_confirm'),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+              backgroundColor: DarkModeColors.error(context),
+            ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               l?.forgetAllSyncedTripsConfirmAction ?? 'Forget all',

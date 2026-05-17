@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/cache/cache_manager.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'storage_bar.dart';
@@ -56,7 +57,7 @@ class StorageSection extends ConsumerWidget {
                 StorageSegment(
                   'Price History (${storageMgmt.priceHistoryEntryCount})',
                   stats.priceHistory,
-                  Colors.orange.withValues(alpha: 0.7),
+                  DarkModeColors.warning(context).withValues(alpha: 0.7),
                 ),
               ],
               totalBytes: stats.total,
@@ -95,13 +96,13 @@ class StorageSection extends ConsumerWidget {
               detail:
                   '${storageMgmt.priceHistoryEntryCount} stations tracked',
               bytes: stats.priceHistory,
-              color: Colors.orange.withValues(alpha: 0.7),
+              color: DarkModeColors.warning(context).withValues(alpha: 0.7),
             ),
             StorageDetailRow(
               label: l?.priceAlerts ?? 'Alerts',
               detail: '${storageMgmt.alertCount} configured',
               bytes: stats.alerts,
-              color: Colors.amber.withValues(alpha: 0.7),
+              color: DarkModeColors.warning(context).withValues(alpha: 0.7),
             ),
             StorageDetailRow(
               label: 'Ignored',

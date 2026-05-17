@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/widgets/vehicle_adapter_section.dart';
 import '../../../consumption/presentation/widgets/vehicle_baseline_section.dart';
@@ -110,7 +111,7 @@ class _Obd2AdapterCardHighlight extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.amber.withValues(alpha: t),
+              color: DarkModeColors.warning(context).withValues(alpha: t),
               width: 2,
             ),
           ),

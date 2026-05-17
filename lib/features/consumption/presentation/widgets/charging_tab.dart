@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_log.dart';
@@ -63,7 +64,7 @@ class ChargingTab extends ConsumerWidget {
               background: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 24),
-                color: Colors.red,
+                color: DarkModeColors.error(context),
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (_) {

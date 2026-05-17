@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/country/country_config.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 
 /// Small pill that labels a country with either "API key required" (orange)
 /// or "Free — no key needed" (green). Used inside the country picker on
@@ -22,8 +23,9 @@ class CountryStatusBadge extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color:
-              requiresKey ? Colors.orange.shade100 : Colors.green.shade100,
+          color: requiresKey
+              ? DarkModeColors.warningSurface(context)
+              : DarkModeColors.successSurface(context),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -31,8 +33,9 @@ class CountryStatusBadge extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color:
-                requiresKey ? Colors.orange.shade800 : Colors.green.shade800,
+            color: requiresKey
+                ? DarkModeColors.warning(context)
+                : DarkModeColors.success(context),
           ),
         ),
       ),

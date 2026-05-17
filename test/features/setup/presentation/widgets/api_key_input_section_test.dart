@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/api_key_input_section.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
@@ -73,14 +74,20 @@ void main() {
     testWidgets('shows green check when the format is valid', (tester) async {
       await pumpSection(tester, formatValid: true);
       final icon = tester.widget<Icon>(find.byIcon(Icons.check_circle));
-      expect(icon.color, Colors.green);
+      expect(
+        icon.color,
+        DarkModeColors.success(tester.element(find.byIcon(Icons.check_circle))),
+      );
     });
 
     testWidgets('shows red error icon and error text when format is invalid',
         (tester) async {
       await pumpSection(tester, formatValid: false);
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
-      expect(icon.color, Colors.red);
+      expect(
+        icon.color,
+        DarkModeColors.error(tester.element(find.byIcon(Icons.error_outline))),
+      );
       expect(
         find.text('Invalid format — expected UUID (8-4-4-4-12)'),
         findsOneWidget,

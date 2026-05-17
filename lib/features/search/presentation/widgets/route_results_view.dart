@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
@@ -211,7 +212,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
       secondaryBackground: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
-        color: Colors.orange.shade700,
+        color: DarkModeColors.warning(context),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

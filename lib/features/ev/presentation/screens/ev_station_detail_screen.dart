@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -174,11 +175,20 @@ class _ConnectorTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     switch (status) {
       case ConnectorStatus.available:
-        return (l10n?.evStatusAvailable ?? 'Available', Colors.green);
+        return (
+          l10n?.evStatusAvailable ?? 'Available',
+          DarkModeColors.success(context)
+        );
       case ConnectorStatus.occupied:
-        return (l10n?.evStatusOccupied ?? 'Occupied', Colors.orange);
+        return (
+          l10n?.evStatusOccupied ?? 'Occupied',
+          DarkModeColors.warning(context)
+        );
       case ConnectorStatus.outOfOrder:
-        return (l10n?.evStatusOutOfOrder ?? 'Out of order', Colors.red);
+        return (
+          l10n?.evStatusOutOfOrder ?? 'Out of order',
+          DarkModeColors.error(context)
+        );
       case ConnectorStatus.unknown:
         return (l10n?.evStatusUnknown ?? 'Unknown', Colors.grey);
     }
