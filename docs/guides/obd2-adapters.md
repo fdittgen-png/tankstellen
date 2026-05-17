@@ -12,6 +12,26 @@ The registry source of truth is
 `lib/features/consumption/data/obd2/adapter_registry.dart`; the
 catalogue below is curated manually from that file.
 
+## Buying an adapter (#1648 decisions)
+
+The table carries a **Buy** column with a link per adapter. The
+sourcing decisions, recorded here so they don't drift:
+
+- **Plain links, no affiliate program.** The links are ordinary
+  Amazon *search* URLs — not affiliate / tag links — so there is no
+  affiliate-disclosure obligation and no account to maintain.
+- **Search URLs, not product ASINs.** Each link is an Amazon search
+  for the adapter name (`amazon.de/s?k=<name>+OBD2`). Search URLs are
+  stable; a specific product listing's ASIN rots when the seller
+  re-lists, a search does not.
+- **Reference marketplace: amazon.de.** It is the app's home market.
+  The search-by-name query works unchanged on any Amazon marketplace
+  (swap the TLD) and on any other retailer — so countries Amazon does
+  not serve are covered by the same adapter *name*.
+- **Doc-only, not in-app.** The links live in this guide (and the
+  wiki it feeds), not in an in-app registry field — the adapter
+  picker stays a connection tool, not a storefront.
+
 ## Compatibility status
 
 Each adapter row carries one of three states, sourced from the
@@ -30,24 +50,37 @@ Each adapter row carries one of three states, sourced from the
 
 ## Supported adapters
 
-| Display name | Transport | Name matchers | Notes | Compatibility |
+| Display name | Transport | Name matchers | Compatibility | Buy |
 |---|---|---|---|---|
-| vLinker FS (Classic) | Classic BT | `vlinker fs`, `vlinker ms`, `vlink fs`, `vgate fs` | Dominant Amazon-EU model; Classic SPP | ✅ tested |
-| vLinker FD / MC (BLE) | BLE | `vlinker fd`, `vlinker mc`, `vlink fd`, `vlink mc` | Nordic UART FFF0 family | ⚠️ theoretical |
-| OBDLink MX+ | BLE | `obdlink` | Scantool premium adapter; custom 18f0 service | ⚠️ theoretical |
-| Carista OBD2 | BLE | `carista` | Nordic UART FFF0 family | ⚠️ theoretical |
-| Veepeak BLE+ | BLE | `veepeak` | Nordic UART FFF0 family | ⚠️ theoretical |
-| SmartOBD (BLE) | BLE | `smartobd` | Generic ELM327 v1.5 clone | 👤 user-verified |
-| SmartOBD (Classic) | Classic BT | `smartobd` | Same brand, Classic SPP variant | 👤 user-verified |
-| ieGeek Scanner | BLE | `iegeek` | ELM327 v2.1 BLE clone | ⚠️ theoretical |
-| vLinker BM+ (BLE) | BLE | `vlinker bm+`, `vlink bm+` | BLE-only sibling to vLinker BM; the "+" is load-bearing | ⚠️ theoretical |
-| vLinker BM-Android (Classic) | Classic BT | `vlinker bm-android`, `vlink bm-android` | Classic SPP sibling to vLinker BM+ | ✅ tested |
-| Konnwei KW902 | Classic BT | `konnwei`, `kw902` | ELM327 v1.5 Classic clone | ⚠️ theoretical |
-| Vgate iCar Pro | BLE | `vgate`, `icar pro` | Chinese brand; BLE variant (WiFi variant handled by TCP facade) | ⚠️ theoretical |
-| Panlong WiFi | Classic BT (no-op) | `panlong` | WiFi-only adapter; name kept so the UI can label a mis-paired Classic entry | ⚠️ theoretical |
-| BAFX 34t5 | Classic BT | `bafx` | Legacy ELM327 v1.5 adapter, still sold in the US | ⚠️ theoretical |
-| Generic ELM327 (BLE) | BLE | — (matched by FFF0 service UUID) | Catch-all for unfamiliar BLE FFF0 clones | ⚠️ theoretical |
-| Generic ELM327 (Classic) | Classic BT | `obdii`, `obd-ii`, `obd ii`, `obd2`, `elm327` | Catch-all for unfamiliar Classic-SPP clones | ⚠️ theoretical |
+| vLinker FS (Classic) | Classic BT | `vlinker fs`, `vlinker ms`, `vlink fs`, `vgate fs` | ✅ tested | [amazon.de](https://www.amazon.de/s?k=vLinker+FS+OBD2) |
+| vLinker FD / MC (BLE) | BLE | `vlinker fd`, `vlinker mc`, `vlink fd`, `vlink mc` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=vLinker+FD+OBD2) |
+| vLinker BM+ (BLE) | BLE | `vlinker bm+`, `vlink bm+` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=vLinker+BM+OBD2) |
+| vLinker BM-Android (Classic) | Classic BT | `vlinker bm-android`, `vlink bm-android` | ✅ tested | [amazon.de](https://www.amazon.de/s?k=vLinker+BM+OBD2) |
+| OBDLink MX+ | BLE | `obdlink mx` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=OBDLink+MX+) |
+| OBDLink LX | BLE | `obdlink lx` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=OBDLink+LX) |
+| OBDLink CX | BLE | `obdlink cx` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=OBDLink+CX) |
+| Carista OBD2 | BLE | `carista` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=Carista+OBD2) |
+| Veepeak BLE+ | BLE | `veepeak` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=Veepeak+OBD2) |
+| BlueDriver | BLE | `bluedriver` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=BlueDriver+OBD2) |
+| PLX Kiwi 3 | BLE | `kiwi` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=PLX+Kiwi+3+OBD2) |
+| SmartOBD (BLE) | BLE | `smartobd` | 👤 user-verified | [amazon.de](https://www.amazon.de/s?k=SmartOBD+ELM327) |
+| SmartOBD (Classic) | Classic BT | `smartobd` | 👤 user-verified | [amazon.de](https://www.amazon.de/s?k=SmartOBD+ELM327) |
+| ieGeek Scanner | BLE | `iegeek` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=ieGeek+OBD2) |
+| LELink BLE | BLE | `lelink` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=LELink+OBD2) |
+| Topdon TopScan | BLE | `topscan`, `topdon` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=Topdon+TopScan) |
+| ANCEL BD310 | BLE | `ancel`, `bd310` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=ANCEL+BD310) |
+| Tonwon Pro BLE | BLE | `tonwon` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=Tonwon+Pro+OBD2) |
+| NEXAS NexLink | BLE | `nexas`, `nexlink` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=NEXAS+NexLink+OBD2) |
+| Konnwei KW902 | Classic BT | `konnwei`, `kw902` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=Konnwei+KW902) |
+| Vgate iCar Pro | BLE | `vgate`, `icar pro` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=Vgate+iCar+Pro) |
+| BAFX 34t5 | Classic BT | `bafx` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=BAFX+OBD2) |
+| Panlong WiFi | Classic BT (no-op) | `panlong` | ⚠️ theoretical | [amazon.de](https://www.amazon.de/s?k=Panlong+WiFi+OBD2) |
+| Generic ELM327 (BLE) | BLE | — (matched by FFF0 service UUID) | ⚠️ theoretical | — |
+| Generic ELM327 (Classic) | Classic BT | `obdii`, `obd-ii`, `obd ii`, `obd2`, `elm327` | ⚠️ theoretical | — |
+
+The Notes for each profile (chip family, transport quirks) live in
+the `adapter_registry.dart` source comments — the doc keeps the table
+scannable; the registry file is the long-form reference.
 
 ## How to add a new adapter
 

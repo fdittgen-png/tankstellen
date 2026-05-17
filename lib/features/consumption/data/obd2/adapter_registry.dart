@@ -243,15 +243,36 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
     nameMatchers: ['vlinker fd', 'vlinker mc', 'vlink fd', 'vlink mc'],
   ),
-  // OBDLink MX+ — Scantool's premium adapter, uses a custom service
-  // UUID pair. Name always starts with "OBDLink".
+  // OBDLink MX+ — Scantool's premium STN-chip adapter, custom service
+  // UUID pair. The matcher is the model-specific "obdlink mx" so the
+  // LX / CX siblings below get their own profiles (#1641).
   Obd2AdapterProfile(
     id: 'obdlink-mx',
     displayName: 'OBDLink MX+',
     serviceUuid: '000018f0-0000-1000-8000-00805f9b34fb',
     writeCharUuid: '00002af1-0000-1000-8000-00805f9b34fb',
     notifyCharUuid: '00002af0-0000-1000-8000-00805f9b34fb',
-    nameMatchers: ['obdlink'],
+    nameMatchers: ['obdlink mx'],
+  ),
+  // OBDLink LX — Scantool's mid-range STN-chip BLE adapter (#1641).
+  // Same custom 18F0 service family as the MX+.
+  Obd2AdapterProfile(
+    id: 'obdlink-lx',
+    displayName: 'OBDLink LX',
+    serviceUuid: '000018f0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '00002af1-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '00002af0-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['obdlink lx'],
+  ),
+  // OBDLink CX — Scantool's newest STN-chip BLE adapter, CAN-FD
+  // capable, popular with BMW owners (#1641).
+  Obd2AdapterProfile(
+    id: 'obdlink-cx',
+    displayName: 'OBDLink CX',
+    serviceUuid: '000018f0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '00002af1-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '00002af0-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['obdlink cx'],
   ),
   // Carista OBD2 — Nordic UART like vLinker but advertises as
   // "Carista" so it gets its own named profile.
@@ -379,6 +400,76 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     displayName: 'BAFX 34t5',
     transport: BluetoothTransport.classic,
     nameMatchers: ['bafx'],
+  ),
+  // BlueDriver (Lemur Vehicle Monitors) — premium BLE scan tool, a
+  // long-running Amazon best-seller (#1641). Rides the Nordic-UART
+  // FFF0 family; theoretical until verified on a real device.
+  Obd2AdapterProfile(
+    id: 'bluedriver',
+    displayName: 'BlueDriver',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['bluedriver'],
+  ),
+  // PLX Kiwi 3 — long-lived premium BLE ELM327-compatible adapter
+  // (#1641). Advertises as "Kiwi".
+  Obd2AdapterProfile(
+    id: 'kiwi-3',
+    displayName: 'PLX Kiwi 3',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['kiwi'],
+  ),
+  // LELink / LELink2 — popular low-cost BLE ELM327 clone, common on
+  // Amazon and iOS-friendly (#1641). Nordic-UART FFF0 family.
+  Obd2AdapterProfile(
+    id: 'lelink',
+    displayName: 'LELink BLE',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['lelink'],
+  ),
+  // Topdon TopScan — recent best-selling BLE OBD2 adapter (#1641).
+  // Advertises as "TopScan" / "Topdon".
+  Obd2AdapterProfile(
+    id: 'topdon-topscan',
+    displayName: 'Topdon TopScan',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['topscan', 'topdon'],
+  ),
+  // ANCEL BD310 — dual-mode (app + standalone display) BLE adapter,
+  // a steady Amazon best-seller (#1641). Nordic-UART FFF0 family.
+  Obd2AdapterProfile(
+    id: 'ancel-bd310',
+    displayName: 'ANCEL BD310',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['ancel', 'bd310'],
+  ),
+  // Tonwon Pro — widely-sold low-cost BLE ELM327 clone (#1641).
+  Obd2AdapterProfile(
+    id: 'tonwon',
+    displayName: 'Tonwon Pro BLE',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['tonwon'],
+  ),
+  // NEXAS NexLink — popular BLE OBD2 adapter sold across Amazon EU
+  // (#1641). Nordic-UART FFF0 family.
+  Obd2AdapterProfile(
+    id: 'nexas-nexlink',
+    displayName: 'NEXAS NexLink',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['nexas', 'nexlink'],
   ),
   // Generic ELM327 BLE fallback. Matches any clone that advertises
   // the FFF0 service but has an unfamiliar name (plenty on Amazon).
