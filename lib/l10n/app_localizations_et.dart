@@ -868,6 +868,17 @@ class AppLocalizationsEt extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API võti';
 
   @override
+  String get routePlanningSection => 'Marsruudi planeerimine';
+
+  @override
+  String get routeDetourBudget => 'Maksimaalne ümbersõit';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Kuva jaamad kuni $km km kaugusel otseteest';
+  }
+
+  @override
   String get routeSegment => 'Marsruudi segment';
 
   @override

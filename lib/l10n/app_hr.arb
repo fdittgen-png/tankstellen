@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "API ključ Tankerkoenig",
   "evChargingApiKey": "API ključ EV punjenja",
   "openChargeMapApiKey": "API ključ OpenChargeMap",
+  "routePlanningSection": "Planiranje rute",
+  "routeDetourBudget": "Maksimalni obilazak",
+  "routeDetourBudgetCaption": "Prikaži postaje do {km} km od izravne rute",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Segment rute",
   "showCheapestEveryNKm": "Prikaži najjeftiniju postaju svakih {km} km duž rute",
   "avoidHighways": "Izbjegavaj autoceste",

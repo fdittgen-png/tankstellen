@@ -24,6 +24,7 @@ void main() {
     countryCode: 'DE',
     languageCode: 'de',
     routeSegmentKm: 100,
+    routeDetourBudgetKm: 18,
     avoidHighways: false,
     ratingMode: 'local',
     defaultVehicleId: 'veh-1',
@@ -55,6 +56,9 @@ void main() {
     if (skip != 'routeSegmentKm') {
       expect(actual.routeSegmentKm, reference.routeSegmentKm);
     }
+    if (skip != 'routeDetourBudgetKm') {
+      expect(actual.routeDetourBudgetKm, reference.routeDetourBudgetKm);
+    }
     if (skip != 'avoidHighways') {
       expect(actual.avoidHighways, reference.avoidHighways);
     }
@@ -82,6 +86,7 @@ void main() {
       expect(s.countryCode, profile.countryCode);
       expect(s.languageCode, profile.languageCode);
       expect(s.routeSegmentKm, profile.routeSegmentKm);
+      expect(s.routeDetourBudgetKm, profile.routeDetourBudgetKm);
       expect(s.avoidHighways, profile.avoidHighways);
       expect(s.ratingMode, profile.ratingMode);
       expect(s.defaultVehicleId, profile.defaultVehicleId);
@@ -99,6 +104,7 @@ void main() {
       expect(s.radius, 10.0);
       expect(s.landingScreen, LandingScreen.nearest);
       expect(s.routeSegmentKm, 50.0);
+      expect(s.routeDetourBudgetKm, 5.0);
       expect(s.avoidHighways, isFalse);
       expect(s.ratingMode, 'local');
     });
@@ -176,6 +182,13 @@ void main() {
       expectAllFieldsExcept(copy, base, skip: 'routeSegmentKm');
     });
 
+    test('routeDetourBudgetKm only changes routeDetourBudgetKm', () {
+      final base = baseState();
+      final copy = base.copyWith(routeDetourBudgetKm: 12);
+      expect(copy.routeDetourBudgetKm, 12);
+      expectAllFieldsExcept(copy, base, skip: 'routeDetourBudgetKm');
+    });
+
     test('avoidHighways only changes avoidHighways', () {
       final base = baseState();
       final copy = base.copyWith(avoidHighways: true);
@@ -221,6 +234,7 @@ void main() {
       expect(s.countryCode, 'DE');
       expect(s.languageCode, 'de');
       expect(s.routeSegmentKm, 100);
+      expect(s.routeDetourBudgetKm, 18);
       expect(s.avoidHighways, isFalse);
       expect(s.ratingMode, 'local');
       expect(s.defaultVehicleId, 'veh-1');
@@ -251,6 +265,15 @@ void main() {
       final s = c.read(profileEditControllerProvider(profile));
       expect(s.routeSegmentKm, 250);
       expectAllFieldsExcept(s, baseState(), skip: 'routeSegmentKm');
+    });
+
+    test('setRouteDetourBudgetKm updates routeDetourBudgetKm only', () {
+      final c = makeContainer();
+      final ctrl = c.read(profileEditControllerProvider(profile).notifier);
+      ctrl.setRouteDetourBudgetKm(12);
+      final s = c.read(profileEditControllerProvider(profile));
+      expect(s.routeDetourBudgetKm, 12);
+      expectAllFieldsExcept(s, baseState(), skip: 'routeDetourBudgetKm');
     });
 
     test('setAvoidHighways updates avoidHighways only', () {

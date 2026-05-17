@@ -45,7 +45,7 @@ The audit was run on 2026-05-14 against
 | `unifiedSearchResults` | Feature management toggle | Search results list | Toggle only — flips single-list vs split-list rendering | No (binary by design) |
 | `priceAlerts` | Feature management toggle | *Alerts* tab / radius alert create sheet | Per-alert thresholds in `radius_alert_create_sheet.dart` | No |
 | `priceHistory` | Feature management toggle | Station detail → 30-day chart | View-only; charts derived from price-history collection | No (binary by design) |
-| `routePlanning` | Feature management toggle | Search → "along the route" mode in `search_criteria_screen.dart` | Toggle only — no detour-budget / radius preference | **Orphan candidate** — see follow-up |
+| `routePlanning` | Feature management toggle + Edit-profile → *Route planning* section | Search → "along the route" mode in `search_criteria_screen.dart` | Route-segment spacing + detour budget (`UserProfile.routeDetourBudgetKm`, #1602) | No (richer parameter UI) |
 | `evCharging` | Feature management toggle | Map / search EV results | Toggle only — paired with `showElectric` for filter UI | No |
 | `glideCoach` | Conso card (Trajets tier) | In-trip glide guidance | `driving_settings_section.dart` (sensitivity / opt-in) | No |
 | `gpsTripPath` | Conso card (Trajets tier) | Trip detail → map path | Toggle only — sample rate / accuracy hard-coded | No (binary by design) |
@@ -67,7 +67,7 @@ The audit was run on 2026-05-14 against
 
 ## Follow-ups
 
-- **#1575-orphan-routePlanning** — `routePlanning` turns on the "along the route" search mode but has no detour-budget / radius preference, so two users on the same route get the same result with no way to weight closer vs farther stops. File a settings entry: detour-budget (km) and minimum-saving (€/L). Filed in this Epic as a follow-up issue.
+- **#1575-orphan-routePlanning** — resolved. #1602 added the *Route planning* section to the edit-profile sheet with a **detour-budget** slider (`UserProfile.routeDetourBudgetKm`), feeding `searchAlongRoute`'s corridor. The **minimum-saving (€/L)** weighting was split off — it needs a product decision on the saving baseline — and is tracked separately.
 
 - `tflitePricePrediction` is intentionally parameterless until a trained `.tflite` artifact ships (#1543). Not refiled here.
 

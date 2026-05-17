@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "API ключ Tankerkoenig",
   "evChargingApiKey": "API ключ за EV зареждане",
   "openChargeMapApiKey": "API ключ OpenChargeMap",
+  "routePlanningSection": "Планиране на маршрут",
+  "routeDetourBudget": "Максимално отклонение",
+  "routeDetourBudgetCaption": "Показване на станции до {km} км от прекия маршрут",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Сегмент на маршрута",
   "showCheapestEveryNKm": "Показвай най-евтината станция на всеки {km} км по маршрута",
   "avoidHighways": "Избягвай магистрали",

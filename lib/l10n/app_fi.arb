@@ -267,6 +267,16 @@
   "tankerkoenigApiKey": "Tankerkoenig API-avain",
   "evChargingApiKey": "Sähköauton lataus API-avain",
   "openChargeMapApiKey": "OpenChargeMap API-avain",
+  "routePlanningSection": "Reittisuunnittelu",
+  "routeDetourBudget": "Suurin kiertotie",
+  "routeDetourBudgetCaption": "Näytä asemat enintään {km} km päässä suorasta reitistä",
+  "@routeDetourBudgetCaption": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeSegment": "Reittisegmentti",
   "showCheapestEveryNKm": "Näytä halvin asema joka {km} km reitin varrella",
   "avoidHighways": "Vältä moottoriteitä",

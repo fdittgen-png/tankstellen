@@ -23,6 +23,7 @@ class ProfileEditState {
   final String? countryCode;
   final String? languageCode;
   final double routeSegmentKm;
+  final double routeDetourBudgetKm;
   final bool avoidHighways;
   final String ratingMode;
   final String? defaultVehicleId;
@@ -34,6 +35,7 @@ class ProfileEditState {
     required this.countryCode,
     required this.languageCode,
     required this.routeSegmentKm,
+    required this.routeDetourBudgetKm,
     required this.avoidHighways,
     required this.ratingMode,
     required this.defaultVehicleId,
@@ -46,6 +48,7 @@ class ProfileEditState {
         countryCode: p.countryCode,
         languageCode: p.languageCode,
         routeSegmentKm: p.routeSegmentKm,
+        routeDetourBudgetKm: p.routeDetourBudgetKm,
         avoidHighways: p.avoidHighways,
         ratingMode: p.ratingMode,
         defaultVehicleId: p.defaultVehicleId,
@@ -60,6 +63,7 @@ class ProfileEditState {
     String? languageCode,
     bool clearLanguage = false,
     double? routeSegmentKm,
+    double? routeDetourBudgetKm,
     bool? avoidHighways,
     String? ratingMode,
     String? defaultVehicleId,
@@ -72,6 +76,7 @@ class ProfileEditState {
       countryCode: clearCountry ? null : (countryCode ?? this.countryCode),
       languageCode: clearLanguage ? null : (languageCode ?? this.languageCode),
       routeSegmentKm: routeSegmentKm ?? this.routeSegmentKm,
+      routeDetourBudgetKm: routeDetourBudgetKm ?? this.routeDetourBudgetKm,
       avoidHighways: avoidHighways ?? this.avoidHighways,
       ratingMode: ratingMode ?? this.ratingMode,
       defaultVehicleId: clearDefaultVehicle
@@ -94,6 +99,8 @@ class ProfileEditController extends _$ProfileEditController {
   void setRadius(double v) => state = state.copyWith(radius: v);
   void setRouteSegmentKm(double v) =>
       state = state.copyWith(routeSegmentKm: v);
+  void setRouteDetourBudgetKm(double v) =>
+      state = state.copyWith(routeDetourBudgetKm: v);
   void setAvoidHighways(bool v) => state = state.copyWith(avoidHighways: v);
   void setRatingMode(String v) => state = state.copyWith(ratingMode: v);
   void setLandingScreen(LandingScreen v) =>

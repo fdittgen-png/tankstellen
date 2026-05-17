@@ -875,6 +875,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API-sleutel';
 
   @override
+  String get routePlanningSection => 'Routeplanning';
+
+  @override
+  String get routeDetourBudget => 'Maximale omweg';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Toon stations tot $km km van je directe route';
+  }
+
+  @override
   String get routeSegment => 'Routesegment';
 
   @override

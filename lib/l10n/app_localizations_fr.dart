@@ -875,6 +875,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openChargeMapApiKey => 'Clé API OpenChargeMap';
 
   @override
+  String get routePlanningSection => 'Planification d\'itinéraire';
+
+  @override
+  String get routeDetourBudget => 'Détour maximal';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Afficher les stations jusqu\'à $km km de votre itinéraire direct';
+  }
+
+  @override
   String get routeSegment => 'Segment de trajet';
 
   @override

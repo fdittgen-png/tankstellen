@@ -1743,6 +1743,24 @@ abstract class AppLocalizations {
   /// **'OpenChargeMap API Key'**
   String get openChargeMapApiKey;
 
+  /// No description provided for @routePlanningSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Route planning'**
+  String get routePlanningSection;
+
+  /// No description provided for @routeDetourBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum detour'**
+  String get routeDetourBudget;
+
+  /// No description provided for @routeDetourBudgetCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface stations up to {km} km off your direct route'**
+  String routeDetourBudgetCaption(int km);
+
   /// No description provided for @routeSegment.
   ///
   /// In en, this message translates to:

@@ -872,6 +872,17 @@ class AppLocalizationsHr extends AppLocalizations {
   String get openChargeMapApiKey => 'API ključ OpenChargeMap';
 
   @override
+  String get routePlanningSection => 'Planiranje rute';
+
+  @override
+  String get routeDetourBudget => 'Maksimalni obilazak';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Prikaži postaje do $km km od izravne rute';
+  }
+
+  @override
   String get routeSegment => 'Segment rute';
 
   @override

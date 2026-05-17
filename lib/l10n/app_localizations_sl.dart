@@ -870,6 +870,17 @@ class AppLocalizationsSl extends AppLocalizations {
   String get openChargeMapApiKey => 'API ključ OpenChargeMap';
 
   @override
+  String get routePlanningSection => 'Načrtovanje poti';
+
+  @override
+  String get routeDetourBudget => 'Največji obvoz';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Prikaži postaje do $km km od neposredne poti';
+  }
+
+  @override
   String get routeSegment => 'Segment poti';
 
   @override

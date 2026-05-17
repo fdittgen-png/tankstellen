@@ -873,6 +873,17 @@ class AppLocalizationsRo extends AppLocalizations {
   String get openChargeMapApiKey => 'Cheie API OpenChargeMap';
 
   @override
+  String get routePlanningSection => 'Planificarea rutei';
+
+  @override
+  String get routeDetourBudget => 'Ocol maxim';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Afișează stații până la $km km de ruta directă';
+  }
+
+  @override
   String get routeSegment => 'Segment rută';
 
   @override

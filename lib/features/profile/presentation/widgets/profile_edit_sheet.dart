@@ -7,6 +7,9 @@ import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
+import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -106,6 +109,16 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
     final editCtrl =
         ref.read(profileEditControllerProvider(widget.profile).notifier);
 
+    // #1602 — the route-planning preferences are only meaningful when
+    // the "along the route" search mode is reachable, so the section
+    // tracks `Feature.routePlanning` exactly as search_criteria_screen
+    // gates the mode toggle.
+    final routePlanningOn = isEffectivelyEnabled(
+      Feature.routePlanning,
+      ref.watch(featureManifestProvider),
+      ref.watch(enabledFeaturesProvider),
+    );
+
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.5,
@@ -164,7 +177,10 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                 onChanged: editCtrl.setRadius,
               ),
               const SizedBox(height: 16),
-              _RouteSegmentSection(state: editState, ctrl: editCtrl),
+              if (routePlanningOn) ...[
+                _RouteSegmentSection(state: editState, ctrl: editCtrl),
+                const SizedBox(height: 16),
+              ],
               _TogglesSection(state: editState, ctrl: editCtrl),
               const SizedBox(height: 16),
               _RatingModeSection(state: editState, ctrl: editCtrl),

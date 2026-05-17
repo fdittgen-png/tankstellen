@@ -869,6 +869,17 @@ class AppLocalizationsNb extends AppLocalizations {
   String get openChargeMapApiKey => 'OpenChargeMap API-nøkkel';
 
   @override
+  String get routePlanningSection => 'Ruteplanlegging';
+
+  @override
+  String get routeDetourBudget => 'Maksimal omvei';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Vis stasjoner opptil $km km fra den direkte ruten';
+  }
+
+  @override
   String get routeSegment => 'Rutesegment';
 
   @override

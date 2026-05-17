@@ -96,10 +96,14 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
 
   void _performRouteSearch(List<RouteWaypoint> waypoints) {
     final fuelType = ref.read(selectedFuelTypeProvider);
+    // #1602 — the route search corridor is the user's detour budget.
+    final detourBudgetKm =
+        ref.read(activeProfileProvider)?.routeDetourBudgetKm ?? 5.0;
     ref.read(activeSearchModeProvider.notifier).set(SearchMode.route);
     ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
           waypoints: waypoints,
           fuelType: fuelType,
+          searchRadiusKm: detourBudgetKm,
         );
     Navigator.of(context).pop();
   }

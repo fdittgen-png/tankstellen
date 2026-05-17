@@ -873,6 +873,17 @@ class AppLocalizationsCs extends AppLocalizations {
   String get openChargeMapApiKey => 'Klíč API OpenChargeMap';
 
   @override
+  String get routePlanningSection => 'Plánování trasy';
+
+  @override
+  String get routeDetourBudget => 'Maximální zajížďka';
+
+  @override
+  String routeDetourBudgetCaption(int km) {
+    return 'Zobrazit stanice až $km km od přímé trasy';
+  }
+
+  @override
   String get routeSegment => 'Úsek trasy';
 
   @override
