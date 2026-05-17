@@ -4,12 +4,15 @@ name: Daily Open-Testing Build
 # Cron is UTC: 16:00 UTC = 18:00 CEST (summer) / 17:00 CET (winter).
 # Adjust to '0 17 * * *' if you want 18:00 Paris during winter instead.
 #
-# Build numbers are date+hour-based (YYYYMMDDHH) computed at build time, so
-# there's no commit pushed back to master and re-runs on the same day get
-# distinct, monotonically-increasing version codes (Play Store version codes
-# are global across tracks, so YYYYMMDD alone collides if Internal and Open
-# Testing both upload on the same day). pubspec.yaml's +N keeps tracking
-# manual releases. Max value at year 2099 fits Android's 2,100,000,000 cap.
+# The Play Store version code is derived from the monotonic workflow run
+# counter (`github.run_number` + `github.run_attempt`), computed at build
+# time — no commit is pushed back to master. Play version codes are global
+# across tracks and must STRICTLY INCREASE, so the counter guarantees a
+# unique, monotonically-rising code for every run *and* every re-run attempt
+# (#1882 — the previous YYYYMMDDHH scheme collided when two runs landed in
+# the same hour). The base sits just above the last date-scheme code ever
+# uploaded; (2_100_000_000 - base) / 10 leaves ~7M runs of head-room under
+# Android's version-code cap. pubspec.yaml's +N keeps tracking manual releases.
 on:
   schedule:
     - cron: '0 16 * * *'
@@ -43,12 +46,21 @@ jobs:
         with:
           ref: master
 
-      - name: Compute date-based build number
+      - name: Compute build number
         id: bn
         run: |
-          BN=$(TZ=Europe/Paris date +%Y%m%d%H)
+          # #1882 — the old YYYYMMDDHH scheme gave only hour resolution,
+          # so two runs in the same hour produced the same code and Play
+          # rejected the duplicate. Derive it from the monotonic run
+          # counter instead: unique per run, unique per re-run attempt,
+          # strictly increasing. Base 2_026_060_000 is just above the
+          # last YYYYMMDDHH code ever uploaded (2026051719); the *10
+          # leaves room for re-run attempts. Max stays well under
+          # Android's 2_100_000_000 cap.
+          BN=$(( 2026060000 + ${{ github.run_number }} * 10 + ${{ github.run_attempt }} ))
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
-          echo "Daily build number: $BN"
+          echo "Build number: $BN" \
+            "(run ${{ github.run_number }}, attempt ${{ github.run_attempt }})"
 
       - uses: actions/setup-java@v5
         with:
@@ -79,7 +91,7 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      - name: Build AAB (play flavor, date-based build number)
+      - name: Build AAB (play flavor, run-counter build number)
         run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
 
       - name: Clean up decoded keystore
