@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "No se encontró ningún adaptador OBD2 cerca. Asegúrate de que esté conectado y encendido.",
   "obd2ErrorAdapterUnresponsive": "El adaptador OBD2 no respondió. Pon el contacto e inténtalo de nuevo.",
   "obd2ErrorProtocolInitFailed": "El adaptador OBD2 envió una respuesta no reconocida. Puede ser incompatible: prueba con otro adaptador.",
-  "obd2ErrorDisconnected": "El adaptador OBD2 se desconectó. Vuelve a conectarlo e inténtalo de nuevo."
+  "obd2ErrorDisconnected": "El adaptador OBD2 se desconectó. Vuelve a conectarlo e inténtalo de nuevo.",
+  "onboardingExploreDemoData": "Explorar con datos de demostración"
 }

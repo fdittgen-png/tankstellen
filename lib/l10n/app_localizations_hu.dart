@@ -3306,6 +3306,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az OBD2-adapter kapcsolata megszakadt. Csatlakozzon újra, és próbálja újra.';
 
   @override
+  String get onboardingExploreDemoData => 'Felfedezés demóadatokkal';
+
+  @override
   String get achievementSmoothDriver => 'Sima sorozat';
 
   @override

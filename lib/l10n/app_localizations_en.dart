@@ -3268,6 +3268,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'The OBD2 adapter disconnected. Reconnect and try again.';
 
   @override
+  String get onboardingExploreDemoData => 'Explore with demo data';
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override
@@ -8545,6 +8548,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2ErrorDisconnected =>
       '⟦Ŧĥé ÓƁĐ2 áđáƥŧéř đîšçóññéçŧéđ. Řéçóññéçŧ áñđ ŧřý áǧáîñ. ····················⟧';
+
+  @override
+  String get onboardingExploreDemoData => '⟦Éẋƥłóřé ŵîŧĥ đéɱó đáŧá ·········⟧';
 
   @override
   String get achievementSmoothDriver => '⟦Šɱóóŧĥ šŧřéáķ ·····⟧';

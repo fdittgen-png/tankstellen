@@ -77,7 +77,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(),
       );
 
@@ -110,7 +110,7 @@ void main() {
         '(_isFormatValid stays null)', (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(),
       );
 
@@ -123,7 +123,7 @@ void main() {
         'debounce elapses', (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(),
       );
 
@@ -145,7 +145,7 @@ void main() {
         'once the debounce elapses', (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(),
       );
 
@@ -168,7 +168,7 @@ void main() {
 
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(),
       );
 
@@ -185,7 +185,7 @@ void main() {
 
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(),
       );
 
@@ -198,7 +198,7 @@ void main() {
         'apiProvider when apiKeyRegistrationUrl is set', (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(country: Countries.germany),
       );
 
@@ -218,7 +218,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(country: _germanyNoUrl),
       );
 
@@ -230,7 +230,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(country: _germanyNoAttribution),
       );
 
@@ -245,7 +245,7 @@ void main() {
         '(timer is cancelled in dispose)', (tester) async {
       await pumpApp(
         tester,
-        ApiKeyStep(apiKeyController: controller),
+        ApiKeyStep(apiKeyController: controller, onUseDemoData: () {}),
         overrides: overridesFor(),
       );
 
@@ -262,6 +262,29 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
 
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the demo-mode CTA invokes onUseDemoData (#1691)',
+        (tester) async {
+      var demoTapped = false;
+      await pumpApp(
+        tester,
+        ApiKeyStep(
+          apiKeyController: controller,
+          onUseDemoData: () => demoTapped = true,
+        ),
+        overrides: overridesFor(),
+      );
+
+      final cta = find.widgetWithText(
+          OutlinedButton, 'Explore with demo data');
+      expect(cta, findsOneWidget);
+
+      await tester.ensureVisible(cta);
+      await tester.tap(cta);
+      await tester.pump();
+
+      expect(demoTapped, isTrue);
     });
   });
 }

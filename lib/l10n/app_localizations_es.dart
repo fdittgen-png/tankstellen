@@ -3305,6 +3305,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'El adaptador OBD2 se desconectó. Vuelve a conectarlo e inténtalo de nuevo.';
 
   @override
+  String get onboardingExploreDemoData => 'Explorar con datos de demostración';
+
+  @override
   String get achievementSmoothDriver => 'Racha suave';
 
   @override

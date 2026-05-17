@@ -1594,5 +1594,9 @@
   "obd2ErrorDisconnected": "The OBD2 adapter disconnected. Reconnect and try again.",
   "@obd2ErrorDisconnected": {
     "description": "User-facing OBD2 connection error: the transport dropped mid-session (#1663)."
+  },
+  "onboardingExploreDemoData": "Explore with demo data",
+  "@onboardingExploreDemoData": {
+    "description": "Onboarding API-key step \u2014 CTA to skip key entry and use demo data (#1691)."
   }
 }

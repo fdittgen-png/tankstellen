@@ -3286,6 +3286,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'OBD2-adaptern kopplades från. Anslut igen och försök igen.';
 
   @override
+  String get onboardingExploreDemoData => 'Utforska med demodata';
+
+  @override
   String get achievementSmoothDriver => 'Mjukserie';
 
   @override

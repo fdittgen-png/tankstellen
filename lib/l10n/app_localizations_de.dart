@@ -3303,6 +3303,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der OBD2-Adapter wurde getrennt. Stelle die Verbindung wieder her und versuche es erneut.';
 
   @override
+  String get onboardingExploreDemoData => 'Mit Demodaten erkunden';
+
+  @override
   String get achievementSmoothDriver => 'Ruhige Serie';
 
   @override

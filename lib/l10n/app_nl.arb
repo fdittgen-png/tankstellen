@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Geen OBD2-adapter in de buurt gevonden. Controleer of deze is aangesloten en ingeschakeld.",
   "obd2ErrorAdapterUnresponsive": "De OBD2-adapter reageerde niet. Zet het contact aan en probeer het opnieuw.",
   "obd2ErrorProtocolInitFailed": "De OBD2-adapter stuurde een niet-herkend antwoord. Mogelijk is deze incompatibel — probeer een andere adapter.",
-  "obd2ErrorDisconnected": "De OBD2-adapter is losgekoppeld. Maak opnieuw verbinding en probeer het opnieuw."
+  "obd2ErrorDisconnected": "De OBD2-adapter is losgekoppeld. Maak opnieuw verbinding en probeer het opnieuw.",
+  "onboardingExploreDemoData": "Verken met demogegevens"
 }

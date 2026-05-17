@@ -3302,6 +3302,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'OBD2 adapteris atsijungė. Prisijunkite iš naujo ir bandykite dar kartą.';
 
   @override
+  String get onboardingExploreDemoData =>
+      'Naršyti su demonstraciniais duomenimis';
+
+  @override
   String get achievementSmoothDriver => 'Sklandaus vairavimo serija';
 
   @override

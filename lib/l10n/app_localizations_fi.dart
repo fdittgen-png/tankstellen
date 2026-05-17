@@ -3285,6 +3285,9 @@ class AppLocalizationsFi extends AppLocalizations {
       'OBD2-sovittimen yhteys katkesi. Yhdistä uudelleen ja yritä uudelleen.';
 
   @override
+  String get onboardingExploreDemoData => 'Tutustu esittelytiedoilla';
+
+  @override
   String get achievementSmoothDriver => 'Tasainen putki';
 
   @override

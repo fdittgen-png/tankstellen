@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Lähistöltä ei löytynyt OBD2-sovitinta. Varmista, että se on kytkettynä ja päällä.",
   "obd2ErrorAdapterUnresponsive": "OBD2-sovitin ei vastannut. Kytke virta päälle ja yritä uudelleen.",
   "obd2ErrorProtocolInitFailed": "OBD2-sovitin lähetti tunnistamattoman vastauksen. Se voi olla yhteensopimaton — kokeile toista sovitinta.",
-  "obd2ErrorDisconnected": "OBD2-sovittimen yhteys katkesi. Yhdistä uudelleen ja yritä uudelleen."
+  "obd2ErrorDisconnected": "OBD2-sovittimen yhteys katkesi. Yhdistä uudelleen ja yritä uudelleen.",
+  "onboardingExploreDemoData": "Tutustu esittelytiedoilla"
 }

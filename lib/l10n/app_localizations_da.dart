@@ -3282,6 +3282,9 @@ class AppLocalizationsDa extends AppLocalizations {
       'OBD2-adapteren blev afbrudt. Tilslut igen, og prøv igen.';
 
   @override
+  String get onboardingExploreDemoData => 'Udforsk med demodata';
+
+  @override
   String get achievementSmoothDriver => 'Blød stræk';
 
   @override

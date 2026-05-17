@@ -3285,6 +3285,9 @@ class AppLocalizationsSl extends AppLocalizations {
       'Vmesnik OBD2 je prekinil povezavo. Znova se povežite in poskusite znova.';
 
   @override
+  String get onboardingExploreDemoData => 'Razišči z demo podatki';
+
+  @override
   String get achievementSmoothDriver => 'Mirna serija';
 
   @override

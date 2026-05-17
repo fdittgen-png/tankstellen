@@ -3298,6 +3298,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'De OBD2-adapter is losgekoppeld. Maak opnieuw verbinding en probeer het opnieuw.';
 
   @override
+  String get onboardingExploreDemoData => 'Verken met demogegevens';
+
+  @override
   String get achievementSmoothDriver => 'Soepele reeks';
 
   @override

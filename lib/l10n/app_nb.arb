@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "Fant ingen OBD2-adapter i nærheten. Kontroller at den er koblet til og slått på.",
   "obd2ErrorAdapterUnresponsive": "OBD2-adapteren svarte ikke. Slå på tenningen og prøv igjen.",
   "obd2ErrorProtocolInitFailed": "OBD2-adapteren sendte et ukjent svar. Den er kanskje ikke kompatibel — prøv en annen adapter.",
-  "obd2ErrorDisconnected": "OBD2-adapteren ble frakoblet. Koble til på nytt og prøv igjen."
+  "obd2ErrorDisconnected": "OBD2-adapteren ble frakoblet. Koble til på nytt og prøv igjen.",
+  "onboardingExploreDemoData": "Utforsk med demodata"
 }

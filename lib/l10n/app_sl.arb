@@ -1652,5 +1652,6 @@
   "obd2ErrorScanTimeout": "V bližini ni bil najden vmesnik OBD2. Preverite, ali je priključen in vklopljen.",
   "obd2ErrorAdapterUnresponsive": "Vmesnik OBD2 se ni odzval. Vklopite vžig in poskusite znova.",
   "obd2ErrorProtocolInitFailed": "Vmesnik OBD2 je poslal neprepoznan odgovor. Morda ni združljiv — poskusite z drugim vmesnikom.",
-  "obd2ErrorDisconnected": "Vmesnik OBD2 je prekinil povezavo. Znova se povežite in poskusite znova."
+  "obd2ErrorDisconnected": "Vmesnik OBD2 je prekinil povezavo. Znova se povežite in poskusite znova.",
+  "onboardingExploreDemoData": "Razišči z demo podatki"
 }

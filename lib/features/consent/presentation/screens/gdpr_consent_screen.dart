@@ -166,15 +166,18 @@ class GdprConsentScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // #1691 — granular choice is the primary action;
+                  // "Accept All" is de-emphasised so the consent screen
+                  // does not nudge toward blanket consent.
                   FilledButton(
-                    onPressed: () => _acceptAll(context, ref),
-                    child: Text(l10n?.gdprAcceptAll ?? 'Accept All'),
-                  ),
-                  const SizedBox(height: 8),
-                  OutlinedButton(
                     onPressed: () => _acceptSelected(context, ref),
                     child: Text(
                         l10n?.gdprAcceptSelected ?? 'Accept Selected'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: () => _acceptAll(context, ref),
+                    child: Text(l10n?.gdprAcceptAll ?? 'Accept All'),
                   ),
                 ],
               ),

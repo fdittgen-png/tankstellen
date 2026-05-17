@@ -3281,6 +3281,9 @@ class AppLocalizationsNb extends AppLocalizations {
       'OBD2-adapteren ble frakoblet. Koble til på nytt og prøv igjen.';
 
   @override
+  String get onboardingExploreDemoData => 'Utforsk med demodata';
+
+  @override
   String get achievementSmoothDriver => 'Jevn kjørerekke';
 
   @override

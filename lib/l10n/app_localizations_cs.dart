@@ -3293,6 +3293,9 @@ class AppLocalizationsCs extends AppLocalizations {
       'Adaptér OBD2 se odpojil. Připojte se znovu a zkuste to znovu.';
 
   @override
+  String get onboardingExploreDemoData => 'Prozkoumat s ukázkovými daty';
+
+  @override
   String get achievementSmoothDriver => 'Série plynulé jízdy';
 
   @override
