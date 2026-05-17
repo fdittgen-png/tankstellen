@@ -319,6 +319,21 @@ class VeLearner {
   }
 }
 
+/// The ± half-width of the η_v convergence band for a profile with
+/// [sampleCount] accepted plein-complet reconciliations (#1626).
+///
+/// [VeLearner]'s EWMA blend does not track per-sample variance, so the
+/// band is a sample-count heuristic rather than a true standard error:
+/// with no samples the stored η_v is just the catalog default and can
+/// be off by ~0.10; each accepted tankful tightens the estimate.
+/// Decays as `0.10 / (sampleCount + 1)` and is clamped to `[0.01,
+/// 0.10]` so a long-calibrated profile still reports a small, honest
+/// band rather than implying zero uncertainty.
+double veConvergenceHalfWidth(int sampleCount) {
+  final n = sampleCount < 0 ? 0 : sampleCount;
+  return (0.10 / (n + 1)).clamp(0.01, 0.10).toDouble();
+}
+
 /// Default sample-count heuristic: trip duration in seconds ≈ sample
 /// count, because OBD2 polling hovers near 1 Hz. Falls back to a
 /// 50-sample floor when either timestamp is missing but the trip
