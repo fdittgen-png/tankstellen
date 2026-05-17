@@ -12,6 +12,7 @@ import '../../data/trip_history_repository.dart';
 import '../../domain/services/monthly_insights_aggregator.dart';
 import '../../providers/trip_history_provider.dart';
 import '../../providers/trip_recording_provider.dart';
+import '../obd2_connection_error_l10n.dart';
 import '../screens/trip_recording_screen.dart';
 import 'maintenance_suggestion_card.dart';
 import 'monthly_insights_card.dart';
@@ -95,7 +96,10 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
         ),
       );
     } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
-      if (mounted) SnackBarHelper.showError(context, e.message);
+      if (mounted) {
+        SnackBarHelper.showError(
+            context, e.localizedMessage(AppLocalizations.of(context)));
+      }
     } catch (e, st) {
       debugPrint('TrajetsTab._onStartRecording: $e\n$st');
     } finally {

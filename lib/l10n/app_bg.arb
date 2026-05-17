@@ -1646,5 +1646,11 @@
   "tankerkoenigApiKeyLabel": "API ключ за Tankerkoenig",
   "openChargeMapApiKeyLabel": "API ключ за OpenChargeMap",
   "tapToUpdateGpsPosition": "Докоснете, за да актуализирате GPS позицията",
-  "nameLabel": "Име"
+  "nameLabel": "Име",
+  "obd2ErrorPermissionDenied": "Необходимо е разрешение за Bluetooth, за да се свържете с OBD2 адаптер.",
+  "obd2ErrorBluetoothOff": "Включете Bluetooth и опитайте отново.",
+  "obd2ErrorScanTimeout": "Наблизо не е намерен OBD2 адаптер. Уверете се, че е включен и захранен.",
+  "obd2ErrorAdapterUnresponsive": "OBD2 адаптерът не отговори. Включете запалването и опитайте отново.",
+  "obd2ErrorProtocolInitFailed": "OBD2 адаптерът изпрати неразпознат отговор. Възможно е да е несъвместим — опитайте друг адаптер.",
+  "obd2ErrorDisconnected": "OBD2 адаптерът се изключи. Свържете се отново и опитайте пак."
 }

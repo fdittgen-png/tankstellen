@@ -1646,5 +1646,11 @@
   "tankerkoenigApiKeyLabel": "Tankerkoenig-API-avain",
   "openChargeMapApiKeyLabel": "OpenChargeMap-API-avain",
   "tapToUpdateGpsPosition": "Päivitä GPS-sijainti napauttamalla",
-  "nameLabel": "Nimi"
+  "nameLabel": "Nimi",
+  "obd2ErrorPermissionDenied": "OBD2-sovittimeen yhdistäminen edellyttää Bluetooth-lupaa.",
+  "obd2ErrorBluetoothOff": "Ota Bluetooth käyttöön ja yritä uudelleen.",
+  "obd2ErrorScanTimeout": "Lähistöltä ei löytynyt OBD2-sovitinta. Varmista, että se on kytkettynä ja päällä.",
+  "obd2ErrorAdapterUnresponsive": "OBD2-sovitin ei vastannut. Kytke virta päälle ja yritä uudelleen.",
+  "obd2ErrorProtocolInitFailed": "OBD2-sovitin lähetti tunnistamattoman vastauksen. Se voi olla yhteensopimaton — kokeile toista sovitinta.",
+  "obd2ErrorDisconnected": "OBD2-sovittimen yhteys katkesi. Yhdistä uudelleen ja yritä uudelleen."
 }

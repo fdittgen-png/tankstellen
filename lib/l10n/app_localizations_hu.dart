@@ -3282,6 +3282,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String get nameLabel => 'Név';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Az OBD2-adapterhez való csatlakozáshoz Bluetooth-engedély szükséges.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Kapcsolja be a Bluetootht, és próbálja újra.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Nem található OBD2-adapter a közelben. Ellenőrizze, hogy be van-e dugva és be van-e kapcsolva.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'Az OBD2-adapter nem válaszolt. Kapcsolja be a gyújtást, és próbálja újra.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'Az OBD2-adapter ismeretlen választ küldött. Lehet, hogy nem kompatibilis — próbáljon meg másik adaptert.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'Az OBD2-adapter kapcsolata megszakadt. Csatlakozzon újra, és próbálja újra.';
+
+  @override
   String get achievementSmoothDriver => 'Sima sorozat';
 
   @override

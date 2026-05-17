@@ -3262,6 +3262,29 @@ class AppLocalizationsSl extends AppLocalizations {
   String get nameLabel => 'Ime';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Za povezavo z vmesnikom OBD2 je potrebno dovoljenje za Bluetooth.';
+
+  @override
+  String get obd2ErrorBluetoothOff => 'Vklopite Bluetooth in poskusite znova.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'V bližini ni bil najden vmesnik OBD2. Preverite, ali je priključen in vklopljen.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'Vmesnik OBD2 se ni odzval. Vklopite vžig in poskusite znova.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'Vmesnik OBD2 je poslal neprepoznan odgovor. Morda ni združljiv — poskusite z drugim vmesnikom.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'Vmesnik OBD2 je prekinil povezavo. Znova se povežite in poskusite znova.';
+
+  @override
   String get achievementSmoothDriver => 'Mirna serija';
 
   @override

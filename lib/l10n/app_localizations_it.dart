@@ -3274,6 +3274,29 @@ class AppLocalizationsIt extends AppLocalizations {
   String get nameLabel => 'Nome';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'È necessaria l\'autorizzazione Bluetooth per connettersi a un adattatore OBD2.';
+
+  @override
+  String get obd2ErrorBluetoothOff => 'Attiva il Bluetooth e riprova.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Nessun adattatore OBD2 trovato nelle vicinanze. Assicurati che sia collegato e acceso.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'L\'adattatore OBD2 non ha risposto. Inserisci il quadro e riprova.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'L\'adattatore OBD2 ha inviato una risposta non riconosciuta. Potrebbe essere incompatibile: prova un altro adattatore.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'L\'adattatore OBD2 si è disconnesso. Riconnettilo e riprova.';
+
+  @override
   String get achievementSmoothDriver => 'Serie di guida fluida';
 
   @override

@@ -3259,6 +3259,29 @@ class AppLocalizationsDa extends AppLocalizations {
   String get nameLabel => 'Navn';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Bluetooth-tilladelse er påkrævet for at oprette forbindelse til en OBD2-adapter.';
+
+  @override
+  String get obd2ErrorBluetoothOff => 'Slå Bluetooth til, og prøv igen.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Ingen OBD2-adapter fundet i nærheden. Kontroller, at den er tilsluttet og tændt.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'OBD2-adapteren svarede ikke. Slå tændingen til, og prøv igen.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'OBD2-adapteren sendte et ukendt svar. Den er muligvis inkompatibel — prøv en anden adapter.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'OBD2-adapteren blev afbrudt. Tilslut igen, og prøv igen.';
+
+  @override
   String get achievementSmoothDriver => 'Blød stræk';
 
   @override

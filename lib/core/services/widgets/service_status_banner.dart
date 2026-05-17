@@ -154,6 +154,8 @@ class ServiceChainErrorWidget extends StatelessWidget {
       final chain = error as ServiceChainExhaustedException;
       return chain.errors.map((e) {
         if (e is ServiceError) {
+          // i18n-ignore: developer diagnostic — this is the expandable
+          // technical-details section, intentionally raw for debugging.
           return '${e.source.displayName}: ${e.message}';
         }
         return render(e);

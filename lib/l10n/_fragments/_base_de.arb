@@ -1274,5 +1274,11 @@
   "tankerkoenigApiKeyLabel": "Tankerkoenig-API-Schlüssel",
   "openChargeMapApiKeyLabel": "OpenChargeMap-API-Schlüssel",
   "tapToUpdateGpsPosition": "Zum Aktualisieren der GPS-Position tippen",
-  "nameLabel": "Name"
+  "nameLabel": "Name",
+  "obd2ErrorPermissionDenied": "Für die Verbindung mit einem OBD2-Adapter ist die Bluetooth-Berechtigung erforderlich.",
+  "obd2ErrorBluetoothOff": "Schalte Bluetooth ein und versuche es erneut.",
+  "obd2ErrorScanTimeout": "Kein OBD2-Adapter in der Nähe gefunden. Stelle sicher, dass er eingesteckt und eingeschaltet ist.",
+  "obd2ErrorAdapterUnresponsive": "Der OBD2-Adapter hat nicht geantwortet. Schalte die Zündung ein und versuche es erneut.",
+  "obd2ErrorProtocolInitFailed": "Der OBD2-Adapter hat eine unbekannte Antwort gesendet. Er ist möglicherweise nicht kompatibel — probiere einen anderen Adapter.",
+  "obd2ErrorDisconnected": "Der OBD2-Adapter wurde getrennt. Stelle die Verbindung wieder her und versuche es erneut."
 }

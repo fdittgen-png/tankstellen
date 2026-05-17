@@ -3271,6 +3271,29 @@ class AppLocalizationsPl extends AppLocalizations {
   String get nameLabel => 'Nazwa';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Do połączenia z adapterem OBD2 wymagane jest uprawnienie Bluetooth.';
+
+  @override
+  String get obd2ErrorBluetoothOff => 'Włącz Bluetooth i spróbuj ponownie.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Nie znaleziono adaptera OBD2 w pobliżu. Upewnij się, że jest podłączony i włączony.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'Adapter OBD2 nie odpowiedział. Włącz zapłon i spróbuj ponownie.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'Adapter OBD2 wysłał nierozpoznaną odpowiedź. Może być niekompatybilny — wypróbuj inny adapter.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'Adapter OBD2 został odłączony. Połącz ponownie i spróbuj jeszcze raz.';
+
+  @override
   String get achievementSmoothDriver => 'Seria płynnej jazdy';
 
   @override

@@ -1646,5 +1646,11 @@
   "tankerkoenigApiKeyLabel": "Tankerkoenigi API-võti",
   "openChargeMapApiKeyLabel": "OpenChargeMapi API-võti",
   "tapToUpdateGpsPosition": "Puudutage GPS-asukoha värskendamiseks",
-  "nameLabel": "Nimi"
+  "nameLabel": "Nimi",
+  "obd2ErrorPermissionDenied": "OBD2-adapteriga ühenduse loomiseks on vaja Bluetoothi luba.",
+  "obd2ErrorBluetoothOff": "Lülitage Bluetooth sisse ja proovige uuesti.",
+  "obd2ErrorScanTimeout": "Läheduses ei leitud OBD2-adapterit. Veenduge, et see on ühendatud ja sisse lülitatud.",
+  "obd2ErrorAdapterUnresponsive": "OBD2-adapter ei vastanud. Lülitage süüde sisse ja proovige uuesti.",
+  "obd2ErrorProtocolInitFailed": "OBD2-adapter saatis tundmatu vastuse. See võib olla ühildumatu — proovige teist adapterit.",
+  "obd2ErrorDisconnected": "OBD2-adapter katkestas ühenduse. Ühendage uuesti ja proovige uuesti."
 }

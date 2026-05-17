@@ -3266,6 +3266,30 @@ class AppLocalizationsHr extends AppLocalizations {
   String get nameLabel => 'Naziv';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'Za povezivanje s OBD2 adapterom potrebno je dopuštenje za Bluetooth.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Uključite Bluetooth i pokušajte ponovno.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'U blizini nije pronađen OBD2 adapter. Provjerite je li priključen i uključen.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'OBD2 adapter nije odgovorio. Uključite paljenje i pokušajte ponovno.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'OBD2 adapter poslao je neprepoznat odgovor. Možda nije kompatibilan — pokušajte s drugim adapterom.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'OBD2 adapter se isključio. Ponovno se povežite i pokušajte ponovno.';
+
+  @override
   String get achievementSmoothDriver => 'Niz mirnih vožnji';
 
   @override

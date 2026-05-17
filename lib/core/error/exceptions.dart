@@ -2,8 +2,21 @@
 ///
 /// Sealed so that `switch` on [AppException] is exhaustive and all
 /// catch blocks using `on AppException` will match any app error.
+///
+/// ## `message` is a developer diagnostic — not user-facing (#1663)
+///
+/// Every [message] string here (and in the data-layer throw sites that
+/// raise these — `ApiException('Invalid MITECO response')`, etc.) is an
+/// English diagnostic for logs and [toString]. It is deliberately NOT
+/// localized: the user-facing path is `ErrorLocalizer.localize`, which
+/// maps each exception *type* (and HTTP status) to a translated ARB
+/// string and never reads `message`. UI code must therefore route every
+/// error through `ErrorLocalizer` rather than showing `e.message` /
+/// `e.toString()` directly.
 sealed class AppException implements Exception {
   const AppException();
+
+  /// English developer diagnostic — see the class doc. Not for display.
   String get message;
 }
 

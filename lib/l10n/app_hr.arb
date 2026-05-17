@@ -1646,5 +1646,11 @@
   "tankerkoenigApiKeyLabel": "Tankerkoenig API ključ",
   "openChargeMapApiKeyLabel": "OpenChargeMap API ključ",
   "tapToUpdateGpsPosition": "Dodirnite za ažuriranje GPS položaja",
-  "nameLabel": "Naziv"
+  "nameLabel": "Naziv",
+  "obd2ErrorPermissionDenied": "Za povezivanje s OBD2 adapterom potrebno je dopuštenje za Bluetooth.",
+  "obd2ErrorBluetoothOff": "Uključite Bluetooth i pokušajte ponovno.",
+  "obd2ErrorScanTimeout": "U blizini nije pronađen OBD2 adapter. Provjerite je li priključen i uključen.",
+  "obd2ErrorAdapterUnresponsive": "OBD2 adapter nije odgovorio. Uključite paljenje i pokušajte ponovno.",
+  "obd2ErrorProtocolInitFailed": "OBD2 adapter poslao je neprepoznat odgovor. Možda nije kompatibilan — pokušajte s drugim adapterom.",
+  "obd2ErrorDisconnected": "OBD2 adapter se isključio. Ponovno se povežite i pokušajte ponovno."
 }

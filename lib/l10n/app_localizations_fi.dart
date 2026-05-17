@@ -3261,6 +3261,30 @@ class AppLocalizationsFi extends AppLocalizations {
   String get nameLabel => 'Nimi';
 
   @override
+  String get obd2ErrorPermissionDenied =>
+      'OBD2-sovittimeen yhdistäminen edellyttää Bluetooth-lupaa.';
+
+  @override
+  String get obd2ErrorBluetoothOff =>
+      'Ota Bluetooth käyttöön ja yritä uudelleen.';
+
+  @override
+  String get obd2ErrorScanTimeout =>
+      'Lähistöltä ei löytynyt OBD2-sovitinta. Varmista, että se on kytkettynä ja päällä.';
+
+  @override
+  String get obd2ErrorAdapterUnresponsive =>
+      'OBD2-sovitin ei vastannut. Kytke virta päälle ja yritä uudelleen.';
+
+  @override
+  String get obd2ErrorProtocolInitFailed =>
+      'OBD2-sovitin lähetti tunnistamattoman vastauksen. Se voi olla yhteensopimaton — kokeile toista sovitinta.';
+
+  @override
+  String get obd2ErrorDisconnected =>
+      'OBD2-sovittimen yhteys katkesi. Yhdistä uudelleen ja yritä uudelleen.';
+
+  @override
   String get achievementSmoothDriver => 'Tasainen putki';
 
   @override
