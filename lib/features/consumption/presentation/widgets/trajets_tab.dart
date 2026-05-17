@@ -145,7 +145,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
     // than starting a new one.
     final isRecordingActive = ref.watch(tripRecordingProvider).isActive;
     final header = Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 220),
         child: stage == null
@@ -284,14 +284,14 @@ class _TrajetRow extends StatelessWidget {
 
     return Card(
       key: ValueKey('trajet-${entry.id}'),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             children: [
-              const Icon(Icons.route, size: 28),
+              const Icon(Icons.route, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
