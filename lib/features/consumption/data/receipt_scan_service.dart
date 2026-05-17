@@ -105,7 +105,10 @@ class ReceiptScanService {
   Future<PumpDisplayScanOutcome?> scanPumpDisplay() async {
     final capture = await _capture();
     if (capture == null) return null;
-    final text = await _recognise(capture);
+    // #1860 — the pump path runs an extra grayscale + contrast pass so
+    // ML Kit can read 7-segment LCDs and sky-washed displays. Scoped
+    // here so the prose-receipt OCR is not affected.
+    final text = await _recognise(capture, enhanceContrast: true);
     if (text == null) {
       await _tryDelete(capture);
       return null;
@@ -136,10 +139,14 @@ class ReceiptScanService {
   /// read, the dominant cause of the pump-display OCR failures. We OCR
   /// an EXIF-upright temp copy and delete it immediately; the original
   /// [path] is untouched for the bad-scan reporting flow.
-  Future<String?> _recognise(String path) async {
+  ///
+  /// #1860 — when [enhanceContrast] is set (the pump-display path) the
+  /// temp copy also gets a grayscale + histogram-normalise + contrast
+  /// pass so 7-segment LCDs and washed-out displays become readable.
+  Future<String?> _recognise(String path, {bool enhanceContrast = false}) async {
     String? uprightTemp;
     try {
-      uprightTemp = await _writeUprightCopy(path);
+      uprightTemp = await _writeUprightCopy(path, enhanceContrast: enhanceContrast);
       final inputImage = InputImage.fromFilePath(uprightTemp ?? path);
       final recognized = await _recognizer.processImage(inputImage);
       final text = recognized.text;
@@ -157,9 +164,19 @@ class ReceiptScanService {
   /// pixels, and writes the upright result to a sibling temp file —
   /// returns that temp path, or null when the image cannot be decoded
   /// (the caller then OCRs the original unchanged).
-  Future<String?> _writeUprightCopy(String path) async {
+  ///
+  /// #1860 — with [enhanceContrast] the temp copy is additionally run
+  /// through [preprocessPumpDisplayForOcr] (grayscale + normalise +
+  /// contrast); otherwise it is the plain [bakeImageOrientation] path.
+  Future<String?> _writeUprightCopy(
+    String path, {
+    bool enhanceContrast = false,
+  }) async {
     try {
-      final upright = bakeImageOrientation(await File(path).readAsBytes());
+      final bytes = await File(path).readAsBytes();
+      final upright = enhanceContrast
+          ? preprocessPumpDisplayForOcr(bytes)
+          : bakeImageOrientation(bytes);
       if (upright == null) return null;
       final tempPath = '$path.upright.jpg';
       await File(tempPath).writeAsBytes(upright);
@@ -210,6 +227,42 @@ Uint8List? bakeImageOrientation(Uint8List jpegBytes) {
   } catch (e, st) {
     // A malformed / non-JPEG file is not fatal — OCR the original.
     debugPrint('bakeImageOrientation: decode failed: $e\n$st');
+    return null;
+  }
+}
+
+/// Re-encodes a pump-display capture for OCR (#1860).
+///
+/// Bakes EXIF orientation (exactly as [bakeImageOrientation] does) and
+/// then applies a three-step enhancement pass:
+///
+///   1. **grayscale** — colour carries no signal on a monochrome LCD
+///      and only adds noise for the recognizer.
+///   2. **histogram normalise** — stretches the tonal range to the
+///      full 0–255 span, the fix for sky-washed / grey-on-grey
+///      displays whose digits and background sit a few levels apart.
+///   3. **contrast boost** — crisps the 7-segment edges so ML Kit's
+///      general recognizer stops dropping/misreading segment digits.
+///
+/// Scoped to the pump-display path only — [scanReceipt]'s prose-receipt
+/// OCR keeps the plain [bakeImageOrientation] path, since this much
+/// contrast would crush faint thermal-receipt print and regress
+/// full-page recognition (#1860 acceptance).
+///
+/// Returns the processed JPEG bytes, or `null` when the input cannot be
+/// decoded as a JPEG — the caller then OCRs the original unchanged.
+Uint8List? preprocessPumpDisplayForOcr(Uint8List jpegBytes) {
+  try {
+    final decoded = img.decodeJpg(jpegBytes);
+    if (decoded == null) return null;
+    final upright = img.bakeOrientation(decoded);
+    final gray = img.grayscale(upright);
+    final normalized = img.normalize(gray, min: 0, max: 255);
+    final boosted = img.contrast(normalized, contrast: 140);
+    return img.encodeJpg(boosted, quality: 90);
+  } catch (e, st) {
+    // A malformed / non-JPEG file is not fatal — OCR the original.
+    debugPrint('preprocessPumpDisplayForOcr: decode failed: $e\n$st');
     return null;
   }
 }
