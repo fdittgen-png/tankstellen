@@ -4232,6 +4232,20 @@ class AppLocalizationsEt extends AppLocalizations {
       'Saatmine ebaõnnestus — käsitsi jagamine';
 
   @override
+  String get pumpCameraHint => 'Joonda tankla ekraani kolm numbrit raami sisse';
+
+  @override
+  String get pumpCameraCapture => 'Pildista';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Tankla ekraani skannimiseks on vaja kaamera juurdepääsu. Lubage see seadme seadetes.';
+
+  @override
+  String get pumpCameraError =>
+      'Kaamerat ei õnnestunud käivitada. Proovige uuesti või sisestage väärtused käsitsi.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mida täitsid';
 
   @override

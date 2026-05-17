@@ -4241,6 +4241,21 @@ class AppLocalizationsCs extends AppLocalizations {
   String get badScanReportFallbackToShare => 'Odeslání selhalo — ruční sdílení';
 
   @override
+  String get pumpCameraHint =>
+      'Zarovnejte tři čísla z displeje stojanu do rámečku';
+
+  @override
+  String get pumpCameraCapture => 'Vyfotit';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Pro naskenování displeje stojanu je potřeba přístup ke kameře. Povolte jej v nastavení zařízení.';
+
+  @override
+  String get pumpCameraError =>
+      'Kameru se nepodařilo spustit. Zkuste to znovu nebo zadejte hodnoty ručně.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Co jste natankovali';
 
   @override

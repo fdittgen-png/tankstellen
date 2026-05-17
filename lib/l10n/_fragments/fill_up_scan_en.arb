@@ -93,5 +93,21 @@
   "badScanReportFallbackToShare": "Submission failed — manual share",
   "@badScanReportFallbackToShare": {
     "description": "Snackbar shown when the GitHub submission fails and we fall back to the system share sheet (#952 phase 2)."
+  },
+  "pumpCameraHint": "Line up the three pump-display numbers inside the frame",
+  "@pumpCameraHint": {
+    "description": "Hint shown over the in-app camera reticle for the pump-display capture (#1868)."
+  },
+  "pumpCameraCapture": "Capture",
+  "@pumpCameraCapture": {
+    "description": "Label of the shutter button on the pump-display camera screen (#1868)."
+  },
+  "pumpCameraPermissionDenied": "Camera access is needed to scan the pump display. Enable it in your device settings.",
+  "@pumpCameraPermissionDenied": {
+    "description": "Shown when the camera permission is denied on the pump-display capture screen (#1868)."
+  },
+  "pumpCameraError": "The camera couldn't start. Try again or enter the values by hand.",
+  "@pumpCameraError": {
+    "description": "Shown when the in-app camera fails to initialise on the pump-display capture screen (#1868)."
   }
 }

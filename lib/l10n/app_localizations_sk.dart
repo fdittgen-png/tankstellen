@@ -4256,6 +4256,21 @@ class AppLocalizationsSk extends AppLocalizations {
       'Odoslanie zlyhalo — ručné zdieľanie';
 
   @override
+  String get pumpCameraHint =>
+      'Zarovnajte tri čísla z displeja stojana do rámčeka';
+
+  @override
+  String get pumpCameraCapture => 'Odfotiť';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Na naskenovanie displeja stojana je potrebný prístup ku kamere. Povoľte ho v nastaveniach zariadenia.';
+
+  @override
+  String get pumpCameraError =>
+      'Kameru sa nepodarilo spustiť. Skúste to znova alebo zadajte hodnoty ručne.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Čo ste natankovali';
 
   @override

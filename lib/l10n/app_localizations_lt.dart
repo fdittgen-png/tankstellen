@@ -4261,6 +4261,21 @@ class AppLocalizationsLt extends AppLocalizations {
       'Pateikimas nepavyko — rankinis bendrinimas';
 
   @override
+  String get pumpCameraHint =>
+      'Sulygiuokite tris degalinės ekrano skaičius rėmelyje';
+
+  @override
+  String get pumpCameraCapture => 'Fotografuoti';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Norint nuskaityti degalinės ekraną, reikia prieigos prie kameros. Įjunkite ją įrenginio nustatymuose.';
+
+  @override
+  String get pumpCameraError =>
+      'Nepavyko paleisti kameros. Bandykite dar kartą arba įveskite reikšmes rankiniu būdu.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Ką pildėte';
 
   @override

@@ -4251,6 +4251,21 @@ class AppLocalizationsNl extends AppLocalizations {
       'Verzending mislukt — handmatig delen';
 
   @override
+  String get pumpCameraHint =>
+      'Lijn de drie cijfers van het pompdisplay uit binnen het kader';
+
+  @override
+  String get pumpCameraCapture => 'Vastleggen';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Cameratoegang is nodig om het pompdisplay te scannen. Schakel het in bij de apparaatinstellingen.';
+
+  @override
+  String get pumpCameraError =>
+      'De camera kon niet starten. Probeer opnieuw of voer de waarden handmatig in.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Wat je getankt hebt';
 
   @override

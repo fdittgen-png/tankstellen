@@ -51,6 +51,12 @@ class FillUpScanHostState {
   /// `await` so we never call setState on a disposed screen.
   final bool Function() isMounted;
 
+  /// Opens the pump-display capture surface — the #1868 in-app camera
+  /// screen with the framing reticle — and returns the captured
+  /// photo's file path, or null when the user cancels or the camera
+  /// is unavailable. A seam so widget tests can stub the capture.
+  final Future<String?> Function(BuildContext) capturePumpImage;
+
   const FillUpScanHostState({
     required this.litersCtrl,
     required this.costCtrl,
@@ -63,6 +69,7 @@ class FillUpScanHostState {
     required this.setFuelType,
     required this.setLastScan,
     required this.isMounted,
+    required this.capturePumpImage,
   });
 }
 
@@ -148,7 +155,11 @@ Future<void> runPumpDisplayScan(
       service = ReceiptScanService();
       state.writeService(service);
     }
-    final outcome = await service.scanPumpDisplay();
+    // #1868 — capture through the in-app camera screen (framing
+    // reticle), then OCR + parse the returned photo.
+    final path = await state.capturePumpImage(context);
+    if (path == null || !state.isMounted()) return;
+    final outcome = await service.parsePumpDisplayImage(path);
     if (outcome == null || !state.isMounted()) return;
     final result = outcome.parse;
     if (!result.hasUsableData) {

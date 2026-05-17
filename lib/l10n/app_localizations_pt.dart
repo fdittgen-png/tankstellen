@@ -4268,6 +4268,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get badScanReportFallbackToShare => 'Envio falhado — partilha manual';
 
   @override
+  String get pumpCameraHint =>
+      'Alinhe os três números do visor da bomba dentro do quadro';
+
+  @override
+  String get pumpCameraCapture => 'Capturar';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'É necessário acesso à câmera para digitalizar o visor da bomba. Ative-o nas configurações do dispositivo.';
+
+  @override
+  String get pumpCameraError =>
+      'A câmera não pôde iniciar. Tente novamente ou insira os valores manualmente.';
+
+  @override
   String get fillUpSectionWhatTitle => 'O que abasteceu';
 
   @override

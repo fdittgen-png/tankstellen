@@ -4235,6 +4235,21 @@ class AppLocalizationsNb extends AppLocalizations {
       'Innsending mislyktes – manuell deling';
 
   @override
+  String get pumpCameraHint =>
+      'Plasser de tre tallene fra pumpedisplayet innenfor rammen';
+
+  @override
+  String get pumpCameraCapture => 'Ta bilde';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Kameratilgang trengs for å skanne pumpedisplayet. Aktiver det i enhetsinnstillingene.';
+
+  @override
+  String get pumpCameraError =>
+      'Kameraet kunne ikke startes. Prøv igjen, eller skriv inn verdiene manuelt.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Hva du fylte';
 
   @override

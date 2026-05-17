@@ -14,9 +14,9 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// Minimal fake [TextRecognizer] — not actually called from this test
-/// (the fake service overrides `scanPumpDisplay`) but required so the
-/// real ReceiptScanService constructor doesn't try to spin up the ML
-/// Kit native handle when we hand it to `super(...)`.
+/// (the fake service overrides `parsePumpDisplayImage`) but required
+/// so the real ReceiptScanService constructor doesn't try to spin up
+/// the ML Kit native handle when we hand it to `super(...)`.
 class _NoopRecognizer extends TextRecognizer {
   _NoopRecognizer();
 
@@ -49,10 +49,12 @@ final _withVehicle = <Object>[
   vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
 ];
 
-/// Fake [ReceiptScanService] that bypasses the camera + ML Kit and
-/// returns a pre-canned [PumpDisplayScanOutcome] for [scanPumpDisplay].
-/// Used by the failure-flow test (#953) to verify the screen opens the
-/// [PumpScanFailureSheet] when the parse result has no usable data.
+/// Fake [ReceiptScanService] that bypasses ML Kit and returns a
+/// pre-canned [PumpDisplayScanOutcome] for [parsePumpDisplayImage]
+/// (the #1868 seam — the camera capture is stubbed separately via
+/// `AddFillUpScreen.pumpImageCapture`). Used by the failure-flow test
+/// (#953) to verify the screen opens the [PumpScanFailureSheet] when
+/// the parse result has no usable data.
 class _FakeFailingScanService extends ReceiptScanService {
   _FakeFailingScanService()
       : super(
@@ -65,7 +67,7 @@ class _FakeFailingScanService extends ReceiptScanService {
   int deleteCalls = 0;
 
   @override
-  Future<PumpDisplayScanOutcome?> scanPumpDisplay() async {
+  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(String path) async {
     return const PumpDisplayScanOutcome(
       // confidence == 0 + only one usable field → !hasUsableData → opens
       // the failure-flow sheet.
@@ -101,7 +103,12 @@ void main() {
     ) async {
       await pumpApp(
         tester,
-        AddFillUpScreen(scanService: scanService),
+        AddFillUpScreen(
+          scanService: scanService,
+          // #1868 — stub the in-app camera so the test feeds a fixture
+          // path straight into parsePumpDisplayImage.
+          pumpImageCapture: (_) async => '/tmp/fake-pump-failure.jpg',
+        ),
         overrides: _withVehicle,
       );
       // #951 — the import affordance is now two visible buttons; the

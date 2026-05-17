@@ -4249,6 +4249,21 @@ class AppLocalizationsHr extends AppLocalizations {
       'Slanje nije uspjelo — ručno dijeljenje';
 
   @override
+  String get pumpCameraHint =>
+      'Poravnajte tri broja sa zaslona crpke unutar okvira';
+
+  @override
+  String get pumpCameraCapture => 'Snimi';
+
+  @override
+  String get pumpCameraPermissionDenied =>
+      'Pristup kameri potreban je za skeniranje zaslona crpke. Omogućite ga u postavkama uređaja.';
+
+  @override
+  String get pumpCameraError =>
+      'Kamera se nije mogla pokrenuti. Pokušajte ponovno ili unesite vrijednosti ručno.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Što ste natočili';
 
   @override
