@@ -248,13 +248,9 @@ class HiveBoxes {
     );
 
     // Phase 2 — open the first-frame-critical boxes in one parallel
-    // batch: the 6 encrypted domain boxes plus the unencrypted boxes the
-    // landing path / background isolate need immediately.
-    //
-    // #1686 — a box file damaged beyond Hive's own crash recovery
-    // throws here. It is re-tagged as a HiveCorruptionException so the
-    // startup error path can prompt for recovery, rather than crashing
-    // on a raw HiveError or booting with the box silently missing.
+    // batch. #1686 — a box damaged beyond Hive's crash recovery throws
+    // here; it is re-tagged as a HiveCorruptionException for the startup
+    // error path rather than crashing on a raw HiveError.
     try {
       await Future.wait<Box<dynamic>>([
         Hive.openBox(settings, encryptionCipher: cipher),
@@ -273,9 +269,8 @@ class HiveBoxes {
         // #1686 — schema-version meta box. Unencrypted: small integers.
         Hive.openBox<int>(boxSchema),
       ]);
-      // HiveError is Hive's runtime storage-failure type (a damaged box
-      // file), not a programmer bug — re-tag it for the startup path.
-    } on HiveError catch (e) { // ignore: avoid_catching_errors
+      // HiveError is Hive's runtime storage-failure type, not a bug.
+    } on HiveError catch (e, st) { // ignore: avoid_catching_errors, unused_catch_stack
       throw HiveCorruptionException(
           'a storage box could not be opened (${e.message})');
     }
