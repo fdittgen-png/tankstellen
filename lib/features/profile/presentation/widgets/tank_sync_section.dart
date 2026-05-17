@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
+import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -39,6 +40,7 @@ class TankSyncSection extends ConsumerWidget {
     ThemeData theme,
   ) {
     final l = AppLocalizations.of(context);
+    final consent = ref.watch(gdprConsentProvider);
     return [
       ListTile(
         leading: const Icon(Icons.cloud_done, color: Colors.green),
@@ -63,6 +65,39 @@ class TankSyncSection extends ConsumerWidget {
           subtitle: Text(l?.switchToAnonymousSubtitle ?? 'Keep local data, use new anonymous session'),
           onTap: () => _confirmSwitchToAnonymous(context, ref),
         ),
+      const Divider(indent: 16, endIndent: 16),
+      // #1665 — trajet sync. Recorded trips upload to TankSync only
+      // when a non-anonymous (email) account is configured AND this
+      // toggle is on AND Cloud Sync consent is granted. Disabled with
+      // a hint when the account is anonymous or Cloud Sync is off.
+      SwitchListTile(
+        key: const Key('tripsSyncToggle'),
+        secondary: const Icon(Icons.route_outlined),
+        title: Text(l?.consentSyncTripsTitle ?? 'Sync trip recordings'),
+        subtitle: Text(
+          !consent.cloudSync
+              ? (l?.consentSyncTripsDisabledHint ??
+                  'Enable Cloud Sync to back up trips.')
+              : !syncConfig.hasEmail
+                  ? (l?.consentSyncTripsNeedsEmailHint ??
+                      'Sign in with an email account to sync trips '
+                          'across devices.')
+                  : (l?.consentSyncTripsSubtitle ??
+                      'Back up OBD2 + GPS trips to TankSync. '
+                          'Cross-device, opt-in.'),
+        ),
+        value: consent.syncTrips,
+        onChanged: (consent.cloudSync && syncConfig.hasEmail)
+            ? (v) => ref.read(gdprConsentProvider.notifier).save(
+                  location: consent.location,
+                  errorReporting: consent.errorReporting,
+                  cloudSync: consent.cloudSync,
+                  communityWaitTime: consent.communityWaitTime,
+                  vinOnlineDecode: consent.vinOnlineDecode,
+                  syncTrips: v,
+                )
+            : null,
+      ),
       const Divider(indent: 16, endIndent: 16),
       ListTile(
         leading: const Icon(Icons.visibility_outlined),

@@ -2937,6 +2937,7 @@
   "consentSyncTripsTitle": "Sync trip recordings",
   "consentSyncTripsSubtitle": "Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.",
   "consentSyncTripsDisabledHint": "Enable Cloud Sync above to back up trips.",
+  "consentSyncTripsNeedsEmailHint": "Sign in with an email account to sync trips across devices.",
   "consentHideDetails": "Hide details",
   "consentShowDetails": "Show details",
   "dialogOk": "OK",

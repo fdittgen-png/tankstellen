@@ -4450,6 +4450,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ενεργοποιήστε τον Συγχρονισμό Cloud παραπάνω για δημιουργία αντιγράφων ταξιδιών.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Συνδεθείτε με λογαριασμό email για συγχρονισμό διαδρομών μεταξύ συσκευών.';
+
+  @override
   String get consentHideDetails => 'Απόκρυψη λεπτομερειών';
 
   @override

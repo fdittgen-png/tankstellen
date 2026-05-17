@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Útfelvételek szinkronizálása",
   "consentSyncTripsSubtitle": "OBD2 + GPS utak mentése TankSync-re. Eszközök között, opcionális.",
   "consentSyncTripsDisabledHint": "Az utak mentéséhez engedélyezze a Felhőszinkronizálást fentebb.",
+  "consentSyncTripsNeedsEmailHint": "Jelentkezz be e-mail-fiókkal az utak eszközök közötti szinkronizálásához.",
   "consentHideDetails": "Részletek elrejtése",
   "consentShowDetails": "Részletek megjelenítése",
   "dialogOk": "OK",

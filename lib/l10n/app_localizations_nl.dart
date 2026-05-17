@@ -4425,6 +4425,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Schakel hierboven Cloudsync in om ritten te back-uppen.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Meld je aan met een e-mailaccount om ritten tussen apparaten te synchroniseren.';
+
+  @override
   String get consentHideDetails => 'Details verbergen';
 
   @override

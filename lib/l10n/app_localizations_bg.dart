@@ -4447,6 +4447,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Активирайте облачната синхронизация по-горе за резервно копие на пътуванията.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Влезте с имейл акаунт, за да синхронизирате пътуванията между устройства.';
+
+  @override
   String get consentHideDetails => 'Скрий подробностите';
 
   @override

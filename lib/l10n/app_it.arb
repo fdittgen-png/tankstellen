@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Sincronizza registrazioni percorsi",
   "consentSyncTripsSubtitle": "Backup percorsi OBD2 + GPS su TankSync. Multi-dispositivo, opt-in.",
   "consentSyncTripsDisabledHint": "Abilita la sincronizzazione cloud sopra per fare il backup dei percorsi.",
+  "consentSyncTripsNeedsEmailHint": "Accedi con un account e-mail per sincronizzare i viaggi tra dispositivi.",
   "consentHideDetails": "Nascondi dettagli",
   "consentShowDetails": "Mostra dettagli",
   "dialogOk": "OK",

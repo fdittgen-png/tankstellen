@@ -4405,6 +4405,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Luba ülal Pilvsünkroonimine reiside varundamiseks.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Logige sisse e-posti kontoga, et sõite seadmete vahel sünkroonida.';
+
+  @override
   String get consentHideDetails => 'Peida üksikasjad';
 
   @override

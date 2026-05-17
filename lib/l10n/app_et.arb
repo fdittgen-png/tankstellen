@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Sünkrooni reisi salvestisi",
   "consentSyncTripsSubtitle": "Varunda OBD2 + GPS reisid TankSync'i. Seadmeteülene, vabatahtlik.",
   "consentSyncTripsDisabledHint": "Luba ülal Pilvsünkroonimine reiside varundamiseks.",
+  "consentSyncTripsNeedsEmailHint": "Logige sisse e-posti kontoga, et sõite seadmete vahel sünkroonida.",
   "consentHideDetails": "Peida üksikasjad",
   "consentShowDetails": "Kuva üksikasjad",
   "dialogOk": "OK",

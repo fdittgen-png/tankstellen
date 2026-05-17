@@ -4408,6 +4408,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ota pilvisynkronointi käyttöön yllä varmuuskopioidaksesi matkat.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Kirjaudu sähköpostitilillä, jotta voit synkronoida matkat laitteiden välillä.';
+
+  @override
   String get consentHideDetails => 'Piilota tiedot';
 
   @override

@@ -156,42 +156,14 @@ class _ConsentSettingsSectionState
                 syncTrips: consent.syncTrips,
               ),
         ),
-        // #1479 phase 1 — trip-sync consent. Sits LAST so the
-        // historical 0..4 SwitchListTile indices in older tests stay
-        // stable. Gated on the master Cloud Sync above; the toggle
-        // is disabled (onChanged: null) when cloudSync is off and the
-        // provider's `save()` enforces effective-false when
-        // cloudSync=false so the visible position stays honest.
-        SwitchListTile(
-          key: const Key('consentSyncTripsToggle'),
-          secondary: const Icon(Icons.route_outlined, size: 20),
-          title: Text(l10n?.consentSyncTripsTitle ?? 'Sync trip recordings'),
-          subtitle: Text(
-            consent.cloudSync
-                ? (l10n?.consentSyncTripsSubtitle ??
-                    'Back up OBD2 + GPS trips to TankSync. '
-                        'Cross-device, opt-in.')
-                : (l10n?.consentSyncTripsDisabledHint ??
-                    'Enable Cloud Sync above to back up trips.'),
-            style: theme.textTheme.bodySmall,
-            maxLines: collapsedMaxLines(),
-            overflow: collapsedOverflow(),
-          ),
-          value: consent.syncTrips,
-          onChanged: consent.cloudSync
-              ? (v) => ref.read(gdprConsentProvider.notifier).save(
-                    location: consent.location,
-                    errorReporting: consent.errorReporting,
-                    cloudSync: consent.cloudSync,
-                    communityWaitTime: consent.communityWaitTime,
-                    vinOnlineDecode: consent.vinOnlineDecode,
-                    syncTrips: v,
-                  )
-              : null,
-        ),
-        // #1529 — section-level expand toggle for the 4 collapsed
+        // #1665 — the trajet-sync toggle moved to Settings → TankSync
+        // (`tank_sync_section.dart`); it now also gates on a
+        // non-anonymous account, which only makes sense alongside the
+        // account controls. The `consentSyncTrips` storage key +
+        // `GdprConsent.syncTrips` field still back it.
+        // #1529 — section-level expand toggle for the 3 collapsed
         // subtitles (Cloud Sync, Community Wait Times, VIN online
-        // decode, Sync trip recordings). The first two consents
+        // decode). The first two consents
         // (Location, Error Reporting) keep their full text always
         // because they're the ones a user is most likely to revisit.
         Align(

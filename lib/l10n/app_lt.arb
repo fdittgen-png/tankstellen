@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Sinchronizuoti kelionių įrašus",
   "consentSyncTripsSubtitle": "Kurti atsargines OBD2 + GPS kelionių kopijas TankSync. Tarpįrengininis, pasirenkamas.",
   "consentSyncTripsDisabledHint": "Įjunkite debesų sinchronizavimą aukščiau, kad kurti atsargines kelionių kopijas.",
+  "consentSyncTripsNeedsEmailHint": "Prisijunkite naudodami el. pašto paskyrą, kad sinchronizuotumėte keliones tarp įrenginių.",
   "consentHideDetails": "Slėpti detales",
   "consentShowDetails": "Rodyti detales",
   "dialogOk": "Gerai",

@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Sinhroniziraj posnetke voženj",
   "consentSyncTripsSubtitle": "Varnostno kopiraj OBD2 + GPS vožnje v TankSync. Med napravami, po izbiri.",
   "consentSyncTripsDisabledHint": "Zgoraj omogočite sinhronizacijo v oblaku za varnostno kopiranje voženj.",
+  "consentSyncTripsNeedsEmailHint": "Prijavite se z e-poštnim računom za sinhronizacijo voženj med napravami.",
   "consentHideDetails": "Skrij podrobnosti",
   "consentShowDetails": "Prikaži podrobnosti",
   "dialogOk": "V redu",

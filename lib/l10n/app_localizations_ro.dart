@@ -4439,6 +4439,10 @@ class AppLocalizationsRo extends AppLocalizations {
       'Activați mai întâi Sincronizarea cloud pentru a face backup la călătorii.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Conectează-te cu un cont de e-mail pentru a sincroniza călătoriile între dispozitive.';
+
+  @override
   String get consentHideDetails => 'Ascundeți detaliile';
 
   @override

@@ -1389,6 +1389,7 @@
   "consentSyncTripsTitle": "Synchroniser les trajets enregistrés",
   "consentSyncTripsSubtitle": "Sauvegardez les trajets OBD2 + GPS dans TankSync. Multi-appareil, opt-in.",
   "consentSyncTripsDisabledHint": "Activez Cloud Sync ci-dessus pour sauvegarder les trajets.",
+  "consentSyncTripsNeedsEmailHint": "Connecte-toi avec un compte e-mail pour synchroniser les trajets entre appareils.",
   "consentHideDetails": "Masquer les détails",
   "consentShowDetails": "Afficher les détails",
   "dialogOk": "OK",

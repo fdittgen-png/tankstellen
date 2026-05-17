@@ -4431,6 +4431,10 @@ class AppLocalizationsSk extends AppLocalizations {
       'Zapnite synchronizáciu s cloudom vyššie pre zálohovanie jázd.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Prihláste sa pomocou e-mailového účtu na synchronizáciu jázd medzi zariadeniami.';
+
+  @override
   String get consentHideDetails => 'Skryť podrobnosti';
 
   @override

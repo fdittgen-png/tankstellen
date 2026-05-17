@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Sincronizar grabaciones de viajes",
   "consentSyncTripsSubtitle": "Haz una copia de seguridad de los viajes OBD2 + GPS en TankSync. Entre dispositivos, opcional.",
   "consentSyncTripsDisabledHint": "Activa la sincronización en la nube arriba para hacer copias de seguridad de los viajes.",
+  "consentSyncTripsNeedsEmailHint": "Inicia sesión con una cuenta de correo para sincronizar los viajes entre dispositivos.",
   "consentHideDetails": "Ocultar detalles",
   "consentShowDetails": "Mostrar detalles",
   "dialogOk": "Aceptar",

@@ -4444,6 +4444,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Ative a Sincronização na Nuvem acima para fazer cópia de segurança das viagens.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Inicia sessão com uma conta de e-mail para sincronizar as viagens entre dispositivos.';
+
+  @override
   String get consentHideDetails => 'Ocultar detalhes';
 
   @override

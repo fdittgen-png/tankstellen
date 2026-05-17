@@ -4435,6 +4435,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Įjunkite debesų sinchronizavimą aukščiau, kad kurti atsargines kelionių kopijas.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Prisijunkite naudodami el. pašto paskyrą, kad sinchronizuotumėte keliones tarp įrenginių.';
+
+  @override
   String get consentHideDetails => 'Slėpti detales';
 
   @override
