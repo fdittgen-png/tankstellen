@@ -1,9 +1,10 @@
 part of 'profile_edit_sheet.dart';
 
-/// Route-planning preferences — route-segment spacing and the maximum
-/// detour budget (#1602). The whole section is gated on
-/// `Feature.routePlanning` by the caller, so it is only built when the
-/// "along the route" search mode is reachable.
+/// Route-planning preferences — route-segment spacing, the maximum
+/// detour budget (#1602) and the minimum-saving filter (#1872). The
+/// whole section is gated on `Feature.routePlanning` by the caller, so
+/// it is only built when the "along the route" search mode is
+/// reachable.
 class _RouteSegmentSection extends StatelessWidget {
   final ProfileEditState state;
   final ProfileEditController ctrl;
@@ -68,6 +69,55 @@ class _RouteSegmentSection extends StatelessWidget {
             l10n?.routeDetourBudgetCaption(state.routeDetourBudgetKm.round()) ??
                 'Surface stations up to ${state.routeDetourBudgetKm.round()} '
                     'km off your direct route',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        _buildMinSavingRow(context, theme, l10n),
+      ],
+    );
+  }
+
+  /// Minimum-saving slider (#1872). `0.0` is shown as "Off" — every
+  /// station along the route is surfaced; a positive value keeps only
+  /// stations priced within that band of the route's cheapest.
+  Widget _buildMinSavingRow(
+    BuildContext context,
+    ThemeData theme,
+    AppLocalizations? l10n,
+  ) {
+    final saving = state.minRouteSavingPerLiter;
+    final off = saving <= 0;
+    // i18n-ignore: language-neutral currency-per-litre unit mask.
+    final amount = '${saving.toStringAsFixed(2)} €/L';
+    final valueLabel = off ? (l10n?.routeMinSavingOff ?? 'Off') : amount;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Text('${l10n?.routeMinSaving ?? "Minimum saving"}:'),
+            Expanded(
+              child: Slider(
+                value: saving,
+                max: 0.30,
+                divisions: 30,
+                label: valueLabel,
+                onChanged: ctrl.setMinRouteSavingPerLiter,
+              ),
+            ),
+            Text(valueLabel),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Text(
+            off
+                ? (l10n?.routeMinSavingOffCaption ??
+                    'Showing every station found along the route')
+                : (l10n?.routeMinSavingCaption(amount) ??
+                    "Only stations within $amount of the route's cheapest"),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -304,6 +354,7 @@ class _SaveDeleteActions extends StatelessWidget {
                 languageCode: state.languageCode,
                 routeSegmentKm: state.routeSegmentKm,
                 routeDetourBudgetKm: state.routeDetourBudgetKm,
+                minRouteSavingPerLiter: state.minRouteSavingPerLiter,
                 avoidHighways: state.avoidHighways,
                 ratingMode: state.ratingMode,
                 defaultVehicleId: state.defaultVehicleId,

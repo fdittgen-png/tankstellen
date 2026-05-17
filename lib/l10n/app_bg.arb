@@ -268,6 +268,17 @@
   "evChargingApiKey": "API ключ за EV зареждане",
   "openChargeMapApiKey": "API ключ OpenChargeMap",
   "routePlanningSection": "Планиране на маршрут",
+  "routeMinSaving": "Минимална икономия",
+  "routeMinSavingOff": "Изключено",
+  "routeMinSavingOffCaption": "Показват се всички станции, намерени по маршрута",
+  "routeMinSavingCaption": "Само станции в рамките на {amount} от най-евтината по маршрута",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Максимално отклонение",
   "routeDetourBudgetCaption": "Показване на станции до {km} км от прекия маршрут",
   "@routeDetourBudgetCaption": {

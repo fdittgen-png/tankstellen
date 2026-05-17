@@ -875,6 +875,21 @@ class AppLocalizationsFi extends AppLocalizations {
   String get routePlanningSection => 'Reittisuunnittelu';
 
   @override
+  String get routeMinSaving => 'Vähimmäissäästö';
+
+  @override
+  String get routeMinSavingOff => 'Pois';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Näytetään kaikki reitin varrelta löytyneet asemat';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Vain asemat $amount päässä reitin halvimmasta';
+  }
+
+  @override
   String get routeDetourBudget => 'Suurin kiertotie';
 
   @override

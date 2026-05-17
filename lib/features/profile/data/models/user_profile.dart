@@ -51,6 +51,14 @@ abstract class UserProfile with _$UserProfile {
     /// prior hard-coded call-site default, so existing profiles see no
     /// behaviour change.
     @Default(5.0) double routeDetourBudgetKm,
+    /// Minimum price advantage (€/L) a route-planning station must have
+    /// over the cheapest station found along the route to stay in the
+    /// result feed (#1872). `0.0` disables the filter — every station
+    /// along the route is shown (the default, behaviour-preserving).
+    /// A positive value keeps only stations priced within this band of
+    /// the route's cheapest, decluttering the feed to genuinely
+    /// competitive stops.
+    @Default(0.0) double minRouteSavingPerLiter,
     @Deprecated(
       'Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.',
     )

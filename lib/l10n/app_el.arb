@@ -268,6 +268,17 @@
   "evChargingApiKey": "Κλειδί API φόρτισης EV",
   "openChargeMapApiKey": "Κλειδί API OpenChargeMap",
   "routePlanningSection": "Σχεδιασμός διαδρομής",
+  "routeMinSaving": "Ελάχιστη εξοικονόμηση",
+  "routeMinSavingOff": "Ανενεργό",
+  "routeMinSavingOffCaption": "Εμφάνιση όλων των σταθμών που βρέθηκαν κατά μήκος της διαδρομής",
+  "routeMinSavingCaption": "Μόνο σταθμοί εντός {amount} από τον φθηνότερο της διαδρομής",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Μέγιστη παράκαμψη",
   "routeDetourBudgetCaption": "Εμφάνιση σταθμών έως {km} χλμ από την άμεση διαδρομή σας",
   "@routeDetourBudgetCaption": {

@@ -268,6 +268,17 @@
   "evChargingApiKey": "Chave API carregamento EV",
   "openChargeMapApiKey": "Chave API OpenChargeMap",
   "routePlanningSection": "Planejamento de rota",
+  "routeMinSaving": "Economia mínima",
+  "routeMinSavingOff": "Desativado",
+  "routeMinSavingOffCaption": "Mostrando todos os postos encontrados na rota",
+  "routeMinSavingCaption": "Apenas postos dentro de {amount} do mais barato da rota",
+  "@routeMinSavingCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "routeDetourBudget": "Desvio máximo",
   "routeDetourBudgetCaption": "Mostrar postos até {km} km da sua rota direta",
   "@routeDetourBudgetCaption": {

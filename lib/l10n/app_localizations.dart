@@ -1749,6 +1749,30 @@ abstract class AppLocalizations {
   /// **'Route planning'**
   String get routePlanningSection;
 
+  /// No description provided for @routeMinSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum saving'**
+  String get routeMinSaving;
+
+  /// No description provided for @routeMinSavingOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get routeMinSavingOff;
+
+  /// No description provided for @routeMinSavingOffCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing every station found along the route'**
+  String get routeMinSavingOffCaption;
+
+  /// No description provided for @routeMinSavingCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Only stations within {amount} of the route\'s cheapest'**
+  String routeMinSavingCaption(String amount);
+
   /// No description provided for @routeDetourBudget.
   ///
   /// In en, this message translates to:

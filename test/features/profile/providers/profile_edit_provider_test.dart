@@ -25,6 +25,7 @@ void main() {
     languageCode: 'de',
     routeSegmentKm: 100,
     routeDetourBudgetKm: 18,
+    minRouteSavingPerLiter: 0.07,
     avoidHighways: false,
     ratingMode: 'local',
     defaultVehicleId: 'veh-1',
@@ -59,6 +60,9 @@ void main() {
     if (skip != 'routeDetourBudgetKm') {
       expect(actual.routeDetourBudgetKm, reference.routeDetourBudgetKm);
     }
+    if (skip != 'minRouteSavingPerLiter') {
+      expect(actual.minRouteSavingPerLiter, reference.minRouteSavingPerLiter);
+    }
     if (skip != 'avoidHighways') {
       expect(actual.avoidHighways, reference.avoidHighways);
     }
@@ -87,6 +91,7 @@ void main() {
       expect(s.languageCode, profile.languageCode);
       expect(s.routeSegmentKm, profile.routeSegmentKm);
       expect(s.routeDetourBudgetKm, profile.routeDetourBudgetKm);
+      expect(s.minRouteSavingPerLiter, profile.minRouteSavingPerLiter);
       expect(s.avoidHighways, profile.avoidHighways);
       expect(s.ratingMode, profile.ratingMode);
       expect(s.defaultVehicleId, profile.defaultVehicleId);
@@ -105,6 +110,7 @@ void main() {
       expect(s.landingScreen, LandingScreen.nearest);
       expect(s.routeSegmentKm, 50.0);
       expect(s.routeDetourBudgetKm, 5.0);
+      expect(s.minRouteSavingPerLiter, 0.0);
       expect(s.avoidHighways, isFalse);
       expect(s.ratingMode, 'local');
     });
@@ -189,6 +195,13 @@ void main() {
       expectAllFieldsExcept(copy, base, skip: 'routeDetourBudgetKm');
     });
 
+    test('minRouteSavingPerLiter only changes minRouteSavingPerLiter', () {
+      final base = baseState();
+      final copy = base.copyWith(minRouteSavingPerLiter: 0.12);
+      expect(copy.minRouteSavingPerLiter, 0.12);
+      expectAllFieldsExcept(copy, base, skip: 'minRouteSavingPerLiter');
+    });
+
     test('avoidHighways only changes avoidHighways', () {
       final base = baseState();
       final copy = base.copyWith(avoidHighways: true);
@@ -235,6 +248,7 @@ void main() {
       expect(s.languageCode, 'de');
       expect(s.routeSegmentKm, 100);
       expect(s.routeDetourBudgetKm, 18);
+      expect(s.minRouteSavingPerLiter, 0.07);
       expect(s.avoidHighways, isFalse);
       expect(s.ratingMode, 'local');
       expect(s.defaultVehicleId, 'veh-1');
@@ -274,6 +288,15 @@ void main() {
       final s = c.read(profileEditControllerProvider(profile));
       expect(s.routeDetourBudgetKm, 12);
       expectAllFieldsExcept(s, baseState(), skip: 'routeDetourBudgetKm');
+    });
+
+    test('setMinRouteSavingPerLiter updates minRouteSavingPerLiter only', () {
+      final c = makeContainer();
+      final ctrl = c.read(profileEditControllerProvider(profile).notifier);
+      ctrl.setMinRouteSavingPerLiter(0.12);
+      final s = c.read(profileEditControllerProvider(profile));
+      expect(s.minRouteSavingPerLiter, 0.12);
+      expectAllFieldsExcept(s, baseState(), skip: 'minRouteSavingPerLiter');
     });
 
     test('setAvoidHighways updates avoidHighways only', () {

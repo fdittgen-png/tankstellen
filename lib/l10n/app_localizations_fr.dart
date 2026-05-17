@@ -878,6 +878,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get routePlanningSection => 'Planification d\'itinéraire';
 
   @override
+  String get routeMinSaving => 'Économie minimale';
+
+  @override
+  String get routeMinSavingOff => 'Désactivé';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Affiche toutes les stations trouvées le long de l\'itinéraire';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Uniquement les stations dans une marge de $amount de la moins chère de l\'itinéraire';
+  }
+
+  @override
   String get routeDetourBudget => 'Détour maximal';
 
   @override

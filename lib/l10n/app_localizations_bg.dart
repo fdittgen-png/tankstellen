@@ -877,6 +877,21 @@ class AppLocalizationsBg extends AppLocalizations {
   String get routePlanningSection => 'Планиране на маршрут';
 
   @override
+  String get routeMinSaving => 'Минимална икономия';
+
+  @override
+  String get routeMinSavingOff => 'Изключено';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Показват се всички станции, намерени по маршрута';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Само станции в рамките на $amount от най-евтината по маршрута';
+  }
+
+  @override
   String get routeDetourBudget => 'Максимално отклонение';
 
   @override

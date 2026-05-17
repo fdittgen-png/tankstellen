@@ -871,6 +871,21 @@ class AppLocalizationsEt extends AppLocalizations {
   String get routePlanningSection => 'Marsruudi planeerimine';
 
   @override
+  String get routeMinSaving => 'Minimaalne kokkuhoid';
+
+  @override
+  String get routeMinSavingOff => 'Väljas';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Kuvatakse kõik marsruudilt leitud jaamad';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Ainult jaamad $amount piires marsruudi odavaimast';
+  }
+
+  @override
   String get routeDetourBudget => 'Maksimaalne ümbersõit';
 
   @override

@@ -878,6 +878,21 @@ class AppLocalizationsEl extends AppLocalizations {
   String get routePlanningSection => 'Σχεδιασμός διαδρομής';
 
   @override
+  String get routeMinSaving => 'Ελάχιστη εξοικονόμηση';
+
+  @override
+  String get routeMinSavingOff => 'Ανενεργό';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Εμφάνιση όλων των σταθμών που βρέθηκαν κατά μήκος της διαδρομής';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Μόνο σταθμοί εντός $amount από τον φθηνότερο της διαδρομής';
+  }
+
+  @override
   String get routeDetourBudget => 'Μέγιστη παράκαμψη';
 
   @override

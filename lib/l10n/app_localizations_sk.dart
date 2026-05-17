@@ -877,6 +877,21 @@ class AppLocalizationsSk extends AppLocalizations {
   String get routePlanningSection => 'Plánovanie trasy';
 
   @override
+  String get routeMinSaving => 'Minimálna úspora';
+
+  @override
+  String get routeMinSavingOff => 'Vypnuté';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Zobrazujú sa všetky stanice nájdené na trase';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Iba stanice do $amount od najlacnejšej na trase';
+  }
+
+  @override
   String get routeDetourBudget => 'Maximálna obchádzka';
 
   @override

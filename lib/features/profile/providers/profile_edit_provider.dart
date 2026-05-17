@@ -24,6 +24,7 @@ class ProfileEditState {
   final String? languageCode;
   final double routeSegmentKm;
   final double routeDetourBudgetKm;
+  final double minRouteSavingPerLiter;
   final bool avoidHighways;
   final String ratingMode;
   final String? defaultVehicleId;
@@ -36,6 +37,7 @@ class ProfileEditState {
     required this.languageCode,
     required this.routeSegmentKm,
     required this.routeDetourBudgetKm,
+    required this.minRouteSavingPerLiter,
     required this.avoidHighways,
     required this.ratingMode,
     required this.defaultVehicleId,
@@ -49,6 +51,7 @@ class ProfileEditState {
         languageCode: p.languageCode,
         routeSegmentKm: p.routeSegmentKm,
         routeDetourBudgetKm: p.routeDetourBudgetKm,
+        minRouteSavingPerLiter: p.minRouteSavingPerLiter,
         avoidHighways: p.avoidHighways,
         ratingMode: p.ratingMode,
         defaultVehicleId: p.defaultVehicleId,
@@ -64,6 +67,7 @@ class ProfileEditState {
     bool clearLanguage = false,
     double? routeSegmentKm,
     double? routeDetourBudgetKm,
+    double? minRouteSavingPerLiter,
     bool? avoidHighways,
     String? ratingMode,
     String? defaultVehicleId,
@@ -77,6 +81,8 @@ class ProfileEditState {
       languageCode: clearLanguage ? null : (languageCode ?? this.languageCode),
       routeSegmentKm: routeSegmentKm ?? this.routeSegmentKm,
       routeDetourBudgetKm: routeDetourBudgetKm ?? this.routeDetourBudgetKm,
+      minRouteSavingPerLiter:
+          minRouteSavingPerLiter ?? this.minRouteSavingPerLiter,
       avoidHighways: avoidHighways ?? this.avoidHighways,
       ratingMode: ratingMode ?? this.ratingMode,
       defaultVehicleId: clearDefaultVehicle
@@ -101,6 +107,8 @@ class ProfileEditController extends _$ProfileEditController {
       state = state.copyWith(routeSegmentKm: v);
   void setRouteDetourBudgetKm(double v) =>
       state = state.copyWith(routeDetourBudgetKm: v);
+  void setMinRouteSavingPerLiter(double v) =>
+      state = state.copyWith(minRouteSavingPerLiter: v);
   void setAvoidHighways(bool v) => state = state.copyWith(avoidHighways: v);
   void setRatingMode(String v) => state = state.copyWith(ratingMode: v);
   void setLandingScreen(LandingScreen v) =>

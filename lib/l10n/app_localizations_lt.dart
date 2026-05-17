@@ -876,6 +876,21 @@ class AppLocalizationsLt extends AppLocalizations {
   String get routePlanningSection => 'Maršruto planavimas';
 
   @override
+  String get routeMinSaving => 'Minimalus sutaupymas';
+
+  @override
+  String get routeMinSavingOff => 'Išjungta';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Rodomos visos maršrute rastos stotelės';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Tik stotelės $amount ribose nuo pigiausios maršrute';
+  }
+
+  @override
   String get routeDetourBudget => 'Didžiausias apylankas';
 
   @override

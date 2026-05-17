@@ -879,6 +879,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get routePlanningSection => 'Útvonaltervezés';
 
   @override
+  String get routeMinSaving => 'Minimális megtakarítás';
+
+  @override
+  String get routeMinSavingOff => 'Ki';
+
+  @override
+  String get routeMinSavingOffCaption =>
+      'Az útvonalon talált összes állomás megjelenítése';
+
+  @override
+  String routeMinSavingCaption(String amount) {
+    return 'Csak az útvonal legolcsóbb állomásától $amount értéken belüli állomások';
+  }
+
+  @override
   String get routeDetourBudget => 'Maximális kerülő';
 
   @override
