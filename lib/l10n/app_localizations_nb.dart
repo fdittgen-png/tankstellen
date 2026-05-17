@@ -4409,6 +4409,10 @@ class AppLocalizationsNb extends AppLocalizations {
       'Aktiver Skysynkronisering ovenfor for å sikkerhetskopiere turer.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Logg på med en e-postkonto for å synkronisere turer mellom enheter.';
+
+  @override
   String get consentHideDetails => 'Skjul detaljer';
 
   @override

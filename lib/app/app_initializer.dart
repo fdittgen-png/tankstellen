@@ -26,6 +26,7 @@ import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
 import '../core/sync/trips_sync.dart';
+import '../core/sync/trips_sync_enabled_provider.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
 import '../features/consumption/data/obd2/active_trip_recovery_service.dart';
@@ -124,7 +125,7 @@ class AppInitializer {
       // #1541 — run the trip-summaries merge + details retention pass
       // once TankSync is up. No-ops cleanly when the user is signed
       // out or when the trip-history Hive box isn't open.
-      await _runTripsSyncMerge();
+      await _runTripsSyncMerge(container);
     });
 
     // Cache runtime version so AppConstants.appVersion is accurate (#570).
@@ -475,12 +476,15 @@ class AppInitializer {
   /// missing server row — `TripsSync.merge` returns the input
   /// unchanged on error so a transient network blip never costs the
   /// user their local history view.
-  static Future<void> _runTripsSyncMerge() async {
+  static Future<void> _runTripsSyncMerge(ProviderContainer container) async {
     // #1794 — `obd2TripHistory` is a deferred box; wait for the
     // post-first-frame opens before reading it.
     await HiveBoxes.initDeferred();
     if (TankSyncClient.client == null) return;
     if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
+    // #1665 — gate the launch-time merge on the trajet-sync gate so an
+    // anonymous session no longer downloads / heals trip rows.
+    if (!container.read(tripsSyncEnabledProvider)) return;
     try {
       final repo = TripHistoryRepository(
         box: Hive.box<String>(HiveBoxes.obd2TripHistory),

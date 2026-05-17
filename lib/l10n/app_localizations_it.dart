@@ -4435,6 +4435,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Abilita la sincronizzazione cloud sopra per fare il backup dei percorsi.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Accedi con un account e-mail per sincronizzare i viaggi tra dispositivi.';
+
+  @override
   String get consentHideDetails => 'Nascondi dettagli';
 
   @override

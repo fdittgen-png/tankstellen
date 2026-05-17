@@ -4415,6 +4415,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Pro zálohování cest povolte cloudovou synchronizaci výše.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Přihlaste se pomocí e-mailového účtu pro synchronizaci jízd mezi zařízeními.';
+
+  @override
   String get consentHideDetails => 'Skrýt podrobnosti';
 
   @override

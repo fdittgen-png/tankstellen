@@ -7,9 +7,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
-import '../../../core/providers/app_state_provider.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/trips_sync.dart';
+import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../search/domain/entities/fuel_type.dart';
@@ -1130,16 +1130,13 @@ class TripRecording extends _$TripRecording {
           debugPrint('TripRecording auto-record badge increment: $e\n$st');
         }
       }
-      // #1479 phase 2 — opportunistic upload of the freshly saved
-      // summary to TankSync. Gated on the user's opt-in
-      // `consentSyncTrips` consent (which is itself gated on the
-      // master `cloudSync` consent at the toggle layer). Read here
-      // rather than hoisted into the orchestrator so a manual stop
-      // path also benefits — the user opted in once, every trip
-      // they save flows through the same `_saveToHistory`.
+      // #1479 phase 2 / #1665 — opportunistic upload of the freshly
+      // saved summary to TankSync. Gated by `tripsSyncEnabledProvider`
+      // — the single source of truth (non-anonymous account ∧ cloud
+      // sync consent ∧ trips toggle). Read here rather than hoisted
+      // into the orchestrator so a manual stop path also benefits.
       try {
-        final consent = ref.read(gdprConsentProvider);
-        if (consent.syncTrips) {
+        if (ref.read(tripsSyncEnabledProvider)) {
           final entry = repo.loadAll().firstWhere(
             (e) => e.id == id,
             orElse: () => TripHistoryEntry(

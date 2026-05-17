@@ -4432,6 +4432,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Cloud-Sync oben aktivieren, um Fahrten zu sichern.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Mit einem E-Mail-Konto anmelden, um Fahrten geräteübergreifend zu synchronisieren.';
+
+  @override
   String get consentHideDetails => 'Details ausblenden';
 
   @override

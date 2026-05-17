@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Synchronizuj nagrania tras",
   "consentSyncTripsSubtitle": "Twórz kopię zapasową tras OBD2 + GPS w TankSync. Między urządzeniami, opt-in.",
   "consentSyncTripsDisabledHint": "Włącz Synchronizację w chmurze powyżej, aby tworzyć kopię tras.",
+  "consentSyncTripsNeedsEmailHint": "Zaloguj się przy użyciu konta e-mail, aby synchronizować trasy między urządzeniami.",
   "consentHideDetails": "Ukryj szczegóły",
   "consentShowDetails": "Pokaż szczegóły",
   "dialogOk": "OK",

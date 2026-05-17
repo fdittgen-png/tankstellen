@@ -4455,6 +4455,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Activez Cloud Sync ci-dessus pour sauvegarder les trajets.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Connecte-toi avec un compte e-mail pour synchroniser les trajets entre appareils.';
+
+  @override
   String get consentHideDetails => 'Masquer les détails';
 
   @override

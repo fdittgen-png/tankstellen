@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Синхронизиране на записи на пътувания",
   "consentSyncTripsSubtitle": "Резервно копие на OBD2 + GPS пътувания в TankSync. Между устройства, по избор.",
   "consentSyncTripsDisabledHint": "Активирайте облачната синхронизация по-горе за резервно копие на пътуванията.",
+  "consentSyncTripsNeedsEmailHint": "Влезте с имейл акаунт, за да синхронизирате пътуванията между устройства.",
   "consentHideDetails": "Скрий подробностите",
   "consentShowDetails": "Покажи подробностите",
   "dialogOk": "OK",

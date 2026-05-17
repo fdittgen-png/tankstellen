@@ -4410,6 +4410,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Aktivér Cloud-synkronisering ovenfor for at sikkerhedskopiere ture.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Log ind med en e-mailkonto for at synkronisere ture mellem enheder.';
+
+  @override
   String get consentHideDetails => 'Skjul detaljer';
 
   @override

@@ -4431,6 +4431,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Włącz Synchronizację w chmurze powyżej, aby tworzyć kopię tras.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Zaloguj się przy użyciu konta e-mail, aby synchronizować trasy między urządzeniami.';
+
+  @override
   String get consentHideDetails => 'Ukryj szczegóły';
 
   @override

@@ -46,38 +46,14 @@ void main() {
   }
 
   group('ConsentSettingsSection', () {
-    testWidgets('shows six toggle switches', (tester) async {
-      // #1479 phase 1 added the 6th toggle (Sync trip recordings).
+    testWidgets('shows five toggle switches', (tester) async {
+      // #1665 — the 6th toggle (Sync trip recordings) moved to the
+      // TankSync settings section; five consent toggles remain here.
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
-      expect(find.byType(SwitchListTile), findsNWidgets(6));
+      expect(find.byType(SwitchListTile), findsNWidgets(5));
     });
-
-    testWidgets(
-      '#1479 — sync trip recordings toggle is disabled until Cloud Sync is on',
-      (tester) async {
-        await tester.pumpWidget(buildWidget(cloudSync: false));
-        await tester.pumpAndSettle();
-        final tile = tester.widget<SwitchListTile>(
-            find.byKey(const Key('consentSyncTripsToggle')));
-        expect(tile.onChanged, isNull,
-            reason: 'syncTrips toggle must be disabled while cloudSync is off');
-      },
-    );
-
-    testWidgets(
-      '#1479 — sync trip recordings toggle becomes enabled when Cloud Sync is on',
-      (tester) async {
-        await tester.pumpWidget(buildWidget(cloudSync: true));
-        await tester.pumpAndSettle();
-        final tile = tester.widget<SwitchListTile>(
-            find.byKey(const Key('consentSyncTripsToggle')));
-        expect(tile.onChanged, isNotNull,
-            reason:
-                'syncTrips toggle must be tappable once cloudSync consent is on');
-      },
-    );
 
     testWidgets('shows correct labels', (tester) async {
       await tester.pumpWidget(buildWidget());

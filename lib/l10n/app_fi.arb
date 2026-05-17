@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Synkronoi matkatallenteet",
   "consentSyncTripsSubtitle": "Varmuuskopioi OBD2- ja GPS-matkat TankSynciin. Laitteiden välinen, valinnainen.",
   "consentSyncTripsDisabledHint": "Ota pilvisynkronointi käyttöön yllä varmuuskopioidaksesi matkat.",
+  "consentSyncTripsNeedsEmailHint": "Kirjaudu sähköpostitilillä, jotta voit synkronoida matkat laitteiden välillä.",
   "consentHideDetails": "Piilota tiedot",
   "consentShowDetails": "Näytä tiedot",
   "dialogOk": "OK",

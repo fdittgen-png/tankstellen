@@ -4411,6 +4411,10 @@ class AppLocalizationsSv extends AppLocalizations {
       'Aktivera Molnsynkronisering ovan för att säkerhetskopiera resor.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Logga in med ett e-postkonto för att synkronisera resor mellan enheter.';
+
+  @override
   String get consentHideDetails => 'Dölj detaljer';
 
   @override

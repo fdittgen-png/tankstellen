@@ -4385,6 +4385,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enable Cloud Sync above to back up trips.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Sign in with an email account to sync trips across devices.';
+
+  @override
   String get consentHideDetails => 'Hide details';
 
   @override
@@ -9654,6 +9658,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get consentSyncTripsDisabledHint =>
       '⟦Éñáƀłé Çłóúđ Šýñç áƀóṽé ŧó ƀáçķ úƥ ŧřîƥš. ···············⟧';
+
+  @override
+  String get consentSyncTripsNeedsEmailHint =>
+      '⟦Šîǧñ îñ ŵîŧĥ áñ éɱáîł áççóúñŧ ŧó šýñç ŧřîƥš áçřóšš đéṽîçéš. ······················⟧';
 
   @override
   String get consentHideDetails => '⟦Ĥîđé đéŧáîłš ·····⟧';

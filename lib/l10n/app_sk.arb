@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Synchronizovať záznamy jázd",
   "consentSyncTripsSubtitle": "Zálohovať OBD2 + GPS jazdy do TankSync. Naprieč zariadeniami, dobrovoľné.",
   "consentSyncTripsDisabledHint": "Zapnite synchronizáciu s cloudom vyššie pre zálohovanie jázd.",
+  "consentSyncTripsNeedsEmailHint": "Prihláste sa pomocou e-mailového účtu na synchronizáciu jázd medzi zariadeniami.",
   "consentHideDetails": "Skryť podrobnosti",
   "consentShowDetails": "Zobraziť podrobnosti",
   "dialogOk": "OK",

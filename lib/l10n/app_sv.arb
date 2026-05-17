@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Synka reseinspelningar",
   "consentSyncTripsSubtitle": "Säkerhetskopiera OBD2- och GPS-resor till TankSync. Mellan enheter, opt-in.",
   "consentSyncTripsDisabledHint": "Aktivera Molnsynkronisering ovan för att säkerhetskopiera resor.",
+  "consentSyncTripsNeedsEmailHint": "Logga in med ett e-postkonto för att synkronisera resor mellan enheter.",
   "consentHideDetails": "Dölj detaljer",
   "consentShowDetails": "Visa detaljer",
   "dialogOk": "OK",

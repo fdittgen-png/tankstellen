@@ -4424,6 +4424,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Omogućite Sinkronizaciju u oblaku gore za sigurnosno kopiranje vožnji.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Prijavite se s računom e-pošte za sinkronizaciju vožnji među uređajima.';
+
+  @override
   String get consentHideDetails => 'Sakrij pojedinosti';
 
   @override

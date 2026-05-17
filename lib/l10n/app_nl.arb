@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Ritopnames synchroniseren",
   "consentSyncTripsSubtitle": "OBD2 + GPS-ritten back-uppen naar TankSync. Cross-device, opt-in.",
   "consentSyncTripsDisabledHint": "Schakel hierboven Cloudsync in om ritten te back-uppen.",
+  "consentSyncTripsNeedsEmailHint": "Meld je aan met een e-mailaccount om ritten tussen apparaten te synchroniseren.",
   "consentHideDetails": "Details verbergen",
   "consentShowDetails": "Details tonen",
   "dialogOk": "OK",

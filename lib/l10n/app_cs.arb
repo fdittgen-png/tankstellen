@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Synchronizovat záznamy cest",
   "consentSyncTripsSubtitle": "Zálohovat OBD2 + GPS cesty na TankSync. Mezi zařízeními, volitelné.",
   "consentSyncTripsDisabledHint": "Pro zálohování cest povolte cloudovou synchronizaci výše.",
+  "consentSyncTripsNeedsEmailHint": "Přihlaste se pomocí e-mailového účtu pro synchronizaci jízd mezi zařízeními.",
   "consentHideDetails": "Skrýt podrobnosti",
   "consentShowDetails": "Zobrazit podrobnosti",
   "dialogOk": "OK",

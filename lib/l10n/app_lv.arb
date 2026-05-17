@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Sinhronizēt braucienu ierakstus",
   "consentSyncTripsSubtitle": "Dublēt OBD2 + GPS braucienus ar TankSync. Starpierīču, pēc izvēles.",
   "consentSyncTripsDisabledHint": "Iespējojiet Mākoņa sinhronizāciju augstāk, lai dublētu braucienus.",
+  "consentSyncTripsNeedsEmailHint": "Pierakstieties ar e-pasta kontu, lai sinhronizētu braucienus starp ierīcēm.",
   "consentHideDetails": "Slēpt detaļas",
   "consentShowDetails": "Rādīt detaļas",
   "dialogOk": "Labi",

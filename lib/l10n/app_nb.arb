@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Synkroniser turopptak",
   "consentSyncTripsSubtitle": "Sikkerhetskopier OBD2 + GPS-turer til TankSync. På tvers av enheter, valgfritt.",
   "consentSyncTripsDisabledHint": "Aktiver Skysynkronisering ovenfor for å sikkerhetskopiere turer.",
+  "consentSyncTripsNeedsEmailHint": "Logg på med en e-postkonto for å synkronisere turer mellom enheter.",
   "consentHideDetails": "Skjul detaljer",
   "consentShowDetails": "Vis detaljer",
   "dialogOk": "OK",

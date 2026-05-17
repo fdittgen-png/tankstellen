@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Συγχρονισμός καταγεγραμμένων ταξιδιών",
   "consentSyncTripsSubtitle": "Δημιουργία αντιγράφων ταξιδιών OBD2 + GPS στο TankSync. Μεταξύ συσκευών, προαιρετικό.",
   "consentSyncTripsDisabledHint": "Ενεργοποιήστε τον Συγχρονισμό Cloud παραπάνω για δημιουργία αντιγράφων ταξιδιών.",
+  "consentSyncTripsNeedsEmailHint": "Συνδεθείτε με λογαριασμό email για συγχρονισμό διαδρομών μεταξύ συσκευών.",
   "consentHideDetails": "Απόκρυψη λεπτομερειών",
   "consentShowDetails": "Εμφάνιση λεπτομερειών",
   "dialogOk": "ΟΚ",

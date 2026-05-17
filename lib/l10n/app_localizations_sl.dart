@@ -4416,6 +4416,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zgoraj omogočite sinhronizacijo v oblaku za varnostno kopiranje voženj.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Prijavite se z e-poštnim računom za sinhronizacijo voženj med napravami.';
+
+  @override
   String get consentHideDetails => 'Skrij podrobnosti';
 
   @override

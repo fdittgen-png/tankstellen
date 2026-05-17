@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Sincronizați înregistrările de călătorii",
   "consentSyncTripsSubtitle": "Faceți backup la călătoriile OBD2 + GPS în TankSync. Cross-device, opt-in.",
   "consentSyncTripsDisabledHint": "Activați mai întâi Sincronizarea cloud pentru a face backup la călătorii.",
+  "consentSyncTripsNeedsEmailHint": "Conectează-te cu un cont de e-mail pentru a sincroniza călătoriile între dispozitive.",
   "consentHideDetails": "Ascundeți detaliile",
   "consentShowDetails": "Afișați detaliile",
   "dialogOk": "OK",

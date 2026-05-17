@@ -4436,6 +4436,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Iespējojiet Mākoņa sinhronizāciju augstāk, lai dublētu braucienus.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Pierakstieties ar e-pasta kontu, lai sinhronizētu braucienus starp ierīcēm.';
+
+  @override
   String get consentHideDetails => 'Slēpt detaļas';
 
   @override

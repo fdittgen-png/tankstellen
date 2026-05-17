@@ -4448,6 +4448,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az utak mentéséhez engedélyezze a Felhőszinkronizálást fentebb.';
 
   @override
+  String get consentSyncTripsNeedsEmailHint =>
+      'Jelentkezz be e-mail-fiókkal az utak eszközök közötti szinkronizálásához.';
+
+  @override
   String get consentHideDetails => 'Részletek elrejtése';
 
   @override

@@ -1301,6 +1301,7 @@
   "consentSyncTripsTitle": "Synkroniser turoptagelser",
   "consentSyncTripsSubtitle": "Sikkerhedskopier OBD2 + GPS-ture til TankSync. Tværenhed, opt-in.",
   "consentSyncTripsDisabledHint": "Aktivér Cloud-synkronisering ovenfor for at sikkerhedskopiere ture.",
+  "consentSyncTripsNeedsEmailHint": "Log ind med en e-mailkonto for at synkronisere ture mellem enheder.",
   "consentHideDetails": "Skjul detaljer",
   "consentShowDetails": "Vis detaljer",
   "dialogOk": "OK",

@@ -7959,6 +7959,12 @@ abstract class AppLocalizations {
   /// **'Enable Cloud Sync above to back up trips.'**
   String get consentSyncTripsDisabledHint;
 
+  /// No description provided for @consentSyncTripsNeedsEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with an email account to sync trips across devices.'**
+  String get consentSyncTripsNeedsEmailHint;
+
   /// No description provided for @consentHideDetails.
   ///
   /// In en, this message translates to:
