@@ -115,6 +115,22 @@ void main() {
     );
 
     testWidgets(
+      'exposes the share action in the app bar (#1959)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [...test.overrides, userPositionNullOverride()],
+        );
+
+        expect(find.byIcon(Icons.share), findsOneWidget);
+      },
+    );
+
+    testWidgets(
       'a long-gap app resume while Carte is visible does not throw',
       (tester) async {
         final test = standardTestOverrides();

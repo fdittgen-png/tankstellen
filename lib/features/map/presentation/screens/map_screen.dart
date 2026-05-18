@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/current_shell_branch_provider.dart';
 import '../../../../app/shell/settings_app_bar_action.dart';
+import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/presentation/widgets/ev_filter_chips.dart';
@@ -74,6 +75,26 @@ class _MapScreenState extends ConsumerState<MapScreen>
   /// When the app last entered a non-resumed state. Compared against the
   /// resume timestamp to decide whether to refresh.
   DateTime? _pausedAt;
+
+  /// Boundary around the map body — `shareWidgetAsImage` renders the
+  /// widget under this key to a PNG for the Share action (#1959).
+  final GlobalKey _shareBoundaryKey =
+      GlobalKey(debugLabel: 'map_share_boundary');
+
+  /// Render the current map view to an image and hand it to the OS
+  /// share sheet (#1959). Best-effort — a share failure is logged and
+  /// swallowed so the action never crashes the map screen.
+  Future<void> _onShare(AppLocalizations? l10n) async {
+    try {
+      await shareWidgetAsImage(
+        boundaryKey: _shareBoundaryKey,
+        subject: l10n?.map ?? 'Map',
+        fileNameStem: 'tankstellen_map',
+      );
+    } catch (e, st) {
+      debugPrint('MapScreen share image: $e\n$st');
+    }
+  }
 
   @override
   void initState() {
@@ -164,14 +185,22 @@ class _MapScreenState extends ConsumerState<MapScreen>
           tooltip: l10n?.refreshPrices ?? 'Refresh prices',
         ),
         const EvToggleButton(),
+        IconButton(
+          icon: const Icon(Icons.share),
+          onPressed: () => _onShare(l10n),
+          tooltip: l10n?.favoritesShareAction ?? 'Share',
+        ),
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
-      body: Column(
-        children: [
-          if (isVisibleBranch && showEv) const EvFilterChips(),
-          Expanded(child: body),
-        ],
+      body: RepaintBoundary(
+        key: _shareBoundaryKey,
+        child: Column(
+          children: [
+            if (isVisibleBranch && showEv) const EvFilterChips(),
+            Expanded(child: body),
+          ],
+        ),
       ),
     );
   }
