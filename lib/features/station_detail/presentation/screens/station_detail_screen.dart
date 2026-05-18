@@ -9,7 +9,7 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../providers/station_detail_provider.dart';
-import '../widgets/price_history_section.dart';
+import '../widgets/price_history_foldable.dart';
 import '../widgets/station_brand_header.dart';
 import '../widgets/station_brand_helpers.dart';
 import '../widgets/station_detail_app_bar_actions.dart';
@@ -118,7 +118,6 @@ class _StationDetailLoaded extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final station = detail.station;
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
@@ -194,26 +193,21 @@ class _StationDetailLoaded extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate.fixed([
                 StationPricesSection(station: station),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 // #1119 phase 2 — community wait-time hint + "Track my wait"
                 // toggle. Hidden entirely when consent is OFF; renders the
                 // toggle alone when consent is ON but the aggregate row is
                 // still sparse (< 5 samples server-side).
                 WaitTimeSection(stationId: stationId),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 StationInfoSection(station: station, detail: detail),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 StationRatingSection(stationId: stationId),
-                const SizedBox(height: 24),
-                Semantics(
-                  header: true,
-                  child: Text(
-                    l10n?.priceHistory ?? 'Price History',
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                PriceHistorySection(stationId: stationId, station: station),
+                const SizedBox(height: 12),
+                // #1957 — the price-history chart is a tall,
+                // detail-on-demand block; show it in a foldable that is
+                // collapsed by default so it does not dominate the page.
+                PriceHistoryFoldable(stationId: stationId, station: station),
               ]),
             ),
           ),
