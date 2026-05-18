@@ -13,9 +13,8 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// Enables the full Trajets surface so all three tab icons render.
-/// Per #1573 the gate is `consoMode == fuelAndTrips`, requires both
-/// `showConsumptionTab` and `obd2TripRecording`.
+/// Enables the consumption surface. #1901 — the Fuel section's
+/// Fuel/Charging switcher does not depend on the OBD2 flag.
 class _ObdEnabledFlags extends FeatureFlags {
   @override
   Set<Feature> build() => <Feature>{
@@ -28,6 +27,10 @@ class _ObdEnabledFlags extends FeatureFlags {
 /// Lock that the Conso sub-tabs keep their icon-above-label rendering.
 /// If anyone strips an icon from `ConsumptionScreen` to "match" Favoris
 /// the wrong way round, this test fails.
+///
+/// #1901 — the Fuel section of [ConsumptionScreen] renders a 2-entry
+/// Fuel / Charging switcher for an EV/hybrid vehicle (Trajets is now a
+/// separate destination, not a tab here).
 class _FixedFillUpList extends FillUpList {
   final List<FillUp> _value;
   _FixedFillUpList(this._value);
@@ -114,10 +117,11 @@ void main() {
         ],
       );
 
-      // EV profile keeps the Charging tab visible → 3 Tab widgets.
+      // #1901 — EV profile renders the 2-entry Fuel / Charging
+      // switcher (Trajets moved out to its own destination).
       final tabs = tester.widgetList<Tab>(find.byType(Tab)).toList();
-      expect(tabs, hasLength(3),
-          reason: 'EV profile must render Fuel + Trips + Charging');
+      expect(tabs, hasLength(2),
+          reason: 'EV profile must render the Fuel + Charging switcher');
 
       // Every Tab must carry an icon — the visual contract this issue
       // locked across both Conso and Favoris.
@@ -132,7 +136,6 @@ void main() {
       // an EV profile with no logs — the tab assertion above is the
       // strict per-tab guarantee.
       expect(find.byIcon(Icons.local_gas_station_outlined), findsAtLeast(1));
-      expect(find.byIcon(Icons.route_outlined), findsAtLeast(1));
       expect(find.byIcon(Icons.ev_station_outlined), findsAtLeast(1));
     });
   });

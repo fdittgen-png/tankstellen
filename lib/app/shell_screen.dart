@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../features/feature_management/application/feature_flags_provider.dart';
+import '../features/feature_management/domain/conso_mode.dart';
 import '../features/feature_management/domain/consumption_tab_visibility.dart';
 import '../features/vehicle/presentation/widgets/catalog_reresolve_snackbar_host.dart';
 import '../l10n/app_localizations.dart';
@@ -53,10 +54,11 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
   /// otherwise stop on the hidden Conso branch, #893).
   List<int> _branchForSlot = const [0, 1, 2, 3, 4];
 
-  /// Upper bound on destination count — the router always registers 5
-  /// branches (see StatefulShellRoute in router.dart), the UI decides
-  /// how many are visible.
-  static const _pageCount = 5;
+  /// Upper bound on destination count — the router registers 6
+  /// branches (#1901: Search, Map, Favorites, Carburant, Profile,
+  /// Trajets — see `shell_branches.dart`); the UI decides how many
+  /// are visible.
+  static const _pageCount = 6;
 
   @override
   void initState() {
@@ -213,31 +215,53 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     final manifest = ref.watch(featureManifestProvider);
     final enabledFlags = ref.watch(enabledFeaturesProvider);
     final showConsumption = isConsumptionTabReachable(manifest, enabledFlags);
+    // #1901 — Trajets is its own destination, shown only in the
+    // fuel-and-trips ConsoMode (the Full use-mode profile). Fuel-only
+    // mode shows Carburant alone.
+    final showTrajets =
+        consoModeFromFlags(enabledFlags) == ConsoMode.fuelAndTrips;
     final destinations = resolveShellDestinations(
       l10n: l10n,
       showConsumption: showConsumption,
+      showTrajets: showTrajets,
     );
     final visibleDestinations = destinations.items;
     final branchForSlot = destinations.branchForSlot;
     _branchForSlot = branchForSlot;
 
-    // If the user was on the Conso tab and just disabled the gating
-    // features (e.g. switched profile from Full to Basic), snap the
-    // selection to Search (branch 0) — the Conso slot is gone from
-    // the nav bar and leaving `_currentIndex` pointing at it would
-    // leave no item highlighted.
-    if (!showConsumption && _currentIndex == kConsumptionBranchIndex) {
+    // If the user was on a consumption destination and just disabled
+    // the gating features (e.g. switched profile from Full to Basic),
+    // snap the selection to Search (branch 0) — the Carburant/Trajets
+    // slots are gone and leaving `_currentIndex` on one would leave no
+    // item highlighted.
+    final onConsumptionBranch = _currentIndex == kConsumptionBranchIndex ||
+        _currentIndex == kTrajetsBranchIndex;
+    if (!showConsumption && onConsumptionBranch) {
       // #1690 — the tab vanishing + the selection jumping is silent
       // and confusing; tell the user a profile change hid the tab.
       final tabHiddenNotice = l10n?.consumptionTabHiddenNotice ??
           'The Consumption tab was hidden by your profile settings.';
       safePostFrame(() {
         if (!mounted) return;
-        if (_currentIndex != kConsumptionBranchIndex) return;
+        if (_currentIndex != kConsumptionBranchIndex &&
+            _currentIndex != kTrajetsBranchIndex) {
+          return;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(tabHiddenNotice)),
         );
         _goToPage(0);
+      });
+    } else if (showConsumption &&
+        !showTrajets &&
+        _currentIndex == kTrajetsBranchIndex) {
+      // #1901 — the Trajets slot vanished (switched to fuel-only mode)
+      // while the user was on it; fall back to Carburant rather than
+      // strand the selection on a now-hidden branch.
+      safePostFrame(() {
+        if (!mounted) return;
+        if (_currentIndex != kTrajetsBranchIndex) return;
+        _goToPage(kConsumptionBranchIndex);
       });
     }
 

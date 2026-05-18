@@ -158,6 +158,16 @@ void main() {
                   ),
                 ],
               ),
+              // #1901 — Trajets is its own branch (index 5).
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/trajets-tab',
+                    builder: (context, state) =>
+                        const Center(child: Text('TrajetsScreen')),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -194,10 +204,13 @@ void main() {
 
       // Bottom nav bar items should be present. Search is the
       // icon-only centre button; Settings moved to the app bar (#1874).
+      // #1901 — Consumption split into Carburant ('Fuel') + Trajets
+      // ('Trips'); the Full profile flags surface both.
       expect(find.byIcon(Icons.search), findsOneWidget);
       expect(find.text('Map'), findsOneWidget);
       expect(find.text('Favorites'), findsOneWidget);
-      expect(find.text('Consumption'), findsOneWidget);
+      expect(find.text('Fuel'), findsOneWidget);
+      expect(find.text('Trips'), findsOneWidget);
 
       // NavigationRail should NOT be present
       expect(find.byType(NavigationRail), findsNothing);

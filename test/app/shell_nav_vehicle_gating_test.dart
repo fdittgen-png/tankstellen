@@ -83,6 +83,14 @@ Future<void> _pumpShell(
               builder: (_, _) => const Text('SettingsBody'),
             ),
           ]),
+          // #1901 — Trajets is now its own branch (index 5), appended
+          // after Profile. ShellScreen registers 6 branches.
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/trajets-tab',
+              builder: (_, _) => const Text('TrajetsBody'),
+            ),
+          ]),
         ],
       ),
     ],
@@ -135,9 +143,12 @@ void main() {
         expect(find.byIcon(Icons.search), findsOneWidget);
         expect(find.text('Map'), findsOneWidget);
         expect(find.text('Favorites'), findsOneWidget);
-        expect(find.text('Consumption'), findsNothing,
-            reason: 'Basic profile must not surface the Conso tab — '
+        // #1901 — the Carburant destination label is now 'Fuel'.
+        expect(find.text('Fuel'), findsNothing,
+            reason: 'Basic profile must not surface the Carburant tab — '
                 'no consumption features are reachable.');
+        expect(find.text('Trips'), findsNothing,
+            reason: 'Basic profile must not surface the Trajets tab.');
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsNothing);
       },
@@ -171,7 +182,11 @@ void main() {
         expect(find.byIcon(Icons.search), findsOneWidget);
         expect(find.text('Map'), findsOneWidget);
         expect(find.text('Favorites'), findsOneWidget);
-        expect(find.text('Consumption'), findsOneWidget);
+        // #1901 — Medium profile (manualConsumption, no obd2) is
+        // fuel-only ConsoMode: the Carburant tab shows, Trajets does not.
+        expect(find.text('Fuel'), findsOneWidget);
+        expect(find.text('Trips'), findsNothing,
+            reason: 'Medium profile has no OBD2 trips — Trajets hidden.');
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsOneWidget);
       },
@@ -204,9 +219,13 @@ void main() {
           },
         );
 
-        expect(find.text('Consumption'), findsOneWidget);
+        // #1901 — Full profile (obd2TripRecording on) is fuel-and-trips
+        // ConsoMode: both Carburant and Trajets destinations show.
+        expect(find.text('Fuel'), findsOneWidget);
+        expect(find.text('Trips'), findsOneWidget);
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsOneWidget);
+        expect(find.byIcon(Icons.route_outlined), findsOneWidget);
       },
     );
   });

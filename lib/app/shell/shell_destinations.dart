@@ -3,18 +3,23 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import 'shell_nav_item.dart';
 
-/// Index of the Consumption branch in the StatefulShellRoute (see
-/// `router.dart`). Public so the shell's "snap selection back to
-/// Search when the consumption features are disabled" branch can refer
-/// to the hidden tab by name rather than a naked `3`.
+/// Router-branch index of the **Carburant** destination in the
+/// StatefulShellRoute (see `shell_branches.dart`). Public so the
+/// shell's "snap selection back to Search when consumption is
+/// disabled" branch can refer to it by name rather than a naked `3`.
 const int kConsumptionBranchIndex = 3;
+
+/// Router-branch index of the **Trajets** destination (#1901). Trajets
+/// is appended after Profile so Profile keeps index 4 — see
+/// `shell_branches.dart`.
+const int kTrajetsBranchIndex = 5;
 
 /// Resolved nav destinations for the current shell render.
 ///
 /// [items] is the list the bottom-bar / rail iterates over, **in
-/// visual order** — Search sits in the centre slot (#1874). [branchForSlot]
-/// maps each visible slot back to its router-branch index, so a tap on
-/// slot N routes to `branchForSlot[N]`.
+/// visual order** — Search sits in the centre slot (#1874).
+/// [branchForSlot] maps each visible slot back to its router-branch
+/// index, so a tap on slot N routes to `branchForSlot[N]`.
 class ShellDestinations {
   final List<ShellNavItem> items;
   final List<int> branchForSlot;
@@ -25,28 +30,28 @@ class ShellDestinations {
   });
 }
 
-/// Build the visible nav destinations, hiding the Conso slot when
-/// [showConsumption] is false.
+/// Build the visible nav destinations.
 ///
-/// ## Layout (#1874)
+/// ## Layout (#1874 / #1901)
 ///
 /// Search — the app's core action — is the centre, raised button; the
-/// other destinations flank it:
+/// other destinations flank it. Consumption is now **two** separate
+/// destinations, Carburant and Trajets (#1901):
 ///
-///   * Conso shown:  `Map · Favorites · [Search] · Consumption`
-///   * Conso hidden: `Map · [Search] · Favorites`
+///   * Conso off:            `Map · [Search] · Favorites`
+///   * Fuel-only mode:       `Map · Favorites · [Search] · Carburant`
+///   * Fuel + Trips mode:    `Map · Favorites · [Search] · Carburant · Trajets`
 ///
 /// Settings is **not** a tab — it lives in the top-right app bar
 /// (`SettingsAppBarAction`), reached via router branch 4 (`/profile`).
 ///
 /// ## Conso gate
 ///
-/// The #893 gate hid Conso "when no vehicle is configured", a catch-22
-/// for the Medium use-mode profile (#1517) — the consumption screen is
-/// where users add their first vehicle. The gate is now driven by
-/// `isConsumptionTabReachable(manifest, enabledFlags)`: true when the
-/// user has either `manualConsumption` OR `obd2TripRecording`
-/// effectively enabled (Medium / Full profiles, not Basic).
+/// [showConsumption] gates the whole consumption surface (true for the
+/// Medium / Full use-mode profiles, false for Basic — see
+/// `isConsumptionTabReachable`). [showTrajets] additionally gates the
+/// Trajets destination: it appears only in the fuel-and-trips ConsoMode
+/// (Full profile). Fuel-only mode shows Carburant alone.
 ///
 /// Pure function — no Flutter state, no Riverpod — kept lean so the
 /// shell can re-resolve on every build without paying provider-read
@@ -54,10 +59,11 @@ class ShellDestinations {
 ShellDestinations resolveShellDestinations({
   required AppLocalizations? l10n,
   required bool showConsumption,
+  required bool showTrajets,
 }) {
-  // Branch indices in `router.dart`: Search=0, Map=1, Favorites=2,
-  // Consumption=3, Settings=4. The visual slot order below differs so
-  // Search lands in the centre.
+  // Branch indices in `shell_branches.dart`: Search=0, Map=1,
+  // Favorites=2, Carburant=3, Settings=4, Trajets=5. The visual slot
+  // order below differs so Search lands in the centre.
   final search = ShellNavItem(
     Icons.search_outlined,
     Icons.search,
@@ -70,20 +76,31 @@ ShellDestinations resolveShellDestinations({
     Icons.star,
     l10n?.favorites ?? 'Favorites',
   );
-  final consumption = ShellNavItem(
+  final carburant = ShellNavItem(
     Icons.local_gas_station_outlined,
     Icons.local_gas_station,
-    l10n?.navConsumption ?? 'Consumption',
+    l10n?.consumptionTabFuel ?? 'Fuel',
+  );
+  final trajets = ShellNavItem(
+    Icons.route_outlined,
+    Icons.route,
+    l10n?.trajetsTabLabel ?? 'Trips',
   );
 
-  if (showConsumption) {
+  if (!showConsumption) {
     return ShellDestinations(
-      items: [map, favorites, search, consumption],
+      items: [map, search, favorites],
+      branchForSlot: const [1, 0, 2],
+    );
+  }
+  if (!showTrajets) {
+    return ShellDestinations(
+      items: [map, favorites, search, carburant],
       branchForSlot: const [1, 2, 0, 3],
     );
   }
   return ShellDestinations(
-    items: [map, search, favorites],
-    branchForSlot: const [1, 0, 2],
+    items: [map, favorites, search, carburant, trajets],
+    branchForSlot: const [1, 2, 0, 3, kTrajetsBranchIndex],
   );
 }
