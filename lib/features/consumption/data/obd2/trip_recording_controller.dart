@@ -1183,7 +1183,12 @@ class TripRecordingController {
   /// a [TripLiveReading], integrates any new fuel/distance since the
   /// last emit, and pushes to [live].
   void _emit() {
-    if (_paused || _pausedDueToDrop) return; // don't flood while paused
+    // Don't emit/integrate while paused, while a drop is on the pause
+    // banner, OR during the #1904 silent-reconnect window (#1912): the
+    // scheduler is stopped then, so the snapshot is stale — feeding it
+    // to the recorder would integrate phantom distance/fuel from a
+    // frozen speed over real elapsed time.
+    if (_paused || _pausedDueToDrop || _silentlyReconnecting) return;
     if (_liveController.isClosed) return;
 
     final snap = _liveSampleSnapshot;
