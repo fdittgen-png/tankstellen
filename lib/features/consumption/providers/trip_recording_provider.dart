@@ -68,6 +68,15 @@ part 'trip_recording_provider.g.dart';
 class TripRecording extends _$TripRecording {
   Obd2Service? _service;
   TripRecordingController? _controller;
+
+  // #1932 — re-entrancy guard for [start]. `state` is only marked
+  // active by the last line of `start()`, but `start()` has `await`s
+  // before that, so a second start racing in the window between would
+  // pass the `state.isActive` guard and orphan a controller. This flag
+  // is set synchronously at the top of `start()` — before any await —
+  // so the second call is rejected.
+  bool _startInProgress = false;
+
   StreamSubscription<TripLiveReading>? _liveSub;
   StreamSubscription<TripRecordingControllerState>? _stateSub;
 
@@ -234,7 +243,9 @@ class TripRecording extends _$TripRecording {
     Obd2Service? service,
     bool automatic = false,
   }) async {
-    if (state.isActive) return StartTripOutcome.alreadyActive;
+    if (state.isActive || _startInProgress) {
+      return StartTripOutcome.alreadyActive;
+    }
     final activeVehicle = _tryReadActiveVehicle();
     final resolvedVehicleId = vehicleId ?? activeVehicle?.id;
     final resolvedMac = adapterMac ?? activeVehicle?.obd2AdapterMac;
@@ -271,7 +282,25 @@ class TripRecording extends _$TripRecording {
   /// call sites are unchanged. The hands-free [AutoTripCoordinator]
   /// path passes `automatic: true`.
   Future<void> start(Obd2Service service, {bool automatic = false}) async {
-    if (state.isActive) return;
+    // #1932 — synchronous re-entrancy guard. Both the check and the
+    // flag set run before `start()`'s first `await`, so a second start
+    // racing into the window (e.g. the AutoTripCoordinator and a manual
+    // UI start firing together) is rejected instead of orphaning a
+    // second controller. Cleared in a `finally` so a throwing start
+    // never locks recording out permanently.
+    if (state.isActive || _startInProgress) return;
+    _startInProgress = true;
+    try {
+      await _startInternal(service, automatic: automatic);
+    } finally {
+      _startInProgress = false;
+    }
+  }
+
+  Future<void> _startInternal(
+    Obd2Service service, {
+    bool automatic = false,
+  }) async {
     _lastTripStartedAt ??= DateTime.now();
     _service = service;
     // #1312 — snapshot adapter identity NOW. The service is
