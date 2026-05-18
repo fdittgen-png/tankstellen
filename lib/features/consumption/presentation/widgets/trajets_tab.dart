@@ -144,105 +144,103 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
     // user understands tapping returns them to the live trip rather
     // than starting a new one.
     final isRecordingActive = ref.watch(tripRecordingProvider).isActive;
-    final header = Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 220),
-        child: stage == null
-            // #1889 — an extended FAB so the record CTA matches the
-            // fuel tab's "Ajouter un plein" (soft light-green tonal
-            // style) instead of a heavy dark-green FilledButton.
-            // `heroTag: null` — it lives inline, so it must not
-            // contend for the screen-level FAB's hero tag.
-            ? FloatingActionButton.extended(
-                key: const Key('trajets_start_recording_button'),
-                heroTag: null,
-                onPressed: _onStartRecording,
-                icon: Icon(
-                  isRecordingActive
-                      ? Icons.visibility
-                      : Icons.fiber_manual_record,
-                ),
-                label: Text(
-                  isRecordingActive
-                      ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
-                      : (l?.trajetsStartRecordingButton ?? 'Start recording'),
-                ),
-              )
-            : TripStartProgress(
-                key: const Key('trajets_start_progress'),
-                stage: stage,
+    // #1951 — the record CTA floats bottom-right (matching the
+    // Carburant tab's "Ajouter un plein" FAB) instead of sitting at
+    // the top. `heroTag: null` — it is positioned inside the body, so
+    // it must not contend for a screen-level FAB hero tag.
+    final recordFab = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 220),
+      child: stage == null
+          ? FloatingActionButton.extended(
+              key: const Key('trajets_start_recording_button'),
+              heroTag: null,
+              onPressed: _onStartRecording,
+              icon: Icon(
+                isRecordingActive
+                    ? Icons.visibility
+                    : Icons.fiber_manual_record,
               ),
-      ),
+              label: Text(
+                isRecordingActive
+                    ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
+                    : (l?.trajetsStartRecordingButton ?? 'Start recording'),
+              ),
+            )
+          : TripStartProgress(
+              key: const Key('trajets_start_progress'),
+              stage: stage,
+            ),
     );
 
+    final Widget content;
     if (filtered.isEmpty) {
-      return Column(
+      content = EmptyState(
+        key: const Key('trajets_empty_state'),
+        icon: Icons.route_outlined,
+        title: l?.trajetsEmptyStateTitle ?? 'No trips yet',
+        subtitle: l?.trajetsEmptyStateBody ??
+            'Tap Start recording to begin logging your drives.',
+        topBiased: true,
+      );
+    } else {
+      // Aggregate the (already vehicle-filtered) trips into the
+      // monthly-insights summary. Aggregator is pure + cheap; running
+      // it on every rebuild keeps the card in lock-step with the
+      // visible trip list.
+      final monthlySummary =
+          aggregateMonthlyInsights(filtered, DateTime.now());
+      content = Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          header,
+          // "This month vs last month" aggregates (#1041 phase 4).
+          MonthlyInsightsCard(summary: monthlySummary),
+          // Predictive-maintenance suggestion list (#1124) — empty by
+          // default, appears only when a trend heuristic fires.
+          const MaintenanceSuggestionList(),
           Expanded(
-            child: EmptyState(
-              key: const Key('trajets_empty_state'),
-              icon: Icons.route_outlined,
-              title: l?.trajetsEmptyStateTitle ?? 'No trips yet',
-              subtitle: l?.trajetsEmptyStateBody ??
-                  'Tap Start recording to begin logging your drives.',
-              topBiased: true,
+            child: ListView.builder(
+              key: const Key('trajets_list'),
+              padding: EdgeInsets.only(
+                top: 4,
+                // Clear the floating record FAB so the last row is not
+                // hidden behind it.
+                bottom: 88 + MediaQuery.of(context).viewPadding.bottom,
+              ),
+              itemCount: filtered.length,
+              itemBuilder: (context, index) {
+                final entry = filtered[index];
+                // Resolve the per-trip vehicle for fuel-family display.
+                // Fall back to the active vehicle when the trip
+                // pre-dates the vehicleId tagging (#889).
+                final vehicle = entry.vehicleId == null
+                    ? activeVehicle
+                    : vehicles
+                            .where((v) => v.id == entry.vehicleId)
+                            .firstOrNull ??
+                        activeVehicle;
+                return _TrajetRow(
+                  entry: entry,
+                  vehicle: vehicle,
+                  l: l,
+                  theme: theme,
+                  onTap: () => context.push('/trip/${entry.id}'),
+                );
+              },
             ),
           ),
         ],
       );
     }
 
-    // Aggregate the (already vehicle-filtered) trips into the
-    // monthly-insights summary. Aggregator is pure + cheap; running it
-    // on every rebuild keeps the card in lock-step with the visible
-    // trip list (vehicle filter changes flow through automatically).
-    final monthlySummary = aggregateMonthlyInsights(filtered, DateTime.now());
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Stack(
       children: [
-        header,
-        // "This month vs last month" aggregates (#1041 phase 4).
-        // Hidden in the zero-trip branch above — by the time we reach
-        // here `filtered` is non-empty, so the card always carries at
-        // least one current/previous month bucket.
-        MonthlyInsightsCard(summary: monthlySummary),
-        // Predictive-maintenance suggestion list (#1124). Renders zero
-        // or more cards above the trip list — empty by default, only
-        // appears when one of the trend heuristics fires AND the
-        // signal is not currently snoozed.
-        const MaintenanceSuggestionList(),
-        Expanded(
-          child: ListView.builder(
-            key: const Key('trajets_list'),
-            padding: EdgeInsets.only(
-              top: 4,
-              bottom: 16 + MediaQuery.of(context).viewPadding.bottom,
-            ),
-            itemCount: filtered.length,
-            itemBuilder: (context, index) {
-              final entry = filtered[index];
-              // Resolve the per-trip vehicle for fuel-family display.
-              // Fall back to the active vehicle (most likely the
-              // right one) when the trip pre-dates the vehicleId
-              // tagging that landed alongside #889.
-              final vehicle = entry.vehicleId == null
-                  ? activeVehicle
-                  : vehicles
-                      .where((v) => v.id == entry.vehicleId)
-                      .firstOrNull ??
-                      activeVehicle;
-              return _TrajetRow(
-                entry: entry,
-                vehicle: vehicle,
-                l: l,
-                theme: theme,
-                onTap: () => context.push('/trip/${entry.id}'),
-              );
-            },
+        Positioned.fill(child: content),
+        Positioned(
+          right: 12,
+          bottom: 16 + MediaQuery.of(context).viewPadding.bottom,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 300),
+            child: recordFab,
           ),
         ),
       ],
