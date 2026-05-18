@@ -72,6 +72,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -106,6 +112,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -168,6 +180,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -267,6 +285,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -305,6 +329,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -336,6 +366,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -364,6 +400,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - run: flutter pub get
       - name: OSV vulnerability scan
@@ -381,6 +423,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -402,6 +450,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
@@ -435,6 +489,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #1936 — pin Flutter. A floating `channel: stable` picked up
+          # a newer SDK whose bundled Gradle plugin hard-fails on the
+          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
+          # 3.41.9 is the last build-android-green version (and the
+          # local dev SDK). Bump deliberately, not by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
