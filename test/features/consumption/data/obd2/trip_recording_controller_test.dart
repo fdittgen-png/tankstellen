@@ -467,7 +467,7 @@ void main() {
         'ATL0': 'OK>',
         'ATH0': 'OK>',
         'ATSP0': 'OK>',
-        'ATAT2': 'OK>',
+        'ATAT1': 'OK>',
         '015E': 'NO DATA>',
         '0110': 'NO DATA>',
         '010B': '41 0B 50>', // MAP 80 kPa
@@ -514,7 +514,7 @@ void main() {
         'ATL0': 'OK>',
         'ATH0': 'OK>',
         'ATSP0': 'OK>',
-        'ATAT2': 'OK>',
+        'ATAT1': 'OK>',
         '015E': '41 5E 00 64>', // PID 5E direct fuel rate = 5.0 L/h
         '010C': '41 0C 0E A6>', // RPM ~937
         '010D': '41 0D 32>', // 50 km/h

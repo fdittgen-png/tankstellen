@@ -67,7 +67,7 @@ void main() {
         'ATL0\r',
         'ATH0\r',
         'ATSP0\r',
-        'ATAT2\r', // #1904 — aggressive adaptive timing
+        'ATAT1\r', // #1904 — adaptive timing (ATAT1, #1918)
       ]);
     });
 
@@ -104,14 +104,14 @@ void main() {
           'ATL0': 'OK>',
           'ATH0': 'OK>',
           'ATSP0': 'OK>',
-          'ATAT2': 'OK>',
+          'ATAT1': 'OK>',
         });
         final service = Obd2Service(transport);
 
         final connected = await service.connect();
 
         expect(connected, isTrue);
-        // Captured commands match the init list (#1904 added ATAT2),
+        // Captured commands match the init list (#1904 added ATAT1),
         // followed by the #1401 phase 1 firmware-version probe.
         final sent = transport.commands.map((c) => c.command).toList();
         expect(sent, [
@@ -120,7 +120,7 @@ void main() {
           'ATL0',
           'ATH0',
           'ATSP0',
-          'ATAT2',
+          'ATAT1',
           'ATI',
         ]);
 
