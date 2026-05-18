@@ -79,6 +79,21 @@ String formatObd2DebugSessionXml(Obd2DebugSession session) {
           }
           final gapMs = e.gapMs;
           if (gapMs != null) builder.attribute('gapMs', '$gapMs');
+          // Vehicle state around a data gap (#1930) — non-zero pre-gap
+          // speed/rpm means the car was driving when data stopped (the
+          // link died); zero means the engine was idle/off.
+          final preSpeed = e.preGapSpeedKmh;
+          if (preSpeed != null) {
+            builder.attribute('preGapSpeedKmh', _num(preSpeed));
+          }
+          final preRpm = e.preGapRpm;
+          if (preRpm != null) builder.attribute('preGapRpm', _num(preRpm));
+          final postSpeed = e.postGapSpeedKmh;
+          if (postSpeed != null) {
+            builder.attribute('postGapSpeedKmh', _num(postSpeed));
+          }
+          final postRpm = e.postGapRpm;
+          if (postRpm != null) builder.attribute('postGapRpm', _num(postRpm));
           final detail = e.detail;
           if (detail != null) builder.attribute('detail', detail);
         });
@@ -87,6 +102,11 @@ String formatObd2DebugSessionXml(Obd2DebugSession session) {
   });
   return builder.buildDocument().toXmlString(pretty: true);
 }
+
+/// Format a double for an XML attribute — drops a redundant `.0` so
+/// `95.0` serialises as `95`, keeping the export readable.
+String _num(double v) =>
+    v == v.roundToDouble() ? '${v.toInt()}' : v.toString();
 
 /// Redact a BLE MAC to its last four characters — a full MAC is a
 /// stable hardware identifier (PII). Everything before the final four

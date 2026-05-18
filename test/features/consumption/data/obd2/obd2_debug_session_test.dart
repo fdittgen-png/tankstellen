@@ -94,6 +94,59 @@ void main() {
       expect(gaps.single.gapMs, 10000);
     });
 
+    test('a data gap records vehicle state before and after the silence',
+        () {
+      Obd2DebugSessionRecorder.ingest(AutoRecordEventKind.connectStarted,
+          timestamp: at(0));
+      Obd2DebugSessionRecorder.recordData(at(1), speedKmh: 95, rpm: 2200);
+      // 12 s later data resumes with the car stopped — the link died
+      // mid-drive (pre-gap moving, post-gap stationary).
+      Obd2DebugSessionRecorder.recordData(at(13), speedKmh: 0, rpm: 0);
+      final gap = Obd2DebugSessionRecorder.currentSession!.events
+          .firstWhere((e) => e.kind == Obd2SessionEventKind.dataGap);
+      expect(gap.preGapSpeedKmh, 95);
+      expect(gap.preGapRpm, 2200);
+      expect(gap.postGapSpeedKmh, 0);
+      expect(gap.postGapRpm, 0);
+    });
+
+    test('a session that ends while data is silent records a trailing gap',
+        () {
+      Obd2DebugSessionRecorder.ingest(AutoRecordEventKind.connectStarted,
+          timestamp: at(0));
+      Obd2DebugSessionRecorder.recordData(at(1), speedKmh: 80, rpm: 2000);
+      // No further data — the session ends 30 s later.
+      Obd2DebugSessionRecorder.endSession(clock: at(31));
+      final gaps = Obd2DebugSessionRecorder.latestSession!.events
+          .where((e) => e.kind == Obd2SessionEventKind.dataGap)
+          .toList();
+      expect(gaps, hasLength(1));
+      expect(gaps.single.gapMs, 30000);
+      expect(gaps.single.preGapSpeedKmh, 80);
+      expect(gaps.single.postGapSpeedKmh, isNull,
+          reason: 'data never resumed — post-gap state is unknown');
+    });
+
+    test('disconnect-save timer transitions are mapped into the session',
+        () {
+      Obd2DebugSessionRecorder.ingest(AutoRecordEventKind.connectStarted,
+          timestamp: at(0));
+      Obd2DebugSessionRecorder.ingest(
+          AutoRecordEventKind.disconnectTimerStarted,
+          timestamp: at(5));
+      Obd2DebugSessionRecorder.ingest(
+          AutoRecordEventKind.disconnectTimerFired,
+          timestamp: at(65));
+      final kinds = Obd2DebugSessionRecorder.currentSession!.events
+          .map((e) => e.kind);
+      expect(
+          kinds,
+          containsAll(<Obd2SessionEventKind>[
+            Obd2SessionEventKind.disconnectTimerStarted,
+            Obd2SessionEventKind.disconnectTimerFired,
+          ]));
+    });
+
     test('drop and silent-reconnect transitions are mapped', () {
       Obd2DebugSessionRecorder.ingest(AutoRecordEventKind.connectStarted,
           timestamp: at(0));
@@ -164,10 +217,11 @@ void main() {
           timestamp: at(1));
       Obd2DebugSessionRecorder.recordData(at(2));
       Obd2DebugSessionRecorder.recordData(at(20)); // 18 s gap
-      Obd2DebugSessionRecorder.endSession(clock: at(30));
+      // End at the last data point so no trailing gap is added (#1930).
+      Obd2DebugSessionRecorder.endSession(clock: at(20));
 
       final s = Obd2DebugSessionRecorder.latestSession!.summary;
-      expect(s.duration, const Duration(seconds: 30));
+      expect(s.duration, const Duration(seconds: 20));
       expect(s.handshakeCommands, 2);
       expect(s.handshakeLatencyMs, 130);
       expect(s.dataGaps, 1);
