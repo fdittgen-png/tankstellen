@@ -129,7 +129,10 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
               Text(
                 l?.tankLevelLitersFormat(litresText) ?? '$litresText L',
                 key: const Key('tank_level_big_number'),
-                style: theme.textTheme.displayMedium?.copyWith(
+                // #1914 — was `displayMedium` (~45 sp), which dominated
+                // the card; `titleLarge` (~22 sp) roughly halves it
+                // while the w600 weight keeps it the card's focal point.
+                style: theme.textTheme.titleLarge?.copyWith(
                   color: lowFuel ? theme.colorScheme.error : null,
                   fontWeight: FontWeight.w600,
                   fontFeatures: const [FontFeature.tabularFigures()],
