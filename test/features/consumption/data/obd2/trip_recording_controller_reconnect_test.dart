@@ -442,6 +442,64 @@ void main() {
             reason: 'the retrying path makes exactly 2 attempts before '
                 'giving up — one try + one retry');
       });
+
+      test(
+          'the silent-reconnect window emits nothing — no phantom '
+          'integration from a stale snapshot (#1912)', () async {
+        // Speed + RPM PIDs so live telemetry actually flows before the
+        // drop. The default scheduler is used (no override) so it
+        // really polls; a short pollInterval keeps the emit timer
+        // ticking inside the test window.
+        final transport = FakeObd2Transport({
+          ...initResponses(),
+          '010D': '41 0D 32>', // 50 km/h
+          '010C': '41 0C 0E A6>', // ~937 rpm
+        });
+        await transport.connect();
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(milliseconds: 40),
+          vehicleId: 'car-1912',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          pinnedAdapterMac: 'AA:BB',
+          // A scanner that never auto-reconnects, so the trip stays in
+          // the silent window for the whole test.
+          reconnectScannerFactory: (mac, onReconnect) => _ObservableScanner(
+            pinnedMac: mac,
+            onReconnect: onReconnect,
+            onStart: () {},
+            onStop: () {},
+          ),
+        );
+
+        final readings = <Object>[];
+        final sub = ctl.live.listen(readings.add);
+        await ctl.start();
+        // Live telemetry flows normally before the drop.
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+        expect(readings, isNotEmpty,
+            reason: 'the emit timer must produce readings while the '
+                'trip is genuinely recording');
+
+        // Transport drop → enters the invisible reconnect window.
+        ctl.debugTriggerDrop();
+        expect(ctl.debugSilentlyReconnecting, isTrue);
+        final countAtDrop = readings.length;
+
+        // Several emit-timer ticks elapse while still inside the
+        // silent window (the scanner never reconnects here).
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+
+        expect(readings.length, countAtDrop,
+            reason: '#1912 — _emit must be gated during the silent '
+                'reconnect window: the scheduler is stopped, so emitting '
+                'the stale snapshot would integrate phantom distance / '
+                'fuel from a frozen speed over real elapsed time');
+
+        await sub.cancel();
+        await ctl.stop();
+      });
     });
   });
 }
