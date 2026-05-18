@@ -57,7 +57,7 @@ dependencies:
 
   # Utilities
   collection: ^1.19.0
-  meta: ^1.17.0
+  meta: ^1.18.0
   # Pinned to 6.x — xml 7.x is a major bump; the 17 country
   # station-service parsers depend on the 6.x API. Bump under its own
   # pass (#1684).
