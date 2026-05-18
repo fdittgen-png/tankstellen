@@ -5137,6 +5137,9 @@ class AppLocalizationsLt extends AppLocalizations {
       'Prisekite ekraną, kad GPS veiktų kelionės metu — Android gali riboti GPS miego režimo metu.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Sumažinti į slankųjį langelį';
+
+  @override
   String get unifiedFilterFuel => 'Kuras';
 
   @override

@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Записването продължава на заден план. Докоснете червения банер в горната част на всеки екран за връщане.",
   "tripBannerOpenFromConsumptionTab": "Отвори активното пътуване от раздела Разход",
   "tripRecordingUnpinnedWarning": "Закачете екрана, за да поддържате GPS активен по време на пътуването — Android може да ограничи GPS при заспиване.",
+  "tripRecordingMinimiseTooltip": "Минимизиране в плаваща плочка",
   "unifiedFilterFuel": "Гориво",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "И двете",

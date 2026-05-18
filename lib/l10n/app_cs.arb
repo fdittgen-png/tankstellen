@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Nahrávání pokračuje na pozadí. Klepněte na červený banner v horní části libovolné obrazovky pro návrat.",
   "tripBannerOpenFromConsumptionTab": "Otevřít aktivní cestu ze záložky Spotřeba",
   "tripRecordingUnpinnedWarning": "Připněte obrazovku pro zachování aktivní GPS během cesty — Android může GPS při spánku omezit.",
+  "tripRecordingMinimiseTooltip": "Minimalizovat do plovoucí dlaždice",
   "unifiedFilterFuel": "Palivo",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Oboje",

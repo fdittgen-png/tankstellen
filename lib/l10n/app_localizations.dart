@@ -9183,6 +9183,12 @@ abstract class AppLocalizations {
   /// **'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.'**
   String get tripRecordingUnpinnedWarning;
 
+  /// Tooltip on the minimise (Picture-in-Picture) icon button on the trip-recording screen (#1884). Tapping shrinks the app into a small floating tile that keeps showing live consumption over other apps. Android-only.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimise to a floating tile'**
+  String get tripRecordingMinimiseTooltip;
+
   /// Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c).
   ///
   /// In en, this message translates to:

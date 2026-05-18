@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Inspelning fortsätter i bakgrunden. Tryck på det röda bandet längst upp på valfri skärm för att återgå.",
   "tripBannerOpenFromConsumptionTab": "Öppna den aktiva resan från förbrukningsfliken",
   "tripRecordingUnpinnedWarning": "Nåla skärmen för att hålla GPS aktivt under resan – Android kan begränsa GPS under viloläge.",
+  "tripRecordingMinimiseTooltip": "Minimera till en flytande ruta",
   "unifiedFilterFuel": "Bränsle",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Båda",

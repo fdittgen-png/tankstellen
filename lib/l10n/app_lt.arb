@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Įrašymas tęsiamas fone. Palieskite raudoną juostą bet kurio ekrano viršuje, kad grįžtumėte.",
   "tripBannerOpenFromConsumptionTab": "Atidarykite aktyvią kelionę iš suvartojimo skirtuko",
   "tripRecordingUnpinnedWarning": "Prisekite ekraną, kad GPS veiktų kelionės metu — Android gali riboti GPS miego režimo metu.",
+  "tripRecordingMinimiseTooltip": "Sumažinti į slankųjį langelį",
   "unifiedFilterFuel": "Kuras",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Abu",

@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Optagelse fortsætter i baggrunden. Tryk på det røde banner øverst på en vilkårlig skærm for at vende tilbage.",
   "tripBannerOpenFromConsumptionTab": "Åbn den aktive tur fra forbrugsfanen",
   "tripRecordingUnpinnedWarning": "Fastgør skærmen for at holde GPS aktiv under turen — Android kan begrænse GPS under søvn.",
+  "tripRecordingMinimiseTooltip": "Minimér til en svævende flise",
   "unifiedFilterFuel": "Brændstof",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Begge",

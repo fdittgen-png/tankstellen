@@ -5108,6 +5108,9 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kiinnitä näyttö pitääksesi GPS aktiivisena matkan aikana — Android voi rajoittaa GPS:ää nukkuessa.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Pienennä kelluvaksi ruuduksi';
+
+  @override
   String get unifiedFilterFuel => 'Polttoaine';
 
   @override

@@ -5133,6 +5133,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bildschirm anpinnen, damit das GPS während der Fahrt aktiv bleibt — Android kann das GPS im Ruhezustand drosseln.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Als schwebende Kachel minimieren';
+
+  @override
   String get unifiedFilterFuel => 'Kraftstoff';
 
   @override

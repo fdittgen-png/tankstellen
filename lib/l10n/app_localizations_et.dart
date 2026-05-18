@@ -5098,6 +5098,9 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kinnita ekraan, et GPS oleks aktiivne reisi ajal — Android võib GPS-i une ajal piirata.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Minimeeri hõljuvaks paaniks';
+
+  @override
   String get unifiedFilterFuel => 'Kütus';
 
   @override

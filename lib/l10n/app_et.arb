@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Salvestamine jätkub taustal. Puuduta punast ribareklaam ekraani ülaosas, et naasta.",
   "tripBannerOpenFromConsumptionTab": "Ava aktiivne reis Kulu kaardilt",
   "tripRecordingUnpinnedWarning": "Kinnita ekraan, et GPS oleks aktiivne reisi ajal — Android võib GPS-i une ajal piirata.",
+  "tripRecordingMinimiseTooltip": "Minimeeri hõljuvaks paaniks",
   "unifiedFilterFuel": "Kütus",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Mõlemad",

@@ -5149,6 +5149,9 @@ class AppLocalizationsBg extends AppLocalizations {
       'Закачете екрана, за да поддържате GPS активен по време на пътуването — Android може да ограничи GPS при заспиване.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Минимизиране в плаваща плочка';
+
+  @override
   String get unifiedFilterFuel => 'Гориво';
 
   @override

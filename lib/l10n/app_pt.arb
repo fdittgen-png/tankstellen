@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "A gravação continua em segundo plano. Toque na faixa vermelha no topo de qualquer ecrã para voltar.",
   "tripBannerOpenFromConsumptionTab": "Abra a viagem ativa no separador Conso",
   "tripRecordingUnpinnedWarning": "Fixe o ecrã para manter o GPS ativo durante a viagem — o Android pode limitar o GPS durante o repouso.",
+  "tripRecordingMinimiseTooltip": "Minimizar para um mosaico flutuante",
   "unifiedFilterFuel": "Combustível",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Ambos",

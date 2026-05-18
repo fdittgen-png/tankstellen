@@ -5151,6 +5151,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Rögzítse a képernyőt a GPS aktív tartásához — az Android korlátozhatja a GPS-t alvás közben.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Kicsinyítés lebegő csempére';
+
+  @override
   String get unifiedFilterFuel => 'Üzemanyag';
 
   @override

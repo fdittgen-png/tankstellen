@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Opname gaat door op de achtergrond. Tik op de rode balk boven aan elk scherm om terug te keren.",
   "tripBannerOpenFromConsumptionTab": "Open de actieve rit via het tabblad Verbruik",
   "tripRecordingUnpinnedWarning": "Zet het scherm vast om GPS actief te houden tijdens de rit — Android kan GPS beperken tijdens slaapstand.",
+  "tripRecordingMinimiseTooltip": "Minimaliseren tot een zwevende tegel",
   "unifiedFilterFuel": "Brandstof",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Beide",

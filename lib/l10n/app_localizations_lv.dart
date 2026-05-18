@@ -5138,6 +5138,9 @@ class AppLocalizationsLv extends AppLocalizations {
       'Piespraudiet ekrānu, lai GPS paliek aktīvs brauciena laikā — Android var ierobežot GPS miega laikā.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Minimizēt uz peldošu elementu';
+
+  @override
   String get unifiedFilterFuel => 'Degviela';
 
   @override

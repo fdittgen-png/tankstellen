@@ -5152,6 +5152,9 @@ class AppLocalizationsEl extends AppLocalizations {
       'Καρφιτσώστε την οθόνη για να διατηρείτε το GPS ενεργό κατά τη διάρκεια του ταξιδιού — Το Android μπορεί να περιορίσει το GPS κατά την αδρανοποίηση.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Σμίκρυνση σε πλωτό πλακίδιο';
+
+  @override
   String get unifiedFilterFuel => 'Καύσιμο';
 
   @override

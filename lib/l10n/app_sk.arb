@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Záznam pokračuje na pozadí. Klepnite na červený banner v hornej časti ľubovoľnej obrazovky pre návrat.",
   "tripBannerOpenFromConsumptionTab": "Otvoriť aktívnu jazdu z karty Spotreba",
   "tripRecordingUnpinnedWarning": "Pripnite obrazovku pre udržanie GPS aktívneho počas jazdy — Android môže obmedziť GPS počas spánku.",
+  "tripRecordingMinimiseTooltip": "Minimalizovať do plávajúcej dlaždice",
   "unifiedFilterFuel": "Palivo",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Oboje",

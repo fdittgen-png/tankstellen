@@ -5134,6 +5134,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Blocca lo schermo per mantenere il GPS attivo durante il percorso — Android potrebbe limitare il GPS durante la sospensione.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Riduci a riquadro mobile';
+
+  @override
   String get unifiedFilterFuel => 'Carburante';
 
   @override

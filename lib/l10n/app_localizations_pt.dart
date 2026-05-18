@@ -5144,6 +5144,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Fixe o ecrã para manter o GPS ativo durante a viagem — o Android pode limitar o GPS durante o repouso.';
 
   @override
+  String get tripRecordingMinimiseTooltip =>
+      'Minimizar para um mosaico flutuante';
+
+  @override
   String get unifiedFilterFuel => 'Combustível';
 
   @override

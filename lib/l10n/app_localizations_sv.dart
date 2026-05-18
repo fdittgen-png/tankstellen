@@ -5107,6 +5107,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'Nåla skärmen för att hålla GPS aktivt under resan – Android kan begränsa GPS under viloläge.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Minimera till en flytande ruta';
+
+  @override
   String get unifiedFilterFuel => 'Bränsle';
 
   @override
