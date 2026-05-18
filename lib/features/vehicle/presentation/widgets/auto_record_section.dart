@@ -16,12 +16,12 @@ import '../../providers/vehicle_providers.dart';
 /// disconnect-save delay, paired adapter, background-location
 /// consent). #1310 — when the master toggle is on the card renders a
 /// state-aware status banner that mirrors the actual orchestrator
-/// gate (`pairedAdapterMac` non-empty + `backgroundLocationConsent`
+/// gate (`obd2AdapterMac` non-empty + `backgroundLocationConsent`
 /// true). The banner shows one of three states:
 ///
 ///   * Active — both prerequisites satisfied; auto-record arms next
 ///     drive.
-///   * Needs pairing — no `pairedAdapterMac` set. #1400 — the card
+///   * Needs pairing — no `obd2AdapterMac` set. #1400 — the card
 ///     surfaces a passive informational link pointing the user at
 ///     the canonical "OBD2 adapter" card below; the actual pair CTA
 ///     lives there to consolidate the two adapter-pair entry points.
@@ -400,7 +400,7 @@ enum _AutoRecordStatus {
   /// orchestrator will arm next time the user enters the car.
   active,
 
-  /// `pairedAdapterMac` is null/empty. The orchestrator silently
+  /// `obd2AdapterMac` is null/empty. The orchestrator silently
   /// drops this vehicle until an adapter is paired.
   needsPairing,
 

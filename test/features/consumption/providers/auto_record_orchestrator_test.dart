@@ -160,7 +160,7 @@ VehicleProfile _profile({
     name: 'Test $id',
     type: VehicleType.combustion,
     autoRecord: autoRecord,
-    pairedAdapterMac: mac,
+    obd2AdapterMac: mac,
     movementStartThresholdKmh: thresholdKmh,
     disconnectSaveDelaySec: delaySec,
   );
@@ -225,7 +225,7 @@ void main() {
   }
 
   test(
-      'new vehicle with autoRecord=true and pairedAdapterMac creates and starts coordinator',
+      'new vehicle with autoRecord=true and obd2AdapterMac creates and starts coordinator',
       () async {
     final list = _FakeVehicleProfileList(
       [_profile(id: 'v1')],
@@ -267,7 +267,7 @@ void main() {
     expect(harness.created, isEmpty);
   });
 
-  test('vehicle without pairedAdapterMac is ignored', () async {
+  test('vehicle without obd2AdapterMac is ignored', () async {
     final list = _FakeVehicleProfileList(
       [_profile(id: 'v1', mac: null)],
     );
@@ -307,7 +307,7 @@ void main() {
         reason: 'Disabling autoRecord must call stop() on the listener');
   });
 
-  test('changing pairedAdapterMac stops old coordinator and starts a new one',
+  test('changing obd2AdapterMac stops old coordinator and starts a new one',
       () async {
     final list = _FakeVehicleProfileList(
       [_profile(id: 'v1', mac: 'AA:AA:AA:AA:AA:AA')],

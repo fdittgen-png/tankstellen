@@ -155,7 +155,6 @@ void main() {
         calibrationMode: VehicleCalibrationMode.fuzzy,
         // Auto-record
         autoRecord: true,
-        pairedAdapterMac: '11:22:33:44:55:66',
         movementStartThresholdKmh: 7.5,
         disconnectSaveDelaySec: 90,
         backgroundLocationConsent: true,

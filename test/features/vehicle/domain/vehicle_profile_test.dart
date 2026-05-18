@@ -134,11 +134,10 @@ void main() {
     });
 
     group('hands-free auto-record config (#1004 phase 1)', () {
-      test('defaults: auto-record off, no paired adapter, 5 km/h / 60 s, '
+      test('defaults: auto-record off, 5 km/h / 60 s, '
           'no background-location consent', () {
         const v = VehicleProfile(id: 'abc', name: 'Car');
         expect(v.autoRecord, isFalse);
-        expect(v.pairedAdapterMac, isNull);
         expect(v.movementStartThresholdKmh, 5.0);
         expect(v.disconnectSaveDelaySec, 60);
         expect(v.backgroundLocationConsent, isFalse);
@@ -150,7 +149,7 @@ void main() {
           name: 'Daily Driver',
           type: VehicleType.combustion,
           autoRecord: true,
-          pairedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+          obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
           movementStartThresholdKmh: 7.5,
           disconnectSaveDelaySec: 90,
           backgroundLocationConsent: true,
@@ -159,7 +158,7 @@ void main() {
         final restored = VehicleProfile.fromJson(v.toJson());
 
         expect(restored.autoRecord, isTrue);
-        expect(restored.pairedAdapterMac, 'AA:BB:CC:DD:EE:FF');
+        expect(restored.obd2AdapterMac, 'AA:BB:CC:DD:EE:FF');
         expect(restored.movementStartThresholdKmh, closeTo(7.5, 0.001));
         expect(restored.disconnectSaveDelaySec, 90);
         expect(restored.backgroundLocationConsent, isTrue);
@@ -169,9 +168,9 @@ void main() {
       test('legacy JSON without auto-record keys still decodes — '
           'existing Hive profiles take safe defaults', () {
         // Payload shape that pre-#1004 profiles wrote to Hive: no
-        // autoRecord / pairedAdapterMac / movementStartThresholdKmh
-        // / disconnectSaveDelaySec / backgroundLocationConsent
-        // keys at all. Must round-trip cleanly with defaults.
+        // autoRecord / movementStartThresholdKmh / disconnectSaveDelaySec
+        // / backgroundLocationConsent keys at all. Must round-trip
+        // cleanly with defaults.
         final json = <String, dynamic>{
           'id': 'legacy',
           'name': 'Legacy Car',
@@ -183,13 +182,49 @@ void main() {
         final v = VehicleProfile.fromJson(json);
 
         expect(v.autoRecord, isFalse);
-        expect(v.pairedAdapterMac, isNull);
         expect(v.movementStartThresholdKmh, 5.0);
         expect(v.disconnectSaveDelaySec, 60);
         expect(v.backgroundLocationConsent, isFalse);
         // Pre-existing fields should still come through.
         expect(v.tankCapacityL, 50.0);
         expect(v.preferredFuelType, 'Diesel');
+      });
+
+      test('legacy pairedAdapterMac JSON key folds into obd2AdapterMac '
+          '(#1950)', () {
+        // A profile saved before #1949/#1950 kept the auto-record
+        // adapter under a separate `pairedAdapterMac` key. That field
+        // is gone; the value must survive into `obd2AdapterMac` so the
+        // vehicle keeps its auto-record binding.
+        final json = <String, dynamic>{
+          'id': 'pre-1949',
+          'name': 'Old Pairing',
+          'type': 'combustion',
+          'pairedAdapterMac': 'AA:BB:CC:DD:EE:FF',
+        };
+
+        final v = VehicleProfile.fromJson(json);
+
+        expect(v.obd2AdapterMac, 'AA:BB:CC:DD:EE:FF');
+        expect(v.autoRecordAdapterMac, 'AA:BB:CC:DD:EE:FF');
+      });
+
+      test('a present obd2AdapterMac wins over a legacy pairedAdapterMac '
+          'key (#1950)', () {
+        // When both keys are present (a profile re-saved across the
+        // #1949 transition) the canonical `obd2AdapterMac` is kept —
+        // the legacy key is ignored, never overwrites.
+        final json = <String, dynamic>{
+          'id': 'both',
+          'name': 'Both Keys',
+          'type': 'combustion',
+          'obd2AdapterMac': '11:22:33:44:55:66',
+          'pairedAdapterMac': 'AA:BB:CC:DD:EE:FF',
+        };
+
+        final v = VehicleProfile.fromJson(json);
+
+        expect(v.obd2AdapterMac, '11:22:33:44:55:66');
       });
 
       test('copyWith updates auto-record fields without disturbing '
@@ -203,7 +238,7 @@ void main() {
 
         final updated = v.copyWith(
           autoRecord: true,
-          pairedAdapterMac: '11:22:33:44:55:66',
+          obd2AdapterMac: '11:22:33:44:55:66',
           movementStartThresholdKmh: 3.0,
           disconnectSaveDelaySec: 120,
           backgroundLocationConsent: true,
@@ -211,7 +246,7 @@ void main() {
 
         expect(updated.tankCapacityL, 45);
         expect(updated.autoRecord, isTrue);
-        expect(updated.pairedAdapterMac, '11:22:33:44:55:66');
+        expect(updated.obd2AdapterMac, '11:22:33:44:55:66');
         expect(updated.movementStartThresholdKmh, 3.0);
         expect(updated.disconnectSaveDelaySec, 120);
         expect(updated.backgroundLocationConsent, isTrue);

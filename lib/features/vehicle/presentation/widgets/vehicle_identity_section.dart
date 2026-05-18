@@ -16,9 +16,9 @@ import '../../../../l10n/app_localizations.dart';
 /// button is always rendered (#1328); when no adapter is selected
 /// ([adapterMac] is null OR [onReadVinFromCar] is null) it is
 /// shown visibly disabled with a small helper text, so users discover
-/// the feature even before pairing. (#1339 — gated on the basic
-/// `obd2AdapterMac` field, NOT the auto-record `pairedAdapterMac`
-/// flag, so the button enables as soon as the user picks an adapter.)
+/// the feature even before pairing. (#1339 — gated on the
+/// `obd2AdapterMac` field so the button enables as soon as the user
+/// picks an adapter.)
 class VehicleIdentitySection extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController vinController;
@@ -32,8 +32,8 @@ class VehicleIdentitySection extends StatelessWidget {
   /// null AND [onReadVinFromCar] is null, the "Read VIN from car"
   /// button is rendered disabled with a helper hint instead of being
   /// hidden — see #1328 for why discoverability beats minimalism here.
-  /// This is the basic `obd2AdapterMac` selection (the bottom adapter-
-  /// picker), NOT the auto-record `pairedAdapterMac` flag (#1004).
+  /// This is the `obd2AdapterMac` selection (the bottom adapter-
+  /// picker) — the single adapter-MAC field since #1949/#1950.
   final String? adapterMac;
 
   /// Callback fired when the user taps the "Read VIN from car" button

@@ -22,7 +22,8 @@ class AutoRecordConfig {
   /// background BT listener for this vehicle.
   final bool autoRecord;
 
-  /// MAC of the OBD2 adapter the user paired to this vehicle.
+  /// MAC of the OBD2 adapter the user paired to this vehicle —
+  /// projected from `VehicleProfile.obd2AdapterMac` (#1949/#1950).
   /// Null when no adapter has been paired yet — phase 2 must skip
   /// auto-connect registration in that case.
   final String? pairedAdapterMac;
@@ -57,8 +58,8 @@ class AutoRecordConfig {
   factory AutoRecordConfig.fromProfile(VehicleProfile profile) {
     return AutoRecordConfig(
       autoRecord: profile.autoRecord,
-      // #1949 — auto-record arms on the vehicle's obd2AdapterMac,
-      // falling back to the legacy pairedAdapterMac.
+      // #1949 / #1950 — auto-record arms on the vehicle's single
+      // obd2AdapterMac field.
       pairedAdapterMac: profile.autoRecordAdapterMac,
       movementStartThresholdKmh: profile.movementStartThresholdKmh,
       disconnectSaveDelaySec: profile.disconnectSaveDelaySec,

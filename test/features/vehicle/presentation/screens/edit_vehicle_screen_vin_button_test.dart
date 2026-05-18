@@ -15,11 +15,10 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 ///
 /// The OBD2 read is faked via a [_FakeVinReaderService] override on
 /// [vinReaderServiceProvider] so no Bluetooth stack is required. The
-/// button is gated on the active profile's basic `obd2AdapterMac`
-/// selection (#1339, fixed from the original auto-record
-/// `pairedAdapterMac` gate); these tests cover both the disabled (no
-/// adapter selected) and enabled (adapter selected) states plus the
-/// success / failure UX branches.
+/// button is gated on the active profile's `obd2AdapterMac` selection
+/// (#1339); these tests cover both the disabled (no adapter selected)
+/// and enabled (adapter selected) states plus the success / failure
+/// UX branches.
 void main() {
   group('EditVehicleScreen — Read-VIN-from-car button (#1162 / #1339)', () {
     testWidgets(
@@ -48,53 +47,24 @@ void main() {
     );
 
     testWidgets(
-      'button is enabled when the basic adapter selection is set even '
-      'though the auto-record pairedAdapterMac flag is null (#1339)',
+      'button is enabled when the adapter selection is set (#1339)',
       (tester) async {
-        // #1339 regression repro: user picked an adapter via the bottom
-        // OBD2 picker (`obd2AdapterMac` written) but never opted into
-        // the auto-record pairing flow (`pairedAdapterMac` still null).
-        // Before the fix the button was disabled because the gate
-        // confused the two fields.
-        await _pumpWithProfile(
-          tester,
-          withAdapterSelected: true,
-          autoRecordPaired: false,
-        );
+        // #1339 regression repro: user picked an adapter via the OBD2
+        // picker (`obd2AdapterMac` written) — the button must enable on
+        // that selection alone.
+        await _pumpWithProfile(tester, withAdapterSelected: true);
 
         final buttonFinder = find.byKey(const Key('vehicleReadVinFromCar'));
         expect(buttonFinder, findsOneWidget);
         final button = tester.widget<OutlinedButton>(buttonFinder);
         expect(button.onPressed, isNotNull,
-            reason: 'Adapter selected → button must be tappable even when '
-                'auto-record pairing is not configured');
+            reason: 'Adapter selected → button must be tappable');
         expect(find.text('Read VIN from car'), findsOneWidget);
         expect(
           find.byTooltip('Read VIN from the paired OBD2 adapter'),
           findsOneWidget,
         );
         // The "no adapter" hint is gone once an adapter is selected.
-        expect(
-          find.byKey(const Key('vehicleReadVinNoAdapterHint')),
-          findsNothing,
-        );
-      },
-    );
-
-    testWidgets(
-      'button is enabled when both the adapter selection and the '
-      'auto-record pairing are set',
-      (tester) async {
-        await _pumpWithProfile(
-          tester,
-          withAdapterSelected: true,
-          autoRecordPaired: true,
-        );
-
-        final buttonFinder = find.byKey(const Key('vehicleReadVinFromCar'));
-        expect(buttonFinder, findsOneWidget);
-        final button = tester.widget<OutlinedButton>(buttonFinder);
-        expect(button.onPressed, isNotNull);
         expect(
           find.byKey(const Key('vehicleReadVinNoAdapterHint')),
           findsNothing,
@@ -202,18 +172,14 @@ void main() {
 
 /// Pumps [EditVehicleScreen] in edit-mode with a stored profile.
 ///
-/// [withAdapterSelected] writes `obd2AdapterMac` (the basic OBD2-picker
-/// selection that gates the Read-VIN-from-car button — #1339).
-/// [autoRecordPaired] is independent: it writes the auto-record
-/// `pairedAdapterMac` flag (#1004). The two were confused before #1339;
-/// the helper exposes both so tests can assert each combination.
+/// [withAdapterSelected] writes `obd2AdapterMac` — the single adapter
+/// selection that gates the Read-VIN-from-car button (#1339).
 ///
 /// The OBD2 reader is always faked so the test never touches a real
 /// transport.
 Future<void> _pumpWithProfile(
   WidgetTester tester, {
   required bool withAdapterSelected,
-  bool autoRecordPaired = false,
   ObdVinResult? readerResult,
 }) async {
   final repo = VehicleProfileRepository(_FakeSettings());
@@ -224,8 +190,6 @@ Future<void> _pumpWithProfile(
       obd2AdapterMac:
           withAdapterSelected ? 'AA:BB:CC:DD:EE:FF' : null,
       obd2AdapterName: withAdapterSelected ? 'Test Adapter' : null,
-      pairedAdapterMac:
-          autoRecordPaired ? 'AA:BB:CC:DD:EE:FF' : null,
     ),
   );
 

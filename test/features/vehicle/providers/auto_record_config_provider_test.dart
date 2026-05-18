@@ -21,7 +21,7 @@ void main() {
       const profile = VehicleProfile(id: 'fresh', name: 'Fresh');
       const config = AutoRecordConfig.defaults;
       expect(config.autoRecord, profile.autoRecord);
-      expect(config.pairedAdapterMac, profile.pairedAdapterMac);
+      expect(config.pairedAdapterMac, profile.obd2AdapterMac);
       expect(config.movementStartThresholdKmh, profile.movementStartThresholdKmh);
       expect(config.disconnectSaveDelaySec, profile.disconnectSaveDelaySec);
       expect(config.backgroundLocationConsent, profile.backgroundLocationConsent);
@@ -33,7 +33,7 @@ void main() {
         name: 'Daily',
         type: VehicleType.combustion,
         autoRecord: true,
-        pairedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+        obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
         movementStartThresholdKmh: 8.5,
         disconnectSaveDelaySec: 120,
         backgroundLocationConsent: true,
@@ -119,7 +119,7 @@ void main() {
         name: 'Daily Driver',
         type: VehicleType.combustion,
         autoRecord: true,
-        pairedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+        obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
         movementStartThresholdKmh: 7.5,
         disconnectSaveDelaySec: 90,
         backgroundLocationConsent: true,
@@ -188,7 +188,7 @@ void main() {
         name: 'Mutable',
         type: VehicleType.combustion,
         autoRecord: true,
-        pairedAdapterMac: '11:22:33:44:55:66',
+        obd2AdapterMac: '11:22:33:44:55:66',
         movementStartThresholdKmh: 3.0,
         disconnectSaveDelaySec: 45,
         backgroundLocationConsent: true,
@@ -230,7 +230,7 @@ void main() {
         name: 'Mutable',
         type: VehicleType.combustion,
         autoRecord: true,
-        pairedAdapterMac: '11:22:33:44:55:66',
+        obd2AdapterMac: '11:22:33:44:55:66',
       );
       await container.read(vehicleProfileListProvider.notifier).save(updated);
 
@@ -249,7 +249,7 @@ void main() {
         name: 'Vanishing',
         type: VehicleType.combustion,
         autoRecord: true,
-        pairedAdapterMac: 'DE:AD:BE:EF:00:01',
+        obd2AdapterMac: 'DE:AD:BE:EF:00:01',
       );
       await container.read(vehicleProfileListProvider.notifier).save(v);
 

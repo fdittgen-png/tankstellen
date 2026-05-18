@@ -66,7 +66,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
   /// MAC of the adapter the user picked in the connector flow. Stashed
   /// on the state so the auto-fill save path (which runs AFTER the VIN
   /// confirm dialog) can persist it onto the freshly-built profile as
-  /// `pairedAdapterMac` (#1310). Without this the orchestrator gate
+  /// `obd2AdapterMac` (#1310). Without this the orchestrator gate
   /// silently drops users who finished onboarding.
   String? _pickedMac;
 
@@ -203,11 +203,11 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
       if (data.model != null) data.model,
     ].whereType<String>().join(' ').trim();
 
-    // #1310 — persist the picked adapter MAC on BOTH `obd2AdapterMac`
-    // (the "currently/last connected" key the pinned-MAC fast path
-    // reads) AND `pairedAdapterMac` (the auto-record orchestrator
-    // gate). Without `pairedAdapterMac` the orchestrator silently
-    // drops the vehicle even though the user just paired.
+    // #1310 — persist the picked adapter MAC on `obd2AdapterMac`, the
+    // single adapter-MAC field (#1949/#1950): it is both the
+    // "currently/last connected" key the pinned-MAC fast path reads and
+    // the auto-record orchestrator gate. Without it the orchestrator
+    // silently drops the vehicle even though the user just paired.
     final pickedMac = _pickedMac;
     final profile = VehicleProfile(
       id: _uuid.v4(),
@@ -220,7 +220,6 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
       engineDisplacementCc: engineDisplacementCc,
       engineCylinders: data.cylinderCount,
       obd2AdapterMac: pickedMac,
-      pairedAdapterMac: pickedMac,
     );
 
     await ref.read(vehicleProfileListProvider.notifier).save(profile);

@@ -51,7 +51,6 @@ class VehicleFormControllers {
       connectors: {...profile.supportedConnectors},
       adapterMac: profile.obd2AdapterMac,
       adapterName: profile.obd2AdapterName,
-      pairedAdapterMac: profile.pairedAdapterMac,
       engineDisplacementCc: profile.engineDisplacementCc,
       engineCylinders: profile.engineCylinders,
       curbWeightKg: profile.curbWeightKg,
@@ -285,14 +284,6 @@ class VehicleFormSnapshot {
   final Set<ConnectorType> connectors;
   final String? adapterMac;
   final String? adapterName;
-
-  /// Long-lived "this adapter belongs to this car" marker (#1004).
-  /// Distinct from [adapterMac] — that field holds the currently-
-  /// connected adapter from the OBD2 picker. The auto-record flow
-  /// (#1004) watches this field for BLE auto-connect; the
-  /// read-VIN-from-car button (#1162) gates on [adapterMac] (#1339).
-  final String? pairedAdapterMac;
-
   final int? engineDisplacementCc;
   final int? engineCylinders;
   final int? curbWeightKg;
@@ -303,7 +294,6 @@ class VehicleFormSnapshot {
     required this.connectors,
     required this.adapterMac,
     required this.adapterName,
-    required this.pairedAdapterMac,
     required this.engineDisplacementCc,
     required this.engineCylinders,
     required this.curbWeightKg,

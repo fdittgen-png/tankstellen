@@ -222,13 +222,6 @@ abstract class VehicleProfile with _$VehicleProfile {
     //
     //   autoRecord: master toggle. Off by default — every user must
     //     opt in explicitly from the vehicle edit screen.
-    //   pairedAdapterMac: MAC address of the ELM327 adapter that
-    //     belongs to this vehicle. Distinct from
-    //     [obd2AdapterMac] (the "currently connected" adapter from
-    //     #784 / #816); pairedAdapterMac is the long-lived "this
-    //     adapter belongs to this car" marker that the BLE auto-
-    //     connect listener watches for. Null when the user hasn't
-    //     paired one yet.
     //   movementStartThresholdKmh: speed (OBD2 PID 0x0D OR phone
     //     GPS, whichever fires first) above which auto-record fires
     //     `startTrip()`. Default 5 km/h — low enough to catch
@@ -244,7 +237,6 @@ abstract class VehicleProfile with _$VehicleProfile {
     //     record GPS while the screen is off?" Without it, the
     //     auto-flow runs BT-only and skips GPS-based trip metadata.
     @Default(false) bool autoRecord,
-    String? pairedAdapterMac,
     @Default(5.0) double movementStartThresholdKmh,
     @Default(60) int disconnectSaveDelaySec,
     @Default(false) bool backgroundLocationConsent,
@@ -337,7 +329,7 @@ abstract class VehicleProfile with _$VehicleProfile {
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>
-      _$VehicleProfileFromJson(json);
+      _$VehicleProfileFromJson(_migrateLegacyAdapterMac(json));
 
   bool get isEv => type == VehicleType.ev || type == VehicleType.hybrid;
   bool get isCombustion =>
@@ -412,14 +404,23 @@ class ConnectorTypeSetConverter
 extension VehicleProfileAutoRecordAdapter on VehicleProfile {
   /// The OBD2 adapter MAC auto-record arms on.
   ///
-  /// Prefers the vehicle's configured [obd2AdapterMac]; falls back to
-  /// the legacy [pairedAdapterMac] for a vehicle paired before the two
-  /// MACs were consolidated. #1950 (PR 2) drops `pairedAdapterMac` and
-  /// this fallback once a migration has copied any paired-only MAC
-  /// across.
-  String? get autoRecordAdapterMac {
-    final obd2 = obd2AdapterMac;
-    if (obd2 != null && obd2.isNotEmpty) return obd2;
-    return pairedAdapterMac;
-  }
+  /// Since #1949/#1950 a vehicle carries a single adapter-MAC field —
+  /// `obd2AdapterMac`. A profile saved before the two MACs were
+  /// consolidated kept the value under a separate `pairedAdapterMac`
+  /// key; [_migrateLegacyAdapterMac] folds that into `obd2AdapterMac`
+  /// at deserialization, so this getter only needs the one field.
+  String? get autoRecordAdapterMac => obd2AdapterMac;
+}
+
+/// Migrates a pre-#1949 profile JSON payload: the auto-record adapter
+/// MAC used to live under a separate `pairedAdapterMac` key. That field
+/// is gone (#1950); fold a paired-only MAC into `obd2AdapterMac` so a
+/// vehicle paired before the consolidation keeps its auto-record
+/// binding. A no-op for payloads that already carry `obd2AdapterMac`.
+Map<String, dynamic> _migrateLegacyAdapterMac(Map<String, dynamic> json) {
+  final paired = json['pairedAdapterMac'];
+  if (paired is! String || paired.isEmpty) return json;
+  final current = json['obd2AdapterMac'];
+  if (current is String && current.isNotEmpty) return json;
+  return {...json, 'obd2AdapterMac': paired};
 }

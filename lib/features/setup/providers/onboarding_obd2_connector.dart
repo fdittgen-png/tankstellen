@@ -19,16 +19,16 @@ part 'onboarding_obd2_connector.g.dart';
 /// test (connect + VIN success / VIN null / connect failure).
 ///
 /// #1310 — `connect` now exposes the picked MAC alongside the live
-/// service so the onboarding step can persist [VehicleProfile.pairedAdapterMac]
+/// service so the onboarding step can persist [VehicleProfile.obd2AdapterMac]
 /// on the freshly-saved profile. Without this, users who finished the
 /// adapter-first onboarding ended up with a profile that had a service
-/// connection at runtime but no `pairedAdapterMac` — the auto-record
+/// connection at runtime but no `obd2AdapterMac` — the auto-record
 /// orchestrator silently dropped them.
 abstract class OnboardingObd2Connector {
   /// Open the adapter picker and return the connected session
   /// (service + MAC), or `null` when the user cancels / the scan
   /// fails. The MAC stored on the result is what the onboarding step
-  /// writes to [VehicleProfile.pairedAdapterMac] (#1310).
+  /// writes to [VehicleProfile.obd2AdapterMac] (#1310).
   Future<OnboardingObd2Session?> connect(BuildContext context);
 
   /// Read the VIN from [service] via Mode 09 PID 02. Returns `null`
