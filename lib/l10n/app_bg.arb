@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "OBD2 адаптерът не отговори. Включете запалването и опитайте отново.",
   "obd2ErrorProtocolInitFailed": "OBD2 адаптерът изпрати неразпознат отговор. Възможно е да е несъвместим — опитайте друг адаптер.",
   "obd2ErrorDisconnected": "OBD2 адаптерът се изключи. Свържете се отново и опитайте пак.",
-  "onboardingExploreDemoData": "Разгледай с демоданни"
+  "onboardingExploreDemoData": "Разгледай с демоданни",
+  "obd2DebugLoggingTitle": "OBD2 дебъг журналиране",
+  "obd2DebugLoggingSubtitle": "Записвайте всяка OBD2 сесия — свързване, handshake, пропуски в данните и повторни свързвания — в експортируем XML журнал. Изключено по подразбиране.",
+  "obd2DebugSessionShareLabel": "Споделяне на журнала на OBD2 сесията"
 }

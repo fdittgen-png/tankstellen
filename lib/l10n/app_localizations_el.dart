@@ -4691,6 +4691,17 @@ class AppLocalizationsEl extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Κοινοποίηση διαγνωστικού αρχείου';
 
   @override
+  String get obd2DebugLoggingTitle => 'Καταγραφή εντοπισμού σφαλμάτων OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Καταγράψτε κάθε συνεδρία OBD2 — σύνδεση, χειραψία, κενά δεδομένων και επανασυνδέσεις — σε ένα εξαγώγιμο αρχείο καταγραφής XML. Απενεργοποιημένο από προεπιλογή.';
+
+  @override
+  String get obd2DebugSessionShareLabel =>
+      'Κοινή χρήση αρχείου καταγραφής συνεδρίας OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Δεν ήταν δυνατή η επαφή με \'$adapterName\' — επιλέξτε άλλον προσαρμογέα';
   }

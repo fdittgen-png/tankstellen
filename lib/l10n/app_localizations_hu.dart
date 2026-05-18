@@ -4690,6 +4690,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Diagnosztikai napló megosztása';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2 hibakeresési naplózás';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Rögzítsen minden OBD2-munkamenetet — kapcsolódás, kézfogás, adatkimaradások és újracsatlakozások — egy exportálható XML-naplóba. Alapértelmezés szerint kikapcsolva.';
+
+  @override
+  String get obd2DebugSessionShareLabel =>
+      'OBD2-munkamenet naplójának megosztása';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nem sikerült elérni a(z) \'$adapterName\'-t — válasszon másik adaptert';
   }

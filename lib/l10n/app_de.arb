@@ -1851,6 +1851,9 @@
   "obd2DebugOverlayCloseButton": "Schließen",
   "obd2DebugOverlayTitle": "OBD2-Spuren",
   "obd2DiagnosticShareLabel": "Diagnoseprotokoll teilen",
+  "obd2DebugLoggingTitle": "OBD2-Debug-Protokoll",
+  "obd2DebugLoggingSubtitle": "Zeichnet jede OBD2-Sitzung auf — Verbindung, Handshake, Datenlücken und Wiederverbindungen — als exportierbares XML-Protokoll. Standardmäßig aus.",
+  "obd2DebugSessionShareLabel": "OBD2-Sitzungsprotokoll teilen",
   "obd2PickerPinnedFallback": "Konnte '{adapterName}' nicht erreichen — wähle einen anderen Adapter",
   "@obd2PickerPinnedFallback": {
     "description": "Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.",

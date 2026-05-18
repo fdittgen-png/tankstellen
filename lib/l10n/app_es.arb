@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "El adaptador OBD2 no respondió. Pon el contacto e inténtalo de nuevo.",
   "obd2ErrorProtocolInitFailed": "El adaptador OBD2 envió una respuesta no reconocida. Puede ser incompatible: prueba con otro adaptador.",
   "obd2ErrorDisconnected": "El adaptador OBD2 se desconectó. Vuelve a conectarlo e inténtalo de nuevo.",
-  "onboardingExploreDemoData": "Explorar con datos de demostración"
+  "onboardingExploreDemoData": "Explorar con datos de demostración",
+  "obd2DebugLoggingTitle": "Registro de depuración OBD2",
+  "obd2DebugLoggingSubtitle": "Registra cada sesión OBD2 — conexión, handshake, interrupciones de datos y reconexiones — en un registro XML exportable. Desactivado de forma predeterminada.",
+  "obd2DebugSessionShareLabel": "Compartir registro de sesión OBD2"
 }

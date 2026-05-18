@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "OBD2-sovitin ei vastannut. Kytke virta päälle ja yritä uudelleen.",
   "obd2ErrorProtocolInitFailed": "OBD2-sovitin lähetti tunnistamattoman vastauksen. Se voi olla yhteensopimaton — kokeile toista sovitinta.",
   "obd2ErrorDisconnected": "OBD2-sovittimen yhteys katkesi. Yhdistä uudelleen ja yritä uudelleen.",
-  "onboardingExploreDemoData": "Tutustu esittelytiedoilla"
+  "onboardingExploreDemoData": "Tutustu esittelytiedoilla",
+  "obd2DebugLoggingTitle": "OBD2-virheenkorjausloki",
+  "obd2DebugLoggingSubtitle": "Tallenna jokainen OBD2-istunto — yhteys, kättely, datakatkot ja uudelleenyhteydet — vietävään XML-lokiin. Oletuksena pois käytöstä.",
+  "obd2DebugSessionShareLabel": "Jaa OBD2-istuntoloki"
 }

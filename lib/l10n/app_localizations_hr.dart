@@ -4665,6 +4665,17 @@ class AppLocalizationsHr extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Podijeli dijagnostički zapisnik';
 
   @override
+  String get obd2DebugLoggingTitle =>
+      'Zapisivanje za otklanjanje pogrešaka OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Zabilježite svaku OBD2 sesiju — povezivanje, handshake, prekide podataka i ponovna povezivanja — u izvozivi XML zapisnik. Prema zadanim postavkama isključeno.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Podijeli zapisnik OBD2 sesije';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nije moguće dosegnuti \'$adapterName\' — odaberite drugi adapter';
   }

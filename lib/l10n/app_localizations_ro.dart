@@ -4683,6 +4683,16 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Partajează jurnalul de diagnosticare';
 
   @override
+  String get obd2DebugLoggingTitle => 'Jurnalizare depanare OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Înregistrați fiecare sesiune OBD2 — conectare, handshake, întreruperi de date și reconectări — într-un jurnal XML exportabil. Dezactivat în mod implicit.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Partajează jurnalul sesiunii OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nu s-a putut accesa \'$adapterName\' — alegeți alt adaptor';
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
+import 'obd2_debug_session.dart';
 
 /// Kinds of state transitions the auto-record flow goes through. Used
 /// by [AutoRecordTraceLog] so the user (and a future debug screen) can
@@ -215,6 +216,10 @@ class AutoRecordTraceLog {
       'auto_record:${kind.name}',
       detail: parts.isEmpty ? null : parts.join(' '),
     );
+    // #1925 — mirror the transition into the opt-in OBD2 debug-session
+    // recorder. A cheap no-op unless the user enabled debug logging,
+    // so the connect / drop / reconnect path needs no extra hooks.
+    Obd2DebugSessionRecorder.ingest(kind, mac: mac, detail: detail, timestamp: ts);
   }
 
   /// Read-only snapshot for debug screens / future log export.

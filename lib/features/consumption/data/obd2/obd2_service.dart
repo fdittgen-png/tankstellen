@@ -10,6 +10,7 @@ import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_estimator.dart' as estimator;
 import 'obd2_breadcrumb_collector.dart';
+import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
 import 'supported_pids_cache.dart';
@@ -206,7 +207,16 @@ class Obd2Service implements Obd2RawCommandPort {
         ...adapter.extraInitCommands,
       ];
       for (var i = 0; i < sequence.length; i++) {
-        await _transport.sendCommand(sequence[i]);
+        // #1925 — time each handshake command for the opt-in OBD2
+        // debug log (a no-op when debug logging is off).
+        final sw = Stopwatch()..start();
+        final response = await _transport.sendCommand(sequence[i]);
+        sw.stop();
+        Obd2DebugSessionRecorder.recordHandshakeCommand(
+          sequence[i],
+          response,
+          sw.elapsedMilliseconds,
+        );
         // First command is the ATZ-style reset — its post-delay can
         // differ from the rest on slow clones.
         final delay =
@@ -221,7 +231,14 @@ class Obd2Service implements Obd2RawCommandPort {
       // [Obd2AdapterCapability.standardOnly] default and let the
       // connect succeed. No call site branches on `capability` yet.
       try {
+        final atiSw = Stopwatch()..start();
         final raw = await _transport.sendCommand(_atiCommand);
+        atiSw.stop();
+        Obd2DebugSessionRecorder.recordHandshakeCommand(
+          _atiCommand,
+          raw,
+          atiSw.elapsedMilliseconds,
+        );
         final firmware = _parseFirmwareString(raw);
         if (firmware != null && firmware.isNotEmpty) {
           adapterFirmware = firmware;

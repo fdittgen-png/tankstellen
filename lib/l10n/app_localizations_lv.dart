@@ -4679,6 +4679,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Kopīgot diagnostikas žurnālu';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2 atkļūdošanas žurnāls';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Ierakstiet katru OBD2 sesiju — savienojumu, rokasspiedienu, datu pārtraukumus un atkārtotus savienojumus — eksportējamā XML žurnālā. Pēc noklusējuma izslēgts.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Kopīgot OBD2 sesijas žurnālu';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nevarēja sasniegt \'$adapterName\' — izvēlieties citu adapteru';
   }

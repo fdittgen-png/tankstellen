@@ -16,6 +16,7 @@ import 'elm327_protocol.dart';
 import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_connection_errors.dart';
+import 'obd2_debug_session.dart';
 import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
@@ -607,6 +608,9 @@ class TripRecordingController {
   /// distinguishing the two. This lets the fill-up flow and analytics
   /// decide whether the km figure is ground truth or an estimate.
   Future<TripSummary> stop() async {
+    // #1925 — finalise the opt-in OBD2 debug session so its summary
+    // (duration, reconnects, data gaps) is complete for export.
+    Obd2DebugSessionRecorder.endSession();
     _scheduler?.stop();
     _emitTimer?.cancel();
     _emitTimer = null;
@@ -1269,6 +1273,9 @@ class TripRecordingController {
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;
+      // #1925 — ping the opt-in debug recorder so a stretch of silence
+      // surfaces as a data-gap event in the exported session log.
+      Obd2DebugSessionRecorder.recordData(nowTs);
       _sampleBuffer.maybeCapture(sample);
     }
     if (fuelRate != null) {

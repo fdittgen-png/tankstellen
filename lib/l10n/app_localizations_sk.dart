@@ -4669,6 +4669,16 @@ class AppLocalizationsSk extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Zdieľať diagnostický denník';
 
   @override
+  String get obd2DebugLoggingTitle => 'Ladiace protokolovanie OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Zaznamenávajte každú reláciu OBD2 — pripojenie, handshake, výpadky dát a opätovné pripojenia — do exportovateľného XML protokolu. V predvolenom nastavení vypnuté.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Zdieľať protokol relácie OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nepodarilo sa dosiahnuť \'$adapterName\' — vyberte iný adaptér';
   }

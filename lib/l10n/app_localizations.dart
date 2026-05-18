@@ -8379,6 +8379,24 @@ abstract class AppLocalizations {
   /// **'Share diagnostic log'**
   String get obd2DiagnosticShareLabel;
 
+  /// Title of the opt-in checkbox in the Trips (OBD2) settings sub-section that turns on detailed OBD2 session recording (#1925).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 debug logging'**
+  String get obd2DebugLoggingTitle;
+
+  /// Helper text under the OBD2 debug-logging checkbox, explaining what gets recorded and that the feature is off unless opted into (#1925).
+  ///
+  /// In en, this message translates to:
+  /// **'Record each OBD2 session — connection, handshake, data gaps and reconnects — to an exportable XML log. Off by default.'**
+  String get obd2DebugLoggingSubtitle;
+
+  /// Label and tooltip for the button on the in-app OBD2 diagnostic overlay that exports the most recent OBD2 debug session as an XML file to the OS share sheet (#1925).
+  ///
+  /// In en, this message translates to:
+  /// **'Share OBD2 session log'**
+  String get obd2DebugSessionShareLabel;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

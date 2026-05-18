@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "Vmesnik OBD2 se ni odzval. Vklopite vžig in poskusite znova.",
   "obd2ErrorProtocolInitFailed": "Vmesnik OBD2 je poslal neprepoznan odgovor. Morda ni združljiv — poskusite z drugim vmesnikom.",
   "obd2ErrorDisconnected": "Vmesnik OBD2 je prekinil povezavo. Znova se povežite in poskusite znova.",
-  "onboardingExploreDemoData": "Razišči z demo podatki"
+  "onboardingExploreDemoData": "Razišči z demo podatki",
+  "obd2DebugLoggingTitle": "Razhroščevalno beleženje OBD2",
+  "obd2DebugLoggingSubtitle": "Zabeležite vsako sejo OBD2 — povezavo, rokovanje, vrzeli v podatkih in ponovne povezave — v izvozljiv dnevnik XML. Privzeto izklopljeno.",
+  "obd2DebugSessionShareLabel": "Deli dnevnik seje OBD2"
 }

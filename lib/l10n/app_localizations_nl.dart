@@ -4665,6 +4665,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Diagnoselogboek delen';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2-foutopsporingslogboek';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Leg elke OBD2-sessie vast — verbinding, handshake, gegevensonderbrekingen en herverbindingen — in een exporteerbaar XML-logboek. Standaard uitgeschakeld.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'OBD2-sessielogboek delen';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Kon \'$adapterName\' niet bereiken — kies een andere adapter';
   }

@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "Az OBD2-adapter nem válaszolt. Kapcsolja be a gyújtást, és próbálja újra.",
   "obd2ErrorProtocolInitFailed": "Az OBD2-adapter ismeretlen választ küldött. Lehet, hogy nem kompatibilis — próbáljon meg másik adaptert.",
   "obd2ErrorDisconnected": "Az OBD2-adapter kapcsolata megszakadt. Csatlakozzon újra, és próbálja újra.",
-  "onboardingExploreDemoData": "Felfedezés demóadatokkal"
+  "onboardingExploreDemoData": "Felfedezés demóadatokkal",
+  "obd2DebugLoggingTitle": "OBD2 hibakeresési naplózás",
+  "obd2DebugLoggingSubtitle": "Rögzítsen minden OBD2-munkamenetet — kapcsolódás, kézfogás, adatkimaradások és újracsatlakozások — egy exportálható XML-naplóba. Alapértelmezés szerint kikapcsolva.",
+  "obd2DebugSessionShareLabel": "OBD2-munkamenet naplójának megosztása"
 }

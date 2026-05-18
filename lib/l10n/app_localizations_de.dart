@@ -4673,6 +4673,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Diagnoseprotokoll teilen';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2-Debug-Protokoll';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Zeichnet jede OBD2-Sitzung auf — Verbindung, Handshake, Datenlücken und Wiederverbindungen — als exportierbares XML-Protokoll. Standardmäßig aus.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'OBD2-Sitzungsprotokoll teilen';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

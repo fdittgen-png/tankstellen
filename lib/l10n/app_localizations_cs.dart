@@ -4654,6 +4654,16 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Sdílet diagnostický protokol';
 
   @override
+  String get obd2DebugLoggingTitle => 'Ladicí protokolování OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Zaznamenávejte každou relaci OBD2 — připojení, handshake, výpadky dat a opětovná připojení — do exportovatelného XML protokolu. Ve výchozím nastavení vypnuto.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Sdílet protokol relace OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nelze se připojit k \'$adapterName\' — vyberte jiný adaptér';
   }

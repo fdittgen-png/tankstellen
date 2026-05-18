@@ -4675,6 +4675,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Condividi il registro diagnostico';
 
   @override
+  String get obd2DebugLoggingTitle => 'Registro di debug OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Registra ogni sessione OBD2 — connessione, handshake, interruzioni dei dati e riconnessioni — in un registro XML esportabile. Disattivato per impostazione predefinita.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Condividi registro sessione OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Impossibile raggiungere \'$adapterName\' — scegli un altro adattatore';
   }

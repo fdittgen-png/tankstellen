@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "OBD2 adapter nije odgovorio. Uključite paljenje i pokušajte ponovno.",
   "obd2ErrorProtocolInitFailed": "OBD2 adapter poslao je neprepoznat odgovor. Možda nije kompatibilan — pokušajte s drugim adapterom.",
   "obd2ErrorDisconnected": "OBD2 adapter se isključio. Ponovno se povežite i pokušajte ponovno.",
-  "onboardingExploreDemoData": "Istraži s demo podacima"
+  "onboardingExploreDemoData": "Istraži s demo podacima",
+  "obd2DebugLoggingTitle": "Zapisivanje za otklanjanje pogrešaka OBD2",
+  "obd2DebugLoggingSubtitle": "Zabilježite svaku OBD2 sesiju — povezivanje, handshake, prekide podataka i ponovna povezivanja — u izvozivi XML zapisnik. Prema zadanim postavkama isključeno.",
+  "obd2DebugSessionShareLabel": "Podijeli zapisnik OBD2 sesije"
 }

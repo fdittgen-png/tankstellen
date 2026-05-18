@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "OBD2 adapteris neatbildēja. Ieslēdziet aizdedzi un mēģiniet vēlreiz.",
   "obd2ErrorProtocolInitFailed": "OBD2 adapteris nosūtīja neatpazītu atbildi. Tas var nebūt saderīgs — izmēģiniet citu adapteri.",
   "obd2ErrorDisconnected": "OBD2 adapteris atvienojās. Pievienojiet to vēlreiz un mēģiniet vēlreiz.",
-  "onboardingExploreDemoData": "Izpētīt ar demonstrācijas datiem"
+  "onboardingExploreDemoData": "Izpētīt ar demonstrācijas datiem",
+  "obd2DebugLoggingTitle": "OBD2 atkļūdošanas žurnāls",
+  "obd2DebugLoggingSubtitle": "Ierakstiet katru OBD2 sesiju — savienojumu, rokasspiedienu, datu pārtraukumus un atkārtotus savienojumus — eksportējamā XML žurnālā. Pēc noklusējuma izslēgts.",
+  "obd2DebugSessionShareLabel": "Kopīgot OBD2 sesijas žurnālu"
 }

@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "OBD2 adapteris neatsakė. Įjunkite degimą ir bandykite dar kartą.",
   "obd2ErrorProtocolInitFailed": "OBD2 adapteris išsiuntė neatpažintą atsakymą. Jis gali būti nesuderinamas — pabandykite kitą adapterį.",
   "obd2ErrorDisconnected": "OBD2 adapteris atsijungė. Prisijunkite iš naujo ir bandykite dar kartą.",
-  "onboardingExploreDemoData": "Naršyti su demonstraciniais duomenimis"
+  "onboardingExploreDemoData": "Naršyti su demonstraciniais duomenimis",
+  "obd2DebugLoggingTitle": "OBD2 derinimo žurnalas",
+  "obd2DebugLoggingSubtitle": "Įrašykite kiekvieną OBD2 seansą — prisijungimą, rankų paspaudimą, duomenų spragas ir pakartotinius prisijungimus — į eksportuojamą XML žurnalą. Pagal numatytuosius nustatymus išjungta.",
+  "obd2DebugSessionShareLabel": "Bendrinti OBD2 seanso žurnalą"
 }

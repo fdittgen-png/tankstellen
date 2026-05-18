@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "OBD2-adapteren svarede ikke. Slå tændingen til, og prøv igen.",
   "obd2ErrorProtocolInitFailed": "OBD2-adapteren sendte et ukendt svar. Den er muligvis inkompatibel — prøv en anden adapter.",
   "obd2ErrorDisconnected": "OBD2-adapteren blev afbrudt. Tilslut igen, og prøv igen.",
-  "onboardingExploreDemoData": "Udforsk med demodata"
+  "onboardingExploreDemoData": "Udforsk med demodata",
+  "obd2DebugLoggingTitle": "OBD2-fejlfindingslog",
+  "obd2DebugLoggingSubtitle": "Optag hver OBD2-session — forbindelse, handshake, datahuller og genforbindelser — i en eksporterbar XML-log. Slået fra som standard.",
+  "obd2DebugSessionShareLabel": "Del OBD2-sessionslog"
 }

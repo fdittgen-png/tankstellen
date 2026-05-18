@@ -4623,6 +4623,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Share diagnostic log';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2 debug logging';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Record each OBD2 session — connection, handshake, data gaps and reconnects — to an exportable XML log. Off by default.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Share OBD2 session log';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
   }
@@ -9999,6 +10009,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2DiagnosticShareLabel => '⟦Šĥářé đîáǧñóšŧîç łóǧ ········⟧';
+
+  @override
+  String get obd2DebugLoggingTitle => '⟦ÓƁĐ2 đéƀúǧ łóǧǧîñǧ ·······⟧';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      '⟦Řéçóřđ éáçĥ ÓƁĐ2 šéššîóñ — çóññéçŧîóñ, ĥáñđšĥáķé, đáŧá ǧáƥš áñđ řéçóññéçŧš — ŧó áñ éẋƥóřŧáƀłé ẊṀŁ łóǧ. Óƒƒ ƀý đéƒáúłŧ. ·········································⟧';
+
+  @override
+  String get obd2DebugSessionShareLabel => '⟦Šĥářé ÓƁĐ2 šéššîóñ łóǧ ········⟧';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
