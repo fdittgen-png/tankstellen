@@ -4671,6 +4671,16 @@ class AppLocalizationsPl extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Udostępnij dziennik diagnostyczny';
 
   @override
+  String get obd2DebugLoggingTitle => 'Rejestrowanie debugowania OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Rejestruj każdą sesję OBD2 — połączenie, uzgadnianie, przerwy w danych i ponowne połączenia — w eksportowalnym dzienniku XML. Domyślnie wyłączone.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Udostępnij dziennik sesji OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nie można było dotrzeć do \'$adapterName\' — wybierz inny adapter';
   }

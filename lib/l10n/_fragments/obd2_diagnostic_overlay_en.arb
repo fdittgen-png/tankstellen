@@ -22,5 +22,17 @@
   "obd2DiagnosticShareLabel": "Share diagnostic log",
   "@obd2DiagnosticShareLabel": {
     "description": "Label and tooltip for the button on the in-app OBD2 diagnostic overlay that exports the OBD2 connect/drop/reconnect trace as plain text to the OS share sheet, so a developer can analyse a failed recording session (#1920)."
+  },
+  "obd2DebugLoggingTitle": "OBD2 debug logging",
+  "@obd2DebugLoggingTitle": {
+    "description": "Title of the opt-in checkbox in the Trips (OBD2) settings sub-section that turns on detailed OBD2 session recording (#1925)."
+  },
+  "obd2DebugLoggingSubtitle": "Record each OBD2 session — connection, handshake, data gaps and reconnects — to an exportable XML log. Off by default.",
+  "@obd2DebugLoggingSubtitle": {
+    "description": "Helper text under the OBD2 debug-logging checkbox, explaining what gets recorded and that the feature is off unless opted into (#1925)."
+  },
+  "obd2DebugSessionShareLabel": "Share OBD2 session log",
+  "@obd2DebugSessionShareLabel": {
+    "description": "Label and tooltip for the button on the in-app OBD2 diagnostic overlay that exports the most recent OBD2 debug session as an XML file to the OS share sheet (#1925)."
   }
 }

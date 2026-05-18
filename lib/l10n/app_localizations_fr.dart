@@ -4696,6 +4696,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Partager le journal de diagnostic';
 
   @override
+  String get obd2DebugLoggingTitle => 'Journalisation de débogage OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Enregistrez chaque session OBD2 — connexion, handshake, pertes de données et reconnexions — dans un journal XML exportable. Désactivé par défaut.';
+
+  @override
+  String get obd2DebugSessionShareLabel =>
+      'Partager le journal de session OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Impossible de joindre \'$adapterName\' — choisissez un autre adaptateur';
   }

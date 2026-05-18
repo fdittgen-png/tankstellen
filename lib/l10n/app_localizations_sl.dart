@@ -4655,6 +4655,16 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Deli diagnostični dnevnik';
 
   @override
+  String get obd2DebugLoggingTitle => 'Razhroščevalno beleženje OBD2';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Zabeležite vsako sejo OBD2 — povezavo, rokovanje, vrzeli v podatkih in ponovne povezave — v izvozljiv dnevnik XML. Privzeto izklopljeno.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Deli dnevnik seje OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ni bilo mogoče doseči \'$adapterName\' — izberite drug adapter';
   }

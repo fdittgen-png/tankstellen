@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "Adaptér OBD2 neodpověděl. Zapněte zapalování a zkuste to znovu.",
   "obd2ErrorProtocolInitFailed": "Adaptér OBD2 odeslal nerozpoznanou odpověď. Možná není kompatibilní — zkuste jiný adaptér.",
   "obd2ErrorDisconnected": "Adaptér OBD2 se odpojil. Připojte se znovu a zkuste to znovu.",
-  "onboardingExploreDemoData": "Prozkoumat s ukázkovými daty"
+  "onboardingExploreDemoData": "Prozkoumat s ukázkovými daty",
+  "obd2DebugLoggingTitle": "Ladicí protokolování OBD2",
+  "obd2DebugLoggingSubtitle": "Zaznamenávejte každou relaci OBD2 — připojení, handshake, výpadky dat a opětovná připojení — do exportovatelného XML protokolu. Ve výchozím nastavení vypnuto.",
+  "obd2DebugSessionShareLabel": "Sdílet protokol relace OBD2"
 }

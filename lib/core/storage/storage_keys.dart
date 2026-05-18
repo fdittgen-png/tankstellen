@@ -94,6 +94,13 @@ class StorageKeys {
   /// screen title. Defaults to `false`.
   static const String obd2DebugOverlayEnabled = 'obd2_debug_overlay_enabled';
 
+  /// #1925 — opt-in OBD2 debug-session logging. When on, each OBD2
+  /// connection is recorded (init handshake, data gaps, reconnects)
+  /// as an exportable XML session log. Toggled by a checkbox in the
+  /// Trips (OBD2) settings sub-section. Defaults to `false`.
+  static const String obd2DebugSessionLoggingEnabled =
+      'obd2_debug_session_logging_enabled';
+
   /// #1396 — prefix for the per-vehicle "we already nudged this user
   /// to re-pick their catalog row" Hive flag. The full key is
   /// `<prefix><vehicleId>` and stores a `bool true` once the snackbar

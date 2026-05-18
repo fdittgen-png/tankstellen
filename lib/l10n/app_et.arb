@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "OBD2-adapter ei vastanud. Lülitage süüde sisse ja proovige uuesti.",
   "obd2ErrorProtocolInitFailed": "OBD2-adapter saatis tundmatu vastuse. See võib olla ühildumatu — proovige teist adapterit.",
   "obd2ErrorDisconnected": "OBD2-adapter katkestas ühenduse. Ühendage uuesti ja proovige uuesti.",
-  "onboardingExploreDemoData": "Tutvu demoandmetega"
+  "onboardingExploreDemoData": "Tutvu demoandmetega",
+  "obd2DebugLoggingTitle": "OBD2 silumislogi",
+  "obd2DebugLoggingSubtitle": "Salvestage iga OBD2 seanss — ühendus, käepigistus, andmelüngad ja taasühendused — eksporditavasse XML-logisse. Vaikimisi välja lülitatud.",
+  "obd2DebugSessionShareLabel": "Jaga OBD2 seansilogi"
 }

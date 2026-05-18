@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/providers/obd2_debug_logging_provider.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/conso_mode.dart';
 import '../../../feature_management/domain/feature.dart';
@@ -91,6 +92,7 @@ class DrivingSettingsSection extends ConsumerWidget {
           ),
           if (ref.watch(glideCoachEnabledProvider))
             const _GlideCoachToggleTile(),
+          const _Obd2DebugLoggingToggleTile(),
         ],
 
         // 3. Driving sub-section — eco-coach + gamification + fuel-club.
@@ -159,6 +161,38 @@ class _GlideCoachToggleTile extends ConsumerWidget {
       onChanged: (v) => ref
           .read(glideCoachSettingsProvider.notifier)
           .setEnabled(v),
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+}
+
+/// Opt-in toggle for OBD2 debug-session logging (#1925).
+///
+/// When on, every OBD2 connection is recorded — init handshake, data
+/// gaps, drops and reconnects — as an exportable XML session log the
+/// user can hand to a developer. Off by default; lives in the Trips
+/// (OBD2) sub-section because it only concerns the OBD2 link.
+class _Obd2DebugLoggingToggleTile extends ConsumerWidget {
+  const _Obd2DebugLoggingToggleTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final enabled = ref.watch(obd2DebugSessionLoggingProvider);
+    return SwitchListTile(
+      key: const Key('obd2DebugLoggingToggle'),
+      value: enabled,
+      title: Text(l?.obd2DebugLoggingTitle ?? 'OBD2 debug logging'),
+      subtitle: Text(
+        l?.obd2DebugLoggingSubtitle ??
+            'Record each OBD2 session — connection, handshake, data '
+                'gaps and reconnects — to an exportable XML log. Off by '
+                'default.',
+        style: theme.textTheme.bodySmall,
+      ),
+      onChanged: (v) =>
+          ref.read(obd2DebugSessionLoggingProvider.notifier).set(v),
       contentPadding: EdgeInsets.zero,
     );
   }

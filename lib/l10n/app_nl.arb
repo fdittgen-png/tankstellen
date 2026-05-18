@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "De OBD2-adapter reageerde niet. Zet het contact aan en probeer het opnieuw.",
   "obd2ErrorProtocolInitFailed": "De OBD2-adapter stuurde een niet-herkend antwoord. Mogelijk is deze incompatibel — probeer een andere adapter.",
   "obd2ErrorDisconnected": "De OBD2-adapter is losgekoppeld. Maak opnieuw verbinding en probeer het opnieuw.",
-  "onboardingExploreDemoData": "Verken met demogegevens"
+  "onboardingExploreDemoData": "Verken met demogegevens",
+  "obd2DebugLoggingTitle": "OBD2-foutopsporingslogboek",
+  "obd2DebugLoggingSubtitle": "Leg elke OBD2-sessie vast — verbinding, handshake, gegevensonderbrekingen en herverbindingen — in een exporteerbaar XML-logboek. Standaard uitgeschakeld.",
+  "obd2DebugSessionShareLabel": "OBD2-sessielogboek delen"
 }

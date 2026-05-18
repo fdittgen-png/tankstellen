@@ -4649,6 +4649,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Dela diagnostiklogg';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2-felsökningslogg';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Spela in varje OBD2-session — anslutning, handskakning, dataluckor och återanslutningar — i en exporterbar XML-logg. Avstängd som standard.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Dela OBD2-sessionslogg';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Kunde inte nå \'$adapterName\' – välj en annan adapter';
   }

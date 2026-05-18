@@ -1681,5 +1681,8 @@
   "obd2ErrorAdapterUnresponsive": "Adapter OBD2 nie odpowiedział. Włącz zapłon i spróbuj ponownie.",
   "obd2ErrorProtocolInitFailed": "Adapter OBD2 wysłał nierozpoznaną odpowiedź. Może być niekompatybilny — wypróbuj inny adapter.",
   "obd2ErrorDisconnected": "Adapter OBD2 został odłączony. Połącz ponownie i spróbuj jeszcze raz.",
-  "onboardingExploreDemoData": "Przeglądaj z danymi demo"
+  "onboardingExploreDemoData": "Przeglądaj z danymi demo",
+  "obd2DebugLoggingTitle": "Rejestrowanie debugowania OBD2",
+  "obd2DebugLoggingSubtitle": "Rejestruj każdą sesję OBD2 — połączenie, uzgadnianie, przerwy w danych i ponowne połączenia — w eksportowalnym dzienniku XML. Domyślnie wyłączone.",
+  "obd2DebugSessionShareLabel": "Udostępnij dziennik sesji OBD2"
 }

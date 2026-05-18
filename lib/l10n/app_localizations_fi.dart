@@ -4649,6 +4649,16 @@ class AppLocalizationsFi extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Jaa diagnostiikkaloki';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2-virheenkorjausloki';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Tallenna jokainen OBD2-istunto — yhteys, kättely, datakatkot ja uudelleenyhteydet — vietävään XML-lokiin. Oletuksena pois käytöstä.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Jaa OBD2-istuntoloki';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ei voitu tavoittaa \'$adapterName\' — valitse toinen sovitin';
   }

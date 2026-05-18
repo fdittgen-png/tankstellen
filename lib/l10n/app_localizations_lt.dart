@@ -4678,6 +4678,16 @@ class AppLocalizationsLt extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Bendrinti diagnostikos žurnalą';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2 derinimo žurnalas';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Įrašykite kiekvieną OBD2 seansą — prisijungimą, rankų paspaudimą, duomenų spragas ir pakartotinius prisijungimus — į eksportuojamą XML žurnalą. Pagal numatytuosius nustatymus išjungta.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Bendrinti OBD2 seanso žurnalą';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nepavyko pasiekti \"$adapterName\" — pasirinkite kitą adapterį';
   }

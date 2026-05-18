@@ -4643,6 +4643,16 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2DiagnosticShareLabel => 'Jaga diagnostikalogi';
 
   @override
+  String get obd2DebugLoggingTitle => 'OBD2 silumislogi';
+
+  @override
+  String get obd2DebugLoggingSubtitle =>
+      'Salvestage iga OBD2 seanss — ühendus, käepigistus, andmelüngad ja taasühendused — eksporditavasse XML-logisse. Vaikimisi välja lülitatud.';
+
+  @override
+  String get obd2DebugSessionShareLabel => 'Jaga OBD2 seansilogi';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ei suutnud jõuda \'$adapterName\' — vali teine adapter';
   }

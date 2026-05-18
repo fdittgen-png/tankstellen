@@ -35,6 +35,7 @@ import '../features/consumption/data/obd2/paused_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/paused_trip_repository.dart';
 import '../features/consumption/data/trip_history_repository.dart';
 import '../features/consumption/providers/auto_record_orchestrator.dart';
+import '../features/consumption/providers/obd2_debug_logging_provider.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
 import '../features/consumption/providers/trip_ve_recompute_provider.dart';
 import '../features/feature_management/application/legacy_toggle_migration_provider.dart';
@@ -200,6 +201,20 @@ class AppInitializer {
       } catch (e, st) {
         debugPrint(
             'AppInitializer: η_v recompute listener kick-off failed: $e\n$st');
+      }
+    });
+
+    // #1925 — arm the OBD2 debug-session recorder from the persisted
+    // opt-in flag. Reading the provider runs its `build`, which mirrors
+    // the flag onto `Obd2DebugSessionRecorder.enabled`, so a user who
+    // opted in last session has logging armed before the next connect
+    // even if they never open Settings.
+    _deferPostFirstFrame(() async {
+      try {
+        container.read(obd2DebugSessionLoggingProvider);
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: OBD2 debug-logging kick-off failed: $e\n$st');
       }
     });
 

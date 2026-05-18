@@ -8,6 +8,8 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/auto_record_trace_log.dart';
 import '../../data/obd2/obd2_breadcrumb_collector.dart';
+import '../../data/obd2/obd2_debug_session.dart';
+import '../../data/obd2/obd2_debug_session_xml.dart';
 import '../../data/obd2/obd2_diagnostic_report.dart';
 import '../../providers/obd2_breadcrumb_provider.dart';
 import 'broken_map_widgets.dart';
@@ -64,6 +66,28 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       await sink(params);
     } catch (e, st) {
       debugPrint('Obd2BreadcrumbOverlay share diagnostic log failed: $e\n$st');
+    }
+  }
+
+  /// Export the most recent OBD2 debug session as XML (#1925). Only
+  /// produces real content when the user has opted into OBD2 debug
+  /// logging; otherwise the latest session is null and a short note is
+  /// shared so the user understands why. Best-effort, like
+  /// [_shareDiagnosticLog].
+  Future<void> _shareSessionXml() async {
+    final Obd2DebugSession? session = Obd2DebugSessionRecorder.latestSession;
+    final String payload = session == null
+        ? '<!-- No OBD2 debug session recorded. Enable "OBD2 debug '
+            'logging" in Settings, then reproduce the issue. -->'
+        : formatObd2DebugSessionXml(session);
+    final ShareParams params = ShareParams(text: payload);
+    final Obd2DiagnosticShareSink sink =
+        debugObd2DiagnosticShareSinkOverride ??
+            _defaultObd2DiagnosticShareSink;
+    try {
+      await sink(params);
+    } catch (e, st) {
+      debugPrint('Obd2BreadcrumbOverlay share session XML failed: $e\n$st');
     }
   }
 
@@ -163,6 +187,22 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
                         color: Colors.white,
                         tooltip: l10n?.obd2DiagnosticShareLabel ??
                             'Share diagnostic log',
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      // #1925 — export the most recent OBD2 debug
+                      // session (init handshake, data gaps, reconnects)
+                      // as XML when the user enabled debug logging.
+                      IconButton(
+                        onPressed: () => _shareSessionXml(),
+                        icon: const Icon(Icons.bug_report, size: 18),
+                        color: Colors.white,
+                        tooltip: l10n?.obd2DebugSessionShareLabel ??
+                            'Share OBD2 session log',
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         constraints: const BoxConstraints(
                           minWidth: 32,
