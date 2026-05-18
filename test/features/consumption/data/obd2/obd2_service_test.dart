@@ -1307,4 +1307,105 @@ void main() {
       expect(rate, closeTo(19.2, 0.1));
     });
   });
+
+  group('connect handshake retry (#1916)', () {
+    test('a single transient init-command failure is retried, not fatal',
+        () async {
+      final transport = _FlakyConnectTransport(
+        failCommand: 'ATE0',
+        commandFailures: 1,
+      );
+      final service = Obd2Service(transport);
+
+      expect(await service.connect(), isTrue,
+          reason: 'one lost write during the init handshake must be '
+              'absorbed by the retry, not fail the connect');
+      expect(transport.commandCalls['ATE0'], 2,
+          reason: 'one failed try + one retry');
+      expect(service.isConnected, isTrue);
+    });
+
+    test('an init-command failure that survives the retry fails the connect',
+        () async {
+      final transport = _FlakyConnectTransport(
+        failCommand: 'ATH0',
+        commandFailures: 1 << 20, // fails on every attempt
+      );
+      final service = Obd2Service(transport);
+
+      expect(await service.connect(), isFalse,
+          reason: 'a failure that outlives the single retry propagates '
+              'and connect() fails as before');
+      expect(transport.commandCalls['ATH0'], 2,
+          reason: 'exactly two attempts — one try + one retry');
+    });
+
+    test('a transient link-open failure is retried', () async {
+      final transport = _FlakyConnectTransport(connectFailures: 1);
+      final service = Obd2Service(transport);
+
+      expect(await service.connect(), isTrue,
+          reason: 'a fresh BLE link that drops on the first open gets '
+              'one retry');
+      expect(transport.connectCalls, 2);
+    });
+  });
+}
+
+/// Flaky transport for the #1916 connect-handshake-retry tests: it can
+/// fail the link open and/or a chosen init command a set number of
+/// times before succeeding, and records every call so the tests can
+/// assert "exactly one try + one retry".
+class _FlakyConnectTransport implements Obd2Transport {
+  _FlakyConnectTransport({
+    this.connectFailures = 0,
+    this.failCommand,
+    this.commandFailures = 0,
+  });
+
+  int connectFailures;
+  final String? failCommand;
+  int commandFailures;
+
+  bool _connected = false;
+  int connectCalls = 0;
+  final Map<String, int> commandCalls = {};
+
+  static const Map<String, String> _responses = {
+    'ATZ': 'ELM327 v1.5>',
+    'ATE0': 'OK>',
+    'ATL0': 'OK>',
+    'ATH0': 'OK>',
+    'ATSP0': 'OK>',
+    'ATAT2': 'OK>',
+    'ATI': 'ELM327 v1.5>',
+  };
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<void> connect() async {
+    connectCalls++;
+    if (connectFailures > 0) {
+      connectFailures--;
+      throw StateError('flaky link open');
+    }
+    _connected = true;
+  }
+
+  @override
+  Future<String> sendCommand(String command) async {
+    if (!_connected) throw StateError('Not connected');
+    final cmd = command.trim();
+    commandCalls[cmd] = (commandCalls[cmd] ?? 0) + 1;
+    if (cmd == failCommand && commandFailures > 0) {
+      commandFailures--;
+      throw StateError('flaky command $cmd');
+    }
+    return _responses[cmd] ?? 'NO DATA>';
+  }
+
+  @override
+  Future<void> disconnect() async => _connected = false;
 }

@@ -184,7 +184,18 @@ class Obd2Service implements Obd2RawCommandPort {
   }) async {
     try {
       _adapter = adapter;
-      await _transport.connect();
+      // #1916 — one-shot retry on the link open: a fresh BLE link is
+      // least reliable in its very first moment.
+      try {
+        await _transport.connect();
+      } catch (_) {
+        await Future<void>.delayed(_connectRetryDelay);
+        await _transport.connect();
+      }
+      // Let the freshly-opened link settle before the first write —
+      // the ELM init handshake runs in the window where BLE is least
+      // stable, so a brief pause measurably cuts handshake drops.
+      await Future<void>.delayed(_connectRetryDelay);
 
       // Clear the per-connection supported-PIDs cache. A new session
       // may be a different car / different adapter firmware.
@@ -199,7 +210,11 @@ class Obd2Service implements Obd2RawCommandPort {
         ...adapter.extraInitCommands,
       ];
       for (var i = 0; i < sequence.length; i++) {
-        await _transport.sendCommand(sequence[i]);
+        // #1916 — retry each init command once. A single lost write
+        // during the handshake otherwise throws straight out of
+        // connect() and fails the whole trip start; the live polling
+        // loop already retries (#1904), the handshake must too.
+        await _sendWithRetry(sequence[i]);
         // First command is the ATZ-style reset — its post-delay can
         // differ from the rest on slow clones.
         final delay =
@@ -242,6 +257,24 @@ class Obd2Service implements Obd2RawCommandPort {
     } catch (e, st) {
       debugPrint('OBD2 connect failed: $e\n$st');
       return false;
+    }
+  }
+
+  /// #1916 — settle / retry delay for the connect handshake. Mirrors
+  /// the live-poll retry delay in [TripRecordingController].
+  static const Duration _connectRetryDelay = Duration(milliseconds: 150);
+
+  /// #1916 — send one handshake command, retrying once after a short
+  /// settle if the transport throws. A fresh BLE link drops the odd
+  /// write in its first seconds; absorbing that here keeps a transient
+  /// blip from failing the whole connect. A failure that survives the
+  /// retry rethrows — connect() then fails as before.
+  Future<String> _sendWithRetry(String command) async {
+    try {
+      return await _transport.sendCommand(command);
+    } catch (_) {
+      await Future<void>.delayed(_connectRetryDelay);
+      return _transport.sendCommand(command);
     }
   }
 
