@@ -271,6 +271,19 @@ class TripRecordingController {
   double? _odometerLatestKm;
   double _fuelLitersSoFar = 0;
   bool _fuelRateSeen = false;
+
+  // #1858 — η_v recompute provenance, accumulated per emit tick.
+  // [_veWeightedFuelSum] is Σ(η_v_i × fuelRate_i) and
+  // [_veDerivedFuelRateSum] is Σ(fuelRate_i), both over speed-density
+  // ticks only; [_sawNonVeDerivedFuel] flips true the moment any fuel
+  // is integrated from PID 5E or the MAF branch (neither uses η_v).
+  // At trip end these collapse into [TripSummary.volumetricEfficiencyUsed].
+  // A fresh controller is built per trip, so declaration-time zero is
+  // the only reset needed (the values carry correctly across
+  // pause/resume — that is all one trip).
+  double _veWeightedFuelSum = 0;
+  double _veDerivedFuelRateSum = 0;
+  bool _sawNonVeDerivedFuel = false;
   bool _paused = false;
   bool _pausedDueToDrop = false;
   bool _started = false;
@@ -671,6 +684,15 @@ class TripRecordingController {
         fuelRateSuspect = true;
       }
     }
+    // #1858 — η_v recompute provenance. Non-null ONLY when every litre
+    // of the trip's fuel was speed-density-derived (η_v-scalable) and
+    // some fuel was burned; then it is the fuel-weighted mean of the
+    // per-tick η_v applied. Any PID 5E / MAF fuel — or no fuel — leaves
+    // it null, marking the trip "not recalculable".
+    final double? veUsed =
+        (!_sawNonVeDerivedFuel && _veDerivedFuelRateSum > 0)
+            ? _veWeightedFuelSum / _veDerivedFuelRateSum
+            : null;
     return TripSummary(
       distanceKm: distanceKm,
       maxRpm: base.maxRpm,
@@ -685,6 +707,7 @@ class TripRecordingController {
       distanceSource: source,
       secondsBelowOptimalGear: _computeGearCoachingMetric(),
       fuelRateSuspect: fuelRateSuspect,
+      volumetricEfficiencyUsed: veUsed,
     );
   }
 
@@ -1166,6 +1189,20 @@ class TripRecordingController {
     final snap = _liveSampleSnapshot;
     final nowTs = _now();
     final fuelRate = snap.deriveFuelRateLPerHour();
+    // #1858 — fold this tick into the trip's η_v recompute provenance.
+    // Speed-density fuel is the only η_v-derived branch; PID 5E / MAF
+    // fuel marks the trip non-recalculable.
+    if (fuelRate != null && fuelRate > 0) {
+      final veUsed = snap.lastFuelRateBranch == Obd2BranchTag.speedDensity
+          ? snap.lastFuelRateVe
+          : null;
+      if (veUsed != null && veUsed > 0) {
+        _veWeightedFuelSum += veUsed * fuelRate;
+        _veDerivedFuelRateSum += fuelRate;
+      } else {
+        _sawNonVeDerivedFuel = true;
+      }
+    }
     final speedKmh = snap.latestSpeedKmh;
     final rpm = snap.latestRpm;
     final throttlePercent = snap.latestThrottlePercent;

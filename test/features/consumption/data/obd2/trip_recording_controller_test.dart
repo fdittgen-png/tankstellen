@@ -454,6 +454,98 @@ void main() {
     });
   });
 
+  group('η_v recompute provenance — #1858', () {
+    test(
+        'a speed-density-only trip stamps volumetricEfficiencyUsed with the '
+        'η_v that was applied', () async {
+      // No PID 5E (015E) and no MAF (0110) → the fuel rate can only
+      // come from the speed-density branch (MAP + IAT + RPM), which is
+      // the one branch that uses η_v.
+      final transport = FakeObd2Transport({
+        'ATZ': 'ELM327 v1.5>',
+        'ATE0': 'OK>',
+        'ATL0': 'OK>',
+        'ATH0': 'OK>',
+        'ATSP0': 'OK>',
+        'ATAT2': 'OK>',
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 50>', // MAP 80 kPa
+        '010F': '41 0F 41>', // IAT 25 °C
+        '010C': '41 0C 0E A6>', // RPM ~937
+        '010D': '41 0D 32>', // 50 km/h
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+      final ctl = TripRecordingController(
+        service: service,
+        pollInterval: const Duration(milliseconds: 50),
+        scheduler: PidScheduler(
+          transport: service.sendCommand,
+          tickRate: const Duration(milliseconds: 20),
+        ),
+        vehicle: const VehicleProfile(
+          id: 'sd-car',
+          name: 'Speed-density car',
+          engineDisplacementCc: 1200,
+          volumetricEfficiency: 0.80,
+        ),
+      );
+      await ctl.start();
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      final summary = await ctl.stop();
+
+      expect(summary.fuelLitersConsumed, isNotNull,
+          reason: 'the speed-density branch must integrate some fuel');
+      expect(summary.volumetricEfficiencyUsed, isNotNull,
+          reason: 'an all-speed-density trip is η_v-recalculable');
+      expect(summary.volumetricEfficiencyUsed, closeTo(0.80, 0.001),
+          reason: 'the stamped η_v is the (flat) value actually applied');
+    });
+
+    test(
+        'a trip whose fuel came from PID 5E leaves volumetricEfficiencyUsed '
+        'null — PID 5E does not use η_v, so the trip is not recalculable',
+        () async {
+      // PID 5E answers directly → the fuel rate never touches η_v.
+      final transport = FakeObd2Transport({
+        'ATZ': 'ELM327 v1.5>',
+        'ATE0': 'OK>',
+        'ATL0': 'OK>',
+        'ATH0': 'OK>',
+        'ATSP0': 'OK>',
+        'ATAT2': 'OK>',
+        '015E': '41 5E 00 64>', // PID 5E direct fuel rate = 5.0 L/h
+        '010C': '41 0C 0E A6>', // RPM ~937
+        '010D': '41 0D 32>', // 50 km/h
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+      final ctl = TripRecordingController(
+        service: service,
+        pollInterval: const Duration(milliseconds: 50),
+        scheduler: PidScheduler(
+          transport: service.sendCommand,
+          tickRate: const Duration(milliseconds: 20),
+        ),
+        vehicle: const VehicleProfile(
+          id: 'pid5e-car',
+          name: 'PID 5E car',
+          volumetricEfficiency: 0.80,
+        ),
+      );
+      await ctl.start();
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      final summary = await ctl.stop();
+
+      expect(summary.fuelLitersConsumed, isNotNull,
+          reason: 'PID 5E still integrates fuel');
+      expect(summary.volumetricEfficiencyUsed, isNull,
+          reason: 'PID-5E fuel is not η_v-derived — rescaling it would be '
+              'wrong, so the trip must read as not-recalculable');
+    });
+  });
+
   group('BT drop resilience — #797 phase 1', () {
     late Directory tmpDir;
     late Box<String> pausedBox;

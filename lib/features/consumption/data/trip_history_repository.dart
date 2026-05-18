@@ -205,6 +205,11 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // gear-inference data carry no value, so parsimony saves bytes.
       if (s.secondsBelowOptimalGear != null)
         'sblog': s.secondsBelowOptimalGear,
+      // #1858: η_v recompute provenance. Compact key 'veUsed'. Omitted
+      // when null — legacy trips and non-recalculable trips (any PID 5E
+      // / MAF fuel) carry no value, so parsimony saves bytes.
+      if (s.volumetricEfficiencyUsed != null)
+        'veUsed': s.volumetricEfficiencyUsed,
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -233,6 +238,10 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       // #1263 phase 2: gear-inference coaching metric. Legacy trips
       // (and EV / no-inference trips) carry no key → null.
       secondsBelowOptimalGear: (j['sblog'] as num?)?.toDouble(),
+      // #1858: η_v recompute provenance. Legacy trips and trips whose
+      // fuel was not 100% speed-density carry no key → null, which
+      // correctly reads as "not recalculable".
+      volumetricEfficiencyUsed: (j['veUsed'] as num?)?.toDouble(),
     );
 
 /// Hive-backed list of finalised trips (#726).

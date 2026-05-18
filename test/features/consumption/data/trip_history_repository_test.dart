@@ -847,4 +847,93 @@ void main() {
       expect(s.coolantTempC, 82.0);
     });
   });
+
+  group('TripSummary.volumetricEfficiencyUsed persistence (#1858)', () {
+    test(
+        'summary with volumetricEfficiencyUsed populated round-trips through '
+        'save / loadAll', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 18, 9);
+      final recalculable = TripSummary(
+        distanceKm: 42,
+        maxRpm: 3000,
+        highRpmSeconds: 5,
+        idleSeconds: 30,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        fuelLitersConsumed: 3.1,
+        avgLPer100Km: 7.4,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 40)),
+        volumetricEfficiencyUsed: 0.88,
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: 'veh-recalc',
+        summary: recalculable,
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.summary.volumetricEfficiencyUsed, 0.88,
+          reason: 'the η_v recompute basis must survive Hive round-trip');
+    });
+
+    test(
+        'summary with volumetricEfficiencyUsed null omits the "veUsed" key — '
+        'a not-recalculable / legacy trip carries no provenance', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 18, 9);
+      final notRecalculable = TripSummary(
+        distanceKm: 18,
+        maxRpm: 2600,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        fuelLitersConsumed: 1.4,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 16)),
+        // volumetricEfficiencyUsed defaults null
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: notRecalculable,
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final summaryJson = (decoded['summary'] as Map).cast<String, dynamic>();
+      expect(summaryJson.containsKey('veUsed'), isFalse);
+
+      final loaded = repo.loadAll();
+      expect(loaded.first.summary.volumetricEfficiencyUsed, isNull);
+    });
+
+    test(
+        'a legacy payload without the "veUsed" key deserialises with a null '
+        'volumetricEfficiencyUsed — pre-#1858 trips read as not-recalculable',
+        () {
+      // A pre-#1858 stored summary — no `veUsed` key at all.
+      final legacy = {
+        'id': 'legacy-ve',
+        'vehicleId': 'veh-1',
+        'summary': {
+          'distanceKm': 30.0,
+          'maxRpm': 2800.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'fuelLitersConsumed': 2.2,
+          'distanceSource': 'virtual',
+        },
+      };
+      final restored = TripHistoryEntry.fromJson(legacy);
+      expect(restored.summary.volumetricEfficiencyUsed, isNull,
+          reason: 'legacy trips have no η_v provenance and must read as '
+              'not-recalculable rather than throwing');
+    });
+  });
 }
