@@ -184,10 +184,11 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          // #522 — compact the form so every filter fits above the
-          // fold on an S23 Ultra at 1x text scale. Section gaps went
-          // from 20 dp → 12 dp, label-to-control gaps from 8 dp →
-          // 4 dp, and surrounding padding from 16 dp top → 8 dp.
+          // #522 / #1962 — compact the form so every filter fits above
+          // the fold on an S23 Ultra at 1x text scale. Section gaps are
+          // 8 dp, label-to-control gaps 4 dp, and the surrounding
+          // padding is 8 dp at the top. #1962 took the section gaps
+          // from 12 dp → 8 dp and shrank the radius-slider overlay.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -203,7 +204,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   onChanged: (m) =>
                       ref.read(activeSearchModeProvider.notifier).set(m),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
               ],
               if (mode == SearchMode.nearby) ...[
                 Text(
@@ -224,14 +225,14 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                 const SizedBox(height: 4),
                 RouteInput(onSearch: _performRouteSearch),
               ],
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 l10n?.fuelType ?? 'Fuel type',
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: 4),
               const FuelTypeSelector(),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               SearchRadiusSlider(
                 radiusKm: radius,
                 onChanged: (value) =>
@@ -268,7 +269,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   return BrandFilterChips(stations: stations);
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               OutlinedButton.icon(
                 key: const ValueKey('criteria-save-defaults-button'),
                 onPressed: _saveAsDefaults,
