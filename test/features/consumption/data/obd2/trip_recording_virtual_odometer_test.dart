@@ -59,19 +59,17 @@ void main() {
       final ctl = _buildController(service);
       await ctl.start();
 
-      // Pre-populate the virtual-odometer buffer: 0→60 km/h ramp over
-      // 30 s, then cruise at 60 km/h for 270 s = 4.5 km cruise +
-      // 0.25 km ramp = 4.75 km total.
+      // Pre-populate the virtual-odometer buffer at the ≤15 s cadence
+      // the #1927 gap cap requires: 0→60 km/h ramp over 30 s = 0.25 km,
+      // then cruise at 60 km/h for 270 s = 4.5 km → 4.75 km total.
       final t0 = DateTime.utc(2026, 4, 22, 11);
       ctl.debugRecordSpeedSample(speedKmh: 0, at: t0);
       ctl.debugRecordSpeedSample(
-        speedKmh: 60,
-        at: t0.add(const Duration(seconds: 30)),
-      );
-      ctl.debugRecordSpeedSample(
-        speedKmh: 60,
-        at: t0.add(const Duration(seconds: 300)),
-      );
+          speedKmh: 30, at: t0.add(const Duration(seconds: 15)));
+      for (var s = 30; s <= 300; s += 15) {
+        ctl.debugRecordSpeedSample(
+            speedKmh: 60, at: t0.add(Duration(seconds: s)));
+      }
 
       final summary = await ctl.stop();
       final expected = VirtualOdometer(samples: ctl.debugSpeedSamples)
@@ -92,13 +90,13 @@ void main() {
       await ctl.start();
       // Odometer never moved (car was idling / reading quantised away).
       ctl.debugSetOdometerReadings(latestKm: 9271.6);
-      // But some speed samples were recorded.
+      // But some speed samples were recorded — 30 km/h for 60 s =
+      // 0.5 km, at the ≤15 s cadence the #1927 gap cap requires.
       final t0 = DateTime.utc(2026, 4, 22, 12);
-      ctl.debugRecordSpeedSample(speedKmh: 30, at: t0);
-      ctl.debugRecordSpeedSample(
-        speedKmh: 30,
-        at: t0.add(const Duration(seconds: 60)),
-      );
+      for (var s = 0; s <= 60; s += 15) {
+        ctl.debugRecordSpeedSample(
+            speedKmh: 30, at: t0.add(Duration(seconds: s)));
+      }
 
       final summary = await ctl.stop();
       // 0 km real delta → null → virtual. 0.5 km from samples
@@ -118,12 +116,13 @@ void main() {
       final ctl = _buildController(service);
       await ctl.start();
 
+      // 0→60 km/h ramp over 60 s = 0.5 km, at the ≤15 s cadence the
+      // #1927 gap cap requires.
       final t0 = DateTime.utc(2026, 4, 22, 13);
-      ctl.debugRecordSpeedSample(speedKmh: 0, at: t0);
-      ctl.debugRecordSpeedSample(
-        speedKmh: 60,
-        at: t0.add(const Duration(seconds: 60)),
-      );
+      for (var s = 0; s <= 60; s += 15) {
+        ctl.debugRecordSpeedSample(
+            speedKmh: s.toDouble(), at: t0.add(Duration(seconds: s)));
+      }
       final live = ctl.currentDistanceKm;
       expect(live, closeTo(0.5, 0.01));
 

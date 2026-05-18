@@ -353,6 +353,13 @@ class TripRecordingController {
   /// and [_recordSpeedSample] tear-offs.
   late final LiveSampleSnapshot _liveSampleSnapshot;
 
+  /// Maximum Δt (seconds) between samples that the distance / fuel
+  /// integrators bridge (#1927). A longer gap is a connection dropout
+  /// or pause — integrating across it fabricates distance and fuel, so
+  /// `TripRecorder` and `VirtualOdometer` skip it. 15 s is far above
+  /// the ~250 ms poll cadence and the 6 s silent-reconnect window.
+  static const double _integrationGapCapSeconds = 15.0;
+
   TripRecordingController({
     required Obd2Service service,
     TripRecorder? recorder,
@@ -378,7 +385,9 @@ class TripRecordingController {
     )? reconnectScannerFactory,
     Obd2BreadcrumbRecorder? breadcrumbCollector,
   })  : _service = service,
-        _recorder = recorder ?? TripRecorder(),
+        _recorder = recorder ??
+            TripRecorder(
+                maxIntegrationGapSeconds: _integrationGapCapSeconds),
         _pollInterval = pollInterval,
         _now = now ?? DateTime.now,
         _vehicle = vehicle,
@@ -802,7 +811,10 @@ class TripRecordingController {
   double get currentDistanceKm {
     final real = _realOdometerDeltaKm();
     if (real != null) return real;
-    return VirtualOdometer(samples: _speedSamples).integrateKm();
+    return VirtualOdometer(
+      samples: _speedSamples,
+      maxGapSeconds: _integrationGapCapSeconds,
+    ).integrateKm();
   }
 
   /// `'real'` when [currentDistanceKm] came from the car's odometer,

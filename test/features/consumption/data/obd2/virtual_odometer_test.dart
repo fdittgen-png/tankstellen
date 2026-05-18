@@ -109,5 +109,70 @@ void main() {
       ]);
       expect(odo.integrateKm(), closeTo(0.0, 0.001));
     });
+
+    group('maxGapSeconds dropout cap (#1927)', () {
+      test('a gap longer than maxGapSeconds is not integrated', () {
+        final odo = VirtualOdometer(
+          maxGapSeconds: 15,
+          samples: [
+            VirtualOdometerSample(timestamp: _t0, speedKmh: 60),
+            // 20-minute dropout — must NOT add 60 km/h × 20 min = 20 km.
+            VirtualOdometerSample(
+                timestamp: _t0.add(const Duration(minutes: 20)),
+                speedKmh: 60),
+          ],
+        );
+        expect(odo.integrateKm(), 0.0);
+      });
+
+      test('a pair within the cap is still integrated', () {
+        final odo = VirtualOdometer(
+          maxGapSeconds: 15,
+          samples: [
+            VirtualOdometerSample(timestamp: _t0, speedKmh: 60),
+            VirtualOdometerSample(
+                timestamp: _t0.add(const Duration(seconds: 10)),
+                speedKmh: 60),
+          ],
+        );
+        expect(odo.integrateKm(), closeTo(60 * 10 / 3600, 1e-9));
+      });
+
+      test(
+          'only the dropout pair is skipped — surrounding distance '
+          'survives', () {
+        final odo = VirtualOdometer(
+          maxGapSeconds: 15,
+          samples: [
+            VirtualOdometerSample(timestamp: _t0, speedKmh: 60),
+            VirtualOdometerSample(
+                timestamp: _t0.add(const Duration(seconds: 10)),
+                speedKmh: 60),
+            // 20-minute dropout in the middle of the drive.
+            VirtualOdometerSample(
+                timestamp:
+                    _t0.add(const Duration(minutes: 20, seconds: 10)),
+                speedKmh: 60),
+            VirtualOdometerSample(
+                timestamp:
+                    _t0.add(const Duration(minutes: 20, seconds: 20)),
+                speedKmh: 60),
+          ],
+        );
+        // The two valid 10-s intervals integrate; the dropout is skipped.
+        expect(odo.integrateKm(), closeTo(2 * 60 * 10 / 3600, 1e-9));
+      });
+
+      test('the default (no cap) integrates any gap — unchanged behaviour',
+          () {
+        final odo = VirtualOdometer(samples: [
+          VirtualOdometerSample(timestamp: _t0, speedKmh: 60),
+          VirtualOdometerSample(
+              timestamp: _t0.add(const Duration(minutes: 20)),
+              speedKmh: 60),
+        ]);
+        expect(odo.integrateKm(), closeTo(60 * 20 / 60, 1e-9));
+      });
+    });
   });
 }
