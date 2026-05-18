@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Tühjenda",
   "obd2DebugOverlayCloseButton": "Sulge",
   "obd2DebugOverlayTitle": "OBD2 leivaraasud",
+  "obd2DiagnosticShareLabel": "Jaga diagnostikalogi",
   "obd2PickerPinnedFallback": "Ei suutnud jõuda '{adapterName}' — vali teine adapter",
   "onboardingObd2StepTitle": "Ühenda oma OBD2 adapter",
   "onboardingObd2StepBody": "Ühenda oma OBD2 adapter auto porti ja lülita süütevool sisse. Loeme VIN-koodi ja täidame mootori andmed sinu eest.",

@@ -4640,6 +4640,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 leivaraasud';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Jaga diagnostikalogi';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ei suutnud jõuda \'$adapterName\' — vali teine adapter';
   }

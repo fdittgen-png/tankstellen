@@ -4666,6 +4666,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 záznamy';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Zdieľať diagnostický denník';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nepodarilo sa dosiahnuť \'$adapterName\' — vyberte iný adaptér';
   }

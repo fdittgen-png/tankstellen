@@ -128,4 +128,23 @@ void main() {
     expect(crumb.detail, contains('mac=AA:BB:CC:DD:EE:FF'));
     expect(crumb.detail, contains('speed=12.3 kmh'));
   });
+
+  test('#1920 OBD2 connect/drop/reconnect event kinds exist', () {
+    // The exportable diagnostic log (#1920) depends on these eight
+    // kinds being present in the enum — guard against an accidental
+    // rename or removal.
+    const List<AutoRecordEventKind> kinds = <AutoRecordEventKind>[
+      AutoRecordEventKind.connectStarted,
+      AutoRecordEventKind.connectSucceeded,
+      AutoRecordEventKind.connectFailed,
+      AutoRecordEventKind.dropDetected,
+      AutoRecordEventKind.silentReconnectStarted,
+      AutoRecordEventKind.silentReconnectSucceeded,
+      AutoRecordEventKind.dropEscalatedToVisible,
+      AutoRecordEventKind.reconnectSucceeded,
+    ];
+    for (final AutoRecordEventKind kind in kinds) {
+      expect(AutoRecordEventKind.values, contains(kind));
+    }
+  });
 }

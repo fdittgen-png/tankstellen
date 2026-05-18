@@ -4685,6 +4685,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 следи';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Споделяне на диагностичния дневник';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Не може да се достигне до \'$adapterName\' — изберете друг адаптер';
   }

@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Išvalyti",
   "obd2DebugOverlayCloseButton": "Uždaryti",
   "obd2DebugOverlayTitle": "OBD2 sekos žurnalai",
+  "obd2DiagnosticShareLabel": "Bendrinti diagnostikos žurnalą",
   "obd2PickerPinnedFallback": "Nepavyko pasiekti \"{adapterName}\" — pasirinkite kitą adapterį",
   "onboardingObd2StepTitle": "Prijunkite savo OBD2 adapterį",
   "onboardingObd2StepBody": "Įkiškite OBD2 adapterį į automobilio lizdą ir įjunkite uždegimą. Nuskaitysime VIN ir užpildysime variklio detales už jus.",

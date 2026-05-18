@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import 'adapter_capability.dart';
+import 'auto_record_trace_log.dart';
 import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_estimator.dart' as estimator;
@@ -182,6 +183,12 @@ class Obd2Service implements Obd2RawCommandPort {
   Future<bool> connect({
     Elm327Adapter adapter = const GenericElm327Adapter(),
   }) async {
+    // #1920 — trace the connect attempt so a failed recording session
+    // can be analysed from the exportable OBD2 diagnostic log.
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.connectStarted,
+      mac: adapterMac,
+    );
     try {
       _adapter = adapter;
       await _transport.connect();
@@ -238,9 +245,23 @@ class Obd2Service implements Obd2RawCommandPort {
 
       await _pids.prime();
 
+      // #1920 — record the successful handshake with the firmware
+      // string when the adapter reported one.
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.connectSucceeded,
+        mac: adapterMac,
+        detail: adapterFirmware,
+      );
       return true;
     } catch (e, st) {
       debugPrint('OBD2 connect failed: $e\n$st');
+      // #1920 — record the failure so the diagnostic log shows the
+      // connect attempt that never produced a session.
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.connectFailed,
+        mac: adapterMac,
+        detail: e.toString(),
+      );
       return false;
     }
   }

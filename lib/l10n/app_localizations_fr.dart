@@ -4693,6 +4693,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'Traces OBD2';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Partager le journal de diagnostic';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Impossible de joindre \'$adapterName\' — choisissez un autre adaptateur';
   }

@@ -87,6 +87,41 @@ enum AutoRecordEventKind {
   /// count.
   obd2SpeedReadFailed,
 
+  /// `Obd2Service.connect()` entered — the ELM327 init handshake is
+  /// about to start. Mac carries the adapter id (#1920).
+  connectStarted,
+
+  /// `Obd2Service.connect()` is about to return `true` — the init
+  /// sequence completed. Detail carries the firmware string when the
+  /// adapter reported one (#1920).
+  connectSucceeded,
+
+  /// `Obd2Service.connect()` threw before it could return — the
+  /// handshake failed. Detail carries the error message (#1920).
+  connectFailed,
+
+  /// A recording session's drop detector flagged a connection drop —
+  /// the scheduler is about to stop. Detail carries the
+  /// [TripDropReason] (#1920).
+  dropDetected,
+
+  /// A transport-error drop entered the #1904 invisible reconnect
+  /// window — the controller still reports `recording` while the
+  /// scanner probes for the adapter (#1920).
+  silentReconnectStarted,
+
+  /// The adapter came back inside the #1904 silent reconnect window —
+  /// polling resumed without the user ever seeing a pause (#1920).
+  silentReconnectSucceeded,
+
+  /// The silent reconnect window elapsed without the adapter coming
+  /// back; the drop escalated to the visible pause banner (#1920).
+  dropEscalatedToVisible,
+
+  /// The adapter came back after the drop went visible — the
+  /// pause-with-grace state was cleared and polling resumed (#1920).
+  reconnectSucceeded,
+
   /// Generic catch — detail carries a free-form message. Used
   /// sparingly so the enum stays the contract.
   error,

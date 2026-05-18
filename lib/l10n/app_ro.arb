@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Ștergeți",
   "obd2DebugOverlayCloseButton": "Închideți",
   "obd2DebugOverlayTitle": "Traseu OBD2",
+  "obd2DiagnosticShareLabel": "Partajează jurnalul de diagnosticare",
   "obd2PickerPinnedFallback": "Nu s-a putut accesa '{adapterName}' — alegeți alt adaptor",
   "onboardingObd2StepTitle": "Conectați adaptorul OBD2",
   "onboardingObd2StepBody": "Introduceți adaptorul OBD2 în portul mașinii și porniți contactul. Vom citi VIN-ul și vom completa detaliile motorului pentru dvs.",

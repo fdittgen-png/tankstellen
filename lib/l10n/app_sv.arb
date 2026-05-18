@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Rensa",
   "obd2DebugOverlayCloseButton": "Stäng",
   "obd2DebugOverlayTitle": "OBD2-brödsmulor",
+  "obd2DiagnosticShareLabel": "Dela diagnostiklogg",
   "obd2PickerPinnedFallback": "Kunde inte nå '{adapterName}' – välj en annan adapter",
   "onboardingObd2StepTitle": "Anslut din OBD2-adapter",
   "onboardingObd2StepBody": "Koppla din OBD2-adapter till bilens port och slå på tändningen. Vi läser VIN och fyller i motordetaljer åt dig.",

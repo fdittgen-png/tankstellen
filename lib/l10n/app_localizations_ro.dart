@@ -4680,6 +4680,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'Traseu OBD2';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Partajează jurnalul de diagnosticare';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nu s-a putut accesa \'$adapterName\' — alegeți alt adaptor';
   }

@@ -4688,6 +4688,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'Ίχνη OBD2';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Κοινοποίηση διαγνωστικού αρχείου';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Δεν ήταν δυνατή η επαφή με \'$adapterName\' — επιλέξτε άλλον προσαρμογέα';
   }

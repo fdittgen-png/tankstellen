@@ -4683,6 +4683,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'Rastro de OBD2';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Compartir registro de diagnóstico';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'No se pudo contactar con «$adapterName»: elige otro adaptador';
   }

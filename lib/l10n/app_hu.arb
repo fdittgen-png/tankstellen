@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Törlés",
   "obd2DebugOverlayCloseButton": "Bezárás",
   "obd2DebugOverlayTitle": "OBD2 morzsakód-nyomvonal",
+  "obd2DiagnosticShareLabel": "Diagnosztikai napló megosztása",
   "obd2PickerPinnedFallback": "Nem sikerült elérni a(z) '{adapterName}'-t — válasszon másik adaptert",
   "onboardingObd2StepTitle": "OBD2-adapter csatlakoztatása",
   "onboardingObd2StepBody": "Dugja be az OBD2-adaptert az autó portjába, és kapcsolja be a gyújtást. Beolvassuk a VIN-t, és kitöltjük a motoradatokat.",

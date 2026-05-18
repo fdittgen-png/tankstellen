@@ -4670,6 +4670,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2-Spuren';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Diagnoseprotokoll teilen';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

@@ -11,6 +11,7 @@ import '../../domain/services/gear_inference.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
+import 'auto_record_trace_log.dart';
 import 'elm327_protocol.dart';
 import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
@@ -969,6 +970,13 @@ class TripRecordingController {
     TripDropReason reason = TripDropReason.transportError,
   }) {
     if (_pausedDueToDrop || _silentlyReconnecting) return;
+    // #1920 — trace every detected drop so a failed recording session
+    // can be analysed from the exportable OBD2 diagnostic log.
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.dropDetected,
+      mac: _pinnedAdapterMac,
+      detail: reason.name,
+    );
     _scheduler?.stop();
     _dropDetector.clearErrorWindow();
     _persistPausedSnapshot();
@@ -976,6 +984,11 @@ class TripRecordingController {
         _silentReconnectWindow > Duration.zero) {
       _silentlyReconnecting = true;
       _dropReason = reason;
+      // #1920 — record entry into the #1904 invisible reconnect window.
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.silentReconnectStarted,
+        mac: _pinnedAdapterMac,
+      );
       _startReconnectScanner();
       _silentReconnectTimer?.cancel();
       _silentReconnectTimer =
@@ -1007,6 +1020,12 @@ class TripRecordingController {
     _silentReconnectTimer = null;
     if (!_silentlyReconnecting || _pausedDueToDrop || _stopped) return;
     _silentlyReconnecting = false;
+    // #1920 — record the escalation: the silent window elapsed without
+    // the adapter coming back, so the drop is now visible to the user.
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.dropEscalatedToVisible,
+      mac: _pinnedAdapterMac,
+    );
     _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
   }
 
@@ -1057,6 +1076,12 @@ class TripRecordingController {
       _dropReason = null;
       _dropDetector.reset();
       _clearPausedTripRow();
+      // #1920 — record the silent-path recovery: the adapter came back
+      // inside the #1904 window and the user never saw a pause.
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.silentReconnectSucceeded,
+        mac: _pinnedAdapterMac,
+      );
       // Respect a user pause that landed during the silent window.
       if (!_paused && !_stopped) _scheduler?.start();
       _emitState();
@@ -1064,7 +1089,15 @@ class TripRecordingController {
     }
     // Reconnected after the drop went visible — the ordinary resume()
     // path cancels the grace timer and clears the paused-trips row.
-    if (_pausedDueToDrop) resume();
+    if (_pausedDueToDrop) {
+      // #1920 — record the visible-path recovery: the adapter came back
+      // after the pause banner had already been shown.
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.reconnectSucceeded,
+        mac: _pinnedAdapterMac,
+      );
+      resume();
+    }
   }
 
   Future<void> _stopReconnectScanner() async {

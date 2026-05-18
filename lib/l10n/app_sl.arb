@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Počisti",
   "obd2DebugOverlayCloseButton": "Zapri",
   "obd2DebugOverlayTitle": "Sledilne točke OBD2",
+  "obd2DiagnosticShareLabel": "Deli diagnostični dnevnik",
   "obd2PickerPinnedFallback": "Ni bilo mogoče doseči '{adapterName}' — izberite drug adapter",
   "onboardingObd2StepTitle": "Povežite adapter OBD2",
   "onboardingObd2StepBody": "Priključite adapter OBD2 v vrata avtomobila in vklopite vžig. Prebrali bomo VIN in izpolnili podrobnosti motorja za vas.",

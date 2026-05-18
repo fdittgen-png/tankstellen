@@ -4646,6 +4646,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2-brødkrummer';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Del diagnostiklog';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Kunne ikke nå \'$adapterName\' — vælg en anden adapter';
   }

@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Vymazať",
   "obd2DebugOverlayCloseButton": "Zavrieť",
   "obd2DebugOverlayTitle": "OBD2 záznamy",
+  "obd2DiagnosticShareLabel": "Zdieľať diagnostický denník",
   "obd2PickerPinnedFallback": "Nepodarilo sa dosiahnuť '{adapterName}' — vyberte iný adaptér",
   "onboardingObd2StepTitle": "Pripojiť OBD2 adaptér",
   "onboardingObd2StepBody": "Zapojte OBD2 adaptér do portu auta a zapnite zapaľovanie. Prečítame VIN a vyplníme detaily motora za vás.",

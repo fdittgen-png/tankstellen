@@ -4652,6 +4652,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'Sledilne točke OBD2';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Deli diagnostični dnevnik';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ni bilo mogoče doseči \'$adapterName\' — izberite drug adapter';
   }

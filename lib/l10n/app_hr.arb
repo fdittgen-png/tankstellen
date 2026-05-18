@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Očisti",
   "obd2DebugOverlayCloseButton": "Zatvori",
   "obd2DebugOverlayTitle": "OBD2 trag",
+  "obd2DiagnosticShareLabel": "Podijeli dijagnostički zapisnik",
   "obd2PickerPinnedFallback": "Nije moguće dosegnuti '{adapterName}' — odaberite drugi adapter",
   "onboardingObd2StepTitle": "Spojite vaš OBD2 adapter",
   "onboardingObd2StepBody": "Priključite OBD2 adapter u priključak automobila i uključite paljenje. Pročitat ćemo VIN i popuniti detalje motora za vas.",

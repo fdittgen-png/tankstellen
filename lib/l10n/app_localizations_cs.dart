@@ -4651,6 +4651,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'Stopy OBD2';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Sdílet diagnostický protokol';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nelze se připojit k \'$adapterName\' — vyberte jiný adaptér';
   }

@@ -18,5 +18,9 @@
   "obd2DebugOverlayTitle": "OBD2 breadcrumbs",
   "@obd2DebugOverlayTitle": {
     "description": "Title shown at the top of the in-app OBD2 fuel-rate diagnostic overlay panel (#1395)."
+  },
+  "obd2DiagnosticShareLabel": "Share diagnostic log",
+  "@obd2DiagnosticShareLabel": {
+    "description": "Label and tooltip for the button on the in-app OBD2 diagnostic overlay that exports the OBD2 connect/drop/reconnect trace as plain text to the OS share sheet, so a developer can analyse a failed recording session (#1920)."
   }
 }

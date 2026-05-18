@@ -3,5 +3,6 @@
   "obd2DebugOverlayDisabledSnack": "OBD2-Diagnose-Overlay deaktiviert",
   "obd2DebugOverlayClearButton": "Leeren",
   "obd2DebugOverlayCloseButton": "Schließen",
-  "obd2DebugOverlayTitle": "OBD2-Spuren"
+  "obd2DebugOverlayTitle": "OBD2-Spuren",
+  "obd2DiagnosticShareLabel": "Diagnoseprotokoll teilen"
 }

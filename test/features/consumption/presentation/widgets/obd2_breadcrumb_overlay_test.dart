@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
+import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_breadcrumb_collector.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/obd2_breadcrumb_overlay.dart';
 import 'package:tankstellen/features/consumption/providers/obd2_breadcrumb_provider.dart';
@@ -138,6 +140,52 @@ void main() {
       // provider must report `false`.
       expect(container.read(obd2DebugOverlayProvider), isFalse);
     });
+
+    testWidgets(
+      '#1920 share button hands the formatted diagnostic log to the sink',
+      (tester) async {
+        AutoRecordTraceLog.clear();
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.connectStarted,
+          mac: 'AA:BB:CC:DD:EE:FF',
+        );
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.connectFailed,
+          mac: 'AA:BB:CC:DD:EE:FF',
+          detail: 'TimeoutException',
+        );
+
+        ShareParams? captured;
+        debugObd2DiagnosticShareSinkOverride = (params) async {
+          captured = params;
+        };
+        addTearDown(() {
+          debugObd2DiagnosticShareSinkOverride = null;
+          AutoRecordTraceLog.clear();
+        });
+
+        await pumpApp(
+          tester,
+          const Stack(children: [Obd2BreadcrumbOverlay()]),
+          overrides: [
+            obd2DebugOverlayProvider.overrideWith(() => _FixedOverlay(true)),
+          ],
+        );
+
+        await tester.tap(find.byIcon(Icons.share));
+        await tester.pump();
+
+        expect(captured, isNotNull,
+            reason: 'the share button must invoke the sink');
+        final String text = captured!.text ?? '';
+        expect(text, contains('OBD2 diagnostic log'));
+        expect(text, contains('connectStarted'));
+        expect(text, contains('connectFailed'));
+        expect(text, contains('TimeoutException'));
+        // The full MAC is PII and must be redacted in the shared text.
+        expect(text, isNot(contains('AA:BB:CC:DD:EE:FF')));
+      },
+    );
   });
 }
 

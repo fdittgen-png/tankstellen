@@ -4675,6 +4675,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 sekos žurnalai';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Bendrinti diagnostikos žurnalą';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nepavyko pasiekti \"$adapterName\" — pasirinkite kitą adapterį';
   }

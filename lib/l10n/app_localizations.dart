@@ -8373,6 +8373,12 @@ abstract class AppLocalizations {
   /// **'OBD2 breadcrumbs'**
   String get obd2DebugOverlayTitle;
 
+  /// Label and tooltip for the button on the in-app OBD2 diagnostic overlay that exports the OBD2 connect/drop/reconnect trace as plain text to the OS share sheet, so a developer can analyse a failed recording session (#1920).
+  ///
+  /// In en, this message translates to:
+  /// **'Share diagnostic log'**
+  String get obd2DiagnosticShareLabel;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:
