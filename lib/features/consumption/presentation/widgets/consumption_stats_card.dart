@@ -293,14 +293,18 @@ class _StatTile extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.labelSmall,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              // #1902 — the stat figures (litres, total spent, …) read
+              // far smaller than the old bold titleMedium: they were
+              // dominating the summary card. Weight still sets them
+              // apart from the label above.
               Text(
                 value,
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(fontWeight: FontWeight.w700),
               ),
             ],
           ),

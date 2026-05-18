@@ -16,12 +16,11 @@ import 'eco_score_badge.dart';
 /// turning the card from a passive record into a driving-behaviour
 /// nudge. See issue #676 ("Smarter pump. Smarter drive. Save twice.").
 ///
-/// When [FillUp.isCorrection] is true (#1361 phase 2b), the card uses
-/// the orange-amber correction theme: a 4 px left border, an
-/// `auto_fix_high` leading icon on an orange background, and an inline
-/// "Auto-correction — tap to edit" subtitle. Tapping a correction card
-/// is expected to open the [EditCorrectionFillUpSheet] — the tap
-/// handler is wired by the parent (the Fuel tab list builder).
+/// When [FillUp.isCorrection] is true (#1361 phase 2b / #1902), the
+/// card collapses to a single slim amber row — a system-generated
+/// adjustment is not a real fill-up and must not compete with one for
+/// vertical space. Tapping it opens the [EditCorrectionFillUpSheet];
+/// the tap handler is wired by the parent (the Fuel tab list builder).
 ///
 /// When both [FillUp.fuelLevelBeforeL] and [FillUp.fuelLevelAfterL] are
 /// non-null (#1401 phase 7b), a small "Verified by adapter" chip is
@@ -45,6 +44,13 @@ class FillUpCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
+    final volume = UnitFormatter.formatVolume(fillUp.liters);
+
+    // #1902 — a correction is a system adjustment, not a fill-up:
+    // render it as a single slim row so real fill-ups dominate.
+    if (fillUp.isCorrection) {
+      return _CorrectionRow(volume: volume, onTap: onTap);
+    }
 
     final dateStr =
         '${fillUp.date.year}-${_pad(fillUp.date.month)}-${_pad(fillUp.date.day)}';
@@ -53,74 +59,32 @@ class FillUpCard extends StatelessWidget {
     // records logged before this change will re-format on the fly when
     // the user changes country — acceptable as a transitional step.
     final distance = UnitFormatter.formatDistance(fillUp.odometerKm);
-    final volume = UnitFormatter.formatVolume(fillUp.liters);
     final costStr =
         '${fillUp.totalCost.toStringAsFixed(2)} ${PriceFormatter.currency}';
     final ppl = UnitFormatter.formatPricePerUnit(fillUp.pricePerLiter);
-
-    final isCorrection = fillUp.isCorrection;
-    // Material amber/orange that reads cleanly against both M3 light
-    // and dark backgrounds. Picked shade 700 for the border + circle
-    // background so the contrast vs. white text on the avatar stays
-    // readable at smaller sizes.
-    final correctionColor = DarkModeColors.warning(context);
     // #1401 phase 7b — only render the verified-by-adapter chip when
     // both fuel-level captures are present. Either missing → no chip.
     final isVerifiedByAdapter = FillUpVariance.hasAdapterCapture(fillUp);
 
-    final card = Card(
-      // #1891 — a correction is a system-generated adjustment, not a
-      // real fill-up: it sits tighter so the actual fill-ups dominate
-      // the list.
-      margin: EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: isCorrection ? 2 : 4,
-      ),
-      // The outline gives a 4 px left border via shape; we paint the
-      // rest of the card normally. Using `Card.shape` keeps the
-      // material elevation/ink ripple intact (vs. wrapping in a
-      // Container, which would clip the ListTile splash).
-      shape: isCorrection
-          ? RoundedRectangleBorder(
-              side: BorderSide(color: correctionColor, width: 4),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-                topRight: Radius.circular(4),
-                bottomRight: Radius.circular(4),
-              ),
-            )
-          : null,
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
         onTap: onTap,
-        // #1891 — corrections render as a compact row; real fill-ups
-        // keep the full-size ListTile.
-        dense: isCorrection,
-        visualDensity:
-            isCorrection ? VisualDensity.compact : VisualDensity.standard,
         leading: CircleAvatar(
-          radius: isCorrection ? 16 : 20,
-          backgroundColor: isCorrection
-              ? correctionColor
-              : theme.colorScheme.primaryContainer,
+          radius: 20,
+          backgroundColor: theme.colorScheme.primaryContainer,
           child: Icon(
-            isCorrection ? Icons.auto_fix_high : Icons.local_gas_station,
-            size: isCorrection ? 18 : 24,
-            color: isCorrection
-                ? Colors.white
-                : theme.colorScheme.onPrimaryContainer,
+            Icons.local_gas_station,
+            size: 24,
+            color: theme.colorScheme.onPrimaryContainer,
           ),
         ),
         title: Text(
           fillUp.stationName ?? fillUp.fuelType.apiValue.toUpperCase(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          // Corrections get lighter, smaller title type — they are
-          // secondary to the real fill-ups.
-          style: isCorrection
-              ? theme.textTheme.bodyMedium
-              : theme.textTheme.titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,17 +94,6 @@ class FillUpCard extends StatelessWidget {
               '$volume · $costStr · $ppl',
               style: theme.textTheme.bodySmall,
             ),
-            if (isCorrection) ...[
-              const SizedBox(height: 4),
-              Text(
-                l?.fillUpCorrectionLabel ??
-                    'Auto-correction — tap to edit',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: correctionColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
             if (isVerifiedByAdapter) ...[
               const SizedBox(height: 4),
               // #1401 phase 7b — small "Verified by adapter" chip. Uses
@@ -193,9 +146,73 @@ class FillUpCard extends StatelessWidget {
         ),
       ),
     );
-
-    return card;
   }
 
   String _pad(int n) => n.toString().padLeft(2, '0');
+}
+
+/// #1902 — the slim amber row a correction [FillUp] collapses to. It
+/// carries only the auto-correction label and the adjusted volume on a
+/// single line: the date, cost, fuel type and odometer of a system
+/// adjustment are noise next to the real fill-ups it sits between.
+class _CorrectionRow extends StatelessWidget {
+  final String volume;
+  final VoidCallback? onTap;
+
+  const _CorrectionRow({required this.volume, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final correctionColor = DarkModeColors.warning(context);
+
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+      // A slim 2 px left rule (down from the old full 4 px border) —
+      // enough to read as "correction", not enough to shout.
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: correctionColor, width: 2),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          topRight: Radius.circular(4),
+          bottomRight: Radius.circular(4),
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            children: [
+              Icon(Icons.auto_fix_high, size: 16, color: correctionColor),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l?.fillUpCorrectionLabel ??
+                      'Auto-correction — tap to edit',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: correctionColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                volume,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: correctionColor,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

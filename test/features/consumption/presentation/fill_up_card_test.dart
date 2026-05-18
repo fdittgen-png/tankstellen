@@ -141,7 +141,8 @@ void main() {
         reason: 'fillUpCorrectionLabel must render under the cost line',
       );
 
-      // The card must paint a 4 px orange border via Card.shape.
+      // #1902 — the correction collapses to a slim row with a 2 px
+      // orange rule (down from the old 4 px full border).
       final card = tester.widget<Card>(find.byType(Card));
       final shape = card.shape;
       expect(shape, isA<RoundedRectangleBorder>());
@@ -150,7 +151,11 @@ void main() {
         border.color,
         DarkModeColors.warning(tester.element(find.byType(Card))),
       );
-      expect(border.width, 4);
+      expect(border.width, 2);
+      // The slim correction row is not a full ListTile.
+      expect(find.byType(ListTile), findsNothing,
+          reason: '#1902 — a correction is a compact single row, not a '
+              'full fill-up ListTile');
     });
 
     testWidgets(
@@ -192,7 +197,8 @@ void main() {
         tester,
         FillUpCard(fillUp: fillUp, onTap: () => tapped = true),
       );
-      await tester.tap(find.byType(ListTile));
+      // #1902 — the compact correction row taps via its InkWell.
+      await tester.tap(find.text('Auto-correction — tap to edit'));
       expect(tapped, true);
     });
   });
