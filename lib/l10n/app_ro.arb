@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Înregistrarea continuă în fundal. Apăsați bannerul roșu din partea de sus a oricărui ecran pentru a reveni.",
   "tripBannerOpenFromConsumptionTab": "Deschideți călătoria activă din fila Conso",
   "tripRecordingUnpinnedWarning": "Fixați ecranul pentru a menține GPS-ul activ în timpul călătoriei — Android poate reduce GPS-ul în somn.",
+  "tripRecordingMinimiseTooltip": "Minimizează într-o casetă flotantă",
   "unifiedFilterFuel": "Combustibil",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Ambele",

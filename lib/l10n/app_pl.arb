@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Nagrywanie trwa w tle. Dotknij czerwonego baneru na górze dowolnego ekranu, aby wrócić.",
   "tripBannerOpenFromConsumptionTab": "Otwórz aktywną trasę z karty Zużycie",
   "tripRecordingUnpinnedWarning": "Przypnij ekran, aby utrzymać GPS aktywny podczas trasy — Android może ograniczać GPS podczas uśpienia.",
+  "tripRecordingMinimiseTooltip": "Zminimalizuj do pływającego kafelka",
   "unifiedFilterFuel": "Paliwo",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Oba",

@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "A rögzítés a háttérben folytatódik. Érintse a bármelyik képernyő tetején lévő piros sávot a visszatéréshez.",
   "tripBannerOpenFromConsumptionTab": "Nyissa meg az aktív utat a Fogyasztás fülről",
   "tripRecordingUnpinnedWarning": "Rögzítse a képernyőt a GPS aktív tartásához — az Android korlátozhatja a GPS-t alvás közben.",
+  "tripRecordingMinimiseTooltip": "Kicsinyítés lebegő csempére",
   "unifiedFilterFuel": "Üzemanyag",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Mindkettő",

@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Opptaket fortsetter i bakgrunnen. Trykk på det røde banneret øverst på en skjerm for å returnere.",
   "tripBannerOpenFromConsumptionTab": "Åpne den aktive turen fra Forbruk-fanen",
   "tripRecordingUnpinnedWarning": "Fest skjermen for å holde GPS aktiv under turen – Android kan begrense GPS under dvale.",
+  "tripRecordingMinimiseTooltip": "Minimer til en flytende rute",
   "unifiedFilterFuel": "Drivstoff",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Begge",

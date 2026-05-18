@@ -5124,6 +5124,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Zet het scherm vast om GPS actief te houden tijdens de rit — Android kan GPS beperken tijdens slaapstand.';
 
   @override
+  String get tripRecordingMinimiseTooltip =>
+      'Minimaliseren tot een zwevende tegel';
+
+  @override
   String get unifiedFilterFuel => 'Brandstof';
 
   @override

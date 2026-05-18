@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Η καταγραφή συνεχίζεται στο παρασκήνιο. Πατήστε το κόκκινο banner στην κορυφή οποιασδήποτε οθόνης για επιστροφή.",
   "tripBannerOpenFromConsumptionTab": "Ανοίξτε το ενεργό ταξίδι από την καρτέλα Κατανάλωση",
   "tripRecordingUnpinnedWarning": "Καρφιτσώστε την οθόνη για να διατηρείτε το GPS ενεργό κατά τη διάρκεια του ταξιδιού — Το Android μπορεί να περιορίσει το GPS κατά την αδρανοποίηση.",
+  "tripRecordingMinimiseTooltip": "Σμίκρυνση σε πλωτό πλακίδιο",
   "unifiedFilterFuel": "Καύσιμο",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Και τα δύο",

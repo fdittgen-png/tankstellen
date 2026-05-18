@@ -5079,6 +5079,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Minimise to a floating tile';
+
+  @override
   String get unifiedFilterFuel => 'Fuel';
 
   @override
@@ -10457,6 +10460,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripRecordingUnpinnedWarning =>
       '⟦Ƥîñ ŧĥé šçřééñ ŧó ķééƥ ǦƤŠ áçŧîṽé đúřîñǧ ŧĥé ŧřîƥ — Áñđřóîđ ɱáý ŧĥřóŧŧłé ǦƤŠ đúřîñǧ šłééƥ. ································⟧';
+
+  @override
+  String get tripRecordingMinimiseTooltip =>
+      '⟦Ṁîñîɱîšé ŧó á ƒłóáŧîñǧ ŧîłé ··········⟧';
 
   @override
   String get unifiedFilterFuel => '⟦Ƒúéł ··⟧';

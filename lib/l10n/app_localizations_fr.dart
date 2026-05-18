@@ -5162,6 +5162,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Épinglez l\'écran pour garder le GPS actif pendant le trajet — Android peut limiter le GPS en veille.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Réduire en vignette flottante';
+
+  @override
   String get unifiedFilterFuel => 'Carburant';
 
   @override

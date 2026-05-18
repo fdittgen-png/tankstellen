@@ -5128,6 +5128,10 @@ class AppLocalizationsSk extends AppLocalizations {
       'Pripnite obrazovku pre udržanie GPS aktívneho počas jazdy — Android môže obmedziť GPS počas spánku.';
 
   @override
+  String get tripRecordingMinimiseTooltip =>
+      'Minimalizovať do plávajúcej dlaždice';
+
+  @override
   String get unifiedFilterFuel => 'Palivo';
 
   @override

@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "La registrazione continua in background. Tocca il banner rosso in cima a qualsiasi schermata per tornare.",
   "tripBannerOpenFromConsumptionTab": "Apri il percorso attivo dalla scheda Conso",
   "tripRecordingUnpinnedWarning": "Blocca lo schermo per mantenere il GPS attivo durante il percorso — Android potrebbe limitare il GPS durante la sospensione.",
+  "tripRecordingMinimiseTooltip": "Riduci a riquadro mobile",
   "unifiedFilterFuel": "Carburante",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Entrambi",

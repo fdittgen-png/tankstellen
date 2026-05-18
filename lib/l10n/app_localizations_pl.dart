@@ -5130,6 +5130,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Przypnij ekran, aby utrzymać GPS aktywny podczas trasy — Android może ograniczać GPS podczas uśpienia.';
 
   @override
+  String get tripRecordingMinimiseTooltip =>
+      'Zminimalizuj do pływającego kafelka';
+
+  @override
   String get unifiedFilterFuel => 'Paliwo';
 
   @override

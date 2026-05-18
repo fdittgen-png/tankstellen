@@ -5106,6 +5106,9 @@ class AppLocalizationsDa extends AppLocalizations {
       'Fastgør skærmen for at holde GPS aktiv under turen — Android kan begrænse GPS under søvn.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Minimér til en svævende flise';
+
+  @override
   String get unifiedFilterFuel => 'Brændstof';
 
   @override

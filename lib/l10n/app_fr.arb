@@ -832,6 +832,7 @@
   "tripBannerPaused": "Trajet en pause — toucher pour reprendre",
   "tripBannerOpenFromConsumptionTab": "Ouvrez le trajet actif depuis l'onglet Conso",
   "tripRecordingUnpinnedWarning": "Épinglez l'écran pour garder le GPS actif pendant le trajet — Android peut limiter le GPS en veille.",
+  "tripRecordingMinimiseTooltip": "Réduire en vignette flottante",
   "navConsumption": "Conso",
   "vehicleBaselineSectionTitle": "Calibrage de la baseline",
   "vehicleBaselineEmpty": "Aucun échantillon pour l'instant — lancez un trajet OBD2 pour commencer à apprendre le profil de consommation de ce véhicule.",

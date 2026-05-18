@@ -5104,6 +5104,9 @@ class AppLocalizationsNb extends AppLocalizations {
       'Fest skjermen for å holde GPS aktiv under turen – Android kan begrense GPS under dvale.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Minimer til en flytende rute';
+
+  @override
   String get unifiedFilterFuel => 'Drivstoff';
 
   @override

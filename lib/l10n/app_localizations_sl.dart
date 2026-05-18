@@ -5112,6 +5112,9 @@ class AppLocalizationsSl extends AppLocalizations {
       'Prikleni zaslon za ohranitev GPS-a med vožnjo — Android lahko med spanjem omeji GPS.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Pomanjšaj v lebdečo ploščico';
+
+  @override
   String get unifiedFilterFuel => 'Gorivo';
 
   @override

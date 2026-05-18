@@ -34,5 +34,9 @@
   "tripRecordingUnpinnedWarning": "Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.",
   "@tripRecordingUnpinnedWarning": {
     "description": "One-shot SnackBar shown the moment the user lands on the trip-recording screen with the pin toggle OFF (#1458 phase 2). Warns that without pinning, Android may suspend or throttle GPS while the screen sleeps and the captured path will show gaps."
+  },
+  "tripRecordingMinimiseTooltip": "Minimise to a floating tile",
+  "@tripRecordingMinimiseTooltip": {
+    "description": "Tooltip on the minimise (Picture-in-Picture) icon button on the trip-recording screen (#1884). Tapping shrinks the app into a small floating tile that keeps showing live consumption over other apps. Android-only."
   }
 }

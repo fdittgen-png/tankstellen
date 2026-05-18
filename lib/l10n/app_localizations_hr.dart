@@ -5123,6 +5123,9 @@ class AppLocalizationsHr extends AppLocalizations {
       'Prikačite ekran za održavanje GPS-a aktivnim za vrijeme vožnje — Android može ograničiti GPS za vrijeme spavanja.';
 
   @override
+  String get tripRecordingMinimiseTooltip => 'Smanji u plutajuću pločicu';
+
+  @override
   String get unifiedFilterFuel => 'Gorivo';
 
   @override

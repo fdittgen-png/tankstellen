@@ -5144,6 +5144,10 @@ class AppLocalizationsRo extends AppLocalizations {
       'Fixați ecranul pentru a menține GPS-ul activ în timpul călătoriei — Android poate reduce GPS-ul în somn.';
 
   @override
+  String get tripRecordingMinimiseTooltip =>
+      'Minimizează într-o casetă flotantă';
+
+  @override
   String get unifiedFilterFuel => 'Combustibil';
 
   @override

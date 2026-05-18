@@ -1505,6 +1505,7 @@
   "tripRecordingResumeHintMessage": "Tallennus jatkuu taustalla. Napauta yläosan punaista banneria millä tahansa näytöllä palataksesi.",
   "tripBannerOpenFromConsumptionTab": "Avaa aktiivinen matka Kulutus-välilehdeltä",
   "tripRecordingUnpinnedWarning": "Kiinnitä näyttö pitääksesi GPS aktiivisena matkan aikana — Android voi rajoittaa GPS:ää nukkuessa.",
+  "tripRecordingMinimiseTooltip": "Pienennä kelluvaksi ruuduksi",
   "unifiedFilterFuel": "Polttoaine",
   "unifiedFilterEv": "Sähköauto",
   "unifiedFilterBoth": "Molemmat",

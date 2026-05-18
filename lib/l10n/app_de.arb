@@ -2005,6 +2005,7 @@
   "tripRecordingResumeHintMessage": "Die Aufnahme läuft im Hintergrund weiter. Tippe oben auf das rote Banner, um zurückzukehren.",
   "tripBannerOpenFromConsumptionTab": "Aktive Fahrt aus dem Verbrauchs-Tab öffnen",
   "tripRecordingUnpinnedWarning": "Bildschirm anpinnen, damit das GPS während der Fahrt aktiv bleibt — Android kann das GPS im Ruhezustand drosseln.",
+  "tripRecordingMinimiseTooltip": "Als schwebende Kachel minimieren",
   "unifiedFilterFuel": "Kraftstoff",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Beide",
