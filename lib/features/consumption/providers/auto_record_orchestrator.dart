@@ -135,7 +135,7 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
       final wantedProfile = wanted[entry.key];
       if (wantedProfile == null) {
         toRemove.add(entry.key);
-      } else if (wantedProfile.pairedAdapterMac != entry.value.armedMac) {
+      } else if (wantedProfile.autoRecordAdapterMac != entry.value.armedMac) {
         // MAC changed — drop and let the add loop spin up a fresh
         // coordinator below.
         toRemove.add(entry.key);
@@ -177,13 +177,13 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     );
     if (!centralEnabled) return false;
     if (!p.autoRecord) return false;
-    final mac = p.pairedAdapterMac;
+    final mac = p.autoRecordAdapterMac;
     if (mac == null || mac.isEmpty) return false;
     return true;
   }
 
   _OrchestratorEntry? _buildEntry(VehicleProfile profile) {
-    final mac = profile.pairedAdapterMac;
+    final mac = profile.autoRecordAdapterMac;
     if (mac == null || mac.isEmpty) return null;
 
     final listenerFactory = ref.read(autoRecordListenerFactoryProvider);

@@ -164,15 +164,9 @@ class AutoRecordSection extends ConsumerWidget {
                 profile.copyWith(disconnectSaveDelaySec: v),
               ),
             ),
-            const SizedBox(height: 16),
-            _PairedAdapterRow(
-              mac: profile.pairedAdapterMac,
-              label: l?.autoRecordPairedAdapterLabel ?? 'Paired adapter',
-              empty: l?.autoRecordPairedAdapterNone ??
-                  'No adapter paired. Pair one via the OBD2 onboarding '
-                      'first.',
-              theme: theme,
-            ),
+            // #1949 — the adapter is shown once, on the canonical
+            // "Adaptateur OBD2" card; auto-record uses that same
+            // adapter, so no separate paired-adapter row here.
             const SizedBox(height: 16),
             _BackgroundLocationRow(
               consent: profile.backgroundLocationConsent,
@@ -206,10 +200,10 @@ class AutoRecordSection extends ConsumerWidget {
   /// Map the four real states the auto-record orchestrator gates on
   /// to the banner shown on this card (#1310). Mirrors
   /// `AutoRecordOrchestrator._isAutoRecordReady`: a vehicle is
-  /// "active" only when `pairedAdapterMac` is non-empty AND
+  /// "active" only when its OBD2 adapter MAC is non-empty AND
   /// `backgroundLocationConsent` is true.
   _AutoRecordStatus _statusFor(VehicleProfile profile) {
-    final mac = profile.pairedAdapterMac;
+    final mac = profile.autoRecordAdapterMac;
     if (mac == null || mac.isEmpty) {
       return _AutoRecordStatus.needsPairing;
     }
@@ -641,46 +635,6 @@ class _SaveDelaySlider extends StatelessWidget {
           value: v.toDouble(),
           onChanged: (next) => onChanged(next.round()),
         ),
-      ],
-    );
-  }
-}
-
-class _PairedAdapterRow extends StatelessWidget {
-  final String? mac;
-  final String label;
-  final String empty;
-  final ThemeData theme;
-
-  const _PairedAdapterRow({
-    required this.mac,
-    required this.label,
-    required this.empty,
-    required this.theme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final macText = mac;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: theme.textTheme.bodyMedium),
-        const SizedBox(height: 4),
-        if (macText != null && macText.isNotEmpty)
-          Text(
-            macText,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontFamily: 'monospace',
-            ),
-          )
-        else
-          Text(
-            empty,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
       ],
     );
   }
