@@ -254,10 +254,10 @@ void main() {
     });
   });
 
-  group('OnboardingObd2Step — pairedAdapterMac persistence (#1310)', () {
+  group('OnboardingObd2Step — obd2AdapterMac persistence (#1310)', () {
     testWidgets(
       'happy path: connect + VIN read + confirm → saved profile carries '
-      'the picked MAC on BOTH obd2AdapterMac AND pairedAdapterMac',
+      'the picked MAC on obd2AdapterMac',
       (tester) async {
         const pickedMac = 'AA:BB:CC:11:22:33';
         final service = _buildService();
@@ -297,22 +297,20 @@ void main() {
         await tester.pumpAndSettle();
 
         // Without the #1310 fix, the saved profile carried no MAC at
-        // all — the orchestrator's `pairedAdapterMac != null` gate
+        // all — the orchestrator's `obd2AdapterMac != null` gate
         // silently dropped the user.
         final vehicles = container.read(vehicleProfileListProvider);
         expect(vehicles, hasLength(1));
         final saved = vehicles.first;
-        expect(saved.pairedAdapterMac, pickedMac,
-            reason: 'auto-record orchestrator gates on pairedAdapterMac '
-                'being non-empty (#1310)');
         expect(saved.obd2AdapterMac, pickedMac,
-            reason: 'pinned-MAC fast path keys on obd2AdapterMac (#1188)');
+            reason: 'the pinned-MAC fast path and the auto-record '
+                'orchestrator both gate on obd2AdapterMac (#1188 / #1950)');
       },
     );
 
     testWidgets(
       'connector reports an empty MAC → saved profile leaves '
-      'pairedAdapterMac null (does not persist a bogus value)',
+      'obd2AdapterMac null (does not persist a bogus value)',
       (tester) async {
         final service = _buildService();
         final connector = _FakeConnector(
@@ -320,7 +318,7 @@ void main() {
           onReadVin: (_) async => '1HGCM82633A004352',
           pickedMac: '', // production picker always supplies a non-empty
           // id, but defensively the empty case must not write a bogus
-          // value into pairedAdapterMac.
+          // value into obd2AdapterMac.
         );
         final decoder = _StubDecoder(
           (vin) => VinData(
@@ -350,7 +348,6 @@ void main() {
         await tester.pumpAndSettle();
 
         final saved = container.read(vehicleProfileListProvider).first;
-        expect(saved.pairedAdapterMac, isNull);
         expect(saved.obd2AdapterMac, isNull);
       },
     );

@@ -261,7 +261,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     // #1226 — read the freshest persisted profile from the provider
     // and pass it as `existing:` so `buildProfile` can `copyWith` over
     // it. This preserves every non-form field (calibrationMode,
-    // pairedAdapterMac, autoRecord & friends, runtime-calibrated η_v,
+    // autoRecord & friends, runtime-calibrated η_v,
     // driving-stats aggregates, VIN-decode metadata, ...) verbatim and
     // closes the bug class behind #1217 / #1221 (which was a minimum-
     // scope thread-through for `calibrationMode` only).
@@ -377,11 +377,9 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
   /// editable.
   Future<void> _readVinFromCar() async {
     final l = AppLocalizations.of(context);
-    // #1339 — gate on the basic adapter-selection field
-    // (`obd2AdapterMac`, surfaced here as `_adapterMac`), NOT the
-    // auto-record `pairedAdapterMac` flag (#1004). VIN reading via
-    // Mode 09 PID 02 only needs an adapter to talk to; auto-record
-    // pairing is unrelated.
+    // #1339 — gate on the adapter-selection field (`obd2AdapterMac`,
+    // surfaced here as `_adapterMac`). VIN reading via Mode 09 PID 02
+    // only needs an adapter to talk to.
     final mac = _adapterMac;
     if (mac == null || mac.isEmpty) return;
 
@@ -652,10 +650,9 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
               // no adapter is selected we pass `onReadVinFromCar = null`
               // (which renders the button visibly disabled with a hint)
               // so users discover the feature even before pairing.
-              // #1339 — "selected" here is the basic `obd2AdapterMac`
-              // state (`_adapterMac`), NOT the auto-record
-              // `pairedAdapterMac` flag (#1004); VIN reading only needs
-              // an adapter to talk to.
+              // #1339 — "selected" here is the `obd2AdapterMac` state
+              // (`_adapterMac`); VIN reading only needs an adapter to
+              // talk to.
               adapterMac: _adapterMac,
               onReadVinFromCar:
                   (_adapterMac != null && _adapterMac!.isNotEmpty)

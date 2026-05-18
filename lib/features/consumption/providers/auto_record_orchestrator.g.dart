@@ -13,7 +13,7 @@ part of 'auto_record_orchestrator.dart';
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
-/// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
+/// `autoRecord: true` AND a non-null `obd2AdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
 /// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
 /// 2b-3), poll PID 0x0D for speed, and hand the live session to
@@ -24,7 +24,7 @@ part of 'auto_record_orchestrator.dart';
 ///
 /// 1. A vehicle that flips `autoRecord: false` (or removes its paired
 ///    MAC) gets its coordinator stopped and disposed.
-/// 2. A vehicle that changes its `pairedAdapterMac` gets the old
+/// 2. A vehicle that changes its `obd2AdapterMac` gets the old
 ///    coordinator stopped and a new one started for the new MAC — the
 ///    foreground service watches a single MAC at a time on the Kotlin
 ///    side, so re-arming is the only way to switch.
@@ -68,7 +68,7 @@ final autoRecordOrchestratorProvider = AutoRecordOrchestratorProvider._();
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
-/// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
+/// `autoRecord: true` AND a non-null `obd2AdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
 /// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
 /// 2b-3), poll PID 0x0D for speed, and hand the live session to
@@ -79,7 +79,7 @@ final autoRecordOrchestratorProvider = AutoRecordOrchestratorProvider._();
 ///
 /// 1. A vehicle that flips `autoRecord: false` (or removes its paired
 ///    MAC) gets its coordinator stopped and disposed.
-/// 2. A vehicle that changes its `pairedAdapterMac` gets the old
+/// 2. A vehicle that changes its `obd2AdapterMac` gets the old
 ///    coordinator stopped and a new one started for the new MAC — the
 ///    foreground service watches a single MAC at a time on the Kotlin
 ///    side, so re-arming is the only way to switch.
@@ -121,7 +121,7 @@ final class AutoRecordOrchestratorProvider
   /// Sits between [vehicleProfileListProvider] and the per-vehicle
   /// [AutoTripCoordinator]: watches the vehicle list for changes and
   /// keeps a long-lived coordinator alive for every profile that has
-  /// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
+  /// `autoRecord: true` AND a non-null `obd2AdapterMac`. The
   /// coordinator(s) in turn observe the native Android foreground service
   /// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
   /// 2b-3), poll PID 0x0D for speed, and hand the live session to
@@ -132,7 +132,7 @@ final class AutoRecordOrchestratorProvider
   ///
   /// 1. A vehicle that flips `autoRecord: false` (or removes its paired
   ///    MAC) gets its coordinator stopped and disposed.
-  /// 2. A vehicle that changes its `pairedAdapterMac` gets the old
+  /// 2. A vehicle that changes its `obd2AdapterMac` gets the old
   ///    coordinator stopped and a new one started for the new MAC — the
   ///    foreground service watches a single MAC at a time on the Kotlin
   ///    side, so re-arming is the only way to switch.
@@ -202,7 +202,7 @@ String _$autoRecordOrchestratorHash() =>
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
-/// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
+/// `autoRecord: true` AND a non-null `obd2AdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
 /// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
 /// 2b-3), poll PID 0x0D for speed, and hand the live session to
@@ -213,7 +213,7 @@ String _$autoRecordOrchestratorHash() =>
 ///
 /// 1. A vehicle that flips `autoRecord: false` (or removes its paired
 ///    MAC) gets its coordinator stopped and disposed.
-/// 2. A vehicle that changes its `pairedAdapterMac` gets the old
+/// 2. A vehicle that changes its `obd2AdapterMac` gets the old
 ///    coordinator stopped and a new one started for the new MAC — the
 ///    foreground service watches a single MAC at a time on the Kotlin
 ///    side, so re-arming is the only way to switch.

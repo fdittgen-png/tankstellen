@@ -397,7 +397,7 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: '00:11:22:33:44:55',
+            obd2AdapterMac: '00:11:22:33:44:55',
           ),
         ]);
         await _pumpSection(tester, vehicleId: 'v1', list: list);
@@ -430,7 +430,7 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: '00:11:22:33:44:55',
+            obd2AdapterMac: '00:11:22:33:44:55',
             backgroundLocationConsent: true,
           ),
         ]);
@@ -488,14 +488,14 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: 'DE:AD:BE:EF:00:01',
+            obd2AdapterMac: 'DE:AD:BE:EF:00:01',
           ),
           // active
           const VehicleProfile(
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: 'DE:AD:BE:EF:00:01',
+            obd2AdapterMac: 'DE:AD:BE:EF:00:01',
             backgroundLocationConsent: true,
           ),
         ];
@@ -583,7 +583,7 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: 'DE:AD:BE:EF:00:01',
+            obd2AdapterMac: 'DE:AD:BE:EF:00:01',
           ),
         ];
 
@@ -653,7 +653,7 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            obd2AdapterMac: 'AA:BB:CC:11:22:33',
             backgroundLocationConsent: true,
           ),
         ]);
@@ -710,7 +710,7 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            obd2AdapterMac: 'AA:BB:CC:11:22:33',
             backgroundLocationConsent: true,
           ),
         ]);
@@ -742,7 +742,7 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            obd2AdapterMac: 'AA:BB:CC:11:22:33',
             backgroundLocationConsent: true,
           ),
         ]);
@@ -788,7 +788,7 @@ void main() {
             id: 'v1',
             name: 'Golf',
             autoRecord: true,
-            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            obd2AdapterMac: 'AA:BB:CC:11:22:33',
             backgroundLocationConsent: true,
           ),
         ]);

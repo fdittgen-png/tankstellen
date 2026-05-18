@@ -144,7 +144,6 @@ class BackupXmlWriter {
 
       _writeOptionalText(builder, 'Obd2AdapterMac', v.obd2AdapterMac);
       _writeOptionalText(builder, 'Obd2AdapterName', v.obd2AdapterName);
-      _writeOptionalText(builder, 'PairedAdapterMac', v.pairedAdapterMac);
 
       _writeOptionalText(builder, 'Vin', v.vin);
       _writeText(builder, 'CalibrationMode', v.calibrationMode.key);

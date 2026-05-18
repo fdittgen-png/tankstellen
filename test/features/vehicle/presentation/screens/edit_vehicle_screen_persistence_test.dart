@@ -14,8 +14,8 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Architectural-correctness test for #1226: the edit-vehicle Save
 /// pathway must preserve every non-form field on the loaded
-/// [VehicleProfile] (calibrationMode, pairedAdapterMac, autoRecord
-/// and friends, runtime-calibrated η_v, runtime-cached driving-stats
+/// [VehicleProfile] (calibrationMode, autoRecord and friends,
+/// runtime-calibrated η_v, runtime-cached driving-stats
 /// aggregates, VIN-decode metadata, ...). Before this fix,
 /// `VehicleFormControllers.buildProfile` constructed a fresh
 /// `VehicleProfile(...)` and silently fell back to the freezed
@@ -52,7 +52,6 @@ void main() {
       id: 'v1',
       name: 'Car',
       calibrationMode: VehicleCalibrationMode.fuzzy,
-      pairedAdapterMac: 'AA:BB:CC:DD:EE:FF',
       autoRecord: true,
       movementStartThresholdKmh: 7.5,
       disconnectSaveDelaySec: 90,
@@ -108,8 +107,6 @@ void main() {
     // Every non-form field survives the round-trip via copyWith.
     expect(after.calibrationMode, VehicleCalibrationMode.fuzzy,
         reason: '#1217 / #1221 — must NOT revert to rule');
-    expect(after.pairedAdapterMac, 'AA:BB:CC:DD:EE:FF',
-        reason: '#1004 — long-lived adapter pairing must survive');
     expect(after.autoRecord, isTrue,
         reason: '#1004 phase 1 — hands-free toggle must survive');
     expect(after.movementStartThresholdKmh, 7.5,

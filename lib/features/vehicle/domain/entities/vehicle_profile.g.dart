@@ -69,7 +69,6 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
               json['calibrationMode'] as String?,
             ),
       autoRecord: json['autoRecord'] as bool? ?? false,
-      pairedAdapterMac: json['pairedAdapterMac'] as String?,
       movementStartThresholdKmh:
           (json['movementStartThresholdKmh'] as num?)?.toDouble() ?? 5.0,
       disconnectSaveDelaySec:
@@ -145,7 +144,6 @@ Map<String, dynamic> _$VehicleProfileToJson(
     instance.calibrationMode,
   ),
   'autoRecord': instance.autoRecord,
-  'pairedAdapterMac': instance.pairedAdapterMac,
   'movementStartThresholdKmh': instance.movementStartThresholdKmh,
   'disconnectSaveDelaySec': instance.disconnectSaveDelaySec,
   'backgroundLocationConsent': instance.backgroundLocationConsent,

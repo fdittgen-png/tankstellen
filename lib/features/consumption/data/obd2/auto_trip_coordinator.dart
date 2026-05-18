@@ -20,7 +20,7 @@ import 'obd2_speed_stream.dart';
 @immutable
 class AutoRecordConfig {
   /// MAC address of the paired ELM327 adapter, sourced from
-  /// `VehicleProfile.pairedAdapterMac`. The coordinator drops every
+  /// `VehicleProfile.obd2AdapterMac`. The coordinator drops every
   /// event whose MAC does not equal this string — the multi-vehicle
   /// case (a household with two paired cars) only treats the active
   /// profile's adapter as live.

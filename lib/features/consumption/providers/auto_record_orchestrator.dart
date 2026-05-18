@@ -22,7 +22,7 @@ part 'auto_record_orchestrator.g.dart';
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
-/// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
+/// `autoRecord: true` AND a non-null `obd2AdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
 /// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
 /// 2b-3), poll PID 0x0D for speed, and hand the live session to
@@ -33,7 +33,7 @@ part 'auto_record_orchestrator.g.dart';
 ///
 /// 1. A vehicle that flips `autoRecord: false` (or removes its paired
 ///    MAC) gets its coordinator stopped and disposed.
-/// 2. A vehicle that changes its `pairedAdapterMac` gets the old
+/// 2. A vehicle that changes its `obd2AdapterMac` gets the old
 ///    coordinator stopped and a new one started for the new MAC — the
 ///    foreground service watches a single MAC at a time on the Kotlin
 ///    side, so re-arming is the only way to switch.
@@ -265,7 +265,7 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
 }
 
 /// Bundle of a coordinator and the MAC it was armed against. Lets the
-/// orchestrator detect a `pairedAdapterMac` change cheaply — the
+/// orchestrator detect a `obd2AdapterMac` change cheaply — the
 /// `coordinator.config.mac` getter would also work, but caching here
 /// keeps the diff loop O(1) per vehicle without reaching through
 /// foreign objects.

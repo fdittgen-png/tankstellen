@@ -450,7 +450,6 @@ void main() {
         id: 'v1',
         name: 'old',
         calibrationMode: VehicleCalibrationMode.fuzzy,
-        pairedAdapterMac: 'AA:BB:CC:DD:EE:FF',
         autoRecord: true,
         movementStartThresholdKmh: 7.5,
         disconnectSaveDelaySec: 90,
@@ -477,7 +476,6 @@ void main() {
       expect(profile.name, 'Polo');
       // All non-form fields survive the round-trip.
       expect(profile.calibrationMode, VehicleCalibrationMode.fuzzy);
-      expect(profile.pairedAdapterMac, 'AA:BB:CC:DD:EE:FF');
       expect(profile.autoRecord, isTrue);
       expect(profile.movementStartThresholdKmh, 7.5);
       expect(profile.disconnectSaveDelaySec, 90);
@@ -605,7 +603,6 @@ void main() {
         connectors: {ConnectorType.ccs},
         adapterMac: 'mac',
         adapterName: 'name',
-        pairedAdapterMac: 'paired-mac',
         engineDisplacementCc: 1500,
         engineCylinders: 4,
         curbWeightKg: 1300,
@@ -616,7 +613,6 @@ void main() {
       expect(snapshot.connectors, {ConnectorType.ccs});
       expect(snapshot.adapterMac, 'mac');
       expect(snapshot.adapterName, 'name');
-      expect(snapshot.pairedAdapterMac, 'paired-mac');
       expect(snapshot.engineDisplacementCc, 1500);
       expect(snapshot.engineCylinders, 4);
       expect(snapshot.curbWeightKg, 1300);
