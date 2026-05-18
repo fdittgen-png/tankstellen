@@ -322,6 +322,35 @@ jobs:
       - name: Check startup time budget
         run: bash scripts/check_startup_budget.sh
 
+  # #1612 — end-to-end integration journeys. The files under
+  # `test/integration/` drive full vertical feature slices (OBD2 trip
+  # recording, fill-up + receipt-scan reconciliation, cross-device
+  # TankSync) wired with fakes only at the boundary. They are kept
+  # headless under `test/` rather than `integration_test/` — the
+  # latter forces an Android emulator, which would be slow and flaky —
+  # so this stays a fast, deterministic check. A dedicated job gives
+  # the integration suite a named CI signal; it is cheap (three small
+  # files) and `needs: [analyze]` so it fails fast on broken analysis.
+  integration:
+    needs: [analyze]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - name: Run end-to-end integration journeys
+        run: flutter test test/integration/
+
   # #1810 — security-scan / license-audit / dependency-check are pure
   # functions of `pubspec.*`. They skip on PRs that don't touch the
   # dependency set; master push + the weekly schedule always run them,
