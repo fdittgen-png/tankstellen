@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'harsh_event_detector.dart';
+
 /// One OBD2 sample tick — captured by the polling loop and fed into
 /// [TripRecorder] for metric accumulation.
 class TripSample {
@@ -202,20 +204,17 @@ class TripRecorder {
   /// RPM value above which the recorder clocks "high-RPM" time.
   final double highRpmThreshold;
 
-  /// Negative acceleration (m/s²) that triggers a harsh-brake count.
-  /// Stored as a positive number; comparison uses absolute value.
-  final double harshBrakeThresholdMps2;
-
-  /// Positive acceleration (m/s²) that triggers a harsh-accel count.
-  final double harshAccelThresholdMps2;
+  /// Detects harsh braking / acceleration from the speed stream. Kept
+  /// in its own class (#1922) so the speed derivative is re-sampled at
+  /// ~1 Hz — feeding it the raw 250 ms emit cadence used to inflate
+  /// the count ~4x.
+  final HarshEventDetector _harshDetector;
 
   TripSample? _previous;
   double _distanceKm = 0;
   double _maxRpm = 0;
   double _highRpmSeconds = 0;
   double _idleSeconds = 0;
-  int _harshBrakes = 0;
-  int _harshAccels = 0;
   double _fuelLiters = 0;
   bool _hadFuelRate = false;
   DateTime? _startedAt;
@@ -238,9 +237,12 @@ class TripRecorder {
 
   TripRecorder({
     this.highRpmThreshold = 3500,
-    this.harshBrakeThresholdMps2 = 3.5,
-    this.harshAccelThresholdMps2 = 3.0,
-  });
+    double harshBrakeThresholdMps2 = 3.5,
+    double harshAccelThresholdMps2 = 3.0,
+  }) : _harshDetector = HarshEventDetector(
+          brakeThresholdMps2: harshBrakeThresholdMps2,
+          accelThresholdMps2: harshAccelThresholdMps2,
+        );
 
   /// Feed one sample. Safe to call with arbitrary cadence; the
   /// recorder derives Δt internally.
@@ -248,6 +250,12 @@ class TripRecorder {
     _startedAt ??= sample.timestamp;
     _endedAt = sample.timestamp;
     _maxRpm = math.max(_maxRpm, sample.rpm);
+
+    // Harsh brake / accel — delegated to the detector, which
+    // re-samples speed at ~1 Hz so the 250 ms emit cadence cannot
+    // inflate the count (#1922). Fed every sample, including the
+    // first, so its anchor is seeded from trip start.
+    _harshDetector.onSample(sample.speedKmh, sample.timestamp);
 
     // Track coolant samples for the cold-start surcharge heuristic
     // (#1262 phase 2). Cars without PID 0x05 carry coolantTempC ==
@@ -295,16 +303,6 @@ class TripRecorder {
     // Idle time: engine on, car stationary for the whole interval.
     if (previous.speedKmh <= 0.5 && previous.rpm > 0) {
       _idleSeconds += dt;
-    }
-
-    // Harsh brake / accel: derivative of speed across the interval.
-    // Convert km/h → m/s by / 3.6.
-    final dvMps = (sample.speedKmh - previous.speedKmh) / 3.6;
-    final accelMps2 = dvMps / dt;
-    if (accelMps2 <= -harshBrakeThresholdMps2) {
-      _harshBrakes++;
-    } else if (accelMps2 >= harshAccelThresholdMps2) {
-      _harshAccels++;
     }
 
     // Fuel: integrate fuel rate across the interval. Only counts when
@@ -368,8 +366,8 @@ class TripRecorder {
       maxRpm: _maxRpm,
       highRpmSeconds: _highRpmSeconds,
       idleSeconds: _idleSeconds,
-      harshBrakes: _harshBrakes,
-      harshAccelerations: _harshAccels,
+      harshBrakes: _harshDetector.brakes,
+      harshAccelerations: _harshDetector.accelerations,
       avgLPer100Km: avgLPer100Km,
       fuelLitersConsumed: _hadFuelRate ? _fuelLiters : null,
       startedAt: _startedAt,
@@ -386,8 +384,7 @@ class TripRecorder {
     _maxRpm = 0;
     _highRpmSeconds = 0;
     _idleSeconds = 0;
-    _harshBrakes = 0;
-    _harshAccels = 0;
+    _harshDetector.reset();
     _fuelLiters = 0;
     _hadFuelRate = false;
     _startedAt = null;
