@@ -41,7 +41,20 @@ class VirtualOdometer {
   /// poisoning the total.
   final List<VirtualOdometerSample> samples;
 
-  const VirtualOdometer({required this.samples});
+  /// Maximum gap (seconds) between two adjacent samples that is still
+  /// integrated (#1927). A gap longer than this is a connection
+  /// dropout or a pause, not a measurement interval — bridging it with
+  /// `avgSpeed × dt` fabricates distance (a 20-minute hole added ~10 km
+  /// in a real backup). Pairs beyond this gap are skipped, so the
+  /// estimate honestly under-counts the lost stretch instead of
+  /// guessing it. Defaults to [double.infinity] — the pure integrator
+  /// caps nothing; the trip-recording path opts into a finite value.
+  final double maxGapSeconds;
+
+  const VirtualOdometer({
+    required this.samples,
+    this.maxGapSeconds = double.infinity,
+  });
 
   /// Trapezoidal integration of speed × dt over the captured
   /// [samples]. For each adjacent pair `(t_i, v_i)`, `(t_{i+1},
@@ -58,6 +71,8 @@ class VirtualOdometer {
   ///     a buffered tick out of order, and dropping the bad pair is
   ///     less damaging than negating a chunk of real distance.
   ///   - Samples with the same timestamp → skipped as above.
+  ///   - A gap longer than [maxGapSeconds] → the pair is skipped
+  ///     (#1927): a multi-minute dropout is not a measurement interval.
   double integrateKm() {
     if (samples.length < 2) return 0.0;
     var distanceKm = 0.0;
@@ -67,6 +82,7 @@ class VirtualOdometer {
       final dtSeconds = curr.timestamp.difference(prev.timestamp).inMicroseconds
           / Duration.microsecondsPerSecond;
       if (dtSeconds <= 0) continue; // skip non-monotonic pair
+      if (dtSeconds > maxGapSeconds) continue; // #1927 — skip a dropout gap
       final v1 = prev.speedKmh < 0 ? 0.0 : prev.speedKmh;
       final v2 = curr.speedKmh < 0 ? 0.0 : curr.speedKmh;
       final avgKmh = (v1 + v2) / 2.0;

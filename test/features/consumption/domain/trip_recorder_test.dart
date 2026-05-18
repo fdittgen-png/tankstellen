@@ -419,5 +419,87 @@ void main() {
       ));
       expect(strict.buildSummary().harshBrakes, 1);
     });
+
+    group('maxIntegrationGapSeconds dropout cap (#1927)', () {
+      test('distance and fuel are not integrated across an abnormal gap',
+          () {
+        final r = TripRecorder(maxIntegrationGapSeconds: 15);
+        final start = DateTime.utc(2026);
+        r.onSample(TripSample(
+            timestamp: start, speedKmh: 60, rpm: 2000, fuelRateLPerHour: 6));
+        // A 20-minute connection dropout — not 20 minutes of driving.
+        r.onSample(TripSample(
+          timestamp: start.add(const Duration(minutes: 20)),
+          speedKmh: 60,
+          rpm: 2000,
+          fuelRateLPerHour: 6,
+        ));
+        final s = r.buildSummary();
+        expect(s.distanceKm, 0,
+            reason: 'no distance may be fabricated across the gap');
+        expect(s.fuelLitersConsumed ?? 0, 0,
+            reason: 'no fuel may be fabricated across the gap');
+      });
+
+      test('a long gap does not inflate idle time', () {
+        final r = TripRecorder(maxIntegrationGapSeconds: 15);
+        final start = DateTime.utc(2026);
+        // Stationary, engine on — would clock as "idle" if integrated.
+        r.onSample(TripSample(timestamp: start, speedKmh: 0, rpm: 800));
+        r.onSample(TripSample(
+          timestamp: start.add(const Duration(minutes: 20)),
+          speedKmh: 0,
+          rpm: 800,
+        ));
+        expect(r.buildSummary().idleSeconds, 0);
+      });
+
+      test('intervals within the cap still integrate normally', () {
+        final r = TripRecorder(maxIntegrationGapSeconds: 15);
+        final start = DateTime.utc(2026);
+        r.onSample(TripSample(timestamp: start, speedKmh: 60, rpm: 2000));
+        r.onSample(TripSample(
+          timestamp: start.add(const Duration(seconds: 10)),
+          speedKmh: 60,
+          rpm: 2000,
+        ));
+        expect(r.buildSummary().distanceKm, closeTo(60 * 10 / 3600, 1e-6));
+      });
+
+      test('only the dropout interval is skipped — the rest integrates',
+          () {
+        final r = TripRecorder(maxIntegrationGapSeconds: 15);
+        final start = DateTime.utc(2026);
+        r.onSample(TripSample(timestamp: start, speedKmh: 60, rpm: 2000));
+        r.onSample(TripSample(
+            timestamp: start.add(const Duration(seconds: 10)),
+            speedKmh: 60,
+            rpm: 2000));
+        // 20-minute dropout, then driving resumes.
+        r.onSample(TripSample(
+            timestamp: start.add(const Duration(minutes: 20, seconds: 10)),
+            speedKmh: 60,
+            rpm: 2000));
+        r.onSample(TripSample(
+            timestamp: start.add(const Duration(minutes: 20, seconds: 20)),
+            speedKmh: 60,
+            rpm: 2000));
+        expect(r.buildSummary().distanceKm,
+            closeTo(2 * 60 * 10 / 3600, 1e-6));
+      });
+
+      test('the default (no cap) integrates any gap — unchanged behaviour',
+          () {
+        final r = TripRecorder();
+        final start = DateTime.utc(2026);
+        r.onSample(TripSample(timestamp: start, speedKmh: 60, rpm: 2000));
+        r.onSample(TripSample(
+          timestamp: start.add(const Duration(minutes: 20)),
+          speedKmh: 60,
+          rpm: 2000,
+        ));
+        expect(r.buildSummary().distanceKm, closeTo(60 * 20 / 60, 1e-6));
+      });
+    });
   });
 }
