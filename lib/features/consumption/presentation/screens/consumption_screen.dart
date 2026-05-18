@@ -173,6 +173,13 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
             icon: const Icon(Icons.eco_outlined),
             onPressed: () => context.push('/carbon'),
           ),
+        // #1946 — vehicle entry point in the consumption app bar.
+        IconButton(
+          key: const Key('open_vehicles'),
+          tooltip: l?.vehiclesMenuTitle ?? 'My vehicles',
+          icon: const Icon(Icons.directions_car_outlined),
+          onPressed: () => context.push('/vehicles'),
+        ),
         const SettingsAppBarAction(),
       ];
 

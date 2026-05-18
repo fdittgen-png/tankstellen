@@ -38,7 +38,8 @@ void main() {
       expect(find.text('Golf'), findsOneWidget);
       expect(find.textContaining('50'), findsOneWidget);
       expect(find.textContaining('Diesel'), findsOneWidget);
-      expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
+      // #1947 — combustion vehicles show a car icon, not a fuel pump.
+      expect(find.byIcon(Icons.directions_car), findsOneWidget);
     });
 
     testWidgets('shows active check when isActive', (tester) async {

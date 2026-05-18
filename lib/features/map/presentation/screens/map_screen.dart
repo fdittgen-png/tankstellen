@@ -7,7 +7,6 @@ import '../../../../app/current_shell_branch_provider.dart';
 import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../driving/presentation/widgets/driving_mode_fab.dart';
 import '../../../ev/presentation/widgets/ev_filter_chips.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
@@ -168,7 +167,6 @@ class _MapScreenState extends ConsumerState<MapScreen>
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
-      floatingActionButton: const DrivingModeFab(),
       body: Column(
         children: [
           if (isVisibleBranch && showEv) const EvFilterChips(),

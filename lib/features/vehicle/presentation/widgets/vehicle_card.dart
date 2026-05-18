@@ -32,7 +32,7 @@ class VehicleCard extends StatelessWidget {
       case VehicleType.hybrid:
         return Icons.directions_car_filled;
       case VehicleType.combustion:
-        return Icons.local_gas_station;
+        return Icons.directions_car;
     }
   }
 

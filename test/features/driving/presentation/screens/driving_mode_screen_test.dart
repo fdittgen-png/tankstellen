@@ -8,7 +8,6 @@ import 'package:tankstellen/features/driving/presentation/widgets/driving_bottom
 import 'package:tankstellen/features/driving/presentation/widgets/driving_station_sheet.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/safety_disclaimer_dialog.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_marker_builder.dart';
-import 'package:tankstellen/features/driving/presentation/widgets/driving_mode_fab.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -311,15 +310,6 @@ void main() {
 
       expect(marker.width, 150);
       expect(marker.height, 62);
-    });
-  });
-
-  group('DrivingModeFab', () {
-    testWidgets('renders FAB with drive icon', (tester) async {
-      await pumpApp(tester, const DrivingModeFab());
-
-      expect(find.byIcon(Icons.drive_eta), findsOneWidget);
-      expect(find.byType(FloatingActionButton), findsOneWidget);
     });
   });
 
