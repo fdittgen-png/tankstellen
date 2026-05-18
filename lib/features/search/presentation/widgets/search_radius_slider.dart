@@ -40,13 +40,22 @@ class SearchRadiusSlider extends StatelessWidget {
             ),
           ],
         ),
-        Slider(
-          value: radiusKm.clamp(minKm, maxKm),
-          min: minKm,
-          max: maxKm,
-          divisions: divisions,
-          label: '${radiusKm.round()} km',
-          onChanged: onChanged,
+        // #1962 — shrink the slider's reaction overlay so the control
+        // takes far less vertical space in the compact criteria form
+        // (the default 24 dp overlay inflates the row to ~48 dp).
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            overlayShape:
+                const RoundSliderOverlayShape(overlayRadius: 14),
+          ),
+          child: Slider(
+            value: radiusKm.clamp(minKm, maxKm),
+            min: minKm,
+            max: maxKm,
+            divisions: divisions,
+            label: '${radiusKm.round()} km',
+            onChanged: onChanged,
+          ),
         ),
       ],
     );
