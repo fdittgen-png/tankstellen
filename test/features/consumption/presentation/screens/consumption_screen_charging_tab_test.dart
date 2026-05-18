@@ -79,8 +79,20 @@ void main() {
       // #923 phase 3a — tabs now come from the canonical `TabSwitcher`
       // widget whose `TabSwitcherEntry` contract has no `key:` field,
       // so we assert on the localised label text instead.
-      expect(find.text('Fuel'), findsOneWidget);
-      expect(find.text('Charging'), findsOneWidget);
+      // #1901 — the Fuel section AppBar title is also 'Fuel', so scope
+      // the tab-label assertions to the `Tab` widgets themselves.
+      expect(
+        find.descendant(of: find.byType(Tab), matching: find.text('Fuel')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+            of: find.byType(Tab), matching: find.text('Charging')),
+        findsOneWidget,
+      );
+      // The Fuel/Charging switcher has exactly two entries (#1901 —
+      // Trajets is no longer a tab of this screen).
+      expect(find.byType(Tab), findsNWidgets(2));
     });
 
     testWidgets('Fuel tab shows its empty state with 0 fill-ups',

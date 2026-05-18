@@ -4,10 +4,12 @@ import 'package:tankstellen/app/routes/shell_branches.dart';
 
 void main() {
   group('shellBranches', () {
-    test('returns exactly 5 branches', () {
+    test('returns exactly 6 branches', () {
+      // #1901 — Carburant and Trajets are now separate destinations,
+      // so the router registers 6 branches (Trajets appended last).
       // Guards against accidental reorder/insert — the bottom-nav
       // depends on this length matching the destinations list.
-      expect(shellBranches.length, 5);
+      expect(shellBranches.length, 6);
     });
 
     test('branch 0 route path is "/"', () {
@@ -39,6 +41,14 @@ void main() {
     test('branch 4 route path is "/profile"', () {
       final route = shellBranches[4].routes.single as GoRoute;
       expect(route.path, '/profile');
+    });
+
+    test('branch 5 route path is "/trajets-tab" (#1901)', () {
+      // #1901 — Trajets is its own destination, appended after Profile
+      // so Profile keeps branch index 4. Path stays distinct from the
+      // `/consumption-tab` Carburant branch.
+      final route = shellBranches[5].routes.single as GoRoute;
+      expect(route.path, '/trajets-tab');
     });
 
     test('every branch has exactly one route', () {

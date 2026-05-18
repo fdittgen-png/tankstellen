@@ -158,6 +158,16 @@ void main() {
                   ),
                 ],
               ),
+              // #1901 — Trajets is its own branch (index 5).
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/trajets-tab',
+                    builder: (context, state) =>
+                        const Center(child: Text('TrajetsScreen')),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -315,6 +325,16 @@ void main() {
                   ),
                 ],
               ),
+              // #1901 — Trajets is its own branch (index 5).
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/trajets-tab',
+                    builder: (context, state) =>
+                        const Center(child: Text('TrajetsScreen')),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -335,10 +355,13 @@ void main() {
 
       // Each bottom-bar nav item carries a Semantics label. Settings
       // is no longer a tab (#1874) — it lives in the app bar.
+      // #1901 — Consumption split into Carburant ('Fuel') and Trajets
+      // ('Trips'); the Full profile flags surface both.
       expect(find.bySemanticsLabel('Search'), findsOneWidget);
       expect(find.bySemanticsLabel('Map'), findsOneWidget);
       expect(find.bySemanticsLabel('Favorites'), findsOneWidget);
-      expect(find.bySemanticsLabel('Consumption'), findsOneWidget);
+      expect(find.bySemanticsLabel('Fuel'), findsOneWidget);
+      expect(find.bySemanticsLabel('Trips'), findsOneWidget);
 
       handle.dispose();
     });
