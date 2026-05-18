@@ -38,9 +38,9 @@ class ShellDestinations {
 /// other destinations flank it. Consumption is now **two** separate
 /// destinations, Carburant and Trajets (#1901):
 ///
-///   * Conso off:            `Map · [Search] · Favorites`
-///   * Fuel-only mode:       `Map · Favorites · [Search] · Carburant`
-///   * Fuel + Trips mode:    `Map · Favorites · [Search] · Carburant · Trajets`
+///   * Conso off:            `Favorites · [Search] · Map`
+///   * Fuel-only mode:       `Favorites · Map · [Search] · Carburant`
+///   * Fuel + Trips mode:    `Favorites · Map · [Search] · Carburant · Trajets`
 ///
 /// Settings is **not** a tab — it lives in the top-right app bar
 /// (`SettingsAppBarAction`), reached via router branch 4 (`/profile`).
@@ -89,18 +89,18 @@ ShellDestinations resolveShellDestinations({
 
   if (!showConsumption) {
     return ShellDestinations(
-      items: [map, search, favorites],
-      branchForSlot: const [1, 0, 2],
+      items: [favorites, search, map],
+      branchForSlot: const [2, 0, 1],
     );
   }
   if (!showTrajets) {
     return ShellDestinations(
-      items: [map, favorites, search, carburant],
-      branchForSlot: const [1, 2, 0, 3],
+      items: [favorites, map, search, carburant],
+      branchForSlot: const [2, 1, 0, 3],
     );
   }
   return ShellDestinations(
-    items: [map, favorites, search, carburant, trajets],
-    branchForSlot: const [1, 2, 0, 3, kTrajetsBranchIndex],
+    items: [favorites, map, search, carburant, trajets],
+    branchForSlot: const [2, 1, 0, 3, kTrajetsBranchIndex],
   );
 }

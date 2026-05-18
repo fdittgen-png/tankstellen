@@ -28,9 +28,9 @@ void main() {
         );
 
         expect(result.items, hasLength(3));
-        expect(result.branchForSlot, [1, 0, 2]);
+        expect(result.branchForSlot, [2, 0, 1]);
         expect(result.items.map((i) => i.label).toList(),
-            ['Map', 'Search', 'Favorites']);
+            ['Favorites', 'Search', 'Map']);
 
         // No fuel-station / route icon in the visible items list.
         for (final item in result.items) {
@@ -41,7 +41,7 @@ void main() {
     );
 
     test(
-      'fuel-only mode → Map · Favorites · [Search] · Carburant '
+      'fuel-only mode → Favorites · Map · [Search] · Carburant '
       '(#1901: Trajets hidden)',
       () {
         final result = resolveShellDestinations(
@@ -53,9 +53,9 @@ void main() {
         expect(result.items, hasLength(4));
         // Visual slots map back to router branches Search=0, Map=1,
         // Favorites=2, Carburant=3.
-        expect(result.branchForSlot, [1, 2, 0, 3]);
+        expect(result.branchForSlot, [2, 1, 0, 3]);
         expect(result.items.map((i) => i.label).toList(),
-            ['Map', 'Favorites', 'Search', 'Fuel']);
+            ['Favorites', 'Map', 'Search', 'Fuel']);
 
         // Carburant item carries the fuel-station icon.
         expect(result.items[3].outlinedIcon, Icons.local_gas_station_outlined);
@@ -69,7 +69,7 @@ void main() {
     );
 
     test(
-      'fuel + trips mode → Map · Favorites · [Search] · Carburant · Trajets '
+      'fuel + trips mode → Favorites · Map · [Search] · Carburant · Trajets '
       '(#1901)',
       () {
         final result = resolveShellDestinations(
@@ -80,9 +80,9 @@ void main() {
 
         expect(result.items, hasLength(5));
         // Search=0, Map=1, Favorites=2, Carburant=3, Trajets=5.
-        expect(result.branchForSlot, [1, 2, 0, 3, kTrajetsBranchIndex]);
+        expect(result.branchForSlot, [2, 1, 0, 3, kTrajetsBranchIndex]);
         expect(result.items.map((i) => i.label).toList(),
-            ['Map', 'Favorites', 'Search', 'Fuel', 'Trips']);
+            ['Favorites', 'Map', 'Search', 'Fuel', 'Trips']);
 
         // Carburant carries the fuel-station icon, Trajets the route icon.
         expect(result.items[3].outlinedIcon, Icons.local_gas_station_outlined);
@@ -140,7 +140,7 @@ void main() {
         showTrajets: true,
       );
       expect(result.items.map((i) => i.label).toList(),
-          ['Map', 'Favorites', 'Search', 'Fuel', 'Trips']);
+          ['Favorites', 'Map', 'Search', 'Fuel', 'Trips']);
     });
 
     test('the Carburant slot routes to kConsumptionBranchIndex', () {
