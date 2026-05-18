@@ -160,6 +160,12 @@ void main() {
           at: start.add(Duration(seconds: i)),
           fuelRateLPerHour: 5.5,
         );
+        // Feed the virtual odometer so the summary clears the #1923
+        // 0 km stub-discard floor in `_saveToHistory`.
+        ctl.debugRecordSpeedSample(
+          speedKmh: 40 + i.toDouble(),
+          at: start.add(Duration(seconds: i)),
+        );
         ctl.debugCaptureSample(TripSample(
           timestamp: start.add(Duration(seconds: i)),
           speedKmh: 40 + i.toDouble(),
