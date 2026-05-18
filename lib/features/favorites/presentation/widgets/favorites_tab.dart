@@ -4,12 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../providers/favorites_provider.dart';
 import '../../providers/merged_favorites_provider.dart';
-import 'ev_favorite_card.dart';
+import 'ev_favorite_dismissible.dart';
 import 'favorite_station_dismissible.dart';
 import 'favorites_loading_view.dart';
 import 'swipe_tutorial_banner.dart';
@@ -76,22 +75,10 @@ class FavoritesTab extends ConsumerWidget {
                     return switch (item) {
                       FuelStationResult(:final station) =>
                         FavoriteStationDismissible(station: station),
-                      EVStationResult(:final station) => EvFavoriteCard(
-                          key: ValueKey('ev-${station.id}'),
-                          station: station,
-                          onTap: () =>
-                              context.push('/ev-station', extra: station),
-                          onFavoriteTap: () {
-                            ref
-                                .read(favoritesProvider.notifier)
-                                .remove(station.id);
-                            SnackBarHelper.show(
-                              context,
-                              l10n?.removedFromFavorites ??
-                                  'Removed from favorites',
-                            );
-                          },
-                        ),
+                      // #1958 — EV favorites now swipe just like
+                      // fuel-station favorites (navigate / remove).
+                      EVStationResult(:final station) =>
+                        EvFavoriteDismissible(station: station),
                     };
                   },
                 ),
