@@ -1091,10 +1091,16 @@ class TripRecording extends _$TripRecording {
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
   }) async {
-    // Skip empty trips — the user tapped Stop without any usable
-    // sample, or the service disconnected immediately. No signal, no
-    // history clutter.
-    if (summary.distanceKm < 0.01 && summary.startedAt == null) return;
+    // Skip stub trips so they never clutter history (#1923). A trip is
+    // a stub when the recorder never received a sample (`startedAt`
+    // null — service disconnected immediately) OR it covered no
+    // distance (a false-start: Stop tapped, or the adapter dropped,
+    // before the car moved). The pre-#1923 guard required *both* —
+    // `distanceKm < 0.01 && startedAt == null` — so a 20-second 0 km
+    // false-start that did capture a few idle samples still landed in
+    // history. A real trip always has both a `startedAt` and a
+    // non-zero distance, so this never discards a genuine drive.
+    if (summary.startedAt == null || summary.distanceKm < 0.01) return;
     try {
       final repo = ref.read(tripHistoryRepositoryProvider);
       if (repo == null) return;

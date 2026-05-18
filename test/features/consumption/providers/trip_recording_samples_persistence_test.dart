@@ -121,14 +121,19 @@ void main() {
           rpm: 1800 + i * 5,
           fuelRateLPerHour: 5.5,
         );
-        // Feed the recorder so the resulting summary has a startedAt
-        // and a non-zero distance — without this _saveToHistory
-        // short-circuits as an "empty" trip.
+        // Feed the recorder so the resulting summary has a startedAt;
+        // feed the virtual odometer so it has a non-zero distance —
+        // without both, `_saveToHistory` discards it as a stub trip
+        // (#1923).
         ctl!.debugInjectSample(
           speedKmh: sample.speedKmh,
           rpm: sample.rpm,
           at: sample.timestamp,
           fuelRateLPerHour: sample.fuelRateLPerHour,
+        );
+        ctl.debugRecordSpeedSample(
+          speedKmh: sample.speedKmh,
+          at: sample.timestamp,
         );
         // Capture the same sample into the per-tick buffer that the
         // chart layer reads back at display time.

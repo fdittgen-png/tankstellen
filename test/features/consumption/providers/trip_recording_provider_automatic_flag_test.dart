@@ -68,6 +68,12 @@ void main() {
         at: start.add(Duration(seconds: i)),
         fuelRateLPerHour: 6.0,
       );
+      // Feed the virtual odometer so the summary clears the #1923
+      // 0 km stub-discard floor in `_saveToHistory`.
+      ctl.debugRecordSpeedSample(
+        speedKmh: 50 + i.toDouble(),
+        at: start.add(Duration(seconds: i)),
+      );
     }
     await stopper(notifier);
 
@@ -159,6 +165,12 @@ void main() {
           at: start.add(Duration(seconds: i)),
           fuelRateLPerHour: 6.0,
         );
+        // Feed the virtual odometer so the summary clears the #1923
+        // 0 km stub-discard floor in `_saveToHistory`.
+        ctl.debugRecordSpeedSample(
+          speedKmh: 50 + i.toDouble(),
+          at: start.add(Duration(seconds: i)),
+        );
       }
       await notifier.stopAndSaveAutomatic();
 
@@ -191,6 +203,12 @@ void main() {
           rpm: 2000 + i * 10,
           at: start.add(Duration(seconds: i)),
           fuelRateLPerHour: 6.0,
+        );
+        // Feed the virtual odometer so the summary clears the #1923
+        // 0 km stub-discard floor in `_saveToHistory`.
+        ctl.debugRecordSpeedSample(
+          speedKmh: 50 + i.toDouble(),
+          at: start.add(Duration(seconds: i)),
         );
       }
       await notifier.stop();
