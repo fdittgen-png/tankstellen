@@ -36,6 +36,7 @@ import '../features/consumption/data/obd2/paused_trip_repository.dart';
 import '../features/consumption/data/trip_history_repository.dart';
 import '../features/consumption/providers/auto_record_orchestrator.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
+import '../features/consumption/providers/trip_ve_recompute_provider.dart';
 import '../features/feature_management/application/legacy_toggle_migration_provider.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
@@ -185,6 +186,20 @@ class AppInitializer {
       } catch (e, st) {
         debugPrint(
             'AppInitializer: legacyToggleMigration kick-off failed: $e\n$st');
+      }
+    });
+
+    // #1858 — instantiate the keep-alive η_v recompute listener so it
+    // is watching vehicle-profile edits before the user can reach the
+    // Edit-vehicle screen. Reading the provider triggers its `build`,
+    // which wires the `ref.listen`; deferred because no η_v edit can
+    // happen until well after first frame.
+    _deferPostFirstFrame(() async {
+      try {
+        container.read(tripVeRecomputeListenerProvider);
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: η_v recompute listener kick-off failed: $e\n$st');
       }
     });
 

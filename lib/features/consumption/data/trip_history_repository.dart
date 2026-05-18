@@ -81,6 +81,22 @@ class TripHistoryEntry {
     this.gpsSampleDiagnostics = const [],
   });
 
+  /// Returns a copy with the given fields replaced (#1858). The
+  /// retroactive η_v recompute uses it to swap in a rescaled [summary]
+  /// while leaving the id / vehicle / samples / adapter identity
+  /// untouched.
+  TripHistoryEntry copyWith({TripSummary? summary}) => TripHistoryEntry(
+        id: id,
+        vehicleId: vehicleId,
+        summary: summary ?? this.summary,
+        automatic: automatic,
+        samples: samples,
+        adapterMac: adapterMac,
+        adapterName: adapterName,
+        adapterFirmware: adapterFirmware,
+        gpsSampleDiagnostics: gpsSampleDiagnostics,
+      );
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'vehicleId': vehicleId,

@@ -145,6 +145,48 @@ class TripSummary {
     this.fuelRateSuspect = false,
     this.volumetricEfficiencyUsed,
   });
+
+  /// Returns a copy with the given fields replaced (#1858). Used by the
+  /// retroactive η_v recompute to rescale `fuelLitersConsumed` /
+  /// `avgLPer100Km` and re-stamp `volumetricEfficiencyUsed`. A passed
+  /// null keeps the existing value — the recompute never needs to
+  /// *clear* a field, so the simple form is sufficient.
+  TripSummary copyWith({
+    double? distanceKm,
+    double? maxRpm,
+    double? highRpmSeconds,
+    double? idleSeconds,
+    int? harshBrakes,
+    int? harshAccelerations,
+    double? avgLPer100Km,
+    double? fuelLitersConsumed,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    String? distanceSource,
+    bool? coldStartSurcharge,
+    double? secondsBelowOptimalGear,
+    bool? fuelRateSuspect,
+    double? volumetricEfficiencyUsed,
+  }) =>
+      TripSummary(
+        distanceKm: distanceKm ?? this.distanceKm,
+        maxRpm: maxRpm ?? this.maxRpm,
+        highRpmSeconds: highRpmSeconds ?? this.highRpmSeconds,
+        idleSeconds: idleSeconds ?? this.idleSeconds,
+        harshBrakes: harshBrakes ?? this.harshBrakes,
+        harshAccelerations: harshAccelerations ?? this.harshAccelerations,
+        avgLPer100Km: avgLPer100Km ?? this.avgLPer100Km,
+        fuelLitersConsumed: fuelLitersConsumed ?? this.fuelLitersConsumed,
+        startedAt: startedAt ?? this.startedAt,
+        endedAt: endedAt ?? this.endedAt,
+        distanceSource: distanceSource ?? this.distanceSource,
+        coldStartSurcharge: coldStartSurcharge ?? this.coldStartSurcharge,
+        secondsBelowOptimalGear:
+            secondsBelowOptimalGear ?? this.secondsBelowOptimalGear,
+        fuelRateSuspect: fuelRateSuspect ?? this.fuelRateSuspect,
+        volumetricEfficiencyUsed:
+            volumetricEfficiencyUsed ?? this.volumetricEfficiencyUsed,
+      );
 }
 
 /// Pure-logic accumulator that turns a stream of OBD2 [TripSample]s
