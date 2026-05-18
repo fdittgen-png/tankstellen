@@ -515,10 +515,11 @@ class TripRecordingController {
   /// only lives at the provider seam, which keeps unit-testing the
   /// controller cheap (no Geolocator mocks required) and lets the
   /// flag-off path skip the plugin entirely.
-  void updateGpsFix({double? latitude, double? longitude}) {
+  void updateGpsFix({double? latitude, double? longitude, double? altitudeM}) {
     _liveSampleSnapshot.updateGpsFix(
       latitude: latitude,
       longitude: longitude,
+      altitudeM: altitudeM,
     );
   }
 
@@ -579,6 +580,12 @@ class TripRecordingController {
   /// [debugLatestLatitude].
   @visibleForTesting
   double? get debugLatestLongitude => _liveSampleSnapshot.latestLongitude;
+
+  /// Read-only snapshot of the most recent GPS altitude (metres) pushed
+  /// in via [updateGpsFix] (#1935 child A). Same caveats as
+  /// [debugLatestLatitude].
+  @visibleForTesting
+  double? get debugLatestAltitudeM => _liveSampleSnapshot.latestAltitudeM;
 
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
   /// identity; subsequent ticks are scheduled per-PID by
@@ -1277,11 +1284,13 @@ class TripRecordingController {
         engineLoadPercent: engineLoadPercent,
         coolantTempC: coolantTempC,
         // #1374 phase 1 — stamp the most recent GPS fix when the
-        // provider has pushed one in. Both fields stay null when the
+        // provider has pushed one in. The fields stay null when the
         // feature flag is off (no Geolocator subscription was ever
-        // started) or before the first fix lands.
+        // started) or before the first fix lands. Altitude added in
+        // #1935 child A for the road-grade calculator.
         latitude: snap.latestLatitude,
         longitude: snap.latestLongitude,
+        altitudeM: snap.latestAltitudeM,
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;

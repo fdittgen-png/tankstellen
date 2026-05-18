@@ -263,6 +263,52 @@ void main() {
       expect(loaded.first.samples.first.fuelRateLPerHour, 4.2);
     });
 
+    test('sample with GPS altitude round-trips through save / loadAll '
+        '(#1935 child A)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 18);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: start.add(const Duration(seconds: 5)),
+            speedKmh: 60,
+            rpm: 2000,
+            latitude: 45.1,
+            longitude: 6.2,
+            altitudeM: 318.4,
+          ),
+        ],
+      ));
+
+      final sample = repo.loadAll().first.samples.first;
+      expect(sample.altitudeM, 318.4);
+      // The sibling GPS fields still round-trip alongside it.
+      expect(sample.latitude, 45.1);
+      expect(sample.longitude, 6.2);
+    });
+
+    test('a legacy sample with no altitude key deserialises altitudeM '
+        'null (#1935 child A)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 18, 1);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: start.add(const Duration(seconds: 5)),
+            speedKmh: 60,
+            rpm: 2000,
+          ),
+        ],
+      ));
+      expect(repo.loadAll().first.samples.first.altitudeM, isNull);
+    });
+
     test(
         'sample with null throttle does NOT include the "th" key in stored '
         'JSON — matches the parsimony rule the "f" key already follows',

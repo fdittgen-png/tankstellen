@@ -48,6 +48,13 @@ class TripSample {
   /// — a half-set fix is meaningless on a map.
   final double? longitude;
 
+  /// GPS altitude in metres (#1935 child A — epic #1935). Same
+  /// null-semantics as [latitude]/[longitude]: null when the
+  /// `Feature.gpsTripPath` flag is off, before the first fix, or when
+  /// the platform reports no altitude. Captured so the road-grade
+  /// calculator (#1941) can derive the trip's slope.
+  final double? altitudeM;
+
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
@@ -58,6 +65,7 @@ class TripSample {
     this.coolantTempC,
     this.latitude,
     this.longitude,
+    this.altitudeM,
   });
 }
 
