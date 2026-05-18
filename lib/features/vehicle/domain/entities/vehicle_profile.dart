@@ -407,3 +407,19 @@ class ConnectorTypeSetConverter
   List<String> toJson(Set<ConnectorType> object) =>
       object.map((c) => c.key).toList();
 }
+
+/// Adapter-MAC resolution for the hands-free auto-record flow (#1949).
+extension VehicleProfileAutoRecordAdapter on VehicleProfile {
+  /// The OBD2 adapter MAC auto-record arms on.
+  ///
+  /// Prefers the vehicle's configured [obd2AdapterMac]; falls back to
+  /// the legacy [pairedAdapterMac] for a vehicle paired before the two
+  /// MACs were consolidated. #1950 (PR 2) drops `pairedAdapterMac` and
+  /// this fallback once a migration has copied any paired-only MAC
+  /// across.
+  String? get autoRecordAdapterMac {
+    final obd2 = obd2AdapterMac;
+    if (obd2 != null && obd2.isNotEmpty) return obd2;
+    return pairedAdapterMac;
+  }
+}

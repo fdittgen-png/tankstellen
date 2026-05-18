@@ -159,34 +159,10 @@ void main() {
       expect(list.savedProfiles.single.name, 'Golf');
     });
 
-    testWidgets('paired adapter MAC renders monospace; missing renders hint',
-        (tester) async {
-      // No paired MAC — empty hint visible.
-      final list = _FakeVehicleProfileList([
-        const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
-      ]);
-      await _pumpSection(tester, vehicleId: 'v1', list: list);
-
-      expect(
-        find.textContaining('No adapter paired'),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('paired adapter MAC is shown when set', (tester) async {
-      final list = _FakeVehicleProfileList([
-        const VehicleProfile(
-          id: 'v1',
-          name: 'Golf',
-          autoRecord: true,
-          pairedAdapterMac: 'AA:BB:CC:11:22:33',
-        ),
-      ]);
-      await _pumpSection(tester, vehicleId: 'v1', list: list);
-
-      expect(find.text('AA:BB:CC:11:22:33'), findsOneWidget);
-      expect(find.textContaining('No adapter paired'), findsNothing);
-    });
+    // #1949 — the auto-record section no longer renders a separate
+    // paired-adapter row; the adapter is shown once on the canonical
+    // "Adaptateur OBD2" card. The two tests that asserted that row are
+    // removed with it.
 
     testWidgets(
       'background-location request button is hidden when consent is true',

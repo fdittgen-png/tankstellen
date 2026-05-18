@@ -57,7 +57,9 @@ class AutoRecordConfig {
   factory AutoRecordConfig.fromProfile(VehicleProfile profile) {
     return AutoRecordConfig(
       autoRecord: profile.autoRecord,
-      pairedAdapterMac: profile.pairedAdapterMac,
+      // #1949 — auto-record arms on the vehicle's obd2AdapterMac,
+      // falling back to the legacy pairedAdapterMac.
+      pairedAdapterMac: profile.autoRecordAdapterMac,
       movementStartThresholdKmh: profile.movementStartThresholdKmh,
       disconnectSaveDelaySec: profile.disconnectSaveDelaySec,
       backgroundLocationConsent: profile.backgroundLocationConsent,
