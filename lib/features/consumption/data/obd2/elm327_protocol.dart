@@ -44,6 +44,7 @@ class Elm327Protocol {
   static const autoProtocolCommand = Elm327Commands.autoProtocolCommand;
   static const lineFeedsOffCommand = Elm327Commands.lineFeedsOffCommand;
   static const headersOffCommand = Elm327Commands.headersOffCommand;
+  static const adaptiveTimingCommand = Elm327Commands.adaptiveTimingCommand;
   static const initCommands = Elm327Commands.initCommands;
 
   // ---------------------------------------------------------------------------

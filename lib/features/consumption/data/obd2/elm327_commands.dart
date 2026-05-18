@@ -104,13 +104,24 @@ class Elm327Commands {
   /// Turn off headers in responses.
   static const headersOffCommand = 'ATH0\r';
 
-  /// Standard initialization sequence for a new connection.
+  /// Enable aggressive adaptive timing (#1904). `ATAT2` lets the
+  /// ELM327 shorten its per-request timeout when the ECU is answering
+  /// quickly and *extend* it when a slow ECU needs more time — a fixed
+  /// timeout either wastes time or cuts a slow reply short, and the
+  /// latter shows up as a dropped read. Adaptive timing measurably
+  /// cuts spurious mid-trip drops.
+  static const adaptiveTimingCommand = 'ATAT2\r';
+
+  /// Standard initialization sequence for a new connection. `ATAT2` is
+  /// sent last, after the protocol is selected, so the adaptive-timing
+  /// algorithm is in effect for the very first OBD request.
   static const initCommands = [
     resetCommand,
     echoOffCommand,
     lineFeedsOffCommand,
     headersOffCommand,
     autoProtocolCommand,
+    adaptiveTimingCommand,
   ];
 
   // ---------------------------------------------------------------------------

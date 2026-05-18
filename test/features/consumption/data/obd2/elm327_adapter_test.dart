@@ -67,6 +67,7 @@ void main() {
         'ATL0\r',
         'ATH0\r',
         'ATSP0\r',
+        'ATAT2\r', // #1904 — aggressive adaptive timing
       ]);
     });
 
@@ -103,13 +104,14 @@ void main() {
           'ATL0': 'OK>',
           'ATH0': 'OK>',
           'ATSP0': 'OK>',
+          'ATAT2': 'OK>',
         });
         final service = Obd2Service(transport);
 
         final connected = await service.connect();
 
         expect(connected, isTrue);
-        // Captured commands match the legacy init list exactly,
+        // Captured commands match the init list (#1904 added ATAT2),
         // followed by the #1401 phase 1 firmware-version probe.
         final sent = transport.commands.map((c) => c.command).toList();
         expect(sent, [
@@ -118,6 +120,7 @@ void main() {
           'ATL0',
           'ATH0',
           'ATSP0',
+          'ATAT2',
           'ATI',
         ]);
 

@@ -513,6 +513,10 @@ void main() {
         pausedRepo: pausedRepo,
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(minutes: 5),
+        // #1904 — disable the silent reconnect window so a transport
+        // drop flips straight to the visible pausedDueToDrop state
+        // this test asserts on.
+        silentReconnectWindow: Duration.zero,
         schedulerTickRate: const Duration(milliseconds: 20),
       );
       final states = <TripRecordingControllerState>[];
@@ -560,11 +564,19 @@ void main() {
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(minutes: 5),
         dropThreshold: 99, // huge threshold — only typed path can fire
+        // #1904 — disable the silent reconnect window so the typed
+        // disconnect flips straight to the visible drop state.
+        silentReconnectWindow: Duration.zero,
         schedulerTickRate: const Duration(milliseconds: 20),
       );
 
       await ctl.start();
-      await Future<void>.delayed(const Duration(milliseconds: 150));
+      // #1904 — _runTransport now retries a failed sendCommand once
+      // after a 150 ms delay before the error counts toward a drop, so
+      // the first error only lands after one retry cycle. Wait past
+      // that cycle (was 150 ms pre-#1904) so the typed-disconnect drop
+      // has had a chance to fire.
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       expect(
         ctl.currentState,
@@ -585,6 +597,9 @@ void main() {
         vehicleId: 'car-under-test',
         pausedRepo: pausedRepo,
         historyRepo: historyRepo,
+        // #1904 — disable the silent reconnect window so the drop is
+        // immediately visible and persists the paused-trip snapshot.
+        silentReconnectWindow: Duration.zero,
       );
       await ctl.start();
 
@@ -627,6 +642,9 @@ void main() {
         pausedRepo: pausedRepo,
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(milliseconds: 50),
+        // #1904 — disable the silent reconnect window so the drop is
+        // immediately visible and the grace timer starts at once.
+        silentReconnectWindow: Duration.zero,
       );
       await ctl.start();
       ctl.debugTriggerDrop();
@@ -661,6 +679,9 @@ void main() {
         pausedRepo: pausedRepo,
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(milliseconds: 50),
+        // #1904 — disable the silent reconnect window so the drop is
+        // immediately visible and the grace timer starts at once.
+        silentReconnectWindow: Duration.zero,
       );
       await ctl.start();
 
@@ -706,6 +727,9 @@ void main() {
         pausedRepo: pausedRepo,
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(hours: 1),
+        // #1904 — disable the silent reconnect window so the drop is
+        // immediately visible and debugExpireGraceWindow can finalise.
+        silentReconnectWindow: Duration.zero,
       );
       await ctl.start();
       ctl.debugInjectSample(
@@ -912,6 +936,11 @@ void main() {
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(minutes: 5),
         silentFailureThreshold: 3,
+        // #1904 — disable the silent reconnect window so the
+        // transport-error drop is immediately visible (this test
+        // asserts the silent-failure path is suppressed once
+        // pausedDueToDrop is already set).
+        silentReconnectWindow: Duration.zero,
       );
       await ctl.start();
 
