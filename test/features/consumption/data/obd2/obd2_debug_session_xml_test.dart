@@ -35,6 +35,10 @@ void main() {
         timestamp: at(30),
         kind: Obd2SessionEventKind.dataGap,
         gapMs: 9500,
+        preGapSpeedKmh: 95,
+        preGapRpm: 2200,
+        postGapSpeedKmh: 0,
+        postGapRpm: 0,
       ))
       ..add(Obd2SessionEvent(
         timestamp: at(90),
@@ -89,6 +93,20 @@ void main() {
     final gap =
         events.firstWhere((e) => e.getAttribute('kind') == 'dataGap');
     expect(gap.getAttribute('gapMs'), '9500');
+  });
+
+  test('a data gap serialises the pre/post-gap vehicle state (#1930)', () {
+    final doc = XmlDocument.parse(formatObd2DebugSessionXml(buildSession()));
+    final gap = doc.rootElement
+        .getElement('Events')!
+        .findElements('Event')
+        .firstWhere((e) => e.getAttribute('kind') == 'dataGap');
+    // Pre-gap moving, post-gap stopped — the link died mid-drive. A
+    // whole .0 is dropped so the export reads cleanly.
+    expect(gap.getAttribute('preGapSpeedKmh'), '95');
+    expect(gap.getAttribute('preGapRpm'), '2200');
+    expect(gap.getAttribute('postGapSpeedKmh'), '0');
+    expect(gap.getAttribute('postGapRpm'), '0');
   });
 
   test('an in-progress session (no endedAt) still serialises', () {

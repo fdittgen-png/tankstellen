@@ -1275,7 +1275,9 @@ class TripRecordingController {
       _lastSampleAt = nowTs;
       // #1925 — ping the opt-in debug recorder so a stretch of silence
       // surfaces as a data-gap event in the exported session log.
-      Obd2DebugSessionRecorder.recordData(nowTs);
+      // #1930 — pass the vehicle state so a gap records what the car
+      // was doing when data stopped (driving vs engine-off).
+      Obd2DebugSessionRecorder.recordData(nowTs, speedKmh: speedKmh, rpm: rpm);
       _sampleBuffer.maybeCapture(sample);
     }
     if (fuelRate != null) {
