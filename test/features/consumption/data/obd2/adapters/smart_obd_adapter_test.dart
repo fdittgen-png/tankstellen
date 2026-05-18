@@ -59,6 +59,7 @@ void main() {
         'ATL0\r',
         'ATH0\r',
         'ATSP0\r',
+        'ATAT2\r', // #1904 — aggressive adaptive timing
       ]);
     });
 
@@ -158,7 +159,7 @@ void main() {
         // #1401 phase 1: connect appends a firmware-version probe
         // (`ATI`) after the init sequence — same interCommandDelay
         // applies, so it slots into the gap-bound assertions below.
-        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATI']);
+        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATAT2', 'ATI']);
 
         // Gap before ATE0 reflects the 400 ms postResetDelay.
         final firstGap = transport.commands[1].at - transport.commands[0].at;

@@ -218,6 +218,14 @@ class TripRecordingController {
   /// (e.g. 100 ms) to exercise the auto-finalise path.
   final Duration _pauseGraceWindow;
 
+  /// #1904 — how long a transport drop stays invisible while the
+  /// reconnect scanner tries to get the adapter back. If the scanner
+  /// reconnects inside this window the user never sees a pause; if it
+  /// elapses the controller escalates to the visible drop state.
+  /// `Duration.zero` disables the silent window (every drop is visible
+  /// at once — the pre-#1904 behaviour).
+  final Duration _silentReconnectWindow;
+
   /// Owns the connection-drop *detection* heuristics — the #797
   /// transport-error sliding window and the #1330 silent-failure
   /// null-parse counter — extracted into a focused collaborator
@@ -268,6 +276,17 @@ class TripRecordingController {
   bool _started = false;
   bool _stopped = false;
   String? _sessionId; // ISO start-ts, stable across pause→resume cycles
+
+  /// #1904 — true between a transport drop and either a silent
+  /// reconnect or the escalation to the visible [_pausedDueToDrop].
+  /// While set, the scheduler is stopped but the controller still
+  /// reports `recording` — the user sees no pause banner for a drop
+  /// the reconnect scanner is about to clear within seconds.
+  bool _silentlyReconnecting = false;
+
+  /// #1904 — fires when the silent reconnect window elapses without
+  /// the adapter coming back; escalates to the visible drop state.
+  Timer? _silentReconnectTimer;
 
   /// Reason the most recent [_handleDrop] fired (#1330 phase 3).
   /// Null when no drop has occurred. Read by the provider so the
@@ -331,6 +350,7 @@ class TripRecordingController {
     PausedTripRepository? pausedRepo,
     TripHistoryRepository? historyRepo,
     Duration pauseGraceWindow = const Duration(minutes: 15),
+    Duration silentReconnectWindow = const Duration(seconds: 6),
     Duration dropWindow = const Duration(seconds: 5),
     int dropThreshold = 3,
     int silentFailureThreshold = 50,
@@ -353,6 +373,7 @@ class TripRecordingController {
         _pausedRepoOverride = pausedRepo,
         _historyRepoOverride = historyRepo,
         _pauseGraceWindow = pauseGraceWindow,
+        _silentReconnectWindow = silentReconnectWindow,
         _schedulerTickRate = schedulerTickRate,
         _pinnedAdapterMac = pinnedAdapterMac,
         _automatic = automatic,
@@ -448,14 +469,7 @@ class TripRecordingController {
       // scanner reconnected. Either way, no scanner should survive
       // the resume transition.
       unawaited(_stopReconnectScanner());
-      // Clear the paused-trips box row — the session is live again,
-      // so leaving the partial behind would let a subsequent pause
-      // stomp over the in-memory state. Best-effort.
-      final id = _sessionId;
-      if (id != null) {
-        final repo = _resolvePausedRepo();
-        repo?.delete(id);
-      }
+      _clearPausedTripRow();
     }
     _paused = false;
     _scheduler?.start();
@@ -584,6 +598,11 @@ class TripRecordingController {
     _emitTimer = null;
     _graceTimer?.cancel();
     _graceTimer = null;
+    // #1904 — tear down a pending silent-reconnect window so it can't
+    // escalate after the trip has stopped.
+    _silentReconnectTimer?.cancel();
+    _silentReconnectTimer = null;
+    _silentlyReconnecting = false;
     await _stopReconnectScanner();
     _started = false;
     _stopped = true;
@@ -830,11 +849,28 @@ class TripRecordingController {
       // response string, not an exception.
       _dropDetector.registerSuccess();
       return response;
-    } catch (e, st) { // ignore: unused_catch_stack
-      _registerTransportError(e);
-      rethrow;
+    } catch (_) {
+      // #1904 — one silent retry before a transport error counts
+      // toward a drop. Bluetooth links hiccup briefly (a single lost
+      // write, a momentary RF collision); retrying once after a short
+      // pause absorbs that common transient case so it never reaches
+      // the drop detector. Only a failure that survives the retry is
+      // a real drop signal.
+      await Future<void>.delayed(_transportRetryDelay);
+      try {
+        final response = await _service.sendCommand(command);
+        _dropDetector.registerSuccess();
+        return response;
+      } catch (e, st) { // ignore: unused_catch_stack
+        _registerTransportError(e);
+        rethrow;
+      }
     }
   }
+
+  /// #1904 — pause before the single transport retry, giving the
+  /// Bluetooth link a moment to settle rather than hammering it.
+  static const Duration _transportRetryDelay = Duration(milliseconds: 150);
 
   /// Funnel a transport error through the drop detector and react to
   /// its verdict (#797 phase 1). The lifecycle guard stays here — the
@@ -891,19 +927,73 @@ class TripRecordingController {
     _handleDrop(reason: TripDropReason.silentFailure);
   }
 
+  /// React to a detected connection drop.
+  ///
+  /// #1904 — a `transportError` drop (the Bluetooth link hiccupped)
+  /// first enters an *invisible* reconnect window: the scheduler stops
+  /// and the reconnect scanner starts, but the controller keeps
+  /// reporting `recording`, so the user sees no pause banner. The
+  /// adapter is usually still in range and the scanner gets it back
+  /// within seconds — a reconnect inside the window resumes polling
+  /// silently. Only if [_silentReconnectWindow] elapses with no
+  /// reconnect — the adapter is genuinely gone — does the controller
+  /// escalate to the visible [_pausedDueToDrop] banner.
+  ///
+  /// A `silentFailure` drop (the ECU stopped answering while the link
+  /// is healthy) escalates straight to the visible state — reconnecting
+  /// the Bluetooth link cannot revive a dead ECU.
   void _handleDrop({
     TripDropReason reason = TripDropReason.transportError,
   }) {
-    if (_pausedDueToDrop) return;
-    _pausedDueToDrop = true;
-    _dropReason = reason;
+    if (_pausedDueToDrop || _silentlyReconnecting) return;
     _scheduler?.stop();
     _dropDetector.clearErrorWindow();
     _persistPausedSnapshot();
+    if (reason == TripDropReason.transportError &&
+        _silentReconnectWindow > Duration.zero) {
+      _silentlyReconnecting = true;
+      _dropReason = reason;
+      _startReconnectScanner();
+      _silentReconnectTimer?.cancel();
+      _silentReconnectTimer =
+          Timer(_silentReconnectWindow, _escalateToVisibleDrop);
+      // Deliberately no _emitState() — an in-presence drop the scanner
+      // is about to clear must stay invisible to the UI.
+      return;
+    }
+    _enterVisibleDrop(reason);
+  }
+
+  /// Flip into the visible pause-with-grace state: stop is already
+  /// done by [_handleDrop]; this starts the grace timer, ensures a
+  /// reconnect scanner is running, and emits so the pause banner
+  /// appears.
+  void _enterVisibleDrop(TripDropReason reason) {
+    _pausedDueToDrop = true;
+    _dropReason = reason;
     _graceTimer?.cancel();
     _graceTimer = Timer(_pauseGraceWindow, _onGraceWindowElapsed);
-    _startReconnectScanner();
+    // The scanner may already be running from the silent window.
+    if (_reconnectScanner == null) _startReconnectScanner();
     _emitState();
+  }
+
+  /// #1904 — the silent reconnect window elapsed without the adapter
+  /// coming back; surface the drop to the user.
+  void _escalateToVisibleDrop() {
+    _silentReconnectTimer = null;
+    if (!_silentlyReconnecting || _pausedDueToDrop || _stopped) return;
+    _silentlyReconnecting = false;
+    _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
+  }
+
+  /// Delete this session's row from the paused-trips box — the session
+  /// is live again, so leaving the partial behind would let a later
+  /// pause stomp the in-memory state. Best-effort.
+  void _clearPausedTripRow() {
+    final id = _sessionId;
+    if (id == null) return;
+    _resolvePausedRepo()?.delete(id);
   }
 
   /// Kick off the auto-reconnect scanner (#797 phase 3) if both the
@@ -930,11 +1020,27 @@ class TripRecordingController {
   }
 
   void _onScannerReconnect() {
-    // The scanner self-stops before firing this callback, so we
-    // don't need to call stop() here. Just resume the trip — the
-    // ordinary resume() path cancels the grace timer and clears
-    // the paused-trips row.
+    // The scanner self-stops before firing this callback.
     _reconnectScanner = null;
+    if (_silentlyReconnecting) {
+      // #1904 — reconnected inside the silent window: resume polling
+      // without the user ever having seen a pause. Mirrors the
+      // drop-recovery half of resume() but skips the _pausedDueToDrop
+      // teardown (it was never set) and the _emitState pause-banner
+      // churn — the state was `recording` throughout.
+      _silentReconnectTimer?.cancel();
+      _silentReconnectTimer = null;
+      _silentlyReconnecting = false;
+      _dropReason = null;
+      _dropDetector.reset();
+      _clearPausedTripRow();
+      // Respect a user pause that landed during the silent window.
+      if (!_paused && !_stopped) _scheduler?.start();
+      _emitState();
+      return;
+    }
+    // Reconnected after the drop went visible — the ordinary resume()
+    // path cancels the grace timer and clears the paused-trips row.
     if (_pausedDueToDrop) resume();
   }
 
@@ -1141,11 +1247,28 @@ class TripRecordingController {
 
   /// Exposed for tests: trigger the drop-handling path directly, so
   /// tests that can't easily convince a fake transport to throw three
-  /// times in a row still exercise the state transition.
+  /// times in a row still exercise the state transition. [reason]
+  /// defaults to a transport drop; pass [TripDropReason.silentFailure]
+  /// to exercise the dead-ECU path.
   @visibleForTesting
-  void debugTriggerDrop() {
-    _handleDrop();
+  void debugTriggerDrop({
+    TripDropReason reason = TripDropReason.transportError,
+  }) {
+    _handleDrop(reason: reason);
   }
+
+  /// Exposed for tests: whether the controller is inside the #1904
+  /// invisible reconnect window (a transport drop the scanner is
+  /// trying to clear before it ever reaches the pause banner).
+  @visibleForTesting
+  bool get debugSilentlyReconnecting => _silentlyReconnecting;
+
+  /// Exposed for tests: run one command through the retrying transport
+  /// path so the #1904 single-retry-on-transient-error behaviour can
+  /// be unit-tested without driving the whole PID scheduler.
+  @visibleForTesting
+  Future<String> debugRunTransport(String command) =>
+      _runTransport(command);
 
   /// Exposed for tests: drive the silent-failure observer with a
   /// hand-built parse outcome so tests don't have to spin up a fake

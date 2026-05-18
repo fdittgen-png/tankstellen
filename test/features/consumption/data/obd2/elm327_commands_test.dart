@@ -205,14 +205,18 @@ void main() {
       expect(Elm327Commands.headersOffCommand, 'ATH0\r');
     });
 
-    test('initCommands contains all five AT init commands in expected order',
+    test('initCommands contains the AT init commands in expected order',
         () {
+      // #1904 — ATAT2 (aggressive adaptive timing) is sent last, after
+      // the protocol is selected.
+      expect(Elm327Commands.adaptiveTimingCommand, 'ATAT2\r');
       expect(Elm327Commands.initCommands, <String>[
         'ATZ\r',
         'ATE0\r',
         'ATL0\r',
         'ATH0\r',
         'ATSP0\r',
+        'ATAT2\r',
       ]);
     });
 

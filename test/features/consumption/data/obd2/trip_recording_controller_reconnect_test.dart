@@ -75,6 +75,10 @@ void main() {
         // Long grace so we can prove the scanner's resume beats
         // the grace-window auto-finalise.
         pauseGraceWindow: const Duration(hours: 1),
+        // This test exercises the visible-drop + grace + scanner
+        // wiring directly; disable the #1904 silent reconnect window
+        // so a drop flips straight to pausedDueToDrop.
+        silentReconnectWindow: Duration.zero,
         pinnedAdapterMac: 'AA:BB:CC:DD:EE:FF',
         reconnectScannerFactory: (mac, onReconnect) {
           capturedPinnedMac = mac;
@@ -152,6 +156,9 @@ void main() {
         pausedRepo: pausedRepo,
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(milliseconds: 50),
+        // #1904 — disable the silent reconnect window so the drop is
+        // visible immediately and the grace path runs as before.
+        silentReconnectWindow: Duration.zero,
         // pinnedAdapterMac omitted — null.
         reconnectScannerFactory: (mac, onReconnect) {
           factoryCalls++;
@@ -219,6 +226,9 @@ void main() {
         pausedRepo: pausedRepo,
         historyRepo: historyRepo,
         pauseGraceWindow: const Duration(hours: 1),
+        // #1904 — disable the silent reconnect window so the drop goes
+        // straight to the visible grace-window path under test.
+        silentReconnectWindow: Duration.zero,
         pinnedAdapterMac: 'MAC',
         reconnectScannerFactory: (mac, onReconnect) => _ObservableScanner(
           pinnedMac: mac,
@@ -242,7 +252,236 @@ void main() {
               'finalising so a late reconnect cannot race');
       expect(historyRepo.loadAll(), hasLength(1));
     });
+
+    group('connection reliability — #1904', () {
+      test(
+          'silent reconnect stays invisible — a transport drop the '
+          'scanner clears within the window never reaches the banner',
+          () async {
+        final transport = FakeObd2Transport(initResponses());
+        await transport.connect();
+        VoidCallback? capturedOnReconnect;
+        var scannerStartCount = 0;
+
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-silent-reconnect',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          // Default 6 s silent-reconnect window — long enough that the
+          // manual onReconnect below lands well inside it.
+          pinnedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+          reconnectScannerFactory: (mac, onReconnect) {
+            capturedOnReconnect = onReconnect;
+            return _ObservableScanner(
+              pinnedMac: mac,
+              onReconnect: onReconnect,
+              onStart: () => scannerStartCount++,
+              onStop: () {},
+            );
+          },
+        );
+
+        await ctl.start();
+        ctl.debugInjectSample(
+          speedKmh: 50,
+          rpm: 1800,
+          at: DateTime(2026, 5, 18, 9),
+        );
+        ctl.debugTriggerDrop();
+
+        // The drop entered the invisible reconnect window: the user
+        // still sees `recording`, the scanner is probing.
+        expect(ctl.currentState, TripRecordingControllerState.recording,
+            reason: 'a transport drop must NOT flip the visible state '
+                'while the silent reconnect window is open');
+        expect(ctl.debugSilentlyReconnecting, isTrue,
+            reason: 'the controller must report it is silently '
+                'reconnecting after a transport drop');
+        expect(scannerStartCount, 1,
+            reason: 'the reconnect scanner must start during the '
+                'silent window');
+
+        // The scanner finds the adapter inside the window.
+        capturedOnReconnect!.call();
+
+        expect(ctl.currentState, TripRecordingControllerState.recording,
+            reason: 'a silent reconnect must keep the state at '
+                'recording — the user never saw a pause');
+        expect(ctl.debugSilentlyReconnecting, isFalse,
+            reason: 'a successful reconnect must clear the silent '
+                'reconnect flag');
+        expect(pausedRepo.loadAll(), isEmpty,
+            reason: 'a silent reconnect must clear the paused-trips '
+                'row so the user never sees a stranded partial trip');
+
+        await ctl.stop();
+      });
+
+      test(
+          'no reconnect escalates to the visible banner once the '
+          'silent window elapses', () async {
+        final transport = FakeObd2Transport(initResponses());
+        await transport.connect();
+
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-no-reconnect',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          // Tiny silent window so the escalation fires fast in-test.
+          silentReconnectWindow: const Duration(milliseconds: 50),
+          pinnedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+          // A scanner that never calls onReconnect — the adapter is
+          // genuinely gone.
+          reconnectScannerFactory: (mac, onReconnect) => _ObservableScanner(
+            pinnedMac: mac,
+            onReconnect: onReconnect,
+            onStart: () {},
+            onStop: () {},
+          ),
+        );
+
+        await ctl.start();
+        ctl.debugTriggerDrop();
+
+        // Immediately after the drop the state is still invisible.
+        expect(ctl.currentState, TripRecordingControllerState.recording,
+            reason: 'the drop is invisible while the silent window is '
+                'still open');
+
+        // Wait past the 50 ms silent window.
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+
+        expect(
+          ctl.currentState,
+          TripRecordingControllerState.pausedDueToDrop,
+          reason: 'when the silent window elapses with no reconnect '
+              'the controller must escalate to the visible pause banner',
+        );
+
+        await ctl.stop();
+      });
+
+      test(
+          'a silentFailure drop is visible immediately — no silent '
+          'reconnect window', () async {
+        final transport = FakeObd2Transport(initResponses());
+        await transport.connect();
+
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-silent-failure',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          // Default 6 s silent-reconnect window — proves a
+          // silentFailure drop bypasses it entirely.
+          pinnedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+          reconnectScannerFactory: (mac, onReconnect) => _ObservableScanner(
+            pinnedMac: mac,
+            onReconnect: onReconnect,
+            onStart: () {},
+            onStop: () {},
+          ),
+        );
+
+        await ctl.start();
+        ctl.debugTriggerDrop(reason: TripDropReason.silentFailure);
+
+        expect(
+          ctl.currentState,
+          TripRecordingControllerState.pausedDueToDrop,
+          reason: 'a silentFailure drop — the ECU stopped answering — '
+              'cannot be cleared by a Bluetooth reconnect, so it must '
+              'go straight to the visible pause banner',
+        );
+        expect(ctl.debugSilentlyReconnecting, isFalse,
+            reason: 'a silentFailure drop must NOT enter the silent '
+                'reconnect window');
+
+        await ctl.stop();
+      });
+
+      test(
+          'a single transient transport error is retried, not counted '
+          'as a drop', () async {
+        // First fake: throws once for 010D, then succeeds. The #1904
+        // single retry should absorb the transient error.
+        final transientFake = _FlakyTransport(failuresPerCommand: 1);
+        await transientFake.connect();
+        final ctlRetry = TripRecordingController(
+          service: Obd2Service(transientFake),
+          pollInterval: const Duration(minutes: 1),
+        );
+
+        final retried = await ctlRetry.debugRunTransport('010D\r');
+        expect(retried, _FlakyTransport.successResponse,
+            reason: 'the #1904 single retry must absorb a transient '
+                'transport error and return the success response');
+        expect(transientFake.callCount('010D\r'), 2,
+            reason: 'one failed try + one retry = exactly 2 calls');
+
+        // Second fake: throws on every call. The retry exhausts and
+        // the error propagates.
+        final brokenFake = _FlakyTransport(failuresPerCommand: 1 << 20);
+        await brokenFake.connect();
+        final ctlBroken = TripRecordingController(
+          service: Obd2Service(brokenFake),
+          pollInterval: const Duration(minutes: 1),
+        );
+
+        await expectLater(
+          ctlBroken.debugRunTransport('010D\r'),
+          throwsA(isA<StateError>()),
+          reason: 'a failure that survives the retry must propagate',
+        );
+        expect(brokenFake.callCount('010D\r'), 2,
+            reason: 'the retrying path makes exactly 2 attempts before '
+                'giving up — one try + one retry');
+      });
+    });
   });
+}
+
+/// Test-local transport whose [sendCommand] throws for the first
+/// [failuresPerCommand] calls of any given command, then succeeds.
+/// Tracks a per-command call count so the #1904 single-retry tests
+/// can assert exactly how many attempts the retrying transport path
+/// made.
+class _FlakyTransport implements Obd2Transport {
+  _FlakyTransport({required this.failuresPerCommand});
+
+  /// Response returned once a command's failure budget is exhausted.
+  static const String successResponse = '41 0D 32>';
+
+  final int failuresPerCommand;
+  final Map<String, int> _counts = <String, int>{};
+  bool _connected = false;
+
+  int callCount(String command) => _counts[command.trim()] ?? 0;
+
+  @override
+  Future<void> connect() async => _connected = true;
+
+  @override
+  Future<void> disconnect() async => _connected = false;
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<String> sendCommand(String command) async {
+    final key = command.trim();
+    final priorCalls = _counts[key] ?? 0;
+    _counts[key] = priorCalls + 1;
+    if (priorCalls < failuresPerCommand) {
+      throw StateError('Transport closed');
+    }
+    return successResponse;
+  }
 }
 
 /// A fake scanner that records `start()` / `stop()` invocations so

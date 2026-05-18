@@ -708,13 +708,14 @@ void main() {
             'ATL0': 'OK>',
             'ATH0': 'OK>',
             'ATSP0': 'OK>',
+            'ATAT2': 'OK>',
             'ATI': 'ELM327 v1.5>',
           },
           sent,
         );
         final service = Obd2Service(transport);
         await service.connect();
-        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATI']);
+        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATAT2', 'ATI']);
       },
     );
 
