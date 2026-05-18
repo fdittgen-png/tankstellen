@@ -242,6 +242,21 @@ class LiveSampleSnapshot {
     );
   }
 
+  /// #1858 — the branch [deriveFuelRateLPerHour] resolved on its most
+  /// recent call. Lets the controller tell η_v-derived fuel (the
+  /// [Obd2BranchTag.speedDensity] branch) from fuel that does not use
+  /// η_v (PID 5E / MAF) so it can stamp the trip's recompute
+  /// provenance. Null before the first call.
+  Obd2BranchTag? _lastFuelRateBranch;
+  Obd2BranchTag? get lastFuelRateBranch => _lastFuelRateBranch;
+
+  /// #1858 — the volumetric efficiency applied on the most recent
+  /// [deriveFuelRateLPerHour] call. Only meaningful when
+  /// [lastFuelRateBranch] is [Obd2BranchTag.speedDensity]; null
+  /// otherwise (PID 5E / MAF / no rate do not use η_v).
+  double? _lastFuelRateVe;
+  double? get lastFuelRateVe => _lastFuelRateVe;
+
   /// Derive the current fuel rate (L/h) from whatever snapshot
   /// values have landed so far. Mirrors the tier-1/2/3 fallback in
   /// [Obd2Service.readFuelRateLPerHour], but over snapshot values
@@ -254,6 +269,9 @@ class LiveSampleSnapshot {
   /// anything else (including null / unknown) stays on the petrol
   /// defaults the pre-#800 path used.
   double? deriveFuelRateLPerHour() {
+    // #1858 — provenance defaults; each branch below overrides them.
+    _lastFuelRateBranch = Obd2BranchTag.none;
+    _lastFuelRateVe = null;
     final preferredFuel =
         _vehicle?.preferredFuelType?.trim().toLowerCase() ?? '';
     final isDiesel = preferredFuel.contains('diesel');
@@ -328,6 +346,7 @@ class LiveSampleSnapshot {
           );
         }
       }
+      _lastFuelRateBranch = Obd2BranchTag.pid5E;
       return direct;
     }
 
@@ -346,6 +365,7 @@ class LiveSampleSnapshot {
         engineDisplacementCc: displacement.toDouble(),
         volumetricEfficiency: ve,
       );
+      _lastFuelRateBranch = Obd2BranchTag.maf;
       return corrected;
     }
 
@@ -401,6 +421,10 @@ class LiveSampleSnapshot {
       engineDisplacementCc: displacement.toDouble(),
       volumetricEfficiency: ve,
     );
+    // #1858 — the only η_v-derived branch: record the η_v applied so
+    // the controller can stamp the trip's recompute provenance.
+    _lastFuelRateBranch = Obd2BranchTag.speedDensity;
+    _lastFuelRateVe = ve;
     return corrected;
   }
 

@@ -112,6 +112,22 @@ class TripSummary {
   /// on the trip summary card based on this bit.
   final bool fuelRateSuspect;
 
+  /// Fuel-weighted mean volumetric efficiency (η_v) the trip's fuel was
+  /// integrated with (#1858), or null when the trip is **not**
+  /// η_v-recalculable.
+  ///
+  /// Speed-density fuel scales linearly with η_v, so a stored trip can
+  /// be retroactively recomputed for a corrected η_v by
+  /// `fuelLitersConsumed × (newVe / volumetricEfficiencyUsed)` — but
+  /// only when *every* litre was speed-density-derived. This field is
+  /// non-null exactly then: it carries the fuel-weighted mean of the
+  /// per-tick η_v actually applied. It is null when any fuel came from
+  /// PID 5E or the MAF branch (neither uses η_v — rescaling would
+  /// corrupt that portion), when the trip burned no fuel, and for
+  /// legacy trips recorded before #1858. A null value means "not
+  /// recalculable" and such trips are left untouched by a recompute.
+  final double? volumetricEfficiencyUsed;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -127,6 +143,7 @@ class TripSummary {
     this.coldStartSurcharge = false,
     this.secondsBelowOptimalGear,
     this.fuelRateSuspect = false,
+    this.volumetricEfficiencyUsed,
   });
 }
 
