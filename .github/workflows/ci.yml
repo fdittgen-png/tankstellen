@@ -227,15 +227,13 @@ jobs:
             # the 4 matrix runners.
             mapfile -t TESTS < affected_tests.txt
             flutter test "${TESTS[@]}" \
-              --exclude-tags=network \
-              --exclude-tags=flaky \
+              --exclude-tags=network,flaky \
               --total-shards=4 \
               --shard-index=${{ matrix.shard }}
           else
             # Empty selector output ⇒ paranoia: run full suite.
             flutter test \
-              --exclude-tags=network \
-              --exclude-tags=flaky \
+              --exclude-tags=network,flaky \
               --total-shards=4 \
               --shard-index=${{ matrix.shard }}
           fi
@@ -244,8 +242,7 @@ jobs:
         run: |
           flutter test \
             --coverage \
-            --exclude-tags=network \
-            --exclude-tags=flaky \
+            --exclude-tags=network,flaky \
             --total-shards=4 \
             --shard-index=${{ matrix.shard }}
       - name: Upload shard coverage
