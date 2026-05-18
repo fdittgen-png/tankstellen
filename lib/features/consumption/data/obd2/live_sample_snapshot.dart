@@ -69,6 +69,10 @@ class LiveSampleSnapshot {
   double? _latestLatitude;
   double? _latestLongitude;
 
+  // #1935 child A — most recent GPS altitude (metres), pushed in
+  // alongside the lat/lon fix. Feeds the road-grade calculator (#1941).
+  double? _latestAltitudeM;
+
   // #1615 — most recent exact-litre OEM-PID fuel reading, pushed in by
   // the provider layer (`TripOemFuelLevelController`) when the
   // `experimentalOemPids` flag is on and an OEM-capable adapter
@@ -87,13 +91,16 @@ class LiveSampleSnapshot {
   double? get latestFuelLevelPercent => _latestFuelLevelPercent;
   double? get latestLatitude => _latestLatitude;
   double? get latestLongitude => _latestLongitude;
+  double? get latestAltitudeM => _latestAltitudeM;
   double? get latestOemFuelLevelLitres => _latestOemFuelLevelLitres;
 
   /// Push the most recent GPS fix into the per-tick snapshot
-  /// (#1374 phase 1). Pass `null` for either coord to clear the latch.
-  void updateGpsFix({double? latitude, double? longitude}) {
+  /// (#1374 phase 1; altitude added #1935 child A). Pass `null` for a
+  /// field to clear that latch.
+  void updateGpsFix({double? latitude, double? longitude, double? altitudeM}) {
     _latestLatitude = latitude;
     _latestLongitude = longitude;
+    _latestAltitudeM = altitudeM;
   }
 
   /// Push the most recent exact-litre OEM-PID fuel reading into the

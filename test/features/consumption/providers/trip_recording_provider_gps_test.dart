@@ -111,20 +111,23 @@ void main() {
       expect(fakeGeo.lastAccuracy, LocationAccuracy.high);
 
       // Push a fix down the fake stream and let the listener run.
-      fakeGeo.emit(_pos(43.4567, 3.5821));
+      fakeGeo.emit(_pos(43.4567, 3.5821, altitude: 112.0));
       await Future<void>.delayed(Duration.zero);
 
       final ctl = notifier.debugController;
       expect(ctl, isNotNull);
       expect(ctl!.debugLatestLatitude, closeTo(43.4567, 1e-9));
       expect(ctl.debugLatestLongitude, closeTo(3.5821, 1e-9));
+      // #1935 child A — altitude rides the same fix into the latch.
+      expect(ctl.debugLatestAltitudeM, closeTo(112.0, 1e-9));
 
       // A second fix overwrites the first — the latch is "most-recent
       // wins", which matches the heatmap's per-tick semantics.
-      fakeGeo.emit(_pos(43.4600, 3.5900));
+      fakeGeo.emit(_pos(43.4600, 3.5900, altitude: 137.5));
       await Future<void>.delayed(Duration.zero);
       expect(ctl.debugLatestLatitude, closeTo(43.4600, 1e-9));
       expect(ctl.debugLatestLongitude, closeTo(3.5900, 1e-9));
+      expect(ctl.debugLatestAltitudeM, closeTo(137.5, 1e-9));
 
       await notifier.stop();
       // After stop, the subscription must be cancelled. Pushing more
@@ -193,12 +196,12 @@ Map<String, String> _elmOk() => const {
       '01A6': '41 A6 00 01 6A 2C>',
     };
 
-Position _pos(double lat, double lng) => Position(
+Position _pos(double lat, double lng, {double altitude = 0}) => Position(
       latitude: lat,
       longitude: lng,
       timestamp: DateTime.now(),
       accuracy: 5,
-      altitude: 0,
+      altitude: altitude,
       altitudeAccuracy: 0,
       heading: 0,
       headingAccuracy: 0,

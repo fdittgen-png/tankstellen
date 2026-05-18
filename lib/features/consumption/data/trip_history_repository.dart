@@ -174,6 +174,7 @@ Map<String, dynamic> _sampleToJson(TripSample s) => {
       if (s.coolantTempC != null) 'ct': s.coolantTempC,
       if (s.latitude != null) 'la': s.latitude,
       if (s.longitude != null) 'lo': s.longitude,
+      if (s.altitudeM != null) 'al': s.altitudeM,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -191,6 +192,9 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       // for "we don't know where this sample was taken".
       latitude: (j['la'] as num?)?.toDouble(),
       longitude: (j['lo'] as num?)?.toDouble(),
+      // #1935 child A: GPS altitude per sample. Legacy trips carry no
+      // 'al' key → null.
+      altitudeM: (j['al'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _summaryToJson(TripSummary s) => {

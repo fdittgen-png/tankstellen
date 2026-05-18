@@ -71,6 +71,8 @@ class TripGpsStreamController {
           ctl.updateGpsFix(
             latitude: pos.latitude,
             longitude: pos.longitude,
+            // #1935 child A — altitude feeds the road-grade calculator.
+            altitudeM: pos.altitude,
           );
           // #1458 phase 2 — record one cadence-diagnostic per fix so the
           // user can see, post-trip, whether the OS kept delivering

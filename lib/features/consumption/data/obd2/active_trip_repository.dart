@@ -207,6 +207,7 @@ Map<String, dynamic> _sampleToJson(TripSample s) => {
       // samples deserialise identically when the user finishes it.
       if (s.latitude != null) 'la': s.latitude,
       if (s.longitude != null) 'lo': s.longitude,
+      if (s.altitudeM != null) 'al': s.altitudeM,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -223,6 +224,8 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       // this PR carry no GPS keys → null on both fields.
       latitude: (j['la'] as num?)?.toDouble(),
       longitude: (j['lo'] as num?)?.toDouble(),
+      // #1935 child A — GPS altitude mirror key.
+      altitudeM: (j['al'] as num?)?.toDouble(),
     );
 
 /// Hive-backed singleton store for the live, in-progress trip
