@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Wyczyść",
   "obd2DebugOverlayCloseButton": "Zamknij",
   "obd2DebugOverlayTitle": "Breadcrumbs OBD2",
+  "obd2DiagnosticShareLabel": "Udostępnij dziennik diagnostyczny",
   "obd2PickerPinnedFallback": "Nie można było dotrzeć do '{adapterName}' — wybierz inny adapter",
   "onboardingObd2StepTitle": "Podłącz adapter OBD2",
   "onboardingObd2StepBody": "Podłącz adapter OBD2 do portu diagnostycznego samochodu i włącz zapłon. Odczytamy VIN i uzupełnimy dane silnika.",

@@ -4646,6 +4646,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2-jäljet';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Jaa diagnostiikkaloki';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ei voitu tavoittaa \'$adapterName\' — valitse toinen sovitin';
   }

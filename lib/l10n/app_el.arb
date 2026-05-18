@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Εκκαθάριση",
   "obd2DebugOverlayCloseButton": "Κλείσιμο",
   "obd2DebugOverlayTitle": "Ίχνη OBD2",
+  "obd2DiagnosticShareLabel": "Κοινοποίηση διαγνωστικού αρχείου",
   "obd2PickerPinnedFallback": "Δεν ήταν δυνατή η επαφή με '{adapterName}' — επιλέξτε άλλον προσαρμογέα",
   "onboardingObd2StepTitle": "Σύνδεση προσαρμογέα OBD2",
   "onboardingObd2StepBody": "Συνδέστε τον προσαρμογέα OBD2 στη θύρα του αυτοκινήτου και ανάψτε τη μίζα. Θα διαβάσουμε το VIN και θα συμπληρώσουμε τα στοιχεία κινητήρα για εσάς.",

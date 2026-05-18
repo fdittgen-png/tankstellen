@@ -4676,6 +4676,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 izsekošanas pēdas';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Kopīgot diagnostikas žurnālu';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nevarēja sasniegt \'$adapterName\' — izvēlieties citu adapteru';
   }

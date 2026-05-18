@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Изчисти",
   "obd2DebugOverlayCloseButton": "Затвори",
   "obd2DebugOverlayTitle": "OBD2 следи",
+  "obd2DiagnosticShareLabel": "Споделяне на диагностичния дневник",
   "obd2PickerPinnedFallback": "Не може да се достигне до '{adapterName}' — изберете друг адаптер",
   "onboardingObd2StepTitle": "Свържете OBD2 адаптера",
   "onboardingObd2StepBody": "Включете OBD2 адаптера в порта на автомобила и включете запалването. Ще прочетем VIN и ще попълним данните за двигателя вместо вас.",

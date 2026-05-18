@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Wissen",
   "obd2DebugOverlayCloseButton": "Sluiten",
   "obd2DebugOverlayTitle": "OBD2-breadcrumbs",
+  "obd2DiagnosticShareLabel": "Diagnoselogboek delen",
   "obd2PickerPinnedFallback": "Kon '{adapterName}' niet bereiken — kies een andere adapter",
   "onboardingObd2StepTitle": "Verbind je OBD2-adapter",
   "onboardingObd2StepBody": "Sluit je OBD2-adapter aan op de poort van de auto en zet het contact aan. We lezen het VIN en vullen de motorgegevens voor je in.",

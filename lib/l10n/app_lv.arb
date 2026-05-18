@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Notīrīt",
   "obd2DebugOverlayCloseButton": "Aizvērt",
   "obd2DebugOverlayTitle": "OBD2 izsekošanas pēdas",
+  "obd2DiagnosticShareLabel": "Kopīgot diagnostikas žurnālu",
   "obd2PickerPinnedFallback": "Nevarēja sasniegt '{adapterName}' — izvēlieties citu adapteru",
   "onboardingObd2StepTitle": "Savienojiet savu OBD2 adapteru",
   "onboardingObd2StepBody": "Pievienojiet OBD2 adapteru automašīnas portam un ieslēdziet aizdedzi. Mēs nolasīsim VIN un aizpildīsim dzinēja datus jūsu vietā.",

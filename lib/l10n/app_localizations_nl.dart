@@ -4662,6 +4662,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2-breadcrumbs';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Diagnoselogboek delen';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Kon \'$adapterName\' niet bereiken — kies een andere adapter';
   }

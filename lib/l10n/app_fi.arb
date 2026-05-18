@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Tyhjennä",
   "obd2DebugOverlayCloseButton": "Sulje",
   "obd2DebugOverlayTitle": "OBD2-jäljet",
+  "obd2DiagnosticShareLabel": "Jaa diagnostiikkaloki",
   "obd2PickerPinnedFallback": "Ei voitu tavoittaa '{adapterName}' — valitse toinen sovitin",
   "onboardingObd2StepTitle": "Yhdistä OBD2-sovitin",
   "onboardingObd2StepBody": "Kytke OBD2-sovitin auton porttiin ja käynnistä sytytin. Luemme VIN-koodin ja täytämme moottorin tiedot puolestasi.",

@@ -4620,6 +4620,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 breadcrumbs';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Share diagnostic log';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
   }
@@ -9993,6 +9996,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2DebugOverlayTitle => '⟦ÓƁĐ2 ƀřéáđçřúɱƀš ······⟧';
+
+  @override
+  String get obd2DiagnosticShareLabel => '⟦Šĥářé đîáǧñóšŧîç łóǧ ········⟧';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Ryd",
   "obd2DebugOverlayCloseButton": "Luk",
   "obd2DebugOverlayTitle": "OBD2-brødkrummer",
+  "obd2DiagnosticShareLabel": "Del diagnostiklog",
   "obd2PickerPinnedFallback": "Kunne ikke nå '{adapterName}' — vælg en anden adapter",
   "onboardingObd2StepTitle": "Tilslut din OBD2-adapter",
   "onboardingObd2StepBody": "Sæt din OBD2-adapter i bilens port og tænd tændingen. Vi aflæser VIN'en og udfylder motoroplysninger for dig.",

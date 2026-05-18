@@ -4682,6 +4682,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'Breadcrumbs OBD2';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Partilhar registo de diagnóstico';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Não foi possível alcançar \'$adapterName\' — escolha outro adaptador';
   }

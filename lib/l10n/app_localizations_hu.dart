@@ -4687,6 +4687,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 morzsakód-nyomvonal';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Diagnosztikai napló megosztása';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nem sikerült elérni a(z) \'$adapterName\'-t — válasszon másik adaptert';
   }

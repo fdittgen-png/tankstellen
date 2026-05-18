@@ -1,13 +1,32 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/obd2/auto_record_trace_log.dart';
 import '../../data/obd2/obd2_breadcrumb_collector.dart';
+import '../../data/obd2/obd2_diagnostic_report.dart';
 import '../../providers/obd2_breadcrumb_provider.dart';
 import 'broken_map_widgets.dart';
+
+/// Hook for the share-sheet handoff of the OBD2 diagnostic log
+/// (#1920). Production uses `SharePlus.instance.share`; tests
+/// substitute a fake via [debugObd2DiagnosticShareSinkOverride] to
+/// assert the outgoing report text without launching the OS share
+/// sheet. Mirrors the seam pattern in `full_backup_exporter.dart`.
+typedef Obd2DiagnosticShareSink = Future<void> Function(ShareParams params);
+
+/// Test-only override for the share sink used by the OBD2 diagnostic
+/// share button. When set, the button hands the formatted report to
+/// this sink instead of the real `share_plus` plugin.
+@visibleForTesting
+Obd2DiagnosticShareSink? debugObd2DiagnosticShareSinkOverride;
+
+Future<void> _defaultObd2DiagnosticShareSink(ShareParams params) =>
+    SharePlus.instance.share(params);
 
 /// In-app overlay that renders the most recent fuel-rate breadcrumbs
 /// captured by [Obd2BreadcrumbsNotifier] (#1395). Sibling to the map
@@ -28,6 +47,25 @@ import 'broken_map_widgets.dart';
 /// production builds where the flag is off.
 class Obd2BreadcrumbOverlay extends ConsumerWidget {
   const Obd2BreadcrumbOverlay({super.key});
+
+  /// Format the process-wide OBD2 trace ring into a plain-text report
+  /// and hand it to the OS share sheet (#1920). Best-effort — a share
+  /// failure is logged and swallowed so the developer-only overlay
+  /// never crashes the recording screen.
+  Future<void> _shareDiagnosticLog() async {
+    final String report = formatObd2DiagnosticReport(
+      AutoRecordTraceLog.snapshot(),
+    );
+    final ShareParams params = ShareParams(text: report);
+    final Obd2DiagnosticShareSink sink =
+        debugObd2DiagnosticShareSinkOverride ??
+            _defaultObd2DiagnosticShareSink;
+    try {
+      await sink(params);
+    } catch (e, st) {
+      debugPrint('Obd2BreadcrumbOverlay share diagnostic log failed: $e\n$st');
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -113,6 +151,24 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
                         child: Text(
                           l10n?.obd2DebugOverlayClearButton ?? 'Clear',
                         ),
+                      ),
+                      // #1920 — export the OBD2 connect/drop/reconnect
+                      // trace as plain text so a developer can analyse
+                      // a failed recording session. The trace ring is
+                      // process-wide, not tied to the fuel-rate
+                      // breadcrumbs above.
+                      IconButton(
+                        onPressed: () => _shareDiagnosticLog(),
+                        icon: const Icon(Icons.share, size: 18),
+                        color: Colors.white,
+                        tooltip: l10n?.obd2DiagnosticShareLabel ??
+                            'Share diagnostic log',
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
+                        visualDensity: VisualDensity.compact,
                       ),
                       TextButton(
                         onPressed: () {

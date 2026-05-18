@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Vymazat",
   "obd2DebugOverlayCloseButton": "Zavřít",
   "obd2DebugOverlayTitle": "Stopy OBD2",
+  "obd2DiagnosticShareLabel": "Sdílet diagnostický protokol",
   "obd2PickerPinnedFallback": "Nelze se připojit k '{adapterName}' — vyberte jiný adaptér",
   "onboardingObd2StepTitle": "Připojit adaptér OBD2",
   "onboardingObd2StepBody": "Zapojte adaptér OBD2 do portu auta a zapněte zapalování. Přečteme VIN a vyplníme podrobnosti o motoru za vás.",

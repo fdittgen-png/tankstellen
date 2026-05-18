@@ -1370,6 +1370,7 @@
   "obd2DebugOverlayClearButton": "Azzera",
   "obd2DebugOverlayCloseButton": "Chiudi",
   "obd2DebugOverlayTitle": "Breadcrumb OBD2",
+  "obd2DiagnosticShareLabel": "Condividi il registro diagnostico",
   "obd2PickerPinnedFallback": "Impossibile raggiungere '{adapterName}' — scegli un altro adattatore",
   "onboardingObd2StepTitle": "Connetti il tuo adattatore OBD2",
   "onboardingObd2StepBody": "Collega il tuo adattatore OBD2 alla porta dell'auto e accendi il quadro. Leggeremo il VIN e inseriremo i dettagli del motore per te.",

@@ -1162,6 +1162,7 @@
   "obd2DebugOverlayClearButton": "Effacer",
   "obd2DebugOverlayCloseButton": "Fermer",
   "obd2DebugOverlayTitle": "Traces OBD2",
+  "obd2DiagnosticShareLabel": "Partager le journal de diagnostic",
   "brokenMapChipVerifying": "Vérification du capteur MAP…",
   "brokenMapChipDisclaimer": "Lectures MAP suspectes",
   "brokenMapSnackbarUnreliable": "Le capteur MAP donne des valeurs incorrectes — la consommation affichée peut être 50 à 80 % trop basse. Essayez un autre adaptateur.",

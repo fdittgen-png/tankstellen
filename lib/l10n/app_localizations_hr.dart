@@ -4662,6 +4662,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get obd2DebugOverlayTitle => 'OBD2 trag';
 
   @override
+  String get obd2DiagnosticShareLabel => 'Podijeli dijagnostički zapisnik';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nije moguće dosegnuti \'$adapterName\' — odaberite drugi adapter';
   }
