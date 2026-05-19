@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../app/router.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/situation_classifier.dart';
@@ -85,25 +84,16 @@ class TripRecordingBanner extends ConsumerWidget {
                 bottom: false,
                 child: InkWell(
                   key: const Key('tripRecordingBanner'),
-                  onTap: () {
-                    // #1322 — TripRecordingBanner is wrapped via
-                    // MaterialApp.builder, so its context can sit
-                    // ABOVE the Router/Navigator subtree on certain
-                    // modal paths (e.g. /privacy-dashboard). In those
-                    // cases GoRouter.of throws "No GoRouter found in
-                    // context". Use maybeOf + a ScaffoldMessenger
-                    // fallback so the banner never crashes.
-                    final router = GoRouter.maybeOf(context);
-                    if (router != null) {
-                      router.push('/trip-recording');
-                      return;
-                    }
-                    final messenger = ScaffoldMessenger.maybeOf(context);
-                    messenger?.showSnackBar(SnackBarHelper.infoSnackBar(
-                      l?.tripBannerOpenFromConsumptionTab ??
-                          'Open the active trip from the Conso tab',
-                    ));
-                  },
+                  // #1987 — TripRecordingBanner is wrapped via
+                  // MaterialApp.builder, so its context sits ABOVE the
+                  // Router/Navigator subtree and `GoRouter.of(context)`
+                  // fails. Navigate through the router instance from
+                  // `routerProvider` instead — always resolvable, no
+                  // context lookup — so the banner reliably reopens the
+                  // active recording (the old context-lookup fell back
+                  // to a snackbar naming the long-removed "Conso" tab).
+                  onTap: () =>
+                      ref.read(routerProvider).push('/trip-recording'),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 6),
