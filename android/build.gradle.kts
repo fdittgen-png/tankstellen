@@ -32,6 +32,21 @@ subprojects {
     }
 }
 
+// #1985 — the `home_widget` plugin declares `androidx.glance:
+// glance-appwidget:1.+`, a dynamic version. Gradle resolved it up to
+// `1.3.0-alpha01`, whose transitive `androidx.compose.remote` alphas
+// demand AGP 9.1 / compileSdk 37 — this project is on AGP 8.11 / SDK
+// 36, so `bundlePlayRelease` broke. Pin glance to the current stable
+// line (the plugin was authored against 1.1.x) across every subproject.
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.glance:glance-appwidget:1.1.1")
+            force("androidx.glance:glance:1.1.1")
+        }
+    }
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
