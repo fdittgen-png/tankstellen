@@ -52,4 +52,17 @@ void main() {
       }
     });
   });
+
+  group('#1981 — GPS trip path default-on', () {
+    test('gpsTripPath ships default-on so trip consumption uses the '
+        'accurate GPS-track distance', () {
+      final entry = manifest.entries[Feature.gpsTripPath];
+      expect(entry, isNotNull);
+      expect(entry!.defaultEnabledIn(BuildChannel.production), isTrue,
+          reason: 'a GPS track gives true road distance (#1979/#1981); '
+              'without it the speed-sensor virtual odometer over-reads');
+      expect(entry.requires, contains(Feature.obd2TripRecording),
+          reason: 'GPS trip path only matters once trips are recorded');
+    });
+  });
 }

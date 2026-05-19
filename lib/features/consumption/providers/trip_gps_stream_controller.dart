@@ -44,22 +44,36 @@ class TripGpsStreamController {
   /// Open a Geolocator position stream and route every fix through
   /// [TripRecordingController.updateGpsFix] (#1374 phase 1).
   ///
-  /// No-op when [Feature.gpsTripPath] is disabled — that's the
-  /// default for every existing user, so this method must NEVER pull
-  /// on the Geolocator plugin in that case (zero battery cost). When
-  /// the flag is on we open the stream at [LocationAccuracy.high]
-  /// because the eventual heatmap (Phase 3) wants ~10 m precision.
+  /// No-op when [Feature.gpsTripPath] is disabled — the user can still
+  /// turn it off from Feature management, and the flag-off path never
+  /// touches the Geolocator plugin (zero battery cost). When the flag
+  /// is on we open the stream at [LocationAccuracy.high] because the
+  /// eventual heatmap (Phase 3) wants ~10 m precision.
+  ///
+  /// #1981 — before opening the stream we ensure foreground location
+  /// permission: `getPositionStream` does not prompt, so without a
+  /// grant it just errors. A denial is non-fatal — `start` returns and
+  /// the recorder finalises on the virtual odometer.
   ///
   /// Stream errors are logged and swallowed: a permission revoke
   /// mid-trip, a temporary loss of fix, or the OS killing the
   /// position service must NOT derail the OBD2 trip recording. The
   /// controller's per-tick latch simply stops being refreshed and
   /// subsequent samples carry `latitude: null, longitude: null`.
-  void start(TripRecordingController ctl) {
+  Future<void> start(TripRecordingController ctl) async {
     final flags = _ref.read(featureFlagsProvider.notifier);
     if (!flags.isEnabled(Feature.gpsTripPath)) return;
     final geolocator = _ref.read(geolocatorWrapperProvider);
     try {
+      // #1981 — request foreground location permission up front.
+      var permission = await geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await geolocator.requestPermission();
+      }
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        return;
+      }
       _gpsSub = geolocator
           .getPositionStream(
         locationSettings: const LocationSettings(

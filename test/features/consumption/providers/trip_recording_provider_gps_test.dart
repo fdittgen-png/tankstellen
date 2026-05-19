@@ -102,6 +102,10 @@ void main() {
 
       final notifier = container.read(tripRecordingProvider.notifier);
       await notifier.start(service);
+      // #1981 — `_gps.start` is now async (it awaits a location-
+      // permission check before opening the stream) and the provider
+      // fires it without awaiting; drain so the subscription is wired.
+      await Future<void>.delayed(Duration.zero);
 
       // The provider must have asked Geolocator for a stream exactly once.
       expect(fakeGeo.positionStreamCallCount, 1,
@@ -167,6 +171,9 @@ void main() {
 
       final notifier = container.read(tripRecordingProvider.notifier);
       await notifier.start(service);
+      // #1981 — drain the async permission check so `_gps.start` has
+      // opened the stream before the first fix is pushed.
+      await Future<void>.delayed(Duration.zero);
       // First push a real fix so we know the wiring works…
       fakeGeo.emit(_pos(50.0, 4.0));
       await Future<void>.delayed(Duration.zero);
@@ -180,6 +187,40 @@ void main() {
       fakeGeo.emitError(Exception('permission revoked'));
       await Future<void>.delayed(Duration.zero);
       // The trip is still active — no phase regression.
+      expect(container.read(tripRecordingProvider).isActive, isTrue);
+
+      await notifier.stop();
+    });
+
+    test(
+        'flag ON but location permission denied — no stream opens, the '
+        'trip still records (#1981)', () async {
+      final fakeGeo = _RecordingGeolocator()
+        ..permission = LocationPermission.denied;
+      final container = ProviderContainer(overrides: [
+        geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+      ]);
+      addTearDown(container.dispose);
+      addTearDown(fakeGeo.dispose);
+
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.obd2TripRecording);
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.gpsTripPath);
+
+      final service = Obd2Service(FakeObd2Transport(_elmOk()));
+      await service.connect();
+
+      final notifier = container.read(tripRecordingProvider.notifier);
+      await notifier.start(service);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(fakeGeo.positionStreamCallCount, 0,
+          reason: 'a denied location permission must not open a stream');
+      // The trip records regardless — GPS distance just falls back to
+      // the virtual odometer.
       expect(container.read(tripRecordingProvider).isActive, isTrue);
 
       await notifier.stop();
@@ -226,6 +267,17 @@ class _RecordingGeolocator extends GeolocatorWrapper {
   // subscribed (a single shared controller would conflate the two).
   StreamController<Position>? _controller;
   int activeListeners = 0;
+
+  /// Permission the fake hands back from [checkPermission] /
+  /// [requestPermission] (#1981). Granted by default so the flag-on
+  /// tests open a stream; a test flips it to assert the denied path.
+  LocationPermission permission = LocationPermission.whileInUse;
+
+  @override
+  Future<LocationPermission> checkPermission() async => permission;
+
+  @override
+  Future<LocationPermission> requestPermission() async => permission;
 
   @override
   Stream<Position> getPositionStream({LocationSettings? locationSettings}) {
