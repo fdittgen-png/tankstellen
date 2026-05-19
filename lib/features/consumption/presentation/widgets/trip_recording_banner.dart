@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/obd2_connection_state_provider.dart';
+import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
@@ -28,6 +29,15 @@ class TripRecordingBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(tripRecordingProvider);
     final obd2 = ref.watch(obd2ConnectionStatusProvider);
+
+    // #1977 — once the OS shrinks the app into a Picture-in-Picture
+    // tile, render ONLY the compact trip strip. This wrapper sits above
+    // every screen, so collapsing here strips the shell chrome (the
+    // bottom nav bar, app bars) out of the tile no matter which route
+    // was visible when PiP fired.
+    if (ref.watch(pipModeProvider)) {
+      return _pipView(context, state);
+    }
 
     // When no trip is active: show a thin strip carrying only the
     // OBD2 status dot — and only when there's an adapter remembered
@@ -111,6 +121,30 @@ class TripRecordingBanner extends ConsumerWidget {
         const Obd2PauseBanner(),
         Expanded(child: child),
       ],
+    );
+  }
+
+  /// Full-bleed compact tile shown while the app is a Picture-in-
+  /// Picture window (#1977) — the band-coloured trip strip only, none
+  /// of the shell chrome.
+  Widget _pipView(BuildContext context, TripRecordingState state) {
+    if (!state.isActive) {
+      // A trip ended while the app sat in PiP — the OS restores the
+      // full window momentarily; a neutral panel avoids flashing the
+      // shell (and its nav bar) back into the tile in the meantime.
+      return Material(color: Theme.of(context).colorScheme.surface);
+    }
+    final palette = _bandColor(context, state.band, state.phase);
+    return Material(
+      color: palette.background,
+      child: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: _Content(state: state, palette: palette),
+          ),
+        ),
+      ),
     );
   }
 

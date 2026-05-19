@@ -6,6 +6,7 @@ import 'package:tankstellen/features/consumption/data/obd2/trip_recording_contro
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_banner.dart';
+import 'package:tankstellen/features/consumption/providers/pip_mode_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
@@ -19,6 +20,15 @@ class _FakeTripRecording extends TripRecording {
 
   @override
   TripRecordingState build() => _initial;
+}
+
+/// Fake [PipMode] notifier — pins the app's PiP-mode flag for a test.
+class _FakePipMode extends PipMode {
+  final bool _value;
+  _FakePipMode(this._value);
+
+  @override
+  bool build() => _value;
 }
 
 TripRecordingState _activeState({
@@ -276,6 +286,45 @@ void main() {
       expect(pushedLocations, contains('/trip-recording'));
       expect(find.text('trip-recording-screen'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('TripRecordingBanner PiP mode (#1977)', () {
+    testWidgets(
+        'in PiP mode renders only the compact tile — the shell child '
+        '(which carries the bottom nav bar) is dropped', (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox(key: Key('shell-child'))),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(distance: 4.0)),
+          ),
+          pipModeProvider.overrideWith(() => _FakePipMode(true)),
+        ],
+      );
+
+      expect(find.byKey(const Key('shell-child')), findsNothing,
+          reason: 'PiP must not render the shell — that is what dragged '
+              'the button bar into the tile (#1977)');
+      // The compact trip strip itself is still shown.
+      expect(find.textContaining('km'), findsOneWidget);
+    });
+
+    testWidgets('outside PiP mode the shell child renders as usual',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox(key: Key('shell-child'))),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(distance: 4.0)),
+          ),
+          pipModeProvider.overrideWith(() => _FakePipMode(false)),
+        ],
+      );
+
+      expect(find.byKey(const Key('shell-child')), findsOneWidget);
     });
   });
 }

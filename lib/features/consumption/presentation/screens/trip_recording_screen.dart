@@ -20,11 +20,11 @@ import '../../domain/entities/consumption_stats.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/broken_map_warned_vehicles_provider.dart';
 import '../../providers/consumption_providers.dart';
+import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
-import '../widgets/pip_tile.dart';
 
 /// Result returned when the user confirms saving a recorded trip
 /// from the summary screen (#726, #1185).
@@ -57,13 +57,7 @@ class TripSaveResult {
 /// continues via the provider, surfaced by [TripRecordingBanner] on
 /// every subsequent screen.
 class TripRecordingScreen extends ConsumerStatefulWidget {
-  const TripRecordingScreen({super.key, this.debugPipController});
-
-  /// Test seam (#1884): injects a fake [PipController] so widget tests
-  /// can drive PiP-mode transitions without a live platform channel.
-  /// Null in production — the screen builds its own.
-  @visibleForTesting
-  final PipController? debugPipController;
+  const TripRecordingScreen({super.key});
 
   @override
   ConsumerState<TripRecordingScreen> createState() =>
@@ -119,15 +113,11 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   /// SnackBar even if the coach keeps firing in the background.
   StreamSubscription<CoachEvent>? _coachEventsSub;
 
-  /// #1884 — Picture-in-Picture bridge. Owned by this screen so the
-  /// native auto-PiP opt-in is scoped to a foreground recording: the
-  /// opt-in is cleared on [dispose], so leaving the app from any other
-  /// screen never shrinks the wrong UI into the tile.
+  /// #1884 — the shared Picture-in-Picture bridge (`pipControllerProvider`,
+  /// #1977). This screen drives the native auto-PiP opt-in — scoped to
+  /// a foreground recording, cleared on [dispose] — and the minimise
+  /// button; the PiP-mode rendering itself lives in `TripRecordingBanner`.
   late final PipController _pip;
-  StreamSubscription<bool>? _pipSub;
-
-  /// Whether the OS has shrunk the app into a PiP tile.
-  bool _inPipMode = false;
 
   /// Last value pushed to [PipController.setAutoEnterEnabled], so the
   /// build method only crosses the channel when the opt-in changes.
@@ -136,12 +126,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   @override
   void initState() {
     super.initState();
-    // #1884 — wire the PiP bridge. The mode stream flips the compact
-    // tile on/off; in widget tests an injected fake stands in.
-    _pip = widget.debugPipController ?? PipController();
-    _pipSub = _pip.pipModeChanges.listen((inPip) {
-      if (mounted) setState(() => _inPipMode = inPip);
-    });
+    // #1977 — the single app-wide PiP controller; PiP-mode observation
+    // is centralised in `pipModeProvider` / `TripRecordingBanner`.
+    _pip = ref.read(pipControllerProvider);
     // Subscribe to the long-lived coach-events broadcast. The
     // lifecycle provider's stream is filter-empty when the toggle is
     // off — no event will be emitted until the user has opted in,
@@ -189,12 +176,11 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     // user has popped this screen.
     _unpinnedWarningTimer?.cancel();
     _unpinnedWarningTimer = null;
-    // #1884 — drop the native auto-PiP opt-in and release the channel
-    // handler. Fire-and-forget — `dispose` must stay synchronous.
-    _pipSub?.cancel();
-    _pipSub = null;
+    // #1884 — drop the native auto-PiP opt-in so leaving the app from
+    // an unrelated screen never shrinks the wrong UI into a tile.
+    // Fire-and-forget — `dispose` must stay synchronous. The controller
+    // itself is owned by `pipControllerProvider`, not disposed here.
     unawaited(_pip.setAutoEnterEnabled(false));
-    _pip.dispose();
     super.dispose();
   }
 
@@ -562,17 +548,10 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       _pip.setAutoEnterEnabled(wantAutoPip);
     }
 
-    // #1884 — once the OS has shrunk the app into a PiP tile, render
-    // only the compact glanceable consumption tile. The recording
-    // keeps running; tapping the OS tile restores the full screen
-    // (which fires onPipModeChanged(false) and flips this back).
-    if (_inPipMode) {
-      return PipTile(
-        avgText: _pipAvgText(state),
-        band: state.band,
-        paused: state.phase == TripRecordingPhase.paused,
-      );
-    }
+    // #1977 — when the OS shrinks the app into a PiP tile, the compact
+    // glanceable view is rendered app-wide by `TripRecordingBanner`
+    // (which wraps every screen), so this screen needs no PiP branch of
+    // its own — the recording keeps running underneath regardless.
 
     // #1423 phase 5 — listen for the active vehicle's broken-MAP
     // belief crossing into the 0.7-0.9 warning band. The listener
@@ -746,13 +725,6 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         ],
       ),
     );
-  }
-
-  /// #1884 — live consumption for the PiP tile: the live L/100 km to
-  /// one decimal, or an em-dash when no reading has landed yet.
-  String _pipAvgText(TripRecordingState state) {
-    final avg = state.live?.liveAvgLPer100Km;
-    return avg == null ? '—' : avg.toStringAsFixed(1);
   }
 
   Widget _buildRecording(
