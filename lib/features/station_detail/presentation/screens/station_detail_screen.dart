@@ -22,7 +22,7 @@ import '../widgets/wait_time_section.dart';
 /// Detail screen for a single fuel station.
 ///
 /// #1539 — the data state uses a `CustomScrollView` + `SliverAppBar`
-/// (pinned, `expandedHeight: 220`) so the rich status-row + brand-header
+/// (pinned, `expandedHeight: 196`) so the rich status-row + brand-header
 /// block collapses out of view on scroll, leaving a 1-row compact bar
 /// (back arrow + station name + cheapest-price chip + actions). Loading
 /// and error states keep a plain fixed `AppBar` since there is no scroll
@@ -100,7 +100,7 @@ class _StationDetailPlain extends StatelessWidget {
 }
 
 /// Loaded state — `CustomScrollView` + `SliverAppBar(pinned: true,
-/// expandedHeight: 220)`. Status row and brand header live inside the
+/// expandedHeight: 196)`. Status row and brand header live inside the
 /// `flexibleSpace.background`, so they fade out as the bar collapses
 /// to its compact form on scroll past the prices card.
 class _StationDetailLoaded extends StatelessWidget {
@@ -128,7 +128,9 @@ class _StationDetailLoaded extends StatelessWidget {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 220,
+            // #1989 — trimmed from 220: the status row + brand header
+            // do not fill that much, leaving dead space below the name.
+            expandedHeight: 196,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.pop(),
@@ -177,7 +179,7 @@ class _StationDetailLoaded extends StatelessWidget {
                         serviceResult: serviceResult,
                         stationId: stationId,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       StationBrandHeader(station: station),
                     ],
                   ),
@@ -193,17 +195,17 @@ class _StationDetailLoaded extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate.fixed([
                 StationPricesSection(station: station),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 // #1119 phase 2 — community wait-time hint + "Track my wait"
                 // toggle. Hidden entirely when consent is OFF; renders the
                 // toggle alone when consent is ON but the aggregate row is
                 // still sparse (< 5 samples server-side).
                 WaitTimeSection(stationId: stationId),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 StationInfoSection(station: station, detail: detail),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 StationRatingSection(stationId: stationId),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 // #1957 — the price-history chart is a tall,
                 // detail-on-demand block; show it in a foldable that is
                 // collapsed by default so it does not dominate the page.
