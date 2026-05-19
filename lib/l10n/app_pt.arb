@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Dados exportados para a área de transferência",
   "privacyExportCsvButton": "Exportar todos os dados como CSV",
   "privacyExportCsvSuccess": "Dados CSV exportados para a área de transferência",
+  "privacyClearErrorLog": "Limpar registo de erros",
+  "privacyErrorLogCleared": "Registo de erros limpo",
   "privacyDeleteButton": "Eliminar todos os dados",
   "privacyCopyErrorLog": "Copiar registo de erros ({count})",
   "privacyDeleteTitle": "Eliminar todos os dados?",

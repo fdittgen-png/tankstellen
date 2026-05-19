@@ -1530,6 +1530,12 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Očisti zapisnik pogrešaka';
+
+  @override
+  String get privacyErrorLogCleared => 'Zapisnik pogrešaka očišćen';
+
+  @override
   String get privacyDeleteTitle => 'Obrisati sve podatke?';
 
   @override

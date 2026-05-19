@@ -1533,6 +1533,12 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Vymazat protokol chyb';
+
+  @override
+  String get privacyErrorLogCleared => 'Protokol chyb byl vymazán';
+
+  @override
   String get privacyDeleteTitle => 'Smazat všechna data?';
 
   @override

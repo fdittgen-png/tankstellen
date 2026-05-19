@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Duomenys eksportuoti į iškarpinę",
   "privacyExportCsvButton": "Eksportuoti visus duomenis kaip CSV",
   "privacyExportCsvSuccess": "CSV duomenys eksportuoti į iškarpinę",
+  "privacyClearErrorLog": "Išvalyti klaidų žurnalą",
+  "privacyErrorLogCleared": "Klaidų žurnalas išvalytas",
   "privacyDeleteButton": "Ištrinti visus duomenis",
   "privacyCopyErrorLog": "Kopijuoti klaidų žurnalą į iškarpinę ({count})",
   "privacyDeleteTitle": "Ištrinti visus duomenis?",

@@ -1538,6 +1538,12 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Limpar registo de erros';
+
+  @override
+  String get privacyErrorLogCleared => 'Registo de erros limpo';
+
+  @override
   String get privacyDeleteTitle => 'Eliminar todos os dados?';
 
   @override

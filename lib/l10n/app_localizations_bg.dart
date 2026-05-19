@@ -1539,6 +1539,12 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Изчистване на дневника с грешки';
+
+  @override
+  String get privacyErrorLogCleared => 'Дневникът с грешки е изчистен';
+
+  @override
   String get privacyDeleteTitle => 'Изтриване на всички данни?';
 
   @override

@@ -1536,6 +1536,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Borrar registro de errores';
+
+  @override
+  String get privacyErrorLogCleared => 'Registro de errores borrado';
+
+  @override
   String get privacyDeleteTitle => '¿Eliminar todos los datos?';
 
   @override

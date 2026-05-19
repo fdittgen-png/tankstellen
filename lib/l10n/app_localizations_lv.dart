@@ -1535,6 +1535,12 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Notīrīt kļūdu žurnālu';
+
+  @override
+  String get privacyErrorLogCleared => 'Kļūdu žurnāls notīrīts';
+
+  @override
   String get privacyDeleteTitle => 'Dzēst visus datus?';
 
   @override

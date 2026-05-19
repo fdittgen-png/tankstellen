@@ -1529,6 +1529,12 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Ryd fejllog';
+
+  @override
+  String get privacyErrorLogCleared => 'Fejllog ryddet';
+
+  @override
   String get privacyDeleteTitle => 'Slet alle data?';
 
   @override

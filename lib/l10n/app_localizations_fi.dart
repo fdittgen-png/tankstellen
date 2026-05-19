@@ -1529,6 +1529,12 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Tyhjennä virheloki';
+
+  @override
+  String get privacyErrorLogCleared => 'Virheloki tyhjennetty';
+
+  @override
   String get privacyDeleteTitle => 'Poistetaanko kaikki tiedot?';
 
   @override

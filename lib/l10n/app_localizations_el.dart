@@ -1541,6 +1541,12 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Εκκαθάριση αρχείου σφαλμάτων';
+
+  @override
+  String get privacyErrorLogCleared => 'Το αρχείο σφαλμάτων εκκαθαρίστηκε';
+
+  @override
   String get privacyDeleteTitle => 'Διαγραφή όλων των δεδομένων;';
 
   @override

@@ -1519,6 +1519,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Clear error log';
+
+  @override
+  String get privacyErrorLogCleared => 'Error log cleared';
+
+  @override
   String get privacyDeleteTitle => 'Delete all data?';
 
   @override
@@ -6818,6 +6824,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String privacyCopyErrorLog(int count) {
     return '⟦Çóƥý éřřóř łóǧ ŧó çłîƥƀóářđ ($count) ··········⟧';
   }
+
+  @override
+  String get privacyClearErrorLog => '⟦Çłéář éřřóř łóǧ ······⟧';
+
+  @override
+  String get privacyErrorLogCleared => '⟦Éřřóř łóǧ çłéářéđ ·······⟧';
 
   @override
   String get privacyDeleteTitle => '⟦Đéłéŧé áłł đáŧá? ······⟧';

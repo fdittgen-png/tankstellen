@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Podaci izvezeni u međuspremnik",
   "privacyExportCsvButton": "Izvezi sve podatke kao CSV",
   "privacyExportCsvSuccess": "CSV podaci izvezeni u međuspremnik",
+  "privacyClearErrorLog": "Očisti zapisnik pogrešaka",
+  "privacyErrorLogCleared": "Zapisnik pogrešaka očišćen",
   "privacyDeleteButton": "Obriši sve podatke",
   "privacyCopyErrorLog": "Kopiraj dnevnik grešaka u međuspremnik ({count})",
   "privacyDeleteTitle": "Obrisati sve podatke?",

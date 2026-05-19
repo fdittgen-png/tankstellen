@@ -937,6 +937,8 @@
   "privacySyncDisabled": "La synchronisation cloud est désactivée. Toutes les données restent uniquement sur cet appareil.",
   "privacyExportButton": "Exporter toutes les données en JSON",
   "privacyExportCsvButton": "Exporter toutes les données en CSV",
+  "privacyClearErrorLog": "Effacer le journal d'erreurs",
+  "privacyErrorLogCleared": "Journal d'erreurs effacé",
   "privacyDeleteButton": "Tout supprimer",
   "privacyCopyErrorLog": "Copier le journal d'erreurs ({count})",
   "@privacyCopyErrorLog": {

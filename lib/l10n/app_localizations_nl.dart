@@ -1536,6 +1536,12 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Foutenlogboek wissen';
+
+  @override
+  String get privacyErrorLogCleared => 'Foutenlogboek gewist';
+
+  @override
   String get privacyDeleteTitle => 'Alle gegevens verwijderen?';
 
   @override

@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Dati eksportēti starpliktuvē",
   "privacyExportCsvButton": "Eksportēt visus datus kā CSV",
   "privacyExportCsvSuccess": "CSV dati eksportēti starpliktuvē",
+  "privacyClearErrorLog": "Notīrīt kļūdu žurnālu",
+  "privacyErrorLogCleared": "Kļūdu žurnāls notīrīts",
   "privacyDeleteButton": "Dzēst visus datus",
   "privacyCopyErrorLog": "Kopēt kļūdu žurnālu starpliktuvē ({count})",
   "privacyDeleteTitle": "Dzēst visus datus?",

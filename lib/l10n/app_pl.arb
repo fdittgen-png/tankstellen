@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Dane wyeksportowane do schowka",
   "privacyExportCsvButton": "Eksportuj wszystkie dane jako CSV",
   "privacyExportCsvSuccess": "Dane CSV wyeksportowane do schowka",
+  "privacyClearErrorLog": "Wyczyść dziennik błędów",
+  "privacyErrorLogCleared": "Dziennik błędów wyczyszczony",
   "privacyDeleteButton": "Usuń wszystkie dane",
   "privacyCopyErrorLog": "Skopiuj dziennik błędów do schowka ({count})",
   "privacyDeleteTitle": "Usunąć wszystkie dane?",

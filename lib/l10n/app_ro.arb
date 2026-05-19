@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Date exportate în clipboard",
   "privacyExportCsvButton": "Exportați toate datele ca CSV",
   "privacyExportCsvSuccess": "Date CSV exportate în clipboard",
+  "privacyClearErrorLog": "Șterge jurnalul de erori",
+  "privacyErrorLogCleared": "Jurnalul de erori a fost șters",
   "privacyDeleteButton": "Ștergeți toate datele",
   "privacyCopyErrorLog": "Copiați jurnalul de erori în clipboard ({count})",
   "privacyDeleteTitle": "Ștergeți toate datele?",

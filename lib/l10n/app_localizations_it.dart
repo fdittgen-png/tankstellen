@@ -1535,6 +1535,12 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Cancella registro errori';
+
+  @override
+  String get privacyErrorLogCleared => 'Registro errori cancellato';
+
+  @override
   String get privacyDeleteTitle => 'Eliminare tutti i dati?';
 
   @override

@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Dati esportati negli appunti",
   "privacyExportCsvButton": "Esporta tutti i dati come CSV",
   "privacyExportCsvSuccess": "Dati CSV esportati negli appunti",
+  "privacyClearErrorLog": "Cancella registro errori",
+  "privacyErrorLogCleared": "Registro errori cancellato",
   "privacyDeleteButton": "Elimina tutti i dati",
   "privacyCopyErrorLog": "Copia registro errori negli appunti ({count})",
   "privacyDeleteTitle": "Eliminare tutti i dati?",

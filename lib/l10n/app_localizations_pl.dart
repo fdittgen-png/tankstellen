@@ -1535,6 +1535,12 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Wyczyść dziennik błędów';
+
+  @override
+  String get privacyErrorLogCleared => 'Dziennik błędów wyczyszczony';
+
+  @override
   String get privacyDeleteTitle => 'Usunąć wszystkie dane?';
 
   @override

@@ -1,7 +1,7 @@
 ﻿import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:share_plus/share_plus.dart';
@@ -42,6 +42,14 @@ class _StubTraceStorage extends TraceStorage {
 
   @override
   String exportAsJson() => stubExport;
+
+  /// Records the clear-error-log tap without touching Hive.
+  bool clearAllCalled = false;
+
+  @override
+  Future<void> clearAll() async {
+    clearAllCalled = true;
+  }
 }
 
 /// #519 — the Privacy Dashboard body grew with the
@@ -184,6 +192,56 @@ void main() {
         find.textContaining('Copy error log to clipboard (0)'),
         findsOneWidget,
       );
+    });
+
+    testWidgets(
+        'clear error-log button is disabled when the log is empty',
+        (tester) async {
+      await _setTallSurface(tester);
+      await pumpApp(
+        tester,
+        const PrivacyDashboardScreen(),
+        // Default stub reports count 0.
+        overrides: overrides(),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('privacy-clear-error-log-button')),
+        50.0,
+      );
+      final button = tester.widget<IconButton>(
+        find.byKey(const ValueKey('privacy-clear-error-log-button')),
+      );
+      expect(button.onPressed, isNull,
+          reason: 'nothing to clear → the reset button is disabled');
+    });
+
+    testWidgets(
+        'tapping clear error-log clears the traces and confirms (#1971)',
+        (tester) async {
+      await _setTallSurface(tester);
+      final stub = _StubTraceStorage(stubCount: 7);
+      await pumpApp(
+        tester,
+        const PrivacyDashboardScreen(),
+        overrides: [
+          storageRepositoryProvider.overrideWithValue(mockStorage),
+          syncStateProvider.overrideWith(() => _DisabledSyncState()),
+          traceStorageProvider.overrideWithValue(stub),
+        ],
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('privacy-clear-error-log-button')),
+        50.0,
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('privacy-clear-error-log-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(stub.clearAllCalled, isTrue);
+      expect(find.text('Error log cleared'), findsOneWidget);
     });
 
     testWidgets('shows export button', (tester) async {
