@@ -55,4 +55,4 @@ final class WidgetLaunchHandlerProvider
 }
 
 String _$widgetLaunchHandlerHash() =>
-    r'259f9b333bd7222fdc6f1ca6fafd5841f6314dfb';
+    r'a5f58e4a6884fcb4915435691fbb75ab1fa23082';
