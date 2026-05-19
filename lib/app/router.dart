@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/data/storage_repository.dart';
+import '../core/navigation/root_navigator_key.dart';
 import '../l10n/app_localizations.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
@@ -69,6 +70,10 @@ GoRouter router(Ref ref) {
   final storage = ref.watch(storageRepositoryProvider);
 
   return GoRouter(
+    // #1971 — an explicit root navigator key so widgets above the
+    // navigator (e.g. `CountrySwitchListener` in the MaterialApp
+    // builder) can reach a navigator-bearing context for `showDialog`.
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/consent',
     observers: [NavigationTraceObserver()],
     errorBuilder: (context, state) {

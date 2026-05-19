@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_switch_event.dart';
 import 'package:tankstellen/core/country/country_switch_listener.dart';
+import 'package:tankstellen/core/navigation/root_navigator_key.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -93,15 +94,20 @@ Future<
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: const MaterialApp(
+      // #1971 — mount `CountrySwitchListener` in the `builder:`, i.e.
+      // ABOVE the navigator, exactly as production does in
+      // `MaterialApp.router`'s builder. With the pre-fix code the
+      // listener's own context had no Navigator and `showDialog`
+      // crashed; the fix routes dialogs through `rootNavigatorKey`.
+      child: MaterialApp(
+        navigatorKey: rootNavigatorKey,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: Locale('en'),
-        home: Scaffold(
-          body: CountrySwitchListener(
-            child: Text('child-content'),
-          ),
+        locale: const Locale('en'),
+        builder: (context, child) => CountrySwitchListener(
+          child: child ?? const SizedBox.shrink(),
         ),
+        home: const Scaffold(body: Text('child-content')),
       ),
     ),
   );

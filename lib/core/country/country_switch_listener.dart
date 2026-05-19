@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/profile/providers/profile_provider.dart';
+import '../navigation/root_navigator_key.dart';
 import '../widgets/snackbar_helper.dart';
 import '../../l10n/app_localizations.dart';
 import 'country_config.dart';
@@ -73,13 +74,25 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
 
   Future<void> _handleSuggest(CountrySwitchEvent event) async {
     final profile = event.matchingProfile!;
-    final l = AppLocalizations.of(context);
+    // #1971 — mark the cooldown up-front. `CountrySwitchListener` lives
+    // above the navigator (MaterialApp `builder:`), so its own context
+    // has no Navigator; show the dialog against the navigator's overlay
+    // context instead. If that is unavailable, skip without crashing.
+    _markDismissed(event.detectedCountryCode);
+    // Capture the notifier before the await — the user can leave the
+    // screen while the dialog is open, which would make a post-await
+    // `ref` use throw a disposed-ref error.
+    final profileNotifier = ref.read(activeProfileProvider.notifier);
+    final dialogContext = rootNavigatorKey.currentState?.overlay?.context;
+    if (dialogContext == null) return;
+
+    final l = AppLocalizations.of(dialogContext);
     final countryConfig = Countries.byCode(event.detectedCountryCode);
     final countryName = countryConfig?.name ?? event.detectedCountryCode;
     final countryFlag = countryConfig?.flag ?? '';
 
     final confirmed = await showDialog<bool>(
-      context: context,
+      context: dialogContext,
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
         icon: Text(countryFlag, style: const TextStyle(fontSize: 48)),
@@ -102,19 +115,26 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
     );
 
     if (confirmed == true) {
-      await ref.read(activeProfileProvider.notifier).switchProfile(profile.id);
+      await profileNotifier.switchProfile(profile.id);
     }
-    _markDismissed(event.detectedCountryCode);
   }
 
   Future<void> _handleNoProfile(CountrySwitchEvent event) async {
-    final l = AppLocalizations.of(context);
+    // #1971 — mark the cooldown first so a missing navigator context
+    // can never let the event re-fire and spam the crash, then show the
+    // dialog against the navigator's overlay context (this listener's
+    // own context sits above the navigator and has none).
+    _markDismissed(event.detectedCountryCode);
+    final dialogContext = rootNavigatorKey.currentState?.overlay?.context;
+    if (dialogContext == null) return;
+
+    final l = AppLocalizations.of(dialogContext);
     final countryConfig = Countries.byCode(event.detectedCountryCode);
     final countryName = countryConfig?.name ?? event.detectedCountryCode;
     final countryFlag = countryConfig?.flag ?? '';
 
     await showDialog<void>(
-      context: context,
+      context: dialogContext,
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
         icon: Text(countryFlag, style: const TextStyle(fontSize: 48)),
@@ -131,6 +151,5 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
         ],
       ),
     );
-    _markDismissed(event.detectedCountryCode);
   }
 }
