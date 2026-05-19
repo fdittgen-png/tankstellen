@@ -194,16 +194,18 @@ object StationWidgetRenderer {
             ),
         )
 
-        // Refresh icon (#1801 / #1803) — an Activity PendingIntent that
-        // opens the app; the Flutter side then refreshes the widget on
-        // resume. This used to be a broadcast whose onReceive called
-        // `startActivity`, which Android 10+ blocks from a receiver — so
-        // the refresh button silently did nothing.
+        // Refresh icon (#1801 / #1803 / #1961) — an Activity PendingIntent
+        // that opens the app carrying the `tankstellenwidget://refresh`
+        // marker URI. The Flutter side recognises that URI and runs an
+        // explicit widget rebuild (price re-fetch + re-render) instead of
+        // relying on the resume heartbeat alone — so a tap deterministically
+        // refreshes. A bare launch (uri = null) used to leave the refresh
+        // racing the resume tick.
         views.setOnClickPendingIntent(
             R.id.widget_refresh,
             buildActivity(
                 context,
-                uri = null,
+                uri = Uri.parse("tankstellenwidget://refresh"),
                 requestCode = appWidgetId * 10 + 2,
             ),
         )
@@ -396,7 +398,15 @@ object StationWidgetRenderer {
             "buildRow widgetId=$appWidgetId index=$index id=$stationId brand=${station.optString("brand", "")} profile=${profileId ?: "active"}",
         )
         if (stationId.isNotBlank()) {
-            val uri = Uri.parse("tankstellenwidget://station?id=$stationId")
+            // #1961 — build the URI with Uri.Builder so the station id is
+            // percent-encoded. String-interpolating it raw let an id
+            // containing `&`, `+`, `%`, `#` or a space corrupt the query
+            // — the Flutter parser then opened the wrong station or none.
+            val uri = Uri.Builder()
+                .scheme("tankstellenwidget")
+                .authority("station")
+                .appendQueryParameter("id", stationId)
+                .build()
             row.setOnClickPendingIntent(
                 R.id.station_row_root,
                 buildActivity(

@@ -21,3 +21,16 @@ String? widgetUriToPath(Uri? uri) {
   if (id == null || id.isEmpty) return null;
   return id.startsWith('ocm-') ? '/ev-station/$id' : '/station/$id';
 }
+
+/// Whether [uri] is the home-widget **refresh** marker
+/// (`tankstellenwidget://refresh`), set by the widget's refresh button
+/// (`StationWidgetRenderer`, #1961).
+///
+/// It is not a navigation target — the caller treats it as "rebuild the
+/// widget" rather than a route to push. [widgetUriToPath] returns `null`
+/// for it (host is `refresh`, not `station`), so the two helpers are
+/// mutually exclusive.
+bool isWidgetRefreshUri(Uri? uri) =>
+    uri != null &&
+    uri.scheme == 'tankstellenwidget' &&
+    uri.host == 'refresh';

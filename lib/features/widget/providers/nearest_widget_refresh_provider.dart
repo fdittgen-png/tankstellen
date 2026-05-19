@@ -53,6 +53,13 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
     unawaited(_tick());
   }
 
+  /// Force an immediate widget rebuild — both variants — outside the
+  /// timer/resume cadence. Driven by the home-widget refresh button
+  /// (#1961): a tap launches the app with the `refresh` marker URI, and
+  /// `WidgetLaunchHandler` calls this so the rebuild is deterministic
+  /// rather than racing the resume heartbeat.
+  Future<void> refresh() => _tick();
+
   Future<void> _tick() async {
     try {
       final storage = ref.read(storageRepositoryProvider);
