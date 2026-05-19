@@ -130,4 +130,69 @@ void main() {
       expect(summary.distanceKm, closeTo(live, 1e-9));
     });
   });
+
+  group('TripRecordingController GPS-distance source (#1979)', () {
+    test(
+        'usable GPS track, no odometer → distanceSource == `gps`, '
+        'distanceKm == haversine of the track', () async {
+      final service = await _connectedService({
+        '01A6': 'NO DATA>',
+        '0131': 'NO DATA>',
+      });
+      final ctl = _buildController(service);
+      await ctl.start();
+
+      // 12 fixes, 0.001 deg latitude apart (~111 m) → 11 legs ~1.223 km.
+      for (var i = 0; i < 12; i++) {
+        ctl.debugAppendGpsFix(latitude: 45.0 + i * 0.001, longitude: 5.0);
+      }
+
+      final summary = await ctl.stop();
+      expect(summary.distanceSource, 'gps');
+      expect(summary.distanceKm, closeTo(1.223, 0.03));
+    });
+
+    test('a real odometer delta still wins over a GPS track', () async {
+      final service = await _connectedService({
+        '01A6': '41 A6 00 01 6A 2C>', // start = 9271.6 km
+      });
+      final ctl = _buildController(service);
+      await ctl.start();
+      ctl.debugSetOdometerReadings(latestKm: 9274.6); // +3.0 km
+      for (var i = 0; i < 12; i++) {
+        ctl.debugAppendGpsFix(latitude: 45.0 + i * 0.001, longitude: 5.0);
+      }
+
+      final summary = await ctl.stop();
+      expect(summary.distanceSource, 'real');
+      expect(summary.distanceKm, closeTo(3.0, 0.01));
+    });
+
+    test(
+        'a sparse GPS track (< 10 fixes) is not trusted — falls back to '
+        'the virtual odometer', () async {
+      final service = await _connectedService({
+        '01A6': 'NO DATA>',
+        '0131': 'NO DATA>',
+      });
+      final ctl = _buildController(service);
+      await ctl.start();
+
+      // Only 5 fixes — below kMinGpsFixesForDistanceSource.
+      for (var i = 0; i < 5; i++) {
+        ctl.debugAppendGpsFix(latitude: 45.0 + i * 0.001, longitude: 5.0);
+      }
+      // Speed samples so the virtual fallback has something to integrate:
+      // 30 km/h for 60 s = 0.5 km, at the #1927 ≤15 s cadence.
+      final t0 = DateTime.utc(2026, 5, 19, 10);
+      for (var s = 0; s <= 60; s += 15) {
+        ctl.debugRecordSpeedSample(
+            speedKmh: 30, at: t0.add(Duration(seconds: s)));
+      }
+
+      final summary = await ctl.stop();
+      expect(summary.distanceSource, 'virtual');
+      expect(summary.distanceKm, closeTo(0.5, 0.01));
+    });
+  });
 }

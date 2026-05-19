@@ -7,6 +7,7 @@ import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../domain/entities/gps_sample_diagnostic.dart';
+import '../../domain/gps_track_distance.dart';
 import '../../domain/services/gear_inference.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
@@ -31,7 +32,7 @@ import 'virtual_odometer.dart';
 // the #563 controller-split refactor. New callers should import the
 // individual files directly.
 export 'trip_distance_source.dart'
-    show kDistanceSourceReal, kDistanceSourceVirtual;
+    show kDistanceSourceReal, kDistanceSourceVirtual, kDistanceSourceGps;
 export 'trip_live_reading.dart' show TripLiveReading;
 
 /// Public recording state exposed by [TripRecordingController]
@@ -322,6 +323,13 @@ class TripRecordingController {
   /// real odometer.
   final List<VirtualOdometerSample> _speedSamples = <VirtualOdometerSample>[];
 
+  /// Rolling buffer of GPS fixes for the #1979 GPS-distance source.
+  /// Appended by [updateGpsFix] (one entry per Geolocator fix);
+  /// haversine-summed at finalisation when a usable track exists.
+  /// Capped at [kVirtualOdometerSampleCap] — the same generous bound
+  /// the speed buffer uses — so a forgotten recording stays bounded.
+  final List<GpsTrackPoint> _gpsTrack = <GpsTrackPoint>[];
+
   /// Owns the #1040 captured-sample buffer and the #1458 GPS
   /// cadence-diagnostics buffer — both per-trip ring buffers
   /// extracted into a focused collaborator (#1679).
@@ -521,6 +529,17 @@ class TripRecordingController {
       longitude: longitude,
       altitudeM: altitudeM,
     );
+    // #1979 — buffer every real fix for the GPS-distance source. A
+    // null-coord call only clears the per-tick latch; it is not a fix.
+    if (latitude != null && longitude != null) {
+      _gpsTrack.add(GpsTrackPoint(latitude, longitude));
+      if (_gpsTrack.length > kVirtualOdometerSampleCap) {
+        _gpsTrack.removeRange(
+          0,
+          _gpsTrack.length - kVirtualOdometerSampleCap,
+        );
+      }
+    }
   }
 
   /// #1615 — push the most recent exact-litre OEM-PID fuel reading into
@@ -808,16 +827,22 @@ class TripRecordingController {
 
   /// Distance covered by the current trip so far (#800).
   ///
-  /// Prefers the ground truth `odometerLatest - odometerStart` when
-  /// both readings are present AND moved forward by more than a
-  /// noise-floor epsilon (odometer PIDs are quantised to 0.1 km on
-  /// most cars — a 0.09-km delta on a 20-minute trip is a sensor
-  /// artefact, not real distance). When the odometer isn't readable
-  /// (Peugeot 107 class), falls back to the trapezoidal integral of
-  /// buffered speed samples via [VirtualOdometer].
+  /// Resolution order (#800 / #1979):
+  ///   1. the ground-truth `odometerLatest - odometerStart` when both
+  ///      readings are present AND moved forward by more than a
+  ///      noise-floor epsilon (odometer PIDs are quantised to 0.1 km
+  ///      on most cars — a 0.09-km delta is a sensor artefact);
+  ///   2. the haversine-summed GPS track, when a usable one was
+  ///      recorded — true road distance, free of the speed sensor's
+  ///      over-read;
+  ///   3. the trapezoidal integral of buffered speed samples via
+  ///      [VirtualOdometer], when the car exposes no odometer
+  ///      (Peugeot 107 class) and no GPS track was captured.
   double get currentDistanceKm {
     final real = _realOdometerDeltaKm();
     if (real != null) return real;
+    final gps = _gpsTrackDistanceKm();
+    if (gps != null) return gps;
     return VirtualOdometer(
       samples: _speedSamples,
       maxGapSeconds: _integrationGapCapSeconds,
@@ -825,19 +850,21 @@ class TripRecordingController {
   }
 
   /// `'real'` when [currentDistanceKm] came from the car's odometer,
+  /// `'gps'` when it came from the haversine-summed GPS track (#1979),
   /// `'virtual'` when it came from [VirtualOdometer] integration
   /// (#800). Persisted on the finalised [TripSummary] so the fill-up
   /// flow and eco-analytics know whether to treat the km as a ground
   /// truth or as an estimate.
-  String get distanceSource =>
-      _realOdometerDeltaKm() != null
-          ? kDistanceSourceReal
-          : kDistanceSourceVirtual;
+  String get distanceSource {
+    if (_realOdometerDeltaKm() != null) return kDistanceSourceReal;
+    if (_gpsTrackDistanceKm() != null) return kDistanceSourceGps;
+    return kDistanceSourceVirtual;
+  }
 
   /// `odometerLatest - odometerStart` if both are present and the
   /// delta is above a small noise-floor epsilon (0.05 km — half the
   /// 0.1 km quantisation most cars apply to PID A6). Returns null
-  /// otherwise so callers can fall back to the virtual odometer.
+  /// otherwise so callers can fall back to the GPS / virtual odometer.
   double? _realOdometerDeltaKm() {
     final start = _odometerStartKm;
     final latest = _odometerLatestKm;
@@ -845,6 +872,18 @@ class TripRecordingController {
     final delta = latest - start;
     if (delta < 0.05) return null;
     return delta;
+  }
+
+  /// Haversine-summed distance of the buffered GPS track, or null when
+  /// the track is too sparse to trust (#1979): fewer than
+  /// [kMinGpsFixesForDistanceSource] fixes, or a sub-50 m total (a
+  /// parked car's GPS scatter). Callers then fall back to the virtual
+  /// odometer.
+  double? _gpsTrackDistanceKm() {
+    if (_gpsTrack.length < kMinGpsFixesForDistanceSource) return null;
+    final km = GpsTrackDistance.haversineKm(_gpsTrack);
+    if (km < 0.05) return null;
+    return km;
   }
 
   /// Append a speed sample to the virtual-odometer buffer, dropping
@@ -1459,4 +1498,13 @@ class TripRecordingController {
   @visibleForTesting
   List<VirtualOdometerSample> get debugSpeedSamples =>
       List.unmodifiable(_speedSamples);
+
+  /// Exposed for tests: append a GPS fix to the #1979 track buffer
+  /// without a live Geolocator stream, so tests can drive the
+  /// GPS-distance path of [currentDistanceKm] / [distanceSource]
+  /// deterministically.
+  @visibleForTesting
+  void debugAppendGpsFix({required double latitude, required double longitude}) {
+    _gpsTrack.add(GpsTrackPoint(latitude, longitude));
+  }
 }

@@ -17,6 +17,18 @@ const String kDistanceSourceReal = 'real';
 /// the oldest samples first.
 const String kDistanceSourceVirtual = 'virtual';
 
+/// Final trip distance came from haversine-summing the trip's recorded
+/// GPS track (#1979). More accurate than [kDistanceSourceVirtual] — the
+/// OBD speed sensor reads the speedometer, which over-reads true road
+/// distance by a few percent — but ranked below [kDistanceSourceReal]:
+/// the car's own odometer stays the ground truth when it is readable.
+const String kDistanceSourceGps = 'gps';
+
+/// Minimum number of buffered GPS fixes before the track is trusted as
+/// a distance source (#1979). A handful of fixes cannot describe a
+/// route; below this the recorder falls back to the virtual odometer.
+const int kMinGpsFixesForDistanceSource = 10;
+
 /// Upper bound on the speed-sample buffer used by the virtual
 /// odometer (#800). At 5 Hz a 10-hour trip produces ~180 k samples —
 /// the typical driving session is well under 2 hours, so 60 k (~3.3
