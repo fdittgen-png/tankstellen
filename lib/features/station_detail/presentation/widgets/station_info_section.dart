@@ -48,6 +48,7 @@ class StationInfoSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         ListTile(
+          dense: true,
           leading: const Icon(Icons.location_on),
           title: Text(
             '${station.street}${station.houseNumber != null ? ' ${station.houseNumber}' : ''}',
@@ -62,7 +63,7 @@ class StationInfoSection extends StatelessWidget {
             tooltip: l10n?.navigate ?? 'Navigate',
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
 
         // Opening times
         SectionHeader(
@@ -94,7 +95,7 @@ class StationInfoSection extends StatelessWidget {
             leading: Icon(Icons.schedule),
             title: Text('—'),
           ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
 
         // Location info
         if (station.department != null || station.region != null) ...[
@@ -113,7 +114,7 @@ class StationInfoSection extends StatelessWidget {
                 ? Text(l10n?.highway ?? 'Highway')
                 : Text(l10n?.localStation ?? 'Local station'),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
         ],
 
         // Amenities (icon chips) — at the bottom
@@ -124,7 +125,7 @@ class StationInfoSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           AmenityChips(amenities: station.amenities, maxVisible: 8),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
         ],
 
         // Payment methods (inferred from brand — no API data available)
@@ -137,7 +138,7 @@ class StationInfoSection extends StatelessWidget {
           PaymentMethodChips(brand: station.brand, maxVisible: 8),
           const SizedBox(height: 8),
           PayWithAppButton(brand: station.brand),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
         ],
 
         // Services (raw text from API) — at the bottom, collapsed by
