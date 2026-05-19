@@ -1529,6 +1529,12 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Počisti dnevnik napak';
+
+  @override
+  String get privacyErrorLogCleared => 'Dnevnik napak počiščen';
+
+  @override
   String get privacyDeleteTitle => 'Izbrisati vse podatke?';
 
   @override

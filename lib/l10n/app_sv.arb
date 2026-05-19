@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Data exporterad till urklipp",
   "privacyExportCsvButton": "Exportera all data som CSV",
   "privacyExportCsvSuccess": "CSV-data exporterad till urklipp",
+  "privacyClearErrorLog": "Rensa felloggen",
+  "privacyErrorLogCleared": "Felloggen rensad",
   "privacyDeleteButton": "Radera all data",
   "privacyCopyErrorLog": "Kopiera fellogg till urklipp ({count})",
   "privacyDeleteTitle": "Radera all data?",

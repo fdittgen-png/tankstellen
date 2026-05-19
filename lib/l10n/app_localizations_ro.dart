@@ -1536,6 +1536,12 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Șterge jurnalul de erori';
+
+  @override
+  String get privacyErrorLogCleared => 'Jurnalul de erori a fost șters';
+
+  @override
   String get privacyDeleteTitle => 'Ștergeți toate datele?';
 
   @override

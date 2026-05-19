@@ -1536,6 +1536,12 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Hibanapló törlése';
+
+  @override
+  String get privacyErrorLogCleared => 'Hibanapló törölve';
+
+  @override
   String get privacyDeleteTitle => 'Törli az összes adatot?';
 
   @override

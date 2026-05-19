@@ -1541,6 +1541,12 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Effacer le journal d\'erreurs';
+
+  @override
+  String get privacyErrorLogCleared => 'Journal d\'erreurs effacé';
+
+  @override
   String get privacyDeleteTitle => 'Supprimer toutes les données ?';
 
   @override

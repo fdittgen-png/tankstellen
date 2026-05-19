@@ -67,6 +67,7 @@ class _PrivacyDashboardScreenState
   Widget build(BuildContext context) {
     final snapshot = ref.watch(privacyDataProvider);
     final l = AppLocalizations.of(context);
+    final errorLogCount = ref.watch(traceStorageProvider).count;
 
     return PageScaffold(
       title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
@@ -93,15 +94,31 @@ class _PrivacyDashboardScreenState
           // traces with the maintainer (or with their own bug report)
           // even when Sentry is not configured. Uses Clipboard so we
           // don't need a share_plus dependency.
-          OutlinedButton.icon(
-            key: const ValueKey('privacy-export-error-log-button'),
-            onPressed: _exportErrorLog,
-            icon: const Icon(Icons.bug_report_outlined),
-            label: Text(
-              l?.privacyCopyErrorLog(ref.watch(traceStorageProvider).count) ??
-                  'Copy error log to clipboard '
-                      '(${ref.watch(traceStorageProvider).count})',
-            ),
+          //
+          // #1971 follow-up — a trailing reset button clears the
+          // buffered traces once the user has copied them (or just
+          // wants a clean slate); disabled when the log is empty.
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  key: const ValueKey('privacy-export-error-log-button'),
+                  onPressed: _exportErrorLog,
+                  icon: const Icon(Icons.bug_report_outlined),
+                  label: Text(
+                    l?.privacyCopyErrorLog(errorLogCount) ??
+                        'Copy error log to clipboard ($errorLogCount)',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                key: const ValueKey('privacy-clear-error-log-button'),
+                onPressed: errorLogCount == 0 ? null : _clearErrorLog,
+                icon: const Icon(Icons.delete_outline),
+                tooltip: l?.privacyClearErrorLog ?? 'Clear error log',
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           PrivacyDeleteAllButton(onPressed: _deleteAllData),
@@ -184,6 +201,21 @@ class _PrivacyDashboardScreenState
           '$kb KB) — some entries failed to parse';
     }
     return 'Error log copied to clipboard — $kb KB, $parsed entries';
+  }
+
+  /// Clears every buffered error trace and refreshes the dashboard so
+  /// the copy button's count drops to 0 (#1971 follow-up).
+  Future<void> _clearErrorLog() async {
+    await ref.read(traceStorageProvider).clearAll();
+    if (!mounted) return;
+    // `traceStorageProvider` hands back a stable wrapper over the Hive
+    // box, so invalidate it to force `build`'s `count` read to re-run.
+    ref.invalidate(traceStorageProvider);
+    final l = AppLocalizations.of(context);
+    SnackBarHelper.showSuccess(
+      context,
+      l?.privacyErrorLogCleared ?? 'Error log cleared',
+    );
   }
 
   Future<void> _shareErrorLogAsFile(String json) async {

@@ -1537,6 +1537,12 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Vymazať protokol chýb';
+
+  @override
+  String get privacyErrorLogCleared => 'Protokol chýb vymazaný';
+
+  @override
   String get privacyDeleteTitle => 'Odstrániť všetky údaje?';
 
   @override

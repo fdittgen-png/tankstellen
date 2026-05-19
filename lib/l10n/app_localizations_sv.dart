@@ -1529,6 +1529,12 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Rensa felloggen';
+
+  @override
+  String get privacyErrorLogCleared => 'Felloggen rensad';
+
+  @override
   String get privacyDeleteTitle => 'Radera all data?';
 
   @override

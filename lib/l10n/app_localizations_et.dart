@@ -1525,6 +1525,12 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Tühjenda vealogi';
+
+  @override
+  String get privacyErrorLogCleared => 'Vealogi tühjendatud';
+
+  @override
   String get privacyDeleteTitle => 'Kustutada kõik andmed?';
 
   @override

@@ -1527,6 +1527,12 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Tøm feilloggen';
+
+  @override
+  String get privacyErrorLogCleared => 'Feilloggen tømt';
+
+  @override
   String get privacyDeleteTitle => 'Slette alle data?';
 
   @override

@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Andmed eksporditi lõikelauale",
   "privacyExportCsvButton": "Ekspordi kõik andmed CSV-na",
   "privacyExportCsvSuccess": "CSV-andmed eksporditi lõikelauale",
+  "privacyClearErrorLog": "Tühjenda vealogi",
+  "privacyErrorLogCleared": "Vealogi tühjendatud",
   "privacyDeleteButton": "Kustuta kõik andmed",
   "privacyCopyErrorLog": "Kopeeri tõrkepäevik lõikelauale ({count})",
   "privacyDeleteTitle": "Kustutada kõik andmed?",

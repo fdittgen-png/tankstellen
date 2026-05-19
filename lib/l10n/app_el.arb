@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Τα δεδομένα εξήχθησαν στο πρόχειρο",
   "privacyExportCsvButton": "Εξαγωγή όλων των δεδομένων ως CSV",
   "privacyExportCsvSuccess": "Τα δεδομένα CSV εξήχθησαν στο πρόχειρο",
+  "privacyClearErrorLog": "Εκκαθάριση αρχείου σφαλμάτων",
+  "privacyErrorLogCleared": "Το αρχείο σφαλμάτων εκκαθαρίστηκε",
   "privacyDeleteButton": "Διαγραφή όλων των δεδομένων",
   "privacyCopyErrorLog": "Αντιγραφή αρχείου καταγραφής σφαλμάτων στο πρόχειρο ({count})",
   "privacyDeleteTitle": "Διαγραφή όλων των δεδομένων;",

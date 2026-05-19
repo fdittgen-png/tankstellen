@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Data eksporteret til udklipsholder",
   "privacyExportCsvButton": "Eksporter alle data som CSV",
   "privacyExportCsvSuccess": "CSV-data eksporteret til udklipsholder",
+  "privacyClearErrorLog": "Ryd fejllog",
+  "privacyErrorLogCleared": "Fejllog ryddet",
   "privacyDeleteButton": "Slet alle data",
   "privacyCopyErrorLog": "Kopier fejllog til udklipsholder ({count})",
   "privacyDeleteTitle": "Slet alle data?",

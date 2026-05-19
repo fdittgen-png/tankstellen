@@ -2913,6 +2913,18 @@ abstract class AppLocalizations {
   /// **'Copy error log to clipboard ({count})'**
   String privacyCopyErrorLog(int count);
 
+  /// No description provided for @privacyClearErrorLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear error log'**
+  String get privacyClearErrorLog;
+
+  /// No description provided for @privacyErrorLogCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Error log cleared'**
+  String get privacyErrorLogCleared;
+
   /// No description provided for @privacyDeleteTitle.
   ///
   /// In en, this message translates to:

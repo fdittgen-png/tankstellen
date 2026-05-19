@@ -1540,6 +1540,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get privacyClearErrorLog => 'Fehlerprotokoll löschen';
+
+  @override
+  String get privacyErrorLogCleared => 'Fehlerprotokoll gelöscht';
+
+  @override
   String get privacyDeleteTitle => 'Alle Daten löschen?';
 
   @override

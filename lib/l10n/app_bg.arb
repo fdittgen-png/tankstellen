@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Данните са експортирани в клипборда",
   "privacyExportCsvButton": "Експортирай всички данни като CSV",
   "privacyExportCsvSuccess": "CSV данните са експортирани в клипборда",
+  "privacyClearErrorLog": "Изчистване на дневника с грешки",
+  "privacyErrorLogCleared": "Дневникът с грешки е изчистен",
   "privacyDeleteButton": "Изтрий всички данни",
   "privacyCopyErrorLog": "Копирай журнала с грешки в клипборда ({count})",
   "privacyDeleteTitle": "Изтриване на всички данни?",

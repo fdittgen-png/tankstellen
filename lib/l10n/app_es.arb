@@ -474,6 +474,8 @@
   "privacyExportSuccess": "Datos exportados al portapapeles",
   "privacyExportCsvButton": "Exportar todos los datos como CSV",
   "privacyExportCsvSuccess": "Datos CSV exportados al portapapeles",
+  "privacyClearErrorLog": "Borrar registro de errores",
+  "privacyErrorLogCleared": "Registro de errores borrado",
   "privacyDeleteButton": "Eliminar todos los datos",
   "privacyCopyErrorLog": "Copiar registro de errores al portapapeles ({count})",
   "privacyDeleteTitle": "¿Eliminar todos los datos?",
