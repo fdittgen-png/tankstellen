@@ -34,6 +34,14 @@ DEFAULT_CHANGELOG_DIR = "fastlane/metadata/android"
 DEFAULT_LOCALES = ["de-DE", "en-US", "fr-FR"]
 SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 
+# #1983 — every Android Publisher call is a network round-trip; a daily
+# CI build must not die on a single transient socket timeout / 5xx.
+# `num_retries` makes googleapiclient retry those with exponential
+# backoff. `UPLOAD_CHUNK_BYTES` splits the resumable AAB upload into
+# smaller, individually-retryable requests (must be a 256 KB multiple).
+MAX_API_RETRIES = 5
+UPLOAD_CHUNK_BYTES = 8 * 1024 * 1024
+
 
 def load_release_notes(
     changelog_dir: Path,
@@ -102,7 +110,9 @@ def main() -> int:
 
     print(f"Opening edit for {args.package}")
     try:
-        edit = edits.insert(packageName=args.package, body={}).execute()
+        edit = edits.insert(packageName=args.package, body={}).execute(
+            num_retries=MAX_API_RETRIES,
+        )
     except HttpError as e:
         print(f"ERROR: edits.insert failed: {e}", file=sys.stderr)
         return 3
@@ -110,13 +120,18 @@ def main() -> int:
     print(f"  edit id: {edit_id}")
 
     print(f"Uploading {aab} ({aab.stat().st_size / 1_000_000:.2f} MB)")
-    media = MediaFileUpload(str(aab), mimetype="application/octet-stream", resumable=True)
+    media = MediaFileUpload(
+        str(aab),
+        mimetype="application/octet-stream",
+        resumable=True,
+        chunksize=UPLOAD_CHUNK_BYTES,
+    )
     try:
         bundle = edits.bundles().upload(
             packageName=args.package,
             editId=edit_id,
             media_body=media,
-        ).execute()
+        ).execute(num_retries=MAX_API_RETRIES)
     except HttpError as e:
         print(f"ERROR: bundle upload failed: {e}", file=sys.stderr)
         return 4
@@ -141,7 +156,7 @@ def main() -> int:
                     "releaseNotes": release_notes,
                 }],
             },
-        ).execute()
+        ).execute(num_retries=MAX_API_RETRIES)
     except HttpError as e:
         print(f"ERROR: track update failed: {e}", file=sys.stderr)
         return 5
@@ -149,7 +164,9 @@ def main() -> int:
     if args.dry_run:
         print("Dry-run: validating edit (no commit)")
         try:
-            edits.validate(packageName=args.package, editId=edit_id).execute()
+            edits.validate(packageName=args.package, editId=edit_id).execute(
+                num_retries=MAX_API_RETRIES,
+            )
             print("Validation OK — edit will NOT be committed (dry-run).")
         except HttpError as e:
             print(f"ERROR: validation failed: {e}", file=sys.stderr)
@@ -158,7 +175,9 @@ def main() -> int:
 
     print("Committing edit")
     try:
-        edits.commit(packageName=args.package, editId=edit_id).execute()
+        edits.commit(packageName=args.package, editId=edit_id).execute(
+            num_retries=MAX_API_RETRIES,
+        )
     except HttpError as e:
         print(f"ERROR: edits.commit failed: {e}", file=sys.stderr)
         return 7
