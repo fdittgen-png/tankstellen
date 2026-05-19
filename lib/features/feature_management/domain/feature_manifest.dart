@@ -117,7 +117,9 @@ class FeatureManifest {
   /// - `consumptionAnalytics`: false (no trips → no tab)
   /// - `baselineSync`: false (off until TankSync is enabled)
   /// - `priceAlerts`, `priceHistory`, `routePlanning`, `evCharging`: true
-  /// - `glideCoach`, `gpsTripPath`: false (future features, opt-in)
+  /// - `glideCoach`: false (future feature, opt-in)
+  /// - `gpsTripPath`: true (#1981 — a GPS track is true road distance,
+  ///   which makes the consumption figure accurate; #1979)
   /// - `showFuel`, `showElectric`: true (#1373 phase 3c — both
   ///   surfaces visible by default; mirrors the historical
   ///   `UserProfile.showFuel` / `showElectric` defaults so existing
@@ -201,7 +203,12 @@ class FeatureManifest {
     ),
     Feature.gpsTripPath: FeatureManifestEntry.allChannels(
       feature: Feature.gpsTripPath,
-      defaultOn: false,
+      // #1981 — default-on: the GPS track is true road distance, which
+      // makes the consumption figure accurate (the OBD speed sensor
+      // over-reads — #1979). `requires: obd2TripRecording` scopes it to
+      // users who actually record trips; it is foreground-only and can
+      // still be turned off from Feature management.
+      defaultOn: true,
       requires: {Feature.obd2TripRecording},
       displayName: 'GPS trip path',
       description: 'Persist GPS path samples alongside each trip.',

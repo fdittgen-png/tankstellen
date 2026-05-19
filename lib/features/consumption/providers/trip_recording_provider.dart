@@ -370,11 +370,12 @@ class TripRecording extends _$TripRecording {
     await _baselines.load();
 
     await ctl.start();
-    // #1374 phase 1 — opt-in GPS sampling. Only when the user has
-    // explicitly turned the feature on do we open a Geolocator
-    // position stream; the flag-off path skips the plugin entirely so
-    // a default-config user pays no battery cost.
-    _gps.start(ctl);
+    // #1374 / #1981 — GPS trip-path sampling. Default-on for trip
+    // recorders (#1981) so consumption uses true road distance; the
+    // controller requests location permission and no-ops cleanly if
+    // the flag is off or permission is denied. Fire-and-forget — the
+    // permission round-trip must not block trip-start.
+    unawaited(_gps.start(ctl));
     // #1615 — opt-in experimental OEM-PID exact-fuel-level poll. A
     // no-op (no timer, no registry resolution) when the flag is off or
     // the adapter is not OEM-PID-capable, so a default-config user pays
