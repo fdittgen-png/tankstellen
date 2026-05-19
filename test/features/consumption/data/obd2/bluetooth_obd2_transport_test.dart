@@ -83,6 +83,37 @@ void main() {
       expect(reply.trim(), '41 0D 3C');
     });
 
+    test(
+        'overlapping sendCommand calls serialise instead of colliding (#1972)',
+        () async {
+      final channel = _ScriptedChannel();
+      channel.scriptResponse('ATZ\r', 'ELM327>');
+      channel.scriptResponse('ATE0\r', 'OK>');
+      channel.scriptResponse('ATL0\r', 'OK>');
+      channel.scriptResponse('ATH0\r', 'OK>');
+      channel.scriptResponse('ATSP0\r', 'OK>');
+      channel.scriptResponse('010C\r', '41 0C 1A F8 >');
+      channel.scriptResponse('010D\r', '41 0D 3C >');
+      final transport = BluetoothObd2Transport(channel);
+      await transport.connect();
+
+      // Fire both WITHOUT awaiting the first — a VIN read racing the
+      // auto-record PID poller on the shared transport. Pre-#1972 the
+      // second call threw a concurrent-sendCommand StateError.
+      final f1 = transport.sendCommand('010C\r');
+      final f2 = transport.sendCommand('010D\r');
+      final results = await Future.wait([f1, f2]);
+
+      expect(results[0], contains('41 0C 1A F8'));
+      expect(results[1], contains('41 0D 3C'));
+      // The second command must be written only after the first's
+      // round-trip — the queue preserves order on the half-duplex link.
+      expect(
+        channel.writesAsStrings.sublist(channel.writesAsStrings.length - 2),
+        ['010C\r', '010D\r'],
+      );
+    });
+
     test('disconnect closes the channel and flips isConnected to false',
         () async {
       final channel = _ScriptedChannel();
