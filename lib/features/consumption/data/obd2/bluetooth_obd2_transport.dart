@@ -28,6 +28,14 @@ class BluetoothObd2Transport implements Obd2Transport {
   Completer<String>? _pending;
   bool _connected = false;
 
+  /// Tail of the command queue. Every [sendCommand] chains onto this so
+  /// overlapping callers — e.g. the VIN reader racing the auto-record
+  /// PID poller, both sharing one transport — serialise instead of
+  /// colliding on the half-duplex ELM327 link (#1972). The tail tracks
+  /// completion of each command (success *or* error) so one failed
+  /// command never stalls the queue behind it.
+  Future<void> _queueTail = Future<void>.value();
+
   BluetoothObd2Transport(
     this._channel, {
     Duration readTimeout = const Duration(seconds: 5),
@@ -58,7 +66,27 @@ class BluetoothObd2Transport implements Obd2Transport {
     if (!_connected) {
       throw StateError('BluetoothObd2Transport not connected');
     }
-    return _sendRaw(command);
+    // #1972 — serialise every caller onto a single queue. The ELM327 is
+    // half-duplex; without this a second consumer's command collided
+    // with one already in flight and threw a concurrent-sendCommand
+    // StateError.
+    final completer = Completer<String>();
+    _queueTail = _queueTail.then((_) async {
+      // The transport may have been torn down while this command waited
+      // its turn — fail it cleanly rather than writing to a closed link.
+      if (!_connected) {
+        completer.completeError(
+          StateError('BluetoothObd2Transport not connected'),
+        );
+        return;
+      }
+      try {
+        completer.complete(await _sendRaw(command));
+      } catch (e, st) {
+        completer.completeError(e, st);
+      }
+    });
+    return completer.future;
   }
 
   @override
@@ -73,8 +101,9 @@ class BluetoothObd2Transport implements Obd2Transport {
 
   Future<String> _sendRaw(String command) async {
     // One in-flight command at a time — the ELM327 is half-duplex.
-    // Queuing is handled by Future chaining at the service layer;
-    // reject overlapping writes here explicitly.
+    // [sendCommand] serialises every caller onto `_queueTail`, so this
+    // guard is now a defensive invariant: tripping it means a code path
+    // reached `_sendRaw` while another command was unfinished.
     if (_pending != null) {
       throw StateError(
         'BluetoothObd2Transport: concurrent sendCommand is not allowed',
