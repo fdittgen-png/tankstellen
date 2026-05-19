@@ -40,7 +40,10 @@ typedef AdapterConnectAttempt = Future<bool> Function(String mac);
 ///
 /// Lifetime:
 ///   - Constructed by the controller when `_handleDrop` fires.
-///   - [start] schedules the first timer at [initialBackoff].
+///   - [start] schedules the first probe after a short `firstProbeDelay`
+///     (#1991) — a fresh drop is usually a transient BLE blip, so the
+///     first reconnect must land inside the controller's silent-
+///     reconnect grace window rather than after the full backoff.
 ///   - [stop] cancels the timer cleanly; safe to call more than
 ///     once.
 ///   - The scanner does not own the controller; the caller decides
@@ -51,6 +54,14 @@ class AdapterReconnectScanner {
   final AdapterConnectAttempt _connect;
   final VoidCallback _onReconnect;
   final Duration _maxBackoff;
+
+  /// Delay before the FIRST probe after a drop (#1991). A fresh drop is
+  /// most often a transient BLE blip; probing near-immediately — rather
+  /// than after the full [_currentBackoff] — lets the reconnect land
+  /// inside the controller's 6 s silent-reconnect grace window, so the
+  /// user never sees the "connection lost" banner. Only the first
+  /// attempt is fast; subsequent misses use exponential backoff.
+  final Duration _firstProbeDelay;
 
   Duration _currentBackoff;
   Timer? _timer;
@@ -64,11 +75,13 @@ class AdapterReconnectScanner {
     required VoidCallback onReconnect,
     Duration initialBackoff = const Duration(seconds: 5),
     Duration maxBackoff = const Duration(seconds: 60),
+    Duration firstProbeDelay = const Duration(seconds: 1),
   })  : _pinnedMac = pinnedMac,
         _probe = probe,
         _connect = connect,
         _onReconnect = onReconnect,
         _maxBackoff = maxBackoff,
+        _firstProbeDelay = firstProbeDelay,
         _currentBackoff = initialBackoff;
 
   /// `true` while the scanner is active (a probe timer is scheduled
@@ -93,7 +106,10 @@ class AdapterReconnectScanner {
   Future<void> start() async {
     if (_scanning) return;
     _scanning = true;
-    _scheduleNext();
+    // #1991 — first probe fast (a transient drop recovers quickest with
+    // a near-immediate retry); subsequent misses fall back to the
+    // exponential backoff via `_scheduleNext`.
+    _timer = Timer(_firstProbeDelay, _runCycle);
   }
 
   /// Cancel any pending timer and mark the scanner stopped. Safe to
@@ -121,8 +137,11 @@ class AdapterReconnectScanner {
       final inRange = await _probeSafely();
       if (!_scanning) return; // stop() raced — honour it
       if (!inRange) {
-        _doubleBackoff();
+        // Schedule the next retry at the current backoff, THEN double
+        // it — so the first retry after a fast first probe uses
+        // `initialBackoff`, not `initialBackoff × 2` (#1991).
         _scheduleNext();
+        _doubleBackoff();
         return;
       }
       final ok = await _connectSafely();
@@ -136,10 +155,10 @@ class AdapterReconnectScanner {
         return;
       }
       // Probe said "in range" but connect failed (adapter busy,
-      // dance interrupted). Treat as a miss — double the backoff
-      // so we don't hammer the adapter.
-      _doubleBackoff();
+      // dance interrupted). Treat as a miss — schedule the retry,
+      // then double the backoff so we don't hammer the adapter.
       _scheduleNext();
+      _doubleBackoff();
     } finally {
       _cycleInFlight = false;
     }

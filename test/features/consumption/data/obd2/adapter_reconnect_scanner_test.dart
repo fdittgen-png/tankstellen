@@ -37,6 +37,7 @@ void main() {
         connect: (_) async => true,
         onReconnect: () {},
         initialBackoff: _kInitial,
+        firstProbeDelay: _kInitial,
         maxBackoff: _kMax,
       );
       await scanner.start();
@@ -61,6 +62,37 @@ void main() {
       await scanner.stop();
     });
 
+    test('first probe fires at firstProbeDelay, not initialBackoff (#1991)',
+        () async {
+      var probeCalls = 0;
+      final scanner = AdapterReconnectScanner(
+        pinnedMac: 'MAC',
+        probe: (_) async {
+          probeCalls++;
+          return false;
+        },
+        connect: (_) async => false,
+        onReconnect: () {},
+        firstProbeDelay: const Duration(milliseconds: 10),
+        // A deliberately long initialBackoff — if the first probe
+        // waited for it, the assertion below would time out.
+        initialBackoff: const Duration(seconds: 30),
+        maxBackoff: const Duration(seconds: 60),
+      );
+      await scanner.start();
+
+      // The first probe must land within the short firstProbeDelay —
+      // far inside the controller's 6 s silent-reconnect grace window,
+      // not after the 30 s initialBackoff.
+      await _waitFor(() => probeCalls >= 1,
+          timeout: const Duration(milliseconds: 500));
+      expect(probeCalls, 1,
+          reason: 'the first reconnect probe must fire at '
+              'firstProbeDelay, not wait the full initialBackoff (#1991)');
+
+      await scanner.stop();
+    });
+
     test('caps backoff at maxBackoff', () async {
       var probeCalls = 0;
       final scanner = AdapterReconnectScanner(
@@ -72,6 +104,7 @@ void main() {
         connect: (_) async => false,
         onReconnect: () {},
         initialBackoff: _kInitial, // 10 ms
+        firstProbeDelay: _kInitial,
         maxBackoff: _kMax, // 80 ms
       );
       await scanner.start();
@@ -97,6 +130,7 @@ void main() {
         },
         onReconnect: () => reconnectCount++,
         initialBackoff: _kInitial,
+        firstProbeDelay: _kInitial,
       );
       await scanner.start();
 
@@ -119,6 +153,7 @@ void main() {
         connect: (_) async => false,
         onReconnect: () {},
         initialBackoff: _kInitial,
+        firstProbeDelay: _kInitial,
       );
       await scanner.start();
       expect(scanner.isScanning, isTrue);
@@ -148,6 +183,7 @@ void main() {
         },
         onReconnect: () => reconnectCount++,
         initialBackoff: _kInitial,
+        firstProbeDelay: _kInitial,
       );
       await scanner.start();
 
@@ -172,6 +208,7 @@ void main() {
         connect: (_) async => true,
         onReconnect: () {},
         initialBackoff: _kInitial,
+        firstProbeDelay: _kInitial,
       );
       await scanner.start();
 
@@ -204,6 +241,7 @@ void main() {
         connect: (_) async => false,
         onReconnect: () {},
         initialBackoff: _kInitial,
+        firstProbeDelay: _kInitial,
       );
       await scanner.start();
       await scanner.start();
