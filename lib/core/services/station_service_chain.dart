@@ -118,9 +118,16 @@ class StationServiceChain implements StationService {
       }
     }
 
-    // Step 2: API call
+    // Step 2: API call. Wrapped with one transient-error retry so a
+    // single 5xx burst or connect-timeout doesn't immediately fall
+    // through to stale cache (or, when there is no stale cache, throw
+    // `ServiceChainExhaustedException` straight to the user). The
+    // affected sources right now are the MITECO endpoint (#1954 — 503s
+    // under load) and the Argentina CKAN bulk-download (#1955 — slow
+    // first-byte triggering Dio's connect timeout). Both recover on a
+    // second attempt within a second.
     try {
-      final result = await apiCall();
+      final result = await _callWithTransientRetry(apiCall);
       await _cache.put(
         cacheKey,
         serialize(result.data),
@@ -153,6 +160,59 @@ class StationServiceChain implements StationService {
 
     // Step 4: Nothing worked
     throw ServiceChainExhaustedException(errors: errors);
+  }
+
+  /// Delay between the first and second attempt of [_callWithTransientRetry].
+  /// 500 ms keeps the user-visible latency tight (most browsers stall ≥1 s
+  /// before a user even notices), and is long enough for an overloaded
+  /// upstream to clear a 503 burst. Exposed as `@visibleForTesting` so the
+  /// retry test can run without sleeping a real half-second.
+  @visibleForTesting
+  static Duration transientRetryDelay = const Duration(milliseconds: 500);
+
+  /// Wraps a single [apiCall] with one retry on transient remote errors —
+  /// 5xx responses (`ApiException.statusCode in 500..599`) and Dio
+  /// connect/receive/send timeouts (the `ApiException.message` is stamped
+  /// `${e.type.name}:` by [StationServiceHelpers.throwApiException], so we
+  /// match on that prefix). One retry only — the goal is to absorb a
+  /// transient blip, not to mask sustained outages from the chain's
+  /// fall-through to stale cache or to the user-visible error dialog.
+  ///
+  /// Returns the second attempt's result on success; rethrows the second
+  /// attempt's exception on failure so the caller observes the same
+  /// `on Exception` semantics as a plain `await apiCall()`. Non-transient
+  /// errors (4xx, parse failures, anything else) skip the retry — those
+  /// are not going to fix themselves in 500 ms.
+  Future<ServiceResult<T>> _callWithTransientRetry<T>(
+    Future<ServiceResult<T>> Function() apiCall,
+  ) async {
+    try {
+      return await apiCall();
+    } on ApiException catch (e) {
+      if (!_isTransient(e)) rethrow;
+      // Single retry — log to the dev console so debug builds surface the
+      // recovered call (production has no listener attached).
+      debugPrint(
+        'StationServiceChain: retrying after transient error '
+        '(status=${e.statusCode}, message=${e.message})',
+      );
+      await Future<void>.delayed(transientRetryDelay);
+      return apiCall();
+    }
+  }
+
+  /// `true` when [e] is the kind of error a 500 ms retry could plausibly
+  /// recover from — a server-side 5xx burst or a Dio-layer connect /
+  /// receive / send timeout. 4xx ("bad request", "not found") and parse
+  /// errors are not transient.
+  static bool _isTransient(ApiException e) {
+    final code = e.statusCode;
+    if (code != null && code >= 500 && code < 600) return true;
+    final msg = e.message;
+    return msg.startsWith('connectionTimeout') ||
+        msg.startsWith('receiveTimeout') ||
+        msg.startsWith('sendTimeout') ||
+        msg.startsWith('connectionError');
   }
 
   @override
