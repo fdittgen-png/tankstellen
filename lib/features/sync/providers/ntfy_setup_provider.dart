@@ -126,13 +126,28 @@ class NtfySetupController extends _$NtfySetupController {
   }
 
   /// Send a test notification to the current topic.
-  /// Returns true on success.
-  Future<bool> sendTestNotification() async {
+  ///
+  /// #2001 — returns the rich [NtfyPostResult] so the setup card can
+  /// surface the actual HTTP status / reason in the snackbar instead
+  /// of a bare "test failed". Returns a synthetic result with
+  /// `success: false` when no topic is set yet — same shape so the
+  /// caller has one branch to handle.
+  Future<NtfyPostResult> sendTestNotification() async {
     final topic = state.topic;
-    if (topic == null) return false;
+    if (topic == null) {
+      debugPrint(
+        'NtfySetupController.sendTestNotification: no topic generated '
+        'yet — call ensureTopic(userId) first',
+      );
+      return const NtfyPostResult(
+        success: false,
+        topic: '',
+        reason: 'no topic generated yet (sign-in not completed?)',
+      );
+    }
     state = state.copyWith(isSendingTest: true);
-    final success = await _ntfyService.sendTestNotification(topic);
+    final result = await _ntfyService.sendTestNotification(topic);
     state = state.copyWith(isSendingTest: false);
-    return success;
+    return result;
   }
 }

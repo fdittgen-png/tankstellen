@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
+import 'package:tankstellen/core/sync/ntfy_service.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/ntfy_setup.dart';
 import 'package:tankstellen/features/sync/providers/ntfy_setup_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -55,8 +56,17 @@ class _FakeNtfySetupController extends NtfySetupController {
     return true;
   }
 
+  /// #2001 — the controller's `sendTestNotification` now returns
+  /// [NtfyPostResult] (HTTP status + reason + topic) instead of a
+  /// bare `bool` so the snackbar can show the real failure cause.
+  /// The test fake mirrors the new shape with a synthetic success.
   @override
-  Future<bool> sendTestNotification() async => true;
+  Future<NtfyPostResult> sendTestNotification() async => const NtfyPostResult(
+        success: true,
+        topic: 'tankstellen-fake',
+        statusCode: 200,
+        reason: 'ok',
+      );
 }
 
 void main() {

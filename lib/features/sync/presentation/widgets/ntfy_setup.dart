@@ -127,21 +127,30 @@ class NtfySetupCard extends ConsumerWidget {
                 onPressed: state.isSendingTest
                     ? null
                     : () async {
-                        final success = await notifier.sendTestNotification();
+                        final result = await notifier.sendTestNotification();
                         if (!context.mounted) return;
                         final l10n = AppLocalizations.of(context);
-                        if (success) {
+                        if (result.success) {
                           SnackBarHelper.showSuccess(
                             context,
                             l10n?.testNotificationSent ??
                                 'Test notification sent!',
                           );
                         } else {
-                          SnackBarHelper.showError(
-                            context,
-                            l10n?.testNotificationFailed ??
-                                'Failed to send test notification',
-                          );
+                          // #2001 — surface the actual reason so the
+                          // user can debug a silent failure: HTTP
+                          // status (429 rate-limit, 5xx) or the dio
+                          // error type. Falls back to the generic
+                          // localized message when there's no useful
+                          // detail.
+                          final base = l10n?.testNotificationFailed ??
+                              'Failed to send test notification';
+                          final detail = result.statusCode != null
+                              ? '$base (HTTP ${result.statusCode})'
+                              : (result.reason.isNotEmpty
+                                  ? '$base: ${result.reason}'
+                                  : base);
+                          SnackBarHelper.showError(context, detail);
                         }
                       },
                 icon: state.isSendingTest
