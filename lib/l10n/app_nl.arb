@@ -474,6 +474,7 @@
   "privacyExportSuccess": "Gegevens geëxporteerd naar klembord",
   "privacyExportCsvButton": "Alle gegevens exporteren als CSV",
   "privacyExportCsvSuccess": "CSV-gegevens geëxporteerd naar klembord",
+  "savedToFile": "Opgeslagen in {path}",
   "privacyClearErrorLog": "Foutenlogboek wissen",
   "privacyErrorLogCleared": "Foutenlogboek gewist",
   "privacyDeleteButton": "Alle gegevens verwijderen",

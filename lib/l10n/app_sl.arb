@@ -474,6 +474,7 @@
   "privacyExportSuccess": "Podatki izvoženi v odložišče",
   "privacyExportCsvButton": "Izvozi vse podatke kot CSV",
   "privacyExportCsvSuccess": "Podatki CSV izvoženi v odložišče",
+  "savedToFile": "Shranjeno v {path}",
   "privacyClearErrorLog": "Počisti dnevnik napak",
   "privacyErrorLogCleared": "Dnevnik napak počiščen",
   "privacyDeleteButton": "Izbriši vse podatke",

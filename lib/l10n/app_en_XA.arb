@@ -460,6 +460,7 @@
   "privacyExportSuccess": "⟦Đáŧá éẋƥóřŧéđ ŧó çłîƥƀóářđ ··········⟧",
   "privacyExportCsvButton": "⟦Éẋƥóřŧ áłł đáŧá áš ÇŠṼ ········⟧",
   "privacyExportCsvSuccess": "⟦ÇŠṼ đáŧá éẋƥóřŧéđ ŧó çłîƥƀóářđ ············⟧",
+  "savedToFile": "⟦Šáṽéđ ŧó {path} ···⟧",
   "privacyDeleteButton": "⟦Đéłéŧé áłł đáŧá ······⟧",
   "privacyCopyErrorLog": "⟦Çóƥý éřřóř łóǧ ŧó çłîƥƀóářđ ({count}) ··········⟧",
   "privacyClearErrorLog": "⟦Çłéář éřřóř łóǧ ······⟧",

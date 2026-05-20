@@ -474,6 +474,7 @@
   "privacyExportSuccess": "Tiedot viety leikepöydälle",
   "privacyExportCsvButton": "Vie kaikki tiedot CSV-muodossa",
   "privacyExportCsvSuccess": "CSV-tiedot viety leikepöydälle",
+  "savedToFile": "Tallennettu polkuun {path}",
   "privacyClearErrorLog": "Tyhjennä virheloki",
   "privacyErrorLogCleared": "Virheloki tyhjennetty",
   "privacyDeleteButton": "Poista kaikki tiedot",

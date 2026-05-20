@@ -474,6 +474,7 @@
   "privacyExportSuccess": "Adatok exportálva a vágólapra",
   "privacyExportCsvButton": "Összes adat exportálása CSV-ként",
   "privacyExportCsvSuccess": "CSV-adatok exportálva a vágólapra",
+  "savedToFile": "Mentve ide: {path}",
   "privacyClearErrorLog": "Hibanapló törlése",
   "privacyErrorLogCleared": "Hibanapló törölve",
   "privacyDeleteButton": "Összes adat törlése",

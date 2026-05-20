@@ -128,7 +128,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
 
       final exporter =
           ConsumptionScreen.debugExporterOverride ?? FullBackupExporter();
-      await exporter.export(
+      final result = await exporter.export(
         vehicles: vehicles,
         fillUps: fillUps,
         trips: trips,
@@ -136,10 +136,15 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       );
 
       if (!mounted) return;
-      SnackBarHelper.showSuccess(
-        context,
-        l?.exportBackupReady ?? 'Backup ready — pick a destination',
-      );
+      // #1993 — when the exporter also wrote a copy to Downloads, surface
+      // the saved path so the user can find the file via any file manager
+      // after the share sheet closes. Falls back to the legacy "Backup
+      // ready" snackbar if the save-to-Downloads step bailed.
+      final savedPath = result.savedPath;
+      final message = (savedPath != null)
+          ? (l?.savedToFile(savedPath) ?? 'Saved to $savedPath')
+          : (l?.exportBackupReady ?? 'Backup ready — pick a destination');
+      SnackBarHelper.showSuccess(context, message);
     } catch (e, st) {
       debugPrint('ConsumptionScreen._runBackupExport failed: $e\n$st');
       if (!mounted) return;

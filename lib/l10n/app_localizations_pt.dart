@@ -1530,6 +1530,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Dados CSV exportados para a área de transferência';
 
   @override
+  String savedToFile(String path) {
+    return 'Guardado em $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Eliminar todos os dados';
 
   @override

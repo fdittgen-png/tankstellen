@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/providers/app_state_provider.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/sharing/local_file_saver.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/auto_record_trace_log.dart';
 import '../../data/obd2/obd2_breadcrumb_collector.dart';
@@ -13,6 +13,7 @@ import '../../data/obd2/obd2_debug_session_xml.dart';
 import '../../data/obd2/obd2_diagnostic_report.dart';
 import '../../providers/obd2_breadcrumb_provider.dart';
 import 'broken_map_widgets.dart';
+import 'obd2_breadcrumb_row.dart';
 
 /// Hook for the share-sheet handoff of the OBD2 diagnostic log
 /// (#1920). Production uses `SharePlus.instance.share`; tests
@@ -53,8 +54,14 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
   /// Format the process-wide OBD2 trace ring into a plain-text report
   /// and hand it to the OS share sheet (#1920). Best-effort — a share
   /// failure is logged and swallowed so the developer-only overlay
-  /// never crashes the recording screen.
-  Future<void> _shareDiagnosticLog() async {
+  /// never crashes the recording screen. Also drops a copy under
+  /// `<docs>/Downloads/` so the user can grab the file from any file
+  /// manager later (#1993); the saved path is reported through the
+  /// messenger snackbar when [messenger] is supplied.
+  Future<void> _shareDiagnosticLog(
+    ScaffoldMessengerState? messenger,
+    AppLocalizations? l10n,
+  ) async {
     final String report = formatObd2DiagnosticReport(
       AutoRecordTraceLog.snapshot(),
     );
@@ -67,6 +74,12 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     } catch (e, st) {
       debugPrint('Obd2BreadcrumbOverlay share diagnostic log failed: $e\n$st');
     }
+    await _alsoSaveToDownloads(
+      text: report,
+      fileName: 'tankstellen-obd2-diagnostic.txt',
+      messenger: messenger,
+      l10n: l10n,
+    );
   }
 
   /// Export the most recent OBD2 debug session as XML (#1925). Only
@@ -74,7 +87,10 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
   /// logging; otherwise the latest session is null and a short note is
   /// shared so the user understands why. Best-effort, like
   /// [_shareDiagnosticLog].
-  Future<void> _shareSessionXml() async {
+  Future<void> _shareSessionXml(
+    ScaffoldMessengerState? messenger,
+    AppLocalizations? l10n,
+  ) async {
     final Obd2DebugSession? session = Obd2DebugSessionRecorder.latestSession;
     final String payload = session == null
         ? '<!-- No OBD2 debug session recorded. Enable "OBD2 debug '
@@ -88,6 +104,38 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       await sink(params);
     } catch (e, st) {
       debugPrint('Obd2BreadcrumbOverlay share session XML failed: $e\n$st');
+    }
+    await _alsoSaveToDownloads(
+      text: payload,
+      fileName: 'tankstellen-obd2-session.xml',
+      messenger: messenger,
+      l10n: l10n,
+    );
+  }
+
+  /// Write [text] to `<docs>/Downloads/<fileName>` and, when a
+  /// [messenger] is available, surface the resulting path through a
+  /// snackbar (#1993). Best-effort — a write failure is logged but the
+  /// share-sheet hand-off above is already complete, so the user is not
+  /// stranded.
+  Future<void> _alsoSaveToDownloads({
+    required String text,
+    required String fileName,
+    required ScaffoldMessengerState? messenger,
+    required AppLocalizations? l10n,
+  }) async {
+    try {
+      final saved = await LocalFileSaver.saveTextToDownloads(
+        text: text,
+        fileName: fileName,
+      );
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text(l10n?.savedToFile(saved) ?? 'Saved to $saved'),
+        ),
+      );
+    } on Object catch (e, st) {
+      debugPrint('Obd2BreadcrumbOverlay save-to-downloads failed: $e\n$st');
     }
   }
 
@@ -182,7 +230,10 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
                       // process-wide, not tied to the fuel-rate
                       // breadcrumbs above.
                       IconButton(
-                        onPressed: () => _shareDiagnosticLog(),
+                        onPressed: () => _shareDiagnosticLog(
+                          ScaffoldMessenger.maybeOf(context),
+                          l10n,
+                        ),
                         icon: const Icon(Icons.share, size: 18),
                         color: Colors.white,
                         tooltip: l10n?.obd2DiagnosticShareLabel ??
@@ -198,7 +249,10 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
                       // session (init handshake, data gaps, reconnects)
                       // as XML when the user enabled debug logging.
                       IconButton(
-                        onPressed: () => _shareSessionXml(),
+                        onPressed: () => _shareSessionXml(
+                          ScaffoldMessenger.maybeOf(context),
+                          l10n,
+                        ),
                         icon: const Icon(Icons.bug_report, size: 18),
                         color: Colors.white,
                         tooltip: l10n?.obd2DebugSessionShareLabel ??
@@ -248,7 +302,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
                           // sample. `reverse: true` on the scroll view
                           // keeps the freshest row pinned at bottom.
                           for (final c in crumbs.reversed)
-                            _BreadcrumbRow(crumb: c),
+                            Obd2BreadcrumbRow(crumb: c),
                         ],
                       ),
                     ),
@@ -264,86 +318,3 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
   }
 }
 
-/// One row in the diagnostic overlay: timestamp + branch + L/h on
-/// line 1, AFR/density/displacement/VE on line 2 (smaller). Colour
-/// reflects the sanity flag: green = clean, amber = suspicious-low,
-/// red = 5E-vs-MAF divergent.
-class _BreadcrumbRow extends StatelessWidget {
-  const _BreadcrumbRow({required this.crumb});
-
-  final Obd2Breadcrumb crumb;
-
-  String get _timestamp {
-    final h = crumb.at.hour.toString().padLeft(2, '0');
-    final m = crumb.at.minute.toString().padLeft(2, '0');
-    final s = crumb.at.second.toString().padLeft(2, '0');
-    return '$h:$m:$s';
-  }
-
-  String get _branchTag {
-    switch (crumb.branch) {
-      case Obd2BranchTag.pid5E:
-        return '5E';
-      case Obd2BranchTag.maf:
-        return 'MAF';
-      case Obd2BranchTag.speedDensity:
-        return 'SD';
-      case Obd2BranchTag.none:
-        return '--';
-    }
-  }
-
-  Color _color(BuildContext context) {
-    switch (crumb.flag) {
-      case Obd2BreadcrumbCollector.flagSuspiciousLow:
-        return DarkModeColors.warning(context);
-      case Obd2BreadcrumbCollector.flag5eVsMafDivergent:
-        return DarkModeColors.error(context);
-      default:
-        return DarkModeColors.success(context);
-    }
-  }
-
-  String _formatRate(double? r) =>
-      r == null ? '--' : r.toStringAsFixed(2);
-
-  String _formatNum(double? v, {int decimals = 1}) =>
-      v == null ? '--' : v.toStringAsFixed(decimals);
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _color(context);
-    final secondLine = StringBuffer()
-      ..write('AFR=${_formatNum(crumb.afr, decimals: 1)} ')
-      ..write('ρ=${_formatNum(crumb.fuelDensityGPerL, decimals: 0)} ')
-      ..write('cc=${_formatNum(crumb.engineDisplacementCc, decimals: 0)} ')
-      ..write('η=${_formatNum(crumb.volumetricEfficiency, decimals: 2)}');
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '$_timestamp [$_branchTag] ${_formatRate(crumb.fuelRateLPerHour)} L/h',
-            style: TextStyle(
-              color: color,
-              fontSize: 10,
-              fontFamily: 'monospace',
-              height: 1.2,
-            ),
-          ),
-          Text(
-            secondLine.toString(),
-            style: TextStyle(
-              color: color.withValues(alpha: 0.7),
-              fontSize: 9,
-              fontFamily: 'monospace',
-              height: 1.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

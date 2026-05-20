@@ -1527,6 +1527,11 @@ class AppLocalizationsLv extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV dati eksportēti starpliktuvē';
 
   @override
+  String savedToFile(String path) {
+    return 'Saglabāts mapē $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Dzēst visus datus';
 
   @override

@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../core/constants/app_constants.dart';
+import '../../../../../core/sharing/local_file_saver.dart';
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
@@ -40,18 +41,27 @@ DateTime Function()? debugBackupClockOverride;
 @visibleForTesting
 String? debugBackupAppVersionOverride;
 
-/// Result of a successful export — the bytes written and the absolute
-/// path on disk. Returned for instrumentation / tests; the production
-/// caller hands the path off to the share sheet via the supplied sink
-/// before this value is used.
+/// Result of a successful export — the bytes written, the absolute
+/// temp-file path used for the share sheet, and the on-device Downloads
+/// path the same payload was also written to (#1993). Returned for
+/// instrumentation / tests; the production caller hands [filePath] off
+/// to the share sheet via the supplied sink and surfaces [savedPath]
+/// in a confirmation snackbar so the user can find the file in any
+/// file manager.
 @immutable
 class FullBackupExportResult {
   final String filePath;
   final int byteSize;
 
+  /// Absolute path under `<docs>/Downloads/` where a second copy of the
+  /// zip was written. `null` only if the save-to-Downloads side step
+  /// failed; the temp-file + share-sheet path is unaffected.
+  final String? savedPath;
+
   const FullBackupExportResult({
     required this.filePath,
     required this.byteSize,
+    this.savedPath,
   });
 }
 
@@ -118,9 +128,25 @@ class FullBackupExporter {
     final sink = debugBackupShareSinkOverride ?? _defaultShareSink;
     await sink(params);
 
+    // #1993 — also drop the same zip into the app's Downloads folder
+    // so the user can find it via any file manager after the share
+    // sheet closes. The share-sheet hand-off above is the primary
+    // surface; this save step is best-effort — a failure here must not
+    // mask the successful share.
+    String? savedPath;
+    try {
+      savedPath = await LocalFileSaver.saveBytesToDownloads(
+        bytes: bytes,
+        fileName: fileName,
+      );
+    } on Object catch (e, st) {
+      debugPrint('FullBackupExporter: save-to-downloads failed: $e\n$st');
+    }
+
     return FullBackupExportResult(
       filePath: filePath,
       byteSize: bytes.length,
+      savedPath: savedPath,
     );
   }
 }
