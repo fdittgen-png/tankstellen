@@ -188,13 +188,17 @@ class StationServiceChain implements StationService {
   ) async {
     try {
       return await apiCall();
-    } on ApiException catch (e) {
+    } on ApiException catch (e, st) {
       if (!_isTransient(e)) rethrow;
-      // Single retry — log to the dev console so debug builds surface the
-      // recovered call (production has no listener attached).
+      // Single retry — log to the dev console so debug builds surface
+      // the recovered call (production has no listener attached). The
+      // stack trace is included to satisfy the
+      // `catch_block_stacktrace_coverage` lint (#1103) and to help a
+      // future bug report identify which upstream code path triggered
+      // the retry without re-running under a debugger.
       debugPrint(
         'StationServiceChain: retrying after transient error '
-        '(status=${e.statusCode}, message=${e.message})',
+        '(status=${e.statusCode}, message=${e.message})\n$st',
       );
       await Future<void>.delayed(transientRetryDelay);
       return apiCall();
