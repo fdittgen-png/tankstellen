@@ -125,6 +125,27 @@ class _WaitTimeSectionState extends ConsumerState<WaitTimeSection> {
     final session = ref.watch(waitTimeActiveSessionProvider);
     final country = ref.watch(activeCountryProvider).code;
 
+    final activeSession =
+        session != null && session.stationId == widget.stationId;
+
+    // #1996 — when neither the aggregate hint nor an active session has
+    // anything to say (the empty-state, which is the dominant case on
+    // most stations until they accumulate enough samples), we used to
+    // wrap a single "Track my wait" button in a full [SectionCard] —
+    // 16 dp padding on every side around an otherwise tiny target.
+    // Render the button bare in that case: it still announces the
+    // affordance, but the screen recovers ~32 dp of dead space that the
+    // surrounding sections can now claim.
+    if (_hint == null && !activeSession) {
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: FilledButton.tonal(
+          onPressed: () => _onTrackPressed(consent, country),
+          child: Text(l10n?.waitTimeTrackStart ?? 'Track my wait'),
+        ),
+      );
+    }
+
     final children = <Widget>[];
     if (_hint != null) {
       final minutes = _hint!.medianMinutes;
@@ -139,7 +160,7 @@ class _WaitTimeSectionState extends ConsumerState<WaitTimeSection> {
       children.add(const SizedBox(height: 12));
     }
 
-    if (session != null && session.stationId == widget.stationId) {
+    if (activeSession) {
       final elapsedMin =
           DateTime.now().difference(session.arrivedAt).inMinutes;
       final elapsedLabel = l10n?.waitTimeElapsedShort(elapsedMin) ??

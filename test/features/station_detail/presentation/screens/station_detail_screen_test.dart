@@ -271,7 +271,9 @@ void main() {
               'station card title can fly to the app bar on push.');
     });
 
-    testWidgets('renders address information', (tester) async {
+    testWidgets(
+        'address surfaces through the AppBar header, not a duplicate '
+        'body section (#1996)', (tester) async {
       final result = ServiceResult(
         data: const StationDetail(station: testStation),
         source: ServiceSource.cache,
@@ -293,8 +295,14 @@ void main() {
         ],
       );
 
-      // Address info from testStation
-      expect(find.textContaining('Berlin'), findsAtLeast(1));
+      // The dedicated "Address" body block is gone (#1996 compaction);
+      // the street + place still reach the user via the brand-header
+      // inside the sliver app bar, so we just check that some piece of
+      // the address survives somewhere on screen.
+      expect(find.text('Address'), findsNothing,
+          reason: 'duplicate Address heading must be gone after #1996');
+      expect(find.textContaining('Berlin'), findsAtLeast(1),
+          reason: 'street/place still reach the user via the AppBar');
     });
   });
 }
