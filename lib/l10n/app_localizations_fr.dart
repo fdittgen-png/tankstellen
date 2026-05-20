@@ -1533,6 +1533,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Données CSV exportées dans le presse-papiers';
 
   @override
+  String savedToFile(String path) {
+    return 'Enregistré dans $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Tout supprimer';
 
   @override

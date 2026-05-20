@@ -1517,6 +1517,11 @@ class AppLocalizationsEt extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV-andmed eksporditi lõikelauale';
 
   @override
+  String savedToFile(String path) {
+    return 'Salvestatud asukohta $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Kustuta kõik andmed';
 
   @override

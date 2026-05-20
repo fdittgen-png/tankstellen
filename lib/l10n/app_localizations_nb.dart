@@ -1519,6 +1519,11 @@ class AppLocalizationsNb extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV-data eksportert til utklippstavle';
 
   @override
+  String savedToFile(String path) {
+    return 'Lagret i $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Slett alle data';
 
   @override

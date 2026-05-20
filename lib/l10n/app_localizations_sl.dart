@@ -1521,6 +1521,11 @@ class AppLocalizationsSl extends AppLocalizations {
   String get privacyExportCsvSuccess => 'Podatki CSV izvoženi v odložišče';
 
   @override
+  String savedToFile(String path) {
+    return 'Shranjeno v $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Izbriši vse podatke';
 
   @override

@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/sharing/local_file_saver.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -129,13 +130,18 @@ class _PrivacyDashboardScreenState
   }
 
   Future<void> _exportData() async {
+    // Grab the localizations BEFORE any async gap so the analyzer is
+    // satisfied that we never reach across one to look up `context`.
+    final l = AppLocalizations.of(context);
     final json = ref.read(exportPrivacyDataProvider);
     await Clipboard.setData(ClipboardData(text: json));
-    if (!mounted) return;
-    final l = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l?.privacyExportSuccess ?? 'Data exported to clipboard',
+    // #1993 — also save a copy to the on-device Downloads folder so the
+    // user can find the file later via any file manager. The clipboard
+    // path stays so existing copy-paste workflows are unchanged.
+    await _saveExportToDownloads(
+      text: json,
+      fileName: 'tankstellen-data.json',
+      copySnackbar: l?.privacyExportSuccess ?? 'Data exported to clipboard',
     );
   }
 
@@ -172,18 +178,23 @@ class _PrivacyDashboardScreenState
         return;
       }
       if (!mounted) return;
-      SnackBarHelper.showSuccess(
-        context,
-        'Error log shared ($kb KB, $totalEntries entries)',
+      // #1993 — also drop a copy into Downloads so the user can grab the
+      // file from the file manager without re-running the share flow.
+      await _saveExportToDownloads(
+        text: json,
+        fileName: 'tankstellen-error-log.json',
+        copySnackbar: 'Error log shared ($kb KB, $totalEntries entries)',
       );
       return;
     }
 
     await Clipboard.setData(ClipboardData(text: json));
-    if (!mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      _formatCopySnackbar(
+    // #1993 — also persist to Downloads (small-path); snackbar now reports
+    // the saved path. Falls back to the legacy copy snackbar on save failure.
+    await _saveExportToDownloads(
+      text: json,
+      fileName: 'tankstellen-error-log.json',
+      copySnackbar: _formatCopySnackbar(
         parsed: parsed,
         unparsed: unparsed,
         kb: kb,
@@ -238,6 +249,9 @@ class _PrivacyDashboardScreenState
       SharePlus.instance.share(params);
 
   Future<void> _exportDataCsv() async {
+    // Grab localizations pre-await — see `_exportData` for the same
+    // analyser-friendly pattern.
+    final l = AppLocalizations.of(context);
     final storage = ref.read(storageRepositoryProvider);
     final exporter = DataExporter(storage);
     final parts = exporter.exportAllAsCsv();
@@ -247,13 +261,44 @@ class _PrivacyDashboardScreenState
         ..writeln('# $name')
         ..writeln(csv);
     });
-    await Clipboard.setData(ClipboardData(text: buf.toString()));
+    final csvText = buf.toString();
+    await Clipboard.setData(ClipboardData(text: csvText));
+    // #1993 — also save a copy to the Downloads folder for offline retrieval.
+    await _saveExportToDownloads(
+      text: csvText,
+      fileName: 'tankstellen-data.csv',
+      copySnackbar:
+          l?.privacyExportCsvSuccess ?? 'CSV data exported to clipboard',
+    );
+  }
+
+  /// Writes [text] to `<docs>/Downloads/<fileName>` and announces the
+  /// outcome to the user (#1993). When the save succeeds, the snackbar
+  /// shows `savedToFile(path)`; when it fails (no permission, no space),
+  /// it falls back to [copySnackbar] so the user still gets the original
+  /// clipboard/share confirmation.
+  Future<void> _saveExportToDownloads({
+    required String text,
+    required String fileName,
+    required String copySnackbar,
+  }) async {
     if (!mounted) return;
     final l = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l?.privacyExportCsvSuccess ?? 'CSV data exported to clipboard',
-    );
+    try {
+      final savedPath = await LocalFileSaver.saveTextToDownloads(
+        text: text,
+        fileName: fileName,
+      );
+      if (!mounted) return;
+      SnackBarHelper.showSuccess(
+        context,
+        l?.savedToFile(savedPath) ?? 'Saved to $savedPath',
+      );
+    } on Object catch (e, st) {
+      debugPrint('privacy: save-to-downloads fallback: $e\n$st');
+      if (!mounted) return;
+      SnackBarHelper.showSuccess(context, copySnackbar);
+    }
   }
 
   Future<void> _deleteAllData() async {

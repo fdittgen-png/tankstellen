@@ -1528,6 +1528,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV-adatok exportálva a vágólapra';
 
   @override
+  String savedToFile(String path) {
+    return 'Mentve ide: $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Összes adat törlése';
 
   @override

@@ -1528,6 +1528,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'CSV-gegevens geëxporteerd naar klembord';
 
   @override
+  String savedToFile(String path) {
+    return 'Opgeslagen in $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Alle gegevens verwijderen';
 
   @override

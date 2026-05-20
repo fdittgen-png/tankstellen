@@ -2901,6 +2901,12 @@ abstract class AppLocalizations {
   /// **'CSV data exported to clipboard'**
   String get privacyExportCsvSuccess;
 
+  /// Snackbar confirming an export was written to the on-device Downloads folder (#1993). The {path} placeholder is the absolute filesystem path of the saved file.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {path}'**
+  String savedToFile(String path);
+
   /// No description provided for @privacyDeleteButton.
   ///
   /// In en, this message translates to:

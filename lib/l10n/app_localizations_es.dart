@@ -1528,6 +1528,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get privacyExportCsvSuccess => 'Datos CSV exportados al portapapeles';
 
   @override
+  String savedToFile(String path) {
+    return 'Guardado en $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Eliminar todos los datos';
 
   @override

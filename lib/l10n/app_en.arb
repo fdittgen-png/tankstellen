@@ -708,6 +708,15 @@
   "privacyExportSuccess": "Data exported to clipboard",
   "privacyExportCsvButton": "Export all data as CSV",
   "privacyExportCsvSuccess": "CSV data exported to clipboard",
+  "savedToFile": "Saved to {path}",
+  "@savedToFile": {
+    "description": "Snackbar confirming an export was written to the on-device Downloads folder (#1993). The {path} placeholder is the absolute filesystem path of the saved file.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "privacyDeleteButton": "Delete all data",
   "privacyCopyErrorLog": "Copy error log to clipboard ({count})",
   "@privacyCopyErrorLog": {

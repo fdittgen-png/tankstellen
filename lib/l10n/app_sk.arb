@@ -474,6 +474,7 @@
   "privacyExportSuccess": "Údaje exportované do schránky",
   "privacyExportCsvButton": "Exportovať všetky údaje ako CSV",
   "privacyExportCsvSuccess": "Údaje CSV exportované do schránky",
+  "savedToFile": "Uložené do {path}",
   "privacyClearErrorLog": "Vymazať protokol chýb",
   "privacyErrorLogCleared": "Protokol chýb vymazaný",
   "privacyDeleteButton": "Odstrániť všetky údaje",

@@ -1527,6 +1527,11 @@ class AppLocalizationsPl extends AppLocalizations {
   String get privacyExportCsvSuccess => 'Dane CSV wyeksportowane do schowka';
 
   @override
+  String savedToFile(String path) {
+    return 'Zapisano w $path';
+  }
+
+  @override
   String get privacyDeleteButton => 'Usuń wszystkie dane';
 
   @override
