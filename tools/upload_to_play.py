@@ -29,6 +29,20 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
+# #2009 part 2 — httplib2 lists 308 in `REDIRECT_CODES` and follows it
+# as a normal redirect. Google's resumable-upload protocol abuses 308
+# ("Resume Incomplete") to mean "I've received N bytes — please POST
+# the next range to the SAME session URI" and intentionally omits the
+# `Location` header (the session URI is sticky). httplib2's redirect-
+# follow code then raises `RedirectMissingLocation` and the upload
+# dies even though googleapiclient's `next_chunk` is itself designed
+# to recognise a 308 + sticky URI and continue the upload (see
+# googleapiclient/http.py `next_chunk` — it reads `resp["range"]` and
+# loops). Removing 308 from `REDIRECT_CODES` lets the 308 pass
+# through to googleapiclient so it can resume correctly. Affects
+# only our process — the frozenset is class-level, not per-instance.
+httplib2.REDIRECT_CODES = frozenset(httplib2.REDIRECT_CODES - {308})
+
 DEFAULT_PACKAGE = "de.tankstellen.fuelprices"
 DEFAULT_TRACK = "beta"  # 'beta' = open testing, 'internal' = internal, 'alpha' = closed, 'production' = prod
 DEFAULT_AAB = "build/app/outputs/bundle/playRelease/app-play-release.aab"
