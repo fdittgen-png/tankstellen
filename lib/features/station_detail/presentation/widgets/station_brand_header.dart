@@ -22,10 +22,22 @@ class StationBrandHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
+    // #1996 — the dedicated body Address section is gone (it just
+    // duplicated the street the AppBar already showed). Fold the
+    // postal code + place into the brand-header subtitle so the city
+    // info still reaches the user. Composed as "<street>, <postcode>
+    // <place>" — falls back gracefully to whichever pieces the upstream
+    // populated. // i18n-ignore: language-neutral postal format mask.
+    final addressLine = [
+      if (station.street.isNotEmpty) station.street,
+      if (station.postCode.isNotEmpty || station.place.isNotEmpty)
+        '${station.postCode} ${station.place}'.trim(),
+    ].join(', ');
+
     return Semantics(
       label:
           '${hasRealBrand(station) ? station.brand : station.street}'
-          '${hasRealBrand(station) && station.brand != station.street ? ', ${station.street}' : ''}',
+          '${hasRealBrand(station) && station.brand != station.street ? ', $addressLine' : ''}',
       header: true,
       excludeSemantics: true,
       child: Row(
@@ -44,7 +56,15 @@ class StationBrandHeader extends StatelessWidget {
                   ),
                 ),
                 if (hasRealBrand(station) && station.brand != station.street)
-                  Text(station.street, style: theme.textTheme.bodyLarge),
+                  Text(addressLine, style: theme.textTheme.bodyLarge)
+                else if (addressLine != station.street && addressLine.isNotEmpty)
+                  // Brand IS the street (independent station rendering) —
+                  // still surface postal code + place on a second line so
+                  // the user gets the city without the body Address block.
+                  Text(
+                    '${station.postCode} ${station.place}'.trim(),
+                    style: theme.textTheme.bodyLarge,
+                  ),
                 if (isIndependentSentinel(station))
                   Padding(
                     padding: const EdgeInsets.only(top: 2),

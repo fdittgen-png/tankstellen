@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/utils/navigation_utils.dart';
-import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
@@ -38,64 +36,58 @@ class StationInfoSection extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
+    // #1996 — the dedicated "Address" block was pure duplication: the
+    // street is already in the collapsing AppBar header, the user does
+    // not need to read `38 Avenue de Verdun` twice on the same screen.
+    // Postal code + place + the "directions" affordance live on the
+    // sliver-app-bar's brand-header / status row, so dropping the whole
+    // block here is purely a compaction win — no information is lost.
+    //
+    // The opening-hours section now also short-circuits when there's
+    // nothing meaningful to say (not 24h, no `openingHoursText`, empty
+    // `detail.openingTimes`). The previous behaviour rendered a full
+    // ListTile with a literal `—`, costing ~60 dp of vertical space for
+    // zero user value. With both blocks gone in the common French-API
+    // case (no opening hours surfaced by the upstream feed), the screen
+    // fits inside the viewport on a Pixel-class device.
+    final hasOpeningInfo = station.is24h ||
+        (station.openingHoursText != null &&
+            station.openingHoursText!.isNotEmpty) ||
+        detail.openingTimes.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Address
-        SectionHeader(
-          title: l10n?.address ?? 'Address',
-          padding: EdgeInsets.zero,
-        ),
-        const SizedBox(height: 8),
-        ListTile(
-          dense: true,
-          leading: const Icon(Icons.location_on),
-          title: Text(
-            '${station.street}${station.houseNumber != null ? ' ${station.houseNumber}' : ''}',
+        // Opening times — section + content fully elided when empty.
+        if (hasOpeningInfo) ...[
+          SectionHeader(
+            title: l10n?.openingHours ?? 'Opening hours',
+            padding: EdgeInsets.zero,
           ),
-          subtitle: Text('${station.postCode} ${station.place}'),
-          trailing: IconButton(
-            icon: const Icon(Icons.directions),
-            onPressed: () => NavigationUtils.openInMaps(
-              station.lat, station.lng,
-              label: station.displayName,
-            ),
-            tooltip: l10n?.navigate ?? 'Navigate',
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Opening times
-        SectionHeader(
-          title: l10n?.openingHours ?? 'Opening hours',
-          padding: EdgeInsets.zero,
-        ),
-        const SizedBox(height: 8),
-        if (station.is24h)
-          ListTile(
-            leading: Icon(Icons.schedule, color: DarkModeColors.success(context)),
-            title: Text(l10n?.automate24h ?? '24h/24 — Automate'),
-          )
-        else if (station.openingHoursText != null && station.openingHoursText!.isNotEmpty)
-          ...station.openingHoursText!.split('\n').map((line) => ListTile(
-                dense: true,
-                leading: const Icon(Icons.schedule),
-                title: Text(line.trim()),
-              ))
-        else if (detail.openingTimes.isNotEmpty)
-          ...detail.openingTimes.map((ot) => ListTile(
-                dense: true,
-                leading: const Icon(Icons.schedule),
-                title: Text(ot.text),
-                trailing: Text('${ot.start.substring(0, 5)} – ${ot.end.substring(0, 5)}'),
-              ))
-        else
-          const ListTile(
-            dense: true,
-            leading: Icon(Icons.schedule),
-            title: Text('—'),
-          ),
-        const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          if (station.is24h)
+            ListTile(
+              leading:
+                  Icon(Icons.schedule, color: DarkModeColors.success(context)),
+              title: Text(l10n?.automate24h ?? '24h/24 — Automate'),
+            )
+          else if (station.openingHoursText != null &&
+              station.openingHoursText!.isNotEmpty)
+            ...station.openingHoursText!.split('\n').map((line) => ListTile(
+                  dense: true,
+                  leading: const Icon(Icons.schedule),
+                  title: Text(line.trim()),
+                ))
+          else
+            ...detail.openingTimes.map((ot) => ListTile(
+                  dense: true,
+                  leading: const Icon(Icons.schedule),
+                  title: Text(ot.text),
+                  trailing: Text(
+                      '${ot.start.substring(0, 5)} – ${ot.end.substring(0, 5)}'),
+                )),
+          const SizedBox(height: 12),
+        ],
 
         // Location info
         if (station.department != null || station.region != null) ...[

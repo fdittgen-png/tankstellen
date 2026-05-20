@@ -8,16 +8,22 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('StationBrandHeader', () {
-    testWidgets('renders real brand as headline and street as subtitle',
-        (tester) async {
+    testWidgets(
+        'renders real brand as headline and street + postal/place as '
+        'subtitle (#1996 — body Address section was dropped, so the '
+        'header carries the full address)', (tester) async {
       await pumpApp(
         tester,
         const StationBrandHeader(station: testStation),
       );
 
-      // Real brand renders as headline (STAR), street renders as subtitle.
+      // Real brand renders as headline (STAR); the subtitle now also
+      // carries postal code + place so the user keeps the city info
+      // even though the dedicated body Address block is gone.
       expect(find.text('STAR'), findsOneWidget);
-      expect(find.text('Hauptstr.'), findsOneWidget);
+      expect(find.textContaining('Hauptstr.'), findsAtLeast(1));
+      expect(find.textContaining('Berlin'), findsAtLeast(1),
+          reason: 'place must still surface in the subtitle');
     });
 
     testWidgets('shows "Independent station" subtitle for independent sentinel',
