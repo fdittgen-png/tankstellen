@@ -1687,5 +1687,8 @@
   "onboardingExploreDemoData": "Preskúmať s ukážkovými údajmi",
   "obd2DebugLoggingTitle": "Ladiace protokolovanie OBD2",
   "obd2DebugLoggingSubtitle": "Zaznamenávajte každú reláciu OBD2 — pripojenie, handshake, výpadky dát a opätovné pripojenia — do exportovateľného XML protokolu. V predvolenom nastavení vypnuté.",
-  "obd2DebugSessionShareLabel": "Zdieľať protokol relácie OBD2"
+  "obd2DebugSessionShareLabel": "Zdieľať protokol relácie OBD2",
+  "coachingShiftUp": "Zaraď vyššie",
+  "coachingShiftDown": "Zaraď nižšie",
+  "coachingEasePedal": "Pusť plyn"
 }

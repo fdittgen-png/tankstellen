@@ -2383,6 +2383,15 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tooltipClearSearch => 'Wyczyść wyszukiwanie';
 
   @override
+  String get coachingShiftUp => 'Zmień bieg w górę';
+
+  @override
+  String get coachingShiftDown => 'Zmień bieg w dół';
+
+  @override
+  String get coachingEasePedal => 'Puść gaz';
+
+  @override
   String get tooltipUseGps => 'Użyj lokalizacji GPS';
 
   @override

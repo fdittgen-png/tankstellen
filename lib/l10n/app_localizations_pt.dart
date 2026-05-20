@@ -2390,6 +2390,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tooltipClearSearch => 'Limpar pesquisa';
 
   @override
+  String get coachingShiftUp => 'Subir mudança';
+
+  @override
+  String get coachingShiftDown => 'Descer mudança';
+
+  @override
+  String get coachingEasePedal => 'Alivia o acelerador';
+
+  @override
   String get tooltipUseGps => 'Usar localização GPS';
 
   @override

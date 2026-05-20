@@ -1687,5 +1687,8 @@
   "onboardingExploreDemoData": "Utforska med demodata",
   "obd2DebugLoggingTitle": "OBD2-felsökningslogg",
   "obd2DebugLoggingSubtitle": "Spela in varje OBD2-session — anslutning, handskakning, dataluckor och återanslutningar — i en exporterbar XML-logg. Avstängd som standard.",
-  "obd2DebugSessionShareLabel": "Dela OBD2-sessionslogg"
+  "obd2DebugSessionShareLabel": "Dela OBD2-sessionslogg",
+  "coachingShiftUp": "Växla upp",
+  "coachingShiftDown": "Växla ned",
+  "coachingEasePedal": "Släpp gasen"
 }

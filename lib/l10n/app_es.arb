@@ -1687,5 +1687,8 @@
   "onboardingExploreDemoData": "Explorar con datos de demostración",
   "obd2DebugLoggingTitle": "Registro de depuración OBD2",
   "obd2DebugLoggingSubtitle": "Registra cada sesión OBD2 — conexión, handshake, interrupciones de datos y reconexiones — en un registro XML exportable. Desactivado de forma predeterminada.",
-  "obd2DebugSessionShareLabel": "Compartir registro de sesión OBD2"
+  "obd2DebugSessionShareLabel": "Compartir registro de sesión OBD2",
+  "coachingShiftUp": "Subir marcha",
+  "coachingShiftDown": "Bajar marcha",
+  "coachingEasePedal": "Suelta acelerador"
 }

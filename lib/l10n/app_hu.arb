@@ -1687,5 +1687,8 @@
   "onboardingExploreDemoData": "Felfedezés demóadatokkal",
   "obd2DebugLoggingTitle": "OBD2 hibakeresési naplózás",
   "obd2DebugLoggingSubtitle": "Rögzítsen minden OBD2-munkamenetet — kapcsolódás, kézfogás, adatkimaradások és újracsatlakozások — egy exportálható XML-naplóba. Alapértelmezés szerint kikapcsolva.",
-  "obd2DebugSessionShareLabel": "OBD2-munkamenet naplójának megosztása"
+  "obd2DebugSessionShareLabel": "OBD2-munkamenet naplójának megosztása",
+  "coachingShiftUp": "Sebességet feljebb",
+  "coachingShiftDown": "Sebességet lejjebb",
+  "coachingEasePedal": "Engedd a gázt"
 }
