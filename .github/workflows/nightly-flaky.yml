@@ -44,10 +44,16 @@ jobs:
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       - name: Run flaky + network suites
-        # Includes both tags so we cover everything the PR/master path
-        # excludes. Single invocation — comma-separated tags is the
-        # `flutter test --tags=` syntax.
-        run: flutter test --tags=flaky,network
+        # #2003 — the comma form `--tags=flaky,network` is parsed by
+        # `package:test` (which `flutter test --tags=` delegates to) as
+        # the Boolean expression `flaky && network`. Zero tests carry
+        # both tags (`flaky` is on 2 share-plus widget tests; `network`
+        # is on 8 live-API tests; intersection is empty), so the runner
+        # exited 79 with "No tests match" on every nightly run. The
+        # intent — per this workflow's own header comment — is OR: "we
+        # cover everything the PR/master path excludes". Use the
+        # explicit Boolean form so the selector matches both buckets.
+        run: flutter test --tags 'flaky || network'
       - name: Surface failure on tracking issue
         if: failure()
         env:
