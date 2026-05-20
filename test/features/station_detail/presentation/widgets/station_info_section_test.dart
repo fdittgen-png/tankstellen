@@ -27,7 +27,9 @@ void main() {
 
     const baseDetail = StationDetail(station: baseStation);
 
-    testWidgets('renders address section', (tester) async {
+    testWidgets(
+        'no dedicated Address section — the street already lives in '
+        'the AppBar header (#1996 compaction)', (tester) async {
       await pumpApp(
         tester,
         const SingleChildScrollView(
@@ -35,16 +37,37 @@ void main() {
         ),
       );
 
-      expect(find.text('Address'), findsOneWidget);
-      expect(find.textContaining('Hauptstr.'), findsAtLeast(1));
-      expect(find.textContaining('Berlin'), findsAtLeast(1));
+      // The body must NOT repeat the address heading or the street —
+      // they are surfaced by the sliver-app-bar header, and duplicating
+      // them here was the dominant waste of vertical space.
+      expect(find.text('Address'), findsNothing);
+      expect(find.textContaining('Hauptstr.'), findsNothing);
     });
 
-    testWidgets('renders opening hours section', (tester) async {
+    testWidgets('Opening hours — section header hidden when there is '
+        'nothing to show (#1996)', (tester) async {
       await pumpApp(
         tester,
         const SingleChildScrollView(
           child: StationInfoSection(station: baseStation, detail: baseDetail),
+        ),
+      );
+
+      // baseStation has no `openingHoursText`, isn't 24h, and the
+      // detail has no opening-times → the whole section disappears
+      // rather than rendering an empty `—` ListTile.
+      expect(find.text('Opening hours'), findsNothing);
+    });
+
+    testWidgets('Opening hours — section header IS rendered when the '
+        'station is 24h (regression for #1996)', (tester) async {
+      final station24h = baseStation.copyWith(is24h: true);
+      final detail24h = StationDetail(station: station24h);
+
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: StationInfoSection(station: station24h, detail: detail24h),
         ),
       );
 
