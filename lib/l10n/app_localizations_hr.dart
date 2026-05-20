@@ -2374,6 +2374,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tooltipClose => 'Zatvori';
 
   @override
+  String get tooltipShare => 'Podijeli';
+
+  @override
   String get tooltipClearSearch => 'Obriši unos pretraživanja';
 
   @override

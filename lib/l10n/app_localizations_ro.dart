@@ -2384,6 +2384,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tooltipClose => 'Închideți';
 
   @override
+  String get tooltipShare => 'Distribuie';
+
+  @override
   String get tooltipClearSearch => 'Ștergeți căutarea';
 
   @override

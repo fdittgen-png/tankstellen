@@ -4454,6 +4454,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get tooltipClose;
 
+  /// No description provided for @tooltipShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get tooltipShare;
+
   /// No description provided for @tooltipClearSearch.
   ///
   /// In en, this message translates to:

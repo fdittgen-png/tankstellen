@@ -1086,6 +1086,7 @@
   "sectionLocation": "Location",
   "tooltipBack": "Back",
   "tooltipClose": "Close",
+  "tooltipShare": "Share",
   "tooltipClearSearch": "Clear search input",
   "tooltipUseGps": "Use GPS location",
   "tooltipShowPassword": "Show password",
