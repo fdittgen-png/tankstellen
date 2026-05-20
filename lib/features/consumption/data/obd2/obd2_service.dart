@@ -118,12 +118,50 @@ class Obd2Service implements Obd2RawCommandPort {
     String? vehicleFallbackKey,
     this.breadcrumbCollector,
   }) {
+    // #1916 — the supported-PIDs prime + discovery run during connect,
+    // when the BLE link is least settled. Wrap their `_send` callback
+    // with the same one-shot retry the init handshake now uses, so a
+    // single lost write at trip-start doesn't reach the user as a
+    // connect failure. After prime returns, the resolver only serves
+    // the cached set (no further `_send`), so no live-polling call
+    // sites pick up the wrapper.
     _pids = SupportedPidsResolver(
-      send: _send,
+      send: (cmd) => _withConnectRetry(cmd, _send),
       isConnected: () => _transport.isConnected,
       cache: pidsCache,
       vehicleFallbackKey: vehicleFallbackKey,
     );
+  }
+
+  /// #1916 — settle delay between the first connect-time send and its
+  /// single retry. Matches the polling-loop value
+  /// [TripRecordingController._transportRetryDelay] so the same
+  /// transient-blip window is absorbed in both phases. Exposed as
+  /// `@visibleForTesting` so the connect-retry unit test runs in
+  /// milliseconds instead of waiting a real 150 ms per case.
+  @visibleForTesting
+  static Duration connectRetryDelay = const Duration(milliseconds: 150);
+
+  /// One-shot retry around a connect-time send. The init sequence,
+  /// the `ATI` firmware probe, and the supported-PIDs prime all route
+  /// through this — Bluetooth links hiccup briefly in the first few
+  /// seconds of a fresh link (a lost write, an RF collision); the
+  /// retry absorbs that common transient case so it never propagates
+  /// up to `connect()` returning `false`. The same pattern lives in
+  /// the polling loop as `TripRecordingController._runTransport`
+  /// (#1904) — here we extend it to the connect / init phase the
+  /// polling-loop guard doesn't cover.
+  Future<String> _withConnectRetry(
+    String command,
+    Future<String> Function(String) inner,
+  ) async {
+    try {
+      return await inner(command);
+    } catch (e, st) {
+      debugPrint('OBD2 connect-time send retry after $e\n$st');
+      await Future<void>.delayed(connectRetryDelay);
+      return inner(command);
+    }
   }
 
   /// AT command that asks the ELM327 to identify itself. Returns a
@@ -209,8 +247,14 @@ class Obd2Service implements Obd2RawCommandPort {
       for (var i = 0; i < sequence.length; i++) {
         // #1925 — time each handshake command for the opt-in OBD2
         // debug log (a no-op when debug logging is off).
+        // #1916 — route through [_withConnectRetry] so a single
+        // transient BLE blip during the init sequence is absorbed
+        // rather than failing the whole connect attempt.
         final sw = Stopwatch()..start();
-        final response = await _transport.sendCommand(sequence[i]);
+        final response = await _withConnectRetry(
+          sequence[i],
+          _transport.sendCommand,
+        );
         sw.stop();
         Obd2DebugSessionRecorder.recordHandshakeCommand(
           sequence[i],
@@ -231,8 +275,14 @@ class Obd2Service implements Obd2RawCommandPort {
       // [Obd2AdapterCapability.standardOnly] default and let the
       // connect succeed. No call site branches on `capability` yet.
       try {
+        // #1916 — same retry guard as the init sequence; the ATI probe
+        // is the first command after the init burst and a hiccup here
+        // would skip firmware-tier detection entirely.
         final atiSw = Stopwatch()..start();
-        final raw = await _transport.sendCommand(_atiCommand);
+        final raw = await _withConnectRetry(
+          _atiCommand,
+          _transport.sendCommand,
+        );
         atiSw.stop();
         Obd2DebugSessionRecorder.recordHandshakeCommand(
           _atiCommand,
