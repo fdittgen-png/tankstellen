@@ -103,7 +103,12 @@ jobs:
           python-version: '3.12'
 
       - name: Install Python deps
-        run: pip install --quiet google-api-python-client google-auth
+        # #1999 — `google-auth-httplib2` is a transitive dep of
+        # `google-api-python-client`, but make it explicit so a future
+        # constraint change in the upstream wheel can't silently
+        # break the long-timeout `AuthorizedHttp` wiring in
+        # `tools/upload_to_play.py`.
+        run: pip install --quiet google-api-python-client google-auth google-auth-httplib2
 
       - name: Decode service-account key
         env:

@@ -21,7 +21,9 @@ import sys
 from datetime import date
 from pathlib import Path
 
+import httplib2
 from google.oauth2 import service_account
+from google_auth_httplib2 import AuthorizedHttp
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
@@ -39,8 +41,20 @@ SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 # `num_retries` makes googleapiclient retry those with exponential
 # backoff. `UPLOAD_CHUNK_BYTES` splits the resumable AAB upload into
 # smaller, individually-retryable requests (must be a 256 KB multiple).
+#
+# #1999 — #1983's retries don't help when the failure mode is a *slow*
+# chunk (server still processing the previous one, the PUT response
+# read stalls past httplib2's default ~60 s socket timeout). Two
+# follow-ups:
+#   1. Drop the chunk size from 8 MiB to 4 MiB — a retry replays half
+#      as much data, and the per-chunk wall-clock shrinks so a slow
+#      server is less likely to push us past the read timeout.
+#   2. Wrap the credentialed client in an [AuthorizedHttp] backed by
+#      an [httplib2.Http] with a 300 s (5 min) socket timeout, well
+#      above the worst slow-chunk window observed in CI (~65 s).
 MAX_API_RETRIES = 5
-UPLOAD_CHUNK_BYTES = 8 * 1024 * 1024
+UPLOAD_CHUNK_BYTES = 4 * 1024 * 1024
+HTTP_SOCKET_TIMEOUT_S = 300
 
 
 def load_release_notes(
@@ -105,7 +119,13 @@ def main() -> int:
 
     print(f"Authenticating as service account from {key}")
     creds = service_account.Credentials.from_service_account_file(str(key), scopes=SCOPES)
-    service = build("androidpublisher", "v3", credentials=creds, cache_discovery=False)
+    # #1999 — route the API client through an httplib2.Http with a
+    # 5-minute socket timeout so the chunked AAB upload doesn't die on
+    # one slow-server response read. The default httplib2 timeout
+    # (~60 s) was the trigger for the Daily Open-Testing Build failures
+    # logged on 2026-05-19 / 2026-05-20.
+    authed_http = AuthorizedHttp(creds, http=httplib2.Http(timeout=HTTP_SOCKET_TIMEOUT_S))
+    service = build("androidpublisher", "v3", http=authed_http, cache_discovery=False)
     edits = service.edits()
 
     print(f"Opening edit for {args.package}")
