@@ -47,11 +47,6 @@ class StorageKeys {
   static const String helpBannerConsumption = 'help_banner_consumption_shown';
   static const String helpBannerVehicles = 'help_banner_vehicles_shown';
   static const String supabaseAnonKey = 'supabase_anon_key';
-  /// #580 — ntfy.sh push mirror of the Supabase push_tokens row, so
-  /// the background isolate can fire push alerts without needing a
-  /// Riverpod / Supabase handshake from inside WorkManager.
-  static const String ntfyEnabled = 'ntfy_enabled';
-  static const String ntfyTopic = 'ntfy_topic';
 
   /// #780 — opt-in switch for per-vehicle baseline sync. Defaults to
   /// false (off) so users who only want favourite sync aren't

@@ -78,9 +78,6 @@ class SchemaVerifier {
     if (schema['price_snapshots'] != true) {
       buffer.writeln(_priceSnapshotsSql);
     }
-    if (schema['push_tokens'] != true) {
-      buffer.writeln(_pushTokensSql);
-    }
     if (schema['sync_settings'] != true) {
       buffer.writeln(_syncSettingsSql);
     }
@@ -149,15 +146,6 @@ CREATE TABLE IF NOT EXISTS public.price_snapshots (
   e85 DOUBLE PRECISION,
   lpg DOUBLE PRECISION,
   cng DOUBLE PRECISION
-);
-''';
-
-  static const _pushTokensSql = '''
-CREATE TABLE IF NOT EXISTS public.push_tokens (
-  user_id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
-  ntfy_topic TEXT NOT NULL,
-  enabled BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ''';
 

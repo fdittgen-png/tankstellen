@@ -2947,32 +2947,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get authNewHereCreateAccount => 'Νέος χρήστης; Δημιουργία λογαριασμού';
 
   @override
-  String get ntfyCardTitle => 'Push ειδοποιήσεις (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Ενεργοποίηση ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle => 'Λήψη ειδοποιήσεων τιμών μέσω ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'URL θέματος';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Αντιγραφή URL θέματος';
-
-  @override
-  String get ntfySendTestButton => 'Αποστολή δοκιμαστικής ειδοποίησης';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Εγκαταστήστε την εφαρμογή ntfy από το F-Droid για λήψη push ειδοποιήσεων στη συσκευή σας.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Συνδεθείτε πρώτα στο TankSync για ενεργοποίηση push ειδοποιήσεων.';
-
-  @override
   String get linkDeviceScreenTitle => 'Σύνδεση συσκευής';
 
   @override

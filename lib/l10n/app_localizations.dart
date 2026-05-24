@@ -5444,54 +5444,6 @@ abstract class AppLocalizations {
   /// **'New here? Create account'**
   String get authNewHereCreateAccount;
 
-  /// No description provided for @ntfyCardTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Push Notifications (ntfy.sh)'**
-  String get ntfyCardTitle;
-
-  /// No description provided for @ntfyEnableTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable ntfy.sh push'**
-  String get ntfyEnableTitle;
-
-  /// No description provided for @ntfyEnableSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Receive price alerts via ntfy.sh'**
-  String get ntfyEnableSubtitle;
-
-  /// No description provided for @ntfyTopicUrlLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Topic URL'**
-  String get ntfyTopicUrlLabel;
-
-  /// No description provided for @ntfyCopyTopicUrlTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Copy topic URL'**
-  String get ntfyCopyTopicUrlTooltip;
-
-  /// No description provided for @ntfySendTestButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Send test notification'**
-  String get ntfySendTestButton;
-
-  /// No description provided for @ntfyFdroidHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Install the ntfy app from F-Droid to receive push notifications on your device.'**
-  String get ntfyFdroidHint;
-
-  /// No description provided for @ntfyConnectFirstHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect TankSync first to enable push notifications.'**
-  String get ntfyConnectFirstHint;
-
   /// No description provided for @linkDeviceScreenTitle.
   ///
   /// In en, this message translates to:

@@ -24,7 +24,6 @@ import '../../features/station_services/germany/tankerkoenig_batch_price_fetcher
 import '../../features/station_services/germany/tankerkoenig_station_service.dart';
 import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
-import '../sync/ntfy_service.dart';
 import '../utils/json_extensions.dart';
 import 'background_price_fetcher_provider.dart';
 import 'background_retry.dart';
@@ -261,56 +260,10 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     // 5. Evaluate alerts (prices may be empty if all retries failed)
     final activeAlerts = alerts.where((a) => a.isActive).toList();
 
-    // #2001 — Hive-read the ntfy config up-front so the diagnostic
-    // logs surface "why didn't ntfy fire?" even on the branches that
-    // never reach the ntfy service. The flag values are themselves
-    // useful diagnostics: a `ntfyEnabled=false` Hive entry on a user
-    // who toggled it on in the UI points at the foreground→Hive
-    // mirror in `NtfySetupController.setEnabled` (#580).
-    final ntfyEnabled =
-        storage.getSetting(StorageKeys.ntfyEnabled) as bool? ?? false;
-    final ntfyTopic = storage.getSetting(StorageKeys.ntfyTopic) as String?;
-    debugPrint(
-      'BackgroundService.ntfy: configured? '
-      'enabled=$ntfyEnabled, topic=${ntfyTopic == null ? "<null>" : (ntfyTopic.isEmpty ? "<empty>" : "${ntfyTopic.length} chars")}',
-    );
-    // Surface configuration mismatches to the persisted spool so the
-    // privacy dashboard error-log carries the signal even when the
-    // foreground replay happens days later. We deliberately only spool
-    // the "definitely a bug" combinations — `enabled=false` with no
-    // topic is the expected fresh-install state and would just be
-    // noise.
-    if (ntfyEnabled && (ntfyTopic == null || ntfyTopic.isEmpty)) {
-      await IsolateErrorSpool.enqueue(
-        isolateTaskName: 'ntfy_config_mismatch',
-        error: StateError(
-          'ntfyEnabled=true but ntfyTopic is ${ntfyTopic == null ? "null" : "empty"}',
-        ),
-        contextMap: <String, dynamic>{
-          'ntfyEnabled': ntfyEnabled,
-          'ntfyTopicLen': ntfyTopic?.length ?? -1,
-        },
-      );
-    }
-
     if (activeAlerts.isNotEmpty && prices.isNotEmpty) {
       final notifier = LocalNotificationService();
       await notifier.initialize();
       int notificationCount = 0;
-
-      // #580 — ntfy.sh push runs alongside local notification when the
-      // user has configured a topic. Reads Hive settings so no Supabase
-      // / Riverpod access is needed from the background isolate.
-      final ntfyService = (ntfyEnabled &&
-              ntfyTopic != null &&
-              ntfyTopic.isNotEmpty)
-          ? NtfyService()
-          : null;
-      // #2001 — explain WHY ntfy is or isn't going to fire this run.
-      debugPrint(
-        'BackgroundService.ntfy: ntfyService=${ntfyService == null ? "skipped (config gate)" : "ready"}, '
-        '${activeAlerts.length} active alerts, ${prices.length} prices fetched',
-      );
 
       for (final alert in activeAlerts) {
         final stationPrices = prices[alert.stationId];
@@ -333,14 +286,12 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           if (alert.lastTriggeredAt != null &&
               now.difference(alert.lastTriggeredAt!) <
                   BackgroundService.alertRetriggerCooldown) {
-            // #2001 — log so the user can correlate "I expected an
-            // alert but didn't get one" against the cooldown window.
             debugPrint(
-              'BackgroundService.ntfy: alert ${alert.stationId} '
+              'BackgroundService: alert ${alert.stationId} '
               '(${alert.fuelType.displayName}) tripped at '
               '${currentPrice.toStringAsFixed(3)}, but cooldown is '
               'still active (lastTriggeredAt=${alert.lastTriggeredAt}) '
-              '— skipping both local + ntfy notifications',
+              '— skipping notification',
             );
             continue;
           }
@@ -352,54 +303,23 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           );
           notificationCount++;
 
-          // #580 — fire-and-forget ntfy.sh push. Best-effort; a network
-          // hiccup must not block the local notification already fired.
-          if (ntfyService != null) {
-            try {
-              await ntfyService.sendPriceAlert(
-                topic: ntfyTopic!,
-                stationName: alert.stationName,
-                fuelType: alert.fuelType.displayName,
-                currentPrice: currentPrice,
-                targetPrice: alert.targetPrice,
-              );
-            } catch (e, st) {
-              debugPrint('BackgroundService: ntfy push failed: $e\n$st');
-              // #1105 — spool the error so the foreground TraceRecorder
-              // can replay it. ntfy push failures are best-effort but
-              // they're a real signal that something is wrong with the
-              // user's relay configuration, so they belong in the
-              // observability pipeline.
-              await IsolateErrorSpool.enqueue(
-                isolateTaskName: 'ntfy_push',
-                error: e,
-                stack: st,
-                contextMap: <String, dynamic>{
-                  'alertId': alert.stationId,
-                  'fuelType': alert.fuelType.displayName,
-                },
-              );
-            }
-          }
-
           // Update last triggered
           await repo.saveAlert(alert.copyWith(lastTriggeredAt: now));
         }
       }
       debugPrint('BackgroundService: $notificationCount alerts triggered');
     } else {
-      // #2001 — be explicit about WHICH precondition failed: no
-      // alerts (user hasn't created any), prices empty (refresh
-      // chain-exhausted), or both. This is the single most common
-      // "ntfy didn't send anything" branch and was previously a
-      // generic one-liner.
+      // Be explicit about WHICH precondition failed: no alerts (user
+      // hasn't created any), prices empty (refresh chain-exhausted),
+      // or both. Most common branch users ask about: "why didn't I
+      // get an alert?"
       final reason = activeAlerts.isEmpty
           ? (prices.isEmpty
               ? 'no active alerts AND no prices fetched'
               : 'no active alerts')
           : 'no prices fetched (refresh failed?)';
       debugPrint(
-        'BackgroundService.ntfy: alert loop skipped — $reason '
+        'BackgroundService: alert loop skipped — $reason '
         '(activeAlerts=${activeAlerts.length}, prices=${prices.length})',
       );
     }

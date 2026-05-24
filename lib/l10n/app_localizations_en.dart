@@ -2912,32 +2912,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authNewHereCreateAccount => 'New here? Create account';
 
   @override
-  String get ntfyCardTitle => 'Push Notifications (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Enable ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle => 'Receive price alerts via ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'Topic URL';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Copy topic URL';
-
-  @override
-  String get ntfySendTestButton => 'Send test notification';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Install the ntfy app from F-Droid to receive push notifications on your device.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Connect TankSync first to enable push notifications.';
-
-  @override
   String get linkDeviceScreenTitle => 'Link Device';
 
   @override
@@ -8260,33 +8234,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get authNewHereCreateAccount => '⟦Ñéŵ ĥéřé? Çřéáŧé áççóúñŧ ·········⟧';
-
-  @override
-  String get ntfyCardTitle => '⟦Ƥúšĥ Ñóŧîƒîçáŧîóñš (ñŧƒý.šĥ) ··········⟧';
-
-  @override
-  String get ntfyEnableTitle => '⟦Éñáƀłé ñŧƒý.šĥ ƥúšĥ ·······⟧';
-
-  @override
-  String get ntfyEnableSubtitle =>
-      '⟦Řéçéîṽé ƥřîçé áłéřŧš ṽîá ñŧƒý.šĥ ············⟧';
-
-  @override
-  String get ntfyTopicUrlLabel => '⟦Ŧóƥîç ÚŘŁ ····⟧';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => '⟦Çóƥý ŧóƥîç ÚŘŁ ·····⟧';
-
-  @override
-  String get ntfySendTestButton => '⟦Šéñđ ŧéšŧ ñóŧîƒîçáŧîóñ ·········⟧';
-
-  @override
-  String get ntfyFdroidHint =>
-      '⟦Îñšŧáłł ŧĥé ñŧƒý áƥƥ ƒřóɱ Ƒ-Đřóîđ ŧó řéçéîṽé ƥúšĥ ñóŧîƒîçáŧîóñš óñ ýóúř đéṽîçé. ·····························⟧';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      '⟦Çóññéçŧ ŦáñķŠýñç ƒîřšŧ ŧó éñáƀłé ƥúšĥ ñóŧîƒîçáŧîóñš. ····················⟧';
 
   @override
   String get linkDeviceScreenTitle => '⟦Łîñķ Đéṽîçé ·····⟧';
