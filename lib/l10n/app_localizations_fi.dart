@@ -5013,6 +5013,15 @@ class AppLocalizationsFi extends AppLocalizations {
   String get trajetDetailShareAction => 'Jaa';
 
   @override
+  String get trajetDetailShareImageOption => 'Jaa kuva';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Jaa GPS-jälki (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Ei GPS-tietoja tällä matkalla';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — matka $date';
   }

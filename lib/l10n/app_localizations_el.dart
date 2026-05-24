@@ -5058,6 +5058,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get trajetDetailShareAction => 'Κοινοποίηση';
 
   @override
+  String get trajetDetailShareImageOption => 'Κοινοποίηση εικόνας';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Κοινοποίηση διαδρομής GPS (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty =>
+      'Χωρίς δεδομένα GPS σε αυτό το ταξίδι';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — ταξίδι στις $date';
   }

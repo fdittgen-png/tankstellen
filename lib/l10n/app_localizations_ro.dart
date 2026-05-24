@@ -5048,6 +5048,15 @@ class AppLocalizationsRo extends AppLocalizations {
   String get trajetDetailShareAction => 'Partajați';
 
   @override
+  String get trajetDetailShareImageOption => 'Partajează imaginea';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Partajează traseul GPS (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Fără date GPS în această călătorie';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — călătorie din $date';
   }

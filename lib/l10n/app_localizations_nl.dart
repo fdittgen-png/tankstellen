@@ -5029,6 +5029,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trajetDetailShareAction => 'Delen';
 
   @override
+  String get trajetDetailShareImageOption => 'Afbeelding delen';
+
+  @override
+  String get trajetDetailShareGpxOption => 'GPS-spoor (GPX) delen';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Geen GPS-gegevens in deze rit';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — rit op $date';
   }

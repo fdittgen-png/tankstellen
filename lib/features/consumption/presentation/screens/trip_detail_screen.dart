@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,11 +13,13 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
+import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
-import '../../domain/trip_recorder.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
 import '../widgets/trip_detail_charts.dart';
+import 'trip_detail_gpx_share.dart';
+import 'trip_detail_sample_converter.dart';
 
 /// Test-only override for the lazy fetcher (#1541 phase 4). Lets the
 /// trip-detail widget test inject a fake fetch result without spinning
@@ -132,7 +136,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     // the shared empty-state caption — same UX as a fresh install.
     final List<TripDetailSample> samples = widget.samples.isNotEmpty
         ? widget.samples
-        : (entry?.samples.map(_toDetailSample).toList(growable: false) ??
+        : (entry?.samples.map(toDetailSample).toList(growable: false) ??
             const []);
 
     return PageScaffold(
@@ -145,11 +149,48 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       actions: entry == null
           ? null
           : [
-              IconButton(
-                key: const Key('trip_detail_share_button'),
+              PopupMenuButton<String>(
+                key: const Key('trip_detail_share_menu'),
                 icon: const Icon(Icons.share),
                 tooltip: l?.trajetDetailShareAction ?? 'Share',
-                onPressed: () => _onShare(context, l, entry, vehicle),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'image':
+                      unawaited(_onShare(context, l, entry, vehicle));
+                    case 'gpx':
+                      unawaited(shareTripGpx(context, l, entry));
+                  }
+                },
+                itemBuilder: (_) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    key: const Key('trip_detail_share_image_option'),
+                    value: 'image',
+                    child: ListTile(
+                      leading: const Icon(Icons.image_outlined),
+                      title: Text(
+                        l?.trajetDetailShareImageOption ?? 'Share image',
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    key: const Key('trip_detail_share_gpx_option'),
+                    value: 'gpx',
+                    enabled: countGpsFixes(entry) > 0,
+                    child: ListTile(
+                      leading: const Icon(Icons.route_outlined),
+                      title: Text(
+                        l?.trajetDetailShareGpxOption ??
+                            'Share GPS track (GPX)',
+                      ),
+                      subtitle: countGpsFixes(entry) > 0
+                          ? null
+                          : Text(
+                              l?.trajetDetailShareGpxEmpty ??
+                                  'No GPS samples in this trip',
+                            ),
+                    ),
+                  ),
+                ],
               ),
               IconButton(
                 key: const Key('trip_detail_delete_button'),
@@ -312,24 +353,3 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   }
 }
 
-/// Convert a domain-layer [TripSample] (persisted on
-/// [TripHistoryEntry]) into the presentation-layer [TripDetailSample]
-/// the trip-detail charts consume (#1040). The two types carry the
-/// same fields but live in different layers — keeping the converter
-/// at the screen boundary stops the chart widgets from depending on
-/// the consumption-domain package.
-TripDetailSample _toDetailSample(TripSample s) => TripDetailSample(
-      timestamp: s.timestamp,
-      speedKmh: s.speedKmh,
-      rpm: s.rpm,
-      fuelRateLPerHour: s.fuelRateLPerHour,
-      throttlePercent: s.throttlePercent,
-      engineLoadPercent: s.engineLoadPercent,
-      coolantTempC: s.coolantTempC,
-      // #1374 phase 2 — plumb GPS coords through the presentation
-      // layer so the trip-detail map overlay can render the recorded
-      // route. Legacy trips deserialise with null on both fields and
-      // the overlay self-suppresses in that case.
-      latitude: s.latitude,
-      longitude: s.longitude,
-    );

@@ -5033,6 +5033,15 @@ class AppLocalizationsSk extends AppLocalizations {
   String get trajetDetailShareAction => 'Zdieľať';
 
   @override
+  String get trajetDetailShareImageOption => 'Zdieľať obrázok';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Zdieľať GPS stopu (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Žiadne GPS údaje v tejto jazde';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — jazda dňa $date';
   }

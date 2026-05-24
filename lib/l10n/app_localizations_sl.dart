@@ -5017,6 +5017,15 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetDetailShareAction => 'Deli';
 
   @override
+  String get trajetDetailShareImageOption => 'Deli sliko';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Deli GPS sled (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Brez GPS podatkov na tej vožnji';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — vožnja dne $date';
   }

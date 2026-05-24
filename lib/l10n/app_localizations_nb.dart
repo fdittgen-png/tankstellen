@@ -5010,6 +5010,15 @@ class AppLocalizationsNb extends AppLocalizations {
   String get trajetDetailShareAction => 'Del';
 
   @override
+  String get trajetDetailShareImageOption => 'Del bilde';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Del GPS-spor (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Ingen GPS-data i denne turen';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — tur den $date';
   }
