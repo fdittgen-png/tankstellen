@@ -1532,9 +1532,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'CSV-Daten in die Zwischenablage exportiert';
 
   @override
-  String savedToFile(String path) {
-    return 'Gespeichert unter $path';
-  }
+  String get savedToDownloadsFolder => 'Im Downloads-Ordner gespeichert';
 
   @override
   String get privacyDeleteButton => 'Alle Daten löschen';

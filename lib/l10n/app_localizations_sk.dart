@@ -1529,9 +1529,7 @@ class AppLocalizationsSk extends AppLocalizations {
   String get privacyExportCsvSuccess => 'Údaje CSV exportované do schránky';
 
   @override
-  String savedToFile(String path) {
-    return 'Uložené do $path';
-  }
+  String get savedToDownloadsFolder => 'Uložené do priečinka Stiahnuté';
 
   @override
   String get privacyDeleteButton => 'Odstrániť všetky údaje';

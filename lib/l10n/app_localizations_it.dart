@@ -1527,9 +1527,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get privacyExportCsvSuccess => 'Dati CSV esportati negli appunti';
 
   @override
-  String savedToFile(String path) {
-    return 'Salvato in $path';
-  }
+  String get savedToDownloadsFolder => 'Salvato nella cartella Download';
 
   @override
   String get privacyDeleteButton => 'Elimina tutti i dati';

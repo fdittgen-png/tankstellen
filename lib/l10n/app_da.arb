@@ -474,7 +474,7 @@
   "privacyExportSuccess": "Data eksporteret til udklipsholder",
   "privacyExportCsvButton": "Eksporter alle data som CSV",
   "privacyExportCsvSuccess": "CSV-data eksporteret til udklipsholder",
-  "savedToFile": "Gemt i {path}",
+  "savedToDownloadsFolder": "Gemt i mappen Downloads",
   "privacyClearErrorLog": "Ryd fejllog",
   "privacyErrorLogCleared": "Fejllog ryddet",
   "privacyDeleteButton": "Slet alle data",

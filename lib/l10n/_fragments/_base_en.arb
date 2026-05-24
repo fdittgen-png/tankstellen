@@ -708,12 +708,9 @@
   "privacyExportSuccess": "Data exported to clipboard",
   "privacyExportCsvButton": "Export all data as CSV",
   "privacyExportCsvSuccess": "CSV data exported to clipboard",
-  "savedToFile": "Saved to {path}",
-  "@savedToFile": {
-    "description": "Snackbar confirming an export was written to the on-device Downloads folder (#1993). The {path} placeholder is the absolute filesystem path of the saved file.",
-    "placeholders": {
-      "path": { "type": "String" }
-    }
+  "savedToDownloadsFolder": "Saved to your Downloads folder",
+  "@savedToDownloadsFolder": {
+    "description": "Snackbar confirming an export was written to the device's public Downloads folder (#2014). Replaces the earlier savedToFile string, which leaked a filesystem path that is meaningless to users (and on Android Q+ becomes a content:// URI)."
   },
   "privacyDeleteButton": "Delete all data",
   "privacyCopyErrorLog": "Copy error log to clipboard ({count})",

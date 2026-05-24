@@ -1533,9 +1533,7 @@ class AppLocalizationsEl extends AppLocalizations {
       'Τα δεδομένα CSV εξήχθησαν στο πρόχειρο';
 
   @override
-  String savedToFile(String path) {
-    return 'Αποθηκεύτηκε στο $path';
-  }
+  String get savedToDownloadsFolder => 'Αποθηκεύτηκε στον φάκελο Λήψεις';
 
   @override
   String get privacyDeleteButton => 'Διαγραφή όλων των δεδομένων';

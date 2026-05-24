@@ -1521,9 +1521,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV-tiedot viety leikepöydälle';
 
   @override
-  String savedToFile(String path) {
-    return 'Tallennettu polkuun $path';
-  }
+  String get savedToDownloadsFolder => 'Tallennettu Lataukset-kansioon';
 
   @override
   String get privacyDeleteButton => 'Poista kaikki tiedot';

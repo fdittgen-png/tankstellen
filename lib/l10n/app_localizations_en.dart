@@ -1511,9 +1511,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
 
   @override
-  String savedToFile(String path) {
-    return 'Saved to $path';
-  }
+  String get savedToDownloadsFolder => 'Saved to your Downloads folder';
 
   @override
   String get privacyDeleteButton => 'Delete all data';
@@ -6812,9 +6810,8 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦ÇŠṼ đáŧá éẋƥóřŧéđ ŧó çłîƥƀóářđ ············⟧';
 
   @override
-  String savedToFile(String path) {
-    return '⟦Šáṽéđ ŧó $path ···⟧';
-  }
+  String get savedToDownloadsFolder =>
+      '⟦Šáṽéđ ŧó ýóúř Đóŵñłóáđš ƒółđéř ············⟧';
 
   @override
   String get privacyDeleteButton => '⟦Đéłéŧé áłł đáŧá ······⟧';
