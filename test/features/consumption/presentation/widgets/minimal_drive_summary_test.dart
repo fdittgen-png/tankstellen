@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/minimal_drive_summary.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_state.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 Widget _harness(TripRecordingState state) {
@@ -21,6 +20,8 @@ Widget _harness(TripRecordingState state) {
     ),
   );
 }
+
+// ignore_for_file: prefer_const_constructors
 
 class _FakeTripRecordingNotifier extends TripRecording {
   _FakeTripRecordingNotifier(this._state);

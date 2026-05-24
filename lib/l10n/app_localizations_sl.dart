@@ -2380,7 +2380,7 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tooltipClearSearch => 'Počisti iskanje';
 
   @override
-  String get minimalDriveInstantConsumption => 'Instant consumption';
+  String get minimalDriveInstantConsumption => 'Trenutna poraba';
 
   @override
   String get coachingShiftUp => 'Prestavi navzgor';

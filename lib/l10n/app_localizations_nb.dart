@@ -2378,7 +2378,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tooltipClearSearch => 'Tøm søkefelt';
 
   @override
-  String get minimalDriveInstantConsumption => 'Instant consumption';
+  String get minimalDriveInstantConsumption => 'Øyeblikksforbruk';
 
   @override
   String get coachingShiftUp => 'Gir opp';

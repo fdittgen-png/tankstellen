@@ -2388,7 +2388,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tooltipClearSearch => 'Zoekinvoer wissen';
 
   @override
-  String get minimalDriveInstantConsumption => 'Instant consumption';
+  String get minimalDriveInstantConsumption => 'Direct verbruik';
 
   @override
   String get coachingShiftUp => 'Schakel op';

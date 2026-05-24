@@ -2374,7 +2374,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tooltipClearSearch => 'Tühjenda otsingusisestus';
 
   @override
-  String get minimalDriveInstantConsumption => 'Instant consumption';
+  String get minimalDriveInstantConsumption => 'Hetketarbimine';
 
   @override
   String get coachingShiftUp => 'Vaheta üles';

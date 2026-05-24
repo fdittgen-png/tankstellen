@@ -7706,6 +7706,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get tooltipClearSearch => '⟦Çłéář šéářçĥ îñƥúŧ ·······⟧';
 
   @override
+  String get minimalDriveInstantConsumption => '⟦Îñšŧáñŧ çóñšúɱƥŧîóñ ········⟧';
+
+  @override
   String get coachingShiftUp => '⟦Šĥîƒŧ úƥ ···⟧';
 
   @override

@@ -2390,7 +2390,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tooltipClearSearch => 'Borrar el texto de búsqueda';
 
   @override
-  String get minimalDriveInstantConsumption => 'Instant consumption';
+  String get minimalDriveInstantConsumption => 'Consumo instantáneo';
 
   @override
   String get coachingShiftUp => 'Subir marcha';
