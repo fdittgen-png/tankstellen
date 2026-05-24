@@ -2385,6 +2385,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tooltipClearSearch => 'Zoekinvoer wissen';
 
   @override
+  String get coachingShiftUp => 'Schakel op';
+
+  @override
+  String get coachingShiftDown => 'Schakel terug';
+
+  @override
+  String get coachingEasePedal => 'Gas loslaten';
+
+  @override
   String get tooltipUseGps => 'GPS-locatie gebruiken';
 
   @override

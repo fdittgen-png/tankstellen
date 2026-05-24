@@ -2385,6 +2385,15 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tooltipClearSearch => 'Išvalyti paieškos lauką';
 
   @override
+  String get coachingShiftUp => 'Aukštyn pavarą';
+
+  @override
+  String get coachingShiftDown => 'Žemyn pavarą';
+
+  @override
+  String get coachingEasePedal => 'Atleisk akceleratorių';
+
+  @override
   String get tooltipUseGps => 'Naudoti GPS vietą';
 
   @override

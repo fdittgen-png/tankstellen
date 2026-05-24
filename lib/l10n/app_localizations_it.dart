@@ -2385,6 +2385,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tooltipClearSearch => 'Cancella input di ricerca';
 
   @override
+  String get coachingShiftUp => 'Marcia su';
+
+  @override
+  String get coachingShiftDown => 'Marcia giù';
+
+  @override
+  String get coachingEasePedal => 'Alza il piede';
+
+  @override
   String get tooltipUseGps => 'Usa posizione GPS';
 
   @override

@@ -1687,5 +1687,8 @@
   "onboardingExploreDemoData": "Verken met demogegevens",
   "obd2DebugLoggingTitle": "OBD2-foutopsporingslogboek",
   "obd2DebugLoggingSubtitle": "Leg elke OBD2-sessie vast — verbinding, handshake, gegevensonderbrekingen en herverbindingen — in een exporteerbaar XML-logboek. Standaard uitgeschakeld.",
-  "obd2DebugSessionShareLabel": "OBD2-sessielogboek delen"
+  "obd2DebugSessionShareLabel": "OBD2-sessielogboek delen",
+  "coachingShiftUp": "Schakel op",
+  "coachingShiftDown": "Schakel terug",
+  "coachingEasePedal": "Gas loslaten"
 }

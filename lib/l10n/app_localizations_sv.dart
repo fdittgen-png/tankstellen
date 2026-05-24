@@ -2378,6 +2378,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tooltipClearSearch => 'Rensa sökinmatning';
 
   @override
+  String get coachingShiftUp => 'Växla upp';
+
+  @override
+  String get coachingShiftDown => 'Växla ned';
+
+  @override
+  String get coachingEasePedal => 'Släpp gasen';
+
+  @override
   String get tooltipUseGps => 'Använd GPS-plats';
 
   @override

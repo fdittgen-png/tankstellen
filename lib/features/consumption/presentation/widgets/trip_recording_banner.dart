@@ -5,10 +5,12 @@ import '../../../../app/router.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
+import '../../domain/driving_coaching.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
+import 'coaching_chip.dart';
 import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
 
@@ -243,6 +245,16 @@ class _Content extends StatelessWidget {
         ? Icons.pause_circle_filled
         : _iconFor(state.situation, state.band);
 
+    // #2007 — instantaneous L/100 km (L/h at idle) + a conservative
+    // eco-coaching chip surfaced from the live reading. Both pieces
+    // are silent when the data isn't available so the strip degrades
+    // gracefully on cars without a fuel-rate PID.
+    final instantConsumption =
+        (live != null && !paused) ? formatInstantConsumption(live) : null;
+    final coachingHintValue = (live != null && !paused)
+        ? coachingHint(live, situation: state.situation, band: state.band)
+        : null;
+
     return Row(
       children: [
         Icon(bandIcon, size: 18, color: fg),
@@ -255,6 +267,20 @@ class _Content extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        if (coachingHintValue != null) ...[
+          CoachingChip(hint: coachingHintValue, foreground: fg),
+          const SizedBox(width: 8),
+        ],
+        if (instantConsumption != null) ...[
+          Text(
+            instantConsumption,
+            style: TextStyle(
+              color: fg,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
         if (state.liveDeltaFraction != null && !paused) ...[
           Text(
             _fmtDelta(state.liveDeltaFraction!),
@@ -340,3 +366,4 @@ class _Content extends StatelessWidget {
     return '${m.toString()}:${s.toString().padLeft(2, '0')}';
   }
 }
+
