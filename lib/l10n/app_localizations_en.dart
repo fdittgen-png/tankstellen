@@ -5010,6 +5010,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trajetDetailShareAction => 'Share';
 
   @override
+  String get trajetDetailShareImageOption => 'Share image';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Share GPS track (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'No GPS samples in this trip';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — trip on $date';
   }
@@ -10426,6 +10435,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetDetailShareAction => '⟦Šĥářé ··⟧';
+
+  @override
+  String get trajetDetailShareImageOption => '⟦Šĥářé îɱáǧé ·····⟧';
+
+  @override
+  String get trajetDetailShareGpxOption => '⟦Šĥářé ǦƤŠ ŧřáçķ (ǦƤẊ) ·······⟧';
+
+  @override
+  String get trajetDetailShareGpxEmpty =>
+      '⟦Ñó ǦƤŠ šáɱƥłéš îñ ŧĥîš ŧřîƥ ··········⟧';
 
   @override
   String trajetDetailShareSubject(String date) {

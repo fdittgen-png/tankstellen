@@ -5080,6 +5080,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get trajetDetailShareAction => 'Сподели';
 
   @override
+  String get trajetDetailShareImageOption => 'Споделяне на изображение';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Споделяне на GPS трасе (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Няма GPS данни в това пътуване';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — пътуване на $date';
   }

@@ -5081,6 +5081,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailShareAction => 'Megosztás';
 
   @override
+  String get trajetDetailShareImageOption => 'Kép megosztása';
+
+  @override
+  String get trajetDetailShareGpxOption => 'GPS-nyomvonal (GPX) megosztása';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Nincs GPS-adat ezen az úton';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — út $date-n';
   }

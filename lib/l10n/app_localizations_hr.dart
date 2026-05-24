@@ -5054,6 +5054,15 @@ class AppLocalizationsHr extends AppLocalizations {
   String get trajetDetailShareAction => 'Dijeli';
 
   @override
+  String get trajetDetailShareImageOption => 'Podijeli sliku';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Podijeli GPS trag (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Nema GPS podataka na ovom putovanju';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — vožnja na $date';
   }

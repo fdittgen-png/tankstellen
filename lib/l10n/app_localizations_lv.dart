@@ -5069,6 +5069,15 @@ class AppLocalizationsLv extends AppLocalizations {
   String get trajetDetailShareAction => 'Kopīgot';
 
   @override
+  String get trajetDetailShareImageOption => 'Kopīgot attēlu';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Kopīgot GPS taku (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Nav GPS datu šim braucienam';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — brauciens $date';
   }

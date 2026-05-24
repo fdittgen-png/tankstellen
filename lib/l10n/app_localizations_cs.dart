@@ -5042,6 +5042,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get trajetDetailShareAction => 'Sdílet';
 
   @override
+  String get trajetDetailShareImageOption => 'Sdílet obrázek';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Sdílet GPS trasu (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Žádná GPS data v této jízdě';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — cesta ze dne $date';
   }

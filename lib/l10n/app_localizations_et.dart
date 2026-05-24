@@ -5029,6 +5029,15 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetDetailShareAction => 'Jaga';
 
   @override
+  String get trajetDetailShareImageOption => 'Jaga pilti';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Jaga GPS-rada (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Pole GPS-andmeid sellel sõidul';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — reis $date';
   }

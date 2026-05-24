@@ -5068,6 +5068,15 @@ class AppLocalizationsLt extends AppLocalizations {
   String get trajetDetailShareAction => 'Bendrinti';
 
   @override
+  String get trajetDetailShareImageOption => 'Bendrinti vaizdą';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Bendrinti GPS pėdsaką (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Šioje kelionėje GPS duomenų nėra';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — kelionė $date';
   }

@@ -9075,6 +9075,24 @@ abstract class AppLocalizations {
   /// **'Share'**
   String get trajetDetailShareAction;
 
+  /// Menu option on the Trip detail share button (#2032). Selecting it rasterises the report into a PNG and hands it to the OS share sheet — the legacy behaviour before the GPX option was added.
+  ///
+  /// In en, this message translates to:
+  /// **'Share image'**
+  String get trajetDetailShareImageOption;
+
+  /// Menu option on the Trip detail share button (#2032). Selecting it serialises every persisted GPS sample as a GPX 1.1 file and hands it to the OS share sheet so the user can open the route in Google Earth / Strava / etc.
+  ///
+  /// In en, this message translates to:
+  /// **'Share GPS track (GPX)'**
+  String get trajetDetailShareGpxOption;
+
+  /// Subtitle shown under the GPX share menu option when the trip has no GPS samples (e.g. recorded with the gpsTripPath feature flag off). Also reused as the snackbar message if the GPX share action is invoked anyway.
+  ///
+  /// In en, this message translates to:
+  /// **'No GPS samples in this trip'**
+  String get trajetDetailShareGpxEmpty;
+
   /// Subject / preview text passed to the OS share sheet when the user shares a trip detail report as an image (#1189). The {date} placeholder is replaced with a localised short date.
   ///
   /// In en, this message translates to:

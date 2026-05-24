@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
@@ -11,11 +16,22 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
+import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
 import '../widgets/trip_detail_charts.dart';
+
+/// Test-only override for the GPX share sink (#2032). When set, the
+/// trip detail screen hands the GPX bytes + suggested filename to this
+/// callback instead of launching `share_plus`. Lets widget tests
+/// assert on the outgoing payload without driving the OS share sheet.
+@visibleForTesting
+Future<void> Function({
+  required Uint8List bytes,
+  required String fileName,
+})? debugTripDetailGpxShareOverride;
 
 /// Test-only override for the lazy fetcher (#1541 phase 4). Lets the
 /// trip-detail widget test inject a fake fetch result without spinning
@@ -145,11 +161,48 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       actions: entry == null
           ? null
           : [
-              IconButton(
-                key: const Key('trip_detail_share_button'),
+              PopupMenuButton<String>(
+                key: const Key('trip_detail_share_menu'),
                 icon: const Icon(Icons.share),
                 tooltip: l?.trajetDetailShareAction ?? 'Share',
-                onPressed: () => _onShare(context, l, entry, vehicle),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'image':
+                      unawaited(_onShare(context, l, entry, vehicle));
+                    case 'gpx':
+                      unawaited(_onShareGpx(context, l, entry));
+                  }
+                },
+                itemBuilder: (_) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    key: const Key('trip_detail_share_image_option'),
+                    value: 'image',
+                    child: ListTile(
+                      leading: const Icon(Icons.image_outlined),
+                      title: Text(
+                        l?.trajetDetailShareImageOption ?? 'Share image',
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    key: const Key('trip_detail_share_gpx_option'),
+                    value: 'gpx',
+                    enabled: countGpsFixes(entry) > 0,
+                    child: ListTile(
+                      leading: const Icon(Icons.route_outlined),
+                      title: Text(
+                        l?.trajetDetailShareGpxOption ??
+                            'Share GPS track (GPX)',
+                      ),
+                      subtitle: countGpsFixes(entry) > 0
+                          ? null
+                          : Text(
+                              l?.trajetDetailShareGpxEmpty ??
+                                  'No GPS samples in this trip',
+                            ),
+                    ),
+                  ),
+                ],
               ),
               IconButton(
                 key: const Key('trip_detail_delete_button'),
@@ -269,6 +322,53 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       if (messenger == null) return;
       final errorMsg = l?.trajetDetailShareError ??
           "Couldn't generate share image";
+      messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
+    }
+  }
+
+  /// Export the trip's persisted GPS samples as a GPX 1.1 file and
+  /// hand it to the OS share sheet (#2032). Works regardless of OBD2
+  /// presence — every sample with a GPS fix becomes a `<trkpt>`. Best-
+  /// effort: a share failure surfaces a snackbar, never throws.
+  Future<void> _onShareGpx(
+    BuildContext context,
+    AppLocalizations? l,
+    TripHistoryEntry entry,
+  ) async {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final scheme = Theme.of(context).colorScheme;
+    if (countGpsFixes(entry) == 0) {
+      final msg = l?.trajetDetailShareGpxEmpty ??
+          'No GPS samples in this trip';
+      messenger?.showSnackBar(SnackBarHelper.errorSnackBar(scheme, msg));
+      return;
+    }
+    final gpx = buildGpxXml(entry);
+    final bytes = Uint8List.fromList(utf8.encode(gpx));
+    final fileName = gpxFileNameFor(entry);
+    final override = debugTripDetailGpxShareOverride;
+    try {
+      if (override != null) {
+        await override(bytes: bytes, fileName: fileName);
+        return;
+      }
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile.fromData(
+              bytes,
+              mimeType: 'application/gpx+xml',
+              name: fileName,
+            ),
+          ],
+          subject: fileName,
+        ),
+      );
+    } catch (e, st) {
+      debugPrint('TripDetailScreen share GPX: $e\n$st');
+      if (messenger == null) return;
+      final errorMsg = l?.trajetDetailShareError ??
+          "Couldn't share the GPX file";
       messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
     }
   }

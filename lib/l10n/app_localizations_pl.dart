@@ -5060,6 +5060,15 @@ class AppLocalizationsPl extends AppLocalizations {
   String get trajetDetailShareAction => 'Udostępnij';
 
   @override
+  String get trajetDetailShareImageOption => 'Udostępnij obraz';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Udostępnij ścieżkę GPS (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Brak danych GPS w tym przejazdzie';
+
+  @override
   String trajetDetailShareSubject(String date) {
     return 'Sparkilo — trasa z dnia $date';
   }
