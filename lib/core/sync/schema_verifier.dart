@@ -15,7 +15,6 @@ class SchemaVerifier {
     'favorites',
     'alerts',
     'price_snapshots',
-    'push_tokens',
     'sync_settings',
   ];
 
@@ -77,9 +76,6 @@ class SchemaVerifier {
     }
     if (schema['price_snapshots'] != true) {
       buffer.writeln(_priceSnapshotsSql);
-    }
-    if (schema['push_tokens'] != true) {
-      buffer.writeln(_pushTokensSql);
     }
     if (schema['sync_settings'] != true) {
       buffer.writeln(_syncSettingsSql);
@@ -152,15 +148,6 @@ CREATE TABLE IF NOT EXISTS public.price_snapshots (
 );
 ''';
 
-  static const _pushTokensSql = '''
-CREATE TABLE IF NOT EXISTS public.push_tokens (
-  user_id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
-  ntfy_topic TEXT NOT NULL,
-  enabled BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-''';
-
   static const _syncSettingsSql = '''
 CREATE TABLE IF NOT EXISTS public.sync_settings (
   user_id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
@@ -215,7 +202,6 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.alerts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.price_snapshots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.push_tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sync_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.itineraries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ignored_stations ENABLE ROW LEVEL SECURITY;
@@ -232,9 +218,6 @@ CREATE POLICY IF NOT EXISTS "alerts_own" ON public.alerts FOR ALL USING (user_id
 
 -- Price snapshots: read all, no user writes (service_role only)
 CREATE POLICY IF NOT EXISTS "snapshots_read" ON public.price_snapshots FOR SELECT USING (true);
-
--- Push tokens: own data only
-CREATE POLICY IF NOT EXISTS "push_own" ON public.push_tokens FOR ALL USING (user_id = auth.uid());
 
 -- Sync settings: own data only
 CREATE POLICY IF NOT EXISTS "sync_own" ON public.sync_settings FOR ALL USING (user_id = auth.uid());
