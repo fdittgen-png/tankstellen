@@ -2948,32 +2948,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get authNewHereCreateAccount => 'Jauns lietotājs? Izveidot kontu';
 
   @override
-  String get ntfyCardTitle => 'Push paziņojumi (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Iespējot ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle => 'Saņemt cenu brīdinājumus caur ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'Tēmas URL';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopēt tēmas URL';
-
-  @override
-  String get ntfySendTestButton => 'Nosūtīt testa paziņojumu';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Instalējiet ntfy lietotni no F-Droid, lai saņemtu push paziņojumus savā ierīcē.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Vispirms savienojiet TankSync, lai iespējotu push paziņojumus.';
-
-  @override
   String get linkDeviceScreenTitle => 'Saistīt ierīci';
 
   @override

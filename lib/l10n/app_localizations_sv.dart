@@ -2930,32 +2930,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get authNewHereCreateAccount => 'Ny här? Skapa konto';
 
   @override
-  String get ntfyCardTitle => 'Push-aviseringar (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Aktivera ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle => 'Få prisaviseringar via ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'Ämnes-URL';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopiera ämnes-URL';
-
-  @override
-  String get ntfySendTestButton => 'Skicka testavisering';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Installera ntfy-appen från F-Droid för att ta emot push-aviseringar på din enhet.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Anslut TankSync först för att aktivera push-aviseringar.';
-
-  @override
   String get linkDeviceScreenTitle => 'Länka enhet';
 
   @override

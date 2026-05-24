@@ -12,7 +12,6 @@ import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/consumption_tab_visibility.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../feature_management/domain/feature_dependency_graph.dart';
-import '../../../sync/presentation/widgets/ntfy_setup.dart';
 import '../../../widget/presentation/widget_help_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
@@ -102,16 +101,7 @@ class ProfileScreen extends ConsumerWidget {
               // brand-named section isn't an unexplained label.
               subtitle: l?.tankSyncSectionSubtitle ??
                   'Cloud sync across your devices',
-              // #1703 — the ntfy.sh push-setup card sits directly below
-              // the sync status/actions; it self-handles the not-yet-
-              // connected state with a "Connect TankSync first" hint.
-              child: const Column(
-                children: [
-                  TankSyncSection(),
-                  SizedBox(height: 8),
-                  NtfySetupCard(),
-                ],
-              ),
+              child: const TankSyncSection(),
             ),
             const SizedBox(height: 8),
           ],

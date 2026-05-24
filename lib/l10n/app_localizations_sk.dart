@@ -2946,32 +2946,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get authNewHereCreateAccount => 'Prvýkrát tu? Vytvoriť účet';
 
   @override
-  String get ntfyCardTitle => 'Push upozornenia (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Zapnúť ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle => 'Prijímať cenové upozornenia cez ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'URL témy';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopírovať URL témy';
-
-  @override
-  String get ntfySendTestButton => 'Odoslať testovacie upozornenie';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Nainštalujte aplikáciu ntfy z F-Droid pre prijímanie push upozornení na vašom zariadení.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Najprv pripojte TankSync pre zapnutie push upozornení.';
-
-  @override
   String get linkDeviceScreenTitle => 'Prepojiť zariadenie';
 
   @override

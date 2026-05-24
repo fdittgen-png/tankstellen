@@ -296,6 +296,7 @@ class TripRecorder {
       startedAt: _startedAt,
       endedAt: _endedAt,
       coldStartSurcharge: coldStartSurcharge,
+      harshEvents: _harshDetector.events,
     );
   }
 

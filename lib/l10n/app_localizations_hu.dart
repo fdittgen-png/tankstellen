@@ -2949,32 +2949,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get authNewHereCreateAccount => 'Új itt? Fiók létrehozása';
 
   @override
-  String get ntfyCardTitle => 'Leküldéses értesítések (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'ntfy.sh leküldés engedélyezése';
-
-  @override
-  String get ntfyEnableSubtitle => 'Áriasztások fogadása ntfy.sh-n keresztül';
-
-  @override
-  String get ntfyTopicUrlLabel => 'Téma URL-je';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Téma URL-jének másolása';
-
-  @override
-  String get ntfySendTestButton => 'Teszt értesítés küldése';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Telepítse az ntfy alkalmazást F-Droid-ról leküldéses értesítések fogadásához az eszközön.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Először csatlakoztassa a TankSync-et a leküldéses értesítések engedélyezéséhez.';
-
-  @override
   String get linkDeviceScreenTitle => 'Eszköz összekapcsolása';
 
   @override

@@ -1,4 +1,6 @@
-/// Counts harsh-braking / harsh-acceleration events from a stream of
+import 'harsh_event.dart';
+
+/// Detects harsh-braking / harsh-acceleration events from a stream of
 /// speed samples, decoupled from the sample-feed cadence (#1922).
 ///
 /// Extracted from [TripRecorder]: the recorder is fed a `TripSample`
@@ -15,6 +17,11 @@
 /// Genuine hard braking (a large Δspeed within ~1 s) still trips the
 /// threshold; the staircase no longer does; and the count is
 /// independent of how fast samples are fed.
+///
+/// Since #2029 the detector also records a [HarshEvent] per crossing
+/// — the integer counters stay as cheap getters for legacy consumers,
+/// while [events] gives post-trip coaching the timestamped detail it
+/// needs to surface "harsh brake at 14:23, 0.45 g while doing 80 km/h".
 class HarshEventDetector {
   HarshEventDetector({
     this.brakeThresholdMps2 = 3.5,
@@ -35,8 +42,7 @@ class HarshEventDetector {
   /// sample instead of skipping to a 2 s window.
   static const double _evalIntervalSec = 0.9;
 
-  int _brakes = 0;
-  int _accels = 0;
+  final List<HarshEvent> _events = [];
 
   // The last sample an evaluation was anchored on. Advances only when
   // an evaluation actually fires, so a burst of sub-second samples
@@ -45,10 +51,20 @@ class HarshEventDetector {
   DateTime? _anchorAt;
 
   /// Number of harsh-braking events counted so far.
-  int get brakes => _brakes;
+  int get brakes => _events
+      .where((e) => e.type == HarshEventType.brake)
+      .length;
 
   /// Number of harsh-acceleration events counted so far.
-  int get accelerations => _accels;
+  int get accelerations => _events
+      .where((e) => e.type == HarshEventType.acceleration)
+      .length;
+
+  /// Per-event detail captured since the detector was last reset
+  /// (#2029). Surfaces the timestamped magnitude + speed needed for
+  /// post-trip coaching messages. Caller copies defensively if it
+  /// intends to mutate.
+  List<HarshEvent> get events => List.unmodifiable(_events);
 
   /// Feed one speed sample. Safe to call at any cadence; samples
   /// closer together than [_evalIntervalSec] are folded into the next
@@ -68,9 +84,19 @@ class HarshEventDetector {
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
     final accelMps2 = ((speedKmh - anchorSpeed) / 3.6) / dt;
     if (accelMps2 <= -brakeThresholdMps2) {
-      _brakes++;
+      _events.add(HarshEvent(
+        timestamp: timestamp,
+        magnitudeG: (-accelMps2) / standardGravityMps2,
+        speedKmh: speedKmh,
+        type: HarshEventType.brake,
+      ));
     } else if (accelMps2 >= accelThresholdMps2) {
-      _accels++;
+      _events.add(HarshEvent(
+        timestamp: timestamp,
+        magnitudeG: accelMps2 / standardGravityMps2,
+        speedKmh: speedKmh,
+        type: HarshEventType.acceleration,
+      ));
     }
     _anchorAt = timestamp;
     _anchorSpeedKmh = speedKmh;
@@ -79,8 +105,7 @@ class HarshEventDetector {
   /// Reset the counters and anchor — used before recording a fresh
   /// trip without discarding the detector instance.
   void reset() {
-    _brakes = 0;
-    _accels = 0;
+    _events.clear();
     _anchorSpeedKmh = null;
     _anchorAt = null;
   }
