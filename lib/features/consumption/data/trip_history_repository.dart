@@ -234,6 +234,12 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // #2025 — trajet kind. Omitted when gpsPlusObd2 (the historical
       // default) so legacy trips round-trip with zero bytes added.
       if (s.kind != TripKind.gpsPlusObd2) 'kind': s.kind.wireName,
+      // #2029: per-event harsh-brake / harsh-accel detail with
+      // timestamp + magnitude + speed. Compact key 'he'. Omitted when
+      // empty so legacy trips and event-free trips round-trip with
+      // zero bytes added.
+      if (s.harshEvents.isNotEmpty)
+        'he': s.harshEvents.map((e) => e.toJson()).toList(growable: false),
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -269,6 +275,14 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       // #2025: trajet kind. Missing key → gpsPlusObd2 because every
       // recording before this field landed required an OBD2 connection.
       kind: TripKind.fromWireName(j['kind'] as String?),
+      // #2029: per-event harsh-brake / harsh-accel detail. Missing
+      // key → empty list so legacy trips fall back to the bare
+      // [harshBrakes] / [harshAccelerations] integer counters.
+      harshEvents: (j['he'] as List?)
+              ?.map((e) =>
+                  HarshEvent.fromJson((e as Map).cast<String, dynamic>()))
+              .toList(growable: false) ??
+          const [],
     );
 
 /// Hive-backed list of finalised trips (#726).
