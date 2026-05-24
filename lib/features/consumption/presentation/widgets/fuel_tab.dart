@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -45,73 +46,91 @@ class FuelTab extends ConsumerWidget {
         topBiased: true,
       );
     }
-    // #1194 — opt-out gate for gamification surfaces. Watching here
-    // (above the ListView) so the BadgeShelf is omitted from the
-    // header column without churning the itemCount.
     final showGamification = ref.watch(gamificationEnabledProvider);
-    // #1397 — surface the auto-learner's η_v on the stats card.
-    // Active-vehicle profile is null in the no-vehicle / pre-paired
-    // state, in which case the chip is omitted entirely.
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
-    return ListView.builder(
-      padding: EdgeInsets.only(
-        top: 8,
-        bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
+    final bottomInset = 96 + MediaQuery.of(context).viewPadding.bottom;
+
+    final headerChildren = <Widget>[
+      HelpBanner(
+        storageKey: StorageKeys.helpBannerConsumption,
+        icon: Icons.tips_and_updates_outlined,
+        message: l?.helpBannerConsumption ??
+            'Log every fill-up to track your real-world '
+                'consumption and CO₂ footprint. Swipe left '
+                'to delete an entry.',
       ),
+      if (showGamification) const BadgeShelf(),
+      const TankLevelCard(),
+      ConsumptionStatsCard(
+        stats: stats,
+        volumetricEfficiency: activeVehicle?.volumetricEfficiency,
+        volumetricEfficiencySamples:
+            activeVehicle?.volumetricEfficiencySamples,
+      ),
+    ];
+
+    Widget buildFillUpRow(int index) {
+      final fillUp = fillUps[index];
+      return Dismissible(
+        key: ValueKey(fillUp.id),
+        direction: DismissDirection.endToStart,
+        background: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 24),
+          color: DarkModeColors.error(context),
+          child: const Icon(Icons.delete, color: Colors.white),
+        ),
+        onDismissed: (_) {
+          ref.read(fillUpListProvider.notifier).remove(fillUp.id);
+        },
+        child: FillUpCard(
+          fillUp: fillUp,
+          ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
+          onTap: fillUp.isCorrection
+              ? () => _openCorrectionEditor(context, fillUp)
+              : null,
+        ),
+      );
+    }
+
+    // #2018 — landscape / tablet split: left = tank level + stats
+    // header, right = fill-ups list. Mirrors the search-results
+    // wide-screen pattern via `isWideScreen(context)` (≥ 600dp).
+    if (isWideScreen(context)) {
+      return Row(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(top: 8, bottom: bottomInset),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: headerChildren,
+              ),
+            ),
+          ),
+          const VerticalDivider(width: 1),
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.only(top: 8, bottom: bottomInset),
+              itemCount: fillUps.length,
+              itemBuilder: (context, index) => buildFillUpRow(index),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.only(top: 8, bottom: bottomInset),
       itemCount: fillUps.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              HelpBanner(
-                storageKey: StorageKeys.helpBannerConsumption,
-                icon: Icons.tips_and_updates_outlined,
-                message: l?.helpBannerConsumption ??
-                    'Log every fill-up to track your real-world '
-                        'consumption and CO₂ footprint. Swipe left '
-                        'to delete an entry.',
-              ),
-              if (showGamification) const BadgeShelf(),
-              // #1195 — tank-level indicator sits above the consumption
-              // stats card. Renders nothing when no active vehicle is
-              // configured (FuelTab itself shows the no-fill-ups empty
-              // state above this point).
-              const TankLevelCard(),
-              ConsumptionStatsCard(
-                stats: stats,
-                volumetricEfficiency: activeVehicle?.volumetricEfficiency,
-                volumetricEfficiencySamples:
-                    activeVehicle?.volumetricEfficiencySamples,
-              ),
-            ],
+            children: headerChildren,
           );
         }
-        final fillUp = fillUps[index - 1];
-        return Dismissible(
-          key: ValueKey(fillUp.id),
-          direction: DismissDirection.endToStart,
-          background: Container(
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 24),
-            color: DarkModeColors.error(context),
-            child: const Icon(Icons.delete, color: Colors.white),
-          ),
-          onDismissed: (_) {
-            ref.read(fillUpListProvider.notifier).remove(fillUp.id);
-          },
-          child: FillUpCard(
-            fillUp: fillUp,
-            ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
-            // #1361 phase 2b — tapping a correction entry opens the
-            // edit sheet. Non-correction cards keep the existing
-            // no-op tap behaviour (a future fill-up detail screen
-            // would wire here).
-            onTap: fillUp.isCorrection
-                ? () => _openCorrectionEditor(context, fillUp)
-                : null,
-          ),
-        );
+        return buildFillUpRow(index - 1);
       },
     );
   }
