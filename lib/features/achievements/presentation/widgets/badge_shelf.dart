@@ -91,15 +91,10 @@ class _BadgeTile extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final (icon, label) = _iconAndLabel(id, l);
-    // In compact mode (wide screens) drop the label off the tile and
-    // surface it via the Tooltip alongside the description, so the
-    // shelf collapses to a single-row icon strip.
-    final tooltipMessage =
-        compact ? '$label — ${_description(id, l)}' : _description(id, l);
     return Tooltip(
-      message: tooltipMessage,
+      message: _description(id, l),
       child: Container(
-        width: compact ? 48 : 88,
+        width: compact ? 72 : 88,
         margin: const EdgeInsets.only(right: 8),
         padding: EdgeInsets.all(compact ? 4 : 6),
         decoration: BoxDecoration(
@@ -113,25 +108,24 @@ class _BadgeTile extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: compact ? 24 : 28,
+              size: compact ? 20 : 28,
               color: isEarned
                   ? theme.colorScheme.onPrimaryContainer
                   : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
-            if (!compact) ...[
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: isEarned
-                      ? theme.colorScheme.onPrimaryContainer
-                      : theme.colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+            SizedBox(height: compact ? 2 : 4),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isEarned
+                    ? theme.colorScheme.onPrimaryContainer
+                    : theme.colorScheme.onSurfaceVariant,
+                fontSize: compact ? 10 : null,
               ),
-            ],
+              textAlign: TextAlign.center,
+              maxLines: compact ? 1 : 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),
