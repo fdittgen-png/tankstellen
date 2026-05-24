@@ -5074,6 +5074,22 @@ class AppLocalizationsNl extends AppLocalizations {
       'OBD2-adapter verbonden maar geeft geen gegevens terug. Probeer een andere adapter of controleer het diagnostische protocol van het voertuig.';
 
   @override
+  String get trajetsViewAllOnMap => 'View all on map';
+
+  @override
+  String get trajetsMapTitle => 'Trajets on map';
+
+  @override
+  String get trajetsMapShareGpx => 'Share GPX';
+
+  @override
+  String get trajetsMapEmpty =>
+      'None of the selected trajets carry GPS samples.';
+
+  @override
+  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+
+  @override
   String get tripLengthCardTitle => 'Verbruik per ritlengte';
 
   @override

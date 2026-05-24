@@ -3780,6 +3780,26 @@
   "@tripRecordingObd2NotResponding": {
     "description": "OBD2 pause banner copy (#1330 phase 3) when the adapter is connected but every high-priority PID parse returned null for ~10 s. Distinct from the 'connection lost' message — the link is fine, but the ECU isn't answering. Suggests trying a different adapter or checking the vehicle's diagnostic protocol."
   },
+  "trajetsViewAllOnMap": "View all on map",
+  "@trajetsViewAllOnMap": {
+    "description": "Action button on the Trajets tab (#2030) that opens a new screen overlaying every visible trajet's GPS polyline on a single flutter_map view, with an aggregate GPX export."
+  },
+  "trajetsMapTitle": "Trajets on map",
+  "@trajetsMapTitle": {
+    "description": "AppBar title of the TrajetsMapScreen (#2030)."
+  },
+  "trajetsMapShareGpx": "Share GPX",
+  "@trajetsMapShareGpx": {
+    "description": "AppBar action tooltip on the TrajetsMapScreen (#2030) that exports the visible trajets as a multi-track GPX file via the OS share sheet."
+  },
+  "trajetsMapEmpty": "None of the selected trajets carry GPS samples.",
+  "@trajetsMapEmpty": {
+    "description": "Empty-state caption on the TrajetsMapScreen (#2030) when every selected trip's samples lack lat/lon — e.g. legacy trips recorded before #1374 or trips whose Feature.gpsTripPath flag was off."
+  },
+  "trajetsMapShareError": "Couldn't share the GPX file",
+  "@trajetsMapShareError": {
+    "description": "Snackbar shown on the TrajetsMapScreen (#2030) when handing the aggregate GPX off to the OS share sheet throws."
+  },
   "tripLengthCardTitle": "Consumption by trip length",
   "@tripLengthCardTitle": {
     "description": "Title of the trip-length consumption card on the Carbon dashboard Charts tab — splits trips into short/medium/long buckets so the user can see cold-start fuel waste vs. cruising efficiency (#1191)."

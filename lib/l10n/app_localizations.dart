@@ -9111,6 +9111,36 @@ abstract class AppLocalizations {
   /// **'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.'**
   String get tripRecordingObd2NotResponding;
 
+  /// Action button on the Trajets tab (#2030) that opens a new screen overlaying every visible trajet's GPS polyline on a single flutter_map view, with an aggregate GPX export.
+  ///
+  /// In en, this message translates to:
+  /// **'View all on map'**
+  String get trajetsViewAllOnMap;
+
+  /// AppBar title of the TrajetsMapScreen (#2030).
+  ///
+  /// In en, this message translates to:
+  /// **'Trajets on map'**
+  String get trajetsMapTitle;
+
+  /// AppBar action tooltip on the TrajetsMapScreen (#2030) that exports the visible trajets as a multi-track GPX file via the OS share sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Share GPX'**
+  String get trajetsMapShareGpx;
+
+  /// Empty-state caption on the TrajetsMapScreen (#2030) when every selected trip's samples lack lat/lon — e.g. legacy trips recorded before #1374 or trips whose Feature.gpsTripPath flag was off.
+  ///
+  /// In en, this message translates to:
+  /// **'None of the selected trajets carry GPS samples.'**
+  String get trajetsMapEmpty;
+
+  /// Snackbar shown on the TrajetsMapScreen (#2030) when handing the aggregate GPX off to the OS share sheet throws.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t share the GPX file'**
+  String get trajetsMapShareError;
+
   /// Title of the trip-length consumption card on the Carbon dashboard Charts tab — splits trips into short/medium/long buckets so the user can see cold-start fuel waste vs. cruising efficiency (#1191).
   ///
   /// In en, this message translates to:

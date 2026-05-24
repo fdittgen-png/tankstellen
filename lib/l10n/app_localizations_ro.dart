@@ -5094,6 +5094,22 @@ class AppLocalizationsRo extends AppLocalizations {
       'Adaptorul OBD2 este conectat dar nu returnează date. Încercați un adaptor diferit sau verificați protocolul de diagnosticare al vehiculului.';
 
   @override
+  String get trajetsViewAllOnMap => 'View all on map';
+
+  @override
+  String get trajetsMapTitle => 'Trajets on map';
+
+  @override
+  String get trajetsMapShareGpx => 'Share GPX';
+
+  @override
+  String get trajetsMapEmpty =>
+      'None of the selected trajets carry GPS samples.';
+
+  @override
+  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+
+  @override
   String get tripLengthCardTitle => 'Consum pe lungimea călătoriei';
 
   @override

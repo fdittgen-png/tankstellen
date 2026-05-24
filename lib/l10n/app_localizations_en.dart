@@ -5029,6 +5029,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
 
   @override
+  String get trajetsViewAllOnMap => 'View all on map';
+
+  @override
+  String get trajetsMapTitle => 'Trajets on map';
+
+  @override
+  String get trajetsMapShareGpx => 'Share GPX';
+
+  @override
+  String get trajetsMapEmpty =>
+      'None of the selected trajets carry GPS samples.';
+
+  @override
+  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+
+  @override
   String get tripLengthCardTitle => 'Consumption by trip length';
 
   @override
