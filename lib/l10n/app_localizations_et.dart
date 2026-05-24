@@ -2368,6 +2368,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tooltipClose => 'Sulge';
 
   @override
+  String get tooltipShare => 'Jaga';
+
+  @override
   String get tooltipClearSearch => 'Tühjenda otsingusisestus';
 
   @override

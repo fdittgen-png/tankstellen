@@ -2372,6 +2372,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tooltipClose => 'Lukk';
 
   @override
+  String get tooltipShare => 'Del';
+
+  @override
   String get tooltipClearSearch => 'Tøm søkefelt';
 
   @override
