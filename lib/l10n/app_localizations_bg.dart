@@ -2951,32 +2951,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get authNewHereCreateAccount => 'Нов потребител? Създайте акаунт';
 
   @override
-  String get ntfyCardTitle => 'Push известия (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Активирай ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle => 'Получавайте ценови сигнали чрез ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'URL на темата';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Копирай URL на темата';
-
-  @override
-  String get ntfySendTestButton => 'Изпрати тестово известие';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Инсталирайте приложението ntfy от F-Droid, за да получавате push известия на устройството си.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Първо свържете TankSync, за да активирате push известия.';
-
-  @override
   String get linkDeviceScreenTitle => 'Свърза устройство';
 
   @override

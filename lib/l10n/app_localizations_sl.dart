@@ -2930,32 +2930,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get authNewHereCreateAccount => 'Prvič tukaj? Ustvari račun';
 
   @override
-  String get ntfyCardTitle => 'Potisna obvestila (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Omogoči ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle => 'Prejemajte cenovna opozorila prek ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'URL teme';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopiraj URL teme';
-
-  @override
-  String get ntfySendTestButton => 'Pošlji testno obvestilo';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Namestite aplikacijo ntfy iz F-Droid za prejemanje potisnih obvestil na napravi.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Najprej povežite TankSync za omogočanje potisnih obvestil.';
-
-  @override
   String get linkDeviceScreenTitle => 'Poveži napravo';
 
   @override
