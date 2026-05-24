@@ -1,3 +1,7 @@
+import 'harsh_event.dart';
+
+export 'harsh_event.dart';
+
 /// Aggregated metrics for a single driving trip (#718).
 ///
 /// Extracted from `trip_recorder.dart` (#1927 — keeps that file under
@@ -85,6 +89,16 @@ class TripSummary {
   /// required an OBD2 connection.
   final TripKind kind;
 
+  /// Timestamped per-event harsh-brake / harsh-accel detail (#2029).
+  /// Replaces the bare [harshBrakes] / [harshAccelerations] counters
+  /// for post-trip coaching ("harsh brake at 14:23, 0.45 g while
+  /// doing 80 km/h"). The counters remain populated alongside the
+  /// list — every legacy consumer keeps working unchanged; new UI
+  /// reads from [harshEvents] directly. Legacy trips deserialise with
+  /// an empty list, in which case rendering falls back to the bare
+  /// counters.
+  final List<HarshEvent> harshEvents;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -102,6 +116,7 @@ class TripSummary {
     this.fuelRateSuspect = false,
     this.volumetricEfficiencyUsed,
     this.kind = TripKind.gpsPlusObd2,
+    this.harshEvents = const [],
   });
 
   /// Returns a copy with the given fields replaced (#1858). Used by the
@@ -126,6 +141,7 @@ class TripSummary {
     bool? fuelRateSuspect,
     double? volumetricEfficiencyUsed,
     TripKind? kind,
+    List<HarshEvent>? harshEvents,
   }) =>
       TripSummary(
         distanceKm: distanceKm ?? this.distanceKm,
@@ -146,6 +162,7 @@ class TripSummary {
         volumetricEfficiencyUsed:
             volumetricEfficiencyUsed ?? this.volumetricEfficiencyUsed,
         kind: kind ?? this.kind,
+        harshEvents: harshEvents ?? this.harshEvents,
       );
 }
 

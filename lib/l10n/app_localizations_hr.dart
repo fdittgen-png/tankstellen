@@ -2932,33 +2932,6 @@ class AppLocalizationsHr extends AppLocalizations {
   String get authNewHereCreateAccount => 'Novi ste ovdje? Stvorite račun';
 
   @override
-  String get ntfyCardTitle => 'Push obavijesti (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Omogući ntfy.sh push';
-
-  @override
-  String get ntfyEnableSubtitle =>
-      'Primajte upozorenja o cijenama putem ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'URL teme';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopiraj URL teme';
-
-  @override
-  String get ntfySendTestButton => 'Pošalji testnu obavijest';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Instalirajte ntfy aplikaciju s F-Droid za primanje push obavijesti na vašem uređaju.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Prvo povežite TankSync za omogućavanje push obavijesti.';
-
-  @override
   String get linkDeviceScreenTitle => 'Poveži uređaj';
 
   @override

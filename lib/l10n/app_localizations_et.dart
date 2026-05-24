@@ -2924,32 +2924,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get authNewHereCreateAccount => 'Uus kasutaja? Loo konto';
 
   @override
-  String get ntfyCardTitle => 'Tõuketeated (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Luba ntfy.sh tõuketeated';
-
-  @override
-  String get ntfyEnableSubtitle => 'Võta vastu hinnateatiseid ntfy.sh kaudu';
-
-  @override
-  String get ntfyTopicUrlLabel => 'Teema URL';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopeeri teema URL';
-
-  @override
-  String get ntfySendTestButton => 'Saada testteatist';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Installi ntfy rakendus F-Droidist, et saada tõukeateatisi oma seadmesse.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Ühenda esmalt TankSync, et lubada tõuketeated.';
-
-  @override
   String get linkDeviceScreenTitle => 'Seadme linkimine';
 
   @override
