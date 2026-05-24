@@ -281,6 +281,24 @@ class BackupXmlWriter {
         // older backups (where the tag is missing) default to
         // `gpsPlusObd2` via `TripKind.fromWireName`.
         _writeText(builder, 'Kind', t.summary.kind.wireName);
+        // #2029 — timestamped harsh-event detail. The integer
+        // [HarshBrakes] / [HarshAccelerations] elements above stay
+        // populated as the simple counter view; this list carries the
+        // per-event timestamp + magnitude + speed for post-trip
+        // coaching. Omitted entirely when no events fired so legacy
+        // backups round-trip unchanged.
+        if (t.summary.harshEvents.isNotEmpty) {
+          builder.element('HarshEvents', nest: () {
+            for (final e in t.summary.harshEvents) {
+              builder.element('HarshEvent', nest: () {
+                _writeText(builder, 'Timestamp', _iso(e.timestamp));
+                _writeText(builder, 'Type', e.type.wireName);
+                _writeText(builder, 'MagnitudeG', e.magnitudeG.toString());
+                _writeText(builder, 'SpeedKmh', e.speedKmh.toString());
+              });
+            }
+          });
+        }
       });
 
       builder.element('Samples', nest: () {
