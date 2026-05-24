@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
@@ -18,20 +15,11 @@ import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
-import '../../domain/trip_recorder.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
 import '../widgets/trip_detail_charts.dart';
-
-/// Test-only override for the GPX share sink (#2032). When set, the
-/// trip detail screen hands the GPX bytes + suggested filename to this
-/// callback instead of launching `share_plus`. Lets widget tests
-/// assert on the outgoing payload without driving the OS share sheet.
-@visibleForTesting
-Future<void> Function({
-  required Uint8List bytes,
-  required String fileName,
-})? debugTripDetailGpxShareOverride;
+import 'trip_detail_gpx_share.dart';
+import 'trip_detail_sample_converter.dart';
 
 /// Test-only override for the lazy fetcher (#1541 phase 4). Lets the
 /// trip-detail widget test inject a fake fetch result without spinning
@@ -148,7 +136,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     // the shared empty-state caption — same UX as a fresh install.
     final List<TripDetailSample> samples = widget.samples.isNotEmpty
         ? widget.samples
-        : (entry?.samples.map(_toDetailSample).toList(growable: false) ??
+        : (entry?.samples.map(toDetailSample).toList(growable: false) ??
             const []);
 
     return PageScaffold(
@@ -170,7 +158,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                     case 'image':
                       unawaited(_onShare(context, l, entry, vehicle));
                     case 'gpx':
-                      unawaited(_onShareGpx(context, l, entry));
+                      unawaited(shareTripGpx(context, l, entry));
                   }
                 },
                 itemBuilder: (_) => <PopupMenuEntry<String>>[
@@ -326,53 +314,6 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     }
   }
 
-  /// Export the trip's persisted GPS samples as a GPX 1.1 file and
-  /// hand it to the OS share sheet (#2032). Works regardless of OBD2
-  /// presence — every sample with a GPS fix becomes a `<trkpt>`. Best-
-  /// effort: a share failure surfaces a snackbar, never throws.
-  Future<void> _onShareGpx(
-    BuildContext context,
-    AppLocalizations? l,
-    TripHistoryEntry entry,
-  ) async {
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    final scheme = Theme.of(context).colorScheme;
-    if (countGpsFixes(entry) == 0) {
-      final msg = l?.trajetDetailShareGpxEmpty ??
-          'No GPS samples in this trip';
-      messenger?.showSnackBar(SnackBarHelper.errorSnackBar(scheme, msg));
-      return;
-    }
-    final gpx = buildGpxXml(entry);
-    final bytes = Uint8List.fromList(utf8.encode(gpx));
-    final fileName = gpxFileNameFor(entry);
-    final override = debugTripDetailGpxShareOverride;
-    try {
-      if (override != null) {
-        await override(bytes: bytes, fileName: fileName);
-        return;
-      }
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [
-            XFile.fromData(
-              bytes,
-              mimeType: 'application/gpx+xml',
-              name: fileName,
-            ),
-          ],
-          subject: fileName,
-        ),
-      );
-    } catch (e, st) {
-      debugPrint('TripDetailScreen share GPX: $e\n$st');
-      if (messenger == null) return;
-      final errorMsg = l?.trajetDetailShareError ??
-          "Couldn't share the GPX file";
-      messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
-    }
-  }
-
   Future<void> _onDelete(
     BuildContext context,
     WidgetRef ref,
@@ -412,24 +353,3 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   }
 }
 
-/// Convert a domain-layer [TripSample] (persisted on
-/// [TripHistoryEntry]) into the presentation-layer [TripDetailSample]
-/// the trip-detail charts consume (#1040). The two types carry the
-/// same fields but live in different layers — keeping the converter
-/// at the screen boundary stops the chart widgets from depending on
-/// the consumption-domain package.
-TripDetailSample _toDetailSample(TripSample s) => TripDetailSample(
-      timestamp: s.timestamp,
-      speedKmh: s.speedKmh,
-      rpm: s.rpm,
-      fuelRateLPerHour: s.fuelRateLPerHour,
-      throttlePercent: s.throttlePercent,
-      engineLoadPercent: s.engineLoadPercent,
-      coolantTempC: s.coolantTempC,
-      // #1374 phase 2 — plumb GPS coords through the presentation
-      // layer so the trip-detail map overlay can render the recorded
-      // route. Legacy trips deserialise with null on both fields and
-      // the overlay self-suppresses in that case.
-      latitude: s.latitude,
-      longitude: s.longitude,
-    );
