@@ -2376,6 +2376,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tooltipClose => 'Zavřít';
 
   @override
+  String get tooltipShare => 'Sdílet';
+
+  @override
   String get tooltipClearSearch => 'Vymazat vstup hledání';
 
   @override

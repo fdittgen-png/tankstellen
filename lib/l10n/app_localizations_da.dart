@@ -2371,6 +2371,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tooltipClose => 'Luk';
 
   @override
+  String get tooltipShare => 'Del';
+
+  @override
   String get tooltipClearSearch => 'Ryd søgeinput';
 
   @override

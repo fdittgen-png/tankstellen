@@ -2380,6 +2380,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tooltipClose => 'Uždaryti';
 
   @override
+  String get tooltipShare => 'Bendrinti';
+
+  @override
   String get tooltipClearSearch => 'Išvalyti paieškos lauką';
 
   @override

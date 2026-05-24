@@ -2380,6 +2380,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tooltipClose => 'Chiudi';
 
   @override
+  String get tooltipShare => 'Condividi';
+
+  @override
   String get tooltipClearSearch => 'Cancella input di ricerca';
 
   @override

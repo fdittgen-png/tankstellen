@@ -2380,6 +2380,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tooltipClose => 'Sluiten';
 
   @override
+  String get tooltipShare => 'Delen';
+
+  @override
   String get tooltipClearSearch => 'Zoekinvoer wissen';
 
   @override

@@ -732,6 +732,7 @@
   "sectionLocation": "Lokacija",
   "tooltipBack": "Natrag",
   "tooltipClose": "Zatvori",
+  "tooltipShare": "Podijeli",
   "tooltipClearSearch": "Obriši unos pretraživanja",
   "tooltipUseGps": "Koristi GPS lokaciju",
   "tooltipShowPassword": "Prikaži lozinku",

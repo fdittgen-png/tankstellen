@@ -2385,6 +2385,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tooltipClose => 'Aizvērt';
 
   @override
+  String get tooltipShare => 'Kopīgot';
+
+  @override
   String get tooltipClearSearch => 'Notīrīt meklēšanu';
 
   @override

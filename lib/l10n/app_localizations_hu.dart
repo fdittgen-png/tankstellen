@@ -2383,6 +2383,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipClose => 'Bezárás';
 
   @override
+  String get tooltipShare => 'Megosztás';
+
+  @override
   String get tooltipClearSearch => 'Keresési mező törlése';
 
   @override

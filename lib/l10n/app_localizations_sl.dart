@@ -2372,6 +2372,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tooltipClose => 'Zapri';
 
   @override
+  String get tooltipShare => 'Deli';
+
+  @override
   String get tooltipClearSearch => 'Počisti iskanje';
 
   @override

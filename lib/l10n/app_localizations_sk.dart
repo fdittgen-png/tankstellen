@@ -2381,6 +2381,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tooltipClose => 'Zavrieť';
 
   @override
+  String get tooltipShare => 'Zdieľať';
+
+  @override
   String get tooltipClearSearch => 'Vymazať vstup vyhľadávania';
 
   @override

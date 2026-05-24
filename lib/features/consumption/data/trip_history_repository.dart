@@ -175,6 +175,9 @@ Map<String, dynamic> _sampleToJson(TripSample s) => {
       if (s.latitude != null) 'la': s.latitude,
       if (s.longitude != null) 'lo': s.longitude,
       if (s.altitudeM != null) 'al': s.altitudeM,
+      if (s.hAccuracyM != null) 'ha': s.hAccuracyM,
+      if (s.bearingDeg != null) 'be': s.bearingDeg,
+      if (s.accelG != null) 'ag': s.accelG,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -187,14 +190,12 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       throttlePercent: (j['th'] as num?)?.toDouble(),
       engineLoadPercent: (j['el'] as num?)?.toDouble(),
       coolantTempC: (j['ct'] as num?)?.toDouble(),
-      // #1374 phase 1: GPS fix per sample. Legacy trips written before
-      // this PR carry no key → null on both, which is the right answer
-      // for "we don't know where this sample was taken".
       latitude: (j['la'] as num?)?.toDouble(),
       longitude: (j['lo'] as num?)?.toDouble(),
-      // #1935 child A: GPS altitude per sample. Legacy trips carry no
-      // 'al' key → null.
       altitudeM: (j['al'] as num?)?.toDouble(),
+      hAccuracyM: (j['ha'] as num?)?.toDouble(),
+      bearingDeg: (j['be'] as num?)?.toDouble(),
+      accelG: (j['ag'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _summaryToJson(TripSummary s) => {
@@ -230,6 +231,15 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // / MAF fuel) carry no value, so parsimony saves bytes.
       if (s.volumetricEfficiencyUsed != null)
         'veUsed': s.volumetricEfficiencyUsed,
+      // #2025 — trajet kind. Omitted when gpsPlusObd2 (the historical
+      // default) so legacy trips round-trip with zero bytes added.
+      if (s.kind != TripKind.gpsPlusObd2) 'kind': s.kind.wireName,
+      // #2029: per-event harsh-brake / harsh-accel detail with
+      // timestamp + magnitude + speed. Compact key 'he'. Omitted when
+      // empty so legacy trips and event-free trips round-trip with
+      // zero bytes added.
+      if (s.harshEvents.isNotEmpty)
+        'he': s.harshEvents.map((e) => e.toJson()).toList(growable: false),
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -262,6 +272,17 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       // fuel was not 100% speed-density carry no key → null, which
       // correctly reads as "not recalculable".
       volumetricEfficiencyUsed: (j['veUsed'] as num?)?.toDouble(),
+      // #2025: trajet kind. Missing key → gpsPlusObd2 because every
+      // recording before this field landed required an OBD2 connection.
+      kind: TripKind.fromWireName(j['kind'] as String?),
+      // #2029: per-event harsh-brake / harsh-accel detail. Missing
+      // key → empty list so legacy trips fall back to the bare
+      // [harshBrakes] / [harshAccelerations] integer counters.
+      harshEvents: (j['he'] as List?)
+              ?.map((e) =>
+                  HarshEvent.fromJson((e as Map).cast<String, dynamic>()))
+              .toList(growable: false) ??
+          const [],
     );
 
 /// Hive-backed list of finalised trips (#726).

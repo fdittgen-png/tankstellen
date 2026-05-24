@@ -2389,6 +2389,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tooltipClose => 'Затвори';
 
   @override
+  String get tooltipShare => 'Споделяне';
+
+  @override
   String get tooltipClearSearch => 'Изчисти полето за търсене';
 
   @override

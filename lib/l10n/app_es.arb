@@ -732,6 +732,7 @@
   "sectionLocation": "Ubicación",
   "tooltipBack": "Atrás",
   "tooltipClose": "Cerrar",
+  "tooltipShare": "Compartir",
   "tooltipClearSearch": "Borrar el texto de búsqueda",
   "tooltipUseGps": "Usar la ubicación GPS",
   "tooltipShowPassword": "Mostrar contraseña",
