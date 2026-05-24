@@ -6,6 +6,8 @@ import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/trip_history_repository.dart';
@@ -58,6 +60,27 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
     setState(() => _startStage = TripStartStage.connectingAdapter);
     try {
       final notifier = ref.read(tripRecordingProvider.notifier);
+      // #2025 — when the user has disabled "Require OBD2 for trip
+      // recording" in feature management, bypass the adapter picker
+      // and start a GPS-only trajet immediately. The recording screen
+      // displays distance + speed from Geolocator; engine fields stay
+      // null and the persisted trip carries `kind: TripKind.gpsOnly`.
+      final flags = ref.read(enabledFeaturesProvider);
+      final obd2Required = flags.contains(Feature.obd2Optional);
+      if (!obd2Required) {
+        final outcome = await notifier.startGpsOnly();
+        if (!mounted) return;
+        await Navigator.of(context).push<TripSaveResult?>(
+          MaterialPageRoute(
+            builder: (_) => const TripRecordingScreen(),
+          ),
+        );
+        // `outcome` is informational here — the recording screen
+        // handles both the freshly-started and already-active cases
+        // the same way (its build reads from the provider).
+        if (outcome == StartTripOutcome.alreadyActive) return;
+        return;
+      }
       final outcome = await notifier.startTrip();
       if (!mounted) return;
       if (outcome == StartTripOutcome.alreadyActive) {

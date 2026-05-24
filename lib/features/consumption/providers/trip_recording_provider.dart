@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../core/location/geolocator_wrapper.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
@@ -90,6 +93,17 @@ class TripRecording extends _$TripRecording {
   String? _adapterMac;
   String? _adapterName;
   String? _adapterFirmware;
+
+  // #2025 — GPS-only recording mode. When `_gpsOnlyMode` is true the
+  // notifier is running a parallel pipeline that taps Geolocator
+  // directly, feeds a pure [TripRecorder], and persists with
+  // `kind: TripKind.gpsOnly` on stop. No `_controller` / `_service` is
+  // created in this mode — the OBD2 polling loop simply isn't started.
+  bool _gpsOnlyMode = false;
+  TripRecorder? _gpsOnlyRecorder;
+  StreamSubscription<Position>? _gpsOnlySub;
+  final List<TripSample> _gpsOnlySamples = [];
+  DateTime? _gpsOnlyStartedAt;
 
   // #1458 phase 2 — most recent app lifecycle state observed by the
   // wiring layer's [WidgetsBindingObserver]. Read by the GPS stream
@@ -558,6 +572,11 @@ class TripRecording extends _$TripRecording {
   /// wrapper below) so the launcher-icon badge increments only when
   /// the coordinator was the one that decided to save.
   Future<StoppedTripResult> stop({bool automatic = false}) async {
+    // #2025 — GPS-only mode runs its own teardown that bypasses the
+    // OBD2 controller / service entirely.
+    if (_gpsOnlyMode) {
+      return _stopGpsOnly(automatic: automatic);
+    }
     final ctl = _controller;
     final svc = _service;
     if (ctl == null || svc == null) {
@@ -1192,6 +1211,131 @@ class TripRecording extends _$TripRecording {
     } catch (e, st) {
       debugPrint('TripRecording._saveToHistory: $e\n$st');
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // #2025 — GPS-only recording path. Lets users record a trajet without
+  // an OBD2 dongle: samples come from Geolocator, the TripRecorder
+  // accumulator runs the same harsh-event / distance / idle integration
+  // it does for OBD2 trips, and the persisted summary carries
+  // `kind: TripKind.gpsOnly` so downstream surfaces (confidence-tier
+  // badge, recording-screen redesign) can adapt.
+  // ---------------------------------------------------------------------------
+
+  /// Start a GPS-only trajet recording (#2025). Skips the OBD2 service
+  /// + adapter picker entirely; instead opens a Geolocator stream and
+  /// feeds a pure [TripRecorder] with synthetic samples (speed from
+  /// `Position.speed`, all engine fields null, lat/lon/altitude/bearing
+  /// from the fix).
+  ///
+  /// Returns:
+  ///  - [StartTripOutcome.started] when the stream was opened. Caller
+  ///    pushes the recording screen.
+  ///  - [StartTripOutcome.alreadyActive] when a trip is already
+  ///    running (OBD2 or GPS-only).
+  Future<StartTripOutcome> startGpsOnly() async {
+    if (state.isActive || _startInProgress) {
+      return StartTripOutcome.alreadyActive;
+    }
+    _startInProgress = true;
+    try {
+      _gpsOnlyMode = true;
+      _gpsOnlyRecorder = TripRecorder(maxIntegrationGapSeconds: 30);
+      _gpsOnlySamples.clear();
+      _gpsOnlyStartedAt = DateTime.now();
+      _lastTripStartedAt = DateTime.now();
+      _lastTripVehicleId = _tryReadActiveVehicle()?.id;
+      // Subscribe to the position stream at high accuracy — the
+      // post-trip map polyline + confidence-tier UX both want ~10 m
+      // precision. Permission failure is non-fatal: the stream errors
+      // and we log; the user sees an unmoving recording until they
+      // grant permission or stop.
+      final geo = ref.read(geolocatorWrapperProvider);
+      _gpsOnlySub = geo
+          .getPositionStream(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.high,
+            ),
+          )
+          .listen(
+            _onGpsOnlyPosition,
+            onError: (Object e, StackTrace st) {
+              debugPrint('TripRecording.startGpsOnly: stream error: $e\n$st');
+            },
+          );
+      // Seed the state so the recording screen renders immediately
+      // (the first GPS fix can be 1-3 s away on a cold start).
+      state = state.copyWith(
+        phase: TripRecordingPhase.recording,
+        live: const TripLiveReading(
+          elapsed: Duration.zero,
+          distanceKmSoFar: 0,
+        ),
+      );
+      return StartTripOutcome.started;
+    } finally {
+      _startInProgress = false;
+    }
+  }
+
+  void _onGpsOnlyPosition(Position p) {
+    final recorder = _gpsOnlyRecorder;
+    final startedAt = _gpsOnlyStartedAt;
+    if (recorder == null || startedAt == null || !_gpsOnlyMode) return;
+    // Geolocator can report a stale fix in the first emit before the
+    // GPS warms up — guard against speed = NaN / negative.
+    final speedMps = p.speed.isFinite && p.speed >= 0 ? p.speed : 0.0;
+    final sample = TripSample(
+      timestamp: p.timestamp,
+      speedKmh: speedMps * 3.6,
+      rpm: 0,
+      latitude: p.latitude.isFinite ? p.latitude : null,
+      longitude: p.longitude.isFinite ? p.longitude : null,
+      altitudeM: p.altitude.isFinite ? p.altitude : null,
+      hAccuracyM: p.accuracy.isFinite ? p.accuracy : null,
+      bearingDeg: p.heading.isFinite ? p.heading : null,
+    );
+    _gpsOnlySamples.add(sample);
+    recorder.onSample(sample);
+    final summary = recorder.buildSummary();
+    state = state.copyWith(
+      phase: TripRecordingPhase.recording,
+      live: TripLiveReading(
+        speedKmh: sample.speedKmh,
+        distanceKmSoFar: summary.distanceKm,
+        elapsed: DateTime.now().difference(startedAt),
+      ),
+    );
+  }
+
+  Future<StoppedTripResult> _stopGpsOnly({bool automatic = false}) async {
+    final recorder = _gpsOnlyRecorder;
+    await _gpsOnlySub?.cancel();
+    _gpsOnlySub = null;
+    if (recorder == null) {
+      _gpsOnlyMode = false;
+      state = const TripRecordingState();
+      return const StoppedTripResult.empty();
+    }
+    final summary = recorder.buildSummary().copyWith(
+          kind: TripKind.gpsOnly,
+        );
+    final samples = List<TripSample>.unmodifiable(_gpsOnlySamples);
+    await _saveToHistory(
+      summary,
+      samples: samples,
+      automatic: automatic,
+    );
+    _gpsOnlyMode = false;
+    _gpsOnlyRecorder = null;
+    _gpsOnlySamples.clear();
+    _gpsOnlyStartedAt = null;
+    state = const TripRecordingState();
+    return StoppedTripResult(
+      summary: summary,
+      odometerStartKm: null,
+      odometerLatestKm: null,
+    );
   }
 }
 
