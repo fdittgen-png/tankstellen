@@ -2373,6 +2373,15 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tooltipClearSearch => 'Tøm søkefelt';
 
   @override
+  String get coachingShiftUp => 'Gir opp';
+
+  @override
+  String get coachingShiftDown => 'Gir ned';
+
+  @override
+  String get coachingEasePedal => 'Slipp gassen';
+
+  @override
   String get tooltipUseGps => 'Bruk GPS-posisjon';
 
   @override

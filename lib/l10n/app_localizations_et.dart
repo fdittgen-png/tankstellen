@@ -2369,6 +2369,15 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tooltipClearSearch => 'Tühjenda otsingusisestus';
 
   @override
+  String get coachingShiftUp => 'Vaheta üles';
+
+  @override
+  String get coachingShiftDown => 'Vaheta alla';
+
+  @override
+  String get coachingEasePedal => 'Lase gaas';
+
+  @override
   String get tooltipUseGps => 'Kasuta GPS-asukohta';
 
   @override

@@ -2388,6 +2388,15 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tooltipClearSearch => 'Notīrīt meklēšanu';
 
   @override
+  String get coachingShiftUp => 'Pārslēgt augšup';
+
+  @override
+  String get coachingShiftDown => 'Pārslēgt lejup';
+
+  @override
+  String get coachingEasePedal => 'Atlaid gāzi';
+
+  @override
   String get tooltipUseGps => 'Izmantot GPS atrašanās vietu';
 
   @override

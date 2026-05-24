@@ -2375,6 +2375,15 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tooltipClearSearch => 'Obriši unos pretraživanja';
 
   @override
+  String get coachingShiftUp => 'Prebaci gore';
+
+  @override
+  String get coachingShiftDown => 'Prebaci dolje';
+
+  @override
+  String get coachingEasePedal => 'Smanji gas';
+
+  @override
   String get tooltipUseGps => 'Koristi GPS lokaciju';
 
   @override

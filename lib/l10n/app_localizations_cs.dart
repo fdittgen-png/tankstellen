@@ -2379,6 +2379,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tooltipClearSearch => 'Vymazat vstup hledání';
 
   @override
+  String get coachingShiftUp => 'Zařadit vyšší';
+
+  @override
+  String get coachingShiftDown => 'Zařadit nižší';
+
+  @override
+  String get coachingEasePedal => 'Uberte plyn';
+
+  @override
   String get tooltipUseGps => 'Použít polohu GPS';
 
   @override

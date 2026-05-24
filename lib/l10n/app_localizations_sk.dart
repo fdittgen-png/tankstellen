@@ -2384,6 +2384,15 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tooltipClearSearch => 'Vymazať vstup vyhľadávania';
 
   @override
+  String get coachingShiftUp => 'Zaraď vyššie';
+
+  @override
+  String get coachingShiftDown => 'Zaraď nižšie';
+
+  @override
+  String get coachingEasePedal => 'Pusť plyn';
+
+  @override
   String get tooltipUseGps => 'Použiť GPS polohu';
 
   @override

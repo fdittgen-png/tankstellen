@@ -1687,5 +1687,8 @@
   "onboardingExploreDemoData": "Tutvu demoandmetega",
   "obd2DebugLoggingTitle": "OBD2 silumislogi",
   "obd2DebugLoggingSubtitle": "Salvestage iga OBD2 seanss — ühendus, käepigistus, andmelüngad ja taasühendused — eksporditavasse XML-logisse. Vaikimisi välja lülitatud.",
-  "obd2DebugSessionShareLabel": "Jaga OBD2 seansilogi"
+  "obd2DebugSessionShareLabel": "Jaga OBD2 seansilogi",
+  "coachingShiftUp": "Vaheta üles",
+  "coachingShiftDown": "Vaheta alla",
+  "coachingEasePedal": "Lase gaas"
 }
