@@ -66,9 +66,14 @@ void main() {
       fills: _twoTanksAt7Avg(),
     );
 
+    // #2026 — the live figure is now also rendered in
+    // MinimalDriveSummary at the top of the recording column, so we
+    // expect at least one (and now two) widgets to show it. The
+    // intent of the assertion is preserved: the value is still
+    // visible, not swapped or hidden.
     expect(
       find.textContaining('10.0 L/100 km'),
-      findsOneWidget,
+      findsAtLeastNWidgets(1),
       reason: 'In the warning band the live number remains the source '
           'of truth — only the disclaimer chip + snackbar surface.',
     );

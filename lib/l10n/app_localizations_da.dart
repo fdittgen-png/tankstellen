@@ -2377,6 +2377,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tooltipClearSearch => 'Ryd søgeinput';
 
   @override
+  String get minimalDriveInstantConsumption => 'Aktuelt forbrug';
+
+  @override
   String get coachingShiftUp => 'Skift op';
 
   @override

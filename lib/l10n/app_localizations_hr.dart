@@ -2378,6 +2378,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tooltipClearSearch => 'Obriši unos pretraživanja';
 
   @override
+  String get minimalDriveInstantConsumption => 'Trenutna potrošnja';
+
+  @override
   String get coachingShiftUp => 'Prebaci gore';
 
   @override

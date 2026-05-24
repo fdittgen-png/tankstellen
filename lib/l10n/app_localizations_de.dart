@@ -2391,6 +2391,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tooltipClearSearch => 'Sucheingabe löschen';
 
   @override
+  String get minimalDriveInstantConsumption => 'Momentaner Verbrauch';
+
+  @override
   String get coachingShiftUp => 'Hochschalten';
 
   @override

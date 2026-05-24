@@ -1083,6 +1083,10 @@
   "tooltipClose": "Close",
   "tooltipShare": "Share",
   "tooltipClearSearch": "Clear search input",
+  "minimalDriveInstantConsumption": "Instant consumption",
+  "@minimalDriveInstantConsumption": {
+    "description": "Label above the headline instant-L/100km figure in the MinimalDriveSummary card on the trip-recording screen (#2026). Replaces the five-card 'Distance/Speed/Fuel/Avg/Elapsed' wall as the primary live-drive surface."
+  },
   "coachingShiftUp": "Shift up",
   "coachingShiftDown": "Shift down",
   "coachingEasePedal": "Ease off",

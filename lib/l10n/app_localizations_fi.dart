@@ -2376,6 +2376,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tooltipClearSearch => 'Tyhjennä hakukenttä';
 
   @override
+  String get minimalDriveInstantConsumption => 'Hetkellinen kulutus';
+
+  @override
   String get coachingShiftUp => 'Vaihda ylös';
 
   @override

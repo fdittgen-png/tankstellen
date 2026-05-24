@@ -2368,6 +2368,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltipClearSearch => 'Clear search input';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Shift up';
 
   @override
@@ -7672,6 +7675,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tooltipClearSearch => '⟦Çłéář šéářçĥ îñƥúŧ ·······⟧';
+
+  @override
+  String get minimalDriveInstantConsumption => '⟦Îñšŧáñŧ çóñšúɱƥŧîóñ ········⟧';
 
   @override
   String get coachingShiftUp => '⟦Šĥîƒŧ úƥ ···⟧';

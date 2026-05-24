@@ -24,6 +24,7 @@ import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
+import '../widgets/minimal_drive_summary.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
 
 /// Result returned when the user confirms saving a recorded trip
@@ -756,6 +757,15 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // #2026 — minimal live-drive summary at the very top: one big
+        // instant L/100 km figure + three coaching symbols (shift up
+        // / shift down / ease pedal). Reads the same live state as
+        // the metric-card column below so a glance at the top tells
+        // the driver everything they need without scanning five
+        // cards. The card column underneath stays for the detail
+        // breakdown view.
+        const MinimalDriveSummary(),
+        const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.route,
           label: l?.tripMetricDistance ?? 'Distance',

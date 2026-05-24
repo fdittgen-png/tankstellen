@@ -2384,6 +2384,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tooltipClearSearch => 'Wyczyść wyszukiwanie';
 
   @override
+  String get minimalDriveInstantConsumption => 'Chwilowe zużycie';
+
+  @override
   String get coachingShiftUp => 'Zmień bieg w górę';
 
   @override
