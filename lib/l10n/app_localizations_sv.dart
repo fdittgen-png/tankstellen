@@ -5057,20 +5057,19 @@ class AppLocalizationsSv extends AppLocalizations {
       'OBD2-adapter ansluten men returnerar ingen data. Prova en annan adapter eller kontrollera fordonets diagnostikprotokoll.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Visa alla på karta';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Resor på karta';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'Dela GPX';
 
   @override
-  String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+  String get trajetsMapEmpty => 'Inga av de valda resorna har GPS-data.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'Det gick inte att dela GPX-filen';
 
   @override
   String get tripLengthCardTitle => 'Förbrukning per reselängd';

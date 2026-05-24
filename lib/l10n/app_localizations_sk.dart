@@ -5078,20 +5078,19 @@ class AppLocalizationsSk extends AppLocalizations {
       'OBD2 adaptér je pripojený, ale nevracia dáta. Skúste iný adaptér alebo skontrolujte diagnostický protokol vozidla.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Zobraziť všetko na mape';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Jazdy na mape';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'Zdieľať GPX';
 
   @override
-  String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+  String get trajetsMapEmpty => 'Žiadna z vybraných jázd nemá GPS údaje.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'Súbor GPX sa nepodarilo zdieľať';
 
   @override
   String get tripLengthCardTitle => 'Spotreba podľa dĺžky jazdy';

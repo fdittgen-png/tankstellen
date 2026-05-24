@@ -5087,20 +5087,19 @@ class AppLocalizationsLt extends AppLocalizations {
       'OBD2 adapteris prijungtas, bet negrąžina duomenų. Išbandykite kitą adapterį arba patikrinkite transporto priemonės diagnostikos protokolą.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Rodyti visus žemėlapyje';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Kelionės žemėlapyje';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'Bendrinti GPX';
 
   @override
-  String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+  String get trajetsMapEmpty => 'Pasirinktose kelionėse nėra GPS duomenų.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'Nepavyko bendrinti GPX failo';
 
   @override
   String get tripLengthCardTitle => 'Suvartojimas pagal kelionės ilgį';

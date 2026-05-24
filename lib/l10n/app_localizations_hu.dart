@@ -5102,20 +5102,19 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az OBD2-adapter csatlakoztatva van, de nem küld adatot. Próbáljon másik adaptert, vagy ellenőrizze a jármű diagnosztikai protokollját.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Mind a térképen';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Utak térképen';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'GPX megosztása';
 
   @override
-  String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+  String get trajetsMapEmpty => 'A kiválasztott utak egyikében sincs GPS-adat.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'A GPX-fájlt nem sikerült megosztani';
 
   @override
   String get tripLengthCardTitle => 'Fogyasztás úthossz szerint';

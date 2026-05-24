@@ -10457,6 +10457,23 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦ÓƁĐ2 áđáƥŧéř çóññéçŧéđ ƀúŧ ñóŧ řéŧúřñîñǧ đáŧá. Ŧřý á đîƒƒéřéñŧ áđáƥŧéř óř çĥéçķ ŧĥé ṽéĥîçłé\'š đîáǧñóšŧîç ƥřóŧóçół. ··········································⟧';
 
   @override
+  String get trajetsViewAllOnMap => '⟦Ṽîéŵ áłł óñ ɱáƥ ·····⟧';
+
+  @override
+  String get trajetsMapTitle => '⟦Ŧřáĵéŧš óñ ɱáƥ ·····⟧';
+
+  @override
+  String get trajetsMapShareGpx => '⟦Šĥářé ǦƤẊ ····⟧';
+
+  @override
+  String get trajetsMapEmpty =>
+      '⟦Ñóñé óƒ ŧĥé šéłéçŧéđ ŧřáĵéŧš çářřý ǦƤŠ šáɱƥłéš. ··················⟧';
+
+  @override
+  String get trajetsMapShareError =>
+      '⟦Çóúłđñ\'ŧ šĥářé ŧĥé ǦƤẊ ƒîłé ··········⟧';
+
+  @override
   String get tripLengthCardTitle => '⟦Çóñšúɱƥŧîóñ ƀý ŧřîƥ łéñǧŧĥ ··········⟧';
 
   @override

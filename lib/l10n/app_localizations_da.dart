@@ -5056,20 +5056,19 @@ class AppLocalizationsDa extends AppLocalizations {
       'OBD2-adapter tilsluttet, men returnerer ingen data. Prøv en anden adapter eller tjek køretøjets diagnostikprotokol.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Vis alle på kort';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Ture på kort';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'Del GPX';
 
   @override
-  String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+  String get trajetsMapEmpty => 'Ingen af de valgte ture indeholder GPS-data.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'GPX-filen kunne ikke deles';
 
   @override
   String get tripLengthCardTitle => 'Forbrug efter turlængde';

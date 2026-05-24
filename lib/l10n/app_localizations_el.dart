@@ -5105,20 +5105,20 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ο προσαρμογέας OBD2 είναι συνδεδεμένος αλλά δεν επιστρέφει δεδομένα. Δοκιμάστε διαφορετικό προσαρμογέα ή ελέγξτε το πρωτόκολλο διαγνωστικού του οχήματος.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Όλα στον χάρτη';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Διαδρομές στον χάρτη';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'Κοινοποίηση GPX';
 
   @override
   String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+      'Καμία από τις επιλεγμένες διαδρομές δεν έχει δεδομένα GPS.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'Αδυναμία κοινοποίησης του αρχείου GPX';
 
   @override
   String get tripLengthCardTitle => 'Κατανάλωση ανά μήκος ταξιδιού';

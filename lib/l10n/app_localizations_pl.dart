@@ -5080,20 +5080,20 @@ class AppLocalizationsPl extends AppLocalizations {
       'Adapter OBD2 połączony, ale nie zwraca danych. Spróbuj innego adaptera lub sprawdź protokół diagnostyczny pojazdu.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Pokaż wszystkie na mapie';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Trasy na mapie';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'Udostępnij GPX';
 
   @override
   String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+      'Żaden z wybranych przejazdów nie ma danych GPS.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'Nie udało się udostępnić pliku GPX';
 
   @override
   String get tripLengthCardTitle => 'Zużycie wg długości trasy';

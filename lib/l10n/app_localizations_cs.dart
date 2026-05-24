@@ -5062,20 +5062,19 @@ class AppLocalizationsCs extends AppLocalizations {
       'Adaptér OBD2 je připojen, ale nevrací data. Zkuste jiný adaptér nebo zkontrolujte diagnostický protokol vozidla.';
 
   @override
-  String get trajetsViewAllOnMap => 'View all on map';
+  String get trajetsViewAllOnMap => 'Zobrazit vše na mapě';
 
   @override
-  String get trajetsMapTitle => 'Trajets on map';
+  String get trajetsMapTitle => 'Jízdy na mapě';
 
   @override
-  String get trajetsMapShareGpx => 'Share GPX';
+  String get trajetsMapShareGpx => 'Sdílet GPX';
 
   @override
-  String get trajetsMapEmpty =>
-      'None of the selected trajets carry GPS samples.';
+  String get trajetsMapEmpty => 'Žádná z vybraných jízd nemá GPS data.';
 
   @override
-  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+  String get trajetsMapShareError => 'Soubor GPX nelze sdílet';
 
   @override
   String get tripLengthCardTitle => 'Spotřeba podle délky cesty';
