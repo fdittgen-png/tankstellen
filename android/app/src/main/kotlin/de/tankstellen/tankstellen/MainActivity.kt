@@ -47,6 +47,12 @@ class MainActivity : FlutterActivity() {
         // its own GATT client.
         BackgroundAdapterChannel.registerWith(flutterEngine, applicationContext)
 
+        // Public file-export bridge (#2014). Routes exports to the
+        // device's MediaStore.Downloads collection so the user can
+        // find them via Files / any file manager — the previous
+        // app-private save target was invisible.
+        PublicFileExporterChannel.registerWith(flutterEngine, applicationContext)
+
         // Picture-in-Picture bridge (#1884).
         val pip = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,

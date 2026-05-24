@@ -1525,9 +1525,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get privacyExportCsvSuccess => 'Data CSV exportována do schránky';
 
   @override
-  String savedToFile(String path) {
-    return 'Uloženo do $path';
-  }
+  String get savedToDownloadsFolder => 'Uloženo do složky Stažené';
 
   @override
   String get privacyDeleteButton => 'Smazat všechna data';

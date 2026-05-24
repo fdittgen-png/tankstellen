@@ -1522,9 +1522,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV podaci izvezeni u međuspremnik';
 
   @override
-  String savedToFile(String path) {
-    return 'Spremljeno u $path';
-  }
+  String get savedToDownloadsFolder => 'Spremljeno u mapu Preuzimanja';
 
   @override
   String get privacyDeleteButton => 'Obriši sve podatke';

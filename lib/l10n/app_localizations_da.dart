@@ -1521,9 +1521,7 @@ class AppLocalizationsDa extends AppLocalizations {
       'CSV-data eksporteret til udklipsholder';
 
   @override
-  String savedToFile(String path) {
-    return 'Gemt i $path';
-  }
+  String get savedToDownloadsFolder => 'Gemt i mappen Downloads';
 
   @override
   String get privacyDeleteButton => 'Slet alle data';

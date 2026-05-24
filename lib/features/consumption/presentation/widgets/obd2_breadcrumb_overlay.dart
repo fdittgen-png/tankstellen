@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/providers/app_state_provider.dart';
-import '../../../../core/sharing/local_file_saver.dart';
+import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/auto_record_trace_log.dart';
 import '../../data/obd2/obd2_breadcrumb_collector.dart';
@@ -125,13 +125,16 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     required AppLocalizations? l10n,
   }) async {
     try {
-      final saved = await LocalFileSaver.saveTextToDownloads(
+      await PublicFileExporter.saveTextToDownloads(
         text: text,
         fileName: fileName,
+        mimeType: 'application/json',
       );
       messenger?.showSnackBar(
         SnackBar(
-          content: Text(l10n?.savedToFile(saved) ?? 'Saved to $saved'),
+          content: Text(
+            l10n?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
+          ),
         ),
       );
     } on Object catch (e, st) {

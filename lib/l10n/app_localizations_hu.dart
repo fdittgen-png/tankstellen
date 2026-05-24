@@ -1528,9 +1528,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV-adatok exportálva a vágólapra';
 
   @override
-  String savedToFile(String path) {
-    return 'Mentve ide: $path';
-  }
+  String get savedToDownloadsFolder => 'Mentve a Letöltések mappába';
 
   @override
   String get privacyDeleteButton => 'Összes adat törlése';

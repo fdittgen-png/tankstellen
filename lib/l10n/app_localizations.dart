@@ -2901,11 +2901,11 @@ abstract class AppLocalizations {
   /// **'CSV data exported to clipboard'**
   String get privacyExportCsvSuccess;
 
-  /// Snackbar confirming an export was written to the on-device Downloads folder (#1993). The {path} placeholder is the absolute filesystem path of the saved file.
+  /// Snackbar confirming an export was written to the device's public Downloads folder (#2014). Replaces the earlier savedToFile string, which leaked a filesystem path that is meaningless to users (and on Android Q+ becomes a content:// URI).
   ///
   /// In en, this message translates to:
-  /// **'Saved to {path}'**
-  String savedToFile(String path);
+  /// **'Saved to your Downloads folder'**
+  String get savedToDownloadsFolder;
 
   /// No description provided for @privacyDeleteButton.
   ///

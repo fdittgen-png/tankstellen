@@ -1532,7 +1532,7 @@
   "privacyViewServerData": "Voir les données du serveur",
   "privacyExportSuccess": "Données exportées dans le presse-papiers",
   "privacyExportCsvSuccess": "Données CSV exportées dans le presse-papiers",
-  "savedToFile": "Enregistré dans {path}",
+  "savedToDownloadsFolder": "Enregistré dans le dossier Téléchargements",
   "privacyDeleteTitle": "Supprimer toutes les données ?",
   "privacyDeleteBody": "Cela supprimera définitivement :\n\n- Tous les favoris et données de stations\n- Tous les profils de recherche\n- Toutes les alertes de prix\n- Tout l'historique des prix\n- Toutes les données en cache\n- Votre clé API\n- Tous les paramètres de l'application\n\nL'application sera réinitialisée à son état initial. Cette action est irréversible.",
   "privacyDeleteConfirm": "Tout supprimer",

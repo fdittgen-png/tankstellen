@@ -1531,9 +1531,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'CSV данните са експортирани в клипборда';
 
   @override
-  String savedToFile(String path) {
-    return 'Запазено в $path';
-  }
+  String get savedToDownloadsFolder => 'Запазено в папката Изтегляния';
 
   @override
   String get privacyDeleteButton => 'Изтрий всички данни';
