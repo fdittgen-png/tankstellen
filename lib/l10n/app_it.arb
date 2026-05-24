@@ -474,7 +474,7 @@
   "privacyExportSuccess": "Dati esportati negli appunti",
   "privacyExportCsvButton": "Esporta tutti i dati come CSV",
   "privacyExportCsvSuccess": "Dati CSV esportati negli appunti",
-  "savedToFile": "Salvato in {path}",
+  "savedToDownloadsFolder": "Salvato nella cartella Download",
   "privacyClearErrorLog": "Cancella registro errori",
   "privacyErrorLogCleared": "Registro errori cancellato",
   "privacyDeleteButton": "Elimina tutti i dati",

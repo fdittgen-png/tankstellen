@@ -1525,9 +1525,7 @@ class AppLocalizationsLt extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV duomenys eksportuoti į iškarpinę';
 
   @override
-  String savedToFile(String path) {
-    return 'Išsaugota: $path';
-  }
+  String get savedToDownloadsFolder => 'Išsaugota aplanke Atsisiuntimai';
 
   @override
   String get privacyDeleteButton => 'Ištrinti visus duomenis';

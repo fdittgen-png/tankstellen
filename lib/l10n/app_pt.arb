@@ -474,7 +474,7 @@
   "privacyExportSuccess": "Dados exportados para a área de transferência",
   "privacyExportCsvButton": "Exportar todos os dados como CSV",
   "privacyExportCsvSuccess": "Dados CSV exportados para a área de transferência",
-  "savedToFile": "Guardado em {path}",
+  "savedToDownloadsFolder": "Guardado na pasta Transferências",
   "privacyClearErrorLog": "Limpar registo de erros",
   "privacyErrorLogCleared": "Registo de erros limpo",
   "privacyDeleteButton": "Eliminar todos os dados",

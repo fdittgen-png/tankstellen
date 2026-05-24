@@ -9,7 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../core/sharing/local_file_saver.dart';
+import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -272,11 +272,11 @@ class _PrivacyDashboardScreenState
     );
   }
 
-  /// Writes [text] to `<docs>/Downloads/<fileName>` and announces the
-  /// outcome to the user (#1993). When the save succeeds, the snackbar
-  /// shows `savedToFile(path)`; when it fails (no permission, no space),
-  /// it falls back to [copySnackbar] so the user still gets the original
-  /// clipboard/share confirmation.
+  /// Writes [text] to the device's public Downloads folder via
+  /// [PublicFileExporter] (#2014) and announces the outcome. When the
+  /// save succeeds, the snackbar shows `savedToDownloadsFolder`; on
+  /// failure (no permission, no space) it falls back to [copySnackbar]
+  /// so the user still gets the original clipboard/share confirmation.
   Future<void> _saveExportToDownloads({
     required String text,
     required String fileName,
@@ -285,14 +285,15 @@ class _PrivacyDashboardScreenState
     if (!mounted) return;
     final l = AppLocalizations.of(context);
     try {
-      final savedPath = await LocalFileSaver.saveTextToDownloads(
+      await PublicFileExporter.saveTextToDownloads(
         text: text,
         fileName: fileName,
+        mimeType: fileName.endsWith('.csv') ? 'text/csv' : 'application/json',
       );
       if (!mounted) return;
       SnackBarHelper.showSuccess(
         context,
-        l?.savedToFile(savedPath) ?? 'Saved to $savedPath',
+        l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
       );
     } on Object catch (e, st) {
       debugPrint('privacy: save-to-downloads fallback: $e\n$st');

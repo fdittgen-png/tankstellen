@@ -1528,9 +1528,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get privacyExportCsvSuccess => 'Date CSV exportate în clipboard';
 
   @override
-  String savedToFile(String path) {
-    return 'Salvat în $path';
-  }
+  String get savedToDownloadsFolder => 'Salvat în folderul Descărcări';
 
   @override
   String get privacyDeleteButton => 'Ștergeți toate datele';

@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../core/constants/app_constants.dart';
-import '../../../../../core/sharing/local_file_saver.dart';
+import '../../../../../core/sharing/public_file_exporter.dart';
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
@@ -128,16 +128,18 @@ class FullBackupExporter {
     final sink = debugBackupShareSinkOverride ?? _defaultShareSink;
     await sink(params);
 
-    // #1993 — also drop the same zip into the app's Downloads folder
-    // so the user can find it via any file manager after the share
-    // sheet closes. The share-sheet hand-off above is the primary
-    // surface; this save step is best-effort — a failure here must not
-    // mask the successful share.
+    // #2014 — also drop the same zip into the device's public
+    // Downloads folder (MediaStore on Android Q+, Files-app-visible
+    // Documents/Downloads on iOS) so the user can find it via any
+    // file manager after the share sheet closes. The share-sheet
+    // hand-off above is the primary surface; this save step is
+    // best-effort — a failure here must not mask the successful share.
     String? savedPath;
     try {
-      savedPath = await LocalFileSaver.saveBytesToDownloads(
+      savedPath = await PublicFileExporter.saveBytesToDownloads(
         bytes: bytes,
         fileName: fileName,
+        mimeType: 'application/zip',
       );
     } on Object catch (e, st) {
       debugPrint('FullBackupExporter: save-to-downloads failed: $e\n$st');

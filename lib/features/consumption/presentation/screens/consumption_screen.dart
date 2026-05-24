@@ -136,13 +136,14 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       );
 
       if (!mounted) return;
-      // #1993 — when the exporter also wrote a copy to Downloads, surface
-      // the saved path so the user can find the file via any file manager
-      // after the share sheet closes. Falls back to the legacy "Backup
-      // ready" snackbar if the save-to-Downloads step bailed.
-      final savedPath = result.savedPath;
-      final message = (savedPath != null)
-          ? (l?.savedToFile(savedPath) ?? 'Saved to $savedPath')
+      // #2014 — when the exporter also wrote a copy to the device's
+      // public Downloads folder, confirm with a folder-level snackbar.
+      // The exact path / content URI varies per platform (MediaStore on
+      // Android Q+) and is not useful for users to read — just point
+      // them at "your Downloads folder". Falls back to the legacy
+      // "Backup ready" snackbar when the save-to-Downloads step bailed.
+      final message = (result.savedPath != null)
+          ? (l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder')
           : (l?.exportBackupReady ?? 'Backup ready — pick a destination');
       SnackBarHelper.showSuccess(context, message);
     } catch (e, st) {
