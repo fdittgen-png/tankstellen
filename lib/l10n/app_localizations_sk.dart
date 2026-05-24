@@ -4097,6 +4097,13 @@ class AppLocalizationsSk extends AppLocalizations {
       'Nahlásiť cenu stanice z obrazovky detailov stanice.';
 
   @override
+  String get featureLabel_obd2Optional => 'Vyžadovať OBD2 pre záznam jázd';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Keď je vypnuté, aplikácia zaznamenáva jazdy iba pomocou GPS bez OBD2 adaptéra. Coaching je obmedzený — žiadne okamžité L/100 km, menej motorových signálov.';
+
+  @override
   String get feedbackConsentTitle => 'Odoslať hlásenie na GitHub?';
 
   @override

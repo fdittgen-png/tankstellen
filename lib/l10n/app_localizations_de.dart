@@ -4102,6 +4102,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Einen Tankstellenpreis von der Detailseite aus melden.';
 
   @override
+  String get featureLabel_obd2Optional =>
+      'OBD2 für Fahrtaufzeichnung erforderlich';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Wenn aus, zeichnet die App reine GPS-Fahrten ohne OBD2-Adapter auf. Das Coaching ist eingeschränkt — keine momentane L/100 km, weniger motorbasierte Signale.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

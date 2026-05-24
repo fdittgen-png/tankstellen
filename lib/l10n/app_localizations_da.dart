@@ -4078,6 +4078,13 @@ class AppLocalizationsDa extends AppLocalizations {
       'Rapporter en stationspris fra stationsdetalje-skærmen.';
 
   @override
+  String get featureLabel_obd2Optional => 'Kræv OBD2 til turoptagelse';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Når slået fra optager appen ture med kun GPS uden en OBD2-adapter. Coaching er reduceret — ingen øjeblikkelig L/100 km, færre motorsignaler.';
+
+  @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';
 
   @override

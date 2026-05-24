@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "Skann-til-betal QR-leser på stasjonsdetalj-skjermen.",
   "featureLabel_communityPriceReports": "Fellesskapsprisrapporter",
   "featureDescription_communityPriceReports": "Rapporter en stasjonspris fra stasjonsdetalj-skjermen.",
+  "featureLabel_obd2Optional": "Krev OBD2 for turopptak",
+  "featureDescription_obd2Optional": "Når av tar appen opp turer med kun GPS uten en OBD2-adapter. Coaching er redusert — ingen umiddelbar L/100 km, færre motorsignaler.",
   "feedbackConsentTitle": "Send rapport til GitHub?",
   "feedbackConsentBody": "Dette oppretter en offentlig sak på GitHub-depotet vårt med bildet og OCR-teksten. Ingen personopplysninger (posisjon, konto-ID) sendes. Fortsett?",
   "feedbackConsentContinue": "Fortsett",

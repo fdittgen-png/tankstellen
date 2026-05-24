@@ -129,4 +129,14 @@ enum Feature {
   /// flag preserves current behaviour while bringing it under central
   /// feature management. No prerequisites.
   communityPriceReports,
+
+  /// Whether the trip recorder should require an OBD2 adapter at all
+  /// (#2024). Default-on — every existing user has OBD2 set up and the
+  /// recorder workflow assumes a dongle. Toggling this flag off lets
+  /// users record GPS-only trajets (kind = `gpsOnly`) without ever
+  /// pairing a dongle; the recording screen falls back to the minimal
+  /// instant-consumption + coaching-symbols layout (#2026) and the
+  /// vehicle calibration drops to confidence tier A (#2027). Soft-
+  /// requires nothing — the flag is the prerequisite-removal itself.
+  obd2Optional,
 }

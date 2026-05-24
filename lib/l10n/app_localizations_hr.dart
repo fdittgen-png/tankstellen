@@ -4089,6 +4089,14 @@ class AppLocalizationsHr extends AppLocalizations {
       'Prijavite cijenu postaje sa zaslona detalja postaje.';
 
   @override
+  String get featureLabel_obd2Optional =>
+      'Zahtijevaj OBD2 za snimanje putovanja';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Kada je isključeno, aplikacija snima putovanja samo s GPS-om bez OBD2 adaptera. Coaching je smanjen — nema trenutne L/100 km, manje motornih signala.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati izvješće na GitHub?';
 
   @override

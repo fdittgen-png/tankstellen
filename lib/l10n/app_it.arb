@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "Lettore QR scan-to-pay nella schermata dettagli stazione.",
   "featureLabel_communityPriceReports": "Segnalazioni prezzi community",
   "featureDescription_communityPriceReports": "Segnala il prezzo di una stazione dalla schermata dettagli stazione.",
+  "featureLabel_obd2Optional": "Richiedi OBD2 per la registrazione dei viaggi",
+  "featureDescription_obd2Optional": "Quando disattivato, l'app registra viaggi solo GPS senza un adattatore OBD2. Il coaching è ridotto — niente L/100 km istantanea, meno segnali motore.",
   "feedbackConsentTitle": "Inviare la segnalazione su GitHub?",
   "feedbackConsentBody": "Verrà creato un ticket pubblico nel nostro repository GitHub con la tua foto e il testo OCR. Non vengono inviati dati personali (posizione, ID account). Continuare?",
   "feedbackConsentContinue": "Continua",

@@ -4107,6 +4107,14 @@ class AppLocalizationsLv extends AppLocalizations {
       'Ziņot par stacijas cenu no stacijas detaļu ekrāna.';
 
   @override
+  String get featureLabel_obd2Optional =>
+      'Pieprasīt OBD2 braucienu ierakstīšanai';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Kad izslēgts, lietotne ieraksta braucienus tikai ar GPS bez OBD2 adaptera. Treniņš ir ierobežots — nav momentānā L/100 km, mazāk dzinēja signālu.';
+
+  @override
   String get feedbackConsentTitle => 'Nosūtīt ziņojumu uz GitHub?';
 
   @override

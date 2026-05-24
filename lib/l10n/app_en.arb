@@ -2618,6 +2618,14 @@
   "@featureDescription_communityPriceReports": {
     "description": "Settings toggle description for the community price-report station-detail action (#1638)."
   },
+  "featureLabel_obd2Optional": "Require OBD2 for trip recording",
+  "@featureLabel_obd2Optional": {
+    "description": "Settings toggle label for the OBD2-optional flag (#2024). When the toggle is on (default), the trip recorder still requires an OBD2 adapter; when off, GPS-only trajets become possible."
+  },
+  "featureDescription_obd2Optional": "When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.",
+  "@featureDescription_obd2Optional": {
+    "description": "Settings toggle description for the OBD2-optional flag (#2024). Explains the trade-off between gpsPlusObd2 (default) and gpsOnly trip recording."
+  },
   "feedbackConsentTitle": "Send report to GitHub?",
   "@feedbackConsentTitle": {
     "description": "Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3)."

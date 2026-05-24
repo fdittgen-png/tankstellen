@@ -4102,6 +4102,13 @@ class AppLocalizationsLt extends AppLocalizations {
       'Pranešti apie stotelės kainą iš stotelės detalių ekrano.';
 
   @override
+  String get featureLabel_obd2Optional => 'Reikalauti OBD2 kelionių įrašymui';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Kai išjungta, programa įrašo keliones tik su GPS be OBD2 adapterio. Vairavimo patarimai sumažėjo — nėra momentinio L/100 km, mažiau variklio signalų.';
+
+  @override
   String get feedbackConsentTitle => 'Siųsti ataskaitą į GitHub?';
 
   @override

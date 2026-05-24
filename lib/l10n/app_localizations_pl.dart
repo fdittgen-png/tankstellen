@@ -4095,6 +4095,13 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zgłoś cenę stacji z ekranu szczegółów stacji.';
 
   @override
+  String get featureLabel_obd2Optional => 'Wymagaj OBD2 do nagrywania tras';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Gdy wyłączone, aplikacja nagrywa trasy tylko z GPS bez adaptera OBD2. Coaching jest ograniczony — brak chwilowego L/100 km, mniej sygnałów z silnika.';
+
+  @override
   String get feedbackConsentTitle => 'Wysłać zgłoszenie do GitHub?';
 
   @override

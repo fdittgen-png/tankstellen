@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "Czytnik QR do płatności na ekranie szczegółów stacji.",
   "featureLabel_communityPriceReports": "Zgłoszenia cen społeczności",
   "featureDescription_communityPriceReports": "Zgłoś cenę stacji z ekranu szczegółów stacji.",
+  "featureLabel_obd2Optional": "Wymagaj OBD2 do nagrywania tras",
+  "featureDescription_obd2Optional": "Gdy wyłączone, aplikacja nagrywa trasy tylko z GPS bez adaptera OBD2. Coaching jest ograniczony — brak chwilowego L/100 km, mniej sygnałów z silnika.",
   "feedbackConsentTitle": "Wysłać zgłoszenie do GitHub?",
   "feedbackConsentBody": "Spowoduje to utworzenie publicznego zgłoszenia na naszym repozytorium GitHub ze zdjęciem i tekstem OCR. Żadne dane osobowe (lokalizacja, ID konta) nie są wysyłane. Kontynuować?",
   "feedbackConsentContinue": "Kontynuuj",

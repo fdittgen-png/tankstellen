@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "Beolvasás-fizetés QR-olvasó az állomás részletes képernyőjén.",
   "featureLabel_communityPriceReports": "Közösségi árjelentések",
   "featureDescription_communityPriceReports": "Állomás árának bejelentése az állomás részletes képernyőjéről.",
+  "featureLabel_obd2Optional": "OBD2 megkövetelése az utak rögzítéséhez",
+  "featureDescription_obd2Optional": "Ha ki van kapcsolva, az alkalmazás csak GPS-szel rögzít utakat OBD2-adapter nélkül. A coaching csökkentett — nincs azonnali L/100 km, kevesebb motorjel.",
   "feedbackConsentTitle": "Elküldi a jelentést GitHub-ra?",
   "feedbackConsentBody": "Ez egy nyilvános jegyet hoz létre a GitHub-tárolónkban a fotójával és az OCR-szöveggel. Nem kerül személyes adat (helyszín, fiók-azonosító). Folytatja?",
   "feedbackConsentContinue": "Folytatás",

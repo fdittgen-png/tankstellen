@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "QR čtečka pro platbu na obrazovce detailu stanice.",
   "featureLabel_communityPriceReports": "Komunitní cenová hlášení",
   "featureDescription_communityPriceReports": "Nahlásit cenu stanice z obrazovky detailu stanice.",
+  "featureLabel_obd2Optional": "Vyžadovat OBD2 pro záznam jízd",
+  "featureDescription_obd2Optional": "Když je vypnuto, aplikace zaznamenává jízdy pouze pomocí GPS bez OBD2 adaptéru. Coaching je omezen — žádné okamžité L/100 km, méně motorových signálů.",
   "feedbackConsentTitle": "Odeslat hlášení na GitHub?",
   "feedbackConsentBody": "Tímto se vytvoří veřejný ticket v našem GitHub repozitáři s vaší fotografií a textem z OCR. Nejsou odesílány žádné osobní údaje (poloha, ID účtu). Pokračovat?",
   "feedbackConsentContinue": "Pokračovat",

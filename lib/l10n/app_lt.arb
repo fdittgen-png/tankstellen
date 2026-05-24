@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "QR nuskaitymo mokėjimui skaitytuvas stotelės detalių ekrane.",
   "featureLabel_communityPriceReports": "Bendruomenės kainų pranešimai",
   "featureDescription_communityPriceReports": "Pranešti apie stotelės kainą iš stotelės detalių ekrano.",
+  "featureLabel_obd2Optional": "Reikalauti OBD2 kelionių įrašymui",
+  "featureDescription_obd2Optional": "Kai išjungta, programa įrašo keliones tik su GPS be OBD2 adapterio. Vairavimo patarimai sumažėjo — nėra momentinio L/100 km, mažiau variklio signalų.",
   "feedbackConsentTitle": "Siųsti ataskaitą į GitHub?",
   "feedbackConsentBody": "Tai sukurs viešą bilietą mūsų GitHub saugykloje su jūsų nuotrauka ir OCR tekstu. Asmeniniai duomenys (vieta, paskyros ID) neišsiunčiami. Tęsti?",
   "feedbackConsentContinue": "Tęsti",

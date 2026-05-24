@@ -524,6 +524,8 @@ String _featureLabel(AppLocalizations? l, Feature f) {
     case Feature.communityPriceReports:
       return l?.featureLabel_communityPriceReports ??
           'Community price reports';
+    case Feature.obd2Optional:
+      return l?.featureLabel_obd2Optional ?? 'Require OBD2 for trip recording';
   }
 }
 
@@ -603,6 +605,11 @@ String _featureDescription(AppLocalizations? l, Feature f) {
     case Feature.communityPriceReports:
       return l?.featureDescription_communityPriceReports ??
           'Report a station price from the station detail screen.';
+    case Feature.obd2Optional:
+      return l?.featureDescription_obd2Optional ??
+          'When off, the app records GPS-only trajets without needing an '
+              'OBD2 adapter. Coaching is reduced — no instant L/100 km, '
+              'fewer engine-derived signals.';
   }
 }
 
@@ -655,6 +662,7 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.carbonDashboard:
     case Feature.paymentQrScan:
     case Feature.communityPriceReports:
+    case Feature.obd2Optional:
       return 'Prerequisites not met';
   }
 }

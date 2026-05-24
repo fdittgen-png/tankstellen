@@ -4083,6 +4083,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'Prijavite ceno postaje z zaslona s podrobnostmi postaje.';
 
   @override
+  String get featureLabel_obd2Optional => 'Zahtevaj OBD2 za snemanje voženj';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Ko je izklopljeno, aplikacija snema vožnje samo z GPS brez OBD2 adapterja. Coaching je omejen — brez trenutne L/100 km, manj signalov motorja.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati poročilo na GitHub?';
 
   @override

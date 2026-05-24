@@ -7407,6 +7407,18 @@ abstract class AppLocalizations {
   /// **'Report a station price from the station detail screen.'**
   String get featureDescription_communityPriceReports;
 
+  /// Settings toggle label for the OBD2-optional flag (#2024). When the toggle is on (default), the trip recorder still requires an OBD2 adapter; when off, GPS-only trajets become possible.
+  ///
+  /// In en, this message translates to:
+  /// **'Require OBD2 for trip recording'**
+  String get featureLabel_obd2Optional;
+
+  /// Settings toggle description for the OBD2-optional flag (#2024). Explains the trade-off between gpsPlusObd2 (default) and gpsOnly trip recording.
+  ///
+  /// In en, this message translates to:
+  /// **'When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.'**
+  String get featureDescription_obd2Optional;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

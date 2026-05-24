@@ -4094,6 +4094,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Een stationsprijs melden via het stationsdetailscherm.';
 
   @override
+  String get featureLabel_obd2Optional => 'OBD2 vereisen voor ritopname';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Indien uit, neemt de app alleen-GPS-ritten op zonder OBD2-adapter. Coaching is beperkt — geen direct L/100 km, minder motorgegevens.';
+
+  @override
   String get feedbackConsentTitle => 'Rapport versturen naar GitHub?';
 
   @override

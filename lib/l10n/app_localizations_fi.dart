@@ -4078,6 +4078,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ilmoita aseman hinta aseman tietosivulta.';
 
   @override
+  String get featureLabel_obd2Optional => 'Vaadi OBD2 matkojen tallentamiseen';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Kun pois päältä, sovellus tallentaa matkoja vain GPS:llä ilman OBD2-sovitinta. Valmennus on rajallisempaa — ei välitöntä L/100 km, vähemmän moottorisignaaleja.';
+
+  @override
   String get feedbackConsentTitle => 'Lähetetäänkö raportti GitHubiin?';
 
   @override

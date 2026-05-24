@@ -4113,6 +4113,14 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αναφορά τιμής σταθμού από την οθόνη λεπτομερειών.';
 
   @override
+  String get featureLabel_obd2Optional =>
+      'Απαίτηση OBD2 για καταγραφή διαδρομών';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'Όταν είναι απενεργοποιημένο, η εφαρμογή καταγράφει διαδρομές μόνο με GPS χωρίς προσαρμογέα OBD2. Το coaching είναι περιορισμένο — χωρίς στιγμιαία L/100 km, λιγότερα σήματα κινητήρα.';
+
+  @override
   String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';
 
   @override

@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "Cititor QR de plată pe ecranul de detalii al stației.",
   "featureLabel_communityPriceReports": "Rapoarte de prețuri comunitate",
   "featureDescription_communityPriceReports": "Raportați prețul unei stații din ecranul de detalii al stației.",
+  "featureLabel_obd2Optional": "Solicită OBD2 pentru înregistrarea călătoriilor",
+  "featureDescription_obd2Optional": "Când este oprit, aplicația înregistrează călătorii doar cu GPS fără adaptor OBD2. Coachingul este redus — fără L/100 km instantaneu, mai puține semnale ale motorului.",
   "feedbackConsentTitle": "Trimiteți raportul pe GitHub?",
   "feedbackConsentBody": "Aceasta creează un tichet public în depozitul nostru GitHub cu fotografia și textul OCR. Nu sunt trimise date personale (locație, ID cont). Continuați?",
   "feedbackConsentContinue": "Continuați",

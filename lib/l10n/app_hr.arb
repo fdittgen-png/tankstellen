@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "QR čitač za plaćanje na zaslonu detalja postaje.",
   "featureLabel_communityPriceReports": "Izvještaji o cijenama zajednice",
   "featureDescription_communityPriceReports": "Prijavite cijenu postaje sa zaslona detalja postaje.",
+  "featureLabel_obd2Optional": "Zahtijevaj OBD2 za snimanje putovanja",
+  "featureDescription_obd2Optional": "Kada je isključeno, aplikacija snima putovanja samo s GPS-om bez OBD2 adaptera. Coaching je smanjen — nema trenutne L/100 km, manje motornih signala.",
   "feedbackConsentTitle": "Poslati izvješće na GitHub?",
   "feedbackConsentBody": "Ovo stvara javnu prijavu na našem GitHub repozitoriju s vašom fotografijom i OCR tekstom. Osobni podaci (lokacija, ID računa) ne šalju se. Nastaviti?",
   "feedbackConsentContinue": "Nastavi",

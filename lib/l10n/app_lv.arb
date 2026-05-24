@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "Skenēšana-maksāšanai QR lasītājs stacijas detaļu ekrānā.",
   "featureLabel_communityPriceReports": "Kopienas cenu ziņojumi",
   "featureDescription_communityPriceReports": "Ziņot par stacijas cenu no stacijas detaļu ekrāna.",
+  "featureLabel_obd2Optional": "Pieprasīt OBD2 braucienu ierakstīšanai",
+  "featureDescription_obd2Optional": "Kad izslēgts, lietotne ieraksta braucienus tikai ar GPS bez OBD2 adaptera. Treniņš ir ierobežots — nav momentānā L/100 km, mazāk dzinēja signālu.",
   "feedbackConsentTitle": "Nosūtīt ziņojumu uz GitHub?",
   "feedbackConsentBody": "Tiks izveidota publiska biļete mūsu GitHub repozitorijā ar jūsu fotoattēlu un OCR tekstu. Tiek sūtīti nav nekādi personas dati (atrašanās vieta, konta ID). Turpināt?",
   "feedbackConsentContinue": "Turpināt",

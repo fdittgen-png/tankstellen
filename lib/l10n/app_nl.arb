@@ -1206,6 +1206,8 @@
   "featureDescription_paymentQrScan": "QR-scan-to-pay op het stationsdetailscherm.",
   "featureLabel_communityPriceReports": "Community-prijsrapporten",
   "featureDescription_communityPriceReports": "Een stationsprijs melden via het stationsdetailscherm.",
+  "featureLabel_obd2Optional": "OBD2 vereisen voor ritopname",
+  "featureDescription_obd2Optional": "Indien uit, neemt de app alleen-GPS-ritten op zonder OBD2-adapter. Coaching is beperkt — geen direct L/100 km, minder motorgegevens.",
   "feedbackConsentTitle": "Rapport versturen naar GitHub?",
   "feedbackConsentBody": "Hiermee wordt een openbaar ticket aangemaakt op onze GitHub-repository met je foto en de OCR-tekst. Er worden geen persoonsgegevens (locatie, account-id) meegestuurd. Doorgaan?",
   "feedbackConsentContinue": "Doorgaan",
