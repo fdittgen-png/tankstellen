@@ -4127,11 +4127,11 @@ class AppLocalizationsLt extends AppLocalizations {
       'Pranešti apie stotelės kainą iš stotelės detalių ekrano.';
 
   @override
-  String get featureLabel_obd2Optional => 'Require OBD2 for trip recording';
+  String get featureLabel_obd2Optional => 'Reikalauti OBD2 kelionių įrašymui';
 
   @override
   String get featureDescription_obd2Optional =>
-      'When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.';
+      'Kai išjungta, programa įrašo keliones tik su GPS be OBD2 adapterio. Vairavimo patarimai sumažėjo — nėra momentinio L/100 km, mažiau variklio signalų.';
 
   @override
   String get feedbackConsentTitle => 'Siųsti ataskaitą į GitHub?';

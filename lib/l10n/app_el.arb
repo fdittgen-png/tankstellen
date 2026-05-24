@@ -1213,6 +1213,8 @@
   "featureDescription_paymentQrScan": "Αναγνώστης QR για πληρωμή στην οθόνη λεπτομερειών σταθμού.",
   "featureLabel_communityPriceReports": "Αναφορές τιμών κοινότητας",
   "featureDescription_communityPriceReports": "Αναφορά τιμής σταθμού από την οθόνη λεπτομερειών.",
+  "featureLabel_obd2Optional": "Απαίτηση OBD2 για καταγραφή διαδρομών",
+  "featureDescription_obd2Optional": "Όταν είναι απενεργοποιημένο, η εφαρμογή καταγράφει διαδρομές μόνο με GPS χωρίς προσαρμογέα OBD2. Το coaching είναι περιορισμένο — χωρίς στιγμιαία L/100 km, λιγότερα σήματα κινητήρα.",
   "feedbackConsentTitle": "Αποστολή αναφοράς στο GitHub;",
   "feedbackConsentBody": "Αυτό δημιουργεί δημόσιο ticket στο αποθετήριο GitHub μας με τη φωτογραφία και το κείμενο OCR. Δεν αποστέλλονται προσωπικά δεδομένα (τοποθεσία, αναγνωριστικό λογαριασμού). Συνέχεια;",
   "feedbackConsentContinue": "Συνέχεια",

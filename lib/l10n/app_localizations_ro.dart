@@ -4133,11 +4133,12 @@ class AppLocalizationsRo extends AppLocalizations {
       'Raportați prețul unei stații din ecranul de detalii al stației.';
 
   @override
-  String get featureLabel_obd2Optional => 'Require OBD2 for trip recording';
+  String get featureLabel_obd2Optional =>
+      'Solicită OBD2 pentru înregistrarea călătoriilor';
 
   @override
   String get featureDescription_obd2Optional =>
-      'When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.';
+      'Când este oprit, aplicația înregistrează călătorii doar cu GPS fără adaptor OBD2. Coachingul este redus — fără L/100 km instantaneu, mai puține semnale ale motorului.';
 
   @override
   String get feedbackConsentTitle => 'Trimiteți raportul pe GitHub?';

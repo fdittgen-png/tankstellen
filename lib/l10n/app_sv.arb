@@ -1213,6 +1213,8 @@
   "featureDescription_paymentQrScan": "QR-läsare för betalning på stationsdetaljskärmen.",
   "featureLabel_communityPriceReports": "Community-prisrapporter",
   "featureDescription_communityPriceReports": "Rapportera ett stationspris från stationsdetaljskärmen.",
+  "featureLabel_obd2Optional": "Kräv OBD2 för ressparring",
+  "featureDescription_obd2Optional": "När av spelar appen in resor med endast GPS utan OBD2-adapter. Coaching är begränsat — inget direkt L/100 km, färre motorsignaler.",
   "feedbackConsentTitle": "Skicka rapport till GitHub?",
   "feedbackConsentBody": "Det här skapar ett offentligt ärende på vårt GitHub-förråd med ditt foto och OCR-texten. Ingen persondata (plats, konto-id) skickas. Fortsätt?",
   "feedbackConsentContinue": "Fortsätt",

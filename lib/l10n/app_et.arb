@@ -1213,6 +1213,8 @@
   "featureDescription_paymentQrScan": "Skaneeri-et-maksa QR-lugeja jaama üksikasjade ekraanil.",
   "featureLabel_communityPriceReports": "Kogukonna hinnaaruanded",
   "featureDescription_communityPriceReports": "Teata jaama hinnast jaama üksikasjade ekraanil.",
+  "featureLabel_obd2Optional": "Nõua OBD2 sõitude salvestamiseks",
+  "featureDescription_obd2Optional": "Kui välja lülitatud, salvestab rakendus sõite ainult GPS-iga ilma OBD2-adapterita. Coaching on piiratud — pole hetkelist L/100 km, vähem mootori signaale.",
   "feedbackConsentTitle": "Saata raport GitHubile?",
   "feedbackConsentBody": "See loob avaliku pileti meie GitHubi hoidlasse koos sinu fotoga ja OCR tekstiga. Isikuandmeid (asukoht, konto ID) ei saadeta. Jätkata?",
   "feedbackConsentContinue": "Jätka",

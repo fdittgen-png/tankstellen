@@ -4137,11 +4137,12 @@ class AppLocalizationsHu extends AppLocalizations {
       'Állomás árának bejelentése az állomás részletes képernyőjéről.';
 
   @override
-  String get featureLabel_obd2Optional => 'Require OBD2 for trip recording';
+  String get featureLabel_obd2Optional =>
+      'OBD2 megkövetelése az utak rögzítéséhez';
 
   @override
   String get featureDescription_obd2Optional =>
-      'When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.';
+      'Ha ki van kapcsolva, az alkalmazás csak GPS-szel rögzít utakat OBD2-adapter nélkül. A coaching csökkentett — nincs azonnali L/100 km, kevesebb motorjel.';
 
   @override
   String get feedbackConsentTitle => 'Elküldi a jelentést GitHub-ra?';
