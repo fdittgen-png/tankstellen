@@ -277,6 +277,28 @@ class BackupXmlWriter {
           'SecondsBelowOptimalGear',
           t.summary.secondsBelowOptimalGear,
         );
+        // #2025 — trajet kind. Emitted on every trip; legacy reads of
+        // older backups (where the tag is missing) default to
+        // `gpsPlusObd2` via `TripKind.fromWireName`.
+        _writeText(builder, 'Kind', t.summary.kind.wireName);
+        // #2029 — timestamped harsh-event detail. The integer
+        // [HarshBrakes] / [HarshAccelerations] elements above stay
+        // populated as the simple counter view; this list carries the
+        // per-event timestamp + magnitude + speed for post-trip
+        // coaching. Omitted entirely when no events fired so legacy
+        // backups round-trip unchanged.
+        if (t.summary.harshEvents.isNotEmpty) {
+          builder.element('HarshEvents', nest: () {
+            for (final e in t.summary.harshEvents) {
+              builder.element('HarshEvent', nest: () {
+                _writeText(builder, 'Timestamp', _iso(e.timestamp));
+                _writeText(builder, 'Type', e.type.wireName);
+                _writeText(builder, 'MagnitudeG', e.magnitudeG.toString());
+                _writeText(builder, 'SpeedKmh', e.speedKmh.toString());
+              });
+            }
+          });
+        }
       });
 
       builder.element('Samples', nest: () {
@@ -297,6 +319,15 @@ class BackupXmlWriter {
               s.engineLoadPercent,
             );
             _writeOptionalNumber(builder, 'CoolantTempC', s.coolantTempC);
+            // #2019 — GPS + derived-accel fields. Older backups omit
+            // these tags; the reader treats missing tags as null so
+            // legacy backups round-trip unchanged.
+            _writeOptionalNumber(builder, 'Latitude', s.latitude);
+            _writeOptionalNumber(builder, 'Longitude', s.longitude);
+            _writeOptionalNumber(builder, 'AltitudeM', s.altitudeM);
+            _writeOptionalNumber(builder, 'HAccuracyM', s.hAccuracyM);
+            _writeOptionalNumber(builder, 'BearingDeg', s.bearingDeg);
+            _writeOptionalNumber(builder, 'AccelG', s.accelG);
           });
         }
       });

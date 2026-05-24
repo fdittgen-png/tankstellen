@@ -72,6 +72,7 @@
         <FuelLitersConsumed>1.58</FuelLitersConsumed>
         <DistanceSource>real</DistanceSource>
         <ColdStartSurcharge>false</ColdStartSurcharge>
+        <Kind>gpsPlusObd2</Kind>
       </Summary>
       <Samples>
         <Sample>

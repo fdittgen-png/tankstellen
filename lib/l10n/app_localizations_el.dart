@@ -2388,6 +2388,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tooltipClose => 'Κλείσιμο';
 
   @override
+  String get tooltipShare => 'Κοινοποίηση';
+
+  @override
   String get tooltipClearSearch => 'Εκκαθάριση αναζήτησης';
 
   @override

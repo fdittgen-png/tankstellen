@@ -2375,6 +2375,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tooltipClose => 'Stäng';
 
   @override
+  String get tooltipShare => 'Dela';
+
+  @override
   String get tooltipClearSearch => 'Rensa sökinmatning';
 
   @override

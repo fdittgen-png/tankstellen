@@ -2364,6 +2364,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltipClose => 'Close';
 
   @override
+  String get tooltipShare => 'Share';
+
+  @override
   String get tooltipClearSearch => 'Clear search input';
 
   @override
@@ -7666,6 +7669,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tooltipClose => '⟦Çłóšé ··⟧';
+
+  @override
+  String get tooltipShare => '⟦Šĥářé ··⟧';
 
   @override
   String get tooltipClearSearch => '⟦Çłéář šéářçĥ îñƥúŧ ·······⟧';

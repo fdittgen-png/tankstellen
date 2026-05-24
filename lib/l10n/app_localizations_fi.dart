@@ -2372,6 +2372,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tooltipClose => 'Sulje';
 
   @override
+  String get tooltipShare => 'Jaa';
+
+  @override
   String get tooltipClearSearch => 'Tyhjennä hakukenttä';
 
   @override

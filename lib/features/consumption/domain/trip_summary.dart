@@ -1,3 +1,7 @@
+import 'harsh_event.dart';
+
+export 'harsh_event.dart';
+
 /// Aggregated metrics for a single driving trip (#718).
 ///
 /// Extracted from `trip_recorder.dart` (#1927 — keeps that file under
@@ -77,6 +81,24 @@ class TripSummary {
   /// recalculable" and such trips are left untouched by a recompute.
   final double? volumetricEfficiencyUsed;
 
+  /// Kind of trajet — whether the recorder collected OBD2 telemetry
+  /// alongside GPS, or GPS only (#2025). Trips upgrade in-place from
+  /// `gpsOnly` to `gpsPlusObd2` the moment an OBD2 adapter starts
+  /// supplying samples mid-recording. Legacy trips deserialise as
+  /// `gpsPlusObd2` because every recording before this field landed
+  /// required an OBD2 connection.
+  final TripKind kind;
+
+  /// Timestamped per-event harsh-brake / harsh-accel detail (#2029).
+  /// Replaces the bare [harshBrakes] / [harshAccelerations] counters
+  /// for post-trip coaching ("harsh brake at 14:23, 0.45 g while
+  /// doing 80 km/h"). The counters remain populated alongside the
+  /// list — every legacy consumer keeps working unchanged; new UI
+  /// reads from [harshEvents] directly. Legacy trips deserialise with
+  /// an empty list, in which case rendering falls back to the bare
+  /// counters.
+  final List<HarshEvent> harshEvents;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -93,6 +115,8 @@ class TripSummary {
     this.secondsBelowOptimalGear,
     this.fuelRateSuspect = false,
     this.volumetricEfficiencyUsed,
+    this.kind = TripKind.gpsPlusObd2,
+    this.harshEvents = const [],
   });
 
   /// Returns a copy with the given fields replaced (#1858). Used by the
@@ -116,6 +140,8 @@ class TripSummary {
     double? secondsBelowOptimalGear,
     bool? fuelRateSuspect,
     double? volumetricEfficiencyUsed,
+    TripKind? kind,
+    List<HarshEvent>? harshEvents,
   }) =>
       TripSummary(
         distanceKm: distanceKm ?? this.distanceKm,
@@ -135,5 +161,40 @@ class TripSummary {
         fuelRateSuspect: fuelRateSuspect ?? this.fuelRateSuspect,
         volumetricEfficiencyUsed:
             volumetricEfficiencyUsed ?? this.volumetricEfficiencyUsed,
+        kind: kind ?? this.kind,
+        harshEvents: harshEvents ?? this.harshEvents,
       );
+}
+
+/// Distinguishes a trajet recorded with OBD2 telemetry from one
+/// recorded with GPS alone (#2025). Drives the confidence-tier label
+/// on the calibration UI (#2027) and the recording-screen layout
+/// (#2026) — gpsOnly trips have no instantaneous L/100 km, so they
+/// fall back to a "vs your average %" indicator.
+enum TripKind {
+  /// GPS samples were recorded but no OBD2 adapter contributed any
+  /// telemetry. Used for users who haven't paired a dongle, or whose
+  /// dongle disconnected before any sample landed.
+  gpsOnly,
+
+  /// At least one sample carried OBD2 telemetry (RPM > 0 or a fuel
+  /// rate reading). This is the historical default for every trip
+  /// recorded before #2025 landed.
+  gpsPlusObd2;
+
+  /// Stable string used in JSON / backup XML. Avoids `name` because
+  /// future-Dart enum rename safety relies on the string being chosen
+  /// deliberately rather than tracking the declaration.
+  String get wireName => switch (this) {
+        TripKind.gpsOnly => 'gpsOnly',
+        TripKind.gpsPlusObd2 => 'gpsPlusObd2',
+      };
+
+  /// Parses [s] back to a [TripKind]. Returns [gpsPlusObd2] for
+  /// unknown / null inputs so legacy backups + JSON without the key
+  /// land on the historical default.
+  static TripKind fromWireName(String? s) => switch (s) {
+        'gpsOnly' => TripKind.gpsOnly,
+        _ => TripKind.gpsPlusObd2,
+      };
 }

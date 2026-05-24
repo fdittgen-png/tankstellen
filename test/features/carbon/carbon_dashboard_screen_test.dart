@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/carbon/presentation/screens/carbon_dashboard_screen.dart';
@@ -85,6 +87,66 @@ void main() {
       find.text('Monthly CO2 emissions', skipOffstage: false),
       findsOneWidget,
     );
+  });
+
+  testWidgets(
+      'share button is hidden in the empty state (#2005) — nothing to '
+      'share, the button would just be noise',
+      (tester) async {
+    await pumpApp(
+      tester,
+      const CarbonDashboardScreen(),
+      overrides: [
+        settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+      ],
+    );
+    expect(
+      find.byKey(const Key('carbon-dashboard-share')),
+      findsNothing,
+      reason: 'the empty-state body covers no-data — sharing an empty '
+          'summary would just be noise',
+    );
+  });
+
+  testWidgets(
+      'share button hands a formatted summary to the share sink (#2005)',
+      (tester) async {
+    ShareParams? captured;
+    debugCarbonShareSinkOverride = (params) async {
+      captured = params;
+    };
+    addTearDown(() => debugCarbonShareSinkOverride = null);
+
+    await pumpApp(
+      tester,
+      const CarbonDashboardScreen(),
+      overrides: [
+        settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+        fillUpListProvider.overrideWith(_FakeFillUpList.new),
+      ],
+    );
+
+    final shareFinder = find.byKey(const Key('carbon-dashboard-share'));
+    expect(shareFinder, findsOneWidget,
+        reason: 'share button must render when fill-ups exist');
+    await tester.tap(shareFinder);
+    await tester.pumpAndSettle();
+
+    expect(captured, isNotNull,
+        reason: 'tapping share must dispatch to the share sink');
+    // The summary must carry the screen's headline figures so the
+    // receiving app shows a useful preview, not a bare title.
+    expect(captured!.text, contains('Carbon dashboard'));
+    expect(captured!.text, contains('Total cost'));
+    expect(captured!.text, contains('Total CO2'));
+    // Numbers come from `_FakeFillUpList` — exact values are
+    // computed by `MonthlyAggregator.totalCost / totalCo2` and may
+    // change as the formulas evolve; we just assert that SOME value
+    // shows up next to each label rather than pinning a specific
+    // number that would force a test rewrite on every formula change.
+    expect(captured!.subject, 'Carbon dashboard',
+        reason: 'subject lets email clients use the dashboard title '
+            'as the message subject');
   });
 }
 

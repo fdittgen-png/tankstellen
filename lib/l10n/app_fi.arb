@@ -732,6 +732,7 @@
   "sectionLocation": "Sijainti",
   "tooltipBack": "Takaisin",
   "tooltipClose": "Sulje",
+  "tooltipShare": "Jaa",
   "tooltipClearSearch": "Tyhjennä hakukenttä",
   "tooltipUseGps": "Käytä GPS-sijaintia",
   "tooltipShowPassword": "Näytä salasana",

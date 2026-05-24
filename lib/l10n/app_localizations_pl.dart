@@ -2380,6 +2380,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tooltipClose => 'Zamknij';
 
   @override
+  String get tooltipShare => 'Udostępnij';
+
+  @override
   String get tooltipClearSearch => 'Wyczyść wyszukiwanie';
 
   @override
