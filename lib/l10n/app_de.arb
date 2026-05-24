@@ -1652,6 +1652,8 @@
   "featureDescription_paymentQrScan": "QR-Scanner zum Bezahlen auf der Tankstellen-Detailseite.",
   "featureLabel_communityPriceReports": "Community-Preismeldungen",
   "featureDescription_communityPriceReports": "Einen Tankstellenpreis von der Detailseite aus melden.",
+  "featureLabel_obd2Optional": "OBD2 für Fahrtaufzeichnung erforderlich",
+  "featureDescription_obd2Optional": "Wenn aus, zeichnet die App reine GPS-Fahrten ohne OBD2-Adapter auf. Das Coaching ist eingeschränkt — keine momentane L/100 km, weniger motorbasierte Signale.",
   "feedbackConsentTitle": "Bericht an GitHub senden?",
   "feedbackConsentBody": "Damit wird ein öffentliches Ticket in unserem GitHub-Repository mit deinem Foto und dem OCR-Text erstellt. Es werden keine personenbezogenen Daten (Standort, Konto-ID) gesendet. Fortfahren?",
   "feedbackConsentContinue": "Fortfahren",

@@ -58,5 +58,7 @@
   "featureLabel_paymentQrScan": "Zahlungs-QR scannen",
   "featureDescription_paymentQrScan": "QR-Scanner zum Bezahlen auf der Tankstellen-Detailseite.",
   "featureLabel_communityPriceReports": "Community-Preismeldungen",
-  "featureDescription_communityPriceReports": "Einen Tankstellenpreis von der Detailseite aus melden."
+  "featureDescription_communityPriceReports": "Einen Tankstellenpreis von der Detailseite aus melden.",
+  "featureLabel_obd2Optional": "OBD2 für Fahrtaufzeichnung erforderlich",
+  "featureDescription_obd2Optional": "Wenn aus, zeichnet die App reine GPS-Fahrten ohne OBD2-Adapter auf. Das Coaching ist eingeschränkt — keine momentane L/100 km, weniger motorbasierte Signale."
 }

@@ -4146,6 +4146,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Signaler le prix d\'une station depuis la page détail de la station.';
 
   @override
+  String get featureLabel_obd2Optional => 'Require OBD2 for trip recording';
+
+  @override
+  String get featureDescription_obd2Optional =>
+      'When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

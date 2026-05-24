@@ -356,5 +356,20 @@ class FeatureManifest {
       displayName: 'Community price reports',
       description: 'Report a station price from the station detail screen.',
     ),
+    Feature.obd2Optional: FeatureManifestEntry.allChannels(
+      feature: Feature.obd2Optional,
+      // Default-on (#2024): the trip recorder has always required an
+      // OBD2 adapter. Flipping this flag off enables GPS-only trajets
+      // (kind = gpsOnly) and unlocks the minimal recording-screen
+      // layout (#2026). No prerequisites — this flag IS the
+      // prerequisite-removal.
+      defaultOn: true,
+      displayName: 'Require OBD2 for trip recording',
+      description:
+          'When off, the app records GPS-only trajets without needing an '
+              'OBD2 adapter. Coaching is reduced — no instant L/100 km, '
+              'fewer engine-derived signals. Calibration drops to '
+              'confidence tier A until you add fuel-ups.',
+    ),
   });
 }
