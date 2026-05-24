@@ -235,6 +235,8 @@ class _MapState extends State<_Map> {
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'de.tankstellen.tankstellen',
+          evictErrorTileStrategy:
+              EvictErrorTileStrategy.notVisibleRespectMargin,
         ),
         PolylineLayer(
           polylines: [
