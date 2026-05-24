@@ -15,7 +15,6 @@ class SchemaVerifier {
     'favorites',
     'alerts',
     'price_snapshots',
-    'push_tokens',
     'sync_settings',
   ];
 
@@ -203,7 +202,6 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.alerts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.price_snapshots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.push_tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sync_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.itineraries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ignored_stations ENABLE ROW LEVEL SECURITY;
@@ -220,9 +218,6 @@ CREATE POLICY IF NOT EXISTS "alerts_own" ON public.alerts FOR ALL USING (user_id
 
 -- Price snapshots: read all, no user writes (service_role only)
 CREATE POLICY IF NOT EXISTS "snapshots_read" ON public.price_snapshots FOR SELECT USING (true);
-
--- Push tokens: own data only
-CREATE POLICY IF NOT EXISTS "push_own" ON public.push_tokens FOR ALL USING (user_id = auth.uid());
 
 -- Sync settings: own data only
 CREATE POLICY IF NOT EXISTS "sync_own" ON public.sync_settings FOR ALL USING (user_id = auth.uid());
