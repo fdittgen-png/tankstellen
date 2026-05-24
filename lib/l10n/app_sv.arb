@@ -474,7 +474,7 @@
   "privacyExportSuccess": "Data exporterad till urklipp",
   "privacyExportCsvButton": "Exportera all data som CSV",
   "privacyExportCsvSuccess": "CSV-data exporterad till urklipp",
-  "savedToFile": "Sparat i {path}",
+  "savedToDownloadsFolder": "Sparad i mappen Hämtningar",
   "privacyClearErrorLog": "Rensa felloggen",
   "privacyErrorLogCleared": "Felloggen rensad",
   "privacyDeleteButton": "Radera all data",

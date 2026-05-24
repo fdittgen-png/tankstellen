@@ -689,7 +689,7 @@
   "privacyExportSuccess": "Daten in die Zwischenablage exportiert",
   "privacyExportCsvButton": "Alle Daten als CSV exportieren",
   "privacyExportCsvSuccess": "CSV-Daten in die Zwischenablage exportiert",
-  "savedToFile": "Gespeichert unter {path}",
+  "savedToDownloadsFolder": "Im Downloads-Ordner gespeichert",
   "privacyDeleteButton": "Alle Daten löschen",
   "privacyCopyErrorLog": "Fehlerprotokoll in Zwischenablage kopieren ({count})",
   "@privacyCopyErrorLog": {
