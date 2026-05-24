@@ -55,6 +55,27 @@ class TripSample {
   /// calculator (#1941) can derive the trip's slope.
   final double? altitudeM;
 
+  /// Reported horizontal accuracy of the GPS fix in metres (#2019).
+  /// Lets downstream filters reject jittery fixes from urban-canyon
+  /// readings before they feed the speed-derivative accel pipeline
+  /// (#2022) or the post-trip map polyline. Null with the same
+  /// semantics as [latitude] — no fix means no accuracy.
+  final double? hAccuracyM;
+
+  /// Bearing in degrees from true north (#2019). Populated when the
+  /// platform supplies it; null otherwise. The trip-detail map can
+  /// render directional arrowheads off this, and the gear-inference
+  /// heuristic (#2023) uses bearing-stability to gate "is this
+  /// straight-line cruise" decisions.
+  final double? bearingDeg;
+
+  /// Acceleration magnitude in g (#2019). Populated by the
+  /// speed-derivative low-pass pipeline (#2022) when no real
+  /// accelerometer feed is wired up; future hardware integrations may
+  /// overwrite this from raw sensor data. Null on legacy samples and
+  /// when the speed series is too short to differentiate.
+  final double? accelG;
+
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
@@ -66,6 +87,9 @@ class TripSample {
     this.latitude,
     this.longitude,
     this.altitudeM,
+    this.hAccuracyM,
+    this.bearingDeg,
+    this.accelG,
   });
 }
 

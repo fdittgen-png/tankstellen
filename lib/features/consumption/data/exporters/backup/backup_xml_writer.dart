@@ -277,6 +277,10 @@ class BackupXmlWriter {
           'SecondsBelowOptimalGear',
           t.summary.secondsBelowOptimalGear,
         );
+        // #2025 — trajet kind. Emitted on every trip; legacy reads of
+        // older backups (where the tag is missing) default to
+        // `gpsPlusObd2` via `TripKind.fromWireName`.
+        _writeText(builder, 'Kind', t.summary.kind.wireName);
       });
 
       builder.element('Samples', nest: () {
@@ -297,6 +301,15 @@ class BackupXmlWriter {
               s.engineLoadPercent,
             );
             _writeOptionalNumber(builder, 'CoolantTempC', s.coolantTempC);
+            // #2019 — GPS + derived-accel fields. Older backups omit
+            // these tags; the reader treats missing tags as null so
+            // legacy backups round-trip unchanged.
+            _writeOptionalNumber(builder, 'Latitude', s.latitude);
+            _writeOptionalNumber(builder, 'Longitude', s.longitude);
+            _writeOptionalNumber(builder, 'AltitudeM', s.altitudeM);
+            _writeOptionalNumber(builder, 'HAccuracyM', s.hAccuracyM);
+            _writeOptionalNumber(builder, 'BearingDeg', s.bearingDeg);
+            _writeOptionalNumber(builder, 'AccelG', s.accelG);
           });
         }
       });
