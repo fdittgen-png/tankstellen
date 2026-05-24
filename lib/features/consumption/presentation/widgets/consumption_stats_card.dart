@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../vehicle/domain/calibration_confidence_tier.dart';
 import '../../domain/entities/consumption_stats.dart';
 
 /// Card summarising aggregated consumption statistics.
@@ -32,11 +33,19 @@ class ConsumptionStatsCard extends StatelessWidget {
   /// yet" state, 1-2 the bootstrap state, 3+ the calibrated state.
   final int? volumetricEfficiencySamples;
 
+  /// Whether the user has at least one trip whose `kind` is
+  /// `gpsPlusObd2` (#2027). Combined with [volumetricEfficiencySamples]
+  /// this drives the A/B/C confidence-tier badge. Defaults to `true`
+  /// because every legacy trip was recorded with OBD2 — so a user with
+  /// no migration data still sees the historical default.
+  final bool hasGpsPlusObd2Trip;
+
   const ConsumptionStatsCard({
     super.key,
     required this.stats,
     this.volumetricEfficiency,
     this.volumetricEfficiencySamples,
+    this.hasGpsPlusObd2Trip = true,
   });
 
   @override
@@ -139,6 +148,14 @@ class ConsumptionStatsCard extends StatelessWidget {
               _CalibrationChip(
                 volumetricEfficiency: volumetricEfficiency ?? 0.85,
                 samples: volumetricEfficiencySamples!,
+              ),
+              // #2027 — confidence tier badge (A/B/C) surfaces how
+              // trustworthy the consumption estimate is. A = GPS-only
+              // / no fill-ups, B = fill-ups + GPS, C = fill-ups + OBD2.
+              const SizedBox(height: 8),
+              _ConfidenceTierBadge(
+                samples: volumetricEfficiencySamples!,
+                hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
               ),
             ],
           ],
@@ -311,5 +328,80 @@ class _StatTile extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Chip labelling the trustworthiness of the consumption estimate
+/// (#2027). A = GPS-only / no fill-ups, B = fill-ups but no OBD2 trip
+/// yet, C = full fill-ups + OBD2 stack. Tooltip carries the expected
+/// error band for each tier.
+class _ConfidenceTierBadge extends StatelessWidget {
+  final int samples;
+  final bool hasGpsPlusObd2Trip;
+
+  const _ConfidenceTierBadge({
+    required this.samples,
+    required this.hasGpsPlusObd2Trip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tier = calibrationConfidenceTier(
+      volumetricEfficiencySamples: samples,
+      hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
+    );
+    final theme = Theme.of(context);
+    final (label, tooltip, bg, fg) = _styleFor(tier, theme);
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: fg,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  (String, String, Color, Color) _styleFor(
+    CalibrationConfidenceTier tier,
+    ThemeData theme,
+  ) {
+    final scheme = theme.colorScheme;
+    switch (tier) {
+      case CalibrationConfidenceTier.a:
+        return (
+          'Confidence: A — ±40-60%',
+          'GPS-only — no fill-ups have anchored the consumption model yet. '
+              'Add a couple of full fill-ups to upgrade to tier B.',
+          scheme.errorContainer,
+          scheme.onErrorContainer,
+        );
+      case CalibrationConfidenceTier.b:
+        return (
+          'Confidence: B — ±10-20%',
+          'Fill-ups have anchored the consumption model, but no OBD2 trip '
+              'has fed the loop yet. Record one with OBD2 connected to '
+              'reach tier C.',
+          scheme.tertiaryContainer,
+          scheme.onTertiaryContainer,
+        );
+      case CalibrationConfidenceTier.c:
+        return (
+          'Confidence: C — ±3-7%',
+          'Full calibration: fill-ups + OBD2-recorded trips. The L/100 km '
+              'figure tracks reality to within a few percent.',
+          scheme.primaryContainer,
+          scheme.onPrimaryContainer,
+        );
+    }
   }
 }
