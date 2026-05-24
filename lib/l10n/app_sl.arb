@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Razišči z demo podatki",
   "obd2DebugLoggingTitle": "Razhroščevalno beleženje OBD2",
   "obd2DebugLoggingSubtitle": "Zabeležite vsako sejo OBD2 — povezavo, rokovanje, vrzeli v podatkih in ponovne povezave — v izvozljiv dnevnik XML. Privzeto izklopljeno.",
-  "obd2DebugSessionShareLabel": "Deli dnevnik seje OBD2"
+  "obd2DebugSessionShareLabel": "Deli dnevnik seje OBD2",
+  "coachingShiftUp": "Prestavi navzgor",
+  "coachingShiftDown": "Prestavi navzdol",
+  "coachingEasePedal": "Spusti plin"
 }

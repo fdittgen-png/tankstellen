@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Przeglądaj z danymi demo",
   "obd2DebugLoggingTitle": "Rejestrowanie debugowania OBD2",
   "obd2DebugLoggingSubtitle": "Rejestruj każdą sesję OBD2 — połączenie, uzgadnianie, przerwy w danych i ponowne połączenia — w eksportowalnym dzienniku XML. Domyślnie wyłączone.",
-  "obd2DebugSessionShareLabel": "Udostępnij dziennik sesji OBD2"
+  "obd2DebugSessionShareLabel": "Udostępnij dziennik sesji OBD2",
+  "coachingShiftUp": "Zmień bieg w górę",
+  "coachingShiftDown": "Zmień bieg w dół",
+  "coachingEasePedal": "Puść gaz"
 }

@@ -2380,6 +2380,15 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tooltipClearSearch => 'Počisti iskanje';
 
   @override
+  String get coachingShiftUp => 'Prestavi navzgor';
+
+  @override
+  String get coachingShiftDown => 'Prestavi navzdol';
+
+  @override
+  String get coachingEasePedal => 'Spusti plin';
+
+  @override
   String get tooltipUseGps => 'Uporabi lokacijo GPS';
 
   @override

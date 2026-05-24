@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Udforsk med demodata",
   "obd2DebugLoggingTitle": "OBD2-fejlfindingslog",
   "obd2DebugLoggingSubtitle": "Optag hver OBD2-session — forbindelse, handshake, datahuller og genforbindelser — i en eksporterbar XML-log. Slået fra som standard.",
-  "obd2DebugSessionShareLabel": "Del OBD2-sessionslog"
+  "obd2DebugSessionShareLabel": "Del OBD2-sessionslog",
+  "coachingShiftUp": "Skift op",
+  "coachingShiftDown": "Skift ned",
+  "coachingEasePedal": "Slip speederen"
 }

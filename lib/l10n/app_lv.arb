@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Izpētīt ar demonstrācijas datiem",
   "obd2DebugLoggingTitle": "OBD2 atkļūdošanas žurnāls",
   "obd2DebugLoggingSubtitle": "Ierakstiet katru OBD2 sesiju — savienojumu, rokasspiedienu, datu pārtraukumus un atkārtotus savienojumus — eksportējamā XML žurnālā. Pēc noklusējuma izslēgts.",
-  "obd2DebugSessionShareLabel": "Kopīgot OBD2 sesijas žurnālu"
+  "obd2DebugSessionShareLabel": "Kopīgot OBD2 sesijas žurnālu",
+  "coachingShiftUp": "Pārslēgt augšup",
+  "coachingShiftDown": "Pārslēgt lejup",
+  "coachingEasePedal": "Atlaid gāzi"
 }

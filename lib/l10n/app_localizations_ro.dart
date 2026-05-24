@@ -2390,6 +2390,15 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tooltipClearSearch => 'Ștergeți căutarea';
 
   @override
+  String get coachingShiftUp => 'Schimbă în sus';
+
+  @override
+  String get coachingShiftDown => 'Schimbă în jos';
+
+  @override
+  String get coachingEasePedal => 'Mai puțină accelerație';
+
+  @override
   String get tooltipUseGps => 'Utilizați locația GPS';
 
   @override

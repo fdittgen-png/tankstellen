@@ -1830,5 +1830,8 @@
   "onboardingExploreDemoData": "Explorer avec des données de démo",
   "obd2DebugLoggingTitle": "Journalisation de débogage OBD2",
   "obd2DebugLoggingSubtitle": "Enregistrez chaque session OBD2 — connexion, handshake, pertes de données et reconnexions — dans un journal XML exportable. Désactivé par défaut.",
-  "obd2DebugSessionShareLabel": "Partager le journal de session OBD2"
+  "obd2DebugSessionShareLabel": "Partager le journal de session OBD2",
+  "coachingShiftUp": "Monter un rapport",
+  "coachingShiftDown": "Rétrograder",
+  "coachingEasePedal": "Lever le pied"
 }

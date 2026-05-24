@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Explorează cu date demo",
   "obd2DebugLoggingTitle": "Jurnalizare depanare OBD2",
   "obd2DebugLoggingSubtitle": "Înregistrați fiecare sesiune OBD2 — conectare, handshake, întreruperi de date și reconectări — într-un jurnal XML exportabil. Dezactivat în mod implicit.",
-  "obd2DebugSessionShareLabel": "Partajează jurnalul sesiunii OBD2"
+  "obd2DebugSessionShareLabel": "Partajează jurnalul sesiunii OBD2",
+  "coachingShiftUp": "Schimbă în sus",
+  "coachingShiftDown": "Schimbă în jos",
+  "coachingEasePedal": "Mai puțină accelerație"
 }

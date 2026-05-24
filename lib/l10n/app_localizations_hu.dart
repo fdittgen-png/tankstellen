@@ -2391,6 +2391,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipClearSearch => 'Keresési mező törlése';
 
   @override
+  String get coachingShiftUp => 'Sebességet feljebb';
+
+  @override
+  String get coachingShiftDown => 'Sebességet lejjebb';
+
+  @override
+  String get coachingEasePedal => 'Engedd a gázt';
+
+  @override
   String get tooltipUseGps => 'GPS-helyzet használata';
 
   @override

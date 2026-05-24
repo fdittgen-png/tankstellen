@@ -2370,6 +2370,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltipClearSearch => 'Clear search input';
 
   @override
+  String get coachingShiftUp => 'Shift up';
+
+  @override
+  String get coachingShiftDown => 'Shift down';
+
+  @override
+  String get coachingEasePedal => 'Ease off';
+
+  @override
   String get tooltipUseGps => 'Use GPS location';
 
   @override
@@ -7692,6 +7701,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tooltipClearSearch => '⟦Çłéář šéářçĥ îñƥúŧ ·······⟧';
+
+  @override
+  String get coachingShiftUp => '⟦Šĥîƒŧ úƥ ···⟧';
+
+  @override
+  String get coachingShiftDown => '⟦Šĥîƒŧ đóŵñ ····⟧';
+
+  @override
+  String get coachingEasePedal => '⟦Éášé óƒƒ ···⟧';
 
   @override
   String get tooltipUseGps => '⟦Úšé ǦƤŠ łóçáŧîóñ ······⟧';

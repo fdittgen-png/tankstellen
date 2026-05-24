@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Разгледай с демоданни",
   "obd2DebugLoggingTitle": "OBD2 дебъг журналиране",
   "obd2DebugLoggingSubtitle": "Записвайте всяка OBD2 сесия — свързване, handshake, пропуски в данните и повторни свързвания — в експортируем XML журнал. Изключено по подразбиране.",
-  "obd2DebugSessionShareLabel": "Споделяне на журнала на OBD2 сесията"
+  "obd2DebugSessionShareLabel": "Споделяне на журнала на OBD2 сесията",
+  "coachingShiftUp": "Превключи нагоре",
+  "coachingShiftDown": "Превключи надолу",
+  "coachingEasePedal": "Намали газта"
 }

@@ -2394,6 +2394,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tooltipClearSearch => 'Εκκαθάριση αναζήτησης';
 
   @override
+  String get coachingShiftUp => 'Ανέβα σχέση';
+
+  @override
+  String get coachingShiftDown => 'Κατέβα σχέση';
+
+  @override
+  String get coachingEasePedal => 'Λιγότερο γκάζι';
+
+  @override
   String get tooltipUseGps => 'Χρήση τοποθεσίας GPS';
 
   @override

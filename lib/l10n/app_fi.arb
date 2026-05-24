@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Tutustu esittelytiedoilla",
   "obd2DebugLoggingTitle": "OBD2-virheenkorjausloki",
   "obd2DebugLoggingSubtitle": "Tallenna jokainen OBD2-istunto — yhteys, kättely, datakatkot ja uudelleenyhteydet — vietävään XML-lokiin. Oletuksena pois käytöstä.",
-  "obd2DebugSessionShareLabel": "Jaa OBD2-istuntoloki"
+  "obd2DebugSessionShareLabel": "Jaa OBD2-istuntoloki",
+  "coachingShiftUp": "Vaihda ylös",
+  "coachingShiftDown": "Vaihda alas",
+  "coachingEasePedal": "Hellitä kaasua"
 }

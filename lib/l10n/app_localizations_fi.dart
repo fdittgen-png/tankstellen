@@ -2378,6 +2378,15 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tooltipClearSearch => 'Tyhjennä hakukenttä';
 
   @override
+  String get coachingShiftUp => 'Vaihda ylös';
+
+  @override
+  String get coachingShiftDown => 'Vaihda alas';
+
+  @override
+  String get coachingEasePedal => 'Hellitä kaasua';
+
+  @override
   String get tooltipUseGps => 'Käytä GPS-sijaintia';
 
   @override

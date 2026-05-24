@@ -2397,6 +2397,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tooltipClearSearch => 'Изчисти полето за търсене';
 
   @override
+  String get coachingShiftUp => 'Превключи нагоре';
+
+  @override
+  String get coachingShiftDown => 'Превключи надолу';
+
+  @override
+  String get coachingEasePedal => 'Намали газта';
+
+  @override
   String get tooltipUseGps => 'Използвай GPS местоположение';
 
   @override

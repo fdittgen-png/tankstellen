@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Εξερεύνηση με δοκιμαστικά δεδομένα",
   "obd2DebugLoggingTitle": "Καταγραφή εντοπισμού σφαλμάτων OBD2",
   "obd2DebugLoggingSubtitle": "Καταγράψτε κάθε συνεδρία OBD2 — σύνδεση, χειραψία, κενά δεδομένων και επανασυνδέσεις — σε ένα εξαγώγιμο αρχείο καταγραφής XML. Απενεργοποιημένο από προεπιλογή.",
-  "obd2DebugSessionShareLabel": "Κοινή χρήση αρχείου καταγραφής συνεδρίας OBD2"
+  "obd2DebugSessionShareLabel": "Κοινή χρήση αρχείου καταγραφής συνεδρίας OBD2",
+  "coachingShiftUp": "Ανέβα σχέση",
+  "coachingShiftDown": "Κατέβα σχέση",
+  "coachingEasePedal": "Λιγότερο γκάζι"
 }

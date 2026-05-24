@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Naršyti su demonstraciniais duomenimis",
   "obd2DebugLoggingTitle": "OBD2 derinimo žurnalas",
   "obd2DebugLoggingSubtitle": "Įrašykite kiekvieną OBD2 seansą — prisijungimą, rankų paspaudimą, duomenų spragas ir pakartotinius prisijungimus — į eksportuojamą XML žurnalą. Pagal numatytuosius nustatymus išjungta.",
-  "obd2DebugSessionShareLabel": "Bendrinti OBD2 seanso žurnalą"
+  "obd2DebugSessionShareLabel": "Bendrinti OBD2 seanso žurnalą",
+  "coachingShiftUp": "Aukštyn pavarą",
+  "coachingShiftDown": "Žemyn pavarą",
+  "coachingEasePedal": "Atleisk akceleratorių"
 }

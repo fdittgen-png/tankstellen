@@ -1688,5 +1688,8 @@
   "onboardingExploreDemoData": "Utforsk med demodata",
   "obd2DebugLoggingTitle": "OBD2-feilsøkingslogg",
   "obd2DebugLoggingSubtitle": "Registrer hver OBD2-økt — tilkobling, håndtrykk, datahull og gjentilkoblinger — i en eksporterbar XML-logg. Av som standard.",
-  "obd2DebugSessionShareLabel": "Del OBD2-øktlogg"
+  "obd2DebugSessionShareLabel": "Del OBD2-øktlogg",
+  "coachingShiftUp": "Gir opp",
+  "coachingShiftDown": "Gir ned",
+  "coachingEasePedal": "Slipp gassen"
 }

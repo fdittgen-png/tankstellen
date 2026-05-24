@@ -2379,6 +2379,15 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tooltipClearSearch => 'Ryd søgeinput';
 
   @override
+  String get coachingShiftUp => 'Skift op';
+
+  @override
+  String get coachingShiftDown => 'Skift ned';
+
+  @override
+  String get coachingEasePedal => 'Slip speederen';
+
+  @override
   String get tooltipUseGps => 'Brug GPS-placering';
 
   @override

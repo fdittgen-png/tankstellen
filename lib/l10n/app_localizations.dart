@@ -4466,6 +4466,24 @@ abstract class AppLocalizations {
   /// **'Clear search input'**
   String get tooltipClearSearch;
 
+  /// No description provided for @coachingShiftUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift up'**
+  String get coachingShiftUp;
+
+  /// No description provided for @coachingShiftDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift down'**
+  String get coachingShiftDown;
+
+  /// No description provided for @coachingEasePedal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ease off'**
+  String get coachingEasePedal;
+
   /// No description provided for @tooltipUseGps.
   ///
   /// In en, this message translates to:
