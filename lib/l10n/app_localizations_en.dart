@@ -5029,6 +5029,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
 
   @override
+  String get trajetsViewAllOnMap => 'View all on map';
+
+  @override
+  String get trajetsMapTitle => 'Trajets on map';
+
+  @override
+  String get trajetsMapShareGpx => 'Share GPX';
+
+  @override
+  String get trajetsMapEmpty =>
+      'None of the selected trajets carry GPS samples.';
+
+  @override
+  String get trajetsMapShareError => 'Couldn\'t share the GPX file';
+
+  @override
   String get tripLengthCardTitle => 'Consumption by trip length';
 
   @override
@@ -10439,6 +10455,23 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripRecordingObd2NotResponding =>
       '⟦ÓƁĐ2 áđáƥŧéř çóññéçŧéđ ƀúŧ ñóŧ řéŧúřñîñǧ đáŧá. Ŧřý á đîƒƒéřéñŧ áđáƥŧéř óř çĥéçķ ŧĥé ṽéĥîçłé\'š đîáǧñóšŧîç ƥřóŧóçół. ··········································⟧';
+
+  @override
+  String get trajetsViewAllOnMap => '⟦Ṽîéŵ áłł óñ ɱáƥ ·····⟧';
+
+  @override
+  String get trajetsMapTitle => '⟦Ŧřáĵéŧš óñ ɱáƥ ·····⟧';
+
+  @override
+  String get trajetsMapShareGpx => '⟦Šĥářé ǦƤẊ ····⟧';
+
+  @override
+  String get trajetsMapEmpty =>
+      '⟦Ñóñé óƒ ŧĥé šéłéçŧéđ ŧřáĵéŧš çářřý ǦƤŠ šáɱƥłéš. ··················⟧';
+
+  @override
+  String get trajetsMapShareError =>
+      '⟦Çóúłđñ\'ŧ šĥářé ŧĥé ǦƤẊ ƒîłé ··········⟧';
 
   @override
   String get tripLengthCardTitle => '⟦Çóñšúɱƥŧîóñ ƀý ŧřîƥ łéñǧŧĥ ··········⟧';

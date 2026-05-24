@@ -14,6 +14,7 @@ import '../../providers/trip_history_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../obd2_connection_error_l10n.dart';
 import '../screens/trip_recording_screen.dart';
+import '../screens/trajets_map_screen.dart';
 import 'maintenance_suggestion_card.dart';
 import 'monthly_insights_card.dart';
 import 'obd2_adapter_picker.dart';
@@ -214,10 +215,38 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
         },
       );
 
-      // #2018 — landscape / tablet split: left = monthly-insights
-      // ("ce mois-ci vs le mois dernier") + maintenance suggestions,
-      // right = trajets list. Falls back to single-column on narrow
-      // screens (< 600dp).
+      // #2030 — "View all on map" action. Discoverable inline (one
+      // tap reaches it) and lands the user on a new screen that
+      // overlays every visible trajet's polyline + offers an
+      // aggregate GPX export.
+      final mapAction = Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Align(
+          alignment: AlignmentDirectional.centerEnd,
+          child: TextButton.icon(
+            key: const Key('trajets_view_all_on_map'),
+            icon: const Icon(Icons.map_outlined),
+            label: Text(
+              l?.trajetsViewAllOnMap ?? 'View all on map',
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => TrajetsMapScreen(
+                    tripIds:
+                        filtered.map((e) => e.id).toList(growable: false),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      // #2018 + #2030 — landscape / tablet split: left = monthly-insights
+      // + maintenance suggestions + "view all on map" action, right =
+      // trajets list. Narrow screens fall back to a single column with
+      // the same vertical order.
       if (isWideScreen(context)) {
         content = Row(
           children: [
@@ -229,6 +258,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
                   children: [
                     MonthlyInsightsCard(summary: monthlySummary),
                     const MaintenanceSuggestionList(),
+                    mapAction,
                   ],
                 ),
               ),
@@ -243,6 +273,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
           children: [
             MonthlyInsightsCard(summary: monthlySummary),
             const MaintenanceSuggestionList(),
+            mapAction,
             Expanded(child: trajetsList),
           ],
         );

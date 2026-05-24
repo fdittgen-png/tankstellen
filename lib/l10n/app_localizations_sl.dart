@@ -5062,6 +5062,21 @@ class AppLocalizationsSl extends AppLocalizations {
       'Adapter OBD2 je povezan, a ne vrača podatkov. Poskusite z drugim adapterjem ali preverite diagnostični protokol vozila.';
 
   @override
+  String get trajetsViewAllOnMap => 'Prikaži vse na zemljevidu';
+
+  @override
+  String get trajetsMapTitle => 'Vožnje na zemljevidu';
+
+  @override
+  String get trajetsMapShareGpx => 'Deli GPX';
+
+  @override
+  String get trajetsMapEmpty => 'Nobena od izbranih voženj nima GPS podatkov.';
+
+  @override
+  String get trajetsMapShareError => 'Datoteke GPX ni bilo mogoče deliti';
+
+  @override
   String get tripLengthCardTitle => 'Poraba glede na dolžino vožnje';
 
   @override

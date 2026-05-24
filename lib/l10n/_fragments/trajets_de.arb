@@ -41,5 +41,10 @@
   "trajetDetailDeleteConfirmBody": "Diese Fahrt wird dauerhaft aus deinem Verlauf entfernt.",
   "trajetDetailDeleteConfirmCancel": "Abbrechen",
   "trajetDetailDeleteConfirmConfirm": "Löschen",
-  "tripRecordingObd2NotResponding": "OBD2-Adapter verbunden, aber liefert keine Daten. Probiere einen anderen Adapter oder prüfe das Diagnose-Protokoll des Fahrzeugs."
+  "tripRecordingObd2NotResponding": "OBD2-Adapter verbunden, aber liefert keine Daten. Probiere einen anderen Adapter oder prüfe das Diagnose-Protokoll des Fahrzeugs.",
+  "trajetsViewAllOnMap": "Alle auf Karte anzeigen",
+  "trajetsMapTitle": "Fahrten auf der Karte",
+  "trajetsMapShareGpx": "GPX teilen",
+  "trajetsMapEmpty": "Keine der ausgewählten Fahrten enthält GPS-Daten.",
+  "trajetsMapShareError": "Die GPX-Datei konnte nicht geteilt werden"
 }

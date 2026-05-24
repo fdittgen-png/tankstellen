@@ -5101,6 +5101,21 @@ class AppLocalizationsBg extends AppLocalizations {
       'OBD2 адаптерът е свързан, но не връща данни. Опитайте друг адаптер или проверете диагностичния протокол на превозното средство.';
 
   @override
+  String get trajetsViewAllOnMap => 'Виж всички на картата';
+
+  @override
+  String get trajetsMapTitle => 'Пътувания на картата';
+
+  @override
+  String get trajetsMapShareGpx => 'Споделяне на GPX';
+
+  @override
+  String get trajetsMapEmpty => 'Никое от избраните пътувания няма GPS данни.';
+
+  @override
+  String get trajetsMapShareError => 'GPX файлът не може да бъде споделен';
+
+  @override
   String get tripLengthCardTitle => 'Разход по дължина на пътуването';
 
   @override

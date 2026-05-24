@@ -5054,6 +5054,21 @@ class AppLocalizationsNb extends AppLocalizations {
       'OBD2-adapter tilkoblet, men returnerer ingen data. Prøv en annen adapter eller sjekk kjøretøyets diagnostikkprotokoll.';
 
   @override
+  String get trajetsViewAllOnMap => 'Vis alle på kart';
+
+  @override
+  String get trajetsMapTitle => 'Turer på kart';
+
+  @override
+  String get trajetsMapShareGpx => 'Del GPX';
+
+  @override
+  String get trajetsMapEmpty => 'Ingen av de valgte turene har GPS-data.';
+
+  @override
+  String get trajetsMapShareError => 'Kunne ikke dele GPX-filen';
+
+  @override
   String get tripLengthCardTitle => 'Forbruk etter turlengde';
 
   @override

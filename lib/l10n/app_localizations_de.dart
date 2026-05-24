@@ -5084,6 +5084,23 @@ class AppLocalizationsDe extends AppLocalizations {
       'OBD2-Adapter verbunden, aber liefert keine Daten. Probiere einen anderen Adapter oder prüfe das Diagnose-Protokoll des Fahrzeugs.';
 
   @override
+  String get trajetsViewAllOnMap => 'Alle auf Karte anzeigen';
+
+  @override
+  String get trajetsMapTitle => 'Fahrten auf der Karte';
+
+  @override
+  String get trajetsMapShareGpx => 'GPX teilen';
+
+  @override
+  String get trajetsMapEmpty =>
+      'Keine der ausgewählten Fahrten enthält GPS-Daten.';
+
+  @override
+  String get trajetsMapShareError =>
+      'Die GPX-Datei konnte nicht geteilt werden';
+
+  @override
   String get tripLengthCardTitle => 'Verbrauch nach Fahrtlänge';
 
   @override

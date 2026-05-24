@@ -5048,6 +5048,21 @@ class AppLocalizationsEt extends AppLocalizations {
       'OBD2 adapter ühendatud, kuid ei tagasta andmeid. Proovi teist adapterit või kontrolli sõiduki diagnostikaprotokolli.';
 
   @override
+  String get trajetsViewAllOnMap => 'Näita kõik kaardil';
+
+  @override
+  String get trajetsMapTitle => 'Sõidud kaardil';
+
+  @override
+  String get trajetsMapShareGpx => 'Jaga GPX';
+
+  @override
+  String get trajetsMapEmpty => 'Üheski valitud sõidus pole GPS-andmeid.';
+
+  @override
+  String get trajetsMapShareError => 'GPX-faili ei õnnestunud jagada';
+
+  @override
   String get tripLengthCardTitle => 'Tarbimine reisi pikkuse järgi';
 
   @override

@@ -5057,6 +5057,22 @@ class AppLocalizationsFi extends AppLocalizations {
       'OBD2-sovitin yhdistetty mutta ei palauta tietoja. Kokeile toista sovitinta tai tarkista ajoneuvon diagnostiikkaprotokolla.';
 
   @override
+  String get trajetsViewAllOnMap => 'Näytä kaikki kartalla';
+
+  @override
+  String get trajetsMapTitle => 'Matkat kartalla';
+
+  @override
+  String get trajetsMapShareGpx => 'Jaa GPX';
+
+  @override
+  String get trajetsMapEmpty =>
+      'Yhdelläkään valitusta matkasta ei ole GPS-tietoja.';
+
+  @override
+  String get trajetsMapShareError => 'GPX-tiedostoa ei voitu jakaa';
+
+  @override
   String get tripLengthCardTitle => 'Kulutus matkan pituuden mukaan';
 
   @override

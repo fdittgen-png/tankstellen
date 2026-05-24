@@ -5094,6 +5094,23 @@ class AppLocalizationsPt extends AppLocalizations {
       'Adaptador OBD2 ligado mas sem devolver dados. Tente um adaptador diferente ou verifique o protocolo de diagnóstico do veículo.';
 
   @override
+  String get trajetsViewAllOnMap => 'Ver todos no mapa';
+
+  @override
+  String get trajetsMapTitle => 'Viagens no mapa';
+
+  @override
+  String get trajetsMapShareGpx => 'Partilhar GPX';
+
+  @override
+  String get trajetsMapEmpty =>
+      'Nenhuma das viagens selecionadas tem dados GPS.';
+
+  @override
+  String get trajetsMapShareError =>
+      'Não foi possível partilhar o ficheiro GPX';
+
+  @override
   String get tripLengthCardTitle => 'Consumo por duração da viagem';
 
   @override
