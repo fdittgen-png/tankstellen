@@ -97,9 +97,14 @@ class FuelTab extends ConsumerWidget {
     // header, right = fill-ups list. Mirrors the search-results
     // wide-screen pattern via `isWideScreen(context)` (≥ 600dp).
     if (isWideScreen(context)) {
+      // 2:3 flex on landscape so the Pleins list (the dense data the
+      // user scrolls) gets more width than the mostly-static stats
+      // header. Prior 1:1 split wasted half the screen on the sparse
+      // left column per the 2026-05-24 screenshots.
       return Row(
         children: [
           Expanded(
+            flex: 2,
             child: SingleChildScrollView(
               padding: EdgeInsets.only(top: 8, bottom: bottomInset),
               child: Column(
@@ -110,6 +115,7 @@ class FuelTab extends ConsumerWidget {
           ),
           const VerticalDivider(width: 1),
           Expanded(
+            flex: 3,
             child: ListView.builder(
               padding: EdgeInsets.only(top: 8, bottom: bottomInset),
               itemCount: fillUps.length,
