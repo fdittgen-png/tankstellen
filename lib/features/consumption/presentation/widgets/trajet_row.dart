@@ -32,23 +32,30 @@ class TrajetRow extends StatelessWidget {
         : null;
     final durationMinutes = durationSec == null ? null : durationSec ~/ 60;
     final isEv = vehicle?.type == VehicleType.ev;
-    // Placeholder kWh/100 km formula for EV trips — full EV telemetry
-    // lands with the OBD2 EV PID set. Until then, treat the combustion
-    // path as the canonical avg, and just swap the unit label for EV
-    // vehicles so the UI reads correctly when an EV trip IS logged.
     final avgUnit = isEv ? 'kWh/100 km' : 'L/100 km';
+    // Compact density on landscape / tablet widths — drops the
+    // per-row vertical margin from 3 → 1 dp and the inner padding
+    // from (12, 8) → (10, 4) so a 600+ dp viewport shows ~50 % more
+    // trajets without scrolling.
+    final compact = MediaQuery.of(context).size.width >= 600;
+    final cardMargin = compact
+        ? const EdgeInsets.symmetric(horizontal: 8, vertical: 1)
+        : const EdgeInsets.symmetric(horizontal: 12, vertical: 3);
+    final innerPadding = compact
+        ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
+        : const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
     return Card(
       key: ValueKey('trajet-${entry.id}'),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+      margin: cardMargin,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: innerPadding,
           child: Row(
             children: [
-              const Icon(Icons.route, size: 24),
-              const SizedBox(width: 12),
+              Icon(Icons.route, size: compact ? 18 : 24),
+              SizedBox(width: compact ? 8 : 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,9 +64,11 @@ class TrajetRow extends StatelessWidget {
                       startedAt == null
                           ? (l?.tripHistoryUnknownDate ?? 'Unknown date')
                           : _fmtDate(startedAt),
-                      style: theme.textTheme.titleMedium,
+                      style: compact
+                          ? theme.textTheme.bodyMedium
+                          : theme.textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: compact ? 2 : 4),
                     Wrap(
                       spacing: 12,
                       runSpacing: 4,
