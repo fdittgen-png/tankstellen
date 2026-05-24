@@ -1521,9 +1521,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get privacyExportCsvSuccess => 'CSV-data exporterad till urklipp';
 
   @override
-  String savedToFile(String path) {
-    return 'Sparat i $path';
-  }
+  String get savedToDownloadsFolder => 'Sparad i mappen Hämtningar';
 
   @override
   String get privacyDeleteButton => 'Radera all data';
