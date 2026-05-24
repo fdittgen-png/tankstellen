@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -189,47 +190,63 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
       // visible trip list.
       final monthlySummary =
           aggregateMonthlyInsights(filtered, DateTime.now());
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // "This month vs last month" aggregates (#1041 phase 4).
-          MonthlyInsightsCard(summary: monthlySummary),
-          // Predictive-maintenance suggestion list (#1124) — empty by
-          // default, appears only when a trend heuristic fires.
-          const MaintenanceSuggestionList(),
-          Expanded(
-            child: ListView.builder(
-              key: const Key('trajets_list'),
-              padding: EdgeInsets.only(
-                top: 4,
-                // Clear the floating record FAB so the last row is not
-                // hidden behind it.
-                bottom: 88 + MediaQuery.of(context).viewPadding.bottom,
-              ),
-              itemCount: filtered.length,
-              itemBuilder: (context, index) {
-                final entry = filtered[index];
-                // Resolve the per-trip vehicle for fuel-family display.
-                // Fall back to the active vehicle when the trip
-                // pre-dates the vehicleId tagging (#889).
-                final vehicle = entry.vehicleId == null
-                    ? activeVehicle
-                    : vehicles
-                            .where((v) => v.id == entry.vehicleId)
-                            .firstOrNull ??
-                        activeVehicle;
-                return _TrajetRow(
-                  entry: entry,
-                  vehicle: vehicle,
-                  l: l,
-                  theme: theme,
-                  onTap: () => context.push('/trip/${entry.id}'),
-                );
-              },
-            ),
-          ),
-        ],
+      final bottomInset = 88 + MediaQuery.of(context).viewPadding.bottom;
+
+      final trajetsList = ListView.builder(
+        key: const Key('trajets_list'),
+        padding: EdgeInsets.only(top: 4, bottom: bottomInset),
+        itemCount: filtered.length,
+        itemBuilder: (context, index) {
+          final entry = filtered[index];
+          final vehicle = entry.vehicleId == null
+              ? activeVehicle
+              : vehicles
+                      .where((v) => v.id == entry.vehicleId)
+                      .firstOrNull ??
+                  activeVehicle;
+          return _TrajetRow(
+            entry: entry,
+            vehicle: vehicle,
+            l: l,
+            theme: theme,
+            onTap: () => context.push('/trip/${entry.id}'),
+          );
+        },
       );
+
+      // #2018 — landscape / tablet split: left = monthly-insights
+      // ("ce mois-ci vs le mois dernier") + maintenance suggestions,
+      // right = trajets list. Falls back to single-column on narrow
+      // screens (< 600dp).
+      if (isWideScreen(context)) {
+        content = Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(top: 4, bottom: bottomInset),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    MonthlyInsightsCard(summary: monthlySummary),
+                    const MaintenanceSuggestionList(),
+                  ],
+                ),
+              ),
+            ),
+            const VerticalDivider(width: 1),
+            Expanded(child: trajetsList),
+          ],
+        );
+      } else {
+        content = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            MonthlyInsightsCard(summary: monthlySummary),
+            const MaintenanceSuggestionList(),
+            Expanded(child: trajetsList),
+          ],
+        );
+      }
     }
 
     return Stack(
