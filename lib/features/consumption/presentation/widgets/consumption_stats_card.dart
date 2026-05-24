@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/consumption_stats.dart';
+import 'confidence_tier_badge.dart';
 
 /// Card summarising aggregated consumption statistics.
 ///
@@ -32,11 +33,19 @@ class ConsumptionStatsCard extends StatelessWidget {
   /// yet" state, 1-2 the bootstrap state, 3+ the calibrated state.
   final int? volumetricEfficiencySamples;
 
+  /// Whether the user has at least one trip whose `kind` is
+  /// `gpsPlusObd2` (#2027). Combined with [volumetricEfficiencySamples]
+  /// this drives the A/B/C confidence-tier badge. Defaults to `true`
+  /// because every legacy trip was recorded with OBD2 — so a user with
+  /// no migration data still sees the historical default.
+  final bool hasGpsPlusObd2Trip;
+
   const ConsumptionStatsCard({
     super.key,
     required this.stats,
     this.volumetricEfficiency,
     this.volumetricEfficiencySamples,
+    this.hasGpsPlusObd2Trip = true,
   });
 
   @override
@@ -139,6 +148,14 @@ class ConsumptionStatsCard extends StatelessWidget {
               _CalibrationChip(
                 volumetricEfficiency: volumetricEfficiency ?? 0.85,
                 samples: volumetricEfficiencySamples!,
+              ),
+              // #2027 — confidence tier badge (A/B/C) surfaces how
+              // trustworthy the consumption estimate is. A = GPS-only
+              // / no fill-ups, B = fill-ups + GPS, C = fill-ups + OBD2.
+              const SizedBox(height: 8),
+              ConfidenceTierBadge(
+                samples: volumetricEfficiencySamples!,
+                hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
               ),
             ],
           ],
@@ -313,3 +330,4 @@ class _StatTile extends StatelessWidget {
     );
   }
 }
+
