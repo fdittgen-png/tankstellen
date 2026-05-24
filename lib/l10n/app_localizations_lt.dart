@@ -2941,32 +2941,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get authNewHereCreateAccount => 'Naujas čia? Sukurti paskyrą';
 
   @override
-  String get ntfyCardTitle => 'Stumtiamieji pranešimai (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Įjungti ntfy.sh stumtimąjį';
-
-  @override
-  String get ntfyEnableSubtitle => 'Gauti kainų įspėjimus per ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'Temos URL';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopijuoti temos URL';
-
-  @override
-  String get ntfySendTestButton => 'Siųsti bandomąjį pranešimą';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Įdiekite ntfy programą iš F-Droid, kad gautumėte stumtiamuosius pranešimus savo įrenginyje.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Pirmiausia prijunkite TankSync, kad įjungtumėte stumtiamuosius pranešimus.';
-
-  @override
   String get linkDeviceScreenTitle => 'Susieti įrenginį';
 
   @override

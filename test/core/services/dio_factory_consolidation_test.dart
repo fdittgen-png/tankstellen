@@ -43,7 +43,6 @@ void main() {
         'lib/core/services/impl/nominatim_geocoding_provider.dart',
         'lib/core/telemetry/upload/trace_uploader.dart',
         'lib/features/setup/data/api_key_validator.dart',
-        'lib/core/sync/ntfy_service.dart',
       ];
 
       for (final path in filesToCheck) {

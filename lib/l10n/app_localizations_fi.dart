@@ -2926,33 +2926,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get authNewHereCreateAccount => 'Uusi käyttäjä? Luo tili';
 
   @override
-  String get ntfyCardTitle => 'Push-ilmoitukset (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Ota ntfy.sh push käyttöön';
-
-  @override
-  String get ntfyEnableSubtitle =>
-      'Vastaanota hintahälytykset ntfy.sh:n kautta';
-
-  @override
-  String get ntfyTopicUrlLabel => 'Aihe-URL';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Kopioi aihe-URL';
-
-  @override
-  String get ntfySendTestButton => 'Lähetä testipush';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Asenna ntfy-sovellus F-Droidista vastaanottaaksesi push-ilmoituksia laitteellesi.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Yhdistä ensin TankSync ottaaksesi push-ilmoitukset käyttöön.';
-
-  @override
   String get linkDeviceScreenTitle => 'Linkitä laite';
 
   @override

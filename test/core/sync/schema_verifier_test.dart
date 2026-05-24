@@ -3,14 +3,13 @@ import 'package:tankstellen/core/sync/schema_verifier.dart';
 
 void main() {
   group('SchemaVerifier - table lists', () {
-    test('requiredTables contains exactly 6 expected tables', () {
-      expect(SchemaVerifier.requiredTables, hasLength(6));
+    test('requiredTables contains exactly 5 expected tables', () {
+      expect(SchemaVerifier.requiredTables, hasLength(5));
       expect(SchemaVerifier.requiredTables, containsAll([
         'users',
         'favorites',
         'alerts',
         'price_snapshots',
-        'push_tokens',
         'sync_settings',
       ]));
     });
@@ -34,7 +33,6 @@ void main() {
         'favorites': true,
         'alerts': true,
         'price_snapshots': true,
-        'push_tokens': true,
         'sync_settings': true,
         'price_reports': true,
         'itineraries': true,
@@ -57,7 +55,6 @@ void main() {
         'favorites': true,
         'alerts': true,
         'price_snapshots': true,
-        'push_tokens': true,
         'sync_settings': true,
       };
 
@@ -73,7 +70,6 @@ void main() {
         'favorites': false,
         'alerts': false,
         'price_snapshots': true,
-        'push_tokens': true,
         'sync_settings': true,
       };
 
@@ -93,7 +89,6 @@ void main() {
         'favorites': true,
         'alerts': true,
         'price_snapshots': true,
-        'push_tokens': true,
         'sync_settings': true,
       };
 
@@ -106,7 +101,6 @@ void main() {
         'favorites': true,
         'alerts': true,
         'price_snapshots': true,
-        'push_tokens': true,
         'sync_settings': true,
       };
 
@@ -120,7 +114,6 @@ void main() {
         'favorites': false,
         'alerts': true,
         'price_snapshots': true,
-        'push_tokens': true,
         'sync_settings': true,
       };
 

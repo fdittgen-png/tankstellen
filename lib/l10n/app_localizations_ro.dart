@@ -2943,32 +2943,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get authNewHereCreateAccount => 'Nou aici? Creați cont';
 
   @override
-  String get ntfyCardTitle => 'Notificări push (ntfy.sh)';
-
-  @override
-  String get ntfyEnableTitle => 'Activați push ntfy.sh';
-
-  @override
-  String get ntfyEnableSubtitle => 'Primiți alerte de prețuri prin ntfy.sh';
-
-  @override
-  String get ntfyTopicUrlLabel => 'URL temă';
-
-  @override
-  String get ntfyCopyTopicUrlTooltip => 'Copiați URL-ul temei';
-
-  @override
-  String get ntfySendTestButton => 'Trimiteți notificare de test';
-
-  @override
-  String get ntfyFdroidHint =>
-      'Instalați aplicația ntfy din F-Droid pentru a primi notificări push pe dispozitivul dvs.';
-
-  @override
-  String get ntfyConnectFirstHint =>
-      'Conectați mai întâi TankSync pentru a activa notificările push.';
-
-  @override
   String get linkDeviceScreenTitle => 'Conectați dispozitivul';
 
   @override
