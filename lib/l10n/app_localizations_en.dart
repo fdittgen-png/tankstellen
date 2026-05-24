@@ -2368,6 +2368,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltipClearSearch => 'Clear search input';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Shift up';
 
   @override
@@ -4987,6 +4990,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Share';
+
+  @override
+  String get trajetDetailShareImageOption => 'Share image';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Share GPS track (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'No GPS samples in this trip';
 
   @override
   String trajetDetailShareSubject(String date) {
@@ -7679,6 +7691,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tooltipClearSearch => '⟦Çłéář šéářçĥ îñƥúŧ ·······⟧';
+
+  @override
+  String get minimalDriveInstantConsumption => '⟦Îñšŧáñŧ çóñšúɱƥŧîóñ ········⟧';
 
   @override
   String get coachingShiftUp => '⟦Šĥîƒŧ úƥ ···⟧';
@@ -10385,6 +10400,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetDetailShareAction => '⟦Šĥářé ··⟧';
+
+  @override
+  String get trajetDetailShareImageOption => '⟦Šĥářé îɱáǧé ·····⟧';
+
+  @override
+  String get trajetDetailShareGpxOption => '⟦Šĥářé ǦƤŠ ŧřáçķ (ǦƤẊ) ·······⟧';
+
+  @override
+  String get trajetDetailShareGpxEmpty =>
+      '⟦Ñó ǦƤŠ šáɱƥłéš îñ ŧĥîš ŧřîƥ ··········⟧';
 
   @override
   String trajetDetailShareSubject(String date) {

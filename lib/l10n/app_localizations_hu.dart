@@ -2389,6 +2389,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipClearSearch => 'Keresési mező törlése';
 
   @override
+  String get minimalDriveInstantConsumption => 'Pillanatnyi fogyasztás';
+
+  @override
   String get coachingShiftUp => 'Sebességet feljebb';
 
   @override
@@ -5059,6 +5062,15 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Megosztás';
+
+  @override
+  String get trajetDetailShareImageOption => 'Kép megosztása';
+
+  @override
+  String get trajetDetailShareGpxOption => 'GPS-nyomvonal (GPX) megosztása';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Nincs GPS-adat ezen az úton';
 
   @override
   String trajetDetailShareSubject(String date) {

@@ -2377,6 +2377,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tooltipClearSearch => 'Ryd søgeinput';
 
   @override
+  String get minimalDriveInstantConsumption => 'Aktuelt forbrug';
+
+  @override
   String get coachingShiftUp => 'Skift op';
 
   @override
@@ -5014,6 +5017,15 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Del';
+
+  @override
+  String get trajetDetailShareImageOption => 'Del billede';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Del GPS-spor (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Ingen GPS-data i denne tur';
 
   @override
   String trajetDetailShareSubject(String date) {

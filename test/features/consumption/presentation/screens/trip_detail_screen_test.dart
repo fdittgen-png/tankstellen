@@ -345,7 +345,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byKey(const Key('trip_detail_share_button')));
+        await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('trip_detail_share_image_option')),
+        );
         await tester.pumpAndSettle();
 
         expect(capturedKey, isNotNull,
@@ -394,7 +398,11 @@ void main() {
         // No exception during build with the empty-samples placeholder.
         expect(tester.takeException(), isNull);
 
-        await tester.tap(find.byKey(const Key('trip_detail_share_button')));
+        await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('trip_detail_share_image_option')),
+        );
         await tester.pumpAndSettle();
 
         expect(rendererCalled, isTrue,
@@ -422,7 +430,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byKey(const Key('trip_detail_share_button')));
+        await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('trip_detail_share_image_option')),
+        );
         await tester.pumpAndSettle();
 
         // The error snackbar surfaces — exact message is the EN

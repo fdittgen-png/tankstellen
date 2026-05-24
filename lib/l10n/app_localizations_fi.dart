@@ -2376,6 +2376,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tooltipClearSearch => 'Tyhjennä hakukenttä';
 
   @override
+  String get minimalDriveInstantConsumption => 'Hetkellinen kulutus';
+
+  @override
   String get coachingShiftUp => 'Vaihda ylös';
 
   @override
@@ -5015,6 +5018,15 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Jaa';
+
+  @override
+  String get trajetDetailShareImageOption => 'Jaa kuva';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Jaa GPS-jälki (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Ei GPS-tietoja tällä matkalla';
 
   @override
   String trajetDetailShareSubject(String date) {

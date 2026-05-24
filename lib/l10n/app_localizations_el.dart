@@ -2392,6 +2392,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tooltipClearSearch => 'Εκκαθάριση αναζήτησης';
 
   @override
+  String get minimalDriveInstantConsumption => 'Στιγμιαία κατανάλωση';
+
+  @override
   String get coachingShiftUp => 'Ανέβα σχέση';
 
   @override
@@ -5061,6 +5064,16 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Κοινοποίηση';
+
+  @override
+  String get trajetDetailShareImageOption => 'Κοινοποίηση εικόνας';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Κοινοποίηση διαδρομής GPS (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty =>
+      'Χωρίς δεδομένα GPS σε αυτό το ταξίδι';
 
   @override
   String trajetDetailShareSubject(String date) {

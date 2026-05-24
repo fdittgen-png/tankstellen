@@ -2376,6 +2376,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tooltipClearSearch => 'Tøm søkefelt';
 
   @override
+  String get minimalDriveInstantConsumption => 'Øyeblikksforbruk';
+
+  @override
   String get coachingShiftUp => 'Gir opp';
 
   @override
@@ -5012,6 +5015,15 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Del';
+
+  @override
+  String get trajetDetailShareImageOption => 'Del bilde';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Del GPS-spor (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Ingen GPS-data i denne turen';
 
   @override
   String trajetDetailShareSubject(String date) {

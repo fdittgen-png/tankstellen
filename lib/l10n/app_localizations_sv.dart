@@ -2379,6 +2379,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tooltipClearSearch => 'Rensa sökinmatning';
 
   @override
+  String get minimalDriveInstantConsumption => 'Momentanförbrukning';
+
+  @override
   String get coachingShiftUp => 'Växla upp';
 
   @override
@@ -5015,6 +5018,15 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Dela';
+
+  @override
+  String get trajetDetailShareImageOption => 'Dela bild';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Dela GPS-spår (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Inga GPS-data i denna resa';
 
   @override
   String trajetDetailShareSubject(String date) {

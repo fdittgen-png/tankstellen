@@ -2395,6 +2395,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tooltipClearSearch => 'Effacer la recherche';
 
   @override
+  String get minimalDriveInstantConsumption => 'Consommation instantanée';
+
+  @override
   String get coachingShiftUp => 'Monter un rapport';
 
   @override
@@ -5070,6 +5073,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Partager';
+
+  @override
+  String get trajetDetailShareImageOption => 'Partager l\'image';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Partager la trace GPS (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Aucune donnée GPS pour ce trajet';
 
   @override
   String trajetDetailShareSubject(String date) {

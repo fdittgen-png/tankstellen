@@ -2387,6 +2387,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tooltipClearSearch => 'Vymazať vstup vyhľadávania';
 
   @override
+  String get minimalDriveInstantConsumption => 'Okamžitá spotreba';
+
+  @override
   String get coachingShiftUp => 'Zaraď vyššie';
 
   @override
@@ -5035,6 +5038,15 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Zdieľať';
+
+  @override
+  String get trajetDetailShareImageOption => 'Zdieľať obrázok';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Zdieľať GPS stopu (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Žiadne GPS údaje v tejto jazde';
 
   @override
   String trajetDetailShareSubject(String date) {

@@ -2395,6 +2395,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tooltipClearSearch => 'Изчисти полето за търсене';
 
   @override
+  String get minimalDriveInstantConsumption => 'Моментен разход';
+
+  @override
   String get coachingShiftUp => 'Превключи нагоре';
 
   @override
@@ -5058,6 +5061,15 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Сподели';
+
+  @override
+  String get trajetDetailShareImageOption => 'Споделяне на изображение';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Споделяне на GPS трасе (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Няма GPS данни в това пътуване';
 
   @override
   String trajetDetailShareSubject(String date) {

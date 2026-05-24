@@ -2386,6 +2386,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tooltipClearSearch => 'Išvalyti paieškos lauką';
 
   @override
+  String get minimalDriveInstantConsumption => 'Momentinės sąnaudos';
+
+  @override
   String get coachingShiftUp => 'Aukštyn pavarą';
 
   @override
@@ -5045,6 +5048,15 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Bendrinti';
+
+  @override
+  String get trajetDetailShareImageOption => 'Bendrinti vaizdą';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Bendrinti GPS pėdsaką (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Šioje kelionėje GPS duomenų nėra';
 
   @override
   String trajetDetailShareSubject(String date) {

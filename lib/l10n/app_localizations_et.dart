@@ -2372,6 +2372,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tooltipClearSearch => 'Tühjenda otsingusisestus';
 
   @override
+  String get minimalDriveInstantConsumption => 'Hetketarbimine';
+
+  @override
   String get coachingShiftUp => 'Vaheta üles';
 
   @override
@@ -5006,6 +5009,15 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Jaga';
+
+  @override
+  String get trajetDetailShareImageOption => 'Jaga pilti';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Jaga GPS-rada (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Pole GPS-andmeid sellel sõidul';
 
   @override
   String trajetDetailShareSubject(String date) {

@@ -2378,6 +2378,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tooltipClearSearch => 'Obriši unos pretraživanja';
 
   @override
+  String get minimalDriveInstantConsumption => 'Trenutna potrošnja';
+
+  @override
   String get coachingShiftUp => 'Prebaci gore';
 
   @override
@@ -5031,6 +5034,15 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Dijeli';
+
+  @override
+  String get trajetDetailShareImageOption => 'Podijeli sliku';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Podijeli GPS trag (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Nema GPS podataka na ovom putovanju';
 
   @override
   String trajetDetailShareSubject(String date) {

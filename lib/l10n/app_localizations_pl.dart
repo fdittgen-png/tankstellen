@@ -2384,6 +2384,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tooltipClearSearch => 'Wyczyść wyszukiwanie';
 
   @override
+  String get minimalDriveInstantConsumption => 'Chwilowe zużycie';
+
+  @override
   String get coachingShiftUp => 'Zmień bieg w górę';
 
   @override
@@ -5037,6 +5040,15 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Udostępnij';
+
+  @override
+  String get trajetDetailShareImageOption => 'Udostępnij obraz';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Udostępnij ścieżkę GPS (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Brak danych GPS w tym przejazdzie';
 
   @override
   String trajetDetailShareSubject(String date) {

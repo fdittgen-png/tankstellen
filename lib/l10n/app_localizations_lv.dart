@@ -2391,6 +2391,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tooltipClearSearch => 'Notīrīt meklēšanu';
 
   @override
+  String get minimalDriveInstantConsumption => 'Momentānais patēriņš';
+
+  @override
   String get coachingShiftUp => 'Pārslēgt augšup';
 
   @override
@@ -5047,6 +5050,15 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Kopīgot';
+
+  @override
+  String get trajetDetailShareImageOption => 'Kopīgot attēlu';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Kopīgot GPS taku (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Nav GPS datu šim braucienam';
 
   @override
   String trajetDetailShareSubject(String date) {

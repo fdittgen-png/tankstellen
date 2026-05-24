@@ -2388,6 +2388,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tooltipClearSearch => 'Ștergeți căutarea';
 
   @override
+  String get minimalDriveInstantConsumption => 'Consum instantaneu';
+
+  @override
   String get coachingShiftUp => 'Schimbă în sus';
 
   @override
@@ -5051,6 +5054,15 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get trajetDetailShareAction => 'Partajați';
+
+  @override
+  String get trajetDetailShareImageOption => 'Partajează imaginea';
+
+  @override
+  String get trajetDetailShareGpxOption => 'Partajează traseul GPS (GPX)';
+
+  @override
+  String get trajetDetailShareGpxEmpty => 'Fără date GPS în această călătorie';
 
   @override
   String trajetDetailShareSubject(String date) {
