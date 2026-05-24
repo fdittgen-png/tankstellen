@@ -18,11 +18,23 @@ class BadgeShelf extends ConsumerWidget {
     if (earned.isEmpty) return const SizedBox.shrink();
     final earnedIds = {for (final e in earned) e.id};
     final theme = Theme.of(context);
+    // Wide-screen / landscape compact mode (#2018 follow-up). The
+    // portrait tile is 88×88 with an icon + label; landscape compresses
+    // to 48×48 icon-only with the label moving to the tooltip so the
+    // shelf doesn't eat ~120 dp of left-panel real-estate in a wide
+    // layout.
+    final compact = MediaQuery.of(context).size.width >= 600;
+    final shelfHeight = compact ? 48.0 : 88.0;
+    final cardMargin = compact
+        ? const EdgeInsets.symmetric(horizontal: 12, vertical: 4)
+        : const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+    final cardPadding =
+        compact ? const EdgeInsets.all(8) : const EdgeInsets.all(12);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: cardMargin,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -41,9 +53,9 @@ class BadgeShelf extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: compact ? 4 : 8),
             SizedBox(
-              height: 88,
+              height: shelfHeight,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
@@ -51,6 +63,7 @@ class BadgeShelf extends ConsumerWidget {
                     _BadgeTile(
                       id: id,
                       isEarned: earnedIds.contains(id),
+                      compact: compact,
                     ),
                 ],
               ),
@@ -65,8 +78,13 @@ class BadgeShelf extends ConsumerWidget {
 class _BadgeTile extends StatelessWidget {
   final AchievementId id;
   final bool isEarned;
+  final bool compact;
 
-  const _BadgeTile({required this.id, required this.isEarned});
+  const _BadgeTile({
+    required this.id,
+    required this.isEarned,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +94,11 @@ class _BadgeTile extends StatelessWidget {
     return Tooltip(
       message: _description(id, l),
       child: Container(
-        width: 88,
+        width: compact ? 72 : 88,
         margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.all(6),
+        padding: EdgeInsets.all(compact ? 4 : 6),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(compact ? 8 : 12),
           color: isEarned
               ? theme.colorScheme.primaryContainer
               : theme.colorScheme.surfaceContainerHighest,
@@ -90,21 +108,22 @@ class _BadgeTile extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 28,
+              size: compact ? 20 : 28,
               color: isEarned
                   ? theme.colorScheme.onPrimaryContainer
                   : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: compact ? 2 : 4),
             Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: isEarned
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onSurfaceVariant,
+                fontSize: compact ? 10 : null,
               ),
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: compact ? 1 : 2,
               overflow: TextOverflow.ellipsis,
             ),
           ],

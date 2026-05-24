@@ -250,7 +250,12 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
       if (isWideScreen(context)) {
         content = Row(
           children: [
+            // 2:3 flex on landscape so the trajets list (the dense
+            // data) gets more room than the mostly-static insights
+            // panel. Prior 1:1 split wasted half the screen on the
+            // sparse left side per the 2026-05-24 screenshots.
             Expanded(
+              flex: 2,
               child: SingleChildScrollView(
                 padding: EdgeInsets.only(top: 4, bottom: bottomInset),
                 child: Column(
@@ -264,7 +269,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
               ),
             ),
             const VerticalDivider(width: 1),
-            Expanded(child: trajetsList),
+            Expanded(flex: 3, child: trajetsList),
           ],
         );
       } else {
