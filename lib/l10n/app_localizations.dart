@@ -4466,6 +4466,12 @@ abstract class AppLocalizations {
   /// **'Clear search input'**
   String get tooltipClearSearch;
 
+  /// Label above the headline instant-L/100km figure in the MinimalDriveSummary card on the trip-recording screen (#2026). Replaces the five-card 'Distance/Speed/Fuel/Avg/Elapsed' wall as the primary live-drive surface.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant consumption'**
+  String get minimalDriveInstantConsumption;
+
   /// No description provided for @coachingShiftUp.
   ///
   /// In en, this message translates to:

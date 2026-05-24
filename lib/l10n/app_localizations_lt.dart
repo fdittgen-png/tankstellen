@@ -2386,6 +2386,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tooltipClearSearch => 'Išvalyti paieškos lauką';
 
   @override
+  String get minimalDriveInstantConsumption => 'Momentinės sąnaudos';
+
+  @override
   String get coachingShiftUp => 'Aukštyn pavarą';
 
   @override
