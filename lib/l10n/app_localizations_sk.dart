@@ -2389,6 +2389,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tooltipClearSearch => 'Vymazať vstup vyhľadávania';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Zaraď vyššie';
 
   @override

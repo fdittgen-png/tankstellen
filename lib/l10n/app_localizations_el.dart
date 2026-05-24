@@ -2394,6 +2394,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tooltipClearSearch => 'Εκκαθάριση αναζήτησης';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Ανέβα σχέση';
 
   @override

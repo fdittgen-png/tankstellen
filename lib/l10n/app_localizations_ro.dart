@@ -2390,6 +2390,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tooltipClearSearch => 'Ștergeți căutarea';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Schimbă în sus';
 
   @override

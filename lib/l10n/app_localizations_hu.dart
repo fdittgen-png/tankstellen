@@ -2391,6 +2391,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipClearSearch => 'Keresési mező törlése';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Sebességet feljebb';
 
   @override

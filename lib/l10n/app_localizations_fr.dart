@@ -2396,6 +2396,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tooltipClearSearch => 'Effacer la recherche';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Monter un rapport';
 
   @override

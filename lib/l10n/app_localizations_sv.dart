@@ -2381,6 +2381,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tooltipClearSearch => 'Rensa sökinmatning';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Växla upp';
 
   @override

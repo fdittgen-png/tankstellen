@@ -2393,6 +2393,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tooltipClearSearch => 'Limpar pesquisa';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Subir mudança';
 
   @override

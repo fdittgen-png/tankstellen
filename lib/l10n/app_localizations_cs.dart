@@ -2384,6 +2384,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tooltipClearSearch => 'Vymazat vstup hledání';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Zařadit vyšší';
 
   @override

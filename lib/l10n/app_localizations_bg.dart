@@ -2397,6 +2397,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tooltipClearSearch => 'Изчисти полето за търсене';
 
   @override
+  String get minimalDriveInstantConsumption => 'Instant consumption';
+
+  @override
   String get coachingShiftUp => 'Превключи нагоре';
 
   @override
