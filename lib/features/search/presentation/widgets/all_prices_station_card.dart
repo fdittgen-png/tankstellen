@@ -3,6 +3,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
 
@@ -35,10 +36,14 @@ class AllPricesStationCard extends StatelessWidget {
     this.profileFuelType,
   });
 
+  /// Defers to the shared [hasRealBrand] helper so the search card and
+  /// the detail screen agree on what counts as a brand (#2061). The
+  /// helper excludes the legacy `'Station'` sentinel and
+  /// `BrandRegistry.independentLabel` (`'Independent'` from #482).
+  /// `'Autoroute'` is a synthetic motorway tag, not a real brand, so
+  /// the card keeps that exclusion on top.
   bool get _hasBrand =>
-      station.brand.isNotEmpty &&
-      station.brand != 'Station' &&
-      station.brand != 'Autoroute';
+      hasRealBrand(station) && station.brand != 'Autoroute';
 
   @override
   Widget build(BuildContext context) {

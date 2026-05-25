@@ -998,5 +998,42 @@ void main() {
         );
       });
     });
+
+    testWidgets(
+        '#2061 — the "Independent" sentinel does not leak into the title',
+        (tester) async {
+      // The French Prix Carburants parser tags brandless stations with
+      // `BrandRegistry.independentLabel` (== "Independent"). Before
+      // #2061 the search card rendered that sentinel as the title;
+      // after, it falls back to the street address (matching the
+      // detail screen).
+      const independentStation = Station(
+        id: 'indep-2061',
+        name: '',
+        brand: 'Independent',
+        street: '26 AVENUE DE VERDUN',
+        postCode: '34120',
+        place: 'Pézenas',
+        lat: 43.46,
+        lng: 3.42,
+        e10: 1.999,
+        isOpen: true,
+      );
+
+      await pumpApp(
+        tester,
+        const StationCard(
+          station: independentStation,
+          selectedFuelType: FuelType.e10,
+        ),
+      );
+
+      expect(find.text('Independent'), findsNothing,
+          reason:
+              'The Independent sentinel is an internal classification, '
+              'not a brand to render.');
+      expect(find.text('26 AVENUE DE VERDUN'), findsOneWidget,
+          reason: 'Brandless station falls back to the street as title.');
+    });
   });
 }
