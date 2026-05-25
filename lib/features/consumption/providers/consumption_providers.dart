@@ -773,3 +773,23 @@ EcoScore? ecoScoreForFillUp(Ref ref, String fillUpId) {
     history: fillUps,
   );
 }
+
+/// Raw per-fill-up L/100 km, with no baseline / no comparison (#2060).
+///
+/// Returns the per-entry consumption number even when
+/// [ecoScoreForFillUp] is null because there isn't enough history
+/// to build a rolling-average baseline. The card consumes this to
+/// render a plain "X.X L/100 km" line on entries that would otherwise
+/// be blank — the 2026-05-20 entry in the user's screenshot has the
+/// distance + litres to compute a number, just not enough preceding
+/// same-fuel entries for a trend.
+@riverpod
+double? litersPer100KmForFillUp(Ref ref, String fillUpId) {
+  final fillUps = ref.watch(fillUpListProvider);
+  final current = fillUps.where((f) => f.id == fillUpId).firstOrNull;
+  if (current == null) return null;
+  return EcoScoreCalculator.computeLitersPer100Km(
+    current: current,
+    history: fillUps,
+  );
+}

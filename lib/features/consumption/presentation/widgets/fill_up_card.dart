@@ -34,12 +34,19 @@ import 'eco_score_badge.dart';
 class FillUpCard extends StatelessWidget {
   final FillUp fillUp;
   final EcoScore? ecoScore;
+  /// Raw per-fill-up L/100 km without the comparison-to-baseline
+  /// chip (#2060). Rendered only when [ecoScore] is null AND this
+  /// value is non-null — entries that have enough data to compute
+  /// L/100 km but not enough preceding same-fuel history for a
+  /// rolling baseline. The card stays silent when both are null.
+  final double? rawLPer100Km;
   final VoidCallback? onTap;
 
   const FillUpCard({
     super.key,
     required this.fillUp,
     this.ecoScore,
+    this.rawLPer100Km,
     this.onTap,
   });
 
@@ -139,6 +146,21 @@ class FillUpCard extends StatelessWidget {
             if (ecoScore != null) ...[
               const SizedBox(height: 4),
               EcoScoreBadge(score: ecoScore!),
+            ] else if (rawLPer100Km != null) ...[
+              const SizedBox(height: 4),
+              // #2060 — render the bare L/100 km when there isn't
+              // enough preceding same-fuel history for an EcoScoreBadge
+              // trend chip. Plain text, no arrow, no comparison.
+              Text(
+                l?.ecoScoreConsumption(
+                      rawLPer100Km!.toStringAsFixed(1),
+                    ) ??
+                    '${rawLPer100Km!.toStringAsFixed(1)} L/100 km',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ],
         ),
