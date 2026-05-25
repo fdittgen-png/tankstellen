@@ -8,6 +8,22 @@ import '../../../search/domain/entities/station_amenity.dart';
 part 'user_profile.freezed.dart';
 part 'user_profile.g.dart';
 
+/// Which price the approach overlay flashes when the driver enters
+/// the configured radius of a fuel station (#2067 / Epic #2065).
+///
+/// - [nearest] — price at the single nearest station the driver first
+///   crossed the radius of. Stable; doesn't flip mid-approach.
+/// - [cheapestInRadius] — price at the cheapest station currently
+///   within the radius. Optimises for "best deal right now"; can flip
+///   while driving.
+enum ApproachPriceMode {
+  nearest('nearest'),
+  cheapestInRadius('cheapestInRadius');
+
+  final String key;
+  const ApproachPriceMode(this.key);
+}
+
 enum LandingScreen {
   favorites('favorites'),
   map('map'),
@@ -108,6 +124,23 @@ abstract class UserProfile with _$UserProfile {
       'Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.',
     )
     @Default(true) bool gamificationEnabled,
+    /// Radius (in km) within which the in-trip approach overlay
+    /// (#2067 / Epic #2065) grows + flips to a huge price figure for
+    /// the user's fuel type. Range 0.5–5.0 in 0.5 km steps; default
+    /// 1.0 km. In countries that use miles (UK/US), the slider label
+    /// is rendered via `UnitFormatter`; the persisted value stays km.
+    @Default(1.0) double approachRadiusKm,
+    /// Which station price the approach overlay shows when the driver
+    /// is inside [approachRadiusKm]: the nearest station the radius
+    /// was crossed for, or the cheapest station currently in range.
+    /// See [ApproachPriceMode].
+    @Default(ApproachPriceMode.nearest) ApproachPriceMode approachPriceMode,
+    /// Floor on how often the approach detector polls the search
+    /// chain while a trajet is recording (#2067 / Epic #2065). The
+    /// actual cadence is speed-adaptive (≈ 20 % of `radius_m / speed`)
+    /// but is never tighter than this floor — protects the search
+    /// provider quota. Range 1–10 s; default 5 s.
+    @Default(5) int approachMinPollSeconds,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>

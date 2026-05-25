@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "Sdílet protokol relace OBD2",
   "coachingShiftUp": "Zařadit vyšší",
   "coachingShiftDown": "Zařadit nižší",
-  "coachingEasePedal": "Uberte plyn"
+  "coachingEasePedal": "Uberte plyn",
+  "approachOverlaySection": "Překryv při příjezdu k čerpací stanici",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Poloměr",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "Překryv se zvětší a zobrazí cenu, když jste do {km} km od čerpací stanice",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Zobrazit cenu",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Nejbližší stanice",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Nejlevnější v okruhu",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Min. obnovení",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Spodní hranice obnovování nejbližší stanice (rychlejší při vyšší rychlosti, nikdy častěji než {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

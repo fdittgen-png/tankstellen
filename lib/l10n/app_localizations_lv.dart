@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3353,6 +3350,35 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Pabeidziet 30 km+ braucienu ar nemainīgu ātrumu un maigās braukšanas novērtējumu 90 vai augstāku.';
+
+  @override
+  String get approachOverlaySection =>
+      'Pārklājums tuvojoties degvielas uzpildes stacijai';
+
+  @override
+  String get approachRadiusLabel => 'Rādiuss';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Pārklājums palielinās un parāda cenu, kad esat tuvāk par $km km uzpildes stacijai';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Rādīt cenu par';
+
+  @override
+  String get approachPriceModeNearest => 'Tuvākā stacija';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Lētākā rādiusā';
+
+  @override
+  String get approachMinPollLabel => 'Min. atjaunināšana';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Tuvākās stacijas atjaunināšanas apakšējā robeža (ātrāk ar lielāku ātrumu, nekad biežāk nekā $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork => 'Nav tīkla savienojuma. Mēģiniet vēlāk.';

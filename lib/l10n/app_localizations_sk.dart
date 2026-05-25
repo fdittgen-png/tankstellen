@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3349,6 +3346,34 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Dokončite jazdu 30+ km pri konštantnej rýchlosti so skóre plynulej jazdy 90 alebo vyšším.';
+
+  @override
+  String get approachOverlaySection => 'Prekryv pri približovaní k stanici';
+
+  @override
+  String get approachRadiusLabel => 'Polomer';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Prekryv sa zväčší a zobrazí cenu, keď ste do $km km od čerpacej stanice';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Zobraziť cenu';
+
+  @override
+  String get approachPriceModeNearest => 'Najbližšia stanica';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Najlacnejšia v polomere';
+
+  @override
+  String get approachMinPollLabel => 'Min. obnovenie';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Spodný limit obnovovania najbližšej stanice (rýchlejšie pri rýchlosti, nikdy častejšie ako $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>

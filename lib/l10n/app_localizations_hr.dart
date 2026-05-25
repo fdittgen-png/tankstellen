@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3338,6 +3335,35 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Završite vožnju od 30 km+ pri konstantnoj brzini s ocjenom mirne vožnje 90 ili više.';
+
+  @override
+  String get approachOverlaySection =>
+      'Preklapanje pri prilasku benzinskoj postaji';
+
+  @override
+  String get approachRadiusLabel => 'Polumjer';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Preklapanje se povećava i prikazuje cijenu kada ste unutar $km km od postaje';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Prikaži cijenu za';
+
+  @override
+  String get approachPriceModeNearest => 'Najbliža postaja';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Najjeftinija u polumjeru';
+
+  @override
+  String get approachMinPollLabel => 'Min. osvježavanje';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Donja granica osvježavanja najbliže postaje (brže pri brzini, nikada češće od $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>
