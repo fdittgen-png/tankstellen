@@ -1785,5 +1785,15 @@
         "example": "10"
       }
     }
+  },
+  "approachStationDistance": "{meters} m attālumā",
+  "@approachStationDistance": {
+    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
+    "placeholders": {
+      "meters": {
+        "type": "String",
+        "example": "350"
+      }
+    }
   }
 }

@@ -6225,6 +6225,12 @@ abstract class AppLocalizations {
   /// **'Floor on how often the overlay refreshes the nearest station (faster at speed, never tighter than {seconds} s)'**
   String approachMinPollCaption(int seconds);
 
+  /// PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m away'**
+  String approachStationDistance(String meters);
+
   /// Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186.
   ///
   /// In en, this message translates to:

@@ -3382,6 +3382,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m-re';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Nincs hálózati kapcsolat. Próbálja újra később.';
 

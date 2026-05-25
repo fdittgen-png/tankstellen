@@ -1696,6 +1696,16 @@
       }
     }
   },
+  "approachStationDistance": "{meters} m away",
+  "@approachStationDistance": {
+    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
+    "placeholders": {
+      "meters": {
+        "type": "String",
+        "example": "350"
+      }
+    }
+  },
   "authErrorNoNetwork": "No network connection. Try again later.",
   "@authErrorNoNetwork": {
     "description": "Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186."

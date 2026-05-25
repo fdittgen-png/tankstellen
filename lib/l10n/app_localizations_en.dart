@@ -3344,6 +3344,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m away';
+  }
+
+  @override
   String get authErrorNoNetwork => 'No network connection. Try again later.';
 
   @override
@@ -8748,6 +8753,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String approachMinPollCaption(int seconds) {
     return '⟦Ƒłóóř óñ ĥóŵ óƒŧéñ ŧĥé óṽéřłáý řéƒřéšĥéš ŧĥé ñéářéšŧ šŧáŧîóñ (ƒášŧéř áŧ šƥééđ, ñéṽéř ŧîǧĥŧéř ŧĥáñ $seconds š) ····································⟧';
+  }
+
+  @override
+  String approachStationDistance(String meters) {
+    return '⟦$meters ɱ áŵáý ··⟧';
   }
 
   @override

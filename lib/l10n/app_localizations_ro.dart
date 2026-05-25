@@ -3381,6 +3381,11 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return 'la $meters m';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Nicio conexiune la rețea. Încercați mai târziu.';
 

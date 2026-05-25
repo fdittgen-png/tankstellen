@@ -3,7 +3,11 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/services/approach_detector.dart';
+import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/driving_coaching.dart';
 import '../../providers/trip_recording_provider.dart';
 
@@ -36,15 +40,36 @@ class TripRecordingPipView extends StatelessWidget {
   final Color backgroundColor;
   final Color foregroundColor;
 
+  /// Optional approach-detector state (#2084 / Epic #2065). When set
+  /// to [ApproachInRadius] or [ApproachLeaving], the PiP tile flips
+  /// from the default huge-L/100-km layout to a huge-price layout
+  /// for the driver's fuel type — see [_buildApproachPriceLayout].
+  /// Null in every other state collapses to the existing layout.
+  final ApproachState? approachState;
+
+  /// Driver's preferred fuel type — resolved by the caller from
+  /// (vehicle's fuel, falling back to profile's preferred). Used by
+  /// the approach-price layout to pick the right price column off
+  /// the in-radius station. Falls back to E10 when null.
+  final FuelType? fuelType;
+
   const TripRecordingPipView({
     super.key,
     required this.state,
     required this.backgroundColor,
     required this.foregroundColor,
+    this.approachState,
+    this.fuelType,
   });
 
   @override
   Widget build(BuildContext context) {
+    // #2084 — approach mode wins over the default L/100 km view.
+    final approach = approachState;
+    if (approach is ApproachInRadius || approach is ApproachLeaving) {
+      return _buildApproachPriceLayout(context, approach!);
+    }
+
     final l = AppLocalizations.of(context);
     final live = state.live;
     final paused = state.phase == TripRecordingPhase.paused;
@@ -134,6 +159,92 @@ class TripRecordingPipView extends StatelessWidget {
                     color: foregroundColor.withValues(alpha: 0.8),
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Approach-radius layout (#2084 / Epic #2065): huge price for the
+  /// driver's fuel type at the targeted station + station name +
+  /// distance underneath. Active when `approachState is
+  /// ApproachInRadius` OR `ApproachLeaving` (Leaving keeps the price
+  /// visible through the 5 s grace before the overlay collapses
+  /// back to L/100 km).
+  Widget _buildApproachPriceLayout(
+    BuildContext context,
+    ApproachState approach,
+  ) {
+    final l = AppLocalizations.of(context);
+    final station = approach is ApproachInRadius
+        ? approach.station
+        : (approach as ApproachLeaving).lastStation;
+    final distanceMeters =
+        approach is ApproachInRadius ? approach.distanceMeters : null;
+    final fuel = fuelType ?? FuelType.e10;
+    final price = station.priceFor(fuel);
+
+    final priceText = price != null
+        ? PriceFormatter.formatPrice(price)
+        : '—';
+    final fuelLabel = fuel.displayName;
+
+    return Material(
+      color: backgroundColor,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  priceText,
+                  style: TextStyle(
+                    color: foregroundColor,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 56,
+                    height: 1.0,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                fuelLabel,
+                style: TextStyle(
+                  color: foregroundColor.withValues(alpha: 0.85),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                station.name.isNotEmpty ? station.name : station.brand,
+                style: TextStyle(
+                  color: foregroundColor.withValues(alpha: 0.95),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (distanceMeters != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  l?.approachStationDistance(
+                          distanceMeters.toStringAsFixed(0)) ??
+                      '${distanceMeters.toStringAsFixed(0)} m',
+                  style: TextStyle(
+                    color: foregroundColor.withValues(alpha: 0.85),
+                    fontSize: 12,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
               ],
