@@ -3694,17 +3694,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Mēnesis';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Kopienas gaidīšanas laiki';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anonīmi kopīgot degvielas stacijas gaidīšanas laikus';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Anonīmi kopīgot, kad ierašaties un atstājat degvielas staciju, lai lietotne varētu rādīt tipiskos gaidīšanas laikus. Nekādas atrašanās vietas koordinātas netiek augšupielādētas — tikai stacijas ID.';
-
-  @override
   String get consoFeatureGroupTitle => 'Patēriņš';
 
   @override
@@ -5313,22 +5302,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Lietot';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min gaidīšana';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Izsekot manu gaidīšanu';
-
-  @override
-  String get waitTimeTrackEnd => 'Es aiziet';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min pagājuši';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Sākuma ekrāna logrīks';

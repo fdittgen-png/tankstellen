@@ -26,7 +26,6 @@ class GdprConsentScreen extends ConsumerWidget {
           location: form.locationConsent,
           errorReporting: form.errorReportingConsent,
           cloudSync: form.cloudSyncConsent,
-          communityWaitTime: form.communityWaitTimeConsent,
           vinOnlineDecode: form.vinOnlineDecodeConsent,
         );
     if (context.mounted) context.go('/setup');
@@ -37,7 +36,6 @@ class GdprConsentScreen extends ConsumerWidget {
           location: true,
           errorReporting: true,
           cloudSync: true,
-          communityWaitTime: true,
           vinOnlineDecode: true,
         );
     if (context.mounted) context.go('/setup');
@@ -115,18 +113,6 @@ class GdprConsentScreen extends ConsumerWidget {
                           'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.',
                       value: form.cloudSyncConsent,
                       onChanged: notifier.setCloudSync,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Community wait-time consent (#1119)
-                    _ConsentToggle(
-                      icon: Icons.timer_outlined,
-                      title: l10n?.gdprCommunityWaitTimeTitle ??
-                          'Community Wait Times',
-                      description: l10n?.gdprCommunityWaitTimeDescription ??
-                          'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.',
-                      value: form.communityWaitTimeConsent,
-                      onChanged: notifier.setCommunityWaitTime,
                     ),
                     const SizedBox(height: 16),
 

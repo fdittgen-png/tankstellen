@@ -11,14 +11,12 @@ class GdprConsentFormState {
   final bool locationConsent;
   final bool errorReportingConsent;
   final bool cloudSyncConsent;
-  final bool communityWaitTimeConsent;
   final bool vinOnlineDecodeConsent;
 
   const GdprConsentFormState({
     this.locationConsent = false,
     this.errorReportingConsent = false,
     this.cloudSyncConsent = false,
-    this.communityWaitTimeConsent = false,
     this.vinOnlineDecodeConsent = false,
   });
 
@@ -26,7 +24,6 @@ class GdprConsentFormState {
     bool? locationConsent,
     bool? errorReportingConsent,
     bool? cloudSyncConsent,
-    bool? communityWaitTimeConsent,
     bool? vinOnlineDecodeConsent,
   }) {
     return GdprConsentFormState(
@@ -34,8 +31,6 @@ class GdprConsentFormState {
       errorReportingConsent:
           errorReportingConsent ?? this.errorReportingConsent,
       cloudSyncConsent: cloudSyncConsent ?? this.cloudSyncConsent,
-      communityWaitTimeConsent:
-          communityWaitTimeConsent ?? this.communityWaitTimeConsent,
       vinOnlineDecodeConsent:
           vinOnlineDecodeConsent ?? this.vinOnlineDecodeConsent,
     );
@@ -57,10 +52,6 @@ class GdprConsentFormController extends _$GdprConsentFormController {
 
   void setCloudSync(bool value) {
     state = state.copyWith(cloudSyncConsent: value);
-  }
-
-  void setCommunityWaitTime(bool value) {
-    state = state.copyWith(communityWaitTimeConsent: value);
   }
 
   void setVinOnlineDecode(bool value) {

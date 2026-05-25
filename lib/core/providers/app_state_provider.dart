@@ -126,7 +126,6 @@ class GdprConsent extends _$GdprConsent {
     bool location,
     bool errorReporting,
     bool cloudSync,
-    bool communityWaitTime,
     bool vinOnlineDecode,
     bool syncTrips,
   }) build() {
@@ -135,8 +134,6 @@ class GdprConsent extends _$GdprConsent {
       location: storage.getSetting(StorageKeys.consentLocation) as bool? ?? false,
       errorReporting: storage.getSetting(StorageKeys.consentErrorReporting) as bool? ?? false,
       cloudSync: storage.getSetting(StorageKeys.consentCloudSync) as bool? ?? false,
-      communityWaitTime:
-          storage.getSetting(StorageKeys.consentCommunityWaitTime) as bool? ?? false,
       vinOnlineDecode:
           storage.getSetting(StorageKeys.consentVinOnlineDecode) as bool? ?? false,
       syncTrips:
@@ -148,7 +145,6 @@ class GdprConsent extends _$GdprConsent {
     required bool location,
     required bool errorReporting,
     required bool cloudSync,
-    required bool communityWaitTime,
     required bool vinOnlineDecode,
     bool syncTrips = false,
   }) async {
@@ -157,10 +153,6 @@ class GdprConsent extends _$GdprConsent {
     await storage.putSetting(StorageKeys.consentLocation, location);
     await storage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
     await storage.putSetting(StorageKeys.consentCloudSync, cloudSync);
-    await storage.putSetting(
-      StorageKeys.consentCommunityWaitTime,
-      communityWaitTime,
-    );
     await storage.putSetting(
       StorageKeys.consentVinOnlineDecode,
       vinOnlineDecode,
@@ -179,7 +171,6 @@ class GdprConsent extends _$GdprConsent {
       location: location,
       errorReporting: errorReporting,
       cloudSync: cloudSync,
-      communityWaitTime: communityWaitTime,
       vinOnlineDecode: vinOnlineDecode,
       syncTrips: effectiveSyncTrips,
     );

@@ -3699,17 +3699,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Μήνας';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Χρόνοι αναμονής κοινότητας';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Ανώνυμη κοινοποίηση χρόνων αναμονής στον σταθμό';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Ανώνυμη κοινοποίηση της άφιξης και αναχώρησής σας από σταθμό καυσίμων για εμφάνιση τυπικών χρόνων αναμονής. Δεν μεταφορτώνονται συντεταγμένες τοποθεσίας — μόνο το αναγνωριστικό σταθμού.';
-
-  @override
   String get consoFeatureGroupTitle => 'Κατανάλωση';
 
   @override
@@ -5328,22 +5317,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Εφαρμογή';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes λεπτά αναμονή';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Παρακολούθηση αναμονής μου';
-
-  @override
-  String get waitTimeTrackEnd => 'Φεύγω';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes λεπτά μέχρι τώρα';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Widget αρχικής οθόνης';

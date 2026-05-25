@@ -3677,17 +3677,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Měsíc';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Komunitní čekací doby';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anonymně sdílet čekací doby na stanicích';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Anonymně sdílejte příjezd a odjezd z čerpací stanice, aby aplikace mohla zobrazovat typické čekací doby. Nejsou nahrávány žádné souřadnice polohy — pouze ID stanice.';
-
-  @override
   String get consoFeatureGroupTitle => 'Spotřeba';
 
   @override
@@ -5284,22 +5273,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Použít';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min čekání';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Sledovat mé čekání';
-
-  @override
-  String get waitTimeTrackEnd => 'Odcházím';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min zatím';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Widget domovské obrazovky';

@@ -3691,17 +3691,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Monat';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Wartezeiten der Community';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Wartezeiten an Tankstellen anonym teilen';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Teile anonym, wann du an einer Tankstelle ankommst und wieder fährst, damit die App typische Wartezeiten anzeigen kann. Es werden keine GPS-Koordinaten übertragen — nur die Tankstellen-ID.';
-
-  @override
   String get consoFeatureGroupTitle => 'Verbrauch';
 
   @override
@@ -5307,22 +5296,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Übernehmen';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes Min Wartezeit';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Meine Wartezeit verfolgen';
-
-  @override
-  String get waitTimeTrackEnd => 'Ich gehe gerade';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return 'Bisher $minutes Min';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Homescreen-Widget';

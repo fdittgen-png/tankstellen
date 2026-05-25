@@ -3671,16 +3671,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Månad';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Community-väntetider';
-
-  @override
-  String get gdprCommunityWaitTimeShort => 'Dela stationsväntetider anonymt';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Dela anonymt när du anländer till och lämnar en bränslestation så att appen kan visa typiska väntetider. Inga platskoordinater laddas upp – bara stations-ID:t.';
-
-  @override
   String get consoFeatureGroupTitle => 'Förbrukning';
 
   @override
@@ -5278,22 +5268,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Tillämpa';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min väntetid';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Spåra min väntetid';
-
-  @override
-  String get waitTimeTrackEnd => 'Jag lämnar';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min hittills';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Hemskärmswidget';

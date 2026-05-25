@@ -553,7 +553,6 @@ final class GdprConsentProvider
           GdprConsent,
           ({
             bool cloudSync,
-            bool communityWaitTime,
             bool errorReporting,
             bool location,
             bool syncTrips,
@@ -585,7 +584,6 @@ final class GdprConsentProvider
   Override overrideWithValue(
     ({
       bool cloudSync,
-      bool communityWaitTime,
       bool errorReporting,
       bool location,
       bool syncTrips,
@@ -599,7 +597,6 @@ final class GdprConsentProvider
           $SyncValueProvider<
             ({
               bool cloudSync,
-              bool communityWaitTime,
               bool errorReporting,
               bool location,
               bool syncTrips,
@@ -610,7 +607,7 @@ final class GdprConsentProvider
   }
 }
 
-String _$gdprConsentHash() => r'd373fc8312c1d19d065507cb41b695b86fe3eb2e';
+String _$gdprConsentHash() => r'8c47e3e59a46eca0abc334f08234f3410cc5b0f6';
 
 /// GDPR consent state: location, error reporting, cloud sync,
 /// community wait-time pings (#1119), VIN online decode (#1399),
@@ -621,7 +618,6 @@ abstract class _$GdprConsent
         $Notifier<
           ({
             bool cloudSync,
-            bool communityWaitTime,
             bool errorReporting,
             bool location,
             bool syncTrips,
@@ -630,7 +626,6 @@ abstract class _$GdprConsent
         > {
   ({
     bool cloudSync,
-    bool communityWaitTime,
     bool errorReporting,
     bool location,
     bool syncTrips,
@@ -645,7 +640,6 @@ abstract class _$GdprConsent
             as $Ref<
               ({
                 bool cloudSync,
-                bool communityWaitTime,
                 bool errorReporting,
                 bool location,
                 bool syncTrips,
@@ -653,7 +647,6 @@ abstract class _$GdprConsent
               }),
               ({
                 bool cloudSync,
-                bool communityWaitTime,
                 bool errorReporting,
                 bool location,
                 bool syncTrips,
@@ -666,7 +659,6 @@ abstract class _$GdprConsent
               AnyNotifier<
                 ({
                   bool cloudSync,
-                  bool communityWaitTime,
                   bool errorReporting,
                   bool location,
                   bool syncTrips,
@@ -674,7 +666,6 @@ abstract class _$GdprConsent
                 }),
                 ({
                   bool cloudSync,
-                  bool communityWaitTime,
                   bool errorReporting,
                   bool location,
                   bool syncTrips,
@@ -683,7 +674,6 @@ abstract class _$GdprConsent
               >,
               ({
                 bool cloudSync,
-                bool communityWaitTime,
                 bool errorReporting,
                 bool location,
                 bool syncTrips,

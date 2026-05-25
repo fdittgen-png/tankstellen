@@ -4,12 +4,11 @@ import 'package:tankstellen/features/consent/providers/gdpr_consent_form_provide
 
 void main() {
   group('GdprConsentFormState', () {
-    test('default constructor leaves all five flags false', () {
+    test('default constructor leaves all four flags false', () {
       const state = GdprConsentFormState();
       expect(state.locationConsent, isFalse);
       expect(state.errorReportingConsent, isFalse);
       expect(state.cloudSyncConsent, isFalse);
-      expect(state.communityWaitTimeConsent, isFalse);
       expect(state.vinOnlineDecodeConsent, isFalse);
     });
 
@@ -19,22 +18,11 @@ void main() {
           locationConsent: true,
           errorReportingConsent: true,
           cloudSyncConsent: true,
-          communityWaitTimeConsent: true,
         );
         final copy = original.copyWith();
         expect(copy.locationConsent, isTrue);
         expect(copy.errorReportingConsent, isTrue);
         expect(copy.cloudSyncConsent, isTrue);
-        expect(copy.communityWaitTimeConsent, isTrue);
-      });
-
-      test('overrides only communityWaitTimeConsent when supplied', () {
-        const original = GdprConsentFormState();
-        final copy = original.copyWith(communityWaitTimeConsent: true);
-        expect(copy.locationConsent, isFalse);
-        expect(copy.errorReportingConsent, isFalse);
-        expect(copy.cloudSyncConsent, isFalse);
-        expect(copy.communityWaitTimeConsent, isTrue);
       });
 
       test('overrides only locationConsent when that param is supplied', () {
@@ -86,41 +74,6 @@ void main() {
       expect(state.locationConsent, isFalse);
       expect(state.errorReportingConsent, isFalse);
       expect(state.cloudSyncConsent, isFalse);
-      expect(state.communityWaitTimeConsent, isFalse);
-    });
-
-    test('setCommunityWaitTime(true) flips communityWaitTimeConsent only', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      final notifier =
-          container.read(gdprConsentFormControllerProvider.notifier);
-
-      notifier.setCommunityWaitTime(true);
-
-      final state = container.read(gdprConsentFormControllerProvider);
-      expect(state.locationConsent, isFalse);
-      expect(state.errorReportingConsent, isFalse);
-      expect(state.cloudSyncConsent, isFalse);
-      expect(state.communityWaitTimeConsent, isTrue);
-    });
-
-    test('setCommunityWaitTime leaves the other three flags intact', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      final notifier =
-          container.read(gdprConsentFormControllerProvider.notifier);
-
-      notifier.setLocation(true);
-      notifier.setErrorReporting(true);
-      notifier.setCloudSync(true);
-
-      notifier.setCommunityWaitTime(true);
-
-      final state = container.read(gdprConsentFormControllerProvider);
-      expect(state.locationConsent, isTrue);
-      expect(state.errorReportingConsent, isTrue);
-      expect(state.cloudSyncConsent, isTrue);
-      expect(state.communityWaitTimeConsent, isTrue);
     });
 
     test('setLocation(true) flips locationConsent only', () {
@@ -249,11 +202,10 @@ void main() {
       expect(state.locationConsent, isFalse);
       expect(state.errorReportingConsent, isFalse);
       expect(state.cloudSyncConsent, isFalse);
-      expect(state.communityWaitTimeConsent, isFalse);
       expect(state.vinOnlineDecodeConsent, isTrue);
     });
 
-    test('setVinOnlineDecode leaves the other four flags intact (#1399)', () {
+    test('setVinOnlineDecode leaves the other three flags intact (#1399)', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier =
@@ -262,7 +214,6 @@ void main() {
       notifier.setLocation(true);
       notifier.setErrorReporting(true);
       notifier.setCloudSync(true);
-      notifier.setCommunityWaitTime(true);
 
       notifier.setVinOnlineDecode(true);
 
@@ -270,7 +221,6 @@ void main() {
       expect(state.locationConsent, isTrue);
       expect(state.errorReportingConsent, isTrue);
       expect(state.cloudSyncConsent, isTrue);
-      expect(state.communityWaitTimeConsent, isTrue);
       expect(state.vinOnlineDecodeConsent, isTrue);
     });
   });

@@ -3685,17 +3685,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Mese';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Tempi di attesa della community';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Condividi in modo anonimo i tempi di attesa alle stazioni';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Condividi in modo anonimo quando arrivi a una stazione di carburante e quando la lasci, così l\'app può mostrare i tempi di attesa tipici. Non vengono caricate coordinate di posizione — solo l\'ID della stazione.';
-
-  @override
   String get consoFeatureGroupTitle => 'Conso';
 
   @override
@@ -5306,22 +5295,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Applica';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min di attesa';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Tieni traccia della mia attesa';
-
-  @override
-  String get waitTimeTrackEnd => 'Me ne vado';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min finora';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Widget schermata Home';

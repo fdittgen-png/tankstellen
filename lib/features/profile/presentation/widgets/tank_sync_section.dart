@@ -93,7 +93,6 @@ class TankSyncSection extends ConsumerWidget {
                   location: consent.location,
                   errorReporting: consent.errorReporting,
                   cloudSync: consent.cloudSync,
-                  communityWaitTime: consent.communityWaitTime,
                   vinOnlineDecode: consent.vinOnlineDecode,
                   syncTrips: v,
                 )
