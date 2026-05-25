@@ -118,6 +118,22 @@ GoRouter router(Ref ref) {
       final isSetupAllowedChild = state.matchedLocation == '/vehicles' ||
           state.matchedLocation == '/vehicles/edit';
 
+      // Cold-start widget tap on an existing fully-setup user lands the
+      // router at the configured `landingScreen` (typically '/'). The
+      // stashed widget URI must be consumed BEFORE the consent/setup
+      // gates run their default behaviour, otherwise an existing user
+      // whose redirect never falls into the consent/setup branches
+      // never gets the URI applied (the original 2026-05-24 report).
+      // Consuming up-front is safe: the consent/setup gates below
+      // return their own override paths if the user actually needs to
+      // be sent to onboarding, and the pending URI is then re-honoured
+      // by the consent/setup branches once the user lands past those
+      // walls.
+      if (hasConsent && isReady && !isConsent && !isSetup) {
+        final widgetPath = _consumePendingWidgetPath(ref);
+        if (widgetPath != null) return widgetPath;
+      }
+
       // Step 1: GDPR consent must be given before anything else
       if (!hasConsent && !isConsent) return '/consent';
       if (hasConsent && isConsent) {
