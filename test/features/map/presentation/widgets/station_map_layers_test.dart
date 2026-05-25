@@ -347,8 +347,9 @@ void main() {
         final sub = reset.listen(emissions.add);
         addTearDown(sub.cancel);
 
-        // Burn past the 3-second cold-start window.
-        await tester.pump(const Duration(seconds: 4));
+        // Burn past the 12-second cold-start window (extended from
+        // 3 s in the #2025 follow-up to cover slow-network cold opens).
+        await tester.pump(const Duration(seconds: 13));
         final baseline = emissions.length;
 
         // Programmatic move AFTER the window — must not re-emit on

@@ -211,14 +211,19 @@ class _StationMapLayersState extends State<StationMapLayers> {
   Timer? _coldStartCloseTimer;
 
   /// How long to keep firing tile-resets on programmatic
-  /// size/camera changes after init. Three seconds covers the worst
+  /// size/camera changes after init. Twelve seconds covers the worst
   /// observed cold-start sequence (offstage IndexedStack pre-mount
   /// → onstage promotion → LayoutBuilder gate clears → FlutterMap
   /// internal LayoutBuilder lays out → `fitCamera` post-frame
-  /// callback fires → camera settles). Shorter windows missed the
-  /// late `fitCamera` on slow devices; longer windows risk
-  /// interfering with the user's first deliberate zoom.
-  static const Duration _coldStartResetWindow = Duration(seconds: 3);
+  /// callback fires → camera settles). Originally 3 s but the user's
+  /// 2026-05-24 report showed a slow-network cold open where the
+  /// first search result + `fitCamera` arrived ~5-8 s after mount
+  /// — past the old window — leaving the grey-tile bug uncovered
+  /// until they tapped Refresh. Twelve seconds gives a healthy
+  /// margin for GPS resolution + first network round-trip on cellular
+  /// while still bounded enough that the user's first deliberate
+  /// zoom (10+ s in) is unaffected.
+  static const Duration _coldStartResetWindow = Duration(seconds: 12);
 
   /// #1774 — the marker list and the price range are memoised here and
   /// recomputed only when `stations` / `selectedFuel` /
@@ -256,10 +261,29 @@ class _StationMapLayersState extends State<StationMapLayers> {
     // references until the underlying value changes, so identity
     // comparison is enough to skip the recompute on an unrelated
     // `MapScreen` rebuild.
-    if (!identical(oldWidget.stations, widget.stations) ||
+    final stationsChanged = !identical(oldWidget.stations, widget.stations);
+    if (stationsChanged ||
         oldWidget.selectedFuel != widget.selectedFuel ||
         !identical(oldWidget.selectedStationIds, widget.selectedStationIds)) {
       _recomputeMarkers();
+    }
+    // Tap-the-refresh-button cure (#2025 follow-up). When stations
+    // transition from empty → populated (the first successful search
+    // after a cold open) OR when the camera-anchoring centre changes,
+    // force a TileLayer reset. This catches the case where the user
+    // opens Carte before a search has landed: the initial map renders
+    // with a bootstrap camera and TileLayer captured a degenerate
+    // viewport, the 3-second cold-start window closed silently, and
+    // the user sees a grey background until they tap Refresh. The
+    // reset stream is broadcast + cheap (a no-op when tiles are
+    // already loaded for the visible range), so re-firing it on the
+    // search-results-arrived transition is the safest cure.
+    final wasEmpty = oldWidget.stations.isEmpty;
+    final centerChanged = widget.center != oldWidget.center;
+    if ((wasEmpty && widget.stations.isNotEmpty) || centerChanged) {
+      if (!_resetController.isClosed) {
+        _resetController.add(null);
+      }
     }
   }
 
