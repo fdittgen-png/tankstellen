@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -6179,6 +6176,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.'**
   String get achievementHighwayMasterDesc;
+
+  /// Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065).
+  ///
+  /// In en, this message translates to:
+  /// **'Approach-station overlay'**
+  String get approachOverlaySection;
+
+  /// Slider label for the approach-overlay radius (km).
+  ///
+  /// In en, this message translates to:
+  /// **'Radius'**
+  String get approachRadiusLabel;
+
+  /// Caption under the approach-radius slider.
+  ///
+  /// In en, this message translates to:
+  /// **'Overlay grows + shows the price when within {km} km of a fuel station'**
+  String approachRadiusCaption(String km);
+
+  /// Title above the nearest/cheapest-in-radius choice chips.
+  ///
+  /// In en, this message translates to:
+  /// **'Show price for'**
+  String get approachPriceModeLabel;
+
+  /// Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest station'**
+  String get approachPriceModeNearest;
+
+  /// Choice chip — overlay shows the price at the cheapest station currently within the radius.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest in radius'**
+  String get approachPriceModeCheapestInRadius;
+
+  /// Slider label for the minimum poll interval (seconds) used by the approach detector.
+  ///
+  /// In en, this message translates to:
+  /// **'Min refresh'**
+  String get approachMinPollLabel;
+
+  /// Caption under the min-poll slider.
+  ///
+  /// In en, this message translates to:
+  /// **'Floor on how often the overlay refreshes the nearest station (faster at speed, never tighter than {seconds} s)'**
+  String approachMinPollCaption(int seconds);
 
   /// Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186.
   ///

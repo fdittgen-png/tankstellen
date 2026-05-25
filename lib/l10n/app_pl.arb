@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "Udostępnij dziennik sesji OBD2",
   "coachingShiftUp": "Zmień bieg w górę",
   "coachingShiftDown": "Zmień bieg w dół",
-  "coachingEasePedal": "Puść gaz"
+  "coachingEasePedal": "Puść gaz",
+  "approachOverlaySection": "Nakładka podczas zbliżania się do stacji",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Promień",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "Nakładka powiększa się i pokazuje cenę, gdy jesteś w odległości do {km} km od stacji",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Pokaż cenę dla",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Najbliższa stacja",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Najtańsza w promieniu",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Min. odświeżanie",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Minimalna częstotliwość odświeżania najbliższej stacji (szybciej przy prędkości, nigdy częściej niż {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

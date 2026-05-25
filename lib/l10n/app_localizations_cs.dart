@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3342,6 +3339,34 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Dokončete cestu 30 km+ při konstantní rychlosti se skóre plynulé jízdy 90 nebo vyšším.';
+
+  @override
+  String get approachOverlaySection => 'Překryv při příjezdu k čerpací stanici';
+
+  @override
+  String get approachRadiusLabel => 'Poloměr';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Překryv se zvětší a zobrazí cenu, když jste do $km km od čerpací stanice';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Zobrazit cenu';
+
+  @override
+  String get approachPriceModeNearest => 'Nejbližší stanice';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Nejlevnější v okruhu';
+
+  @override
+  String get approachMinPollLabel => 'Min. obnovení';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Spodní hranice obnovování nejbližší stanice (rychlejší při vyšší rychlosti, nikdy častěji než $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork => 'Žádné síťové připojení. Zkuste to znovu.';

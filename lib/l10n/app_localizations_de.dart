@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3352,6 +3349,34 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Fahre eine Tour von mindestens 30 km mit gleichmäßigem Tempo und einem Fahrstil-Score von 90 oder höher.';
+
+  @override
+  String get approachOverlaySection => 'Tankstellen-Annäherungs-Overlay';
+
+  @override
+  String get approachRadiusLabel => 'Radius';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Overlay vergrößert sich und zeigt den Preis an, wenn Sie sich innerhalb von $km km einer Tankstelle befinden';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Preis anzeigen für';
+
+  @override
+  String get approachPriceModeNearest => 'Nächste Tankstelle';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Günstigste im Radius';
+
+  @override
+  String get approachMinPollLabel => 'Min. Aktualisierung';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Untergrenze, wie oft das Overlay die nächste Tankstelle aktualisiert (schneller bei höherer Geschwindigkeit, nie häufiger als alle $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>

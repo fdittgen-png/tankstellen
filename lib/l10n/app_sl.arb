@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "Deli dnevnik seje OBD2",
   "coachingShiftUp": "Prestavi navzgor",
   "coachingShiftDown": "Prestavi navzdol",
-  "coachingEasePedal": "Spusti plin"
+  "coachingEasePedal": "Spusti plin",
+  "approachOverlaySection": "Prekrivanje pri približevanju črpalki",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Polmer",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "Prekrivanje se poveča in prikaže ceno, ko ste znotraj {km} km od bencinske črpalke",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Pokaži ceno za",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Najbližja črpalka",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Najcenejša v polmeru",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Min. osvežitev",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Spodnja meja osveževanja najbližje črpalke (hitreje pri višji hitrosti, nikoli pogosteje kot {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

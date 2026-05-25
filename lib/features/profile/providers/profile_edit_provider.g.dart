@@ -68,7 +68,7 @@ final class ProfileEditControllerProvider
 }
 
 String _$profileEditControllerHash() =>
-    r'baece0e63b7350a93bf06fdd92fb1e337530285e';
+    r'0a8d0e278c64cc8c74ba43a02fbd1e56835086f4';
 
 /// Family provider keyed on the profile id, so a sheet edit never leaks
 /// across profiles and each sheet gets its own scoped state that is

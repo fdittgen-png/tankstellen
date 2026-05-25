@@ -31,6 +31,9 @@ class ProfileEditState {
   final bool avoidHighways;
   final String ratingMode;
   final String? defaultVehicleId;
+  final double approachRadiusKm;
+  final ApproachPriceMode approachPriceMode;
+  final int approachMinPollSeconds;
 
   const ProfileEditState({
     required this.fuelType,
@@ -44,6 +47,9 @@ class ProfileEditState {
     required this.avoidHighways,
     required this.ratingMode,
     required this.defaultVehicleId,
+    required this.approachRadiusKm,
+    required this.approachPriceMode,
+    required this.approachMinPollSeconds,
   });
 
   factory ProfileEditState.fromProfile(UserProfile p) => ProfileEditState(
@@ -58,6 +64,9 @@ class ProfileEditState {
         avoidHighways: p.avoidHighways,
         ratingMode: p.ratingMode,
         defaultVehicleId: p.defaultVehicleId,
+        approachRadiusKm: p.approachRadiusKm,
+        approachPriceMode: p.approachPriceMode,
+        approachMinPollSeconds: p.approachMinPollSeconds,
       );
 
   ProfileEditState copyWith({
@@ -75,6 +84,9 @@ class ProfileEditState {
     String? ratingMode,
     String? defaultVehicleId,
     bool clearDefaultVehicle = false,
+    double? approachRadiusKm,
+    ApproachPriceMode? approachPriceMode,
+    int? approachMinPollSeconds,
   }) {
     return ProfileEditState(
       fuelType: fuelType ?? this.fuelType,
@@ -91,6 +103,10 @@ class ProfileEditState {
       defaultVehicleId: clearDefaultVehicle
           ? null
           : (defaultVehicleId ?? this.defaultVehicleId),
+      approachRadiusKm: approachRadiusKm ?? this.approachRadiusKm,
+      approachPriceMode: approachPriceMode ?? this.approachPriceMode,
+      approachMinPollSeconds:
+          approachMinPollSeconds ?? this.approachMinPollSeconds,
     );
   }
 }
@@ -124,4 +140,10 @@ class ProfileEditController extends _$ProfileEditController {
         defaultVehicleId: v,
         clearDefaultVehicle: v == null,
       );
+  void setApproachRadiusKm(double v) =>
+      state = state.copyWith(approachRadiusKm: v);
+  void setApproachPriceMode(ApproachPriceMode v) =>
+      state = state.copyWith(approachPriceMode: v);
+  void setApproachMinPollSeconds(int v) =>
+      state = state.copyWith(approachMinPollSeconds: v);
 }

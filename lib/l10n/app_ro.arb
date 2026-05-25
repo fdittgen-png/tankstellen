@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "Partajează jurnalul sesiunii OBD2",
   "coachingShiftUp": "Schimbă în sus",
   "coachingShiftDown": "Schimbă în jos",
-  "coachingEasePedal": "Mai puțină accelerație"
+  "coachingEasePedal": "Mai puțină accelerație",
+  "approachOverlaySection": "Suprapunere la apropierea de stație",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Rază",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "Suprapunerea se mărește și afișează prețul când ești la {km} km de o stație",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Afișează prețul pentru",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Stația cea mai apropiată",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Cea mai ieftină din rază",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Reîmprospătare min.",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Limita inferioară a reîmprospătării celei mai apropiate stații (mai rapid la viteză, niciodată mai des de {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

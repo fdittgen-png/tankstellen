@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "Podijeli zapisnik OBD2 sesije",
   "coachingShiftUp": "Prebaci gore",
   "coachingShiftDown": "Prebaci dolje",
-  "coachingEasePedal": "Smanji gas"
+  "coachingEasePedal": "Smanji gas",
+  "approachOverlaySection": "Preklapanje pri prilasku benzinskoj postaji",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Polumjer",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "Preklapanje se povećava i prikazuje cijenu kada ste unutar {km} km od postaje",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Prikaži cijenu za",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Najbliža postaja",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Najjeftinija u polumjeru",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Min. osvježavanje",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Donja granica osvježavanja najbliže postaje (brže pri brzini, nikada češće od {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

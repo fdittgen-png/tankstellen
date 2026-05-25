@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3330,6 +3327,34 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Fullfør en tur på 30+ km med konstant hastighet og kjørescore på 90 eller høyere.';
+
+  @override
+  String get approachOverlaySection => 'Innflygingsoverlegg';
+
+  @override
+  String get approachRadiusLabel => 'Radius';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Overlegget vokser og viser prisen når du er innenfor $km km fra en stasjon';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Vis pris for';
+
+  @override
+  String get approachPriceModeNearest => 'Nærmeste stasjon';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Billigste i radius';
+
+  @override
+  String get approachMinPollLabel => 'Min. oppdatering';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Nedre grense for hvor ofte overlegget oppdaterer nærmeste stasjon (raskere ved fart, aldri tettere enn $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>

@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3347,6 +3344,35 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Voltooi een rit van 30 km of meer op constante snelheid met een soepele rijscore van 90 of hoger.';
+
+  @override
+  String get approachOverlaySection =>
+      'Overlay bij nadering van een tankstation';
+
+  @override
+  String get approachRadiusLabel => 'Radius';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'De overlay groeit en toont de prijs wanneer je binnen $km km van een tankstation bent';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Toon prijs van';
+
+  @override
+  String get approachPriceModeNearest => 'Dichtstbijzijnde station';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Goedkoopste in radius';
+
+  @override
+  String get approachMinPollLabel => 'Min. ververs.';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Ondergrens voor hoe vaak de overlay het dichtstbijzijnde station ververst (sneller bij snelheid, nooit korter dan $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>

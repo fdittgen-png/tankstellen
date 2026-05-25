@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3353,6 +3350,35 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Completa un viaje de más de 30 km a velocidad constante con una puntuación de conducción suave de 90 o más.';
+
+  @override
+  String get approachOverlaySection =>
+      'Superposición al acercarse a una estación';
+
+  @override
+  String get approachRadiusLabel => 'Radio';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'La superposición crece y muestra el precio cuando estás a menos de $km km de una gasolinera';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Mostrar precio de';
+
+  @override
+  String get approachPriceModeNearest => 'Estación más cercana';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Más barata del radio';
+
+  @override
+  String get approachMinPollLabel => 'Actualización mín.';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Mínimo entre actualizaciones de la estación más cercana (más rápido a velocidad, nunca menor que $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork => 'Sin conexión de red. Inténtalo más tarde.';

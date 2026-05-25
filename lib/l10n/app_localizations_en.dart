@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3317,6 +3314,34 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+
+  @override
+  String get approachOverlaySection => 'Approach-station overlay';
+
+  @override
+  String get approachRadiusLabel => 'Radius';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Overlay grows + shows the price when within $km km of a fuel station';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Show price for';
+
+  @override
+  String get approachPriceModeNearest => 'Nearest station';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Cheapest in radius';
+
+  @override
+  String get approachMinPollLabel => 'Min refresh';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Floor on how often the overlay refreshes the nearest station (faster at speed, never tighter than $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork => 'No network connection. Try again later.';
@@ -8662,6 +8687,35 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get achievementHighwayMasterDesc =>
       '⟦Çóɱƥłéŧé á 30 ķɱ+ ŧřîƥ áŧ çóñšîšŧéñŧ šƥééđ ŵîŧĥ á šɱóóŧĥ-đřîṽîñǧ šçóřé óƒ 90 óř ĥîǧĥéř. ·····························⟧';
+
+  @override
+  String get approachOverlaySection => '⟦Áƥƥřóáçĥ-šŧáŧîóñ óṽéřłáý ··········⟧';
+
+  @override
+  String get approachRadiusLabel => '⟦Řáđîúš ···⟧';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return '⟦Óṽéřłáý ǧřóŵš + šĥóŵš ŧĥé ƥřîçé ŵĥéñ ŵîŧĥîñ $km ķɱ óƒ á ƒúéł šŧáŧîóñ ·······················⟧';
+  }
+
+  @override
+  String get approachPriceModeLabel => '⟦Šĥóŵ ƥřîçé ƒóř ·····⟧';
+
+  @override
+  String get approachPriceModeNearest => '⟦Ñéářéšŧ šŧáŧîóñ ······⟧';
+
+  @override
+  String get approachPriceModeCheapestInRadius =>
+      '⟦Çĥéáƥéšŧ îñ řáđîúš ·······⟧';
+
+  @override
+  String get approachMinPollLabel => '⟦Ṁîñ řéƒřéšĥ ·····⟧';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return '⟦Ƒłóóř óñ ĥóŵ óƒŧéñ ŧĥé óṽéřłáý řéƒřéšĥéš ŧĥé ñéářéšŧ šŧáŧîóñ (ƒášŧéř áŧ šƥééđ, ñéṽéř ŧîǧĥŧéř ŧĥáñ $seconds š) ····································⟧';
+  }
 
   @override
   String get authErrorNoNetwork =>
