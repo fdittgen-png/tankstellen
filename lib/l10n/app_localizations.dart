@@ -7941,6 +7941,42 @@ abstract class AppLocalizations {
   /// **'Captured during recording to verify GPS cadence under phone-sleep.'**
   String get gpsDiagnosticsExplain;
 
+  /// Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold'**
+  String get gpsMatrixMaturityCold;
+
+  /// Maturity tier label (#2082) — GPS matrix has 3–7 reconciliations with variance ≤ 1.5. Usable but still settling.
+  ///
+  /// In en, this message translates to:
+  /// **'Warming'**
+  String get gpsMatrixMaturityWarming;
+
+  /// Maturity tier label (#2082) — GPS matrix has 8+ reconciliations with variance ≤ 0.5. Estimates trustworthy within ~2 %.
+  ///
+  /// In en, this message translates to:
+  /// **'Converged'**
+  String get gpsMatrixMaturityConverged;
+
+  /// Tooltip explaining the cold tier.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS matrix is still warming up ({count} fill-up refinements so far). Estimates are provisional.'**
+  String gpsMatrixMaturityColdTooltip(int count);
+
+  /// Tooltip explaining the warming tier.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS matrix is converging ({count} fill-ups). Estimates are usable but may drift a few %.'**
+  String gpsMatrixMaturityWarmingTooltip(int count);
+
+  /// Tooltip explaining the converged tier.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS matrix has converged ({count} fill-ups). Estimates are within ~2 % of real-world burn.'**
+  String gpsMatrixMaturityConvergedTooltip(int count);
+
   /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
   ///
   /// In en, this message translates to:

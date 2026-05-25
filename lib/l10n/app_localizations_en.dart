@@ -4362,6 +4362,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'Captured during recording to verify GPS cadence under phone-sleep.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Cold';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Warming';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Converged';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS matrix is still warming up ($count fill-up refinements so far). Estimates are provisional.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS matrix is converging ($count fill-ups). Estimates are usable but may drift a few %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS matrix has converged ($count fill-ups). Estimates are within ~2 % of real-world burn.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Driving';
 
   @override
@@ -9782,6 +9806,30 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get gpsDiagnosticsExplain =>
       '⟦Çáƥŧúřéđ đúřîñǧ řéçóřđîñǧ ŧó ṽéřîƒý ǦƤŠ çáđéñçé úñđéř ƥĥóñé-šłééƥ. ·························⟧';
+
+  @override
+  String get gpsMatrixMaturityCold => '⟦Çółđ ··⟧';
+
+  @override
+  String get gpsMatrixMaturityWarming => '⟦Ŵářɱîñǧ ···⟧';
+
+  @override
+  String get gpsMatrixMaturityConverged => '⟦Çóñṽéřǧéđ ····⟧';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return '⟦ǦƤŠ ɱáŧřîẋ îš šŧîłł ŵářɱîñǧ úƥ ($count ƒîłł-úƥ řéƒîñéɱéñŧš šó ƒář). Éšŧîɱáŧéš ářé ƥřóṽîšîóñáł. ································⟧';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return '⟦ǦƤŠ ɱáŧřîẋ îš çóñṽéřǧîñǧ ($count ƒîłł-úƥš). Éšŧîɱáŧéš ářé úšáƀłé ƀúŧ ɱáý đřîƒŧ á ƒéŵ %. ···························⟧';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return '⟦ǦƤŠ ɱáŧřîẋ ĥáš çóñṽéřǧéđ ($count ƒîłł-úƥš). Éšŧîɱáŧéš ářé ŵîŧĥîñ ~2 % óƒ řéáł-ŵóřłđ ƀúřñ. ···························⟧';
+  }
 
   @override
   String get hapticEcoCoachSectionTitle => '⟦Đřîṽîñǧ ···⟧';

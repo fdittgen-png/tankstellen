@@ -2990,6 +2990,48 @@
   "@gpsDiagnosticsExplain": {
     "description": "Subtle one-line explanation at the bottom of the GPS diagnostics card (#1458 phase 2.5) reminding the user why this card exists — they probably opened the trip detail to look at consumption, not GPS plumbing."
   },
+  "gpsMatrixMaturityCold": "Cold",
+  "@gpsMatrixMaturityCold": {
+    "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
+  },
+  "gpsMatrixMaturityWarming": "Warming",
+  "@gpsMatrixMaturityWarming": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 3–7 reconciliations with variance ≤ 1.5. Usable but still settling."
+  },
+  "gpsMatrixMaturityConverged": "Converged",
+  "@gpsMatrixMaturityConverged": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 8+ reconciliations with variance ≤ 0.5. Estimates trustworthy within ~2 %."
+  },
+  "gpsMatrixMaturityColdTooltip": "GPS matrix is still warming up ({count} fill-up refinements so far). Estimates are provisional.",
+  "@gpsMatrixMaturityColdTooltip": {
+    "description": "Tooltip explaining the cold tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "gpsMatrixMaturityWarmingTooltip": "GPS matrix is converging ({count} fill-ups). Estimates are usable but may drift a few %.",
+  "@gpsMatrixMaturityWarmingTooltip": {
+    "description": "Tooltip explaining the warming tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "gpsMatrixMaturityConvergedTooltip": "GPS matrix has converged ({count} fill-ups). Estimates are within ~2 % of real-world burn.",
+  "@gpsMatrixMaturityConvergedTooltip": {
+    "description": "Tooltip explaining the converged tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
   "hapticEcoCoachSectionTitle": "Driving",
   "@hapticEcoCoachSectionTitle": {
     "description": "Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122)."

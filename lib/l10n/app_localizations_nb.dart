@@ -4385,6 +4385,30 @@ class AppLocalizationsNb extends AppLocalizations {
       'Fanget under opptak for å verifisere GPS-kadense under telefon-dvale.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Kald';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Varmes opp';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konvergert';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS-matrisen varmes opp ($count forbedringer så langt). Estimater er foreløpige.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS-matrisen konvergerer ($count fyllinger). Estimater er brukbare men kan avvike noen %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS-matrisen har konvergert ($count fyllinger). Estimater innen ~2 % av faktisk forbruk.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Kjøring';
 
   @override

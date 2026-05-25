@@ -4432,6 +4432,30 @@ class AppLocalizationsFr extends AppLocalizations {
       'Capturé pendant l\'enregistrement pour vérifier la cadence GPS en veille.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Froide';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'En chauffe';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Convergée';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'La matrice GPS chauffe encore ($count affinements jusqu\'ici). Les estimations sont provisoires.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'La matrice GPS converge ($count pleins). Les estimations sont utilisables mais peuvent dériver de quelques %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'La matrice GPS a convergé ($count pleins). Les estimations sont à ~2 % de la consommation réelle.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Conduite';
 
   @override

@@ -4400,6 +4400,30 @@ class AppLocalizationsHr extends AppLocalizations {
       'Snimljeno za vrijeme snimanja za provjeru GPS kadence tijekom spavanja telefona.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Hladna';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Zagrijava se';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konvergirana';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS matrica se još zagrijava ($count dorada do sada). Procjene su privremene.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS matrica konvergira ($count točenja). Procjene su upotrebljive uz mogući otklon nekoliko %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS matrica je konvergirala ($count točenja). Procjene unutar ~2 % stvarne potrošnje.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Vožnja';
 
   @override

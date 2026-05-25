@@ -4393,6 +4393,30 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zajeto med snemanjem za preverjanje frekvence GPS pri spanju telefona.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Hladna';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Segreva se';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konvergirana';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS matrica se še segreva ($count prilagoditev do zdaj). Ocene so začasne.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS matrica konvergira ($count točenj). Ocene so uporabne z možnim odstopanjem nekaj %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS matrica je konvergirala ($count točenj). Ocene v okviru ~2 % dejanske porabe.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Vožnja';
 
   @override

@@ -4417,6 +4417,30 @@ class AppLocalizationsRo extends AppLocalizations {
       'Capturat în timpul înregistrării pentru a verifica cadența GPS în timpul somnului telefonului.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Rece';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Se încălzește';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Convergentă';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'Matricea GPS încă se încălzește ($count rafinamente până acum). Estimări provizorii.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'Matricea GPS converge ($count alimentări). Estimări utilizabile dar pot devia câteva %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'Matricea GPS a convers ($count alimentări). Estimări în limita a ~2 % din consumul real.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Condus';
 
   @override

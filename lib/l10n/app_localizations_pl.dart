@@ -4406,6 +4406,30 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zebrane podczas nagrywania w celu weryfikacji kadencji GPS przy uśpionym telefonie.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Zimna';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Rozgrzewa się';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Zbieżna';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'Matryca GPS się jeszcze rozgrzewa ($count korekt). Oszacowania tymczasowe.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'Matryca GPS zbiega się ($count tankowań). Użyteczne, mogą się różnić o kilka %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'Matryca GPS jest zbieżna ($count tankowań). Oszacowania w granicach ~2 % rzeczywistego zużycia.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Jazda';
 
   @override

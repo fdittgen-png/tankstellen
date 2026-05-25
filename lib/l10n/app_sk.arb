@@ -1743,5 +1743,47 @@
   "coachingGpsSmoothAccel": "Plynulé zrýchlenie",
   "@coachingGpsSmoothAccel": {
     "description": "GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel."
+  },
+  "gpsMatrixMaturityCold": "Studená",
+  "@gpsMatrixMaturityCold": {
+    "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
+  },
+  "gpsMatrixMaturityWarming": "Zahrieva sa",
+  "@gpsMatrixMaturityWarming": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 3–7 reconciliations with variance ≤ 1.5. Usable but still settling."
+  },
+  "gpsMatrixMaturityConverged": "Konvergujúca",
+  "@gpsMatrixMaturityConverged": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 8+ reconciliations with variance ≤ 0.5. Estimates trustworthy within ~2 %."
+  },
+  "gpsMatrixMaturityColdTooltip": "Matica GPS sa zahrieva ({count} úprav). Odhady dočasné.",
+  "@gpsMatrixMaturityColdTooltip": {
+    "description": "Tooltip explaining the cold tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "gpsMatrixMaturityWarmingTooltip": "Matica GPS konverguje ({count} tankovaní). Odhady použiteľné, môžu sa líšiť o niekoľko %.",
+  "@gpsMatrixMaturityWarmingTooltip": {
+    "description": "Tooltip explaining the warming tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "gpsMatrixMaturityConvergedTooltip": "Matica GPS konvergovala ({count} tankovaní). Odhady do ~2 % skutočnej spotreby.",
+  "@gpsMatrixMaturityConvergedTooltip": {
+    "description": "Tooltip explaining the converged tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
   }
 }

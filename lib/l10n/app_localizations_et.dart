@@ -4381,6 +4381,30 @@ class AppLocalizationsEt extends AppLocalizations {
       'Salvestatud salvestamise ajal, et kontrollida GPS sagedust telefoni une ajal.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Külm';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Soojeneb';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Koondunud';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS-maatriks veel soojeneb ($count täpsustust seni). Hinnangud on esialgsed.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS-maatriks koondub ($count tankimist). Hinnangud kasutatavad, võivad erineda mõne %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS-maatriks on koondunud ($count tankimist). Hinnangud ~2 % piires tegelikust kulust.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Sõitmine';
 
   @override

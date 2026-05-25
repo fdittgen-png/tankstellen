@@ -1743,5 +1743,47 @@
   "coachingGpsSmoothAccel": "Glatko ubrzanje",
   "@coachingGpsSmoothAccel": {
     "description": "GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel."
+  },
+  "gpsMatrixMaturityCold": "Hladna",
+  "@gpsMatrixMaturityCold": {
+    "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
+  },
+  "gpsMatrixMaturityWarming": "Zagrijava se",
+  "@gpsMatrixMaturityWarming": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 3–7 reconciliations with variance ≤ 1.5. Usable but still settling."
+  },
+  "gpsMatrixMaturityConverged": "Konvergirana",
+  "@gpsMatrixMaturityConverged": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 8+ reconciliations with variance ≤ 0.5. Estimates trustworthy within ~2 %."
+  },
+  "gpsMatrixMaturityColdTooltip": "GPS matrica se još zagrijava ({count} dorada do sada). Procjene su privremene.",
+  "@gpsMatrixMaturityColdTooltip": {
+    "description": "Tooltip explaining the cold tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "gpsMatrixMaturityWarmingTooltip": "GPS matrica konvergira ({count} točenja). Procjene su upotrebljive uz mogući otklon nekoliko %.",
+  "@gpsMatrixMaturityWarmingTooltip": {
+    "description": "Tooltip explaining the warming tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "gpsMatrixMaturityConvergedTooltip": "GPS matrica je konvergirala ({count} točenja). Procjene unutar ~2 % stvarne potrošnje.",
+  "@gpsMatrixMaturityConvergedTooltip": {
+    "description": "Tooltip explaining the converged tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
   }
 }

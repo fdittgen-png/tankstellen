@@ -4424,6 +4424,30 @@ class AppLocalizationsBg extends AppLocalizations {
       'Заснето по време на записа за проверка на GPS честотата при заспал телефон.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Студена';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Загрява се';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Сходяща';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS матрицата още се загрява ($count прецизирания засега). Оценките са временни.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS матрицата се сходи ($count зареждания). Оценките са използваеми с възможно отклонение от няколко %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS матрицата се сходи ($count зареждания). Оценките са в рамките на ~2 % от реалния разход.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Шофиране';
 
   @override

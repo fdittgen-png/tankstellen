@@ -4425,6 +4425,30 @@ class AppLocalizationsHu extends AppLocalizations {
       'Rögzítés közben rögzítve a GPS-ütem ellenőrzéséhez alvó telefon esetén.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Hideg';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Melegszik';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konvergens';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS mátrix még melegszik ($count finomítás eddig). Az becslések ideiglenesek.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS mátrix konvergál ($count tankolás). Becslések használhatók, néhány %-kal eltérhetnek.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS mátrix konvergált ($count tankolás). Becslések ~2 %-on belül a tényleges fogyasztáshoz.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Vezetés';
 
   @override

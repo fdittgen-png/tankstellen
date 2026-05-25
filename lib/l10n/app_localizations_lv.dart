@@ -4417,6 +4417,30 @@ class AppLocalizationsLv extends AppLocalizations {
       'Uztverts ierakstīšanas laikā, lai verificētu GPS kadenci tālruņa miega laikā.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Auksta';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Sasilst';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konverģējusi';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS matrica vēl sasilst ($count pielāgojumi līdz šim). Aplēses ir provizoriskas.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS matrica konverģē ($count uzpildes). Aplēses ir lietojamas, var atšķirties par dažiem %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS matrica ir konverģējusi ($count uzpildes). Aplēses ~2 % robežās no faktiskā patēriņa.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Braukšana';
 
   @override

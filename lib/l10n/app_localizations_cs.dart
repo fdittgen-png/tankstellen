@@ -4391,6 +4391,30 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zachyceno během nahrávání pro ověření kadence GPS při spánku telefonu.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Studená';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Zahřívá se';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konvergující';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'Matice GPS se zahřívá ($count úprav). Odhady prozatímní.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'Matice GPS konverguje ($count tankování). Odhady použitelné, mohou se lišit o pár %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'Matice GPS konverguje ($count tankování). Odhady do ~2 % skutečné spotřeby.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Jízda';
 
   @override
