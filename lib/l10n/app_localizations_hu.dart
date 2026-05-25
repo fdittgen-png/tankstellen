@@ -3354,6 +3354,34 @@ class AppLocalizationsHu extends AppLocalizations {
       'Teljesítsen egy 30 km-nél hosszabb utat egyenletes sebességgel, legalább 90-es sima-vezetési pontszámmal.';
 
   @override
+  String get approachOverlaySection => 'Töltőállomás-megközelítési átfedés';
+
+  @override
+  String get approachRadiusLabel => 'Sugár';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Az átfedés megnő, és megjeleníti az árat, ha $km km-en belül vagy egy töltőállomástól';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Ár megjelenítése';
+
+  @override
+  String get approachPriceModeNearest => 'Legközelebbi állomás';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Legolcsóbb a sugárban';
+
+  @override
+  String get approachMinPollLabel => 'Min. frissítés';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'A legközelebbi állomás frissítésének alsó határa (gyorsabb sebességnél, soha nem gyakrabban, mint $seconds mp)';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Nincs hálózati kapcsolat. Próbálja újra később.';
 

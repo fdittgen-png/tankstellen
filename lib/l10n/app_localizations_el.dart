@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3358,6 +3355,35 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Ολοκληρώστε ένα ταξίδι 30+ km σε σταθερή ταχύτητα με βαθμολογία ομαλής οδήγησης 90 ή παραπάνω.';
+
+  @override
+  String get approachOverlaySection =>
+      'Επικάλυψη κατά την προσέγγιση πρατηρίου';
+
+  @override
+  String get approachRadiusLabel => 'Ακτίνα';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Η επικάλυψη μεγαλώνει και εμφανίζει την τιμή όταν είστε εντός $km χλμ από πρατήριο';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Εμφάνιση τιμής για';
+
+  @override
+  String get approachPriceModeNearest => 'Πλησιέστερο πρατήριο';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Φθηνότερο στην ακτίνα';
+
+  @override
+  String get approachMinPollLabel => 'Ελάχιστη ανανέωση';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Κατώφλι ανανέωσης πλησιέστερου πρατηρίου (γρηγορότερο σε ταχύτητα, ποτέ συχνότερο από $seconds δ)';
+  }
 
   @override
   String get authErrorNoNetwork =>

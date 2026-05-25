@@ -1815,5 +1815,49 @@
   "obd2DebugSessionShareLabel": "Partager le journal de session OBD2",
   "coachingShiftUp": "Monter un rapport",
   "coachingShiftDown": "Rétrograder",
-  "coachingEasePedal": "Lever le pied"
+  "coachingEasePedal": "Lever le pied",
+  "approachOverlaySection": "Overlay à l'approche d'une station",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Rayon",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "L'overlay s'agrandit et affiche le prix lorsque vous êtes à moins de {km} km d'une station",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Afficher le prix de",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Station la plus proche",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Moins cher du rayon",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Rafraîchissement min.",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Plancher de la fréquence d'actualisation de la station la plus proche (plus rapide à vitesse élevée, jamais plus serré que {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

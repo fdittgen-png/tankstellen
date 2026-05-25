@@ -193,6 +193,8 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                 onChanged: editCtrl.setLandingScreen,
               ),
               const SizedBox(height: 16),
+              _ApproachOverlaySection(state: editState, ctrl: editCtrl),
+              const SizedBox(height: 16),
               _DefaultVehicleSection(state: editState, ctrl: editCtrl),
               const SizedBox(height: 16),
               _CountrySection(state: editState, ctrl: editCtrl),

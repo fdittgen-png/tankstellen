@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3352,6 +3349,34 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Įvykdykite 30 km+ kelionę pastoviu greičiu su sklandaus vairavimo balu 90 ar daugiau.';
+
+  @override
+  String get approachOverlaySection => 'Užklotis artėjant prie degalinės';
+
+  @override
+  String get approachRadiusLabel => 'Spindulys';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Užklotis padidėja ir rodo kainą, kai esate $km km atstumu nuo degalinės';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Rodyti kainą';
+
+  @override
+  String get approachPriceModeNearest => 'Artimiausia degalinė';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Pigiausia spindulyje';
+
+  @override
+  String get approachMinPollLabel => 'Min. atnaujinimas';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Artimiausios degalinės atnaujinimo apatinė riba (greičiau esant didesniam greičiui, niekada dažniau nei $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork => 'Nėra tinklo ryšio. Bandykite vėliau.';

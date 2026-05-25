@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3359,6 +3356,35 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Завършете пътуване от 30+ км с постоянна скорост и резултат за плавно шофиране 90 или повече.';
+
+  @override
+  String get approachOverlaySection =>
+      'Наложение при приближаване до бензиностанция';
+
+  @override
+  String get approachRadiusLabel => 'Радиус';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Наложението се увеличава и показва цената, когато сте на по-малко от $km км от бензиностанция';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Показване на цена за';
+
+  @override
+  String get approachPriceModeNearest => 'Най-близка бензиностанция';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Най-евтината в радиуса';
+
+  @override
+  String get approachMinPollLabel => 'Мин. опресняване';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Долна граница на опресняване на най-близката бензиностанция (по-бързо при скорост, никога по-често от $seconds сек)';
+  }
 
   @override
   String get authErrorNoNetwork => 'Няма мрежова връзка. Опитайте по-късно.';

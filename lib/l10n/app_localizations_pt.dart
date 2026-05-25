@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3354,6 +3351,34 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Complete uma viagem de 30 km+ a velocidade constante com uma pontuação de condução suave de 90 ou superior.';
+
+  @override
+  String get approachOverlaySection => 'Overlay ao aproximar-se de um posto';
+
+  @override
+  String get approachRadiusLabel => 'Raio';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'O overlay aumenta e mostra o preço quando estás a menos de $km km de um posto';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Mostrar preço de';
+
+  @override
+  String get approachPriceModeNearest => 'Posto mais próximo';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Mais barato no raio';
+
+  @override
+  String get approachMinPollLabel => 'Atualização mín.';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Limite mínimo de atualização do posto mais próximo (mais rápido em velocidade, nunca menos de $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>

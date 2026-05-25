@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "OBD2-sessielogboek delen",
   "coachingShiftUp": "Schakel op",
   "coachingShiftDown": "Schakel terug",
-  "coachingEasePedal": "Gas loslaten"
+  "coachingEasePedal": "Gas loslaten",
+  "approachOverlaySection": "Overlay bij nadering van een tankstation",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Radius",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "De overlay groeit en toont de prijs wanneer je binnen {km} km van een tankstation bent",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Toon prijs van",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Dichtstbijzijnde station",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Goedkoopste in radius",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Min. ververs.",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Ondergrens voor hoe vaak de overlay het dichtstbijzijnde station ververst (sneller bij snelheid, nooit korter dan {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

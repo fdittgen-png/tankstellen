@@ -3328,6 +3328,34 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lõpeta 30 km+ reis ühtlase kiirusega ja sujuva sõidu tulemusega 90 või rohkem.';
 
   @override
+  String get approachOverlaySection => 'Tankla lähenemise ülekate';
+
+  @override
+  String get approachRadiusLabel => 'Raadius';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Ülekate suureneb ja kuvab hinda, kui olete tanklast vähem kui $km km kaugusel';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Kuva hind';
+
+  @override
+  String get approachPriceModeNearest => 'Lähim tankla';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Odavaim raadiuses';
+
+  @override
+  String get approachMinPollLabel => 'Min. värskendus';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Lähima tankla värskendamise alampiir (kiirem suurel kiirusel, mitte kunagi sagedamini kui $seconds s)';
+  }
+
+  @override
   String get authErrorNoNetwork => 'Võrguühendus puudub. Proovi hiljem uuesti.';
 
   @override

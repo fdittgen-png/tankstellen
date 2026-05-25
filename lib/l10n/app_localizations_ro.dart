@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3354,6 +3351,34 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Finalizați o călătorie de 30+ km la viteză constantă cu un scor de condus lin de 90 sau mai mult.';
+
+  @override
+  String get approachOverlaySection => 'Suprapunere la apropierea de stație';
+
+  @override
+  String get approachRadiusLabel => 'Rază';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Suprapunerea se mărește și afișează prețul când ești la $km km de o stație';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Afișează prețul pentru';
+
+  @override
+  String get approachPriceModeNearest => 'Stația cea mai apropiată';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Cea mai ieftină din rază';
+
+  @override
+  String get approachMinPollLabel => 'Reîmprospătare min.';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Limita inferioară a reîmprospătării celei mai apropiate stații (mai rapid la viteză, niciodată mai des de $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>

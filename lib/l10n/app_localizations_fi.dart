@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3333,6 +3330,34 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Suorita vähintään 30 km matka tasaisella nopeudella ja tasaisen ajon pisteet 90 tai enemmän.';
+
+  @override
+  String get approachOverlaySection => 'Aseman lähestymisilmoitus';
+
+  @override
+  String get approachRadiusLabel => 'Säde';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Ilmoitus suurenee ja näyttää hinnan, kun olet alle $km km päässä huoltoasemasta';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Näytä hinta';
+
+  @override
+  String get approachPriceModeNearest => 'Lähin asema';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Halvin säteen sisällä';
+
+  @override
+  String get approachMinPollLabel => 'Päivitysväli vähint.';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Lähimmän aseman päivitysvälin alaraja (nopeampi suuremmilla nopeuksilla, ei koskaan tiheämmin kuin $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>
