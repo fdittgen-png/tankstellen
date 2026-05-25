@@ -8,6 +8,7 @@ import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
 import '../../domain/entities/brand_registry.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
@@ -65,10 +66,13 @@ class StationCard extends StatelessWidget {
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
+  /// Defers to the shared [hasRealBrand] helper so the search card and
+  /// the detail screen agree on what counts as a brand (#2061). The
+  /// helper excludes the legacy `'Station'` sentinel + the
+  /// `BrandRegistry.independentLabel` (`'Independent'` from #482).
+  /// `'Autoroute'` is a synthetic motorway tag, kept excluded here.
   bool get _hasBrand =>
-      station.brand.isNotEmpty &&
-      station.brand != 'Station' &&
-      station.brand != 'Autoroute';
+      hasRealBrand(station) && station.brand != 'Autoroute';
 
   double? get _displayPrice => station.priceFor(selectedFuelType);
 
