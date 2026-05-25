@@ -4395,6 +4395,15 @@ class AppLocalizationsEl extends AppLocalizations {
       'Όταν είναι ανενεργό, σήματα, βαθμολογίες και εικονίδια τροπαίων αποκρύπτονται από ολόκληρη την εφαρμογή.';
 
   @override
+  String get coachingGpsLiftOff => 'Άφησε το γκάζι';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Πρόβλεψε';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Ομαλή επιτάχυνση';
+
+  @override
   String get gpsDiagnosticsTitle => 'Διαγνωστικά δειγματοληψίας GPS';
 
   @override

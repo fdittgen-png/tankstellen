@@ -62,6 +62,58 @@ class MinimalDriveSummary extends ConsumerWidget {
         ? '—'
         : '${liveAvg.toStringAsFixed(1)} L/100 km';
 
+    // #2058 — when the trajet has no fuel-rate data (GPS-only mode),
+    // swap the OBD2-derived tile triplet (shift-up / shift-down /
+    // ease-pedal) for the GPS-derived triplet (lift-off / anticipate-
+    // brake / smooth-accel). The decision is made on the reading
+    // shape, not on `Feature.obd2Optional`: a hybrid trip where
+    // OBD2 dropped mid-recording also lands in this branch until the
+    // adapter reconnects, which matches the user's mental model
+    // ("I have no fuel-rate data right now → show me the GPS coach").
+    final gpsMode = reading != null && reading.fuelRateLPerHour == null;
+    final gpsHint = gpsMode ? state.gpsCoachingHint : null;
+    final tiles = gpsMode
+        ? <Widget>[
+            _CoachingSymbol(
+              icon: Icons.eco,
+              label: l?.coachingGpsLiftOff ?? 'Lift off',
+              active: gpsHint == DrivingCoachingHint.gpsLiftOffCoast,
+              scheme: scheme,
+            ),
+            _CoachingSymbol(
+              icon: Icons.visibility,
+              label: l?.coachingGpsAnticipateBrake ?? 'Anticipate',
+              active: gpsHint == DrivingCoachingHint.gpsAnticipateBrake,
+              scheme: scheme,
+            ),
+            _CoachingSymbol(
+              icon: Icons.swipe_up,
+              label: l?.coachingGpsSmoothAccel ?? 'Smooth accel',
+              active: gpsHint == DrivingCoachingHint.gpsSmoothAccel,
+              scheme: scheme,
+            ),
+          ]
+        : <Widget>[
+            _CoachingSymbol(
+              icon: Icons.keyboard_double_arrow_up,
+              label: l?.coachingShiftUp ?? 'Shift up',
+              active: hint == DrivingCoachingHint.shiftUp,
+              scheme: scheme,
+            ),
+            _CoachingSymbol(
+              icon: Icons.keyboard_double_arrow_down,
+              label: l?.coachingShiftDown ?? 'Shift down',
+              active: hint == DrivingCoachingHint.shiftDown,
+              scheme: scheme,
+            ),
+            _CoachingSymbol(
+              icon: Icons.eco,
+              label: l?.coachingEasePedal ?? 'Ease pedal',
+              active: hint == DrivingCoachingHint.easePedal,
+              scheme: scheme,
+            ),
+          ];
+
     return Card(
       key: const Key('minimal_drive_summary_card'),
       child: Padding(
@@ -86,26 +138,7 @@ class MinimalDriveSummary extends ConsumerWidget {
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _CoachingSymbol(
-                  icon: Icons.keyboard_double_arrow_up,
-                  label: l?.coachingShiftUp ?? 'Shift up',
-                  active: hint == DrivingCoachingHint.shiftUp,
-                  scheme: scheme,
-                ),
-                _CoachingSymbol(
-                  icon: Icons.keyboard_double_arrow_down,
-                  label: l?.coachingShiftDown ?? 'Shift down',
-                  active: hint == DrivingCoachingHint.shiftDown,
-                  scheme: scheme,
-                ),
-                _CoachingSymbol(
-                  icon: Icons.eco,
-                  label: l?.coachingEasePedal ?? 'Ease pedal',
-                  active: hint == DrivingCoachingHint.easePedal,
-                  scheme: scheme,
-                ),
-              ],
+              children: tiles,
             ),
           ],
         ),

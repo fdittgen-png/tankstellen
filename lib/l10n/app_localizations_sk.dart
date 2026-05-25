@@ -4373,6 +4373,15 @@ class AppLocalizationsSk extends AppLocalizations {
       'Keď je vypnuté, odznaky, skóre a trofejové ikony sú skryté v celej aplikácii.';
 
   @override
+  String get coachingGpsLiftOff => 'Uvoľniť plyn';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Predvídať';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Plynulé zrýchlenie';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnostika vzorkovania GPS';
 
   @override

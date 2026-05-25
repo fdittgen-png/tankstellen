@@ -4354,6 +4354,15 @@ class AppLocalizationsSv extends AppLocalizations {
       'När av döljs märken, poäng och troféikoner i hela appen.';
 
   @override
+  String get coachingGpsLiftOff => 'Släpp gasen';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Förutse';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Mjuk acceleration';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-samplingdiagnostik';
 
   @override

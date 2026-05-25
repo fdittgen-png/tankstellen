@@ -33,6 +33,7 @@ import '../data/obd2/trip_recording_controller.dart';
 import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
+import '../domain/driving_coaching.dart' show gpsCoachingHint;
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/trip_recorder.dart';
 import 'trip_baseline_recorder.dart';
@@ -1301,6 +1302,14 @@ class TripRecording extends _$TripRecording {
     _gpsOnlySamples.add(sample);
     recorder.onSample(sample);
     final summary = recorder.buildSummary();
+    // #2058 — compute the GPS coaching hint from the most recent 5 s
+    // of samples on every position emit. Bounded slice so a long
+    // trajet's per-emit cost stays O(window) not O(trajet).
+    final cutoff = sample.timestamp.subtract(const Duration(seconds: 5));
+    final recent = _gpsOnlySamples
+        .where((s) => s.timestamp.isAfter(cutoff))
+        .toList();
+    final coaching = gpsCoachingHint(recent);
     state = state.copyWith(
       phase: TripRecordingPhase.recording,
       live: TripLiveReading(
@@ -1308,6 +1317,8 @@ class TripRecording extends _$TripRecording {
         distanceKmSoFar: summary.distanceKm,
         elapsed: DateTime.now().difference(startedAt),
       ),
+      gpsCoachingHint: coaching,
+      clearGpsCoachingHint: coaching == null,
     );
   }
 

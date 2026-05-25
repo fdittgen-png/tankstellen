@@ -4373,6 +4373,15 @@ class AppLocalizationsPl extends AppLocalizations {
       'Gdy wyłączone, odznaki, wyniki i ikony pucharów są ukryte w całej aplikacji.';
 
   @override
+  String get coachingGpsLiftOff => 'Puść gaz';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Przewiduj';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Płynne przyspieszanie';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnostyka próbkowania GPS';
 
   @override

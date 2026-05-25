@@ -1731,5 +1731,17 @@
         "example": "5"
       }
     }
+  },
+  "coachingGpsLiftOff": "Atleisk dujas",
+  "@coachingGpsLiftOff": {
+    "description": "GPS-only coaching tile (#2058): the driver is cruising downhill with no recent brake event; lifting off would let the car coast more efficiently."
+  },
+  "coachingGpsAnticipateBrake": "Numatyk",
+  "@coachingGpsAnticipateBrake": {
+    "description": "GPS-only coaching tile (#2058): a brake event was detected in the rolling window; reading the road further ahead would let the lift-off start earlier."
+  },
+  "coachingGpsSmoothAccel": "Sklandus greitėjimas",
+  "@coachingGpsSmoothAccel": {
+    "description": "GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel."
   }
 }

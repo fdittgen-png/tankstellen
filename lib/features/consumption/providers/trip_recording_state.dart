@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/cold_start_baselines.dart';
+import '../domain/driving_coaching.dart' show DrivingCoachingHint;
 import '../domain/situation_classifier.dart';
 import 'trip_recording_phase.dart';
 
@@ -28,6 +29,13 @@ class TripRecordingState {
   /// connected but not returning data" for silent failure.
   final TripDropReason? dropReason;
 
+  /// GPS-only live coaching hint (#2058) — derived from the rolling
+  /// window of the last ~5 s of GPS samples on every recorder emit.
+  /// Null when the trajet has OBD2 fuel-rate data (the standard
+  /// `coachingHint` path takes over) or when no hint applies.
+  /// Drives the three GPS-derived tiles in `MinimalDriveSummary`.
+  final DrivingCoachingHint? gpsCoachingHint;
+
   const TripRecordingState({
     this.phase = TripRecordingPhase.idle,
     this.live,
@@ -35,6 +43,7 @@ class TripRecordingState {
     this.band = ConsumptionBand.normal,
     this.liveDeltaFraction,
     this.dropReason,
+    this.gpsCoachingHint,
   });
 
   TripRecordingState copyWith({
@@ -46,6 +55,8 @@ class TripRecordingState {
     bool clearDelta = false,
     TripDropReason? dropReason,
     bool clearDropReason = false,
+    DrivingCoachingHint? gpsCoachingHint,
+    bool clearGpsCoachingHint = false,
   }) =>
       TripRecordingState(
         phase: phase ?? this.phase,
@@ -58,6 +69,9 @@ class TripRecordingState {
         dropReason: clearDropReason
             ? null
             : (dropReason ?? this.dropReason),
+        gpsCoachingHint: clearGpsCoachingHint
+            ? null
+            : (gpsCoachingHint ?? this.gpsCoachingHint),
       );
 
   bool get isActive =>

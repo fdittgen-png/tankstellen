@@ -4379,6 +4379,15 @@ class AppLocalizationsLt extends AppLocalizations {
       'Kai išjungta, ženkleliai, balai ir trofėjaus piktogramos slepiamos visoje programoje.';
 
   @override
+  String get coachingGpsLiftOff => 'Atleisk dujas';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Numatyk';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Sklandus greitėjimas';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS mėginių diagnostika';
 
   @override

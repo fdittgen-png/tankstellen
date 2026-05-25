@@ -4353,6 +4353,15 @@ class AppLocalizationsDa extends AppLocalizations {
       'Når slået fra, er badges, scorer og trofæikoner skjult i hele appen.';
 
   @override
+  String get coachingGpsLiftOff => 'Slip gassen';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Forudse';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Blød acceleration';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-samplingdiagnostik';
 
   @override

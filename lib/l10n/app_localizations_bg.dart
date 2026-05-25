@@ -4391,6 +4391,15 @@ class AppLocalizationsBg extends AppLocalizations {
       'При изключване, значките, резултатите и иконите за трофеи са скрити навсякъде в приложението.';
 
   @override
+  String get coachingGpsLiftOff => 'Освободи газта';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Предвиди';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Плавно ускорение';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS диагностика на вземане на проби';
 
   @override

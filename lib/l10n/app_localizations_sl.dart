@@ -4360,6 +4360,15 @@ class AppLocalizationsSl extends AppLocalizations {
       'Ko je izklopljeno, so značke, ocene in ikone trofej skrite po celotni aplikaciji.';
 
   @override
+  String get coachingGpsLiftOff => 'Spusti plin';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Predvidi';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Gladko pospeševanje';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnostika vzorčenja GPS';
 
   @override

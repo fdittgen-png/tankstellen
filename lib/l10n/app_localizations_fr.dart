@@ -4399,6 +4399,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Désactivé, les badges, scores et trophées sont masqués dans toute l\'app.';
 
   @override
+  String get coachingGpsLiftOff => 'Lever le pied';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Anticiper';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Accélération douce';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnostic d\'échantillonnage GPS';
 
   @override

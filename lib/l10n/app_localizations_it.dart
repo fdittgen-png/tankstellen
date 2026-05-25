@@ -4378,6 +4378,15 @@ class AppLocalizationsIt extends AppLocalizations {
       'Quando disattivato, badge, punteggi e icone trofeo sono nascosti nell\'app.';
 
   @override
+  String get coachingGpsLiftOff => 'Rilascia';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Anticipa';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Accelerazione dolce';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnostica campionamento GPS';
 
   @override

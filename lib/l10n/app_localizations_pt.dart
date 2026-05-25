@@ -4386,6 +4386,15 @@ class AppLocalizationsPt extends AppLocalizations {
       'Quando desativado, as conquistas, pontuações e ícones de troféu ficam ocultos em toda a aplicação.';
 
   @override
+  String get coachingGpsLiftOff => 'Soltar gás';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Antecipar';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Aceleração suave';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnóstico de amostras GPS';
 
   @override

@@ -4384,6 +4384,15 @@ class AppLocalizationsRo extends AppLocalizations {
       'Când e dezactivat, insignele, scorurile și icoanele trofeu sunt ascunse în toată aplicația.';
 
   @override
+  String get coachingGpsLiftOff => 'Eliberează';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Anticipează';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Accelerare lină';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnostice eșantionare GPS';
 
   @override

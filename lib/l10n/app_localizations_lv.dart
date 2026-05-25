@@ -4384,6 +4384,15 @@ class AppLocalizationsLv extends AppLocalizations {
       'Kad izslēgts, visā lietotnē tiek paslēptas zīmotnes, novērtējumi un trofeju ikonas.';
 
   @override
+  String get coachingGpsLiftOff => 'Atlaid gāzi';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Paredzi';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Vienmērīga paātrināšana';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS paraugu ņemšanas diagnostika';
 
   @override

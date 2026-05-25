@@ -4367,6 +4367,15 @@ class AppLocalizationsHr extends AppLocalizations {
       'Kada je isključeno, značke, ocjene i ikone trofeja su skrivene u cijeloj aplikaciji.';
 
   @override
+  String get coachingGpsLiftOff => 'Otpusti gas';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Predvidi';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Glatko ubrzanje';
+
+  @override
   String get gpsDiagnosticsTitle => 'Dijagnostika GPS uzorkovanja';
 
   @override
