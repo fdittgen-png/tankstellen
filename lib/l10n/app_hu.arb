@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "OBD2-munkamenet naplójának megosztása",
   "coachingShiftUp": "Sebességet feljebb",
   "coachingShiftDown": "Sebességet lejjebb",
-  "coachingEasePedal": "Engedd a gázt"
+  "coachingEasePedal": "Engedd a gázt",
+  "approachOverlaySection": "Töltőállomás-megközelítési átfedés",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Sugár",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "Az átfedés megnő, és megjeleníti az árat, ha {km} km-en belül vagy egy töltőállomástól",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Ár megjelenítése",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Legközelebbi állomás",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Legolcsóbb a sugárban",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Min. frissítés",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "A legközelebbi állomás frissítésének alsó határa (gyorsabb sebességnél, soha nem gyakrabban, mint {seconds} mp)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

@@ -361,6 +361,9 @@ class _SaveDeleteActions extends StatelessWidget {
                 avoidHighways: state.avoidHighways,
                 ratingMode: state.ratingMode,
                 defaultVehicleId: state.defaultVehicleId,
+                approachRadiusKm: state.approachRadiusKm,
+                approachPriceMode: state.approachPriceMode,
+                approachMinPollSeconds: state.approachMinPollSeconds,
               );
               await onSave(updated);
               if (context.mounted) Navigator.pop(context);

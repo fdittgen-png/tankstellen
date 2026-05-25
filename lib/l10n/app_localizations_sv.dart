@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
-
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
@@ -3334,6 +3331,34 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get achievementHighwayMasterDesc =>
       'Genomför en resa på 30 km+ i jämn hastighet med ett mjukkörningspoäng på 90 eller högre.';
+
+  @override
+  String get approachOverlaySection => 'Inflygningsöverlägg';
+
+  @override
+  String get approachRadiusLabel => 'Radie';
+
+  @override
+  String approachRadiusCaption(String km) {
+    return 'Överlägget förstoras och visar priset när du är inom $km km från en station';
+  }
+
+  @override
+  String get approachPriceModeLabel => 'Visa pris för';
+
+  @override
+  String get approachPriceModeNearest => 'Närmaste station';
+
+  @override
+  String get approachPriceModeCheapestInRadius => 'Billigaste i radien';
+
+  @override
+  String get approachMinPollLabel => 'Min. uppdatering';
+
+  @override
+  String approachMinPollCaption(int seconds) {
+    return 'Undre gräns för hur ofta överlägget uppdaterar närmaste station (snabbare i hastighet, aldrig oftare än $seconds s)';
+  }
 
   @override
   String get authErrorNoNetwork =>

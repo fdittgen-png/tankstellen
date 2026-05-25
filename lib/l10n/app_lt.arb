@@ -1687,5 +1687,49 @@
   "obd2DebugSessionShareLabel": "Bendrinti OBD2 seanso žurnalą",
   "coachingShiftUp": "Aukštyn pavarą",
   "coachingShiftDown": "Žemyn pavarą",
-  "coachingEasePedal": "Atleisk akceleratorių"
+  "coachingEasePedal": "Atleisk akceleratorių",
+  "approachOverlaySection": "Užklotis artėjant prie degalinės",
+  "@approachOverlaySection": {
+    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+  },
+  "approachRadiusLabel": "Spindulys",
+  "@approachRadiusLabel": {
+    "description": "Slider label for the approach-overlay radius (km)."
+  },
+  "approachRadiusCaption": "Užklotis padidėja ir rodo kainą, kai esate {km} km atstumu nuo degalinės",
+  "@approachRadiusCaption": {
+    "description": "Caption under the approach-radius slider.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "approachPriceModeLabel": "Rodyti kainą",
+  "@approachPriceModeLabel": {
+    "description": "Title above the nearest/cheapest-in-radius choice chips."
+  },
+  "approachPriceModeNearest": "Artimiausia degalinė",
+  "@approachPriceModeNearest": {
+    "description": "Choice chip — overlay shows the price at the single nearest station the driver crossed the radius of."
+  },
+  "approachPriceModeCheapestInRadius": "Pigiausia spindulyje",
+  "@approachPriceModeCheapestInRadius": {
+    "description": "Choice chip — overlay shows the price at the cheapest station currently within the radius."
+  },
+  "approachMinPollLabel": "Min. atnaujinimas",
+  "@approachMinPollLabel": {
+    "description": "Slider label for the minimum poll interval (seconds) used by the approach detector."
+  },
+  "approachMinPollCaption": "Artimiausios degalinės atnaujinimo apatinė riba (greičiau esant didesniam greičiui, niekada dažniau nei {seconds} s)",
+  "@approachMinPollCaption": {
+    "description": "Caption under the min-poll slider.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  }
 }

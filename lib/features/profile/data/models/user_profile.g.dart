@@ -48,40 +48,53 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
   ),
   showConsumptionTab: json['showConsumptionTab'] as bool? ?? false,
   gamificationEnabled: json['gamificationEnabled'] as bool? ?? true,
+  approachRadiusKm: (json['approachRadiusKm'] as num?)?.toDouble() ?? 1.0,
+  approachPriceMode:
+      $enumDecodeNullable(
+        _$ApproachPriceModeEnumMap,
+        json['approachPriceMode'],
+      ) ??
+      ApproachPriceMode.nearest,
+  approachMinPollSeconds:
+      (json['approachMinPollSeconds'] as num?)?.toInt() ?? 5,
 );
 
-Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'preferredFuelType': const FuelTypeJsonConverter().toJson(
-        instance.preferredFuelType,
-      ),
-      'defaultSearchRadius': instance.defaultSearchRadius,
-      'landingScreen': _$LandingScreenEnumMap[instance.landingScreen]!,
-      'favoriteStationIds': instance.favoriteStationIds,
-      'homeZipCode': instance.homeZipCode,
-      'autoUpdatePosition': instance.autoUpdatePosition,
-      'countryCode': instance.countryCode,
-      'languageCode': instance.languageCode,
-      'routeSegmentKm': instance.routeSegmentKm,
-      'avoidHighways': instance.avoidHighways,
-      'routeDetourBudgetKm': instance.routeDetourBudgetKm,
-      'minRouteSavingPerLiter': instance.minRouteSavingPerLiter,
-      'showFuel': instance.showFuel,
-      'showElectric': instance.showElectric,
-      'ratingMode': instance.ratingMode,
-      'preferredAmenities': instance.preferredAmenities
-          .map((e) => _$StationAmenityEnumMap[e]!)
-          .toList(),
-      'defaultVehicleId': instance.defaultVehicleId,
-      'hybridFuelChoice': _$JsonConverterToJson<String, FuelType>(
-        instance.hybridFuelChoice,
-        const FuelTypeJsonConverter().toJson,
-      ),
-      'showConsumptionTab': instance.showConsumptionTab,
-      'gamificationEnabled': instance.gamificationEnabled,
-    };
+Map<String, dynamic> _$UserProfileToJson(
+  _UserProfile instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'preferredFuelType': const FuelTypeJsonConverter().toJson(
+    instance.preferredFuelType,
+  ),
+  'defaultSearchRadius': instance.defaultSearchRadius,
+  'landingScreen': _$LandingScreenEnumMap[instance.landingScreen]!,
+  'favoriteStationIds': instance.favoriteStationIds,
+  'homeZipCode': instance.homeZipCode,
+  'autoUpdatePosition': instance.autoUpdatePosition,
+  'countryCode': instance.countryCode,
+  'languageCode': instance.languageCode,
+  'routeSegmentKm': instance.routeSegmentKm,
+  'avoidHighways': instance.avoidHighways,
+  'routeDetourBudgetKm': instance.routeDetourBudgetKm,
+  'minRouteSavingPerLiter': instance.minRouteSavingPerLiter,
+  'showFuel': instance.showFuel,
+  'showElectric': instance.showElectric,
+  'ratingMode': instance.ratingMode,
+  'preferredAmenities': instance.preferredAmenities
+      .map((e) => _$StationAmenityEnumMap[e]!)
+      .toList(),
+  'defaultVehicleId': instance.defaultVehicleId,
+  'hybridFuelChoice': _$JsonConverterToJson<String, FuelType>(
+    instance.hybridFuelChoice,
+    const FuelTypeJsonConverter().toJson,
+  ),
+  'showConsumptionTab': instance.showConsumptionTab,
+  'gamificationEnabled': instance.gamificationEnabled,
+  'approachRadiusKm': instance.approachRadiusKm,
+  'approachPriceMode': _$ApproachPriceModeEnumMap[instance.approachPriceMode]!,
+  'approachMinPollSeconds': instance.approachMinPollSeconds,
+};
 
 const _$LandingScreenEnumMap = {
   LandingScreen.favorites: 'favorites',
@@ -105,6 +118,11 @@ Value? _$JsonConverterFromJson<Json, Value>(
   Object? json,
   Value? Function(Json json) fromJson,
 ) => json == null ? null : fromJson(json as Json);
+
+const _$ApproachPriceModeEnumMap = {
+  ApproachPriceMode.nearest: 'nearest',
+  ApproachPriceMode.cheapestInRadius: 'cheapestInRadius',
+};
 
 Json? _$JsonConverterToJson<Json, Value>(
   Value? value,
