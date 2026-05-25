@@ -116,4 +116,43 @@ class EcoScoreCalculator {
     if (deltaPercent >= EcoScore.threshold) return EcoScoreDirection.worsening;
     return EcoScoreDirection.stable;
   }
+
+  /// Returns just the raw L/100 km for [current] (no baseline / no
+  /// comparison-to-rolling-average), or `null` when the math is
+  /// undefined (first-ever fill-up, odometer rollback, no preceding
+  /// same-fuel entry — same fail-conditions as [compute], but only
+  /// the upstream-distance gate, not the baseline-history gate).
+  ///
+  /// Used on partial / auto-corrected entries (#2060) where [compute]
+  /// returns null because there aren't enough preceding same-fuel
+  /// fill-ups to build a rolling baseline, but the per-entry L/100 km
+  /// itself IS meaningful — distance + litres are present, just not
+  /// the comparison data.
+  ///
+  /// Render this as plain text (no trend arrow, no percentage). The
+  /// [EcoScoreBadge] continues to handle the "↓ X L/100 km · -N%"
+  /// shape when [compute] returns non-null.
+  static double? computeLitersPer100Km({
+    required FillUp current,
+    required List<FillUp> history,
+  }) {
+    final sorted = [...history]..sort((a, b) => a.date.compareTo(b.date));
+    final idx = sorted.indexWhere((f) => f.id == current.id);
+    if (idx <= 0) return null; // not found or is the very first entry
+
+    // Find the most recent preceding entry of the SAME fuel type — the
+    // odometer base for distance. Differs from [compute] in that we
+    // don't also need a baseline window; one prior entry is enough.
+    FillUp? referencePrev;
+    for (var i = idx - 1; i >= 0; i--) {
+      if (sorted[i].fuelType == current.fuelType) {
+        referencePrev = sorted[i];
+        break;
+      }
+    }
+    if (referencePrev == null) return null;
+    final distance = current.odometerKm - referencePrev.odometerKm;
+    if (distance <= 0) return null;
+    return current.liters / distance * 100;
+  }
 }

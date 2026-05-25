@@ -670,3 +670,131 @@ final class EcoScoreForFillUpFamily extends $Family
   @override
   String toString() => r'ecoScoreForFillUpProvider';
 }
+
+/// Raw per-fill-up L/100 km, with no baseline / no comparison (#2060).
+///
+/// Returns the per-entry consumption number even when
+/// [ecoScoreForFillUp] is null because there isn't enough history
+/// to build a rolling-average baseline. The card consumes this to
+/// render a plain "X.X L/100 km" line on entries that would otherwise
+/// be blank — the 2026-05-20 entry in the user's screenshot has the
+/// distance + litres to compute a number, just not enough preceding
+/// same-fuel entries for a trend.
+
+@ProviderFor(litersPer100KmForFillUp)
+final litersPer100KmForFillUpProvider = LitersPer100KmForFillUpFamily._();
+
+/// Raw per-fill-up L/100 km, with no baseline / no comparison (#2060).
+///
+/// Returns the per-entry consumption number even when
+/// [ecoScoreForFillUp] is null because there isn't enough history
+/// to build a rolling-average baseline. The card consumes this to
+/// render a plain "X.X L/100 km" line on entries that would otherwise
+/// be blank — the 2026-05-20 entry in the user's screenshot has the
+/// distance + litres to compute a number, just not enough preceding
+/// same-fuel entries for a trend.
+
+final class LitersPer100KmForFillUpProvider
+    extends $FunctionalProvider<double?, double?, double?>
+    with $Provider<double?> {
+  /// Raw per-fill-up L/100 km, with no baseline / no comparison (#2060).
+  ///
+  /// Returns the per-entry consumption number even when
+  /// [ecoScoreForFillUp] is null because there isn't enough history
+  /// to build a rolling-average baseline. The card consumes this to
+  /// render a plain "X.X L/100 km" line on entries that would otherwise
+  /// be blank — the 2026-05-20 entry in the user's screenshot has the
+  /// distance + litres to compute a number, just not enough preceding
+  /// same-fuel entries for a trend.
+  LitersPer100KmForFillUpProvider._({
+    required LitersPer100KmForFillUpFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'litersPer100KmForFillUpProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$litersPer100KmForFillUpHash();
+
+  @override
+  String toString() {
+    return r'litersPer100KmForFillUpProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<double?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double? create(Ref ref) {
+    final argument = this.argument as String;
+    return litersPer100KmForFillUp(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double?>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LitersPer100KmForFillUpProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$litersPer100KmForFillUpHash() =>
+    r'6f61c26cafb27ca36198380bb9c75ac80b39c9f3';
+
+/// Raw per-fill-up L/100 km, with no baseline / no comparison (#2060).
+///
+/// Returns the per-entry consumption number even when
+/// [ecoScoreForFillUp] is null because there isn't enough history
+/// to build a rolling-average baseline. The card consumes this to
+/// render a plain "X.X L/100 km" line on entries that would otherwise
+/// be blank — the 2026-05-20 entry in the user's screenshot has the
+/// distance + litres to compute a number, just not enough preceding
+/// same-fuel entries for a trend.
+
+final class LitersPer100KmForFillUpFamily extends $Family
+    with $FunctionalFamilyOverride<double?, String> {
+  LitersPer100KmForFillUpFamily._()
+    : super(
+        retry: null,
+        name: r'litersPer100KmForFillUpProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Raw per-fill-up L/100 km, with no baseline / no comparison (#2060).
+  ///
+  /// Returns the per-entry consumption number even when
+  /// [ecoScoreForFillUp] is null because there isn't enough history
+  /// to build a rolling-average baseline. The card consumes this to
+  /// render a plain "X.X L/100 km" line on entries that would otherwise
+  /// be blank — the 2026-05-20 entry in the user's screenshot has the
+  /// distance + litres to compute a number, just not enough preceding
+  /// same-fuel entries for a trend.
+
+  LitersPer100KmForFillUpProvider call(String fillUpId) =>
+      LitersPer100KmForFillUpProvider._(argument: fillUpId, from: this);
+
+  @override
+  String toString() => r'litersPer100KmForFillUpProvider';
+}
