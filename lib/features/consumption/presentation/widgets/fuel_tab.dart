@@ -89,6 +89,8 @@ class FuelTab extends ConsumerWidget {
         child: FillUpCard(
           fillUp: fillUp,
           ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
+          rawLPer100Km:
+              ref.watch(litersPer100KmForFillUpProvider(fillUp.id)),
           onTap: fillUp.isCorrection
               ? () => _openCorrectionEditor(context, fillUp)
               : null,
