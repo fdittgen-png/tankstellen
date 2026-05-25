@@ -72,6 +72,10 @@ SKIP_FILE_SUFFIXES = (
 
 SKIP_FILE_NAMES = {
     "LICENSE",
+    # Golden fixture XML — the BackupXmlWriter test compares its output
+    # byte-for-byte to this file; the writer emits no header, so the
+    # fixture cannot carry one either (#2053 follow-up).
+    "sample_backup_v1.xml",
     "pubspec.lock",
     "Gemfile.lock",
     "Podfile.lock",
