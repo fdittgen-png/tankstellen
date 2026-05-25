@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Trip-length consumption aggregator (#1191).
 ///
 /// Folds a list of [TripHistoryEntry]s into three fixed length buckets

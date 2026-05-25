@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Actionable cross-border suggestion shown when the user is close to a
 /// neighbor country whose fuel is cheaper than the current search.
 ///

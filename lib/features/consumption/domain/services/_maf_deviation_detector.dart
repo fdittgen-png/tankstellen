@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// MAF-deviation pilot heuristic for [MaintenanceAnalyzer] (#1124).
 ///
 /// Split out of `maintenance_analyzer.dart` to keep that file under the

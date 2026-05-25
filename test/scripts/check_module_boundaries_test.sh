@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Tests for scripts/check_module_boundaries.sh
 # Run: bash test/scripts/check_module_boundaries_test.sh
 

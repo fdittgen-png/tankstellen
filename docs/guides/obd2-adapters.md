@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Supported OBD2 Adapters
 
 This is the list of OBD2 adapter models Tankstellen recognises by

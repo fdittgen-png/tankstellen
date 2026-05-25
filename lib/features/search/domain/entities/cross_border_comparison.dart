@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Data for a cross-border price comparison banner.
 ///
 /// Shows the user how prices in a neighboring country compare

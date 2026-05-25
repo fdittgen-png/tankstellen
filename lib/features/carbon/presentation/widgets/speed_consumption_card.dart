@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Consumption-by-speed card on the Carbon dashboard Charts tab (#1192).
 ///
 /// See [SpeedConsumptionCard] for the rendering contract. The bar

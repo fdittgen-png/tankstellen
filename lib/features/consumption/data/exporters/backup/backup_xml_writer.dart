@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:xml/xml.dart';
 
 import '../../../../ev/domain/entities/charging_log.dart';

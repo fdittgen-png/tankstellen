@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // PSA passive-CAN fuel-level stream provider (#1418).
 //
 // Wires the data-layer [Obd2Service.canFrameStream] (the streaming

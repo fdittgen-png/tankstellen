@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Valid widget content-variant identifiers (#1121).
 ///
 /// Mirrors [widgetColorSchemes] in shape — a flat const list so callers (the

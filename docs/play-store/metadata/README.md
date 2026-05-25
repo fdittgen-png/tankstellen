@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Play Store metadata (fastlane supply layout)
 
 Source of truth for the Google Play Console listing copy. The CI workflow at `.github/workflows/play-store-listing.yml` uploads from this directory.

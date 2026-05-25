@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../core/storage/storage_keys.dart';
 import '../domain/entities/reference_vehicle.dart';
 import '../domain/entities/vehicle_profile.dart';

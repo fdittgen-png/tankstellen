@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Reproducible generator for the Sparkilo app icon (#1756).
 //
 // Renders the canonical app glyph — the white shield + fuel-drop from the

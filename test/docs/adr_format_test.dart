@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -47,11 +50,17 @@ void main() {
     });
 
     test('each ADR has a title as the first heading', () {
+      // Tolerate a leading HTML comment block (the standard MIT SPDX
+      // header added in #2053) — the title may follow it. The check
+      // is on the first NON-COMMENT line.
+      final commentBlock = RegExp(r'^\s*<!--[\s\S]*?-->\s*');
       for (final file in adrFiles) {
         final content = file.readAsStringSync();
+        final body = content.replaceFirst(commentBlock, '');
         final name = file.uri.pathSegments.last;
-        expect(content, matches(RegExp(r'^# ADR \d{4}:')),
-            reason: '$name must start with "# ADR NNNN: <title>"');
+        expect(body, matches(RegExp(r'^# ADR \d{4}:')),
+            reason: '$name must start with "# ADR NNNN: <title>" '
+                '(after any leading SPDX comment)');
       }
     });
 

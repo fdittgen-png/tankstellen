@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Time-share histogram calculator for the throttle / RPM card on the
 /// Trip detail screen (#1041 phase 3a — "Card C").
 ///

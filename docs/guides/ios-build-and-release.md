@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # iOS build & release
 
 > This file used to be `BLOCKER-IOS-PROVISIONING.md`, recording iOS as

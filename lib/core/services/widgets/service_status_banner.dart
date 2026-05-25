@@ -1,4 +1,7 @@
-﻿import 'package:flutter/material.dart';
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../error/error_localizer.dart';
 import '../../error/exceptions.dart';

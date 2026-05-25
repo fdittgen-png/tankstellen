@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Adding a New Country to Tankstellen
 
 This guide walks through adding support for a new country's fuel price API.

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Dependency freshness and security advisory check for CI.
 # - Runs flutter pub outdated and reports results
 # - Checks for security advisories via dart pub outdated --json

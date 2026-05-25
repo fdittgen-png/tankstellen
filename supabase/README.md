@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # TankSync -- Supabase Backend
 
 Optional cloud backend for the Tankstellen fuel price app.

@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Always-run test bucket — May 2026
 
 **Issue**: #1593 (parent epic #1591 — path-affected test selection).

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../entities/fill_up.dart';
 import '../../data/trip_history_repository.dart';
 

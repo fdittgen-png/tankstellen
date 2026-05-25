@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Raw byte pipe to an ELM327-compatible adapter.
 ///
 /// Abstracted so [BluetoothObd2Transport] can be unit-tested with a

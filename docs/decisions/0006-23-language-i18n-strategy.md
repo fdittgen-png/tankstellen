@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # ADR 0006: 23-language i18n strategy
 
 **Status:** Accepted

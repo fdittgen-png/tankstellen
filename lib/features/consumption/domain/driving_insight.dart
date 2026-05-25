@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// One "cost line" surfaced in the trip Insights tab (#1041 phase 1).
 ///
 /// Each insight quantifies a single behaviour-driven fuel cost so the

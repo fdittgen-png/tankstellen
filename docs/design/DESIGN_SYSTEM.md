@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Tankstellen — Design System
 
 **Status:** living contract (#923 phase 1). Coordinator-written

@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # iOS hands-free trip auto-record (port from #1004)
 
 Status: **phase 1 + phase 2 scaffolding shipped**. Info.plist

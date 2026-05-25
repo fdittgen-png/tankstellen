@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'elm327_commands.dart';
 
 /// Per-adapter ELM327 protocol quirks (#1330).

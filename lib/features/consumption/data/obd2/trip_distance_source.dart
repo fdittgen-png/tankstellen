@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Provenance tags persisted on [TripSummary.distanceSource] (#800).
 ///
 /// Extracted from `trip_recording_controller.dart` as part of the

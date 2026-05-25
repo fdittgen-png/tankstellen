@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Edge Function: check-alerts
 // Evaluates all active price alerts, fetches current prices, and sends
 // ntfy notifications when targets are met. Intended to be called by

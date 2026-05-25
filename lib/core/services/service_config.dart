@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../constants/app_constants.dart';
 
 /// Connection configuration for an external service.

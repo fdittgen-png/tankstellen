@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // `gamificationEnabled` is `@Deprecated` post-#1373 phase 3b but the
 // field is still around (kept for the one-shot migration read in
 // `legacy_toggle_migrator.dart`). These tests pin the persistence /

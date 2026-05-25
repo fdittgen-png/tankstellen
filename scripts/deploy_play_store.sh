@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # deploy_play_store.sh — Upload AAB to Play Store internal track from local machine.
 #
 # Usage:

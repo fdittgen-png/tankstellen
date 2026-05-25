@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Pure-domain helpers for the fuel-club card add/edit form (#1120).
 ///
 /// Extracted from `loyalty_settings_screen.dart` so the parsing and

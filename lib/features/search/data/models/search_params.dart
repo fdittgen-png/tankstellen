@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/fuel_type.dart';
 // Re-export SearchMode so existing data-layer callers keep working while

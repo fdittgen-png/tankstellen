@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Tests for the predictive widget variant (#1121).
 //
 // Two pure-Dart concerns are exercised here, both running entirely off the

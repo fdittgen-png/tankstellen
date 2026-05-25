@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../elm327_adapter.dart';
 import '../elm327_commands.dart';
 

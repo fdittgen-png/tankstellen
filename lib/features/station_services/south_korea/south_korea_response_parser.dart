@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Pure parsing helpers for the OPINET (KNOC) `aroundAll.do` envelope
 /// (#597, #563 split). Lives separately from `SouthKoreaStationService`
 /// so the JSON-shape contract — which is what the live endpoint

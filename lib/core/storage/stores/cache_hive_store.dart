@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../data/storage_repository.dart';

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../services/country_service_registry.dart';
 
 /// Geographic bounding box for a country.

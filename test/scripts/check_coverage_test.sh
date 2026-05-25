@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Tests for scripts/check_coverage.sh
 # Run: bash test/scripts/check_coverage_test.sh
 

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'isolate_error_spool_entry.freezed.dart';

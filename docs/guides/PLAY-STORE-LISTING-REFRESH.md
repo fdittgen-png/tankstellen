@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Play Store listing refresh (#594)
 
 The Fastlane metadata under `fastlane/metadata/android/{en-US,de-DE,fr-FR}/`

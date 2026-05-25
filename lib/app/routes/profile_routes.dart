@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:go_router/go_router.dart';
 
 import '../../features/itinerary/presentation/screens/itineraries_screen.dart';

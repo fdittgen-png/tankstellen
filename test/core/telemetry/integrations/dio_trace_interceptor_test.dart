@@ -1,4 +1,7 @@
-﻿import 'package:dio/dio.dart';
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/telemetry/collectors/app_state_collector.dart';

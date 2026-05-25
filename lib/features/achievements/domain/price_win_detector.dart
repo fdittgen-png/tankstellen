@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../consumption/domain/entities/fill_up.dart';
 import '../../price_history/data/repositories/price_history_repository.dart';
 

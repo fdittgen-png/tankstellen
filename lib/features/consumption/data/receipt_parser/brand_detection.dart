@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Brand-name heuristics that sit between the raw OCR lines and the
 // per-layout parsers in `brand_layouts.dart`. Kept separate from the
 // numeric field extractors so the brand string list is easy to grow

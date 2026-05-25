@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:meta/meta.dart';
 
 /// One composite "driving score" for a single trip on the Trip detail

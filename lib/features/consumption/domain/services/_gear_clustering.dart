@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Internal clustering helpers for the gear-inference pipeline
 /// (#1263 phase 1).
 ///

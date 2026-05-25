@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Domain entity re-export for PriceRecord.
 ///
 /// Presentation and cross-feature consumers must import this path instead of

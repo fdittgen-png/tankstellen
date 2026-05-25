@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 part of 'profile_edit_sheet.dart';
 
 /// Country selector rendered as a wrap of ChoiceChips with flag + name.

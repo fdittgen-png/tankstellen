@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Reference Vehicle Catalog
 
 The reference vehicle catalog ships a curated list of popular EU

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 
 /// A filled/unfilled star icon that bounces (scale 1.0 → 1.3 → 1.0) and

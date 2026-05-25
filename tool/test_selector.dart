@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Path-affected test selector (#1592 / Epic #1591).
 //
 // Reads a list of changed paths (one per line, on stdin or from git

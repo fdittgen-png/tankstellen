@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/route_search/data/strategies/balanced_search_strategy.dart';
 import 'package:tankstellen/features/route_search/data/strategies/cheapest_search_strategy.dart';

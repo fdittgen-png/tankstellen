@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// The decision returned by [GlideCoachEvaluator] (#1125 phase 3a) for
 /// a single GPS / throttle tick.
 ///

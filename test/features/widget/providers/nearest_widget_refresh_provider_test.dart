@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Unit tests for [NearestWidgetRefresh] (#561 — zero-coverage backlog).
 //
 // The provider owns a [Timer.periodic] that ticks every

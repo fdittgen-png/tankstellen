@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/utils/geo_utils.dart';

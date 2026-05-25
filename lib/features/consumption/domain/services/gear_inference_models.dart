@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Value objects for the gear-inference pipeline (#1263 phase 1).
 ///
 /// Split out of `gear_inference.dart` to keep that file under the

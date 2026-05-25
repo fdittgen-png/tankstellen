@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 package de.tankstellen.tankstellen
 
 import android.app.PendingIntent

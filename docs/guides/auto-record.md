@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Hands-free trip auto-record (Android)
 
 Status: phase 2b-2 — native bridge shipped, `AutoTripCoordinator` wired

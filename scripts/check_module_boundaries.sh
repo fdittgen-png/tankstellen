@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Feature-module boundary enforcement for CI and local use.
 # Detects cross-feature imports in lib/features/ and fails if any are found.
 #

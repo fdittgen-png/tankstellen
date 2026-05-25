@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../domain/entities/gps_sample_diagnostic.dart';
 import '../../domain/trip_recorder.dart';
 

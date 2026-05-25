@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Central catalogue of toggleable application features (#1373 phase 1).
 ///
 /// This enum is the manifest other systems consult — it does NOT yet drive

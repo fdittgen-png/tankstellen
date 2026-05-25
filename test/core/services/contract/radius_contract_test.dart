@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Radius-sensitivity contract test (#299).
 //
 // Every [StationService] implementation must honour [SearchParams.radiusKm].

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Regression test for the always-run bucket (#1593 / Epic #1591).
 //
 // Pins the load-bearing cross-cutting tests so an accidental

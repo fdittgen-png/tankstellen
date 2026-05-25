@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
+<!--
   Adaptive launcher icon (API 26+). The foreground is a vector drawable
   whose geometry already respects the 72dp safe zone; no inset wrapper
   needed. Pre-API-26 devices fall back to the legacy PNG in

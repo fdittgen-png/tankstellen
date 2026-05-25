@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # ============================================================================
 # TankSync — Create & Configure a New Supabase Project
 # ============================================================================

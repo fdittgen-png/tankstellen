@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../ev/domain/charging_cost_calculator.dart';
 import '../../ev/domain/entities/charging_log.dart';
 

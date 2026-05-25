@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_profile_catalog_matcher.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';

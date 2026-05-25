@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// One observation in the price-prediction feature space.
 ///
 /// **This is the input contract for the future TFLite phase-2 model

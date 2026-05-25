@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Segregated storage interfaces following the Interface Segregation Principle.
 ///
 /// Each interface covers a single data domain (3-5 methods).

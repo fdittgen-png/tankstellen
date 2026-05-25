@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// How the user chose to sync their data.
 ///
 /// This enum is persisted in Hive so the app remembers the choice.

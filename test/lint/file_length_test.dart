@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -67,7 +70,18 @@ void main() {
       if (entity is! File) continue;
       final path = entity.path;
       if (!isScanned(path)) continue;
-      final lines = entity.readAsLinesSync().length;
+      final rawLines = entity.readAsLinesSync();
+      // The standard MIT SPDX header (#2053) adds 3 lines at the top of
+      // every file (copyright, SPDX-License-Identifier, blank). Discount
+      // it so the 400-line norm measures actual content, not boilerplate.
+      final headerOffset =
+          rawLines.length >= 2 &&
+                  rawLines[0]
+                      .contains('Copyright (c) 2026 Florian DITTGEN') &&
+                  rawLines[1].contains('SPDX-License-Identifier')
+              ? 3
+              : 0;
+      final lines = rawLines.length - headerOffset;
       if (lines <= lineLimit) continue;
       if (grandfathered.contains(path)) {
         stillOver.add(path);

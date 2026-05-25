@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Network-tagged tests
 
 This project keeps a small set of tests that hit **real, third-party**

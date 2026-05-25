@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import 'broken_map_belief.dart';
 

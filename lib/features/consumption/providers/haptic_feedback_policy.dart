@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../domain/cold_start_baselines.dart';
 
 /// Haptic strength emitted when the consumption band changes (#767).

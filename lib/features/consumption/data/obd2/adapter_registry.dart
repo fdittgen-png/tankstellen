@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'adapters/smart_obd_adapter.dart';
 import 'adapters/v_linker_fs_adapter.dart';
 import 'elm327_adapter.dart';

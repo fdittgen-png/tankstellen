@@ -1,4 +1,7 @@
-﻿import 'package:sentry_flutter/sentry_flutter.dart';
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'models/error_trace.dart' as et;
 

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Pure-logic gear inference for the "labouring in low gear" coaching
 /// signal (#1263 phase 1).
 ///

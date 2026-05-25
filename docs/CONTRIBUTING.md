@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Contributing to Tankstellen
 
 Thank you for your interest in contributing to Tankstellen, the free fuel price

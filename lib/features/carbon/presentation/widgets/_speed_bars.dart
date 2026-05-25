@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Internal bar-rendering widgets for [SpeedConsumptionCard] (#1192).
 ///
 /// Split out of `speed_consumption_card.dart` to keep that file under

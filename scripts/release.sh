@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # release.sh — Bump version, generate changelog entry, commit, tag, and push.
 #
 # Usage:

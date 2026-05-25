@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Blocker — Apply 20260418 Supabase migration (#713)
 
 The `vehicles` and `fill_ups` tables added in the 5.0.0+5032 build are

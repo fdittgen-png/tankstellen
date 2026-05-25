@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'dart:convert';
 
 /// Testable seam for the JSON the home-screen widget reads (#753).

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'entities/fill_up.dart';
 
 /// Pure helpers for the OBD2 fill-up reconciliation flow (#1401 phase 7b).

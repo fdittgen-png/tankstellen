@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Generates the `en_XA` pseudo-locale ARB for text-expansion testing
 // (#1699).
 //

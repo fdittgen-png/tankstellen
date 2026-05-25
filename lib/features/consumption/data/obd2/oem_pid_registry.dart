@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'adapter_capability.dart';
 import 'oem_pid_table.dart';
 import 'oem_pid_tables/opel_oem_pid_table.dart';

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 part of 'all_prices_station_card.dart';
 
 /// A single fuel badge rendered inside [AllPricesStationCard].

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // #1584 — Tagged `flaky` because share_plus's platform channel
 // occasionally returns null or doesn't call back in the headless
 // test environment, so the captured ShareParams arrives late or not

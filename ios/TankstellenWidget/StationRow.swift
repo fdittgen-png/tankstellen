@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Decodable mirror of the Dart-side widget row (see
 // `lib/features/widget/data/home_widget_service.dart` /
 // `nearest_widget_data_builder.dart`).

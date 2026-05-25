@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Classifies the raw text decoded from a QR code into one of a
 /// small set of actionable categories for the payment-scan flow
 /// (#587).

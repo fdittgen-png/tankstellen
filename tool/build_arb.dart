@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Merges ARB fragment files into the canonical `app_<locale>.arb` templates.
 //
 // Rationale: during parallel-worker sessions, every worker appending new

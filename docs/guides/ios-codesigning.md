@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # iOS code signing — fastlane match
 
 iOS signing identities (development cert + appstore distribution cert) and the

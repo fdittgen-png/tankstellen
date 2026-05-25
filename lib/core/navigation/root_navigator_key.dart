@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/widgets.dart';
 
 /// The root [Navigator]'s key, handed to the app's `GoRouter`

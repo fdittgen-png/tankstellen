@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
+<!--
   TEMPORARY widget color palette (Phase 1 of #607 — widget redesign epic).
 
   Designer will swap these hex values in a follow-up PR; they are

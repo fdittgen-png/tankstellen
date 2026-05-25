@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Per-country price validation to flag suspicious fuel prices.
 ///
 /// Checks prices against absolute thresholds and relative deviation

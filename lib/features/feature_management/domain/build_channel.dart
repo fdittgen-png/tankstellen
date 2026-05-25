@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// The release channel a running build belongs to (epic #1670).
 ///
 /// Two channels:

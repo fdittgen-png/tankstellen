@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Tankstellen Backup XML — Schema v1.0
 
 This page describes the format produced by the Consumption screen's

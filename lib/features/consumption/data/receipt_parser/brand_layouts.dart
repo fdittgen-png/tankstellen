@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'brand_detection.dart';
 import 'receipt_field_extractors.dart';
 import 'receipt_parse_result.dart';

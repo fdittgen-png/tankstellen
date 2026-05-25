@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/trips_sync.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';

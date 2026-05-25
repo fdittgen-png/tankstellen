@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Widget tests for `lib/app/app.dart` (#561 — zero-coverage backlog).
 //
 // `TankstellenApp` is the top-level Material app: it reads three providers

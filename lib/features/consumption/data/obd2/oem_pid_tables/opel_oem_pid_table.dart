@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../oem_pid_table.dart';
 import 'psa_oem_pid_table.dart';
 

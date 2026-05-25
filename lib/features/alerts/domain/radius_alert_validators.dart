@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Pure validators / parsers for the Radius Alert create form (#563).
 ///
 /// Pulled out of `radius_alert_create_sheet.dart` so the rules can be

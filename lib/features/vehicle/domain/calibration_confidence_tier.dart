@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// User-facing trustworthiness label for a vehicle's consumption
 /// calibration (#2027). Surfaced as a small chip on the vehicle
 /// calibration screen + the per-trip summary header so the user

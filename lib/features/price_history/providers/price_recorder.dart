@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/foundation.dart';
 import '../../search/domain/entities/station.dart';
 import '../data/models/price_record.dart';

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Widget extension bundle entry point.
 //
 // Defines the Nearest-Stations widget and registers it with the WidgetKit

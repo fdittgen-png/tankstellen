@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../entities/service_reminder.dart';
 
 /// Pure domain helper that decides which reminders an odometer

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Tests the per-widget profile override (#610).
 //
 // The configure activity writes `profile_<appWidgetId>` into SharedPreferences

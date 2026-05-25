@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'eco_route_candidate.dart';
 
 /// Pure scoring math for the eco strategy (#1123).

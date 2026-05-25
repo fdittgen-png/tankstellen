@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 part of 'station_card.dart';
 
 /// Compact single-fuel price row used in all-fuels mode: colored dot,

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// What kind of search the user is performing — the presentation layer's
 /// domain model for the search tab strip. Kept in `domain/` so it can be
 /// used by providers and screens without leaking imports from `data/`.

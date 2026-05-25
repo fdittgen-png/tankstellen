@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 <resources>
     <color name="ic_launcher_background">#2E7D32</color>
     <!-- Widget text colors with explicit light/dark variants so dark-mode

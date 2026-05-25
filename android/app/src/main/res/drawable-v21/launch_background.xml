@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
+<!--
   Branded splash for API 21+ — mirror of drawable/launch_background.xml.
   See that file for the rationale; this variant exists because Flutter's
   default project layout shipped both and some launchers pick one over

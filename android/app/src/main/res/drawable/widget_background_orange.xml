@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
+<!--
   TEMPORARY widget background — orange accent scheme (Phase 1 of #607).
   Colour tokens live in values/widget_color_schemes.xml; designer may
   replace the hex values there without touching this file.

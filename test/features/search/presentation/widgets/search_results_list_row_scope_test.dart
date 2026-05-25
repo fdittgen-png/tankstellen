@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Regression test for #1771 — each row of [SearchResultsList] watches
 // its favorite/rating providers inside its own per-row `Consumer`, so a
 // favorite toggle or rating change rebuilds only that row instead of

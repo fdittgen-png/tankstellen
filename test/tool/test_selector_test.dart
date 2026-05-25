@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Tests for `tool/test_selector.dart` (#1592 / Epic #1591).
 //
 // The selector is a CLI tool, not an importable library, so we drive

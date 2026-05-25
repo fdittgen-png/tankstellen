@@ -1,4 +1,7 @@
-﻿import 'dart:io' show Platform;
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';

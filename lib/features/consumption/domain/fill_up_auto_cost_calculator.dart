@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Auto-fills the total-cost field on the Add-Fill-up form (#581)
 /// when the screen receives a non-null `preFilledPricePerLiter` from
 /// the station context.

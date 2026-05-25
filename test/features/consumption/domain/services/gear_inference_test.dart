@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/services/gear_inference.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';

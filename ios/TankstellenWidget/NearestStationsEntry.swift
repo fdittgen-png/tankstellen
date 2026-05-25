@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // TimelineEntry payload for the Nearest-Stations widget.
 //
 // `rows` is the parsed `nearest_json` array (see `StationRow`). `isStale`

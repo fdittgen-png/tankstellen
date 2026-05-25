@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 part of 'service_reminder_section.dart';
 
 /// Preset chip row rendered above the reminder list inside

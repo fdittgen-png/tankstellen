@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Daily Feature Concept — 2026-05-05
 
 ## Detailed Architecture & Implementation Document

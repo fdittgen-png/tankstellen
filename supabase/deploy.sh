@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Deploy Supabase Edge Functions and apply migrations.
 # Usage: bash supabase/deploy.sh
 #

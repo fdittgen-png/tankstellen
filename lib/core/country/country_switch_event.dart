@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/profile/data/models/user_profile.dart';
 import '../../features/profile/providers/profile_provider.dart';

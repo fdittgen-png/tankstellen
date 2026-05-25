@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Flutter
 -keep class io.flutter.app.** { *; }
 -keep class io.flutter.plugin.** { *; }

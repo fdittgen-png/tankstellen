@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../constants/app_constants.dart';
 import 'error_report_payload.dart';
 

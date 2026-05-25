@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Retroactive volumetric-efficiency (η_v) recompute (#1858).
 //
 // When a vehicle's η_v is corrected, every stored trip that recorded

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Tests for HomeWidgetService.publishProfiles (#610).
 //
 // The configure activity (Kotlin side) reads a JSON array from the

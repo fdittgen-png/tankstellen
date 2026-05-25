@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// User-facing settings for the glide-coach feature (#1125 phase 3a).
 ///
 /// Wired into the runtime in phase 3b; defaulted to disabled per
