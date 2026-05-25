@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/services.dart';
 
 import '../domain/cold_start_baselines.dart';

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Trend direction for a fuel price over a time window.
 enum PriceTrend { up, down, stable }
 

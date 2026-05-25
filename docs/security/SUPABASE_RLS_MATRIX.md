@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Supabase RLS Policy Matrix
 
 This document is the **authoritative inventory** of every Supabase

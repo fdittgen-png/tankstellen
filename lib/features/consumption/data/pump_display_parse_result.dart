@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Fields extracted from a fuel pump display (the 7-segment / LCD
 /// panel on the pump itself, NOT the paper receipt).
 ///

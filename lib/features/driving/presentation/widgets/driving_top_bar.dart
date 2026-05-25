@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';

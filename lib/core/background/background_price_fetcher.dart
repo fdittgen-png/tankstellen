@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Platform-agnostic interface for background price fetching.
 ///
 /// Android uses WorkManager for periodic background tasks.

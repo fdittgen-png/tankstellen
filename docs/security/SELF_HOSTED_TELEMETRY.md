@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Self-Hosted Telemetry (Glitchtip)
 
 > Status: opt-in. Sentry is the default. Swap procedure is documented

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Abstract interface for authentication.
 ///
 /// ## Reusability

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // TimelineProvider that reads the latest Nearest-Stations payload from
 // the shared App Group container.
 //

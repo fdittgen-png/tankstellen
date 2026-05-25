@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/driving_insights_analyzer.dart';
 import 'package:tankstellen/features/consumption/domain/driving_insight.dart';

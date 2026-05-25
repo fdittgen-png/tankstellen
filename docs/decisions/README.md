@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Architecture Decision Records
 
 This directory contains Architecture Decision Records (ADRs) for the

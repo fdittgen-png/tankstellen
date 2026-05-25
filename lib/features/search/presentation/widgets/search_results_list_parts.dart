@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 part of 'search_results_list.dart';
 
 /// Extracts fuel stations from the unified results list.

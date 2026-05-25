@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Driving insights — counterfactual model
 
 Phase 1 of #1041 introduces an analytical layer that turns a trip's raw OBD2

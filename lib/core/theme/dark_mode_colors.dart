@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 
 /// Semantic colors that adapt to light / dark mode for WCAG AA contrast.

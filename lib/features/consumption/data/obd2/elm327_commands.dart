@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Coarse vehicle brand used to pick a manufacturer-specific odometer
 /// PID when the standard PID A6 isn't supported (#719). The VIN's WMI
 /// prefix (first 3 chars) maps to one of these.

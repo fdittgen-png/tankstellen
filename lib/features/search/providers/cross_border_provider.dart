@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/country/border_proximity.dart';
 import '../../../core/country/country_provider.dart';

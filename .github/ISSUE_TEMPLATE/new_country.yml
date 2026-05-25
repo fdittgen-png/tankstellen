@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 name: New Country API
 description: Request or propose support for a new country's fuel price data
 labels: ["type/feature", "new-country"]

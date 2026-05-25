@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// ELM327 OBD-II protocol module.
 ///
 /// The ELM327 is an OBD-to-serial interpreter chip. Commands are ASCII

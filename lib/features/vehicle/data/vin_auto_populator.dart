@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../domain/entities/vehicle_profile.dart';
 import '../domain/entities/vin_data.dart';
 

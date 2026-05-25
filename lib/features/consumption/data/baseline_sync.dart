@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Per-situation merge helpers for syncing OBD2 baselines (#780).
 ///
 /// Baseline payloads shape (as produced by [BaselineStore.flush]):

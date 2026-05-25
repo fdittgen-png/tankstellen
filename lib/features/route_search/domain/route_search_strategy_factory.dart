@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../data/strategies/balanced_search_strategy.dart';
 import '../data/strategies/cheapest_search_strategy.dart';
 import '../data/strategies/eco_route_search_strategy.dart';

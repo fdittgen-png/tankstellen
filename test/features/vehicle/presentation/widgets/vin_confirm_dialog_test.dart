@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vin_data.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/vin_confirm_dialog.dart';

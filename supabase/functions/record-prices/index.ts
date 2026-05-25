@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Edge Function: record-prices
 // Records price snapshots for all stations referenced by active alerts.
 // Intended to be called by pg_cron hourly. Also cleans up snapshots

@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Vehicle abstraction
 
 A guide for contributors who want to know how Tankstellen models a

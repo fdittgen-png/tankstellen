@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 default_platform(:ios)
 
 # Builds an App Store Connect API key payload that match / pilot / sigh can

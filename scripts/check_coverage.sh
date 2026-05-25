@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Coverage threshold enforcement for CI and local use.
 # Parses lcov.info, excludes generated files, and fails if coverage is below threshold.
 #

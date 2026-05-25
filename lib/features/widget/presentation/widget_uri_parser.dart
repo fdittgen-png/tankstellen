@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Parses a home-widget launch URI into the router path it should push.
 ///
 /// URI contract (set natively by `StationWidgetRenderer.buildActivity`):

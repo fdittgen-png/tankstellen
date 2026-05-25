@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '_pump_display_helpers.dart';
 import '_pump_display_patterns.dart';
 import '_pump_display_pollution.dart';

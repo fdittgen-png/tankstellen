@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 """Generate Sparkilo's localized privacy policy pages.
 
 Input: the TRANSLATIONS dict below (one entry per locale, holding every

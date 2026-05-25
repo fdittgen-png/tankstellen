@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// A type-safe union for operations that can succeed or fail.
 ///
 /// Uses Dart sealed classes so callers can pattern-match exhaustively:

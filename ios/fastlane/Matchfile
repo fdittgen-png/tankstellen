@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # SSH URL: avoids relying on a fine-grained PAT (which kept hitting 403 even
 # with read-only Contents scope). Local devs need their personal GitHub SSH
 # key loaded; CI loads MATCH_DEPLOY_KEY (ed25519 deploy key on the certs

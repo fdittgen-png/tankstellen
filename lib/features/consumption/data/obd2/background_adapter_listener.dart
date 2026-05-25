@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Abstract event source for the OS-level Bluetooth auto-connect
 /// bridge that drives hands-free trip recording (#1004 phase 2).
 ///

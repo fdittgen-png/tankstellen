@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Average price for a specific hour of day (0-23).
 class HourlyAverage {
   final int hour; // 0-23

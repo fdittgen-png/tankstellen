@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Base class for all domain exceptions in the app.
 ///
 /// Sealed so that `switch` on [AppException] is exhaustive and all

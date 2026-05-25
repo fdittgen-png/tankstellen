@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Abstract notification service interface.
 ///
 /// Decouples notification logic from the concrete plugin so an

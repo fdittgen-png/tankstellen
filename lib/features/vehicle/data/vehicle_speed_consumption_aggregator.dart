@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../consumption/domain/trip_recorder.dart';
 import '../domain/entities/speed_consumption_histogram.dart';
 

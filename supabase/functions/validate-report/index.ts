@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Edge Function: validate-report
 // Validates community-submitted price reports by comparing against official
 // prices and enforcing rate limits. Intended to be called via a database

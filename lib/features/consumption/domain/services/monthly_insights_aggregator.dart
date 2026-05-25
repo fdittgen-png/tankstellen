@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// "This month vs last month" aggregator for the Trajets tab landing
 /// screen (#1041 phase 4 — Aggregates surface).
 ///

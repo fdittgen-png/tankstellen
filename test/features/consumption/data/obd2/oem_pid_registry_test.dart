@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_capability.dart';
 import 'package:tankstellen/features/consumption/data/obd2/oem_pid_registry.dart';

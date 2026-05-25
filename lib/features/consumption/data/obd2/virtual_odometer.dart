@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/foundation.dart';
 
 /// One vehicle-speed observation captured during trip recording.

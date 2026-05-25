@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Registry of major fuel station brands across all supported countries.
 ///
 /// Brands not in this list are grouped under "Others" in the brand filter.

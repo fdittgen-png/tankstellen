@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 part of 'station_card.dart';
 
 /// Right-side block: user rating stars, selected-fuel price with tier icon

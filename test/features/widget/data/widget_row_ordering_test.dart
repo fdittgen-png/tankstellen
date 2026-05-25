@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Regression guard for issue #753 — hypothesis 4.
 //
 // Bug hypothesis: the favorites home-screen widget shows station rows in an

@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Hard-coded user-facing text — remediation worklist
 
 Tracks the output of the hard-coded-text detector

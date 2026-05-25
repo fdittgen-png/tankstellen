@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/station.dart';

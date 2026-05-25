@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Argentine "Secretaría de Energía" open-data CSV uses product strings like:
 ///   - "Nafta (premium) de más de 95 Ron"
 ///   - "Nafta (súper) entre 92 y 95 Ron"

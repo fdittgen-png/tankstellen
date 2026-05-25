@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'auto_record_trace_log.dart';
 
 /// Formats a list of [AutoRecordEvent]s into a plain-text OBD2

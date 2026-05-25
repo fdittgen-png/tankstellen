@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Regression tests for #491 — verify that amenity, open-only, and brand
 // filter providers actually narrow the visible station list in
 // [SearchResultsList]. Before the fix, only the brand filter was applied;

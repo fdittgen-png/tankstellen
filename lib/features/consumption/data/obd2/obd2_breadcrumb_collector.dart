@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// In-memory ring buffer that captures every fuel-rate sample the
 /// OBD2 stack produces during a recording trip — the raw inputs (PID
 /// 5E read, MAF read, MAP/IAT/RPM samples), the resolved branch

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/calculator/presentation/widgets/calculator_result_card.dart';
 import 'package:tankstellen/features/calculator/providers/calculator_provider.dart';

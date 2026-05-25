@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'feature.dart';
 import 'feature_dependency_graph.dart';
 import 'feature_manifest.dart';

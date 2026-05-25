@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 name: Bug Report
 description: Report something that isn't working correctly
 labels: ["type/bug", "needs-triage"]

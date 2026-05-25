@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Phone screenshots — en-US
 
 Drop 8 PNGs (1080x1920 preferred) in this directory with the filenames

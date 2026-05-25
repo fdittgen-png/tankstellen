@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Edge Function: aggregate-wait-times
 //
 // Pairs "arrived"/"left" pings by session_id, computes a rolling

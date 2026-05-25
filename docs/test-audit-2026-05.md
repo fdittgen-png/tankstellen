@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Test-suite audit — May 2026
 
 **Issue**: #1579 (parent epic #1578, CI optimisation).

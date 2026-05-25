@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 part of 'station_card.dart';
 
 /// Status dot (green/red) with optional 24h badge below it.

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../l10n/app_localizations.dart';
 import '../data/obd2/obd2_connection_errors.dart';
 

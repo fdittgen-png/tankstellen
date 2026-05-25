@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // #595 — verify the staggered fade-in wraps each card in the
 // search results list so the shimmer → results transition feels
 // like a cascade rather than a flash.

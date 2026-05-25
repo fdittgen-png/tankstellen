@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'dart:ui' as ui;
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';

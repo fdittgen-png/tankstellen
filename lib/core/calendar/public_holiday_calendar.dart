@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Pure-Dart helper for resolving fixed-date European public holidays.
 ///
 /// Used by the [PriceFeatureExtractor] (#1117 phase 1) to mark records

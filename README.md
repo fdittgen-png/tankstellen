@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 ﻿<p align="center">
   <img src="assets/icon.png" alt="Sparkilo app icon" width="160" height="160" />
 </p>

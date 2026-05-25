@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # test_deploy.sh — Validate deploy scripts and workflow YAML syntax.
 #
 # Usage:

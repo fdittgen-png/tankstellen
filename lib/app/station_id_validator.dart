@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Validator for station ids coming from deep links.
 ///
 /// Station ids come from many different APIs — short numeric codes

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// RFC 4180 CSV encoder used by [DataExporter].
 ///
 /// Kept as a sibling helper (private to the package via the leading

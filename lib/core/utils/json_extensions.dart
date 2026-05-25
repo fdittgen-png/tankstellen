@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Safe typed accessors for `Map<String, dynamic>` JSON payloads.
 ///
 /// Replaces fragile `data['key'] as Type?` casts that throw at runtime if the

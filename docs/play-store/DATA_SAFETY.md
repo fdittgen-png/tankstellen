@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Play Store Data Safety Form Responses
 
 > Reference document for completing the Google Play Console Data Safety section.

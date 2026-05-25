@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 <TankstellenBackup version="1.0" xmlns="https://tankstellen.app/backup/v1">
   <ExportedAt>2026-04-30T22:04:00.000Z</ExportedAt>
   <AppVersion>5.0.0</AppVersion>

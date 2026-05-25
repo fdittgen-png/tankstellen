@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// A road grade (slope) estimate with a confidence flag (#1941).
 class RoadGrade {
   /// Signed grade as a rise/run fraction — positive uphill, negative

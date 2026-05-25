@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../l10n/app_localizations.dart';
 
 /// Pure validators / parsers shared by the Add-Fill-up form (#563

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Classifies a single harsh-driving event captured by
 /// [HarshEventDetector] (#2029). Replaces the old integer counters
 /// with a typed list so post-trip coaching can say "harsh brake at

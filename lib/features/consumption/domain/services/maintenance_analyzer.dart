@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Predictive-maintenance trend analyzer for the Trips data layer (#1124).
 ///
 /// Walks the last 30 days of finalised trips and surfaces a small

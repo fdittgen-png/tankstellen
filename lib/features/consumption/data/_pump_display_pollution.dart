@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Pre-processing helpers that strip OCR pollution from French pump
 /// photos before [PumpDisplayParser] applies labelled extraction and
 /// positional inference.

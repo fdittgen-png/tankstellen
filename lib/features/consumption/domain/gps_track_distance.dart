@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'dart:math' as math;
 
 /// A single GPS fix on a recorded trip's track — latitude / longitude

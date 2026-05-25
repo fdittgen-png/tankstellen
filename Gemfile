@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 source "https://rubygems.org"
 
 # fastlane drives iOS code signing (match) and TestFlight uploads (pilot).

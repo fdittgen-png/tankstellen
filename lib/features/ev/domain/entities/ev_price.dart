@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// A structured EV charging price parsed from the free-form
 /// `ChargingStation.usageCost` string (#1785).
 ///

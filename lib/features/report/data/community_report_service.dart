@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/field_names.dart';

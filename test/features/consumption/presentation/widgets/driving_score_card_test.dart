@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/driving_score.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/driving_score_card.dart';

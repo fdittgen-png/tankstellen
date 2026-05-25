@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Typed errors for the OBD2 connection flow (#741).
 ///
 /// Replaces the former catch-all `Exception('OBD-II error: …')` so the

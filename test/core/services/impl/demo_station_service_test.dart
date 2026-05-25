@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/impl/demo_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';

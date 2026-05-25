@@ -1,4 +1,7 @@
-﻿import 'package:flutter/foundation.dart';
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../telemetry/storage/isolate_error_spool.dart';

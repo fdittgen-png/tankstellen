@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'dart:math' as math;
 
 /// Online running-mean + running-variance accumulator via Welford's

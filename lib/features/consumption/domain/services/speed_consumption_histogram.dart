@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Speed-vs-consumption histogram aggregator (#1192).
 ///
 /// Folds a stream of per-second [TripSample]s into seven fixed

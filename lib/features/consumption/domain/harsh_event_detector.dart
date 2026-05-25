@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'harsh_event.dart';
 
 /// Detects harsh-braking / harsh-acceleration events from a stream of

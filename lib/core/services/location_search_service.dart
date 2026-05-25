@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'dart:async';
 import 'package:dio/dio.dart';
 import '../cache/cache_manager.dart';

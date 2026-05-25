@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Formats a byte count into a human-readable string.
 ///
 /// Mirrors the `_formatBytes` logic used in

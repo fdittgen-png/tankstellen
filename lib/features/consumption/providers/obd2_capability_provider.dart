@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Surfaces the runtime [Obd2AdapterCapability] of the currently
 // connected adapter (#1401 phase 6).
 //

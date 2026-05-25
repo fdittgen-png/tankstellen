@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../storage/storage_providers.dart';
 import '../models/error_trace.dart';

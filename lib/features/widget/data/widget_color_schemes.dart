@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Valid widget color-scheme identifiers, matching the Android drawable set.
 ///
 /// Kept in sync with

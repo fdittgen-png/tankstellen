@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Tankerkoenig API response field names.
 ///
 /// Centralizes magic strings used when parsing JSON responses from

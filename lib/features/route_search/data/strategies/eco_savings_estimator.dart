@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Estimated litres saved by picking the eco route over the fastest.
 ///
 /// Simple model: distance × consumption_baseline_lPer100km / 100,

@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # ADR 0005: Service chain fallback pattern
 
 **Status:** Accepted

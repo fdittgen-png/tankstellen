@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../../core/data/storage_repository.dart';
 
 /// Persistent per-adapter broken-MAP blocklist (#1423 phase 4).

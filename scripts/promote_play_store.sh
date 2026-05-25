@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # promote_play_store.sh — Promote a Play Store release to production with staged rollout.
 #
 # Used by the deploy.yml workflow dispatch action. Reads the latest release from

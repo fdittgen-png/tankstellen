@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/glide_coach/data/osm_traffic_signal_client.dart';
 import 'package:tankstellen/features/glide_coach/data/traffic_signal_repository.dart';

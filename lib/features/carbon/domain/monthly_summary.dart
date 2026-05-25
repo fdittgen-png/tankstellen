@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../core/services/co2_calculator.dart';
 import '../../consumption/domain/entities/fill_up.dart';
 

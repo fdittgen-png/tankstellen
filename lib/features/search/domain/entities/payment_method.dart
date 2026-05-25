@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 
 /// Payment methods that may be accepted at a fuel station.

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/form_section_card.dart';

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:permission_handler/permission_handler.dart';
 
 /// Coarse state for the camera permission needed by the QR scanner

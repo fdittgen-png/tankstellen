@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Feature Concept Drafts
 
 Long-form feature proposals + concept-architecture deep-dives surfaced from the daily competitive-analysis loop. Each file is a snapshot at the date in its filename — these are exploration drafts, not committed roadmap.

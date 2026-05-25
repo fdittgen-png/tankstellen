@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // Lists petrol-only catalog entries that have a popular European diesel
 // sibling but no matching diesel row in `vehicles.json` (#1396).
 //

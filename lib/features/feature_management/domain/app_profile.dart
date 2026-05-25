@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'feature.dart';
 
 /// User-facing "use mode" that bundles a curated set of [Feature] flags

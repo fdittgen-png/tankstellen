@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Offline WMI (World Manufacturer Identifier) lookup table.
 ///
 /// The first 3 characters of a VIN encode the manufacturer and, in most

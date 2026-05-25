@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/feature_management/domain/consumption_tab_visibility.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';

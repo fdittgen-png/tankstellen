@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // SwiftUI body for the Nearest-Stations widget.
 //
 // Renders one row per station with `widgetURL` set to the

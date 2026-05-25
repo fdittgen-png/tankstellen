@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 // ntfy.sh push notification helper.
 // ntfy is a simple HTTP-based pub/sub notification service.
 // Users subscribe to a topic in their ntfy app; we POST messages to that topic.

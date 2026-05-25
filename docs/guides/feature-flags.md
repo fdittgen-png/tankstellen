@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Feature flags — registry, gating, profile bundles
 
 Single source of truth for every `Feature` enum value the app ships:

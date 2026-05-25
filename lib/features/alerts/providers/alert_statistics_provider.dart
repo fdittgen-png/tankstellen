@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/models/price_alert.dart';
 import 'alert_provider.dart';

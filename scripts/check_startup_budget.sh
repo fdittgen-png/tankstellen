@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Startup time budget enforcement for CI.
 # Verifies that startup instrumentation is in place and that the
 # timer utility tests pass. On a real device/emulator, this would

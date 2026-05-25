@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:dio/dio.dart';
 
 import '../../../core/background/background_retry.dart';

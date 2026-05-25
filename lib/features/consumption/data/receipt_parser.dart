@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../search/domain/entities/fuel_type.dart';
 import 'receipt_override_registry.dart';
 import 'receipt_parser/brand_detection.dart';

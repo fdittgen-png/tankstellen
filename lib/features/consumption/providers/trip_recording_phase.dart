@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Lifecycle phase of the app-wide OBD2 trip recording (#726).
 ///
 /// #797 phase 1 adds [pausedDueToDrop] for the "Bluetooth link lost

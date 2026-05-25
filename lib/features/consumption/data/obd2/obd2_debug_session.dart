@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/foundation.dart';
 
 // The recorder lives in its own file (#1930 — keeps each under the

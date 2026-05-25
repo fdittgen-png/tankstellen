@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Pump-display OCR failure corpus — #1711
 
 Ten real fuel-pump photos (downsized to ≤1280 px) on which the

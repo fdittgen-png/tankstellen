@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Maps fuel station brand names to their logo image URLs.
 ///
 /// Uses favicon/logo services that don't require API keys.

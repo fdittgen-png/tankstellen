@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/foundation.dart';
 
 /// Gamification badges (#781 phase 1). Deliberately small and

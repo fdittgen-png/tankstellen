@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Regex patterns and lookup tables used by [PumpDisplayParser].
 ///
 /// Centralised here so the parser class can stay focused on

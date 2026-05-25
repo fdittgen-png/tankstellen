@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// ELM327 response parsers — pure string→value decoders for Mode 01,
 /// Mode 09 and Mode 22 responses.
 ///

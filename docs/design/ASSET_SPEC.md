@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Tankstellen — Brand Asset Specification
 
 **Status:** living document. Generator-ready spec for every brand asset

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Direction the current fill-up moved relative to the rolling baseline.
 ///
 /// Used on the fill-up card as a single glance cue: did I drive more

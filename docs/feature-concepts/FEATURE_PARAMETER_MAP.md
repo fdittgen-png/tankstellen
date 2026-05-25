@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Feature × Parameter Visibility Map (#1575)
 
 Snapshot of every value in the `Feature` enum and the parameter

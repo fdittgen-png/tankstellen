@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// OEM-specific PID table abstraction (#1401 phase 3).
 ///
 /// Standard OBD-II PID `0x2F` reports fuel level as 0-100% in coarse

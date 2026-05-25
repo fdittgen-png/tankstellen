@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/foundation.dart';
 
 import '../../features/alerts/data/models/price_alert.dart';

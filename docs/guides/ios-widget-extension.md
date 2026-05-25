@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # iOS Widget Extension — Mac-developer setup checklist
 
 This PR adds **source-tracked scaffolding** for an iOS WidgetKit

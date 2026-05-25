@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'entities/charging_log.dart';
 
 /// Pure-Dart pricing math for EV charging logs (#582 phase 1).

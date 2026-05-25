@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/screens/gdpr_consent_screen.dart';

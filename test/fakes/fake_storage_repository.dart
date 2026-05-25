@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:tankstellen/core/data/storage_repository.dart';
 
 import 'fake_hive_storage.dart';

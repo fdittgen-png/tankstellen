@@ -1,4 +1,7 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter_test/flutter_test.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart' as et;
 import 'package:tankstellen/core/telemetry/pii_scrubber.dart';

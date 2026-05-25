@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 name: Nightly Full Test Suite
 
 # Paranoia net for #1591's path-affected test selector — if the selector

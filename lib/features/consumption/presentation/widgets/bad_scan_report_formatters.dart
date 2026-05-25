@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_scan_service.dart';

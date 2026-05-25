@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Drop zone
 
 Drop fresh phone captures here. Any filename, any order. Then run `/play-store-shots` and the skill will:

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Tests for scripts/release.sh
 #
 # Run: bash test/scripts/release_script_test.sh

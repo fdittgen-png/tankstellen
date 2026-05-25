@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import '../../sync/alerts_sync.dart';
 import '../../sync/favorites_sync.dart';
 import '../../sync/ignored_stations_sync.dart';

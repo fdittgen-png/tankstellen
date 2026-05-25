@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Gear-based coaching metrics derived from [inferGears] output
 /// (#1263 phase 2).
 ///

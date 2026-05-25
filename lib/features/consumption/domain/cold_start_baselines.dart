@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'situation_classifier.dart';
 
 /// Fuel-type-specific typical consumption for every steady-state

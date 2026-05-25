@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # Play Store Screenshots — drop zone + canonical set
 
 Two-step workflow:

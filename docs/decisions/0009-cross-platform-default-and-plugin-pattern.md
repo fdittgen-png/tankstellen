@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
 # ADR 0009: Cross-platform by default; platform-specific code lives in loosely-coupled plugins
 
 **Status:** Accepted

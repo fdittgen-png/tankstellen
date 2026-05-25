@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 import '../collectors/app_state_collector.dart';
 import '../collectors/breadcrumb_collector.dart';

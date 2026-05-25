@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Mixin for services that download a full national dataset and cache it
 /// in memory (MITECO, MISE, Argentina, Denmark).
 ///

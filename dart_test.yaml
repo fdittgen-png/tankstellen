@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 # Test runner configuration.
 #
 # Declares the tags that test files use so flutter_test doesn't warn

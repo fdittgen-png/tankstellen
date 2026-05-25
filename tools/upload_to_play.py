@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
 """Upload a Flutter-built AAB to a Google Play track via the Android Publisher API.
 
 Usage:

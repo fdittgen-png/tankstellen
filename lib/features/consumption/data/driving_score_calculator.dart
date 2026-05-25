@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
 /// Pure calculator that turns a stream of [TripSample]s into a
 /// [DrivingScore] composite for the trip Insights tab (#1041 phase 5a
 /// — Card A).
