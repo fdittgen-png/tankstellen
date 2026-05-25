@@ -197,4 +197,31 @@ enum TripKind {
         'gpsOnly' => TripKind.gpsOnly,
         _ => TripKind.gpsPlusObd2,
       };
+
+  /// Derives the kind from the actual sample data — the mid-trip
+  /// upgrade rule baked into #2025's acceptance: a trip that started
+  /// in GPS-only mode but later received OBD2 telemetry should be
+  /// classified as `gpsPlusObd2`.
+  ///
+  /// Heuristic: any sample with `rpm > 0` OR `fuelRateLPerHour != null`
+  /// is an OBD2 sample (GPS-only samples carry `rpm: 0` and a null
+  /// fuel rate by construction). One such sample flips the whole
+  /// trip — that's the "subsequent samples carry OBD2 fields" clause
+  /// from the issue.
+  ///
+  /// Returns [gpsPlusObd2] for an empty iterable so the historical
+  /// default holds when called against legacy data that doesn't
+  /// thread its samples through.
+  static TripKind fromSamples(Iterable<dynamic> samples) {
+    var sawAny = false;
+    for (final s in samples) {
+      sawAny = true;
+      final rpm = (s as dynamic).rpm as num? ?? 0;
+      final fuelRate =
+          (s as dynamic).fuelRateLPerHour as double?;
+      if (rpm > 0 || fuelRate != null) return TripKind.gpsPlusObd2;
+    }
+    if (!sawAny) return TripKind.gpsPlusObd2;
+    return TripKind.gpsOnly;
+  }
 }
