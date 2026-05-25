@@ -12,7 +12,7 @@
 #
 # Usage:
 #   PLAY_STORE_SERVICE_ACCOUNT_JSON='{"..."}' \
-#   PACKAGE_NAME=com.dittgen.tankstellen \
+#   PACKAGE_NAME=de.tankstellen.fuelprices \
 #   TRACK_FROM=internal \
 #   ROLLOUT_PERCENTAGE=5 \
 #   bash scripts/promote_play_store.sh
