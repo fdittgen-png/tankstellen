@@ -35,7 +35,10 @@ import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/driving_coaching.dart' show gpsCoachingHint;
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/gps_driving_features.dart';
+import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/trip_recorder.dart';
+import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
 import 'trip_haptic_controller.dart';
@@ -1336,9 +1339,36 @@ class TripRecording extends _$TripRecording {
     // hardcoding `gpsOnly`. If [_upgradeGpsOnlyToObd2] (or any future
     // mid-trip path) injected OBD2 samples into the buffer, the
     // resulting kind correctly flips to `gpsPlusObd2`.
-    final summary = recorder.buildSummary().copyWith(
+    var summary = recorder.buildSummary().copyWith(
           kind: TripKind.fromSamples(samples),
         );
+    // #2080 — for GPS-only / hybrid trips (no OBD2 fuel-rate
+    // coverage), feed the sample stream through GpsDrivingFeatures +
+    // the active vehicle's GpsCalibrationMatrix to impute
+    // `avgLPer100Km` and `fuelLitersConsumed`. The fields stay null
+    // when no active vehicle exists, when the trajet has no
+    // distance, or when the OBD2 path already populated them
+    // (gpsPlusObd2 trips skip this branch — `summary.kind` is the
+    // gate).
+    if (summary.kind == TripKind.gpsOnly &&
+        summary.avgLPer100Km == null) {
+      final features = GpsDrivingFeatures.from(samples);
+      if (features != null) {
+        final vehicle = ref.read(activeVehicleProfileProvider);
+        final matrix = vehicle?.gpsCalibration ??
+            GpsCalibrationMatrix.coldStart();
+        final est = GpsFuelEstimator.estimate(
+          matrix: matrix,
+          features: features,
+        );
+        if (est != null) {
+          summary = summary.copyWith(
+            avgLPer100Km: est.lPer100Km,
+            fuelLitersConsumed: est.litersConsumed,
+          );
+        }
+      }
+    }
     await _saveToHistory(
       summary,
       samples: samples,

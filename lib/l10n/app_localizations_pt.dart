@@ -4419,6 +4419,30 @@ class AppLocalizationsPt extends AppLocalizations {
       'Capturado durante a gravação para verificar a cadência GPS com o telemóvel em repouso.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Fria';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Aquecendo';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Convergente';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'Matriz GPS ainda aquecendo ($count refinamentos até agora). Estimativas provisórias.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'Matriz GPS convergindo ($count abastecimentos). Estimativas utilizáveis com possível variação de alguns %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'Matriz GPS convergiu ($count abastecimentos). Estimativas dentro de ~2 % do consumo real.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Condução';
 
   @override

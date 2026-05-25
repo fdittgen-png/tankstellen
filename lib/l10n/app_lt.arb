@@ -1743,5 +1743,47 @@
   "coachingGpsSmoothAccel": "Sklandus greitėjimas",
   "@coachingGpsSmoothAccel": {
     "description": "GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel."
+  },
+  "gpsMatrixMaturityCold": "Šalta",
+  "@gpsMatrixMaturityCold": {
+    "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
+  },
+  "gpsMatrixMaturityWarming": "Šyla",
+  "@gpsMatrixMaturityWarming": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 3–7 reconciliations with variance ≤ 1.5. Usable but still settling."
+  },
+  "gpsMatrixMaturityConverged": "Suderinta",
+  "@gpsMatrixMaturityConverged": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 8+ reconciliations with variance ≤ 0.5. Estimates trustworthy within ~2 %."
+  },
+  "gpsMatrixMaturityColdTooltip": "GPS matrica vis dar šyla ({count} patikslinimai iki šiol). Įverčiai yra laikini.",
+  "@gpsMatrixMaturityColdTooltip": {
+    "description": "Tooltip explaining the cold tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "gpsMatrixMaturityWarmingTooltip": "GPS matrica derinasi ({count} pildymai). Įverčiai naudotini, gali skirtis keliais %.",
+  "@gpsMatrixMaturityWarmingTooltip": {
+    "description": "Tooltip explaining the warming tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "gpsMatrixMaturityConvergedTooltip": "GPS matrica suderinta ({count} pildymai). Įverčiai ~2 % ribose faktinio sąnaudų.",
+  "@gpsMatrixMaturityConvergedTooltip": {
+    "description": "Tooltip explaining the converged tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
   }
 }

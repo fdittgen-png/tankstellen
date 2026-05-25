@@ -4386,6 +4386,30 @@ class AppLocalizationsDa extends AppLocalizations {
       'Optaget under optagelse for at verificere GPS-kadence under telefonsøvn.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Kold';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Varmer op';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konvergeret';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS-matrix varmer stadig op ($count forfininger indtil videre). Estimater er foreløbige.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS-matrix konvergerer ($count tankninger). Estimater er brugbare men kan afvige nogle få %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS-matrix er konvergeret ($count tankninger). Estimater inden for ~2 % af faktisk forbrug.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Kørsel';
 
   @override

@@ -1743,5 +1743,47 @@
   "coachingGpsSmoothAccel": "Ομαλή επιτάχυνση",
   "@coachingGpsSmoothAccel": {
     "description": "GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel."
+  },
+  "gpsMatrixMaturityCold": "Ψυχρή",
+  "@gpsMatrixMaturityCold": {
+    "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
+  },
+  "gpsMatrixMaturityWarming": "Ζεσταίνεται",
+  "@gpsMatrixMaturityWarming": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 3–7 reconciliations with variance ≤ 1.5. Usable but still settling."
+  },
+  "gpsMatrixMaturityConverged": "Συγκλίνουσα",
+  "@gpsMatrixMaturityConverged": {
+    "description": "Maturity tier label (#2082) — GPS matrix has 8+ reconciliations with variance ≤ 0.5. Estimates trustworthy within ~2 %."
+  },
+  "gpsMatrixMaturityColdTooltip": "Ο πίνακας GPS ζεσταίνεται ({count} βελτιστοποιήσεις μέχρι τώρα). Οι εκτιμήσεις είναι προσωρινές.",
+  "@gpsMatrixMaturityColdTooltip": {
+    "description": "Tooltip explaining the cold tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "gpsMatrixMaturityWarmingTooltip": "Ο πίνακας GPS συγκλίνει ({count} ανεφοδιασμοί). Εκτιμήσεις χρηστικές με πιθανή απόκλιση μερικών %.",
+  "@gpsMatrixMaturityWarmingTooltip": {
+    "description": "Tooltip explaining the warming tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "gpsMatrixMaturityConvergedTooltip": "Ο πίνακας GPS έχει συγκλίνει ({count} ανεφοδιασμοί). Εκτιμήσεις εντός ~2 % της πραγματικής κατανάλωσης.",
+  "@gpsMatrixMaturityConvergedTooltip": {
+    "description": "Tooltip explaining the converged tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
   }
 }

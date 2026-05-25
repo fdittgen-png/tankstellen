@@ -4428,6 +4428,30 @@ class AppLocalizationsEl extends AppLocalizations {
       'Καταγράφηκε κατά τη διάρκεια εγγραφής για επαλήθευση ρυθμού GPS κατά την αδρανοποίηση τηλεφώνου.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Ψυχρή';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Ζεσταίνεται';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Συγκλίνουσα';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'Ο πίνακας GPS ζεσταίνεται ($count βελτιστοποιήσεις μέχρι τώρα). Οι εκτιμήσεις είναι προσωρινές.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'Ο πίνακας GPS συγκλίνει ($count ανεφοδιασμοί). Εκτιμήσεις χρηστικές με πιθανή απόκλιση μερικών %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'Ο πίνακας GPS έχει συγκλίνει ($count ανεφοδιασμοί). Εκτιμήσεις εντός ~2 % της πραγματικής κατανάλωσης.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Οδήγηση';
 
   @override

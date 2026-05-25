@@ -4385,6 +4385,30 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kerätty tallennuksen aikana GPS-tahdin tarkistamiseksi puhelimen nukkuessa.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Kylmä';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Lämpenee';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Vakautunut';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS-matriisi vielä lämpenee ($count hienosäätöä toistaiseksi). Arviot ovat alustavia.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS-matriisi vakautuu ($count tankkausta). Arviot ovat käyttökelpoisia mutta voivat poiketa muutaman %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS-matriisi on vakautunut ($count tankkausta). Arviot ~2 %:n sisällä todellisesta kulutuksesta.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Ajaminen';
 
   @override

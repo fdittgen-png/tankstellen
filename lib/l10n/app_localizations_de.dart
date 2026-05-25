@@ -4412,6 +4412,30 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wird während der Aufzeichnung erfasst, um die GPS-Abtastung im Standby-Modus zu prüfen.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Kalt';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Aufwärmend';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Konvergiert';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS-Matrix wärmt sich noch auf ($count Verfeinerungen bisher). Schätzungen sind vorläufig.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS-Matrix nähert sich an ($count Tankfüllungen). Schätzungen sind brauchbar, können aber um wenige % abweichen.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS-Matrix ist konvergiert ($count Tankfüllungen). Schätzungen liegen innerhalb ~2 % des realen Verbrauchs.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Fahrweise';
 
   @override

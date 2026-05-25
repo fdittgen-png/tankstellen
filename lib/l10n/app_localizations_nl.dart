@@ -4402,6 +4402,30 @@ class AppLocalizationsNl extends AppLocalizations {
       'Vastgelegd tijdens opname om GPS-cadans te verifiëren tijdens telefoonscherm-uit.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Koud';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Opwarmen';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Geconvergeerd';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS-matrix warmt nog op ($count verfijningen tot nu toe). Schattingen zijn voorlopig.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS-matrix convergeert ($count tankbeurten). Schattingen bruikbaar maar kunnen enkele % afwijken.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS-matrix is geconvergeerd ($count tankbeurten). Schattingen binnen ~2 % van werkelijk verbruik.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Rijden';
 
   @override

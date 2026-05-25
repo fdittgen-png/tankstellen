@@ -4420,6 +4420,30 @@ class AppLocalizationsEs extends AppLocalizations {
       'Capturado durante la grabación para verificar la cadencia del GPS con el teléfono en reposo.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Fría';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Calentando';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Convergida';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'La matriz GPS está calentando ($count refinamientos hasta ahora). Estimaciones provisionales.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'La matriz GPS está convergiendo ($count llenados). Estimaciones utilizables pero pueden desviarse unos %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'La matriz GPS ha convergido ($count llenados). Estimaciones dentro de ~2 % del consumo real.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Conducción';
 
   @override

@@ -12,6 +12,7 @@ import '../../../core/storage/storage_providers.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
+import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/providers/service_reminder_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
@@ -23,7 +24,9 @@ import '../data/trip_history_repository.dart';
 import '../domain/entities/consumption_stats.dart';
 import '../domain/entities/eco_score.dart';
 import '../domain/entities/fill_up.dart';
+import '../domain/gps_driving_features.dart';
 import '../domain/services/eco_score_calculator.dart';
+import '../domain/services/gps_matrix_reconciler.dart';
 import '../domain/services/reconciler.dart';
 import '../domain/trip_recorder.dart';
 import 'trip_history_provider.dart';
@@ -236,6 +239,12 @@ class FillUpList extends _$FillUpList {
     state = repo.getAll();
     await _evaluateReminders(linked);
     final veResult = await _reconcileVolumetricEfficiency(linked, previous);
+    // #2081 — GPS matrix reconciliation. Independent of η_v: the η_v
+    // path applies to the OBD2 fuel-rate trim; this path applies to
+    // the GPS-only L/100 km matrix. Both happily run for hybrid
+    // vehicles — the GPS matrix only consumes GPS-only / hybrid
+    // trajets in the window, the OBD2 path consumes the rest.
+    await _reconcileGpsCalibrationMatrix(linked);
     // #1361 — trip-vs-pump reconciliation. Only runs on plein fills;
     // partials extend the open window and don't trigger a closing.
     final reconciliation = await _reconcileTripVsPump(linked);
@@ -692,6 +701,82 @@ class FillUpList extends _$FillUpList {
     } catch (e, st) {
       debugPrint('FillUpList: VE reconciliation failed: $e\n$st');
       return null;
+    }
+  }
+
+  /// Refine the active vehicle's [GpsCalibrationMatrix] against the
+  /// observed fuel burn at this fill-up (#2081 / Epic #2055).
+  ///
+  /// Looks up GPS-only / hybrid trajets in the fill-up's linked
+  /// window, builds the feature aggregate per trajet, and passes
+  /// them through [GpsMatrixReconciler.reconcile] to update the
+  /// matrix's `baseline` coefficient + the bookkeeping fields
+  /// (count, variance, last-reconciled-at). Skips silently when:
+  ///
+  /// - No vehicle is linked to the fill-up.
+  /// - No GPS-only / hybrid trajets exist in the window.
+  /// - The reconciler returns null (degenerate inputs).
+  ///
+  /// Cold-starts the matrix from the vehicle's defaults when the
+  /// field is null — first GPS-only fill-up reconciliation will
+  /// seed the matrix and step it once toward the observed truth.
+  Future<void> _reconcileGpsCalibrationMatrix(FillUp fillUp) async {
+    final vehicleId = fillUp.vehicleId;
+    if (vehicleId == null) return;
+    if (fillUp.liters <= 0) return;
+    try {
+      final vehicleRepo = ref.read(vehicleProfileRepositoryProvider);
+      final vehicle = vehicleRepo.getById(vehicleId);
+      if (vehicle == null) return;
+
+      // Trajets linked to this fill-up's window. We restrict to
+      // GPS-only + hybrid kinds — gpsPlusObd2 trips already had
+      // their OBD2 fuel-rate ground truth and aren't useful signal
+      // for the GPS matrix (they'd over-fit it to OBD2-instrumented
+      // driving patterns).
+      final tripHistory = ref.read(tripHistoryRepositoryProvider);
+      if (tripHistory == null) return;
+      final allTrips = tripHistory.loadAll();
+      final inWindow = allTrips
+          .where((t) => fillUp.linkedTripIds.contains(t.id))
+          .where((t) => t.summary.kind != TripKind.gpsPlusObd2)
+          .toList();
+      if (inWindow.isEmpty) return;
+
+      final trajetFeatures = <GpsDrivingFeatures>[];
+      var totalKm = 0.0;
+      for (final t in inWindow) {
+        final f = GpsDrivingFeatures.from(t.samples);
+        if (f != null) {
+          trajetFeatures.add(f);
+          totalKm += f.distanceKm;
+        }
+      }
+      if (trajetFeatures.isEmpty || totalKm <= 0) return;
+
+      final matrix =
+          vehicle.gpsCalibration ?? GpsCalibrationMatrix.coldStart();
+      // The reconciler manages its own residual window; we'd
+      // need a per-vehicle residual log to persist across runs.
+      // For the MVP we pass an empty list — the variance figure
+      // reflects only this fill-up's residual and grows accurate
+      // as the matrix iterates. A follow-up wires per-vehicle
+      // residual history into Hive.
+      final updated = GpsMatrixReconciler.reconcile(
+        matrix: matrix,
+        trajets: trajetFeatures,
+        actualLitersBurned: fillUp.liters,
+        totalDistanceKm: totalKm,
+        recentResiduals: const <double>[],
+      );
+      if (updated == null) return;
+
+      await vehicleRepo.save(
+        vehicle.copyWith(gpsCalibration: updated),
+      );
+      ref.invalidate(vehicleProfileListProvider);
+    } catch (e, st) {
+      debugPrint('GPS matrix reconciliation failed: $e\n$st');
     }
   }
 

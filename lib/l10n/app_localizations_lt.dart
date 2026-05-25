@@ -4412,6 +4412,30 @@ class AppLocalizationsLt extends AppLocalizations {
       'Fiksuota įrašymo metu, siekiant patikrinti GPS ritmiką telefono miego režimo metu.';
 
   @override
+  String get gpsMatrixMaturityCold => 'Šalta';
+
+  @override
+  String get gpsMatrixMaturityWarming => 'Šyla';
+
+  @override
+  String get gpsMatrixMaturityConverged => 'Suderinta';
+
+  @override
+  String gpsMatrixMaturityColdTooltip(int count) {
+    return 'GPS matrica vis dar šyla ($count patikslinimai iki šiol). Įverčiai yra laikini.';
+  }
+
+  @override
+  String gpsMatrixMaturityWarmingTooltip(int count) {
+    return 'GPS matrica derinasi ($count pildymai). Įverčiai naudotini, gali skirtis keliais %.';
+  }
+
+  @override
+  String gpsMatrixMaturityConvergedTooltip(int count) {
+    return 'GPS matrica suderinta ($count pildymai). Įverčiai ~2 % ribose faktinio sąnaudų.';
+  }
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Vairavimas';
 
   @override
