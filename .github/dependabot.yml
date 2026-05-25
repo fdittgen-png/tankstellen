@@ -12,6 +12,14 @@ updates:
       minor-and-patch:
         update-types: ["minor", "patch"]
     open-pull-requests-limit: 5
+    # `flutter_blue_plus` 2.x switched from BSD-3 to a custom
+    # commercial-only licence (#2072). Sparkilo is a for-profit
+    # product, so the major bump is a paid-licence decision, not a
+    # routine drift update. Ignore major bumps until the decision
+    # in #2072 resolves.
+    ignore:
+      - dependency-name: "flutter_blue_plus"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
