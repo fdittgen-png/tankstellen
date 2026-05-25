@@ -46,7 +46,7 @@ concurrency:
 
 env:
   AAB_PATH: app-play-release.aab
-  PACKAGE_NAME: com.dittgen.tankstellen
+  PACKAGE_NAME: de.tankstellen.fuelprices
 
 jobs:
   # --- Job 1: Deploy AAB to Play Store internal track ---

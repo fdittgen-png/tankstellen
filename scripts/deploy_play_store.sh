@@ -14,12 +14,12 @@
 #   --dry-run       Validate inputs without uploading
 #   --sa-file PATH  Path to service account JSON file (instead of env var)
 #   --track TRACK   Target track (default: internal)
-#   --package PKG   Package name (default: com.dittgen.tankstellen)
+#   --package PKG   Package name (default: de.tankstellen.fuelprices)
 
 set -euo pipefail
 
 # --- Configuration ---
-DEFAULT_PACKAGE="com.dittgen.tankstellen"
+DEFAULT_PACKAGE="de.tankstellen.fuelprices"
 DEFAULT_TRACK="internal"
 
 # --- Helpers ---
