@@ -74,7 +74,7 @@ final class TripRecordingProvider
   }
 }
 
-String _$tripRecordingHash() => r'4a52244a18887a7c25a95defff23ff715326b35e';
+String _$tripRecordingHash() => r'b243709e449fdce6426a8af435d6c56c0647e677';
 
 /// App-wide owner of the trip recording (#726).
 ///
