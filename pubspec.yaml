@@ -87,7 +87,7 @@ dependencies:
   # Pinned to 1.x — flutter_blue_plus 2.x is a major BLE-API rewrite,
   # and BLE is core to OBD2 trip recording. The 2.x upgrade is tracked
   # separately as part of #1542; do NOT bump it as routine drift.
-  flutter_blue_plus: ^1.35.5
+  flutter_blue_plus: ^2.3.3
   async: ^2.11.0
   permission_handler: ^12.0.0+1
   flutter_secure_storage: ^10.2.0
