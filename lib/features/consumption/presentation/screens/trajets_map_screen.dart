@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -127,23 +127,23 @@ class TrajetsMapScreen extends ConsumerWidget {
         await override(bytes: bytes, fileName: fileName);
         return;
       }
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [
-            XFile.fromData(
-              bytes,
-              mimeType: 'application/gpx+xml',
-              name: fileName,
-            ),
-          ],
-          subject: fileName,
-        ),
+      // 2026-05-24 follow-up — file exports go straight to the device's
+      // public Downloads folder via PublicFileExporter. No share sheet
+      // / chooser; a single confirmation snackbar points the user at
+      // the Downloads folder.
+      await PublicFileExporter.saveBytesToDownloads(
+        bytes: bytes,
+        fileName: fileName,
+        mimeType: 'application/gpx+xml',
       );
+      if (messenger == null) return;
+      final ok = l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
+      messenger.showSnackBar(SnackBar(content: Text(ok)));
     } catch (e, st) {
-      debugPrint('TrajetsMapScreen share GPX: $e\n$st');
+      debugPrint('TrajetsMapScreen save GPX: $e\n$st');
       if (messenger == null) return;
       final errorMsg =
-          l?.trajetsMapShareError ?? "Couldn't share the GPX file";
+          l?.trajetsMapShareError ?? "Couldn't save the GPX file";
       messenger
           .showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
     }

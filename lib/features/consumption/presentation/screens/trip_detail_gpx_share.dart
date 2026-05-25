@@ -2,25 +2,33 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
 
-/// Test-only override for the GPX share sink (#2032).
+/// Test-only override for the GPX save sink (#2032). Originally named
+/// `*ShareOverride` when this path used the OS share sheet; preserved
+/// for test compatibility after the action became download-only in
+/// the 2026-05-24 follow-up (user request: "for files only download
+/// and do not suggest sharing").
 @visibleForTesting
 Future<void> Function({
   required Uint8List bytes,
   required String fileName,
 })? debugTripDetailGpxShareOverride;
 
-/// Export the trip's persisted GPS samples as a GPX 1.1 file and hand
-/// it to the OS share sheet (#2032). Extracted from
-/// `trip_detail_screen.dart` to keep that file under the 400-line
-/// guard. Best-effort: a share failure surfaces a snackbar, never
-/// throws.
+/// Export the trip's persisted GPS samples as a GPX 1.1 file and save
+/// it to the device's public Downloads folder (#2032 + 2026-05-24
+/// follow-up). The file lands where the user can find it via the
+/// system file manager — no share sheet, no chooser; a single
+/// confirmation snackbar reports success.
+///
+/// Best-effort: a save failure surfaces an error snackbar, never
+/// throws. Empty-GPS trips short-circuit with the same "no GPS
+/// samples" message the share path used.
 Future<void> shareTripGpx(
   BuildContext context,
   AppLocalizations? l,
@@ -42,23 +50,19 @@ Future<void> shareTripGpx(
       await override(bytes: bytes, fileName: fileName);
       return;
     }
-    await SharePlus.instance.share(
-      ShareParams(
-        files: [
-          XFile.fromData(
-            bytes,
-            mimeType: 'application/gpx+xml',
-            name: fileName,
-          ),
-        ],
-        subject: fileName,
-      ),
+    await PublicFileExporter.saveBytesToDownloads(
+      bytes: bytes,
+      fileName: fileName,
+      mimeType: 'application/gpx+xml',
     );
-  } catch (e, st) {
-    debugPrint('TripDetailScreen share GPX: $e\n$st');
     if (messenger == null) return;
-    final errorMsg =
-        l?.trajetDetailShareError ?? "Couldn't share the GPX file";
+    final ok =
+        l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
+    messenger.showSnackBar(SnackBar(content: Text(ok)));
+  } catch (e, st) {
+    debugPrint('TripDetailScreen save GPX: $e\n$st');
+    if (messenger == null) return;
+    final errorMsg = l?.trajetDetailShareError ?? "Couldn't save the GPX file";
     messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
   }
 }

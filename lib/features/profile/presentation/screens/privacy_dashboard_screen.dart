@@ -230,23 +230,41 @@ class _PrivacyDashboardScreenState
   }
 
   Future<void> _shareErrorLogAsFile(String json) async {
-    final tempDirProvider =
-        debugPrivacyTempDirectoryOverride ?? getTemporaryDirectory;
-    final tempDir = await tempDirProvider();
-    final filePath = '${tempDir.path}/tankstellen-error-log.json';
-    final file = File(filePath);
-    await file.writeAsString(json, flush: true);
-
-    final params = ShareParams(
-      files: [XFile(filePath, mimeType: 'application/json')],
-      subject: 'tankstellen-error-log.json',
-    );
-    final sink = debugPrivacyShareSinkOverride ?? _defaultShareSink;
-    await sink(params);
+    // 2026-05-24 follow-up — file exports go straight to the device's
+    // public Downloads folder. The test seam is preserved so widget
+    // tests can still observe the outgoing ShareParams payload, but
+    // production runs only the PublicFileExporter save.
+    final sink = debugPrivacyShareSinkOverride;
+    if (sink != null) {
+      final tempDirProvider =
+          debugPrivacyTempDirectoryOverride ?? getTemporaryDirectory;
+      final tempDir = await tempDirProvider();
+      final filePath = '${tempDir.path}/tankstellen-error-log.json';
+      final file = File(filePath);
+      await file.writeAsString(json, flush: true);
+      final params = ShareParams(
+        files: [XFile(filePath, mimeType: 'application/json')],
+        subject: 'tankstellen-error-log.json',
+      );
+      await sink(params);
+      return;
+    }
+    try {
+      await PublicFileExporter.saveTextToDownloads(
+        text: json,
+        fileName: 'tankstellen-error-log.json',
+        mimeType: 'application/json',
+      );
+      if (!mounted) return;
+      final l = AppLocalizations.of(context);
+      SnackBarHelper.showSuccess(
+        context,
+        l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
+      );
+    } on Object catch (e, st) {
+      debugPrint('privacy: error-log save-to-downloads failed: $e\n$st');
+    }
   }
-
-  static Future<void> _defaultShareSink(ShareParams params) =>
-      SharePlus.instance.share(params);
 
   Future<void> _exportDataCsv() async {
     // Grab localizations pre-await — see `_exportData` for the same
