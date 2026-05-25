@@ -110,10 +110,15 @@ Captured 2026-05-25 on a Samsung Galaxy S20 (Android 14, French locale) running 
 
 ### Find fuel & EV charging
 
-| Search list | Favorites + alerts | Map view |
+| Search list | Search criteria | Favorites + alerts |
 |:--:|:--:|:--:|
-| ![Sparkilo home — 10 stations near Pézenas with E85 filter, sorted by distance, price arrow + amenity badges](docs/screenshots/01-search-results.png) | ![Favorites tab — Independent + Pézenas Carburant pinned, with full per-fuel pricing and a 22 kW Type-2 EV charger card](docs/screenshots/02-favorites-and-alerts.png) | ![Map view — 10 stations within 10 km radius, green-to-red price markers + a bon-marché/cher legend](docs/screenshots/03-map-price-clusters.png) |
-| Real-time prices ranked by distance with amenity badges and a one-tap driving-mode launcher. Filter chips for fuel type + radius. | Saved fuel stations AND EV chargers in one list, with full per-fuel pricing and one-tap toggle to the price-alerts pane. | Interactive map with green-to-red price markers across a country-wide radius, fuel-station / EV toggle in the app bar. |
+| ![Sparkilo home — 10 stations near Pézenas with E85 filter, sorted by distance, price arrow + amenity badges](docs/screenshots/01-search-results.png) | ![Search criteria modal — Nearby vs Search-along-route toggle, fuel-type chips, 10 km radius slider, Open-only toggle, amenity + brand filters, Save as my defaults](docs/screenshots/15-search-criteria.png) | ![Favorites tab — Independent + Pézenas Carburant pinned, with full per-fuel pricing and a 22 kW Type-2 EV charger card](docs/screenshots/02-favorites-and-alerts.png) |
+| Real-time prices ranked by distance with amenity badges and a one-tap driving-mode launcher. | Single modal: Nearby vs Search-along-route mode, fuel type, radius, Open-only filter, 8 amenity chips, brand multi-select. Save-as-defaults pins your usual filter set. | Saved fuel stations AND EV chargers in one list, with full per-fuel pricing and one-tap toggle to the price-alerts pane. |
+
+| Map (nearby) | Map (best stops along route) |
+|:--:|:--:|
+| ![Map view — 10 stations within 10 km radius, green-to-red price markers + a bon-marché/cher legend](docs/screenshots/03-map-price-clusters.png) | ![Map view in Best stops mode — Perpignan→Agde 117 km/77 min route with the 3 cheapest stops surfaced inline (Auchan 0.768 €, Intermarché 0.798 €) on a color-coded price scale](docs/screenshots/14-route-search-best-stops.png) |
+| Interactive map with green-to-red price markers across a country-wide radius, fuel-station / EV toggle in the app bar. | Plan a route, get the cheapest stops along it surfaced as ranked chips — saves money + time without making you scroll a list. |
 
 ### Track & alert
 
