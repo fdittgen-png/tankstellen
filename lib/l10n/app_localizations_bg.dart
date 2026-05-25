@@ -3387,6 +3387,11 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return 'на $meters м';
+  }
+
+  @override
   String get authErrorNoNetwork => 'Няма мрежова връзка. Опитайте по-късно.';
 
   @override

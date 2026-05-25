@@ -3356,6 +3356,11 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m kaugusel';
+  }
+
+  @override
   String get authErrorNoNetwork => 'Võrguühendus puudub. Proovi hiljem uuesti.';
 
   @override

@@ -3381,6 +3381,11 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m attālumā';
+  }
+
+  @override
   String get authErrorNoNetwork => 'Nav tīkla savienojuma. Mēģiniet vēlāk.';
 
   @override

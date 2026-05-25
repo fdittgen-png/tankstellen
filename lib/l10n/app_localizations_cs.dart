@@ -3369,6 +3369,11 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m daleko';
+  }
+
+  @override
   String get authErrorNoNetwork => 'Žádné síťové připojení. Zkuste to znovu.';
 
   @override

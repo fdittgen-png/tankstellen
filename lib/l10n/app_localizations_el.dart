@@ -3386,6 +3386,11 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m μακριά';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Δεν υπάρχει σύνδεση δικτύου. Δοκιμάστε αργότερα.';
 

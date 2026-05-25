@@ -3360,6 +3360,11 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m päässä';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Ei verkkoyhteyttä. Yritä myöhemmin uudelleen.';
 

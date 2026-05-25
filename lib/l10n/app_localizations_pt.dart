@@ -3381,6 +3381,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return 'a $meters m';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Sem ligação à rede. Tente novamente mais tarde.';
 

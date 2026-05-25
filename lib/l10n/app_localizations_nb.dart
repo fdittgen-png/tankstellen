@@ -3357,6 +3357,11 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m unna';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Ingen nettverkstilkobling. Prøv igjen senere.';
 

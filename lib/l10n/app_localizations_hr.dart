@@ -3366,6 +3366,11 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m udaljeno';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Nema mrežne veze. Pokušajte ponovno kasnije.';
 

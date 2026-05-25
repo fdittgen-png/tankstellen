@@ -3379,6 +3379,11 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m atstumu';
+  }
+
+  @override
   String get authErrorNoNetwork => 'Nėra tinklo ryšio. Bandykite vėliau.';
 
   @override

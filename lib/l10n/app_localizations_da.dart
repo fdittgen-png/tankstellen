@@ -3358,6 +3358,11 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String approachStationDistance(String meters) {
+    return '$meters m væk';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Ingen netværksforbindelse. Prøv igen senere.';
 
