@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
+import '../../domain/trip_recorder.dart' show TripKind;
 
 /// One row in the Trajets list (#889). Shows date/time + chips for
 /// distance, duration, and average consumption. Extracted from
@@ -48,12 +49,26 @@ class TrajetRow extends StatelessWidget {
         ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
         : const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
+    // #2059 — 4dp left-edge stripe carries the trip kind at a glance.
+    // Green = OBD2-instrumented (real L/100 km from fuel rate),
+    // blue = GPS-only (estimated). Hybrid coverage is added in a
+    // follow-up once `obd2CoverageRatio` lands in #J of Epic #2065.
+    final stripeColor = s.kind == TripKind.gpsPlusObd2
+        ? theme.colorScheme.primary
+        : theme.colorScheme.tertiary;
+
     return Card(
       key: ValueKey('trajet-${entry.id}'),
       margin: cardMargin,
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(color: stripeColor, width: 4),
+            ),
+          ),
           padding: innerPadding,
           child: Row(
             children: [
