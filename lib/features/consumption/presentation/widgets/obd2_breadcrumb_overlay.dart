@@ -28,8 +28,6 @@ typedef Obd2DiagnosticShareSink = Future<void> Function(ShareParams params);
 @visibleForTesting
 Obd2DiagnosticShareSink? debugObd2DiagnosticShareSinkOverride;
 
-Future<void> _defaultObd2DiagnosticShareSink(ShareParams params) =>
-    SharePlus.instance.share(params);
 
 /// In-app overlay that renders the most recent fuel-rate breadcrumbs
 /// captured by [Obd2BreadcrumbsNotifier] (#1395). Sibling to the map
@@ -65,14 +63,17 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     final String report = formatObd2DiagnosticReport(
       AutoRecordTraceLog.snapshot(),
     );
-    final ShareParams params = ShareParams(text: report);
-    final Obd2DiagnosticShareSink sink =
-        debugObd2DiagnosticShareSinkOverride ??
-            _defaultObd2DiagnosticShareSink;
-    try {
-      await sink(params);
-    } catch (e, st) {
-      debugPrint('Obd2BreadcrumbOverlay share diagnostic log failed: $e\n$st');
+    // 2026-05-24 follow-up — file exports go straight to Downloads,
+    // no share sheet. The test seam (`debugObd2DiagnosticShareSinkOverride`)
+    // is preserved so the widget tests can still observe the outgoing
+    // payload via a `ShareParams(text: ...)` wrapper.
+    final sink = debugObd2DiagnosticShareSinkOverride;
+    if (sink != null) {
+      try {
+        await sink(ShareParams(text: report));
+      } catch (e, st) {
+        debugPrint('Obd2BreadcrumbOverlay diagnostic log sink: $e\n$st');
+      }
     }
     await _alsoSaveToDownloads(
       text: report,
@@ -96,14 +97,15 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
         ? '<!-- No OBD2 debug session recorded. Enable "OBD2 debug '
             'logging" in Settings, then reproduce the issue. -->'
         : formatObd2DebugSessionXml(session);
-    final ShareParams params = ShareParams(text: payload);
-    final Obd2DiagnosticShareSink sink =
-        debugObd2DiagnosticShareSinkOverride ??
-            _defaultObd2DiagnosticShareSink;
-    try {
-      await sink(params);
-    } catch (e, st) {
-      debugPrint('Obd2BreadcrumbOverlay share session XML failed: $e\n$st');
+    // Same download-only policy as `_shareDiagnosticLog` — see note
+    // there.
+    final sink = debugObd2DiagnosticShareSinkOverride;
+    if (sink != null) {
+      try {
+        await sink(ShareParams(text: payload));
+      } catch (e, st) {
+        debugPrint('Obd2BreadcrumbOverlay session XML sink: $e\n$st');
+      }
     }
     await _alsoSaveToDownloads(
       text: payload,

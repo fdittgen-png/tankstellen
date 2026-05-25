@@ -120,20 +120,14 @@ class FullBackupExporter {
     final file = File(filePath);
     await file.writeAsBytes(bytes, flush: true);
 
-    final params = ShareParams(
-      files: [XFile(filePath, mimeType: 'application/zip')],
-      subject: fileName,
-      text: fileName,
-    );
-    final sink = debugBackupShareSinkOverride ?? _defaultShareSink;
-    await sink(params);
-
-    // #2014 — also drop the same zip into the device's public
-    // Downloads folder (MediaStore on Android Q+, Files-app-visible
-    // Documents/Downloads on iOS) so the user can find it via any
-    // file manager after the share sheet closes. The share-sheet
-    // hand-off above is the primary surface; this save step is
-    // best-effort — a failure here must not mask the successful share.
+    // 2026-05-24 follow-up — file exports go straight to the device's
+    // public Downloads folder via PublicFileExporter (MediaStore on
+    // Android Q+, Files-app-visible Documents/Downloads on iOS). The
+    // OS share sheet is no longer offered: the user explicitly asked
+    // for "files only download, do not suggest sharing." The tempDir
+    // copy above is kept because some test fakes assert on
+    // `result.filePath`; the production caller now only reads
+    // `result.savedPath` and surfaces a "Saved to Downloads" snackbar.
     String? savedPath;
     try {
       savedPath = await PublicFileExporter.saveBytesToDownloads(
@@ -145,6 +139,20 @@ class FullBackupExporter {
       debugPrint('FullBackupExporter: save-to-downloads failed: $e\n$st');
     }
 
+    // Keep the share-sink shape so existing test fakes (and any
+    // future surface that wants to re-enable a share fallback) can
+    // still hand the file off. Production wires the no-op default
+    // below.
+    final sink = debugBackupShareSinkOverride;
+    if (sink != null) {
+      final params = ShareParams(
+        files: [XFile(filePath, mimeType: 'application/zip')],
+        subject: fileName,
+        text: fileName,
+      );
+      await sink(params);
+    }
+
     return FullBackupExportResult(
       filePath: filePath,
       byteSize: bytes.length,
@@ -153,5 +161,3 @@ class FullBackupExporter {
   }
 }
 
-Future<void> _defaultShareSink(ShareParams params) =>
-    SharePlus.instance.share(params);
