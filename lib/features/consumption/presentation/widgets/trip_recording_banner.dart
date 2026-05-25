@@ -16,6 +16,7 @@ import '../../providers/trip_recording_provider.dart';
 import 'coaching_chip.dart';
 import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
+import 'trip_recording_pip_view.dart';
 
 /// Persistent indicator of an active OBD2 trip (#726 + #768).
 ///
@@ -120,8 +121,14 @@ class TripRecordingBanner extends ConsumerWidget {
   }
 
   /// Full-bleed compact tile shown while the app is a Picture-in-
-  /// Picture window (#1977) — the band-coloured trip strip only, none
-  /// of the shell chrome.
+  /// Picture window (#1977 + #2068).
+  ///
+  /// As of #2068 the tile is dominated by a huge L/100 km figure
+  /// (the user's primary at-a-glance signal while driving). Distance
+  /// and elapsed time render in a small caption row below. The whole
+  /// layout lives in [TripRecordingPipView] — keeps this file under
+  /// the 400-line guard and isolates the PiP-specific styling away
+  /// from the inline-banner [_Content] row.
   Widget _pipView(BuildContext context, TripRecordingState state) {
     if (!state.isActive) {
       // A trip ended while the app sat in PiP — the OS restores the
@@ -130,16 +137,10 @@ class TripRecordingBanner extends ConsumerWidget {
       return Material(color: Theme.of(context).colorScheme.surface);
     }
     final palette = _bandColor(context, state.band, state.phase);
-    return Material(
-      color: palette.background,
-      child: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: _Content(state: state, palette: palette),
-          ),
-        ),
-      ),
+    return TripRecordingPipView(
+      state: state,
+      backgroundColor: palette.background,
+      foregroundColor: palette.foreground,
     );
   }
 
