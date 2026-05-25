@@ -1317,10 +1317,14 @@ class TripRecording extends _$TripRecording {
       state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
-    final summary = recorder.buildSummary().copyWith(
-          kind: TripKind.gpsOnly,
-        );
     final samples = List<TripSample>.unmodifiable(_gpsOnlySamples);
+    // #2025 — derive `kind` from the actual sample stream rather than
+    // hardcoding `gpsOnly`. If [_upgradeGpsOnlyToObd2] (or any future
+    // mid-trip path) injected OBD2 samples into the buffer, the
+    // resulting kind correctly flips to `gpsPlusObd2`.
+    final summary = recorder.buildSummary().copyWith(
+          kind: TripKind.fromSamples(samples),
+        );
     await _saveToHistory(
       summary,
       samples: samples,
@@ -1336,6 +1340,25 @@ class TripRecording extends _$TripRecording {
       odometerStartKm: null,
       odometerLatestKm: null,
     );
+  }
+
+  /// #2025 — mid-trip upgrade hook. Appends an externally-built
+  /// [TripSample] (carrying OBD2 telemetry) to the in-progress
+  /// GPS-only buffer + recorder so the final [TripSummary.kind] flips
+  /// to `gpsPlusObd2` via [TripKind.fromSamples].
+  ///
+  /// No-op when no GPS-only trip is active. Future UX surface
+  /// (banner: "OBD2 detected — attach to current trip?") drives
+  /// this; until then the API lives here so the acceptance scenario
+  /// is testable + the data layer supports it the moment any
+  /// caller starts producing OBD2-flavoured samples.
+  @visibleForTesting
+  void debugAppendObd2SampleToGpsOnly(TripSample sample) {
+    if (!_gpsOnlyMode) return;
+    final recorder = _gpsOnlyRecorder;
+    if (recorder == null) return;
+    _gpsOnlySamples.add(sample);
+    recorder.onSample(sample);
   }
 }
 
