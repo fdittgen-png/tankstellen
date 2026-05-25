@@ -44,11 +44,19 @@ void main() {
       // can't reach the vehicle-add affordance).
       expect(medium, contains(Feature.manualConsumption));
       expect(medium, contains(Feature.showConsumptionTab));
-      // Medium STILL excludes the OBD2 stack — that is the Full tier.
-      expect(medium, isNot(contains(Feature.obd2TripRecording)));
+      // #2025 — Medium now includes the trajet recording surface but
+      // routes through the GPS-only path. The presence of
+      // `obd2TripRecording` enables the Trajets tab + Start CTA; the
+      // ABSENCE of `obd2Optional` tells the start flow to call
+      // `startGpsOnly()` instead of the adapter picker.
+      expect(medium, contains(Feature.obd2TripRecording));
+      expect(medium, contains(Feature.consumptionAnalytics));
+      expect(medium, contains(Feature.gpsTripPath));
+      expect(medium, isNot(contains(Feature.obd2Optional)));
+      // Auto-record / gamification / loyalty stay Full-tier — they
+      // assume a paired OBD2 dongle.
       expect(medium, isNot(contains(Feature.autoRecord)));
       expect(medium, isNot(contains(Feature.gamification)));
-      expect(medium, isNot(contains(Feature.consumptionAnalytics)));
       expect(medium, isNot(contains(Feature.loyaltyCards)));
     });
 
@@ -70,6 +78,9 @@ void main() {
       expect(full, contains(Feature.hapticEcoCoach));
       expect(full, contains(Feature.glideCoach));
       expect(full, contains(Feature.gpsTripPath));
+      // #2025 — Full requires an OBD2 dongle to start a trip
+      // (`obd2Optional` ON ⇒ adapter picker, no GPS-only fallback).
+      expect(full, contains(Feature.obd2Optional));
       // Full does NOT mean "every flag on" — `tflitePricePrediction`
       // stays off until the user opts in (off-band model artifact).
       expect(full, isNot(contains(Feature.tflitePricePrediction)));
@@ -154,14 +165,20 @@ void main() {
       );
     });
 
-    test('medium ⇒ ConsoMode.fuel (manual fill-ups, no Trajets)', () {
+    test(
+        'medium ⇒ ConsoMode.fuelAndTrips (manual fill-ups + GPS-only trajets)',
+        () {
+      // #2025 — Medium now exposes the Trajets tab too; the trip-start
+      // path uses the GPS-only branch (no OBD2 required). ConsoMode
+      // still flips to fuelAndTrips because `obd2TripRecording` is in
+      // the bundle — that's the surface gate, not the data-source gate.
       expect(
         consoModeFromFlags(appProfileBundles[AppProfile.medium]!),
-        ConsoMode.fuel,
+        ConsoMode.fuelAndTrips,
       );
     });
 
-    test('full ⇒ ConsoMode.fuelAndTrips (full Conso + OBD2)', () {
+    test('full ⇒ ConsoMode.fuelAndTrips (full Conso + OBD2 required)', () {
       expect(
         consoModeFromFlags(appProfileBundles[AppProfile.full]!),
         ConsoMode.fuelAndTrips,

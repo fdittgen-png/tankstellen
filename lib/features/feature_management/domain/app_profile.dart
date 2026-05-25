@@ -57,20 +57,23 @@ enum AppProfile {
 ///   `requires:` edge; both go in together so the requires graph stays
 ///   satisfied)
 ///
-/// **Medium** — Basic + manual fill-up logging
+/// **Medium** — Basic + manual fill-up logging + GPS-only trajets
 /// - All Basic features
 /// - `manualConsumption` — fuel fill-ups + EV charging logged by hand
+/// - `obd2TripRecording` + `consumptionAnalytics` + `showConsumptionTab`
+///   — trajet recording feature surfaces, but the user is NOT required
+///   to pair an OBD2 dongle: the absent `obd2Optional` flag means the
+///   #2025 GPS-only path kicks in on Start
+/// - `gpsTripPath` — GPS samples persisted so the post-trip map +
+///   GPX export work for GPS-only trajets
 ///
-/// Trajets / OBD2 stay off on Medium; the Trajets tab self-hides via
-/// the `obd2TripRecording` gate (#conso-coherence).
-///
-/// **Full** — Medium + OBD2 + ergonomics
+/// **Full** — Medium + OBD2 required + ergonomics
 /// - All Medium features
-/// - OBD2 stack: `obd2TripRecording`, `autoRecord`,
-///   `consumptionAnalytics`, `gamification`, `showConsumptionTab`,
-///   `loyaltyCards`
-/// - Ergonomics opt-ins: `hapticEcoCoach`, `glideCoach`, `gpsTripPath`
-///   (all three `requires: {obd2TripRecording}` per the manifest)
+/// - `obd2Optional` — OBD2 is required to start a trip (no GPS-only
+///   fallback). Full users are expected to have an adapter paired.
+/// - OBD2 ergonomics: `autoRecord`, `gamification`, `loyaltyCards`,
+///   `hapticEcoCoach`, `glideCoach` (the last two
+///   `requires: {obd2TripRecording}` per the manifest)
 ///
 /// Off in **every** preset (user opts in individually):
 /// - `tflitePricePrediction` (model artifact still off-band; #1543)
@@ -100,6 +103,15 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     // leaving Medium users no path to configure a vehicle for the
     // manual fill-up flow they just opted into.
     Feature.showConsumptionTab,
+    // #2025 — Medium users get trajet recording but in the GPS-only
+    // path: `obd2TripRecording` surfaces the Trajets tab + recording
+    // CTA, `gpsTripPath` persists GPS samples for the post-trip map
+    // and GPX export, and the deliberate ABSENCE of `obd2Optional`
+    // tells `_onStartRecording` to skip the adapter picker and call
+    // `startGpsOnly()` instead.
+    Feature.obd2TripRecording,
+    Feature.consumptionAnalytics,
+    Feature.gpsTripPath,
   },
   AppProfile.full: {
     Feature.showFuel,
@@ -120,6 +132,11 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.hapticEcoCoach,
     Feature.glideCoach,
     Feature.gpsTripPath,
+    // #2025 — Full users require an OBD2 dongle. Including
+    // `obd2Optional` in the preset preserves the historical default
+    // (Start → adapter picker → OBD2-driven recording) for users who
+    // pick Full from the wizard.
+    Feature.obd2Optional,
   },
   // The custom sentinel has no bundle — the user's flag set is
   // whatever they last persisted, and re-selecting `custom` from the

@@ -100,7 +100,9 @@ void main() {
       expect(profileRepo.load(), AppProfile.basic);
     });
 
-    test('medium enables manualConsumption on top of basic', () async {
+    test(
+        'medium enables manualConsumption + GPS-only trajets on top of basic',
+        () async {
       final c = makeContainer();
       await pumpLoad(c);
       await c
@@ -109,7 +111,11 @@ void main() {
       final flags = c.read(enabledFeaturesProvider);
       expect(flags, contains(Feature.manualConsumption));
       expect(flags, contains(Feature.priceAlerts));
-      expect(flags, isNot(contains(Feature.obd2TripRecording)));
+      // #2025 — Medium now surfaces Trajets via obd2TripRecording, but
+      // *without* obd2Optional so the start path uses GPS-only.
+      expect(flags, contains(Feature.obd2TripRecording));
+      expect(flags, contains(Feature.gpsTripPath));
+      expect(flags, isNot(contains(Feature.obd2Optional)));
     });
 
     test(
@@ -132,7 +138,11 @@ void main() {
       final flags = c.read(enabledFeaturesProvider);
       expect(flags, appProfileBundles[AppProfile.medium]);
       expect(flags, contains(Feature.showConsumptionTab));
-      expect(flags, isNot(contains(Feature.obd2TripRecording)));
+      // #2025 — Medium DOES now contain obd2TripRecording (it's just
+      // routed through the GPS-only start path via the absent
+      // obd2Optional flag). The atomic bundle apply still succeeds
+      // because each Feature's prerequisites are written together.
+      expect(flags, contains(Feature.obd2TripRecording));
     });
 
     test('full enables OBD2 stack and loyalty', () async {
