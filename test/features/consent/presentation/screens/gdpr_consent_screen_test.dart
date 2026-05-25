@@ -58,14 +58,16 @@ void main() {
       );
     });
 
-    testWidgets('shows four consent toggles', (tester) async {
+    testWidgets('shows the four consent toggles (#2063 — wait-time removed)',
+        (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
       expect(find.text('Location Access'), findsOneWidget);
       expect(find.text('Error Reporting'), findsOneWidget);
       expect(find.text('Cloud Sync'), findsOneWidget);
-      expect(find.text('Community Wait Times'), findsOneWidget);
+      expect(find.text('VIN online decode'), findsOneWidget);
+      expect(find.text('Community Wait Times'), findsNothing);
     });
 
     testWidgets('shows Accept All and Accept Selected buttons',
@@ -109,29 +111,6 @@ void main() {
       expect(switches[3].value, isFalse);
     });
 
-    testWidgets('tapping community wait-time switch toggles only that value',
-        (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.pumpAndSettle();
-
-      // The 4th switch is the community wait-time toggle. Scroll first
-      // because the first-launch screen body is taller than the test
-      // surface.
-      await tester.scrollUntilVisible(
-        find.text('Community Wait Times'),
-        100,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.byType(Switch).at(3));
-      await tester.pumpAndSettle();
-
-      final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
-      expect(switches[0].value, isFalse);
-      expect(switches[1].value, isFalse);
-      expect(switches[2].value, isFalse);
-      expect(switches[3].value, isTrue);
-    });
-
     testWidgets('Accept Selected saves only selected consents',
         (tester) async {
       await tester.pumpWidget(buildScreen());
@@ -149,8 +128,6 @@ void main() {
       expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
       expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
-      expect(
-          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), false);
     });
 
     testWidgets('Accept All saves all consents as true', (tester) async {
@@ -165,8 +142,6 @@ void main() {
       expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
       expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), true);
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), true);
-      expect(
-          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), true);
     });
 
     testWidgets('shows privacy icon', (tester) async {
@@ -176,7 +151,7 @@ void main() {
       expect(find.byIcon(Icons.privacy_tip_outlined), findsOneWidget);
     });
 
-    testWidgets('shows location, error reporting, sync, and timer icons',
+    testWidgets('shows location, error reporting, sync, and VIN icons',
         (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
@@ -184,7 +159,7 @@ void main() {
       expect(find.byIcon(Icons.my_location), findsOneWidget);
       expect(find.byIcon(Icons.bug_report_outlined), findsOneWidget);
       expect(find.byIcon(Icons.cloud_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.timer_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.directions_car_outlined), findsOneWidget);
     });
   });
 }

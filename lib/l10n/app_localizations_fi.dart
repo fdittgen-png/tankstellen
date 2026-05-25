@@ -3669,16 +3669,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Kuukausi';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Yhteisön jonotusajat';
-
-  @override
-  String get gdprCommunityWaitTimeShort => 'Jaa aseman jonotusajat anonyymisti';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Jaa anonyymisti milloin saavut ja lähdet polttoaineasemalta, jotta sovellus voi näyttää tyypilliset jonotusajat. GPS-koordinaatteja ei ladata — vain aseman tunnus.';
-
-  @override
   String get consoFeatureGroupTitle => 'Kulutus';
 
   @override
@@ -5278,22 +5268,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Sovella';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min odotus';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Seuraa odotusaikaani';
-
-  @override
-  String get waitTimeTrackEnd => 'Lähden';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min toistaiseksi';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Aloitusnäytön widget';

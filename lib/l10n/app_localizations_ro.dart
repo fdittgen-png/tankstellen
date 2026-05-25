@@ -3694,17 +3694,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Luna';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Timpi de așteptare comunitate';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Partajați anonim timpii de așteptare la stații';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Partajați anonim când ajungeți la și plecați de la o stație de combustibil, astfel încât aplicația să poată afișa timpii tipici de așteptare. Nu se încarcă coordonate de locație — doar ID-ul stației.';
-
-  @override
   String get consoFeatureGroupTitle => 'Conso';
 
   @override
@@ -5318,22 +5307,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Aplicați';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min așteptare';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Urmăriți așteptarea mea';
-
-  @override
-  String get waitTimeTrackEnd => 'Plec';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min până acum';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Widget ecran principal';

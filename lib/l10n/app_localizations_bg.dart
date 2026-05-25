@@ -3695,17 +3695,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Месец';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Времена за изчакване от общността';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Анонимно споделяне на времената за изчакване в станциите';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Анонимно споделяйте кога пристигате и напускате горивна станция, за да може приложението да показва типичните времена за изчакване. Не се качват координати на местоположението — само ID на станцията.';
-
-  @override
   String get consoFeatureGroupTitle => 'Разход';
 
   @override
@@ -5323,22 +5312,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Приложи';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes мин изчакване';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Следи изчакването ми';
-
-  @override
-  String get waitTimeTrackEnd => 'Тръгвам';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes мин досега';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Джаджа на начален екран';

@@ -1,6 +1,0 @@
-{
-  "waitTimeHint": "~{minutes} Min Wartezeit",
-  "waitTimeTrackStart": "Meine Wartezeit verfolgen",
-  "waitTimeTrackEnd": "Ich gehe gerade",
-  "waitTimeElapsedShort": "Bisher {minutes} Min"
-}

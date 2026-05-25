@@ -18,7 +18,6 @@ class StorageKeys {
   static const String consentLocation = 'consent_location';
   static const String consentErrorReporting = 'consent_error_reporting';
   static const String consentCloudSync = 'consent_cloud_sync';
-  static const String consentCommunityWaitTime = 'consent_community_wait_time';
   /// #1399 — opt-in toggle for sending the 17-character VIN to NHTSA's
   /// free public vPIC service to enrich the VIN-driven profile auto-
   /// population with full make/model/displacement/cylinders/fuel type.

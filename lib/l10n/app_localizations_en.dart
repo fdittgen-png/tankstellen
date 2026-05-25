@@ -3652,17 +3652,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Month';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Community Wait Times';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anonymously share station wait times';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
-
-  @override
   String get consoFeatureGroupTitle => 'Conso';
 
   @override
@@ -5250,22 +5239,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Apply';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min wait';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Track my wait';
-
-  @override
-  String get waitTimeTrackEnd => 'I\'m leaving';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min so far';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Home-screen widget';
@@ -9038,17 +9011,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get chargingChartsMonthAxis => '⟦Ṁóñŧĥ ··⟧';
 
   @override
-  String get gdprCommunityWaitTimeTitle => '⟦Çóɱɱúñîŧý Ŵáîŧ Ŧîɱéš ········⟧';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      '⟦Áñóñýɱóúšłý šĥářé šŧáŧîóñ ŵáîŧ ŧîɱéš ··············⟧';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      '⟦Áñóñýɱóúšłý šĥářé ŵĥéñ ýóú ářřîṽé áŧ áñđ łéáṽé á ƒúéł šŧáŧîóñ šó ŧĥé áƥƥ çáñ šĥóŵ ŧýƥîçáł ŵáîŧ ŧîɱéš. Ñó łóçáŧîóñ çóóřđîñáŧéš ářé úƥłóáđéđ — óñłý ŧĥé šŧáŧîóñ ÎĐ. ···························································⟧';
-
-  @override
   String get consoFeatureGroupTitle => '⟦Çóñšó ··⟧';
 
   @override
@@ -10683,22 +10645,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get vehicleDetectedFromVinApply => '⟦Áƥƥłý ··⟧';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '⟦~$minutes ɱîñ ŵáîŧ ···⟧';
-  }
-
-  @override
-  String get waitTimeTrackStart => '⟦Ŧřáçķ ɱý ŵáîŧ ·····⟧';
-
-  @override
-  String get waitTimeTrackEnd => '⟦Î\'ɱ łéáṽîñǧ ····⟧';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '⟦$minutes ɱîñ šó ƒář ····⟧';
-  }
 
   @override
   String get widgetHelpSectionTitle => '⟦Ĥóɱé-šçřééñ ŵîđǧéŧ ·······⟧';

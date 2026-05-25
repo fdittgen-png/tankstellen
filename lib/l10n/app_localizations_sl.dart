@@ -3672,17 +3672,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Mesec';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Čakalni časi skupnosti';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anonimno delite čakalne čase postaj';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Anonimno delite, kdaj prispete na bencinski postaji in jo zapustite, da aplikacija prikaže tipične čakalne čase. Koordinate lokacije se ne naložijo — samo ID postaje.';
-
-  @override
   String get consoFeatureGroupTitle => 'Poraba';
 
   @override
@@ -5283,22 +5272,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Uporabi';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min čakanja';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Sledi mojemu čakanju';
-
-  @override
-  String get waitTimeTrackEnd => 'Odhajam';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min do zdaj';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Pripomoček za domači zaslon';

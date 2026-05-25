@@ -3666,16 +3666,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Kuu';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Kogukonna ooteajad';
-
-  @override
-  String get gdprCommunityWaitTimeShort => 'Jaga anonüümselt jaama ooteaegu';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Jaga anonüümselt, millal saabud ja lahkud kütusejaamast, et rakendus saaks kuvada tüüpilisi ooteaegu. GPS-koordinaate ei laadita üles — ainult jaama ID.';
-
-  @override
   String get consoFeatureGroupTitle => 'Kulu';
 
   @override
@@ -5268,22 +5258,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Rakenda';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min ootamine';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Jälgi minu ooteaega';
-
-  @override
-  String get waitTimeTrackEnd => 'Lahkun';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min seni';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Avaekraani vidin';

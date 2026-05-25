@@ -3689,17 +3689,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Mėnuo';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Bendruomenės laukimo laikas';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anonimiškai bendrinti stotelės laukimo laiką';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Anonimiškai bendrinkite, kada atvykote į degalinę ir išvykote, kad programa galėtų rodyti įprastą laukimo laiką. Vietos koordinatės neįkeliamos — tik stotelės ID.';
-
-  @override
   String get consoFeatureGroupTitle => 'Suvartojimas';
 
   @override
@@ -5309,22 +5298,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Taikyti';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min laukimas';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Sekti mano laukimą';
-
-  @override
-  String get waitTimeTrackEnd => 'Išvykstu';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min iki šiol';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Pradinio ekrano valdiklis';

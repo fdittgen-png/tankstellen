@@ -3698,17 +3698,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Hónap';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Közösségi várakozási idők';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Névtelenül ossza meg az állomások várakozási idejét';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Névtelenül ossza meg, mikor érkezik és mikor hagyja el az üzemanyag-állomást, hogy az alkalmazás jellegzetes várakozási időket mutasson. Nem kerül fel helyszín-koordináta — csak az állomás azonosítója.';
-
-  @override
   String get consoFeatureGroupTitle => 'Fogyasztás';
 
   @override
@@ -5324,22 +5313,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Alkalmazás';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes perc várakozás';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Várakozásom nyomon követése';
-
-  @override
-  String get waitTimeTrackEnd => 'Indulok';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes perc eddig';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Kezdőképernyő-widget';

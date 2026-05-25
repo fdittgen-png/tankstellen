@@ -19,15 +19,12 @@ void main() {
     bool location = false,
     bool errorReporting = false,
     bool cloudSync = false,
-    bool communityWaitTime = false,
     bool vinOnlineDecode = false,
     bool syncTrips = false,
   }) {
     fakeStorage.putSetting(StorageKeys.consentLocation, location);
     fakeStorage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
     fakeStorage.putSetting(StorageKeys.consentCloudSync, cloudSync);
-    fakeStorage.putSetting(
-        StorageKeys.consentCommunityWaitTime, communityWaitTime);
     fakeStorage.putSetting(
         StorageKeys.consentVinOnlineDecode, vinOnlineDecode);
     fakeStorage.putSetting(StorageKeys.consentSyncTrips, syncTrips);
@@ -46,13 +43,15 @@ void main() {
   }
 
   group('ConsentSettingsSection', () {
-    testWidgets('shows five toggle switches', (tester) async {
-      // #1665 — the 6th toggle (Sync trip recordings) moved to the
-      // TankSync settings section; five consent toggles remain here.
+    testWidgets('shows four toggle switches', (tester) async {
+      // #1665 — the 5th toggle (Sync trip recordings) moved to the
+      // TankSync settings section. #2063 — the community wait-time
+      // toggle was removed alongside the wait-time feature. Four
+      // consent toggles remain here.
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
-      expect(find.byType(SwitchListTile), findsNWidgets(5));
+      expect(find.byType(SwitchListTile), findsNWidgets(4));
     });
 
     testWidgets('shows correct labels', (tester) async {
@@ -62,7 +61,6 @@ void main() {
       expect(find.text('Location Access'), findsOneWidget);
       expect(find.text('Error Reporting'), findsOneWidget);
       expect(find.text('Cloud Sync'), findsOneWidget);
-      expect(find.text('Community Wait Times'), findsOneWidget);
       expect(find.text('VIN online decode'), findsOneWidget);
     });
 
@@ -71,7 +69,6 @@ void main() {
         location: true,
         errorReporting: false,
         cloudSync: true,
-        communityWaitTime: true,
         vinOnlineDecode: true,
       ));
       await tester.pumpAndSettle();
@@ -81,8 +78,7 @@ void main() {
       expect(tiles[0].value, isTrue); // location
       expect(tiles[1].value, isFalse); // error reporting
       expect(tiles[2].value, isTrue); // cloud sync
-      expect(tiles[3].value, isTrue); // community wait time
-      expect(tiles[4].value, isTrue); // vin online decode
+      expect(tiles[3].value, isTrue); // vin online decode
     });
 
     testWidgets('toggling location saves to storage', (tester) async {
@@ -96,7 +92,7 @@ void main() {
       expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
     });
 
-    testWidgets('toggling community wait-time saves only that key',
+    testWidgets('toggling VIN online decode saves only that key (#1399)',
         (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
@@ -105,43 +101,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), true);
-      expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
-      expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
-      expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
-      expect(
-          fakeStorage.getSetting(StorageKeys.consentVinOnlineDecode), false);
-    });
-
-    testWidgets('toggling VIN online decode saves only that key (#1399)',
-        (tester) async {
-      await tester.pumpWidget(buildWidget());
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(Switch).at(4));
-      await tester.pumpAndSettle();
-
-      expect(
           fakeStorage.getSetting(StorageKeys.consentVinOnlineDecode), true);
       expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
       expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
-      expect(
-          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), false);
-    });
-
-    testWidgets(
-        'toggling location preserves existing communityWaitTime value',
-        (tester) async {
-      await tester.pumpWidget(buildWidget(communityWaitTime: true));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(Switch).first);
-      await tester.pumpAndSettle();
-
-      expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
-      expect(
-          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), true);
     });
 
     testWidgets('shows settings hint text', (tester) async {

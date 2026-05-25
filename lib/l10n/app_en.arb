@@ -2144,18 +2144,6 @@
   "@chargingChartsMonthAxis": {
     "description": "Axis label for the X axis (month) on the charging charts (#582 phase 3)."
   },
-  "gdprCommunityWaitTimeTitle": "Community Wait Times",
-  "@gdprCommunityWaitTimeTitle": {
-    "description": "GDPR consent toggle — short title for the opt-in to anonymously share station arrival/departure timestamps so the app can surface typical wait times (#1119). Used in both the first-launch consent screen and the settings page."
-  },
-  "gdprCommunityWaitTimeShort": "Anonymously share station wait times",
-  "@gdprCommunityWaitTimeShort": {
-    "description": "GDPR consent toggle — one-line subtitle shown in the settings page alongside the toggle (#1119). Kept terse; the first-launch consent screen uses gdprCommunityWaitTimeDescription for the longer explanation."
-  },
-  "gdprCommunityWaitTimeDescription": "Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.",
-  "@gdprCommunityWaitTimeDescription": {
-    "description": "GDPR consent toggle — full description used on the first-launch consent screen (#1119). Mentions exactly what is uploaded (station ID + arrival/departure timestamps) and what is NOT uploaded (raw lat/lng) so the user can give informed consent."
-  },
   "consoFeatureGroupTitle": "Conso",
   "consoFeatureGroupDescription": "Track your consumption — manual fill-ups, or automatic OBD2 trip recording.",
   "consoModeOff": "Off",
@@ -4038,34 +4026,6 @@
   "vehicleDetectedFromVinApply": "Apply",
   "@vehicleDetectedFromVinApply": {
     "description": "Snackbar action button label — confirm applying the VIN-decoded values to the vehicle profile (#1399)."
-  },
-  "waitTimeHint": "~{minutes} min wait",
-  "@waitTimeHint": {
-    "description": "Aggregate wait-time hint shown above the 'Track my wait' toggle on the station-detail screen (#1119 phase 2). Sourced from the `wait_time_aggregates` table; only renders when the most recent hour bucket has at least 5 paired pings.",
-    "placeholders": {
-      "minutes": {
-        "type": "int",
-        "example": "4"
-      }
-    }
-  },
-  "waitTimeTrackStart": "Track my wait",
-  "@waitTimeTrackStart": {
-    "description": "Label for the 'Track my wait' tonal button on the station-detail screen (#1119 phase 2). Visible only when community-wait-time consent is ON. Tapping records an 'arrived' ping and switches the section into elapsed-time mode."
-  },
-  "waitTimeTrackEnd": "I'm leaving",
-  "@waitTimeTrackEnd": {
-    "description": "Label for the 'I'm leaving' tonal button shown on the station-detail screen while a wait-time session is in flight (#1119 phase 2). Tapping fires the matching 'left' ping so the server can pair it with the arrival."
-  },
-  "waitTimeElapsedShort": "{minutes} min so far",
-  "@waitTimeElapsedShort": {
-    "description": "Live elapsed-time label rendered next to the 'I'm leaving' button on the station-detail screen while a wait-time session is in flight (#1119 phase 2). Updates every 30s.",
-    "placeholders": {
-      "minutes": {
-        "type": "int",
-        "example": "3"
-      }
-    }
   },
   "widgetHelpSectionTitle": "Home-screen widget",
   "@widgetHelpSectionTitle": {

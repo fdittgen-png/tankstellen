@@ -3684,17 +3684,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Maand';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Wachttijden van de community';
-
-  @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anoniem wachttijden bij stations delen';
-
-  @override
-  String get gdprCommunityWaitTimeDescription =>
-      'Deel anoniem wanneer je bij een tankstation aankomt en vertrekt zodat de app typische wachttijden kan tonen. Er worden geen locatiecoördinaten geüpload — alleen het stations-ID.';
-
-  @override
   String get consoFeatureGroupTitle => 'Verbruik';
 
   @override
@@ -5296,22 +5285,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get vehicleDetectedFromVinApply => 'Toepassen';
-
-  @override
-  String waitTimeHint(int minutes) {
-    return '~$minutes min wachten';
-  }
-
-  @override
-  String get waitTimeTrackStart => 'Mijn wachttijd bijhouden';
-
-  @override
-  String get waitTimeTrackEnd => 'Ik vertrek';
-
-  @override
-  String waitTimeElapsedShort(int minutes) {
-    return '$minutes min tot nu toe';
-  }
 
   @override
   String get widgetHelpSectionTitle => 'Widget voor startscherm';
