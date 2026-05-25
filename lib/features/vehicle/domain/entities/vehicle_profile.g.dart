@@ -108,6 +108,11 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
       detectedEngineDisplacementCc:
           (json['detectedEngineDisplacementCc'] as num?)?.toInt(),
       detectedFuelType: json['detectedFuelType'] as String?,
+      gpsCalibration: json['gpsCalibration'] == null
+          ? null
+          : GpsCalibrationMatrix.fromJson(
+              json['gpsCalibration'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$VehicleProfileToJson(
@@ -164,4 +169,5 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'detectedYear': instance.detectedYear,
   'detectedEngineDisplacementCc': instance.detectedEngineDisplacementCc,
   'detectedFuelType': instance.detectedFuelType,
+  'gpsCalibration': instance.gpsCalibration?.toJson(),
 };

@@ -3,6 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'gps_calibration_matrix.dart';
 import 'speed_consumption_histogram.dart';
 import 'trip_length_breakdown.dart';
 
@@ -329,6 +330,20 @@ abstract class VehicleProfile with _$VehicleProfile {
     int? detectedYear,
     int? detectedEngineDisplacementCc,
     String? detectedFuelType,
+
+    /// Per-vehicle GPS driving-style calibration matrix (#2079 / Epic
+    /// #2055). Null on legacy profiles + on profiles created before
+    /// the first GPS-only trajet; the trip-recorder seeds it lazily
+    /// via [GpsCalibrationMatrix.coldStart] on first use. The
+    /// reconciler (#2081) refines it after every fill-up. The
+    /// estimator (#2080) reads it to impute `fuelLitersConsumed` +
+    /// `avgLPer100Km` on `gpsOnly` and `hybrid` trips.
+    ///
+    /// Independent of the existing OBD2 calibration
+    /// ([volumetricEfficiency] et al.) — OBD2 trips with full
+    /// coverage continue to use the OBD2 path; the GPS matrix is
+    /// only consulted when the trajet's `obd2CoverageRatio < 0.95`.
+    GpsCalibrationMatrix? gpsCalibration,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>
