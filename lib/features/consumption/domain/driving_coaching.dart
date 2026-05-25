@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../data/obd2/trip_live_reading.dart';
 import 'cold_start_baselines.dart';
 import 'situation_classifier.dart';
+import 'trip_recorder.dart' show TripSample;
 
 /// Eco-driving coaching hint emitted from a live OBD2 reading (#2007).
 ///
@@ -25,6 +26,20 @@ enum DrivingCoachingHint {
   /// AND the live consumption band is already heavy. Backing off the
   /// pedal would cut burn rate without losing real progress.
   easePedal,
+
+  /// GPS-only coaching (#2058) — fires when the driver is at cruise
+  /// speed and the altitude trace is descending, with no recent brake
+  /// event. Suggests lifting off the throttle to coast.
+  gpsLiftOffCoast,
+
+  /// GPS-only (#2058) — fires when a brake event > 2 m/s² was
+  /// detected in the last few seconds. Suggests reading the road
+  /// further ahead and starting the lift-off earlier next time.
+  gpsAnticipateBrake,
+
+  /// GPS-only (#2058) — fires when an acceleration event > 2 m/s²
+  /// was detected in the last few seconds. Suggests a gentler ramp.
+  gpsSmoothAccel,
 }
 
 /// Speed-relative thresholds picked to keep [coachingHint] silent in
@@ -147,4 +162,68 @@ String? formatInstantConsumption(TripLiveReading r) {
   }
   final lPer100 = fuelRate / speed * 100.0;
   return '${lPer100.toStringAsFixed(1)} L/100';
+}
+
+/// GPS-only coaching hint (#2058) — selects one of the three GPS
+/// coaching enum values from a rolling window of the last few seconds
+/// of [TripSample]s. Returns null when no hint applies.
+///
+/// Priority (highest first):
+/// - [gpsAnticipateBrake] — at least one brake event (Δv/Δt ≤ -2 m/s²
+///   sustained ≥ 1 s) in the window.
+/// - [gpsSmoothAccel] — at least one accel event (Δv/Δt ≥ +2 m/s²
+///   sustained ≥ 1 s) in the window AND no brake event.
+/// - [gpsLiftOffCoast] — currently cruising (speed ≥ 50 km/h),
+///   altitude trace descending over the window, no brake event in
+///   the window.
+///
+/// The window is expected to be ~5 seconds of samples (recorder
+/// owns the buffer length, the function is window-agnostic).
+DrivingCoachingHint? gpsCoachingHint(List<TripSample> recent) {
+  if (recent.length < 3) return null;
+  final sorted = [...recent]..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+  bool sawAccel = false, sawBrake = false;
+  double accelEventDur = 0, brakeEventDur = 0;
+  double climb = 0, descent = 0;
+  for (var i = 1; i < sorted.length; i++) {
+    final prev = sorted[i - 1];
+    final cur = sorted[i];
+    final dt = cur.timestamp.difference(prev.timestamp).inMilliseconds /
+        1000.0;
+    if (dt <= 0 || dt > 60) continue;
+    final aMps2 = (cur.speedKmh - prev.speedKmh) / 3.6 / dt;
+    if (aMps2 >= 2.0) {
+      accelEventDur += dt;
+      if (accelEventDur >= 1.0) sawAccel = true;
+    } else {
+      accelEventDur = 0;
+    }
+    if (aMps2 <= -2.0) {
+      brakeEventDur += dt;
+      if (brakeEventDur >= 1.0) sawBrake = true;
+    } else {
+      brakeEventDur = 0;
+    }
+    final pAlt = prev.altitudeM, cAlt = cur.altitudeM;
+    if (pAlt != null && cAlt != null) {
+      final dAlt = cAlt - pAlt;
+      if (dAlt > 0) {
+        climb += dAlt;
+      } else {
+        descent += -dAlt;
+      }
+    }
+  }
+
+  if (sawBrake) return DrivingCoachingHint.gpsAnticipateBrake;
+  if (sawAccel) return DrivingCoachingHint.gpsSmoothAccel;
+
+  // Lift-off-coast: currently cruising + net descending + no brake.
+  final currentSpeed = sorted.last.speedKmh;
+  final netDescent = descent - climb;
+  if (currentSpeed >= 50 && netDescent >= 2.0) {
+    return DrivingCoachingHint.gpsLiftOffCoast;
+  }
+  return null;
 }

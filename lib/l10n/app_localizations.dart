@@ -7899,6 +7899,24 @@ abstract class AppLocalizations {
   /// **'When off, badges, scores and trophy icons are hidden across the app.'**
   String get profileGamificationToggleSubtitle;
 
+  /// GPS-only coaching tile (#2058): the driver is cruising downhill with no recent brake event; lifting off would let the car coast more efficiently.
+  ///
+  /// In en, this message translates to:
+  /// **'Lift off'**
+  String get coachingGpsLiftOff;
+
+  /// GPS-only coaching tile (#2058): a brake event was detected in the rolling window; reading the road further ahead would let the lift-off start earlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Anticipate'**
+  String get coachingGpsAnticipateBrake;
+
+  /// GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth accel'**
+  String get coachingGpsSmoothAccel;
+
   /// Title of the read-only GPS sample diagnostics card on the Trip detail screen — surfaces the cadence + lifecycle-state info captured by #1458 phase 2 so the user can verify that the OS did not throttle the GPS stream during phone-sleep, ahead of deciding whether phase 3 (foreground service) is needed.
   ///
   /// In en, this message translates to:

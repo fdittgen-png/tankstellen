@@ -4369,6 +4369,15 @@ class AppLocalizationsNl extends AppLocalizations {
       'Als uitgeschakeld, zijn badges, scores en trofee-iconen overal in de app verborgen.';
 
   @override
+  String get coachingGpsLiftOff => 'Loslaten';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Anticiperen';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Soepel optrekken';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-steekproefdiagnostiek';
 
   @override

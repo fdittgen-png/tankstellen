@@ -4352,6 +4352,15 @@ class AppLocalizationsNb extends AppLocalizations {
       'Når av, er merker, poeng og trofé-ikoner skjult i hele appen.';
 
   @override
+  String get coachingGpsLiftOff => 'Slipp gassen';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Forutse';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Myk akselerasjon';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-prøvetakingsdiagnostikk';
 
   @override

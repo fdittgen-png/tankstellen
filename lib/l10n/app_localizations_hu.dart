@@ -4392,6 +4392,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ha ki van kapcsolva, a jelvények, pontszámok és trófeaikonok el vannak rejtve az egész alkalmazásban.';
 
   @override
+  String get coachingGpsLiftOff => 'Levenni a lábat';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Előrelátás';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Lágy gyorsítás';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-mintavételi diagnosztika';
 
   @override

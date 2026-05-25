@@ -4348,6 +4348,15 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kui väljas, on märgid, hinded ja trofee ikoonid kogu rakenduses peidetud.';
 
   @override
+  String get coachingGpsLiftOff => 'Vabasta gaas';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Ennakoi';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Sujuv kiirendus';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS näidiste diagnostika';
 
   @override

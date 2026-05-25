@@ -2946,6 +2946,18 @@
   "@profileGamificationToggleSubtitle": {
     "description": "Subtitle explaining what the gamification opt-out toggle hides (#1194)."
   },
+  "coachingGpsLiftOff": "Lift off",
+  "@coachingGpsLiftOff": {
+    "description": "GPS-only coaching tile (#2058): the driver is cruising downhill with no recent brake event; lifting off would let the car coast more efficiently."
+  },
+  "coachingGpsAnticipateBrake": "Anticipate",
+  "@coachingGpsAnticipateBrake": {
+    "description": "GPS-only coaching tile (#2058): a brake event was detected in the rolling window; reading the road further ahead would let the lift-off start earlier."
+  },
+  "coachingGpsSmoothAccel": "Smooth accel",
+  "@coachingGpsSmoothAccel": {
+    "description": "GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel."
+  },
   "gpsDiagnosticsTitle": "GPS sampling diagnostics",
   "@gpsDiagnosticsTitle": {
     "description": "Title of the read-only GPS sample diagnostics card on the Trip detail screen — surfaces the cadence + lifecycle-state info captured by #1458 phase 2 so the user can verify that the OS did not throttle the GPS stream during phone-sleep, ahead of deciding whether phase 3 (foreground service) is needed."

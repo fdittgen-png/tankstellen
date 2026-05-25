@@ -4358,6 +4358,15 @@ class AppLocalizationsCs extends AppLocalizations {
       'Pokud je vypnuto, odznaky, skóre a ikony pohárů jsou v celé aplikaci skryty.';
 
   @override
+  String get coachingGpsLiftOff => 'Uvolnit plyn';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Předvídat';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Plynulé zrychlení';
+
+  @override
   String get gpsDiagnosticsTitle => 'Diagnostika vzorkování GPS';
 
   @override

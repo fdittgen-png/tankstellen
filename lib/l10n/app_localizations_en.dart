@@ -4329,6 +4329,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'When off, badges, scores and trophy icons are hidden across the app.';
 
   @override
+  String get coachingGpsLiftOff => 'Lift off';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Anticipate';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Smooth accel';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS sampling diagnostics';
 
   @override
@@ -9740,6 +9749,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get profileGamificationToggleSubtitle =>
       '⟦Ŵĥéñ óƒƒ, ƀáđǧéš, šçóřéš áñđ ŧřóƥĥý îçóñš ářé ĥîđđéñ áçřóšš ŧĥé áƥƥ. ························⟧';
+
+  @override
+  String get coachingGpsLiftOff => '⟦Łîƒŧ óƒƒ ···⟧';
+
+  @override
+  String get coachingGpsAnticipateBrake => '⟦Áñŧîçîƥáŧé ·····⟧';
+
+  @override
+  String get coachingGpsSmoothAccel => '⟦Šɱóóŧĥ áççéł ·····⟧';
 
   @override
   String get gpsDiagnosticsTitle => '⟦ǦƤŠ šáɱƥłîñǧ đîáǧñóšŧîçš ··········⟧';

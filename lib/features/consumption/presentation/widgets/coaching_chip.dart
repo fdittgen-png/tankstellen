@@ -43,6 +43,18 @@ class CoachingChip extends StatelessWidget {
           Icons.eco,
           l?.coachingEasePedal ?? 'Ease off',
         ),
+      DrivingCoachingHint.gpsLiftOffCoast => (
+          Icons.eco,
+          l?.coachingGpsLiftOff ?? 'Lift off',
+        ),
+      DrivingCoachingHint.gpsAnticipateBrake => (
+          Icons.visibility,
+          l?.coachingGpsAnticipateBrake ?? 'Anticipate',
+        ),
+      DrivingCoachingHint.gpsSmoothAccel => (
+          Icons.swipe_up,
+          l?.coachingGpsSmoothAccel ?? 'Smooth accel',
+        ),
     };
     return Semantics(
       label: label,

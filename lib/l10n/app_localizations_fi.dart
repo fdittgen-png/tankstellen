@@ -4352,6 +4352,15 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kun pois päältä, palkinnot, pisteet ja trofeekuvakkeet piilotetaan koko sovelluksesta.';
 
   @override
+  String get coachingGpsLiftOff => 'Päästä kaasusta';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Ennakoi';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Pehmeä kiihdytys';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-näytteenoton diagnostiikka';
 
   @override

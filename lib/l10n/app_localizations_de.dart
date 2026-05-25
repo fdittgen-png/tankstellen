@@ -4379,6 +4379,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wenn aus, sind Abzeichen, Punkte und Pokal-Symbole überall ausgeblendet.';
 
   @override
+  String get coachingGpsLiftOff => 'Vom Gas';
+
+  @override
+  String get coachingGpsAnticipateBrake => 'Vorausschauen';
+
+  @override
+  String get coachingGpsSmoothAccel => 'Sanft beschleunigen';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-Abtastungsdiagnose';
 
   @override
