@@ -52,10 +52,15 @@ void main() {
         final rel = entity.path;
         if (allowlist.contains(rel)) continue;
         final text = entity.readAsStringSync();
-        // Look for the constructor call specifically. `TileLayer.` /
-        // `MapTileLayer` / `_TileLayer` etc. are false positives we
-        // accept — the bug is the parameterless raw constructor.
-        final regex = RegExp(r'\bTileLayer\s*\(');
+        // Look for the constructor call specifically. `MapTileLayer`
+        // / `_TileLayer` etc. are false positives we accept — the
+        // bug is the raw constructor.
+        // #2098 — also match `TileLayer.new(` (Dart 2.15+
+        // constructor tear-off form). Without the `\.new?` branch a
+        // developer using modern Dart syntax could reintroduce the
+        // unhardened default `NetworkTileProvider` without the lint
+        // firing.
+        final regex = RegExp(r'\bTileLayer(\.new)?\s*\(');
         if (regex.hasMatch(text)) {
           offenders.add(rel);
         }
@@ -76,6 +81,27 @@ void main() {
             'follow-up that folds it into the wrapper.\n\n'
             'Offenders:\n${offenders.map((p) => '  $p').join('\n')}',
       );
+    },
+  );
+
+  test(
+    '.new constructor tear-off does not bypass the consistency lint (#2098)',
+    () {
+      // Sanity check: the regex used above must match BOTH the
+      // plain-constructor form `TileLayer(` AND the Dart 2.15+
+      // tear-off form `TileLayer.new(`. Without `.new` matching,
+      // a developer using modern Dart syntax could reintroduce the
+      // unhardened default `NetworkTileProvider` without the test
+      // firing.
+      final regex = RegExp(r'\bTileLayer(\.new)?\s*\(');
+      // Plain form — must match.
+      expect(regex.hasMatch('TileLayer(urlTemplate: x)'), isTrue);
+      // Tear-off form — must match.
+      expect(regex.hasMatch('TileLayer.new(urlTemplate: x)'), isTrue);
+      // False positives we explicitly DON'T want to catch.
+      expect(regex.hasMatch('SparkiloTileLayer(urlTemplate: x)'), isFalse);
+      expect(regex.hasMatch('_TileLayer(urlTemplate: x)'), isFalse);
+      expect(regex.hasMatch('buildTileLayer(urlTemplate: x)'), isFalse);
     },
   );
 }

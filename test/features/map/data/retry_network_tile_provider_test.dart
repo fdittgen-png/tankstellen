@@ -164,7 +164,15 @@ void main() {
 
     test('all 3 attempts return 503 → final 503 response surfaces',
         () async {
-      final inner = _FakeClient(responses: List.filled(3, _resp(503)));
+      // Each `_resp(503)` is a fresh response with its own
+      // single-event stream — necessary because #2098's drain
+      // logic consumes each retryable response's stream before
+      // moving on. The prior `List.filled(3, _resp(503))` form
+      // reused one response 3 times and worked only because the
+      // drain wasn't yet wired.
+      final inner = _FakeClient(
+        responses: [_resp(503), _resp(503), _resp(503)],
+      );
       final client = RetryingTileHttpClient(
         inner: inner,
         sleep: (_) async {},
@@ -388,6 +396,93 @@ void main() {
       // Success — no retry.
       expect(RetryingTileHttpClient.isRetryableStatusCode(200), isFalse);
       expect(RetryingTileHttpClient.isRetryableStatusCode(301), isFalse);
+    });
+
+    group('socket-leak prevention (#2098)', () {
+      test(
+          'retryable responses on attempts 1 + 2 get their streams drained '
+          'before the next attempt — only the final attempt\'s body stays '
+          'intact for the caller', () async {
+        // Build three responses, each backed by a controller we
+        // can introspect. After the retry call:
+        //   - controllers 0 + 1 (the 503s that get superseded)
+        //     must have been listened to (= drained).
+        //   - controller 2 (the final 503 the caller receives)
+        //     must NOT have been drained by us — the caller
+        //     reads it.
+        final controllers = [
+          StreamController<List<int>>(),
+          StreamController<List<int>>(),
+          StreamController<List<int>>(),
+        ];
+        // Seed each stream with a small body + close immediately so
+        // `drain` actually completes (stream.value gives a single
+        // event; we want the same semantics).
+        for (final c in controllers) {
+          unawaited(c.addStream(Stream.value(<int>[0x00])).then((_) => c.close()));
+        }
+        final responses = [
+          for (final c in controllers)
+            http.StreamedResponse(c.stream, 503),
+        ];
+        final inner = _FakeClient(responses: responses);
+        final client = RetryingTileHttpClient(
+          inner: inner,
+          random: math.Random(0),
+          sleep: (_) async {},
+        );
+
+        // `client.send` returns the raw StreamedResponse without
+        // BaseClient.get's body-buffering — lets the test inspect
+        // the final response's stream intact.
+        final response = await client.send(
+            http.Request('GET', Uri.parse('https://tile/leak.png')));
+        // Exhausted all 3 attempts → returns the final 503.
+        expect(response.statusCode, 503);
+        expect(inner.sentCount, 3);
+
+        // The first two controllers' streams must have been
+        // listened to (drained). A drained stream's controller
+        // reports `isClosed == true` once the drain has consumed
+        // the data + the seed `close()` lands.
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        expect(controllers[0].isClosed, isTrue,
+            reason: 'attempt-1 503 stream should be drained + closed');
+        expect(controllers[1].isClosed, isTrue,
+            reason: 'attempt-2 503 stream should be drained + closed');
+        // The final response's body should still be readable —
+        // proof we didn't drain it ourselves.
+        final body = await response.stream.bytesToString();
+        expect(body.codeUnits, [0x00]);
+      });
+
+      test(
+          'a fresh success after retries drains the prior retained 503 '
+          'before returning', () async {
+        // 503 → 200. The 503 must be drained by the client BEFORE
+        // the 200 is handed back to the caller.
+        final firstCtl = StreamController<List<int>>();
+        unawaited(firstCtl.addStream(Stream.value(<int>[0xFF]))
+            .then((_) => firstCtl.close()));
+        final inner = _FakeClient(responses: [
+          http.StreamedResponse(firstCtl.stream, 503),
+          _resp(200, body: 'ok'),
+        ]);
+        final client = RetryingTileHttpClient(
+          inner: inner,
+          random: math.Random(0),
+          sleep: (_) async {},
+        );
+
+        final response = await client.send(
+            http.Request('GET', Uri.parse('https://tile/leak.png')));
+        expect(response.statusCode, 200);
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        expect(firstCtl.isClosed, isTrue,
+            reason: '503 stream drained before returning the 200');
+      });
     });
   });
 }
