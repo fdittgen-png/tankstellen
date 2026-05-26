@@ -33,6 +33,14 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
   routeDetourBudgetKm: (json['routeDetourBudgetKm'] as num?)?.toDouble() ?? 5.0,
   minRouteSavingPerLiter:
       (json['minRouteSavingPerLiter'] as num?)?.toDouble() ?? 0.0,
+  routeSearchTopNPerSamplePoint:
+      (json['routeSearchTopNPerSamplePoint'] as num?)?.toInt() ?? 10,
+  routeSearchCriterion:
+      $enumDecodeNullable(
+        _$RouteSearchCriterionEnumMap,
+        json['routeSearchCriterion'],
+      ) ??
+      RouteSearchCriterion.cheapest,
   showFuel: json['showFuel'] as bool? ?? true,
   showElectric: json['showElectric'] as bool? ?? true,
   ratingMode: json['ratingMode'] as String? ?? 'local',
@@ -78,6 +86,9 @@ Map<String, dynamic> _$UserProfileToJson(
   'avoidHighways': instance.avoidHighways,
   'routeDetourBudgetKm': instance.routeDetourBudgetKm,
   'minRouteSavingPerLiter': instance.minRouteSavingPerLiter,
+  'routeSearchTopNPerSamplePoint': instance.routeSearchTopNPerSamplePoint,
+  'routeSearchCriterion':
+      _$RouteSearchCriterionEnumMap[instance.routeSearchCriterion]!,
   'showFuel': instance.showFuel,
   'showElectric': instance.showElectric,
   'ratingMode': instance.ratingMode,
@@ -101,6 +112,11 @@ const _$LandingScreenEnumMap = {
   LandingScreen.map: 'map',
   LandingScreen.cheapest: 'cheapest',
   LandingScreen.nearest: 'nearest',
+};
+
+const _$RouteSearchCriterionEnumMap = {
+  RouteSearchCriterion.cheapest: 'cheapest',
+  RouteSearchCriterion.nearest: 'nearest',
 };
 
 const _$StationAmenityEnumMap = {

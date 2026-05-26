@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../profile/data/models/user_profile.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
@@ -30,6 +31,9 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
     required double searchRadiusKm,
     required StationQueryFunction queryStations,
     double? maxDetourKm,
+    int topNPerSamplePoint = 10,
+    RouteSearchCriterion criterion = RouteSearchCriterion.cheapest,
+    void Function(List<SearchResultItem> partial)? onPartial,
   }) async {
     // Use wider radius but sample every other point for speed
     final effectiveRadius = searchRadiusKm * 1.5;
@@ -41,12 +45,15 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
 
     debugPrint('CheapestSearch: querying ${sampledPoints.length} points with radius=${effectiveRadius.toStringAsFixed(1)}km');
 
-    const batchHelper = BatchQueryHelper(batchSize: 4);
+    const batchHelper = BatchQueryHelper();
     final results = await batchHelper.queryAll(
       samplePoints: sampledPoints,
       queryStations: queryStations,
       fuelType: fuelType,
       searchRadiusKm: effectiveRadius,
+      topNPerSamplePoint: topNPerSamplePoint,
+      criterion: criterion,
+      onPartial: onPartial,
     );
 
     // Filter by detour distance (more generous for cheapest strategy)

@@ -364,6 +364,9 @@ class _SaveDeleteActions extends StatelessWidget {
                 approachRadiusKm: state.approachRadiusKm,
                 approachPriceMode: state.approachPriceMode,
                 approachMinPollSeconds: state.approachMinPollSeconds,
+                routeSearchTopNPerSamplePoint:
+                    state.routeSearchTopNPerSamplePoint,
+                routeSearchCriterion: state.routeSearchCriterion,
               );
               await onSave(updated);
               if (context.mounted) Navigator.pop(context);
