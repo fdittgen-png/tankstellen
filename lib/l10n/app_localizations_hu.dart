@@ -4795,6 +4795,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Válasszon használati módot a folytatáshoz.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'eltelt';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Ellenőrzési gyakoriság';
 
   @override

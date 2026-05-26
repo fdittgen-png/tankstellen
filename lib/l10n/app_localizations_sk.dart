@@ -4772,6 +4772,9 @@ class AppLocalizationsSk extends AppLocalizations {
       'Pre pokračovanie vyberte režim používania.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'uplynulo';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frekvencia kontrol';
 
   @override

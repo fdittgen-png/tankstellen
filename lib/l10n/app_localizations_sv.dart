@@ -4753,6 +4753,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'Välj ett användningsläge för att fortsätta.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'förflutit';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Kontrollfrekvens';
 
   @override

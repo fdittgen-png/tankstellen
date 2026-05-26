@@ -4725,6 +4725,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPickUseMode => 'Pick a use mode to continue.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'elapsed';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Check frequency';
 
   @override
@@ -10183,6 +10186,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get onboardingPickUseMode =>
       '⟦Ƥîçķ á úšé ɱóđé ŧó çóñŧîñúé. ··········⟧';
+
+  @override
+  String get tripRecordingPipElapsedCaption => '⟦éłáƥšéđ ···⟧';
 
   @override
   String get alertsRadiusFrequencyLabel => '⟦Çĥéçķ ƒřéɋúéñçý ······⟧';

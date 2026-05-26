@@ -231,13 +231,13 @@ void main() {
       expect(find.byKey(const Key('shell-child')), findsNothing,
           reason: 'PiP must not render the shell — that is what dragged '
               'the button bar into the tile (#1977)');
-      // The compact trip strip is still shown. As of #2068 the PiP
-      // tile renders two "km" strings — the distance row ("4.0 km")
-      // and the unit caption ("L/100 km") under the big L/100 km
-      // figure. Asserting the distance is present is enough proof
-      // the tile didn't collapse to nothing.
+      // The compact trip strip is still shown. With distance=4.0 +
+      // no fuel rate, #2094's context-adaptive primary lands the
+      // layout on the GPS-only branch: "4.0" hero figure with "km"
+      // caption. Finding the distance value is enough proof the
+      // tile didn't collapse to nothing.
       expect(find.textContaining('4.0'), findsOneWidget);
-      expect(find.textContaining('L/100 km'), findsOneWidget);
+      expect(find.text('km'), findsOneWidget);
     });
 
     testWidgets('outside PiP mode the shell child renders as usual',

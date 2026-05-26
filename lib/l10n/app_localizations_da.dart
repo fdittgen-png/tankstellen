@@ -4751,6 +4751,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get onboardingPickUseMode => 'Vælg en brugstilstand for at fortsætte.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'forløbet';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Tjekfrekvens';
 
   @override

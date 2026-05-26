@@ -4787,6 +4787,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get onboardingPickUseMode => 'Escolha um modo de uso para continuar.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'decorrido';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frequência de verificação';
 
   @override

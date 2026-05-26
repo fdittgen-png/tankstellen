@@ -4787,6 +4787,9 @@ class AppLocalizationsRo extends AppLocalizations {
       'Alegeți un mod de utilizare pentru a continua.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'scurs';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frecvența verificărilor';
 
   @override

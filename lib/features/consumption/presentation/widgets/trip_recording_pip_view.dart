@@ -70,20 +70,67 @@ class TripRecordingPipView extends StatelessWidget {
       return _buildApproachPriceLayout(context, approach!);
     }
 
+    return _buildDefaultLayout(context);
+  }
+
+  /// Default PiP layout (no approach radius hit) — picks the **most
+  /// informative** metric for the big slot based on what the trajet
+  /// has produced so far (#2094). Three branches in priority order:
+  ///
+  /// 1. **OBD2 live fuel rate available** → huge L/100 km (or L/h on
+  ///    idle). Secondary row: distance + elapsed.
+  /// 2. **GPS-only, distance ≥ 0.1 km** → huge **distance**. The
+  ///    GPS-matrix L/100 km estimate is post-trip only (#2080), so
+  ///    nothing live to render in that slot; distance is the most
+  ///    useful real-time number. Secondary row: elapsed.
+  /// 3. **Pre-roll (distance ≈ 0)** → huge **elapsed time**. The user
+  ///    sees the session is recording while the GPS warms up.
+  ///    Secondary row: empty.
+  ///
+  /// The big `~` placeholder that wasted the tile pre-#2094 is gone —
+  /// no branch renders an information-free symbol huge.
+  Widget _buildDefaultLayout(BuildContext context) {
     final l = AppLocalizations.of(context);
     final live = state.live;
     final paused = state.phase == TripRecordingPhase.paused;
     final distance = live?.distanceKmSoFar;
     final elapsed = live?.elapsed;
 
-    // The L/100 km figure: prefer the OBD2-derived instantaneous
-    // consumption when available, else render the GPS-only placeholder.
-    // `formatInstantConsumption` returns "5.8 L/100" or "1.2 L/h"
-    // (idle) — strip the trailing unit so we can render it ourselves
-    // in a smaller font below the figure.
+    // Resolve OBD2-derived live L/100 km (or L/h at idle).
     final raw = (live != null && !paused) ? formatInstantConsumption(live) : null;
-    final figure = raw != null ? _stripUnit(raw) : '~';
-    final unit = raw != null ? _unitOf(raw) : 'L/100 km';
+
+    final String bigFigure;
+    final String bigCaption;
+    final List<String> secondaryRow;
+
+    if (raw != null) {
+      // Branch 1 — OBD2 live consumption is the most informative.
+      bigFigure = _stripUnit(raw);
+      bigCaption = _unitOf(raw);
+      secondaryRow = [
+        if (distance != null) '${distance.toStringAsFixed(1)} km',
+        if (elapsed != null) _fmtElapsed(elapsed),
+      ];
+    } else if (distance != null && distance >= 0.1) {
+      // Branch 2 — GPS-only mid-trajet: distance is the live signal.
+      bigFigure = distance.toStringAsFixed(1);
+      bigCaption = 'km';
+      secondaryRow = [
+        if (elapsed != null) _fmtElapsed(elapsed),
+      ];
+    } else if (elapsed != null) {
+      // Branch 3 — pre-roll: lead with elapsed time so the user
+      // knows the session is recording while GPS warms up.
+      bigFigure = _fmtElapsed(elapsed);
+      bigCaption = l?.tripRecordingPipElapsedCaption ?? 'elapsed';
+      secondaryRow = const <String>[];
+    } else {
+      // No data at all (shouldn't happen during an active recording,
+      // but render a sane fallback rather than crashing).
+      bigFigure = '0:00';
+      bigCaption = l?.tripRecordingPipElapsedCaption ?? 'elapsed';
+      secondaryRow = const <String>[];
+    }
 
     return Material(
       color: backgroundColor,
@@ -97,7 +144,7 @@ class TripRecordingPipView extends StatelessWidget {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  figure,
+                  bigFigure,
                   style: TextStyle(
                     color: foregroundColor,
                     fontWeight: FontWeight.w800,
@@ -109,48 +156,42 @@ class TripRecordingPipView extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                unit,
+                bigCaption,
                 style: TextStyle(
                   color: foregroundColor.withValues(alpha: 0.85),
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (distance != null)
-                    Text(
-                      '${distance.toStringAsFixed(1)} km',
-                      style: TextStyle(
-                        color: foregroundColor.withValues(alpha: 0.9),
-                        fontSize: 12,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                  if (distance != null && elapsed != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: Text(
-                        '·',
+              if (secondaryRow.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < secondaryRow.length; i++) ...[
+                      if (i > 0)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Text(
+                            '·',
+                            style: TextStyle(
+                              color: foregroundColor.withValues(alpha: 0.6),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      Text(
+                        secondaryRow[i],
                         style: TextStyle(
-                          color: foregroundColor.withValues(alpha: 0.6),
+                          color: foregroundColor.withValues(alpha: 0.9),
                           fontSize: 12,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
-                    ),
-                  if (elapsed != null)
-                    Text(
-                      _fmtElapsed(elapsed),
-                      style: TextStyle(
-                        color: foregroundColor.withValues(alpha: 0.9),
-                        fontSize: 12,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                ],
-              ),
+                    ],
+                  ],
+                ),
+              ],
               if (paused) ...[
                 const SizedBox(height: 4),
                 Text(
@@ -273,9 +314,21 @@ class TripRecordingPipView extends StatelessWidget {
     return '';
   }
 
+  /// Format an elapsed [Duration] so it reads as a duration, not a
+  /// clock time (#2094). Pre-#2094 returned `"14:12"` which on a PiP
+  /// tile next to the system clock could be mistaken for 14:12 of
+  /// the day. New shapes:
+  ///
+  /// - Under 1 minute → `"42s"`.
+  /// - Under 1 hour → `"14m 12s"`.
+  /// - 1 hour or more → `"1h 14m"` (seconds drop — at hour-plus
+  ///   scale the second precision is noise).
   static String _fmtElapsed(Duration d) {
-    final m = d.inMinutes;
+    final h = d.inHours;
+    final m = d.inMinutes % 60;
     final s = d.inSeconds % 60;
-    return '${m.toString()}:${s.toString().padLeft(2, '0')}';
+    if (h >= 1) return '${h}h ${m}m';
+    if (d.inMinutes >= 1) return '${m}m ${s}s';
+    return '${s}s';
   }
 }

@@ -1400,6 +1400,7 @@
   "onboardingObd2VinReadFailed": "⟦Çóúłđñ'ŧ řéáđ ṼÎÑ — éñŧéř ɱáñúáłłý ············⟧",
   "onboardingObd2ConnectFailed": "⟦Çóúłđñ'ŧ çóññéçŧ ŧó ŧĥé áđáƥŧéř. Ýóú çáñ řéŧřý óř šķîƥ. ···················⟧",
   "onboardingPickUseMode": "⟦Ƥîçķ á úšé ɱóđé ŧó çóñŧîñúé. ··········⟧",
+  "tripRecordingPipElapsedCaption": "⟦éłáƥšéđ ···⟧",
   "alertsRadiusFrequencyLabel": "⟦Çĥéçķ ƒřéɋúéñçý ······⟧",
   "alertsRadiusFrequencyDaily": "⟦Óñçé á đáý ····⟧",
   "alertsRadiusFrequencyTwiceDaily": "⟦Ŧŵîçé á đáý ····⟧",

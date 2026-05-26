@@ -4784,6 +4784,9 @@ class AppLocalizationsLv extends AppLocalizations {
       'Izvēlieties lietošanas veidu, lai turpinātu.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'pagājis';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Pārbaudes biežums';
 
   @override
