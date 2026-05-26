@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../data/driving_insights_analyzer.dart';
 import 'trip_detail_charts.dart';
 
@@ -327,14 +327,12 @@ class _TripPathMapState extends State<_TripPathMap> {
         ),
       ),
       children: [
-        TileLayer(
-          urlTemplate: AppConstants.osmTileUrl,
-          userAgentPackageName: AppConstants.osmUserAgent,
-          maxNativeZoom: 19,
-          maxZoom: 19,
-          evictErrorTileStrategy:
-              EvictErrorTileStrategy.notVisibleRespectMargin,
-        ),
+        // #2096 — was a raw TileLayer with the default
+        // `NetworkTileProvider`, which silently produced grey on
+        // every OSM transient + every rebuild abort. Routed
+        // through the hardened wrapper for retry + cancellation
+        // resilience.
+        const SparkiloTileLayer(),
         PolylineLayer(polylines: polylines),
         MarkerLayer(
           markers: [

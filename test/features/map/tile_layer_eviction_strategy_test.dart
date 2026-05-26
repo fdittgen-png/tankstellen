@@ -28,14 +28,17 @@ void main() {
       // char (space / newline / `[` / `,` / `(`). Avoids the
       // `buildTileLayer(` false positive in the MapProvider
       // abstraction.
-      final tokenRe = RegExp(r'(?<![A-Za-z0-9_])TileLayer\(');
+      // #2098 — also match `TileLayer.new(` so the lint can't be
+      // bypassed with the Dart 2.15+ constructor tear-off form.
+      final tokenRe = RegExp(r'(?<![A-Za-z0-9_])TileLayer(\.new)?\(');
       for (final match in tokenRe.allMatches(text)) {
         final idx = match.start;
         {
         // Find the matching close paren; naive but sufficient for
-        // well-formed Dart. The TileLayer constructor is short and
-        // balanced.
-        final end = _matchingCloseParen(text, idx + 'TileLayer('.length - 1);
+        // well-formed Dart. Account for the optional `.new` suffix
+        // when computing where the opening paren lives.
+        final open = text.indexOf('(', idx);
+        final end = _matchingCloseParen(text, open);
         if (end < 0) {
           offenders.add('${entity.path} near char $idx: '
               'unbalanced TileLayer(...) — cannot verify strategy');

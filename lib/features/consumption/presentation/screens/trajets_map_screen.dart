@@ -14,6 +14,7 @@ import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
 import '../../providers/trip_history_provider.dart';
@@ -235,12 +236,10 @@ class _MapState extends State<_Map> {
         ),
       ),
       children: [
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'de.tankstellen.tankstellen',
-          evictErrorTileStrategy:
-              EvictErrorTileStrategy.notVisibleRespectMargin,
-        ),
+        // #2096 — was a raw TileLayer with the default
+        // `NetworkTileProvider`. Routed through the hardened
+        // wrapper.
+        const SparkiloTileLayer(),
         PolylineLayer(
           polylines: [
             for (final t in widget.tracks)

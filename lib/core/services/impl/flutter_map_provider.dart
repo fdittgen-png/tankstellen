@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../features/map/data/sparkilo_tile_layer.dart';
 import '../../constants/app_constants.dart';
 import '../map_provider.dart';
 
@@ -50,12 +51,13 @@ class FlutterMapProvider implements MapProvider {
   @override
   Widget buildTileLayer() {
     final config = tileConfig;
-    return TileLayer(
+    // #2096 — was a raw TileLayer with the default
+    // `NetworkTileProvider`. Routed through the hardened wrapper
+    // for retry + cancellation resilience across every map surface
+    // that uses this service.
+    return SparkiloTileLayer(
       urlTemplate: config.urlTemplate,
       userAgentPackageName: config.userAgent ?? '',
-      // #757 — evict failed tiles once off-screen, retry on next pan.
-      evictErrorTileStrategy:
-          EvictErrorTileStrategy.notVisibleRespectMargin,
     );
   }
 

@@ -133,11 +133,27 @@ class RetryingTileHttpClient extends http.BaseClient {
       try {
         final response = await _inner.send(fresh);
         if (_isRetryable(response.statusCode)) {
+          // #2098 — drain the prior retained response's stream before
+          // overwriting it. http.StreamedResponse keeps its socket
+          // alive until the body stream is drained or cancelled;
+          // abandoning it to retain a fresh response leaks the
+          // socket. On fast-pan + transient outage that compounds
+          // into OS socket-pool exhaustion. The drain is fire-and-
+          // forget — errors during drain are not actionable here
+          // (the socket gets reclaimed by the runtime eventually
+          // either way), so swallow them.
+          if (lastResponse != null) {
+            unawaited(lastResponse.stream.drain<void>().catchError((_) {}));
+          }
           lastResponse = response;
           _logAttempt(request.url, attempt, 'HTTP ${response.statusCode}');
         } else {
           // Success (2xx/3xx) or permanent failure (4xx except 429).
-          // Hand it back to flutter_map unchanged.
+          // Drain any prior retained retryable response before
+          // returning — same socket-leak rationale (#2098).
+          if (lastResponse != null) {
+            unawaited(lastResponse.stream.drain<void>().catchError((_) {}));
+          }
           return response;
         }
       } on SocketException catch (e, s) {
