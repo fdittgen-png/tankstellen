@@ -24,6 +24,22 @@ enum ApproachPriceMode {
   const ApproachPriceMode(this.key);
 }
 
+/// How to pick the **top-N stations per sample point** during a route
+/// search (#2101 / Epic #2100 lever B). Smaller candidate pool feeds
+/// into the isolate-hopped distance math, cutting compute proportionally.
+///
+/// - [cheapest] — take the N cheapest stations for the selected fuel
+///   type at each sample point. Optimises for total trip cost.
+/// - [nearest] — take the N stations closest to the sample point.
+///   Optimises for minimum detour off the corridor.
+enum RouteSearchCriterion {
+  cheapest('cheapest'),
+  nearest('nearest');
+
+  final String key;
+  const RouteSearchCriterion(this.key);
+}
+
 enum LandingScreen {
   favorites('favorites'),
   map('map'),
@@ -78,6 +94,17 @@ abstract class UserProfile with _$UserProfile {
     /// the route's cheapest, decluttering the feed to genuinely
     /// competitive stops.
     @Default(0.0) double minRouteSavingPerLiter,
+    /// Per-sample-point top-N cap on route search (#2101 / Epic #2100
+    /// lever B). The strategy keeps only the N best stations at each
+    /// sample point, picked by [routeSearchCriterion]. Bounds the
+    /// total result set to ~`samplePoints × N` for a 400 km route
+    /// (vs unbounded today), and feeds a smaller candidate pool into
+    /// the isolate-hopped distance math (#2102 / lever A). Default 10.
+    @Default(10) int routeSearchTopNPerSamplePoint,
+    /// Criterion used by lever B's top-N reduce (#2101). See
+    /// [RouteSearchCriterion].
+    @Default(RouteSearchCriterion.cheapest)
+    RouteSearchCriterion routeSearchCriterion,
     @Deprecated(
       'Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.',
     )

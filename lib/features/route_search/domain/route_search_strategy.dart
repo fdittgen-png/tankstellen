@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../profile/data/models/user_profile.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/search_result_item.dart';
 import '../domain/entities/route_info.dart';
@@ -27,6 +28,21 @@ abstract class RouteSearchStrategy {
     required double searchRadiusKm,
     required StationQueryFunction queryStations,
     double? maxDetourKm,
+    /// #2101 — top-N cap applied **per sample point** before the
+    /// downstream detour-filter + sort passes. Defaults to a sane
+    /// per-point cap when unset, but callers should thread the
+    /// user's profile value through.
+    int topNPerSamplePoint = 10,
+    /// #2101 — which criterion ranks the candidates inside each
+    /// sample point's local pool.
+    RouteSearchCriterion criterion = RouteSearchCriterion.cheapest,
+    /// #2103 — optional sink for incremental per-batch results.
+    /// When provided, the strategy emits each completed sample-point
+    /// batch (already top-N reduced) as soon as it arrives, so the
+    /// UI can render the first screenful before the full sweep
+    /// finishes. Final returned list is still the fully reduced +
+    /// sorted set (same contract as before).
+    void Function(List<SearchResultItem> partial)? onPartial,
   });
 
   /// Compute the best stops per segment for the given results.

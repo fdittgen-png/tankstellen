@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/geo_utils.dart' as geo;
 import '../../../../core/utils/station_extensions.dart';
+import '../../../profile/data/models/user_profile.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
@@ -178,18 +179,24 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
     required double searchRadiusKm,
     required StationQueryFunction queryStations,
     double? maxDetourKm,
+    int topNPerSamplePoint = 10,
+    RouteSearchCriterion criterion = RouteSearchCriterion.cheapest,
+    void Function(List<SearchResultItem> partial)? onPartial,
   }) async {
     debugPrint(
       'EcoSearch: querying ${route.samplePoints.length} sample points '
       'with radius=${searchRadiusKm}km on the eco-selected polyline',
     );
 
-    const batchHelper = BatchQueryHelper(batchSize: 4);
+    const batchHelper = BatchQueryHelper();
     final results = await batchHelper.queryAll(
       samplePoints: route.samplePoints,
       queryStations: queryStations,
       fuelType: fuelType,
       searchRadiusKm: searchRadiusKm,
+      topNPerSamplePoint: topNPerSamplePoint,
+      criterion: criterion,
+      onPartial: onPartial,
     );
 
     final detourLimit = maxDetourKm ?? searchRadiusKm;

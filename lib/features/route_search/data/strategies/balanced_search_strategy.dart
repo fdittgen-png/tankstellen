@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../profile/data/models/user_profile.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
@@ -31,15 +32,21 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
     required double searchRadiusKm,
     required StationQueryFunction queryStations,
     double? maxDetourKm,
+    int topNPerSamplePoint = 10,
+    RouteSearchCriterion criterion = RouteSearchCriterion.cheapest,
+    void Function(List<SearchResultItem> partial)? onPartial,
   }) async {
     debugPrint('BalancedSearch: querying ${route.samplePoints.length} points with radius=${searchRadiusKm}km');
 
-    const batchHelper = BatchQueryHelper(batchSize: 4);
+    const batchHelper = BatchQueryHelper();
     final results = await batchHelper.queryAll(
       samplePoints: route.samplePoints,
       queryStations: queryStations,
       fuelType: fuelType,
       searchRadiusKm: searchRadiusKm,
+      topNPerSamplePoint: topNPerSamplePoint,
+      criterion: criterion,
+      onPartial: onPartial,
     );
 
     // Filter by detour distance

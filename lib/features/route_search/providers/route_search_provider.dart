@@ -11,6 +11,7 @@ import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/country/country_provider.dart';
 import '../../../core/utils/station_extensions.dart';
+import '../../profile/data/models/user_profile.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/providers/ev_charging_service_provider.dart';
 import '../../search/domain/entities/fuel_type.dart';
@@ -51,6 +52,10 @@ class RouteSearchState extends _$RouteSearchState {
       final avoidHighways = profile?.avoidHighways ?? false;
       final segmentKm = profile?.routeSegmentKm ?? 50.0;
       final minSaving = profile?.minRouteSavingPerLiter ?? 0.0;
+      // #2101 lever B — profile-configurable top-N cap + criterion.
+      final topN = profile?.routeSearchTopNPerSamplePoint ?? 10;
+      final criterion =
+          profile?.routeSearchCriterion ?? RouteSearchCriterion.cheapest;
       final routingService = RoutingService();
       debugPrint('RouteSearch: fetching route for ${waypoints.length} waypoints, avoidHighways=$avoidHighways, strategy=${strategyType.key}');
       final routeResult = await routingService.getRoute(waypoints, avoidHighways: avoidHighways);
@@ -74,6 +79,22 @@ class RouteSearchState extends _$RouteSearchState {
           searchRadiusKm: effectiveRadius,
           queryStations: queryFn,
           maxDetourKm: searchRadiusKm,
+          topNPerSamplePoint: topN,
+          criterion: criterion,
+          // #2103 lever C — emit each batch's running accumulator so
+          // the list shows the first screenful while later batches
+          // are still in flight. The final state.write below replaces
+          // this with the fully-reduced, isolate-sorted result.
+          onPartial: (partial) {
+            state = AsyncValue.data(RouteSearchResult(
+              route: route,
+              stations: partial,
+              cheapestId: null,
+              cheapestPerSegment: null,
+              strategyType: strategyType,
+              isPartial: true,
+            ));
+          },
         );
       }
 

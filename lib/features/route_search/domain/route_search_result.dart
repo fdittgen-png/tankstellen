@@ -18,11 +18,19 @@ class RouteSearchResult {
   /// Which strategy was used for this search.
   final RouteSearchStrategyType strategyType;
 
+  /// #2103 lever C — true when emitted from the incremental
+  /// `onPartial` sink mid-sweep, false on the final post-isolate
+  /// result. Allows the UI to render a "still loading" affordance
+  /// on top of the running list. Defaults to false so existing
+  /// consumers see no behaviour change.
+  final bool isPartial;
+
   const RouteSearchResult({
     required this.route,
     required this.stations,
     this.cheapestId,
     this.cheapestPerSegment,
     this.strategyType = RouteSearchStrategyType.uniform,
+    this.isPartial = false,
   });
 }

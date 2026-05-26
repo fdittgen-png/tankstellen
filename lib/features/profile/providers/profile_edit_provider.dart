@@ -34,6 +34,8 @@ class ProfileEditState {
   final double approachRadiusKm;
   final ApproachPriceMode approachPriceMode;
   final int approachMinPollSeconds;
+  final int routeSearchTopNPerSamplePoint;
+  final RouteSearchCriterion routeSearchCriterion;
 
   const ProfileEditState({
     required this.fuelType,
@@ -50,6 +52,8 @@ class ProfileEditState {
     required this.approachRadiusKm,
     required this.approachPriceMode,
     required this.approachMinPollSeconds,
+    required this.routeSearchTopNPerSamplePoint,
+    required this.routeSearchCriterion,
   });
 
   factory ProfileEditState.fromProfile(UserProfile p) => ProfileEditState(
@@ -67,6 +71,8 @@ class ProfileEditState {
         approachRadiusKm: p.approachRadiusKm,
         approachPriceMode: p.approachPriceMode,
         approachMinPollSeconds: p.approachMinPollSeconds,
+        routeSearchTopNPerSamplePoint: p.routeSearchTopNPerSamplePoint,
+        routeSearchCriterion: p.routeSearchCriterion,
       );
 
   ProfileEditState copyWith({
@@ -87,6 +93,8 @@ class ProfileEditState {
     double? approachRadiusKm,
     ApproachPriceMode? approachPriceMode,
     int? approachMinPollSeconds,
+    int? routeSearchTopNPerSamplePoint,
+    RouteSearchCriterion? routeSearchCriterion,
   }) {
     return ProfileEditState(
       fuelType: fuelType ?? this.fuelType,
@@ -107,6 +115,9 @@ class ProfileEditState {
       approachPriceMode: approachPriceMode ?? this.approachPriceMode,
       approachMinPollSeconds:
           approachMinPollSeconds ?? this.approachMinPollSeconds,
+      routeSearchTopNPerSamplePoint: routeSearchTopNPerSamplePoint ??
+          this.routeSearchTopNPerSamplePoint,
+      routeSearchCriterion: routeSearchCriterion ?? this.routeSearchCriterion,
     );
   }
 }
@@ -146,4 +157,8 @@ class ProfileEditController extends _$ProfileEditController {
       state = state.copyWith(approachPriceMode: v);
   void setApproachMinPollSeconds(int v) =>
       state = state.copyWith(approachMinPollSeconds: v);
+  void setRouteSearchTopNPerSamplePoint(int v) =>
+      state = state.copyWith(routeSearchTopNPerSamplePoint: v);
+  void setRouteSearchCriterion(RouteSearchCriterion v) =>
+      state = state.copyWith(routeSearchCriterion: v);
 }
