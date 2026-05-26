@@ -4751,6 +4751,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get onboardingPickUseMode => 'Valitse käyttötapa jatkaaksesi.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'kulunut';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Tarkistustiheys';
 
   @override

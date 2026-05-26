@@ -4775,6 +4775,9 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wybierz tryb użytkowania, aby kontynuować.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'upłynęło';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Częstotliwość sprawdzania';
 
   @override

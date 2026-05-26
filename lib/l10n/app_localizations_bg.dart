@@ -4794,6 +4794,9 @@ class AppLocalizationsBg extends AppLocalizations {
       'Изберете режим на използване за да продължите.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'изминало';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Честота на проверка';
 
   @override

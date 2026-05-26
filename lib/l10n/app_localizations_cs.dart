@@ -4756,6 +4756,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get onboardingPickUseMode => 'Pro pokračování vyberte režim použití.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'uplynulo';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frekvence kontroly';
 
   @override

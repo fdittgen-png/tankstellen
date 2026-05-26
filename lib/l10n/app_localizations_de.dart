@@ -4777,6 +4777,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle einen Nutzungsmodus, um fortzufahren.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'vergangen';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Prüfintervall';
 
   @override

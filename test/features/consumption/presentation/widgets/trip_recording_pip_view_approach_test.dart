@@ -30,6 +30,11 @@ const _stationE10 = Station(
 TripRecordingState _activeState({
   double distance = 12.4,
   Duration elapsed = const Duration(minutes: 8, seconds: 32),
+  // Default fuel rate keeps tests on the OBD2 branch (#2094 Branch 1)
+  // where the L/100 km marker is rendered — that's the canonical
+  // "default layout" for the legacy tests. Branch-2 (GPS-only) and
+  // Branch-3 (pre-roll) get their own dedicated tests further down.
+  double? fuelRateLPerHour = 4.06,
 }) =>
     TripRecordingState(
       phase: TripRecordingPhase.recording,
@@ -39,6 +44,7 @@ TripRecordingState _activeState({
         speedKmh: 70,
         distanceKmSoFar: distance,
         elapsed: elapsed,
+        fuelRateLPerHour: fuelRateLPerHour,
       ),
     );
 
@@ -190,4 +196,75 @@ void main() {
       expect(find.text('Carrefour Pézenas'), findsNothing);
     });
   });
+  group('TripRecordingPipView (#2094) — context-adaptive primary', () {
+    Widget buildWith({double? fuelRate, double distance = 12.4}) =>
+        _wrap(TripRecordingPipView(
+          state: _activeState(
+            distance: distance,
+            fuelRateLPerHour: fuelRate,
+          ),
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ));
+
+    testWidgets('OBD2 branch — fuel rate live → big L/100 km',
+        (tester) async {
+      await tester.pumpWidget(buildWith(fuelRate: 4.06));
+      // Branch 1 active.
+      expect(find.text('L/100 km'), findsOneWidget);
+      // km / elapsed move to the secondary row, NOT the caption.
+      expect(find.text('km'), findsNothing);
+      expect(find.text('elapsed'), findsNothing);
+    });
+
+    testWidgets('GPS-only branch — distance ≥ 0.1 km → big distance',
+        (tester) async {
+      await tester.pumpWidget(buildWith(fuelRate: null, distance: 4.0));
+      // Branch 2 — distance is the hero figure.
+      expect(find.text('4.0'), findsOneWidget);
+      expect(find.text('km'), findsOneWidget);
+      expect(find.text('L/100 km'), findsNothing);
+      // Pre-#2094 the layout rendered "~" huge; assert that's gone.
+      expect(find.text('~'), findsNothing);
+    });
+
+    testWidgets('pre-roll branch — distance ≈ 0 → big elapsed time',
+        (tester) async {
+      await tester.pumpWidget(buildWith(fuelRate: null, distance: 0.0));
+      // Branch 3 — elapsed time is the hero figure with "elapsed"
+      // caption. Default helper uses 8m 32s elapsed.
+      expect(find.text('elapsed'), findsOneWidget);
+      expect(find.text('8m 32s'), findsOneWidget);
+      expect(find.text('km'), findsNothing);
+      expect(find.text('L/100 km'), findsNothing);
+      expect(find.text('~'), findsNothing);
+    });
+
+    testWidgets('elapsed-time formatter reads as a duration, not a clock',
+        (tester) async {
+      // Hour-plus shape drops seconds.
+      await tester.pumpWidget(_wrap(TripRecordingPipView(
+        state: _activeState(
+          distance: 0.0,
+          fuelRateLPerHour: null,
+          elapsed: const Duration(hours: 1, minutes: 14, seconds: 12),
+        ),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+      )));
+      expect(find.text('1h 14m'), findsOneWidget);
+      // Under-1-minute shape uses seconds only.
+      await tester.pumpWidget(_wrap(TripRecordingPipView(
+        state: _activeState(
+          distance: 0.0,
+          fuelRateLPerHour: null,
+          elapsed: const Duration(seconds: 42),
+        ),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+      )));
+      expect(find.text('42s'), findsOneWidget);
+    });
+  });
+
 }

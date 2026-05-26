@@ -4802,6 +4802,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Choisissez un mode d\'utilisation pour continuer.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'écoulé';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Fréquence de vérification';
 
   @override

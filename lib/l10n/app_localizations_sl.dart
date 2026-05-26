@@ -4757,6 +4757,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get onboardingPickUseMode => 'Za nadaljevanje izberite način uporabe.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'preteklo';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Pogostost preverjanja';
 
   @override

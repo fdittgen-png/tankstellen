@@ -4746,6 +4746,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get onboardingPickUseMode => 'Jätkamiseks vali kasutusrežiim.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'möödunud';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Kontrollimissagedus';
 
   @override

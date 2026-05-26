@@ -4781,6 +4781,9 @@ class AppLocalizationsLt extends AppLocalizations {
       'Norėdami tęsti, pasirinkite naudojimo režimą.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'praėjo';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Patikrinimo dažnis';
 
   @override

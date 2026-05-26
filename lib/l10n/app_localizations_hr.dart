@@ -4769,6 +4769,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get onboardingPickUseMode => 'Odaberite način korištenja za nastavak.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'proteklo';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Učestalost provjere';
 
   @override

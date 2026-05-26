@@ -4797,6 +4797,9 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επιλέξτε λειτουργία χρήσης για συνέχεια.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'παρήλθε';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Συχνότητα ελέγχου';
 
   @override

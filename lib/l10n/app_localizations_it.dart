@@ -4780,6 +4780,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scegli una modalità d\'uso per continuare.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'trascorso';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frequenza di controllo';
 
   @override

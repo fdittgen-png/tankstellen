@@ -4751,6 +4751,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get onboardingPickUseMode => 'Velg en bruksmodus for å fortsette.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'forløpt';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Sjekkhyppighet';
 
   @override

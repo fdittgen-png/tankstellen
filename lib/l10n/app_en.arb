@@ -3373,6 +3373,10 @@
   "@onboardingPickUseMode": {
     "description": "Error shown when the user taps the onboarding wizard's Next button on the first step without choosing a use mode (#1691)."
   },
+  "tripRecordingPipElapsedCaption": "elapsed",
+  "@tripRecordingPipElapsedCaption": {
+    "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
+  },
   "alertsRadiusFrequencyLabel": "Check frequency",
   "@alertsRadiusFrequencyLabel": {
     "description": "Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert."

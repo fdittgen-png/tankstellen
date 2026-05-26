@@ -1795,5 +1795,9 @@
         "example": "350"
       }
     }
+  },
+  "tripRecordingPipElapsedCaption": "möödunud",
+  "@tripRecordingPipElapsedCaption": {
+    "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   }
 }

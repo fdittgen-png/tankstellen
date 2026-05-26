@@ -8553,6 +8553,12 @@ abstract class AppLocalizations {
   /// **'Pick a use mode to continue.'**
   String get onboardingPickUseMode;
 
+  /// PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches.
+  ///
+  /// In en, this message translates to:
+  /// **'elapsed'**
+  String get tripRecordingPipElapsedCaption;
+
   /// Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert.
   ///
   /// In en, this message translates to:

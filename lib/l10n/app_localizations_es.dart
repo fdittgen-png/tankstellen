@@ -4788,6 +4788,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get onboardingPickUseMode => 'Elige un modo de uso para continuar.';
 
   @override
+  String get tripRecordingPipElapsedCaption => 'transcurrido';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frecuencia de comprobación';
 
   @override
