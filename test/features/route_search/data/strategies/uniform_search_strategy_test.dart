@@ -231,4 +231,67 @@ void main() {
       expect(bestStops, isEmpty);
     });
   });
+
+  group('isolate filter + sort (#2102)', () {
+    // Builds a station at (lat, lng) with a fixed id.
+    FuelStationResult stn(String id, double lat, double lng) =>
+        FuelStationResult(Station(
+          id: id,
+          name: id,
+          brand: 'T',
+          street: '',
+          postCode: '',
+          place: '',
+          lat: lat,
+          lng: lng,
+          dist: 1.0,
+          isOpen: true,
+          e10: 1.50,
+        ));
+
+    test(
+        'drops stations farther than detourLimitKm and sorts the rest in '
+        'itinerary order', () async {
+      // Polyline runs west→east along lat=48.
+      const polyline = [
+        LatLng(48.0, 2.0),
+        LatLng(48.0, 2.5),
+        LatLng(48.0, 3.0),
+      ];
+      final results = [
+        stn('east-on-route', 48.0, 2.9),
+        stn('off-route-far', 48.5, 2.5), // ~55 km north → fail detour 10 km
+        stn('mid-on-route', 48.0, 2.5),
+        stn('west-on-route', 48.0, 2.05),
+      ];
+      final survivors = await runFilterAndSortForTest(
+        results: results,
+        polyline: polyline,
+        detourLimitKm: 10.0,
+      );
+      // 3 survivors — the off-route station drops; rest in west→east order.
+      expect(survivors.map((s) => (s as FuelStationResult).id), [
+        'west-on-route',
+        'mid-on-route',
+        'east-on-route',
+      ]);
+    });
+
+    test('empty inputs return early without crossing the isolate boundary',
+        () async {
+      final r1 = await runFilterAndSortForTest(
+        results: const [],
+        polyline: const [LatLng(48, 2)],
+        detourLimitKm: 5.0,
+      );
+      expect(r1, isEmpty);
+
+      final r2 = await runFilterAndSortForTest(
+        results: [stn('a', 48, 2)],
+        polyline: const [],
+        detourLimitKm: 5.0,
+      );
+      expect(r2, hasLength(1));
+    });
+  });
 }
