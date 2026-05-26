@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/price_utils.dart';
+import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import 'driving_marker_builder.dart';
@@ -43,15 +44,9 @@ class DrivingMapView extends StatelessWidget {
           initialZoom: 12,
         ),
         children: [
-          TileLayer(
-            urlTemplate: AppConstants.osmTileUrl,
-            userAgentPackageName: AppConstants.osmUserAgent,
-            // #757 — evict failed tiles once off-screen so the next
-            // pan retries cleanly. See station_map_layers.dart for
-            // the full rationale.
-            evictErrorTileStrategy:
-                EvictErrorTileStrategy.notVisibleRespectMargin,
-          ),
+          // #2096 — was a raw TileLayer; routed through the
+          // hardened wrapper.
+          const SparkiloTileLayer(),
         ],
       );
     }
@@ -85,13 +80,9 @@ class DrivingMapView extends StatelessWidget {
         onTap: (_, _) => onInteraction(),
       ),
       children: [
-        TileLayer(
-          urlTemplate: AppConstants.osmTileUrl,
-          userAgentPackageName: AppConstants.osmUserAgent,
-          // #757 — evict failed tiles off-screen so the next pan retries.
-          evictErrorTileStrategy:
-              EvictErrorTileStrategy.notVisibleRespectMargin,
-        ),
+        // #2096 — was a raw TileLayer; routed through the hardened
+        // wrapper.
+        const SparkiloTileLayer(),
         MarkerLayer(markers: markers),
         const RichAttributionWidget(
           attributions: [

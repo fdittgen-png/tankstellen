@@ -10,6 +10,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Full-screen map-picker for choosing the center of a [RadiusAlert]
@@ -182,13 +183,9 @@ class _RadiusAlertMapPickerState extends ConsumerState<RadiusAlertMapPicker> {
               ),
             ),
             children: [
-              TileLayer(
-                urlTemplate: AppConstants.osmTileUrl,
-                userAgentPackageName: AppConstants.osmUserAgent,
-                // #757 — evict failed tiles once off-screen.
-                evictErrorTileStrategy:
-                    EvictErrorTileStrategy.notVisibleRespectMargin,
-              ),
+              // #2096 — was a raw TileLayer; routed through the
+              // hardened wrapper for retry + cancellation resilience.
+              const SparkiloTileLayer(),
               const RichAttributionWidget(
                 attributions: [
                   TextSourceAttribution('OpenStreetMap contributors'),
