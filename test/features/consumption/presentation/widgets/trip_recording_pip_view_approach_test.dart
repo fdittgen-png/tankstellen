@@ -265,6 +265,71 @@ void main() {
       )));
       expect(find.text('42s'), findsOneWidget);
     });
-  });
 
+    testWidgets(
+        'real-trip life-cycle — pre-roll → GPS-only → OBD2 adapts the '
+        'primary slot one transition at a time', (tester) async {
+      // Walks the widget through the natural sequence a real trip
+      // produces: start parked (pre-roll, 0 km, no fuel rate), drive a
+      // bit on GPS only (distance > 0.1 km, still no fuel rate),
+      // adapter finally connects mid-trip (fuel rate becomes
+      // available). The big-slot caption must adapt at each step
+      // without any branch ever rendering the `~` placeholder huge
+      // that #2094 set out to kill.
+      Future<void> pumpAt({
+        double distance = 0,
+        double? fuelRate,
+        Duration elapsed = const Duration(seconds: 42),
+      }) async {
+        await tester.pumpWidget(_wrap(TripRecordingPipView(
+          state: _activeState(
+            distance: distance,
+            fuelRateLPerHour: fuelRate,
+            elapsed: elapsed,
+          ),
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        )));
+        await tester.pump();
+      }
+
+      // T = 0 — engine on, GPS still warming up, no fuel rate.
+      // Branch 3: elapsed time is the hero.
+      await pumpAt(distance: 0, fuelRate: null);
+      expect(find.text('elapsed'), findsOneWidget);
+      expect(find.text('km'), findsNothing);
+      expect(find.text('L/100 km'), findsNothing);
+      expect(find.text('~'), findsNothing,
+          reason:
+              'the `~` placeholder pre-#2094 wasted the whole tile — '
+              'no branch should render it');
+
+      // T = 30 s — moved 0.5 km on GPS, still no OBD2 adapter.
+      // Branch 2: distance is the hero.
+      await pumpAt(
+        distance: 0.5,
+        fuelRate: null,
+        elapsed: const Duration(seconds: 30),
+      );
+      expect(find.text('0.5'), findsOneWidget);
+      expect(find.text('km'), findsOneWidget);
+      expect(find.text('elapsed'), findsNothing);
+      expect(find.text('L/100 km'), findsNothing);
+      expect(find.text('~'), findsNothing);
+
+      // T = 5 min — adapter connected, fuel-rate sample landed.
+      // Branch 1: L/100 km takes the hero slot.
+      await pumpAt(
+        distance: 4.0,
+        fuelRate: 4.06,
+        elapsed: const Duration(minutes: 5),
+      );
+      expect(find.text('L/100 km'), findsOneWidget);
+      // Distance + elapsed move to the secondary row — they're
+      // still findable, just no longer the hero caption.
+      expect(find.textContaining('4.0'), findsOneWidget);
+      expect(find.text('elapsed'), findsNothing);
+      expect(find.text('~'), findsNothing);
+    });
+  });
 }
