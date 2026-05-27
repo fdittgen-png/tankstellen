@@ -4180,6 +4180,21 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cuando está apagado, la app graba viajes solo con GPS sin necesitar un adaptador OBD2. El coaching se reduce — sin L/100 km al instante, menos señales del motor.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR de tique';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Escanea un tique impreso en la pantalla Añadir repostaje para rellenar fecha, litros, total y estación.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR de pantalla de surtidor (experimental)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Escanea la pantalla de un surtidor para rellenar el formulario. El reconocimiento no es fiable hoy — actívalo solo si quieres probarlo.';
+
+  @override
   String get feedbackConsentTitle => '¿Enviar el informe a GitHub?';
 
   @override

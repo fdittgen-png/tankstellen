@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
 
 /// Two side-by-side import buttons restored on the Add-Fill-up form
 /// (#951). The previous single "Import from…" chip + bottom-sheet was
@@ -18,7 +21,12 @@ import '../../../../l10n/app_localizations.dart';
 ///
 /// Pulled out of `add_fill_up_screen.dart` (#563 extraction) so the
 /// screen file drops well below 300 LOC.
-class FillUpImportButtonsPair extends StatelessWidget {
+///
+/// As of #2110 the two buttons are independently gated by
+/// `Feature.addFillUpOcrReceipt` (default-on — works reliably) and
+/// `Feature.addFillUpOcrPump` (default-off — recognizer immature).
+/// When both flags are off the widget collapses to `SizedBox.shrink()`.
+class FillUpImportButtonsPair extends ConsumerWidget {
   final bool scanningReceipt;
   final bool scanningPump;
   final VoidCallback onScanReceipt;
@@ -33,49 +41,65 @@ class FillUpImportButtonsPair extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
+    final enabled = ref.watch(enabledFeaturesProvider);
+    final receiptOn = enabled.contains(Feature.addFillUpOcrReceipt);
+    final pumpOn = enabled.contains(Feature.addFillUpOcrPump);
+
+    // #2110 — neither button enabled → render nothing. The form
+    // continues without the import row.
+    if (!receiptOn && !pumpOn) return const SizedBox.shrink();
+
+    final receiptBtn = receiptOn
+        ? Expanded(
+            child: OutlinedButton.icon(
+              key: const Key('import_receipt_button'),
+              onPressed: scanningReceipt ? null : onScanReceipt,
+              icon: scanningReceipt
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.document_scanner_outlined),
+              label: Text(
+                l?.fillUpImportReceiptLabel ?? 'Receipt',
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          )
+        : null;
+    final pumpBtn = pumpOn
+        ? Expanded(
+            child: OutlinedButton.icon(
+              key: const Key('import_pump_button'),
+              onPressed: scanningPump ? null : onScanPumpDisplay,
+              icon: scanningPump
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.local_gas_station_outlined),
+              label: Text(
+                l?.fillUpImportPumpLabel ?? 'Pump display',
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          )
+        : null;
+
     return Row(
       children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            key: const Key('import_receipt_button'),
-            onPressed: scanningReceipt ? null : onScanReceipt,
-            icon: scanningReceipt
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.document_scanner_outlined),
-            label: Text(
-              l?.fillUpImportReceiptLabel ?? 'Receipt',
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.visible,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: OutlinedButton.icon(
-            key: const Key('import_pump_button'),
-            onPressed: scanningPump ? null : onScanPumpDisplay,
-            icon: scanningPump
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.local_gas_station_outlined),
-            label: Text(
-              l?.fillUpImportPumpLabel ?? 'Pump display',
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.visible,
-            ),
-          ),
-        ),
+        ?receiptBtn,
+        if (receiptBtn != null && pumpBtn != null)
+          const SizedBox(width: 8),
+        ?pumpBtn,
       ],
     );
   }

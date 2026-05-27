@@ -4181,6 +4181,21 @@ class AppLocalizationsPt extends AppLocalizations {
       'Quando desligado, a app grava viagens só com GPS sem precisar de um adaptador OBD2. O coaching é reduzido — sem L/100 km instantânea, menos sinais do motor.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR de recibo';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Digitalize um recibo impresso na tela Adicionar abastecimento para preencher data, litros, total e estação.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR do display da bomba (experimental)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Digitalize o display de uma bomba de combustível para preencher o formulário. O reconhecimento é hoje pouco confiável — ative apenas se quiser testar.';
+
+  @override
   String get feedbackConsentTitle => 'Enviar relatório para o GitHub?';
 
   @override

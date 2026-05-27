@@ -4181,6 +4181,20 @@ class AppLocalizationsRo extends AppLocalizations {
       'Când este oprit, aplicația înregistrează călătorii doar cu GPS fără adaptor OBD2. Coachingul este redus — fără L/100 km instantaneu, mai puține semnale ale motorului.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR bon';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Scanați un bon imprimat pe ecranul Adăugare alimentare pentru a precompleta data, litrii, totalul și stația.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump => 'OCR afișaj pompă (experimental)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Scanați afișajul unei pompe de carburant pentru a precompleta formularul. Recunoașterea nu este fiabilă astăzi — activați doar dacă doriți să testați.';
+
+  @override
   String get feedbackConsentTitle => 'Trimiteți raportul pe GitHub?';
 
   @override

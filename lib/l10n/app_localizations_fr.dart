@@ -4195,6 +4195,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'Quand désactivé, l\'app enregistre des trajets uniquement GPS sans avoir besoin d\'un adaptateur OBD2. Le coaching est réduit — pas de L/100 km instantanée, moins de signaux moteur.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR de l\'écran ticket';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Scannez un ticket imprimé sur l\'écran Ajouter un plein pour pré-remplir la date, les litres, le total et la station.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR de l\'écran de pompe (expérimental)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Scannez l\'afficheur d\'une pompe à carburant pour pré-remplir le formulaire. La reconnaissance n\'est pas fiable aujourd\'hui — activez uniquement si vous voulez tester.';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

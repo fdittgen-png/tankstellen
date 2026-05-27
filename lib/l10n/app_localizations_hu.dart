@@ -4185,6 +4185,20 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ha ki van kapcsolva, az alkalmazás csak GPS-szel rögzít utakat OBD2-adapter nélkül. A coaching csökkentett — nincs azonnali L/100 km, kevesebb motorjel.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Számla OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Olvasson be nyomtatott számlát a Tankolás hozzáadása képernyőn, hogy előre kitöltse a dátumot, a litereket, az összeget és a kutat.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump => 'Kút kijelző OCR (kísérleti)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Olvasson be egy üzemanyagkút kijelzőjét az űrlap előre kitöltéséhez. A felismerés ma megbízhatatlan — csak akkor kapcsolja be, ha tesztelni szeretné.';
+
+  @override
   String get feedbackConsentTitle => 'Elküldi a jelentést GitHub-ra?';
 
   @override

@@ -246,5 +246,21 @@
   "featureDescription_obd2Optional": "When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.",
   "@featureDescription_obd2Optional": {
     "description": "Settings toggle description for the OBD2-optional flag (#2024). Explains the trade-off between gpsPlusObd2 (default) and gpsOnly trip recording."
+  },
+  "featureLabel_addFillUpOcrReceipt": "Receipt OCR",
+  "@featureLabel_addFillUpOcrReceipt": {
+    "description": "Settings toggle label for the Add-fill-up receipt-OCR import button (#2110). Default-on."
+  },
+  "featureDescription_addFillUpOcrReceipt": "Scan a printed receipt on the Add fill-up screen to pre-fill date, litres, total, and station.",
+  "@featureDescription_addFillUpOcrReceipt": {
+    "description": "Settings toggle description for the Add-fill-up receipt-OCR button (#2110)."
+  },
+  "featureLabel_addFillUpOcrPump": "Pump display OCR (experimental)",
+  "@featureLabel_addFillUpOcrPump": {
+    "description": "Settings toggle label for the Add-fill-up pump-display-OCR import button (#2110). Default-off — recognizer unreliable."
+  },
+  "featureDescription_addFillUpOcrPump": "Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.",
+  "@featureDescription_addFillUpOcrPump": {
+    "description": "Settings toggle description for the Add-fill-up pump-display-OCR button (#2110). Sets expectation that the recognizer is experimental."
   }
 }

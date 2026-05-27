@@ -4187,6 +4187,21 @@ class AppLocalizationsEl extends AppLocalizations {
       'Όταν είναι απενεργοποιημένο, η εφαρμογή καταγράφει διαδρομές μόνο με GPS χωρίς προσαρμογέα OBD2. Το coaching είναι περιορισμένο — χωρίς στιγμιαία L/100 km, λιγότερα σήματα κινητήρα.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR απόδειξης';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Σαρώστε μια τυπωμένη απόδειξη στην οθόνη Προσθήκη ανεφοδιασμού για να συμπληρώσετε αυτόματα ημερομηνία, λίτρα, σύνολο και πρατήριο.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR οθόνης αντλίας (πειραματικό)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Σαρώστε την οθόνη μιας αντλίας καυσίμου για να συμπληρώσετε αυτόματα τη φόρμα. Η αναγνώριση είναι αναξιόπιστη σήμερα — ενεργοποιήστε μόνο αν θέλετε να δοκιμάσετε.';
+
+  @override
   String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';
 
   @override

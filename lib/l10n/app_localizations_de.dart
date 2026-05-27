@@ -4175,6 +4175,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wenn aus, zeichnet die App reine GPS-Fahrten ohne OBD2-Adapter auf. Das Coaching ist eingeschränkt — keine momentane L/100 km, weniger motorbasierte Signale.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Quittungs-OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Scannen Sie eine gedruckte Quittung auf der Seite \"Tankvorgang hinzufügen\", um Datum, Liter, Gesamtbetrag und Tankstelle vorauszufüllen.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump => 'Zapfsäulen-OCR (experimentell)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Scannen Sie eine Zapfsäulenanzeige, um das Formular vorauszufüllen. Die Erkennung ist heute unzuverlässig — aktivieren Sie nur, wenn Sie testen möchten.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override
