@@ -168,6 +168,19 @@ abstract class UserProfile with _$UserProfile {
     /// but is never tighter than this floor — protects the search
     /// provider quota. Range 1–10 s; default 5 s.
     @Default(5) int approachMinPollSeconds,
+    /// Home-screen widget colour scheme (#2106). One of
+    /// `widgetColorSchemes` (`system | light | dark | blue | green |
+    /// orange`). Surfaced in Settings → Home-screen widget and pushed
+    /// to the Android `HomeWidgetPreferences` global `default_color`
+    /// key on every `home_widget_service` publish, so the renderer
+    /// picks up the change on the next refresh. iOS widget is
+    /// read-only today (`StaticConfiguration` — no per-widget config).
+    @Default('system') String widgetColorScheme,
+    /// Home-screen widget content variant (#2106). One of
+    /// `widgetVariants` (`default | predictive`). Mirrors the
+    /// `widgetColorScheme` path through `home_widget_service` →
+    /// SharedPreferences global `default_variant`.
+    @Default('default') String widgetVariant,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>

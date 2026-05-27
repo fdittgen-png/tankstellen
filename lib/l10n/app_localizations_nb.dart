@@ -5417,6 +5417,34 @@ class AppLocalizationsNb extends AppLocalizations {
       'På Android, trykk og hold widgeten og velg Konfigurer for å endre profil, farge og innhold.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Valgene under gjelder for alle installerte widgeter ved neste oppdatering.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Fargevalg';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Innholdsvariant';
+
+  @override
+  String get widgetColorSchemeSystem => 'Følg systemet';
+
+  @override
+  String get widgetColorSchemeLight => 'Lys';
+
+  @override
+  String get widgetColorSchemeDark => 'Mørk';
+
+  @override
+  String get widgetColorSchemeBlue => 'Blå';
+
+  @override
+  String get widgetColorSchemeGreen => 'Grønn';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oransje';
+
+  @override
   String get widgetVariantDefault => 'Kun gjeldende pris';
 
   @override

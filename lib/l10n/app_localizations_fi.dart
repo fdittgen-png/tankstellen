@@ -5420,6 +5420,34 @@ class AppLocalizationsFi extends AppLocalizations {
       'Androidilla paina widgetiä pitkään ja valitse Määritä uudelleen muuttaaksesi profiilia, väriä ja sisältöä.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Alla olevat valinnat koskevat kaikkia asennettuja widgettejä seuraavalla päivityksellä.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Värimaailma';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Sisältövaihtoehto';
+
+  @override
+  String get widgetColorSchemeSystem => 'Järjestelmä';
+
+  @override
+  String get widgetColorSchemeLight => 'Vaalea';
+
+  @override
+  String get widgetColorSchemeDark => 'Tumma';
+
+  @override
+  String get widgetColorSchemeBlue => 'Sininen';
+
+  @override
+  String get widgetColorSchemeGreen => 'Vihreä';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranssi';
+
+  @override
   String get widgetVariantDefault => 'Vain nykyinen hinta';
 
   @override

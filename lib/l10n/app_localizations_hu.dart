@@ -5465,6 +5465,34 @@ class AppLocalizationsHu extends AppLocalizations {
       'Android-on nyomjon hosszan a widgetre, és válassza az Újrakonfigurálás lehetőséget a profil, szín és tartalom megváltoztatásához.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Az alábbi beállítások a következő frissítéskor minden telepített widgetre érvényesek.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Színséma';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Tartalomváltozat';
+
+  @override
+  String get widgetColorSchemeSystem => 'Rendszer szerint';
+
+  @override
+  String get widgetColorSchemeLight => 'Világos';
+
+  @override
+  String get widgetColorSchemeDark => 'Sötét';
+
+  @override
+  String get widgetColorSchemeBlue => 'Kék';
+
+  @override
+  String get widgetColorSchemeGreen => 'Zöld';
+
+  @override
+  String get widgetColorSchemeOrange => 'Narancs';
+
+  @override
   String get widgetVariantDefault => 'Csak jelenlegi ár';
 
   @override

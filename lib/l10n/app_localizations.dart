@@ -9717,11 +9717,65 @@ abstract class AppLocalizations {
   /// **'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.'**
   String get widgetHelpTap;
 
-  /// Help line explaining how to reconfigure the Android home-screen widget (#1806).
+  /// Help line explaining how to reconfigure the Android home-screen widget (#1806). Shown only on fresh installs without an active profile; otherwise the in-app defaults editor (#2106) renders instead.
   ///
   /// In en, this message translates to:
   /// **'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.'**
   String get widgetHelpConfigure;
+
+  /// #2106 — italicised hint above the in-Settings widget-defaults editor explaining the live-override semantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Choices below apply to every installed widget on the next refresh.'**
+  String get widgetDefaultsApplyToAllHint;
+
+  /// #2106 — label above the widget colour-scheme dropdown in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour scheme'**
+  String get widgetDefaultsColorLabel;
+
+  /// #2106 — label above the widget content-variant SegmentedButton in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Content variant'**
+  String get widgetDefaultsVariantLabel;
+
+  /// #2106 — widget colour-scheme option that follows the OS dark/light mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow system'**
+  String get widgetColorSchemeSystem;
+
+  /// #2106 — widget colour-scheme option (light background).
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get widgetColorSchemeLight;
+
+  /// #2106 — widget colour-scheme option (dark background).
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get widgetColorSchemeDark;
+
+  /// #2106 — widget colour-scheme option (blue accent).
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get widgetColorSchemeBlue;
+
+  /// #2106 — widget colour-scheme option (green accent).
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get widgetColorSchemeGreen;
+
+  /// #2106 — widget colour-scheme option (orange accent).
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get widgetColorSchemeOrange;
 
   /// Label for the default home-widget content variant — shows just the current pump price (#1121).
   ///

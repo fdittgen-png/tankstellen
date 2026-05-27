@@ -5391,6 +5391,34 @@ class AppLocalizationsEn extends AppLocalizations {
       'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Choices below apply to every installed widget on the next refresh.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Colour scheme';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Content variant';
+
+  @override
+  String get widgetColorSchemeSystem => 'Follow system';
+
+  @override
+  String get widgetColorSchemeLight => 'Light';
+
+  @override
+  String get widgetColorSchemeDark => 'Dark';
+
+  @override
+  String get widgetColorSchemeBlue => 'Blue';
+
+  @override
+  String get widgetColorSchemeGreen => 'Green';
+
+  @override
+  String get widgetColorSchemeOrange => 'Orange';
+
+  @override
   String get widgetVariantDefault => 'Current price only';
 
   @override
@@ -10928,6 +10956,34 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get widgetHelpConfigure =>
       '⟦Óñ Áñđřóîđ, łóñǧ-ƥřéšš ŧĥé ŵîđǧéŧ áñđ çĥóóšé Řéçóñƒîǧúřé ŧó çĥáñǧé ŧĥé ƥřóƒîłé, çółóúř, áñđ çóñŧéñŧ. ····································⟧';
+
+  @override
+  String get widgetDefaultsApplyToAllHint =>
+      '⟦Çĥóîçéš ƀéłóŵ áƥƥłý ŧó éṽéřý îñšŧáłłéđ ŵîđǧéŧ óñ ŧĥé ñéẋŧ řéƒřéšĥ. ·························⟧';
+
+  @override
+  String get widgetDefaultsColorLabel => '⟦Çółóúř šçĥéɱé ·····⟧';
+
+  @override
+  String get widgetDefaultsVariantLabel => '⟦Çóñŧéñŧ ṽářîáñŧ ······⟧';
+
+  @override
+  String get widgetColorSchemeSystem => '⟦Ƒółłóŵ šýšŧéɱ ·····⟧';
+
+  @override
+  String get widgetColorSchemeLight => '⟦Łîǧĥŧ ··⟧';
+
+  @override
+  String get widgetColorSchemeDark => '⟦Đářķ ··⟧';
+
+  @override
+  String get widgetColorSchemeBlue => '⟦Ɓłúé ··⟧';
+
+  @override
+  String get widgetColorSchemeGreen => '⟦Ǧřééñ ··⟧';
+
+  @override
+  String get widgetColorSchemeOrange => '⟦Óřáñǧé ···⟧';
 
   @override
   String get widgetVariantDefault => '⟦Çúřřéñŧ ƥřîçé óñłý ·······⟧';

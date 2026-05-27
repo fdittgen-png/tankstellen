@@ -65,6 +65,8 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
       ApproachPriceMode.nearest,
   approachMinPollSeconds:
       (json['approachMinPollSeconds'] as num?)?.toInt() ?? 5,
+  widgetColorScheme: json['widgetColorScheme'] as String? ?? 'system',
+  widgetVariant: json['widgetVariant'] as String? ?? 'default',
 );
 
 Map<String, dynamic> _$UserProfileToJson(
@@ -105,6 +107,8 @@ Map<String, dynamic> _$UserProfileToJson(
   'approachRadiusKm': instance.approachRadiusKm,
   'approachPriceMode': _$ApproachPriceModeEnumMap[instance.approachPriceMode]!,
   'approachMinPollSeconds': instance.approachMinPollSeconds,
+  'widgetColorScheme': instance.widgetColorScheme,
+  'widgetVariant': instance.widgetVariant,
 };
 
 const _$LandingScreenEnumMap = {

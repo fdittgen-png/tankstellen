@@ -5451,6 +5451,34 @@ class AppLocalizationsLt extends AppLocalizations {
       'Android aplinkoje ilgai spauskite valdiklį ir pasirinkite Konfigūruoti iš naujo, kad pakeistumėte profilį, spalvą ir turinį.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Toliau pateikti pasirinkimai taikomi kiekvienam įdiegtam valdikliui kito atnaujinimo metu.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Spalvų schema';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Turinio variantas';
+
+  @override
+  String get widgetColorSchemeSystem => 'Pagal sistemą';
+
+  @override
+  String get widgetColorSchemeLight => 'Šviesi';
+
+  @override
+  String get widgetColorSchemeDark => 'Tamsi';
+
+  @override
+  String get widgetColorSchemeBlue => 'Mėlyna';
+
+  @override
+  String get widgetColorSchemeGreen => 'Žalia';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranžinė';
+
+  @override
   String get widgetVariantDefault => 'Tik dabartinė kaina';
 
   @override

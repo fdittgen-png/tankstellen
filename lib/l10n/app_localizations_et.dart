@@ -5411,6 +5411,34 @@ class AppLocalizationsEt extends AppLocalizations {
       'Androidis hoia vidinat pikalt all ja vali Konfigureeri uuesti, et muuta profiili, värvi ja sisu.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Valikud allpool kehtivad kõikidele paigaldatud vidinatele järgmisel värskendamisel.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Värviskeem';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Sisuvariant';
+
+  @override
+  String get widgetColorSchemeSystem => 'Süsteem';
+
+  @override
+  String get widgetColorSchemeLight => 'Hele';
+
+  @override
+  String get widgetColorSchemeDark => 'Tume';
+
+  @override
+  String get widgetColorSchemeBlue => 'Sinine';
+
+  @override
+  String get widgetColorSchemeGreen => 'Roheline';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranž';
+
+  @override
   String get widgetVariantDefault => 'Ainult praegune hind';
 
   @override

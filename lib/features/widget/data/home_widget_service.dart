@@ -113,6 +113,12 @@ class HomeWidgetService {
         'updated_at',
         DateTime.now().toIso8601String(),
       );
+      // #2106 — push the active profile's widget colour + variant
+      // as global defaults the Android renderer falls back to when
+      // a per-widget value isn't set. The renderer still respects
+      // per-widget overrides (set via the Reconfigure activity) for
+      // backward compatibility.
+      await _writeGlobalWidgetDefaults(profileStorage);
 
       await HomeWidget.updateWidget(
         androidName: _widgetAndroidName,
@@ -594,6 +600,40 @@ class HomeWidgetService {
       'userLat': ctx.userLat,
       'userLng': ctx.userLng,
     };
+  }
+
+  /// #2106 — push the active profile's widget colour + variant choice
+  /// to the global `HomeWidgetPreferences` keys the Android renderer
+  /// already reads as fallback when a per-widget value isn't set. iOS
+  /// widget is read-only (`StaticConfiguration`); the write is still
+  /// performed via the same `HomeWidget.saveWidgetData` call so the
+  /// keys are available if/when iOS WidgetKit grows an
+  /// `IntentConfiguration` follow-up.
+  ///
+  /// Quietly no-ops when [profileStorage] is null or no profile is
+  /// active (e.g. fresh install before onboarding).
+  static Future<void> _writeGlobalWidgetDefaults(
+    ProfileStorage? profileStorage,
+  ) async {
+    if (profileStorage == null) return;
+    final activeId = profileStorage.getActiveProfileId();
+    if (activeId == null) return;
+    final raw = profileStorage.getProfile(activeId);
+    if (raw == null) return;
+    try {
+      final profile = UserProfile.fromJson(Map<String, dynamic>.from(raw));
+      await HomeWidget.saveWidgetData(
+        'default_color',
+        profile.widgetColorScheme,
+      );
+      await HomeWidget.saveWidgetData(
+        'default_variant',
+        profile.widgetVariant,
+      );
+    } catch (e, st) {
+      debugPrint(
+          'HomeWidget._writeGlobalWidgetDefaults: $e\n$st');
+    }
   }
 }
 

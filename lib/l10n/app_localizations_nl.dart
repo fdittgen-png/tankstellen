@@ -5439,6 +5439,34 @@ class AppLocalizationsNl extends AppLocalizations {
       'Op Android: houd de widget ingedrukt en kies Herconfigueren om het profiel, de kleur en de inhoud te wijzigen.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'De keuzes hieronder gelden bij de volgende verversing voor elke geïnstalleerde widget.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Kleurenschema';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Inhoudsvariant';
+
+  @override
+  String get widgetColorSchemeSystem => 'Volg systeem';
+
+  @override
+  String get widgetColorSchemeLight => 'Licht';
+
+  @override
+  String get widgetColorSchemeDark => 'Donker';
+
+  @override
+  String get widgetColorSchemeBlue => 'Blauw';
+
+  @override
+  String get widgetColorSchemeGreen => 'Groen';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranje';
+
+  @override
   String get widgetVariantDefault => 'Alleen huidige prijs';
 
   @override

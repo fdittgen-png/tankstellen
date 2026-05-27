@@ -5466,6 +5466,34 @@ class AppLocalizationsBg extends AppLocalizations {
       'На Android, задръжте върху джаджата и изберете Преконфигурирай за промяна на профила, цвета и съдържанието.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Изборите по-долу се прилагат за всеки инсталиран уиджет при следващото обновяване.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Цветова схема';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Вариант на съдържанието';
+
+  @override
+  String get widgetColorSchemeSystem => 'Системна';
+
+  @override
+  String get widgetColorSchemeLight => 'Светла';
+
+  @override
+  String get widgetColorSchemeDark => 'Тъмна';
+
+  @override
+  String get widgetColorSchemeBlue => 'Синя';
+
+  @override
+  String get widgetColorSchemeGreen => 'Зелена';
+
+  @override
+  String get widgetColorSchemeOrange => 'Оранжева';
+
+  @override
   String get widgetVariantDefault => 'Само текуща цена';
 
   @override

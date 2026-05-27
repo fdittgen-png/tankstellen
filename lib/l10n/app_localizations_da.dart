@@ -5419,6 +5419,34 @@ class AppLocalizationsDa extends AppLocalizations {
       'På Android: langt tryk på widgetten og vælg Genkonfigurér for at ændre profil, farve og indhold.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Valgene nedenfor gælder for alle installerede widgets ved næste opdatering.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Farvetema';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Indholdsvariant';
+
+  @override
+  String get widgetColorSchemeSystem => 'Følg systemet';
+
+  @override
+  String get widgetColorSchemeLight => 'Lys';
+
+  @override
+  String get widgetColorSchemeDark => 'Mørk';
+
+  @override
+  String get widgetColorSchemeBlue => 'Blå';
+
+  @override
+  String get widgetColorSchemeGreen => 'Grøn';
+
+  @override
+  String get widgetColorSchemeOrange => 'Orange';
+
+  @override
   String get widgetVariantDefault => 'Kun aktuel pris';
 
   @override
