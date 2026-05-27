@@ -210,7 +210,10 @@ class _RadiusAlertMapPickerState extends ConsumerState<RadiusAlertMapPicker> {
             right: 16,
             bottom: 24,
             child: Card(
-              color: theme.colorScheme.surface.withValues(alpha: 0.9),
+              // #2117 — hint card should lift subtly off the map backdrop;
+              // surfaceContainerLow is the M3 tier for cards on `surface`.
+              color: theme.colorScheme.surfaceContainerLow
+                  .withValues(alpha: 0.9),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(

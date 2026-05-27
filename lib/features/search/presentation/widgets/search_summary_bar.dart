@@ -105,7 +105,10 @@ class _SummaryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        // #2117 — chip sits on the summary bar's `surfaceContainerHighest`
+        // surface; surfaceContainerLow is the M3 inversion that reads as
+        // a recessed pill rather than fighting the bar.
+        color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),

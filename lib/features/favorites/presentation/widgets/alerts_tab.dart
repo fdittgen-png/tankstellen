@@ -102,6 +102,10 @@ class AlertsTab extends StatelessWidget {
                     ? FuelColors.forType(alert.fuelType)
                     : Colors.grey,
               ),
+              // #2117 \u2014 Switch.adaptive gets the platform-correct
+              // toggle glyph on iOS without changing the ListTile's
+              // tap-to-detail navigation semantics (a full SwitchListTile
+              // would collide with onTap).
               title: Text(alert.stationName),
               subtitle: Text(
                 '${alert.fuelType.displayName} \u2264 ${PriceFormatter.formatPrice(alert.targetPrice)}',
@@ -110,7 +114,7 @@ class AlertsTab extends StatelessWidget {
                         ? FuelColors.forType(alert.fuelType)
                         : Colors.grey),
               ),
-              trailing: Switch(
+              trailing: Switch.adaptive(
                 value: alert.isActive,
                 onChanged: (_) =>
                     ref.read(alertProvider.notifier).toggleAlert(alert.id),
