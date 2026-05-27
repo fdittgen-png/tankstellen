@@ -3653,6 +3653,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'η_v: 0.85 (standard – ingen full tanking ennå)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples prøver';
+  }
+
+  @override
   String get calibrationResetLearner => 'Tilbakestill innlæring';
 
   @override

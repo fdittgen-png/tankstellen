@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibroitu, {samples} näytettä)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (oppii, {samples} näytettä)",
   "calibrationLearnerStatusNoSamples": "η_v: 0,85 (oletus — ei plein-complet-tankkausta vielä)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} näytettä",
   "calibrationResetLearner": "Nollaa oppija",
   "calibrationBasisAtkinson": "Atkinson-sykli",
   "calibrationBasisVnt": "VNT-diesel + DI",

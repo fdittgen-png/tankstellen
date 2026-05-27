@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (калибрирано, {samples} примера)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (обучение, {samples} примера)",
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (по подразбиране — все още няма пълно зареждане)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} проби",
   "calibrationResetLearner": "Нулирай обучението",
   "calibrationBasisAtkinson": "Цикъл Atkinson",
   "calibrationBasisVnt": "VNT дизел + DI",

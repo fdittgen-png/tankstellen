@@ -3680,6 +3680,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'η_v: 0,85 (predefinição — ainda sem tanque cheio)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples amostras';
+  }
+
+  @override
   String get calibrationResetLearner => 'Repor calibração';
 
   @override

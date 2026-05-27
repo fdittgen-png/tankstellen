@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibrēts, {samples} paraugi)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (mācoties, {samples} paraugi)",
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (noklusējums — vēl nav pilnas uzpildes)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} paraugi",
   "calibrationResetLearner": "Atiestatīt mācīšanos",
   "calibrationBasisAtkinson": "Atkinson cikls",
   "calibrationBasisVnt": "VNT dīzelis + DI",

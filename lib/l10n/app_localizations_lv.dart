@@ -3679,6 +3679,11 @@ class AppLocalizationsLv extends AppLocalizations {
       'η_v: 0.85 (noklusējums — vēl nav pilnas uzpildes)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples paraugi';
+  }
+
+  @override
   String get calibrationResetLearner => 'Atiestatīt mācīšanos';
 
   @override

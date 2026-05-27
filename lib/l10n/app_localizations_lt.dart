@@ -3674,6 +3674,11 @@ class AppLocalizationsLt extends AppLocalizations {
       'η_v: 0,85 (numatytasis — dar nėra baigto tankavimo)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples pavyzdžių';
+  }
+
+  @override
   String get calibrationResetLearner => 'Atstatyti mokymosi algoritmą';
 
   @override

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
@@ -51,17 +52,21 @@ void main() {
     required ValueChanged<int> onTap,
   }) {
     return tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Align(
-            alignment: Alignment.bottomCenter,
-            child: ShellBottomBar(
-              items: items,
-              branchForSlot: branchForSlot,
-              currentIndex: currentIndex,
-              iconControllers: iconControllers,
-              isLandscape: isLandscape,
-              onTap: onTap,
+      // #2113 — ShellBottomBar became a ConsumerWidget; needs a
+      // ProviderScope ancestor even when no overrides are needed.
+      ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.bottomCenter,
+              child: ShellBottomBar(
+                items: items,
+                branchForSlot: branchForSlot,
+                currentIndex: currentIndex,
+                iconControllers: iconControllers,
+                isLandscape: isLandscape,
+                onTap: onTap,
+              ),
             ),
           ),
         ),
@@ -206,8 +211,13 @@ void main() {
   });
 
   group('ShellBottomBar onTap', () {
-    testWidgets('tapping slot i fires onTap(i) — flat tabs and centre',
+    testWidgets('tapping a flat tab fires onTap(i) (#1874 + #2113)',
         (tester) async {
+      // #2113 — the centre FAB no longer always fires onTap; on a
+      // non-Search tab with no live results it opens the criteria
+      // modal instead. This test pins the *flat-tab* contract (the
+      // one the user relies on for plain navigation). The FAB's
+      // new branching is covered separately by the test below.
       final taps = <int>[];
       await pumpBar(
         tester,
@@ -220,11 +230,10 @@ void main() {
       );
 
       await tester.tap(find.byIcon(Icons.map)); // slot 0, selected
-      await tester.tap(find.byIcon(Icons.search_outlined)); // slot 1, centre
       await tester.tap(find.byIcon(Icons.favorite_outline)); // slot 2
       await tester.pump();
 
-      expect(taps, [0, 1, 2]);
+      expect(taps, [0, 2]);
     });
   });
 
@@ -339,19 +348,23 @@ void main() {
     testWidgets('renders under RTL directionality without overflow',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Directionality(
-            textDirection: TextDirection.rtl,
-            child: Scaffold(
-              body: Align(
-                alignment: Alignment.bottomCenter,
-                child: ShellBottomBar(
-                  items: items,
-                  branchForSlot: const [0, 1, 2],
-                  currentIndex: 0,
-                  iconControllers: controllers(3),
-                  isLandscape: false,
-                  onTap: (_) {},
+        // #2113 — ShellBottomBar became a ConsumerWidget; needs a
+        // ProviderScope ancestor.
+        ProviderScope(
+          child: MaterialApp(
+            home: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Scaffold(
+                body: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ShellBottomBar(
+                    items: items,
+                    branchForSlot: const [0, 1, 2],
+                    currentIndex: 0,
+                    iconControllers: controllers(3),
+                    isLandscape: false,
+                    onTap: (_) {},
+                  ),
                 ),
               ),
             ),

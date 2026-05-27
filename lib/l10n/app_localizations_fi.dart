@@ -3655,6 +3655,11 @@ class AppLocalizationsFi extends AppLocalizations {
       'η_v: 0,85 (oletus — ei plein-complet-tankkausta vielä)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples näytettä';
+  }
+
+  @override
   String get calibrationResetLearner => 'Nollaa oppija';
 
   @override

@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/route_search/providers/route_search_provider.dart';
+import '../../features/search/presentation/screens/search_criteria_screen.dart';
+import '../../features/search/providers/search_provider.dart';
+import 'search_fab_action_provider.dart';
 import 'shell_nav_item.dart';
 
 /// Compact-screen bottom navigation bar (#1874).
@@ -15,7 +20,7 @@ import 'shell_nav_item.dart';
 /// In landscape the raised treatment is dropped (the bar is too short
 /// to give the button head-room) and the label row is hidden, keeping
 /// the bar from eating the body height on phones held sideways.
-class ShellBottomBar extends StatelessWidget {
+class ShellBottomBar extends ConsumerWidget {
   final List<ShellNavItem> items;
 
   /// Router-branch index for each visible slot (see rail comment, #893).
@@ -40,9 +45,12 @@ class ShellBottomBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final barHeight = isLandscape ? 48.0 : 64.0;
+    // #2113 — context-aware override registered by criteria / results
+    // screens. Null means "default branch-switch behaviour".
+    final fabAction = ref.watch(searchFabActionControllerProvider);
     // Portrait: the centre button rises into a bar-coloured cradle (see
     // _centerButton, #1885). Landscape keeps the bar flat — no head-room.
     final rise = isLandscape ? 0.0 : 24.0;
@@ -113,7 +121,7 @@ class ShellBottomBar extends StatelessWidget {
               if (primaryIndex >= 0)
                 Align(
                   alignment: Alignment.topCenter,
-                  child: _centerButton(context, primaryIndex),
+                  child: _centerButton(context, primaryIndex, fabAction, ref),
                 ),
             ],
           ),
@@ -187,12 +195,72 @@ class ShellBottomBar extends StatelessWidget {
   /// protrudes into the `rise` strip, so the bar appears to rise up and
   /// embrace the button rather than the button floating on top of it.
   /// Landscape has no head-room, so the button stays flat in the bar.
-  Widget _centerButton(BuildContext context, int i) {
+  Widget _centerButton(
+      BuildContext context, int i, SearchFabAction? action, WidgetRef ref) {
     final theme = Theme.of(context);
     final selected = i == currentIndex;
     final item = items[i];
     final controller = iconControllers[branchForSlot[i]];
     final diameter = isLandscape ? 40.0 : 56.0;
+
+    // #2113 — context-aware FAB. Default reads stay safe (no `watch`
+    // here so a results refresh doesn't re-paint the whole bar) —
+    // the read happens lazily inside `onTap`, when it matters.
+    //
+    // Behaviour matrix:
+    //   1. On the Search branch (results screen): tap → open the
+    //      criteria modal so the user can refine the active search.
+    //   2. On any other branch WITH live results: tap → switch to
+    //      the Search branch and show the existing results.
+    //   3. On any other branch with NO results: tap → open the
+    //      criteria modal directly so the user can start a search
+    //      from anywhere (no detour through an empty results screen).
+    //
+    // A registered [SearchFabAction] (e.g. from a future criteria-
+    // screen "fire search" hook) wins over all three branches —
+    // pluggable extension point.
+    final defaultIcon = selected ? item.filledIcon : item.outlinedIcon;
+    final iconData = action?.icon ?? defaultIcon;
+    final tooltipLabel = action?.tooltip ?? item.label;
+
+    void defaultOnTap() {
+      // Defensive read: in widget tests without the search-state
+      // providers wired, the reads can throw; fall back to the
+      // historical branch-switch so existing tests keep passing
+      // and so the FAB never deadlocks on an unwired provider.
+      bool hasResults;
+      try {
+        final hasFuelResults = ref.read(searchStateProvider).when(
+              data: (r) => r.data.isNotEmpty,
+              loading: () => false,
+              error: (_, _) => false,
+            );
+        final hasRouteResults = ref.read(routeSearchStateProvider).when(
+              data: (r) => r != null,
+              loading: () => false,
+              error: (_, _) => false,
+            );
+        hasResults = hasFuelResults || hasRouteResults;
+      } catch (_) {
+        onTap(i);
+        return;
+      }
+      final onSearchBranch = i == currentIndex;
+      if (onSearchBranch || !hasResults) {
+        // Open criteria modal — refine (on Search) or start (no results).
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => const SearchCriteriaScreen(),
+            fullscreenDialog: true,
+          ),
+        );
+      } else {
+        // Other tab, results exist → switch to Search branch.
+        onTap(i);
+      }
+    }
+
+    final onTapHandler = action != null ? action.onTap : defaultOnTap;
 
     final button = Material(
       color: theme.colorScheme.primary,
@@ -201,30 +269,36 @@ class ShellBottomBar extends StatelessWidget {
       shadowColor: Colors.black.withValues(alpha: 0.4),
       child: InkWell(
         customBorder: const CircleBorder(),
-        onTap: () => onTap(i),
+        onTap: onTapHandler,
         child: SizedBox(
           width: diameter,
           height: diameter,
           child: Center(
-            child: ShellBounceIcon(
-              controller: controller,
-              selected: selected,
-              icon: selected ? item.filledIcon : item.outlinedIcon,
-              iconSize: isLandscape ? 22.0 : 28.0,
-              color: theme.colorScheme.onPrimary,
-            ),
+            child: action != null
+                ? Icon(
+                    iconData,
+                    size: isLandscape ? 22.0 : 28.0,
+                    color: theme.colorScheme.onPrimary,
+                  )
+                : ShellBounceIcon(
+                    controller: controller,
+                    selected: selected,
+                    icon: iconData,
+                    iconSize: isLandscape ? 22.0 : 28.0,
+                    color: theme.colorScheme.onPrimary,
+                  ),
           ),
         ),
       ),
     );
 
     return Semantics(
-      label: item.label,
+      label: tooltipLabel,
       button: true,
       selected: selected,
       excludeSemantics: true,
       child: Tooltip(
-        message: item.label,
+        message: tooltipLabel,
         child: isLandscape
             ? button
             : Stack(

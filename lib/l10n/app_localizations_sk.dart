@@ -3671,6 +3671,11 @@ class AppLocalizationsSk extends AppLocalizations {
       'η_v: 0,85 (predvolené — zatiaľ žiadne plné tankovanie)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples vzoriek';
+  }
+
+  @override
   String get calibrationResetLearner => 'Resetovať učenie';
 
   @override

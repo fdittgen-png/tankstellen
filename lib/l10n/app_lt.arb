@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (sukalibruota, {samples} pavyzdžiai)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (mokoma, {samples} pavyzdžiai)",
   "calibrationLearnerStatusNoSamples": "η_v: 0,85 (numatytasis — dar nėra baigto tankavimo)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} pavyzdžių",
   "calibrationResetLearner": "Atstatyti mokymosi algoritmą",
   "calibrationBasisAtkinson": "Atkinsono ciklas",
   "calibrationBasisVnt": "VNT dyzelis + DI",

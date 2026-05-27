@@ -29,6 +29,7 @@
     }
   },
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (Standard – noch keine Volltankung)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} Messwerte",
   "calibrationResetLearner": "Lernalgorithmus zurücksetzen",
   "calibrationBasisAtkinson": "Atkinson-Zyklus",
   "calibrationBasisVnt": "VTG-Diesel + Direkteinspritzung",

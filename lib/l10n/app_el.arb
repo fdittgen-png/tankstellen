@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (βαθμονομημένο, {samples} δείγματα)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (εκμάθηση, {samples} δείγματα)",
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (προεπιλογή — δεν υπάρχει πλήρης ανεφοδιασμός ακόμα)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} δείγματα",
   "calibrationResetLearner": "Επαναφορά εκπαιδευτή",
   "calibrationBasisAtkinson": "Κύκλος Atkinson",
   "calibrationBasisVnt": "VNT diesel + DI",

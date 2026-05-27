@@ -3638,6 +3638,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'η_v: 0.85 (default — no plein-complet yet)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples samples';
+  }
+
+  @override
   String get calibrationResetLearner => 'Reset learner';
 
   @override
@@ -9121,6 +9126,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get calibrationLearnerStatusNoSamples =>
       '⟦η_ṽ: 0.85 (đéƒáúłŧ — ñó ƥłéîñ-çóɱƥłéŧ ýéŧ) ···········⟧';
+
+  @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return '⟦η_ṽ: $eta · $samples šáɱƥłéš ····⟧';
+  }
 
   @override
   String get calibrationResetLearner => '⟦Řéšéŧ łéářñéř ·····⟧';

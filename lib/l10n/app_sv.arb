@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibrerad, {samples} prover)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (lär sig, {samples} prover)",
   "calibrationLearnerStatusNoSamples": "η_v: 0,85 (standard – ingen full tankning ännu)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} prover",
   "calibrationResetLearner": "Återställ inlärning",
   "calibrationBasisAtkinson": "Atkinson-cykel",
   "calibrationBasisVnt": "VNT diesel + DI",

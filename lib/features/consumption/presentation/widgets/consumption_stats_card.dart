@@ -143,22 +143,29 @@ class ConsumptionStatsCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall,
               ),
             ],
-            // #1397 — convergence chip surfacing the auto-learner's
-            // η_v state. Renders nothing when the active vehicle hasn't
-            // been wired in (volumetricEfficiencySamples == null).
+            // #2112 — confidence tier (A/B/C — #2027) and η_v
+            // (#1397 / #815) ride a single Wrap so they sit side-by-
+            // side on a phone and stack only when the row genuinely
+            // overflows. Both pills share the same chip recipe so
+            // the two halves read as one calibration-state group
+            // rather than two visually different decorations. The
+            // confidence tier leads (user-facing accuracy band),
+            // η_v trails (engineer-detail anchor).
             if (volumetricEfficiencySamples != null) ...[
               const SizedBox(height: 8),
-              _CalibrationChip(
-                volumetricEfficiency: volumetricEfficiency ?? 0.85,
-                samples: volumetricEfficiencySamples!,
-              ),
-              // #2027 — confidence tier badge (A/B/C) surfaces how
-              // trustworthy the consumption estimate is. A = GPS-only
-              // / no fill-ups, B = fill-ups + GPS, C = fill-ups + OBD2.
-              const SizedBox(height: 8),
-              ConfidenceTierBadge(
-                samples: volumetricEfficiencySamples!,
-                hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ConfidenceTierBadge(
+                    samples: volumetricEfficiencySamples!,
+                    hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
+                  ),
+                  _CalibrationChip(
+                    volumetricEfficiency: volumetricEfficiency ?? 0.85,
+                    samples: volumetricEfficiencySamples!,
+                  ),
+                ],
               ),
             ],
           ],
@@ -244,12 +251,16 @@ class _CorrectionShareHint extends StatelessWidget {
   }
 }
 
-/// Inline chip surfacing the auto-learner's η_v state (#1397).
+/// Engineer-detail pill surfacing the auto-learner's η_v state
+/// (#1397 / #815). #2112 — restyled to match [ConfidenceTierBadge]'s
+/// recipe so the two land as one harmonised group on the Fuel tab.
 ///
 /// Three branches drive the label:
-///   * `samples >= 3` → "η_v: 0.87 (calibrated, N samples)"
-///   * `0 < samples < 3` → "η_v: 0.87 (learning, N samples)"
-///   * `samples == 0` → "η_v: ?? (no plein-complet yet)"
+///   * `samples >= 3` → "η_v: 0.87 · N samples"
+///   * `0 < samples < 3` → "η_v: 0.87 · N samples" (same shape; the
+///     learning vs calibrated distinction lives on the confidence
+///     tier next to it — keep this pill engineer-bare).
+///   * `samples == 0` → "η_v: ?? · no plein-complet yet"
 ///
 /// Variance tracking would let us print "± 0.04" alongside the mean,
 /// but the existing [VeLearner] only stores the EWMA scalar — adding
@@ -267,23 +278,31 @@ class _CalibrationChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final eta = volumetricEfficiency.toStringAsFixed(2);
     final String label;
     if (samples == 0) {
       label = l?.calibrationLearnerStatusNoSamples ??
-          'η_v: ?? (no plein-complet yet)';
-    } else if (samples < 3) {
-      label = l?.calibrationLearnerStatusLearning(eta, samples) ??
-          'η_v: $eta (learning, $samples samples)';
+          'η_v: ?? — no plein-complet yet';
     } else {
-      label = l?.calibrationLearnerStatusCalibrated(eta, samples) ??
-          'η_v: $eta (calibrated, $samples samples)';
+      // #2112 — single label shape across learning + calibrated;
+      // confidence tier carries the maturity colour.
+      label = l?.calibrationLearnerEtaCompact(eta, samples) ??
+          'η_v: $eta · $samples samples';
     }
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: Chip(
-        label: Text(label),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: scheme.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
