@@ -8,14 +8,6 @@ import 'package:tankstellen/features/consumption/presentation/widgets/consumptio
 
 import '../../../../helpers/pump_app.dart';
 
-/// Matcher for a [Chip] whose label text contains the given substring.
-Finder _findChipContaining(String fragment) {
-  return find.ancestor(
-    of: find.textContaining(fragment),
-    matching: find.byType(Chip),
-  );
-}
-
 /// Builds a [ConsumptionStats] with sensible defaults so each test only
 /// spells out the field it cares about. Mirrors the freezed factory at
 /// `lib/features/consumption/domain/entities/consumption_stats.dart`.
