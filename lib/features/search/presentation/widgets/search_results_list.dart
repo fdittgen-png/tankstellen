@@ -319,15 +319,21 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         label: station.displayName,
       ),
       onIgnore: () {
-        ref.read(ignoredStationsProvider.notifier).add(station.id);
+        // #ref-after-unmount fix — capture the notifier before
+        // handing onUndo to the SnackBar. The action can fire after
+        // this widget has unmounted (the bar persists across
+        // navigation); using `ref.read` from there throws a StateError.
+        // The notifier is stable for the provider's lifetime, so the
+        // captured reference is safe across that gap.
+        final ignoredNotifier =
+            ref.read(ignoredStationsProvider.notifier);
+        ignoredNotifier.add(station.id);
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showWithUndo(
           context,
           l10n?.stationHidden(station.displayName) ?? '${station.displayName} hidden',
           undoLabel: l10n?.undo ?? 'Undo',
-          onUndo: () => ref
-              .read(ignoredStationsProvider.notifier)
-              .remove(station.id),
+          onUndo: () => ignoredNotifier.remove(station.id),
         );
       },
       onTap: () {
