@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/consumption/presentation/screens/consumption_screen.dart';
@@ -8,6 +9,13 @@ import '../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../features/map/presentation/screens/map_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/search/presentation/screens/search_screen.dart';
+
+/// Navigator key for the Search branch (#2131). Lets the shell-level
+/// FAB push the criteria modal onto the *branch's* nested Navigator
+/// instead of the root one — without it, MaterialPageRoute covers the
+/// shell + bottom bar and the FAB disappears mid-flow.
+final GlobalKey<NavigatorState> searchBranchNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'searchBranch');
 
 /// Branches of the bottom-nav `StatefulShellRoute.indexedStack`. Each branch
 /// owns the top-level route for one tab — Search, Map, Favorites, Carburant
@@ -21,6 +29,7 @@ import '../../features/search/presentation/screens/search_screen.dart';
 /// slots back to branch indices.
 List<StatefulShellBranch> get shellBranches => [
       StatefulShellBranch(
+        navigatorKey: searchBranchNavigatorKey,
         routes: [
           GoRoute(
             path: '/',

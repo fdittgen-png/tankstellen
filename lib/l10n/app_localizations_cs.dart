@@ -48,6 +48,18 @@ class AppLocalizationsCs extends AppLocalizations {
   String get searchButton => 'Hledat';
 
   @override
+  String get fabOpenCriteria => 'Open search';
+
+  @override
+  String get fabOpenResults => 'Open results';
+
+  @override
+  String get fabRunSearch => 'Run search';
+
+  @override
+  String get fabRefineCriteria => 'Refine search';
+
+  @override
   String get searchCriteriaTitle => 'Kritéria hledání';
 
   @override

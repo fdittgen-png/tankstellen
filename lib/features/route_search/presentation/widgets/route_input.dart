@@ -16,7 +16,6 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
 import '../../providers/route_input_provider.dart';
 import 'city_autocomplete_field.dart';
-import 'route_search_button.dart';
 
 /// Input widget for route-based search: start, optional stops, destination.
 ///
@@ -32,10 +31,13 @@ class RouteInput extends ConsumerStatefulWidget {
   const RouteInput({super.key, required this.onSearch});
 
   @override
-  ConsumerState<RouteInput> createState() => _RouteInputState();
+  ConsumerState<RouteInput> createState() => RouteInputWidgetState();
 }
 
-class _RouteInputState extends ConsumerState<RouteInput> {
+/// Public State so the parent screen can drive [resolveAndSearch] via a
+/// `GlobalKey` (#2131 — the criteria-screen FAB replaces the inline
+/// route submit button, but the text controllers still live here).
+class RouteInputWidgetState extends ConsumerState<RouteInput> {
   final _startController = TextEditingController();
   final _endController = TextEditingController();
   final _stopControllers = <TextEditingController>[];
@@ -45,6 +47,11 @@ class _RouteInputState extends ConsumerState<RouteInput> {
   @override
   void initState() {
     super.initState();
+    // Mirror text-presence into the shared provider so the criteria-
+    // screen FAB can mirror the (old) inline submit button's enabled
+    // state without owning these controllers.
+    _startController.addListener(_syncStartText);
+    _endController.addListener(_syncEndText);
     // Reset shared provider state for a fresh widget instance.
     safePostFrame(() {
       if (!mounted) return;
@@ -56,8 +63,24 @@ class _RouteInputState extends ConsumerState<RouteInput> {
     });
   }
 
+  void _syncStartText() {
+    if (!mounted) return;
+    ref
+        .read(routeInputControllerProvider.notifier)
+        .setHasStartText(_startController.text.isNotEmpty);
+  }
+
+  void _syncEndText() {
+    if (!mounted) return;
+    ref
+        .read(routeInputControllerProvider.notifier)
+        .setHasEndText(_endController.text.isNotEmpty);
+  }
+
   @override
   void dispose() {
+    _startController.removeListener(_syncStartText);
+    _endController.removeListener(_syncEndText);
     _startController.dispose();
     _endController.dispose();
     for (final c in _stopControllers) {
@@ -116,7 +139,10 @@ class _RouteInputState extends ConsumerState<RouteInput> {
         .setStopCoord(i, LatLng(city.lat, city.lng));
   }
 
-  Future<void> _resolveAndSearch() async {
+  /// Resolve any unresolved city text into coordinates and invoke
+  /// [RouteInput.onSearch] with the waypoints. Public so the shell-level
+  /// FAB can trigger it via [RouteInputWidgetState] (#2131).
+  Future<void> resolveAndSearch() async {
     final routeState = ref.read(routeInputControllerProvider);
     if (routeState.isSearching) return;
     final notifier = ref.read(routeInputControllerProvider.notifier);
@@ -208,7 +234,6 @@ class _RouteInputState extends ConsumerState<RouteInput> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final searchService = ref.watch(locationSearchServiceProvider);
-    final routeState = ref.watch(routeInputControllerProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -280,16 +305,10 @@ class _RouteInputState extends ConsumerState<RouteInput> {
           onTextChanged: () =>
               ref.read(routeInputControllerProvider.notifier).setEndCoords(null),
         ),
-        const SizedBox(height: 8),
-
-        // Search button — listens to controllers so it enables as the user
-        // types, without needing setState.
-        RouteSearchButton(
-          startController: _startController,
-          endController: _endController,
-          isSearching: routeState.isSearching,
-          onSearch: _resolveAndSearch,
-        ),
+        // #2131 — the inline "Search along route" submit button moved
+        // to the central FAB. RouteInput now owns inputs only;
+        // [RouteInputWidgetState.resolveAndSearch] is driven from the
+        // criteria-screen FAB via a `GlobalKey`.
       ],
     );
   }

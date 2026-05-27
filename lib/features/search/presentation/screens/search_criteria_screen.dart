@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/shell/search_fab_action_provider.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/storage/storage_keys.dart';
@@ -19,6 +20,7 @@ import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
+import '../../../route_search/providers/route_input_provider.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../providers/brand_filter_provider.dart';
@@ -44,6 +46,90 @@ class SearchCriteriaScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
+  /// Drives [RouteInputWidgetState.resolveAndSearch] when the central FAB
+  /// fires a route search (#2131). The inline submit button is gone;
+  /// the text controllers still live inside [RouteInput].
+  final GlobalKey<RouteInputWidgetState> _routeInputKey =
+      GlobalKey<RouteInputWidgetState>();
+
+  /// Last action registered on the shell FAB, kept so we can `clearIf`
+  /// in `dispose` without stomping on a sibling screen that registered
+  /// after us.
+  SearchFabAction? _registeredFabAction;
+
+  /// FAB notifier captured in initState so `dispose` can clear without
+  /// touching `ref` (Riverpod forbids ref usage after `deactivate`).
+  SearchFabActionController? _fabNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _fabNotifier = ref.read(searchFabActionControllerProvider.notifier);
+    // Push the initial FAB action after first build so the shell sees
+    // it before the user can tap. didChangeDependencies isn't enough —
+    // the route input controllers (and their text-presence flags)
+    // only stabilise on the first frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateFabAction());
+  }
+
+  @override
+  void dispose() {
+    final action = _registeredFabAction;
+    final notifier = _fabNotifier;
+    if (action != null && notifier != null) {
+      // Defer outside the dispose lifecycle — Riverpod forbids
+      // provider mutation inside build/initState/dispose. A
+      // post-frame callback runs after the current frame finishes
+      // but stays bound to this test's scheduler, so it doesn't leak
+      // across pumps the way Future.microtask does.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          notifier.clearIf(action);
+        } catch (_) {
+          // ProviderContainer torn down (e.g. test teardown) — no-op.
+        }
+      });
+    }
+    super.dispose();
+  }
+
+  /// Pushes a fresh [SearchFabAction] reflecting the current mode +
+  /// route-input enabled state. Idempotent — invoked on every mode or
+  /// route-input change via `ref.listen` in [build].
+  void _updateFabAction() {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    final mode = ref.read(activeSearchModeProvider);
+    final manifest = ref.read(featureManifestProvider);
+    final enabledFlags = ref.read(enabledFeaturesProvider);
+    final routePlanningOn = isEffectivelyEnabled(
+      Feature.routePlanning,
+      manifest,
+      enabledFlags,
+    );
+    final effectiveMode = routePlanningOn ? mode : SearchMode.nearby;
+
+    final bool enabled;
+    final VoidCallback onTap;
+    if (effectiveMode == SearchMode.route) {
+      final routeState = ref.read(routeInputControllerProvider);
+      enabled = routeState.canSearch;
+      onTap = () => _routeInputKey.currentState?.resolveAndSearch();
+    } else {
+      enabled = true;
+      onTap = () => unawaited(_performGpsSearch());
+    }
+
+    final action = SearchFabAction(
+      icon: Icons.search,
+      tooltip: l10n?.fabRunSearch ?? 'Run search',
+      enabled: enabled,
+      onTap: onTap,
+    );
+    ref.read(searchFabActionControllerProvider.notifier).set(action);
+    _registeredFabAction = action;
+  }
+
   Future<void> _performGpsSearch() async {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
@@ -162,6 +248,18 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final openOnly = ref.watch(openOnlyFilterProvider);
     final amenities = ref.watch(selectedAmenitiesProvider);
 
+    // #2131 — keep the shell FAB in sync. ref.listen inside build is
+    // the canonical Riverpod pattern; it de-dupes across rebuilds.
+    ref.listen<SearchMode>(activeSearchModeProvider, (_, _) {
+      _updateFabAction();
+    });
+    ref.listen<RouteInputState>(routeInputControllerProvider, (prev, next) {
+      // Re-register only when the bits the FAB depends on flip; ignore
+      // coord-only updates so we don't churn the controller on every
+      // autocomplete pick.
+      if (prev?.canSearch != next.canSearch) _updateFabAction();
+    });
+
     // Cascading-feature gate (#1447 phase 4). When `Feature.routePlanning`
     // is effectively-disabled, the "Along route" mode is unreachable —
     // hide the toggle entirely AND treat the persisted mode as Nearby
@@ -221,7 +319,10 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   onCitySearch: _performCitySearch,
                 ),
               ] else ...[
-                RouteInput(onSearch: _performRouteSearch),
+                RouteInput(
+                  key: _routeInputKey,
+                  onSearch: _performRouteSearch,
+                ),
               ],
               const SizedBox(height: 8),
               Text(
@@ -279,23 +380,9 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   minimumSize: const Size.fromHeight(44),
                 ),
               ),
-              // #2113 — the screen-level inline Search CTA stays
-              // for nearby mode because the screen-to-FAB wiring
-              // needs a clean way to mutate `searchFabActionController`
-              // from a post-build hook that doesn't trip Riverpod's
-              // test-scheduler timer assertion. Scaffolding for the
-              // override (provider + ShellBottomBar consumer) is in
-              // place; per-screen registration is a follow-up PR.
-              if (mode == SearchMode.nearby)
-                FilledButton.icon(
-                  key: const ValueKey('criteria-search-button'),
-                  onPressed: _performGpsSearch,
-                  icon: const Icon(Icons.search),
-                  label: Text(l10n?.searchButton ?? 'Search'),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                  ),
-                ),
+              // #2131 — the inline Search CTA moved to the central
+              // FAB. Registration is set up in initState; see
+              // [_updateFabAction] for the mode-driven enabled state.
             ],
           ),
         ),

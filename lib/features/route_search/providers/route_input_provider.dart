@@ -19,13 +19,26 @@ class RouteInputState {
   final int stopCount;
   final bool isSearching;
 
+  /// Whether the start / destination fields have any text (#2131).
+  /// Surfaced so the criteria-screen FAB can mirror the inline submit
+  /// button's enabled state without taking ownership of the text
+  /// controllers (which must live in [RouteInput] for lifecycle reasons).
+  final bool hasStartText;
+  final bool hasEndText;
+
   const RouteInputState({
     this.startCoords,
     this.endCoords,
     this.stopCoords = const [],
     this.stopCount = 0,
     this.isSearching = false,
+    this.hasStartText = false,
+    this.hasEndText = false,
   });
+
+  /// True when both endpoints carry text and no search is in flight —
+  /// the same gate the (now removed) inline `RouteSearchButton` used.
+  bool get canSearch => hasStartText && hasEndText && !isSearching;
 
   RouteInputState copyWith({
     LatLng? startCoords,
@@ -35,6 +48,8 @@ class RouteInputState {
     List<LatLng?>? stopCoords,
     int? stopCount,
     bool? isSearching,
+    bool? hasStartText,
+    bool? hasEndText,
   }) {
     return RouteInputState(
       startCoords:
@@ -43,6 +58,8 @@ class RouteInputState {
       stopCoords: stopCoords ?? this.stopCoords,
       stopCount: stopCount ?? this.stopCount,
       isSearching: isSearching ?? this.isSearching,
+      hasStartText: hasStartText ?? this.hasStartText,
+      hasEndText: hasEndText ?? this.hasEndText,
     );
   }
 }
@@ -89,6 +106,16 @@ class RouteInputController extends _$RouteInputController {
 
   void setSearching(bool value) {
     state = state.copyWith(isSearching: value);
+  }
+
+  void setHasStartText(bool value) {
+    if (state.hasStartText == value) return;
+    state = state.copyWith(hasStartText: value);
+  }
+
+  void setHasEndText(bool value) {
+    if (state.hasEndText == value) return;
+    state = state.copyWith(hasEndText: value);
   }
 
   void reset() {

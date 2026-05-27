@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
 import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
 
@@ -373,6 +374,159 @@ void main() {
       );
       expect(find.byType(InkWell), findsNWidgets(items.length));
       expect(find.text('Map'), findsOneWidget);
+    });
+  });
+
+  group('ShellBottomBar SearchFabAction override (#2131)', () {
+    Future<ProviderContainer> pumpBarWithContainer(
+      WidgetTester tester, {
+      SearchFabAction? initialAction,
+    }) async {
+      final container = ProviderContainer(
+        overrides: const [],
+      );
+      addTearDown(container.dispose);
+      if (initialAction != null) {
+        container
+            .read(searchFabActionControllerProvider.notifier)
+            .set(initialAction);
+      }
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: Align(
+                alignment: Alignment.bottomCenter,
+                child: ShellBottomBar(
+                  items: items,
+                  branchForSlot: const [0, 1, 2],
+                  currentIndex: 0,
+                  iconControllers: controllers(3),
+                  isLandscape: false,
+                  onTap: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      return container;
+    }
+
+    testWidgets('enabled action: icon comes from the override, taps fire it',
+        (tester) async {
+      var fired = 0;
+      await pumpBarWithContainer(
+        tester,
+        initialAction: SearchFabAction(
+          icon: Icons.bolt,
+          tooltip: 'Run',
+          onTap: () => fired++,
+        ),
+      );
+      // The override icon replaces the default Search icon on the FAB.
+      expect(find.byIcon(Icons.bolt), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.bolt));
+      await tester.pump();
+      expect(fired, 1);
+    });
+
+    testWidgets('disabled action: tap is a no-op + surface dims',
+        (tester) async {
+      var fired = 0;
+      await pumpBarWithContainer(
+        tester,
+        initialAction: SearchFabAction(
+          icon: Icons.bolt,
+          tooltip: 'Run',
+          enabled: false,
+          onTap: () => fired++,
+        ),
+      );
+
+      // Tap still hit-tests (the FAB stays mounted) — but the
+      // registered onTap is swallowed.
+      await tester.tap(find.byIcon(Icons.bolt));
+      await tester.pump();
+      expect(fired, 0,
+          reason: '#2131 — disabled action must not fire onTap.');
+
+      // Dim styling: the button's Material colour is the primary
+      // alpha-reduced (matches the [_centerButton] disabled branch).
+      final ctx = tester.element(find.byType(ShellBottomBar));
+      final primary = Theme.of(ctx).colorScheme.primary;
+      final dimmed = primary.withValues(alpha: 0.38);
+      final material = tester.widget<Material>(
+        find
+            .ancestor(
+              of: find.byIcon(Icons.bolt),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      expect(material.color, dimmed);
+    });
+  });
+
+  group('ShellBottomBar narrow-width label hiding (#2117 item 3)', () {
+    Future<void> pumpBarWithWidth(
+      WidgetTester tester, {
+      required double width,
+      required int currentIndex,
+    }) {
+      // MediaQueryData wrap is more reliable than setSurfaceSize in
+      // test mode — the latter doesn't always propagate into
+      // MaterialApp's MediaQuery scope.
+      return tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(size: Size(width, 800)),
+              child: Scaffold(
+                body: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ShellBottomBar(
+                    items: items,
+                    branchForSlot: const [0, 1, 2],
+                    currentIndex: currentIndex,
+                    iconControllers: controllers(3),
+                    isLandscape: false,
+                    onTap: (_) {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('inactive tabs hide their label when width < 360dp',
+        (tester) async {
+      await pumpBarWithWidth(
+        tester,
+        width: 320,
+        currentIndex: 0, // Map selected; Favorites inactive
+      );
+
+      // Active tab keeps its label; inactive tab drops it on narrow
+      // screens.
+      expect(find.text('Map'), findsOneWidget);
+      expect(find.text('Favorites'), findsNothing);
+    });
+
+    testWidgets('all inactive labels remain when width >= 360dp',
+        (tester) async {
+      await pumpBarWithWidth(
+        tester,
+        width: 411,
+        currentIndex: 0,
+      );
+
+      expect(find.text('Map'), findsOneWidget);
+      expect(find.text('Favorites'), findsOneWidget);
     });
   });
 

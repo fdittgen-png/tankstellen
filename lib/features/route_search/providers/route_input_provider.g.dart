@@ -42,7 +42,7 @@ final class RouteInputControllerProvider
 }
 
 String _$routeInputControllerHash() =>
-    r'7475ef51597913a7fd8ff142ebff9d31618f2c9e';
+    r'72f4cac4c2a27328131f37427eedaf65c6766d47';
 
 abstract class _$RouteInputController extends $Notifier<RouteInputState> {
   RouteInputState build();

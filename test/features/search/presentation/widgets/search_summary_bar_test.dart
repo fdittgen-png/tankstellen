@@ -12,7 +12,7 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('SearchSummaryBar', () {
-    testWidgets('renders fuel type, quantity, radius badge and button',
+    testWidgets('renders fuel type and radius badge (#2131 — inline button removed)',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -29,7 +29,6 @@ void main() {
 
       expect(find.text('Super E10'), findsOneWidget);
       expect(find.text('Within 10 km'), findsOneWidget);
-      expect(find.text('Search'), findsOneWidget);
     });
 
     testWidgets('tapping the bar opens SearchCriteriaScreen', (tester) async {
@@ -49,30 +48,9 @@ void main() {
 
       expect(find.byType(SearchCriteriaScreen), findsNothing);
 
-      // Tap the inkwell via the bar surface.
+      // #2131 — the inline tonal "Search" button is gone; the bar
+      // itself stays tappable as a discoverable refine affordance.
       await tester.tap(find.byType(SearchSummaryBar));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SearchCriteriaScreen), findsOneWidget);
-    });
-
-    testWidgets('tapping the Search button also opens the criteria screen',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        const SearchSummaryBar(),
-        overrides: [
-          ...test.overrides,
-          selectedFuelTypeOverride(FuelType.e10),
-          searchRadiusOverride(10),
-          userPositionNullOverride(),
-        ],
-      );
-
-      await tester.tap(find.text('Search'));
       await tester.pumpAndSettle();
 
       expect(find.byType(SearchCriteriaScreen), findsOneWidget);

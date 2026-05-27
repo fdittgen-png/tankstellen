@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
@@ -55,8 +56,11 @@ void main() {
       expect(find.byType(LocationInput), findsOneWidget);
       expect(find.byType(FuelTypeSelector), findsOneWidget);
       expect(find.byType(Slider), findsOneWidget);
+      // #2131 — the inline "Search" CTA moved to the central FAB in
+      // the shell bar; the criteria screen no longer renders its own
+      // submit button.
       expect(find.byKey(const ValueKey('criteria-search-button')),
-          findsOneWidget);
+          findsNothing);
       expect(find.byKey(const ValueKey('criteria-mode-toggle')),
           findsOneWidget);
       expect(find.byKey(const ValueKey('criteria-open-only-toggle')),
@@ -261,6 +265,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(SearchCriteriaScreen), findsNothing);
+    });
+
+    testWidgets('#2131 — registers a SearchFabAction on mount (nearby mode)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      late ProviderContainer container;
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...test.overrides,
+            selectedFuelTypeOverride(FuelType.e10),
+            searchRadiusOverride(8),
+            userPositionNullOverride(),
+          ].cast(),
+          child: Consumer(builder: (context, ref, _) {
+            container = ProviderScope.containerOf(context);
+            return const MaterialApp(home: SearchCriteriaScreen());
+          }),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final action =
+          container.read(searchFabActionControllerProvider);
+      expect(action, isNotNull,
+          reason: 'Criteria screen must publish a FAB action on mount.');
+      // Nearby mode is the default — FAB enabled, search icon.
+      expect(action!.icon, Icons.search);
+      expect(action.enabled, isTrue);
     });
 
     testWidgets('radius slider updates value', (tester) async {
