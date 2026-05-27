@@ -726,6 +726,7 @@ class AppInitializer {
     // Capture Flutter framework errors (build, layout, paint).
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
+      if (_isTileFetchNoise(details.exception)) return;
       errorLogger.log(
         ErrorLayer.ui,
         details.exception,
@@ -738,9 +739,28 @@ class AppInitializer {
     };
     // Capture async / platform errors that escape the framework.
     PlatformDispatcher.instance.onError = (error, stack) {
+      if (_isTileFetchNoise(error)) return true;
       errorLogger.log(ErrorLayer.other, error, stack);
       return true;
     };
+  }
+
+  /// Whether [error] is a transient network failure from the OSM tile
+  /// pipeline. flutter_map's `RetryNetworkTileProvider` already retries
+  /// and shows an error tile; the global error log shouldn't also
+  /// record these as crashes — they pollute the report with offline /
+  /// flaky-network noise (17 entries in a single session on a mobile
+  /// device, observed 2026-05-27). Cancellation aborts (#930) are
+  /// classed as noise too.
+  static bool _isTileFetchNoise(Object error) {
+    final msg = error.toString().toLowerCase();
+    final isTileUrl = msg.contains('tile.openstreetmap.org');
+    if (isTileUrl) return true;
+    // SocketException with a host-lookup failure on any host is
+    // offline noise. The wrapping FlutterError shows it as "Failed
+    // host lookup".
+    if (msg.contains('failed host lookup')) return true;
+    return false;
   }
 
   static void _launch(
