@@ -4152,6 +4152,21 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kui välja lülitatud, salvestab rakendus sõite ainult GPS-iga ilma OBD2-adapterita. Coaching on piiratud — pole hetkelist L/100 km, vähem mootori signaale.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Tšeki OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Skannige trükitud tšekk lehel Lisa tankimine, et eeltäita kuupäev, liitrid, kogusumma ja tankla.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'Tankuri ekraani OCR (eksperimentaalne)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Skannige tankuri ekraani, et eeltäita vorm. Tuvastus pole tänapäeval usaldusväärne — aktiveerige ainult siis, kui soovite testida.';
+
+  @override
   String get feedbackConsentTitle => 'Saata raport GitHubile?';
 
   @override

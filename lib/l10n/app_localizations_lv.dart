@@ -4185,6 +4185,21 @@ class AppLocalizationsLv extends AppLocalizations {
       'Kad izslēgts, lietotne ieraksta braucienus tikai ar GPS bez OBD2 adaptera. Treniņš ir ierobežots — nav momentānā L/100 km, mazāk dzinēja signālu.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Čeka OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Skenējiet izdrukāto čeku ekrānā Pievienot uzpildi, lai iepriekš aizpildītu datumu, litrus, summu un staciju.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'Sūkņa displeja OCR (eksperimentāls)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Skenējiet degvielas sūkņa displeju, lai iepriekš aizpildītu veidlapu. Atpazīšana šodien nav uzticama — ieslēdziet tikai tad, ja vēlaties pārbaudīt.';
+
+  @override
   String get feedbackConsentTitle => 'Nosūtīt ziņojumu uz GitHub?';
 
   @override

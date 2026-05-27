@@ -529,6 +529,11 @@ String _featureLabel(AppLocalizations? l, Feature f) {
           'Community price reports';
     case Feature.obd2Optional:
       return l?.featureLabel_obd2Optional ?? 'Require OBD2 for trip recording';
+    case Feature.addFillUpOcrReceipt:
+      return l?.featureLabel_addFillUpOcrReceipt ?? 'Receipt OCR';
+    case Feature.addFillUpOcrPump:
+      return l?.featureLabel_addFillUpOcrPump ??
+          'Pump display OCR (experimental)';
   }
 }
 
@@ -613,6 +618,14 @@ String _featureDescription(AppLocalizations? l, Feature f) {
           'When off, the app records GPS-only trajets without needing an '
               'OBD2 adapter. Coaching is reduced — no instant L/100 km, '
               'fewer engine-derived signals.';
+    case Feature.addFillUpOcrReceipt:
+      return l?.featureDescription_addFillUpOcrReceipt ??
+          'Scan a printed receipt on the Add fill-up screen to pre-fill '
+              'date, litres, total, and station.';
+    case Feature.addFillUpOcrPump:
+      return l?.featureDescription_addFillUpOcrPump ??
+          'Scan a fuel pump display to pre-fill the form. Recognition '
+              'is unreliable today — opt in only if you want to test.';
   }
 }
 
@@ -666,6 +679,8 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.paymentQrScan:
     case Feature.communityPriceReports:
     case Feature.obd2Optional:
+    case Feature.addFillUpOcrReceipt:
+    case Feature.addFillUpOcrPump:
       return 'Prerequisites not met';
   }
 }

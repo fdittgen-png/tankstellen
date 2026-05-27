@@ -4189,6 +4189,21 @@ class AppLocalizationsBg extends AppLocalizations {
       'Когато е изключено, приложението записва пътувания само с GPS без OBD2 адаптер. Коучингът е ограничен — без моментен L/100 km, по-малко сигнали от двигателя.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR за касова бележка';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Сканирайте отпечатана касова бележка на екрана за добавяне на зареждане, за да попълните автоматично дата, литри, обща сума и станция.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR на дисплея на колонката (експериментално)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Сканирайте дисплея на колонката, за да попълните формуляра. Разпознаването е ненадеждно днес — активирайте само ако искате да тествате.';
+
+  @override
   String get feedbackConsentTitle => 'Изпращане на доклад в GitHub?';
 
   @override

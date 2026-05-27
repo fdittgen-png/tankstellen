@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tankstellen/features/consumption/data/pump_display_parser.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
@@ -48,8 +50,19 @@ class _StubVehicleList extends VehicleProfileList {
       ];
 }
 
+/// #2110 — `Feature.addFillUpOcrPump` defaults OFF. This test taps
+/// the pump-display button, so we force-enable the flag.
+class _PumpOcrEnabled extends FeatureFlags {
+  @override
+  Set<Feature> build() => {
+        Feature.addFillUpOcrReceipt,
+        Feature.addFillUpOcrPump,
+      };
+}
+
 final _withVehicle = <Object>[
   vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
+  featureFlagsProvider.overrideWith(() => _PumpOcrEnabled()),
 ];
 
 /// Fake [ReceiptScanService] that bypasses ML Kit and returns a

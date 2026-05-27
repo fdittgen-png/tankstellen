@@ -4135,6 +4135,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Receipt OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Scan a printed receipt on the Add fill-up screen to pre-fill date, litres, total, and station.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump => 'Pump display OCR (experimental)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override
@@ -9624,6 +9638,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureDescription_obd2Optional =>
       '⟦Ŵĥéñ óƒƒ, ŧĥé áƥƥ řéçóřđš ǦƤŠ-óñłý ŧřáĵéŧš ŵîŧĥóúŧ ñééđîñǧ áñ ÓƁĐ2 áđáƥŧéř. Çóáçĥîñǧ îš řéđúçéđ — ñó îñšŧáñŧ Ł/100 ķɱ, ƒéŵéř éñǧîñé-đéřîṽéđ šîǧñáłš. ···················································⟧';
+
+  @override
+  String get featureLabel_addFillUpOcrReceipt => '⟦Řéçéîƥŧ ÓÇŘ ·····⟧';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      '⟦Šçáñ á ƥřîñŧéđ řéçéîƥŧ óñ ŧĥé Áđđ ƒîłł-úƥ šçřééñ ŧó ƥřé-ƒîłł đáŧé, łîŧřéš, ŧóŧáł, áñđ šŧáŧîóñ. ·································⟧';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      '⟦Ƥúɱƥ đîšƥłáý ÓÇŘ (éẋƥéřîɱéñŧáł) ············⟧';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      '⟦Šçáñ á ƒúéł ƥúɱƥ đîšƥłáý ŧó ƥřé-ƒîłł ŧĥé ƒóřɱ. Řéçóǧñîŧîóñ îš úñřéłîáƀłé ŧóđáý — óƥŧ îñ óñłý îƒ ýóú ŵáñŧ ŧó ŧéšŧ. ········································⟧';
 
   @override
   String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';

@@ -4167,6 +4167,21 @@ class AppLocalizationsHr extends AppLocalizations {
       'Kada je isključeno, aplikacija snima putovanja samo s GPS-om bez OBD2 adaptera. Coaching je smanjen — nema trenutne L/100 km, manje motornih signala.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR računa';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Skenirajte ispisani račun na zaslonu Dodaj točenje da unaprijed ispunite datum, litre, ukupno i postaju.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR zaslona crpke (eksperimentalno)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Skenirajte zaslon crpke goriva za prethodno popunjavanje obrasca. Prepoznavanje je danas nepouzdano — uključite samo ako želite testirati.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati izvješće na GitHub?';
 
   @override

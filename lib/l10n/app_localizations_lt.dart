@@ -4179,6 +4179,21 @@ class AppLocalizationsLt extends AppLocalizations {
       'Kai išjungta, programa įrašo keliones tik su GPS be OBD2 adapterio. Vairavimo patarimai sumažėjo — nėra momentinio L/100 km, mažiau variklio signalų.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Kvito OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Nuskaitykite atspausdintą kvitą Pridėti pildymą ekrane, kad iš anksto užpildytumėte datą, litrus, sumą ir stotį.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'Siurblio ekrano OCR (eksperimentinis)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Nuskaitykite degalų siurblio ekraną, kad iš anksto užpildytumėte formą. Atpažinimas šiandien nepatikimas — įjunkite tik jei norite išbandyti.';
+
+  @override
   String get feedbackConsentTitle => 'Siųsti ataskaitą į GitHub?';
 
   @override

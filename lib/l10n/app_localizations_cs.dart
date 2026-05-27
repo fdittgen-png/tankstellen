@@ -4161,6 +4161,21 @@ class AppLocalizationsCs extends AppLocalizations {
       'Když je vypnuto, aplikace zaznamenává jízdy pouze pomocí GPS bez OBD2 adaptéru. Coaching je omezen — žádné okamžité L/100 km, méně motorových signálů.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR účtenky';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Naskenujte vytištěnou účtenku na obrazovce Přidat tankování, abyste předvyplnili datum, litry, celkovou částku a čerpací stanici.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR displeje pumpy (experimentální)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Naskenujte displej palivového čerpadla a předvyplňte formulář. Rozpoznávání je dnes nespolehlivé — aktivujte pouze, pokud chcete testovat.';
+
+  @override
   String get feedbackConsentTitle => 'Odeslat hlášení na GitHub?';
 
   @override

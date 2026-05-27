@@ -4172,6 +4172,21 @@ class AppLocalizationsPl extends AppLocalizations {
       'Gdy wyłączone, aplikacja nagrywa trasy tylko z GPS bez adaptera OBD2. Coaching jest ograniczony — brak chwilowego L/100 km, mniej sygnałów z silnika.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR paragonu';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Zeskanuj wydrukowany paragon na ekranie Dodaj tankowanie, aby wypełnić datę, litry, sumę i stację.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR wyświetlacza dystrybutora (eksperymentalne)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Zeskanuj wyświetlacz dystrybutora paliwa, aby wstępnie wypełnić formularz. Rozpoznawanie jest dziś nierzetelne — włącz tylko, jeśli chcesz przetestować.';
+
+  @override
   String get feedbackConsentTitle => 'Wysłać zgłoszenie do GitHub?';
 
   @override

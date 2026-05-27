@@ -374,5 +374,26 @@ class FeatureManifest {
               'fewer engine-derived signals. Calibration drops to '
               'confidence tier A until you add fuel-ups.',
     ),
+    Feature.addFillUpOcrReceipt: FeatureManifestEntry.allChannels(
+      feature: Feature.addFillUpOcrReceipt,
+      // Default-on (#2110): receipt OCR works reliably enough in
+      // production to ship enabled. No prerequisites.
+      defaultOn: true,
+      displayName: 'Receipt OCR',
+      description:
+          'Scan a printed receipt on the Add fill-up screen to pre-fill '
+              'date, litres, total, and station.',
+    ),
+    Feature.addFillUpOcrPump: FeatureManifestEntry.allChannels(
+      feature: Feature.addFillUpOcrPump,
+      // Default-off (#2110): pump-display OCR doesn't read pump LEDs
+      // reliably yet. The button hides until the user opts in from
+      // Feature management. No prerequisites.
+      defaultOn: false,
+      displayName: 'Pump display OCR (experimental)',
+      description:
+          'Scan a fuel pump display to pre-fill the form. Recognition '
+              'is unreliable today — opt in only if you want to test.',
+    ),
   });
 }

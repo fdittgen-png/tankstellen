@@ -7527,6 +7527,30 @@ abstract class AppLocalizations {
   /// **'When off, the app records GPS-only trajets without needing an OBD2 adapter. Coaching is reduced — no instant L/100 km, fewer engine-derived signals.'**
   String get featureDescription_obd2Optional;
 
+  /// Settings toggle label for the Add-fill-up receipt-OCR import button (#2110). Default-on.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt OCR'**
+  String get featureLabel_addFillUpOcrReceipt;
+
+  /// Settings toggle description for the Add-fill-up receipt-OCR button (#2110).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a printed receipt on the Add fill-up screen to pre-fill date, litres, total, and station.'**
+  String get featureDescription_addFillUpOcrReceipt;
+
+  /// Settings toggle label for the Add-fill-up pump-display-OCR import button (#2110). Default-off — recognizer unreliable.
+  ///
+  /// In en, this message translates to:
+  /// **'Pump display OCR (experimental)'**
+  String get featureLabel_addFillUpOcrPump;
+
+  /// Settings toggle description for the Add-fill-up pump-display-OCR button (#2110). Sets expectation that the recognizer is experimental.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.'**
+  String get featureDescription_addFillUpOcrPump;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

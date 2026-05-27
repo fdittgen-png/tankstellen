@@ -142,4 +142,16 @@ enum Feature {
   /// vehicle calibration drops to confidence tier A (#2027). Soft-
   /// requires nothing — the flag is the prerequisite-removal itself.
   obd2Optional,
+
+  /// Receipt-OCR import button on the Add fill-up screen (#2110).
+  /// Default-on — the OCR works reliably enough to ship enabled. The
+  /// button reads a printed receipt and pre-fills date, litres, total,
+  /// and station.
+  addFillUpOcrReceipt,
+
+  /// Pump-display-OCR import button on the Add fill-up screen (#2110).
+  /// Default-off — the recognizer doesn't read pump LEDs reliably yet.
+  /// Power users can flip it on from Feature management to try it; the
+  /// flag will be flipped on by default once the model matures.
+  addFillUpOcrPump,
 }

@@ -4172,6 +4172,21 @@ class AppLocalizationsNl extends AppLocalizations {
       'Indien uit, neemt de app alleen-GPS-ritten op zonder OBD2-adapter. Coaching is beperkt — geen direct L/100 km, minder motorgegevens.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Bon OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Scan een gedrukte bon op het scherm Tankbeurt toevoegen om datum, liters, totaal en station automatisch in te vullen.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'Pomp-display OCR (experimenteel)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Scan een tankpompdisplay om het formulier vooraf in te vullen. Herkenning is vandaag onbetrouwbaar — schakel alleen in als je wilt testen.';
+
+  @override
   String get feedbackConsentTitle => 'Rapport versturen naar GitHub?';
 
   @override

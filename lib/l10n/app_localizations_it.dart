@@ -4178,6 +4178,21 @@ class AppLocalizationsIt extends AppLocalizations {
       'Quando disattivato, l\'app registra viaggi solo GPS senza un adattatore OBD2. Il coaching è ridotto — niente L/100 km istantanea, meno segnali motore.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'OCR scontrino';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Scansiona uno scontrino stampato nella schermata Aggiungi rifornimento per pre-compilare data, litri, totale e stazione.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'OCR display pompa (sperimentale)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Scansiona il display di una pompa di carburante per pre-compilare il modulo. Il riconoscimento è inaffidabile oggi — attiva solo se vuoi testare.';
+
+  @override
   String get feedbackConsentTitle => 'Inviare la segnalazione su GitHub?';
 
   @override

@@ -4156,6 +4156,20 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kun pois päältä, sovellus tallentaa matkoja vain GPS:llä ilman OBD2-sovitinta. Valmennus on rajallisempaa — ei välitöntä L/100 km, vähemmän moottorisignaaleja.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Kuitin OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Skannaa painettu kuitti Lisää tankkaus -näytöllä esitäyttääksesi päivämäärän, litrat, kokonaissumman ja aseman.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump => 'Pumpun näytön OCR (kokeellinen)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Skannaa polttoainepumpun näyttö esitäyttääksesi lomakkeen. Tunnistus on epäluotettavaa tänään — aktivoi vain, jos haluat testata.';
+
+  @override
   String get feedbackConsentTitle => 'Lähetetäänkö raportti GitHubiin?';
 
   @override

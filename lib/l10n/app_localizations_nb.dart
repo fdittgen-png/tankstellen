@@ -4154,6 +4154,21 @@ class AppLocalizationsNb extends AppLocalizations {
       'Når av tar appen opp turer med kun GPS uten en OBD2-adapter. Coaching er redusert — ingen umiddelbar L/100 km, færre motorsignaler.';
 
   @override
+  String get featureLabel_addFillUpOcrReceipt => 'Kvittering OCR';
+
+  @override
+  String get featureDescription_addFillUpOcrReceipt =>
+      'Skann en utskrevet kvittering på skjermen Legg til fylling for å forhåndsutfylle dato, liter, totalt og stasjon.';
+
+  @override
+  String get featureLabel_addFillUpOcrPump =>
+      'Pumpedisplay OCR (eksperimentell)';
+
+  @override
+  String get featureDescription_addFillUpOcrPump =>
+      'Skann en drivstoffpumpedisplay for å forhåndsutfylle skjemaet. Gjenkjenningen er upålitelig i dag — aktiver kun hvis du vil teste.';
+
+  @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';
 
   @override
