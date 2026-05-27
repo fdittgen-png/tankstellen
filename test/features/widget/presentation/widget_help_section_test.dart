@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/profile/data/models/user_profile.dart';
+import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/widget/presentation/widget_help_section.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../../profile/data/models/user_profile.dart';
+import '../../profile/domain/entities/user_profile.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../data/widget_color_schemes.dart';
 import '../data/widget_variants.dart';
