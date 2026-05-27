@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
-import '../../domain/trip_recorder.dart' show TripKind;
+import 'trajet_stripe_colors.dart';
 
 /// One row in the Trajets list (#889). Shows date/time + chips for
 /// distance, duration, and average consumption. Extracted from
@@ -49,13 +49,13 @@ class TrajetRow extends StatelessWidget {
         ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
         : const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
-    // #2059 — 4dp left-edge stripe carries the trip kind at a glance.
-    // Green = OBD2-instrumented (real L/100 km from fuel rate),
-    // blue = GPS-only (estimated). Hybrid coverage is added in a
-    // follow-up once `obd2CoverageRatio` lands in #J of Epic #2065.
-    final stripeColor = s.kind == TripKind.gpsPlusObd2
-        ? theme.colorScheme.primary
-        : theme.colorScheme.tertiary;
+    // #2059 + #2108 — 4dp left-edge stripe carries the trip kind at
+    // a glance. Green = OBD2-instrumented (real L/100 km from fuel
+    // rate), blue = GPS-only (estimated). The colour binding lives
+    // in `TrajetStripeColors` so a future theme rework doesn't
+    // silently collapse the two hues onto the same olive/brown like
+    // the Eco theme's `primary` / `tertiary` did pre-#2108.
+    final stripeColor = TrajetStripeColors.forKind(s.kind, theme.brightness);
 
     return Card(
       key: ValueKey('trajet-${entry.id}'),
