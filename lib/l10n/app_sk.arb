@@ -340,6 +340,7 @@
   "syncedData": "Synchronizované údaje",
   "pushTokens": "Push tokeny",
   "priceReports": "Hlásenia cien",
+  "syncedTrips": "Cesty",
   "totalItems": "Celkom položiek",
   "estimatedSize": "Odhadovaná veľkosť",
   "viewRawJson": "Zobraziť surové údaje ako JSON",

@@ -1070,7 +1070,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get priceReports => 'Cenu ziņojumi';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Braucieni';
 
   @override
   String get totalItems => 'Kopā vienību';

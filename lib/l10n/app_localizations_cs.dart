@@ -1069,7 +1069,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get priceReports => 'Hlášení cen';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Cesty';
 
   @override
   String get totalItems => 'Celkem položek';

@@ -1070,7 +1070,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get priceReports => 'Ценови доклади';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Пътувания';
 
   @override
   String get totalItems => 'Общо елементи';

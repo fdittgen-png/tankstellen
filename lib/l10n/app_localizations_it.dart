@@ -1070,7 +1070,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get priceReports => 'Segnalazioni prezzi';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Viaggi';
 
   @override
   String get totalItems => 'Elementi totali';

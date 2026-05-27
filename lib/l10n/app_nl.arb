@@ -340,6 +340,7 @@
   "syncedData": "Gesynchroniseerde gegevens",
   "pushTokens": "Push-tokens",
   "priceReports": "Prijsmeldingen",
+  "syncedTrips": "Ritten",
   "totalItems": "Totaal items",
   "estimatedSize": "Geschatte grootte",
   "viewRawJson": "Ruwe gegevens als JSON bekijken",

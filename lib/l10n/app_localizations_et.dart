@@ -1063,7 +1063,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get priceReports => 'Hinnateated';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Sõidud';
 
   @override
   String get totalItems => 'Kokku üksusi';

@@ -340,6 +340,7 @@
   "syncedData": "Synkronoidut tiedot",
   "pushTokens": "Push-tunnisteet",
   "priceReports": "Hintailmoitukset",
+  "syncedTrips": "Matkat",
   "totalItems": "Kohteita yhteensä",
   "estimatedSize": "Arvioitu koko",
   "viewRawJson": "Näytä raakadata JSON-muodossa",

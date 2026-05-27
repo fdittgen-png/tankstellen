@@ -340,6 +340,7 @@
   "syncedData": "Sinchronizuoti duomenys",
   "pushTokens": "Push žetonai",
   "priceReports": "Kainų pranešimai",
+  "syncedTrips": "Kelionės",
   "totalItems": "Iš viso elementų",
   "estimatedSize": "Numatomas dydis",
   "viewRawJson": "Peržiūrėti neapdorotus duomenis kaip JSON",

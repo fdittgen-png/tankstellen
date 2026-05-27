@@ -1064,7 +1064,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get priceReports => 'Prisrapporter';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Turer';
 
   @override
   String get totalItems => 'Totalt antall';

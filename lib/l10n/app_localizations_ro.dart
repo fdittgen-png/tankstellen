@@ -1069,7 +1069,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get priceReports => 'Rapoarte de prețuri';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Călătorii';
 
   @override
   String get totalItems => 'Total elemente';

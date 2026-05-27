@@ -1070,7 +1070,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get priceReports => 'Árjelentések';
 
   @override
-  String get syncedTrips => 'Trips';
+  String get syncedTrips => 'Utak';
 
   @override
   String get totalItems => 'Összes elem';
