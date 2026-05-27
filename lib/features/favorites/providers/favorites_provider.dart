@@ -162,6 +162,14 @@ class Favorites extends _$Favorites {
       if (json != null) {
         await storage.saveFavoriteStationData(stationId, json);
       }
+      // #2114 — emit the new local state BEFORE awaiting the sync
+      // round-trip. Without this, the star icon on the search-results
+      // card stays empty while `FavoritesSync.merge` blocks on
+      // Supabase (often > 1 s on flaky networks), and users perceive
+      // the tap as a no-op until the next search redraws the row.
+      // The trailing `_reload()` below stays as a safety re-emit
+      // (idempotent — same id set).
+      _reload();
       await SyncHelper.syncIfEnabled(
         ref,
         'Favorites.add',
