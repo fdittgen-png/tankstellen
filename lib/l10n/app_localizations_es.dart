@@ -592,6 +592,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get positionUnknown => 'Posición desconocida';
 
   @override
+  String get routeModeBannerLabel =>
+      'Modo ruta — las distancias son a lo largo del corredor';
+
+  @override
   String get distancesFromCenter => 'Distancias desde el centro de búsqueda';
 
   @override

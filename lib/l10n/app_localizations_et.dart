@@ -590,6 +590,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get positionUnknown => 'Asukoht teadmata';
 
   @override
+  String get routeModeBannerLabel =>
+      'Marsruudi režiim — vahemaad on piki koridori';
+
+  @override
   String get distancesFromCenter => 'Kaugused otsingu keskpunktist';
 
   @override

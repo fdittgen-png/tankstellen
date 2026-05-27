@@ -182,6 +182,7 @@
   "cacheCleared": "Pamięć podręczna wyczyszczona.",
   "yourPosition": "Twoja pozycja",
   "positionUnknown": "Pozycja nieznana",
+  "routeModeBannerLabel": "Tryb trasy — odległości wzdłuż korytarza",
   "distancesFromCenter": "Odległości od centrum wyszukiwania",
   "autoUpdatePosition": "Aktualizuj pozycję automatycznie",
   "autoUpdateDescription": "Aktualizuj GPS przed każdym wyszukiwaniem",

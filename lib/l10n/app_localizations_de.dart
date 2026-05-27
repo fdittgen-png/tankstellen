@@ -591,6 +591,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get positionUnknown => 'Position unbekannt';
 
   @override
+  String get routeModeBannerLabel =>
+      'Routenmodus — Entfernungen entlang des Korridors';
+
+  @override
   String get distancesFromCenter => 'Entfernungen vom Suchzentrum';
 
   @override

@@ -243,6 +243,7 @@
   "cacheCleared": "Cache cleared.",
   "yourPosition": "Your position",
   "positionUnknown": "Position unknown",
+  "routeModeBannerLabel": "Route mode — distances are along the corridor",
   "distancesFromCenter": "Distances from search center",
   "autoUpdatePosition": "Auto-update position",
   "autoUpdateDescription": "Refresh GPS position before each search",

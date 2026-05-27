@@ -257,6 +257,7 @@
   "cacheCleared": "Cache vidé.",
   "yourPosition": "Votre position",
   "positionUnknown": "Position inconnue",
+  "routeModeBannerLabel": "Mode itinéraire — distances le long du corridor",
   "distancesFromCenter": "Distances depuis le centre de recherche",
   "autoUpdatePosition": "Mise à jour automatique",
   "autoUpdateDescription": "Actualiser la position GPS avant chaque recherche",

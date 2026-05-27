@@ -592,6 +592,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get positionUnknown => 'Pozycja nieznana';
 
   @override
+  String get routeModeBannerLabel => 'Tryb trasy — odległości wzdłuż korytarza';
+
+  @override
   String get distancesFromCenter => 'Odległości od centrum wyszukiwania';
 
   @override

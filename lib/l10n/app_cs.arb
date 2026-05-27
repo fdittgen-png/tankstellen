@@ -182,6 +182,7 @@
   "cacheCleared": "Mezipaměť vymazána.",
   "yourPosition": "Vaše poloha",
   "positionUnknown": "Poloha neznámá",
+  "routeModeBannerLabel": "Režim trasy — vzdálenosti jsou podél koridoru",
   "distancesFromCenter": "Vzdálenosti od centra hledání",
   "autoUpdatePosition": "Automaticky aktualizovat polohu",
   "autoUpdateDescription": "Aktualizovat polohu GPS před každým hledáním",

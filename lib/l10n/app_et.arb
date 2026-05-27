@@ -182,6 +182,7 @@
   "cacheCleared": "Vahemälu tühjendatud.",
   "yourPosition": "Teie asukoht",
   "positionUnknown": "Asukoht teadmata",
+  "routeModeBannerLabel": "Marsruudi režiim — vahemaad on piki koridori",
   "distancesFromCenter": "Kaugused otsingu keskpunktist",
   "autoUpdatePosition": "Uuenda asukohta automaatselt",
   "autoUpdateDescription": "Uuenda GPS asukohta enne iga otsingut",

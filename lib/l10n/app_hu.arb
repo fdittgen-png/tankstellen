@@ -182,6 +182,7 @@
   "cacheCleared": "Gyorsítótár törölve.",
   "yourPosition": "Az Ön pozíciója",
   "positionUnknown": "Pozíció ismeretlen",
+  "routeModeBannerLabel": "Útvonal mód — a távolságok az útvonal mentén",
   "distancesFromCenter": "Távolságok a keresés központjától",
   "autoUpdatePosition": "Pozíció automatikus frissítése",
   "autoUpdateDescription": "GPS-pozíció frissítése minden keresés előtt",

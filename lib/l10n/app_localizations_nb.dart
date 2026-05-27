@@ -591,6 +591,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get positionUnknown => 'Posisjon ukjent';
 
   @override
+  String get routeModeBannerLabel =>
+      'Rutemodus — avstander er langs korridoren';
+
+  @override
   String get distancesFromCenter => 'Avstander fra søkesentrum';
 
   @override

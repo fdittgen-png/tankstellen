@@ -591,6 +591,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get positionUnknown => 'Poloha neznáma';
 
   @override
+  String get routeModeBannerLabel =>
+      'Režim trasy — vzdialenosti pozdĺž koridoru';
+
+  @override
   String get distancesFromCenter => 'Vzdialenosti od centra hľadania';
 
   @override

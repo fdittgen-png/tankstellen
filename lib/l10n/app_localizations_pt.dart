@@ -593,6 +593,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get positionUnknown => 'Posição desconhecida';
 
   @override
+  String get routeModeBannerLabel =>
+      'Modo rota — distâncias ao longo do corredor';
+
+  @override
   String get distancesFromCenter => 'Distâncias do centro de pesquisa';
 
   @override

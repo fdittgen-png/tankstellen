@@ -182,6 +182,7 @@
   "cacheCleared": "Välimuisti tyhjennetty.",
   "yourPosition": "Sijaintisi",
   "positionUnknown": "Sijainti tuntematon",
+  "routeModeBannerLabel": "Reittitila — etäisyydet ovat reitin varrelta",
   "distancesFromCenter": "Etäisyydet hakukeskuksesta",
   "autoUpdatePosition": "Päivitä sijainti automaattisesti",
   "autoUpdateDescription": "Päivitä GPS-sijainti ennen jokaista hakua",

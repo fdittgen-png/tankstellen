@@ -591,6 +591,10 @@ class AppLocalizationsSl extends AppLocalizations {
   String get positionUnknown => 'Pozicija neznana';
 
   @override
+  String get routeModeBannerLabel =>
+      'Način poti — razdalje so vzdolž koridorja';
+
+  @override
   String get distancesFromCenter => 'Razdalje od središča iskanja';
 
   @override

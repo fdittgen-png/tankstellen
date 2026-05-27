@@ -591,6 +591,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get positionUnknown => 'Pozicija nepoznata';
 
   @override
+  String get routeModeBannerLabel => 'Način rute — udaljenosti su uz koridor';
+
+  @override
   String get distancesFromCenter => 'Udaljenosti od centra pretrage';
 
   @override

@@ -587,6 +587,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get positionUnknown => 'Position unknown';
 
   @override
+  String get routeModeBannerLabel =>
+      'Route mode — distances are along the corridor';
+
+  @override
   String get distancesFromCenter => 'Distances from search center';
 
   @override
@@ -5966,6 +5970,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get positionUnknown => '⟦Ƥóšîŧîóñ úñķñóŵñ ·······⟧';
+
+  @override
+  String get routeModeBannerLabel =>
+      '⟦Řóúŧé ɱóđé — đîšŧáñçéš ářé áłóñǧ ŧĥé çóřřîđóř ·················⟧';
 
   @override
   String get distancesFromCenter =>

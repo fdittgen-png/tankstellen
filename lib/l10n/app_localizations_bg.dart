@@ -592,6 +592,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get positionUnknown => 'Позицията е неизвестна';
 
   @override
+  String get routeModeBannerLabel =>
+      'Режим на маршрута — разстоянията са по коридора';
+
+  @override
   String get distancesFromCenter => 'Разстояния от центъра на търсенето';
 
   @override

@@ -182,6 +182,7 @@
   "cacheCleared": "Cache gewist.",
   "yourPosition": "Uw positie",
   "positionUnknown": "Positie onbekend",
+  "routeModeBannerLabel": "Routemodus — afstanden zijn langs het traject",
   "distancesFromCenter": "Afstanden vanaf zoekcentrum",
   "autoUpdatePosition": "Positie automatisch bijwerken",
   "autoUpdateDescription": "GPS-positie bijwerken voor elke zoekopdracht",

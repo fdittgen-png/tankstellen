@@ -592,6 +592,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get positionUnknown => 'Position ukendt';
 
   @override
+  String get routeModeBannerLabel =>
+      'Rutetilstand — afstande er langs korridoren';
+
+  @override
   String get distancesFromCenter => 'Afstande fra søgecentrum';
 
   @override

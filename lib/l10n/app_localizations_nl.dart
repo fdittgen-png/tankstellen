@@ -593,6 +593,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get positionUnknown => 'Positie onbekend';
 
   @override
+  String get routeModeBannerLabel =>
+      'Routemodus — afstanden zijn langs het traject';
+
+  @override
   String get distancesFromCenter => 'Afstanden vanaf zoekcentrum';
 
   @override
