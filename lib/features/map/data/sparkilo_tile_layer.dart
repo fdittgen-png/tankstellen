@@ -124,7 +124,11 @@ class _SparkiloTileLayerState extends State<SparkiloTileLayer> {
     // aborts a no-op for the retry loop, so reverting to `true`
     // gives bandwidth back to the tiles the user is actually
     // looking at without compromising transient-failure recovery.
-    _tileProvider = RetryNetworkTileProvider();
+    // Explicit `true` satisfies the #930 lint
+    // (`test/lint/retry_tile_provider_call_site_test.dart`) that
+    // forbids implicit defaults — every call site must be intentional
+    // about this parameter.
+    _tileProvider = RetryNetworkTileProvider(abortObsoleteRequests: true);
   }
 
   @override
