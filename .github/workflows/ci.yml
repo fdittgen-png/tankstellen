@@ -21,6 +21,16 @@ on:
       - '.gitignore'
   schedule:
     - cron: '0 6 * * 0'
+  # #2128 — manual hatch so maintainers can re-fire CI on the active
+  # ref without an empty-commit nudge. Useful after a `gh pr update-
+  # branch` (which uses GITHUB_TOKEN and so doesn't auto-trigger the
+  # downstream workflow) or to retry a flaky run.
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for the manual run (audit trail)'
+        required: false
+        default: 'manual'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
