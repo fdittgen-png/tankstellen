@@ -279,7 +279,13 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   minimumSize: const Size.fromHeight(44),
                 ),
               ),
-              const SizedBox(height: 8),
+              // #2113 — the screen-level inline Search CTA stays
+              // for nearby mode because the screen-to-FAB wiring
+              // needs a clean way to mutate `searchFabActionController`
+              // from a post-build hook that doesn't trip Riverpod's
+              // test-scheduler timer assertion. Scaffolding for the
+              // override (provider + ShellBottomBar consumer) is in
+              // place; per-screen registration is a follow-up PR.
               if (mode == SearchMode.nearby)
                 FilledButton.icon(
                   key: const ValueKey('criteria-search-button'),
