@@ -153,7 +153,8 @@ class _AlertListTile extends ConsumerWidget {
         subtitle: Text(
           '${alert.fuelType.displayName} ≤ ${PriceFormatter.formatPrice(alert.targetPrice)}',
         ),
-        trailing: Switch(
+        // #2117 — platform-adaptive switch glyph.
+        trailing: Switch.adaptive(
           value: alert.isActive,
           onChanged: (_) {
             ref.read(alertProvider.notifier).toggleAlert(alert.id);
@@ -255,7 +256,8 @@ class _RadiusAlertListTile extends ConsumerWidget {
           '${PriceFormatter.formatPrice(alert.threshold)} '
           '· ${alert.radiusKm.round()} km',
         ),
-        trailing: Switch(
+        // #2117 — platform-adaptive switch glyph.
+        trailing: Switch.adaptive(
           value: alert.enabled,
           onChanged: (_) {
             ref.read(radiusAlertsProvider.notifier).toggle(alert.id);

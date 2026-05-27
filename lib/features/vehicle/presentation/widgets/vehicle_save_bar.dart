@@ -19,7 +19,10 @@ class VehicleSaveBar extends StatelessWidget {
     final theme = Theme.of(context);
     return Material(
       elevation: 8,
-      color: theme.colorScheme.surface,
+      // #2117 — pinned save bars sit visibly above scroll content;
+      // surfaceContainerHighest is the M3 tier for chrome surfaces
+      // that need to lift off `surface`.
+      color: theme.colorScheme.surfaceContainerHighest,
       child: SafeArea(
         top: false,
         child: Padding(

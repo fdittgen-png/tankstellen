@@ -33,7 +33,12 @@ class DrivingBottomBar extends StatelessWidget {
         bottom: 12 + bottomPadding,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
+        // #2117 — in-car bottom bar needs higher contrast for at-a-glance
+        // legibility. surfaceContainerHighest lifts it cleanly off the map.
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.95),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
