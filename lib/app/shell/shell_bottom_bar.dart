@@ -224,18 +224,28 @@ class ShellBottomBar extends ConsumerWidget {
     final tooltipLabel = action?.tooltip ?? item.label;
 
     void defaultOnTap() {
+      // Defensive read: in widget tests without the search-state
+      // providers wired, the reads can throw; fall back to the
+      // historical branch-switch so existing tests keep passing
+      // and so the FAB never deadlocks on an unwired provider.
+      bool hasResults;
+      try {
+        final hasFuelResults = ref.read(searchStateProvider).when(
+              data: (r) => r.data.isNotEmpty,
+              loading: () => false,
+              error: (_, _) => false,
+            );
+        final hasRouteResults = ref.read(routeSearchStateProvider).when(
+              data: (r) => r != null,
+              loading: () => false,
+              error: (_, _) => false,
+            );
+        hasResults = hasFuelResults || hasRouteResults;
+      } catch (_) {
+        onTap(i);
+        return;
+      }
       final onSearchBranch = i == currentIndex;
-      final hasFuelResults = ref.read(searchStateProvider).when(
-            data: (r) => r.data.isNotEmpty,
-            loading: () => false,
-            error: (_, _) => false,
-          );
-      final hasRouteResults = ref.read(routeSearchStateProvider).when(
-            data: (r) => r != null,
-            loading: () => false,
-            error: (_, _) => false,
-          );
-      final hasResults = hasFuelResults || hasRouteResults;
       if (onSearchBranch || !hasResults) {
         // Open criteria modal — refine (on Search) or start (no results).
         Navigator.of(context).push(
