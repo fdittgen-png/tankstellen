@@ -48,16 +48,16 @@ class AppLocalizationsSk extends AppLocalizations {
   String get searchButton => 'Hľadať';
 
   @override
-  String get fabOpenCriteria => 'Open search';
+  String get fabOpenCriteria => 'Otvoriť vyhľadávanie';
 
   @override
-  String get fabOpenResults => 'Open results';
+  String get fabOpenResults => 'Otvoriť výsledky';
 
   @override
-  String get fabRunSearch => 'Run search';
+  String get fabRunSearch => 'Spustiť vyhľadávanie';
 
   @override
-  String get fabRefineCriteria => 'Refine search';
+  String get fabRefineCriteria => 'Spresniť vyhľadávanie';
 
   @override
   String get searchCriteriaTitle => 'Kritériá vyhľadávania';

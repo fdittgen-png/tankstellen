@@ -48,16 +48,16 @@ class AppLocalizationsLt extends AppLocalizations {
   String get searchButton => 'Ieškoti';
 
   @override
-  String get fabOpenCriteria => 'Open search';
+  String get fabOpenCriteria => 'Atidaryti paiešką';
 
   @override
-  String get fabOpenResults => 'Open results';
+  String get fabOpenResults => 'Atidaryti rezultatus';
 
   @override
-  String get fabRunSearch => 'Run search';
+  String get fabRunSearch => 'Vykdyti paiešką';
 
   @override
-  String get fabRefineCriteria => 'Refine search';
+  String get fabRefineCriteria => 'Tikslinti paiešką';
 
   @override
   String get searchCriteriaTitle => 'Paieškos kriterijai';

@@ -48,16 +48,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get searchButton => 'Keresés';
 
   @override
-  String get fabOpenCriteria => 'Open search';
+  String get fabOpenCriteria => 'Keresés megnyitása';
 
   @override
-  String get fabOpenResults => 'Open results';
+  String get fabOpenResults => 'Eredmények megnyitása';
 
   @override
-  String get fabRunSearch => 'Run search';
+  String get fabRunSearch => 'Keresés futtatása';
 
   @override
-  String get fabRefineCriteria => 'Refine search';
+  String get fabRefineCriteria => 'Keresés finomítása';
 
   @override
   String get searchCriteriaTitle => 'Keresési feltételek';

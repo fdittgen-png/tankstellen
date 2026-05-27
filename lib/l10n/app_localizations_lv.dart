@@ -48,16 +48,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get searchButton => 'Meklēt';
 
   @override
-  String get fabOpenCriteria => 'Open search';
+  String get fabOpenCriteria => 'Atvērt meklēšanu';
 
   @override
-  String get fabOpenResults => 'Open results';
+  String get fabOpenResults => 'Atvērt rezultātus';
 
   @override
-  String get fabRunSearch => 'Run search';
+  String get fabRunSearch => 'Veikt meklēšanu';
 
   @override
-  String get fabRefineCriteria => 'Refine search';
+  String get fabRefineCriteria => 'Precizēt meklēšanu';
 
   @override
   String get searchCriteriaTitle => 'Meklēšanas kritēriji';

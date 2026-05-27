@@ -318,25 +318,33 @@
   "priceHistoryStationsTracked": "{count} praćenih stanica",
   "@priceHistoryStationsTracked": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "alertsConfiguredCount": "{count} konfigurirano",
   "@alertsConfiguredCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ignoredStationsHidden": "{count} skrivenih stanica",
   "@ignoredStationsHidden": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ratingsStationsRated": "{count} ocijenjenih stanica",
   "@ratingsStationsRated": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noPriceHistory": "Još nema povijesti cijena",
@@ -1849,5 +1857,9 @@
   "tripRecordingPipElapsedCaption": "proteklo",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
-  }
+  },
+  "fabOpenCriteria": "Otvori pretraživanje",
+  "fabOpenResults": "Otvori rezultate",
+  "fabRunSearch": "Pokreni pretraživanje",
+  "fabRefineCriteria": "Pročisti pretraživanje"
 }

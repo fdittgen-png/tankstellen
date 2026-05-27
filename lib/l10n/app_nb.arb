@@ -318,25 +318,33 @@
   "priceHistoryStationsTracked": "{count} sporede stasjoner",
   "@priceHistoryStationsTracked": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "alertsConfiguredCount": "{count} konfigurert",
   "@alertsConfiguredCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ignoredStationsHidden": "{count} skjulte stasjoner",
   "@ignoredStationsHidden": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ratingsStationsRated": "{count} vurderte stasjoner",
   "@ratingsStationsRated": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noPriceHistory": "Ingen prishistorikk ennå",
@@ -1849,5 +1857,9 @@
   "tripRecordingPipElapsedCaption": "forløpt",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
-  }
+  },
+  "fabOpenCriteria": "Åpne søk",
+  "fabOpenResults": "Åpne resultater",
+  "fabRunSearch": "Kjør søk",
+  "fabRefineCriteria": "Avgrens søk"
 }

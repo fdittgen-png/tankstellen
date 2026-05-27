@@ -318,25 +318,33 @@
   "priceHistoryStationsTracked": "{count} seurattua asemaa",
   "@priceHistoryStationsTracked": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "alertsConfiguredCount": "{count} määritetty",
   "@alertsConfiguredCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ignoredStationsHidden": "{count} piilotettua asemaa",
   "@ignoredStationsHidden": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ratingsStationsRated": "{count} arvioitua asemaa",
   "@ratingsStationsRated": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noPriceHistory": "Ei hintahistoriaa vielä",
@@ -1849,5 +1857,9 @@
   "tripRecordingPipElapsedCaption": "kulunut",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
-  }
+  },
+  "fabOpenCriteria": "Avaa haku",
+  "fabOpenResults": "Avaa tulokset",
+  "fabRunSearch": "Suorita haku",
+  "fabRefineCriteria": "Tarkenna hakua"
 }

@@ -318,25 +318,33 @@
   "priceHistoryStationsTracked": "{count} izsekotas stacijas",
   "@priceHistoryStationsTracked": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "alertsConfiguredCount": "{count} konfigurētas",
   "@alertsConfiguredCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ignoredStationsHidden": "{count} paslēptas stacijas",
   "@ignoredStationsHidden": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ratingsStationsRated": "{count} novērtētas stacijas",
   "@ratingsStationsRated": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noPriceHistory": "Vēl nav cenu vēstures",
@@ -1849,5 +1857,9 @@
   "tripRecordingPipElapsedCaption": "pagājis",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
-  }
+  },
+  "fabOpenCriteria": "Atvērt meklēšanu",
+  "fabOpenResults": "Atvērt rezultātus",
+  "fabRunSearch": "Veikt meklēšanu",
+  "fabRefineCriteria": "Precizēt meklēšanu"
 }

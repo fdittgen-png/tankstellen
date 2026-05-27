@@ -48,16 +48,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get searchButton => 'Buscar';
 
   @override
-  String get fabOpenCriteria => 'Open search';
+  String get fabOpenCriteria => 'Abrir búsqueda';
 
   @override
-  String get fabOpenResults => 'Open results';
+  String get fabOpenResults => 'Abrir resultados';
 
   @override
-  String get fabRunSearch => 'Run search';
+  String get fabRunSearch => 'Ejecutar búsqueda';
 
   @override
-  String get fabRefineCriteria => 'Refine search';
+  String get fabRefineCriteria => 'Refinar búsqueda';
 
   @override
   String get searchCriteriaTitle => 'Criterios de búsqueda';

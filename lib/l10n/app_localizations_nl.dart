@@ -48,16 +48,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get searchButton => 'Zoeken';
 
   @override
-  String get fabOpenCriteria => 'Open search';
+  String get fabOpenCriteria => 'Zoeken openen';
 
   @override
-  String get fabOpenResults => 'Open results';
+  String get fabOpenResults => 'Resultaten openen';
 
   @override
-  String get fabRunSearch => 'Run search';
+  String get fabRunSearch => 'Zoekopdracht uitvoeren';
 
   @override
-  String get fabRefineCriteria => 'Refine search';
+  String get fabRefineCriteria => 'Zoekopdracht verfijnen';
 
   @override
   String get searchCriteriaTitle => 'Zoekcriteria';
