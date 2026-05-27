@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/route_search/providers/route_search_provider.dart';
 import '../../features/search/presentation/screens/search_criteria_screen.dart';
 import '../../features/search/providers/search_provider.dart';
+import '../routes/shell_branches.dart';
 import 'search_fab_action_provider.dart';
 import 'shell_nav_item.dart';
 
@@ -138,6 +139,15 @@ class ShellBottomBar extends ConsumerWidget {
     final item = items[i];
     final controller = iconControllers[branchForSlot[i]];
 
+    // #2117 — M3 hides inactive-tab labels at narrow widths so the
+    // active tab gets the breathing room. The shell can show up to 5
+    // labels flanking a 76-dp centre gap; below ~360 dp each label
+    // gets <50 dp and starts truncating. Hide on inactive only — the
+    // active tab keeps its label so the user always sees what's
+    // selected.
+    final width = MediaQuery.of(context).size.width;
+    final showLabel = !isLandscape && (selected || width >= 360);
+
     final inkWell = InkWell(
       onTap: () => onTap(i),
       splashColor: theme.colorScheme.primary.withValues(alpha: 0.1),
@@ -154,7 +164,7 @@ class ShellBottomBar extends ConsumerWidget {
                 ? theme.colorScheme.primary
                 : theme.colorScheme.onSurfaceVariant,
           ),
-          if (!isLandscape) ...[
+          if (showLabel) ...[
             const SizedBox(height: 2),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
@@ -222,6 +232,40 @@ class ShellBottomBar extends ConsumerWidget {
     final defaultIcon = selected ? item.filledIcon : item.outlinedIcon;
     final iconData = action?.icon ?? defaultIcon;
     final tooltipLabel = action?.tooltip ?? item.label;
+    // #2131 — disabled override: dim the icon + swallow taps when the
+    // current registrant says the action isn't ready (e.g. route tab
+    // with no destination). Null action ⇒ default branch behaviour,
+    // always enabled.
+    final actionEnabled = action == null || action.enabled;
+
+    // #2131 — push the criteria modal onto the **Search branch's**
+    // nested Navigator (via [searchBranchNavigatorKey]) instead of the
+    // root one. The root push covered the shell + bottom bar, hiding
+    // the FAB mid-flow; the branch push keeps the shell visible.
+    // Switching to the Search branch first ensures the criteria
+    // modal appears on the currently-displayed branch.
+    void openCriteriaOnSearchBranch() {
+      if (i != currentIndex) onTap(i);
+      final searchNav = searchBranchNavigatorKey.currentState;
+      if (searchNav != null) {
+        searchNav.push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => const SearchCriteriaScreen(),
+            fullscreenDialog: true,
+          ),
+        );
+      } else {
+        // Defensive fallback for environments where the branch nav
+        // isn't mounted yet (very early frame, widget tests without
+        // the shell wired). Use the local context's Navigator.
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => const SearchCriteriaScreen(),
+            fullscreenDialog: true,
+          ),
+        );
+      }
+    }
 
     void defaultOnTap() {
       // Defensive read: in widget tests without the search-state
@@ -248,22 +292,28 @@ class ShellBottomBar extends ConsumerWidget {
       final onSearchBranch = i == currentIndex;
       if (onSearchBranch || !hasResults) {
         // Open criteria modal — refine (on Search) or start (no results).
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => const SearchCriteriaScreen(),
-            fullscreenDialog: true,
-          ),
-        );
+        openCriteriaOnSearchBranch();
       } else {
         // Other tab, results exist → switch to Search branch.
         onTap(i);
       }
     }
 
-    final onTapHandler = action != null ? action.onTap : defaultOnTap;
+    final onTapHandler = action != null
+        ? (actionEnabled ? action.onTap : () {})
+        : defaultOnTap;
+
+    // #2131 — surface + icon both dim when the registered action is
+    // disabled, mirroring Material's standard disabled-button look.
+    final buttonColor = actionEnabled
+        ? theme.colorScheme.primary
+        : theme.colorScheme.primary.withValues(alpha: 0.38);
+    final iconColor = actionEnabled
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onPrimary.withValues(alpha: 0.6);
 
     final button = Material(
-      color: theme.colorScheme.primary,
+      color: buttonColor,
       shape: const CircleBorder(),
       elevation: 4,
       shadowColor: Colors.black.withValues(alpha: 0.4),
@@ -278,14 +328,14 @@ class ShellBottomBar extends ConsumerWidget {
                 ? Icon(
                     iconData,
                     size: isLandscape ? 22.0 : 28.0,
-                    color: theme.colorScheme.onPrimary,
+                    color: iconColor,
                   )
                 : ShellBounceIcon(
                     controller: controller,
                     selected: selected,
                     icon: iconData,
                     iconSize: isLandscape ? 22.0 : 28.0,
-                    color: theme.colorScheme.onPrimary,
+                    color: iconColor,
                   ),
           ),
         ),

@@ -318,25 +318,33 @@
   "priceHistoryStationsTracked": "{count} śledzonych stacji",
   "@priceHistoryStationsTracked": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "alertsConfiguredCount": "{count} skonfigurowanych",
   "@alertsConfiguredCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ignoredStationsHidden": "{count} ukrytych stacji",
   "@ignoredStationsHidden": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ratingsStationsRated": "{count} ocenionych stacji",
   "@ratingsStationsRated": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noPriceHistory": "Brak historii cen",
@@ -1849,5 +1857,9 @@
   "tripRecordingPipElapsedCaption": "upłynęło",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
-  }
+  },
+  "fabOpenCriteria": "Otwórz wyszukiwanie",
+  "fabOpenResults": "Otwórz wyniki",
+  "fabRunSearch": "Uruchom wyszukiwanie",
+  "fabRefineCriteria": "Zawęź wyszukiwanie"
 }

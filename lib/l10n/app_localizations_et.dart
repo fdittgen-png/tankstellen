@@ -48,6 +48,18 @@ class AppLocalizationsEt extends AppLocalizations {
   String get searchButton => 'Otsi';
 
   @override
+  String get fabOpenCriteria => 'Ava otsing';
+
+  @override
+  String get fabOpenResults => 'Ava tulemused';
+
+  @override
+  String get fabRunSearch => 'Käivita otsing';
+
+  @override
+  String get fabRefineCriteria => 'Täpsusta otsingut';
+
+  @override
   String get searchCriteriaTitle => 'Otsinguparameetrid';
 
   @override

@@ -48,6 +48,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchButton => 'Suchen';
 
   @override
+  String get fabOpenCriteria => 'Suche öffnen';
+
+  @override
+  String get fabOpenResults => 'Ergebnisse anzeigen';
+
+  @override
+  String get fabRunSearch => 'Suche starten';
+
+  @override
+  String get fabRefineCriteria => 'Suche verfeinern';
+
+  @override
   String get searchCriteriaTitle => 'Suchkriterien';
 
   @override

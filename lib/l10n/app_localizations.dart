@@ -219,6 +219,30 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get searchButton;
 
+  /// No description provided for @fabOpenCriteria.
+  ///
+  /// In en, this message translates to:
+  /// **'Open search'**
+  String get fabOpenCriteria;
+
+  /// No description provided for @fabOpenResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Open results'**
+  String get fabOpenResults;
+
+  /// No description provided for @fabRunSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Run search'**
+  String get fabRunSearch;
+
+  /// No description provided for @fabRefineCriteria.
+  ///
+  /// In en, this message translates to:
+  /// **'Refine search'**
+  String get fabRefineCriteria;
+
   /// No description provided for @searchCriteriaTitle.
   ///
   /// In en, this message translates to:

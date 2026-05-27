@@ -48,6 +48,18 @@ class AppLocalizationsRo extends AppLocalizations {
   String get searchButton => 'Caută';
 
   @override
+  String get fabOpenCriteria => 'Deschide căutarea';
+
+  @override
+  String get fabOpenResults => 'Deschide rezultatele';
+
+  @override
+  String get fabRunSearch => 'Execută căutarea';
+
+  @override
+  String get fabRefineCriteria => 'Rafinează căutarea';
+
+  @override
   String get searchCriteriaTitle => 'Criterii de căutare';
 
   @override

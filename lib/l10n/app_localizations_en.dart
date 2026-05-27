@@ -48,6 +48,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchButton => 'Search';
 
   @override
+  String get fabOpenCriteria => 'Open search';
+
+  @override
+  String get fabOpenResults => 'Open results';
+
+  @override
+  String get fabRunSearch => 'Run search';
+
+  @override
+  String get fabRefineCriteria => 'Refine search';
+
+  @override
   String get searchCriteriaTitle => 'Search criteria';
 
   @override
@@ -5487,6 +5499,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get searchButton => '⟦Šéářçĥ ···⟧';
+
+  @override
+  String get fabOpenCriteria => '⟦Óƥéñ šéářçĥ ·····⟧';
+
+  @override
+  String get fabOpenResults => '⟦Óƥéñ řéšúłŧš ·····⟧';
+
+  @override
+  String get fabRunSearch => '⟦Řúñ šéářçĥ ····⟧';
+
+  @override
+  String get fabRefineCriteria => '⟦Řéƒîñé šéářçĥ ·····⟧';
 
   @override
   String get searchCriteriaTitle => '⟦Šéářçĥ çřîŧéřîá ······⟧';

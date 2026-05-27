@@ -48,6 +48,18 @@ class AppLocalizationsFi extends AppLocalizations {
   String get searchButton => 'Hae';
 
   @override
+  String get fabOpenCriteria => 'Avaa haku';
+
+  @override
+  String get fabOpenResults => 'Avaa tulokset';
+
+  @override
+  String get fabRunSearch => 'Suorita haku';
+
+  @override
+  String get fabRefineCriteria => 'Tarkenna hakua';
+
+  @override
   String get searchCriteriaTitle => 'Hakukriteerit';
 
   @override

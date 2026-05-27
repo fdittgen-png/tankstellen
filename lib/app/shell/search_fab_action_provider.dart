@@ -26,10 +26,17 @@ class SearchFabAction {
   final String tooltip;
   final VoidCallback onTap;
 
+  /// When false, [ShellBottomBar] greys the icon and treats taps as a
+  /// no-op. Lets the criteria screen mirror the inline submit button's
+  /// disabled state (e.g. route tab with no destination yet) without
+  /// the registrant having to manage two separate actions.
+  final bool enabled;
+
   const SearchFabAction({
     required this.icon,
     required this.tooltip,
     required this.onTap,
+    this.enabled = true,
   });
 }
 

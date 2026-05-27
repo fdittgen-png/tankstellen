@@ -97,8 +97,9 @@ void main() {
     });
 
     testWidgets(
-        '#1695 — empty state always carries a search CTA, even when the '
-        'nearest shortcut is hidden', (tester) async {
+        '#1695 / #2131 — empty state shows the start-search hint even '
+        'when the nearest shortcut is hidden (FAB now owns the CTA)',
+        (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -114,10 +115,12 @@ void main() {
         ].cast(),
       );
 
-      // Shortcut card hidden (cheapest landing) — but the empty state
-      // is no longer a dead screen: an actionable search CTA is shown.
+      // Shortcut card hidden (cheapest landing). The inline empty-state
+      // CTA moved to the shell FAB (#2131); the hint text remains so
+      // the user still knows what to do.
       expect(find.byType(NearestShortcutCard), findsNothing);
-      expect(find.byKey(const Key('emptySearchCta')), findsOneWidget);
+      expect(find.byKey(const Key('emptySearchCta')), findsNothing);
+      expect(find.text('Search to find fuel stations.'), findsOneWidget);
     });
 
     testWidgets(

@@ -48,6 +48,18 @@ class AppLocalizationsHr extends AppLocalizations {
   String get searchButton => 'Pretraži';
 
   @override
+  String get fabOpenCriteria => 'Otvori pretraživanje';
+
+  @override
+  String get fabOpenResults => 'Otvori rezultate';
+
+  @override
+  String get fabRunSearch => 'Pokreni pretraživanje';
+
+  @override
+  String get fabRefineCriteria => 'Pročisti pretraživanje';
+
+  @override
   String get searchCriteriaTitle => 'Kriteriji pretraživanja';
 
   @override

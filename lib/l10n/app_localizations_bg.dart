@@ -48,6 +48,18 @@ class AppLocalizationsBg extends AppLocalizations {
   String get searchButton => 'Търсене';
 
   @override
+  String get fabOpenCriteria => 'Отвори търсене';
+
+  @override
+  String get fabOpenResults => 'Отвори резултати';
+
+  @override
+  String get fabRunSearch => 'Стартирай търсене';
+
+  @override
+  String get fabRefineCriteria => 'Прецизирай търсене';
+
+  @override
   String get searchCriteriaTitle => 'Критерии за търсене';
 
   @override

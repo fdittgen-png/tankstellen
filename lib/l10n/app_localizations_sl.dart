@@ -48,6 +48,18 @@ class AppLocalizationsSl extends AppLocalizations {
   String get searchButton => 'Iskanje';
 
   @override
+  String get fabOpenCriteria => 'Odpri iskanje';
+
+  @override
+  String get fabOpenResults => 'Odpri rezultate';
+
+  @override
+  String get fabRunSearch => 'Zaženi iskanje';
+
+  @override
+  String get fabRefineCriteria => 'Izboljšaj iskanje';
+
+  @override
   String get searchCriteriaTitle => 'Merila iskanja';
 
   @override

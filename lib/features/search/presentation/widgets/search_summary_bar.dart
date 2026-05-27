@@ -80,22 +80,10 @@ class SearchSummaryBar extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 6),
-                // "Rechercher" button
-                FilledButton.tonalIcon(
-                  onPressed: () => _openCriteria(context),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    visualDensity: VisualDensity.compact,
-                    minimumSize: const Size(0, 36),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  icon: const Icon(Icons.tune, size: 16),
-                  label: Text(
-                    l10n?.searchCriteriaOpen ?? 'Search',
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                ),
+                // #2131 — inline "Search" tonal button removed; the
+                // central FAB owns the open-criteria action now. The
+                // tap-anywhere-on-bar affordance below is kept as a
+                // discoverable shortcut on the status row itself.
               ],
             ),
           ),

@@ -12,7 +12,6 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
-import '../screens/search_criteria_screen.dart';
 import 'nearest_shortcut_card.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
@@ -73,17 +72,10 @@ class SearchResultsContent extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // #1695 — the empty state always carries an actionable
-                  // search CTA: without it (e.g. a non-"nearest" landing
-                  // mode, where the shortcut card above is hidden) the
-                  // screen was dead-end centered text.
-                  FilledButton.icon(
-                    key: const Key('emptySearchCta'),
-                    onPressed: () => _openCriteria(context),
-                    icon: const Icon(Icons.search),
-                    label: Text(l10n?.searchCriteriaOpen ?? 'Search'),
-                  ),
+                  // #2131 — the empty-state inline "Search" CTA moved to
+                  // the central FAB. The shell's FAB is always visible
+                  // on this screen, so the empty state is no longer a
+                  // dead-end even without an inline button.
                 ],
               ),
             ),
@@ -101,15 +93,4 @@ class SearchResultsContent extends ConsumerWidget {
           ),
     );
   }
-}
-
-/// Open the full search-criteria screen (#1695) — shared by the
-/// empty-state CTA here and the [SearchSummaryBar]'s tune action.
-Future<void> _openCriteria(BuildContext context) async {
-  await Navigator.of(context).push<void>(
-    MaterialPageRoute<void>(
-      fullscreenDialog: true,
-      builder: (_) => const SearchCriteriaScreen(),
-    ),
-  );
 }
