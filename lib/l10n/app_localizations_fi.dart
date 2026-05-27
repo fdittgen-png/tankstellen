@@ -1066,6 +1066,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get priceReports => 'Hintailmoitukset';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Kohteita yhteensä';
 
   @override

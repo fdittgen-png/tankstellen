@@ -74,6 +74,15 @@ class SyncedDataCard extends StatelessWidget {
             InfoRow(label: l?.priceAlerts ?? 'Alerts', value: '${(data['alerts'] as List?)?.length ?? 0}'),
             InfoRow(label: l?.pushTokens ?? 'Push tokens', value: '${(data['push_tokens'] as List?)?.length ?? 0}'),
             InfoRow(label: l?.priceReports ?? 'Price reports', value: '${(data['reports'] as List?)?.length ?? 0}'),
+            // #2107 — `trip_summaries` is the canonical row-per-trip
+            // count; `trip_details` rolls into Total items / Estimated
+            // size below via the generic `_countItems` / `_estimateSize`
+            // walk over `data.values`, but the user-facing Trips row
+            // only shows the summary count (one per trip).
+            InfoRow(
+              label: l?.syncedTrips ?? 'Trips',
+              value: '${(data['trip_summaries'] as List?)?.length ?? 0}',
+            ),
             const Divider(height: 24),
             InfoRow(label: l?.totalItems ?? 'Total items', value: '${_countItems()}'),
             InfoRow(label: l?.estimatedSize ?? 'Estimated size', value: _estimateSize()),

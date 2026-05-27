@@ -1065,6 +1065,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get priceReports => 'Prisrapporter';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Totalt antal';
 
   @override

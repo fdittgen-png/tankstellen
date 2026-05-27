@@ -1072,6 +1072,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get priceReports => 'Αναφορές τιμών';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Σύνολο στοιχείων';
 
   @override

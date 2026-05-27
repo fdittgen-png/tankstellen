@@ -1071,6 +1071,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get priceReports => 'Prijsmeldingen';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Totaal items';
 
   @override

@@ -1065,6 +1065,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get priceReports => 'Prijave cijena';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Ukupno stavki';
 
   @override

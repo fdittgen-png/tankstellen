@@ -1070,6 +1070,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get priceReports => 'Reportes de precios';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Total de elementos';
 
   @override

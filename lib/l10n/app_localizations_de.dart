@@ -1069,6 +1069,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get priceReports => 'Preismeldungen';
 
   @override
+  String get syncedTrips => 'Fahrten';
+
+  @override
   String get totalItems => 'Einträge gesamt';
 
   @override

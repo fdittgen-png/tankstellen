@@ -1063,6 +1063,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get priceReports => 'Hinnateated';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Kokku üksusi';
 
   @override
