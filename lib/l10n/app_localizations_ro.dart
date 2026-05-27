@@ -591,6 +591,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get positionUnknown => 'Poziție necunoscută';
 
   @override
+  String get routeModeBannerLabel =>
+      'Mod rută — distanțele sunt de-a lungul coridorului';
+
+  @override
   String get distancesFromCenter => 'Distanțe de la centrul căutării';
 
   @override

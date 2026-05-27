@@ -182,6 +182,7 @@
   "cacheCleared": "Kešatmiņa iztīrīta.",
   "yourPosition": "Jūsu pozīcija",
   "positionUnknown": "Pozīcija nezināma",
+  "routeModeBannerLabel": "Maršruta režīms — attālumi gar koridoru",
   "distancesFromCenter": "Attālumi no meklēšanas centra",
   "autoUpdatePosition": "Automātiski atjaunināt pozīciju",
   "autoUpdateDescription": "Atjaunināt GPS pozīciju pirms katras meklēšanas",

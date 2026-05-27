@@ -592,6 +592,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get positionUnknown => 'Pozicija nežinoma';
 
   @override
+  String get routeModeBannerLabel =>
+      'Maršruto režimas — atstumai išilgai koridoriaus';
+
+  @override
   String get distancesFromCenter => 'Atstumai nuo paieškos centro';
 
   @override

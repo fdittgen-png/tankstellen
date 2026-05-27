@@ -182,6 +182,7 @@
   "cacheCleared": "Кешът е изчистен.",
   "yourPosition": "Вашата позиция",
   "positionUnknown": "Позицията е неизвестна",
+  "routeModeBannerLabel": "Режим на маршрута — разстоянията са по коридора",
   "distancesFromCenter": "Разстояния от центъра на търсенето",
   "autoUpdatePosition": "Автоматично обновяване на позицията",
   "autoUpdateDescription": "Обновяване на GPS позицията преди всяко търсене",

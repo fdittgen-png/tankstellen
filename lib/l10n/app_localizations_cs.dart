@@ -591,6 +591,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get positionUnknown => 'Poloha neznámá';
 
   @override
+  String get routeModeBannerLabel =>
+      'Režim trasy — vzdálenosti jsou podél koridoru';
+
+  @override
   String get distancesFromCenter => 'Vzdálenosti od centra hledání';
 
   @override

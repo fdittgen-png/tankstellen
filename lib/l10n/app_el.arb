@@ -182,6 +182,7 @@
   "cacheCleared": "Η προσωρινή μνήμη εκκαθαρίστηκε.",
   "yourPosition": "Η θέση σας",
   "positionUnknown": "Θέση άγνωστη",
+  "routeModeBannerLabel": "Λειτουργία διαδρομής — οι αποστάσεις είναι κατά μήκος του διαδρόμου",
   "distancesFromCenter": "Αποστάσεις από το κέντρο αναζήτησης",
   "autoUpdatePosition": "Αυτόματη ενημέρωση θέσης",
   "autoUpdateDescription": "Ενημέρωση θέσης GPS πριν από κάθε αναζήτηση",

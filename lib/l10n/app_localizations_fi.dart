@@ -591,6 +591,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get positionUnknown => 'Sijainti tuntematon';
 
   @override
+  String get routeModeBannerLabel =>
+      'Reittitila — etäisyydet ovat reitin varrelta';
+
+  @override
   String get distancesFromCenter => 'Etäisyydet hakukeskuksesta';
 
   @override

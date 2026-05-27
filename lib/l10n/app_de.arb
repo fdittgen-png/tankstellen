@@ -224,6 +224,7 @@
   "cacheCleared": "Cache wurde geleert.",
   "yourPosition": "Ihre Position",
   "positionUnknown": "Position unbekannt",
+  "routeModeBannerLabel": "Routenmodus — Entfernungen entlang des Korridors",
   "distancesFromCenter": "Entfernungen vom Suchzentrum",
   "autoUpdatePosition": "Position automatisch aktualisieren",
   "autoUpdateDescription": "GPS-Position vor jeder Suche aktualisieren",

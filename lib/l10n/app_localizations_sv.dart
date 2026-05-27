@@ -592,6 +592,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get positionUnknown => 'Position okänd';
 
   @override
+  String get routeModeBannerLabel => 'Ruttläge — avstånd är längs korridoren';
+
+  @override
   String get distancesFromCenter => 'Avstånd från sökcentrum';
 
   @override

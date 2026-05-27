@@ -182,6 +182,7 @@
   "cacheCleared": "Podėlis išvalytas.",
   "yourPosition": "Jūsų pozicija",
   "positionUnknown": "Pozicija nežinoma",
+  "routeModeBannerLabel": "Maršruto režimas — atstumai išilgai koridoriaus",
   "distancesFromCenter": "Atstumai nuo paieškos centro",
   "autoUpdatePosition": "Automatiškai atnaujinti poziciją",
   "autoUpdateDescription": "Atnaujinti GPS poziciją prieš kiekvieną paiešką",

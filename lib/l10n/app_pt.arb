@@ -182,6 +182,7 @@
   "cacheCleared": "Cache limpa.",
   "yourPosition": "A sua posição",
   "positionUnknown": "Posição desconhecida",
+  "routeModeBannerLabel": "Modo rota — distâncias ao longo do corredor",
   "distancesFromCenter": "Distâncias do centro de pesquisa",
   "autoUpdatePosition": "Atualizar posição automaticamente",
   "autoUpdateDescription": "Atualizar posição GPS antes de cada pesquisa",

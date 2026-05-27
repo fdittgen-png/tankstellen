@@ -593,6 +593,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get positionUnknown => 'Pozíció ismeretlen';
 
   @override
+  String get routeModeBannerLabel =>
+      'Útvonal mód — a távolságok az útvonal mentén';
+
+  @override
   String get distancesFromCenter => 'Távolságok a keresés központjától';
 
   @override

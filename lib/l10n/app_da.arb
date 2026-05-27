@@ -182,6 +182,7 @@
   "cacheCleared": "Cache ryddet.",
   "yourPosition": "Din position",
   "positionUnknown": "Position ukendt",
+  "routeModeBannerLabel": "Rutetilstand — afstande er langs korridoren",
   "distancesFromCenter": "Afstande fra søgecentrum",
   "autoUpdatePosition": "Opdater position automatisk",
   "autoUpdateDescription": "Opdater GPS-position før hver søgning",

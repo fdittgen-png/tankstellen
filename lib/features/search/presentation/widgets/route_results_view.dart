@@ -37,7 +37,12 @@ class RouteResultsView extends ConsumerStatefulWidget {
 }
 
 class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
-  RouteResultMode _resultMode = RouteResultMode.allStations;
+  // #2111 — default to bestStops so the user sees the curated
+  // cheapest-per-segment subset first rather than the unbounded
+  // along-route list. The toggle still lets them swap to allStations
+  // if they want every candidate; the choice persists for the
+  // session within this widget's state.
+  RouteResultMode _resultMode = RouteResultMode.bestStops;
 
   @override
   Widget build(BuildContext context) {

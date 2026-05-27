@@ -592,6 +592,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get positionUnknown => 'Pozīcija nezināma';
 
   @override
+  String get routeModeBannerLabel => 'Maršruta režīms — attālumi gar koridoru';
+
+  @override
   String get distancesFromCenter => 'Attālumi no meklēšanas centra';
 
   @override

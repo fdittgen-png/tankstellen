@@ -1233,6 +1233,12 @@ abstract class AppLocalizations {
   /// **'Position unknown'**
   String get positionUnknown;
 
+  /// No description provided for @routeModeBannerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Route mode — distances are along the corridor'**
+  String get routeModeBannerLabel;
+
   /// No description provided for @distancesFromCenter.
   ///
   /// In en, this message translates to:

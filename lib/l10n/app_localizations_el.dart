@@ -592,6 +592,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get positionUnknown => 'Θέση άγνωστη';
 
   @override
+  String get routeModeBannerLabel =>
+      'Λειτουργία διαδρομής — οι αποστάσεις είναι κατά μήκος του διαδρόμου';
+
+  @override
   String get distancesFromCenter => 'Αποστάσεις από το κέντρο αναζήτησης';
 
   @override

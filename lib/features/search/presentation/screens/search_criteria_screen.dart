@@ -209,23 +209,18 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                 ),
                 const SizedBox(height: 8),
               ],
+              // #2111 — drop the redundant "Location" / "Along route"
+              // section headers; the segmented control above already
+              // labels the active mode. Saves ~24 dp vertical so the
+              // radius slider, amenities, and highway filter sit above
+              // the fold on a stock S23 at 1x text scale.
               if (mode == SearchMode.nearby) ...[
-                Text(
-                  l10n?.gpsLocation ?? 'Location',
-                  style: theme.textTheme.titleSmall,
-                ),
-                const SizedBox(height: 4),
                 LocationInput(
                   onGpsSearch: _performGpsSearch,
                   onZipSearch: _performZipSearch,
                   onCitySearch: _performCitySearch,
                 ),
               ] else ...[
-                Text(
-                  l10n?.searchAlongRoute ?? 'Along route',
-                  style: theme.textTheme.titleSmall,
-                ),
-                const SizedBox(height: 4),
                 RouteInput(onSearch: _performRouteSearch),
               ],
               const SizedBox(height: 8),

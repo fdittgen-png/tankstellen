@@ -182,6 +182,7 @@
   "cacheCleared": "Cache golit.",
   "yourPosition": "Poziția dvs.",
   "positionUnknown": "Poziție necunoscută",
+  "routeModeBannerLabel": "Mod rută — distanțele sunt de-a lungul coridorului",
   "distancesFromCenter": "Distanțe de la centrul căutării",
   "autoUpdatePosition": "Actualizare automată a poziției",
   "autoUpdateDescription": "Actualizează poziția GPS înainte de fiecare căutare",

@@ -19,6 +19,8 @@ import '../../../map/presentation/widgets/inline_map.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
+import '../../domain/entities/search_mode.dart';
+import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
 import '../widgets/demo_mode_banner.dart';
@@ -177,6 +179,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         // Compact summary bar — top-level entry point for editing criteria.
         const SearchSummaryBar(),
         UserPositionBar(
+          // #2111 — route mode swaps the banner to a corridor-context
+          // label so users read the results as a trajet view.
+          routeMode:
+              ref.watch(activeSearchModeProvider) == SearchMode.route,
           onUpdatePosition: () async {
             final settings = ref.read(settingsStorageProvider);
             if (!LocationConsentDialog.hasConsent(settings)) {

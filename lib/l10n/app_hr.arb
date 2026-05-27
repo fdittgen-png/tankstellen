@@ -182,6 +182,7 @@
   "cacheCleared": "Predmemorija očišćena.",
   "yourPosition": "Vaša pozicija",
   "positionUnknown": "Pozicija nepoznata",
+  "routeModeBannerLabel": "Način rute — udaljenosti su uz koridor",
   "distancesFromCenter": "Udaljenosti od centra pretrage",
   "autoUpdatePosition": "Automatsko ažuriranje pozicije",
   "autoUpdateDescription": "Ažuriraj GPS poziciju prije svake pretrage",
