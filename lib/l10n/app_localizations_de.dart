@@ -960,6 +960,42 @@ class AppLocalizationsDe extends AppLocalizations {
   String get priceHistory => 'Preisverlauf';
 
   @override
+  String get ignoredStationsLabel => 'Ignoriert';
+
+  @override
+  String get ratingsLabel => 'Bewertungen';
+
+  @override
+  String get favoritesDataCache => 'Favoritendaten';
+
+  @override
+  String get citySearchCache => 'Stadtsuche';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Datenlöschung ist im Community-Modus nicht verfügbar. Trennen Sie zuerst die Verbindung oder verwenden Sie eine private Datenbank.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count Tankstellen verfolgt';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfiguriert';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count Tankstellen ausgeblendet';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count Tankstellen bewertet';
+  }
+
+  @override
   String get noPriceHistory => 'Noch kein Preisverlauf';
 
   @override

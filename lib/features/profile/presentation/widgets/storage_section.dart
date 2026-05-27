@@ -53,12 +53,14 @@ class StorageSection extends ConsumerWidget {
                   theme.colorScheme.tertiary,
                 ),
                 StorageSegment(
+                  // i18n-ignore: "Cache" is a brand-neutral technical term.
                   'Cache (${storageMgmt.cacheEntryCount} ${l?.entries ?? "entries"})',
                   stats.cache,
                   theme.colorScheme.error.withValues(alpha: 0.7),
                 ),
                 StorageSegment(
-                  'Price History (${storageMgmt.priceHistoryEntryCount})',
+                  '${l?.priceHistory ?? "Price History"} '
+                  '(${storageMgmt.priceHistoryEntryCount})',
                   stats.priceHistory,
                   DarkModeColors.warning(context).withValues(alpha: 0.7),
                 ),
@@ -74,7 +76,7 @@ class StorageSection extends ConsumerWidget {
               color: theme.colorScheme.primary,
             ),
             StorageDetailRow(
-              label: 'Profile',
+              label: l?.profile ?? 'Profile',
               detail:
                   '${storageMgmt.profileCount} ${l?.profilesStored ?? 'profiles'}',
               bytes: stats.profiles,
@@ -88,6 +90,8 @@ class StorageSection extends ConsumerWidget {
               color: theme.colorScheme.tertiary,
             ),
             StorageDetailRow(
+              // i18n-ignore: "Cache" is a brand-neutral technical term
+              // commonly left untranslated across European locales.
               label: 'Cache',
               detail:
                   '${storageMgmt.cacheEntryCount} ${l?.cachedResponses ?? 'cached'}',
@@ -95,27 +99,33 @@ class StorageSection extends ConsumerWidget {
               color: theme.colorScheme.error.withValues(alpha: 0.7),
             ),
             StorageDetailRow(
-              label: 'Price History',
-              detail:
+              label: l?.priceHistory ?? 'Price History',
+              detail: l?.priceHistoryStationsTracked(
+                      storageMgmt.priceHistoryEntryCount) ??
                   '${storageMgmt.priceHistoryEntryCount} stations tracked',
               bytes: stats.priceHistory,
               color: DarkModeColors.warning(context).withValues(alpha: 0.7),
             ),
             StorageDetailRow(
               label: l?.priceAlerts ?? 'Alerts',
-              detail: '${storageMgmt.alertCount} configured',
+              detail: l?.alertsConfiguredCount(storageMgmt.alertCount) ??
+                  '${storageMgmt.alertCount} configured',
               bytes: stats.alerts,
               color: DarkModeColors.warning(context).withValues(alpha: 0.7),
             ),
             StorageDetailRow(
-              label: 'Ignored',
-              detail: '${storageMgmt.getIgnoredIds().length} stations hidden',
+              label: l?.ignoredStationsLabel ?? 'Ignored',
+              detail: l?.ignoredStationsHidden(
+                      storageMgmt.getIgnoredIds().length) ??
+                  '${storageMgmt.getIgnoredIds().length} stations hidden',
               bytes: storageMgmt.getIgnoredIds().length * 64,
               color: Colors.grey,
             ),
             StorageDetailRow(
-              label: 'Ratings',
-              detail: '${storageMgmt.getRatings().length} stations rated',
+              label: l?.ratingsLabel ?? 'Ratings',
+              detail: l?.ratingsStationsRated(
+                      storageMgmt.getRatings().length) ??
+                  '${storageMgmt.getRatings().length} stations rated',
               bytes: storageMgmt.getRatings().length * 64,
               color: Colors.amber,
             ),

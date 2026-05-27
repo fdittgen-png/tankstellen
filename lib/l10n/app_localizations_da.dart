@@ -958,6 +958,42 @@ class AppLocalizationsDa extends AppLocalizations {
   String get priceHistory => 'Prishistorik';
 
   @override
+  String get ignoredStationsLabel => 'Ignorerede';
+
+  @override
+  String get ratingsLabel => 'Vurderinger';
+
+  @override
+  String get favoritesDataCache => 'Favoritdata';
+
+  @override
+  String get citySearchCache => 'Bysøgning';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Datasletning er ikke tilgængelig i fællesskabstilstand. Afbryd først forbindelsen, eller brug en privat database.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count sporede stationer';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfigureret';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count skjulte stationer';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count vurderede stationer';
+  }
+
+  @override
   String get noPriceHistory => 'Ingen prishistorik endnu';
 
   @override

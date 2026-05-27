@@ -443,6 +443,35 @@
   "totalCost": "Total cost",
   "enterCalcValues": "Enter distance, consumption, and price to calculate trip cost",
   "priceHistory": "Price History",
+  "ignoredStationsLabel": "Ignored",
+  "ratingsLabel": "Ratings",
+  "favoritesDataCache": "Favorites data",
+  "citySearchCache": "City search",
+  "dataDeletionNotAvailableCommunity": "Data deletion is not available in community mode. Disconnect first, or use a private database.",
+  "priceHistoryStationsTracked": "{count} stations tracked",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} configured",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} stations hidden",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} stations rated",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "No price history yet",
   "noHourlyData": "No hourly data",
   "noStatistics": "No statistics available",

@@ -306,6 +306,35 @@
   "totalCost": "Kopējās izmaksas",
   "enterCalcValues": "Ievadiet attālumu, patēriņu un cenu, lai aprēķinātu brauciena izmaksas",
   "priceHistory": "Cenu vēsture",
+  "ignoredStationsLabel": "Ignorētas",
+  "ratingsLabel": "Vērtējumi",
+  "favoritesDataCache": "Iecienīto dati",
+  "citySearchCache": "Pilsētas meklēšana",
+  "dataDeletionNotAvailableCommunity": "Datu dzēšana nav pieejama Kopienas režīmā. Vispirms atvienojieties vai izmantojiet privātu datu bāzi.",
+  "priceHistoryStationsTracked": "{count} izsekotas stacijas",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} konfigurētas",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} paslēptas stacijas",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} novērtētas stacijas",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Vēl nav cenu vēstures",
   "noHourlyData": "Nav stundu datu",
   "noStatistics": "Nav pieejamu statistiku",

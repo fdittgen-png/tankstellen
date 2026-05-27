@@ -306,6 +306,35 @@
   "totalCost": "Összköltség",
   "enterCalcValues": "Adja meg a távolságot, fogyasztást és árat az útköltség kiszámításához",
   "priceHistory": "Ártörténet",
+  "ignoredStationsLabel": "Mellőzött",
+  "ratingsLabel": "Értékelések",
+  "favoritesDataCache": "Kedvencek adatai",
+  "citySearchCache": "Városkeresés",
+  "dataDeletionNotAvailableCommunity": "Az adatok törlése nem érhető el a Közösségi módban. Először kapcsolódjon le, vagy használjon privát adatbázist.",
+  "priceHistoryStationsTracked": "{count} követett kút",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} beállítva",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} rejtett kút",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} értékelt kút",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Még nincs ártörténet",
   "noHourlyData": "Nincsenek óránkénti adatok",
   "noStatistics": "Nincsenek elérhető statisztikák",

@@ -306,6 +306,35 @@
   "totalCost": "Totalkostnad",
   "enterCalcValues": "Oppgi avstand, forbruk og pris for å beregne turkostnaden",
   "priceHistory": "Prishistorikk",
+  "ignoredStationsLabel": "Ignorert",
+  "ratingsLabel": "Vurderinger",
+  "favoritesDataCache": "Favorittdata",
+  "citySearchCache": "Bysøk",
+  "dataDeletionNotAvailableCommunity": "Sletting av data er ikke tilgjengelig i Fellesskap-modus. Koble fra først, eller bruk en privat database.",
+  "priceHistoryStationsTracked": "{count} sporede stasjoner",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} konfigurert",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} skjulte stasjoner",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} vurderte stasjoner",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Ingen prishistorikk ennå",
   "noHourlyData": "Ingen timedata",
   "noStatistics": "Ingen statistikk tilgjengelig",

@@ -960,6 +960,42 @@ class AppLocalizationsRo extends AppLocalizations {
   String get priceHistory => 'Istoric prețuri';
 
   @override
+  String get ignoredStationsLabel => 'Ignorate';
+
+  @override
+  String get ratingsLabel => 'Evaluări';
+
+  @override
+  String get favoritesDataCache => 'Date favorite';
+
+  @override
+  String get citySearchCache => 'Căutare oraș';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Ștergerea datelor nu este disponibilă în modul Comunitate. Deconectați-vă mai întâi sau utilizați o bază de date privată.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count stații urmărite';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count configurate';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count stații ascunse';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count stații evaluate';
+  }
+
+  @override
   String get noPriceHistory => 'Încă nu există istoric de prețuri';
 
   @override

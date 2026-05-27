@@ -960,6 +960,42 @@ class AppLocalizationsCs extends AppLocalizations {
   String get priceHistory => 'Historie cen';
 
   @override
+  String get ignoredStationsLabel => 'Ignorováno';
+
+  @override
+  String get ratingsLabel => 'Hodnocení';
+
+  @override
+  String get favoritesDataCache => 'Data oblíbených';
+
+  @override
+  String get citySearchCache => 'Hledání města';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Mazání dat není v komunitním režimu k dispozici. Nejprve se odpojte nebo použijte soukromou databázi.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count sledovaných stanic';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count nakonfigurováno';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count skrytých stanic';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count hodnocených stanic';
+  }
+
+  @override
   String get noPriceHistory => 'Zatím žádná historie cen';
 
   @override

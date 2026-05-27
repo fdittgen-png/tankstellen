@@ -457,6 +457,35 @@
   "totalCost": "Coût total",
   "enterCalcValues": "Saisissez la distance, la consommation et le prix pour calculer le coût du trajet",
   "priceHistory": "Historique des prix",
+  "ignoredStationsLabel": "Stations masquées",
+  "ratingsLabel": "Notes",
+  "favoritesDataCache": "Données favoris",
+  "citySearchCache": "Recherche de ville",
+  "dataDeletionNotAvailableCommunity": "La suppression des données n'est pas disponible en mode Communauté. Déconnectez-vous d'abord, ou utilisez une base de données privée.",
+  "priceHistoryStationsTracked": "{count} stations suivies",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} configurée(s)",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} stations masquées",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} stations notées",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Pas encore d'historique de prix",
   "noHourlyData": "Pas de données horaires",
   "noStatistics": "Aucune statistique disponible",

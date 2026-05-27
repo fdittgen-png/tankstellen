@@ -306,6 +306,35 @@
   "totalCost": "Kokonaiskustannus",
   "enterCalcValues": "Syötä matka, kulutus ja hinta laskeaksesi matkan kustannuksen",
   "priceHistory": "Hintahistoria",
+  "ignoredStationsLabel": "Ohitetut",
+  "ratingsLabel": "Arvioinnit",
+  "favoritesDataCache": "Suosikkien tiedot",
+  "citySearchCache": "Kaupunkihaku",
+  "dataDeletionNotAvailableCommunity": "Tietojen poisto ei ole käytettävissä Yhteisö-tilassa. Katkaise ensin yhteys tai käytä yksityistä tietokantaa.",
+  "priceHistoryStationsTracked": "{count} seurattua asemaa",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} määritetty",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} piilotettua asemaa",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} arvioitua asemaa",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Ei hintahistoriaa vielä",
   "noHourlyData": "Ei tuntidataa",
   "noStatistics": "Tilastoja ei saatavilla",

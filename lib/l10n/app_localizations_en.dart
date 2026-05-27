@@ -951,6 +951,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get priceHistory => 'Price History';
 
   @override
+  String get ignoredStationsLabel => 'Ignored';
+
+  @override
+  String get ratingsLabel => 'Ratings';
+
+  @override
+  String get favoritesDataCache => 'Favorites data';
+
+  @override
+  String get citySearchCache => 'City search';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Data deletion is not available in community mode. Disconnect first, or use a private database.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count stations tracked';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count configured';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count stations hidden';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count stations rated';
+  }
+
+  @override
   String get noPriceHistory => 'No price history yet';
 
   @override
@@ -6307,6 +6343,42 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get priceHistory => '⟦Ƥřîçé Ĥîšŧóřý ·····⟧';
+
+  @override
+  String get ignoredStationsLabel => '⟦Îǧñóřéđ ···⟧';
+
+  @override
+  String get ratingsLabel => '⟦Řáŧîñǧš ···⟧';
+
+  @override
+  String get favoritesDataCache => '⟦Ƒáṽóřîŧéš đáŧá ······⟧';
+
+  @override
+  String get citySearchCache => '⟦Çîŧý šéářçĥ ·····⟧';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      '⟦Đáŧá đéłéŧîóñ îš ñóŧ áṽáîłáƀłé îñ çóɱɱúñîŧý ɱóđé. Đîšçóññéçŧ ƒîřšŧ, óř úšé á ƥřîṽáŧé đáŧáƀášé. ···································⟧';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '⟦$count šŧáŧîóñš ŧřáçķéđ ·······⟧';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '⟦$count çóñƒîǧúřéđ ·····⟧';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '⟦$count šŧáŧîóñš ĥîđđéñ ······⟧';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '⟦$count šŧáŧîóñš řáŧéđ ······⟧';
+  }
 
   @override
   String get noPriceHistory => '⟦Ñó ƥřîçé ĥîšŧóřý ýéŧ ········⟧';

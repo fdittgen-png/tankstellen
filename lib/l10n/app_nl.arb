@@ -306,6 +306,35 @@
   "totalCost": "Totale kosten",
   "enterCalcValues": "Voer afstand, verbruik en prijs in om de ritkosten te berekenen",
   "priceHistory": "Prijsgeschiedenis",
+  "ignoredStationsLabel": "Genegeerd",
+  "ratingsLabel": "Beoordelingen",
+  "favoritesDataCache": "Favorietengegevens",
+  "citySearchCache": "Plaatszoeken",
+  "dataDeletionNotAvailableCommunity": "Gegevens verwijderen is niet beschikbaar in de Community-modus. Verbreek eerst de verbinding of gebruik een privédatabase.",
+  "priceHistoryStationsTracked": "{count} gevolgde stations",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} geconfigureerd",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} verborgen stations",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} beoordeelde stations",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Nog geen prijsgeschiedenis",
   "noHourlyData": "Geen uurgegevens",
   "noStatistics": "Geen statistieken beschikbaar",

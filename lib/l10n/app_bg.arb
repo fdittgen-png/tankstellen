@@ -306,6 +306,35 @@
   "totalCost": "Общ разход",
   "enterCalcValues": "Въведете разстояние, разход и цена за изчисляване на разхода за пътуването",
   "priceHistory": "Ценова история",
+  "ignoredStationsLabel": "Игнорирани",
+  "ratingsLabel": "Оценки",
+  "favoritesDataCache": "Данни за любими",
+  "citySearchCache": "Търсене на град",
+  "dataDeletionNotAvailableCommunity": "Изтриването на данни не е достъпно в режим Общност. Първо прекъснете връзката или използвайте частна база данни.",
+  "priceHistoryStationsTracked": "{count} проследени станции",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} конфигурирани",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} скрити станции",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} оценени станции",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Все още няма ценова история",
   "noHourlyData": "Няма почасови данни",
   "noStatistics": "Няма налични статистики",

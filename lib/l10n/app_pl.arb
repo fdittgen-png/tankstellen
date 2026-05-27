@@ -306,6 +306,35 @@
   "totalCost": "Koszt całkowity",
   "enterCalcValues": "Wprowadź odległość, zużycie i cenę, aby obliczyć koszt podróży",
   "priceHistory": "Historia cen",
+  "ignoredStationsLabel": "Ignorowane",
+  "ratingsLabel": "Oceny",
+  "favoritesDataCache": "Dane ulubionych",
+  "citySearchCache": "Wyszukiwanie miasta",
+  "dataDeletionNotAvailableCommunity": "Usuwanie danych nie jest dostępne w trybie Społeczności. Najpierw rozłącz się lub użyj prywatnej bazy danych.",
+  "priceHistoryStationsTracked": "{count} śledzonych stacji",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} skonfigurowanych",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} ukrytych stacji",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} ocenionych stacji",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Brak historii cen",
   "noHourlyData": "Brak danych godzinowych",
   "noStatistics": "Brak dostępnych statystyk",

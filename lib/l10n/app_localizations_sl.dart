@@ -955,6 +955,42 @@ class AppLocalizationsSl extends AppLocalizations {
   String get priceHistory => 'Zgodovina cen';
 
   @override
+  String get ignoredStationsLabel => 'Prezrte';
+
+  @override
+  String get ratingsLabel => 'Ocene';
+
+  @override
+  String get favoritesDataCache => 'Podatki priljubljenih';
+
+  @override
+  String get citySearchCache => 'Iskanje mesta';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Brisanje podatkov v skupnostnem načinu ni na voljo. Najprej se odjavite ali uporabite zasebno bazo podatkov.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count sledenih postaj';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfiguriranih';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count skritih postaj';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count ocenjenih postaj';
+  }
+
+  @override
   String get noPriceHistory => 'Še ni zgodovine cen';
 
   @override

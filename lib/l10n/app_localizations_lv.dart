@@ -961,6 +961,42 @@ class AppLocalizationsLv extends AppLocalizations {
   String get priceHistory => 'Cenu vēsture';
 
   @override
+  String get ignoredStationsLabel => 'Ignorētas';
+
+  @override
+  String get ratingsLabel => 'Vērtējumi';
+
+  @override
+  String get favoritesDataCache => 'Iecienīto dati';
+
+  @override
+  String get citySearchCache => 'Pilsētas meklēšana';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Datu dzēšana nav pieejama Kopienas režīmā. Vispirms atvienojieties vai izmantojiet privātu datu bāzi.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count izsekotas stacijas';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfigurētas';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count paslēptas stacijas';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count novērtētas stacijas';
+  }
+
+  @override
   String get noPriceHistory => 'Vēl nav cenu vēstures';
 
   @override

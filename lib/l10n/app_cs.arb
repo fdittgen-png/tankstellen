@@ -306,6 +306,35 @@
   "totalCost": "Celkové náklady",
   "enterCalcValues": "Zadejte vzdálenost, spotřebu a cenu pro výpočet nákladů na cestu",
   "priceHistory": "Historie cen",
+  "ignoredStationsLabel": "Ignorováno",
+  "ratingsLabel": "Hodnocení",
+  "favoritesDataCache": "Data oblíbených",
+  "citySearchCache": "Hledání města",
+  "dataDeletionNotAvailableCommunity": "Mazání dat není v komunitním režimu k dispozici. Nejprve se odpojte nebo použijte soukromou databázi.",
+  "priceHistoryStationsTracked": "{count} sledovaných stanic",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} nakonfigurováno",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} skrytých stanic",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} hodnocených stanic",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Zatím žádná historie cen",
   "noHourlyData": "Žádná hodinová data",
   "noStatistics": "Žádné statistiky k dispozici",

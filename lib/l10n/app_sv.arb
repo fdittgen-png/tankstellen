@@ -306,6 +306,35 @@
   "totalCost": "Total kostnad",
   "enterCalcValues": "Ange avstånd, förbrukning och pris för att beräkna resekostnaden",
   "priceHistory": "Prishistorik",
+  "ignoredStationsLabel": "Ignorerade",
+  "ratingsLabel": "Betyg",
+  "favoritesDataCache": "Favoritdata",
+  "citySearchCache": "Stadsökning",
+  "dataDeletionNotAvailableCommunity": "Radering av data är inte tillgänglig i Community-läge. Koppla från först eller använd en privat databas.",
+  "priceHistoryStationsTracked": "{count} bevakade stationer",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} konfigurerade",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} dolda stationer",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} betygsatta stationer",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Ingen prishistorik ännu",
   "noHourlyData": "Inga timdata",
   "noStatistics": "Ingen statistik tillgänglig",

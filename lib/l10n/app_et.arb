@@ -306,6 +306,35 @@
   "totalCost": "Kogukulu",
   "enterCalcValues": "Sisestage kaugus, tarbimine ja hind reisikulu arvutamiseks",
   "priceHistory": "Hinnaajalugu",
+  "ignoredStationsLabel": "Ignoreeritud",
+  "ratingsLabel": "Hinnangud",
+  "favoritesDataCache": "Lemmikute andmed",
+  "citySearchCache": "Linna otsing",
+  "dataDeletionNotAvailableCommunity": "Andmete kustutamine ei ole kogukonna režiimis saadaval. Esmalt katkestage ühendus või kasutage privaatset andmebaasi.",
+  "priceHistoryStationsTracked": "{count} jälitatud tanklat",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} konfigureeritud",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} peidetud tanklat",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} hinnatud tanklat",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Hinnaajalugu puudub",
   "noHourlyData": "Tunniandmed puuduvad",
   "noStatistics": "Statistika pole saadaval",

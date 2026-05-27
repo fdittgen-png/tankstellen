@@ -956,6 +956,42 @@ class AppLocalizationsNb extends AppLocalizations {
   String get priceHistory => 'Prishistorikk';
 
   @override
+  String get ignoredStationsLabel => 'Ignorert';
+
+  @override
+  String get ratingsLabel => 'Vurderinger';
+
+  @override
+  String get favoritesDataCache => 'Favorittdata';
+
+  @override
+  String get citySearchCache => 'Bysøk';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Sletting av data er ikke tilgjengelig i Fellesskap-modus. Koble fra først, eller bruk en privat database.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count sporede stasjoner';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfigurert';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count skjulte stasjoner';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count vurderte stasjoner';
+  }
+
+  @override
   String get noPriceHistory => 'Ingen prishistorikk ennå';
 
   @override

@@ -306,6 +306,35 @@
   "totalCost": "Ukupni trošak",
   "enterCalcValues": "Unesite udaljenost, potrošnju i cijenu za izračun troška putovanja",
   "priceHistory": "Povijest cijena",
+  "ignoredStationsLabel": "Ignorirano",
+  "ratingsLabel": "Ocjene",
+  "favoritesDataCache": "Podaci favorita",
+  "citySearchCache": "Pretraga gradova",
+  "dataDeletionNotAvailableCommunity": "Brisanje podataka nije dostupno u načinu Zajednica. Najprije se odjavite ili upotrijebite privatnu bazu podataka.",
+  "priceHistoryStationsTracked": "{count} praćenih stanica",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} konfigurirano",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} skrivenih stanica",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} ocijenjenih stanica",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Još nema povijesti cijena",
   "noHourlyData": "Nema satnih podataka",
   "noStatistics": "Nema dostupnih statistika",

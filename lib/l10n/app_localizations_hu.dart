@@ -962,6 +962,42 @@ class AppLocalizationsHu extends AppLocalizations {
   String get priceHistory => 'Ártörténet';
 
   @override
+  String get ignoredStationsLabel => 'Mellőzött';
+
+  @override
+  String get ratingsLabel => 'Értékelések';
+
+  @override
+  String get favoritesDataCache => 'Kedvencek adatai';
+
+  @override
+  String get citySearchCache => 'Városkeresés';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Az adatok törlése nem érhető el a Közösségi módban. Először kapcsolódjon le, vagy használjon privát adatbázist.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count követett kút';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count beállítva';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count rejtett kút';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count értékelt kút';
+  }
+
+  @override
   String get noPriceHistory => 'Még nincs ártörténet';
 
   @override

@@ -961,6 +961,42 @@ class AppLocalizationsBg extends AppLocalizations {
   String get priceHistory => 'Ценова история';
 
   @override
+  String get ignoredStationsLabel => 'Игнорирани';
+
+  @override
+  String get ratingsLabel => 'Оценки';
+
+  @override
+  String get favoritesDataCache => 'Данни за любими';
+
+  @override
+  String get citySearchCache => 'Търсене на град';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Изтриването на данни не е достъпно в режим Общност. Първо прекъснете връзката или използвайте частна база данни.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count проследени станции';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count конфигурирани';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count скрити станции';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count оценени станции';
+  }
+
+  @override
   String get noPriceHistory => 'Все още няма ценова история';
 
   @override
