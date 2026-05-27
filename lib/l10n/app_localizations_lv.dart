@@ -5455,6 +5455,34 @@ class AppLocalizationsLv extends AppLocalizations {
       'Android lietotnē ilgi spiediet logrīku un izvēlieties Pārkonfigurēt, lai mainītu profilu, krāsu un saturu.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Turpmākās izvēles tiek piemērotas katram instalētajam logrīkam nākamajā atjaunināšanā.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Krāsu shēma';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Satura variants';
+
+  @override
+  String get widgetColorSchemeSystem => 'Sekot sistēmai';
+
+  @override
+  String get widgetColorSchemeLight => 'Gaišs';
+
+  @override
+  String get widgetColorSchemeDark => 'Tumšs';
+
+  @override
+  String get widgetColorSchemeBlue => 'Zils';
+
+  @override
+  String get widgetColorSchemeGreen => 'Zaļš';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranžs';
+
+  @override
   String get widgetVariantDefault => 'Tikai pašreizējā cena';
 
   @override

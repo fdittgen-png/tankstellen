@@ -5448,6 +5448,34 @@ class AppLocalizationsDe extends AppLocalizations {
       'Halte das Widget unter Android gedrückt und wähle „Neu konfigurieren“, um Profil, Farbe und Inhalt zu ändern.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Die untenstehenden Einstellungen gelten ab der nächsten Aktualisierung für alle installierten Widgets.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Farbschema';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Inhaltsvariante';
+
+  @override
+  String get widgetColorSchemeSystem => 'System folgen';
+
+  @override
+  String get widgetColorSchemeLight => 'Hell';
+
+  @override
+  String get widgetColorSchemeDark => 'Dunkel';
+
+  @override
+  String get widgetColorSchemeBlue => 'Blau';
+
+  @override
+  String get widgetColorSchemeGreen => 'Grün';
+
+  @override
+  String get widgetColorSchemeOrange => 'Orange';
+
+  @override
   String get widgetVariantDefault => 'Nur aktueller Preis';
 
   @override

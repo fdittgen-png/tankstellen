@@ -5439,6 +5439,34 @@ class AppLocalizationsHr extends AppLocalizations {
       'Na Androidu, dugo pritisnite widget i odaberite Rekonfiguriraj za promjenu profila, boje i sadržaja.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Izbori ispod primjenjuju se na svaki instalirani widget pri sljedećem osvježavanju.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Shema boja';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Varijanta sadržaja';
+
+  @override
+  String get widgetColorSchemeSystem => 'Slijedi sustav';
+
+  @override
+  String get widgetColorSchemeLight => 'Svijetla';
+
+  @override
+  String get widgetColorSchemeDark => 'Tamna';
+
+  @override
+  String get widgetColorSchemeBlue => 'Plava';
+
+  @override
+  String get widgetColorSchemeGreen => 'Zelena';
+
+  @override
+  String get widgetColorSchemeOrange => 'Narančasta';
+
+  @override
   String get widgetVariantDefault => 'Samo trenutna cijena';
 
   @override

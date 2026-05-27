@@ -5459,6 +5459,34 @@ class AppLocalizationsRo extends AppLocalizations {
       'Pe Android, apăsați lung pe widget și alegeți Reconfigurați pentru a modifica profilul, culoarea și conținutul.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Opțiunile de mai jos se aplică fiecărui widget instalat la următoarea reîmprospătare.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Schemă de culori';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Variantă de conținut';
+
+  @override
+  String get widgetColorSchemeSystem => 'Conform sistemului';
+
+  @override
+  String get widgetColorSchemeLight => 'Luminos';
+
+  @override
+  String get widgetColorSchemeDark => 'Întunecat';
+
+  @override
+  String get widgetColorSchemeBlue => 'Albastru';
+
+  @override
+  String get widgetColorSchemeGreen => 'Verde';
+
+  @override
+  String get widgetColorSchemeOrange => 'Portocaliu';
+
+  @override
   String get widgetVariantDefault => 'Numai prețul curent';
 
   @override

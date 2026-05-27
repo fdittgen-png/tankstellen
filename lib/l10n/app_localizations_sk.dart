@@ -5441,6 +5441,34 @@ class AppLocalizationsSk extends AppLocalizations {
       'Na Androide podržte widget a vyberte Nakonfigurovať pre zmenu profilu, farby a obsahu.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Voľby nižšie sa použijú na všetky nainštalované widgety pri ďalšom obnovení.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Farebná schéma';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Variant obsahu';
+
+  @override
+  String get widgetColorSchemeSystem => 'Podľa systému';
+
+  @override
+  String get widgetColorSchemeLight => 'Svetlá';
+
+  @override
+  String get widgetColorSchemeDark => 'Tmavá';
+
+  @override
+  String get widgetColorSchemeBlue => 'Modrá';
+
+  @override
+  String get widgetColorSchemeGreen => 'Zelená';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranžová';
+
+  @override
   String get widgetVariantDefault => 'Iba aktuálna cena';
 
   @override

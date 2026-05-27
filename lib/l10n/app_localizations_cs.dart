@@ -5426,6 +5426,34 @@ class AppLocalizationsCs extends AppLocalizations {
       'Na Androidu podržte widget a vyberte Překonfigurovat pro změnu profilu, barvy a obsahu.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Volby níže se použijí na všechny instalované widgety při příští aktualizaci.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Barevné schéma';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Varianta obsahu';
+
+  @override
+  String get widgetColorSchemeSystem => 'Systémové';
+
+  @override
+  String get widgetColorSchemeLight => 'Světlé';
+
+  @override
+  String get widgetColorSchemeDark => 'Tmavé';
+
+  @override
+  String get widgetColorSchemeBlue => 'Modré';
+
+  @override
+  String get widgetColorSchemeGreen => 'Zelené';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranžové';
+
+  @override
   String get widgetVariantDefault => 'Pouze aktuální cena';
 
   @override

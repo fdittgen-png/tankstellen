@@ -17,6 +17,42 @@
   },
   "widgetHelpConfigure": "On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.",
   "@widgetHelpConfigure": {
-    "description": "Help line explaining how to reconfigure the Android home-screen widget (#1806)."
+    "description": "Help line explaining how to reconfigure the Android home-screen widget (#1806). Shown only on fresh installs without an active profile; otherwise the in-app defaults editor (#2106) renders instead."
+  },
+  "widgetDefaultsApplyToAllHint": "Choices below apply to every installed widget on the next refresh.",
+  "@widgetDefaultsApplyToAllHint": {
+    "description": "#2106 — italicised hint above the in-Settings widget-defaults editor explaining the live-override semantics."
+  },
+  "widgetDefaultsColorLabel": "Colour scheme",
+  "@widgetDefaultsColorLabel": {
+    "description": "#2106 — label above the widget colour-scheme dropdown in Settings."
+  },
+  "widgetDefaultsVariantLabel": "Content variant",
+  "@widgetDefaultsVariantLabel": {
+    "description": "#2106 — label above the widget content-variant SegmentedButton in Settings."
+  },
+  "widgetColorSchemeSystem": "Follow system",
+  "@widgetColorSchemeSystem": {
+    "description": "#2106 — widget colour-scheme option that follows the OS dark/light mode."
+  },
+  "widgetColorSchemeLight": "Light",
+  "@widgetColorSchemeLight": {
+    "description": "#2106 — widget colour-scheme option (light background)."
+  },
+  "widgetColorSchemeDark": "Dark",
+  "@widgetColorSchemeDark": {
+    "description": "#2106 — widget colour-scheme option (dark background)."
+  },
+  "widgetColorSchemeBlue": "Blue",
+  "@widgetColorSchemeBlue": {
+    "description": "#2106 — widget colour-scheme option (blue accent)."
+  },
+  "widgetColorSchemeGreen": "Green",
+  "@widgetColorSchemeGreen": {
+    "description": "#2106 — widget colour-scheme option (green accent)."
+  },
+  "widgetColorSchemeOrange": "Orange",
+  "@widgetColorSchemeOrange": {
+    "description": "#2106 — widget colour-scheme option (orange accent)."
   }
 }

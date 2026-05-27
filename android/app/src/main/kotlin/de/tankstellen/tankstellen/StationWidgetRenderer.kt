@@ -83,7 +83,15 @@ object StationWidgetRenderer {
      */
     fun getColorScheme(context: Context, appWidgetId: Int): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getString("$COLOR_KEY_PREFIX$appWidgetId", DEFAULT_COLOR_SCHEME)
+        // #2106 — global `default_color` (set by Flutter
+        // `home_widget_service` from the active profile's
+        // `widgetColorScheme`) is the new source of truth. The
+        // per-widget `color_<id>` value is kept as a fallback so the
+        // Reconfigure activity's existing overrides keep working for
+        // users who tuned a single widget.
+        val perWidget = prefs.getString("$COLOR_KEY_PREFIX$appWidgetId", null)
+        if (perWidget != null) return perWidget
+        return prefs.getString("default_color", DEFAULT_COLOR_SCHEME)
             ?: DEFAULT_COLOR_SCHEME
     }
 
@@ -99,7 +107,11 @@ object StationWidgetRenderer {
      */
     fun getVariant(context: Context, appWidgetId: Int): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getString("$VARIANT_KEY_PREFIX$appWidgetId", DEFAULT_VARIANT)
+        // #2106 — see [getColorScheme]; mirrored fallback chain
+        // (per-widget override wins, global default fills the gap).
+        val perWidget = prefs.getString("$VARIANT_KEY_PREFIX$appWidgetId", null)
+        if (perWidget != null) return perWidget
+        return prefs.getString("default_variant", DEFAULT_VARIANT)
             ?: DEFAULT_VARIANT
     }
 

@@ -5462,6 +5462,34 @@ class AppLocalizationsEs extends AppLocalizations {
       'En Android, mantén pulsado el widget y elige Reconfigurar para cambiar el perfil, el color y el contenido.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Las opciones de abajo se aplican a cada widget instalado en la próxima actualización.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Esquema de color';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Variante de contenido';
+
+  @override
+  String get widgetColorSchemeSystem => 'Seguir sistema';
+
+  @override
+  String get widgetColorSchemeLight => 'Claro';
+
+  @override
+  String get widgetColorSchemeDark => 'Oscuro';
+
+  @override
+  String get widgetColorSchemeBlue => 'Azul';
+
+  @override
+  String get widgetColorSchemeGreen => 'Verde';
+
+  @override
+  String get widgetColorSchemeOrange => 'Naranja';
+
+  @override
   String get widgetVariantDefault => 'Solo el precio actual';
 
   @override

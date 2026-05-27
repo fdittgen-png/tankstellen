@@ -3,5 +3,14 @@
   "widgetHelpIntro": "Füge das SparKilo-Widget zu deinem Startbildschirm hinzu, um Sprit- und Ladepreise auf einen Blick zu sehen.",
   "widgetHelpAdd": "Füge es über die Widget-Auswahl deines Launchers hinzu — halte einen leeren Bereich des Startbildschirms gedrückt, wähle „Widgets“ und suche SparKilo.",
   "widgetHelpTap": "Tippe im Widget auf eine Station, um sie in der App zu öffnen. Tippe auf das Aktualisieren-Symbol, um die Preise zu aktualisieren.",
-  "widgetHelpConfigure": "Halte das Widget unter Android gedrückt und wähle „Neu konfigurieren“, um Profil, Farbe und Inhalt zu ändern."
+  "widgetHelpConfigure": "Halte das Widget unter Android gedrückt und wähle „Neu konfigurieren“, um Profil, Farbe und Inhalt zu ändern.",
+  "widgetDefaultsApplyToAllHint": "Die untenstehenden Einstellungen gelten ab der nächsten Aktualisierung für alle installierten Widgets.",
+  "widgetDefaultsColorLabel": "Farbschema",
+  "widgetDefaultsVariantLabel": "Inhaltsvariante",
+  "widgetColorSchemeSystem": "System folgen",
+  "widgetColorSchemeLight": "Hell",
+  "widgetColorSchemeDark": "Dunkel",
+  "widgetColorSchemeBlue": "Blau",
+  "widgetColorSchemeGreen": "Grün",
+  "widgetColorSchemeOrange": "Orange"
 }

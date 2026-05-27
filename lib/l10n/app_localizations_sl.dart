@@ -5425,6 +5425,34 @@ class AppLocalizationsSl extends AppLocalizations {
       'Na Androidu dolgo pritisnite pripomoček in izberite Konfiguriraj za spremembo profila, barve in vsebine.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Spodnje izbire veljajo za vsak nameščen pripomoček ob naslednji osvežitvi.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Barvna shema';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Različica vsebine';
+
+  @override
+  String get widgetColorSchemeSystem => 'Sledi sistemu';
+
+  @override
+  String get widgetColorSchemeLight => 'Svetla';
+
+  @override
+  String get widgetColorSchemeDark => 'Temna';
+
+  @override
+  String get widgetColorSchemeBlue => 'Modra';
+
+  @override
+  String get widgetColorSchemeGreen => 'Zelena';
+
+  @override
+  String get widgetColorSchemeOrange => 'Oranžna';
+
+  @override
   String get widgetVariantDefault => 'Samo trenutna cena';
 
   @override

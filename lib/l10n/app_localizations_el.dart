@@ -5471,6 +5471,34 @@ class AppLocalizationsEl extends AppLocalizations {
       'Στο Android, πατήστε παρατεταμένα το widget και επιλέξτε Επαναρύθμιση για αλλαγή προφίλ, χρώματος και περιεχομένου.';
 
   @override
+  String get widgetDefaultsApplyToAllHint =>
+      'Οι επιλογές παρακάτω εφαρμόζονται σε κάθε εγκατεστημένο widget στην επόμενη ανανέωση.';
+
+  @override
+  String get widgetDefaultsColorLabel => 'Χρωματικό σχήμα';
+
+  @override
+  String get widgetDefaultsVariantLabel => 'Παραλλαγή περιεχομένου';
+
+  @override
+  String get widgetColorSchemeSystem => 'Σύστημα';
+
+  @override
+  String get widgetColorSchemeLight => 'Φωτεινό';
+
+  @override
+  String get widgetColorSchemeDark => 'Σκούρο';
+
+  @override
+  String get widgetColorSchemeBlue => 'Μπλε';
+
+  @override
+  String get widgetColorSchemeGreen => 'Πράσινο';
+
+  @override
+  String get widgetColorSchemeOrange => 'Πορτοκαλί';
+
+  @override
   String get widgetVariantDefault => 'Μόνο τρέχουσα τιμή';
 
   @override
