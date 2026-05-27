@@ -323,6 +323,15 @@ class AppLocalizationsLt extends AppLocalizations {
       'Podėlis saugo API atsakymus greitesniam įkėlimui ir prieigai neprisijungus.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Tinklas';
+
+  @override
+  String get cacheTtlGroupData => 'Duomenys';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodavimas';
+
+  @override
   String get stationSearch => 'Stočių paieška';
 
   @override
@@ -4192,6 +4201,14 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Nuskaitykite degalų siurblio ekraną, kad iš anksto užpildytumėte formą. Atpažinimas šiandien nepatikimas — įjunkite tik jei norite išbandyti.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Kūrėjo atsiliepimai (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Įjungia nepavykusio nuskaitymo atsiliepimų skydelį, kuris su Personal Access Token automatiškai sukuria GitHub problemas. Pažangių vartotojų / talkininkų funkcija.';
 
   @override
   String get feedbackConsentTitle => 'Siųsti ataskaitą į GitHub?';

@@ -323,6 +323,15 @@ class AppLocalizationsSl extends AppLocalizations {
       'Predpomnilnik shranjuje API odgovore za hitrejše nalaganje in dostop brez povezave.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Omrežje';
+
+  @override
+  String get cacheTtlGroupData => 'Podatki';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodiranje';
+
+  @override
   String get stationSearch => 'Iskanje postaj';
 
   @override
@@ -4173,6 +4182,14 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Skenirajte zaslon točilne črpalke za vnaprejšnje izpolnjevanje obrazca. Prepoznavanje je danes nezanesljivo — vklopite samo, če želite preizkusiti.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Razvijalska povratna informacija (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Omogoča ploščo povratnih informacij za neuspešna skeniranja, ki s Personal Access Tokenom samodejno ustvarja težave v GitHubu. Funkcija za napredne uporabnike / sodelavce.';
 
   @override
   String get feedbackConsentTitle => 'Poslati poročilo na GitHub?';

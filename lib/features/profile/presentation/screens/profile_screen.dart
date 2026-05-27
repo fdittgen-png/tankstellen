@@ -109,15 +109,19 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 8),
           ],
 
-          // #952 phase 3 — bad-scan reporter PAT entry. Closed by
-          // default; users without a token continue to use the
-          // SharePlus fallback.
-          _FoldableSection(
-            icon: Icons.bug_report_outlined,
-            title: l?.feedbackTokenSectionTitle ?? 'Bad-scan feedback (GitHub)',
-            child: const FeedbackTokenSection(),
-          ),
-          const SizedBox(height: 8),
+          // #952 phase 3 + #2116-6 — bad-scan reporter PAT entry,
+          // gated behind `Feature.developerPatToken` (default off).
+          // 99 % of users never paste a token; the SharePlus fallback
+          // covers them. Power users opt in via Feature management.
+          if (enabledFlags.contains(Feature.developerPatToken)) ...[
+            _FoldableSection(
+              icon: Icons.bug_report_outlined,
+              title:
+                  l?.feedbackTokenSectionTitle ?? 'Bad-scan feedback (GitHub)',
+              child: const FeedbackTokenSection(),
+            ),
+            const SizedBox(height: 8),
+          ],
 
           // API Key — closed by default (unchanged).
           _FoldableSection(

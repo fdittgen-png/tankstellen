@@ -154,4 +154,11 @@ enum Feature {
   /// Power users can flip it on from Feature management to try it; the
   /// flag will be flipped on by default once the model matures.
   addFillUpOcrPump,
+
+  /// Developer-mode GitHub PAT entry for bad-scan reports (#2116-6).
+  /// Default-off — 99 % of users will never paste a GitHub Personal
+  /// Access Token, and the SharePlus fallback already covers them.
+  /// Power users / contributors flip this on from Feature management
+  /// to surface the PAT panel + auto-file scan-failure issues.
+  developerPatToken,
 }

@@ -323,6 +323,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Cache speichert API-Antworten für schnellere Ladezeiten und Offline-Zugriff.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Netzwerk';
+
+  @override
+  String get cacheTtlGroupData => 'Daten';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodierung';
+
+  @override
   String get stationSearch => 'Tankstellen-Suche';
 
   @override
@@ -4192,6 +4201,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Scannen Sie eine Zapfsäulenanzeige, um das Formular vorauszufüllen. Die Erkennung ist heute unzuverlässig — aktivieren Sie nur, wenn Sie testen möchten.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Entwickler-Feedback (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktiviert das Fehler-Scan-Feedback-Panel, das mit einem Personal Access Token automatisch GitHub-Issues anlegt. Power-User-/Mitwirkenden-Funktion.';
 
   @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';

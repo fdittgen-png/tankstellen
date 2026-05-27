@@ -534,6 +534,9 @@ String _featureLabel(AppLocalizations? l, Feature f) {
     case Feature.addFillUpOcrPump:
       return l?.featureLabel_addFillUpOcrPump ??
           'Pump display OCR (experimental)';
+    case Feature.developerPatToken:
+      return l?.featureLabel_developerPatToken ??
+          'Developer feedback (GitHub PAT)';
   }
 }
 
@@ -626,6 +629,11 @@ String _featureDescription(AppLocalizations? l, Feature f) {
       return l?.featureDescription_addFillUpOcrPump ??
           'Scan a fuel pump display to pre-fill the form. Recognition '
               'is unreliable today — opt in only if you want to test.';
+    case Feature.developerPatToken:
+      return l?.featureDescription_developerPatToken ??
+          'Enable the bad-scan feedback panel that auto-files GitHub '
+              'issues with a Personal Access Token. Power-user / '
+              'contributor feature.';
   }
 }
 
@@ -681,6 +689,7 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.obd2Optional:
     case Feature.addFillUpOcrReceipt:
     case Feature.addFillUpOcrPump:
+    case Feature.developerPatToken:
       return 'Prerequisites not met';
   }
 }

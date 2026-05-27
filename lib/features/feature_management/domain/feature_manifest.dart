@@ -111,27 +111,9 @@ class FeatureManifest {
     };
   }
 
-  /// Authoritative manifest used at runtime. Defaults match TODAY's
-  /// scattered-toggle behaviour:
-  /// - `obd2TripRecording`: false (matches `VehicleProfile.autoRecord`)
-  /// - `gamification`: true (matches `UserProfile.gamificationEnabled`)
-  /// - `hapticEcoCoach`: false (off by default; explicit opt-in)
-  /// - `tankSync`: false (off until user signs in)
-  /// - `consumptionAnalytics`: false (no trips → no tab)
-  /// - `baselineSync`: false (off until TankSync is enabled)
-  /// - `priceAlerts`, `priceHistory`, `routePlanning`, `evCharging`: true
-  /// - `glideCoach`: false (future feature, opt-in)
-  /// - `gpsTripPath`: true (#1981 — a GPS track is true road distance,
-  ///   which makes the consumption figure accurate; #1979)
-  /// - `showFuel`, `showElectric`: true (#1373 phase 3c — both
-  ///   surfaces visible by default; mirrors the historical
-  ///   `UserProfile.showFuel` / `showElectric` defaults so existing
-  ///   users see no behaviour change post-migration)
-  /// - `showConsumptionTab`: true with `requires: {obd2TripRecording}`
-  ///   (#1373 phase 3c — the consumption analytics tab has nothing
-  ///   to render without trip data, so the dependency edge guards
-  ///   against an empty surface; default-true mirrors the wrap-not-
-  ///   replace shape used for `autoRecord` in phase 3d)
+  /// Authoritative manifest used at runtime. Each entry's `defaultOn`
+  /// argument is the source of truth; the inline comments on each
+  /// entry below carry the rationale + issue references.
   static const FeatureManifest defaultManifest = FeatureManifest({
     Feature.obd2TripRecording: FeatureManifestEntry.allChannels(
       feature: Feature.obd2TripRecording,
@@ -394,6 +376,16 @@ class FeatureManifest {
       description:
           'Scan a fuel pump display to pre-fill the form. Recognition '
               'is unreliable today — opt in only if you want to test.',
+    ),
+    // Default-off (#2116-6): the PAT entry is power-user / contributor
+    // territory. SharePlus fallback covers everyone else.
+    Feature.developerPatToken: FeatureManifestEntry.allChannels(
+      feature: Feature.developerPatToken,
+      defaultOn: false,
+      displayName: 'Developer feedback (GitHub PAT)',
+      description:
+          'Enable the bad-scan feedback panel that auto-files GitHub '
+              'issues with a Personal Access Token.',
     ),
   });
 }

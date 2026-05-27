@@ -323,6 +323,15 @@ class AppLocalizationsDa extends AppLocalizations {
       'Cachen gemmer API-svar for hurtigere indlæsning og offline adgang.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Netværk';
+
+  @override
+  String get cacheTtlGroupData => 'Data';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodning';
+
+  @override
   String get stationSearch => 'Stationssøgning';
 
   @override
@@ -4168,6 +4177,13 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Scan et brændstofpumpedisplay for at forudfylde formularen. Genkendelsen er upålidelig i dag — tilmeld dig kun, hvis du vil teste.';
+
+  @override
+  String get featureLabel_developerPatToken => 'Udvikler-feedback (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktiverer feedback-panelet for fejlskanninger, der automatisk opretter GitHub-issues med en Personal Access Token. Funktion for avancerede brugere/bidragsydere.';
 
   @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';

@@ -42,6 +42,47 @@ void main() {
 
       expect(find.text('No storage used'), findsOneWidget);
     });
+
+    testWidgets('renders a legend that names every visible segment (#2116)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        StorageBar(
+          segments: const [
+            StorageSegment('Settings', 500, Colors.blue),
+            StorageSegment('Cache', 1500, Colors.red),
+          ],
+          totalBytes: 2000,
+          theme: testTheme,
+        ),
+      );
+
+      // The legend lives under the bar; each visible segment gets a
+      // swatch + label pair, so the colours stop being arbitrary.
+      expect(find.byKey(const Key('storage_bar_legend')), findsOneWidget);
+      expect(find.text('Settings'), findsOneWidget);
+      expect(find.text('Cache'), findsOneWidget);
+    });
+
+    testWidgets(
+        'legend omits segments whose share is below 1% of total (#2116)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        StorageBar(
+          segments: const [
+            StorageSegment('Big', 9990, Colors.green),
+            StorageSegment('Tiny', 10, Colors.purple), // 0.1 % → hidden
+          ],
+          totalBytes: 10000,
+          theme: testTheme,
+        ),
+      );
+
+      expect(find.byKey(const Key('storage_bar_legend')), findsOneWidget);
+      expect(find.text('Big'), findsOneWidget);
+      expect(find.text('Tiny'), findsNothing);
+    });
   });
 
   group('StorageDetailRow', () {

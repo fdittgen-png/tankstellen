@@ -324,6 +324,15 @@ class AppLocalizationsPt extends AppLocalizations {
       'A cache armazena respostas API para carregamento mais rápido e acesso offline.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Rede';
+
+  @override
+  String get cacheTtlGroupData => 'Dados';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geocodificação';
+
+  @override
   String get stationSearch => 'Pesquisa de postos';
 
   @override
@@ -4199,6 +4208,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Digitalize o display de uma bomba de combustível para preencher o formulário. O reconhecimento é hoje pouco confiável — ative apenas se quiser testar.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Feedback de desenvolvedor (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Ativa o painel de feedback para scans com falha que cria automaticamente issues no GitHub com um Personal Access Token. Função para usuários avançados / colaboradores.';
 
   @override
   String get feedbackConsentTitle => 'Enviar relatório para o GitHub?';

@@ -324,6 +324,15 @@ class AppLocalizationsRo extends AppLocalizations {
       'Cache-ul stochează răspunsuri API pentru încărcare mai rapidă și acces offline.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Rețea';
+
+  @override
+  String get cacheTtlGroupData => 'Date';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geocodare';
+
+  @override
   String get stationSearch => 'Căutare benzinării';
 
   @override
@@ -4198,6 +4207,14 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Scanați afișajul unei pompe de carburant pentru a precompleta formularul. Recunoașterea nu este fiabilă astăzi — activați doar dacă doriți să testați.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Feedback dezvoltator (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Activează panoul de feedback pentru scanări eșuate care creează automat issues pe GitHub cu un Personal Access Token. Funcție pentru utilizatori avansați / contribuitori.';
 
   @override
   String get feedbackConsentTitle => 'Trimiteți raportul pe GitHub?';

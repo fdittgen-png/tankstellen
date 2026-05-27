@@ -324,6 +324,15 @@ class AppLocalizationsNl extends AppLocalizations {
       'De cache slaat API-antwoorden op voor sneller laden en offline toegang.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Netwerk';
+
+  @override
+  String get cacheTtlGroupData => 'Gegevens';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geocodering';
+
+  @override
   String get stationSearch => 'Stations zoeken';
 
   @override
@@ -4185,6 +4194,14 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Scan een tankpompdisplay om het formulier vooraf in te vullen. Herkenning is vandaag onbetrouwbaar — schakel alleen in als je wilt testen.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Ontwikkelaarsfeedback (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Schakelt het feedbackpaneel voor mislukte scans in dat met een Personal Access Token automatisch GitHub-issues aanmaakt. Functie voor gevorderde gebruikers / bijdragers.';
 
   @override
   String get feedbackConsentTitle => 'Rapport versturen naar GitHub?';

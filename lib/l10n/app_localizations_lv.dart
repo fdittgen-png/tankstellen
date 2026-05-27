@@ -323,6 +323,15 @@ class AppLocalizationsLv extends AppLocalizations {
       'Kešatmiņa saglabā API atbildes ātrākai ielādei un bezsaistes piekļuvei.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Tīkls';
+
+  @override
+  String get cacheTtlGroupData => 'Dati';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Ģeokodēšana';
+
+  @override
   String get stationSearch => 'Staciju meklēšana';
 
   @override
@@ -4198,6 +4207,14 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Skenējiet degvielas sūkņa displeju, lai iepriekš aizpildītu veidlapu. Atpazīšana šodien nav uzticama — ieslēdziet tikai tad, ja vēlaties pārbaudīt.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Izstrādātāja atsauksmes (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Iespējo neveiksmīgu skenējumu atsauksmju paneli, kas ar Personal Access Token automātiski izveido GitHub problēmas. Pieredzējušu lietotāju / līdzdalībnieku funkcija.';
 
   @override
   String get feedbackConsentTitle => 'Nosūtīt ziņojumu uz GitHub?';

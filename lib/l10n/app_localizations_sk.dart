@@ -323,6 +323,15 @@ class AppLocalizationsSk extends AppLocalizations {
       'Vyrovnávacia pamäť ukladá odpovede API pre rýchlejšie načítanie a offline prístup.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Sieť';
+
+  @override
+  String get cacheTtlGroupData => 'Dáta';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokódovanie';
+
+  @override
   String get stationSearch => 'Vyhľadávanie staníc';
 
   @override
@@ -4187,6 +4196,14 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Naskenujte displej palivovej pumpy a predvyplňte formulár. Rozpoznávanie je dnes nespoľahlivé — aktivujte iba ak chcete testovať.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Vývojárska spätná väzba (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktivuje panel spätnej väzby pre neúspešné skenovanie, ktorý automaticky vytvára GitHub issues s Personal Access Tokenom. Funkcia pre pokročilých používateľov / prispievateľov.';
 
   @override
   String get feedbackConsentTitle => 'Odoslať hlásenie na GitHub?';

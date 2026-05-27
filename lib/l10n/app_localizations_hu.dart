@@ -324,6 +324,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'A gyorsítótár API-válaszokat tárol a gyorsabb betöltés és offline hozzáférés érdekében.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Hálózat';
+
+  @override
+  String get cacheTtlGroupData => 'Adatok';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokódolás';
+
+  @override
   String get stationSearch => 'Kútkeresés';
 
   @override
@@ -4202,6 +4211,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get featureDescription_addFillUpOcrPump =>
       'Olvasson be egy üzemanyagkút kijelzőjét az űrlap előre kitöltéséhez. A felismerés ma megbízhatatlan — csak akkor kapcsolja be, ha tesztelni szeretné.';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      'Fejlesztői visszajelzés (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Bekapcsolja a hibás szkenneléshez tartozó visszajelzési panelt, amely Personal Access Tokennel automatikusan létrehoz GitHub-issue-kat. Haladó felhasználói / közreműködői funkció.';
 
   @override
   String get feedbackConsentTitle => 'Elküldi a jelentést GitHub-ra?';
