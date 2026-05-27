@@ -46,9 +46,20 @@ class UserDataSync {
           .eq('reporter_id', userId);
       final itineraries =
           await client.from('itineraries').select().eq('user_id', userId);
+      // #2107 — surface trip sync state in "My server data".
+      // Summaries are the canonical row-per-trip count; details are
+      // queried only for size accounting (the encoder weighs both).
+      // Both tables tolerate a missing row (RLS would return an empty
+      // list on a fresh account).
+      final tripSummaries = await client
+          .from('trip_summaries')
+          .select()
+          .eq('user_id', userId);
+      final tripDetails =
+          await client.from('trip_details').select().eq('user_id', userId);
 
       debugPrint('UserDataSync.fetchAll: favorites=${favorites.length}, '
-          'alerts=${alerts.length}');
+          'alerts=${alerts.length}, trips=${tripSummaries.length}');
 
       return {
         'favorites': favorites,
@@ -56,6 +67,8 @@ class UserDataSync {
         'push_tokens': pushTokens,
         'reports': reports,
         'itineraries': itineraries,
+        'trip_summaries': tripSummaries,
+        'trip_details': tripDetails,
       };
     } catch (e, st) {
       debugPrint('UserDataSync.fetchAll FAILED: $e\n$st');

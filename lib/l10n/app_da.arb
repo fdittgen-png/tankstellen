@@ -340,6 +340,7 @@
   "syncedData": "Synkroniserede data",
   "pushTokens": "Push-tokens",
   "priceReports": "Prisrapporter",
+  "syncedTrips": "Ture",
   "totalItems": "Antal elementer",
   "estimatedSize": "Estimeret størrelse",
   "viewRawJson": "Se rådata som JSON",

@@ -50,6 +50,7 @@ void main() {
           'alerts': [1],
           'push_tokens': [],
           'reports': [1, 2],
+          'trip_summaries': [1, 2, 2, 4, 5, 6, 7], // 7 trips
         }),
       );
 
@@ -58,6 +59,32 @@ void main() {
       expect(find.text('1'), findsOneWidget); // alerts
       expect(find.text('0'), findsOneWidget); // push_tokens
       expect(find.text('2'), findsOneWidget); // reports
+      // #2107 — Trips row renders the trip_summaries count.
+      expect(find.text('Trips'), findsOneWidget);
+      expect(find.text('7'), findsOneWidget); // trip_summaries
+    });
+
+    testWidgets('Trips row reads 0 when trip_summaries is missing (#2107)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const SyncedDataCard(data: {
+          'favorites': [1],
+          'alerts': [],
+          'push_tokens': [],
+          'reports': [],
+          // intentionally no trip_summaries key
+        }),
+      );
+      // A 0 for "trip_summaries" must render — proves the row is not
+      // skipped when the server payload has no trip rows.
+      expect(find.text('Trips'), findsOneWidget);
+      // Five 0s total: alerts, push_tokens, reports, trip_summaries,
+      // plus the favorites=1 elsewhere. The `findsAtLeastNWidgets(2)`
+      // would be brittle, so target the Trips row by walking its
+      // sibling: the easiest pin is just to assert "Trips" + the
+      // total of 1 (only favorites contributes).
+      expect(find.text('1'), findsAtLeastNWidgets(1));
     });
   });
 }

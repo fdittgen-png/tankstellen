@@ -1058,6 +1058,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get priceReports => 'Price reports';
 
   @override
+  String get syncedTrips => 'Trips';
+
+  @override
   String get totalItems => 'Total items';
 
   @override
@@ -6413,6 +6416,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get priceReports => '⟦Ƥřîçé řéƥóřŧš ·····⟧';
+
+  @override
+  String get syncedTrips => '⟦Ŧřîƥš ··⟧';
 
   @override
   String get totalItems => '⟦Ŧóŧáł îŧéɱš ·····⟧';

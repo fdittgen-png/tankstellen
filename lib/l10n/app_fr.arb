@@ -486,6 +486,7 @@
   "syncedData": "Données synchronisées",
   "pushTokens": "Jetons push",
   "priceReports": "Signalements de prix",
+  "syncedTrips": "Trajets",
   "totalItems": "Total éléments",
   "estimatedSize": "Taille estimée",
   "viewRawJson": "Voir les données brutes en JSON",

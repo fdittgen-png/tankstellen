@@ -458,6 +458,7 @@
   "syncedData": "Synchronisierte Daten",
   "pushTokens": "Push-Tokens",
   "priceReports": "Preismeldungen",
+  "syncedTrips": "Fahrten",
   "totalItems": "Einträge gesamt",
   "estimatedSize": "Geschätzte Größe",
   "viewRawJson": "Rohdaten als JSON anzeigen",

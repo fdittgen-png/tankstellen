@@ -1070,6 +1070,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get priceReports => 'Hlásenia cien';
 
   @override
+  String get syncedTrips => 'Cesty';
+
+  @override
   String get totalItems => 'Celkom položiek';
 
   @override

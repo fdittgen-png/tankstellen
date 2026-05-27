@@ -1068,6 +1068,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get priceReports => 'Kainų pranešimai';
 
   @override
+  String get syncedTrips => 'Kelionės';
+
+  @override
   String get totalItems => 'Iš viso elementų';
 
   @override

@@ -477,6 +477,7 @@
   "syncedData": "Synced data",
   "pushTokens": "Push tokens",
   "priceReports": "Price reports",
+  "syncedTrips": "Trips",
   "totalItems": "Total items",
   "estimatedSize": "Estimated size",
   "viewRawJson": "View raw data as JSON",

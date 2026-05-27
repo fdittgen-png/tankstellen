@@ -1063,6 +1063,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get priceReports => 'Prijave cen';
 
   @override
+  String get syncedTrips => 'Potovanja';
+
+  @override
   String get totalItems => 'Skupaj elementov';
 
   @override

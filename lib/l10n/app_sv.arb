@@ -340,6 +340,7 @@
   "syncedData": "Synkroniserad data",
   "pushTokens": "Push-tokens",
   "priceReports": "Prisrapporter",
+  "syncedTrips": "Resor",
   "totalItems": "Totalt antal",
   "estimatedSize": "Uppskattad storlek",
   "viewRawJson": "Visa rådata som JSON",

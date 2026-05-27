@@ -340,6 +340,7 @@
   "syncedData": "Синхронизирани данни",
   "pushTokens": "Push токени",
   "priceReports": "Ценови доклади",
+  "syncedTrips": "Пътувания",
   "totalItems": "Общо елементи",
   "estimatedSize": "Приблизителен размер",
   "viewRawJson": "Преглед на необработени данни като JSON",

@@ -1072,6 +1072,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get priceReports => 'Signalements de prix';
 
   @override
+  String get syncedTrips => 'Trajets';
+
+  @override
   String get totalItems => 'Total éléments';
 
   @override

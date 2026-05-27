@@ -340,6 +340,7 @@
   "syncedData": "Συγχρονισμένα δεδομένα",
   "pushTokens": "Push tokens",
   "priceReports": "Αναφορές τιμών",
+  "syncedTrips": "Διαδρομές",
   "totalItems": "Σύνολο στοιχείων",
   "estimatedSize": "Εκτιμώμενο μέγεθος",
   "viewRawJson": "Προβολή ακατέργαστων δεδομένων ως JSON",

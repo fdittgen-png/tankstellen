@@ -1066,6 +1066,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get priceReports => 'Prisrapporter';
 
   @override
+  String get syncedTrips => 'Ture';
+
+  @override
   String get totalItems => 'Antal elementer';
 
   @override

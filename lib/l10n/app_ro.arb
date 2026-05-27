@@ -340,6 +340,7 @@
   "syncedData": "Date sincronizate",
   "pushTokens": "Tokeni push",
   "priceReports": "Rapoarte de prețuri",
+  "syncedTrips": "Călătorii",
   "totalItems": "Total elemente",
   "estimatedSize": "Dimensiune estimată",
   "viewRawJson": "Vezi date brute ca JSON",

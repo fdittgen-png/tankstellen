@@ -1069,6 +1069,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get priceReports => 'Hlášení cen';
 
   @override
+  String get syncedTrips => 'Cesty';
+
+  @override
   String get totalItems => 'Celkem položek';
 
   @override

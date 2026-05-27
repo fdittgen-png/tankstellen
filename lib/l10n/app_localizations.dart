@@ -2097,6 +2097,12 @@ abstract class AppLocalizations {
   /// **'Price reports'**
   String get priceReports;
 
+  /// No description provided for @syncedTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get syncedTrips;
+
   /// No description provided for @totalItems.
   ///
   /// In en, this message translates to:

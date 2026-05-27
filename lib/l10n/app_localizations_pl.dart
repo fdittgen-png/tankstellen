@@ -1069,6 +1069,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get priceReports => 'Zgłoszenia cen';
 
   @override
+  String get syncedTrips => 'Podróże';
+
+  @override
   String get totalItems => 'Łącznie pozycji';
 
   @override

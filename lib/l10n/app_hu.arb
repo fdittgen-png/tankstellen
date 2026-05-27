@@ -340,6 +340,7 @@
   "syncedData": "Szinkronizált adatok",
   "pushTokens": "Push tokenek",
   "priceReports": "Árjelentések",
+  "syncedTrips": "Utak",
   "totalItems": "Összes elem",
   "estimatedSize": "Becsült méret",
   "viewRawJson": "Nyers adatok megtekintése JSON-ként",
