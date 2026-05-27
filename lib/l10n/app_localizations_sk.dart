@@ -4198,6 +4198,14 @@ class AppLocalizationsSk extends AppLocalizations {
       'Naskenujte displej palivovej pumpy a predvyplňte formulár. Rozpoznávanie je dnes nespoľahlivé — aktivujte iba ak chcete testovať.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Vývojárska spätná väzba (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktivuje panel spätnej väzby pre neúspešné skenovanie, ktorý automaticky vytvára GitHub issues s Personal Access Tokenom. Funkcia pre pokročilých používateľov / prispievateľov.';
+
+  @override
   String get feedbackConsentTitle => 'Odoslať hlásenie na GitHub?';
 
   @override

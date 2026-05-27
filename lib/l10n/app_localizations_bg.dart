@@ -4213,6 +4213,13 @@ class AppLocalizationsBg extends AppLocalizations {
       'Сканирайте дисплея на колонката, за да попълните формуляра. Разпознаването е ненадеждно днес — активирайте само ако искате да тествате.';
 
   @override
+  String get featureLabel_developerPatToken => 'Разработчик: GitHub PAT';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Активира панела за обратна връзка при неуспешен скан, който автоматично създава GitHub issues с Personal Access Token. За опитни потребители/сътрудници.';
+
+  @override
   String get feedbackConsentTitle => 'Изпращане на доклад в GitHub?';
 
   @override

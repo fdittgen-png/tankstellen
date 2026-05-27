@@ -4179,6 +4179,13 @@ class AppLocalizationsDa extends AppLocalizations {
       'Scan et brændstofpumpedisplay for at forudfylde formularen. Genkendelsen er upålidelig i dag — tilmeld dig kun, hvis du vil teste.';
 
   @override
+  String get featureLabel_developerPatToken => 'Udvikler-feedback (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktiverer feedback-panelet for fejlskanninger, der automatisk opretter GitHub-issues med en Personal Access Token. Funktion for avancerede brugere/bidragsydere.';
+
+  @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';
 
   @override

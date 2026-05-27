@@ -4209,6 +4209,14 @@ class AppLocalizationsLv extends AppLocalizations {
       'Skenējiet degvielas sūkņa displeju, lai iepriekš aizpildītu veidlapu. Atpazīšana šodien nav uzticama — ieslēdziet tikai tad, ja vēlaties pārbaudīt.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Izstrādātāja atsauksmes (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Iespējo neveiksmīgu skenējumu atsauksmju paneli, kas ar Personal Access Token automātiski izveido GitHub problēmas. Pieredzējušu lietotāju / līdzdalībnieku funkcija.';
+
+  @override
   String get feedbackConsentTitle => 'Nosūtīt ziņojumu uz GitHub?';
 
   @override

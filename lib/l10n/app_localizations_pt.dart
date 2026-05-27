@@ -4210,6 +4210,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Digitalize o display de uma bomba de combustível para preencher o formulário. O reconhecimento é hoje pouco confiável — ative apenas se quiser testar.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Feedback de desenvolvedor (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Ativa o painel de feedback para scans com falha que cria automaticamente issues no GitHub com um Personal Access Token. Função para usuários avançados / colaboradores.';
+
+  @override
   String get feedbackConsentTitle => 'Enviar relatório para o GitHub?';
 
   @override

@@ -4224,6 +4224,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Scannez l\'afficheur d\'une pompe à carburant pour pré-remplir le formulaire. La reconnaissance n\'est pas fiable aujourd\'hui — activez uniquement si vous voulez tester.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Retour développeur (PAT GitHub)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Active le panneau de retour pour les scans en échec qui crée automatiquement des issues GitHub à partir d\'un Personal Access Token. Fonction pour utilisateurs avancés / contributeurs.';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

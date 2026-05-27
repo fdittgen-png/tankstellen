@@ -4180,6 +4180,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Skanna en bränslepumpsdisplay för att förfylla formuläret. Igenkänningen är opålitlig idag — aktivera endast om du vill testa.';
 
   @override
+  String get featureLabel_developerPatToken => 'Utvecklarfeedback (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktiverar feedbackpanelen för misslyckade skanningar som automatiskt skapar GitHub-issues med en Personal Access Token. Funktion för avancerade användare / bidragsgivare.';
+
+  @override
   String get feedbackConsentTitle => 'Skicka rapport till GitHub?';
 
   @override

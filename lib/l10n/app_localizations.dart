@@ -7569,6 +7569,18 @@ abstract class AppLocalizations {
   /// **'Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.'**
   String get featureDescription_addFillUpOcrPump;
 
+  /// Settings toggle label for the bad-scan-feedback PAT panel (#2116-6). Default-off — most users never paste a token.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer feedback (GitHub PAT)'**
+  String get featureLabel_developerPatToken;
+
+  /// Settings toggle description for the bad-scan-feedback PAT panel (#2116-6).
+  ///
+  /// In en, this message translates to:
+  /// **'Enable the bad-scan feedback panel that auto-files GitHub issues with a Personal Access Token. Power-user / contributor feature.'**
+  String get featureDescription_developerPatToken;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

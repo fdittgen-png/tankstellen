@@ -4196,6 +4196,13 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zeskanuj wyświetlacz dystrybutora paliwa, aby wstępnie wypełnić formularz. Rozpoznawanie jest dziś nierzetelne — włącz tylko, jeśli chcesz przetestować.';
 
   @override
+  String get featureLabel_developerPatToken => 'Opinia dewelopera (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Włącza panel opinii o nieudanych skanowaniach, który automatycznie tworzy issue na GitHubie z Personal Access Token. Funkcja dla zaawansowanych użytkowników / współtwórców.';
+
+  @override
   String get feedbackConsentTitle => 'Wysłać zgłoszenie do GitHub?';
 
   @override

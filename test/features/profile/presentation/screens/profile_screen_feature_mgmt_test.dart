@@ -131,7 +131,7 @@ void main() {
           );
         }
       }
-      expect(Feature.values.length, 27,
+      expect(Feature.values.length, 28,
           reason: '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord (14); phase 3c bundled showFuel + showElectric + '
               'showConsumptionTab (17); #1517 added manualConsumption + '
@@ -140,7 +140,8 @@ void main() {
               '#1615 added experimentalOemPids (23); #1638 added '
               'paymentQrScan + communityPriceReports (25); #1789 removed '
               'unifiedSearchResults (24); #2024 added obd2Optional (25); '
-              '#2110 added addFillUpOcrReceipt + addFillUpOcrPump (27). '
+              '#2110 added addFillUpOcrReceipt + addFillUpOcrPump (27); '
+              '#2116-6 added developerPatToken (28). '
               'Update the test if a new feature was added or removed.');
     });
 

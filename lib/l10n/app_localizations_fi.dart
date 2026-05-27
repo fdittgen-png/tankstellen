@@ -4179,6 +4179,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Skannaa polttoainepumpun näyttö esitäyttääksesi lomakkeen. Tunnistus on epäluotettavaa tänään — aktivoi vain, jos haluat testata.';
 
   @override
+  String get featureLabel_developerPatToken => 'Kehittäjäpalaute (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Ottaa käyttöön epäonnistuneiden skannausten palautepaneelin, joka luo automaattisesti GitHub-issueja Personal Access Tokenilla. Edistyneiden käyttäjien / avustajien ominaisuus.';
+
+  @override
   String get feedbackConsentTitle => 'Lähetetäänkö raportti GitHubiin?';
 
   @override

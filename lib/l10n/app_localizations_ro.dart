@@ -4209,6 +4209,14 @@ class AppLocalizationsRo extends AppLocalizations {
       'Scanați afișajul unei pompe de carburant pentru a precompleta formularul. Recunoașterea nu este fiabilă astăzi — activați doar dacă doriți să testați.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Feedback dezvoltator (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Activează panoul de feedback pentru scanări eșuate care creează automat issues pe GitHub cu un Personal Access Token. Funcție pentru utilizatori avansați / contribuitori.';
+
+  @override
   String get feedbackConsentTitle => 'Trimiteți raportul pe GitHub?';
 
   @override

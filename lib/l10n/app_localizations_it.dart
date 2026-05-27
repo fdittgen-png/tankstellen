@@ -4202,6 +4202,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scansiona il display di una pompa di carburante per pre-compilare il modulo. Il riconoscimento è inaffidabile oggi — attiva solo se vuoi testare.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Feedback sviluppatore (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Abilita il pannello di feedback per le scansioni non riuscite che crea automaticamente issue GitHub con un Personal Access Token. Funzione per utenti esperti / collaboratori.';
+
+  @override
   String get feedbackConsentTitle => 'Inviare la segnalazione su GitHub?';
 
   @override

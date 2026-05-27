@@ -154,14 +154,22 @@ class _PresetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const brandGreen = Color(0xFF2E7D32);
-    final borderColor = isActive ? brandGreen : theme.dividerColor;
+    // #2116 — replaced the 2-px green outline + checkmark badge of
+    // the selected state with a Material 3-style subtle tonal
+    // background (primaryContainer at low alpha) + raised elevation.
+    // The brand-green text + leading icon already carry the
+    // selected-state signal; the outline was visually competing with
+    // the label.
     return Card(
       key: Key('useModeCard_${profile.name}'),
-      elevation: isActive ? 2 : 0,
+      elevation: isActive ? 1 : 0,
       margin: EdgeInsets.zero,
+      color: isActive
+          ? theme.colorScheme.primaryContainer.withValues(alpha: 0.4)
+          : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: borderColor, width: isActive ? 2 : 1),
+        side: BorderSide(color: theme.dividerColor, width: 1),
       ),
       child: InkWell(
         onTap: onTap,

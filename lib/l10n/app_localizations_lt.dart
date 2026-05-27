@@ -4203,6 +4203,14 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nuskaitykite degalų siurblio ekraną, kad iš anksto užpildytumėte formą. Atpažinimas šiandien nepatikimas — įjunkite tik jei norite išbandyti.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Kūrėjo atsiliepimai (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Įjungia nepavykusio nuskaitymo atsiliepimų skydelį, kuris su Personal Access Token automatiškai sukuria GitHub problemas. Pažangių vartotojų / talkininkų funkcija.';
+
+  @override
   String get feedbackConsentTitle => 'Siųsti ataskaitą į GitHub?';
 
   @override

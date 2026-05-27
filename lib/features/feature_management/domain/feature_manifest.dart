@@ -395,5 +395,18 @@ class FeatureManifest {
           'Scan a fuel pump display to pre-fill the form. Recognition '
               'is unreliable today — opt in only if you want to test.',
     ),
+    Feature.developerPatToken: FeatureManifestEntry.allChannels(
+      feature: Feature.developerPatToken,
+      // Default-off (#2116-6): the PAT entry is power-user / contributor
+      // territory. Without it, bad-scan reports still go out via the
+      // SharePlus fallback. Flipping it on surfaces the panel that
+      // pastes a token + auto-files GitHub issues for failed OCR scans.
+      defaultOn: false,
+      displayName: 'Developer feedback (GitHub PAT)',
+      description:
+          'Enable the bad-scan feedback panel that auto-files GitHub '
+              'issues with a Personal Access Token. Power-user / '
+              'contributor feature.',
+    ),
   });
 }

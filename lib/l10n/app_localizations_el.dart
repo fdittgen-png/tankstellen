@@ -4216,6 +4216,14 @@ class AppLocalizationsEl extends AppLocalizations {
       'Σαρώστε την οθόνη μιας αντλίας καυσίμου για να συμπληρώσετε αυτόματα τη φόρμα. Η αναγνώριση είναι αναξιόπιστη σήμερα — ενεργοποιήστε μόνο αν θέλετε να δοκιμάσετε.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Σχόλια προγραμματιστή (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Ενεργοποιεί τον πίνακα σχολίων για αποτυχημένες σαρώσεις, ο οποίος δημιουργεί αυτόματα GitHub issues με ένα Personal Access Token. Λειτουργία για προχωρημένους χρήστες/συνεισφέροντες.';
+
+  @override
   String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';
 
   @override

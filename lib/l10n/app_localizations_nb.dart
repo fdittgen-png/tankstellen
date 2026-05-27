@@ -4178,6 +4178,14 @@ class AppLocalizationsNb extends AppLocalizations {
       'Skann en drivstoffpumpedisplay for å forhåndsutfylle skjemaet. Gjenkjenningen er upålitelig i dag — aktiver kun hvis du vil teste.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Utviklertilbakemelding (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktiverer tilbakemeldingspanelet for mislykkede skanninger som automatisk oppretter GitHub-issues med et Personal Access Token. Funksjon for avanserte brukere / bidragsytere.';
+
+  @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';
 
   @override

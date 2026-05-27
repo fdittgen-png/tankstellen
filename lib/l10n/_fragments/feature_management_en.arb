@@ -262,5 +262,13 @@
   "featureDescription_addFillUpOcrPump": "Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.",
   "@featureDescription_addFillUpOcrPump": {
     "description": "Settings toggle description for the Add-fill-up pump-display-OCR button (#2110). Sets expectation that the recognizer is experimental."
+  },
+  "featureLabel_developerPatToken": "Developer feedback (GitHub PAT)",
+  "@featureLabel_developerPatToken": {
+    "description": "Settings toggle label for the bad-scan-feedback PAT panel (#2116-6). Default-off — most users never paste a token."
+  },
+  "featureDescription_developerPatToken": "Enable the bad-scan feedback panel that auto-files GitHub issues with a Personal Access Token. Power-user / contributor feature.",
+  "@featureDescription_developerPatToken": {
+    "description": "Settings toggle description for the bad-scan-feedback PAT panel (#2116-6)."
   }
 }

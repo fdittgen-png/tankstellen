@@ -1284,6 +1284,8 @@
   "featureDescription_addFillUpOcrReceipt": "Scannez un ticket imprimé sur l'écran Ajouter un plein pour pré-remplir la date, les litres, le total et la station.",
   "featureLabel_addFillUpOcrPump": "OCR de l'écran de pompe (expérimental)",
   "featureDescription_addFillUpOcrPump": "Scannez l'afficheur d'une pompe à carburant pour pré-remplir le formulaire. La reconnaissance n'est pas fiable aujourd'hui — activez uniquement si vous voulez tester.",
+  "featureLabel_developerPatToken": "Retour développeur (PAT GitHub)",
+  "featureDescription_developerPatToken": "Active le panneau de retour pour les scans en échec qui crée automatiquement des issues GitHub à partir d'un Personal Access Token. Fonction pour utilisateurs avancés / contributeurs.",
   "featureBlockedEnable_experimentalOemPids": "Activez d'abord l'enregistrement OBD2 des trajets",
   "featureBlockedEnable_tflitePricePrediction": "Activez d'abord l'historique des prix",
   "tripPathCardTitle": "Trace du trajet",

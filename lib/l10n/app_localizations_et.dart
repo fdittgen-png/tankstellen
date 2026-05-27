@@ -4176,6 +4176,14 @@ class AppLocalizationsEt extends AppLocalizations {
       'Skannige tankuri ekraani, et eeltäita vorm. Tuvastus pole tänapäeval usaldusväärne — aktiveerige ainult siis, kui soovite testida.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Arendaja tagasiside (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Lubab vigaste skannimiste tagasisidepaneeli, mis loob isikliku juurdepääsuvõtmega automaatselt GitHubi probleeme. Edasijõudnud kasutajate / kaastöötajate funktsioon.';
+
+  @override
   String get feedbackConsentTitle => 'Saata raport GitHubile?';
 
   @override

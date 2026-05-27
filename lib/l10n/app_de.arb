@@ -1745,6 +1745,8 @@
   "featureDescription_addFillUpOcrReceipt": "Scannen Sie eine gedruckte Quittung auf der Seite \"Tankvorgang hinzufügen\", um Datum, Liter, Gesamtbetrag und Tankstelle vorauszufüllen.",
   "featureLabel_addFillUpOcrPump": "Zapfsäulen-OCR (experimentell)",
   "featureDescription_addFillUpOcrPump": "Scannen Sie eine Zapfsäulenanzeige, um das Formular vorauszufüllen. Die Erkennung ist heute unzuverlässig — aktivieren Sie nur, wenn Sie testen möchten.",
+  "featureLabel_developerPatToken": "Entwickler-Feedback (GitHub PAT)",
+  "featureDescription_developerPatToken": "Aktiviert das Fehler-Scan-Feedback-Panel, das mit einem Personal Access Token automatisch GitHub-Issues anlegt. Power-User-/Mitwirkenden-Funktion.",
   "feedbackConsentTitle": "Bericht an GitHub senden?",
   "feedbackConsentBody": "Damit wird ein öffentliches Ticket in unserem GitHub-Repository mit deinem Foto und dem OCR-Text erstellt. Es werden keine personenbezogenen Daten (Standort, Konto-ID) gesendet. Fortfahren?",
   "feedbackConsentContinue": "Fortfahren",

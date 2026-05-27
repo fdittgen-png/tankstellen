@@ -4196,6 +4196,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Scan een tankpompdisplay om het formulier vooraf in te vullen. Herkenning is vandaag onbetrouwbaar — schakel alleen in als je wilt testen.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Ontwikkelaarsfeedback (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Schakelt het feedbackpaneel voor mislukte scans in dat met een Personal Access Token automatisch GitHub-issues aanmaakt. Functie voor gevorderde gebruikers / bijdragers.';
+
+  @override
   String get feedbackConsentTitle => 'Rapport versturen naar GitHub?';
 
   @override

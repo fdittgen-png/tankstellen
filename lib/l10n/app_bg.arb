@@ -1244,6 +1244,8 @@
   "featureDescription_addFillUpOcrReceipt": "Сканирайте отпечатана касова бележка на екрана за добавяне на зареждане, за да попълните автоматично дата, литри, обща сума и станция.",
   "featureLabel_addFillUpOcrPump": "OCR на дисплея на колонката (експериментално)",
   "featureDescription_addFillUpOcrPump": "Сканирайте дисплея на колонката, за да попълните формуляра. Разпознаването е ненадеждно днес — активирайте само ако искате да тествате.",
+  "featureLabel_developerPatToken": "Разработчик: GitHub PAT",
+  "featureDescription_developerPatToken": "Активира панела за обратна връзка при неуспешен скан, който автоматично създава GitHub issues с Personal Access Token. За опитни потребители/сътрудници.",
   "feedbackConsentTitle": "Изпращане на доклад в GitHub?",
   "feedbackConsentBody": "Това създава публичен тикет в GitHub хранилището ни с вашата снимка и OCR текста. Не се изпращат лични данни (местоположение, ID на акаунт). Продължавате?",
   "feedbackConsentContinue": "Продължи",

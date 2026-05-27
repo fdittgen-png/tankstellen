@@ -4185,6 +4185,14 @@ class AppLocalizationsCs extends AppLocalizations {
       'Naskenujte displej palivového čerpadla a předvyplňte formulář. Rozpoznávání je dnes nespolehlivé — aktivujte pouze, pokud chcete testovat.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Vývojářská zpětná vazba (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Aktivuje panel pro hlášení neúspěšných skenů, který automaticky vytváří GitHub issues s Personal Access Token. Funkce pro pokročilé uživatele/přispěvatele.';
+
+  @override
   String get feedbackConsentTitle => 'Odeslat hlášení na GitHub?';
 
   @override

@@ -4209,6 +4209,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Escanea la pantalla de un surtidor para rellenar el formulario. El reconocimiento no es fiable hoy — actívalo solo si quieres probarlo.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Feedback de desarrollador (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Activa el panel de feedback para escaneos fallidos que crea automáticamente issues de GitHub con un Personal Access Token. Función para usuarios avanzados/colaboradores.';
+
+  @override
   String get feedbackConsentTitle => '¿Enviar el informe a GitHub?';
 
   @override

@@ -1244,6 +1244,8 @@
   "featureDescription_addFillUpOcrReceipt": "Digitalize um recibo impresso na tela Adicionar abastecimento para preencher data, litros, total e estação.",
   "featureLabel_addFillUpOcrPump": "OCR do display da bomba (experimental)",
   "featureDescription_addFillUpOcrPump": "Digitalize o display de uma bomba de combustível para preencher o formulário. O reconhecimento é hoje pouco confiável — ative apenas se quiser testar.",
+  "featureLabel_developerPatToken": "Feedback de desenvolvedor (GitHub PAT)",
+  "featureDescription_developerPatToken": "Ativa o painel de feedback para scans com falha que cria automaticamente issues no GitHub com um Personal Access Token. Função para usuários avançados / colaboradores.",
   "feedbackConsentTitle": "Enviar relatório para o GitHub?",
   "feedbackConsentBody": "Isto cria um ticket público no nosso repositório GitHub com a sua foto e o texto OCR. Não são enviados dados pessoais (localização, ID de conta). Continuar?",
   "feedbackConsentContinue": "Continuar",

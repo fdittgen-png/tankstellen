@@ -4191,6 +4191,14 @@ class AppLocalizationsHr extends AppLocalizations {
       'Skenirajte zaslon crpke goriva za prethodno popunjavanje obrasca. Prepoznavanje je danas nepouzdano — uključite samo ako želite testirati.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Razvojni povratni podaci (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Omogućuje ploču povratnih informacija za neuspjela skeniranja koja automatski stvara GitHub issues uz Personal Access Token. Funkcija za napredne korisnike / suradnike.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati izvješće na GitHub?';
 
   @override

@@ -4184,6 +4184,14 @@ class AppLocalizationsSl extends AppLocalizations {
       'Skenirajte zaslon točilne črpalke za vnaprejšnje izpolnjevanje obrazca. Prepoznavanje je danes nezanesljivo — vklopite samo, če želite preizkusiti.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Razvijalska povratna informacija (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Omogoča ploščo povratnih informacij za neuspešna skeniranja, ki s Personal Access Tokenom samodejno ustvarja težave v GitHubu. Funkcija za napredne uporabnike / sodelavce.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati poročilo na GitHub?';
 
   @override

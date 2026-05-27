@@ -4158,6 +4158,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.';
 
   @override
+  String get featureLabel_developerPatToken =>
+      'Developer feedback (GitHub PAT)';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      'Enable the bad-scan feedback panel that auto-files GitHub issues with a Personal Access Token. Power-user / contributor feature.';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override
@@ -9699,6 +9707,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureDescription_addFillUpOcrPump =>
       '⟦Šçáñ á ƒúéł ƥúɱƥ đîšƥłáý ŧó ƥřé-ƒîłł ŧĥé ƒóřɱ. Řéçóǧñîŧîóñ îš úñřéłîáƀłé ŧóđáý — óƥŧ îñ óñłý îƒ ýóú ŵáñŧ ŧó ŧéšŧ. ········································⟧';
+
+  @override
+  String get featureLabel_developerPatToken =>
+      '⟦Đéṽéłóƥéř ƒééđƀáçķ (ǦîŧĤúƀ ƤÁŦ) ············⟧';
+
+  @override
+  String get featureDescription_developerPatToken =>
+      '⟦Éñáƀłé ŧĥé ƀáđ-šçáñ ƒééđƀáçķ ƥáñéł ŧĥáŧ áúŧó-ƒîłéš ǦîŧĤúƀ îššúéš ŵîŧĥ á Ƥéřšóñáł Áççéšš Ŧóķéñ. Ƥóŵéř-úšéř / çóñŧřîƀúŧóř ƒéáŧúřé. ···············································⟧';
 
   @override
   String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';
