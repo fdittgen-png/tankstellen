@@ -17,14 +17,14 @@ void main() {
       'SparkiloTileLayer renders a TileLayer with the #2122 hardened defaults',
       (tester) async {
     await tester.pumpWidget(
-      Directionality(
+      const Directionality(
         textDirection: TextDirection.ltr,
         child: FlutterMap(
-          options: const MapOptions(
+          options: MapOptions(
             initialCenter: LatLng(48, 2),
             initialZoom: 6,
           ),
-          children: const [
+          children: [
             SparkiloTileLayer(),
           ],
         ),
