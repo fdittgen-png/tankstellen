@@ -1091,6 +1091,7 @@
   "calibrationLearnerStatusCalibrated": "⟦η_ṽ: {eta} (çáłîƀřáŧéđ, {samples} šáɱƥłéš) ········⟧",
   "calibrationLearnerStatusLearning": "⟦η_ṽ: {eta} (łéářñîñǧ, {samples} šáɱƥłéš) ·······⟧",
   "calibrationLearnerStatusNoSamples": "⟦η_ṽ: 0.85 (đéƒáúłŧ — ñó ƥłéîñ-çóɱƥłéŧ ýéŧ) ···········⟧",
+  "calibrationLearnerEtaCompact": "⟦η_ṽ: {eta} · {samples} šáɱƥłéš ····⟧",
   "calibrationResetLearner": "⟦Řéšéŧ łéářñéř ·····⟧",
   "calibrationBasisAtkinson": "⟦Áŧķîñšóñ çýçłé ······⟧",
   "calibrationBasisVnt": "⟦ṼÑŦ đîéšéł + ĐÎ ·····⟧",

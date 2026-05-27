@@ -3691,6 +3691,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'η_v : 0.85 (par défaut — aucun plein complet)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v : $eta · $samples échantillons';
+  }
+
+  @override
   String get calibrationResetLearner => 'Réinitialiser l\'apprentissage';
 
   @override

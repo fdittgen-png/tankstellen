@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (gekalibreerd, {samples} steekproeven)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (aan het leren, {samples} steekproeven)",
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (standaard — nog geen volledige tank)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} samples",
   "calibrationResetLearner": "Leermodule resetten",
   "calibrationBasisAtkinson": "Atkinson-cyclus",
   "calibrationBasisVnt": "VNT diesel + DI",

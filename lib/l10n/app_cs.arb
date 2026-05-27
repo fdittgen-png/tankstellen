@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibrováno, {samples} vzorků)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (učení, {samples} vzorků)",
   "calibrationLearnerStatusNoSamples": "η_v: 0,85 (výchozí — zatím žádné plné tankování)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} vzorků",
   "calibrationResetLearner": "Resetovat učení",
   "calibrationBasisAtkinson": "Atkinsonův cyklus",
   "calibrationBasisVnt": "VNT diesel + DI",

@@ -3682,6 +3682,11 @@ class AppLocalizationsBg extends AppLocalizations {
       'η_v: 0.85 (по подразбиране — все още няма пълно зареждане)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples проби';
+  }
+
+  @override
   String get calibrationResetLearner => 'Нулирай обучението';
 
   @override

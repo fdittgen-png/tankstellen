@@ -65,6 +65,14 @@
   "@calibrationLearnerStatusNoSamples": {
     "description": "Live readout before the first plein-complet has been logged."
   },
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} samples",
+  "@calibrationLearnerEtaCompact": {
+    "description": "#2112 — compact engineer-detail pill that rides alongside the confidence-tier badge on the Fuel tab. Replaces the longer 'learning' / 'calibrated' parenthetical labels — the maturity colour is carried by the confidence tier next to it.",
+    "placeholders": {
+      "eta": { "type": "String" },
+      "samples": { "type": "int" }
+    }
+  },
   "calibrationResetLearner": "Reset learner",
   "@calibrationResetLearner": {
     "description": "OutlinedButton label that resets η_v back to 0.85 and clears the sample counter."

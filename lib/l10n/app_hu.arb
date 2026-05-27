@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibrált, {samples} minta)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (tanulás, {samples} minta)",
   "calibrationLearnerStatusNoSamples": "η_v: 0,85 (alapértelmezett — még nincs teljes tankolás)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} minta",
   "calibrationResetLearner": "Tanuló visszaállítása",
   "calibrationBasisAtkinson": "Atkinson-ciklus",
   "calibrationBasisVnt": "VNT dízel + DI",

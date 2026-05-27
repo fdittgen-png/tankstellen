@@ -388,7 +388,7 @@ void main() {
       expect(find.byType(Chip), findsNothing);
     });
 
-    testWidgets('samples == 0 → "no plein-complet yet" chip',
+    testWidgets('samples == 0 → "no plein-complet yet" pill (#2112)',
         (tester) async {
       await pumpApp(
         tester,
@@ -398,10 +398,19 @@ void main() {
           volumetricEfficiencySamples: 0,
         ),
       );
-      expect(_findChipContaining('no plein-complet'), findsOneWidget);
+      // #2112 — the calibration pill is no longer a Material `Chip`;
+      // it's a tonal Container so the η_v pill harmonises with the
+      // confidence-tier badge next to it. The label still contains
+      // the no-plein-complet substring.
+      expect(find.textContaining('no plein-complet'), findsOneWidget);
     });
 
-    testWidgets('0 < samples < 3 → learning chip with sample count',
+    // #2112 — the "learning" vs "calibrated" parenthetical was
+    // dropped because the maturity colour is carried by the
+    // confidence-tier badge now riding next to it. The η_v pill
+    // shows the bare mean + sample count in both cases.
+    testWidgets(
+        '0 < samples < 3 → compact η_v pill with sample count (#2112)',
         (tester) async {
       await pumpApp(
         tester,
@@ -411,12 +420,12 @@ void main() {
           volumetricEfficiencySamples: 2,
         ),
       );
-      expect(_findChipContaining('learning'), findsOneWidget);
       expect(find.textContaining('0.87'), findsOneWidget);
-      expect(find.textContaining('2'), findsWidgets);
+      expect(find.textContaining('2 samples'), findsOneWidget);
     });
 
-    testWidgets('samples >= 3 → calibrated chip with sample count',
+    testWidgets(
+        'samples >= 3 → compact η_v pill (no calibrated wording — #2112)',
         (tester) async {
       await pumpApp(
         tester,
@@ -426,8 +435,30 @@ void main() {
           volumetricEfficiencySamples: 5,
         ),
       );
-      expect(_findChipContaining('calibrated'), findsOneWidget);
       expect(find.textContaining('0.91'), findsOneWidget);
+      expect(find.textContaining('5 samples'), findsOneWidget);
+      // #2112 — old shape removed; if the parenthetical comes back
+      // this fails and forces a deliberate decision.
+      expect(find.textContaining('calibrated'), findsNothing);
+      expect(find.textContaining('learning'), findsNothing);
+    });
+
+    testWidgets(
+        '#2112 — η_v pill + confidence tier ride a single Wrap (one parent)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+      );
+      final wraps = find.byType(Wrap).evaluate();
+      // ConsumptionStatsCard has no other Wrap today; this asserts
+      // the calibration pills group sits in exactly one Wrap so
+      // their layout stays harmonised.
+      expect(wraps.length, greaterThanOrEqualTo(1));
     });
   });
 }

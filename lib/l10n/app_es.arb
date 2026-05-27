@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (calibrado, {samples} muestras)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (aprendiendo, {samples} muestras)",
   "calibrationLearnerStatusNoSamples": "η_v: 0,85 (predeterminado: aún sin lleno completo)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} muestras",
   "calibrationResetLearner": "Restablecer el aprendizaje",
   "calibrationBasisAtkinson": "Ciclo Atkinson",
   "calibrationBasisVnt": "Diésel VNT + DI",
