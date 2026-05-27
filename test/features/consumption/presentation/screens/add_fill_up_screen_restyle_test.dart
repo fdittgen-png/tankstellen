@@ -83,19 +83,25 @@ void main() {
     });
 
     testWidgets(
-        'renders two visible import buttons (Receipt + Pump display) '
-        'and hides the OBD-II import path (#951)', (tester) async {
+        'renders the Receipt import button by default, hides Pump display '
+        'until opted in (#2110), and hides the OBD-II import path (#951)',
+        (tester) async {
       await _pumpWithTallView(
         tester,
         const AddFillUpScreen(),
         overrides: _withVehicle,
       );
 
-      // Two side-by-side OutlinedButtons — keyed for stable lookup.
+      // #2110 — `Feature.addFillUpOcrReceipt` defaults ON →
+      // `import_receipt_button` is visible.
       expect(find.byKey(const Key('import_receipt_button')), findsOneWidget);
-      expect(find.byKey(const Key('import_pump_button')), findsOneWidget);
       expect(find.text('Receipt'), findsOneWidget);
-      expect(find.text('Pump display'), findsOneWidget);
+
+      // #2110 — `Feature.addFillUpOcrPump` defaults OFF because the
+      // pump-display OCR recognizer is unreliable. The button stays
+      // hidden until the user opts in from Feature management.
+      expect(find.byKey(const Key('import_pump_button')), findsNothing);
+      expect(find.text('Pump display'), findsNothing);
 
       // The single "Import from…" chip and the OBD-II import tile
       // must NOT appear on this screen — they were rolled back in
@@ -165,8 +171,10 @@ void main() {
       // Card headers + import button labels.
       expect(find.text('What you filled'), findsOneWidget);
       expect(find.text('Where you were'), findsOneWidget);
+      // #2110 — Receipt OCR is default-on, pump-display OCR is
+      // default-off, so the form ships with one OCR button visible.
       expect(find.text('Receipt'), findsOneWidget);
-      expect(find.text('Pump display'), findsOneWidget);
+      expect(find.text('Pump display'), findsNothing);
     });
 
     testWidgets('meets the Android tap-target guideline (48dp, #566)',

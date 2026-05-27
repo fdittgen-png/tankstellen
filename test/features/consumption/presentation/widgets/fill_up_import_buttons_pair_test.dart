@@ -2,9 +2,26 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_import_buttons_pair.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+
+/// #2110 — the pair widget became a `ConsumerWidget` that gates each
+/// button on the matching `Feature` flag (receipt default-on, pump
+/// default-off). These tests assert the rendered shape with BOTH
+/// gates open — so we override `featureFlagsProvider` with an
+/// everything-enabled stub. A separate group below covers the
+/// default-off pump path.
+class _BothOcrEnabled extends FeatureFlags {
+  @override
+  Set<Feature> build() => {
+        Feature.addFillUpOcrReceipt,
+        Feature.addFillUpOcrPump,
+      };
+}
 
 void main() {
   Widget buildPair({
@@ -13,15 +30,20 @@ void main() {
     VoidCallback? onScanReceipt,
     VoidCallback? onScanPumpDisplay,
   }) {
-    return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: FillUpImportButtonsPair(
-          scanningReceipt: scanningReceipt,
-          scanningPump: scanningPump,
-          onScanReceipt: onScanReceipt ?? () {},
-          onScanPumpDisplay: onScanPumpDisplay ?? () {},
+    return ProviderScope(
+      overrides: [
+        featureFlagsProvider.overrideWith(() => _BothOcrEnabled()),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: FillUpImportButtonsPair(
+            scanningReceipt: scanningReceipt,
+            scanningPump: scanningPump,
+            onScanReceipt: onScanReceipt ?? () {},
+            onScanPumpDisplay: onScanPumpDisplay ?? () {},
+          ),
         ),
       ),
     );
