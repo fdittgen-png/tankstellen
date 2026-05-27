@@ -321,6 +321,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'The cache stores API responses for faster loading and offline access.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Network';
+
+  @override
+  String get cacheTtlGroupData => 'Data';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geocoding';
+
+  @override
   String get stationSearch => 'Station search';
 
   @override
@@ -5746,6 +5755,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get cacheDescription =>
       '⟦Ŧĥé çáçĥé šŧóřéš ÁƤÎ řéšƥóñšéš ƒóř ƒášŧéř łóáđîñǧ áñđ óƒƒłîñé áççéšš. ··························⟧';
+
+  @override
+  String get cacheTtlGroupNetwork => '⟦Ñéŧŵóřķ ···⟧';
+
+  @override
+  String get cacheTtlGroupData => '⟦Đáŧá ··⟧';
+
+  @override
+  String get cacheTtlGroupGeocoding => '⟦Ǧéóçóđîñǧ ····⟧';
 
   @override
   String get stationSearch => '⟦Šŧáŧîóñ šéářçĥ ······⟧';

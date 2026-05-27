@@ -323,6 +323,15 @@ class AppLocalizationsCs extends AppLocalizations {
       'Mezipaměť ukládá odpovědi API pro rychlejší načítání a offline přístup.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Síť';
+
+  @override
+  String get cacheTtlGroupData => 'Data';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokódování';
+
+  @override
   String get stationSearch => 'Vyhledávání stanic';
 
   @override

@@ -324,6 +324,15 @@ class AppLocalizationsBg extends AppLocalizations {
       'Кешът съхранява API отговори за по-бързо зареждане и офлайн достъп.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Мрежа';
+
+  @override
+  String get cacheTtlGroupData => 'Данни';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Геокодиране';
+
+  @override
   String get stationSearch => 'Търсене на станции';
 
   @override

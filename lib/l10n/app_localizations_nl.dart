@@ -324,6 +324,15 @@ class AppLocalizationsNl extends AppLocalizations {
       'De cache slaat API-antwoorden op voor sneller laden en offline toegang.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Netwerk';
+
+  @override
+  String get cacheTtlGroupData => 'Gegevens';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geocodering';
+
+  @override
   String get stationSearch => 'Stations zoeken';
 
   @override

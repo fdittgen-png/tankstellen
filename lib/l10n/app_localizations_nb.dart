@@ -323,6 +323,15 @@ class AppLocalizationsNb extends AppLocalizations {
       'Hurtigbufferen lagrer API-svar for raskere lasting og frakoblet tilgang.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Nettverk';
+
+  @override
+  String get cacheTtlGroupData => 'Data';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokoding';
+
+  @override
   String get stationSearch => 'Stasjonssøk';
 
   @override

@@ -323,6 +323,15 @@ class AppLocalizationsFi extends AppLocalizations {
       'Välimuisti tallentaa API-vastaukset nopeampaa latausta ja offline-käyttöä varten.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Verkko';
+
+  @override
+  String get cacheTtlGroupData => 'Tiedot';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokoodaus';
+
+  @override
   String get stationSearch => 'Asemahaku';
 
   @override

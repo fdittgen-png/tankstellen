@@ -51,21 +51,74 @@ class StorageBar extends StatelessWidget {
       );
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: SizedBox(
-        height: 24,
-        child: Row(
-          children: segments.map((seg) {
-            final fraction = seg.bytes / totalBytes;
-            if (fraction < 0.01) return const SizedBox.shrink();
-            return Expanded(
-              flex: (fraction * 1000).round(),
-              child: Container(color: seg.color),
-            );
-          }).toList(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            height: 24,
+            child: Row(
+              children: segments.map((seg) {
+                final fraction = seg.bytes / totalBytes;
+                if (fraction < 0.01) return const SizedBox.shrink();
+                return Expanded(
+                  flex: (fraction * 1000).round(),
+                  child: Container(color: seg.color),
+                );
+              }).toList(),
+            ),
+          ),
         ),
-      ),
+        // #2116 — legend ties each bar segment to its detail row's dot,
+        // so the colours stop being arbitrary "what's the orange one
+        // again?" guesses. Only segments with a measurable share
+        // (≥ 1 % of total) make it into the legend — the same
+        // threshold the bar uses to render its slice.
+        const SizedBox(height: 6),
+        Wrap(
+          key: const Key('storage_bar_legend'),
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            for (final seg in segments)
+              if (totalBytes > 0 && seg.bytes / totalBytes >= 0.01)
+                _LegendSwatch(label: seg.label, color: seg.color),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _LegendSwatch extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _LegendSwatch({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -137,17 +190,42 @@ class CacheTtlInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    // #2116 — groups give the dense six-row list a visual hierarchy.
+    // Three buckets that mirror the call paths: Network = remote API
+    // round-trips, Data = client-side derived caches, Geocoding =
+    // postal-code → coordinates lookups.
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _ttlGroupHeader(l?.cacheTtlGroupNetwork ?? 'Network'),
         _ttlRow(l?.stationSearch ?? 'Station search', l?.minutes(5) ?? '5 min'),
-        _ttlRow(l?.stationDetails ?? 'Station details', l?.minutes(15) ?? '15 min'),
+        _ttlRow(l?.stationDetails ?? 'Station details',
+            l?.minutes(15) ?? '15 min'),
         _ttlRow(l?.priceQuery ?? 'Price query', l?.minutes(5) ?? '5 min'),
+        const SizedBox(height: 4),
+        _ttlGroupHeader(l?.cacheTtlGroupData ?? 'Data'),
         _ttlRow(l?.favoritesDataCache ?? 'Favorites data',
             l?.minutes(30) ?? '30 min'),
         _ttlRow(l?.citySearchCache ?? 'City search',
             l?.minutes(30) ?? '30 min'),
+        const SizedBox(height: 4),
+        _ttlGroupHeader(l?.cacheTtlGroupGeocoding ?? 'Geocoding'),
         _ttlRow(l?.zipGeocoding ?? 'ZIP geocoding', l?.hours(24) ?? '24 h'),
       ],
+    );
+  }
+
+  Widget _ttlGroupHeader(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 2, left: 8),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.4,
+        ),
+      ),
     );
   }
 

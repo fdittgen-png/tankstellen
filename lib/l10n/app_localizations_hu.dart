@@ -324,6 +324,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'A gyorsítótár API-válaszokat tárol a gyorsabb betöltés és offline hozzáférés érdekében.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Hálózat';
+
+  @override
+  String get cacheTtlGroupData => 'Adatok';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokódolás';
+
+  @override
   String get stationSearch => 'Kútkeresés';
 
   @override

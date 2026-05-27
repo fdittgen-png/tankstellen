@@ -323,6 +323,15 @@ class AppLocalizationsLt extends AppLocalizations {
       'Podėlis saugo API atsakymus greitesniam įkėlimui ir prieigai neprisijungus.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Tinklas';
+
+  @override
+  String get cacheTtlGroupData => 'Duomenys';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodavimas';
+
+  @override
   String get stationSearch => 'Stočių paieška';
 
   @override

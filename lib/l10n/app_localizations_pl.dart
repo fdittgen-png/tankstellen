@@ -323,6 +323,15 @@ class AppLocalizationsPl extends AppLocalizations {
       'Pamięć podręczna przechowuje odpowiedzi API dla szybszego ładowania i dostępu offline.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Sieć';
+
+  @override
+  String get cacheTtlGroupData => 'Dane';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodowanie';
+
+  @override
   String get stationSearch => 'Wyszukiwanie stacji';
 
   @override

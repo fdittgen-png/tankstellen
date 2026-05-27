@@ -322,6 +322,15 @@ class AppLocalizationsEl extends AppLocalizations {
       'Η προσωρινή μνήμη αποθηκεύει απαντήσεις API για ταχύτερη φόρτωση και πρόσβαση εκτός σύνδεσης.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Δίκτυο';
+
+  @override
+  String get cacheTtlGroupData => 'Δεδομένα';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Γεωκωδικοποίηση';
+
+  @override
   String get stationSearch => 'Αναζήτηση σταθμών';
 
   @override

@@ -735,6 +735,24 @@ abstract class AppLocalizations {
   /// **'The cache stores API responses for faster loading and offline access.'**
   String get cacheDescription;
 
+  /// No description provided for @cacheTtlGroupNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get cacheTtlGroupNetwork;
+
+  /// No description provided for @cacheTtlGroupData.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get cacheTtlGroupData;
+
+  /// No description provided for @cacheTtlGroupGeocoding.
+  ///
+  /// In en, this message translates to:
+  /// **'Geocoding'**
+  String get cacheTtlGroupGeocoding;
+
   /// No description provided for @stationSearch.
   ///
   /// In en, this message translates to:

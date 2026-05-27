@@ -324,6 +324,15 @@ class AppLocalizationsRo extends AppLocalizations {
       'Cache-ul stochează răspunsuri API pentru încărcare mai rapidă și acces offline.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Rețea';
+
+  @override
+  String get cacheTtlGroupData => 'Date';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geocodare';
+
+  @override
   String get stationSearch => 'Căutare benzinării';
 
   @override

@@ -323,6 +323,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Cache speichert API-Antworten für schnellere Ladezeiten und Offline-Zugriff.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Netzwerk';
+
+  @override
+  String get cacheTtlGroupData => 'Daten';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodierung';
+
+  @override
   String get stationSearch => 'Tankstellen-Suche';
 
   @override

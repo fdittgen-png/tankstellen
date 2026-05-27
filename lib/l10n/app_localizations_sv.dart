@@ -323,6 +323,15 @@ class AppLocalizationsSv extends AppLocalizations {
       'Cachen lagrar API-svar för snabbare laddning och offlineåtkomst.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Nätverk';
+
+  @override
+  String get cacheTtlGroupData => 'Data';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodning';
+
+  @override
   String get stationSearch => 'Stationssökning';
 
   @override

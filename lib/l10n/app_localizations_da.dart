@@ -323,6 +323,15 @@ class AppLocalizationsDa extends AppLocalizations {
       'Cachen gemmer API-svar for hurtigere indlæsning og offline adgang.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Netværk';
+
+  @override
+  String get cacheTtlGroupData => 'Data';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodning';
+
+  @override
   String get stationSearch => 'Stationssøgning';
 
   @override

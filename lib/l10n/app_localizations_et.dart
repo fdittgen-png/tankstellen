@@ -323,6 +323,15 @@ class AppLocalizationsEt extends AppLocalizations {
       'Vahemälu salvestab API vastuseid kiiremaks laadimiseks ja võrguühenduseta juurdepääsuks.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Võrk';
+
+  @override
+  String get cacheTtlGroupData => 'Andmed';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodeerimine';
+
+  @override
   String get stationSearch => 'Jaamade otsing';
 
   @override

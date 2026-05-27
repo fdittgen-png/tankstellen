@@ -323,6 +323,15 @@ class AppLocalizationsLv extends AppLocalizations {
       'Kešatmiņa saglabā API atbildes ātrākai ielādei un bezsaistes piekļuvei.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Tīkls';
+
+  @override
+  String get cacheTtlGroupData => 'Dati';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Ģeokodēšana';
+
+  @override
   String get stationSearch => 'Staciju meklēšana';
 
   @override

@@ -323,6 +323,15 @@ class AppLocalizationsSl extends AppLocalizations {
       'Predpomnilnik shranjuje API odgovore za hitrejše nalaganje in dostop brez povezave.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Omrežje';
+
+  @override
+  String get cacheTtlGroupData => 'Podatki';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodiranje';
+
+  @override
   String get stationSearch => 'Iskanje postaj';
 
   @override

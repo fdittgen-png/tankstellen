@@ -323,6 +323,15 @@ class AppLocalizationsSk extends AppLocalizations {
       'Vyrovnávacia pamäť ukladá odpovede API pre rýchlejšie načítanie a offline prístup.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Sieť';
+
+  @override
+  String get cacheTtlGroupData => 'Dáta';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokódovanie';
+
+  @override
   String get stationSearch => 'Vyhľadávanie staníc';
 
   @override

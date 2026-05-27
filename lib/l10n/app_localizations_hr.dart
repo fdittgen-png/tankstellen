@@ -322,6 +322,15 @@ class AppLocalizationsHr extends AppLocalizations {
       'Predmemorija pohranjuje API odgovore za brže učitavanje i offline pristup.';
 
   @override
+  String get cacheTtlGroupNetwork => 'Mreža';
+
+  @override
+  String get cacheTtlGroupData => 'Podaci';
+
+  @override
+  String get cacheTtlGroupGeocoding => 'Geokodiranje';
+
+  @override
   String get stationSearch => 'Pretraživanje postaja';
 
   @override
