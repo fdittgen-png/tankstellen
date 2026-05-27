@@ -3656,6 +3656,11 @@ class AppLocalizationsSv extends AppLocalizations {
       'η_v: 0,85 (standard – ingen full tankning ännu)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples prover';
+  }
+
+  @override
   String get calibrationResetLearner => 'Återställ inlärning';
 
   @override

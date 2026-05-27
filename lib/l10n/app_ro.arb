@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (calibrat, {samples} eșantioane)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (se învață, {samples} eșantioane)",
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (implicit — niciun plein-complet încă)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} mostre",
   "calibrationResetLearner": "Resetați calibratorul",
   "calibrationBasisAtkinson": "Ciclu Atkinson",
   "calibrationBasisVnt": "Diesel VNT + DI",

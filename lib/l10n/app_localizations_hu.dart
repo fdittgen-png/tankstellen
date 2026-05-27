@@ -3683,6 +3683,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'η_v: 0,85 (alapértelmezett — még nincs teljes tankolás)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples minta';
+  }
+
+  @override
   String get calibrationResetLearner => 'Tanuló visszaállítása';
 
   @override

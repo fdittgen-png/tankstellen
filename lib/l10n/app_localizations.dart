@@ -6699,6 +6699,12 @@ abstract class AppLocalizations {
   /// **'η_v: 0.85 (default — no plein-complet yet)'**
   String get calibrationLearnerStatusNoSamples;
 
+  /// #2112 — compact engineer-detail pill that rides alongside the confidence-tier badge on the Fuel tab. Replaces the longer 'learning' / 'calibrated' parenthetical labels — the maturity colour is carried by the confidence tier next to it.
+  ///
+  /// In en, this message translates to:
+  /// **'η_v: {eta} · {samples} samples'**
+  String calibrationLearnerEtaCompact(String eta, int samples);
+
   /// OutlinedButton label that resets η_v back to 0.85 and clears the sample counter.
   ///
   /// In en, this message translates to:

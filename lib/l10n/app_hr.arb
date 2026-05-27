@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibrirano, {samples} uzoraka)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (učenje, {samples} uzoraka)",
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (zadano — još nema plein-complet)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} uzoraka",
   "calibrationResetLearner": "Resetiraj učilicu",
   "calibrationBasisAtkinson": "Atkinson ciklus",
   "calibrationBasisVnt": "VNT diesel + DI",

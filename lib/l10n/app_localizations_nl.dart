@@ -3671,6 +3671,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'η_v: 0.85 (standaard — nog geen volledige tank)';
 
   @override
+  String calibrationLearnerEtaCompact(String eta, int samples) {
+    return 'η_v: $eta · $samples samples';
+  }
+
+  @override
   String get calibrationResetLearner => 'Leermodule resetten';
 
   @override

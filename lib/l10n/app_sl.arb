@@ -1099,6 +1099,7 @@
   "calibrationLearnerStatusCalibrated": "η_v: {eta} (umerjeno, {samples} vzorcev)",
   "calibrationLearnerStatusLearning": "η_v: {eta} (učenje, {samples} vzorcev)",
   "calibrationLearnerStatusNoSamples": "η_v: 0,85 (privzeto — še ni plein-complet)",
+  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} vzorcev",
   "calibrationResetLearner": "Ponastavi učilnik",
   "calibrationBasisAtkinson": "Atkinsonov cikel",
   "calibrationBasisVnt": "VNT diesel + DI",
