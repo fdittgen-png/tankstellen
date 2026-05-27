@@ -306,6 +306,35 @@
   "totalCost": "Bendra kaina",
   "enterCalcValues": "Įveskite atstumą, sąnaudas ir kainą kelionės kainos apskaičiavimui",
   "priceHistory": "Kainų istorija",
+  "ignoredStationsLabel": "Ignoruojama",
+  "ratingsLabel": "Įvertinimai",
+  "favoritesDataCache": "Mėgstamiausių duomenys",
+  "citySearchCache": "Miesto paieška",
+  "dataDeletionNotAvailableCommunity": "Duomenų ištrynimas nepasiekiamas Bendruomenės režime. Pirmiausia atsijunkite arba naudokite privačią duomenų bazę.",
+  "priceHistoryStationsTracked": "{count} stebimų stočių",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} sukonfigūruota",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} paslėptų stočių",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} įvertintų stočių",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Kainų istorijos dar nėra",
   "noHourlyData": "Nėra valandinių duomenų",
   "noStatistics": "Nėra prieinamų statistikų",

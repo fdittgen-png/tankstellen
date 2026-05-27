@@ -962,6 +962,42 @@ class AppLocalizationsNl extends AppLocalizations {
   String get priceHistory => 'Prijsgeschiedenis';
 
   @override
+  String get ignoredStationsLabel => 'Genegeerd';
+
+  @override
+  String get ratingsLabel => 'Beoordelingen';
+
+  @override
+  String get favoritesDataCache => 'Favorietengegevens';
+
+  @override
+  String get citySearchCache => 'Plaatszoeken';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Gegevens verwijderen is niet beschikbaar in de Community-modus. Verbreek eerst de verbinding of gebruik een privédatabase.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count gevolgde stations';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count geconfigureerd';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count verborgen stations';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count beoordeelde stations';
+  }
+
+  @override
   String get noPriceHistory => 'Nog geen prijsgeschiedenis';
 
   @override

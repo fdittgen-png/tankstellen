@@ -961,6 +961,42 @@ class AppLocalizationsSk extends AppLocalizations {
   String get priceHistory => 'História cien';
 
   @override
+  String get ignoredStationsLabel => 'Ignorované';
+
+  @override
+  String get ratingsLabel => 'Hodnotenia';
+
+  @override
+  String get favoritesDataCache => 'Dáta obľúbených';
+
+  @override
+  String get citySearchCache => 'Vyhľadávanie mesta';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Mazanie údajov nie je v komunitnom režime k dispozícii. Najprv sa odpojte alebo použite súkromnú databázu.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count sledovaných staníc';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count nakonfigurované';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count skrytých staníc';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count hodnotených staníc';
+  }
+
+  @override
   String get noPriceHistory => 'Zatiaľ žiadna história cien';
 
   @override

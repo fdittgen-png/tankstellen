@@ -306,6 +306,35 @@
   "totalCost": "Samlede omkostninger",
   "enterCalcValues": "Indtast afstand, forbrug og pris for at beregne turomkostningen",
   "priceHistory": "Prishistorik",
+  "ignoredStationsLabel": "Ignorerede",
+  "ratingsLabel": "Vurderinger",
+  "favoritesDataCache": "Favoritdata",
+  "citySearchCache": "Bysøgning",
+  "dataDeletionNotAvailableCommunity": "Datasletning er ikke tilgængelig i fællesskabstilstand. Afbryd først forbindelsen, eller brug en privat database.",
+  "priceHistoryStationsTracked": "{count} sporede stationer",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} konfigureret",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} skjulte stationer",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} vurderede stationer",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Ingen prishistorik endnu",
   "noHourlyData": "Ingen timedata",
   "noStatistics": "Ingen statistikker tilgængelige",

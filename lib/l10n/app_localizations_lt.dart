@@ -959,6 +959,42 @@ class AppLocalizationsLt extends AppLocalizations {
   String get priceHistory => 'Kainų istorija';
 
   @override
+  String get ignoredStationsLabel => 'Ignoruojama';
+
+  @override
+  String get ratingsLabel => 'Įvertinimai';
+
+  @override
+  String get favoritesDataCache => 'Mėgstamiausių duomenys';
+
+  @override
+  String get citySearchCache => 'Miesto paieška';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Duomenų ištrynimas nepasiekiamas Bendruomenės režime. Pirmiausia atsijunkite arba naudokite privačią duomenų bazę.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count stebimų stočių';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count sukonfigūruota';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count paslėptų stočių';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count įvertintų stočių';
+  }
+
+  @override
   String get noPriceHistory => 'Kainų istorijos dar nėra';
 
   @override

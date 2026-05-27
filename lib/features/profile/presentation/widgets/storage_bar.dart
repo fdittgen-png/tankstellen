@@ -142,8 +142,10 @@ class CacheTtlInfo extends StatelessWidget {
         _ttlRow(l?.stationSearch ?? 'Station search', l?.minutes(5) ?? '5 min'),
         _ttlRow(l?.stationDetails ?? 'Station details', l?.minutes(15) ?? '15 min'),
         _ttlRow(l?.priceQuery ?? 'Price query', l?.minutes(5) ?? '5 min'),
-        _ttlRow('Favorites data', '30 min'),
-        _ttlRow('City search', '30 min'),
+        _ttlRow(l?.favoritesDataCache ?? 'Favorites data',
+            l?.minutes(30) ?? '30 min'),
+        _ttlRow(l?.citySearchCache ?? 'City search',
+            l?.minutes(30) ?? '30 min'),
         _ttlRow(l?.zipGeocoding ?? 'ZIP geocoding', l?.hours(24) ?? '24 h'),
       ],
     );

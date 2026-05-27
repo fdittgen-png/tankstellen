@@ -958,6 +958,42 @@ class AppLocalizationsFi extends AppLocalizations {
   String get priceHistory => 'Hintahistoria';
 
   @override
+  String get ignoredStationsLabel => 'Ohitetut';
+
+  @override
+  String get ratingsLabel => 'Arvioinnit';
+
+  @override
+  String get favoritesDataCache => 'Suosikkien tiedot';
+
+  @override
+  String get citySearchCache => 'Kaupunkihaku';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Tietojen poisto ei ole käytettävissä Yhteisö-tilassa. Katkaise ensin yhteys tai käytä yksityistä tietokantaa.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count seurattua asemaa';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count määritetty';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count piilotettua asemaa';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count arvioitua asemaa';
+  }
+
+  @override
   String get noPriceHistory => 'Ei hintahistoriaa vielä';
 
   @override

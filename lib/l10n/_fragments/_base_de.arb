@@ -424,6 +424,35 @@
   "totalCost": "Gesamtkosten",
   "enterCalcValues": "Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu berechnen",
   "priceHistory": "Preisverlauf",
+  "ignoredStationsLabel": "Ignoriert",
+  "ratingsLabel": "Bewertungen",
+  "favoritesDataCache": "Favoritendaten",
+  "citySearchCache": "Stadtsuche",
+  "dataDeletionNotAvailableCommunity": "Datenlöschung ist im Community-Modus nicht verfügbar. Trennen Sie zuerst die Verbindung oder verwenden Sie eine private Datenbank.",
+  "priceHistoryStationsTracked": "{count} Tankstellen verfolgt",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} konfiguriert",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} Tankstellen ausgeblendet",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} Tankstellen bewertet",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Noch kein Preisverlauf",
   "noHourlyData": "Keine Stundendaten",
   "noStatistics": "Keine Statistiken verfügbar",

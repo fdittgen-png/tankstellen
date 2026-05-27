@@ -306,6 +306,35 @@
   "totalCost": "Συνολικό κόστος",
   "enterCalcValues": "Εισάγετε απόσταση, κατανάλωση και τιμή για υπολογισμό κόστους ταξιδιού",
   "priceHistory": "Ιστορικό τιμών",
+  "ignoredStationsLabel": "Παραβλέφθηκαν",
+  "ratingsLabel": "Βαθμολογίες",
+  "favoritesDataCache": "Δεδομένα αγαπημένων",
+  "citySearchCache": "Αναζήτηση πόλης",
+  "dataDeletionNotAvailableCommunity": "Η διαγραφή δεδομένων δεν είναι διαθέσιμη στη λειτουργία Κοινότητας. Αποσυνδεθείτε πρώτα ή χρησιμοποιήστε μια ιδιωτική βάση δεδομένων.",
+  "priceHistoryStationsTracked": "{count} σταθμοί που παρακολουθούνται",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} ρυθμισμένες",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} κρυφοί σταθμοί",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} σταθμοί με βαθμολογία",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Δεν υπάρχει ακόμη ιστορικό τιμών",
   "noHourlyData": "Χωρίς ωριαία δεδομένα",
   "noStatistics": "Δεν υπάρχουν διαθέσιμα στατιστικά",

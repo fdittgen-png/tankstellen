@@ -960,6 +960,42 @@ class AppLocalizationsPl extends AppLocalizations {
   String get priceHistory => 'Historia cen';
 
   @override
+  String get ignoredStationsLabel => 'Ignorowane';
+
+  @override
+  String get ratingsLabel => 'Oceny';
+
+  @override
+  String get favoritesDataCache => 'Dane ulubionych';
+
+  @override
+  String get citySearchCache => 'Wyszukiwanie miasta';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Usuwanie danych nie jest dostępne w trybie Społeczności. Najpierw rozłącz się lub użyj prywatnej bazy danych.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count śledzonych stacji';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count skonfigurowanych';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count ukrytych stacji';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count ocenionych stacji';
+  }
+
+  @override
   String get noPriceHistory => 'Brak historii cen';
 
   @override

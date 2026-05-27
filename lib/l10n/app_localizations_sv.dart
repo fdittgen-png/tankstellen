@@ -958,6 +958,42 @@ class AppLocalizationsSv extends AppLocalizations {
   String get priceHistory => 'Prishistorik';
 
   @override
+  String get ignoredStationsLabel => 'Ignorerade';
+
+  @override
+  String get ratingsLabel => 'Betyg';
+
+  @override
+  String get favoritesDataCache => 'Favoritdata';
+
+  @override
+  String get citySearchCache => 'Stadsökning';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Radering av data är inte tillgänglig i Community-läge. Koppla från först eller använd en privat databas.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count bevakade stationer';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfigurerade';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count dolda stationer';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count betygsatta stationer';
+  }
+
+  @override
   String get noPriceHistory => 'Ingen prishistorik ännu';
 
   @override

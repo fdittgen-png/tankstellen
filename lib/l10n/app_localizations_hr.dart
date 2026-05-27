@@ -957,6 +957,42 @@ class AppLocalizationsHr extends AppLocalizations {
   String get priceHistory => 'Povijest cijena';
 
   @override
+  String get ignoredStationsLabel => 'Ignorirano';
+
+  @override
+  String get ratingsLabel => 'Ocjene';
+
+  @override
+  String get favoritesDataCache => 'Podaci favorita';
+
+  @override
+  String get citySearchCache => 'Pretraga gradova';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Brisanje podataka nije dostupno u načinu Zajednica. Najprije se odjavite ili upotrijebite privatnu bazu podataka.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count praćenih stanica';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfigurirano';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count skrivenih stanica';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count ocijenjenih stanica';
+  }
+
+  @override
   String get noPriceHistory => 'Još nema povijesti cijena';
 
   @override

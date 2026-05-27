@@ -1893,6 +1893,60 @@ abstract class AppLocalizations {
   /// **'Price History'**
   String get priceHistory;
 
+  /// No description provided for @ignoredStationsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignored'**
+  String get ignoredStationsLabel;
+
+  /// No description provided for @ratingsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings'**
+  String get ratingsLabel;
+
+  /// No description provided for @favoritesDataCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites data'**
+  String get favoritesDataCache;
+
+  /// No description provided for @citySearchCache.
+  ///
+  /// In en, this message translates to:
+  /// **'City search'**
+  String get citySearchCache;
+
+  /// No description provided for @dataDeletionNotAvailableCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Data deletion is not available in community mode. Disconnect first, or use a private database.'**
+  String get dataDeletionNotAvailableCommunity;
+
+  /// No description provided for @priceHistoryStationsTracked.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stations tracked'**
+  String priceHistoryStationsTracked(int count);
+
+  /// No description provided for @alertsConfiguredCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} configured'**
+  String alertsConfiguredCount(int count);
+
+  /// No description provided for @ignoredStationsHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stations hidden'**
+  String ignoredStationsHidden(int count);
+
+  /// No description provided for @ratingsStationsRated.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stations rated'**
+  String ratingsStationsRated(int count);
+
   /// No description provided for @noPriceHistory.
   ///
   /// In en, this message translates to:

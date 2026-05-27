@@ -955,6 +955,42 @@ class AppLocalizationsEt extends AppLocalizations {
   String get priceHistory => 'Hinnaajalugu';
 
   @override
+  String get ignoredStationsLabel => 'Ignoreeritud';
+
+  @override
+  String get ratingsLabel => 'Hinnangud';
+
+  @override
+  String get favoritesDataCache => 'Lemmikute andmed';
+
+  @override
+  String get citySearchCache => 'Linna otsing';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Andmete kustutamine ei ole kogukonna režiimis saadaval. Esmalt katkestage ühendus või kasutage privaatset andmebaasi.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count jälitatud tanklat';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count konfigureeritud';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count peidetud tanklat';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count hinnatud tanklat';
+  }
+
+  @override
   String get noPriceHistory => 'Hinnaajalugu puudub';
 
   @override

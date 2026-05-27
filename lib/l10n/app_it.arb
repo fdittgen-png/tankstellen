@@ -306,6 +306,35 @@
   "totalCost": "Costo totale",
   "enterCalcValues": "Inserisci distanza, consumo e prezzo per calcolare il costo del viaggio",
   "priceHistory": "Storico prezzi",
+  "ignoredStationsLabel": "Ignorate",
+  "ratingsLabel": "Valutazioni",
+  "favoritesDataCache": "Dati preferiti",
+  "citySearchCache": "Ricerca città",
+  "dataDeletionNotAvailableCommunity": "L'eliminazione dei dati non è disponibile in modalità Community. Disconnettiti prima o usa un database privato.",
+  "priceHistoryStationsTracked": "{count} stazioni tracciate",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} configurate",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} stazioni nascoste",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} stazioni valutate",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Nessuno storico prezzi ancora",
   "noHourlyData": "Nessun dato orario",
   "noStatistics": "Nessuna statistica disponibile",

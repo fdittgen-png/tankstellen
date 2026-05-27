@@ -962,6 +962,42 @@ class AppLocalizationsEl extends AppLocalizations {
   String get priceHistory => 'Ιστορικό τιμών';
 
   @override
+  String get ignoredStationsLabel => 'Παραβλέφθηκαν';
+
+  @override
+  String get ratingsLabel => 'Βαθμολογίες';
+
+  @override
+  String get favoritesDataCache => 'Δεδομένα αγαπημένων';
+
+  @override
+  String get citySearchCache => 'Αναζήτηση πόλης';
+
+  @override
+  String get dataDeletionNotAvailableCommunity =>
+      'Η διαγραφή δεδομένων δεν είναι διαθέσιμη στη λειτουργία Κοινότητας. Αποσυνδεθείτε πρώτα ή χρησιμοποιήστε μια ιδιωτική βάση δεδομένων.';
+
+  @override
+  String priceHistoryStationsTracked(int count) {
+    return '$count σταθμοί που παρακολουθούνται';
+  }
+
+  @override
+  String alertsConfiguredCount(int count) {
+    return '$count ρυθμισμένες';
+  }
+
+  @override
+  String ignoredStationsHidden(int count) {
+    return '$count κρυφοί σταθμοί';
+  }
+
+  @override
+  String ratingsStationsRated(int count) {
+    return '$count σταθμοί με βαθμολογία';
+  }
+
+  @override
   String get noPriceHistory => 'Δεν υπάρχει ακόμη ιστορικό τιμών';
 
   @override

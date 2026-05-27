@@ -306,6 +306,35 @@
   "totalCost": "Cost total",
   "enterCalcValues": "Introduceți distanța, consumul și prețul pentru a calcula costul călătoriei",
   "priceHistory": "Istoric prețuri",
+  "ignoredStationsLabel": "Ignorate",
+  "ratingsLabel": "Evaluări",
+  "favoritesDataCache": "Date favorite",
+  "citySearchCache": "Căutare oraș",
+  "dataDeletionNotAvailableCommunity": "Ștergerea datelor nu este disponibilă în modul Comunitate. Deconectați-vă mai întâi sau utilizați o bază de date privată.",
+  "priceHistoryStationsTracked": "{count} stații urmărite",
+  "@priceHistoryStationsTracked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alertsConfiguredCount": "{count} configurate",
+  "@alertsConfiguredCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ignoredStationsHidden": "{count} stații ascunse",
+  "@ignoredStationsHidden": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ratingsStationsRated": "{count} stații evaluate",
+  "@ratingsStationsRated": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "noPriceHistory": "Încă nu există istoric de prețuri",
   "noHourlyData": "Fără date orare",
   "noStatistics": "Nu sunt statistici disponibile",

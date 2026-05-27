@@ -151,11 +151,12 @@ class DataActionButtons extends StatelessWidget {
                 children: [
                   Icon(Icons.info_outline, color: DarkModeColors.warning(context)),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Data deletion is not available in community '
-                      'mode. Disconnect first, or use a private database.',
-                      style: TextStyle(fontSize: 13),
+                      l?.dataDeletionNotAvailableCommunity ??
+                          'Data deletion is not available in community '
+                              'mode. Disconnect first, or use a private database.',
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ),
                 ],
