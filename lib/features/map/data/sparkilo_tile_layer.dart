@@ -18,17 +18,25 @@ import 'retry_network_tile_provider.dart';
 /// ## Why this widget exists
 ///
 /// `RetryNetworkTileProvider` + `evictErrorTileStrategy:
-/// notVisibleRespectMargin` + `abortObsoleteRequests: false`
+/// notVisibleRespectMargin` + the upstream-default
+/// `abortObsoleteRequests: true` + a wider `keepBuffer` (4)
 /// together cover the four documented grey-tile pathologies:
 ///
 /// 1. OSM transient HTTP 429 / 5xx — provider retries 3× with
 ///    jittered backoff.
-/// 2. flutter_map's rebuild-abort race — provider declines to
-///    re-fire on cancellations, and `abortObsoleteRequests: false`
-///    keeps in-flight fetches alive across rebuilds.
+/// 2. flutter_map's pan-fetch race — `abortObsoleteRequests: true`
+///    (upstream default, restored in #2122) cancels in-flight tile
+///    requests for off-screen coordinates so visible tiles aren't
+///    starved by a backlog. The retry provider's
+///    `_isCancellation` guard makes the cancellations a no-op for
+///    the retry loop.
 /// 3. The error-tile cache trap — `notVisibleRespectMargin` evicts
 ///    failed tiles once off-screen so the next pan retries cleanly.
-/// 4. The cold-start camera-settled race — the optional [reset]
+/// 4. The grey-while-loading symptom — `keepBuffer: 4` keeps the
+///    previous level's painted tiles on screen until the new
+///    fetches resolve, so a slow connection doesn't show grey
+///    squares during the swap.
+/// 5. The cold-start camera-settled race — the optional [reset]
 ///    stream lets a parent fire a tile reset when its layout
 ///    settles (used by `station_map_layers.dart`).
 ///
@@ -106,12 +114,17 @@ class _SparkiloTileLayerState extends State<SparkiloTileLayer> {
   @override
   void initState() {
     super.initState();
-    // `abortObsoleteRequests: false` is critical — flutter_map's
-    // default (true) aborts in-flight tile HTTP requests when the
-    // widget rebuilds. Combined with the provider's
-    // cancellation-aware retry logic, false keeps fetches alive
-    // through the rebuild churn.
-    _tileProvider = RetryNetworkTileProvider(abortObsoleteRequests: false);
+    // #2122 — restored to the upstream default (`true`). The earlier
+    // override to `false` (added in #2097) turned out to amplify the
+    // grey-tile symptom rather than fix it: requests for tiles that
+    // had already panned out of view stayed in the queue, competing
+    // with the visible tiles for bandwidth and producing the user-
+    // reported "loading process gets cut" effect. The retry
+    // provider's `_isCancellation` guard already makes mid-fetch
+    // aborts a no-op for the retry loop, so reverting to `true`
+    // gives bandwidth back to the tiles the user is actually
+    // looking at without compromising transient-failure recovery.
+    _tileProvider = RetryNetworkTileProvider();
   }
 
   @override
@@ -130,6 +143,14 @@ class _SparkiloTileLayerState extends State<SparkiloTileLayer> {
       maxZoom: widget.maxZoom,
       tileProvider: _tileProvider,
       reset: widget.reset,
+      // #2122 — keep the previous level's already-loaded tiles
+      // painted while the new ones fetch. flutter_map's default is
+      // 2; bumping to 4 covers a wider corona around the visible
+      // viewport so a slow connection or a quick pan doesn't expose
+      // a grey ring. `panBuffer` deliberately stays at its default
+      // (1) — the flutter_map docs explicitly warn that raising it
+      // slows the visible tile fetches and adds load to OSM.
+      keepBuffer: 4,
       evictErrorTileStrategy:
           EvictErrorTileStrategy.notVisibleRespectMargin,
       errorTileCallback: (tile, error, stackTrace) {
