@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -12,6 +13,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
@@ -167,10 +169,12 @@ class _PrivacyDashboardScreenState
       try {
         await _shareErrorLogAsFile(json);
       } on Object catch (e, st) {
-        // If share sheet wiring fails we still want to give the user
-        // something — fall back to clipboard so the bug report doesn't
-        // get blocked on a platform-channel hiccup.
-        debugPrint('privacy: error-log share fallback to clipboard: $e\n$st');
+        // Share-sheet wiring failed; fall back to clipboard so the bug
+        // report isn't blocked on a platform-channel hiccup. #2146 —
+        // also surface on the exportable log.
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+          'where': 'PrivacyDashboard._exportErrorLog: share fallback',
+        }));
         await Clipboard.setData(ClipboardData(text: json));
         if (!mounted) return;
         SnackBarHelper.showSuccess(
@@ -268,7 +272,10 @@ class _PrivacyDashboardScreenState
         l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
       );
     } on Object catch (e, st) {
-      debugPrint('privacy: error-log save-to-downloads failed: $e\n$st');
+      // #2146 — surface on the log the user is about to export.
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'PrivacyDashboard._shareErrorLogAsFile',
+      }));
     }
   }
 
@@ -320,7 +327,11 @@ class _PrivacyDashboardScreenState
         l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
       );
     } on Object catch (e, st) {
-      debugPrint('privacy: save-to-downloads fallback: $e\n$st');
+      // #2146 — surface on the user-exportable log.
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        'where': 'PrivacyDashboard._saveExportToDownloads',
+        'fileName': fileName,
+      }));
       if (!mounted) return;
       SnackBarHelper.showSuccess(context, copySnackbar);
     }

@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
@@ -251,7 +254,12 @@ class TankSyncSection extends ConsumerWidget {
         if (context.mounted) {
           SnackBarHelper.show(context, AppLocalizations.of(context)?.switchedToAnonymous ?? 'Switched to anonymous session');
         }
-      } catch (e, st) { // ignore: unused_catch_stack
+      } catch (e, st) {
+        // #2146 — route to errorLogger so the failure lands on the
+        // exportable log (the snackbar is transient).
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+          'where': 'TankSyncSection: switchToAnonymous',
+        }));
         if (context.mounted) {
           SnackBarHelper.showError(context, AppLocalizations.of(context)?.failedToSwitch(e.toString()) ?? 'Failed to switch: $e');
         }

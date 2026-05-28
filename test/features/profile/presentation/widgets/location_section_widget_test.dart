@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/data/repositories/profile_repository.dart';
@@ -118,6 +119,20 @@ UserProfile _profile({bool autoUpdate = false}) => UserProfile(
 void main() {
   setUpAll(() {
     registerFallbackValue(_profile());
+  });
+
+  setUp(() {
+    // #2146 — LocationSectionWidget now routes GPS-update catches
+    // through errorLogger. In tests Hive isn't initialised so the
+    // spool's default path throws — silence it via the existing seam.
+    errorLogger.spoolEnqueueOverride = ({
+      required String isolateTaskName,
+      required Object error,
+      StackTrace? stack,
+      Map<String, dynamic>? contextMap,
+      DateTime? timestamp,
+    }) async {};
+    addTearDown(errorLogger.resetForTest);
   });
 
   group('LocationSectionWidget', () {

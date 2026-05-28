@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -183,7 +186,12 @@ class LocationSectionWidget extends ConsumerWidget {
   Future<void> _updateGps(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(userPositionProvider.notifier).updateFromGps();
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      // #2146 — record the GPS failure on the exportable log so a user
+      // bug report has the stack trace instead of just a snackbar.
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'LocationSection._updateGps: userPosition.updateFromGps',
+      }));
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showError(
