@@ -225,7 +225,15 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
             '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');
       }
     } finally {
-      if (mounted) notifier.setSearching(false);
+      // #2139 — always reset isSearching, even if the widget unmounted
+      // mid-await. The captured notifier reference stays valid for the
+      // provider's lifetime (try/catch covers the rare case where the
+      // provider has been auto-disposed already).
+      try {
+        notifier.setSearching(false);
+      } catch (_) {
+        // Provider disposed — state is gone anyway.
+      }
     }
   }
 
