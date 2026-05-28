@@ -1595,6 +1595,11 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Salvesta tõrkelogi ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Tühjenda vealogi';
 
   @override

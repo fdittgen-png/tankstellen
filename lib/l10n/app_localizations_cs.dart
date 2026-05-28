@@ -1603,6 +1603,11 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Uložit záznam chyb ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Vymazat protokol chyb';
 
   @override

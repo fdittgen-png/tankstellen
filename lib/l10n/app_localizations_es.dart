@@ -1606,6 +1606,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Guardar registro de errores ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Borrar registro de errores';
 
   @override

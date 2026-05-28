@@ -1862,5 +1862,14 @@
   "fabOpenResults": "Otwórz wyniki",
   "fabRunSearch": "Uruchom wyszukiwanie",
   "fabRefineCriteria": "Zawęź wyszukiwanie",
-  "routeSearchPartialBanner": "Wyszukiwanie kolejnych stacji…"
+  "routeSearchPartialBanner": "Wyszukiwanie kolejnych stacji…",
+  "privacySaveErrorLog": "Zapisz dziennik błędów ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

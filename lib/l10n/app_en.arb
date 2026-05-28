@@ -769,6 +769,15 @@
       }
     }
   },
+  "privacySaveErrorLog": "Save error log ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder (and shares / copies as a secondary path). Supersedes privacyCopyErrorLog (#2145). count = number of traces buffered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "privacyClearErrorLog": "Clear error log",
   "privacyErrorLogCleared": "Error log cleared",
   "privacyDeleteTitle": "Delete all data?",

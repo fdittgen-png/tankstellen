@@ -1862,5 +1862,14 @@
   "fabOpenResults": "Öppna resultat",
   "fabRunSearch": "Kör sökning",
   "fabRefineCriteria": "Förfina sökning",
-  "routeSearchPartialBanner": "Söker efter fler stationer…"
+  "routeSearchPartialBanner": "Söker efter fler stationer…",
+  "privacySaveErrorLog": "Spara felloggen ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

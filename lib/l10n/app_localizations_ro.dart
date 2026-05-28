@@ -1606,6 +1606,11 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Salvează jurnalul de erori ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Șterge jurnalul de erori';
 
   @override

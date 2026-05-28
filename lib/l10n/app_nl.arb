@@ -1862,5 +1862,14 @@
   "fabOpenResults": "Resultaten openen",
   "fabRunSearch": "Zoekopdracht uitvoeren",
   "fabRefineCriteria": "Zoekopdracht verfijnen",
-  "routeSearchPartialBanner": "Zoekt naar meer stations…"
+  "routeSearchPartialBanner": "Zoekt naar meer stations…",
+  "privacySaveErrorLog": "Foutenlogboek opslaan ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

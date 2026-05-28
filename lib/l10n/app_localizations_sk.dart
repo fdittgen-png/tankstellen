@@ -1607,6 +1607,11 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Uložiť záznam chýb ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Vymazať protokol chýb';
 
   @override

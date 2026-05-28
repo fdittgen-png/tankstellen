@@ -739,6 +739,15 @@
       }
     }
   },
+  "privacySaveErrorLog": "Fehlerprotokoll speichern ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "privacyClearErrorLog": "Fehlerprotokoll löschen",
   "privacyErrorLogCleared": "Fehlerprotokoll gelöscht",
   "privacyDeleteTitle": "Alle Daten löschen?",

@@ -1597,6 +1597,11 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Lagre feillogg ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Tøm feilloggen';
 
   @override

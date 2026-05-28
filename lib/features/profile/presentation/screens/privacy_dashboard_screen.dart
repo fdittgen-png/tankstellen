@@ -110,8 +110,11 @@ class _PrivacyDashboardScreenState
                   onPressed: _exportErrorLog,
                   icon: const Icon(Icons.bug_report_outlined),
                   label: Text(
-                    l?.privacyCopyErrorLog(errorLogCount) ??
-                        'Copy error log to clipboard ($errorLogCount)',
+                    // #2145 — label reflects the dominant behaviour
+                    // (save to Downloads); clipboard/share fallbacks
+                    // happen automatically based on payload size.
+                    l?.privacySaveErrorLog(errorLogCount) ??
+                        'Save error log ($errorLogCount)',
                   ),
                 ),
               ),

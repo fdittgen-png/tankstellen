@@ -1862,5 +1862,14 @@
   "fabOpenResults": "Ava tulemused",
   "fabRunSearch": "Käivita otsing",
   "fabRefineCriteria": "Täpsusta otsingut",
-  "routeSearchPartialBanner": "Otsitakse rohkem jaamu…"
+  "routeSearchPartialBanner": "Otsitakse rohkem jaamu…",
+  "privacySaveErrorLog": "Salvesta tõrkelogi ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
