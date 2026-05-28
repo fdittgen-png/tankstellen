@@ -469,7 +469,15 @@ object StationWidgetRenderer {
         val intent = Intent(context, MainActivity::class.java).apply {
             action = HomeWidgetLaunchIntent.HOME_WIDGET_LAUNCH_ACTION
             data = uri
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            // #2157 — explicit SINGLE_TOP makes the singleTop manifest
+            // launchMode semantics explicit at the intent level too;
+            // some OEM ROMs were dropping warm-tap onNewIntent without
+            // it (Stream listener never fired → no navigation).
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                    or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            )
         }
         return PendingIntent.getActivity(
             context,
