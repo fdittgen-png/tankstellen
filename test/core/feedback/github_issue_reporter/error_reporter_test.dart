@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter/error_report_payload.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter/error_reporter.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 ErrorReportPayload _samplePayload() => ErrorReportPayload(
       errorType: 'ApiException',
@@ -29,6 +30,7 @@ Widget _wrap(Widget child) {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   // The #1606 dedup ring buffer is process-static — reset it before
   // every test so a fingerprint recorded by one test does not bleed
   // into the next.

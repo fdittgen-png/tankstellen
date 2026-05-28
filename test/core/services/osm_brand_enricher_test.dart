@@ -5,10 +5,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/osm_brand_enricher.dart';
+import '../../helpers/silence_error_logger.dart';
 
 class MockDio extends Mock implements Dio {}
 
 void main() {
+  silenceErrorLoggerSpool();
   late MockDio mockDio;
 
   setUp(() {

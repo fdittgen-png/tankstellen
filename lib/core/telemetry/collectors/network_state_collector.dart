@@ -1,9 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import '../models/error_trace.dart';
+import '../../../core/logging/error_logger.dart';
 
 class NetworkStateCollector {
   static Future<NetworkSnapshot> collect() async {
@@ -21,7 +23,7 @@ class NetworkStateCollector {
       }
       return NetworkSnapshot(isOnline: isOnline, connectivityType: type);
     } on Exception catch (e, st) {
-      debugPrint('NetworkStateCollector: connectivity check failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'NetworkStateCollector: connectivity check failed'}));
       return const NetworkSnapshot(isOnline: false, connectivityType: 'unknown');
     }
   }

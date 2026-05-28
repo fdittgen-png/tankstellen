@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io' show Platform;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import '../../constants/app_constants.dart';
 import '../models/error_trace.dart';
+import '../../../core/logging/error_logger.dart';
 
 class DeviceInfoCollector {
   static DeviceInfo collect() {
@@ -32,7 +35,7 @@ class DeviceInfoCollector {
       final size = view.physicalSize / view.devicePixelRatio;
       screenWidth = size.width;
       screenHeight = size.height;
-    } catch (e, st) { debugPrint('DeviceInfoCollector.screenSize: $e\n$st'); }
+    } catch (e, st) { unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DeviceInfoCollector.screenSize'})); }
 
     return DeviceInfo(
       os: os,

@@ -9,7 +9,10 @@ import 'package:tankstellen/core/feedback/github_issue_body_formatter.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart'
     show ScanKind;
 
+import '../../helpers/silence_error_logger.dart';
+
 void main() {
+  silenceErrorLoggerSpool();
   group('GithubIssueBodyFormatter.scanKindLabel', () {
     test('returns "Receipt" for ScanKind.receipt', () {
       expect(

@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../features/itinerary/domain/entities/saved_itinerary.dart';
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Saved-itinerary sync with Supabase, pulled out of [SyncService]
 /// (#727).
@@ -44,7 +47,7 @@ class ItinerariesSync {
       debugPrint('ItinerariesSync.save: saved "${itinerary.name}"');
       return true;
     } catch (e, st) {
-      debugPrint('ItinerariesSync.save FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ItinerariesSync.save FAILED'}));
       return false;
     }
   }
@@ -85,7 +88,7 @@ class ItinerariesSync {
         );
       }).toList();
     } catch (e, st) {
-      debugPrint('ItinerariesSync.fetchAll FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ItinerariesSync.fetchAll FAILED'}));
       return [];
     }
   }
@@ -105,7 +108,7 @@ class ItinerariesSync {
           .eq('user_id', userId);
       return true;
     } catch (e, st) {
-      debugPrint('ItinerariesSync.delete FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ItinerariesSync.delete FAILED'}));
       return false;
     }
   }

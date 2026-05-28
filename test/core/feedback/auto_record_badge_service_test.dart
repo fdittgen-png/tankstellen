@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tankstellen/core/feedback/auto_record_badge_service.dart';
+import '../../helpers/silence_error_logger.dart';
 
 /// Unit tests for [AutoRecordBadgeService] (#1004 phase 5).
 ///
@@ -12,6 +13,7 @@ import 'package:tankstellen/core/feedback/auto_record_badge_service.dart';
 /// reaching for a platform channel mock — that level of indirection
 /// belongs in the integration suite, not here.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {

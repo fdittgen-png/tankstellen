@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Describes a branded payment/loyalty app for a fuel station brand.
 ///
@@ -96,7 +99,7 @@ class PaymentAppLauncher {
           if (launched) return true;
         }
       } on Exception catch (e, st) {
-        debugPrint('PaymentAppLauncher scheme failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'PaymentAppLauncher scheme failed'}));
       }
     }
 
@@ -109,14 +112,14 @@ class PaymentAppLauncher {
       );
       if (launched) return true;
     } on Exception catch (e, st) {
-      debugPrint('PaymentAppLauncher market failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'PaymentAppLauncher market failed'}));
     }
 
     final webUri = playStoreWebUrl(app);
     try {
       return await launcher(webUri, mode: LaunchMode.externalApplication);
     } on Exception catch (e, st) {
-      debugPrint('PaymentAppLauncher web fallback failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'PaymentAppLauncher web fallback failed'}));
       return false;
     }
   }

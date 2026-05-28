@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../features/vehicle/domain/entities/vehicle_profile.dart';
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Per-vehicle profile sync with Supabase (#713), pulled out of
 /// [SyncService] (#727).
@@ -78,7 +81,7 @@ class VehiclesSync {
           try {
             return VehicleProfile.fromJson(data);
           } catch (e, st) {
-            debugPrint('VehiclesSync.merge decode failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.merge decode failed'}));
             return null;
           }
         }
@@ -87,7 +90,7 @@ class VehiclesSync {
 
       return [...localVehicles, ...downloaded];
     } catch (e, st) {
-      debugPrint('VehiclesSync.merge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.merge FAILED'}));
       return localVehicles;
     }
   }
@@ -107,7 +110,7 @@ class VehiclesSync {
           .eq('user_id', userId)
           .eq('id', vehicleId);
     } catch (e, st) {
-      debugPrint('VehiclesSync.delete FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.delete FAILED'}));
     }
   }
 }

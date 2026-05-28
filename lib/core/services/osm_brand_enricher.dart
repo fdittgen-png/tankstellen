@@ -1,10 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import 'dio_factory.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Enriches station brand data from OpenStreetMap via the Overpass API.
 ///
@@ -82,7 +84,7 @@ class OsmBrandEnricher {
       _cache[cacheKey] = null;
       return null;
     } catch (e, st) {
-      debugPrint('OSM brand enrichment failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OSM brand enrichment failed'}));
       _cache[cacheKey] = null;
       return null;
     }

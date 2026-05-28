@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Thin wrapper around the Supabase Flutter SDK.
 ///
@@ -127,7 +130,7 @@ class TankSyncClient {
     try {
       await c.auth.signOut();
     } catch (e, st) {
-      debugPrint('TankSync: sign-out after upsert failure also failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TankSync: sign-out after upsert failure also failed'}));
     }
     _initialized = false;
     throw StateError(

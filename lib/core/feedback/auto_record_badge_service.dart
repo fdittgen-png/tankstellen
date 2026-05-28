@@ -1,9 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:app_badge_plus/app_badge_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Persistent counter of unseen auto-recorded trips, surfaced as a
 /// launcher-icon badge (#1004 phase 5).
@@ -79,7 +81,7 @@ class AutoRecordBadgeService {
     try {
       await _prefs.setInt(storageKey, value);
     } catch (e, st) {
-      debugPrint('AutoRecordBadgeService write failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'AutoRecordBadgeService write failed'}));
     }
   }
 
@@ -90,7 +92,7 @@ class AutoRecordBadgeService {
       // Launcher does not support badges, or the platform plugin
       // raised. Don't propagate — the Dart-level counter is the
       // source of truth and survives the next launch attempt.
-      debugPrint('AutoRecordBadgeService setBadge($value) failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'AutoRecordBadgeService setBadge($value) failed'}));
     }
   }
 

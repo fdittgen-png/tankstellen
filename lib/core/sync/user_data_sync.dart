@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// GDPR data-management operations over the user's full server-side
 /// footprint, pulled out of [SyncService] (#727).
@@ -71,7 +74,7 @@ class UserDataSync {
         'trip_details': tripDetails,
       };
     } catch (e, st) {
-      debugPrint('UserDataSync.fetchAll FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'UserDataSync.fetchAll FAILED'}));
       return {'error': e.toString()};
     }
   }

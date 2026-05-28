@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Station-rating sync with Supabase, pulled out of [SyncService] (#727).
 ///
@@ -47,7 +50,7 @@ class RatingsSync {
       debugPrint(
           'RatingsSync.upsert: $stationId = $rating stars (shared=$shared)');
     } catch (e, st) {
-      debugPrint('RatingsSync.upsert FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.upsert FAILED'}));
     }
   }
 
@@ -66,7 +69,7 @@ class RatingsSync {
           .eq('station_id', stationId);
       debugPrint('RatingsSync.delete: $stationId removed');
     } catch (e, st) {
-      debugPrint('RatingsSync.delete FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.delete FAILED'}));
     }
   }
 
@@ -93,7 +96,7 @@ class RatingsSync {
       }
       return result;
     } catch (e, st) {
-      debugPrint('RatingsSync.fetchAll FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.fetchAll FAILED'}));
       return {};
     }
   }

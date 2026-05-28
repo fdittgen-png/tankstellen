@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Payload format embedded in price-alert notifications (#1012 phase 3).
 ///
@@ -79,7 +82,7 @@ class NotificationPayload {
         country: country,
       );
     } catch (e, st) {
-      debugPrint('NotificationPayload.tryDecode failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'NotificationPayload.tryDecode failed'}));
       return null;
     }
   }

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,6 +15,7 @@ import 'favorites_sync.dart';
 import 'ignored_stations_sync.dart';
 import 'ratings_sync.dart';
 import 'user_data_sync.dart';
+import '../../core/logging/error_logger.dart';
 
 part 'sync_provider.g.dart';
 
@@ -85,7 +88,7 @@ class SyncState extends _$SyncState {
       // Initial sync: upload local data to server (non-blocking)
       _performInitialSync(storage);
     } catch (e, st) {
-      debugPrint('TankSync connect failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TankSync connect failed'}));
       rethrow;
     }
   }
@@ -162,7 +165,7 @@ class SyncState extends _$SyncState {
       // Sync local data to the new anonymous account
       _performInitialSync(storage);
     } catch (e, st) {
-      debugPrint('switchToAnonymous failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'switchToAnonymous failed'}));
       rethrow;
     }
   }
@@ -180,7 +183,7 @@ class SyncState extends _$SyncState {
       await UserDataSync.deleteAll();
       await TankSyncClient.signOut();
     } catch (e, st) {
-      debugPrint('Delete account failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Delete account failed'}));
     }
     await disconnect();
   }
@@ -191,7 +194,7 @@ class SyncState extends _$SyncState {
     try {
       await TankSyncClient.signOut();
     } catch (e, st) {
-      debugPrint('TankSync signOut failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TankSync signOut failed'}));
     }
 
     await storage.putSetting('sync_enabled', false);
@@ -216,7 +219,7 @@ class SyncState extends _$SyncState {
         }
         debugPrint('InitialSync: complete');
       } catch (e, st) {
-        debugPrint('InitialSync failed (non-fatal): $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
       }
     });
   }

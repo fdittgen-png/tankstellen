@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -14,6 +16,7 @@ import 'stores/favorites_hive_store.dart';
 import 'stores/price_history_hive_store.dart';
 import 'stores/profiles_hive_store.dart';
 import 'stores/settings_hive_store.dart';
+import '../../core/logging/error_logger.dart';
 
 part 'hive_storage.g.dart';
 
@@ -327,7 +330,7 @@ class HiveStorage implements StorageRepository {
       if (!file.existsSync()) return box.length * fallbackPerEntry;
       return file.lengthSync();
     } catch (e, st) {
-      debugPrint('storageStats: lengthSync failed for $boxName: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'storageStats: lengthSync failed for $boxName'}));
       return box.length * fallbackPerEntry;
     }
   }

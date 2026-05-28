@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Tri-state consent for the GitHub bad-scan reporter (#952 phase 3).
 ///
@@ -54,7 +57,7 @@ class FeedbackConsent {
           return FeedbackConsentState.unset;
       }
     } catch (e, st) {
-      debugPrint('FeedbackConsent.read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FeedbackConsent.read failed'}));
       return FeedbackConsentState.unset;
     }
   }
@@ -76,7 +79,7 @@ class FeedbackConsent {
           return;
       }
     } catch (e, st) {
-      debugPrint('FeedbackConsent.write failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FeedbackConsent.write failed'}));
     }
   }
 }

@@ -1,15 +1,17 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:math';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/storage_repository.dart';
 import '../../storage/storage_providers.dart';
 import '../dio_factory.dart';
 import '../../../features/search/domain/entities/brand_registry.dart';
 import '../../../features/search/domain/entities/station.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'osm_brand_enricher.g.dart';
 
@@ -127,7 +129,7 @@ class OsmBrandEnricher {
           }
         }
       }
-    } on DioException catch (e, st) { debugPrint('OSM brand enrichment failed: $e\n$st'); }
+    } on DioException catch (e, st) { unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OSM brand enrichment failed'})); }
   }
 
   List<Station> _applyCachedBrands(List<Station> stations) {

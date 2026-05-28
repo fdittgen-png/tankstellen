@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -8,6 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../widgets/snackbar_helper.dart';
 import 'error_report_formatter.dart';
 import 'error_report_payload.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Launches a URL in the external browser.
 ///
@@ -95,7 +98,7 @@ class ErrorReporter {
       if (launched) _rememberFingerprint(payload.fingerprint);
       return launched;
     } catch (e, st) {
-      debugPrint('ErrorReporter launch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ErrorReporter launch failed'}));
       return false;
     }
   }

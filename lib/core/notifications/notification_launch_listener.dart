@@ -12,6 +12,7 @@ import '../../app/router.dart';
 import 'local_notification_service.dart';
 import 'notification_payload.dart';
 import 'notification_tap_dispatcher.dart';
+import '../../core/logging/error_logger.dart';
 
 part 'notification_launch_listener.g.dart';
 
@@ -42,7 +43,7 @@ class NotificationLaunchHandler {
     try {
       _router.push(path);
     } catch (e, st) {
-      debugPrint('NotificationLaunchHandler: push failed for $rawPayload → $path: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'NotificationLaunchHandler: push failed for $rawPayload → $path'}));
     }
   }
 }
@@ -114,7 +115,7 @@ class _NotificationLaunchListenerState
       // live navigator rather than an empty stack.
       WidgetsBinding.instance.addPostFrameCallback((_) => _dispatch(payload));
     } catch (e, st) {
-      debugPrint('NotificationLaunchListener: cold-launch probe failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'NotificationLaunchListener: cold-launch probe failed'}));
     }
   }
 

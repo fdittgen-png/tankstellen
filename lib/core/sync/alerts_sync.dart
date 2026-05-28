@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../features/alerts/data/models/price_alert.dart';
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Price-alert sync with Supabase, pulled out of [SyncService] (#727).
 ///
@@ -79,7 +82,7 @@ class AlertsSync {
 
       return [...localAlerts, ...downloaded];
     } catch (e, st) {
-      debugPrint('AlertsSync.merge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'AlertsSync.merge FAILED'}));
       return localAlerts;
     }
   }

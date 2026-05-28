@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
 import '../../features/consumption/data/baseline_sync.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Per-vehicle OBD2 baseline sync with Supabase (#780), pulled out of
 /// [SyncService] (#727).
@@ -77,7 +80,7 @@ class BaselinesSync {
       );
       return merged;
     } catch (e, st) {
-      debugPrint('BaselinesSync.merge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BaselinesSync.merge FAILED'}));
       return localJson;
     }
   }
@@ -97,7 +100,7 @@ class BaselinesSync {
           .eq('user_id', userId)
           .eq('vehicle_id', vehicleId);
     } catch (e, st) {
-      debugPrint('BaselinesSync.delete FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BaselinesSync.delete FAILED'}));
     }
   }
 }

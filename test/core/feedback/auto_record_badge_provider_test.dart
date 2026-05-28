@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tankstellen/core/feedback/auto_record_badge_provider.dart';
 import 'package:tankstellen/core/feedback/auto_record_badge_service.dart';
+import '../../helpers/silence_error_logger.dart';
 
 /// Unit tests for `auto_record_badge_provider.dart` (#561 zero-coverage
 /// epic; service is already covered by
@@ -57,6 +58,7 @@ class _FakeAutoRecordBadgeService implements AutoRecordBadgeService {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('AutoRecordBadgeCount.build', () {

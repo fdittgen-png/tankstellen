@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'notification_service.dart';
 import 'notification_tap_dispatcher.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Default [NotificationService] implementation backed by
 /// `flutter_local_notifications`.
@@ -127,7 +129,7 @@ class LocalNotificationService implements NotificationService {
       if (!details.didNotificationLaunchApp) return null;
       return details.notificationResponse?.payload;
     } catch (e, st) {
-      debugPrint('LocalNotificationService.getColdLaunchPayload failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'LocalNotificationService.getColdLaunchPayload failed'}));
       return null;
     }
   }

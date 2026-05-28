@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Ignored-stations sync with Supabase, pulled out of [SyncService] (#727).
 ///
@@ -55,7 +58,7 @@ class IgnoredStationsSync {
 
       return localIds.union(serverIds).toList();
     } catch (e, st) {
-      debugPrint('IgnoredStationsSync.merge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'IgnoredStationsSync.merge FAILED'}));
       return localIgnoredIds;
     }
   }
