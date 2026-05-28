@@ -103,21 +103,11 @@ class DrivingMapView extends StatelessWidget {
   }
 
   /// (min, max) price for [fuel] across the given stations. Returns (0, 0)
-  /// when no station has a price.
+  /// when no station has a price. Delegates to the shared [priceRange]
+  /// helper (#2182) — accepts any non-null price, as before.
   static (double, double) computePriceRange(
     List<Station> stations,
     FuelType fuel,
-  ) {
-    double minP = double.infinity;
-    double maxP = 0;
-    for (final s in stations) {
-      final p = priceForFuelType(s, fuel);
-      if (p != null) {
-        if (p < minP) minP = p;
-        if (p > maxP) maxP = p;
-      }
-    }
-    if (minP == double.infinity) return (0, 0);
-    return (minP, maxP);
-  }
+  ) =>
+      priceRange(stations, fuel);
 }

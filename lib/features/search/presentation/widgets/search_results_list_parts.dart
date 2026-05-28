@@ -47,20 +47,11 @@ Map<String, Map<FuelType, bool>> _computeCheapestFlagsFor(
   return result;
 }
 
-/// Get min/max price range for tier classification.
-(double, double) _getPriceRangeFor(List<Station> stations, FuelType fuel) {
-  double minP = double.infinity;
-  double maxP = 0;
-  for (final s in stations) {
-    final p = s.priceFor(fuel);
-    if (p != null && p > 0) {
-      if (p < minP) minP = p;
-      if (p > maxP) maxP = p;
-    }
-  }
-  if (minP == double.infinity) return (0.0, 0.0);
-  return (minP, maxP);
-}
+/// Get min/max price range for tier classification. Delegates to the
+/// shared [priceRange] helper (#2182); the search list excludes
+/// zero/sentinel prices from its tiers, hence `requirePositive: true`.
+(double, double) _getPriceRangeFor(List<Station> stations, FuelType fuel) =>
+    priceRange(stations, fuel, requirePositive: true);
 
 /// Collapsible section that wraps [BrandFilterChips] inside an expandable
 /// toggle. When collapsed, only a "Brands" label with a chevron is shown.

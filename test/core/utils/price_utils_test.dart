@@ -78,6 +78,39 @@ void main() {
     });
   });
 
+  // #2182 — single source for the three (min,max) price-range loops.
+  group('priceRange', () {
+    test('returns (min, max) across stations', () {
+      final stations = [
+        _makeStation(e10: 1.799),
+        _makeStation(e10: 1.659),
+        _makeStation(e10: 1.899),
+      ];
+      expect(priceRange(stations, FuelType.e10), (1.659, 1.899));
+    });
+
+    test('returns (0, 0) when no station has a price', () {
+      final stations = [_makeStation(), _makeStation()];
+      expect(priceRange(stations, FuelType.e10), (0.0, 0.0));
+    });
+
+    test('default accepts any non-null price incl. zero/negative '
+        '(map/driving behaviour)', () {
+      final stations = [_makeStation(e10: 0.0), _makeStation(e10: 1.5)];
+      // requirePositive defaults false → 0.0 is counted as the min.
+      expect(priceRange(stations, FuelType.e10), (0.0, 1.5));
+    });
+
+    test('requirePositive excludes zero / sentinel prices '
+        '(search-list behaviour)', () {
+      final stations = [_makeStation(e10: 0.0), _makeStation(e10: 1.5)];
+      expect(
+        priceRange(stations, FuelType.e10, requirePositive: true),
+        (1.5, 1.5),
+      );
+    });
+  });
+
   group('priceForFuelType', () {
     test('returns e5 price for FuelType.e5', () {
       final station = _makeStation(e5: 1.659);
