@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 
 import '../../../core/notifications/notification_payload.dart';
 import '../../../core/notifications/notification_service.dart';
@@ -9,6 +10,7 @@ import '../domain/entities/radius_alert.dart';
 import '../domain/radius_alert_evaluator.dart';
 import 'radius_alert_dedup.dart';
 import 'radius_alert_store.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Source of price samples for one [RadiusAlert]. The background
 /// isolate implementation queries the country's StationService (see
@@ -189,7 +191,7 @@ class RadiusAlertRunner {
       } catch (e, st) {
         // One bad alert (e.g. country API down) must not block the
         // rest — log and keep going.
-        debugPrint('RadiusAlertRunner: alert ${alert.id} failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'RadiusAlertRunner: alert ${alert.id} failed'}));
       }
     }
     return fired;

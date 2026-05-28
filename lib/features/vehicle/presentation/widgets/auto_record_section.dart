@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -115,7 +117,7 @@ class AutoRecordSection extends ConsumerWidget {
             orElse: () => const VehicleProfile(id: '', name: ''),
           );
     } catch (e, st) {
-      debugPrint('AutoRecordSection: profile lookup failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AutoRecordSection: profile lookup failed'}));
       return const SizedBox.shrink();
     }
 

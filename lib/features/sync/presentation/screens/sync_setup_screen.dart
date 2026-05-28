@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -20,6 +22,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../widgets/sync_done_step.dart';
 import '../widgets/sync_mode_step.dart';
 import '../widgets/wizard_create_new.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Clean 3-step sync setup: Mode -> Credentials (if needed) -> Auth -> Done.
 ///
@@ -129,7 +132,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
       } catch (e, st) {
-        debugPrint('QR code parse failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'QR code parse failed'}));
         if (mounted) {
           SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCode ?? 'Invalid QR code format');
         }

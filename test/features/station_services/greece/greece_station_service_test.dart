@@ -12,6 +12,7 @@ import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../mocks/mocks.dart';
 
@@ -45,6 +46,7 @@ List<Map<String, dynamic>> _envelope(List<Map<String, dynamic>> responses) =>
     responses;
 
 void main() {
+  silenceErrorLoggerSpool();
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
   });

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,6 +15,7 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import 'south_korea_response_parser.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// South Korea fuel prices from the **OPINET** (Korea National Oil
 /// Corporation, KNOC) developer API (#597).
@@ -165,7 +168,7 @@ class SouthKoreaStationService
 
       return wrapStations(filtered, ServiceSource.openinetApi);
     } on DioException catch (e, st) {
-      debugPrint('KR search failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'KR search failed'}));
       final status = e.response?.statusCode;
       if (status == 401 || status == 403) {
         throw ApiException(

@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
@@ -10,6 +11,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Luxembourg fuel prices — government-regulated, uniform nationally.
 ///
@@ -191,7 +193,7 @@ class LuxembourgStationService
     } on DioException catch (e, st) {
       // No HTTP call is made today, but the catch keeps the signature
       // stable if a future scrape is added.
-      debugPrint('LU search failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'LU search failed'}));
       throwApiException(e, defaultMessage: 'Network error', stackTrace: st);
     }
   }

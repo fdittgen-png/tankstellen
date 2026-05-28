@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../ev/domain/entities/charging_station.dart';
 import 'favorites_provider.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'ev_favorites_provider.g.dart';
 
@@ -89,7 +92,7 @@ class EvFavoriteStations extends _$EvFavoriteStations {
       try {
         stations.add(ChargingStation.fromJson(data));
       } catch (e, st) {
-        debugPrint('[EvFavoriteStations.build] fromJson failed for $id: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': '[EvFavoriteStations.build] fromJson failed for $id'}));
         orphaned.add(id);
       }
     }

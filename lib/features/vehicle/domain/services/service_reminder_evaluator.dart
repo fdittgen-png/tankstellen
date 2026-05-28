@@ -1,12 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 
 import '../../../../core/notifications/notification_service.dart';
 import '../../data/repositories/service_reminder_repository.dart';
 import '../entities/service_reminder.dart';
 import 'service_reminder_trigger.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Copy of the strings the notification renders. Dart doesn't have
 /// test-time locale resolution for background isolates, so the
@@ -91,7 +93,7 @@ class ServiceReminderEvaluator {
       try {
         await repository.save(updated);
       } catch (e, st) {
-        debugPrint('ServiceReminderEvaluator: failed to persist flag: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ServiceReminderEvaluator: failed to persist flag'}));
         continue;
       }
       try {
@@ -104,7 +106,7 @@ class ServiceReminderEvaluator {
           ),
         );
       } catch (e, st) {
-        debugPrint('ServiceReminderEvaluator: notification failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ServiceReminderEvaluator: notification failed'}));
       }
       fired.add(updated);
     }

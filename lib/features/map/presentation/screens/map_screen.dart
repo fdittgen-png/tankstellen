@@ -18,6 +18,7 @@ import '../../../route_search/providers/route_search_provider.dart';
 import '../../../search/providers/search_provider.dart';
 import '../widgets/nearby_map_view.dart';
 import '../widgets/route_map_view.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Top-level map screen that delegates to [RouteMapView] when route search
 /// results are available, or [NearbyMapView] for nearby station results.
@@ -95,7 +96,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
         fileNameStem: 'tankstellen_map',
       );
     } catch (e, st) {
-      debugPrint('MapScreen share image: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'MapScreen share image'}));
     }
   }
 

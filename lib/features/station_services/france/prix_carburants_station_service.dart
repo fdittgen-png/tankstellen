@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/services/impl/osm_brand_enricher.dart';
@@ -11,6 +12,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Real French fuel price data from Prix-Carburants (gouv.fr).
 /// Free, no API key, no registration. Updated every 10 minutes.
@@ -128,7 +130,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       }, cancelToken: cancelToken);
       return parser.extractPrixCarburantsResults(response.data);
     } on DioException catch (e, st) {
-      debugPrint('Prix-Carburants ZIP fetch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants ZIP fetch failed'}));
       return [];
     }
   }
@@ -150,7 +152,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       }, cancelToken: cancelToken);
       return parser.extractPrixCarburantsResults(response.data);
     } on DioException catch (e, st) {
-      debugPrint('Prix-Carburants geo fetch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants geo fetch failed'}));
       return [];
     }
   }
@@ -238,7 +240,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
             status: 'open',
           );
         }
-      } on DioException catch (e, st) { debugPrint('Prix-Carburants detail fetch failed: $e\n$st'); }
+      } on DioException catch (e, st) { unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants detail fetch failed'})); }
     }
     return ServiceResult(
       data: prices,

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +17,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
 import '../widgets/favorites_tab.dart';
+import '../../../../core/logging/error_logger.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -168,7 +171,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
       // Surface the failure to the user instead of silently swallowing
       // it — the snackbar tells them the share didn't go through, and
       // the debugPrint keeps the cause in `flutter logs` for support.
-      debugPrint('FavoritesScreen share image: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'FavoritesScreen share image'}));
       if (messenger == null) return;
       final errorMsg = l10n?.favoritesShareError ??
           "Couldn't generate share image";

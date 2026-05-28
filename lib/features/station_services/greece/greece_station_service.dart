@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,6 +15,7 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import 'greece_prefectures.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Greece fuel prices — Paratiritirio Timon (Fuel Price Observatory) via the
 /// community [fuelpricesgr](https://github.com/mavroprovato/fuelpricesgr)
@@ -148,7 +151,7 @@ class GreeceStationService
         );
         if (s != null) stations.add(s);
       } on DioException catch (e, st) {
-        debugPrint('GR daily fetch failed for ${pref.apiName}: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'GR daily fetch failed for ${pref.apiName}'}));
         final status = e.response?.statusCode;
         if (status == 401 || status == 403) {
           // The community API is free and anonymous — a 401/403 means
@@ -166,7 +169,7 @@ class GreeceStationService
           occurredAt: DateTime.now(),
         ));
       } catch (e, st) {
-        debugPrint('GR daily fetch unexpected error for ${pref.apiName}: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'GR daily fetch unexpected error for ${pref.apiName}'}));
         errors.add(ServiceError(
           source: ServiceSource.greeceApi,
           message: 'parse ${pref.apiName}: $e',

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +17,7 @@ import '../../../price_history/presentation/widgets/price_stats_card.dart';
 import '../../../price_history/providers/price_history_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Price history graph widget that records the current price on init
 /// and always shows the chart (even with a single data point).
@@ -92,7 +95,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
         ref.invalidate(priceHistoryProvider(widget.stationId));
       }
     } catch (e, st) {
-      debugPrint('PriceHistory DB fetch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'PriceHistory DB fetch failed'}));
     }
     if (mounted) setState(() => _fetchedFromDb = true);
   }

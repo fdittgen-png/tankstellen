@@ -1,13 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../domain/entities/loyalty_card.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Hive-backed CRUD for [LoyaltyCard] records (#1120 pilot).
 ///
@@ -53,7 +55,7 @@ class LoyaltyCardRepository {
         if (json == null) continue;
         out.add(LoyaltyCard.fromJson(json));
       } catch (e, st) {
-        debugPrint('LoyaltyCardRepository.loadAll: skipping $key: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'LoyaltyCardRepository.loadAll: skipping $key'}));
       }
     }
     out.sort((a, b) => b.addedAt.compareTo(a.addedAt));

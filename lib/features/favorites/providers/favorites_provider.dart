@@ -18,6 +18,7 @@ import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/station_rating_provider.dart';
 import '../../widget/data/home_widget_service.dart';
+import '../../../core/logging/error_logger.dart';
 
 // #727 — the file this replaces had outgrown its single purpose.
 // `FavoriteStations` (fuel-detail fetch + per-country refresh) lives
@@ -102,7 +103,7 @@ class Favorites extends _$Favorites {
           pricePredictor: predictor,
         );
       } catch (e, st) {
-        debugPrint('Favorites._refreshWidget: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Favorites._refreshWidget'}));
       }
     }());
   }
@@ -206,12 +207,12 @@ class Favorites extends _$Favorites {
       try {
         await ref.read(stationRatingsProvider.notifier).remove(stationId);
       } catch (e, st) {
-        debugPrint('Cleanup: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Cleanup'}));
       }
       try {
         await storage.clearPriceHistoryForStation(stationId);
       } catch (e, st) {
-        debugPrint('Cleanup: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Cleanup'}));
       }
 
       await SyncHelper.fireAndForget(

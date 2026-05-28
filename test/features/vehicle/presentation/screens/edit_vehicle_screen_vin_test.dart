@@ -11,6 +11,7 @@ import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_s
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/features/vehicle/providers/vin_decoder_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Widget tests for the VIN decoder UI added to [EditVehicleScreen]
 /// (#812 phase 2).
@@ -20,6 +21,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// fake backed by an in-memory settings map so Save doesn't touch
 /// Hive.
 void main() {
+  silenceErrorLoggerSpool();
   group('EditVehicleScreen — VIN decoder UI (#812)', () {
     testWidgets('renders the VIN field and decode button with tooltip',
         (tester) async {

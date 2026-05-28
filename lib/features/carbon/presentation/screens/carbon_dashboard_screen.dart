@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/providers/consumption_providers.dart';
 import '../../domain/monthly_summary.dart';
 import '../widgets/charts_tab.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Hook for the share-sheet handoff used by [CarbonDashboardScreen]
 /// (#2005). Production sends [ShareParams] straight to
@@ -116,7 +119,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
     } on Object catch (e, st) {
       // Share-sheet wiring failures should never crash the screen.
       // The user can re-tap; the failure ends in the debug console.
-      debugPrint('CarbonDashboardScreen: share failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'CarbonDashboardScreen: share failed'}));
     }
   }
 }

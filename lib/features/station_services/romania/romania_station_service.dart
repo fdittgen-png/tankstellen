@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,6 +15,7 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import 'romania_observatory_keys.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Romania fuel prices — *Monitorul Prețurilor la Carburanți*
 /// (pretcarburant.ro), the Competition Council + ANPC joint
@@ -149,7 +152,7 @@ class RomaniaStationService
         fetchedAt: DateTime.now(),
       );
     } on DioException catch (e, st) {
-      debugPrint('RO Monitorul fetch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RO Monitorul fetch failed'}));
       final status = e.response?.statusCode;
       throw ApiException(
         message:
@@ -160,7 +163,7 @@ class RomaniaStationService
     } on ApiException {
       rethrow;
     } catch (e, st) {
-      debugPrint('RO Monitorul unexpected error: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RO Monitorul unexpected error'}));
       throw ApiException(message: 'Monitorul Prețurilor parse error: $e');
     }
   }

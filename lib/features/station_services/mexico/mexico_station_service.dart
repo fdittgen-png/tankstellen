@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart';
@@ -13,6 +15,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// CRE (Comisión Reguladora de Energía) Mexican fuel price service.
 ///
@@ -187,7 +190,7 @@ class MexicoStationService
         if (x == null || y == null) continue;
         out[id] = _CrePlace(name: name, lat: y, lng: x);
       } catch (e, st) {
-        debugPrint('CRE place parse failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'CRE place parse failed'}));
         continue;
       }
     }
@@ -224,7 +227,7 @@ class MexicoStationService
           diesel: diesel,
         );
       } catch (e, st) {
-        debugPrint('CRE price parse failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'CRE price parse failed'}));
         continue;
       }
     }

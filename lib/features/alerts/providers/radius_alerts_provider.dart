@@ -1,12 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/radius_alert_dedup.dart';
 import '../data/radius_alert_store.dart';
 import '../domain/entities/radius_alert.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'radius_alerts_provider.g.dart';
 
@@ -45,7 +47,7 @@ class RadiusAlerts extends _$RadiusAlerts {
     try {
       await store.upsert(alert);
     } catch (e, st) {
-      debugPrint('RadiusAlerts.add: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.add'}));
     }
     state = AsyncValue.data(await store.list());
   }
@@ -61,7 +63,7 @@ class RadiusAlerts extends _$RadiusAlerts {
       // the user deletes the alert.
       await dedup.clearForAlert(id);
     } catch (e, st) {
-      debugPrint('RadiusAlerts.remove: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.remove'}));
     }
     state = AsyncValue.data(await store.list());
   }
@@ -83,7 +85,7 @@ class RadiusAlerts extends _$RadiusAlerts {
     try {
       await store.upsert(updated);
     } catch (e, st) {
-      debugPrint('RadiusAlerts.toggle: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.toggle'}));
     }
     state = AsyncValue.data(await store.list());
   }

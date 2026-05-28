@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../consumption/providers/consumption_providers.dart';
@@ -9,6 +10,7 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Cross-cutting actions the edit-vehicle screen runs against
 /// Riverpod providers: default-profile sync, volumetric-efficiency
@@ -36,7 +38,7 @@ extension VehicleSaveActions on WidgetRef {
       await profileRepo.updateProfile(updated);
       read(activeProfileProvider.notifier).refresh();
     } catch (e, st) {
-      debugPrint('EditVehicleScreen: profile sync failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'EditVehicleScreen: profile sync failed'}));
     }
   }
 
@@ -53,7 +55,7 @@ extension VehicleSaveActions on WidgetRef {
       );
       await read(vehicleProfileListProvider.notifier).save(cleared);
     } catch (e, st) {
-      debugPrint('EditVehicleScreen: VE reset failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'EditVehicleScreen: VE reset failed'}));
     }
   }
 
@@ -69,7 +71,7 @@ extension VehicleSaveActions on WidgetRef {
           forVehicle.reduce((a, b) => a.odometerKm > b.odometerKm ? a : b);
       return latest.odometerKm;
     } catch (e, st) {
-      debugPrint('EditVehicleScreen: odometer lookup failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'EditVehicleScreen: odometer lookup failed'}));
       return null;
     }
   }

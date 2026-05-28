@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,6 +15,7 @@ import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../search/domain/entities/station.dart';
 import 'favorites_provider.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'favorite_stations_provider.g.dart';
 
@@ -48,7 +51,7 @@ class FavoriteStations extends _$FavoriteStations {
         try {
           stations.add(Station.fromJson(data));
         } catch (e, st) {
-          debugPrint('Skipping corrupt favorite $id: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'Skipping corrupt favorite $id'}));
         }
       }
     }
@@ -86,7 +89,7 @@ class FavoriteStations extends _$FavoriteStations {
           try {
             stations.add(Station.fromJson(data));
           } catch (e, st) {
-            debugPrint('FavoriteStations: parse error for $id: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'FavoriteStations: parse error for $id'}));
           }
         }
       }
@@ -161,7 +164,7 @@ class FavoriteStations extends _$FavoriteStations {
               stations.add(s);
               await storage.saveFavoriteStationData(id, s.toJson());
             } catch (e, st) {
-              debugPrint('FavoriteStations: fetch detail $id ($code): $e\n$st');
+              unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'FavoriteStations: fetch detail $id ($code)'}));
             }
           }
         }
@@ -182,7 +185,7 @@ class FavoriteStations extends _$FavoriteStations {
             lastResult = result;
             successCountries++;
           } on Exception catch (e, st) {
-            debugPrint('FavoriteStations: prices for ${entry.key} failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'FavoriteStations: prices for ${entry.key} failed'}));
           }
         }
 
@@ -201,7 +204,7 @@ class FavoriteStations extends _$FavoriteStations {
           try {
             await storage.saveFavoriteStationData(s.id, s.toJson());
           } catch (e, st) {
-            debugPrint('FavoriteStations: re-persist ${s.id} failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'FavoriteStations: re-persist ${s.id} failed'}));
           }
         }
 
@@ -218,7 +221,7 @@ class FavoriteStations extends _$FavoriteStations {
           errors: lastResult?.errors ?? const [],
         ));
       } on Exception catch (e, st) {
-        debugPrint('Favorites price refresh failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Favorites price refresh failed'}));
         state = AsyncValue.data(ServiceResult(
           data: stations,
           source: ServiceSource.cache,

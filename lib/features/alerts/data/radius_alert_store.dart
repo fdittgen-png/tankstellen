@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -8,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../domain/entities/radius_alert.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Hive-backed store for [RadiusAlert] records (#578 phase 1).
 ///
@@ -39,7 +42,7 @@ class RadiusAlertStore {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);
     } catch (e, st) {
-      debugPrint('RadiusAlertStore: alerts box unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'RadiusAlertStore: alerts box unavailable'}));
       return null;
     }
   }
@@ -59,7 +62,7 @@ class RadiusAlertStore {
         if (json == null) continue;
         out.add(RadiusAlert.fromJson(json));
       } catch (e, st) {
-        debugPrint('RadiusAlertStore.list: skipping $key: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'RadiusAlertStore.list: skipping $key'}));
       }
     }
     // Stable order — oldest-first keeps the UI deterministic across

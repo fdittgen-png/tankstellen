@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 
 import '../../../core/data/storage_repository.dart';
 import '../../../core/storage/storage_keys.dart';
@@ -9,6 +9,7 @@ import '../domain/entities/reference_vehicle.dart';
 import '../domain/entities/vehicle_profile.dart';
 import 'repositories/vehicle_profile_repository.dart';
 import 'vehicle_profile_catalog_matcher.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// One-shot migrator that backfills [VehicleProfile.referenceVehicleId]
 /// for profiles created before the catalog existed (#950 phase 4).
@@ -70,7 +71,7 @@ class VehicleProfileCatalogMigrator {
       }
     } catch (e, st) {
       // Don't bubble — startup must keep going.
-      debugPrint('VehicleProfileCatalogMigrator: run failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'VehicleProfileCatalogMigrator: run failed'}));
     }
 
     // Always mark done, even if we matched zero. A user who has only
@@ -82,7 +83,7 @@ class VehicleProfileCatalogMigrator {
         true,
       );
     } catch (e, st) {
-      debugPrint('VehicleProfileCatalogMigrator: failed to set done flag: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'VehicleProfileCatalogMigrator: failed to set done flag'}));
     }
 
     return matched;

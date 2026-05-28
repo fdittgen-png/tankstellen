@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/error/exceptions.dart';
@@ -12,6 +13,7 @@ import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Spanish fuel prices from Geoportal Gasolineras (MITECO).
 /// Free, no API key, no registration.
@@ -226,7 +228,7 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
         stationType: r['Margen']?.toString(),
       );
     } on FormatException catch (e, st) {
-      debugPrint('MITECO station parse failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'MITECO station parse failed'}));
       return null;
     }
   }
