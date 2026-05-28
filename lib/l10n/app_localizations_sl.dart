@@ -60,6 +60,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get fabRefineCriteria => 'Izboljšaj iskanje';
 
   @override
+  String get routeSearchPartialBanner => 'Iskanje dodatnih postaj…';
+
+  @override
   String get searchCriteriaTitle => 'Merila iskanja';
 
   @override

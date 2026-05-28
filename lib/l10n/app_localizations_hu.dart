@@ -60,6 +60,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fabRefineCriteria => 'Keresés finomítása';
 
   @override
+  String get routeSearchPartialBanner => 'További állomások keresése…';
+
+  @override
   String get searchCriteriaTitle => 'Keresési feltételek';
 
   @override

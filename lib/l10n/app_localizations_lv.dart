@@ -60,6 +60,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get fabRefineCriteria => 'Precizēt meklēšanu';
 
   @override
+  String get routeSearchPartialBanner => 'Tiek meklētas vairāk staciju…';
+
+  @override
   String get searchCriteriaTitle => 'Meklēšanas kritēriji';
 
   @override

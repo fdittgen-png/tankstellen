@@ -60,6 +60,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fabRefineCriteria => 'Refinar búsqueda';
 
   @override
+  String get routeSearchPartialBanner => 'Buscando más estaciones…';
+
+  @override
   String get searchCriteriaTitle => 'Criterios de búsqueda';
 
   @override

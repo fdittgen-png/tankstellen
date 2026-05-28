@@ -60,6 +60,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get fabRefineCriteria => 'Spresniť vyhľadávanie';
 
   @override
+  String get routeSearchPartialBanner => 'Hľadajú sa ďalšie stanice…';
+
+  @override
   String get searchCriteriaTitle => 'Kritériá vyhľadávania';
 
   @override

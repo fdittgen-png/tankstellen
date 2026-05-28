@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Atvērt meklēšanu",
   "fabOpenResults": "Atvērt rezultātus",
   "fabRunSearch": "Veikt meklēšanu",
-  "fabRefineCriteria": "Precizēt meklēšanu"
+  "fabRefineCriteria": "Precizēt meklēšanu",
+  "routeSearchPartialBanner": "Tiek meklētas vairāk staciju…"
 }

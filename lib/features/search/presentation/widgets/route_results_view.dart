@@ -132,6 +132,16 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // #2140 — non-blocking partial-results banner: shows while
+          // more stations are streaming in. User can still scroll and
+          // tap the partial results below.
+          if (result.isPartial) ...[
+            _PartialResultsBanner(
+              label: l10n?.routeSearchPartialBanner ??
+                  'Searching for more stations…',
+            ),
+            const SizedBox(height: 6),
+          ],
           Row(
             children: [
               Icon(Icons.route, size: 16, color: theme.colorScheme.primary),
@@ -292,5 +302,50 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     }
     final bestIds = segmentMap.values.toSet();
     return allStations.where((s) => bestIds.contains(s.id)).cast<SearchResultItem>().toList();
+  }
+}
+
+/// #2140 — thin non-blocking banner shown above route results while
+/// more stations are still streaming in. Pairs a small spinner with a
+/// localised label so the user knows data is loading without losing
+/// the ability to interact with what's already on screen.
+class _PartialResultsBanner extends StatelessWidget {
+  final String label;
+  const _PartialResultsBanner({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 12,
+            height: 12,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

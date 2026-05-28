@@ -60,6 +60,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get fabRefineCriteria => 'Avgrens søk';
 
   @override
+  String get routeSearchPartialBanner => 'Søker etter flere stasjoner…';
+
+  @override
   String get searchCriteriaTitle => 'Søkekriterier';
 
   @override

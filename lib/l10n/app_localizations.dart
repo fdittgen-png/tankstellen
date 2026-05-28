@@ -243,6 +243,12 @@ abstract class AppLocalizations {
   /// **'Refine search'**
   String get fabRefineCriteria;
 
+  /// No description provided for @routeSearchPartialBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for more stations…'**
+  String get routeSearchPartialBanner;
+
   /// No description provided for @searchCriteriaTitle.
   ///
   /// In en, this message translates to:

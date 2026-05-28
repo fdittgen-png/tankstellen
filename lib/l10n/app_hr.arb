@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Otvori pretraživanje",
   "fabOpenResults": "Otvori rezultate",
   "fabRunSearch": "Pokreni pretraživanje",
-  "fabRefineCriteria": "Pročisti pretraživanje"
+  "fabRefineCriteria": "Pročisti pretraživanje",
+  "routeSearchPartialBanner": "Pretražuju se dodatne stanice…"
 }

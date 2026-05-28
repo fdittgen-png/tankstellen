@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Abrir búsqueda",
   "fabOpenResults": "Abrir resultados",
   "fabRunSearch": "Ejecutar búsqueda",
-  "fabRefineCriteria": "Refinar búsqueda"
+  "fabRefineCriteria": "Refinar búsqueda",
+  "routeSearchPartialBanner": "Buscando más estaciones…"
 }

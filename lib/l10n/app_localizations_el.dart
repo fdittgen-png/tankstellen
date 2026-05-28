@@ -60,6 +60,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get fabRefineCriteria => 'Βελτίωση αναζήτησης';
 
   @override
+  String get routeSearchPartialBanner =>
+      'Αναζήτηση για περισσότερους σταθμούς…';
+
+  @override
   String get searchCriteriaTitle => 'Κριτήρια αναζήτησης';
 
   @override

@@ -60,6 +60,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fabRefineCriteria => 'Pročisti pretraživanje';
 
   @override
+  String get routeSearchPartialBanner => 'Pretražuju se dodatne stanice…';
+
+  @override
   String get searchCriteriaTitle => 'Kriteriji pretraživanja';
 
   @override

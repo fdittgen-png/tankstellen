@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Odpri iskanje",
   "fabOpenResults": "Odpri rezultate",
   "fabRunSearch": "Zaženi iskanje",
-  "fabRefineCriteria": "Izboljšaj iskanje"
+  "fabRefineCriteria": "Izboljšaj iskanje",
+  "routeSearchPartialBanner": "Iskanje dodatnih postaj…"
 }

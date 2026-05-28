@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Keresés megnyitása",
   "fabOpenResults": "Eredmények megnyitása",
   "fabRunSearch": "Keresés futtatása",
-  "fabRefineCriteria": "Keresés finomítása"
+  "fabRefineCriteria": "Keresés finomítása",
+  "routeSearchPartialBanner": "További állomások keresése…"
 }

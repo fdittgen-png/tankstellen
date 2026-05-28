@@ -60,6 +60,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get fabRefineCriteria => 'Upřesnit vyhledávání';
 
   @override
+  String get routeSearchPartialBanner => 'Hledání dalších stanic…';
+
+  @override
   String get searchCriteriaTitle => 'Kritéria hledání';
 
   @override
