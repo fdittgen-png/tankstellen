@@ -18,26 +18,26 @@ import 'ev_marker_widget.dart';
 /// Pulls results from [evStationsProvider], applies the current filter,
 /// and clusters markers independently of fuel-station markers so the two
 /// layers never collide visually.
-class EvMapLayer extends ConsumerWidget {
+class EvMapLayer extends ConsumerStatefulWidget {
   final EvViewport viewport;
 
   const EvMapLayer({super.key, required this.viewport});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(evStationsProvider(viewport));
-    return async.when(
-      data: (stations) => _buildLayer(context, stations),
-      loading: () => const SizedBox.shrink(),
-      error: (_, _) => const SizedBox.shrink(),
-    );
-  }
+  ConsumerState<EvMapLayer> createState() => _EvMapLayerState();
+}
 
-  Widget _buildLayer(BuildContext context, List<ChargingStation> stations) {
-    if (stations.isEmpty) return const SizedBox.shrink();
-    final theme = Theme.of(context);
+class _EvMapLayerState extends ConsumerState<EvMapLayer> {
+  // #2175 — the marker list is memoised here and recomputed only when
+  // the station list identity changes, mirroring the fuel layer's #1774
+  // fix. EvMapLayer is rebuilt fresh in NearbyMapView.build on every EV
+  // toggle / search / app-resume, so without this it re-allocated every
+  // Marker + a fresh onTap closure on each host rebuild.
+  List<ChargingStation>? _lastStations;
+  List<Marker> _markers = const [];
 
-    final markers = stations
+  void _recomputeMarkers(List<ChargingStation> stations) {
+    _markers = stations
         .map(
           (s) => EvMarkerWidget.buildMarker(
             s,
@@ -49,6 +49,27 @@ class EvMapLayer extends ConsumerWidget {
           ),
         )
         .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final async = ref.watch(evStationsProvider(widget.viewport));
+    return async.when(
+      data: _buildLayer,
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildLayer(List<ChargingStation> stations) {
+    if (stations.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+
+    if (!identical(stations, _lastStations)) {
+      _lastStations = stations;
+      _recomputeMarkers(stations);
+    }
+    final markers = _markers;
 
     if (stations.length > 20) {
       return MarkerClusterLayerWidget(

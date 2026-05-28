@@ -232,6 +232,41 @@ void main() {
       // `MarkerLayer` from the <=20 branch must not appear.
       expect(find.byType(MarkerLayer), findsNothing);
     });
+
+    testWidgets('memoises the marker list across host rebuilds (#2175)',
+        (tester) async {
+      final stations = List.generate(
+        5,
+        (i) => buildStation('s$i', lat: i * 0.001, lng: i * 0.001),
+      );
+      final rebuild = ValueNotifier<int>(0);
+      addTearDown(rebuild.dispose);
+
+      await pumpApp(
+        tester,
+        ValueListenableBuilder<int>(
+          valueListenable: rebuild,
+          builder: (_, __, ___) =>
+              hostInMap(EvMapLayer(viewport: viewport)),
+        ),
+        overrides: [
+          evStationsProvider(viewport).overrideWith((_) async => stations),
+        ],
+      );
+
+      final first = tester.widget<MarkerLayer>(find.byType(MarkerLayer)).markers;
+      // Force a host rebuild WITHOUT changing the station list identity.
+      rebuild.value++;
+      await tester.pump();
+      final second = tester.widget<MarkerLayer>(find.byType(MarkerLayer)).markers;
+
+      expect(
+        identical(first, second),
+        isTrue,
+        reason: 'marker list must be memoised, not re-allocated, when the '
+            'station list is unchanged',
+      );
+    });
   });
 }
 
