@@ -1,9 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'sync_provider.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Shared helper to execute sync operations only when TankSync is connected.
 ///
@@ -50,7 +52,7 @@ class SyncHelper {
         await syncFn();
       }
     } catch (e, st) {
-      debugPrint('SyncHelper[$context]: sync failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'SyncHelper[$context]: sync failed'}));
     }
   }
 

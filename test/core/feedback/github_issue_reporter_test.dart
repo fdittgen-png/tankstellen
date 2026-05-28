@@ -7,8 +7,10 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart';
+import '../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   group('GithubIssueReporter', () {
     late _FakeClient client;
     late GithubIssueReporter reporter;

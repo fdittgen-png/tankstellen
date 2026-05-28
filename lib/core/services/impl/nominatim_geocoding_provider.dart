@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../error/exceptions.dart';
@@ -8,6 +10,7 @@ import '../dio_factory.dart';
 import '../geocoding_provider.dart';
 import '../service_config.dart';
 import '../service_result.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Geocoding via OpenStreetMap Nominatim API.
 /// Available on all platforms. Enforces 1 req/sec rate limit.
@@ -130,7 +133,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
           .where((s) => s != null && s.toString().isNotEmpty)
           .join(' ');
     } on DioException catch (e, st) {
-      debugPrint('Nominatim reverse geocoding failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Nominatim reverse geocoding failed'}));
       return '$lat, $lng';
     }
   }
@@ -157,7 +160,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       final code = address?['country_code'] as String?;
       return code?.toUpperCase();
     } on DioException catch (e, st) {
-      debugPrint('Nominatim country detection failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Nominatim country detection failed'}));
       return null;
     }
   }

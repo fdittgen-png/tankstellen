@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../storage/storage_providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/logging/error_logger.dart';
 
 /// A one-time dismissible help banner for contextual onboarding.
 ///
@@ -51,7 +54,7 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
     } catch (e, st) {
       // Widget tests without an initialized settings box — keep the
       // banner hidden rather than crashing.
-      debugPrint('HelpBanner: cannot read shown flag: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HelpBanner: cannot read shown flag'}));
     }
   }
 
@@ -60,7 +63,7 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
       final settings = ref.read(settingsStorageProvider);
       await settings.putSetting(widget.storageKey, true);
     } catch (e, st) {
-      debugPrint('HelpBanner: cannot persist dismiss: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HelpBanner: cannot persist dismiss'}));
     }
     if (mounted) {
       setState(() => _visible = false);

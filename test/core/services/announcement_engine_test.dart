@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/announcement_engine.dart';
 import 'package:tankstellen/core/services/voice_announcement_service.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../helpers/silence_error_logger.dart';
 
 import '../../fixtures/stations.dart';
 
@@ -51,6 +52,7 @@ double _dieselPrice(Station s) => s.diesel ?? 0;
 double _distKm(Station s) => s.dist;
 
 void main() {
+  silenceErrorLoggerSpool();
   late _FakeVoiceAnnouncementService fakeTts;
   late AnnouncementEngine engine;
 

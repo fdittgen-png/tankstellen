@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 
 import 'github_issue_reporter.dart' show ScanKind;
+import '../../core/logging/error_logger.dart';
 
 /// Pure string-formatting helpers used by [GithubIssueReporter] to
 /// build the markdown body of a bad-scan issue. Split out of
@@ -109,7 +112,7 @@ class GithubIssueBodyFormatter {
       final encoded = img.encodeJpg(decoded, quality: 85);
       return _ExifStripResult(bytes: encoded, stripped: true);
     } catch (e, st) {
-      debugPrint('GithubIssueReporter EXIF strip failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'GithubIssueReporter EXIF strip failed'}));
       return _ExifStripResult(bytes: bytes, stripped: false);
     }
   }

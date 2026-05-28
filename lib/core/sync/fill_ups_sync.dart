@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../features/consumption/domain/entities/fill_up.dart';
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Per-fill-up consumption-log sync with Supabase (#713), pulled out
 /// of [SyncService] (#727).
@@ -75,7 +78,7 @@ class FillUpsSync {
           try {
             return FillUp.fromJson(data);
           } catch (e, st) {
-            debugPrint('FillUpsSync.merge decode failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.merge decode failed'}));
             return null;
           }
         }
@@ -84,7 +87,7 @@ class FillUpsSync {
 
       return [...localFillUps, ...downloaded];
     } catch (e, st) {
-      debugPrint('FillUpsSync.merge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.merge FAILED'}));
       return localFillUps;
     }
   }
@@ -102,7 +105,7 @@ class FillUpsSync {
           .eq('user_id', userId)
           .eq('id', fillUpId);
     } catch (e, st) {
-      debugPrint('FillUpsSync.delete FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.delete FAILED'}));
     }
   }
 }

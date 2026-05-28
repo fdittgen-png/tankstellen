@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io' show Platform;
 
 import 'package:flutter/widgets.dart';
 
 import '../../constants/app_constants.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Small synchronous helper that resolves the fields needed to build
 /// an `ErrorReportPayload` without awaiting any plugin calls.
@@ -33,7 +36,7 @@ class ErrorReporterContext {
       if (Platform.isIOS) return 'iOS';
       return Platform.operatingSystem;
     } catch (e, st) {
-      debugPrint('currentPlatform: Platform query failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'currentPlatform: Platform query failed'}));
       return 'unknown';
     }
   }

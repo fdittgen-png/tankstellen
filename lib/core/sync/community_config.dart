@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Pre-configured credentials for the TankSync community database.
 ///
@@ -44,7 +47,7 @@ class CommunityConfig {
       _cachedUrl = config['supabase_url'] as String?;
       _cachedKey = config['supabase_anon_key'] as String?;
     } catch (e, st) {
-      debugPrint('CommunityConfig: failed to load asset: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'CommunityConfig: failed to load asset'}));
     }
   }
 

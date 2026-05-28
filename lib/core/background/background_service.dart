@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -31,6 +33,7 @@ import '../utils/json_extensions.dart';
 import 'background_price_fetcher_provider.dart';
 import 'background_retry.dart';
 import 'hive_isolate_lock.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Constants and callback logic for background price refresh tasks.
 ///
@@ -342,7 +345,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           notifier: notifier,
         );
       } catch (e, st) {
-        debugPrint('BackgroundService: velocity detector failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: velocity detector failed'}));
         // #1105 — spool the failure so the foreground TraceRecorder can
         // surface it through the same pipeline as foreground errors.
         await IsolateErrorSpool.enqueue(
@@ -372,7 +375,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         apiKey: apiKey,
       );
     } catch (e, st) {
-      debugPrint('BackgroundService: radius alert runner failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: radius alert runner failed'}));
       // #1105 — spool the failure so the foreground TraceRecorder can
       // surface radius-alert outages through the same pipeline as
       // foreground errors.
@@ -397,7 +400,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     // path above also runs it.
     await _refreshNearestWidgetFromSearch(storage);
   } catch (e, st) {
-    debugPrint('BackgroundService: task failed: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: task failed'}));
     // #1105 — top-level isolate failure: spool through the ring buffer
     // so the foreground TraceRecorder can replay it. This catches any
     // exception not handled by the inner runners (Hive open failures,
@@ -413,7 +416,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     try {
       await HiveStorage.closeIsolateBoxes();
     } catch (e, st) {
-      debugPrint('BackgroundService: failed to close Hive boxes: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: failed to close Hive boxes'}));
     }
     lock?.release();
   }
@@ -592,7 +595,7 @@ Future<void> _runRadiusAlerts({
         }
         return samples;
       } catch (e, st) {
-        debugPrint('BackgroundService: radius alert samples for ${alert.id} failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'BackgroundService: radius alert samples for ${alert.id} failed'}));
         return const <StationPriceSample>[];
       }
     },
@@ -675,6 +678,6 @@ Future<void> _refreshNearestWidgetFromSearch(HiveStorage storage) async {
       );
     }
   } catch (e, st) {
-    debugPrint('BackgroundService: nearest widget refresh failed: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: nearest widget refresh failed'}));
   }
 }

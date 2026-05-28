@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import '../../core/logging/error_logger.dart';
 
 /// File-based lock to prevent concurrent Hive access from main and background
 /// isolates.
@@ -71,7 +74,7 @@ class HiveIsolateLock {
           try {
             _lockFile.deleteSync();
           } catch (e, st) {
-            debugPrint('HiveIsolateLock: failed to remove stale lock: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: failed to remove stale lock'}));
           }
         }
       }
@@ -89,7 +92,7 @@ class HiveIsolateLock {
             return true;
           }
         } catch (e, st) {
-          debugPrint('HiveIsolateLock: create failed, retrying: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: create failed, retrying'}));
         }
       }
 
@@ -108,7 +111,7 @@ class HiveIsolateLock {
         debugPrint('HiveIsolateLock: released');
       }
     } catch (e, st) {
-      debugPrint('HiveIsolateLock: release failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: release failed'}));
     }
   }
 

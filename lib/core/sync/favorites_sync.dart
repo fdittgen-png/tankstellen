@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Favorites sync with Supabase, pulled out of [SyncService] (#727).
 ///
@@ -57,7 +60,7 @@ class FavoritesSync {
 
       return localIds.union(serverIds).toList();
     } catch (e, st) {
-      debugPrint('FavoritesSync.merge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FavoritesSync.merge FAILED'}));
       return localFavoriteIds;
     }
   }
@@ -78,7 +81,7 @@ class FavoritesSync {
           .eq('station_id', stationId);
       debugPrint('FavoritesSync.delete: $stationId removed from server');
     } catch (e, st) {
-      debugPrint('FavoritesSync.delete FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FavoritesSync.delete FAILED'}));
     }
   }
 }

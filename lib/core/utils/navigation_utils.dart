@@ -1,8 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Centralized navigation utility for opening stations in external maps apps.
 ///
@@ -31,7 +33,7 @@ class NavigationUtils {
       final launched = await launchUrl(geoUri, mode: LaunchMode.externalApplication);
       if (launched) return;
     } on Exception catch (e, st) {
-      debugPrint('Navigation geo: URI failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Navigation geo: URI failed'}));
     }
 
     // Fallback: Google Maps web URL — works universally via browser.

@@ -4,6 +4,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/notifications/local_notification_service.dart';
+import '../../helpers/silence_error_logger.dart';
 
 /// A hand-written fake of [FlutterLocalNotificationsPlugin] that records
 /// every interaction. Implements the public surface we exercise; falls
@@ -89,6 +90,7 @@ class _ShowCall {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   late _FakeFlutterLocalNotificationsPlugin fakePlugin;
   late LocalNotificationService service;
 

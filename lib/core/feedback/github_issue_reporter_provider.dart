@@ -1,12 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'github_issue_reporter.dart';
+import '../../core/logging/error_logger.dart';
 
 part 'github_issue_reporter_provider.g.dart';
 
@@ -53,7 +55,7 @@ Future<GithubIssueReporter?> githubIssueReporter(Ref ref) async {
     // Secure storage can fail on some Android devices (keystore corruption,
     // biometric reset). Treat any failure as "no token" so the UI falls
     // back to SharePlus instead of bubbling up a platform error.
-    debugPrint('githubIssueReporterProvider: secure-storage read failed: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'githubIssueReporterProvider: secure-storage read failed'}));
     return null;
   }
 

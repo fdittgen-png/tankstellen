@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/telemetry/collectors/network_state_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('NetworkStateCollector', () {

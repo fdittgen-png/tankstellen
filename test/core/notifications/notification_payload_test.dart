@@ -5,8 +5,10 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/notifications/notification_payload.dart';
+import '../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   group('NotificationPayload (#1012 phase 3 — deep-link payload)', () {
     test('encode produces the documented {k,s,c} JSON shape', () {
       const payload = NotificationPayload(

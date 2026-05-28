@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'auto_record_badge_service.dart';
+import '../../core/logging/error_logger.dart';
 
 part 'auto_record_badge_provider.g.dart';
 
@@ -57,7 +59,7 @@ class AutoRecordBadgeCount extends _$AutoRecordBadgeCount {
       final service = await ref.read(autoRecordBadgeServiceProvider.future);
       state = service.count;
     } catch (e, st) {
-      debugPrint('AutoRecordBadgeCount refresh: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'AutoRecordBadgeCount refresh'}));
     }
   }
 
@@ -69,7 +71,7 @@ class AutoRecordBadgeCount extends _$AutoRecordBadgeCount {
       await service.markAllAsRead();
       state = service.count;
     } catch (e, st) {
-      debugPrint('AutoRecordBadgeCount markAllAsRead: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'AutoRecordBadgeCount markAllAsRead'}));
     }
   }
 }

@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'github_issue_body_formatter.dart';
+import '../../core/logging/error_logger.dart';
 
 /// What kind of scan produced the failing OCR output — determines the
 /// issue title.
@@ -123,7 +126,7 @@ class GithubIssueReporter {
     } on GithubReporterException {
       rethrow;
     } catch (e, st) {
-      debugPrint('GithubIssueReporter network failure: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'GithubIssueReporter network failure'}));
       throw GithubReporterException('network error: $e');
     }
   }

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_helper.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
+import '../../helpers/silence_error_logger.dart';
 
 /// Helper to run SyncHelper methods with a controlled SyncConfig.
 ///
@@ -39,6 +40,7 @@ Future<void> _runWithSyncConfig(
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   group('SyncHelper.syncIfEnabled', () {
     test('calls syncFn when sync is enabled', () async {
       bool wasCalled = false;

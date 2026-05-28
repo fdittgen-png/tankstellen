@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'supabase_client.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Verifies that the required TankSync database schema exists.
 ///
@@ -43,7 +46,7 @@ class SchemaVerifier {
       try {
         await client.from(table).select('*').limit(0);
         result[table] = true;
-      } catch (e, st) { debugPrint('SchemaVerifier: table check failed: $e\n$st');
+      } catch (e, st) { unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'SchemaVerifier: table check failed'}));
         result[table] = false;
       }
     }

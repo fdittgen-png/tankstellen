@@ -13,8 +13,10 @@ import 'package:tankstellen/features/consumption/data/obd2/pid_scheduler.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   group('TripRecordingController (#726)', () {
     test('start() reads the odometer once and exposes it as '
         'odometerStartKm', () async {

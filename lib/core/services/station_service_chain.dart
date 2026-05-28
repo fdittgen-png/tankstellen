@@ -12,6 +12,7 @@ import '../cache/cache_manager.dart';
 import '../error/exceptions.dart';
 import 'service_result.dart';
 import 'station_service.dart';
+import '../../core/logging/error_logger.dart';
 
 /// Orchestrates station data retrieval with fallback:
 ///
@@ -294,7 +295,7 @@ class StationServiceChain implements StationService {
           .map((j) => Station.fromJson(Map<String, dynamic>.from(j as Map)))
           .toList();
     } on FormatException catch (e, st) {
-      debugPrint('Cache: station list parse failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Cache: station list parse failed'}));
       return null;
     }
   }
@@ -323,7 +324,7 @@ class StationServiceChain implements StationService {
         state: data['state'] as String?,
       );
     } on FormatException catch (e, st) {
-      debugPrint('Cache: station detail parse failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Cache: station detail parse failed'}));
       return null;
     }
   }
@@ -340,7 +341,7 @@ class StationServiceChain implements StationService {
         (k, v) => MapEntry(k, StationPrices.fromJson(Map<String, dynamic>.from(v as Map))),
       );
     } on FormatException catch (e, st) {
-      debugPrint('Cache: prices parse failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Cache: prices parse failed'}));
       return null;
     }
   }

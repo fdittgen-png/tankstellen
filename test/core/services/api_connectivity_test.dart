@@ -6,6 +6,7 @@ library;
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../helpers/silence_error_logger.dart';
 
 /// Integration tests that verify each country's fuel price API is reachable
 /// and returns valid data. Probes Tankerkoenig (DE), Prix-Carburants (FR),
@@ -19,6 +20,7 @@ import 'package:flutter_test/flutter_test.dart';
 ///
 ///   flutter test test/core/services/api_connectivity_test.dart --tags=network
 void main() {
+  silenceErrorLoggerSpool();
   late Dio dio;
 
   setUp(() {

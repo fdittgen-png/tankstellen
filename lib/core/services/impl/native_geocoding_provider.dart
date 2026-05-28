@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io' show Platform;
 
 import 'package:dio/dio.dart';
@@ -9,6 +11,7 @@ import 'package:geocoding/geocoding.dart' as geo;
 import '../../error/exceptions.dart';
 import '../geocoding_provider.dart';
 import '../service_result.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Geocoding via native platform APIs (Android/iOS only).
 /// Uses the `geocoding` package which wraps platform geocoders.
@@ -63,7 +66,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
       if (placemarks.isEmpty) return null;
       return placemarks.first.isoCountryCode;
     } on Exception catch (e, st) {
-      debugPrint('Native country detection failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Native country detection failed'}));
       return null;
     }
   }
@@ -81,7 +84,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
           .where((s) => s != null && s.isNotEmpty)
           .join(' ');
     } on Exception catch (e, st) {
-      debugPrint('Native reverse geocoding failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Native reverse geocoding failed'}));
       return '$lat, $lng';
     }
   }
