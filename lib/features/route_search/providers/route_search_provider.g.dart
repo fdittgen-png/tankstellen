@@ -59,7 +59,7 @@ final class RouteSearchStateProvider
   }
 }
 
-String _$routeSearchStateHash() => r'e5abbb2e98c012de1d7e0236736467254f0b7337';
+String _$routeSearchStateHash() => r'468181118db0d8a5310822537b21d9b1bb818563';
 
 /// Orchestrates "cheapest stations along my route" feature.
 ///
