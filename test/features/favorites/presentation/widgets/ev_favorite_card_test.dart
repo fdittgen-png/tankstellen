@@ -144,7 +144,7 @@ void main() {
     });
 
     testWidgets(
-        'deduplicates connector-type chips using rawType when present',
+        '#2143 deduplicates connector-type labels using rawType when present',
         (tester) async {
       await pumpApp(
         tester,
@@ -168,9 +168,10 @@ void main() {
           ]),
         ),
       );
-      // CCS appears on 2 connectors but only as 1 chip
-      expect(find.widgetWithText(Chip, 'CCS'), findsOneWidget);
-      expect(find.widgetWithText(Chip, 'Type 2'), findsOneWidget);
+      // #2143 — chips swapped for a single joined label in the
+      // right-side detail column. CCS appears on 2 connectors but
+      // dedupes to one segment.
+      expect(find.text('CCS · Type 2'), findsOneWidget);
     });
 
     testWidgets('tap on the card invokes onTap', (tester) async {
