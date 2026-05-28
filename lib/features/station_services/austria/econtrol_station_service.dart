@@ -20,10 +20,16 @@ import '../../../core/logging/error_logger.dart';
 class EControlStationService with StationServiceHelpers implements StationService {
   static const _baseUrl = 'https://api.e-control.at/sprit/1.0';
 
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-  );
+  final Dio _dio;
+
+  /// #2181 — Dio is injectable so tests can assert request shape;
+  /// defaults to the standard factory in production.
+  EControlStationService({Dio? dio})
+      : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 10),
+            );
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(

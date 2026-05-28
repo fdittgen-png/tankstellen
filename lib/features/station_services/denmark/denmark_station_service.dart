@@ -22,10 +22,15 @@ import '../../../core/logging/error_logger.dart';
 /// We download all, calculate distances locally, and filter by radius.
 /// Prices are in DKK (Danish Kroner).
 class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin implements StationService {
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 15),
-    receiveTimeout: const Duration(seconds: 15),
-  );
+  final Dio _dio;
+
+  /// #2181 — Dio injectable for tests; defaults to the standard factory.
+  DenmarkStationService({Dio? dio})
+      : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 15),
+            );
 
   // In-memory cache
   List<Station>? _cachedStations;

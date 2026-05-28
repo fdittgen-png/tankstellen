@@ -26,11 +26,16 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
   static const _pricesUrl =
       'https://www.mimit.gov.it/images/exportCSV/prezzo_alle_8.csv';
 
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 20),
-    receiveTimeout: const Duration(seconds: 60),
-    responseType: ResponseType.plain,
-  );
+  final Dio _dio;
+
+  /// #2181 — Dio injectable for tests; defaults to the standard factory.
+  MiseStationService({Dio? dio})
+      : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 20),
+              receiveTimeout: const Duration(seconds: 60),
+              responseType: ResponseType.plain,
+            );
 
   // In-memory cache of parsed data
   Map<String, _StationData>? _cachedStations;

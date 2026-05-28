@@ -26,10 +26,15 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
       'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes'
       '/PreciosCarburantes';
 
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 20),
-    receiveTimeout: const Duration(seconds: 30),
-  );
+  final Dio _dio;
+
+  /// #2181 — Dio injectable for tests; defaults to the standard factory.
+  MitecoStationService({Dio? dio})
+      : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 20),
+              receiveTimeout: const Duration(seconds: 30),
+            );
 
   // Cache the province list and full station data to avoid repeated large downloads
   List<_Province>? _cachedProvinces;
