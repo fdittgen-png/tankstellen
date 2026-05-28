@@ -7,21 +7,11 @@ import '../../features/search/domain/entities/station.dart';
 import 'station_extensions.dart';
 
 /// Returns the price of the given [fuelType] for [station], or null if unavailable.
-double? priceForFuelType(Station station, FuelType fuelType) {
-  return switch (fuelType) {
-    FuelTypeE5() => station.e5,
-    FuelTypeE10() => station.e10,
-    FuelTypeE98() => station.e98,
-    FuelTypeDiesel() => station.diesel,
-    FuelTypeDieselPremium() => station.dieselPremium,
-    FuelTypeE85() => station.e85,
-    FuelTypeLpg() => station.lpg,
-    FuelTypeCng() => station.cng,
-    FuelTypeHydrogen() => null,
-    FuelTypeElectric() => null,
-    FuelTypeAll() => station.e10 ?? station.e5 ?? station.diesel,
-  };
-}
+///
+/// Delegates to the canonical [StationDisplay.priceFor] extension so the
+/// FuelType→price-field mapping lives in exactly one place (#2170).
+double? priceForFuelType(Station station, FuelType fuelType) =>
+    station.priceFor(fuelType);
 
 /// Compares two stations by price for [fuelType]. Stations without a price sort last.
 int compareByPrice(Station a, Station b, FuelType fuelType) {

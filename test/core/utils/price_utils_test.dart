@@ -53,6 +53,31 @@ Station _makeStation({
 }
 
 void main() {
+  // #2170 — priceForFuelType now delegates to Station.priceFor. This
+  // parity test locks the two in lockstep so a new FuelType added to
+  // only one switch can never silently diverge again.
+  group('priceForFuelType ≡ Station.priceFor (single source)', () {
+    test('agrees with the extension for every FuelType value', () {
+      final s = _makeStation(
+        e5: 1.659,
+        e10: 1.599,
+        e98: 1.899,
+        diesel: 1.549,
+        dieselPremium: 1.749,
+        e85: 0.899,
+        lpg: 0.799,
+        cng: 1.199,
+      );
+      for (final ft in FuelType.values) {
+        expect(
+          priceForFuelType(s, ft),
+          equals(s.priceFor(ft)),
+          reason: 'priceForFuelType must delegate to priceFor for $ft',
+        );
+      }
+    });
+  });
+
   group('priceForFuelType', () {
     test('returns e5 price for FuelType.e5', () {
       final station = _makeStation(e5: 1.659);

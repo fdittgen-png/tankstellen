@@ -361,6 +361,43 @@ void main() {
       expect(stationService.lastParams!.fuelType, FuelType.diesel);
     });
 
+    // #2170 — the builder's private _priceForFuel had a `_` wildcard
+    // that returned the e10/e5/diesel fallback for electric/hydrogen,
+    // so an EV-preferring profile saw a petrol price mislabelled as the
+    // preferred fuel. Collapsing onto Station.priceFor returns null for
+    // electric (Station carries no EV price field) — an empty price, not
+    // a wrong one.
+    test('preferred electric fuel renders no price (null) instead of a '
+        'petrol fallback', () async {
+      await settings.putSetting(StorageKeys.userPositionLat, 52.5200);
+      await settings.putSetting(StorageKeys.userPositionLng, 13.4050);
+      profiles.activeProfileJson = {
+        'id': 'p1',
+        'name': 'EV',
+        'preferredFuelType': 'electric',
+        'defaultSearchRadius': 10.0,
+      };
+      stationService.stationsToReturn = [
+        _stationFixture(
+          id: 'de-0',
+          brand: 'Shell',
+          street: 'Str0',
+          place: 'Berlin',
+          lat: 52.52,
+          lng: 13.40,
+          e10: 1.799,
+          e5: 1.859,
+          diesel: 1.659,
+        ),
+      ];
+
+      final result = await builder.build();
+
+      expect(result.stations, hasLength(1));
+      expect(result.stations.first['preferred_fuel_price'], isNull);
+      expect(result.stations.first['priceFormatted'], '');
+    });
+
     test('on second call after network failure, returns last successful '
         'payload flagged isStale=true', () async {
       await settings.putSetting(StorageKeys.userPositionLat, 52.5200);
