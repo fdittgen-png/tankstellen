@@ -163,6 +163,60 @@ void main() {
     });
   });
 
+  group('LocationInput #2137 — selection does not auto-trigger search', () {
+    testWidgets('GPS icon tap does NOT fire onGpsSearch (FAB owns search)',
+        (tester) async {
+      var gpsCalls = 0;
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        LocationInput(
+          onGpsSearch: () => gpsCalls++,
+          onZipSearch: (_) {},
+          onCitySearch: (_) {},
+        ),
+        overrides: test.overrides,
+      );
+
+      // Tap the suffix GPS icon. It clears + switches mode but must
+      // not fire onGpsSearch — the central FAB does that.
+      await tester.tap(find.byIcon(Icons.my_location).first);
+      await tester.pumpAndSettle();
+
+      expect(gpsCalls, 0,
+          reason: '#2137 — GPS icon must not auto-fire onGpsSearch.');
+    });
+
+    testWidgets('Enter key on the field does NOT fire any callback',
+        (tester) async {
+      var gps = 0;
+      var zip = 0;
+      var city = 0;
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        LocationInput(
+          onGpsSearch: () => gps++,
+          onZipSearch: (_) => zip++,
+          onCitySearch: (_) => city++,
+        ),
+        overrides: test.overrides,
+      );
+
+      await tester.enterText(find.byType(TextField), '34540');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      expect(gps, 0, reason: '#2137 — Enter must not fire onGpsSearch.');
+      expect(zip, 0, reason: '#2137 — Enter must not fire onZipSearch.');
+      expect(city, 0, reason: '#2137 — Enter must not fire onCitySearch.');
+    });
+  });
+
   group('LocationInput accessibility', () {
     testWidgets('TextField is not wrapped in nested Semantics(textField: true)',
         (tester) async {

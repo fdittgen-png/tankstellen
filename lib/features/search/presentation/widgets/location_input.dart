@@ -28,10 +28,13 @@ class LocationInput extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<LocationInput> createState() => _LocationInputState();
+  ConsumerState<LocationInput> createState() => LocationInputWidgetState();
 }
 
-class _LocationInputState extends ConsumerState<LocationInput> {
+/// Public State so the parent criteria screen can drive [submit] via a
+/// `GlobalKey` (#2137 — central FAB owns the search trigger; tapping a
+/// city suggestion only updates the criteria's selectedCity).
+class LocationInputWidgetState extends ConsumerState<LocationInput> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   Timer? _debounce;
@@ -85,7 +88,11 @@ class _LocationInputState extends ConsumerState<LocationInput> {
     }
   }
 
-  void _submit() {
+  /// Dispatches the current criteria to the appropriate search callback.
+  /// Public so the criteria-screen FAB can fire it via `GlobalKey`
+  /// without the suggestion-tap or Enter-key paths having to call it
+  /// themselves (#2137).
+  void submit() {
     final country = ref.read(activeCountryProvider);
     final uiState = ref.read(locationInputControllerProvider);
     final text = _controller.text.trim();
@@ -189,9 +196,10 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                         constraints: const BoxConstraints(
                             minWidth: 32, minHeight: 32),
                         onPressed: () {
+                          // #2137 — switch the criteria to GPS mode but
+                          // don't fire the search; the FAB owns that.
                           _controller.clear();
                           _onChanged('');
-                          widget.onGpsSearch();
                         },
                       ),
                     ],
@@ -200,7 +208,9 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                       const BoxConstraints(minWidth: 36, minHeight: 36),
                 ),
                 onChanged: _onChanged,
-                onSubmitted: (_) => _submit(),
+                // #2137 — Enter is not a search trigger any more; the
+                // central FAB owns that. Tapping Done just unfocuses.
+                onSubmitted: (_) => _focusNode.unfocus(),
               );
             },
           ),
@@ -238,7 +248,8 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                     ref
                         .read(locationInputControllerProvider.notifier)
                         .selectCity(city);
-                    widget.onCitySearch(city);
+                    // #2137 — selection updates the criteria; the
+                    // central FAB triggers the actual search.
                   },
                 );
               },

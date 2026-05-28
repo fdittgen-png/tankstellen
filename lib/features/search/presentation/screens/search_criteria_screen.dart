@@ -30,7 +30,7 @@ import '../../providers/search_screen_ui_provider.dart';
 import '../widgets/amenity_filter_wrap.dart';
 import '../widgets/brand_filter_chips.dart';
 import '../widgets/fuel_type_selector.dart';
-import '../widgets/location_input.dart';
+import '../widgets/location_input.dart' show LocationInput, LocationInputWidgetState;
 import '../widgets/search_mode_toggle.dart';
 import '../widgets/search_radius_slider.dart';
 
@@ -52,6 +52,12 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   final GlobalKey<RouteInputWidgetState> _routeInputKey =
       GlobalKey<RouteInputWidgetState>();
 
+  /// Drives [LocationInputWidgetState.submit] when the central FAB fires
+  /// a nearby search (#2137 — city/ZIP/GPS selection only updates the
+  /// criteria; the FAB submits).
+  final GlobalKey<LocationInputWidgetState> _locationInputKey =
+      GlobalKey<LocationInputWidgetState>();
+
   /// Last action registered on the shell FAB, kept so we can `clearIf`
   /// in `dispose` without stomping on a sibling screen that registered
   /// after us.
@@ -60,6 +66,14 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   /// FAB notifier captured in initState so `dispose` can clear without
   /// touching `ref` (Riverpod forbids ref usage after `deactivate`).
   SearchFabActionController? _fabNotifier;
+
+  /// Re-entry guard against rapid FAB / Enter / suggestion taps that
+  /// each call `Navigator.of(context).pop()` (#2136). The second pop
+  /// runs while the first pop's close animation is still inverting and
+  /// `lastWhere(isPresentPredicate)` finds no present route, crashing
+  /// with `StateError: No element`. Once a search has fired, the modal
+  /// is on its way out — additional taps are no-ops.
+  bool _searchFired = false;
 
   @override
   void initState() {
@@ -117,7 +131,17 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       onTap = () => _routeInputKey.currentState?.resolveAndSearch();
     } else {
       enabled = true;
-      onTap = () => unawaited(_performGpsSearch());
+      // #2137 — dispatch through LocationInput.submit so the FAB
+      // honours the user's current selection (city → coords, ZIP →
+      // by-postcode, empty → GPS) instead of always doing GPS.
+      onTap = () {
+        final loc = _locationInputKey.currentState;
+        if (loc != null) {
+          loc.submit();
+        } else {
+          unawaited(_performGpsSearch());
+        }
+      };
     }
 
     final action = SearchFabAction(
@@ -131,6 +155,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 
   Future<void> _performGpsSearch() async {
+    if (_searchFired) return;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     final settings = ref.read(settingsStorageProvider);
@@ -149,16 +174,20 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       }
       await LocationConsentDialog.recordConsent(settings);
     }
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
 
     // SearchState dispatches to EV or fuel service internally based on fuelType.
     unawaited(ref.read(searchStateProvider.notifier).searchByGps(
           fuelType: fuelType,
           radiusKm: radius,
         ));
-    if (mounted) Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   void _performZipSearch(String zip) {
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     ref.read(searchStateProvider.notifier).searchByZipCode(
@@ -170,6 +199,8 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 
   void _performCitySearch(ResolvedLocation city) {
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     ref.read(searchStateProvider.notifier).searchByCoordinates(
@@ -184,6 +215,8 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 
   void _performRouteSearch(List<RouteWaypoint> waypoints) {
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     // #1602 — the route search corridor is the user's detour budget.
     final detourBudgetKm =
@@ -314,6 +347,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
               // the fold on a stock S23 at 1x text scale.
               if (mode == SearchMode.nearby) ...[
                 LocationInput(
+                  key: _locationInputKey,
                   onGpsSearch: _performGpsSearch,
                   onZipSearch: _performZipSearch,
                   onCitySearch: _performCitySearch,
