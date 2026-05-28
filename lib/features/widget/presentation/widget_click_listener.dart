@@ -97,17 +97,27 @@ class WidgetClickListener extends ConsumerStatefulWidget {
       _WidgetClickListenerState();
 }
 
-class _WidgetClickListenerState extends ConsumerState<WidgetClickListener> {
+class _WidgetClickListenerState extends ConsumerState<WidgetClickListener>
+    with WidgetsBindingObserver {
   StreamSubscription<Uri?>? _subscription;
+
+  /// #2157 — track the last dispatched URI so the resume-time fallback
+  /// doesn't re-fire a URI the Stream listener already handled (and so
+  /// it doesn't re-fire the cold-launch URI either — that one is
+  /// consumed via `pendingWidgetUriProvider`, but the activity's
+  /// `intent.data` still carries it).
+  String? _lastDispatched;
 
   @override
   void initState() {
     super.initState();
     _subscription = HomeWidget.widgetClicked.listen(_dispatch);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // #1352 — `HomeWidget.widgetClicked` is backed by the
     // `home_widget/updates` EventChannel; the platform may have
     // already torn the broadcast down (lifecycle race during navigation
@@ -118,8 +128,39 @@ class _WidgetClickListenerState extends ConsumerState<WidgetClickListener> {
     super.dispose();
   }
 
+  /// #2157 — resume-time safety net. The plugin's `widgetClicked`
+  /// Stream relies on `MainActivity.onNewIntent` → plugin's
+  /// `OnNewIntentListener` → its receiver only being non-null after the
+  /// Flutter side has subscribed. On some OEM ROMs the `singleTop` +
+  /// `FLAG_ACTIVITY_CLEAR_TOP` combination loses the new intent on
+  /// warm taps. As a defensive backup, re-read
+  /// `initiallyLaunchedFromHomeWidget()` every time the app resumes —
+  /// `MainActivity.onNewIntent` calls `setIntent(intent)`, so the
+  /// activity's current intent reflects the latest widget URI by then.
+  /// `_lastDispatched` guards against re-firing the same URI.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    unawaited(_pollLaunchUri());
+  }
+
+  Future<void> _pollLaunchUri() async {
+    if (!mounted) return;
+    try {
+      final uri = await HomeWidget.initiallyLaunchedFromHomeWidget();
+      if (uri == null) return;
+      if (uri.toString() == _lastDispatched) return;
+      _dispatch(uri);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'WidgetClickListener._pollLaunchUri',
+      }));
+    }
+  }
+
   void _dispatch(Uri? uri) {
     if (!mounted) return;
+    if (uri != null) _lastDispatched = uri.toString();
     ref.read(widgetLaunchHandlerProvider).handle(uri);
   }
 
