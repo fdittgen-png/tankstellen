@@ -15,12 +15,22 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import '../../../../mocks/mocks.dart' show MockStorageRepository;
 
 void main() {
+  // #2155 — the AlertsTab now mounts immediately in the wide-layout
+  // branch (default 800×600 test surface lands there); the previous
+  // tab layout already pre-built it via TabBarView, but the wide-row
+  // path surfaces an unmocked getAlerts() faster. Stub it suite-wide.
+  void stubAlerts(MockStorageRepository m) {
+    when(() => m.getAlerts()).thenReturn(const <Map<String, dynamic>>[]);
+  }
+
   group('FavoritesScreen', () {
     testWidgets('renders Scaffold', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      stubAlerts(test.mockStorage);
 
       await pumpApp(
         tester,
@@ -34,6 +44,8 @@ void main() {
     testWidgets('renders app bar with Favorites title', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      stubAlerts(test.mockStorage);
 
       await pumpApp(
         tester,
@@ -49,6 +61,8 @@ void main() {
       final test = standardTestOverrides(favoriteIds: []);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
+      stubAlerts(test.mockStorage);
+
       await pumpApp(
         tester,
         const FavoritesScreen(),
@@ -56,16 +70,19 @@ void main() {
       );
 
       // Empty state shows star_outline icon and "No favorites yet" text.
-      // #1163 — the Favoris sub-tab now also renders Icons.star_outline,
-      // so we expect at least 2 occurrences (one in the tab row, one in
-      // the empty-state body) instead of exactly one.
-      expect(find.byIcon(Icons.star_outline), findsAtLeast(2));
+      // #2155 — the default 800×600 test surface now lands in the wide
+      // layout (no tab switcher), so the only star_outline is the
+      // empty-state body icon. The portrait-tab test below pins the
+      // tab-row star case explicitly.
+      expect(find.byIcon(Icons.star_outline), findsOneWidget);
       expect(find.text('No favorites yet'), findsOneWidget);
     });
 
     testWidgets('shows hint text in empty state', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      stubAlerts(test.mockStorage);
 
       await pumpApp(
         tester,
@@ -79,14 +96,22 @@ void main() {
       );
     });
 
-    testWidgets('shows tabs for Favorites and Price Alerts',
+    testWidgets(
+        'shows tabs for Favorites and Price Alerts (portrait phone)',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
+      stubAlerts(test.mockStorage);
+
       await pumpApp(
         tester,
-        const FavoritesScreen(),
+        // #2155 — wrap in a portrait-phone-shaped MediaQuery so the
+        // tab layout fires (>=600dp OR landscape → side-by-side).
+        const MediaQuery(
+          data: MediaQueryData(size: Size(360, 800)),
+          child: FavoritesScreen(),
+        ),
         overrides: test.overrides,
       );
 
@@ -95,11 +120,59 @@ void main() {
       expect(find.text('Price Alerts'), findsOneWidget);
     });
 
+    testWidgets(
+        '#2155 landscape phone renders FavoritesTab + AlertsTab '
+        'side-by-side (no TabSwitcher)', (tester) async {
+      final test = standardTestOverrides(favoriteIds: []);
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      stubAlerts(test.mockStorage);
+
+      await pumpApp(
+        tester,
+        const MediaQuery(
+          // Landscape phone: 800 x 360 (wide, short).
+          data: MediaQueryData(size: Size(800, 360)),
+          child: FavoritesScreen(),
+        ),
+        overrides: test.overrides,
+      );
+
+      // No tab switcher chip-row in landscape — "Price Alerts" appears
+      // only as the pane title row in AlertsTab, not as a tab label.
+      // The empty-state bodies of both panes should be visible at once.
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      expect(find.text('No favorites yet'), findsOneWidget);
+    });
+
+    testWidgets(
+        '#2155 wide portrait (tablet) also gets the side-by-side layout',
+        (tester) async {
+      final test = standardTestOverrides(favoriteIds: []);
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      stubAlerts(test.mockStorage);
+
+      await pumpApp(
+        tester,
+        const MediaQuery(
+          // Portrait tablet: 800 x 1200 (wide and tall).
+          data: MediaQueryData(size: Size(800, 1200)),
+          child: FavoritesScreen(),
+        ),
+        overrides: test.overrides,
+      );
+
+      expect(find.byType(VerticalDivider), findsOneWidget);
+    });
+
     testWidgets('renders station cards when favorites have data',
         (tester) async {
       final test = standardTestOverrides(
           favoriteIds: [testStation.id]);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      stubAlerts(test.mockStorage);
 
       final result = ServiceResult(
         data: [testStation],

@@ -31,7 +31,12 @@ void main() {
 
         await pumpApp(
           tester,
-          const FavoritesScreen(),
+          // #2155 — pin to a portrait phone surface so the tab-based
+          // layout fires (≥600dp OR landscape → side-by-side).
+          const MediaQuery(
+            data: MediaQueryData(size: Size(360, 800)),
+            child: FavoritesScreen(),
+          ),
           overrides: test.overrides,
         );
 
