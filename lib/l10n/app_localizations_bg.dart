@@ -3459,6 +3459,22 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton =>
+      'Тест на наслагване при приближаване';
+
+  @override
+  String get approachTestStopButton => 'Спрете теста';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Тестът е активен — наслагването показва цената за $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Добавете любима станция, за да тествате наслагването при приближаване';
+
+  @override
   String approachStationDistance(String meters) {
     return 'на $meters м';
   }

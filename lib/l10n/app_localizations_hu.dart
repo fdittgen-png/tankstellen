@@ -3454,6 +3454,21 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Megközelítési rátét tesztelése';
+
+  @override
+  String get approachTestStopButton => 'Teszt leállítása';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Teszt aktív — a rátét a(z) $station árát mutatja';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Adjon hozzá kedvenc kutat a megközelítési rátét teszteléséhez';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m-re';
   }

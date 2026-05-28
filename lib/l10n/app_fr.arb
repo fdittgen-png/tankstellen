@@ -1999,5 +1999,27 @@
         "type": "int"
       }
     }
+  },
+  "approachTestSimulateButton": "Tester l'overlay d'approche",
+  "@approachTestSimulateButton": {
+    "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
+  },
+  "approachTestStopButton": "Arrêter le test",
+  "@approachTestStopButton": {
+    "description": "Button that aborts the in-app approach-overlay simulation (#2163)."
+  },
+  "approachTestActiveCaption": "Test actif — l'overlay affiche le prix pour {station}",
+  "@approachTestActiveCaption": {
+    "description": "Caption shown under the test button while a simulated approach is running (#2163).",
+    "placeholders": {
+      "station": {
+        "type": "String",
+        "example": "Pézenas Carburant"
+      }
+    }
+  },
+  "approachTestUnavailable": "Ajoutez une station favorite pour tester l'overlay d'approche",
+  "@approachTestUnavailable": {
+    "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
   }
 }

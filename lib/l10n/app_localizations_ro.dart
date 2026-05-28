@@ -3453,6 +3453,21 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testează suprapunerea de apropiere';
+
+  @override
+  String get approachTestStopButton => 'Oprește testul';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test activ — suprapunerea afișează prețul pentru $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Adăugați o stație preferată pentru a testa suprapunerea de apropiere';
+
+  @override
   String approachStationDistance(String meters) {
     return 'la $meters m';
   }

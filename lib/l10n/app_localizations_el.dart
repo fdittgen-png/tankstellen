@@ -3459,6 +3459,21 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Δοκιμή επικάλυψης προσέγγισης';
+
+  @override
+  String get approachTestStopButton => 'Τερματισμός δοκιμής';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Η δοκιμή είναι ενεργή — η επικάλυψη εμφανίζει την τιμή για $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Προσθέστε ένα αγαπημένο πρατήριο για να δοκιμάσετε την επικάλυψη προσέγγισης';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m μακριά';
   }

@@ -6345,6 +6345,30 @@ abstract class AppLocalizations {
   /// **'Floor on how often the overlay refreshes the nearest station (faster at speed, never tighter than {seconds} s)'**
   String approachMinPollCaption(int seconds);
 
+  /// Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163).
+  ///
+  /// In en, this message translates to:
+  /// **'Test approach overlay'**
+  String get approachTestSimulateButton;
+
+  /// Button that aborts the in-app approach-overlay simulation (#2163).
+  ///
+  /// In en, this message translates to:
+  /// **'Stop test'**
+  String get approachTestStopButton;
+
+  /// Caption shown under the test button while a simulated approach is running (#2163).
+  ///
+  /// In en, this message translates to:
+  /// **'Test active — overlay shows the price for {station}'**
+  String approachTestActiveCaption(String station);
+
+  /// Caption shown when the test button is disabled because no favorite station is available as a target (#2163).
+  ///
+  /// In en, this message translates to:
+  /// **'Add a favorite station to test the approach overlay'**
+  String get approachTestUnavailable;
+
   /// PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.
   ///
   /// In en, this message translates to:

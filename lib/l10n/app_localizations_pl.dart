@@ -3442,6 +3442,21 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testuj nakładkę zbliżania się';
+
+  @override
+  String get approachTestStopButton => 'Zatrzymaj test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test aktywny — nakładka pokazuje cenę dla $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Dodaj ulubioną stację, aby przetestować nakładkę zbliżania się';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m dalej';
   }

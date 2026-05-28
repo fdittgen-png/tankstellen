@@ -3428,6 +3428,21 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testi lähenemise ülekatet';
+
+  @override
+  String get approachTestStopButton => 'Peata test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test aktiivne — ülekate näitab hinda jaamale $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Lisage lemmikjaam, et lähenemise ülekatet testida';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m kaugusel';
   }

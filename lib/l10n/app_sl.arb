@@ -1871,5 +1871,27 @@
         "type": "int"
       }
     }
+  },
+  "approachTestSimulateButton": "Preizkusi prekrivanje približevanja",
+  "@approachTestSimulateButton": {
+    "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
+  },
+  "approachTestStopButton": "Ustavi preizkus",
+  "@approachTestStopButton": {
+    "description": "Button that aborts the in-app approach-overlay simulation (#2163)."
+  },
+  "approachTestActiveCaption": "Preizkus aktiven — prekrivanje prikazuje ceno za {station}",
+  "@approachTestActiveCaption": {
+    "description": "Caption shown under the test button while a simulated approach is running (#2163).",
+    "placeholders": {
+      "station": {
+        "type": "String",
+        "example": "Pézenas Carburant"
+      }
+    }
+  },
+  "approachTestUnavailable": "Dodajte priljubljeno postajo, da preizkusite prekrivanje približevanja",
+  "@approachTestUnavailable": {
+    "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
   }
 }

@@ -3447,6 +3447,21 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testen van naderingsoverlay';
+
+  @override
+  String get approachTestStopButton => 'Stop test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test actief — overlay toont de prijs voor $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Voeg een favoriete tankstation toe om de naderingsoverlay te testen';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m verderop';
   }

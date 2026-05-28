@@ -21,6 +21,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../approach/presentation/widgets/approach_test_panel.dart';
 import '../../providers/privacy_data_provider.dart';
 import '../widgets/config_verification_widget.dart';
 import '../widgets/privacy_dashboard/local_data_card.dart';
@@ -91,19 +92,16 @@ class _PrivacyDashboardScreenState
           LocalDataCard(snapshot: snapshot),
           const SizedBox(height: 16),
           SyncedDataCard(snapshot: snapshot),
+          const SizedBox(height: 16),
+          const ApproachTestPanel(), // #2163 — test surface
           const SizedBox(height: 24),
           PrivacyExportJsonButton(onPressed: _exportData),
           const SizedBox(height: 12),
           PrivacyExportCsvButton(onPressed: _exportDataCsv),
           const SizedBox(height: 12),
-          // #476 — give users a way to share the locally-recorded error
-          // traces with the maintainer (or with their own bug report)
-          // even when Sentry is not configured. Uses Clipboard so we
-          // don't need a share_plus dependency.
-          //
-          // #1971 follow-up — a trailing reset button clears the
-          // buffered traces once the user has copied them (or just
-          // wants a clean slate); disabled when the log is empty.
+          // #476 — share locally-recorded error traces. #1971 added
+          // the reset button (clears the buffer once shared / for a
+          // clean slate; disabled when the log is empty).
           Row(
             children: [
               Expanded(
