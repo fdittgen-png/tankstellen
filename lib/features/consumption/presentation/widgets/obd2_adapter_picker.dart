@@ -15,6 +15,7 @@ import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/obd2/obd2_connection_service.dart';
 import '../../data/obd2/obd2_service.dart';
 import '../obd2_connection_error_l10n.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Modal bottom sheet that drives the full scan → pick → connect flow
 /// (#743). Caller opens it with [showObd2AdapterPicker]; the future
@@ -54,7 +55,7 @@ Future<Obd2Service?> showObd2AdapterPicker(
       // Real connect failure (permission denied, init timeout). Drop
       // through to the sheet so the user can pick another adapter;
       // the snackbar surfaces the mishap.
-      debugPrint('showObd2AdapterPicker pinned connect failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'showObd2AdapterPicker pinned connect failed'}));
     }
     if (service != null) {
       return service;

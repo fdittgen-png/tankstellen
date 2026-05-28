@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/pid_scheduler.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Helper: build a scheduler wired to a deterministic clock. The returned
 /// `advance` function bumps the clock forward by [d] — use it instead of
@@ -52,6 +53,7 @@ class _FakeTransport {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   group('PidScheduler.pickNextCommand — selection math', () {
     test(
         'picks the PID with the largest (elapsed × hz) when all have '

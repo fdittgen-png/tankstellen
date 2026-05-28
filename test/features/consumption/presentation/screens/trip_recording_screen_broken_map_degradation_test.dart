@@ -21,6 +21,7 @@ import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -36,6 +37,7 @@ import '../../../../helpers/pump_app.dart';
 ///     the receipt-derived per-vehicle L/100 km from the fill-up
 ///     history is shown instead. The persistent banner appears.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late StreamController<CoachEvent> events;

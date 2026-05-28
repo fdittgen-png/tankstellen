@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/features/consumption/data/obd2/paused_trip_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Direct unit tests for [PausedTripRepository] (Refs #561).
 ///
@@ -16,6 +17,7 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 /// JSON shape (omits null optional fields), and resilience to corrupt
 /// payloads.
 void main() {
+  silenceErrorLoggerSpool();
   group('PausedTripRepository (#561)', () {
     late Directory tmpDir;
     late Box<String> box;

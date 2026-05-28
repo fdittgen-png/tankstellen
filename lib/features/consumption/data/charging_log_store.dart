@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -8,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../../ev/domain/entities/charging_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Hive-backed CRUD store for [ChargingLog] records (#582 phase 1).
 ///
@@ -38,7 +41,7 @@ class ChargingLogStore {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);
     } catch (e, st) {
-      debugPrint('ChargingLogStore: settings box unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ChargingLogStore: settings box unavailable'}));
       return null;
     }
   }
@@ -60,7 +63,7 @@ class ChargingLogStore {
         if (json == null) continue;
         out.add(ChargingLog.fromJson(json));
       } catch (e, st) {
-        debugPrint('ChargingLogStore.list: skipping $key: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'ChargingLogStore.list: skipping $key'}));
       }
     }
     out.sort((a, b) => a.date.compareTo(b.date));

@@ -9,6 +9,7 @@ import 'package:tankstellen/features/consumption/domain/situation_classifier.dar
 import 'package:tankstellen/features/consumption/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -54,6 +55,7 @@ Future<void> _pumpRecordingScreen(WidgetTester tester) async {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('TripRecordingScreen — PageScaffold migration (#923 phase 3m)', () {

@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../widgets/pump_display_reticle.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Full-screen in-app camera for capturing a pump display (#1868).
 ///
@@ -103,14 +106,14 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
       final denied = e.code == 'CameraAccessDenied' ||
           e.code == 'CameraAccessDeniedWithoutPrompt' ||
           e.code == 'CameraAccessRestricted';
-      debugPrint('PumpDisplayCameraScreen: camera setup failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'PumpDisplayCameraScreen: camera setup failed'}));
       setState(() {
         _initializing = false;
         _permissionDenied = denied;
         _failed = !denied;
       });
     } catch (e, st) {
-      debugPrint('PumpDisplayCameraScreen: camera unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'PumpDisplayCameraScreen: camera unavailable'}));
       if (mounted) {
         setState(() {
           _initializing = false;

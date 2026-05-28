@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +12,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/station.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Station-first entry point for the fill-up form (#715).
 ///
@@ -38,7 +41,7 @@ class PickStationForFillUpScreen extends ConsumerWidget {
       try {
         stations.add(Station.fromJson(raw));
       } catch (e, st) {
-        debugPrint('PickStationForFillUp: skipping malformed favorite $id: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: {'where': 'PickStationForFillUp: skipping malformed favorite $id'}));
       }
     }
     final profileFuel =

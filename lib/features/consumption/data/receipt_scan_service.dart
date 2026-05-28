@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -10,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'pump_display_parser.dart';
 import 'receipt_parser.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Outcome of a single receipt capture: parsed fields plus the source
 /// OCR text and the path to the captured JPEG on disk. The caller is
@@ -169,7 +172,7 @@ class ReceiptScanService {
       debugPrint('OCR text (${text.length} chars):\n$text');
       return text;
     } catch (e, st) {
-      debugPrint('OCR scan failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OCR scan failed'}));
       return null;
     } finally {
       if (uprightTemp != null) await _tryDelete(uprightTemp);
@@ -198,7 +201,7 @@ class ReceiptScanService {
       await File(tempPath).writeAsBytes(upright);
       return tempPath;
     } catch (e, st) {
-      debugPrint('OCR orientation-bake failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OCR orientation-bake failed'}));
       return null;
     }
   }
@@ -207,7 +210,7 @@ class ReceiptScanService {
     try {
       await File(path).delete();
     } catch (e, st) {
-      debugPrint('OCR temp-file cleanup failed at $path: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'OCR temp-file cleanup failed at $path'}));
     }
   }
 
@@ -242,7 +245,7 @@ Uint8List? bakeImageOrientation(Uint8List jpegBytes) {
     return img.encodeJpg(upright, quality: 90);
   } catch (e, st) {
     // A malformed / non-JPEG file is not fatal — OCR the original.
-    debugPrint('bakeImageOrientation: decode failed: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'bakeImageOrientation: decode failed'}));
     return null;
   }
 }
@@ -278,7 +281,7 @@ Uint8List? preprocessPumpDisplayForOcr(Uint8List jpegBytes) {
     return img.encodeJpg(boosted, quality: 90);
   } catch (e, st) {
     // A malformed / non-JPEG file is not fatal — OCR the original.
-    debugPrint('preprocessPumpDisplayForOcr: decode failed: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'preprocessPumpDisplayForOcr: decode failed'}));
     return null;
   }
 }

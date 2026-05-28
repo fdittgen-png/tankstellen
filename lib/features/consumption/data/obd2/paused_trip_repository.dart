@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../../domain/trip_recorder.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Snapshot of an in-progress OBD2 recording that was paused because
 /// the Bluetooth transport dropped (#797 phase 1).
@@ -140,7 +143,7 @@ class PausedTripRepository {
     try {
       await _box.put(entry.id, jsonEncode(entry.toJson()));
     } catch (e, st) {
-      debugPrint('PausedTripRepository.save: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PausedTripRepository.save'}));
     }
   }
 
@@ -154,7 +157,7 @@ class PausedTripRepository {
       final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
       return PausedTripEntry.fromJson(json);
     } catch (e, st) {
-      debugPrint('PausedTripRepository.load: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PausedTripRepository.load'}));
       return null;
     }
   }
@@ -178,7 +181,7 @@ class PausedTripRepository {
     try {
       await _box.delete(id);
     } catch (e, st) {
-      debugPrint('PausedTripRepository.delete: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PausedTripRepository.delete'}));
     }
   }
 }

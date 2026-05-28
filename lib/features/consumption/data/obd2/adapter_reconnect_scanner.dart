@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Callback signature: "is the pinned adapter MAC currently
 /// discoverable?". Resolved by the scanner against the active
@@ -171,7 +172,7 @@ class AdapterReconnectScanner {
     try {
       return await _probe(_pinnedMac);
     } catch (e, st) {
-      debugPrint('AdapterReconnectScanner probe failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AdapterReconnectScanner probe failed'}));
       return false;
     }
   }
@@ -180,7 +181,7 @@ class AdapterReconnectScanner {
     try {
       return await _connect(_pinnedMac);
     } catch (e, st) {
-      debugPrint('AdapterReconnectScanner connect failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AdapterReconnectScanner connect failed'}));
       return false;
     }
   }

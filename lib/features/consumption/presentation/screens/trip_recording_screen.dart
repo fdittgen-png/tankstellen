@@ -29,6 +29,7 @@ import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
 import '../widgets/minimal_drive_summary.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Result returned when the user confirms saving a recorded trip
 /// from the summary screen (#726, #1185).
@@ -830,8 +831,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     } catch (e, st) {
       // A malformed fill-up set must not crash the summary card —
       // but log the cause rather than hiding it silently (#1682).
-      debugPrint(
-          'TripRecordingScreen: consumption summary calc failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripRecordingScreen: consumption summary calc failed'}));
       return null;
     }
   }

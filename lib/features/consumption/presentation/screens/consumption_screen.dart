@@ -25,6 +25,7 @@ import '../widgets/fuel_tab.dart';
 import '../widgets/obd2_status_chip.dart';
 import '../widgets/trajets_tab.dart';
 import 'add_charging_log_screen.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Which slice of the consumption feature a [ConsumptionScreen] renders.
 ///
@@ -150,7 +151,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
           : (l?.exportBackupReady ?? 'Backup ready — pick a destination');
       SnackBarHelper.showSuccess(context, message);
     } catch (e, st) {
-      debugPrint('ConsumptionScreen._runBackupExport failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'ConsumptionScreen._runBackupExport failed'}));
       if (!mounted) return;
       SnackBarHelper.showError(
         context,

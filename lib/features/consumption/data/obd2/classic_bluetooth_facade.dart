@@ -3,12 +3,12 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 
 import 'adapter_registry.dart';
 import 'classic_elm_channel.dart';
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Facade over the Classic Bluetooth transport for OBD2 adapters
 /// (#761 abstraction, #763 real impl).
@@ -55,7 +55,7 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
               ))
           .toList();
     } on Exception catch (e, st) {
-      debugPrint('PluginClassicBluetoothFacade: bondedDevices failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PluginClassicBluetoothFacade: bondedDevices failed'}));
     }
   }
 

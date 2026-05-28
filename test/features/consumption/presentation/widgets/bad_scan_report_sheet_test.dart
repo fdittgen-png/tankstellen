@@ -16,6 +16,7 @@ import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/bad_scan_report_sheet.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Widget tests for [BadScanReportSheet].
 ///
@@ -23,6 +24,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// GitHub-ticket submission path — those tests live here and swap the
 /// [githubIssueReporterProvider] with provider overrides.
 void main() {
+  silenceErrorLoggerSpool();
   const outcome = ReceiptScanOutcome(
     parse: ReceiptParseResult(
       liters: 32.5,

@@ -11,8 +11,10 @@ import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   final registry = Obd2AdapterRegistry.defaults();
 
   group('Obd2ConnectionService.scan (#741)', () {

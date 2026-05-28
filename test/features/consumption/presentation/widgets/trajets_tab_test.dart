@@ -21,6 +21,7 @@ import 'package:tankstellen/features/consumption/providers/trip_history_provider
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -288,6 +289,7 @@ Future<void> _pumpTab(
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const combustionVehicle = VehicleProfile(

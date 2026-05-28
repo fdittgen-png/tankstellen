@@ -4,7 +4,6 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'adapter_registry.dart';
@@ -14,6 +13,7 @@ import 'classic_bluetooth_facade.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_permissions.dart';
 import 'obd2_service.dart';
+import '../../../../core/logging/error_logger.dart';
 
 part 'obd2_connection_service.g.dart';
 
@@ -142,7 +142,7 @@ class Obd2ConnectionService {
     try {
       return await connect(_lastRanked.first);
     } on Obd2ConnectionError catch (e, st) {
-      debugPrint('Obd2ConnectionService.connectBest failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'Obd2ConnectionService.connectBest failed'}));
       rethrow;
     }
   }

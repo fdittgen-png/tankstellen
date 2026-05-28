@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tankstellen/features/consumption/data/pump_display_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Unit tests for [ReceiptScanService] — the thin orchestration seam
 /// that glues the camera picker to the on-device OCR recognizer and
@@ -117,6 +118,7 @@ class _TempCapture {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('ReceiptScanService.scanReceipt', () {

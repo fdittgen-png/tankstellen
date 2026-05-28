@@ -8,6 +8,7 @@ import 'package:tankstellen/features/consumption/domain/situation_classifier.dar
 import 'package:tankstellen/features/consumption/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -73,6 +74,7 @@ class _FakeTripRecording extends TripRecording {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('TripRecordingScreen unpinned-recording warning (#1458 phase 2)', () {

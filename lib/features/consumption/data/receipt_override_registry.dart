@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Per-field regex override for a single receipt layout.
 ///
@@ -163,7 +166,7 @@ class ReceiptOverrideRegistry {
       // with no overrides rather than crashing when the catalogue has
       // not been shipped in a given build — the same pattern
       // `CommunityConfig.load()` uses for `tanksync_config.json`.
-      debugPrint('ReceiptOverrideRegistry: asset load failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ReceiptOverrideRegistry: asset load failed'}));
       return;
     }
 

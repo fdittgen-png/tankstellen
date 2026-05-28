@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_elm_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_method_channel.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Captured call to [_FakeObd2ClassicMethodChannel.connect].
 class _ConnectCall {
@@ -69,6 +70,7 @@ class _FakeObd2ClassicMethodChannel extends Obd2ClassicMethodChannel {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   late _FakeObd2ClassicMethodChannel fake;
 
   setUp(() {

@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Standard Bluetooth Serial Port Profile UUID (#761). Every
 /// Classic-SPP ELM327 adapter (vLinker FS, OBDLink LX, generic
@@ -83,7 +84,7 @@ class ClassicElmChannel implements ElmByteChannel {
     try {
       await _plugin.disconnect();
     } catch (e, st) {
-      debugPrint('ClassicElmChannel: disconnect error (ignored): $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ClassicElmChannel: disconnect error (ignored)'}));
     }
     await _incoming.close();
   }

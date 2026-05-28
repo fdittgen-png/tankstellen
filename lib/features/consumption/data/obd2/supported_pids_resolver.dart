@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import 'elm327_protocol.dart';
 import 'supported_pids_cache.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Owns the #811 supported-PID concern, extracted from [Obd2Service]
 /// (#1679): the per-connection set of Mode 01 PIDs the car implements,
@@ -81,7 +84,7 @@ class SupportedPidsResolver {
         await cache.put(key, discovered);
       }
     } catch (e, st) {
-      debugPrint('OBD2 supported-PID cache prime failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 supported-PID cache prime failed'}));
     }
   }
 
@@ -95,7 +98,7 @@ class SupportedPidsResolver {
       final vin = Elm327Protocol.parseVin(response);
       if (vin != null && vin.isNotEmpty) return vin;
     } catch (e, st) {
-      debugPrint('OBD2 VIN read for cache key failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 VIN read for cache key failed'}));
     }
     return _vehicleFallbackKey;
   }
@@ -133,7 +136,7 @@ class SupportedPidsResolver {
         final nextRangeFlag = groupBase + 32;
         if (!bitmap.contains(nextRangeFlag)) break;
       } catch (e, st) {
-        debugPrint('OBD2 discoverSupportedPids failed on $command: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'OBD2 discoverSupportedPids failed on $command'}));
         break;
       }
     }

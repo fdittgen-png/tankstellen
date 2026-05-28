@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,6 +31,7 @@ import '../widgets/fill_up_pinned_save_bar.dart';
 import '../widgets/fill_up_scan_handlers.dart';
 import '../widgets/fill_up_variance_prompt.dart';
 import 'pump_display_camera_screen.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -152,7 +155,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     try {
       return ref.read(currentObd2FuelLevelLitresProvider);
     } catch (e, st) {
-      debugPrint('AddFillUp: OBD2 fuel-level read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddFillUp: OBD2 fuel-level read failed'}));
       return null;
     }
   }
@@ -176,13 +179,13 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       defaultId = profile?.defaultVehicleId;
       profilePreferred = profile?.preferredFuelType;
     } catch (e, st) {
-      debugPrint('AddFillUp: active profile unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddFillUp: active profile unavailable'}));
     }
     String? activeId;
     try {
       activeId = ref.read(activeVehicleProfileProvider)?.id;
     } catch (e, st) {
-      debugPrint('AddFillUp: active vehicle unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddFillUp: active vehicle unavailable'}));
     }
     _vehicleId = AddFillUpFuelResolver.pickInitialVehicleId(
       vehicles: vehicles,
@@ -374,7 +377,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     try {
       vehicles = ref.watch(vehicleProfileListProvider);
     } catch (e, st) {
-      debugPrint('AddFillUp build: vehicle list unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddFillUp build: vehicle list unavailable'}));
       vehicles = const [];
     }
     _initVehicleIfNeeded(vehicles);

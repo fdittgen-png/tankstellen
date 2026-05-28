@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -11,6 +13,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Test-only override for the GPX save sink (#2032). Originally named
 /// `*ShareOverride` when this path used the OS share sheet; preserved
@@ -63,7 +66,7 @@ Future<void> shareTripGpx(
         l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
     messenger.showSnackBar(SnackBar(content: Text(ok)));
   } catch (e, st) {
-    debugPrint('TripDetailScreen save GPX: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripDetailScreen save GPX'}));
     if (messenger == null) return;
     final errorMsg = l?.trajetDetailShareError ?? "Couldn't save the GPX file";
     messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));

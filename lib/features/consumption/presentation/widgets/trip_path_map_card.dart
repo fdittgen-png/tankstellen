@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -10,6 +12,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../data/driving_insights_analyzer.dart';
 import 'trip_detail_charts.dart';
+import '../../../../core/logging/error_logger.dart';
 
 // ---------------------------------------------------------------------------
 // Phase 3 thresholds (#1374) — fixed defaults.
@@ -194,7 +197,7 @@ class _TripPathMapState extends State<_TripPathMap> {
           ),
         );
       } catch (e, st) {
-        debugPrint('TripPathMapCard fitCamera failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripPathMapCard fitCamera failed'}));
       }
     });
   }

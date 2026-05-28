@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/trip_recorder.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// One finalised trip as shown in the Trip history list (#726).
 ///
@@ -329,7 +330,7 @@ class TripHistoryRepository {
     try {
       await _box.put(entry.id, jsonEncode(entry.toJson()));
     } catch (e, st) {
-      debugPrint('TripHistoryRepository.save: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripHistoryRepository.save'}));
       return;
     }
     await _trim();
@@ -345,7 +346,7 @@ class TripHistoryRepository {
       try {
         hook(vehicleId);
       } catch (e, st) {
-        debugPrint('TripHistoryRepository.save onSavedHook: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripHistoryRepository.save onSavedHook'}));
       }
     }
   }
@@ -362,7 +363,7 @@ class TripHistoryRepository {
         final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
         result.add(TripHistoryEntry.fromJson(json));
       } catch (e, st) {
-        debugPrint('TripHistoryRepository.loadAll: skipping $key: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'TripHistoryRepository.loadAll: skipping $key'}));
       }
     }
     result.sort((a, b) {
