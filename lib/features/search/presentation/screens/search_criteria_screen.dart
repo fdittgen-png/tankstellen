@@ -46,43 +46,24 @@ class SearchCriteriaScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
-  /// Drives [RouteInputWidgetState.resolveAndSearch] when the central FAB
-  /// fires a route search (#2131). The inline submit button is gone;
-  /// the text controllers still live inside [RouteInput].
+  // #2131 / #2137 — GlobalKeys drive the inline inputs' submit from the FAB.
   final GlobalKey<RouteInputWidgetState> _routeInputKey =
       GlobalKey<RouteInputWidgetState>();
-
-  /// Drives [LocationInputWidgetState.submit] when the central FAB fires
-  /// a nearby search (#2137 — city/ZIP/GPS selection only updates the
-  /// criteria; the FAB submits).
   final GlobalKey<LocationInputWidgetState> _locationInputKey =
       GlobalKey<LocationInputWidgetState>();
 
-  /// Last action registered on the shell FAB, kept so we can `clearIf`
-  /// in `dispose` without stomping on a sibling screen that registered
-  /// after us.
   SearchFabAction? _registeredFabAction;
-
-  /// FAB notifier captured in initState so `dispose` can clear without
-  /// touching `ref` (Riverpod forbids ref usage after `deactivate`).
   SearchFabActionController? _fabNotifier;
 
-  /// Re-entry guard against rapid FAB / Enter / suggestion taps that
-  /// each call `Navigator.of(context).pop()` (#2136). The second pop
-  /// runs while the first pop's close animation is still inverting and
-  /// `lastWhere(isPresentPredicate)` finds no present route, crashing
-  /// with `StateError: No element`. Once a search has fired, the modal
-  /// is on its way out — additional taps are no-ops.
+  // #2136 — re-entry guard: double-tap pop races crash with "No element".
   bool _searchFired = false;
 
   @override
   void initState() {
     super.initState();
     _fabNotifier = ref.read(searchFabActionControllerProvider.notifier);
-    // Push the initial FAB action after first build so the shell sees
-    // it before the user can tap. didChangeDependencies isn't enough —
-    // the route input controllers (and their text-presence flags)
-    // only stabilise on the first frame.
+    // Defer to post-frame: the input widgets' state (and their text
+    // controllers) only stabilises after the first build.
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateFabAction());
   }
 
@@ -91,11 +72,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final action = _registeredFabAction;
     final notifier = _fabNotifier;
     if (action != null && notifier != null) {
-      // Defer outside the dispose lifecycle — Riverpod forbids
-      // provider mutation inside build/initState/dispose. A
-      // post-frame callback runs after the current frame finishes
-      // but stays bound to this test's scheduler, so it doesn't leak
-      // across pumps the way Future.microtask does.
+      // Riverpod forbids mutation in dispose; defer via post-frame.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         try {
           notifier.clearIf(action);
@@ -107,9 +84,6 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     super.dispose();
   }
 
-  /// Pushes a fresh [SearchFabAction] reflecting the current mode +
-  /// route-input enabled state. Idempotent — invoked on every mode or
-  /// route-input change via `ref.listen` in [build].
   void _updateFabAction() {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
@@ -131,9 +105,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       onTap = () => _routeInputKey.currentState?.resolveAndSearch();
     } else {
       enabled = true;
-      // #2137 — dispatch through LocationInput.submit so the FAB
-      // honours the user's current selection (city → coords, ZIP →
-      // by-postcode, empty → GPS) instead of always doing GPS.
+      // #2137 — LocationInput.submit dispatches to city/ZIP/GPS.
       onTap = () {
         final loc = _locationInputKey.currentState;
         if (loc != null) {
