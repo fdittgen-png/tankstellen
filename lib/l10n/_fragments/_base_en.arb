@@ -17,6 +17,7 @@
   "fabOpenResults": "Open results",
   "fabRunSearch": "Run search",
   "fabRefineCriteria": "Refine search",
+  "routeSearchPartialBanner": "Searching for more stations…",
   "searchCriteriaTitle": "Search criteria",
   "searchCriteriaOpen": "Search",
   "searchCriteriaRadiusBadge": "Within {km} km",

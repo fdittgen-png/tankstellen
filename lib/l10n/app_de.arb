@@ -17,6 +17,7 @@
   "fabOpenResults": "Ergebnisse anzeigen",
   "fabRunSearch": "Suche starten",
   "fabRefineCriteria": "Suche verfeinern",
+  "routeSearchPartialBanner": "Weitere Tankstellen werden gesucht…",
   "searchCriteriaTitle": "Suchkriterien",
   "searchCriteriaOpen": "Suchen",
   "searchCriteriaRadiusBadge": "Im Umkreis von {km} km",

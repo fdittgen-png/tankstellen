@@ -1989,5 +1989,6 @@
   "fabOpenCriteria": "Ouvrir la recherche",
   "fabOpenResults": "Ouvrir les résultats",
   "fabRunSearch": "Lancer la recherche",
-  "fabRefineCriteria": "Affiner la recherche"
+  "fabRefineCriteria": "Affiner la recherche",
+  "routeSearchPartialBanner": "Recherche d'autres stations…"
 }

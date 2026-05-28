@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Otevřít vyhledávání",
   "fabOpenResults": "Otevřít výsledky",
   "fabRunSearch": "Spustit vyhledávání",
-  "fabRefineCriteria": "Upřesnit vyhledávání"
+  "fabRefineCriteria": "Upřesnit vyhledávání",
+  "routeSearchPartialBanner": "Hledání dalších stanic…"
 }

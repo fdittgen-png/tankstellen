@@ -60,6 +60,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get fabRefineCriteria => 'Täpsusta otsingut';
 
   @override
+  String get routeSearchPartialBanner => 'Otsitakse rohkem jaamu…';
+
+  @override
   String get searchCriteriaTitle => 'Otsinguparameetrid';
 
   @override

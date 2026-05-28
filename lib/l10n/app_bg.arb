@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Отвори търсене",
   "fabOpenResults": "Отвори резултати",
   "fabRunSearch": "Стартирай търсене",
-  "fabRefineCriteria": "Прецизирай търсене"
+  "fabRefineCriteria": "Прецизирай търсене",
+  "routeSearchPartialBanner": "Търсене на още станции…"
 }

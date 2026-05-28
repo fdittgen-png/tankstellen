@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Avaa haku",
   "fabOpenResults": "Avaa tulokset",
   "fabRunSearch": "Suorita haku",
-  "fabRefineCriteria": "Tarkenna hakua"
+  "fabRefineCriteria": "Tarkenna hakua",
+  "routeSearchPartialBanner": "Etsitään lisää asemia…"
 }

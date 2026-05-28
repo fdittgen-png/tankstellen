@@ -60,6 +60,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get fabRefineCriteria => 'Rafinează căutarea';
 
   @override
+  String get routeSearchPartialBanner => 'Se caută mai multe stații…';
+
+  @override
   String get searchCriteriaTitle => 'Criterii de căutare';
 
   @override

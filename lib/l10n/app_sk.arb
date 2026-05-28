@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Otvoriť vyhľadávanie",
   "fabOpenResults": "Otvoriť výsledky",
   "fabRunSearch": "Spustiť vyhľadávanie",
-  "fabRefineCriteria": "Spresniť vyhľadávanie"
+  "fabRefineCriteria": "Spresniť vyhľadávanie",
+  "routeSearchPartialBanner": "Hľadajú sa ďalšie stanice…"
 }

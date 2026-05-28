@@ -60,6 +60,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get fabRefineCriteria => 'Прецизирай търсене';
 
   @override
+  String get routeSearchPartialBanner => 'Търсене на още станции…';
+
+  @override
   String get searchCriteriaTitle => 'Критерии за търсене';
 
   @override

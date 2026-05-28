@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Atidaryti paiešką",
   "fabOpenResults": "Atidaryti rezultatus",
   "fabRunSearch": "Vykdyti paiešką",
-  "fabRefineCriteria": "Tikslinti paiešką"
+  "fabRefineCriteria": "Tikslinti paiešką",
+  "routeSearchPartialBanner": "Ieškoma daugiau stočių…"
 }

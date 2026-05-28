@@ -60,6 +60,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get fabRefineCriteria => 'Tikslinti paiešką';
 
   @override
+  String get routeSearchPartialBanner => 'Ieškoma daugiau stočių…';
+
+  @override
   String get searchCriteriaTitle => 'Paieškos kriterijai';
 
   @override

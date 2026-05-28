@@ -60,6 +60,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fabRefineCriteria => 'Förfina sökning';
 
   @override
+  String get routeSearchPartialBanner => 'Söker efter fler stationer…';
+
+  @override
   String get searchCriteriaTitle => 'Sökkriterier';
 
   @override

@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Ava otsing",
   "fabOpenResults": "Ava tulemused",
   "fabRunSearch": "Käivita otsing",
-  "fabRefineCriteria": "Täpsusta otsingut"
+  "fabRefineCriteria": "Täpsusta otsingut",
+  "routeSearchPartialBanner": "Otsitakse rohkem jaamu…"
 }

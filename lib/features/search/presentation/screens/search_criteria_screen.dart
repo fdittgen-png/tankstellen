@@ -72,8 +72,10 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final action = _registeredFabAction;
     final notifier = _fabNotifier;
     if (action != null && notifier != null) {
-      // Riverpod forbids mutation in dispose; defer via post-frame.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      // #2139 — microtask fires before any frame; addPostFrameCallback
+      // can be skipped if no frame is scheduled, leaving a stale
+      // action that makes the FAB look enabled but no-op.
+      Future.microtask(() {
         try {
           notifier.clearIf(action);
         } catch (_) {
@@ -100,20 +102,11 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final bool enabled;
     final VoidCallback onTap;
     if (effectiveMode == SearchMode.route) {
-      final routeState = ref.read(routeInputControllerProvider);
-      enabled = routeState.canSearch;
-      onTap = () => _routeInputKey.currentState?.resolveAndSearch();
+      enabled = ref.read(routeInputControllerProvider).canSearch;
+      onTap = _onFabRouteTap;
     } else {
       enabled = true;
-      // #2137 — LocationInput.submit dispatches to city/ZIP/GPS.
-      onTap = () {
-        final loc = _locationInputKey.currentState;
-        if (loc != null) {
-          loc.submit();
-        } else {
-          unawaited(_performGpsSearch());
-        }
-      };
+      onTap = _onFabNearbyTap;
     }
 
     final action = SearchFabAction(
@@ -124,6 +117,30 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     );
     ref.read(searchFabActionControllerProvider.notifier).set(action);
     _registeredFabAction = action;
+  }
+
+  // #2139 — defensively clear if invoked after dispose (covers the
+  // window before the dispose-microtask fires).
+  bool _bailIfStale() {
+    if (mounted) return false;
+    final a = _registeredFabAction;
+    if (a != null) _fabNotifier?.clearIf(a);
+    return true;
+  }
+
+  void _onFabRouteTap() {
+    if (_bailIfStale()) return;
+    _routeInputKey.currentState?.resolveAndSearch();
+  }
+
+  void _onFabNearbyTap() {
+    if (_bailIfStale()) return;
+    final loc = _locationInputKey.currentState;
+    if (loc != null) {
+      loc.submit();
+    } else {
+      unawaited(_performGpsSearch());
+    }
   }
 
   Future<void> _performGpsSearch() async {
@@ -148,12 +165,9 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     }
     if (_searchFired || !mounted) return;
     _searchFired = true;
-
-    // SearchState dispatches to EV or fuel service internally based on fuelType.
+    // SearchState dispatches to EV or fuel service based on fuelType.
     unawaited(ref.read(searchStateProvider.notifier).searchByGps(
-          fuelType: fuelType,
-          radiusKm: radius,
-        ));
+        fuelType: fuelType, radiusKm: radius));
     Navigator.of(context).pop();
   }
 
@@ -253,23 +267,14 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final openOnly = ref.watch(openOnlyFilterProvider);
     final amenities = ref.watch(selectedAmenitiesProvider);
 
-    // #2131 — keep the shell FAB in sync. ref.listen inside build is
-    // the canonical Riverpod pattern; it de-dupes across rebuilds.
-    ref.listen<SearchMode>(activeSearchModeProvider, (_, _) {
-      _updateFabAction();
-    });
-    ref.listen<RouteInputState>(routeInputControllerProvider, (prev, next) {
-      // Re-register only when the bits the FAB depends on flip; ignore
-      // coord-only updates so we don't churn the controller on every
-      // autocomplete pick.
-      if (prev?.canSearch != next.canSearch) _updateFabAction();
+    // #2131 — re-register the FAB when mode or canSearch flip.
+    ref.listen<SearchMode>(activeSearchModeProvider, (_, _) => _updateFabAction());
+    ref.listen<RouteInputState>(routeInputControllerProvider, (p, n) {
+      if (p?.canSearch != n.canSearch) _updateFabAction();
     });
 
-    // Cascading-feature gate (#1447 phase 4). When `Feature.routePlanning`
-    // is effectively-disabled, the "Along route" mode is unreachable —
-    // hide the toggle entirely AND treat the persisted mode as Nearby
-    // so the body never renders the route input. The stored mode value
-    // is preserved (re-enabling the feature restores the prior choice).
+    // #1447 phase 4 — when routePlanning is gated off, hide the toggle
+    // and treat the stored mode as Nearby (the stored value is preserved).
     final manifest = ref.watch(featureManifestProvider);
     final enabledFlags = ref.watch(enabledFeaturesProvider);
     final routePlanningOn = isEffectivelyEnabled(
@@ -312,11 +317,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                 ),
                 const SizedBox(height: 8),
               ],
-              // #2111 — drop the redundant "Location" / "Along route"
-              // section headers; the segmented control above already
-              // labels the active mode. Saves ~24 dp vertical so the
-              // radius slider, amenities, and highway filter sit above
-              // the fold on a stock S23 at 1x text scale.
+              // #2111 — segmented control labels the active mode.
               if (mode == SearchMode.nearby) ...[
                 LocationInput(
                   key: _locationInputKey,

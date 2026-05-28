@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Öppna sökning",
   "fabOpenResults": "Öppna resultat",
   "fabRunSearch": "Kör sökning",
-  "fabRefineCriteria": "Förfina sökning"
+  "fabRefineCriteria": "Förfina sökning",
+  "routeSearchPartialBanner": "Söker efter fler stationer…"
 }

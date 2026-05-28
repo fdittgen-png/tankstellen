@@ -60,6 +60,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get fabRefineCriteria => 'Tarkenna hakua';
 
   @override
+  String get routeSearchPartialBanner => 'Etsitään lisää asemia…';
+
+  @override
   String get searchCriteriaTitle => 'Hakukriteerit';
 
   @override

@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Άνοιγμα αναζήτησης",
   "fabOpenResults": "Άνοιγμα αποτελεσμάτων",
   "fabRunSearch": "Εκτέλεση αναζήτησης",
-  "fabRefineCriteria": "Βελτίωση αναζήτησης"
+  "fabRefineCriteria": "Βελτίωση αναζήτησης",
+  "routeSearchPartialBanner": "Αναζήτηση για περισσότερους σταθμούς…"
 }

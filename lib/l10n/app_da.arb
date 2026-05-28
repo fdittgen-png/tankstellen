@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Åbn søgning",
   "fabOpenResults": "Åbn resultater",
   "fabRunSearch": "Kør søgning",
-  "fabRefineCriteria": "Forfin søgning"
+  "fabRefineCriteria": "Forfin søgning",
+  "routeSearchPartialBanner": "Søger efter flere stationer…"
 }

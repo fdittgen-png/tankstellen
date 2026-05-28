@@ -60,6 +60,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fabRefineCriteria => 'Refine search';
 
   @override
+  String get routeSearchPartialBanner => 'Searching for more stations…';
+
+  @override
   String get searchCriteriaTitle => 'Search criteria';
 
   @override
@@ -5511,6 +5514,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fabRefineCriteria => '⟦Řéƒîñé šéářçĥ ·····⟧';
+
+  @override
+  String get routeSearchPartialBanner =>
+      '⟦Šéářçĥîñǧ ƒóř ɱóřé šŧáŧîóñš… ···········⟧';
 
   @override
   String get searchCriteriaTitle => '⟦Šéářçĥ çřîŧéřîá ······⟧';

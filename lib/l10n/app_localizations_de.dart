@@ -60,6 +60,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fabRefineCriteria => 'Suche verfeinern';
 
   @override
+  String get routeSearchPartialBanner => 'Weitere Tankstellen werden gesucht…';
+
+  @override
   String get searchCriteriaTitle => 'Suchkriterien';
 
   @override

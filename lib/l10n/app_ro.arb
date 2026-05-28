@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Deschide căutarea",
   "fabOpenResults": "Deschide rezultatele",
   "fabRunSearch": "Execută căutarea",
-  "fabRefineCriteria": "Rafinează căutarea"
+  "fabRefineCriteria": "Rafinează căutarea",
+  "routeSearchPartialBanner": "Se caută mai multe stații…"
 }

@@ -1861,5 +1861,6 @@
   "fabOpenCriteria": "Zoeken openen",
   "fabOpenResults": "Resultaten openen",
   "fabRunSearch": "Zoekopdracht uitvoeren",
-  "fabRefineCriteria": "Zoekopdracht verfijnen"
+  "fabRefineCriteria": "Zoekopdracht verfijnen",
+  "routeSearchPartialBanner": "Zoekt naar meer stations…"
 }
