@@ -1862,5 +1862,14 @@
   "fabOpenResults": "Eredmények megnyitása",
   "fabRunSearch": "Keresés futtatása",
   "fabRefineCriteria": "Keresés finomítása",
-  "routeSearchPartialBanner": "További állomások keresése…"
+  "routeSearchPartialBanner": "További állomások keresése…",
+  "privacySaveErrorLog": "Hibanapló mentése ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

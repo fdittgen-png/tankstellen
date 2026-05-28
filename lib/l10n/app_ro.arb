@@ -1862,5 +1862,14 @@
   "fabOpenResults": "Deschide rezultatele",
   "fabRunSearch": "Execută căutarea",
   "fabRefineCriteria": "Rafinează căutarea",
-  "routeSearchPartialBanner": "Se caută mai multe stații…"
+  "routeSearchPartialBanner": "Se caută mai multe stații…",
+  "privacySaveErrorLog": "Salvează jurnalul de erori ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

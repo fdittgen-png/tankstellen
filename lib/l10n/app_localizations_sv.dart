@@ -1598,6 +1598,11 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Spara felloggen ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Rensa felloggen';
 
   @override

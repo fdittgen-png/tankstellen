@@ -1609,6 +1609,11 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Запази дневник на грешки ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Изчистване на дневника с грешки';
 
   @override

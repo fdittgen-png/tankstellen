@@ -1610,6 +1610,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Fehlerprotokoll speichern ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Fehlerprotokoll löschen';
 
   @override

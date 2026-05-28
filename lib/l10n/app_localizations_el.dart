@@ -1612,6 +1612,11 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Αποθήκευση αρχείου σφαλμάτων ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Εκκαθάριση αρχείου σφαλμάτων';
 
   @override

@@ -1604,6 +1604,11 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Saglabāt kļūdu žurnālu ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Notīrīt kļūdu žurnālu';
 
   @override

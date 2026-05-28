@@ -1599,6 +1599,11 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Gem fejllog ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Ryd fejllog';
 
   @override

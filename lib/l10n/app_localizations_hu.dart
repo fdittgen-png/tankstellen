@@ -1606,6 +1606,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Hibanapló mentése ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Hibanapló törlése';
 
   @override

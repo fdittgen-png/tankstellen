@@ -1606,6 +1606,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Foutenlogboek opslaan ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Foutenlogboek wissen';
 
   @override

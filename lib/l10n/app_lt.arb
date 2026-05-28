@@ -1862,5 +1862,14 @@
   "fabOpenResults": "Atidaryti rezultatus",
   "fabRunSearch": "Vykdyti paiešką",
   "fabRefineCriteria": "Tikslinti paiešką",
-  "routeSearchPartialBanner": "Ieškoma daugiau stočių…"
+  "routeSearchPartialBanner": "Ieškoma daugiau stočių…",
+  "privacySaveErrorLog": "Įrašyti klaidų žurnalą ({count})",
+  "@privacySaveErrorLog": {
+    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

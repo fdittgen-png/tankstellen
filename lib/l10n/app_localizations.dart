@@ -3033,6 +3033,12 @@ abstract class AppLocalizations {
   /// **'Copy error log to clipboard ({count})'**
   String privacyCopyErrorLog(int count);
 
+  /// Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder (and shares / copies as a secondary path). Supersedes privacyCopyErrorLog (#2145). count = number of traces buffered.
+  ///
+  /// In en, this message translates to:
+  /// **'Save error log ({count})'**
+  String privacySaveErrorLog(int count);
+
   /// No description provided for @privacyClearErrorLog.
   ///
   /// In en, this message translates to:

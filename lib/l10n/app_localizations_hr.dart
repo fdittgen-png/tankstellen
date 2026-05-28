@@ -1599,6 +1599,11 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Spremi zapisnik pogrešaka ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Očisti zapisnik pogrešaka';
 
   @override

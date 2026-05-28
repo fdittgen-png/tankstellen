@@ -1603,6 +1603,11 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Įrašyti klaidų žurnalą ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Išvalyti klaidų žurnalą';
 
   @override

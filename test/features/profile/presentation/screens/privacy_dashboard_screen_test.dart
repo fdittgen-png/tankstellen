@@ -169,8 +169,8 @@ void main() {
     });
 
     testWidgets(
-        'shows the "Copy error log to clipboard" button labelled with the '
-        'current trace count (#476)', (tester) async {
+        'shows the "Save error log" button labelled with the current '
+        'trace count (#476, #2145)', (tester) async {
       await _setTallSurface(tester);
       await pumpApp(
         tester,
@@ -185,14 +185,15 @@ void main() {
         50.0,
       );
 
-      // The new button is keyed for stable lookup; the label includes the
-      // count from the (stubbed) TraceStorage which returns 0.
+      // #2145 — label switched from "Copy error log to clipboard" to
+      // "Save error log" so it reflects the dominant Downloads-write
+      // behaviour. Count comes from the stubbed TraceStorage (0).
       expect(
         find.byKey(const ValueKey('privacy-export-error-log-button')),
         findsOneWidget,
       );
       expect(
-        find.textContaining('Copy error log to clipboard (0)'),
+        find.textContaining('Save error log (0)'),
         findsOneWidget,
       );
     });

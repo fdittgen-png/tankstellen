@@ -1599,6 +1599,11 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Tallenna virheloki ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Tyhjennä virheloki';
 
   @override

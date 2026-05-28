@@ -1589,6 +1589,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String privacySaveErrorLog(int count) {
+    return 'Save error log ($count)';
+  }
+
+  @override
   String get privacyClearErrorLog => 'Clear error log';
 
   @override
@@ -7083,6 +7088,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String privacyCopyErrorLog(int count) {
     return '⟦Çóƥý éřřóř łóǧ ŧó çłîƥƀóářđ ($count) ··········⟧';
+  }
+
+  @override
+  String privacySaveErrorLog(int count) {
+    return '⟦Šáṽé éřřóř łóǧ ($count) ·····⟧';
   }
 
   @override
