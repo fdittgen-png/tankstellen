@@ -246,8 +246,11 @@ void main() {
         tester,
         ValueListenableBuilder<int>(
           valueListenable: rebuild,
-          builder: (_, __, ___) =>
-              hostInMap(EvMapLayer(viewport: viewport)),
+          // Deliberately non-const: a fresh EvMapLayer widget each rebuild
+          // is what re-runs its State.build, so the memoisation guard is
+          // actually exercised (a const widget would short-circuit).
+          // ignore: prefer_const_constructors
+          builder: (_, _, _) => hostInMap(EvMapLayer(viewport: viewport)),
         ),
         overrides: [
           evStationsProvider(viewport).overrideWith((_) async => stations),
