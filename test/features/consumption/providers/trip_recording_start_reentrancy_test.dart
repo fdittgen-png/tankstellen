@@ -10,12 +10,14 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Regression tests for #1932 — `TripRecording.start` must reject a
 /// second start that races into the window before `state` is marked
 /// active. Without the `_startInProgress` guard the second call passes
 /// the `state.isActive` check and orphans a `TripRecordingController`.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

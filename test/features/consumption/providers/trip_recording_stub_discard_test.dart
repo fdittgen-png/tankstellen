@@ -11,6 +11,7 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Regression tests for #1923 — `_saveToHistory` must discard stub
 /// trips so they never clutter trip history.
@@ -21,6 +22,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 /// backups showed several such stubs — e.g. a 20-second 0 km entry
 /// alongside the real drive.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

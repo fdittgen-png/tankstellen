@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -148,7 +150,7 @@ class BrokenMapBeliefByVehicle extends _$BrokenMapBeliefByVehicle {
       // PathNotFoundException + LateInitializationError "after test
       // completion". Returning null falls back to a fresh belief —
       // the worst case is one re-probed pair, not a crash.
-      debugPrint('brokenMapBeliefByVehicle.load failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'brokenMapBeliefByVehicle.load failed'}));
       return null;
     }
   }
@@ -479,7 +481,7 @@ class FillUpList extends _$FillUpList {
         windowDistanceKm: windowDistanceKm,
       );
     } catch (e, st) {
-      debugPrint('FillUpList: trip-vs-pump reconciliation failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: trip-vs-pump reconciliation failed'}));
       return null;
     }
   }
@@ -600,7 +602,7 @@ class FillUpList extends _$FillUpList {
         }
       }
     } catch (e, st) {
-      debugPrint('FillUpList: broken-MAP observation failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: broken-MAP observation failed'}));
     }
   }
 
@@ -665,7 +667,7 @@ class FillUpList extends _$FillUpList {
       // picks up the new `pendingAcknowledgment` flag immediately.
       ref.invalidate(serviceReminderListProvider);
     } catch (e, st) {
-      debugPrint('FillUpList: reminder evaluation failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: reminder evaluation failed'}));
     }
   }
 
@@ -699,7 +701,7 @@ class FillUpList extends _$FillUpList {
       }
       return result;
     } catch (e, st) {
-      debugPrint('FillUpList: VE reconciliation failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: VE reconciliation failed'}));
       return null;
     }
   }
@@ -776,7 +778,7 @@ class FillUpList extends _$FillUpList {
       );
       ref.invalidate(vehicleProfileListProvider);
     } catch (e, st) {
-      debugPrint('GPS matrix reconciliation failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'GPS matrix reconciliation failed'}));
     }
   }
 

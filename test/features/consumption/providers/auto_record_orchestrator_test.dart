@@ -18,6 +18,7 @@ import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Tests for the auto-record orchestrator (#1004 phase 2b-3).
 ///
@@ -170,6 +171,7 @@ VehicleProfile _profile({
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   late _ListenerHarness harness;
   late _FakeTripRecording fakeTripRecording;
   // Speed-queue per opened MAC. Tests that exercise threshold-cross

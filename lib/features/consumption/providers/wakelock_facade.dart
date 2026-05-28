@@ -1,9 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'wakelock_facade.g.dart';
 
@@ -36,7 +38,7 @@ class RealWakelockFacade implements WakelockFacade {
     try {
       await WakelockPlus.enable();
     } catch (e, st) {
-      debugPrint('WakelockFacade.enable failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'WakelockFacade.enable failed'}));
     }
   }
 
@@ -45,7 +47,7 @@ class RealWakelockFacade implements WakelockFacade {
     try {
       await WakelockPlus.disable();
     } catch (e, st) {
-      debugPrint('WakelockFacade.disable failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'WakelockFacade.disable failed'}));
     }
   }
 }

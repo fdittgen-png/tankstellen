@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,6 +17,7 @@ import '../data/baseline_store.dart';
 import '../data/obd2/trip_live_reading.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Owns the #769 / #780 / #894 baseline-learning concern extracted
 /// from the [TripRecording] notifier (#1679): the per-trip situation
@@ -60,7 +62,7 @@ class TripBaselineRecorder {
         }
       }
     } catch (e, st) {
-      debugPrint('TripRecording.start: baseline setup failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.start: baseline setup failed'}));
       _store = null;
     }
   }
@@ -88,7 +90,7 @@ class TripBaselineRecorder {
       try {
         await store.flush(vid);
       } catch (e, st) {
-        debugPrint('TripRecording.stop: baseline flush failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: baseline flush failed'}));
       }
       // #780 — fold in the server copy once the local flush lands.
       await _syncBaselineAfterFlush(vid);
@@ -265,7 +267,7 @@ class TripBaselineRecorder {
     try {
       return _ref.read(activeVehicleProfileProvider);
     } catch (e, st) {
-      debugPrint('TripRecording: active vehicle unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: active vehicle unavailable'}));
       return null;
     }
   }
@@ -304,7 +306,7 @@ class TripBaselineRecorder {
         // from disk.
       }
     } catch (e, st) {
-      debugPrint('TripRecording.stop: baseline sync failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: baseline sync failed'}));
     }
   }
 }

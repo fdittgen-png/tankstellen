@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../ev/domain/entities/charging_log.dart';
 import '../data/charging_log_store.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'charging_logs_provider.g.dart';
 
@@ -46,7 +48,7 @@ class ChargingLogs extends _$ChargingLogs {
     try {
       await store.upsert(log);
     } catch (e, st) {
-      debugPrint('ChargingLogs.add: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'ChargingLogs.add'}));
     }
     state = AsyncValue.data(await store.list());
   }
@@ -61,7 +63,7 @@ class ChargingLogs extends _$ChargingLogs {
     try {
       await store.upsert(log);
     } catch (e, st) {
-      debugPrint('ChargingLogs.edit: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'ChargingLogs.edit'}));
     }
     state = AsyncValue.data(await store.list());
   }
@@ -74,7 +76,7 @@ class ChargingLogs extends _$ChargingLogs {
     try {
       await store.remove(id);
     } catch (e, st) {
-      debugPrint('ChargingLogs.remove: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'ChargingLogs.remove'}));
     }
     state = AsyncValue.data(await store.list());
   }

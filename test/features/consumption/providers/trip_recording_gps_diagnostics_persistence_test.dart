@@ -15,6 +15,7 @@ import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diag
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Regression coverage for #1458 phase 2 — the GPS cadence
 /// diagnostics buffer captured during a recording must round-trip
@@ -34,6 +35,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 ///      diagnostics buffer onto the saved entry — i.e. the in-memory
 ///      observation channel is durable, not lost at trip-stop.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

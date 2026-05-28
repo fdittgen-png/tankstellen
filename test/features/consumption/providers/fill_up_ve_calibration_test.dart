@@ -15,11 +15,13 @@ import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dar
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Integration-level tests for the fill-up save → η_v reconciliation
 /// path (#815). These tests drive the real provider graph (no Riverpod
 /// doubles) so the FillUpList.add hook is exercised end-to-end.
 void main() {
+  silenceErrorLoggerSpool();
   late ProviderContainer container;
   late _FakeTripHistory history;
   late VehicleProfileRepository profileRepo;

@@ -87,7 +87,7 @@ final class TripVeRecomputeListenerProvider
 }
 
 String _$tripVeRecomputeListenerHash() =>
-    r'ba830cbe85de90ec79bc3f33f89937ffdf6ab258';
+    r'339ed9907aa5c03fd872d3b0693246418dfc4be0';
 
 /// #1858 — retroactive η_v recompute trigger.
 ///

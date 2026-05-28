@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../data/obd2/adapter_capability.dart';
 import '../data/obd2/oem_pid_registry.dart';
 import '../data/obd2/oem_pid_table.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Owns the #1615 experimental OEM-PID exact-fuel-level concern: a slow
 /// poll that reads exact litres-in-tank via a manufacturer [OemPidTable]
@@ -123,7 +124,7 @@ class TripOemFuelLevelController {
       final litres = await table.readFuelLevelLitres(port);
       if (litres != null) onLitres(litres);
     } catch (e, st) {
-      debugPrint('TripRecording OEM fuel-level read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording OEM fuel-level read failed'}));
     }
   }
 

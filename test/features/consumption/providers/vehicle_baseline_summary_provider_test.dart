@@ -11,8 +11,10 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/consumption/data/baseline_store.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/providers/vehicle_baseline_summary_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

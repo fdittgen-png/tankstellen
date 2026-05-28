@@ -14,6 +14,7 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Tests for the public `automatic` flag plumbing through the trip
 /// recording provider (#1004 phase 2a).
@@ -31,6 +32,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 /// — without that the empty-trip early-return inside `_saveToHistory`
 /// would skip the badge bump entirely, and we'd be testing nothing.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

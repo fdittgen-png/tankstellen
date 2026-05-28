@@ -1,14 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../domain/situation_classifier.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'vehicle_baseline_summary_provider.g.dart';
 
@@ -38,7 +40,7 @@ Map<DrivingSituation, int> vehicleBaselineSummary(Ref ref, String vehicleId) {
   try {
     decoded = json.decode(raw) as Map<String, dynamic>;
   } catch (e, st) {
-    debugPrint('vehicleBaselineSummary: corrupt payload for $vehicleId: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'vehicleBaselineSummary: corrupt payload for $vehicleId'}));
     return const {};
   }
 

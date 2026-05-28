@@ -15,6 +15,7 @@ import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Call-site integration tests for the broken-MAP belief hook
 /// (#1423 phase 3). Verifies that when [FillUpList.add] runs the
@@ -25,6 +26,7 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 /// [TripHistoryRepository] (via in-memory Hive) so the hook traverses
 /// the same path production does.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

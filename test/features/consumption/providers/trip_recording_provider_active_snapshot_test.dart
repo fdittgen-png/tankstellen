@@ -13,6 +13,7 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Tests for #1303 — the [TripRecording] provider's write-through
 /// snapshot path.
@@ -30,6 +31,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 ///   5. restoreFromSnapshot rehydrates the provider into a
 ///      pausedDueToDrop state with the stored vehicle id.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

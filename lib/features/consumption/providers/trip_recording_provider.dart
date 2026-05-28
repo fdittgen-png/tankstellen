@@ -46,6 +46,7 @@ import 'trip_oem_fuel_level_controller.dart';
 import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
 import 'trip_recording_state.dart';
+import '../../../core/logging/error_logger.dart';
 
 // Re-export the phase, state, and haptic-policy types so existing
 // callers (widgets, screens, tests) that import this file keep
@@ -493,7 +494,7 @@ class TripRecording extends _$TripRecording {
     try {
       return ref.read(activeVehicleProfileProvider);
     } catch (e, st) {
-      debugPrint('TripRecording: active vehicle unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: active vehicle unavailable'}));
       return null;
     }
   }
@@ -514,7 +515,7 @@ class TripRecording extends _$TripRecording {
         catalog: catalog,
       );
     } catch (e, st) {
-      debugPrint('TripRecording: reference catalog unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: reference catalog unavailable'}));
       return null;
     }
   }
@@ -530,7 +531,7 @@ class TripRecording extends _$TripRecording {
           .read(featureFlagsProvider.notifier)
           .isEnabled(Feature.experimentalOemPids);
     } catch (e, st) {
-      debugPrint('TripRecording: feature flags unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: feature flags unavailable'}));
       return false;
     }
   }
@@ -603,7 +604,7 @@ class TripRecording extends _$TripRecording {
     try {
       await ctl.refreshOdometer();
     } catch (e, st) {
-      debugPrint('TripRecording.stop: refreshOdometer failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: refreshOdometer failed'}));
     }
     // Snapshot the captured-samples buffer BEFORE stop() tears down
     // the controller — without this the trip-detail charts render the
@@ -656,7 +657,7 @@ class TripRecording extends _$TripRecording {
     try {
       await svc.disconnect();
     } catch (e, st) {
-      debugPrint('TripRecording.stop: service disconnect failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: service disconnect failed'}));
     }
     _service = null;
     // #1303 — the trip is finalised in history; the active-trip
@@ -723,7 +724,7 @@ class TripRecording extends _$TripRecording {
         box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
       );
     } catch (e, st) {
-      debugPrint('TripRecording active repo: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording active repo'}));
       return null;
     }
   }
@@ -895,7 +896,7 @@ class TripRecording extends _$TripRecording {
     try {
       await repo.saveSnapshot(next);
     } catch (e, st) {
-      debugPrint('TripRecording flush snapshot failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording flush snapshot failed'}));
     }
   }
 
@@ -931,21 +932,18 @@ class TripRecording extends _$TripRecording {
     try {
       historyRepo = ref.read(tripHistoryRepositoryProvider);
     } catch (e, st) {
-      debugPrint(
-          'TripRecording recovered finalise: history repo read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: history repo read failed'}));
     }
     try {
       historyList = ref.read(tripHistoryListProvider.notifier);
     } catch (e, st) {
-      debugPrint(
-          'TripRecording recovered finalise: history list read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: history list read failed'}));
     }
     if (snapshot.automatic) {
       try {
         badgeFuture = ref.read(autoRecordBadgeServiceProvider.future);
       } catch (e, st) {
-        debugPrint(
-            'TripRecording recovered finalise: badge service read failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: badge service read failed'}));
       }
     }
 
@@ -969,8 +967,7 @@ class TripRecording extends _$TripRecording {
           samples: snapshot.samples,
         ));
       } catch (e, st) {
-        debugPrint(
-            'TripRecording recovered finalise: save failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: save failed'}));
       }
     }
 
@@ -983,8 +980,7 @@ class TripRecording extends _$TripRecording {
     try {
       historyList?.refresh();
     } catch (e, st) {
-      debugPrint(
-          'TripRecording recovered finalise: list refresh failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: list refresh failed'}));
     }
 
     // Mirror the auto-record badge bookkeeping the regular
@@ -995,8 +991,7 @@ class TripRecording extends _$TripRecording {
         final badge = await badgeFuture;
         await badge.increment();
       } catch (e, st) {
-        debugPrint(
-            'TripRecording recovered finalise: badge bump failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: badge bump failed'}));
       }
     }
 
@@ -1014,7 +1009,7 @@ class TripRecording extends _$TripRecording {
     try {
       await repo.clearSnapshot();
     } catch (e, st) {
-      debugPrint('TripRecording clear snapshot failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording clear snapshot failed'}));
     }
   }
 
@@ -1095,7 +1090,7 @@ class TripRecording extends _$TripRecording {
     try {
       connection = ref.read(obd2ConnectionProvider);
     } catch (e, st) {
-      debugPrint('TripRecording: connection provider unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: connection provider unavailable'}));
       return null;
     }
     return (pinnedMac, onReconnect) {
@@ -1116,7 +1111,7 @@ class TripRecording extends _$TripRecording {
               }
             }
           } catch (e, st) {
-            debugPrint('TripRecording reconnect probe failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording reconnect probe failed'}));
           }
           return false;
         },
@@ -1132,7 +1127,7 @@ class TripRecording extends _$TripRecording {
             _service = svc;
             return true;
           } catch (e, st) {
-            debugPrint('TripRecording reconnect connect failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording reconnect connect failed'}));
             return false;
           }
         },
@@ -1189,7 +1184,7 @@ class TripRecording extends _$TripRecording {
           final badge = await ref.read(autoRecordBadgeServiceProvider.future);
           await badge.increment();
         } catch (e, st) {
-          debugPrint('TripRecording auto-record badge increment: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording auto-record badge increment'}));
         }
       }
       // #1479 phase 2 / #1665 — opportunistic upload of the freshly
@@ -1213,10 +1208,10 @@ class TripRecording extends _$TripRecording {
           unawaited(TripsSync.uploadSummary(entry));
         }
       } catch (e, st) {
-        debugPrint('TripRecording trip-sync hook: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording trip-sync hook'}));
       }
     } catch (e, st) {
-      debugPrint('TripRecording._saveToHistory: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording._saveToHistory'}));
     }
   }
 
@@ -1267,7 +1262,7 @@ class TripRecording extends _$TripRecording {
           .listen(
             _onGpsOnlyPosition,
             onError: (Object e, StackTrace st) {
-              debugPrint('TripRecording.startGpsOnly: stream error: $e\n$st');
+              unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.startGpsOnly: stream error'}));
             },
           );
       // Seed the state so the recording screen renders immediately

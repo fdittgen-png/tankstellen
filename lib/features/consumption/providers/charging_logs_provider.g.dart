@@ -138,7 +138,7 @@ final class ChargingLogsProvider
   ChargingLogs create() => ChargingLogs();
 }
 
-String _$chargingLogsHash() => r'b3a633eb5293f6a6ac0325f6cd618ee781b9a4ef';
+String _$chargingLogsHash() => r'60ce3b592f61c4e7e0e845f6dae94830160f04e9';
 
 /// Charging-log list state (#582 phase 1).
 ///
