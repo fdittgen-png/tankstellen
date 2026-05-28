@@ -23,12 +23,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/widget/providers/nearest_widget_refresh_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../fakes/fake_hive_storage.dart';
 import '../../../fakes/fake_storage_repository.dart';
 import '../../../mocks/mocks.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   // The home_widget plugin's MethodChannel — mocked so calls inside

@@ -7,15 +7,18 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 /// #2146 — many catches now route through `errorLogger.log`. In tests
 /// Hive isn't initialised, so the spool's default path throws and the
 /// test framework's zone-error guard fails the test. Silence the spool
-/// for the current group by calling this once at the top of the
-/// suite's `main()` (or inside a `group` block).
+/// for the current test file by calling this once at the top of `main()`.
 ///
-/// Pairs `setUp` + `tearDown` automatically; no caller bookkeeping
-/// needed. The override is process-wide (the test seam is a static),
-/// so calling it twice in nested groups is harmless — the second
-/// `setUp` re-installs the no-op, and the matching `tearDown` resets.
+/// Uses `setUpAll` (not `setUp`) so the override persists between tests
+/// in the same file. Per-test `setUp`/`tearDown` would reset between
+/// tests, which loses races against fire-and-forget async catches that
+/// fire AFTER the test has been marked complete (`This test failed
+/// after it had already completed` errors).
+///
+/// `tearDownAll` resets so the override doesn't leak into other test
+/// files that share the process.
 void silenceErrorLoggerSpool() {
-  setUp(() {
+  setUpAll(() {
     errorLogger.spoolEnqueueOverride = ({
       required String isolateTaskName,
       required Object error,
@@ -24,5 +27,5 @@ void silenceErrorLoggerSpool() {
       DateTime? timestamp,
     }) async {};
   });
-  tearDown(errorLogger.resetForTest);
+  tearDownAll(errorLogger.resetForTest);
 }

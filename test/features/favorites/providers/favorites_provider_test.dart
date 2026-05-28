@@ -13,6 +13,7 @@ import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../fakes/fake_hive_storage.dart';
 import '../../../fixtures/stations.dart';
@@ -29,6 +30,7 @@ void _mockConnectivity(List<String> result) {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   // Default: online

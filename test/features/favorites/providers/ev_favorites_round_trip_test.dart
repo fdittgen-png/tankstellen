@@ -7,6 +7,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../fakes/fake_hive_storage.dart';
 
@@ -21,6 +22,7 @@ import '../../../fakes/fake_hive_storage.dart';
 /// simply verifies the canonical fromJson handles the legacy key
 /// naming directly.
 void main() {
+  silenceErrorLoggerSpool();
   late FakeHiveStorage fakeStorage;
 
   // Canonical ChargingStation — the single unified type after #560.

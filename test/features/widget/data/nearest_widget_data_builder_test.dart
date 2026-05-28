@@ -12,6 +12,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/widget/data/nearest_widget_data_builder.dart';
 
 import 'package:dio/dio.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Fake [StationService] that returns a fixed list (or throws) on
 /// searchStations. getPrices / getStationDetail are unused by the builder.
@@ -177,6 +178,7 @@ Station _stationFixture({
     );
 
 void main() {
+  silenceErrorLoggerSpool();
   group('NearestWidgetDataBuilder.build', () {
     late _FakeStationService stationService;
     late _FakeSettingsStorage settings;
