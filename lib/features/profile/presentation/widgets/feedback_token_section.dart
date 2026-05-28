@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../../core/feedback/github_issue_reporter_provider.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -56,7 +59,11 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
         _loading = false;
       });
     } catch (e, st) {
-      debugPrint('FeedbackTokenSection: secure-storage read failed: $e\n$st');
+      // #2146 — route to errorLogger so secure-storage failures land
+      // in the user-exportable log alongside other catches.
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'FeedbackTokenSection._refresh: secure-storage read',
+      }));
       if (!mounted) return;
       setState(() {
         _hasToken = false;
@@ -135,7 +142,10 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
         value: scrubbed,
       );
     } catch (e, st) {
-      debugPrint('FeedbackTokenSection: secure-storage write failed: $e\n$st');
+      // #2146 — same routing rationale as the read catch above.
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'FeedbackTokenSection._setToken: secure-storage write',
+      }));
       return;
     }
 
@@ -149,7 +159,10 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
     try {
       await _storage.delete(key: kGithubFeedbackTokenKey);
     } catch (e, st) {
-      debugPrint('FeedbackTokenSection: secure-storage delete failed: $e\n$st');
+      // #2146 — same routing rationale as the read/write catches above.
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'FeedbackTokenSection._clearToken: secure-storage delete',
+      }));
     }
     ref.invalidate(githubIssueReporterProvider);
     await _refresh();

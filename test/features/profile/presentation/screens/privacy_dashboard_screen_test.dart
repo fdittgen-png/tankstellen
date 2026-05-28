@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
@@ -72,6 +73,20 @@ void main() {
     late MockStorageRepository mockStorage;
 
     setUp(() {
+      // #2146 — the privacy-dashboard screen now routes its catches
+      // through errorLogger (so they land on the exportable log). In
+      // tests Hive isn't initialised so the spool's default path
+      // throws — point the override at a no-op recorder so log() is
+      // genuinely silent here.
+      errorLogger.spoolEnqueueOverride = ({
+        required String isolateTaskName,
+        required Object error,
+        StackTrace? stack,
+        Map<String, dynamic>? contextMap,
+        DateTime? timestamp,
+      }) async {};
+      addTearDown(errorLogger.resetForTest);
+
       mockStorage = MockStorageRepository();
 
       when(() => mockStorage.favoriteCount).thenReturn(5);
