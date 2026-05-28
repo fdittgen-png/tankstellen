@@ -105,7 +105,7 @@ final class VehicleBaselineSummaryProvider
 }
 
 String _$vehicleBaselineSummaryHash() =>
-    r'2e87740356bc1caee1dd1af30aab390a5649dfbd';
+    r'bb264a1436f2fb5e0691b29d005a9ae60c891b5f';
 
 /// Sample count per [DrivingSituation] for a vehicle (#779).
 ///

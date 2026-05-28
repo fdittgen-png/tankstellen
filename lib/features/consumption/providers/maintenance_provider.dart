@@ -1,13 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/maintenance_snooze_repository.dart';
 import '../domain/entities/maintenance_suggestion.dart';
 import '../domain/services/maintenance_analyzer.dart';
 import 'trip_history_provider.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'maintenance_provider.g.dart';
 
@@ -90,8 +92,7 @@ class MaintenanceSuggestionsController
     try {
       await repo.snoozeForDefault(signal: signal, now: DateTime.now());
     } catch (e, st) {
-      debugPrint(
-          'MaintenanceSuggestionsController.snoozeForDefault(${signal.name}): $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'MaintenanceSuggestionsController.snoozeForDefault(${signal.name})'}));
     }
     ref.invalidate(maintenanceSuggestionsProvider);
   }
@@ -110,8 +111,7 @@ class MaintenanceSuggestionsController
         until: now.add(const Duration(days: 1)),
       );
     } catch (e, st) {
-      debugPrint(
-          'MaintenanceSuggestionsController.dismissForToday(${signal.name}): $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'MaintenanceSuggestionsController.dismissForToday(${signal.name})'}));
     }
     ref.invalidate(maintenanceSuggestionsProvider);
   }

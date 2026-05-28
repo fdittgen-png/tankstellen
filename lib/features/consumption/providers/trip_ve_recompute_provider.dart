@@ -3,13 +3,13 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../domain/trip_ve_recompute.dart';
 import 'trip_history_provider.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'trip_ve_recompute_provider.g.dart';
 
@@ -83,7 +83,7 @@ class TripVeRecomputeListener extends _$TripVeRecomputeListener {
         ref.read(tripHistoryListProvider.notifier).refresh();
       }
     } catch (e, st) {
-      debugPrint('TripVeRecomputeListener: recompute failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripVeRecomputeListener: recompute failed'}));
     }
   }
 }

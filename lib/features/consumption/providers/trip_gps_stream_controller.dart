@@ -16,6 +16,7 @@ import '../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../glide_coach/providers/glide_coach_evaluator_provider.dart';
 import '../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../data/obd2/trip_recording_controller.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Owns the #1374 / #1125 / #1458 GPS concern extracted from the
 /// [TripRecording] notifier (#1679): the opt-in Geolocator position
@@ -120,7 +121,7 @@ class TripGpsStreamController {
         },
       );
     } catch (e, st) {
-      debugPrint('TripRecording GPS subscribe failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording GPS subscribe failed'}));
     }
   }
 
@@ -196,7 +197,7 @@ class TripGpsStreamController {
         await HapticFeedback.lightImpact();
       }
     } catch (e, st) {
-      debugPrint('TripRecording glide-coach evaluation failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording glide-coach evaluation failed'}));
     }
   }
 }

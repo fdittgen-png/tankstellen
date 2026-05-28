@@ -14,6 +14,7 @@ import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// #1361 phase 2a — whole-window trip relinking.
 ///
@@ -24,6 +25,7 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 /// user wanted "the trajets since then are related to all fill-ups
 /// since then" (#1361 spec).
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tmpDir;

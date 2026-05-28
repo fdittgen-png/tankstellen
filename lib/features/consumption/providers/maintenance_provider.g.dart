@@ -262,7 +262,7 @@ final class MaintenanceSuggestionsControllerProvider
 }
 
 String _$maintenanceSuggestionsControllerHash() =>
-    r'34f84c3c575f5b1f3d743820a858890c20da89c2';
+    r'a340ecd3e4530fa4eb40ca5d46eac1c8e234db04';
 
 /// Action surface for the maintenance card. Wraps the snooze repo
 /// so widget tests can stub it via the standard Riverpod override
