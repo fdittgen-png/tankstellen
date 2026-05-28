@@ -31,7 +31,7 @@
 
 <sub>iPhone listing currently in <strong>TestFlight beta</strong> — the App Store page will populate once Apple's first-build review clears.</sub>
 
-**A free, open-source companion app for cutting the running cost of your car.** 13 countries, 23 languages, privacy-first, no ads, no tracking.
+**A free, open-source companion app for cutting the running cost of your car.** 17 countries, 23 languages, privacy-first, no ads, no tracking.
 
 Sparkilo aggregates real-time fuel prices from official government APIs, plugs into your car's OBD-II port to see how it actually drives, and keeps a tidy log of every fill-up and trip so the savings stop being theoretical.
 
@@ -58,15 +58,16 @@ Features that don't serve at least one of those three layers don't belong.
 ### Layer 1 — buying cheaper
 
 - **Real-time prices** from each country's official government data source — no scraping
-- **13 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, Luxembourg, Slovenia, UK, Argentina, Australia, Mexico
+- **17 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, Luxembourg, Slovenia, UK, Argentina, Australia, Mexico, South Korea, Chile, Greece, Romania
 - **23 languages** — from Bulgarian to Swedish
-- **Route-aware search** — uniform / cheapest / balanced strategies, "best stops" along a planned trip
+- **One central FAB owns search** — the bottom-bar search button is context-aware: tap to open the criteria sheet, tap again to run the search. Same button across every tab.
+- **Route-aware search** — uniform / cheapest / balanced strategies, "best stops" along a planned trip; partial-results banner so a slow country never blocks the cheap result
 - **Cross-border suggestions** — when the next country over is meaningfully cheaper, the app says so
 - **Price alerts** — threshold-based notifications, evaluated by a background job
 - **Price history & predictions** — 30-day charts plus "best time to fill" guidance (a day-of-week + price-threshold heuristic) from your local history
 - **Brand filter** — Total / Esso / Shell / Aral, country-aware brand registry
-- **Favorites** — quick access with swipe-to-navigate / swipe-to-remove
-- **Home-screen widget** — current prices and a "predictive" variant without opening the app
+- **Favorites** — quick access with swipe-to-navigate / swipe-to-remove; landscape splits the panel side-by-side with the alerts pane
+- **Home-screen widget** — current prices in two layouts (standard + predictive), a tap that opens the right station whether the app is cold or warm, plus a refresh button that re-pulls without ever opening the app
 - **EV charging** — OpenChargeMap integration with connector type, max power, and pricing
 
 ### Layer 2 — burning less
@@ -82,7 +83,8 @@ Features that don't serve at least one of those three layers don't belong.
 - **Driving score** — composite 0-100 score per trip with breakdown chips, opt-in.
 - **Throttle / RPM histogram** — see the engine zone you actually drive in (OBD2 only).
 - **Visual eco-coach** — live haptic + on-screen feedback when behaviour costs fuel.
-- **Driving mode** — full-screen, in-car friendly map with large markers and voice announcements; redesigned PiP overlay (#2068) leads with a huge L/100 km figure for glance-distance legibility.
+- **Driving mode** — full-screen, in-car friendly map with large markers and voice announcements; PiP overlay shows context-adaptive primary (live L/100 km if OBD2, distance if GPS-only mid-trajet, elapsed time during pre-roll — #2094) and flips to a huge price layout when you cross a station's radius (the **approach overlay**, Epic #2065).
+- **Approach overlay (test before you drive)** — the Privacy Dashboard carries a "Test approach overlay" button that pushes a synthetic in-radius signal for 30 s so the PiP price flip can be verified from the couch.
 - **Maintenance analyzer** — watches consumption drift over time, flags MAF deviation, idle creep, sluggish warm-up.
 
 ### Layer 3 — seeing what you actually spend
@@ -99,7 +101,7 @@ Features that don't serve at least one of those three layers don't belong.
 - **Right-sized profiles** — Basic (search + favorites + alerts), Medium (+ manual fill-ups + GPS-only trajets), Full (+ OBD2 auto-record + driving scores + loyalty cards), Custom (à la carte). Switching is one tap in Settings.
 - **Local-first** — Hive storage, smart caching, offline-capable.
 - **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase), free, anonymous-or-email auth, opt-in trajet sync.
-- **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant. Privacy Dashboard surfaces every stored row with one-tap JSON / CSV export + delete-all.
+- **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant. Privacy Dashboard surfaces every stored row with one-tap JSON / CSV export, a "Save" button to dump the local error log, an in-app approach-overlay test surface, and delete-all.
 - **23 locales fully translated** — every UI label, including new feature surfaces; no English fallbacks except for brand names and unit masks.
 - **Accessibility** — meets Android tap-target and Apple Human Interface tap-target guidelines, semantic labels throughout.
 - **Cross-platform architecture** — iOS and Android share the same Dart codebase; platform-specific surfaces (BLE OBD2, background tasks, widgets) live behind plugin interfaces, never inline `Platform.isIOS` branches. Android is the verified platform; the iOS background-wake path for auto-record is pending #1542.
@@ -184,6 +186,7 @@ Sparkilo uses official government fuel price APIs. Some require a free API key:
 | Austria | [E-Control](https://www.e-control.at/) | No |
 | Spain | [MiTECO](https://sedeaplicaciones.mineco.gob.es/) | No |
 | Italy | [MISE](https://dgsaie.mise.gov.it/) | No |
+| Denmark, Portugal, Luxembourg, Slovenia, UK, Argentina, Australia, Mexico, South Korea, Chile, Greece, Romania | Country-specific government sources | No |
 
 Keys are stored securely on-device (Android Keystore on Android, iOS Keychain on iOS via `flutter_secure_storage`) — never embedded in source code.
 
