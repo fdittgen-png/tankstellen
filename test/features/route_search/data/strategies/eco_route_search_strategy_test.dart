@@ -4,6 +4,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/route_search/data/strategies/eco_route_search_strategy.dart';
+import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 /// Build a synthetic OSRM `routes[]` JSON entry with the metadata
 /// the strategy actually reads — geometry coordinates, distance,
@@ -380,6 +384,56 @@ void main() {
         consumptionLPer100km: 7,
       );
       expect(saved, 0.0);
+    });
+  });
+
+  // #2183 — computeBestStops was previously untested for eco; same
+  // per-segment leader semantics as cheapest after the O(1) refactor.
+  group('EcoRouteSearchStrategy.computeBestStops (#2183)', () {
+    final strategy = EcoRouteSearchStrategy();
+    const route = RouteInfo(
+      geometry: [LatLng(48.0, 2.0), LatLng(48.1, 2.1), LatLng(48.2, 2.2)],
+      distanceKm: 30.0,
+      durationMinutes: 25.0,
+      samplePoints: [LatLng(48.0, 2.0), LatLng(48.1, 2.1), LatLng(48.2, 2.2)],
+    );
+
+    Station station(String id, double lat, double lng, double diesel) => Station(
+          id: id,
+          name: 'Station $id',
+          brand: 'Brand $id',
+          street: 'Street',
+          postCode: '75000',
+          place: 'Paris',
+          lat: lat,
+          lng: lng,
+          dist: 1.0,
+          diesel: diesel,
+          isOpen: true,
+        );
+
+    Map<int, String>? bestFor(List<Station> stations) =>
+        strategy.computeBestStops(
+          route: route,
+          results: [for (final s in stations) FuelStationResult(s)],
+          fuelType: FuelType.diesel,
+          segmentKm: 50.0,
+        );
+
+    test('picks the cheaper station regardless of order', () {
+      final dear = station('dear', 48.0, 2.0, 1.80);
+      final cheap = station('cheap', 48.01, 2.01, 1.60);
+      expect(bestFor([cheap, dear])!.values, contains('cheap'));
+      expect(bestFor([dear, cheap])!.values, contains('cheap'));
+      expect(bestFor([dear, cheap])!.values, isNot(contains('dear')));
+    });
+
+    test('equal prices keep the first-seen station', () {
+      final first = station('first', 48.0, 2.0, 1.70);
+      final second = station('second', 48.01, 2.01, 1.70);
+      final best = bestFor([first, second]);
+      expect(best!.values, contains('first'));
+      expect(best.values, isNot(contains('second')));
     });
   });
 }
