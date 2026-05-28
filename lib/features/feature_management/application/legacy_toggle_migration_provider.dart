@@ -3,13 +3,13 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../profile/providers/profile_provider.dart';
 import '../data/legacy_toggle_migrator.dart';
 import 'feature_flags_provider.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'legacy_toggle_migration_provider.g.dart';
 
@@ -92,7 +92,7 @@ Future<void> legacyToggleMigration(Ref ref) async {
     } catch (e, st) {
       // Failure is non-fatal — the central state stays at manifest
       // defaults and the user can re-enable from the settings UI.
-      debugPrint('legacyToggleMigration failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'legacyToggleMigration failed'}));
     }
   });
 }

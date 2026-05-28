@@ -1,12 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../domain/entities/charging_station.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// CRUD repository for [ChargingStation] entries.
 ///
@@ -33,7 +35,7 @@ class EvStationRepository {
       try {
         result.add(ChargingStation.fromJson(map));
       } catch (e, st) {
-        debugPrint('EvStationRepository: skipping malformed entry: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'EvStationRepository: skipping malformed entry'}));
       }
     }
     return result;

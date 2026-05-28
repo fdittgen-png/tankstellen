@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -15,6 +17,7 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../vehicle/providers/vin_decoder_provider.dart';
 import '../../providers/onboarding_obd2_connector.dart';
 import '../../providers/onboarding_wizard_provider.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Optional onboarding step (#816) that lets a new user connect their
 /// OBD2 adapter, auto-read the VIN, decode it via the vPIC / WMI
@@ -139,7 +142,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     try {
       decoded = await ref.read(decodedVinProvider(vin).future);
     } catch (e, st) {
-      debugPrint('OnboardingObd2Step: VIN decode failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'OnboardingObd2Step: VIN decode failed'}));
       decoded = null;
     }
 
@@ -182,7 +185,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     try {
       await _saveDecodedProfile(decoded);
     } catch (e, st) {
-      debugPrint('OnboardingObd2Step: save decoded profile failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'OnboardingObd2Step: save decoded profile failed'}));
     }
     if (!mounted) return;
     widget.onAutoFillSuccess();

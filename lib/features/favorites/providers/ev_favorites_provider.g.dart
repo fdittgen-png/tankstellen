@@ -208,7 +208,7 @@ final class EvFavoriteStationsProvider
 }
 
 String _$evFavoriteStationsHash() =>
-    r'78eb3700fef6a7a4cc045947d2656eb7e9c3de56';
+    r'bbb7ea1f275fb98fe6d52c4897a472d85733a230';
 
 /// Loads persisted EV station data for favorites.
 ///

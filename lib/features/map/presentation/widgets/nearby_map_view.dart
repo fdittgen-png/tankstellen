@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +16,7 @@ import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import 'station_map_layers.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Displays a map of nearby stations from the current search results.
 ///
@@ -107,7 +110,7 @@ class NearbyMapView extends ConsumerWidget {
               ),
             );
           } catch (e, st) {
-            debugPrint('Map fitCamera failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Map fitCamera failed'}));
           }
         });
 

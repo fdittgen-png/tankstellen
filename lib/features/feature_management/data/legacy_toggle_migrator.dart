@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
@@ -10,6 +12,7 @@ import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../domain/feature.dart';
 import '../domain/feature_manifest.dart';
 import 'feature_flags_repository.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Settings-box key written once after the legacy `hapticEcoCoachEnabled`
 /// value has been promoted into the central feature-flag set (#1373
@@ -232,7 +235,7 @@ Future<void> _migrateHapticEcoCoach({
     } catch (e, st) {
       // Don't block startup on a migration failure — the user can
       // re-toggle from settings if the central state is missing.
-      debugPrint('migrateLegacyToggles: hapticEcoCoach promote failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'migrateLegacyToggles: hapticEcoCoach promote failed'}));
     }
   }
 

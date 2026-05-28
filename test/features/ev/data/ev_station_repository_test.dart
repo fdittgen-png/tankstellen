@@ -8,7 +8,10 @@ import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
 
+import '../../../helpers/silence_error_logger.dart';
+
 void main() {
+  silenceErrorLoggerSpool();
   group('EvStationRepository', () {
     late _FakeSettings storage;
     late EvStationRepository repo;

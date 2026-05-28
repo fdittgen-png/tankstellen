@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/services/dio_factory.dart';
@@ -10,6 +11,7 @@ import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Danish fuel prices aggregated from 3 free public APIs:
 /// - OK (ok.dk) — ~350 stations
@@ -122,7 +124,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
         );
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {
-      debugPrint('DK OK fetch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DK OK fetch failed'}));
       return [];
     }
   }
@@ -174,7 +176,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
         );
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {
-      debugPrint('DK Shell fetch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DK Shell fetch failed'}));
       return [];
     }
   }
@@ -195,7 +197,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           '${dt.hour.toString().padLeft(2, '0')}:'
           '${dt.minute.toString().padLeft(2, '0')}';
     } on FormatException catch (e, st) {
-      debugPrint('DK date parse failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DK date parse failed'}));
       return null;
     }
   }

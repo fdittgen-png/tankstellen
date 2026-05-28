@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/calibration_mode_providers.dart';
 import '../../providers/vehicle_providers.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Rule / Fuzzy toggle for the vehicle baseline calibration (#894).
 ///
@@ -41,7 +44,7 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
             orElse: () => const VehicleProfile(id: '', name: ''),
           );
     } catch (e, st) {
-      debugPrint('VehicleCalibrationModeSelector: profile lookup failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'VehicleCalibrationModeSelector: profile lookup failed'}));
       return const SizedBox.shrink();
     }
 

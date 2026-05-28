@@ -10,6 +10,7 @@ import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_r
 import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Widget tests for the restyled Edit-Vehicle screen (#751 phase 2).
 ///
@@ -19,6 +20,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// guardrails the refactor relies on (tap target, real TextField
 /// labels, decorative icons excluded from semantics).
 void main() {
+  silenceErrorLoggerSpool();
   group('EditVehicleScreen restyle (#751 phase 2)', () {
     testWidgets('renders two grouped section cards (Identity + Drivetrain)',
         (tester) async {

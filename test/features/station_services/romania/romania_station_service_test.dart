@@ -12,6 +12,7 @@ import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../mocks/mocks.dart';
 
@@ -56,6 +57,7 @@ Map<String, dynamic> _petromBucharest({
 List<Map<String, dynamic>> _envelope(List<Map<String, dynamic>> rows) => rows;
 
 void main() {
+  silenceErrorLoggerSpool();
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
   });

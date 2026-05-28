@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ import '../widgets/wizard_choose_mode.dart';
 import '../widgets/wizard_create_new.dart';
 import '../widgets/wizard_join_existing.dart';
 import '../widgets/wizard_schema_step.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Multi-step wizard for setting up TankSync database connection.
 ///
@@ -199,7 +202,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         _keyController.text = json['key']?.toString() ?? '';
         _notifier.setMode(SyncWizardMode.auth);
       } catch (e, st) {
-        debugPrint('QR code parse failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'QR code parse failed'}));
         SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCodeTankSync ?? 'Invalid QR code — expected TankSync format');
       }
     }

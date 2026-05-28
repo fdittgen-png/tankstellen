@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -12,6 +14,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// UK Competition and Markets Authority (CMA) fuel price service.
 ///
@@ -148,7 +151,7 @@ class UkStationService with StationServiceHelpers implements StationService {
       debugPrint('UK feed $url failed: ${e.type.name}');
       return null;
     } catch (e, st) {
-      debugPrint('UK feed $url parse error: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'UK feed $url parse error'}));
       return null;
     }
   }
@@ -212,7 +215,7 @@ class UkStationService with StationServiceHelpers implements StationService {
           isOpen: true,
         ));
       } catch (e, st) {
-        debugPrint('UK station parse failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'UK station parse failed'}));
         continue;
       }
     }

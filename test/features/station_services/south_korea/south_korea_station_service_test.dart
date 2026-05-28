@@ -11,6 +11,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../mocks/mocks.dart';
 
@@ -46,6 +47,7 @@ Map<String, dynamic> _envelope(List<Map<String, dynamic>> oil) =>
     };
 
 void main() {
+  silenceErrorLoggerSpool();
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
   });

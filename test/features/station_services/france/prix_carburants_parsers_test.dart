@@ -3,8 +3,10 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_parsers.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   // Pure-function tests for the Prix-Carburants parser module (#563
   // split). These exercise the JSON-shape contract directly without
   // any Dio fake — if the live endpoint shape drifts, the failure

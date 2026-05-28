@@ -28,11 +28,13 @@
 ///    `*_maj` ISO timestamp on a record and format as `dd/MM HH:mm`.
 library;
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 
 import '../../search/domain/entities/station.dart';
 import '../../search/domain/entities/station_amenity.dart';
 import '../../../core/utils/geo_utils.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Extract the `results` list from a Prix-Carburants API envelope.
 ///
@@ -124,7 +126,7 @@ Station? parsePrixCarburantsStation(
       region: r['region']?.toString(),
     );
   } on FormatException catch (e, st) {
-    debugPrint('Prix-Carburants station parse failed: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants station parse failed'}));
     return null;
   }
 }
@@ -148,7 +150,7 @@ String? parsePrixCarburantsMostRecentUpdate(Map<String, dynamic> r) {
     final dt = DateTime.parse(dates.first);
     return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   } on FormatException catch (e, st) {
-    debugPrint('Prix-Carburants date parse failed: $e\n$st');
+    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants date parse failed'}));
     final raw = dates.first;
     final cut = raw.length >= 16 ? raw.substring(0, 16) : raw;
     return cut.replaceAll('T', ' ');

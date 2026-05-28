@@ -1,14 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Austrian fuel prices from E-Control Spritpreisrechner.
 /// Free, no API key, no registration.
@@ -159,7 +161,7 @@ class EControlStationService with StationServiceHelpers implements StationServic
         openingHoursText: hoursText.isNotEmpty ? hoursText : null,
       );
     } on FormatException catch (e, st) {
-      debugPrint('E-Control station parse failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'E-Control station parse failed'}));
       return null;
     }
   }

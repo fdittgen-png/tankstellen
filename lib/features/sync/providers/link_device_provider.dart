@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/sync/supabase_client.dart';
@@ -16,6 +17,7 @@ import '../../consumption/providers/consumption_providers.dart';
 import '../../favorites/providers/favorites_provider.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'link_device_provider.g.dart';
 
@@ -106,7 +108,7 @@ class LinkDeviceController extends _$LinkDeviceController {
             await ref.read(alertProvider.notifier).addAlert(alert);
             addedAlerts++;
           } catch (e, st) {
-            debugPrint('Alert import failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Alert import failed'}));
           }
         }
       }
@@ -125,7 +127,7 @@ class LinkDeviceController extends _$LinkDeviceController {
                 try {
                   return VehicleProfile.fromJson(data);
                 } catch (e, st) {
-                  debugPrint('Vehicle import decode failed: $e\n$st');
+                  unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Vehicle import decode failed'}));
                   return null;
                 }
               }
@@ -137,7 +139,7 @@ class LinkDeviceController extends _$LinkDeviceController {
             .read(vehicleProfileListProvider.notifier)
             .mergeFrom(parsed);
       } catch (e, st) {
-        debugPrint('Vehicle import failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Vehicle import failed'}));
       }
 
       // 6. Fetch + merge the other device's fill-ups (#713)
@@ -154,7 +156,7 @@ class LinkDeviceController extends _$LinkDeviceController {
                 try {
                   return FillUp.fromJson(data);
                 } catch (e, st) {
-                  debugPrint('FillUp import decode failed: $e\n$st');
+                  unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUp import decode failed'}));
                   return null;
                 }
               }
@@ -165,7 +167,7 @@ class LinkDeviceController extends _$LinkDeviceController {
         addedFillUps =
             await ref.read(fillUpListProvider.notifier).mergeFrom(parsed);
       } catch (e, st) {
-        debugPrint('FillUp import failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUp import failed'}));
       }
 
       // 7. Sync merged data back to our server account. Profile is NOT

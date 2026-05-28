@@ -1,12 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// CRUD repository for [VehicleProfile] entries.
 ///
@@ -34,7 +36,7 @@ class VehicleProfileRepository {
       try {
         result.add(VehicleProfile.fromJson(map));
       } catch (e, st) {
-        debugPrint('VehicleProfileRepository: skipping malformed entry: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'VehicleProfileRepository: skipping malformed entry'}));
       }
     }
     return result;

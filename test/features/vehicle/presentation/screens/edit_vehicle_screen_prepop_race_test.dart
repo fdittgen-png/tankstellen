@@ -10,6 +10,7 @@ import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dar
 import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Widget tests for the VIN pre-population race fix (#1328).
 ///
@@ -21,6 +22,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// the controller load the moment the provider produces a list
 /// containing the target id.
 void main() {
+  silenceErrorLoggerSpool();
   group('EditVehicleScreen — VIN pre-population race (#1328)', () {
     testWidgets(
       'happy path: a profile with a stored VIN populates the VIN '

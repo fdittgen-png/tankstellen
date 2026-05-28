@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -11,6 +13,7 @@ import '../../../core/sync/favorites_sync.dart';
 import '../../../core/sync/user_data_sync.dart';
 import '../../alerts/providers/alert_provider.dart';
 import '../../favorites/providers/favorites_provider.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'data_transparency_provider.g.dart';
 
@@ -115,7 +118,7 @@ class DataTransparencyController extends _$DataTransparencyController {
                 .from('users')
                 .upsert({'id': uid}, onConflict: 'id');
           } catch (e, st) {
-            debugPrint('DataTransparency: users upsert failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'DataTransparency: users upsert failed'}));
           }
         }
       }
@@ -126,7 +129,7 @@ class DataTransparencyController extends _$DataTransparencyController {
       debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
       await AlertsSync.merge(alerts);
     } catch (e, st) {
-      debugPrint('DataTransparency: force sync failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'DataTransparency: force sync failed'}));
     }
 
     await load();

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -12,6 +14,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// DGEG (Direção-Geral de Energia e Geologia) Portuguese fuel price service.
 ///
@@ -185,7 +188,7 @@ class PortugalStationService
 
         byId[id] = merged;
       } catch (e, st) {
-        debugPrint('PT station row parse failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'PT station row parse failed'}));
         continue;
       }
     }

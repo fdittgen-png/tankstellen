@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/background/background_service.dart';
 import '../../../core/storage/storage_providers.dart';
@@ -9,6 +10,7 @@ import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/alerts_sync.dart';
 import '../data/models/price_alert.dart';
 import '../data/repositories/alert_repository.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'alert_provider.g.dart';
 
@@ -72,7 +74,7 @@ class AlertNotifier extends _$AlertNotifier {
         await BackgroundService.cancelAll();
       }
     } catch (e, st) {
-      debugPrint('AlertNotifier: background task reconcile failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'AlertNotifier: background task reconcile failed'}));
     }
   }
 
@@ -86,7 +88,7 @@ class AlertNotifier extends _$AlertNotifier {
         await AlertsSync.merge(state);
       }
     } catch (e, st) {
-      debugPrint('AlertProvider: sync failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'AlertProvider: sync failed'}));
     }
   }
 

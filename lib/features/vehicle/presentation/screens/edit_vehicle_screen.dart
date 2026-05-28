@@ -36,6 +36,7 @@ import '../widgets/vehicle_save_actions.dart';
 import '../widgets/vehicle_save_bar.dart';
 import '../widgets/vin_confirm_dialog.dart';
 import '../widgets/vin_info_sheet.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Sentinel for the four "leave alone" arguments on
 /// [_EditVehicleScreenState._saveCalibrationOverride] — `null` is a
@@ -336,7 +337,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     try {
       decoded = await ref.read(decodedVinProvider(vin).future);
     } catch (e, st) {
-      debugPrint('EditVehicleScreen: VIN decode failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'EditVehicleScreen: VIN decode failed'}));
     }
     if (!mounted) return;
     setState(() => _decodingVin = false);

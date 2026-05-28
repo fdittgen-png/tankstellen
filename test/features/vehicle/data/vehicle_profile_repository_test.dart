@@ -5,8 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_repository.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   group('VehicleProfileRepository', () {
     late _FakeSettings storage;
     late VehicleProfileRepository repo;

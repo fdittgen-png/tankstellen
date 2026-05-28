@@ -12,6 +12,7 @@ import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_s
 import 'package:tankstellen/features/vehicle/providers/obd2_vin_reader_provider.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Widget tests for the "Read VIN from car" button on
 /// [EditVehicleScreen] (#1162 / #1339).
@@ -23,6 +24,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// and enabled (adapter selected) states plus the success / failure
 /// UX branches.
 void main() {
+  silenceErrorLoggerSpool();
   group('EditVehicleScreen — Read-VIN-from-car button (#1162 / #1339)', () {
     testWidgets(
       'button is visible but disabled with a hint when the vehicle has '
