@@ -83,7 +83,7 @@ final class ApproachSimulatorProvider
   }
 }
 
-String _$approachSimulatorHash() => r'b1509fcd42ba0addf1a0a5ae53753af8e624070c';
+String _$approachSimulatorHash() => r'5be2df269df90d443ec4bd4dc86958cd3cc385c4';
 
 /// In-app simulator that injects a synthetic [ApproachState] (#2163).
 ///

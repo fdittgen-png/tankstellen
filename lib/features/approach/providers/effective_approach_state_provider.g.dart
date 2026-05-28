@@ -80,4 +80,4 @@ final class EffectiveApproachStateProvider
 }
 
 String _$effectiveApproachStateHash() =>
-    r'760686bcc787f3ed8950a09e23842bb393b2d8d1';
+    r'9e4e2880298a4967c092152330746284da91531a';

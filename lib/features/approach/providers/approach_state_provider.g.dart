@@ -86,4 +86,4 @@ final class ApproachStateProvider
   }
 }
 
-String _$approachStateHash() => r'6c117788e13447f359a6f518d7e33374b9a25c59';
+String _$approachStateHash() => r'850437048ccd8dec3b30f20449f69a7142011183';
