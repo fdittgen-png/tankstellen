@@ -45,6 +45,7 @@ import 'package:tankstellen/core/theme/theme_mode_provider.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_banner.dart';
 import 'package:tankstellen/features/widget/presentation/widget_click_listener.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../helpers/silence_error_logger.dart';
 
 import '../helpers/mock_providers.dart';
 
@@ -97,6 +98,7 @@ Object _stubRouterOverride(GoRouter router) {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   // The wrapper widgets ([WidgetClickListener] and
