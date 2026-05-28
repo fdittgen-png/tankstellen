@@ -50,10 +50,59 @@ void main() {
         const StationBrandHeader(station: independent),
       );
 
-      // Independent stations fall back to street as headline and expose
-      // the localised "Independent station" subtitle.
-      expect(find.text('Some Street'), findsOneWidget);
+      // #2161 — when brand is the independent sentinel but `name` is
+      // populated, the name takes over the headline (the widget builder
+      // already does this — the detail header now matches). The
+      // localised "Independent station" subtitle still appears.
+      expect(find.text('Independent'), findsOneWidget);
       expect(find.text('Independent station'), findsOneWidget);
+    });
+
+    testWidgets(
+        '#2161 brand-empty + name-populated → name is the headline '
+        '(matches widget builder; widget cold-launch no longer renders '
+        'the street in bold)', (tester) async {
+      const fromWidget = Station(
+        id: 'fr-12345',
+        name: 'Intermarché',
+        brand: '',
+        street: 'Route St Thibéry',
+        postCode: '34550',
+        place: 'Bessan',
+        lat: 43.36,
+        lng: 3.40,
+        dist: 7.2,
+        isOpen: true,
+      );
+
+      await pumpApp(tester, const StationBrandHeader(station: fromWidget));
+
+      expect(find.text('Intermarché'), findsOneWidget,
+          reason: 'name must take over the headline when brand is empty');
+      // Subtitle carries the full address line.
+      expect(find.textContaining('Route St Thibéry'), findsAtLeast(1));
+      expect(find.textContaining('34550'), findsAtLeast(1));
+    });
+
+    testWidgets(
+        '#2161 brand-empty + name-empty → street is the headline',
+        (tester) async {
+      const bareStation = Station(
+        id: 'bare',
+        name: '',
+        brand: '',
+        street: 'Only Street',
+        postCode: '00000',
+        place: 'Nowhere',
+        lat: 0,
+        lng: 0,
+        isOpen: true,
+      );
+
+      await pumpApp(tester, const StationBrandHeader(station: bareStation));
+
+      expect(find.text('Only Street'), findsOneWidget,
+          reason: 'street is the last-resort headline');
     });
   });
 }

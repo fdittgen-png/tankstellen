@@ -37,10 +37,20 @@ class StationBrandHeader extends StatelessWidget {
         '${station.postCode} ${station.place}'.trim(),
     ].join(', ');
 
+    // #2161 — when the brand is empty/sentinel, fall back to the
+    // station name before the street. Matches the home-widget builder
+    // so a station that displays as "Intermarché" in the widget reads
+    // as "Intermarché" in the detail header too. `headingIsBrandOrName`
+    // tracks whether the heading is the brand/name (and therefore the
+    // address should appear as a subtitle) or the street fallback (in
+    // which case only the postCode + place should appear below).
+    final heading = stationDisplayHeading(station);
+    final headingIsBrandOrName = heading != station.street;
+
     return Semantics(
-      label:
-          '${hasRealBrand(station) ? station.brand : station.street}'
-          '${hasRealBrand(station) && station.brand != station.street ? ', $addressLine' : ''}',
+      label: headingIsBrandOrName && heading != addressLine
+          ? '$heading, $addressLine'
+          : heading,
       header: true,
       excludeSemantics: true,
       child: Row(
@@ -53,17 +63,16 @@ class StationBrandHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  hasRealBrand(station) ? station.brand : station.street,
+                  heading,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (hasRealBrand(station) && station.brand != station.street)
+                if (headingIsBrandOrName)
                   Text(addressLine, style: theme.textTheme.bodyLarge)
                 else if (addressLine != station.street && addressLine.isNotEmpty)
-                  // Brand IS the street (independent station rendering) —
-                  // still surface postal code + place on a second line so
-                  // the user gets the city without the body Address block.
+                  // Heading IS the street — still surface postal code +
+                  // place on a second line so the user gets the city.
                   Text(
                     '${station.postCode} ${station.place}'.trim(),
                     style: theme.textTheme.bodyLarge,

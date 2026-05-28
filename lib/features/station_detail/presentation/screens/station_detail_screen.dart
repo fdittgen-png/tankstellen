@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
-import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -14,7 +13,6 @@ import '../../../search/domain/entities/station.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_foldable.dart';
 import '../widgets/station_brand_header.dart';
-import '../widgets/station_brand_helpers.dart';
 import '../widgets/station_detail_app_bar_actions.dart';
 import '../widgets/station_info_section.dart';
 import '../widgets/station_prices_section.dart';
@@ -26,9 +24,14 @@ import '../widgets/station_status_row.dart';
 /// #1539 — the data state uses a `CustomScrollView` + `SliverAppBar`
 /// (pinned, `expandedHeight: 196`) so the rich status-row + brand-header
 /// block collapses out of view on scroll, leaving a 1-row compact bar
-/// (back arrow + station name + cheapest-price chip + actions). Loading
-/// and error states keep a plain fixed `AppBar` since there is no scroll
-/// content to sticky-collapse against.
+/// (back arrow + actions). Loading and error states keep a plain fixed
+/// `AppBar` since there is no scroll content to sticky-collapse against.
+///
+/// #2161 — the AppBar no longer renders the station name or the
+/// cheapest-price chip in its title slot. Both pieces of information
+/// are already prominent in the body (`StationBrandHeader` +
+/// `StationPricesSection`); the truncated `"Péz…"` in the title was
+/// distracting and the Hero fly-in from the search card was noise.
 class StationDetailScreen extends ConsumerWidget {
   final String stationId;
 
@@ -37,31 +40,17 @@ class StationDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(stationDetailProvider(stationId));
-    final l10n = AppLocalizations.of(context);
-
-    // #595 — derive a display title from the loaded station so the Hero
-    // flight from the search card lands on the matching brand/name.
-    // Falls back to the generic "Station" label until data loads.
-    final station = detailAsync.value?.data.station;
-    final appBarTitle = station != null
-        ? (hasRealBrand(station) ? station.brand : station.street)
-        : (l10n?.search ?? 'Station');
 
     return detailAsync.when(
       data: (result) => _StationDetailLoaded(
         stationId: stationId,
         detail: result.data,
         serviceResult: result,
-        appBarTitle: appBarTitle,
       ),
-      loading: () => _StationDetailPlain(
-        stationId: stationId,
-        appBarTitle: appBarTitle,
-        body: const ShimmerStationDetail(),
+      loading: () => const _StationDetailPlain(
+        body: ShimmerStationDetail(),
       ),
       error: (error, _) => _StationDetailPlain(
-        stationId: stationId,
-        appBarTitle: appBarTitle,
         body: ServiceChainErrorWidget(
           error: error,
           onRetry: () => ref.invalidate(stationDetailProvider(stationId)),
@@ -72,24 +61,18 @@ class StationDetailScreen extends ConsumerWidget {
 }
 
 /// Scaffold used by the loading and error states — fixed AppBar via
-/// `PageScaffold` (required by the #923 design-system lint), Hero-tagged
-/// title, back button. No sliver / collapse behaviour.
+/// `PageScaffold` (required by the #923 design-system lint), back
+/// button, no title (#2161). No sliver / collapse behaviour.
 class _StationDetailPlain extends StatelessWidget {
-  final String stationId;
-  final String appBarTitle;
   final Widget body;
 
-  const _StationDetailPlain({
-    required this.stationId,
-    required this.appBarTitle,
-    required this.body,
-  });
+  const _StationDetailPlain({required this.body});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return PageScaffold(
-      titleWidget: _HeroTitle(stationId: stationId, title: appBarTitle),
+      title: '',
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () => context.pop(),
@@ -109,13 +92,11 @@ class _StationDetailLoaded extends StatelessWidget {
   final String stationId;
   final StationDetail detail;
   final ServiceResult<StationDetail> serviceResult;
-  final String appBarTitle;
 
   const _StationDetailLoaded({
     required this.stationId,
     required this.detail,
     required this.serviceResult,
-    required this.appBarTitle,
   });
 
   @override
@@ -123,7 +104,6 @@ class _StationDetailLoaded extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final station = detail.station;
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
-    final cheapest = _cheapestPrice(station);
 
     return Scaffold(
       body: CustomScrollView(
@@ -137,20 +117,6 @@ class _StationDetailLoaded extends StatelessWidget {
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.pop(),
               tooltip: l10n?.tooltipBack ?? 'Back',
-            ),
-            title: Row(
-              children: [
-                Flexible(
-                  child: _HeroTitle(
-                    stationId: stationId,
-                    title: appBarTitle,
-                  ),
-                ),
-                if (cheapest != null) ...[
-                  const SizedBox(width: 8),
-                  _CheapestPriceChip(price: cheapest),
-                ],
-              ],
             ),
             actions: [
               StationDetailAppBarActions(
@@ -215,93 +181,3 @@ class _StationDetailLoaded extends StatelessWidget {
   }
 }
 
-/// Hero-flighted station-name text. Wraps the title in the same Hero
-/// tag the search card uses so the brand label appears to fly into the
-/// detail screen header on push. Centralised here so all three states
-/// (loading, error, data) share the same animation source.
-class _HeroTitle extends StatelessWidget {
-  final String stationId;
-  final String title;
-
-  const _HeroTitle({required this.stationId, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      header: true,
-      child: Hero(
-        tag: 'station-name-$stationId',
-        flightShuttleBuilder: (ctx, animation, direction, fromCtx, toCtx) {
-          final theme = Theme.of(ctx);
-          return Material(
-            type: MaterialType.transparency,
-            child: DefaultTextStyle(
-              style: theme.appBarTheme.titleTextStyle ??
-                  theme.textTheme.titleLarge ??
-                  const TextStyle(fontWeight: FontWeight.bold),
-              child: Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          );
-        },
-        child: Material(
-          type: MaterialType.transparency,
-          child: Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Small pill next to the station name showing the cheapest fuel price
-/// at this station. Visible in both the expanded and collapsed
-/// SliverAppBar states so the user keeps a reference to the headline
-/// price after scrolling past the dedicated prices card.
-class _CheapestPriceChip extends StatelessWidget {
-  final double price;
-
-  const _CheapestPriceChip({required this.price});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        PriceFormatter.formatPrice(price),
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.onPrimaryContainer,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-/// Lowest non-null fuel price across the station's published fuels.
-/// Returns null when the station reports no prices.
-double? _cheapestPrice(Station s) {
-  final candidates = <double>[
-    if (s.e5 != null && s.e5! > 0) s.e5!,
-    if (s.e10 != null && s.e10! > 0) s.e10!,
-    if (s.diesel != null && s.diesel! > 0) s.diesel!,
-    if (s.dieselPremium != null && s.dieselPremium! > 0) s.dieselPremium!,
-    if (s.e98 != null && s.e98! > 0) s.e98!,
-    if (s.e85 != null && s.e85! > 0) s.e85!,
-    if (s.lpg != null && s.lpg! > 0) s.lpg!,
-    if (s.cng != null && s.cng! > 0) s.cng!,
-  ];
-  if (candidates.isEmpty) return null;
-  return candidates.reduce((a, b) => a < b ? a : b);
-}

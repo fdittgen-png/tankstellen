@@ -721,8 +721,11 @@ void main() {
       });
     });
 
-    group('micro-animations (#595)', () {
-      testWidgets('brand/name title is wrapped in a Hero with the station id',
+    group('micro-animations (#595 — reverted by #2161)', () {
+      testWidgets(
+          '#2161 brand/name title is NOT a Hero anymore — the detail '
+          'screen dropped the matching destination, so the card no '
+          'longer needs to animate into it',
           (tester) async {
         await pumpApp(
           tester,
@@ -735,12 +738,10 @@ void main() {
         final heroes = find.byType(Hero);
         final matching = heroes.evaluate().where((element) {
           final widget = element.widget as Hero;
-          return widget.tag ==
-              'station-name-51d4b477-a095-1aa0-e100-80009459e03a';
+          return widget.tag.toString().startsWith('station-name-');
         });
-        expect(matching, isNotEmpty,
-            reason: 'Station card title must be a Hero so the text flies '
-                'to the detail app bar on push.');
+        expect(matching, isEmpty,
+            reason: 'StationCard title Hero source must be gone (#2161)');
       });
 
       testWidgets('favorite star is rendered via AnimatedFavoriteStar',

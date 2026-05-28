@@ -58,38 +58,17 @@ class _StationDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // #595 — Hero flight from the card's brand/name to the detail app
-        // bar title. Text needs Material ancestry mid-flight so wrap in a
-        // transparent Material to avoid "Text requires Material" warnings.
-        Hero(
-          tag: 'station-name-${station.id}',
-          flightShuttleBuilder: (ctx, animation, direction, fromCtx, toCtx) {
-            return Material(
-              type: MaterialType.transparency,
-              child: DefaultTextStyle(
-                style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ) ??
-                    const TextStyle(fontWeight: FontWeight.bold),
-                child: Text(
-                  titleText,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            );
-          },
-          child: Material(
-            type: MaterialType.transparency,
-            child: Text(
-              titleText,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+        // #2161 — was a Hero flight to the detail-screen title; the
+        // detail screen no longer shows the station name in its AppBar
+        // and no longer animates the title, so the source Hero is
+        // dropped too. Plain Text only.
+        Text(
+          titleText,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
