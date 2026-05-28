@@ -30,7 +30,7 @@ import '../../providers/search_screen_ui_provider.dart';
 import '../widgets/amenity_filter_wrap.dart';
 import '../widgets/brand_filter_chips.dart';
 import '../widgets/fuel_type_selector.dart';
-import '../widgets/location_input.dart';
+import '../widgets/location_input.dart' show LocationInput, LocationInputWidgetState;
 import '../widgets/search_mode_toggle.dart';
 import '../widgets/search_radius_slider.dart';
 
@@ -46,29 +46,24 @@ class SearchCriteriaScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
-  /// Drives [RouteInputWidgetState.resolveAndSearch] when the central FAB
-  /// fires a route search (#2131). The inline submit button is gone;
-  /// the text controllers still live inside [RouteInput].
+  // #2131 / #2137 — GlobalKeys drive the inline inputs' submit from the FAB.
   final GlobalKey<RouteInputWidgetState> _routeInputKey =
       GlobalKey<RouteInputWidgetState>();
+  final GlobalKey<LocationInputWidgetState> _locationInputKey =
+      GlobalKey<LocationInputWidgetState>();
 
-  /// Last action registered on the shell FAB, kept so we can `clearIf`
-  /// in `dispose` without stomping on a sibling screen that registered
-  /// after us.
   SearchFabAction? _registeredFabAction;
-
-  /// FAB notifier captured in initState so `dispose` can clear without
-  /// touching `ref` (Riverpod forbids ref usage after `deactivate`).
   SearchFabActionController? _fabNotifier;
+
+  // #2136 — re-entry guard: double-tap pop races crash with "No element".
+  bool _searchFired = false;
 
   @override
   void initState() {
     super.initState();
     _fabNotifier = ref.read(searchFabActionControllerProvider.notifier);
-    // Push the initial FAB action after first build so the shell sees
-    // it before the user can tap. didChangeDependencies isn't enough —
-    // the route input controllers (and their text-presence flags)
-    // only stabilise on the first frame.
+    // Defer to post-frame: the input widgets' state (and their text
+    // controllers) only stabilises after the first build.
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateFabAction());
   }
 
@@ -77,11 +72,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final action = _registeredFabAction;
     final notifier = _fabNotifier;
     if (action != null && notifier != null) {
-      // Defer outside the dispose lifecycle — Riverpod forbids
-      // provider mutation inside build/initState/dispose. A
-      // post-frame callback runs after the current frame finishes
-      // but stays bound to this test's scheduler, so it doesn't leak
-      // across pumps the way Future.microtask does.
+      // Riverpod forbids mutation in dispose; defer via post-frame.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         try {
           notifier.clearIf(action);
@@ -93,9 +84,6 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     super.dispose();
   }
 
-  /// Pushes a fresh [SearchFabAction] reflecting the current mode +
-  /// route-input enabled state. Idempotent — invoked on every mode or
-  /// route-input change via `ref.listen` in [build].
   void _updateFabAction() {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
@@ -117,7 +105,15 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       onTap = () => _routeInputKey.currentState?.resolveAndSearch();
     } else {
       enabled = true;
-      onTap = () => unawaited(_performGpsSearch());
+      // #2137 — LocationInput.submit dispatches to city/ZIP/GPS.
+      onTap = () {
+        final loc = _locationInputKey.currentState;
+        if (loc != null) {
+          loc.submit();
+        } else {
+          unawaited(_performGpsSearch());
+        }
+      };
     }
 
     final action = SearchFabAction(
@@ -131,6 +127,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 
   Future<void> _performGpsSearch() async {
+    if (_searchFired) return;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     final settings = ref.read(settingsStorageProvider);
@@ -149,16 +146,20 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       }
       await LocationConsentDialog.recordConsent(settings);
     }
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
 
     // SearchState dispatches to EV or fuel service internally based on fuelType.
     unawaited(ref.read(searchStateProvider.notifier).searchByGps(
           fuelType: fuelType,
           radiusKm: radius,
         ));
-    if (mounted) Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   void _performZipSearch(String zip) {
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     ref.read(searchStateProvider.notifier).searchByZipCode(
@@ -170,6 +171,8 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 
   void _performCitySearch(ResolvedLocation city) {
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     ref.read(searchStateProvider.notifier).searchByCoordinates(
@@ -184,6 +187,8 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 
   void _performRouteSearch(List<RouteWaypoint> waypoints) {
+    if (_searchFired || !mounted) return;
+    _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     // #1602 — the route search corridor is the user's detour budget.
     final detourBudgetKm =
@@ -314,6 +319,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
               // the fold on a stock S23 at 1x text scale.
               if (mode == SearchMode.nearby) ...[
                 LocationInput(
+                  key: _locationInputKey,
                   onGpsSearch: _performGpsSearch,
                   onZipSearch: _performZipSearch,
                   onCitySearch: _performCitySearch,
