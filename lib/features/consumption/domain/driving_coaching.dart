@@ -179,6 +179,31 @@ String? formatInstantConsumption(TripLiveReading r) {
 ///
 /// The window is expected to be ~5 seconds of samples (recorder
 /// owns the buffer length, the function is window-agnostic).
+/// Returns the trailing samples whose timestamp is after
+/// `reference - window`, scanning only the last [maxScan] samples so the
+/// per-emit cost is O(window) instead of O(trip) (#2174).
+///
+/// Previously the GPS-only recorder filtered the *entire* trip buffer on
+/// every position fix (`.where(...)` over all samples), making the cost
+/// grow linearly with trip duration. The samples arrive in timestamp
+/// order, so the recent window is a suffix; [maxScan] is far larger than
+/// any few-second window at GPS cadence, so the bounded scan still
+/// captures the full window even if a fix lands mildly out of order
+/// (gpsCoachingHint re-sorts internally regardless).
+List<TripSample> recentSamplesWithin(
+  List<TripSample> samples,
+  Duration window,
+  DateTime reference, {
+  int maxScan = 600,
+}) {
+  final cutoff = reference.subtract(window);
+  final start = samples.length > maxScan ? samples.length - maxScan : 0;
+  return [
+    for (final s in samples.getRange(start, samples.length))
+      if (s.timestamp.isAfter(cutoff)) s,
+  ];
+}
+
 DrivingCoachingHint? gpsCoachingHint(List<TripSample> recent) {
   if (recent.length < 3) return null;
   final sorted = [...recent]..sort((a, b) => a.timestamp.compareTo(b.timestamp));
