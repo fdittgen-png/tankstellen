@@ -232,4 +232,39 @@ void main() {
       expect(results[1].id, 'end');
     });
   });
+
+  // #2183 — computeBestStops was previously untested for cheapest; these
+  // pin the per-segment leader semantics the O(1) refactor must preserve.
+  group('computeBestStops — cheapest leader (#2183)', () {
+    Map<int, String>? bestFor(List<Station> stations) => strategy.computeBestStops(
+          route: shortRoute,
+          results: [for (final s in stations) FuelStationResult(s)],
+          fuelType: FuelType.diesel,
+          segmentKm: 50.0, // one segment — all stations compete together
+        );
+
+    test('picks the cheaper station regardless of order', () {
+      final dear = makeStation(id: 'dear', lat: 48.0, lng: 2.0, diesel: 1.80);
+      final cheap = makeStation(id: 'cheap', lat: 48.01, lng: 2.01, diesel: 1.60);
+
+      final cheapFirst = bestFor([cheap, dear]);
+      final cheapSecond = bestFor([dear, cheap]);
+
+      expect(cheapFirst!.values, contains('cheap'));
+      expect(cheapFirst.values, isNot(contains('dear')));
+      // Order must not change the winner.
+      expect(cheapSecond!.values, contains('cheap'));
+      expect(cheapSecond.values, isNot(contains('dear')));
+    });
+
+    test('equal prices keep the first-seen station', () {
+      final first = makeStation(id: 'first', lat: 48.0, lng: 2.0, diesel: 1.70);
+      final second =
+          makeStation(id: 'second', lat: 48.01, lng: 2.01, diesel: 1.70);
+
+      final best = bestFor([first, second]);
+      expect(best!.values, contains('first'));
+      expect(best.values, isNot(contains('second')));
+    });
+  });
 }

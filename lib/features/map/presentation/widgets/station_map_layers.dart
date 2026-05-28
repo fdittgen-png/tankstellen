@@ -11,7 +11,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../data/retry_network_tile_provider.dart';
-import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/utils/price_utils.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import 'price_legend.dart';
@@ -171,20 +171,6 @@ class StationMapLayers extends StatefulWidget {
     return LatLng(sumLat / stations.length, sumLng / stations.length);
   }
 
-  /// Get min/max price range for color gradient.
-  static (double, double) _getPriceRange(List<Station> stations, FuelType fuel) {
-    double minP = double.infinity;
-    double maxP = 0;
-    for (final s in stations) {
-      final p = s.priceFor(fuel);
-      if (p != null) {
-        if (p < minP) minP = p;
-        if (p > maxP) maxP = p;
-      }
-    }
-    if (minP == double.infinity) return (0, 0);
-    return (minP, maxP);
-  }
 }
 
 class _StationMapLayersState extends State<StationMapLayers> {
@@ -240,8 +226,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// Recompute the memoised price range + marker list from the current
   /// widget inputs.
   void _recomputeMarkers() {
-    _priceRange =
-        StationMapLayers._getPriceRange(widget.stations, widget.selectedFuel);
+    _priceRange = priceRange(widget.stations, widget.selectedFuel);
     final ids = widget.selectedStationIds;
     final hasSelection = ids != null && ids.isNotEmpty;
     _markers = widget.stations.map((station) {

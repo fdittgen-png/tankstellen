@@ -3,11 +3,32 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('AppLanguages.all', () {
-    test('has 23 entries', () {
-      expect(AppLanguages.all.length, equals(23));
+    // #2179 — pin the picker to the locales the app actually ships
+    // instead of a magic count, so adding/removing an ARB locale that
+    // isn't mirrored in AppLanguages.all fails loudly. The en_XA
+    // pseudo-locale (text-expansion harness, #1699) is intentionally
+    // not user-selectable, so it is excluded.
+    test('exactly matches AppLocalizations.supportedLocales (minus en_XA)',
+        () {
+      final shipped = AppLocalizations.supportedLocales
+          .where((l) => l.countryCode != 'XA')
+          .map((l) => l.languageCode)
+          .toSet();
+      final picker = AppLanguages.all.map((l) => l.code).toSet();
+      expect(picker, equals(shipped));
+    });
+
+    test('length equals the shipped locale count (no magic number)', () {
+      final shippedCount = AppLocalizations.supportedLocales
+          .where((l) => l.countryCode != 'XA')
+          .map((l) => l.languageCode)
+          .toSet()
+          .length;
+      expect(AppLanguages.all.length, equals(shippedCount));
     });
 
     test('all codes are unique (no duplicates)', () {

@@ -18,11 +18,9 @@ void main() {
       expect(PriceFormatter.formatDistance(null), '--');
     });
 
-    test('returns fuel type name', () {
-      expect(PriceFormatter.fuelTypeName('e5'), 'Super E5');
-      expect(PriceFormatter.fuelTypeName('e10'), 'Super E10');
-      expect(PriceFormatter.fuelTypeName('diesel'), 'Diesel');
-      expect(PriceFormatter.fuelTypeName('all'), 'Alle');
-    });
+    // #2171 — PriceFormatter.fuelTypeName was a dead, non-localized
+    // re-implementation of FuelType.displayName (it hardcoded the
+    // German 'Alle', a HARD-RULE violation). Deleted; fuel display
+    // names come from FuelType.displayName, covered in fuel_type_test.
   });
 }

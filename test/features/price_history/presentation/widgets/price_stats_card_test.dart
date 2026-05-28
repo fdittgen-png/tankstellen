@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
 import 'package:tankstellen/features/price_history/presentation/widgets/price_stats_card.dart';
 
@@ -10,6 +11,12 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('PriceStatsCard', () {
+    // #2172 — the card now formats via PriceFormatter (active-country
+    // locale + currency). Pin GB so the dot-decimal assertions below
+    // hold; restore the FR default afterwards.
+    setUp(() => PriceFormatter.setCountry('GB'));
+    tearDown(() => PriceFormatter.setCountry('FR'));
+
     testWidgets('renders min, max, avg values', (tester) async {
       const stats = PriceStats(
         min: 1.399,

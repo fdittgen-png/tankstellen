@@ -85,8 +85,12 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
     required FuelType fuelType,
     required double segmentKm,
   }) {
-    // Same segment logic as uniform, but with price-first ordering
+    // Same segment logic as uniform, but with price-first ordering.
+    // #2183 — carry the leader's price in a parallel map so the
+    // per-station comparison is O(1) instead of re-scanning `results`
+    // for the current leader (was O(n²)). uniform/balanced already do this.
     final segmentCheapest = <int, String>{};
+    final segmentCheapestPrice = <int, double>{};
 
     for (final item in results) {
       if (item is FuelStationResult) {
@@ -108,18 +112,12 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
 
         final price = station.priceFor(fuelType);
         if (price != null) {
-          final currentBest = segmentCheapest[segmentIdx];
-          if (currentBest == null) {
+          final currentBestPrice = segmentCheapestPrice[segmentIdx];
+          // Strict < keeps first-occurrence-wins on equal prices,
+          // matching the previous behaviour.
+          if (currentBestPrice == null || price < currentBestPrice) {
             segmentCheapest[segmentIdx] = station.id;
-          } else {
-            final currentBestItem = results
-                .whereType<FuelStationResult>()
-                .where((r) => r.id == currentBest)
-                .firstOrNull;
-            final currentBestPrice = currentBestItem?.station.priceFor(fuelType);
-            if (currentBestPrice == null || price < currentBestPrice) {
-              segmentCheapest[segmentIdx] = station.id;
-            }
+            segmentCheapestPrice[segmentIdx] = price;
           }
         }
       }

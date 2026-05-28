@@ -7,20 +7,37 @@ import '../../features/search/domain/entities/station.dart';
 import 'station_extensions.dart';
 
 /// Returns the price of the given [fuelType] for [station], or null if unavailable.
-double? priceForFuelType(Station station, FuelType fuelType) {
-  return switch (fuelType) {
-    FuelTypeE5() => station.e5,
-    FuelTypeE10() => station.e10,
-    FuelTypeE98() => station.e98,
-    FuelTypeDiesel() => station.diesel,
-    FuelTypeDieselPremium() => station.dieselPremium,
-    FuelTypeE85() => station.e85,
-    FuelTypeLpg() => station.lpg,
-    FuelTypeCng() => station.cng,
-    FuelTypeHydrogen() => null,
-    FuelTypeElectric() => null,
-    FuelTypeAll() => station.e10 ?? station.e5 ?? station.diesel,
-  };
+///
+/// Delegates to the canonical [StationDisplay.priceFor] extension so the
+/// FuelType→price-field mapping lives in exactly one place (#2170).
+double? priceForFuelType(Station station, FuelType fuelType) =>
+    station.priceFor(fuelType);
+
+/// (min, max) price for [fuel] across [stations], for colour-gradient /
+/// price-tier classification. Returns `(0, 0)` when no station has a
+/// usable price.
+///
+/// Single source for the three identical loops that previously lived in
+/// the map layer, the driving map, and the search list (#2182). With
+/// [requirePositive] (default `false`) any non-null price counts — the
+/// map/driving layers' historical behaviour; the search list passes
+/// `true` to exclude zero / sentinel prices from its tiers.
+(double, double) priceRange(
+  Iterable<Station> stations,
+  FuelType fuel, {
+  bool requirePositive = false,
+}) {
+  double minP = double.infinity;
+  double maxP = 0;
+  for (final s in stations) {
+    final p = s.priceFor(fuel);
+    if (p != null && (!requirePositive || p > 0)) {
+      if (p < minP) minP = p;
+      if (p > maxP) maxP = p;
+    }
+  }
+  if (minP == double.infinity) return (0, 0);
+  return (minP, maxP);
 }
 
 /// Compares two stations by price for [fuelType]. Stations without a price sort last.

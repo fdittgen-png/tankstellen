@@ -15,7 +15,7 @@ import 'driving_marker_builder.dart';
 ///
 /// When [stations] is empty the map falls back to a default Berlin view so
 /// the screen still has a tile background while the search loads.
-class DrivingMapView extends StatelessWidget {
+class DrivingMapView extends StatefulWidget {
   final MapController mapController;
   final List<Station> stations;
   final FuelType selectedFuel;
@@ -34,63 +34,7 @@ class DrivingMapView extends StatelessWidget {
   static const _defaultCenter = LatLng(52.52, 13.405);
 
   @override
-  Widget build(BuildContext context) {
-    if (stations.isEmpty) {
-      return FlutterMap(
-        mapController: mapController,
-        options: const MapOptions(
-          initialCenter: _defaultCenter,
-          initialZoom: 12,
-        ),
-        children: [
-          // #2096 — was a raw TileLayer; routed through the
-          // hardened wrapper.
-          const SparkiloTileLayer(),
-        ],
-      );
-    }
-
-    final center = computeCenter(stations);
-    final priceRange = computePriceRange(stations, selectedFuel);
-
-    final markers = stations.map((station) {
-      return DrivingMarkerBuilder.build(
-        station,
-        selectedFuel,
-        priceRange.$1,
-        priceRange.$2,
-        onTap: () {
-          onInteraction();
-          onMarkerTap(station);
-        },
-      );
-    }).toList();
-
-    return FlutterMap(
-      mapController: mapController,
-      options: MapOptions(
-        initialCenter: center,
-        initialZoom: 13,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.drag |
-              InteractiveFlag.flingAnimation |
-              InteractiveFlag.doubleTapZoom,
-        ),
-        onTap: (_, _) => onInteraction(),
-      ),
-      children: [
-        // #2096 — was a raw TileLayer; routed through the hardened
-        // wrapper.
-        const SparkiloTileLayer(),
-        MarkerLayer(markers: markers),
-        const RichAttributionWidget(
-          attributions: [
-            TextSourceAttribution('OpenStreetMap contributors'),
-          ],
-        ),
-      ],
-    );
-  }
+  State<DrivingMapView> createState() => _DrivingMapViewState();
 
   /// Geographic centroid of the given stations.
   static LatLng computeCenter(List<Station> stations) {
@@ -103,21 +47,106 @@ class DrivingMapView extends StatelessWidget {
   }
 
   /// (min, max) price for [fuel] across the given stations. Returns (0, 0)
-  /// when no station has a price.
+  /// when no station has a price. Delegates to the shared [priceRange]
+  /// helper (#2182) — accepts any non-null price, as before.
   static (double, double) computePriceRange(
     List<Station> stations,
     FuelType fuel,
-  ) {
-    double minP = double.infinity;
-    double maxP = 0;
-    for (final s in stations) {
-      final p = priceForFuelType(s, fuel);
-      if (p != null) {
-        if (p < minP) minP = p;
-        if (p > maxP) maxP = p;
-      }
+  ) =>
+      priceRange(stations, fuel);
+}
+
+class _DrivingMapViewState extends State<DrivingMapView> {
+  // #2176 — centroid, price range and the oversized markers are memoised
+  // here and recomputed only when the station list identity or the
+  // selected fuel changes (mirrors StationMapLayers #1774). The driving
+  // screen rebuilds on a 30 s auto-lock setState; without this it
+  // re-ran two O(n) passes + re-allocated every marker each time.
+  LatLng? _center;
+  List<Marker> _markers = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _recompute();
+  }
+
+  @override
+  void didUpdateWidget(DrivingMapView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.stations, widget.stations) ||
+        oldWidget.selectedFuel != widget.selectedFuel) {
+      _recompute();
     }
-    if (minP == double.infinity) return (0, 0);
-    return (minP, maxP);
+  }
+
+  void _recompute() {
+    final stations = widget.stations;
+    if (stations.isEmpty) {
+      _center = null;
+      _markers = const [];
+      return;
+    }
+    _center = DrivingMapView.computeCenter(stations);
+    final range = DrivingMapView.computePriceRange(stations, widget.selectedFuel);
+    _markers = stations
+        .map(
+          (station) => DrivingMarkerBuilder.build(
+            station,
+            widget.selectedFuel,
+            range.$1,
+            range.$2,
+            // Read the callbacks off `widget` at tap time so a memoised
+            // marker still dispatches to the current handlers.
+            onTap: () {
+              widget.onInteraction();
+              widget.onMarkerTap(station);
+            },
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.stations.isEmpty) {
+      return FlutterMap(
+        mapController: widget.mapController,
+        options: const MapOptions(
+          initialCenter: DrivingMapView._defaultCenter,
+          initialZoom: 12,
+        ),
+        children: const [
+          // #2096 — was a raw TileLayer; routed through the
+          // hardened wrapper.
+          SparkiloTileLayer(),
+        ],
+      );
+    }
+
+    return FlutterMap(
+      mapController: widget.mapController,
+      options: MapOptions(
+        initialCenter: _center!,
+        initialZoom: 13,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.drag |
+              InteractiveFlag.flingAnimation |
+              InteractiveFlag.doubleTapZoom,
+        ),
+        onTap: (_, _) => widget.onInteraction(),
+      ),
+      children: [
+        // #2096 — was a raw TileLayer; routed through the hardened
+        // wrapper.
+        const SparkiloTileLayer(),
+        MarkerLayer(markers: _markers),
+        const RichAttributionWidget(
+          attributions: [
+            TextSourceAttribution('OpenStreetMap contributors'),
+          ],
+        ),
+      ],
+    );
   }
 }

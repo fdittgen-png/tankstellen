@@ -33,7 +33,8 @@ import '../data/obd2/trip_recording_controller.dart';
 import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
-import '../domain/driving_coaching.dart' show gpsCoachingHint;
+import '../domain/driving_coaching.dart'
+    show gpsCoachingHint, recentSamplesWithin;
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/services/gps_fuel_estimator.dart';
@@ -1300,13 +1301,16 @@ class TripRecording extends _$TripRecording {
     _gpsOnlySamples.add(sample);
     recorder.onSample(sample);
     final summary = recorder.buildSummary();
-    // #2058 — compute the GPS coaching hint from the most recent 5 s
-    // of samples on every position emit. Bounded slice so a long
-    // trajet's per-emit cost stays O(window) not O(trajet).
-    final cutoff = sample.timestamp.subtract(const Duration(seconds: 5));
-    final recent = _gpsOnlySamples
-        .where((s) => s.timestamp.isAfter(cutoff))
-        .toList();
+    // #2058/#2174 — GPS coaching hint from the most recent 5 s of
+    // samples on every emit. recentSamplesWithin scans only a bounded
+    // tail so the per-emit cost is O(window), not O(trajet) — the old
+    // `.where` over the whole buffer grew linearly with trip length
+    // (despite a comment claiming O(window)).
+    final recent = recentSamplesWithin(
+      _gpsOnlySamples,
+      const Duration(seconds: 5),
+      sample.timestamp,
+    );
     final coaching = gpsCoachingHint(recent);
     state = state.copyWith(
       phase: TripRecordingPhase.recording,

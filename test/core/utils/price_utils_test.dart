@@ -53,6 +53,64 @@ Station _makeStation({
 }
 
 void main() {
+  // #2170 — priceForFuelType now delegates to Station.priceFor. This
+  // parity test locks the two in lockstep so a new FuelType added to
+  // only one switch can never silently diverge again.
+  group('priceForFuelType ≡ Station.priceFor (single source)', () {
+    test('agrees with the extension for every FuelType value', () {
+      final s = _makeStation(
+        e5: 1.659,
+        e10: 1.599,
+        e98: 1.899,
+        diesel: 1.549,
+        dieselPremium: 1.749,
+        e85: 0.899,
+        lpg: 0.799,
+        cng: 1.199,
+      );
+      for (final ft in FuelType.values) {
+        expect(
+          priceForFuelType(s, ft),
+          equals(s.priceFor(ft)),
+          reason: 'priceForFuelType must delegate to priceFor for $ft',
+        );
+      }
+    });
+  });
+
+  // #2182 — single source for the three (min,max) price-range loops.
+  group('priceRange', () {
+    test('returns (min, max) across stations', () {
+      final stations = [
+        _makeStation(e10: 1.799),
+        _makeStation(e10: 1.659),
+        _makeStation(e10: 1.899),
+      ];
+      expect(priceRange(stations, FuelType.e10), (1.659, 1.899));
+    });
+
+    test('returns (0, 0) when no station has a price', () {
+      final stations = [_makeStation(), _makeStation()];
+      expect(priceRange(stations, FuelType.e10), (0.0, 0.0));
+    });
+
+    test('default accepts any non-null price incl. zero/negative '
+        '(map/driving behaviour)', () {
+      final stations = [_makeStation(e10: 0.0), _makeStation(e10: 1.5)];
+      // requirePositive defaults false → 0.0 is counted as the min.
+      expect(priceRange(stations, FuelType.e10), (0.0, 1.5));
+    });
+
+    test('requirePositive excludes zero / sentinel prices '
+        '(search-list behaviour)', () {
+      final stations = [_makeStation(e10: 0.0), _makeStation(e10: 1.5)];
+      expect(
+        priceRange(stations, FuelType.e10, requirePositive: true),
+        (1.5, 1.5),
+      );
+    });
+  });
+
   group('priceForFuelType', () {
     test('returns e5 price for FuelType.e5', () {
       final station = _makeStation(e5: 1.659);

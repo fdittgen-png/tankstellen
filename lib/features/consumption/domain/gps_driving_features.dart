@@ -1,8 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:math' as math;
-
+import '../../../core/utils/geo_utils.dart' as geo;
 import 'trip_recorder.dart';
 
 /// Driving-style aggregate derived from a stream of [TripSample]s
@@ -243,25 +242,12 @@ class GpsDrivingFeatures {
   }
 
   /// Great-circle distance between two WGS-84 coordinates in metres.
-  /// Standard haversine — accurate enough for trajet legs (sub-metre
-  /// over kilometres, plenty for L/100 km estimates).
+  /// Delegates to the shared [geo.distanceMeters] (#2169).
   static double _haversineMeters(
     double lat1,
     double lng1,
     double lat2,
     double lng2,
-  ) {
-    const earthR = 6371000.0; // metres
-    final dLat = _toRad(lat2 - lat1);
-    final dLng = _toRad(lng2 - lng1);
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(_toRad(lat1)) *
-            math.cos(_toRad(lat2)) *
-            math.sin(dLng / 2) *
-            math.sin(dLng / 2);
-    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return earthR * c;
-  }
-
-  static double _toRad(double deg) => deg * math.pi / 180.0;
+  ) =>
+      geo.distanceMeters(lat1, lng1, lat2, lng2);
 }

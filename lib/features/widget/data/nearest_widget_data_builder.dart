@@ -15,6 +15,7 @@ import '../../../core/storage/storage_keys.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/utils/station_extensions.dart';
 import 'predictive_payload.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -285,7 +286,7 @@ class NearestWidgetDataBuilder {
         )?.currencySymbol ??
         '';
 
-    final price = _priceForFuel(station, fuel);
+    final price = station.priceFor(fuel);
     final priceFormatted =
         price != null ? price.toStringAsFixed(3) : '';
 
@@ -320,20 +321,6 @@ class NearestWidgetDataBuilder {
       'e10': station.e10,
       'diesel': station.diesel,
       if (predictive != null) ...predictive,
-    };
-  }
-
-  static double? _priceForFuel(Station s, FuelType fuel) {
-    return switch (fuel) {
-      FuelTypeE5() => s.e5,
-      FuelTypeE10() => s.e10,
-      FuelTypeE98() => s.e98,
-      FuelTypeDiesel() => s.diesel,
-      FuelTypeDieselPremium() => s.dieselPremium,
-      FuelTypeE85() => s.e85,
-      FuelTypeLpg() => s.lpg,
-      FuelTypeCng() => s.cng,
-      _ => s.e10 ?? s.e5 ?? s.diesel,
     };
   }
 

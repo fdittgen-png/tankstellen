@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/station_services/austria/econtrol_station_service.dart';
@@ -756,6 +759,54 @@ void main() {
       expect(station.diesel, isNull);
     });
   });
+
+  // #2181 — Dio is now injectable; assert a passed Dio is actually used
+  // for outbound requests (the seam that lets request shape be tested).
+  group('Dio injection (#2181)', () {
+    test('routes requests through the injected Dio', () async {
+      final adapter = _RecordingAdapter();
+      final dio = Dio()..httpClientAdapter = adapter;
+      final injected = EControlStationService(dio: dio);
+
+      await injected.searchStations(
+        const SearchParams(lat: 48.2, lng: 16.37, radiusKm: 10.0),
+      );
+
+      expect(adapter.requestUris, isNotEmpty);
+      expect(
+        adapter.requestUris.every((u) => u.contains('api.e-control.at')),
+        isTrue,
+        reason: 'all requests must go through the injected Dio to the '
+            'e-control endpoint',
+      );
+    });
+  });
+}
+
+/// Minimal [HttpClientAdapter] that records request URIs and returns an
+/// empty JSON array, so the injection seam can be asserted without a live
+/// network call.
+class _RecordingAdapter implements HttpClientAdapter {
+  final List<String> requestUris = [];
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    requestUris.add(options.uri.toString());
+    return ResponseBody.fromString(
+      jsonEncode(<dynamic>[]),
+      200,
+      headers: {
+        'content-type': ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
 
 /// Replicates E-Control parsing logic for isolated testing.

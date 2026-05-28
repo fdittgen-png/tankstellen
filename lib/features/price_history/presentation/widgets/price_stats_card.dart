@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/price_stats.dart';
 
@@ -11,12 +12,10 @@ import '../../domain/entities/price_stats.dart';
 /// a trend indicator arrow.
 class PriceStatsCard extends StatelessWidget {
   final PriceStats stats;
-  final String currencySymbol;
 
   const PriceStatsCard({
     super.key,
     required this.stats,
-    this.currencySymbol = '\u20ac',
   });
 
   @override
@@ -60,10 +59,10 @@ class PriceStatsCard extends StatelessWidget {
     );
   }
 
-  String _formatPrice(double? price) {
-    if (price == null) return '--';
-    return '${price.toStringAsFixed(3)} $currencySymbol';
-  }
+  // #2172 — route through PriceFormatter so the value uses the active
+  // country's locale (decimal separator) and currency symbol instead of
+  // a hardcoded toStringAsFixed(3) + euro-defaulted param.
+  String _formatPrice(double? price) => PriceFormatter.formatPrice(price);
 }
 
 class _StatItem extends StatelessWidget {

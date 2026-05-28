@@ -53,27 +53,32 @@ class EvMarkerWidget extends StatelessWidget {
     final color = colorFor(context, station);
     final maxPower = station.maxPowerKw.round();
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Semantics(
-        label: 'EV charging station ${station.name}, $maxPower kW',
-        button: true,
-        child: Container(
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.ev_station,
-            color: Colors.white,
-            size: 24,
+    // #2178 — isolate each marker's raster, matching the fuel marker
+    // (StationMarker). Without it, a repaint of one marker dirties the
+    // whole layer raster when markers cluster/animate.
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Semantics(
+          label: 'EV charging station ${station.name}, $maxPower kW',
+          button: true,
+          child: Container(
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.ev_station,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
         ),
       ),

@@ -228,6 +228,9 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
     required double segmentKm,
   }) {
     final segmentCheapest = <int, String>{};
+    // #2183 — O(1) leader lookup via a parallel price map (was an
+    // O(n²) re-scan of `results`).
+    final segmentCheapestPrice = <int, double>{};
     for (final item in results) {
       if (item is FuelStationResult) {
         final station = item.station;
@@ -248,19 +251,11 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
         final segmentIdx = (nearestSampleIdx * 15 / segmentKm).floor();
         final price = station.priceFor(fuelType);
         if (price != null) {
-          final currentBest = segmentCheapest[segmentIdx];
-          if (currentBest == null) {
+          final currentBestPrice = segmentCheapestPrice[segmentIdx];
+          // Strict < keeps first-occurrence-wins on equal prices.
+          if (currentBestPrice == null || price < currentBestPrice) {
             segmentCheapest[segmentIdx] = station.id;
-          } else {
-            final currentBestItem = results
-                .whereType<FuelStationResult>()
-                .where((r) => r.id == currentBest)
-                .firstOrNull;
-            final currentBestPrice =
-                currentBestItem?.station.priceFor(fuelType);
-            if (currentBestPrice == null || price < currentBestPrice) {
-              segmentCheapest[segmentIdx] = station.id;
-            }
+            segmentCheapestPrice[segmentIdx] = price;
           }
         }
       }
