@@ -112,20 +112,4 @@ class PriceFormatter {
     // import between price_formatter.dart and unit_formatter.dart.
     return UnitFormatter.formatDistance(distanceKm, countryCode: countryCode);
   }
-
-  /// Get fuel type display name.
-  static String fuelTypeName(String fuelType) {
-    switch (fuelType.toLowerCase()) {
-      case 'e5':
-        return 'Super E5';
-      case 'e10':
-        return 'Super E10';
-      case 'diesel':
-        return 'Diesel';
-      case 'all':
-        return 'Alle';
-      default:
-        return fuelType;
-    }
-  }
 }
