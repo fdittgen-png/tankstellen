@@ -10,6 +10,7 @@ import '../../../core/services/service_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../price_history/providers/price_prediction_provider.dart';
 import '../data/home_widget_service.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'nearest_widget_refresh_provider.g.dart';
 
@@ -93,7 +94,7 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
         ),
       );
     } catch (e, st) {
-      debugPrint('NearestWidgetRefresh: tick failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'NearestWidgetRefresh: tick failed'}));
     }
   }
 }

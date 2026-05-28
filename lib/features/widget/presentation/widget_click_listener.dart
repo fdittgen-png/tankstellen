@@ -13,6 +13,7 @@ import '../../../app/router.dart';
 import '../../consumption/data/obd2/event_channel_cancel.dart';
 import '../providers/nearest_widget_refresh_provider.dart';
 import 'widget_uri_parser.dart';
+import '../../../core/logging/error_logger.dart';
 
 export 'widget_uri_parser.dart' show isWidgetRefreshUri, widgetUriToPath;
 
@@ -57,7 +58,7 @@ class WidgetLaunchHandler {
     try {
       _router.push(path);
     } catch (e, st) {
-      debugPrint('WidgetLaunchHandler: push failed for $uri → $path: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: {'where': 'WidgetLaunchHandler: push failed for $uri → $path'}));
     }
   }
 }

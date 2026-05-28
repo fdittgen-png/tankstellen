@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -14,6 +16,7 @@ import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
 import 'predictive_payload.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Storage boundary for the nearest-widget JSON payload.
 ///
@@ -55,7 +58,7 @@ class HomeWidgetPayloadStore implements NearestWidgetPayloadStore {
       final value = await HomeWidget.getWidgetData<String>('nearest_json');
       return (value != null && value.isNotEmpty && value != '[]') ? value : null;
     } catch (e, st) {
-      debugPrint('HomeWidgetPayloadStore.readLastJson failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidgetPayloadStore.readLastJson failed'}));
       return null;
     }
   }
@@ -67,7 +70,7 @@ class HomeWidgetPayloadStore implements NearestWidgetPayloadStore {
           await HomeWidget.getWidgetData<String>('nearest_updated_at');
       return iso == null ? null : DateTime.tryParse(iso);
     } catch (e, st) {
-      debugPrint('HomeWidgetPayloadStore.readLastFetchedAt failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidgetPayloadStore.readLastFetchedAt failed'}));
       return null;
     }
   }
@@ -207,7 +210,7 @@ class NearestWidgetDataBuilder {
       await _persist(payload, userLat: lat, userLng: lng);
       return payload;
     } catch (e, st) {
-      debugPrint('NearestWidgetDataBuilder.build search failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'NearestWidgetDataBuilder.build search failed'}));
       // Attempt stale-fallback: reuse the previous successful payload.
       final previousJson = await payloadStore.readLastJson();
       if (previousJson != null) {

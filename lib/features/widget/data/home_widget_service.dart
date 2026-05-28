@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'dart:math';
@@ -17,6 +19,7 @@ import '../../search/domain/entities/fuel_type.dart';
 import 'home_widget_json.dart';
 import 'nearest_widget_data_builder.dart';
 import 'predictive_payload.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Manages data for the Android home screen widgets.
 ///
@@ -125,7 +128,7 @@ class HomeWidgetService {
       );
       debugPrint('HomeWidget: favorites updated with ${stations.length} stations');
     } catch (e, st) {
-      debugPrint('HomeWidget: favorites update failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget: favorites update failed'}));
     }
   }
 
@@ -225,7 +228,7 @@ class HomeWidgetService {
       );
       debugPrint('HomeWidget: nearest updated with ${stations.length} stations');
     } catch (e, st) {
-      debugPrint('HomeWidget: nearest update failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget: nearest update failed'}));
     }
   }
 
@@ -532,7 +535,7 @@ class HomeWidgetService {
         jsonEncode(list),
       );
     } catch (e, st) {
-      debugPrint('HomeWidget: publishProfiles failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget: publishProfiles failed'}));
     }
   }
 
@@ -553,7 +556,7 @@ class HomeWidgetService {
       }
       return null;
     } catch (e, st) {
-      debugPrint('HomeWidget: readFirstPerWidgetProfileId failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget: readFirstPerWidgetProfileId failed'}));
       return null;
     }
   }
@@ -631,8 +634,7 @@ class HomeWidgetService {
         profile.widgetVariant,
       );
     } catch (e, st) {
-      debugPrint(
-          'HomeWidget._writeGlobalWidgetDefaults: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget._writeGlobalWidgetDefaults'}));
     }
   }
 }
