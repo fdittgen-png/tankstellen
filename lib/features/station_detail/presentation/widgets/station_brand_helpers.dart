@@ -24,3 +24,19 @@ bool hasRealBrand(Station s) {
 /// bug (#482).
 bool isIndependentSentinel(Station s) =>
     s.brand == BrandRegistry.independentLabel || s.brand == 'Station';
+
+/// The bold heading shown at the top of the station-detail body.
+///
+/// #2161 — French stations from the official `prix-carburants.gouv.fr`
+/// feed often carry no `brand`, but their `name` is populated (e.g.
+/// `"Intermarché"` arrives via `Station.name`, not `Station.brand`).
+/// The home-screen widget already shows the name in that case
+/// (`nearest_widget_data_builder` line 279 has the same fallback) —
+/// the detail header has to match, otherwise a widget cold-launch
+/// renders the street in bold and the name disappears.
+String stationDisplayHeading(Station s) {
+  if (hasRealBrand(s)) return s.brand;
+  final name = s.name.trim();
+  if (name.isNotEmpty) return name;
+  return s.street;
+}

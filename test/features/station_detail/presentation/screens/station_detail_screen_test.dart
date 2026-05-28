@@ -59,9 +59,9 @@ void main() {
         ],
       );
 
-      // The brand 'STAR' should be displayed — once in the app bar hero
-      // target (#595) and once in the body content row.
-      expect(find.text('STAR'), findsNWidgets(2));
+      // #2161 — the AppBar title slot no longer carries the brand, so
+      // 'STAR' renders exactly once, in the body brand-header block.
+      expect(find.text('STAR'), findsOneWidget);
     });
 
     testWidgets('renders price tiles for fuel types', (tester) async {
@@ -240,7 +240,8 @@ void main() {
     });
 
     testWidgets(
-        '#595: app bar title is wrapped in a Hero with the matching tag',
+        '#2161: app bar has NO station-name Hero and NO cheapest-price chip — '
+        'just back arrow + actions',
         (tester) async {
       final result = ServiceResult(
         data: const StationDetail(station: testStation),
@@ -263,15 +264,18 @@ void main() {
         ],
       );
 
+      // No Hero with the station-name tag — the title fly-in is gone
+      // (#595 reversed by #2161). Other Heroes on the screen (e.g. FAB)
+      // are unaffected, so we just check that none carry the
+      // station-name-* tag.
       final heroes = find.byType(Hero);
       final matching = heroes.evaluate().where((element) {
         final widget = element.widget as Hero;
-        return widget.tag ==
-            'station-name-51d4b477-a095-1aa0-e100-80009459e03a';
+        return widget.tag.toString().startsWith('station-name-');
       });
-      expect(matching, isNotEmpty,
-          reason: 'Detail screen must expose a matching hero tag so the '
-              'station card title can fly to the app bar on push.');
+      expect(matching, isEmpty,
+          reason: 'detail screen must NOT carry a station-name Hero '
+              '(#2161 — animation removed)');
     });
 
     testWidgets(
