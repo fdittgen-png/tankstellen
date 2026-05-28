@@ -114,36 +114,9 @@ class UnitFormatter {
   static String _threeDecimals(double v) =>
       NumberFormat('0.000', _activeLocale).format(v);
 
-  static String get _activeLocale {
-    switch (PriceFormatter.activeCountry) {
-      case 'DE':
-        return 'de_DE';
-      case 'FR':
-        return 'fr_FR';
-      case 'AT':
-        return 'de_AT';
-      case 'ES':
-        return 'es_ES';
-      case 'IT':
-        return 'it_IT';
-      case 'PT':
-        return 'pt_PT';
-      case 'BE':
-        return 'fr_BE';
-      case 'LU':
-        return 'fr_LU';
-      case 'DK':
-        return 'da_DK';
-      case 'GB':
-        return 'en_GB';
-      case 'AU':
-        return 'en_AU';
-      case 'MX':
-        return 'es_MX';
-      case 'AR':
-        return 'es_AR';
-      default:
-        return 'en_US';
-    }
-  }
+  /// The active country's CLDR locale, sourced from the same
+  /// [CountryConfig] SSoT as [PriceFormatter] (#2168). Previously a
+  /// third copy of the country→locale switch that omitted SI/KR/CL/RO
+  /// and fell back to `en_US` (wrong decimal separator for those).
+  static String get _activeLocale => PriceFormatter.activeConfig.locale;
 }

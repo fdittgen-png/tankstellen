@@ -63,6 +63,23 @@ void main() {
         PriceFormatter.setCountry('DK');
         expect(PriceFormatter.currency, 'kr');
       });
+
+      // #2168 — these were silently omitted from the old _currencyMap
+      // and fell back to '€'. They now resolve from CountryConfig.
+      test('KRW for South Korea', () {
+        PriceFormatter.setCountry('KR');
+        expect(PriceFormatter.currency, '₩');
+      });
+
+      test('CLP for Chile', () {
+        PriceFormatter.setCountry('CL');
+        expect(PriceFormatter.currency, '\$');
+      });
+
+      test('RON for Romania', () {
+        PriceFormatter.setCountry('RO');
+        expect(PriceFormatter.currency, 'lei');
+      });
     });
 
     group('null and zero handling', () {
@@ -105,7 +122,40 @@ void main() {
 
       test('unknown country defaults to USD-style', () {
         PriceFormatter.setCountry('ZZ');
-        expect(PriceFormatter.currency, '€'); // default
+        expect(PriceFormatter.currency, '€'); // default → Germany
+      });
+    });
+
+    group('CountryConfig SSoT (#2168 — no silent fallback)', () {
+      test('currency symbol matches CountryConfig for every '
+          'registered country', () {
+        for (final c in Countries.all) {
+          PriceFormatter.setCountry(c.code);
+          expect(
+            PriceFormatter.currency,
+            c.currencySymbol,
+            reason: '${c.code} must render its config currencySymbol, '
+                'not a silent fallback',
+          );
+          expect(
+            PriceFormatter.activeConfig.locale,
+            c.locale,
+            reason: '${c.code} must resolve its config locale',
+          );
+        }
+      });
+
+      test('Chile (es_CL) uses comma decimal separator '
+          '(was en_US dot under the old table)', () {
+        PriceFormatter.setCountry('CL');
+        final formatted = PriceFormatter.formatPriceCompact(1.459);
+        expect(formatted, contains(','));
+        expect(formatted, isNot(contains('.')));
+      });
+
+      test('Romania (ro_RO) uses comma decimal separator', () {
+        PriceFormatter.setCountry('RO');
+        expect(PriceFormatter.formatPriceCompact(1.459), contains(','));
       });
     });
   });

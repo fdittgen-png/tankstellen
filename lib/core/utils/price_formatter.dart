@@ -4,66 +4,42 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+import '../country/country_config.dart';
 import 'unit_formatter.dart';
 
 class PriceFormatter {
   PriceFormatter._();
 
-  /// Country code → locale mapping for number formatting.
-  /// Comma-decimal countries (most of Europe) use 'de_DE'.
-  /// Period-decimal countries use 'en_US'.
-  static const _localeMap = <String, String>{
-    'DE': 'de_DE',
-    'FR': 'fr_FR',
-    'AT': 'de_AT',
-    'ES': 'es_ES',
-    'IT': 'it_IT',
-    'PT': 'pt_PT',
-    'BE': 'fr_BE',
-    'LU': 'fr_LU',
-    'DK': 'da_DK',
-    'GB': 'en_GB',
-    'AU': 'en_AU',
-    'MX': 'es_MX',
-    'AR': 'es_AR',
-  };
-
-  /// Currency symbols per country.
-  static const _currencyMap = <String, String>{
-    'DE': '€',
-    'FR': '€',
-    'AT': '€',
-    'ES': '€',
-    'IT': '€',
-    'PT': '€',
-    'BE': '€',
-    'LU': '€',
-    'DK': 'kr',
-    'GB': '£',
-    'AU': '\$',
-    'MX': '\$',
-    'AR': '\$',
-  };
-
-  /// Active country code. Set by the app on country change.
-  static String _activeCountry = 'FR';
+  /// Active country config — the single source of truth for the
+  /// formatting locale and currency symbol. Resolved from
+  /// [CountryConfig] (`locale`, `currencySymbol`) so the formatter can
+  /// never drift from the registry the way the old hand-maintained
+  /// `_localeMap`/`_currencyMap` tables did (#2168). Those tables
+  /// silently omitted SI/KR/CL/RO and fell back to `en_US`/`€`, so a
+  /// Korean profile rendered € instead of ₩.
+  static CountryConfig _activeConfig =
+      Countries.byCode('FR') ?? Countries.germany;
 
   /// ISO code of the country currently set as active. Read-only
   /// from outside; mutate via [setCountry] to keep derived caches
   /// (format objects) in sync.
-  static String get activeCountry => _activeCountry;
+  static String get activeCountry => _activeConfig.code;
+
+  /// The resolved config for the active country. Exposed so
+  /// [UnitFormatter] reads the same locale source instead of keeping
+  /// its own parallel switch.
+  static CountryConfig get activeConfig => _activeConfig;
 
   /// Set the active country for price formatting.
   static void setCountry(String countryCode) {
-    _activeCountry = countryCode.toUpperCase();
+    _activeConfig =
+        Countries.byCode(countryCode.toUpperCase()) ?? Countries.germany;
     _cachedFullFormat = null;
   }
 
-  static String get _locale =>
-      _localeMap[_activeCountry] ?? 'en_US';
+  static String get _locale => _activeConfig.locale;
 
-  static String get currency =>
-      _currencyMap[_activeCountry] ?? '€';
+  static String get currency => _activeConfig.currencySymbol;
 
   // Lazy-initialized formatter that resets when country changes.
   static NumberFormat? _cachedFullFormat;
