@@ -1,12 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/country/border_proximity.dart';
 import '../../../core/country/country_provider.dart';
 import '../../../core/location/user_position_provider.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/utils/station_extensions.dart';
@@ -167,7 +169,12 @@ Future<List<Station>> _safeNeighborSearch({
     );
     return result.data;
   } catch (e, st) {
-    debugPrint('cross-border probe ($countryCode) failed: $e\n$st');
+    // #2146 — route to the user-exportable log so silent
+    // cross-border probe failures are recoverable from bug reports.
+    unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+      'where': 'cross_border_suggestion_provider: probe',
+      'countryCode': countryCode,
+    }));
     return const [];
   }
 }

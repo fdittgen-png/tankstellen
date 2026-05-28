@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/services/location_search_service.dart';
 
 /// Reusable text field with debounced city autocomplete suggestions.
@@ -99,7 +100,11 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
           }
         }
       } catch (e, st) {
-        debugPrint('Route autocomplete failed: $e\n$st');
+        // #2146 — route to the exportable log so autocomplete
+        // failures are recoverable from a bug report.
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+          'where': 'CityAutocompleteField: search',
+        }));
         if (mounted) setState(() => _isLoading = false);
       }
     });

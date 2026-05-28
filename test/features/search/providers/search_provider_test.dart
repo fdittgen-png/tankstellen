@@ -11,6 +11,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/location/location_service.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/services/geocoding_chain.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -104,6 +105,16 @@ void main() {
   late MockGeocodingChain mockGeocoding;
 
   setUp(() {
+    // #2146 — silence the spool so errorLogger.log inside catches
+    // doesn't trip the test framework's zone-error guard.
+    errorLogger.spoolEnqueueOverride = ({
+      required String isolateTaskName,
+      required Object error,
+      StackTrace? stack,
+      Map<String, dynamic>? contextMap,
+      DateTime? timestamp,
+    }) async {};
+
     fakeStorage = FakeHiveStorage();
     mockStationService = MockStationService();
     mockGeocoding = MockGeocodingChain();
@@ -116,6 +127,8 @@ void main() {
     ));
     registerFallbackValue(CancelToken());
   });
+
+  tearDown(errorLogger.resetForTest);
 
   ProviderContainer createContainer() {
     final c = ProviderContainer(overrides: [

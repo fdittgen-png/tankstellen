@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
@@ -174,7 +177,13 @@ class RouteSearchState extends _$RouteSearchState {
       try {
         country = await geocoding.coordinatesToCountryCode(lat, lng);
       } catch (e, st) {
-        debugPrint('RouteSearch: country detection failed at $lat,$lng: $e\n$st');
+        // #2146 — non-fatal (falls through to fallbackService) but
+        // surface on the log so country-detection blackholes are
+        // recoverable from a bug report.
+        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+          'where': 'RouteSearch: fuel country detection',
+          'lat': lat, 'lng': lng,
+        }));
       }
 
       // Reuse cached service if country unchanged
@@ -226,7 +235,12 @@ class RouteSearchState extends _$RouteSearchState {
           );
           if (detected != null) countryCode = detected;
         } catch (e, st) {
-          debugPrint('RouteSearch EV: country detection failed: $e\n$st');
+          // #2146 — non-fatal (uses fallbackCountry) but surface
+          // so triage can spot misconfigured geocoding chains.
+          unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+            'where': 'RouteSearch EV: country detection',
+            'lat': point.latitude, 'lng': point.longitude,
+          }));
         }
 
         final result = await service.searchStations(
@@ -242,7 +256,13 @@ class RouteSearchState extends _$RouteSearchState {
           }
         }
       } catch (e, st) {
-        debugPrint('RouteSearch EV: sample point query failed: $e\n$st');
+        // #2146 — sample failures are tolerated (other points still
+        // yield results), but route to the exportable log so
+        // recurring blackouts of EV results are recoverable.
+        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+          'where': 'RouteSearch EV: sample point query',
+          'lat': point.latitude, 'lng': point.longitude,
+        }));
       }
     }
 

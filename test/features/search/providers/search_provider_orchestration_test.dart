@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/services/geocoding_chain.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
@@ -102,7 +103,22 @@ class _RecordingUserPosition extends UserPosition {
   }
 }
 
+/// #2146 — orchestration helpers now log catches via errorLogger.
+/// In tests Hive isn't initialised, so silence the spool path.
+void _silenceErrorLogger() {
+  errorLogger.spoolEnqueueOverride = ({
+    required String isolateTaskName,
+    required Object error,
+    StackTrace? stack,
+    Map<String, dynamic>? contextMap,
+    DateTime? timestamp,
+  }) async {};
+}
+
 void main() {
+  setUp(_silenceErrorLogger);
+  tearDown(errorLogger.resetForTest);
+
   group('classifySearchError', () {
     final stack = StackTrace.current;
 
