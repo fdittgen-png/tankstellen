@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/location/user_position_provider.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/services/geocoding_chain.dart';
 import '../../../core/services/service_result.dart';
 import '../domain/entities/fuel_type.dart';
@@ -30,7 +33,11 @@ Future<void> autoUpdatePositionIfEnabled(Ref ref) async {
   try {
     await ref.read(userPositionProvider.notifier).updateFromGps();
   } on Exception catch (e, st) {
-    debugPrint('GPS auto-update failed: $e\n$st');
+    // #2146 — route to the user-exportable log; the search continues
+    // without GPS so the user still gets results.
+    unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      'where': 'search_provider: autoUpdatePositionIfEnabled',
+    }));
   }
 }
 
@@ -78,7 +85,13 @@ Future<String?> tryReverseGeocode(
     );
     return addrResult.data;
   } on Exception catch (e, st) {
-    debugPrint('Reverse geocoding failed: $e\n$st');
+    // #2146 — non-fatal, but route so silent failures surface in
+    // the exportable log for bug-report triage.
+    unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+      'where': 'search_provider: tryReverseGeocode',
+      'lat': lat,
+      'lng': lng,
+    }));
     return null;
   }
 }

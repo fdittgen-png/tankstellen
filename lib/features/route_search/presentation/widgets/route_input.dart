@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../core/location/location_service.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/utils/frame_callbacks.dart';
@@ -98,7 +99,11 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       ref.read(routeInputControllerProvider.notifier).setStartCoords(coords);
       final l10n = AppLocalizations.of(context);
       _startController.text = l10n?.currentLocation ?? 'Current location';
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      // #2146 — route to the exportable log; the snackbar is transient.
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'RouteInput._useGpsForStart',
+      }));
       if (mounted) {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showError(
@@ -219,7 +224,11 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       ];
 
       widget.onSearch(waypoints);
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      // #2146 — route to the exportable log; the snackbar is transient.
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'RouteInput.resolveAndSearch',
+      }));
       if (mounted) {
         SnackBarHelper.showError(context,
             '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');

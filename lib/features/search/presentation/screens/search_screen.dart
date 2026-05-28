@@ -10,6 +10,7 @@ import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -199,9 +200,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               }
             } catch (e, st) {
               // #1692 — never surface a raw exception toString() to the
-              // user; show a localized, actionable message instead. The
-              // cause is kept for support via debugPrint below.
-              debugPrint('SearchScreen GPS update failed: $e\n$st');
+              // user; show a localized, actionable message instead.
+              // #2146 — route to the exportable log so the cause is
+              // recoverable from a bug report.
+              unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+                'where': 'SearchScreen: userPosition.updateFromGps',
+              }));
               if (!context.mounted) return;
               SnackBarHelper.showError(
                 context,

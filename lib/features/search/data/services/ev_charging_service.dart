@@ -1,9 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 
+import 'package:dio/dio.dart';
+
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/services/dio_factory.dart';
 import '../../../../core/services/mixins/station_service_helpers.dart';
 import '../../../../core/services/service_result.dart';
@@ -155,7 +157,12 @@ class EVChargingService with StationServiceHelpers {
         countryCode: addr['Country']?['ISOCode']?.toString(),
       );
     } catch (e, st) {
-      debugPrint('EV station parse failed: $e\n$st');
+      // #2146 — silent parse failures used to never reach the
+      // exportable log; route via errorLogger so a malformed OCM
+      // record is recoverable from a bug report.
+      unawaited(errorLogger.log(ErrorLayer.services, e, st, context: const {
+        'where': 'EvChargingService: station parse',
+      }));
       return null;
     }
   }
@@ -200,7 +207,12 @@ class EVChargingService with StationServiceHelpers {
       final dt = DateTime.parse(iso);
       return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
     } catch (e, st) {
-      debugPrint('EV date parse failed: $e\n$st');
+      // #2146 — route to the exportable log; date drift surfaces
+      // as a broken EV station detail otherwise.
+      unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+        'where': 'EvChargingService: date parse',
+        'iso': iso,
+      }));
       return null;
     }
   }
