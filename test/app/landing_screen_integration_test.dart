@@ -73,6 +73,11 @@ List<Object> _readyAppOverrides({
       .thenReturn(true);
   when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
   when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
+  // #2155 — the favorites landing screen mounts AlertsTab immediately
+  // in the wide-layout path; stub getAlerts() so AsyncValue doesn't
+  // error out.
+  when(() => test.mockStorage.getAlerts())
+      .thenReturn(const <Map<String, dynamic>>[]);
   when(() => test.mockStorage.getActiveProfileId()).thenReturn('p1');
   when(() => test.mockStorage.getProfile('p1')).thenReturn({
     'id': 'p1',
