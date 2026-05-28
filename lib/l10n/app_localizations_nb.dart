@@ -3429,6 +3429,21 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Test nærmingsoverlegg';
+
+  @override
+  String get approachTestStopButton => 'Stopp test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test aktiv — overlegget viser prisen for $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Legg til en favorittstasjon for å teste nærmingsoverlegget';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m unna';
   }

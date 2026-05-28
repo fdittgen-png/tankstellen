@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router.dart';
+import '../../../../core/services/approach_detector.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../approach/providers/effective_approach_state_provider.dart';
+import '../../../profile/providers/effective_fuel_type_provider.dart';
+import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/driving_coaching.dart';
 import '../../domain/situation_classifier.dart';
@@ -41,7 +45,13 @@ class TripRecordingBanner extends ConsumerWidget {
     // bottom nav bar, app bars) out of the tile no matter which route
     // was visible when PiP fired.
     if (ref.watch(pipModeProvider)) {
-      return _pipView(context, state);
+      // #2163 — guard both watches: under tests that don't bootstrap
+      // Hive the chain raises and would crash the PiP tile.
+      ApproachState? approach;
+      var fuel = FuelType.e10;
+      try { approach = ref.watch(effectiveApproachStateProvider); } on Object { /* fall back to null */ }
+      try { fuel = ref.watch(effectiveFuelTypeProvider); } on Object { /* keep e10 */ }
+      return _pipView(context, state, approachState: approach, fuelType: fuel);
     }
 
     // When no trip is active: show a thin strip carrying only the
@@ -120,16 +130,14 @@ class TripRecordingBanner extends ConsumerWidget {
     );
   }
 
-  /// Full-bleed compact tile shown while the app is a Picture-in-
-  /// Picture window (#1977 + #2068).
-  ///
-  /// As of #2068 the tile is dominated by a huge L/100 km figure
-  /// (the user's primary at-a-glance signal while driving). Distance
-  /// and elapsed time render in a small caption row below. The whole
-  /// layout lives in [TripRecordingPipView] — keeps this file under
-  /// the 400-line guard and isolates the PiP-specific styling away
-  /// from the inline-banner [_Content] row.
-  Widget _pipView(BuildContext context, TripRecordingState state) {
+  /// Full-bleed compact tile shown while the app is a PiP window
+  /// (#1977 + #2068 — layout lives in [TripRecordingPipView]).
+  Widget _pipView(
+    BuildContext context,
+    TripRecordingState state, {
+    required ApproachState? approachState,
+    required FuelType fuelType,
+  }) {
     if (!state.isActive) {
       // A trip ended while the app sat in PiP — the OS restores the
       // full window momentarily; a neutral panel avoids flashing the
@@ -141,6 +149,9 @@ class TripRecordingBanner extends ConsumerWidget {
       state: state,
       backgroundColor: palette.background,
       foregroundColor: palette.foreground,
+      // #2163 — null outside any radius → PiP keeps the default layout.
+      approachState: approachState,
+      fuelType: fuelType,
     );
   }
 
@@ -227,6 +238,7 @@ class _BannerPalette {
   final Color foreground;
   const _BannerPalette({required this.background, required this.foreground});
 }
+
 
 class _Content extends StatelessWidget {
   final TripRecordingState state;

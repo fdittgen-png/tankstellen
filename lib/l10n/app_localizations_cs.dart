@@ -3441,6 +3441,21 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Otestovat překryv přiblížení';
+
+  @override
+  String get approachTestStopButton => 'Zastavit test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test aktivní — překryv ukazuje cenu pro $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Přidejte oblíbenou stanici, abyste mohli překryv přiblížení otestovat';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m daleko';
   }

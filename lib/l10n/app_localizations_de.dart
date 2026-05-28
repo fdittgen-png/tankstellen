@@ -3451,6 +3451,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Annäherungs-Overlay testen';
+
+  @override
+  String get approachTestStopButton => 'Test stoppen';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test läuft – Overlay zeigt den Preis für $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Fügen Sie einen Favoriten hinzu, um das Annäherungs-Overlay zu testen';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m entfernt';
   }

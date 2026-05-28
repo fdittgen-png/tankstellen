@@ -3437,6 +3437,21 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testiraj sloj približavanja';
+
+  @override
+  String get approachTestStopButton => 'Zaustavi test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test je aktivan — sloj prikazuje cijenu za $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Dodajte omiljenu postaju za testiranje sloja približavanja';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m udaljeno';
   }

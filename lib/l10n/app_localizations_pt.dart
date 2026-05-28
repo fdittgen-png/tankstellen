@@ -3453,6 +3453,21 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testar sobreposição de aproximação';
+
+  @override
+  String get approachTestStopButton => 'Parar teste';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Teste ativo — sobreposição mostra o preço de $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Adicione um posto favorito para testar a sobreposição de aproximação';
+
+  @override
   String approachStationDistance(String meters) {
     return 'a $meters m';
   }

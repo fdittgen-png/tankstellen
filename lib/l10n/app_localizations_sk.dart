@@ -3448,6 +3448,22 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton =>
+      'Otestovať prekrytie pri približovaní';
+
+  @override
+  String get approachTestStopButton => 'Zastaviť test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test aktívny — prekrytie zobrazuje cenu pre $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Pridajte obľúbenú stanicu, aby ste mohli otestovať prekrytie pri približovaní';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m ďaleko';
   }

@@ -3452,6 +3452,21 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testēt tuvošanās pārklājumu';
+
+  @override
+  String get approachTestStopButton => 'Apturēt testu';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Tests aktīvs — pārklājums rāda cenu stacijai $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Pievienojiet iecienītāko staciju, lai testētu tuvošanās pārklājumu';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m attālumā';
   }

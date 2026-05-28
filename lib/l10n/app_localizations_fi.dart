@@ -3432,6 +3432,21 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Testaa lähestymispeitto';
+
+  @override
+  String get approachTestStopButton => 'Pysäytä testi';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Testi aktiivinen — peitto näyttää hinnan asemalle $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Lisää suosikkiasema testataksesi lähestymispeittoa';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m päässä';
   }

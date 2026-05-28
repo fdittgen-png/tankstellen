@@ -3416,6 +3416,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Test approach overlay';
+
+  @override
+  String get approachTestStopButton => 'Stop test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test active — overlay shows the price for $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Add a favorite station to test the approach overlay';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m away';
   }
@@ -8957,6 +8972,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String approachMinPollCaption(int seconds) {
     return '⟦Ƒłóóř óñ ĥóŵ óƒŧéñ ŧĥé óṽéřłáý řéƒřéšĥéš ŧĥé ñéářéšŧ šŧáŧîóñ (ƒášŧéř áŧ šƥééđ, ñéṽéř ŧîǧĥŧéř ŧĥáñ $seconds š) ····································⟧';
   }
+
+  @override
+  String get approachTestSimulateButton => '⟦Ŧéšŧ áƥƥřóáçĥ óṽéřłáý ·········⟧';
+
+  @override
+  String get approachTestStopButton => '⟦Šŧóƥ ŧéšŧ ····⟧';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return '⟦Ŧéšŧ áçŧîṽé — óṽéřłáý šĥóŵš ŧĥé ƥřîçé ƒóř $station ···············⟧';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      '⟦Áđđ á ƒáṽóřîŧé šŧáŧîóñ ŧó ŧéšŧ ŧĥé áƥƥřóáçĥ óṽéřłáý ···················⟧';
 
   @override
   String approachStationDistance(String meters) {

@@ -3430,6 +3430,21 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String get approachTestSimulateButton => 'Test af tilnærmelsesoverlay';
+
+  @override
+  String get approachTestStopButton => 'Stop test';
+
+  @override
+  String approachTestActiveCaption(String station) {
+    return 'Test aktiv — overlay viser prisen for $station';
+  }
+
+  @override
+  String get approachTestUnavailable =>
+      'Tilføj en favoritstation for at teste tilnærmelsesoverlayet';
+
+  @override
   String approachStationDistance(String meters) {
     return '$meters m væk';
   }
