@@ -387,6 +387,11 @@ void main() {
       List<Object> overrides() {
         final test = standardTestOverrides(favoriteIds: []);
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        // #2155 — the wide-layout path mounts AlertsTab immediately, so
+        // stub the otherwise-unmocked getAlerts() call to avoid the
+        // AsyncValue.error blowing the test.
+        when(() => test.mockStorage.getAlerts())
+            .thenReturn(const <Map<String, dynamic>>[]);
         return [
           ...test.overrides,
           favoriteStationsProvider

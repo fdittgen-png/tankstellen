@@ -81,7 +81,13 @@ void main() {
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             locale: Locale('en'),
-            home: FavoritesScreen(),
+            // #2155 — pin to a portrait phone surface so the share
+            // boundary's RepaintBoundary doesn't fight the wide-row
+            // layout (the FavoritesTab pane width drops in half).
+            home: MediaQuery(
+              data: MediaQueryData(size: Size(360, 800)),
+              child: FavoritesScreen(),
+            ),
           ),
         ),
       );

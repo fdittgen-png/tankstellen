@@ -107,38 +107,60 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
       ],
       bodyPadding: EdgeInsets.zero,
       // #1441 — TabSwitcher lives inside the body so the AppBar height
-      // matches the other top-level tabs (Recherche, Carte, Conso,
-      // Paramètres). Keeping the switcher in `bottom:` made the AppBar
-      // visually taller than its siblings.
-      body: Column(
+      // matches the other top-level tabs. #2155 — drop the switcher and
+      // render the two panes side-by-side once the device has the room
+      // (landscape phone OR any width ≥600 dp).
+      body: _buildBody(context, l10n),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, AppLocalizations? l10n) {
+    final media = MediaQuery.of(context);
+    final isLandscape = media.orientation == Orientation.landscape;
+    final isWide = media.size.width >= 600;
+    if (isLandscape || isWide) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TabSwitcher(
-            controller: _tabController,
-            tabs: [
-              TabSwitcherEntry(
-                label: l10n?.favorites ?? 'Favorites',
-                icon: Icons.star_outline,
-              ),
-              TabSwitcherEntry(
-                label: l10n?.priceAlerts ?? 'Price Alerts',
-                icon: Icons.notifications_outlined,
-              ),
-            ],
-          ),
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                RepaintBoundary(
-                  key: _shareBoundaryKey,
-                  child: const FavoritesTab(),
-                ),
-                const AlertsTab(),
-              ],
+            child: RepaintBoundary(
+              key: _shareBoundaryKey,
+              child: const FavoritesTab(),
             ),
           ),
+          const VerticalDivider(width: 1, thickness: 1),
+          const Expanded(child: AlertsTab()),
         ],
-      ),
+      );
+    }
+    return Column(
+      children: [
+        TabSwitcher(
+          controller: _tabController,
+          tabs: [
+            TabSwitcherEntry(
+              label: l10n?.favorites ?? 'Favorites',
+              icon: Icons.star_outline,
+            ),
+            TabSwitcherEntry(
+              label: l10n?.priceAlerts ?? 'Price Alerts',
+              icon: Icons.notifications_outlined,
+            ),
+          ],
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              RepaintBoundary(
+                key: _shareBoundaryKey,
+                child: const FavoritesTab(),
+              ),
+              const AlertsTab(),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
