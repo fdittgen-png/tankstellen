@@ -10,6 +10,7 @@ import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart'
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_speed_stream.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Unit tests for [Obd2SpeedStream] (#1004 phase 2b-3).
 ///
@@ -73,6 +74,7 @@ class _ThrowingTransport implements Obd2Transport {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   const Duration shortPoll = Duration(milliseconds: 5);
   const String mac = 'AA:BB:CC:DD:EE:FF';
 

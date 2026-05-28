@@ -14,8 +14,10 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/obd2_adapter_picker.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   group('Obd2AdapterPickerSheet (#743)', () {
     testWidgets('shows the scanning state on open', (tester) async {
       final svc = _buildService(const [[]]);

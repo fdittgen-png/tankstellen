@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +19,7 @@ import '../../data/obd2/obd2_diagnostic_report.dart';
 import '../../providers/obd2_breadcrumb_provider.dart';
 import 'broken_map_widgets.dart';
 import 'obd2_breadcrumb_row.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Hook for the share-sheet handoff of the OBD2 diagnostic log
 /// (#1920). Production uses `SharePlus.instance.share`; tests
@@ -75,7 +78,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       try {
         await sink(ShareParams(text: report));
       } catch (e, st) {
-        debugPrint('Obd2BreadcrumbOverlay diagnostic log sink: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay diagnostic log sink'}));
       }
     }
     await _alsoSaveToDownloads(
@@ -107,7 +110,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       try {
         await sink(ShareParams(text: payload));
       } catch (e, st) {
-        debugPrint('Obd2BreadcrumbOverlay session XML sink: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay session XML sink'}));
       }
     }
     await _alsoSaveToDownloads(
@@ -143,7 +146,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
         ),
       );
     } on Object catch (e, st) {
-      debugPrint('Obd2BreadcrumbOverlay save-to-downloads failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay save-to-downloads failed'}));
     }
   }
 
@@ -159,7 +162,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     try {
       flag = ref.watch(obd2DebugOverlayProvider);
     } catch (e, st) {
-      debugPrint('Obd2BreadcrumbOverlay flag read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay flag read failed'}));
       flag = false;
     }
     final visible = kDebugMode || flag;
@@ -169,7 +172,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     try {
       crumbs = ref.watch(obd2BreadcrumbsProvider);
     } catch (e, st) {
-      debugPrint('Obd2BreadcrumbOverlay crumbs read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay crumbs read failed'}));
       crumbs = const [];
     }
     final l10n = AppLocalizations.of(context);

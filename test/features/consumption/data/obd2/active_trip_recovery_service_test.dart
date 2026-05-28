@@ -9,6 +9,7 @@ import 'package:tankstellen/features/consumption/data/obd2/active_trip_recovery_
 import 'package:tankstellen/features/consumption/data/obd2/active_trip_repository.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Direct unit tests for [ActiveTripRecoveryService] (#1303).
 ///
@@ -28,6 +29,7 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 ///      after restoreFromSnapshot succeeds, not here),
 ///   7. failures inside loadSnapshot don't crash recovery.
 void main() {
+  silenceErrorLoggerSpool();
   group('ActiveTripRecoveryService (#1303)', () {
     late Directory tmpDir;
     late Box<String> box;

@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Priority tier used as a tiebreaker when two subscribed PIDs have an
 /// identical weight under the weighted round-robin selector.
@@ -212,7 +213,7 @@ class PidScheduler {
           sub.onResult(response);
         } catch (e, st) {
           // Callback errors must not stall the scheduler. Log and move on.
-          debugPrint('PidScheduler: onResult for $command threw: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'PidScheduler: onResult for $command threw'}));
         }
       }
     } catch (e, st) {
@@ -223,7 +224,7 @@ class PidScheduler {
       // the healthy one starved by the FIFO tiebreaker. On the next
       // round the failing PID still gets retried when its weight wins,
       // just no more often than the cadence it was subscribed at.
-      debugPrint('PidScheduler: transport for $command threw: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'PidScheduler: transport for $command threw'}));
       sub.config.lastReadAt = _clock();
     } finally {
       _inFlight = null;

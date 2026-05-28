@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +15,7 @@ import '../../domain/charging_log_readout.dart';
 import '../../domain/charging_log_validators.dart';
 import '../../providers/charging_logs_provider.dart';
 import '../widgets/charging_log_form_fields.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Form to add a new [ChargingLog] entry (#582 phase 2).
 ///
@@ -104,7 +107,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     try {
       activeId = ref.read(activeVehicleProfileProvider)?.id;
     } catch (e, st) {
-      debugPrint('AddChargingLog: active vehicle unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddChargingLog: active vehicle unavailable'}));
     }
     final evVehicles =
         vehicles.where((v) => v.isEv).toList(growable: false);
@@ -162,7 +165,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e, st) {
-      debugPrint('AddChargingLog._save: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddChargingLog._save'}));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -175,7 +178,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     try {
       vehicles = ref.watch(vehicleProfileListProvider);
     } catch (e, st) {
-      debugPrint('AddChargingLog build: vehicle list unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddChargingLog build: vehicle list unavailable'}));
       vehicles = const [];
     }
     _initVehicleIfNeeded(vehicles);

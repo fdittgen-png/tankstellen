@@ -18,6 +18,7 @@ import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
 import '../../providers/trip_history_provider.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Test seam: replace the OS share sheet hand-off with a callback that
 /// captures the outgoing payload (#2030). Lets widget tests assert on
@@ -144,7 +145,7 @@ class TrajetsMapScreen extends ConsumerWidget {
       final ok = l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
       messenger.showSnackBar(SnackBar(content: Text(ok)));
     } catch (e, st) {
-      debugPrint('TrajetsMapScreen save GPX: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TrajetsMapScreen save GPX'}));
       if (messenger == null) return;
       final errorMsg =
           l?.trajetsMapShareError ?? "Couldn't save the GPX file";

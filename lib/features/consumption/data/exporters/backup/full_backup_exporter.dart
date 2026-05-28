@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -15,6 +17,7 @@ import '../../../domain/entities/fill_up.dart';
 import '../../trip_history_repository.dart';
 import 'backup_xml_writer.dart';
 import 'backup_zipper.dart';
+import '../../../../../core/logging/error_logger.dart';
 
 /// Hook for the share-sheet handoff (#1317). Production uses
 /// `SharePlus.instance.share`; tests substitute a fake via
@@ -139,7 +142,7 @@ class FullBackupExporter {
         mimeType: 'application/zip',
       );
     } on Object catch (e, st) {
-      debugPrint('FullBackupExporter: save-to-downloads failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'FullBackupExporter: save-to-downloads failed'}));
     }
 
     // Keep the share-sink shape so existing test fakes (and any

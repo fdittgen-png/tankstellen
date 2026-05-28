@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Transport that throws on a configurable subset of commands and
 /// returns canned responses on the rest. Used to drive the connect-
@@ -50,6 +51,7 @@ class _FlakyTransport implements Obd2Transport {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   // Pin the retry settle to near-zero so the suite runs in
   // milliseconds — we're verifying the retry happens, not the
   // wall-clock spacing.

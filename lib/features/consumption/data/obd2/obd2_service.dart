@@ -18,6 +18,7 @@ import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
 import 'supported_pids_cache.dart';
 import 'supported_pids_resolver.dart';
+import '../../../../core/logging/error_logger.dart';
 
 // Re-export the pure-math estimator + stoichiometric constants so
 // callers that only need the math (e.g. [TripRecordingController]'s
@@ -310,7 +311,7 @@ class Obd2Service implements Obd2RawCommandPort {
           _capability = reconcileCapabilityWithProbe(_capability, probe);
         }
       } catch (e, st) {
-        debugPrint('OBD2 ATI firmware read failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 ATI firmware read failed'}));
       }
 
       await _pids.prime();
@@ -324,7 +325,7 @@ class Obd2Service implements Obd2RawCommandPort {
       );
       return true;
     } catch (e, st) {
-      debugPrint('OBD2 connect failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 connect failed'}));
       // #1920 — record the failure so the diagnostic log shows the
       // connect attempt that never produced a session.
       AutoRecordTraceLog.add(
@@ -411,7 +412,7 @@ class Obd2Service implements Obd2RawCommandPort {
       if (brand == VehicleBrand.unknown) return null;
       return _readOdometerFromCatalogByBrand(brand);
     } catch (e, st) {
-      debugPrint('OBD2 readOdometer failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 readOdometer failed'}));
       return null;
     }
   }
@@ -481,7 +482,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(Elm327Protocol.vehicleSpeedCommand);
       return Elm327Protocol.parseVehicleSpeed(response);
     } catch (e, st) {
-      debugPrint('OBD2 readSpeed failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 readSpeed failed'}));
       return null;
     }
   }
@@ -518,7 +519,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(Elm327Protocol.engineRpmCommand);
       return Elm327Protocol.parseEngineRpm(response);
     } catch (e, st) {
-      debugPrint('OBD2 readRpm failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 readRpm failed'}));
       return null;
     }
   }
@@ -934,7 +935,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(Elm327Protocol.fuelTypeCommand);
       return Elm327Protocol.parseFuelType(response);
     } catch (e, st) {
-      debugPrint('OBD2 readFuelType failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 readFuelType failed'}));
       return null;
     }
   }
@@ -963,7 +964,7 @@ class Obd2Service implements Obd2RawCommandPort {
       if (vin == null || vin.isEmpty) return null;
       return vin;
     } catch (e, st) {
-      debugPrint('OBD2 readVin failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 readVin failed'}));
       return null;
     }
   }
@@ -1098,7 +1099,7 @@ class Obd2Service implements Obd2RawCommandPort {
         // Best-effort: the user has already cancelled, no point
         // crashing on a STMP write that might fail because the
         // channel is mid-disconnect.
-        debugPrint('OBD2 canFrameStream STMP failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 canFrameStream STMP failed'}));
       }
     }
 
@@ -1157,7 +1158,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(command);
       return parser(response);
     } catch (e, st) {
-      debugPrint('OBD2 read $label failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'OBD2 read $label failed'}));
       return null;
     }
   }

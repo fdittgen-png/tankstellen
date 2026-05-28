@@ -18,6 +18,7 @@ import 'package:tankstellen/features/driving/haptic_eco_coach.dart';
 import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -35,6 +36,7 @@ import '../../../../helpers/pump_app.dart';
 ///     0.9 — the snackbar covers the 0.7-0.9 band, the banner covers
 ///     >=0.9.
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late StreamController<CoachEvent> events;

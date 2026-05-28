@@ -15,6 +15,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Widget tests for the OBD2-fuel-level capture wiring on
 /// [AddFillUpScreen] (#1434).
@@ -161,6 +162,7 @@ Future<void> _fillFormAndSave(WidgetTester tester) async {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   group('AddFillUpScreen — OBD2 fuel-level capture (#1434)', () {
     testWidgets(
         'persists the provider value as fuelLevelBeforeL/After when active',

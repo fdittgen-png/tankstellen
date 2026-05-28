@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -8,6 +10,7 @@ import 'package:hive/hive.dart';
 
 import '../../domain/trip_recorder.dart';
 import 'paused_trip_repository.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Snapshot of an in-progress OBD2 recording that is healthy — i.e.
 /// the BT transport is alive and samples are still arriving — but
@@ -262,7 +265,7 @@ class ActiveTripRepository {
     try {
       await _box.put(_singletonKey, jsonEncode(snapshot.toJson()));
     } catch (e, st) {
-      debugPrint('ActiveTripRepository.saveSnapshot: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.saveSnapshot'}));
     }
   }
 
@@ -277,7 +280,7 @@ class ActiveTripRepository {
       final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
       return ActiveTripSnapshot.fromJson(json);
     } catch (e, st) {
-      debugPrint('ActiveTripRepository.loadSnapshot: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.loadSnapshot'}));
       return null;
     }
   }
@@ -288,7 +291,7 @@ class ActiveTripRepository {
     try {
       await _box.delete(_singletonKey);
     } catch (e, st) {
-      debugPrint('ActiveTripRepository.clearSnapshot: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.clearSnapshot'}));
     }
   }
 

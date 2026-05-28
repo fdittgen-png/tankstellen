@@ -29,6 +29,7 @@ import 'trip_drop_detector.dart';
 import 'trip_live_reading.dart';
 import 'trip_sample_buffer.dart';
 import 'virtual_odometer.dart';
+import '../../../../core/logging/error_logger.dart';
 
 // Re-export the DTO + distance-source constants so existing callers
 // (providers, widget tests) that import this file keep working after
@@ -1172,7 +1173,7 @@ class TripRecordingController {
     try {
       await scanner.stop();
     } catch (e, st) {
-      debugPrint('TripRecordingController stop reconnect scanner: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController stop reconnect scanner'}));
     }
   }
 
@@ -1217,7 +1218,7 @@ class TripRecordingController {
           summary: summary,
         ));
       } catch (e, st) {
-        debugPrint('TripRecordingController grace finalise failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController grace finalise failed'}));
       }
     }
     if (repo != null && id != null) {
@@ -1239,7 +1240,7 @@ class TripRecordingController {
         box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
       );
     } catch (e, st) {
-      debugPrint('TripRecordingController paused repo: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController paused repo'}));
       return null;
     }
   }
@@ -1253,7 +1254,7 @@ class TripRecordingController {
         box: Hive.box<String>(TripHistoryRepository.boxName),
       );
     } catch (e, st) {
-      debugPrint('TripRecordingController history repo: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController history repo'}));
       return null;
     }
   }
@@ -1272,7 +1273,7 @@ class TripRecordingController {
       final raw = await _service.sendCommand(Elm327Protocol.vinCommand);
       return Elm327Protocol.parseVin(raw);
     } catch (e, st) {
-      debugPrint('TripRecordingController VIN read failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController VIN read failed'}));
       return null;
     }
   }

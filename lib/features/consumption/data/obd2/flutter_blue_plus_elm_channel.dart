@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'elm_byte_channel.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Standard SPP-over-BLE UUIDs exposed by Vgate vLinker and most
 /// ELM327 BLE clones (Nordic UART Service variant used by the
@@ -116,7 +117,7 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
     try {
       await _device.disconnect();
     } catch (e, st) {
-      debugPrint('FlutterBluePlusElmChannel: disconnect failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'FlutterBluePlusElmChannel: disconnect failed'}));
     }
     _writeChar = null;
     _notifyChar = null;

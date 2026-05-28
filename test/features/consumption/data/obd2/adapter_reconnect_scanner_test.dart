@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_reconnect_scanner.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Small real-wall-clock delays keep the suite under a few seconds
 /// while still exercising the exponential-backoff math. The scanner
@@ -27,6 +28,7 @@ Future<void> _waitFor(
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   group('AdapterReconnectScanner (#797 phase 3)', () {
     test('starts with initialBackoff and doubles on a missed probe',
         () async {

@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../domain/entities/maintenance_suggestion.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Per-signal snooze persistence for the predictive-maintenance card
 /// (#1124).
@@ -44,8 +47,7 @@ class MaintenanceSnoozeRepository {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);
     } catch (e, st) {
-      debugPrint(
-          'MaintenanceSnoozeRepository: settings box unavailable: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'MaintenanceSnoozeRepository: settings box unavailable'}));
       return null;
     }
   }
@@ -98,8 +100,7 @@ class MaintenanceSnoozeRepository {
     try {
       return DateTime.tryParse(raw.toString());
     } catch (e, st) {
-      debugPrint(
-          'MaintenanceSnoozeRepository: corrupt timestamp for ${signal.name}: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'MaintenanceSnoozeRepository: corrupt timestamp for ${signal.name}'}));
       return null;
     }
   }

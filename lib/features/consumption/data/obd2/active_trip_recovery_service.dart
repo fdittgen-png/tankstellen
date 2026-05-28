@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../trip_history_repository.dart';
 import 'active_trip_repository.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Outcome of [ActiveTripRecoveryService.recover].
 ///
@@ -105,7 +108,7 @@ class ActiveTripRecoveryService {
     try {
       snapshot = _activeRepo.loadSnapshot();
     } catch (e, st) {
-      debugPrint('ActiveTripRecoveryService loadSnapshot failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService loadSnapshot failed'}));
       return ActiveTripRecoveryOutcome.failed;
     }
     if (snapshot == null) {
@@ -123,7 +126,7 @@ class ActiveTripRecoveryService {
       try {
         await _activeRepo.clearSnapshot();
       } catch (e, st) {
-        debugPrint('ActiveTripRecoveryService clear stale failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService clear stale failed'}));
         return ActiveTripRecoveryOutcome.failed;
       }
       // Stale auto-record snapshots still bump the unseen badge —
@@ -134,8 +137,7 @@ class ActiveTripRecoveryService {
         try {
           await cb();
         } catch (e, st) {
-          debugPrint(
-              'ActiveTripRecoveryService stale badge bump failed: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService stale badge bump failed'}));
         }
       }
       debugPrint(

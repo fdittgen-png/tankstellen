@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,6 +27,7 @@ import 'monthly_insights_card.dart';
 import 'obd2_adapter_picker.dart';
 import 'trajet_row.dart';
 import 'trip_start_progress.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Trajets tab body on the Consumption screen (#889).
 ///
@@ -129,7 +132,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
             context, e.localizedMessage(AppLocalizations.of(context)));
       }
     } catch (e, st) {
-      debugPrint('TrajetsTab._onStartRecording: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TrajetsTab._onStartRecording'}));
     } finally {
       if (mounted) setState(() => _startStage = null);
     }

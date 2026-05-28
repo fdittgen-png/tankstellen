@@ -14,8 +14,10 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   group('FullBackupExporter (#1317)', () {
     late Directory tempDir;
     late List<ShareParams> captured;

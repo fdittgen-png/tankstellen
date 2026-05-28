@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/receipt_override_registry.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// A minimal [AssetBundle] that serves one asset from memory. Used to
 /// exercise [ReceiptOverrideRegistry.load] without depending on
@@ -35,6 +36,7 @@ class _InMemoryBundle extends CachingAssetBundle {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   group('ReceiptOverrideRegistry', () {
     test('fromJsonString — valid map populates entries', () {
       const json = '''

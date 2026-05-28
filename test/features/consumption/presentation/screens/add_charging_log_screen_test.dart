@@ -9,6 +9,7 @@ import 'package:tankstellen/features/consumption/providers/charging_logs_provide
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -46,6 +47,7 @@ class _PreloadedChargingLogs extends ChargingLogs {
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('AddChargingLogScreen (#582 phase 2)', () {

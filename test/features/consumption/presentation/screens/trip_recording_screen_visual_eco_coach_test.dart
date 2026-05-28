@@ -16,6 +16,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
 import 'package:tankstellen/features/driving/haptic_eco_coach.dart';
 import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider.dart';
+import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -128,6 +129,7 @@ Future<void> _pumpRecordingScreen(
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('TripRecordingScreen visual eco-coach SnackBar (#1273)', () {

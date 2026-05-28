@@ -420,7 +420,7 @@ class AutoTripCoordinator {
       try {
         await service.disconnect();
       } catch (e, st) {
-        debugPrint('AutoTripCoordinator: drop-orphan disconnect failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: drop-orphan disconnect failed'}));
       }
       return;
     }
@@ -622,7 +622,7 @@ class AutoTripCoordinator {
     try {
       await held.disconnect();
     } catch (e, st) {
-      debugPrint('AutoTripCoordinator: session close failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: session close failed'}));
     }
   }
 }
