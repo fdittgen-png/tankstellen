@@ -7,6 +7,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../fakes/fake_hive_storage.dart';
 
@@ -18,6 +19,7 @@ import '../../../fakes/fake_hive_storage.dart';
 /// 4. User taps star → calls favoritesProvider.notifier.toggle(id, rawJson: …)
 /// 5. Favorites tab reads evFavoriteStationsProvider → station must appear
 void main() {
+  silenceErrorLoggerSpool();
   late FakeHiveStorage fakeStorage;
 
   // Canonical unified type after #560 — same entity everywhere.

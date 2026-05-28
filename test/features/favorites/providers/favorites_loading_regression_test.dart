@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
 import '../../../fixtures/stations.dart';
@@ -27,6 +28,7 @@ import '../../../fixtures/stations.dart';
 ///    *without any explicit invalidate* because the provider should
 ///    have rebuilt automatically when `favoritesProvider` changed.
 void main() {
+  silenceErrorLoggerSpool();
   group('FavoriteStations rebuilds when Favorites changes (regression #474)',
       () {
     late FakeStorageRepository storage;
