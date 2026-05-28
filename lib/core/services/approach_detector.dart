@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'package:geolocator/geolocator.dart';
 
 import '../../features/search/domain/entities/station.dart';
+import '../utils/geo_utils.dart' as geo;
 
 /// State emitted by [ApproachDetector] (#2085 / ADR 0011).
 ///
@@ -182,27 +183,15 @@ class ApproachDetector {
     return Duration(milliseconds: (clamped * 1000).round());
   }
 
-  /// Great-circle distance in metres — same haversine as
-  /// `GpsDrivingFeatures` to keep all geo math in one shape.
+  /// Great-circle distance in metres. Delegates to the shared
+  /// [geo.distanceMeters] so the haversine lives in one place (#2169).
   static double distanceMeters(
     double lat1,
     double lng1,
     double lat2,
     double lng2,
-  ) {
-    const earthR = 6371000.0;
-    final dLat = _toRad(lat2 - lat1);
-    final dLng = _toRad(lng2 - lng1);
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(_toRad(lat1)) *
-            math.cos(_toRad(lat2)) *
-            math.sin(dLng / 2) *
-            math.sin(dLng / 2);
-    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return earthR * c;
-  }
-
-  static double _toRad(double deg) => deg * math.pi / 180.0;
+  ) =>
+      geo.distanceMeters(lat1, lng1, lat2, lng2);
 
   void _start() {
     _gpsSub = _gps.listen(_onPosition);

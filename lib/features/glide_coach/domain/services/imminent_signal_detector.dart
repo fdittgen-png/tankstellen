@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/utils/geo_utils.dart' as geo;
 import '../../data/traffic_signal_repository.dart';
 import '../entities/traffic_signal.dart';
 
@@ -28,11 +29,6 @@ const double _kDefaultHorizonMeters = 200.0;
 /// flanks; the forward-cone filter rejects anything spurious that
 /// sneaks in.
 const double _kBboxLateralPaddingMeters = 50.0;
-
-/// Mean Earth radius in metres (WGS-84 sphere approximation). Good to
-/// ~0.5 % at urban distances — well below the resolution that matters
-/// for fuel-coast decisions.
-const double _kEarthRadiusMeters = 6371000.0;
 
 /// Input record for [ImminentSignalDetector] — the minimal GPS shape
 /// the detector needs. Adapter providers (phase 3) will marshal a
@@ -181,22 +177,15 @@ class ImminentSignalDetector {
   }
 
   /// Great-circle distance in metres via the haversine formula.
+  /// Delegates to the shared [geo.distanceMeters] (#2169).
   @visibleForTesting
-  static double distanceMeters(LatLng from, LatLng to) {
-    final lat1 = _degToRad(from.latitude);
-    final lat2 = _degToRad(to.latitude);
-    final deltaLat = _degToRad(to.latitude - from.latitude);
-    final deltaLng = _degToRad(to.longitude - from.longitude);
-
-    final a =
-        math.sin(deltaLat / 2) * math.sin(deltaLat / 2) +
-        math.cos(lat1) *
-            math.cos(lat2) *
-            math.sin(deltaLng / 2) *
-            math.sin(deltaLng / 2);
-    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return _kEarthRadiusMeters * c;
-  }
+  static double distanceMeters(LatLng from, LatLng to) =>
+      geo.distanceMeters(
+        from.latitude,
+        from.longitude,
+        to.latitude,
+        to.longitude,
+      );
 
   /// Smallest absolute arc between two bearings in degrees [0, 180].
   /// Wraps correctly at 360°: `bearingDeltaDegrees(355, 5)` is 10, not

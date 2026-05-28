@@ -65,6 +65,33 @@ void main() {
     });
   });
 
+  group('distanceMeters (#2169 — shared metre haversine)', () {
+    test('Berlin to Paris is approximately 878 km', () {
+      final m = distanceMeters(52.5200, 13.4050, 48.8566, 2.3522);
+      expect(m / 1000, closeTo(878, 5));
+    });
+
+    test('agrees with distanceKm * 1000 for a normal pair', () {
+      final m = distanceMeters(52.5200, 13.4050, 48.1351, 11.5820);
+      final km = distanceKm(52.5200, 13.4050, 48.1351, 11.5820);
+      expect(m, closeTo(km * 1000, 1e-6));
+    });
+
+    test('does NOT short-circuit a (0,0) endpoint (unlike distanceKm)', () {
+      // The metre callers (approach/GPS) need a real distance even at
+      // the equator/prime meridian. ~0.009° lng at the equator ≈ 1 km.
+      expect(distanceMeters(0, 0, 0, 0.009), closeTo(1000, 5));
+      // distanceKm would have returned its null-island 0 here.
+      expect(distanceKm(0, 0, 0, 0.009), 0.0);
+    });
+
+    test('symmetry: A-B equals B-A', () {
+      final ab = distanceMeters(52.5200, 13.4050, 48.1351, 11.5820);
+      final ba = distanceMeters(48.1351, 11.5820, 52.5200, 13.4050);
+      expect(ab, closeTo(ba, 1e-6));
+    });
+  });
+
   group('distanceAlongPolyline', () {
     // Simple straight-line polyline: Paris (48.0, 2.0) -> (48.1, 2.1) -> (48.2, 2.2)
     final polyline = [
