@@ -575,12 +575,16 @@ class Countries {
       all.where((c) => c.verified).toList(growable: false);
 
   /// Find country by ISO code.
-  static CountryConfig? byCode(String code) {
-    for (final c in all) {
-      if (c.code == code) return c;
-    }
-    return null;
-  }
+  /// Code → config lookup, built once from [all]. #2184 — byCode is on a
+  /// per-station hot path (currency/locale resolution for favorites and
+  /// cross-border rows), so an O(1) map beats the old linear scan.
+  /// Case-sensitive on the canonical uppercase ISO code, exactly like the
+  /// previous `c.code == code` scan.
+  static final Map<String, CountryConfig> _byCode = {
+    for (final c in all) c.code: c,
+  };
+
+  static CountryConfig? byCode(String code) => _byCode[code];
 
   /// Detect country from system locale.
   static CountryConfig fromLocale(String localeStr) {
