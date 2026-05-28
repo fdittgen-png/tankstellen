@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/utils/frame_callbacks.dart';
+import '../core/widgets/snackbar_helper.dart';
 import '../features/feature_management/application/feature_flags_provider.dart';
 import '../features/feature_management/domain/conso_mode.dart';
 import '../features/feature_management/domain/consumption_tab_visibility.dart';
@@ -179,13 +180,14 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       await settings.putSetting(_swipeHintStorageKey, true);
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          l10n?.swipeBetweenTabsHint ??
-              'Tip: swipe left or right to switch between tabs.',
-        ),
+      // #2173 — route through SnackBarHelper so the liveRegion announce
+      // (#1692) isn't bypassed; plain info, no visual change.
+      SnackBarHelper.show(
+        context,
+        l10n?.swipeBetweenTabsHint ??
+            'Tip: swipe left or right to switch between tabs.',
         duration: const Duration(seconds: 5),
-      ));
+      );
     } catch (e, st) {
       debugPrint('ShellScreen: swipe hint skipped: $e\n$st');
     }
@@ -250,9 +252,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
             _currentIndex != kTrajetsBranchIndex) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(tabHiddenNotice)),
-        );
+        SnackBarHelper.show(context, tabHiddenNotice);
         _goToPage(0);
       });
     } else if (showConsumption &&

@@ -471,15 +471,15 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       final messenger = ScaffoldMessenger.maybeOf(context);
       if (messenger != null) {
         messenger.hideCurrentSnackBar();
+        // #2173 — plain info through SnackBarHelper (adds liveRegion
+        // announce; Key + duration preserved, no visual change).
         messenger.showSnackBar(
-          SnackBar(
+          SnackBarHelper.infoSnackBar(
+            l?.tripRecordingResumeHintMessage ??
+                'Recording continues in the background. Tap the red '
+                    'banner at the top of any screen to return.',
             key: const Key('tripRecordingResumeHintSnackBar'),
             duration: const Duration(seconds: 5),
-            content: Text(
-              l?.tripRecordingResumeHintMessage ??
-                  'Recording continues in the background. Tap the red '
-                      'banner at the top of any screen to return.',
-            ),
           ),
         );
       }
@@ -525,15 +525,14 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
     final l = AppLocalizations.of(context);
+    // #2173 — plain info through SnackBarHelper (Key + duration kept).
     messenger.showSnackBar(
-      SnackBar(
+      SnackBarHelper.infoSnackBar(
+        l?.brokenMapSnackbarUnreliable ??
+            'MAP sensor reads incorrectly — fuel readings may be '
+                '50–80% too low. Try a different adapter.',
         key: const Key('brokenMapWarningSnackBar'),
         duration: const Duration(seconds: 8),
-        content: Text(
-          l?.brokenMapSnackbarUnreliable ??
-              'MAP sensor reads incorrectly — fuel readings may be '
-                  '50–80% too low. Try a different adapter.',
-        ),
       ),
     );
   }
