@@ -265,6 +265,46 @@ void main() {
       expect(mainSource, isNot(contains('SENTRY_DSN')));
     });
   });
+
+  group('Widget cold-launch URI dispatch (#2159)', () {
+    test(
+        '_stashWidgetLaunchUri intercepts refresh URIs before stashing',
+        () {
+      // #2159 — the refresh-button URI `tankstellenwidget://refresh`
+      // is NOT a route. If we let it flow into pendingWidgetUriProvider
+      // the router redirect consumes it (clears the stash) and
+      // widgetUriToPath returns null, so the user lands on the default
+      // landing screen and the widget never refreshes. The fix is to
+      // discriminate refresh URIs and call the refresh notifier
+      // directly, BEFORE the pending-URI stash.
+      final body = _extractMethodBody(
+          initSource, 'static Future<void> _stashWidgetLaunchUri');
+      expect(body, isNotNull,
+          reason: '_stashWidgetLaunchUri must exist');
+
+      final refreshCheck = body!.indexOf('isWidgetRefreshUri(uri)');
+      final refreshDispatch =
+          body.indexOf('nearestWidgetRefreshProvider.notifier');
+      final stash = body.indexOf('pendingWidgetUriProvider.notifier');
+
+      expect(refreshCheck, isNonNegative,
+          reason: 'must check isWidgetRefreshUri before stashing');
+      expect(refreshDispatch, isNonNegative,
+          reason: 'must dispatch refresh URIs to the refresh notifier');
+      expect(stash, isNonNegative,
+          reason: 'station URIs must still flow through the pending stash');
+
+      expect(refreshCheck, lessThan(stash),
+          reason:
+              'the refresh discriminator must run BEFORE the stash, '
+              'otherwise refresh URIs are consumed by the router redirect '
+              'and silently dropped');
+      expect(refreshDispatch, lessThan(stash),
+          reason:
+              'the refresh dispatch must run BEFORE the stash for the '
+              'same reason');
+    });
+  });
 }
 
 /// Extracts the body of the first method that starts with [signature].
