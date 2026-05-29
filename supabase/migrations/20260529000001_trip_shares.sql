@@ -149,6 +149,9 @@ $$;
 -- the default PUBLIC execute first so anonymous sessions can't probe.
 REVOKE ALL ON FUNCTION public.resolve_share_recipient(TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.resolve_share_recipient(TEXT) TO authenticated;
+-- Supabase grants `anon` separately from PUBLIC, so REVOKE FROM PUBLIC is not
+-- enough — explicitly deny anonymous callers (no unauthenticated email oracle).
+REVOKE EXECUTE ON FUNCTION public.resolve_share_recipient(TEXT) FROM anon;
 
 -- ───────────────────────────────────────────────────────────────────
 -- 5. Token claim (SECURITY DEFINER RPC)
@@ -185,3 +188,4 @@ $$;
 
 REVOKE ALL ON FUNCTION public.claim_trip_share(TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.claim_trip_share(TEXT) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.claim_trip_share(TEXT) FROM anon;
