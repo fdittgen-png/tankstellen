@@ -6,14 +6,15 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/cache/cache_manager.dart';
 import '../../../core/error/exceptions.dart';
-import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/dio_factory.dart';
-import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
+import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
+import 'spain_provinces.dart';
 
 /// Spanish fuel prices from Geoportal Gasolineras (MITECO).
 /// Free, no API key, no registration.
@@ -21,28 +22,39 @@ import '../../../core/logging/error_logger.dart';
 /// The API has no coordinate/radius search — only by province/municipality.
 /// Strategy: fetch all stations, calculate distances locally, filter by radius.
 /// The full dataset (~12,000 stations) is cached aggressively.
-class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implements StationService {
+class MitecoStationService with StationServiceHelpers implements StationService {
   static const String defaultBaseUrl =
       'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes'
       '/PreciosCarburantes';
 
   final Dio _dio;
   final String _baseUrl;
+  final CacheStrategy? _cache;
 
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
   /// #2193 — [baseUrl] injectable too, harmonising the override surface
   /// with Portugal / Slovenia / South Korea; defaults to [defaultBaseUrl].
-  MitecoStationService({Dio? dio, String? baseUrl})
+  /// #2264 — [cache] enables per-province disk persistence (read-through);
+  /// omit it for the pure in-memory behaviour the parser tests rely on.
+  MitecoStationService({Dio? dio, String? baseUrl, CacheStrategy? cache})
       : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 20),
               receiveTimeout: const Duration(seconds: 30),
             ),
-        _baseUrl = baseUrl ?? defaultBaseUrl;
+        _baseUrl = baseUrl ?? defaultBaseUrl,
+        _cache = cache;
 
-  // Cache the province list and full station data to avoid repeated large downloads
-  List<_Province>? _cachedProvinces;
-  List<Map<String, dynamic>>? _cachedStations;
+  // #2264 — soft/hard dataset TTLs mirror the ES FuelServicePolicy (soft 6 h,
+  // hard 24 h). The legacy single-list 10-minute cache is replaced by a
+  // per-province cache so province A's stations are never served for B.
+  static const Duration _softTtl = Duration(hours: 6);
+  static const Duration _hardTtl = Duration(hours: 24);
+
+  /// Per-province in-memory cache, keyed by `IDProvincia`. The previous single
+  /// unkeyed `_cachedStations` list meant the first province searched was
+  /// served for every later search regardless of location (#2264).
+  final Map<String, _ProvinceCache> _byProvince = {};
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -50,17 +62,24 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
     CancelToken? cancelToken,
   }) async {
     try {
-      // Find nearest province for the search coordinates
-      final provinceId = await _findNearestProvince(params.lat, params.lng, cancelToken: cancelToken);
+      // #2264 — fetch every province overlapping the search radius (a point
+      // near a border touches several) and merge, so a station physically
+      // nearby but administratively in the neighbour is not dropped.
+      final provinceIds =
+          spainProvincesNear(params.lat, params.lng, params.radiusKm);
 
-      // Fetch stations for that province
-      final rawStations = await _fetchStationsByProvince(provinceId, cancelToken: cancelToken);
-
-      // Parse all stations with distance
       final allStations = <Station>[];
-      for (final r in rawStations) {
-        final station = _parseStation(r, params.lat, params.lng);
-        if (station != null) allStations.add(station);
+      final seenIds = <String>{};
+      for (final provinceId in provinceIds) {
+        final rawStations =
+            await _stationsForProvince(provinceId, cancelToken: cancelToken);
+        for (final r in rawStations) {
+          final station = _parseStation(r, params.lat, params.lng);
+          // Dedupe across province borders by station id.
+          if (station != null && seenIds.add(station.id)) {
+            allStations.add(station);
+          }
+        }
       }
 
       // Filter by radius; if nothing found, return nearest 20
@@ -75,121 +94,86 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
     }
   }
 
-  /// Find the nearest Spanish province to the given coordinates.
-  Future<String> _findNearestProvince(double lat, double lng, {CancelToken? cancelToken}) async {
-    if (_cachedProvinces == null) {
-      final response = await _dio.get('$_baseUrl/Listados/Provincias/', cancelToken: cancelToken);
-      if (response.data is! List) {
-        throw const ApiException(message: 'Invalid province list response');
-      }
-      _cachedProvinces = (response.data as List).map((p) {
-        return _Province(
-          id: p['IDPovincia']?.toString() ?? p['IDProvincia']?.toString() ?? '',
-          name: p['Provincia']?.toString() ?? '',
-        );
-      }).toList();
+  /// Returns the raw station rows for one province, served from (in order):
+  /// the fresh in-memory copy, the persisted Hive copy (read-through, when a
+  /// cache is wired), then the network — and persisted on a fresh fetch.
+  Future<List<Map<String, dynamic>>> _stationsForProvince(
+    String provinceId, {
+    CancelToken? cancelToken,
+  }) async {
+    final mem = _byProvince[provinceId];
+    if (mem != null &&
+        DateTime.now().difference(mem.fetchedAt) < _softTtl) {
+      return mem.rows;
     }
 
-    // Province approximate centers (major city coordinates)
-    // Use these to find which province the user is closest to
-    const provinceCenters = {
-      '01': (42.8467, -2.6727),   // Álava
-      '02': (38.9943, -1.8585),   // Albacete
-      '03': (38.3452, -0.4810),   // Alicante
-      '04': (36.8340, -2.4637),   // Almería
-      '05': (40.6565, -4.6818),   // Ávila
-      '06': (38.8794, -6.9707),   // Badajoz
-      '07': (39.5696, 2.6502),    // Baleares
-      '08': (41.3851, 2.1734),    // Barcelona
-      '09': (42.3440, -3.6970),   // Burgos
-      '10': (39.4753, -6.3724),   // Cáceres
-      '11': (36.5271, -6.2886),   // Cádiz
-      '12': (39.9864, -0.0513),   // Castellón
-      '13': (38.9860, -3.9273),   // Ciudad Real
-      '14': (37.8882, -4.7794),   // Córdoba
-      '15': (43.3623, -8.4115),   // A Coruña
-      '16': (40.0704, -2.1374),   // Cuenca
-      '17': (41.9794, 2.8214),    // Girona
-      '18': (37.1773, -3.5986),   // Granada
-      '19': (40.6337, -3.1660),   // Guadalajara
-      '20': (43.3183, -1.9812),   // Guipúzcoa
-      '21': (37.2614, -6.9447),   // Huelva
-      '22': (42.1318, -0.4078),   // Huesca
-      '23': (37.7796, -3.7849),   // Jaén
-      '24': (42.5987, -5.5671),   // León
-      '25': (41.6176, 0.6200),    // Lleida
-      '26': (42.4650, -2.4500),   // La Rioja
-      '27': (43.0099, -7.5562),   // Lugo
-      '28': (40.4168, -3.7038),   // Madrid
-      '29': (36.7213, -4.4214),   // Málaga
-      '30': (37.9922, -1.1307),   // Murcia
-      '31': (42.8125, -1.6458),   // Navarra
-      '32': (42.3358, -7.8639),   // Ourense
-      '33': (43.3619, -5.8494),   // Asturias
-      '34': (42.0097, -4.5288),   // Palencia
-      '35': (28.1235, -15.4363),  // Las Palmas
-      '36': (42.4310, -8.6446),   // Pontevedra
-      '37': (40.9701, -5.6635),   // Salamanca
-      '38': (28.4636, -16.2518),  // S/C de Tenerife
-      '39': (43.4623, -3.8100),   // Cantabria
-      '40': (40.9429, -4.1088),   // Segovia
-      '41': (37.3891, -5.9845),   // Sevilla
-      '42': (41.7636, -2.4649),   // Soria
-      '43': (41.1189, 1.2445),    // Tarragona
-      '44': (40.3456, -1.1065),   // Teruel
-      '45': (39.8628, -4.0273),   // Toledo
-      '46': (39.4699, -0.3763),   // Valencia
-      '47': (41.6523, -4.7245),   // Valladolid
-      '48': (43.2630, -2.9350),   // Vizcaya
-      '49': (41.5033, -5.7446),   // Zamora
-      '50': (41.6488, -0.8891),   // Zaragoza
-      '51': (35.8894, -5.3213),   // Ceuta
-      '52': (35.2923, -2.9381),   // Melilla
-    };
-
-    String bestId = '28'; // Default: Madrid
-    double bestDist = double.infinity;
-
-    for (final entry in provinceCenters.entries) {
-      final d = distanceKm(lat, lng, entry.value.$1, entry.value.$2);
-      if (d < bestDist) {
-        bestDist = d;
-        bestId = entry.key;
+    final persistent = _persistentFor(provinceId);
+    if (persistent != null) {
+      final disk = persistent.read();
+      if (disk != null && disk.age <= _hardTtl) {
+        _byProvince[provinceId] =
+            _ProvinceCache(disk.value, DateTime.now().subtract(disk.age));
+        if (disk.age <= _softTtl) return disk.value;
       }
     }
 
-    return bestId;
+    try {
+      final rows = await _fetchProvince(provinceId, cancelToken: cancelToken);
+      _byProvince[provinceId] = _ProvinceCache(rows, DateTime.now());
+      await persistent?.write(rows, hardTtl: _hardTtl);
+      return rows;
+    } on Object {
+      // Network failed — serve any persisted/in-memory copy rather than throw.
+      final disk = persistent?.read();
+      if (disk != null) {
+        _byProvince[provinceId] =
+            _ProvinceCache(disk.value, DateTime.now().subtract(disk.age));
+        return disk.value;
+      }
+      if (mem != null) return mem.rows;
+      rethrow;
+    }
   }
 
-  Future<List<Map<String, dynamic>>> _fetchStationsByProvince(
-    String provinceId, {CancelToken? cancelToken}
+  PersistentDataset<List<Map<String, dynamic>>>? _persistentFor(
+    String provinceId,
   ) {
-    // Use cache if fresh (< 10 minutes)
-    return loadDataset<List<Map<String, dynamic>>>(
-      cached: _cachedStations,
-      ttl: const Duration(minutes: 10),
-      fetch: () async {
-        final response = await _dio.get(
-          '$_baseUrl/EstacionesTerrestres/FiltroProvincia/$provinceId',
-          cancelToken: cancelToken,
-        );
-
-        final data = response.data;
-        if (data is! Map<String, dynamic>) {
-          throw const ApiException(message: 'Invalid MITECO response');
-        }
-
-        if (data['ResultadoConsulta'] != 'OK') {
-          throw ApiException(
-            message: data['ResultadoConsulta']?.toString() ?? 'API error',
-          );
-        }
-
-        final list = data['ListaEESSPrecio'] as List<dynamic>? ?? [];
-        return list.cast<Map<String, dynamic>>();
-      },
-      store: (value) => _cachedStations = value,
+    final cache = _cache;
+    if (cache == null) return null;
+    return PersistentDataset<List<Map<String, dynamic>>>(
+      cache: cache,
+      countryCode: 'ES',
+      datasetName: 'province-$provinceId',
+      source: ServiceSource.mitecoApi,
+      serialize: (rows) => {'rows': rows},
+      deserialize: (json) => (json['rows'] as List<dynamic>?)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
     );
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchProvince(
+    String provinceId, {
+    CancelToken? cancelToken,
+  }) async {
+    final response = await _dio.get(
+      '$_baseUrl/EstacionesTerrestres/FiltroProvincia/$provinceId',
+      cancelToken: cancelToken,
+    );
+
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException(message: 'Invalid MITECO response');
+    }
+
+    if (data['ResultadoConsulta'] != 'OK') {
+      throw ApiException(
+        message: data['ResultadoConsulta']?.toString() ?? 'API error',
+      );
+    }
+
+    final list = data['ListaEESSPrecio'] as List<dynamic>? ?? [];
+    return list.cast<Map<String, dynamic>>();
   }
 
   Station? _parseStation(
@@ -265,8 +249,11 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
   }
 }
 
-class _Province {
-  final String id;
-  final String name;
-  const _Province({required this.id, required this.name});
+/// One province's cached raw rows + when they were fetched (#2264). Keyed by
+/// `IDProvincia` in [MitecoStationService._byProvince] so province A's
+/// stations are never served for a search in province B.
+class _ProvinceCache {
+  final List<Map<String, dynamic>> rows;
+  final DateTime fetchedAt;
+  const _ProvinceCache(this.rows, this.fetchedAt);
 }
