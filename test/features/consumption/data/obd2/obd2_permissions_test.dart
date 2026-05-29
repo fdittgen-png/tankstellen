@@ -51,6 +51,34 @@ void main() {
       expect(await fake.request(), Obd2PermissionState.granted);
     });
   });
+
+  group('requestNotifications() contract (#2282 concern 2)', () {
+    test('reports the implementation grant decision', () async {
+      final granting = _FakePermissions(
+        Obd2PermissionState.granted,
+        notificationsGranted: true,
+      );
+      final denying = _FakePermissions(
+        Obd2PermissionState.granted,
+        notificationsGranted: false,
+      );
+      expect(await granting.requestNotifications(), isTrue);
+      expect(await denying.requestNotifications(), isFalse);
+    });
+
+    test('is callable independently of the Bluetooth permission state',
+        () async {
+      // POST_NOTIFICATIONS is a separate runtime grant from the BLE
+      // scan/connect permissions — a denied Bluetooth state must not
+      // prevent the notification probe from being asked + answered.
+      final fake = _FakePermissions(
+        Obd2PermissionState.denied,
+        notificationsGranted: true,
+      );
+      expect(await fake.requestNotifications(), isTrue);
+      expect(fake.notificationRequestCalls, 1);
+    });
+  });
 }
 
 /// Hand-rolled fake that stand-ins for the real plugin-backed
@@ -60,15 +88,25 @@ void main() {
 class _FakePermissions implements Obd2Permissions {
   final Obd2PermissionState _current;
   final Obd2PermissionState? _onRequest;
+  final bool _notificationsGranted;
+  int notificationRequestCalls = 0;
 
   _FakePermissions(
     this._current, {
     Obd2PermissionState? onRequest,
-  }) : _onRequest = onRequest;
+    bool notificationsGranted = true,
+  })  : _onRequest = onRequest,
+        _notificationsGranted = notificationsGranted;
 
   @override
   Future<Obd2PermissionState> current() async => _current;
 
   @override
   Future<Obd2PermissionState> request() async => _onRequest ?? _current;
+
+  @override
+  Future<bool> requestNotifications() async {
+    notificationRequestCalls++;
+    return _notificationsGranted;
+  }
 }

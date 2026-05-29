@@ -283,6 +283,9 @@ class _AlwaysGrantedPermissions implements Obd2Permissions {
 
   @override
   Future<Obd2PermissionState> request() async => Obd2PermissionState.granted;
+
+  @override
+  Future<bool> requestNotifications() async => true;
 }
 
 /// BluetoothFacade stub. Same rationale as [_AlwaysGrantedPermissions]

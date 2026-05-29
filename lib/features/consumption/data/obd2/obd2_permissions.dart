@@ -30,6 +30,21 @@ abstract class Obd2Permissions {
   /// the UI to decide whether to render the "grant permission" CTA or
   /// jump straight into scanning.
   Future<Obd2PermissionState> current();
+
+  /// Request the runtime POST_NOTIFICATIONS permission (#2282 concern 2).
+  ///
+  /// Android 13+ (API 33) gates the auto-record foreground-service
+  /// notification behind a runtime grant; without it the persistent
+  /// "Trip auto-record" notification is silently dropped and the user
+  /// has no visible signal the service is armed. Auto-record calls this
+  /// BEFORE arming so the prompt appears at a moment the user
+  /// understands ("I just turned on hands-free recording").
+  ///
+  /// Returns `true` when notifications may be posted (granted, or the
+  /// platform has no such gate — iOS, Android ≤ 12), `false` when the
+  /// user denied. A `false` is non-fatal: the caller proceeds to arm
+  /// regardless, the service simply runs without a visible notification.
+  Future<bool> requestNotifications();
 }
 
 /// Production implementation backed by `permission_handler`.
@@ -79,6 +94,24 @@ class PluginObd2Permissions implements Obd2Permissions {
       statuses[p] = await p.status;
     }
     return _aggregate(statuses);
+  }
+
+  @override
+  Future<bool> requestNotifications() async {
+    // POST_NOTIFICATIONS is an Android 13+ (API 33) runtime gate only.
+    // iOS surfaces notification consent through its own
+    // `LocalNotificationService` flow and Android ≤ 12 grants it at
+    // install time, so there is nothing to prompt for there — report
+    // "may post" so the caller doesn't treat those platforms as denied.
+    if (!Platform.isAndroid) return true;
+    final sdkInt = await _androidSdkInt();
+    if (sdkInt < 33) return true;
+    final status = await Permission.notification.request();
+    // `isLimited` never applies to notifications, but treating it as
+    // "may post" keeps the mapping defensive against future plugin
+    // states. Anything else (denied / permanentlyDenied / restricted)
+    // means the channel will be silenced — non-fatal for the caller.
+    return status.isGranted || status.isLimited;
   }
 
   /// Map the single iOS [PermissionStatus] (Bluetooth is a unified perm

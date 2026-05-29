@@ -321,6 +321,8 @@ class _FakePermissions implements Obd2Permissions {
   Future<Obd2PermissionState> current() async => state;
   @override
   Future<Obd2PermissionState> request() async => state;
+  @override
+  Future<bool> requestNotifications() async => true;
 }
 
 class _StreamingFacade implements BluetoothFacade {
