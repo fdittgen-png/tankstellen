@@ -46,12 +46,21 @@ void main() {
         expect(tabs, hasLength(2),
             reason: 'FavoritesScreen has exactly two sub-tabs');
 
-        // Each Tab must have an Icon child (the symptom the issue
-        // describes is that historically these were null).
-        for (final tab in tabs) {
-          expect(tab.icon, isNotNull,
-              reason: 'Every Favoris sub-tab must carry an icon to match '
-                  'the Conso style — #1163.');
+        // Each Tab must render an Icon child (the symptom the issue
+        // describes is that historically these were absent). #2237 made
+        // the tab layout compact (icon beside label inside `Tab.child`
+        // rather than the stacked `Tab.icon`), so we assert the rendered
+        // Icon inside each Tab instead of the now-unused `Tab.icon` field.
+        for (final tabFinder in [
+          find.byType(Tab).at(0),
+          find.byType(Tab).at(1),
+        ]) {
+          expect(
+            find.descendant(of: tabFinder, matching: find.byType(Icon)),
+            findsOneWidget,
+            reason: 'Every Favoris sub-tab must carry an icon to match '
+                'the Conso style — #1163.',
+          );
         }
 
         // Targeted icon presence — find by IconData on the rendered tree.

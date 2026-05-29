@@ -43,8 +43,18 @@ class TabSwitcher extends StatelessWidget implements PreferredSizeWidget {
     this.onTap,
   });
 
+  /// Compact single-row tab height. The default Material layout stacks
+  /// the icon above the label (`Tab(icon:, text:)`) which renders ~72 dp
+  /// tall (75 dp incl. the bottom divider). We lay icon + label out
+  /// side-by-side instead (see [build]): each [Tab] is the text-only
+  /// `kTextTabBarHeight` (46 dp) — still ≥ the 48 dp touch target once
+  /// the indicator/divider is included — and the whole [TabBar] renders
+  /// 49 dp. `preferredSize` is set to that measured 49 dp so an
+  /// `AppBar.bottom:` host reserves exactly the right amount.
+  static const double _compactHeight = kTextTabBarHeight + 1;
+
   @override
-  Size get preferredSize => const Size.fromHeight(kTextTabBarHeight);
+  Size get preferredSize => const Size.fromHeight(_compactHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +77,30 @@ class TabSwitcher extends StatelessWidget implements PreferredSizeWidget {
         tabs: [
           for (final entry in tabs)
             Tab(
-              icon: entry.icon != null ? Icon(entry.icon) : null,
-              text: entry.label,
+              // Compact single-row layout: icon beside the label rather
+              // than Material's default stacked `icon:`/`text:` (which
+              // renders ~72 dp tall). Colours/weight are intentionally
+              // left unset so the surrounding `TabBar` theme drives the
+              // selected ↔ unselected animation for both the Icon (via
+              // IconTheme) and the Text (via DefaultTextStyle).
+              child: Semantics(
+                label: entry.semanticLabel ?? entry.label,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (entry.icon != null) ...[
+                      Icon(entry.icon, size: 18),
+                      const SizedBox(width: 8),
+                    ],
+                    Flexible(
+                      child: Text(
+                        entry.label,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
         ],
       ),

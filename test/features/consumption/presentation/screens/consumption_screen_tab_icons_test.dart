@@ -126,11 +126,20 @@ void main() {
       expect(tabs, hasLength(2),
           reason: 'EV profile must render the Fuel + Charging switcher');
 
-      // Every Tab must carry an icon — the visual contract this issue
-      // locked across both Conso and Favoris.
-      for (final tab in tabs) {
-        expect(tab.icon, isNotNull,
-            reason: 'Conso sub-tab is missing its leading icon — #1163.');
+      // Every Tab must render a leading icon — the visual contract this
+      // issue locked across both Conso and Favoris. #2237 made the tab
+      // layout compact (icon beside label inside `Tab.child` rather than
+      // the stacked `Tab.icon`), so we assert the rendered Icon inside
+      // each Tab instead of the now-unused `Tab.icon` field.
+      for (final tabFinder in [
+        find.byType(Tab).at(0),
+        find.byType(Tab).at(1),
+      ]) {
+        expect(
+          find.descendant(of: tabFinder, matching: find.byType(Icon)),
+          findsOneWidget,
+          reason: 'Conso sub-tab is missing its leading icon — #1163.',
+        );
       }
 
       // Spot-check the specific icons defined in `consumption_screen.dart`.

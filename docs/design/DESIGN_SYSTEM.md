@@ -493,6 +493,12 @@ found in the audit (`ConsumptionScreen` `TabBar`, `FavoritesScreen`
 
 **Visual contract:**
 
+Each tab is a **compact single row** — icon *beside* the label, not
+Material's default stacked `icon:`/`text:` (which renders ~72 dp tall).
+The compact row fits ~49 dp. Colours/weight stay unset on the child so
+the `TabBar` theme drives the selected ↔ unselected animation for both
+the Icon (via `IconTheme`) and the Text (via `DefaultTextStyle`).
+
 ```dart
 return Material(
   color: Colors.transparent,
@@ -500,8 +506,21 @@ return Material(
     tabs: [
       for (final entry in tabs)
         Tab(
-          icon: entry.icon != null ? Icon(entry.icon) : null,
-          text: entry.label,
+          child: Semantics(
+            label: entry.semanticLabel ?? entry.label,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (entry.icon != null) ...[
+                  Icon(entry.icon, size: 18),
+                  const SizedBox(width: 8),
+                ],
+                Flexible(
+                  child: Text(entry.label, overflow: TextOverflow.ellipsis),
+                ),
+              ],
+            ),
+          ),
         ),
     ],
     controller: DefaultTabController.of(context),
