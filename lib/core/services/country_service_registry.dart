@@ -758,7 +758,8 @@ StationService _createEControl(Ref ref) => EControlStationService();
 // (service_providers.dart) so the in-memory copy also survives rebuilds.
 StationService _createMiteco(Ref ref) =>
     MitecoStationService(cache: ref.read(cacheManagerProvider));
-StationService _createMise(Ref ref) => MiseStationService();
+StationService _createMise(Ref ref) =>
+    MiseStationService(cache: ref.read(cacheManagerProvider));
 StationService _createDenmark(Ref ref) =>
     DenmarkStationService(cache: ref.read(cacheManagerProvider));
 StationService _createArgentina(Ref ref) =>
@@ -766,7 +767,8 @@ StationService _createArgentina(Ref ref) =>
 StationService _createPortugal(Ref ref) => PortugalStationService();
 StationService _createUk(Ref ref) => UkStationService();
 StationService _createAustralia(Ref ref) => const AustraliaStationService();
-StationService _createMexico(Ref ref) => MexicoStationService();
+StationService _createMexico(Ref ref) =>
+    MexicoStationService(cache: ref.read(cacheManagerProvider));
 StationService _createLuxembourg(Ref ref) => LuxembourgStationService();
 StationService _createSlovenia(Ref ref) => SloveniaStationService();
 

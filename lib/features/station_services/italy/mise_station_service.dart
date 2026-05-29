@@ -4,10 +4,12 @@
 import 'package:dio/dio.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/cache/cache_manager.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
+import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/utils/csv_parser.dart';
@@ -28,14 +30,38 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
 
   final Dio _dio;
 
+  /// #2270 — disk persistence (read-through), or null when no cache is wired.
+  /// Persists the parsed registry+price dataset so IT survives a cold start +
+  /// works offline, mirroring DK/AR/ES (#2264 deferred IT on-disk persistence
+  /// because its private record types needed bespoke JSON codecs — added now).
+  final PersistentDataset<_MiseDataset>? _persistent;
+
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
-  MiseStationService({Dio? dio})
+  /// #2270 — [cache] enables the disk read-through; omit it for the pure
+  /// in-memory behaviour the existing parser tests rely on.
+  MiseStationService({Dio? dio, CacheStrategy? cache})
       : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 20),
               receiveTimeout: const Duration(seconds: 60),
               responseType: ResponseType.plain,
-            );
+            ),
+        _persistent = cache == null
+            ? null
+            : PersistentDataset<_MiseDataset>(
+                cache: cache,
+                countryCode: 'IT',
+                datasetName: 'stations',
+                source: ServiceSource.miseApi,
+                serialize: _serializeDataset,
+                deserialize: _deserializeDataset,
+              );
+
+  // #2270 — soft/hard dataset TTLs mirror the IT FuelServicePolicy in the
+  // registry (soft 6 h, hard 24 h). The legacy 2-hour in-memory TTL is the
+  // soft bound now; the persisted read-through governs offline freshness.
+  static const Duration _softTtl = Duration(hours: 6);
+  static const Duration _hardTtl = Duration(hours: 24);
 
   // In-memory cache of parsed data
   Map<String, _StationData>? _cachedStations;
@@ -94,30 +120,46 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
   }
 
   Future<void> _ensureDataLoaded({CancelToken? cancelToken}) {
-    // Refresh cache every 2 hours. Both maps are populated from a single
-    // download, so they're cached together as a record — present only when
-    // both are non-null.
+    // Both maps are populated from a single download, so they're cached
+    // together as a record — present only when both are non-null.
     final cached = (_cachedStations != null && _cachedPrices != null)
         ? (_cachedStations!, _cachedPrices!)
         : null;
-    return loadDataset<(Map<String, _StationData>, Map<String, _PriceData>)>(
+    Future<_MiseDataset> fetch() async {
+      // Download both files in parallel
+      final results = await Future.wait([
+        _dio.get<String>(_stationsUrl, cancelToken: cancelToken),
+        _dio.get<String>(_pricesUrl, cancelToken: cancelToken),
+      ]);
+      return (
+        _parseStationsCsv(results[0].data ?? ''),
+        _parsePricesCsv(results[1].data ?? ''),
+      );
+    }
+
+    void store(_MiseDataset value) {
+      _cachedStations = value.$1;
+      _cachedPrices = value.$2;
+    }
+
+    final persistent = _persistent;
+    if (persistent == null) {
+      // No cache wired (unit tests) — preserve the legacy in-memory path.
+      return loadDataset<_MiseDataset>(
+        cached: cached,
+        ttl: const Duration(hours: 2),
+        fetch: fetch,
+        store: store,
+      );
+    }
+    // #2270 — disk read-through: survives cold start + offline.
+    return loadPersistentDataset<_MiseDataset>(
       cached: cached,
-      ttl: const Duration(hours: 2),
-      fetch: () async {
-        // Download both files in parallel
-        final results = await Future.wait([
-          _dio.get<String>(_stationsUrl, cancelToken: cancelToken),
-          _dio.get<String>(_pricesUrl, cancelToken: cancelToken),
-        ]);
-        return (
-          _parseStationsCsv(results[0].data ?? ''),
-          _parsePricesCsv(results[1].data ?? ''),
-        );
-      },
-      store: (value) {
-        _cachedStations = value.$1;
-        _cachedPrices = value.$2;
-      },
+      softTtl: _softTtl,
+      hardTtl: _hardTtl,
+      persistent: persistent,
+      fetch: fetch,
+      store: store,
     );
   }
 
@@ -215,6 +257,35 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
   }
 }
 
+/// #2270 — the parsed MISE dataset: the station registry joined-by-id with the
+/// current prices. Both maps come from a single (two-file) download, so they
+/// are persisted and rehydrated together as one record.
+typedef _MiseDataset = (Map<String, _StationData>, Map<String, _PriceData>);
+
+/// #2270 — JSON codec for the persisted IT dataset. Single-letter keys keep
+/// the Hive footprint of the ~25k-station registry + price table down.
+Map<String, dynamic> _serializeDataset(_MiseDataset value) => {
+      's': {for (final e in value.$1.entries) e.key: e.value.toJson()},
+      'p': {for (final e in value.$2.entries) e.key: e.value.toJson()},
+    };
+
+_MiseDataset? _deserializeDataset(Map<String, dynamic> json) {
+  final stationsJson = json['s'];
+  final pricesJson = json['p'];
+  if (stationsJson is! Map || pricesJson is! Map) return null;
+  final stations = <String, _StationData>{
+    for (final e in stationsJson.entries)
+      e.key as String:
+          _StationData.fromJson(Map<String, dynamic>.from(e.value as Map)),
+  };
+  final prices = <String, _PriceData>{
+    for (final e in pricesJson.entries)
+      e.key as String:
+          _PriceData.fromJson(Map<String, dynamic>.from(e.value as Map)),
+  };
+  return (stations, prices);
+}
+
 class _StationData {
   final String brand;
   final String type;
@@ -235,6 +306,28 @@ class _StationData {
     required this.lat,
     required this.lng,
   });
+
+  Map<String, dynamic> toJson() => {
+        'b': brand,
+        't': type,
+        'n': name,
+        'a': address,
+        'c': city,
+        'pv': province,
+        'la': lat,
+        'lo': lng,
+      };
+
+  factory _StationData.fromJson(Map<String, dynamic> j) => _StationData(
+        brand: j['b'] as String? ?? '',
+        type: j['t'] as String? ?? '',
+        name: j['n'] as String? ?? '',
+        address: j['a'] as String? ?? '',
+        city: j['c'] as String? ?? '',
+        province: j['pv'] as String? ?? '',
+        lat: (j['la'] as num?)?.toDouble() ?? 0,
+        lng: (j['lo'] as num?)?.toDouble() ?? 0,
+      );
 }
 
 class _PriceData {
@@ -245,4 +338,25 @@ class _PriceData {
   double? gpl;
   double? metano;
   String? updatedAt;
+
+  _PriceData();
+
+  Map<String, dynamic> toJson() => {
+        if (benzinaSelf != null) 'bs': benzinaSelf,
+        if (benzinaServed != null) 'bv': benzinaServed,
+        if (gasolioSelf != null) 'gs': gasolioSelf,
+        if (gasolioServed != null) 'gv': gasolioServed,
+        if (gpl != null) 'gp': gpl,
+        if (metano != null) 'me': metano,
+        if (updatedAt != null) 'u': updatedAt,
+      };
+
+  factory _PriceData.fromJson(Map<String, dynamic> j) => _PriceData()
+    ..benzinaSelf = (j['bs'] as num?)?.toDouble()
+    ..benzinaServed = (j['bv'] as num?)?.toDouble()
+    ..gasolioSelf = (j['gs'] as num?)?.toDouble()
+    ..gasolioServed = (j['gv'] as num?)?.toDouble()
+    ..gpl = (j['gp'] as num?)?.toDouble()
+    ..metano = (j['me'] as num?)?.toDouble()
+    ..updatedAt = j['u'] as String?;
 }

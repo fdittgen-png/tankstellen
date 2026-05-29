@@ -9,10 +9,12 @@ import 'package:xml/xml.dart';
 
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/cache/cache_manager.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/cached_dataset_mixin.dart';
+import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
@@ -44,17 +46,50 @@ class MexicoStationService
   final Dio _dio;
   final String _baseUrl;
 
+  /// #2270 — disk persistence (read-through), or null when no cache is wired.
+  /// Persists the merged place+price dataset so MX survives a cold start +
+  /// works offline, mirroring DK/AR/ES (#2264 deferred MX on-disk persistence
+  /// because [_CreStation] needed a bespoke JSON codec — added now).
+  final PersistentDataset<List<_CreStation>>? _persistent;
+
+  /// #2270 — [cache] enables the disk read-through; omit it for the pure
+  /// in-memory behaviour the existing parser tests rely on.
   MexicoStationService({
     Dio? dio,
     String baseUrl = 'https://publicacionexterna.azurewebsites.net/publicaciones',
+    CacheStrategy? cache,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 45),
             ),
-        _baseUrl = baseUrl;
+        _baseUrl = baseUrl,
+        _persistent = cache == null
+            ? null
+            : PersistentDataset<List<_CreStation>>(
+                cache: cache,
+                countryCode: 'MX',
+                datasetName: 'stations',
+                source: ServiceSource.mexicoApi,
+                serialize: (stations) =>
+                    {'stations': stations.map((s) => s.toJson()).toList()},
+                deserialize: (json) {
+                  final list = json['stations'] as List<dynamic>?;
+                  if (list == null) return null;
+                  return list
+                      .map((j) => _CreStation.fromJson(
+                          Map<String, dynamic>.from(j as Map)))
+                      .toList();
+                },
+              );
 
   static const Duration _cacheTtl = Duration(hours: 4);
+
+  // #2270 — soft/hard dataset TTLs for the persisted read-through. Soft mirrors
+  // the 4-hour merge cadence (_cacheTtl); the 24-hour hard bound is the offline
+  // grace window past which a blocking re-pull is forced.
+  static const Duration _softTtl = _cacheTtl;
+  static const Duration _hardTtl = Duration(hours: 24);
 
   List<_CreStation>? _cachedStations;
 
@@ -103,13 +138,28 @@ class MexicoStationService
   // #2264 — migrated onto CachedDatasetMixin: the manual _lastFetch + TTL
   // diff is replaced by loadDataset's guard→fetch→store→mark idiom, matching
   // the other bulk-dataset services (ES/IT/AR/DK).
-  Future<void> _ensureDataLoaded(CancelToken? cancelToken) =>
-      loadDataset<List<_CreStation>>(
+  // #2270 — when a cache is wired the merged dataset is persisted to Hive with
+  // a disk read-through so it survives a cold start + works offline.
+  Future<void> _ensureDataLoaded(CancelToken? cancelToken) {
+    final persistent = _persistent;
+    if (persistent == null) {
+      // No cache wired (unit tests) — preserve the legacy in-memory path.
+      return loadDataset<List<_CreStation>>(
         cached: _cachedStations,
         ttl: _cacheTtl,
         fetch: () => _fetchMerged(cancelToken),
         store: (value) => _cachedStations = value,
       );
+    }
+    return loadPersistentDataset<List<_CreStation>>(
+      cached: _cachedStations,
+      softTtl: _softTtl,
+      hardTtl: _hardTtl,
+      persistent: persistent,
+      fetch: () => _fetchMerged(cancelToken),
+      store: (value) => _cachedStations = value,
+    );
+  }
 
   Future<List<_CreStation>> _fetchMerged(CancelToken? cancelToken) async {
     final responses = await Future.wait([
@@ -286,6 +336,28 @@ class _CreStation {
     required this.premium,
     required this.diesel,
   });
+
+  /// #2270 — compact JSON for the persisted dataset (single-letter keys keep
+  /// the ~13k-station merged dataset's Hive footprint down).
+  Map<String, dynamic> toJson() => {
+        'i': id,
+        'n': name,
+        'la': lat,
+        'lo': lng,
+        if (regular != null) 'r': regular,
+        if (premium != null) 'p': premium,
+        if (diesel != null) 'd': diesel,
+      };
+
+  factory _CreStation.fromJson(Map<String, dynamic> j) => _CreStation(
+        id: j['i'] as String? ?? '',
+        name: j['n'] as String? ?? '',
+        lat: (j['la'] as num?)?.toDouble() ?? 0,
+        lng: (j['lo'] as num?)?.toDouble() ?? 0,
+        regular: (j['r'] as num?)?.toDouble(),
+        premium: (j['p'] as num?)?.toDouble(),
+        diesel: (j['d'] as num?)?.toDouble(),
+      );
 }
 
 class _CrePlace {
