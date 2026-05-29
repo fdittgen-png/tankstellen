@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/auto_record_trace_log.dart';
 import '../../data/obd2/obd2_breadcrumb_collector.dart';
@@ -138,11 +139,10 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
         fileName: fileName,
         mimeType: 'application/json',
       );
+      // #2173 — route through SnackBarHelper for the liveRegion announce.
       messenger?.showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
-          ),
+        SnackBarHelper.infoSnackBar(
+          l10n?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
         ),
       );
     } on Object catch (e, st) {

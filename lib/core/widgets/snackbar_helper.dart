@@ -83,6 +83,24 @@ class SnackBarHelper {
         duration: duration,
       );
 
+  /// An informational [SnackBar] with a leading icon but the DEFAULT
+  /// SnackBar theme (no coloured background) — for coaching/info rows
+  /// like the eco-coach hint and the unpinned-recording warning (#2173).
+  /// The icon + text inherit the ambient content colour, so the visual
+  /// matches the previous hand-built rows while gaining the liveRegion
+  /// announce.
+  static SnackBar iconatedInfoSnackBar(
+    IconData icon,
+    String message, {
+    Duration duration = _infoDuration,
+    Key? key,
+  }) =>
+      SnackBar(
+        key: key,
+        content: _IconatedContent(icon: icon, message: message),
+        duration: duration,
+      );
+
   /// An error [SnackBar] — themed via [scheme] (`errorContainer`) with
   /// an error icon so the failure is signalled by more than colour.
   static SnackBar errorSnackBar(ColorScheme scheme, String message) =>
@@ -164,12 +182,16 @@ class _IconatedContent extends StatelessWidget {
   const _IconatedContent({
     required this.icon,
     required this.message,
-    required this.foreground,
+    this.foreground,
   });
 
   final IconData icon;
   final String message;
-  final Color foreground;
+
+  /// Foreground colour for the icon + text. Null → inherit the ambient
+  /// SnackBar content colour (used by [iconatedInfoSnackBar], #2173); the
+  /// success/error variants pass an explicit on-container colour.
+  final Color? foreground;
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +201,10 @@ class _IconatedContent extends StatelessWidget {
           Icon(icon, color: foreground, size: 20),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(message, style: TextStyle(color: foreground)),
+            child: Text(
+              message,
+              style: foreground == null ? null : TextStyle(color: foreground),
+            ),
           ),
         ],
       ),

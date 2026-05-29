@@ -202,22 +202,15 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
     messenger.hideCurrentSnackBar();
+    // #2173 — iconated info row through the centralized helper (adds the
+    // liveRegion announce; same icon/text/Key/duration as before).
     messenger.showSnackBar(
-      SnackBar(
+      SnackBarHelper.iconatedInfoSnackBar(
+        Icons.eco,
+        l?.hapticEcoCoachSnackBarMessage ??
+            'Easy on the throttle — coasting saves more',
         key: const Key('hapticEcoCoachSnackBar'),
         duration: const Duration(seconds: 4),
-        content: Row(
-          children: [
-            const Icon(Icons.eco, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                l?.hapticEcoCoachSnackBarMessage ??
-                    'Easy on the throttle — coasting saves more',
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -263,22 +256,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final l = AppLocalizations.of(context);
     _unpinnedWarningShown = true;
     messenger.showSnackBar(
-      SnackBar(
+      SnackBarHelper.iconatedInfoSnackBar(
+        Icons.gps_off,
+        l?.tripRecordingUnpinnedWarning ??
+            'Pin the screen to keep GPS active during the trip '
+                '— Android may throttle GPS during sleep.',
         key: const Key('tripRecordingUnpinnedWarningSnackBar'),
         duration: const Duration(seconds: 8),
-        content: Row(
-          children: [
-            const Icon(Icons.gps_off, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                l?.tripRecordingUnpinnedWarning ??
-                    'Pin the screen to keep GPS active during the trip '
-                        '— Android may throttle GPS during sleep.',
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
