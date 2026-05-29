@@ -438,6 +438,58 @@ void main() {
       expect(stations.first.name, 'First');
     });
 
+    // #2199 — SafeJsonAccessors regression coverage. These pin the
+    // observable behaviour after migrating the raw `as num?` / `as Map`
+    // casts to getDouble / getMap so a future change cannot silently
+    // alter which records parse.
+    test('parses string-typed coordinates via getDouble (robustness gain)',
+        () {
+      // Before #2199 a String latitude threw a CastError that the per-item
+      // catch swallowed into a skipped station; getDouble parses it instead.
+      final stations = parse([
+        {
+          'site_id': 'STR',
+          'site_name': 'String Coords',
+          'brand': 'BP',
+          'location': {'latitude': '51.5', 'longitude': '-0.12'},
+          'prices': {'E5': 145.9},
+        },
+      ]);
+      expect(stations, hasLength(1));
+      expect(stations.first.lat, closeTo(51.5, 0.0001));
+      expect(stations.first.lng, closeTo(-0.12, 0.0001));
+    });
+
+    test('still skips records with non-numeric coordinate strings', () {
+      // getDouble('abc') -> null, same as the old cast outcome (skipped).
+      final stations = parse([
+        {
+          'site_id': 'BAD',
+          'site_name': 'Bad Coords',
+          'location': {'latitude': 'not-a-number', 'longitude': '-0.12'},
+          'prices': <String, dynamic>{},
+        },
+      ]);
+      expect(stations, isEmpty);
+    });
+
+    test('degrades to empty prices when prices is not a map', () {
+      // getMap returns null for a non-map value -> `?? {}` -> no prices,
+      // identical to the previous `is Map ? ... : {}` guard.
+      final stations = parse([
+        {
+          'site_id': 'NOPRICE',
+          'site_name': 'No Prices',
+          'location': {'latitude': 51.5, 'longitude': -0.12},
+          'prices': 'not a map',
+        },
+      ]);
+      expect(stations, hasLength(1));
+      expect(stations.first.e5, isNull);
+      expect(stations.first.e10, isNull);
+      expect(stations.first.diesel, isNull);
+    });
+
     test('parsePenceForTest — null, non-numeric, pence, and pounds', () {
       expect(UkStationService.parsePenceForTest(null), isNull);
       expect(UkStationService.parsePenceForTest('abc'), isNull);

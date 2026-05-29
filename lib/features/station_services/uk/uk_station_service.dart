@@ -10,6 +10,7 @@ import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
+import '../../../core/utils/json_extensions.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
@@ -174,37 +175,39 @@ class UkStationService with StationServiceHelpers implements StationService {
     for (final item in items) {
       if (item is! Map) continue;
       try {
-        final location = item['location'];
-        final locMap = location is Map ? location : null;
-        final itemLat = (locMap?['latitude'] as num?)?.toDouble() ??
-            (item['lat'] as num?)?.toDouble();
-        final itemLng = (locMap?['longitude'] as num?)?.toDouble() ??
-            (item['lng'] as num?)?.toDouble();
+        final m = Map<String, dynamic>.from(item);
+        final locMap = m.getMap('location');
+        // #2199 — SafeJsonAccessors: getDouble accepts num OR numeric-string
+        // and returns null on missing/non-numeric. The previous `as num?`
+        // cast threw a CastError on a string-typed coordinate, which the
+        // per-item catch swallowed into a skipped station; getDouble parses
+        // it instead. Records with numeric coords (every CMA feed today)
+        // parse identically.
+        final itemLat = locMap?.getDouble('latitude') ?? m.getDouble('lat');
+        final itemLng = locMap?.getDouble('longitude') ?? m.getDouble('lng');
         if (itemLat == null || itemLng == null) continue;
 
         final dist = distanceKm(lat, lng, itemLat, itemLng);
         if (dist > radiusKm) continue;
 
-        final rawId = item['site_id']?.toString() ??
-            item['id']?.toString() ??
+        final rawId = m['site_id']?.toString() ??
+            m['id']?.toString() ??
             '${itemLat.toStringAsFixed(5)}_${itemLng.toStringAsFixed(5)}';
         final stationId = 'uk-$rawId';
         if (!seenIds.add(stationId)) continue;
 
-        final prices = item['prices'] is Map
-            ? Map<String, dynamic>.from(item['prices'] as Map)
-            : <String, dynamic>{};
+        final prices = m.getMap('prices') ?? <String, dynamic>{};
 
         stations.add(Station(
           id: stationId,
-          name: item['site_name']?.toString() ??
-              item['name']?.toString() ??
-              item['brand']?.toString() ??
+          name: m['site_name']?.toString() ??
+              m['name']?.toString() ??
+              m['brand']?.toString() ??
               '',
-          brand: item['brand']?.toString() ?? '',
-          street: item['address']?.toString() ?? '',
-          postCode: item['postcode']?.toString() ?? '',
-          place: item['town']?.toString() ?? item['locality']?.toString() ?? '',
+          brand: m['brand']?.toString() ?? '',
+          street: m['address']?.toString() ?? '',
+          postCode: m['postcode']?.toString() ?? '',
+          place: m['town']?.toString() ?? m['locality']?.toString() ?? '',
           lat: itemLat,
           lng: itemLng,
           dist: dist,
