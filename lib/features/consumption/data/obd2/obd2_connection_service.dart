@@ -236,9 +236,17 @@ class Obd2ConnectionService {
   /// [timeout] bounds the GATT connect attempt (passed to the channel);
   /// it is NOT a scan window. Returns null when both the direct attempt
   /// and the scan fallback fail to produce a session.
+  ///
+  /// [fallbackToScan] (default `true`) controls the internal scan
+  /// fallback. The in-trip reconnect path (#2245) passes `false` so it
+  /// can own a single RSSI-gated scan fallback itself — gating the
+  /// connect on a relative-RSSI / two-consecutive-batch rule — rather
+  /// than double-scanning (once here, once in the reconnect probe). With
+  /// `false` a failed direct attempt returns null immediately.
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
     Duration timeout = const Duration(seconds: 4),
+    bool fallbackToScan = true,
   }) async {
     // Tear down a prior direct channel BEFORE reopening (dead-GATT
     // teardown). LOAD-BEARING on Android — a still-open GATT client for
@@ -268,6 +276,7 @@ class Obd2ConnectionService {
             'falling back to scan',
       }));
       await _teardownLastDirectChannel();
+      if (!fallbackToScan) return null;
       return connectByMac(mac);
     }
   }
