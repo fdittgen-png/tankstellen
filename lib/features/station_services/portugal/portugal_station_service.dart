@@ -238,24 +238,20 @@ class PortugalStationService
     return double.tryParse(cleaned);
   }
 
+  // #2264 — route the unsupported endpoints through the shared helpers
+  // (throwDetailUnavailable / emptyPricesResult) like the other services.
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
   ) async {
-    throw const ApiException(
-      message: 'Station detail not supported for Portugal',
-    );
+    throwDetailUnavailable('DGEG API');
   }
 
   @override
   Future<ServiceResult<Map<String, StationPrices>>> getPrices(
     List<String> ids,
   ) async {
-    return ServiceResult(
-      data: const {},
-      source: ServiceSource.portugalApi,
-      fetchedAt: DateTime.now(),
-    );
+    return emptyPricesResult(ServiceSource.portugalApi);
   }
 }
 

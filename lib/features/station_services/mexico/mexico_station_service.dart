@@ -12,6 +12,7 @@ import '../../search/domain/entities/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/dio_factory.dart';
+import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
@@ -38,7 +39,7 @@ import '../../../core/logging/error_logger.dart';
 /// 4 hours — the CRE dataset updates several times daily but rarely
 /// faster than that.
 class MexicoStationService
-    with StationServiceHelpers
+    with StationServiceHelpers, CachedDatasetMixin
     implements StationService {
   final Dio _dio;
   final String _baseUrl;
@@ -56,7 +57,6 @@ class MexicoStationService
   static const Duration _cacheTtl = Duration(hours: 4);
 
   List<_CreStation>? _cachedStations;
-  DateTime? _lastFetch;
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -100,13 +100,18 @@ class MexicoStationService
     }
   }
 
-  Future<void> _ensureDataLoaded(CancelToken? cancelToken) async {
-    if (_cachedStations != null &&
-        _lastFetch != null &&
-        DateTime.now().difference(_lastFetch!) < _cacheTtl) {
-      return;
-    }
+  // #2264 — migrated onto CachedDatasetMixin: the manual _lastFetch + TTL
+  // diff is replaced by loadDataset's guard→fetch→store→mark idiom, matching
+  // the other bulk-dataset services (ES/IT/AR/DK).
+  Future<void> _ensureDataLoaded(CancelToken? cancelToken) =>
+      loadDataset<List<_CreStation>>(
+        cached: _cachedStations,
+        ttl: _cacheTtl,
+        fetch: () => _fetchMerged(cancelToken),
+        store: (value) => _cachedStations = value,
+      );
 
+  Future<List<_CreStation>> _fetchMerged(CancelToken? cancelToken) async {
     final responses = await Future.wait([
       _dio.get<String>(
         '$_baseUrl/places',
@@ -133,14 +138,13 @@ class MexicoStationService
       );
     }
 
-    _cachedStations = _mergeFeeds(placesXml: placesXml, pricesXml: pricesXml);
-    _lastFetch = DateTime.now();
-
-    if (_cachedStations!.isEmpty) {
+    final merged = _mergeFeeds(placesXml: placesXml, pricesXml: pricesXml);
+    if (merged.isEmpty) {
       throw const ApiException(
         message: 'CRE feeds parsed to zero stations (schema change?)',
       );
     }
+    return merged;
   }
 
   /// Parses the `/places` and `/prices` XML feeds and joins them by
@@ -239,27 +243,25 @@ class MexicoStationService
   @visibleForTesting
   void clearCacheForTest() {
     _cachedStations = null;
-    _lastFetch = null;
+    // #2264 — CachedDatasetMixin owns the freshness clock now; expire it so
+    // the next search re-fetches.
+    markDatasetRefreshedAt(const Duration(days: 3650));
   }
 
+  // #2264 — route the unsupported endpoints through the shared helpers
+  // (throwDetailUnavailable / emptyPricesResult) like the other services.
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
   ) async {
-    throw const ApiException(
-      message: 'Station detail not supported for Mexico',
-    );
+    throwDetailUnavailable('CRE API');
   }
 
   @override
   Future<ServiceResult<Map<String, StationPrices>>> getPrices(
     List<String> ids,
   ) async {
-    return ServiceResult(
-      data: const {},
-      source: ServiceSource.mexicoApi,
-      fetchedAt: DateTime.now(),
-    );
+    return emptyPricesResult(ServiceSource.mexicoApi);
   }
 }
 
