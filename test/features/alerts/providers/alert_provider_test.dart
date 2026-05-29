@@ -380,4 +380,85 @@ void main() {
       expect(container.read(alertProvider).first.id, 'a2');
     });
   });
+
+  group('alerts merge-download applied to local storage (#2246)', () {
+    late ProviderContainer container;
+    late _NoopNotificationService noopNotifier;
+    late List<PriceAlert> mergeInput;
+    late List<PriceAlert> mergeReturn;
+    int mergeCalls = 0;
+
+    setUp(() async {
+      // sync_enabled=true so _syncAlertsIfConnected actually runs the merge.
+      await fakeStorage.putSetting('sync_enabled', true);
+      noopNotifier = _NoopNotificationService();
+      mergeCalls = 0;
+      mergeReturn = const [];
+      container = ProviderContainer(
+        overrides: [
+          hiveStorageProvider.overrideWithValue(fakeStorage),
+          notificationServiceProvider.overrideWithValue(noopNotifier),
+          // Fake the bidirectional merge: capture the local input and
+          // return a controllable superset so we can assert downloads land.
+          alertsMergeFnProvider.overrideWithValue((local) async {
+            mergeCalls++;
+            mergeInput = local;
+            return mergeReturn;
+          }),
+        ],
+      );
+      addTearDown(container.dispose);
+    });
+
+    test('addAlert applies the downloaded server-only alert to storage',
+        () async {
+      final local = _makeAlert(id: 'local-1', stationId: 's-local');
+      final serverOnly = _makeAlert(id: 'server-1', stationId: 's-server');
+      // merge returns [local, ...downloaded] — the real AlertsSync shape.
+      mergeReturn = [local, serverOnly];
+
+      await container.read(alertProvider.notifier).addAlert(local);
+
+      // The server-only alert must now be in local storage.
+      final stored = fakeStorage.getAlerts().map((a) => a['id']).toSet();
+      expect(stored, containsAll(['local-1', 'server-1']),
+          reason: 'downloaded alert must be persisted, not discarded');
+      // And reflected in provider state.
+      final stateIds =
+          container.read(alertProvider).map((a) => a.id).toSet();
+      expect(stateIds, containsAll(['local-1', 'server-1']));
+      expect(mergeCalls, 1);
+      expect(mergeInput.map((a) => a.id), contains('local-1'));
+    });
+
+    test('addAlert does not duplicate alerts already present locally',
+        () async {
+      final local = _makeAlert(id: 'dup-1');
+      // merge echoes the local alert back (already present) → no new row.
+      mergeReturn = [local];
+
+      await container.read(alertProvider.notifier).addAlert(local);
+
+      expect(fakeStorage.getAlerts(), hasLength(1));
+    });
+
+    test('removeAlert does NOT re-download (no delete resurrection)',
+        () async {
+      final keep = _makeAlert(id: 'keep');
+      final removed = _makeAlert(id: 'gone');
+      await fakeStorage.saveAlerts([keep.toJson(), removed.toJson()]);
+      container.read(alertProvider);
+
+      // Server still holds the deleted row; merge would echo it back.
+      mergeReturn = [keep, removed];
+
+      await container.read(alertProvider.notifier).removeAlert('gone');
+
+      // The removed alert must stay removed — downloads are not applied
+      // on the remove path.
+      final stored = fakeStorage.getAlerts().map((a) => a['id']).toSet();
+      expect(stored, equals({'keep'}),
+          reason: 'remove must not resurrect the deleted alert');
+    });
+  });
 }
