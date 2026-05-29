@@ -1,6 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'failure_kind.dart';
+
+export 'failure_kind.dart';
+
 /// Base class for all domain exceptions in the app.
 ///
 /// Sealed so that `switch` on [AppException] is exhaustive and all
@@ -28,7 +32,23 @@ class ApiException extends AppException {
   final String message;
   final int? statusCode;
 
-  const ApiException({required this.message, this.statusCode});
+  /// Typed classification of this failure (#2255). Lets callers branch on the
+  /// *kind* (transient vs terminal, rate-limited, …) instead of sniffing the
+  /// English [message] prefix. Defaults to [FailureKind.unknown] for the rare
+  /// throw site that has no better information.
+  final FailureKind kind;
+
+  /// When [kind] is [FailureKind.rateLimited], the upstream-suggested backoff
+  /// parsed from the `Retry-After` header (seconds or HTTP-date). Null when the
+  /// header was absent or unparseable.
+  final Duration? retryAfter;
+
+  const ApiException({
+    required this.message,
+    this.statusCode,
+    this.kind = FailureKind.unknown,
+    this.retryAfter,
+  });
 
   @override
   String toString() => 'ApiException: $message (status: $statusCode)';
