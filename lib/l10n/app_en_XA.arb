@@ -1166,6 +1166,8 @@
   "crossBorderCheaper": "⟦{country} šŧáŧîóñš {km} ķɱ áŵáý — €{price}/Ł çĥéáƥéř ··········⟧",
   "crossBorderTapToSwitch": "⟦Ŧáƥ ŧó šŵîŧçĥ çóúñŧřý ········⟧",
   "crossBorderDismissTooltip": "⟦Đîšɱîšš ···⟧",
+  "dataSourceAttribution": "⟦Šóúřçé: {source} ({license}) ···⟧",
+  "dataSourceAttributionSemantic": "⟦Ƒúéł ƥřîçé đáŧá ƥřóṽîđéđ ƀý {source}, łîçéñšéđ úñđéř {license}. ················⟧",
   "developerToolsSectionTitle": "⟦Đéṽéłóƥéř ŧóółš ······⟧",
   "developerToolsSubtitle": "⟦Đîáǧñóšŧîçš áñđ ŧóółš ƒóř đéƀúǧǧîñǧ — óñłý ṽîšîƀłé îñ Đéṽéłóƥéř / Đéƀúǧ ɱóđé. ····························⟧",
   "developerToolsMenuSubtitle": "⟦Éřřóř łóǧ, ŧéšŧ áłéřŧš, đîáǧñóšŧîçš ·············⟧",

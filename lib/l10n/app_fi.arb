@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Peruuta",
   "tripShareRevoked": "Jakaminen peruutettu.",
   "trajetsSharedSectionTitle": "Jaettu kanssani",
-  "trajetsSharedBadge": "Jaettu"
+  "trajetsSharedBadge": "Jaettu",
+  "dataSourceAttribution": "Lähde: {source} ({license})",
+  "dataSourceAttributionSemantic": "Polttoaineiden hintatiedot tarjoaa {source}, lisensoitu lisenssillä {license}."
 }

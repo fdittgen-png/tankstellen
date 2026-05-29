@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Ανάκληση",
   "tripShareRevoked": "Η κοινοποίηση ανακλήθηκε.",
   "trajetsSharedSectionTitle": "Κοινοποιήθηκε σε εμένα",
-  "trajetsSharedBadge": "Κοινόχρηστο"
+  "trajetsSharedBadge": "Κοινόχρηστο",
+  "dataSourceAttribution": "Πηγή: {source} ({license})",
+  "dataSourceAttributionSemantic": "Δεδομένα τιμών καυσίμων από {source}, με άδεια {license}."
 }

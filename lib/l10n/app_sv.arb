@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Återkalla",
   "tripShareRevoked": "Delning återkallad.",
   "trajetsSharedSectionTitle": "Delad med mig",
-  "trajetsSharedBadge": "Delad"
+  "trajetsSharedBadge": "Delad",
+  "dataSourceAttribution": "Källa: {source} ({license})",
+  "dataSourceAttributionSemantic": "Bränsleprisdata tillhandahålls av {source}, licensierad under {license}."
 }

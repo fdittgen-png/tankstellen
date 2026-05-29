@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Revocă",
   "tripShareRevoked": "Partajare revocată.",
   "trajetsSharedSectionTitle": "Partajat cu mine",
-  "trajetsSharedBadge": "Partajat"
+  "trajetsSharedBadge": "Partajat",
+  "dataSourceAttribution": "Sursă: {source} ({license})",
+  "dataSourceAttributionSemantic": "Datele privind prețurile carburanților sunt furnizate de {source}, licențiate sub {license}."
 }

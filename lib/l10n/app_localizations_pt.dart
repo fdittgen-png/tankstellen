@@ -3950,6 +3950,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Ignorar';
 
   @override
+  String dataSourceAttribution(String source, String license) {
+    return 'Fonte: $source ($license)';
+  }
+
+  @override
+  String dataSourceAttributionSemantic(String source, String license) {
+    return 'Dados de preços de combustível fornecidos por $source, licenciados sob $license.';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Ferramentas de programador';
 
   @override

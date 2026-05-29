@@ -1,0 +1,30 @@
+{
+  "dataSourceAttribution": "Quelle: {source} ({license})",
+  "@dataSourceAttribution": {
+    "description": "Small non-intrusive line under the search results crediting the upstream fuel-price provider for the active country, satisfying the open-data licences that mandate visible attribution (CC BY / Licence Ouverte / OGL / IODL). 'Source:' is the localised label; {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy (#2270).",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
+  },
+  "dataSourceAttributionSemantic": "Spritpreisdaten bereitgestellt von {source}, lizenziert unter {license}.",
+  "@dataSourceAttributionSemantic": {
+    "description": "Screen-reader label for the data-source attribution line under the search results — spells out the abbreviated 'Source: … (…)' visual into a full sentence (#2270). {source} and {license} are data (provider + licence names) from the country's FuelServicePolicy.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
+  }
+}

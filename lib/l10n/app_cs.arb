@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Zrušit",
   "tripShareRevoked": "Sdílení zrušeno.",
   "trajetsSharedSectionTitle": "Sdíleno se mnou",
-  "trajetsSharedBadge": "Sdíleno"
+  "trajetsSharedBadge": "Sdíleno",
+  "dataSourceAttribution": "Zdroj: {source} ({license})",
+  "dataSourceAttributionSemantic": "Údaje o cenách paliv poskytuje {source}, licencováno pod {license}."
 }

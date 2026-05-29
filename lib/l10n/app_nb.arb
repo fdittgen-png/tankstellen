@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Tilbakekall",
   "tripShareRevoked": "Deling tilbakekalt.",
   "trajetsSharedSectionTitle": "Delt med meg",
-  "trajetsSharedBadge": "Delt"
+  "trajetsSharedBadge": "Delt",
+  "dataSourceAttribution": "Kilde: {source} ({license})",
+  "dataSourceAttributionSemantic": "Drivstoffprisdata levert av {source}, lisensiert under {license}."
 }

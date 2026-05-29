@@ -10,6 +10,7 @@ import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/services/widgets/data_source_attribution.dart';
 import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -266,6 +267,10 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
             }),
           ),
         ),
+        // #2270 — required open-data attribution for the active country's
+        // upstream source, pinned below the list so it stays visible without
+        // scrolling (CC BY / Licence Ouverte / OGL / IODL all mandate this).
+        const DataSourceAttribution(),
       ],
     );
   }

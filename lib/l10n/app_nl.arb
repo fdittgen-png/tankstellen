@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Intrekken",
   "tripShareRevoked": "Delen ingetrokken.",
   "trajetsSharedSectionTitle": "Met mij gedeeld",
-  "trajetsSharedBadge": "Gedeeld"
+  "trajetsSharedBadge": "Gedeeld",
+  "dataSourceAttribution": "Bron: {source} ({license})",
+  "dataSourceAttributionSemantic": "Brandstofprijsgegevens geleverd door {source}, gelicentieerd onder {license}."
 }

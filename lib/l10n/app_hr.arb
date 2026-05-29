@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Opozovi",
   "tripShareRevoked": "Dijeljenje opozvano.",
   "trajetsSharedSectionTitle": "Podijeljeno sa mnom",
-  "trajetsSharedBadge": "Podijeljeno"
+  "trajetsSharedBadge": "Podijeljeno",
+  "dataSourceAttribution": "Izvor: {source} ({license})",
+  "dataSourceAttributionSemantic": "Podatke o cijenama goriva pruža {source}, licencirano pod {license}."
 }

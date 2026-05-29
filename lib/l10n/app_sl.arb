@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Prekliči",
   "tripShareRevoked": "Deljenje preklicano.",
   "trajetsSharedSectionTitle": "Deljeno z mano",
-  "trajetsSharedBadge": "Deljeno"
+  "trajetsSharedBadge": "Deljeno",
+  "dataSourceAttribution": "Vir: {source} ({license})",
+  "dataSourceAttributionSemantic": "Podatke o cenah goriva zagotavlja {source}, licencirano pod {license}."
 }

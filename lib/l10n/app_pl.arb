@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Cofnij",
   "tripShareRevoked": "Udostępnianie cofnięte.",
   "trajetsSharedSectionTitle": "Udostępnione mnie",
-  "trajetsSharedBadge": "Udostępnione"
+  "trajetsSharedBadge": "Udostępnione",
+  "dataSourceAttribution": "Źródło: {source} ({license})",
+  "dataSourceAttributionSemantic": "Dane o cenach paliw dostarcza {source}, na licencji {license}."
 }

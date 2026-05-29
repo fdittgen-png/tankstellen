@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Tühista",
   "tripShareRevoked": "Jagamine tühistatud.",
   "trajetsSharedSectionTitle": "Minuga jagatud",
-  "trajetsSharedBadge": "Jagatud"
+  "trajetsSharedBadge": "Jagatud",
+  "dataSourceAttribution": "Allikas: {source} ({license})",
+  "dataSourceAttributionSemantic": "Kütusehindade andmed pärinevad allikast {source}, litsentsitud litsentsi {license} alusel."
 }

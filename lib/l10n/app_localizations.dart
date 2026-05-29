@@ -7149,6 +7149,18 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get crossBorderDismissTooltip;
 
+  /// Small non-intrusive line under the search results crediting the upstream fuel-price provider for the active country, satisfying the open-data licences that mandate visible attribution (CC BY / Licence Ouverte / OGL / IODL). 'Source:' is the localised label; {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy (#2270).
+  ///
+  /// In en, this message translates to:
+  /// **'Source: {source} ({license})'**
+  String dataSourceAttribution(String source, String license);
+
+  /// Screen-reader label for the data-source attribution line under the search results — spells out the abbreviated 'Source: … (…)' visual into a full sentence (#2270). {source} and {license} are data (provider + licence names) from the country's FuelServicePolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel price data provided by {source}, licensed under {license}.'**
+  String dataSourceAttributionSemantic(String source, String license);
+
   /// Title of the Settings section / screen hosting dev-only diagnostics, shown only when Developer / Debug mode is on (#2248).
   ///
   /// In en, this message translates to:

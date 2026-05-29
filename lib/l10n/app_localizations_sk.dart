@@ -3942,6 +3942,16 @@ class AppLocalizationsSk extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Zatvoriť';
 
   @override
+  String dataSourceAttribution(String source, String license) {
+    return 'Zdroj: $source ($license)';
+  }
+
+  @override
+  String dataSourceAttributionSemantic(String source, String license) {
+    return 'Údaje o cenách palív poskytuje $source, licencované pod $license.';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Nástroje pre vývojárov';
 
   @override
