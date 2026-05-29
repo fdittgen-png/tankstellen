@@ -39,8 +39,11 @@ class RadiusAlertLabelField extends StatelessWidget {
   }
 }
 
-/// Dropdown picking the fuel type the alert watches. Excludes
-/// [FuelType.all] — an alert needs a concrete fuel to compare against.
+/// Dropdown picking the fuel type the alert watches. #2211 — restricted
+/// to the fuels the background radius search (Tankerkönig) can actually
+/// return; offering LPG/CNG/H2/EV produced silently-dead alerts (no
+/// samples ever matched). [FuelType.all] is excluded — an alert needs a
+/// concrete fuel to compare against.
 class RadiusAlertFuelTypeField extends StatelessWidget {
   const RadiusAlertFuelTypeField({
     super.key,
@@ -48,20 +51,32 @@ class RadiusAlertFuelTypeField extends StatelessWidget {
     required this.onChanged,
   });
 
+  /// Fuels the background radius evaluator can actually surface.
+  static const evaluableFuels = [
+    FuelType.e5,
+    FuelType.e10,
+    FuelType.diesel,
+  ];
+
   final FuelType value;
   final ValueChanged<FuelType> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // Keep the current value selectable even if it's a legacy fuel no
+    // longer offered, so editing an old alert doesn't crash the dropdown.
+    final fuels = <FuelType>{
+      ...evaluableFuels,
+      if (value != FuelType.all) value,
+    }.toList();
     return DropdownButtonFormField<FuelType>(
       initialValue: value,
       decoration: InputDecoration(
         labelText: l10n?.alertsRadiusFuelType ?? 'Fuel type',
         border: const OutlineInputBorder(),
       ),
-      items: FuelType.values
-          .where((t) => t != FuelType.all)
+      items: fuels
           .map((t) => DropdownMenuItem(
                 value: t,
                 child: Text(t.displayName),
@@ -101,7 +116,8 @@ class RadiusAlertThresholdField extends StatelessWidget {
   }
 }
 
-/// 1–50 km slider for the search radius around the alert center.
+/// 1–25 km slider for the search radius around the alert center
+/// (capped at the Tankerkönig radius limit, #2211).
 class RadiusAlertRadiusSlider extends StatelessWidget {
   const RadiusAlertRadiusSlider({
     super.key,
@@ -130,10 +146,12 @@ class RadiusAlertRadiusSlider extends StatelessWidget {
           ],
         ),
         Slider(
-          value: value.clamp(1, 50),
+          // #2211 — cap at 25 km: Tankerkönig clamps radius searches to
+          // 25 km, so a larger value silently searched only 25.
+          value: value.clamp(1, 25),
           min: 1,
-          max: 50,
-          divisions: 49,
+          max: 25,
+          divisions: 24,
           label: '${value.round()} km',
           onChanged: onChanged,
         ),

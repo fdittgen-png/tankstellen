@@ -125,7 +125,8 @@ void main() {
       );
     });
 
-    test('returns true when only postal code is set (geocode later)', () {
+    test('returns false when only a postal code is set — needs real GPS '
+        '(#2211; postal-only used to save a dead (0,0) alert)', () {
       expect(
         RadiusAlertValidators.canSave(
           label: 'Home diesel',
@@ -134,7 +135,7 @@ void main() {
           centerLng: null,
           postalCode: '34120',
         ),
-        isTrue,
+        isFalse,
       );
     });
 
@@ -164,8 +165,9 @@ void main() {
       );
     });
 
-    test('only one of GPS or postal needs to be set', () {
-      // GPS but no postal
+    test('GPS coordinates are required; postal code alone is not enough '
+        '(#2211)', () {
+      // GPS but no postal → OK
       expect(
         RadiusAlertValidators.canSave(
           label: 'L',
@@ -176,7 +178,7 @@ void main() {
         ),
         isTrue,
       );
-      // Postal but no GPS
+      // Postal but no GPS → not saveable (would be a dead (0,0) alert)
       expect(
         RadiusAlertValidators.canSave(
           label: 'L',
@@ -185,7 +187,7 @@ void main() {
           centerLng: null,
           postalCode: '34120',
         ),
-        isTrue,
+        isFalse,
       );
     });
   });

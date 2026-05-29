@@ -46,6 +46,7 @@ void main() {
   }) {
     return StationPriceSample(
       stationId: stationId,
+      name: 'Test Station',
       lat: lat,
       lng: lng,
       fuelType: fuelType,

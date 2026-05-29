@@ -151,12 +151,11 @@ class _RadiusAlertCreateSheetState
         RadiusAlertValidators.parseThreshold(_thresholdController.text);
     if (threshold == null) return;
 
-    // Postal-code-only entries are parked at (0,0) until the phase-3
-    // worker geocodes them. The stored postal code lives in the
-    // label so the user can see what they asked for; the coordinates
-    // are filled in once the geocoding lands.
-    final lat = _centerLat ?? 0.0;
-    final lng = _centerLng ?? 0.0;
+    // #2211 — a real center is required (canSave enforces it). Guard
+    // defensively so we never persist a dead (0,0) alert.
+    final lat = _centerLat;
+    final lng = _centerLng;
+    if (lat == null || lng == null) return;
 
     final alert = RadiusAlert(
       id: (widget.idGenerator ?? _defaultId)(),
