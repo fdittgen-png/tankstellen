@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
 import '../../domain/entities/consumption_stats.dart';
 import 'confidence_tier_badge.dart';
 
@@ -22,7 +25,7 @@ import 'confidence_tier_badge.dart';
 ///
 /// When neither condition fires, the card renders exactly as before so
 /// the all-plein, no-corrections case keeps its calm UX.
-class ConsumptionStatsCard extends StatelessWidget {
+class ConsumptionStatsCard extends ConsumerWidget {
   final ConsumptionStats stats;
 
   /// Active vehicle's auto-learned η_v (#1397). When null the
@@ -52,9 +55,17 @@ class ConsumptionStatsCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
+
+    // #2262 — the raw η_v learner chip is engineering jargon
+    // (volumetric efficiency + sample count). Normal users get the
+    // plain accuracy indicator from [ConfidenceTierBadge]; the raw
+    // chip is gated behind Developer mode (`Feature.debugMode`,
+    // shipped #2248) so only power users see it.
+    final showRawCalibration =
+        ref.watch(enabledFeaturesProvider).contains(Feature.debugMode);
 
     final avgConsumption = stats.avgConsumptionL100km;
     final avgCostKm = stats.avgCostPerKm;
@@ -143,14 +154,15 @@ class ConsumptionStatsCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall,
               ),
             ],
-            // #2112 — confidence tier (A/B/C — #2027) and η_v
-            // (#1397 / #815) ride a single Wrap so they sit side-by-
-            // side on a phone and stack only when the row genuinely
-            // overflows. Both pills share the same chip recipe so
-            // the two halves read as one calibration-state group
-            // rather than two visually different decorations. The
-            // confidence tier leads (user-facing accuracy band),
-            // η_v trails (engineer-detail anchor).
+            // #2112 / #2262 — the accuracy indicator (#2027) and the
+            // raw η_v chip (#1397 / #815) ride a single Wrap so they
+            // sit side-by-side on a phone and stack only when the row
+            // genuinely overflows. Both pills share the same chip
+            // recipe so the two halves read as one calibration-state
+            // group. The plain accuracy indicator leads (user-facing
+            // trust); the raw η_v chip trails and is shown ONLY in
+            // Developer mode (#2262) — for normal users the accuracy
+            // indicator alone conveys trust.
             if (volumetricEfficiencySamples != null) ...[
               const SizedBox(height: 8),
               Wrap(
@@ -161,10 +173,11 @@ class ConsumptionStatsCard extends StatelessWidget {
                     samples: volumetricEfficiencySamples!,
                     hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
                   ),
-                  _CalibrationChip(
-                    volumetricEfficiency: volumetricEfficiency ?? 0.85,
-                    samples: volumetricEfficiencySamples!,
-                  ),
+                  if (showRawCalibration)
+                    _CalibrationChip(
+                      volumetricEfficiency: volumetricEfficiency ?? 0.85,
+                      samples: volumetricEfficiencySamples!,
+                    ),
                 ],
               ),
             ],

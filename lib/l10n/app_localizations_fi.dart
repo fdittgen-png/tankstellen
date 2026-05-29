@@ -3839,6 +3839,32 @@ class AppLocalizationsFi extends AppLocalizations {
   String get consoSubsectionToggles => 'Ajaminen';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Tarkkuus: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Korkea';
+
+  @override
+  String get consumptionAccuracyMedium => 'Keskitaso';
+
+  @override
+  String get consumptionAccuracyLow => 'Matala';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Täysi kalibrointi: tankkaukset sekä OBD2:lla tallennetut matkat. L/100 km -luku vastaa todellisuutta muutaman prosentin tarkkuudella.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Tankkaukset ovat ankkuroineet kulutusmallin, mutta yhtäkään OBD2-matkaa ei ole vielä syötetty. Tallenna yksi OBD2 yhdistettynä saavuttaaksesi korkean tarkkuuden.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Vain GPS — yksikään tankkaus ei ole vielä ankkuroinut kulutusmallia. Lisää pari täyttä tankkausta parantaaksesi tarkkuutta.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

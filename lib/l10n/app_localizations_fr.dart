@@ -3877,6 +3877,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get consoSubsectionToggles => 'Conduite';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Précision : $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Élevée';
+
+  @override
+  String get consumptionAccuracyMedium => 'Moyenne';
+
+  @override
+  String get consumptionAccuracyLow => 'Faible';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Calibrage complet : pleins plus trajets enregistrés en OBD2. La valeur en L/100 km correspond à la réalité à quelques pour cent près.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Les pleins ont ancré le modèle de consommation, mais aucun trajet OBD2 n\'a encore alimenté la boucle. Enregistrez-en un avec l\'OBD2 connecté pour atteindre une précision élevée.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'GPS uniquement — aucun plein n\'a encore ancré le modèle de consommation. Ajoutez quelques pleins complets pour améliorer la précision.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

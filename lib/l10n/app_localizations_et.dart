@@ -3836,6 +3836,32 @@ class AppLocalizationsEt extends AppLocalizations {
   String get consoSubsectionToggles => 'Sõitmine';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Täpsus: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Kõrge';
+
+  @override
+  String get consumptionAccuracyMedium => 'Keskmine';
+
+  @override
+  String get consumptionAccuracyLow => 'Madal';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Täielik kalibreerimine: tankimised pluss OBD2-ga salvestatud sõidud. L/100 km näit vastab tegelikkusele mõne protsendi täpsusega.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Tankimised on kütusekulu mudeli ankurdanud, kuid ühtegi OBD2-sõitu pole veel arvestatud. Salvesta üks ühendatud OBD2-ga, et jõuda kõrge täpsuseni.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Ainult GPS — ükski tankimine pole veel kütusekulu mudelit ankurdanud. Lisa paar täistankimist, et täpsust parandada.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

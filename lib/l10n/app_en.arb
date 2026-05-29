@@ -2307,6 +2307,44 @@
   "consoSubsectionVehicles": "My vehicles",
   "consoSubsectionTrajets": "Trips (OBD2)",
   "consoSubsectionToggles": "Driving",
+  "consumptionAccuracyLabel": "Accuracy: {level} · {band}",
+  "@consumptionAccuracyLabel": {
+    "description": "#2262 — plain-language accuracy indicator on the consumption stats card, replacing the back-to-front A/B/C confidence letters. `level` is one of the localized High/Medium/Low words; `band` is the language-neutral expected-error mask (e.g. ±3-7%).",
+    "placeholders": {
+      "level": {
+        "type": "String",
+        "example": "High"
+      },
+      "band": {
+        "type": "String",
+        "example": "±3-7%"
+      }
+    }
+  },
+  "consumptionAccuracyHigh": "High",
+  "@consumptionAccuracyHigh": {
+    "description": "#2262 — accuracy word for the fully-calibrated tier (fill-ups + OBD2 trips). Highest trust."
+  },
+  "consumptionAccuracyMedium": "Medium",
+  "@consumptionAccuracyMedium": {
+    "description": "#2262 — accuracy word for the fill-ups-anchored-but-no-OBD2-trip tier."
+  },
+  "consumptionAccuracyLow": "Low",
+  "@consumptionAccuracyLow": {
+    "description": "#2262 — accuracy word for the GPS-only, no-fill-ups tier. Lowest trust."
+  },
+  "consumptionAccuracyTooltipHigh": "Full calibration: fill-ups plus OBD2-recorded trips. The L/100 km figure tracks reality to within a few percent.",
+  "@consumptionAccuracyTooltipHigh": {
+    "description": "#2262 — tooltip for the High accuracy indicator. No improvement action needed."
+  },
+  "consumptionAccuracyTooltipMedium": "Fill-ups have anchored the consumption model, but no OBD2 trip has fed the loop yet. Record one with OBD2 connected to reach High accuracy.",
+  "@consumptionAccuracyTooltipMedium": {
+    "description": "#2262 — tooltip for the Medium accuracy indicator. Tells the user to record an OBD2 trip to improve."
+  },
+  "consumptionAccuracyTooltipLow": "GPS-only — no fill-ups have anchored the consumption model yet. Add a couple of full fill-ups to improve the accuracy.",
+  "@consumptionAccuracyTooltipLow": {
+    "description": "#2262 — tooltip for the Low accuracy indicator. Tells the user to add full fill-ups to improve."
+  },
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 partial fill pending plein complet — not in average} other{{count} partial fills pending plein complet — not in average}}",
   "@consumptionStatsOpenWindowBanner": {
     "description": "Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.",

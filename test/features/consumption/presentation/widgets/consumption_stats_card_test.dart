@@ -5,8 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/consumption_stats_card.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 
 import '../../../../helpers/pump_app.dart';
+
+/// #2262 — the raw η_v chip is gated on `Feature.debugMode`. This stub
+/// flips Developer mode ON so the chip renders; without it the manifest
+/// default (debugMode off) keeps the chip hidden.
+class _DebugModeOn extends FeatureFlags {
+  @override
+  Set<Feature> build() => {Feature.debugMode};
+}
+
+/// Overrides list that enables Developer mode for the calibration-chip
+/// tests below.
+final _debugOn = [featureFlagsProvider.overrideWith(() => _DebugModeOn())];
 
 /// Builds a [ConsumptionStats] with sensible defaults so each test only
 /// spells out the field it cares about. Mirrors the freezed factory at
@@ -373,14 +387,27 @@ void main() {
     },
   );
 
-  group('ConsumptionStatsCard — calibration chip (#1397)', () {
+  // ─── #2262 — raw η_v chip gated behind Developer mode ─────────────
+  //
+  // The raw η_v + sample-count chip is engineering jargon, so it is
+  // gated on `Feature.debugMode` (default-off). For normal users the
+  // plain accuracy indicator (ConfidenceTierBadge) is the only
+  // calibration signal; the raw chip only appears when Developer mode
+  // is ON. The chip tests below therefore pump with `_debugOn`.
+
+  group('ConsumptionStatsCard — calibration chip (#1397 / #2262)', () {
     testWidgets('no chip when volumetricEfficiencySamples == null',
         (tester) async {
-      await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(stats: _stats()),
+        overrides: _debugOn,
+      );
       expect(find.byType(Chip), findsNothing);
     });
 
-    testWidgets('samples == 0 → "no plein-complet yet" pill (#2112)',
+    testWidgets(
+        'samples == 0 → "no plein-complet yet" pill (#2112, debug on)',
         (tester) async {
       await pumpApp(
         tester,
@@ -389,6 +416,7 @@ void main() {
           volumetricEfficiency: 0.85,
           volumetricEfficiencySamples: 0,
         ),
+        overrides: _debugOn,
       );
       // #2112 — the calibration pill is no longer a Material `Chip`;
       // it's a tonal Container so the η_v pill harmonises with the
@@ -402,7 +430,7 @@ void main() {
     // confidence-tier badge now riding next to it. The η_v pill
     // shows the bare mean + sample count in both cases.
     testWidgets(
-        '0 < samples < 3 → compact η_v pill with sample count (#2112)',
+        '0 < samples < 3 → compact η_v pill with sample count (debug on)',
         (tester) async {
       await pumpApp(
         tester,
@@ -411,13 +439,14 @@ void main() {
           volumetricEfficiency: 0.87,
           volumetricEfficiencySamples: 2,
         ),
+        overrides: _debugOn,
       );
       expect(find.textContaining('0.87'), findsOneWidget);
       expect(find.textContaining('2 samples'), findsOneWidget);
     });
 
     testWidgets(
-        'samples >= 3 → compact η_v pill (no calibrated wording — #2112)',
+        'samples >= 3 → compact η_v pill (no calibrated wording, debug on)',
         (tester) async {
       await pumpApp(
         tester,
@@ -426,6 +455,7 @@ void main() {
           volumetricEfficiency: 0.91,
           volumetricEfficiencySamples: 5,
         ),
+        overrides: _debugOn,
       );
       expect(find.textContaining('0.91'), findsOneWidget);
       expect(find.textContaining('5 samples'), findsOneWidget);
@@ -436,7 +466,7 @@ void main() {
     });
 
     testWidgets(
-        '#2112 — η_v pill + confidence tier ride a single Wrap (one parent)',
+        '#2112 — accuracy badge + η_v pill ride a single Wrap (debug on)',
         (tester) async {
       await pumpApp(
         tester,
@@ -445,12 +475,65 @@ void main() {
           volumetricEfficiency: 0.87,
           volumetricEfficiencySamples: 2,
         ),
+        overrides: _debugOn,
       );
       final wraps = find.byType(Wrap).evaluate();
       // ConsumptionStatsCard has no other Wrap today; this asserts
       // the calibration pills group sits in exactly one Wrap so
       // their layout stays harmonised.
       expect(wraps.length, greaterThanOrEqualTo(1));
+    });
+  });
+
+  group('ConsumptionStatsCard — raw η_v chip Developer-mode gate (#2262)', () {
+    testWidgets(
+        'η_v chip is HIDDEN for normal users (debugMode off — default)',
+        (tester) async {
+      // No override → manifest default → debugMode off.
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+      );
+      // The raw η_v glyph + sample count must not surface.
+      expect(find.textContaining('η_v'), findsNothing);
+      expect(find.textContaining('2 samples'), findsNothing);
+      // …but the plain accuracy indicator (always-on) still renders.
+      expect(find.textContaining('Accuracy:'), findsOneWidget);
+    });
+
+    testWidgets('η_v chip is SHOWN when Developer mode is ON', (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+        overrides: _debugOn,
+      );
+      expect(find.textContaining('η_v'), findsOneWidget);
+      expect(find.textContaining('2 samples'), findsOneWidget);
+      // Accuracy indicator still rides alongside it.
+      expect(find.textContaining('Accuracy:'), findsOneWidget);
+    });
+
+    testWidgets(
+        'samples == 0 raw chip is HIDDEN for normal users (debugMode off)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.85,
+          volumetricEfficiencySamples: 0,
+        ),
+      );
+      expect(find.textContaining('no plein-complet'), findsNothing);
+      expect(find.textContaining('η_v'), findsNothing);
     });
   });
 }

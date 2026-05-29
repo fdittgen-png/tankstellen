@@ -3855,6 +3855,32 @@ class AppLocalizationsNl extends AppLocalizations {
   String get consoSubsectionToggles => 'Rijden';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Nauwkeurigheid: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Hoog';
+
+  @override
+  String get consumptionAccuracyMedium => 'Gemiddeld';
+
+  @override
+  String get consumptionAccuracyLow => 'Laag';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Volledige kalibratie: tankbeurten plus ritten opgenomen met OBD2. De L/100 km-waarde volgt de werkelijkheid tot op enkele procenten.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Tankbeurten hebben het verbruiksmodel verankerd, maar er is nog geen OBD2-rit verwerkt. Neem er een op met OBD2 verbonden om hoge nauwkeurigheid te bereiken.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Alleen GPS — nog geen tankbeurten hebben het verbruiksmodel verankerd. Voeg een paar volle tankbeurten toe om de nauwkeurigheid te verbeteren.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

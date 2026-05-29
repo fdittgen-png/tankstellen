@@ -3859,6 +3859,32 @@ class AppLocalizationsLt extends AppLocalizations {
   String get consoSubsectionToggles => 'Vairavimas';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Tikslumas: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Aukštas';
+
+  @override
+  String get consumptionAccuracyMedium => 'Vidutinis';
+
+  @override
+  String get consumptionAccuracyLow => 'Žemas';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Visiškas kalibravimas: pildymai ir per OBD2 įrašytos kelionės. L/100 km reikšmė atitinka tikrovę kelių procentų tikslumu.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Pildymai įtvirtino sąnaudų modelį, bet dar nebuvo apdorota nė viena OBD2 kelionė. Įrašykite vieną su prijungtu OBD2, kad pasiektumėte aukštą tikslumą.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Tik GPS — joks pildymas dar neįtvirtino sąnaudų modelio. Pridėkite kelis pilnus pildymus, kad pagerintumėte tikslumą.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

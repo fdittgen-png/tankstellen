@@ -3851,6 +3851,32 @@ class AppLocalizationsPl extends AppLocalizations {
   String get consoSubsectionToggles => 'Jazda';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Dokładność: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Wysoka';
+
+  @override
+  String get consumptionAccuracyMedium => 'Średnia';
+
+  @override
+  String get consumptionAccuracyLow => 'Niska';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Pełna kalibracja: tankowania oraz przejazdy zarejestrowane przez OBD2. Wartość L/100 km odpowiada rzeczywistości z dokładnością do kilku procent.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Tankowania zakotwiczyły model zużycia, ale żaden przejazd OBD2 nie został jeszcze przetworzony. Zarejestruj jeden z podłączonym OBD2, aby osiągnąć wysoką dokładność.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Tylko GPS — żadne tankowanie nie zakotwiczyło jeszcze modelu zużycia. Dodaj kilka pełnych tankowań, aby poprawić dokładność.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
