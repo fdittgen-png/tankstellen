@@ -99,15 +99,22 @@ void main() {
       );
     });
 
-    test('SI — NMB-95/100, Diesel, Diesel Premium, LPG (#575)', () {
+    test('SI — NMB-95 (e5+e10)/100, Diesel, Diesel Premium, LPG, CNG '
+        '(#575, #2180)', () {
+      // #2180 — e10 + cng added: SloveniaStationService surfaces the single
+      // 95-octane grade as both e5 and e10, and maps the goriva.si "cng"
+      // key onto Station.cng. The registry now matches what the service
+      // emits and the country's supportedFuelTypes picker set.
       expect(
         fuelTypesForCountry('SI'),
         equals(<FuelType>[
           FuelType.e5,
+          FuelType.e10,
           FuelType.e98,
           FuelType.diesel,
           FuelType.dieselPremium,
           FuelType.lpg,
+          FuelType.cng,
           FuelType.electric,
           FuelType.all,
         ]),
