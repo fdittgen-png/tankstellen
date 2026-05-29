@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/station_detail_provider.dart';
@@ -81,14 +82,11 @@ class StationDetailInline extends ConsumerWidget {
               );
             },
             loading: () => const ShimmerStationDetail(),
-            error: (error, _) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+            // Replace raw Text(error.toString()) with the localized,
+            // retryable surface used by the standalone screen (#2298).
+            error: (error, _) => ServiceChainErrorWidget(
+              error: error,
+              onRetry: () => ref.invalidate(stationDetailProvider(stationId)),
             ),
           ),
         ),
