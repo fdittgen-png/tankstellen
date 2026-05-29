@@ -435,4 +435,240 @@ void main() {
       expect(rate, greaterThan(0));
     });
   });
+
+  group('SupportedPidsCache.productionKey — #2253', () {
+    test('mac + full make/model/year → adapterMac:make:model:year', () {
+      final key = SupportedPidsCache.productionKey(
+        adapterMac: 'AA:BB:CC:DD',
+        make: 'Peugeot',
+        model: '107',
+        year: 2008,
+      );
+      expect(key, 'aa:bb:cc:dd:peugeot:107:2008');
+    });
+
+    test('mac only (no vehicle fields) → adapterMac-only key', () {
+      final key = SupportedPidsCache.productionKey(adapterMac: 'AA:BB');
+      expect(key, 'aa:bb');
+    });
+
+    test('partial vehicle (missing year) degrades to adapterMac-only', () {
+      final key = SupportedPidsCache.productionKey(
+        adapterMac: 'AA:BB',
+        make: 'Peugeot',
+        model: '107',
+        // year omitted
+      );
+      expect(key, 'aa:bb');
+    });
+
+    test('blank make/model degrade to adapterMac-only', () {
+      final key = SupportedPidsCache.productionKey(
+        adapterMac: 'AA:BB',
+        make: '  ',
+        model: '',
+        year: 2008,
+      );
+      expect(key, 'aa:bb');
+    });
+
+    test('no adapterMac → null (resolver falls back to VIN-first path)', () {
+      expect(
+        SupportedPidsCache.productionKey(adapterMac: null),
+        isNull,
+      );
+      expect(
+        SupportedPidsCache.productionKey(adapterMac: ''),
+        isNull,
+      );
+    });
+
+    test('case-insensitive — capitalisation mismatch shares a slot', () {
+      final a = SupportedPidsCache.productionKey(
+        adapterMac: 'AA:BB',
+        make: 'Peugeot',
+        model: '107',
+        year: 2008,
+      );
+      final b = SupportedPidsCache.productionKey(
+        adapterMac: 'aa:bb',
+        make: 'PEUGEOT',
+        model: '107',
+        year: 2008,
+      );
+      expect(a, b);
+    });
+  });
+
+  group('Obd2Service production-key cache wiring (HIT-skip-0902) — #2253', () {
+    late Directory tmpDir;
+    late Box<String> box;
+
+    setUp(() async {
+      tmpDir = Directory.systemTemp.createTempSync('obd2_prodkey_');
+      Hive.init(tmpDir.path);
+      box = await Hive.openBox<String>(
+        'test_${DateTime.now().microsecondsSinceEpoch}',
+      );
+    });
+
+    tearDown(() async {
+      await box.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    // The production-shaped key the live Obd2ConnectionService hands the
+    // service — no VIN involved.
+    final prodKey = SupportedPidsCache.productionKey(
+      adapterMac: 'AA:BB:CC:DD',
+      make: 'Peugeot',
+      model: '107',
+      year: 2008,
+    )!;
+
+    test(
+        'cold connect (cache miss) → scan runs, bitmap persisted under the '
+        'production key; 0902 fallback only when scan needs a precise key',
+        () async {
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        // No 0902 wired → VIN parse returns null → resolver falls back
+        // to the production key for persistence.
+        '0100': '41 00 80 32 00 00>', // PIDs 1, 0x0B, 0x0C, 0x0F
+      });
+      final service = Obd2Service(
+        transport,
+        pidsCache: SupportedPidsCache(box),
+        vehicleFallbackKey: prodKey,
+      );
+
+      final ok = await service.connect();
+      expect(ok, isTrue);
+
+      // Scan ran on the cold path.
+      expect(transport.sentCommands, contains('0100'));
+      // In-memory + persisted under the production key.
+      expect(service.supportsPid(0x0B), isTrue);
+      expect(service.supportsPid(0x5E), isFalse);
+      expect(box.get(prodKey), isNotNull,
+          reason: 'cold path must persist the bitmap under the prod key');
+      expect(
+        SupportedPidsCache(box).get(prodKey),
+        containsAll([0x01, 0x0B, 0x0C, 0x0F]),
+      );
+    });
+
+    test(
+        'warm connect (cache HIT on production key) → NO support scan AND '
+        'NO 0902 VIN read', () async {
+      // Pre-seed as if a previous session already scanned this
+      // adapter+vehicle.
+      await SupportedPidsCache(box).put(prodKey, {0x01, 0x0B, 0x0C, 0x0F});
+
+      // Neither 0100 NOR 0902 is wired — if the service tries either,
+      // FakeObd2Transport returns 'NO DATA>'. We assert by command
+      // capture that it sends NEITHER.
+      final transport = FakeObd2Transport({..._initResponses});
+      final service = Obd2Service(
+        transport,
+        pidsCache: SupportedPidsCache(box),
+        vehicleFallbackKey: prodKey,
+      );
+
+      final ok = await service.connect();
+      expect(ok, isTrue);
+
+      // The whole point of #2253: a warm connect pays neither the
+      // multi-frame VIN read nor the 8 × 01 XX support scan.
+      expect(transport.sentCommands, isNot(contains('0902')),
+          reason: 'HIT on the production key must skip the 0902 VIN read');
+      expect(transport.sentCommands, isNot(contains('0100')),
+          reason: 'HIT must skip the supported-PID support scan');
+
+      // Cached set populated the in-memory bitmap.
+      expect(service.supportsPid(0x0B), isTrue);
+      expect(service.supportsPid(0x5E), isFalse);
+    });
+
+    test(
+        'warm HIT → unsupported PIDs are NOT polled by the recording-loop '
+        'consumers (readFuelRateLPerHour speed-density path)', () async {
+      // Peugeot 107 1KR-FE: no 5E, no MAF; MAP/IAT/RPM present.
+      await SupportedPidsCache(box).put(prodKey, {0x0B, 0x0C, 0x0F});
+
+      // 015E / 0110 intentionally NOT wired: if the service polled an
+      // unsupported PID it would hit FakeObd2Transport's NO DATA and
+      // show up in sentCommands.
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '010B': '41 0B 28>', // MAP 40 kPa
+        '010F': '41 0F 41>', // IAT 25 °C
+        '010C': '41 0C 0C 80>', // RPM 800
+      });
+      final service = Obd2Service(
+        transport,
+        pidsCache: SupportedPidsCache(box),
+        vehicleFallbackKey: prodKey,
+      );
+      await service.connect();
+
+      expect(service.supportsPid(0x5E), isFalse);
+      expect(service.supportsPid(0x10), isFalse);
+
+      final rate = await service.readFuelRateLPerHour();
+      expect(rate, isNotNull);
+      expect(rate, greaterThan(0));
+
+      // The unsupported PID commands were never sent.
+      expect(transport.sentCommands, isNot(contains('015E')));
+      expect(transport.sentCommands, isNot(contains('0110')));
+    });
+
+    test(
+        'no-cache (cold) path unchanged — service built transport-only still '
+        'scans blindly and never rejects a PID', () async {
+      final transport = FakeObd2Transport({..._initResponses});
+      // No pidsCache, no vehicleFallbackKey — exactly the pre-#2253
+      // construction.
+      final service = Obd2Service(transport);
+
+      final ok = await service.connect();
+      expect(ok, isTrue);
+
+      // prime() is a no-op without a cache → no fallback probe, no scan,
+      // no VIN read.
+      expect(transport.sentCommands, isNot(contains('0100')));
+      expect(transport.sentCommands, isNot(contains('0902')));
+      // "Unknown ⇒ allow": every PID still reports supported.
+      expect(service.supportsPid(0x5E), isTrue);
+      expect(service.supportsPid(0x0B), isTrue);
+    });
+
+    test(
+        'VIN-keyed legacy entries still resolve when no fallback key is '
+        'supplied (no regression to the #811 VIN path)', () async {
+      const vin = 'VF7PPPP0000000001';
+      await SupportedPidsCache(box).put(vin, {0x0B, 0x0C, 0x0F});
+
+      // No vehicleFallbackKey → resolver must read 0902 and hit on VIN.
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '0902': _vinResponse(vin),
+      });
+      final service = Obd2Service(
+        transport,
+        pidsCache: SupportedPidsCache(box),
+      );
+
+      final ok = await service.connect();
+      expect(ok, isTrue);
+      // VIN read happened (it's the only key source here)…
+      expect(transport.sentCommands, contains('0902'));
+      // …and the cached set loaded → no support scan.
+      expect(transport.sentCommands, isNot(contains('0100')));
+      expect(service.supportsPid(0x0B), isTrue);
+      expect(service.supportsPid(0x5E), isFalse);
+    });
+  });
 }

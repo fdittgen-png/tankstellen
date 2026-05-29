@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_bluetooth_facade.dart';
@@ -11,6 +13,7 @@ import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
+import 'package:tankstellen/features/consumption/data/obd2/supported_pids_cache.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 void main() {
@@ -395,6 +398,106 @@ void main() {
           reason: 'fallbackToScan:false must skip the internal scan');
     });
   });
+
+  group('Obd2ConnectionService supported-PID cache wiring — #2253', () {
+    late Directory tmpDir;
+    late Box<String> box;
+
+    setUp(() async {
+      tmpDir = Directory.systemTemp.createTempSync('conn_svc_pidcache_');
+      Hive.init(tmpDir.path);
+      box = await Hive.openBox<String>(
+        'test_${DateTime.now().microsecondsSinceEpoch}',
+      );
+    });
+
+    tearDown(() async {
+      await box.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    // The resolved candidate's MAC is 'aa:bb' + a Peugeot 107 active
+    // vehicle ⇒ this is the production key the service should key on.
+    final prodKey = SupportedPidsCache.productionKey(
+      adapterMac: 'aa:bb',
+      make: 'Peugeot',
+      model: '107',
+      year: 2008,
+    )!;
+
+    test(
+        'cold connect scans + persists the bitmap under the adapterMac+'
+        'make:model:year production key', () async {
+      final svc = _build(
+        permState: Obd2PermissionState.granted,
+        bt: _FakeFacade(
+          batches: const [[]],
+          channel: _FakeChannel(respondTo: {
+            ..._elmOkResponses(),
+            // PIDs 1, 0x0B, 0x0C, 0x0F; continuation bit (PID 32) clear.
+            '0100': '41 00 80 32 00 00>',
+          }),
+        ),
+        supportedPidsCache: SupportedPidsCache(box),
+        activeVehicleKeyFields: () =>
+            (make: 'Peugeot', model: '107', year: 2008),
+      );
+
+      final ready = await svc.connect(_resolvedVlinker(registry));
+      expect(ready.supportsPid(0x0B), isTrue);
+      expect(ready.supportsPid(0x5E), isFalse);
+      // Persisted under the production key for the next session.
+      expect(SupportedPidsCache(box).get(prodKey),
+          containsAll([0x01, 0x0B, 0x0C, 0x0F]));
+      await ready.disconnect();
+    });
+
+    test(
+        'warm connect with a pre-seeded production key skips the support '
+        'scan AND the 0902 VIN read', () async {
+      await SupportedPidsCache(box).put(prodKey, {0x0B, 0x0C, 0x0F});
+
+      // Channel answers ONLY the AT init — neither 0100 nor 0902 wired,
+      // so any attempt would surface as the channel's default 'OK>'
+      // (a non-bitmap, non-VIN response). We assert the resolver loads
+      // the cached set without needing either.
+      final svc = _build(
+        permState: Obd2PermissionState.granted,
+        bt: _FakeFacade(
+          batches: const [[]],
+          channel: _FakeChannel(respondTo: _elmOkResponses()),
+        ),
+        supportedPidsCache: SupportedPidsCache(box),
+        activeVehicleKeyFields: () =>
+            (make: 'Peugeot', model: '107', year: 2008),
+      );
+
+      final ready = await svc.connect(_resolvedVlinker(registry));
+      // Cached bitmap populated the in-memory set without a scan/VIN read.
+      expect(ready.supportsPid(0x0B), isTrue);
+      expect(ready.supportsPid(0x5E), isFalse);
+      await ready.disconnect();
+    });
+
+    test(
+        'no cache wired → behaves exactly as before (transport-only), never '
+        'rejects a PID', () async {
+      final svc = _build(
+        permState: Obd2PermissionState.granted,
+        bt: _FakeFacade(
+          batches: const [[]],
+          channel: _FakeChannel(respondTo: _elmOkResponses()),
+        ),
+        // supportedPidsCache / activeVehicleKeyFields intentionally null.
+      );
+
+      final ready = await svc.connect(_resolvedVlinker(registry));
+      expect(ready.supportsPid(0x5E), isTrue);
+      expect(box.length, 0);
+      await ready.disconnect();
+    });
+  });
 }
 
 // --- helpers ---------------------------------------------------------
@@ -402,11 +505,15 @@ void main() {
 Obd2ConnectionService _build({
   required Obd2PermissionState permState,
   required BluetoothFacade bt,
+  SupportedPidsCache? supportedPidsCache,
+  Obd2VehicleKeyFields Function()? activeVehicleKeyFields,
 }) =>
     Obd2ConnectionService(
       registry: Obd2AdapterRegistry.defaults(),
       permissions: _FakePermissions(permState),
       bluetooth: bt,
+      supportedPidsCache: supportedPidsCache,
+      activeVehicleKeyFields: activeVehicleKeyFields,
     );
 
 ResolvedObd2Candidate _resolvedVlinker(Obd2AdapterRegistry r) {

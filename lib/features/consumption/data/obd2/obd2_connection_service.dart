@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'adapter_registry.dart';
@@ -15,9 +16,19 @@ import 'elm_byte_channel.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_permissions.dart';
 import 'obd2_service.dart';
+import 'supported_pids_cache.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/storage/hive_boxes.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 
 part 'obd2_connection_service.g.dart';
+
+/// Vehicle identity the supported-PID cache (#811/#2253) refines its
+/// per-adapter key with. Supplied lazily by the [Obd2ConnectionService]
+/// owner so the data layer never depends on the vehicle feature's
+/// providers directly — the Riverpod provider resolves the active
+/// profile and hands these three fields through.
+typedef Obd2VehicleKeyFields = ({String? make, String? model, int? year});
 
 /// Binds scan results to the adapter registry and hands back a ready
 /// [Obd2Service] on connect (#741).
@@ -49,11 +60,25 @@ class Obd2ConnectionService {
   /// caller back to the scan path. Null once torn down / never used.
   ElmByteChannel? _lastDirectChannel;
 
+  /// Persistent supported-PID bitmap cache (#811), wired into every
+  /// session built here (#2253). Null in tests / configs that don't
+  /// exercise the cache — the service then behaves exactly as before
+  /// (blind PID querying, full support scan every connect).
+  final SupportedPidsCache? supportedPidsCache;
+
+  /// Lazily resolves the active vehicle's make / model / year so the
+  /// supported-PID cache key can be refined past adapterMac-only
+  /// (#2253). Read fresh on every connect because the active vehicle
+  /// can change between trips. Null ⇒ adapterMac-only keying.
+  final Obd2VehicleKeyFields Function()? activeVehicleKeyFields;
+
   Obd2ConnectionService({
     required this.registry,
     required this.permissions,
     required this.bluetooth,
     this.classicBluetooth,
+    this.supportedPidsCache,
+    this.activeVehicleKeyFields,
   });
 
   /// Stream of ranked, profile-matched candidates for the picker UI.
@@ -149,7 +174,27 @@ class Obd2ConnectionService {
     required String name,
   }) async {
     final transport = BluetoothObd2Transport(channel);
-    final service = Obd2Service(transport);
+    // #2253 — wire the dead #811 supported-PID cache into the live
+    // session. The key is rooted on the adapter MAC and refined with
+    // the active vehicle's make:model:year, so [Obd2Service.connect] →
+    // `prime()` can read a cached support bitmap WITHOUT first paying a
+    // multi-frame 0902 VIN read, and the recording loop skips PIDs the
+    // car doesn't implement. When no cache is wired this collapses to
+    // the pre-#2253 transport-only construction.
+    final cache = supportedPidsCache;
+    final vehicle = activeVehicleKeyFields?.call();
+    final service = Obd2Service(
+      transport,
+      pidsCache: cache,
+      vehicleFallbackKey: cache == null
+          ? null
+          : SupportedPidsCache.productionKey(
+              adapterMac: mac,
+              make: vehicle?.make,
+              model: vehicle?.model,
+              year: vehicle?.year,
+            ),
+    );
     service.adapterMac = mac;
     service.adapterName = name;
     // #1330 — hand the per-adapter ELM327 adapter into [Obd2Service]
@@ -309,5 +354,27 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     permissions: ref.watch(obd2PermissionsProvider),
     bluetooth: const PluginBluetoothFacade(),
     classicBluetooth: const PluginClassicBluetoothFacade(),
+    // #2253 — activate the #811 supported-PID cache in production.
+    supportedPidsCache: _openSupportedPidsCache(),
+    activeVehicleKeyFields: () {
+      // Defensive: the vehicle provider must never make a connect throw.
+      try {
+        final v = ref.read(activeVehicleProfileProvider);
+        return (make: v?.make, model: v?.model, year: v?.year);
+      } catch (_) {
+        return (make: null, model: null, year: null);
+      }
+    },
   );
+}
+
+/// Open the #811 supported-PID cache against the unencrypted box
+/// [HiveBoxes.init] opens after the first frame. Returns null when the
+/// box isn't open yet (early-boot connect, or a bare test harness that
+/// never initialised Hive) so building the connection service can never
+/// throw — the session then runs with the pre-#2253 no-cache behaviour
+/// (blind PID querying, full support scan every connect).
+SupportedPidsCache? _openSupportedPidsCache() {
+  if (!Hive.isBoxOpen(HiveBoxes.obd2SupportedPids)) return null;
+  return SupportedPidsCache(Hive.box<String>(HiveBoxes.obd2SupportedPids));
 }
