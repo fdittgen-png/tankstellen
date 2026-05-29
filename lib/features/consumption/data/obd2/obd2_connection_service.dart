@@ -8,17 +8,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'adapter_registry.dart';
 import 'bluetooth_facade.dart';
-import 'bluetooth_obd2_transport.dart';
 import 'classic_bluetooth_facade.dart';
 import 'elm327_adapter.dart';
 import 'elm_byte_channel.dart';
 import 'negotiated_protocol_cache.dart';
+import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_permissions.dart';
 import 'obd2_service.dart';
 import 'supported_pids_cache.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 
 part 'obd2_connection_service.g.dart';
@@ -77,6 +78,13 @@ class Obd2ConnectionService {
   /// auto-search, exactly as before.
   final NegotiatedProtocolCache? negotiatedProtocolCache;
 
+  /// Per-MAC observed-outcome wake cache (#2268 concern 3). A connect
+  /// reads it to suppress the bounded wake window for a MAC observed
+  /// never to need it, and writes back the fresh observation. Null ⇒ the
+  /// session always honours the adapter's own [WakePolicy] (a no-op for
+  /// every generic adapter, so behaviour is unchanged).
+  final Obd2AdapterWakeCache? adapterWakeCache;
+
   /// Lazily resolves the active vehicle's make / model / year so the
   /// supported-PID cache key can be refined past adapterMac-only
   /// (#2253). Read fresh on every connect because the active vehicle
@@ -90,6 +98,7 @@ class Obd2ConnectionService {
     this.classicBluetooth,
     this.supportedPidsCache,
     this.negotiatedProtocolCache,
+    this.adapterWakeCache,
     this.activeVehicleKeyFields,
   });
 
@@ -185,43 +194,29 @@ class Obd2ConnectionService {
     required String mac,
     required String name,
   }) async {
-    final transport = BluetoothObd2Transport(channel);
-    // #2253 — wire the #811 supported-PID cache into the live session.
-    // Key = adapterMac(+make:model:year), so `prime()` reads a cached
-    // support bitmap WITHOUT a multi-frame 0902 VIN read. No cache wired
-    // ⇒ pre-#2253 transport-only construction.
-    final cache = supportedPidsCache;
+    // #2253/#2261 — build the session with the supported-PID + warm
+    // negotiated-protocol caches wired in (see [buildObd2Session]).
     final vehicle = activeVehicleKeyFields?.call();
-    // #2261 concern 3 — resolve the warm-protocol cache key from the
-    // adapter MAC + the active vehicle's VIN (when known).
-    final protoCache = negotiatedProtocolCache;
-    final protoKey = protoCache == null
-        ? null
-        : NegotiatedProtocolCache.keyFor(
-            adapterMac: mac,
-            vin: vehicle?.vin,
-          );
-    final service = Obd2Service(
-      transport,
-      pidsCache: cache,
-      vehicleFallbackKey: cache == null
-          ? null
-          : SupportedPidsCache.productionKey(
-              adapterMac: mac,
-              make: vehicle?.make,
-              model: vehicle?.model,
-              year: vehicle?.year,
-            ),
-      protocolCache: protoCache,
-      protocolCacheKey: protoKey,
+    final service = buildObd2Session(
+      channel: channel,
+      mac: mac,
+      name: name,
+      pidsCache: supportedPidsCache,
+      protocolCache: negotiatedProtocolCache,
+      make: vehicle?.make,
+      model: vehicle?.model,
+      year: vehicle?.year,
+      vin: vehicle?.vin,
     );
-    service.adapterMac = mac;
-    service.adapterName = name;
-    // #1330 — hand the per-adapter ELM327 adapter into [Obd2Service]
-    // so its init sequence + timing matches the connected adapter's
-    // quirks. Phase 1 ships only [GenericElm327Adapter], so runtime
-    // behaviour is unchanged for every paired adapter.
-    final ok = await service.connect(adapter: adapter);
+    // #2268 concern 3 — a no-op override suppresses the wake window for a
+    // MAC observed never to need it; null ⇒ honour the adapter policy.
+    final wakeOverride = await adapterWakeCache?.overrideFor(mac);
+    // #1330 — the per-adapter ELM327 adapter sets the init sequence/timing.
+    final ok =
+        await service.connect(adapter: adapter, wakePolicyOverride: wakeOverride);
+    // #2268 concern 3 — persist the observed wake outcome (a no-op unless
+    // the bounded window actually ran on this connect).
+    await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
     if (!ok) {
       await service.disconnect();
       throw const Obd2AdapterUnresponsive();
@@ -389,6 +384,10 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     supportedPidsCache: openSupportedPidsCache(),
     // #2261 concern 3 — activate the negotiated-protocol warm cache.
     negotiatedProtocolCache: openNegotiatedProtocolCache(),
+    // #2268 concern 3 — per-MAC observed-outcome wake cache, backed by
+    // the shared `settings` box (same pattern as the broken-MAP blocklist).
+    adapterWakeCache:
+        Obd2AdapterWakeCache(ref.watch(settingsStorageProvider)),
     activeVehicleKeyFields: () {
       // Defensive: the vehicle provider must never make a connect throw.
       try {
