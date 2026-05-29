@@ -143,7 +143,8 @@ class TrajetsMapScreen extends ConsumerWidget {
       );
       if (messenger == null) return;
       final ok = l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
-      messenger.showSnackBar(SnackBar(content: Text(ok)));
+      // #2173 — themed success toast (matches the sibling error path).
+      messenger.showSnackBar(SnackBarHelper.successSnackBar(scheme, ok));
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TrajetsMapScreen save GPX'}));
       if (messenger == null) return;
