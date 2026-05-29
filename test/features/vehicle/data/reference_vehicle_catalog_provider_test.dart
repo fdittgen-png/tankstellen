@@ -50,6 +50,34 @@ void main() {
       }
     });
 
+    test(
+        'returns the parsed catalog (decoded off the UI isolate via compute, '
+        '#2192)', () async {
+      // #2192 moved the jsonDecode + fromJson off the UI isolate into a
+      // compute() background isolate. This asserts the awaited Future still
+      // resolves to fully deserialized ReferenceVehicle instances — i.e.
+      // the result survives the isolate round-trip — not just raw maps.
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final catalog =
+          await container.read(referenceVehicleCatalogProvider.future);
+
+      expect(catalog, isA<List<ReferenceVehicle>>());
+      expect(catalog, isNotEmpty);
+      expect(catalog.first, isA<ReferenceVehicle>());
+
+      // A known catalog entry must come back as a usable entity.
+      final peugeot208 = catalog.firstWhere(
+        (v) =>
+            v.make.toLowerCase() == 'peugeot' &&
+            v.model.toLowerCase() == '208',
+        orElse: () => throw StateError('expected a Peugeot 208 entry'),
+      );
+      expect(peugeot208.make, 'Peugeot');
+      expect(peugeot208.displacementCc, greaterThan(0));
+    });
+
     test('shares the same list instance on repeated reads (keepAlive cache)',
         () async {
       final container = ProviderContainer();

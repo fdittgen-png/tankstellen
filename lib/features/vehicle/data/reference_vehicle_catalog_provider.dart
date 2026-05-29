@@ -3,6 +3,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -23,8 +24,22 @@ const String referenceVehicleCatalogAssetPath =
 /// read this provider; the cached `List<ReferenceVehicle>` is shared.
 @Riverpod(keepAlive: true)
 Future<List<ReferenceVehicle>> referenceVehicleCatalog(Ref ref) async {
+  // The asset load stays on the main isolate (rootBundle is not available
+  // off it), but the ~142 KB JSON decode + N× fromJson deserialization is
+  // pushed to a background isolate via compute() so it can't jank the UI
+  // on first read (#2192). Mirrors the compute(_parseCsv, …) pattern in
+  // argentina_station_service.dart.
   final raw = await rootBundle.loadString(referenceVehicleCatalogAssetPath);
-  final decoded = jsonDecode(raw);
+  return compute(_parseCatalog, raw);
+}
+
+/// Top-level parser run on a background isolate by [referenceVehicleCatalog].
+///
+/// Decodes the catalog JSON and deserializes each entry into a
+/// [ReferenceVehicle]. Must stay top-level (no captured state) so it can be
+/// dispatched through [compute].
+List<ReferenceVehicle> _parseCatalog(String json) {
+  final decoded = jsonDecode(json);
   if (decoded is! List) {
     // The asset is checked into source — a malformed file is a
     // shipping bug, not a runtime condition. Throw loudly so CI

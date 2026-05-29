@@ -30,15 +30,20 @@ import '../../../core/logging/error_logger.dart';
 class PrixCarburantsStationService with StationServiceHelpers implements StationService {
   final OsmBrandEnricher? _enricher;
   final Dio _dio;
+  final String _baseUrl;
 
-  PrixCarburantsStationService({OsmBrandEnricher? enricher, Dio? dio})
-      : _enricher = enricher,
+  PrixCarburantsStationService({
+    OsmBrandEnricher? enricher,
+    Dio? dio,
+    String? baseUrl,
+  })  : _enricher = enricher,
         _dio = dio ?? DioFactory.create(
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
-        );
+        ),
+        _baseUrl = baseUrl ?? defaultBaseUrl;
 
-  static const _baseUrl =
+  static const String defaultBaseUrl =
       'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets'
       '/prix-des-carburants-en-france-flux-instantane-v2/records';
 

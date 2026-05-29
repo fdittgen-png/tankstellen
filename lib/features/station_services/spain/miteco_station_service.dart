@@ -22,19 +22,23 @@ import '../../../core/logging/error_logger.dart';
 /// Strategy: fetch all stations, calculate distances locally, filter by radius.
 /// The full dataset (~12,000 stations) is cached aggressively.
 class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implements StationService {
-  static const _baseUrl =
+  static const String defaultBaseUrl =
       'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes'
       '/PreciosCarburantes';
 
   final Dio _dio;
+  final String _baseUrl;
 
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
-  MitecoStationService({Dio? dio})
+  /// #2193 — [baseUrl] injectable too, harmonising the override surface
+  /// with Portugal / Slovenia / South Korea; defaults to [defaultBaseUrl].
+  MitecoStationService({Dio? dio, String? baseUrl})
       : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 20),
               receiveTimeout: const Duration(seconds: 30),
-            );
+            ),
+        _baseUrl = baseUrl ?? defaultBaseUrl;
 
   // Cache the province list and full station data to avoid repeated large downloads
   List<_Province>? _cachedProvinces;

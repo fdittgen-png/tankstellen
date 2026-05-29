@@ -68,7 +68,7 @@ final class ReferenceVehicleCatalogProvider
 }
 
 String _$referenceVehicleCatalogHash() =>
-    r'63a58d8821fa273613204b24d52bebbb5e0b7f6b';
+    r'31d88b020fecaa29c63a1e11aa8820274975fe88';
 
 /// Returns the best catalog match for [make], [model], and [year], or
 /// `null` if no entry covers the trio (#950 phase 1).
