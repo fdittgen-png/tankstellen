@@ -136,7 +136,10 @@ void mergeOpinetProductResponse(
 ) {
   final parsed = _coerceMap(data);
   if (parsed == null) {
-    throw const ApiException(message: 'OPINET returned unparseable body');
+    throw const ApiException(
+      message: 'OPINET returned unparseable body',
+      kind: FailureKind.parse,
+    );
   }
 
   // Propagate an OPINET-level error (RESULT.OIL is always a list on

@@ -143,6 +143,9 @@ class StationServiceChain implements StationService {
       errors.add(ServiceError(
         source: _errorSource,
         message: e.toString(),
+        statusCode: e is ApiException ? e.statusCode : null,
+        kind: e is ApiException ? _effectiveKind(e) : FailureKind.unknown,
+        retryAfter: e is ApiException ? e.retryAfter : null,
         occurredAt: DateTime.now(),
       ));
     }
@@ -174,19 +177,18 @@ class StationServiceChain implements StationService {
   @visibleForTesting
   static Duration transientRetryDelay = const Duration(milliseconds: 500);
 
-  /// Wraps a single [apiCall] with one retry on transient remote errors —
-  /// 5xx responses (`ApiException.statusCode in 500..599`) and Dio
-  /// connect/receive/send timeouts (the `ApiException.message` is stamped
-  /// `${e.type.name}:` by [StationServiceHelpers.throwApiException], so we
-  /// match on that prefix). One retry only — the goal is to absorb a
+  /// Wraps a single [apiCall] with one retry on transient remote errors.
+  /// Transience is decided by [FailureKind] (#2255): a network blip, a
+  /// timeout, or a rate-limit response are the kinds a short retry could
+  /// plausibly recover from. One retry only — the goal is to absorb a
   /// transient blip, not to mask sustained outages from the chain's
   /// fall-through to stale cache or to the user-visible error dialog.
   ///
   /// Returns the second attempt's result on success; rethrows the second
   /// attempt's exception on failure so the caller observes the same
   /// `on Exception` semantics as a plain `await apiCall()`. Non-transient
-  /// errors (4xx, parse failures, anything else) skip the retry — those
-  /// are not going to fix themselves in 500 ms.
+  /// errors (auth, notFound, parse, unsupported, unknown) skip the retry —
+  /// those are not going to fix themselves in 500 ms.
   Future<ServiceResult<T>> _callWithTransientRetry<T>(
     Future<ServiceResult<T>> Function() apiCall,
   ) async {
@@ -202,25 +204,61 @@ class StationServiceChain implements StationService {
       // the retry without re-running under a debugger.
       debugPrint(
         'StationServiceChain: retrying after transient error '
-        '(status=${e.statusCode}, message=${e.message})\n$st',
+        '(status=${e.statusCode}, kind=${_effectiveKind(e).name})\n$st',
       );
-      await Future<void>.delayed(transientRetryDelay);
+      // Honour an upstream-suggested Retry-After when present (#2255) but cap
+      // it at [transientRetryDelay] so a long server hint never stretches the
+      // user-visible latency of the in-chain retry — sustained rate-limits
+      // fall through to stale cache instead.
+      final delay = e.retryAfter != null && e.retryAfter! < transientRetryDelay
+          ? e.retryAfter!
+          : transientRetryDelay;
+      await Future<void>.delayed(delay);
       return apiCall();
     }
   }
 
-  /// `true` when [e] is the kind of error a 500 ms retry could plausibly
-  /// recover from — a server-side 5xx burst or a Dio-layer connect /
-  /// receive / send timeout. 4xx ("bad request", "not found") and parse
-  /// errors are not transient.
+  /// `true` when [e] is a transient failure a single short retry could
+  /// plausibly recover from. Routes on [FailureKind] (#2255) instead of
+  /// sniffing the English [ApiException.message] prefix:
+  /// network / timeout / rateLimited → transient;
+  /// auth / notFound / parse / unsupported / unknown → terminal.
   static bool _isTransient(ApiException e) {
+    switch (_effectiveKind(e)) {
+      case FailureKind.network:
+      case FailureKind.timeout:
+      case FailureKind.rateLimited:
+        return true;
+      case FailureKind.auth:
+      case FailureKind.notFound:
+      case FailureKind.parse:
+      case FailureKind.unsupported:
+      case FailureKind.unknown:
+        return false;
+    }
+  }
+
+  /// Resolve the [FailureKind] for [e], preserving the pre-#2255 classification
+  /// for exceptions that predate typed kinds (or were constructed without one).
+  /// When [ApiException.kind] is explicitly set (anything but
+  /// [FailureKind.unknown]) it wins; otherwise we fall back to the legacy
+  /// signals — HTTP status (5xx → network, matching the old transient-5xx
+  /// rule) then the Dio-type message prefix stamped by `throwApiException`.
+  static FailureKind _effectiveKind(ApiException e) {
+    if (e.kind != FailureKind.unknown) return e.kind;
     final code = e.statusCode;
-    if (code != null && code >= 500 && code < 600) return true;
+    if (code != null) {
+      final fromStatus = failureKindFromStatus(code);
+      if (fromStatus != FailureKind.unknown) return fromStatus;
+    }
     final msg = e.message;
-    return msg.startsWith('connectionTimeout') ||
+    if (msg.startsWith('connectionTimeout') ||
         msg.startsWith('receiveTimeout') ||
-        msg.startsWith('sendTimeout') ||
-        msg.startsWith('connectionError');
+        msg.startsWith('sendTimeout')) {
+      return FailureKind.timeout;
+    }
+    if (msg.startsWith('connectionError')) return FailureKind.network;
+    return FailureKind.unknown;
   }
 
   @override

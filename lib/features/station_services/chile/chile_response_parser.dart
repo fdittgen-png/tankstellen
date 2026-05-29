@@ -67,7 +67,10 @@ List<Station> parseChileStationsResponse(
 }) {
   final parsed = _coerceMap(data);
   if (parsed == null) {
-    throw const ApiException(message: 'CNE returned unparseable body');
+    throw const ApiException(
+      message: 'CNE returned unparseable body',
+      kind: FailureKind.parse,
+    );
   }
 
   // Propagate a CNE-level error. When auth fails the API usually
