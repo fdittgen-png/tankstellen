@@ -46,6 +46,16 @@ class Elm327BleUuids {
 class FlutterBluePlusElmChannel implements ElmByteChannel {
   final BluetoothDevice _device;
   final Elm327BleUuids _uuids;
+
+  /// Optional bounded timeout passed to `device.connect` (#2242). When
+  /// null, `connect` is called with the legacy `mtu: null` form and no
+  /// explicit timeout (the scan-first path, where the device was just
+  /// seen advertising so a long connect block is unlikely). When set —
+  /// the direct-by-MAC path — `connect(autoConnect:false,
+  /// timeout: …)` bounds the attempt and `open()` first tears down any
+  /// stale GATT client to dodge Android GATT_ERROR 133.
+  final Duration? _connectTimeout;
+
   BluetoothCharacteristic? _writeChar;
   BluetoothCharacteristic? _notifyChar;
   StreamSubscription<List<int>>? _subscription;
@@ -56,7 +66,9 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
   FlutterBluePlusElmChannel(
     this._device, {
     Elm327BleUuids? uuids,
-  }) : _uuids = uuids ?? Elm327BleUuids.vgate;
+    Duration? connectTimeout,
+  })  : _uuids = uuids ?? Elm327BleUuids.vgate,
+        _connectTimeout = connectTimeout;
 
   @override
   bool get isOpen => _open;
@@ -67,7 +79,27 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
   @override
   Future<void> open() async {
     if (_open) return;
-    await _device.connect(autoConnect: false, mtu: null);
+    final timeout = _connectTimeout;
+    if (timeout == null) {
+      await _device.connect(autoConnect: false, mtu: null);
+    } else {
+      // Direct-by-MAC path (#2242). Tear down any stale GATT client for
+      // this device FIRST — Android returns GATT_ERROR 133 if a prior
+      // (dropped-but-not-closed) GATT connection is still open, which
+      // would silently force a fall back to the scan path. disconnect()
+      // is idempotent and a no-op when nothing is connected.
+      try {
+        await _device.disconnect();
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+          'where':
+              'FlutterBluePlusElmChannel: pre-connect dead-GATT teardown',
+        }));
+      }
+      // The explicit ~4 s timeout is LOAD-BEARING: FBP's
+      // autoConnect:false connect can otherwise block ~35 s.
+      await _device.connect(autoConnect: false, timeout: timeout);
+    }
     final services = await _device.discoverServices();
     final service = services.firstWhere(
       (s) => s.uuid == _uuids.service,

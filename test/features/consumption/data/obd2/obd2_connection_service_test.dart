@@ -247,6 +247,124 @@ void main() {
       expect(await svc.connectBest(), isNull);
     });
   });
+
+  group('Obd2ConnectionService.connectByMacDirect (#2242)', () {
+    test('connects WITHOUT scanning on the happy path + runs init',
+        () async {
+      final directChannel = _FakeChannel(respondTo: _elmOkResponses());
+      final fake = _FakeFacade(
+        // Non-empty scan batches: if the direct path ever fell back to
+        // scan, this would be observable via scanInvoked.
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        directChannel: directChannel,
+      );
+      final svc = _build(
+        permState: Obd2PermissionState.granted,
+        bt: fake,
+      );
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+
+      expect(ready, isNotNull);
+      expect(ready!.isConnected, isTrue);
+      expect(fake.scanInvoked, isFalse,
+          reason: 'direct connect must NOT scan on the happy path');
+      expect(fake.directMac, 'aa:bb');
+      expect(directChannel.openCalls, 1);
+      await ready.disconnect();
+    });
+
+    test('passes a 4 s connect timeout to the facade by default',
+        () async {
+      final fake = _FakeFacade(
+        batches: const [[]],
+        directChannel: _FakeChannel(respondTo: _elmOkResponses()),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+      expect(fake.directTimeout, const Duration(seconds: 4));
+      await ready!.disconnect();
+    });
+
+    test('tears down a prior direct channel before reopening', () async {
+      final first = _FakeChannel(respondTo: _elmOkResponses());
+      final second = _FakeChannel(respondTo: _elmOkResponses());
+      var call = 0;
+      final fake = _SequencedDirectFacade(
+        sequence: [first, second],
+        onDirect: () => call++,
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready1 = await svc.connectByMacDirect('aa:bb');
+      expect(first.closeCalls, 0, reason: 'first channel still open');
+
+      final ready2 = await svc.connectByMacDirect('aa:bb');
+      expect(first.closeCalls, greaterThanOrEqualTo(1),
+          reason: 'prior channel must be torn down before the 2nd open');
+      expect(second.openCalls, 1);
+
+      await ready1?.disconnect();
+      await ready2?.disconnect();
+    });
+
+    test('falls back to the scan path when the direct open times out',
+        () async {
+      // Direct channel.open() throws (simulates connect timeout / GATT
+      // 133); the scan batch carries the same MAC so the fallback
+      // connectByMac succeeds.
+      final fake = _FakeFacade(
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        channel: _FakeChannel(respondTo: _elmOkResponses()),
+        directChannel: _FakeChannel(
+          openError: StateError('connect timed out'),
+        ),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+
+      expect(ready, isNotNull,
+          reason: 'scan fallback must still produce a session');
+      expect(fake.scanInvoked, isTrue,
+          reason: 'failed direct connect must fall back to scan');
+      await ready!.disconnect();
+    });
+
+    test('returns null when both direct AND scan fallback fail', () async {
+      final fake = _FakeFacade(
+        // Empty scan ⇒ connectByMac returns null on Obd2ScanTimeout.
+        batches: const [[]],
+        directChannel: _FakeChannel(
+          openError: StateError('connect timed out'),
+        ),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+      expect(ready, isNull);
+      expect(fake.scanInvoked, isTrue);
+    });
+  });
 }
 
 // --- helpers ---------------------------------------------------------
@@ -314,13 +432,33 @@ class _FakeFacade implements BluetoothFacade {
   final List<List<Obd2AdapterCandidate>> batches;
   final ElmByteChannel? channel;
   final Object? error;
-  _FakeFacade({required this.batches, this.channel, this.error});
+
+  /// Channel handed back by [channelForDirect] (#2242). When null the
+  /// direct path reuses [channel] / a silent fallback.
+  final ElmByteChannel? directChannel;
+
+  /// Set true the first time [scan] is iterated — lets the direct-connect
+  /// happy-path test assert NO scan occurred.
+  bool scanInvoked = false;
+
+  /// Args captured from the most recent [channelForDirect] call.
+  String? directMac;
+  Duration? directTimeout;
+  int directCalls = 0;
+
+  _FakeFacade({
+    required this.batches,
+    this.channel,
+    this.error,
+    this.directChannel,
+  });
 
   @override
   Stream<List<Obd2AdapterCandidate>> scan({
     required Set<String> serviceUuids,
     Duration timeout = const Duration(seconds: 8),
   }) async* {
+    scanInvoked = true;
     for (final batch in batches) {
       yield batch;
     }
@@ -339,6 +477,51 @@ class _FakeFacade implements BluetoothFacade {
     Obd2AdapterProfile profile,
   ) =>
       channel ?? _FakeChannel(silent: true);
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+  }) {
+    directCalls++;
+    directMac = mac;
+    directTimeout = connectTimeout;
+    return directChannel ?? channel ?? _FakeChannel(silent: true);
+  }
+}
+
+/// Hands back a different direct channel per call so the teardown test
+/// can assert the FIRST channel is closed before the SECOND opens.
+class _SequencedDirectFacade implements BluetoothFacade {
+  final List<ElmByteChannel> sequence;
+  final void Function() onDirect;
+  int _i = 0;
+  _SequencedDirectFacade({required this.sequence, required this.onDirect});
+
+  @override
+  Stream<List<Obd2AdapterCandidate>> scan({
+    required Set<String> serviceUuids,
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {}
+
+  @override
+  Future<void> stopScan() async {}
+
+  @override
+  ElmByteChannel channelFor(
+    String deviceId,
+    Obd2AdapterProfile profile,
+  ) =>
+      _FakeChannel(silent: true);
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+  }) {
+    onDirect();
+    return sequence[_i++];
+  }
 }
 
 /// Minimal channel that answers every write with the canonical ELM327
@@ -347,10 +530,16 @@ class _FakeFacade implements BluetoothFacade {
 class _FakeChannel implements ElmByteChannel {
   final bool silent;
   final Map<String, String>? respondTo;
+
+  /// When set, [open] throws this — simulates a direct-connect timeout /
+  /// GATT_ERROR 133 so the service falls back to the scan path (#2242).
+  final Object? openError;
   final StreamController<List<int>> _ctrl = StreamController.broadcast();
   bool _open = false;
+  int openCalls = 0;
+  int closeCalls = 0;
 
-  _FakeChannel({this.silent = false, this.respondTo});
+  _FakeChannel({this.silent = false, this.respondTo, this.openError});
 
   @override
   bool get isOpen => _open;
@@ -360,6 +549,9 @@ class _FakeChannel implements ElmByteChannel {
 
   @override
   Future<void> open() async {
+    openCalls++;
+    final err = openError;
+    if (err != null) throw err;
     _open = true;
   }
 
@@ -373,8 +565,9 @@ class _FakeChannel implements ElmByteChannel {
 
   @override
   Future<void> close() async {
+    closeCalls++;
     _open = false;
-    await _ctrl.close();
+    if (!_ctrl.isClosed) await _ctrl.close();
   }
 }
 

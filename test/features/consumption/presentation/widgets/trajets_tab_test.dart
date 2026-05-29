@@ -205,6 +205,14 @@ class _EmptyBluetoothFacade implements BluetoothFacade {
   ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile) {
     throw UnimplementedError('not used in trajets_tab tests');
   }
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+  }) {
+    throw UnimplementedError('not used in trajets_tab tests');
+  }
 }
 
 class _NoopObd2Service implements Obd2Service {
