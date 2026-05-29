@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
@@ -540,6 +541,56 @@ void main() {
           find.textContaining('some entries failed to parse'),
           findsOneWidget,
         );
+      });
+
+      // BUG 1 — the large-log path used to save to Downloads TWICE (once
+      // inside `_shareErrorLogAsFile`, once via `_saveExportToDownloads`),
+      // so MediaStore produced `tankstellen-error-log.json` AND
+      // `… (1).json`. With NO share sink wired (production behaviour), the
+      // file must be written exactly ONCE.
+      testWidgets(
+          'large JSON path writes to Downloads exactly once (no duplicate '
+          'file — BUG 1)', (tester) async {
+        wireClipboardCapture(tester);
+        // Deliberately do NOT wire the share sink: production has none, so
+        // this exercises the real single-write path.
+        await _setTallSurface(tester);
+
+        var saveCalls = 0;
+        final savedNames = <String>[];
+        debugPublicFileExporterOverride = ({
+          required bytes,
+          required fileName,
+          required mimeType,
+        }) async {
+          saveCalls++;
+          savedNames.add(fileName);
+          return '/Downloads/$fileName';
+        };
+        addTearDown(() => debugPublicFileExporterOverride = null);
+
+        final bigPayload = '{"traceCount":1,"big":"${'x' * (80 * 1024)}"}';
+        final stub = _StubTraceStorage(
+          stubCount: 1,
+          stubParsedCount: 1,
+          stubExport: bigPayload,
+        );
+        await pumpApp(
+          tester,
+          const PrivacyDashboardScreen(),
+          overrides: [
+            storageRepositoryProvider.overrideWithValue(mockStorage),
+            syncStateProvider.overrideWith(() => _DisabledSyncState()),
+            traceStorageProvider.overrideWithValue(stub),
+          ],
+        );
+
+        await tapExportButton(tester);
+
+        expect(saveCalls, 1,
+            reason: 'the large error-log export must write the Downloads '
+                'file exactly once, not twice');
+        expect(savedNames, ['tankstellen-error-log.json']);
       });
     });
   });
