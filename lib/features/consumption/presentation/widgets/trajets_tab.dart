@@ -25,10 +25,9 @@ import '../screens/trajets_map_screen.dart';
 import 'maintenance_suggestion_card.dart';
 import 'monthly_insights_card.dart';
 import 'obd2_adapter_picker.dart';
+import 'recording_start_coordinator.dart';
 import 'shared_trips_section.dart';
 import 'trajet_row.dart';
-import 'trip_start_progress.dart';
-import '../../../../core/logging/error_logger.dart';
 
 /// Trajets tab body on the Consumption screen (#889).
 ///
@@ -54,89 +53,104 @@ class TrajetsTab extends ConsumerStatefulWidget {
 }
 
 class _TrajetsTabState extends ConsumerState<TrajetsTab> {
-  /// Non-null while the start flow is running. Drives the inline
-  /// [TripStartProgress] card that replaces the disabled button so
-  /// the user gets visible feedback during the silent BLE-connect /
-  /// odometer-read window instead of staring at a frozen screen.
-  TripStartStage? _startStage;
+  /// #2274 — owns the pre-warm (concern 3) + start-now-connect-later
+  /// (concern 2) orchestration. Extracted into its own object so this
+  /// widget stays under the 400-line cap (#1680).
+  final RecordingStartCoordinator _starter = RecordingStartCoordinator();
 
-  bool get _starting => _startStage != null;
+  @override
+  void initState() {
+    super.initState();
+    // #2274 concern 3 — kick the BLE pre-warm after the first frame so
+    // it never competes with the tab's initial layout, and read
+    // providers off a post-frame callback where `ref` is safe to use.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _starter.maybePrewarm(ref));
+  }
+
+  @override
+  void dispose() {
+    _starter.dispose();
+    super.dispose();
+  }
 
   Future<void> _onStartRecording() async {
-    if (_starting) return;
-    setState(() => _startStage = TripStartStage.connectingAdapter);
-    try {
-      final notifier = ref.read(tripRecordingProvider.notifier);
-      // #2025 — when the user has disabled "Require OBD2 for trip
-      // recording" in feature management, bypass the adapter picker
-      // and start a GPS-only trajet immediately. The recording screen
-      // displays distance + speed from Geolocator; engine fields stay
-      // null and the persisted trip carries `kind: TripKind.gpsOnly`.
-      final flags = ref.read(enabledFeaturesProvider);
-      final obd2Required = flags.contains(Feature.obd2Optional);
-      if (!obd2Required) {
-        final outcome = await notifier.startGpsOnly();
-        if (!mounted) return;
-        await Navigator.of(context).push<TripSaveResult?>(
-          MaterialPageRoute(
-            builder: (_) => const TripRecordingScreen(),
-          ),
-        );
-        // `outcome` is informational here — the recording screen
-        // handles both the freshly-started and already-active cases
-        // the same way (its build reads from the provider).
-        if (outcome == StartTripOutcome.alreadyActive) return;
-        return;
-      }
-      final outcome = await notifier.startTrip();
+    // #2274 concern 2 — re-entrancy guard. A connecting start is already
+    // in flight (the recording screen is up in its connecting view), so
+    // ignore a second CTA tap. The visible progress now lives on the
+    // recording screen rather than an inline card on this tab.
+    if (ref.read(tripRecordingProvider).isConnecting) return;
+    final notifier = ref.read(tripRecordingProvider.notifier);
+    // #2025 — when the user has disabled "Require OBD2 for trip
+    // recording" in feature management, bypass the adapter picker
+    // and start a GPS-only trajet immediately. The recording screen
+    // displays distance + speed from Geolocator; engine fields stay
+    // null and the persisted trip carries `kind: TripKind.gpsOnly`.
+    final flags = ref.read(enabledFeaturesProvider);
+    final obd2Required = flags.contains(Feature.obd2Optional);
+    if (!obd2Required) {
+      await notifier.startGpsOnly();
       if (!mounted) return;
-      if (outcome == StartTripOutcome.alreadyActive) {
-        // A trajet is already running in the background — just jump
-        // into the recording screen without re-connecting.
-        await Navigator.of(context).push<TripSaveResult?>(
-          MaterialPageRoute(
-            builder: (_) => const TripRecordingScreen(),
-          ),
-        );
-        return;
-      }
-      // `started` would only happen if we'd handed a service in — we
-      // didn't. `needsPicker` is the expected path here: surface the
-      // picker, then hand the resulting service back to the provider
-      // (same pattern as AddFillUpScreen).
-      //
-      // #1188 — when the active vehicle has an adapter paired, the
-      // picker takes a silent fast path: it tries `connectByMac` and
-      // only opens the modal sheet when the connect fails. Plumbing
-      // both the MAC and the display name lets the picker surface a
-      // concrete fallback snackbar ("Couldn't reach 'X' …") rather
-      // than a generic message.
-      final activeVehicle = ref.read(activeVehicleProfileProvider);
-      final service = await showObd2AdapterPicker(
-        context,
-        pinnedMac: activeVehicle?.obd2AdapterMac,
-        pinnedAdapterName: activeVehicle?.obd2AdapterName,
-      );
-      if (service == null || !mounted) return;
-      setState(() => _startStage = TripStartStage.readingVehicleData);
-      await notifier.start(service);
-      if (!mounted) return;
-      setState(() => _startStage = TripStartStage.startingRecording);
       await Navigator.of(context).push<TripSaveResult?>(
         MaterialPageRoute(
           builder: (_) => const TripRecordingScreen(),
         ),
       );
-    } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
-      if (mounted) {
-        SnackBarHelper.showError(
-            context, e.localizedMessage(AppLocalizations.of(context)));
-      }
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TrajetsTab._onStartRecording'}));
-    } finally {
-      if (mounted) setState(() => _startStage = null);
+      return;
     }
+    // A trajet already running in the background — just jump back into
+    // the live recording screen without re-connecting.
+    if (ref.read(tripRecordingProvider).isActive) {
+      await Navigator.of(context).push<TripSaveResult?>(
+        MaterialPageRoute(
+          builder: (_) => const TripRecordingScreen(),
+        ),
+      );
+      return;
+    }
+    // #2274 concern 2 — start-now-connect-later. Enter the transient
+    // connecting phase and push the recording screen IMMEDIATELY (just
+    // like the GPS-only path above), then run the connect + prime in the
+    // background with the inline TripStartProgress resolving in-place on
+    // the recording screen. The user lands in the recording mode at once
+    // and the activity is foreground+active before they can leave to
+    // Maps (which makes the onUserLeaveHint auto-PiP — concern 4 — fire
+    // reliably). Previously the connect blocked here and the screen only
+    // pushed after connect+prime completed.
+    notifier.enterConnecting();
+    // Fire the connect concurrently — do NOT await before pushing, or
+    // the screen wouldn't open until the connect finished (the old
+    // behaviour). The coordinator owns its own error surfacing + teardown.
+    unawaited(_starter.connectAndStart(
+      ref,
+      notifier: notifier,
+      isMounted: () => mounted,
+      openPicker: () {
+        // #1188 — silent `connectByMac` fast path for a paired adapter;
+        // the picker opens the modal sheet only when that fails. Plumbing
+        // both the MAC + display name lets it surface a concrete fallback
+        // snackbar ("Couldn't reach 'X' …") rather than a generic one.
+        final activeVehicle = ref.read(activeVehicleProfileProvider);
+        return showObd2AdapterPicker(
+          context,
+          pinnedMac: activeVehicle?.obd2AdapterMac,
+          pinnedAdapterName: activeVehicle?.obd2AdapterName,
+        );
+      },
+      onConnectionError: (error) {
+        // Only an OBD2 connection error carries user-facing copy; other
+        // failures are logged by the coordinator and stay silent.
+        if (error is Obd2ConnectionError && mounted) {
+          SnackBarHelper.showError(
+              context, error.localizedMessage(AppLocalizations.of(context)));
+        }
+      },
+    ));
+    await Navigator.of(context).push<TripSaveResult?>(
+      MaterialPageRoute(
+        builder: (_) => const TripRecordingScreen(),
+      ),
+    );
   }
 
   @override
@@ -168,40 +182,38 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
         return bx.compareTo(ax);
       });
 
-    final stage = _startStage;
     // When a trip is already recording in the background (#1237), the
-    // CTA changes shape: same `_onStartRecording` handler — which
-    // routes through `StartTripOutcome.alreadyActive` and pushes the
-    // existing recording screen — but a different label + icon so the
-    // user understands tapping returns them to the live trip rather
-    // than starting a new one.
-    final isRecordingActive = ref.watch(tripRecordingProvider).isActive;
+    // CTA changes shape: same `_onStartRecording` handler — which jumps
+    // back into the live recording screen — but a different label + icon
+    // so the user understands tapping returns them to the live trip
+    // rather than starting a new one.
+    final recordingState = ref.watch(tripRecordingProvider);
+    final isRecordingActive = recordingState.isActive;
+    // #2274 concern 2 — while a start is connecting, the recording
+    // screen is already foreground showing the inline progress; reflect
+    // that on the CTA too so a glance at the tab matches.
+    final isConnecting = recordingState.isConnecting;
     // #1951 — the record CTA floats bottom-right (matching the
     // Carburant tab's "Ajouter un plein" FAB) instead of sitting at
     // the top. `heroTag: null` — it is positioned inside the body, so
     // it must not contend for a screen-level FAB hero tag.
-    final recordFab = AnimatedSwitcher(
-      duration: const Duration(milliseconds: 220),
-      child: stage == null
-          ? FloatingActionButton.extended(
-              key: const Key('trajets_start_recording_button'),
-              heroTag: null,
-              onPressed: _onStartRecording,
-              icon: Icon(
-                isRecordingActive
-                    ? Icons.visibility
-                    : Icons.fiber_manual_record,
-              ),
-              label: Text(
-                isRecordingActive
-                    ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
-                    : (l?.trajetsStartRecordingButton ?? 'Start recording'),
-              ),
-            )
-          : TripStartProgress(
-              key: const Key('trajets_start_progress'),
-              stage: stage,
-            ),
+    final recordFab = FloatingActionButton.extended(
+      key: const Key('trajets_start_recording_button'),
+      heroTag: null,
+      onPressed: isConnecting ? null : _onStartRecording,
+      icon: Icon(
+        isRecordingActive || isConnecting
+            ? Icons.visibility
+            : Icons.fiber_manual_record,
+      ),
+      label: Text(
+        isConnecting
+            ? (l?.tripStartProgressConnectingAdapter ??
+                'Connecting to OBD2 adapter…')
+            : isRecordingActive
+                ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
+                : (l?.trajetsStartRecordingButton ?? 'Start recording'),
+      ),
     );
 
     final Widget content;
