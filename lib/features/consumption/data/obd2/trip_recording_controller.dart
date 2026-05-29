@@ -10,7 +10,6 @@ import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../domain/entities/gps_sample_diagnostic.dart';
-import '../../domain/gps_track_distance.dart';
 import '../../domain/services/gear_inference.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
@@ -24,7 +23,7 @@ import 'obd2_debug_session.dart';
 import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
-import 'trip_distance_source.dart';
+import 'trip_distance_resolver.dart';
 import 'trip_drop_detector.dart';
 import 'trip_live_reading.dart';
 import 'trip_sample_buffer.dart';
@@ -319,20 +318,14 @@ class TripRecordingController {
   /// Null when the controller is not in that state.
   TripDropReason? get dropReason => _dropReason;
 
-  /// Rolling buffer of `(timestamp, speedKmh)` samples used by the
-  /// virtual odometer (#800). Populated by the 5 Hz speed
-  /// subscription callback; capped at [_virtualOdometerSampleCap] so
-  /// a forgotten recording can't eat unbounded memory. Fed to
-  /// [VirtualOdometer] at finalisation when the car doesn't expose a
-  /// real odometer.
-  final List<VirtualOdometerSample> _speedSamples = <VirtualOdometerSample>[];
-
-  /// Rolling buffer of GPS fixes for the #1979 GPS-distance source.
-  /// Appended by [updateGpsFix] (one entry per Geolocator fix);
-  /// haversine-summed at finalisation when a usable track exists.
-  /// Capped at [kVirtualOdometerSampleCap] — the same generous bound
-  /// the speed buffer uses — so a forgotten recording stays bounded.
-  final List<GpsTrackPoint> _gpsTrack = <GpsTrackPoint>[];
+  /// Owns the trip's distance-resolution concern — the three-tier
+  /// odometer-delta / GPS-track / virtual-odometer selection and the two
+  /// rolling sample buffers it integrates over — extracted into a focused
+  /// pure-Dart collaborator (#2187). The controller keeps the odometer
+  /// readings ([_odometerStartKm] / [_odometerLatestKm]) and passes them
+  /// into the resolver per read. Built in the constructor body so it can
+  /// capture the resolved [_now] clock.
+  late final TripDistanceResolver _distance;
 
   /// Owns the #1040 captured-sample buffer and the #1458 GPS
   /// cadence-diagnostics buffer — both per-trip ring buffers
@@ -420,6 +413,10 @@ class TripRecordingController {
       dropWindow: dropWindow,
       dropThreshold: dropThreshold,
       silentFailureThreshold: silentFailureThreshold,
+    );
+    _distance = TripDistanceResolver(
+      maxIntegrationGapSeconds: _integrationGapCapSeconds,
+      now: _now,
     );
     _liveSampleSnapshot = LiveSampleSnapshot(
       service: _service,
@@ -536,13 +533,7 @@ class TripRecordingController {
     // #1979 — buffer every real fix for the GPS-distance source. A
     // null-coord call only clears the per-tick latch; it is not a fix.
     if (latitude != null && longitude != null) {
-      _gpsTrack.add(GpsTrackPoint(latitude, longitude));
-      if (_gpsTrack.length > kVirtualOdometerSampleCap) {
-        _gpsTrack.removeRange(
-          0,
-          _gpsTrack.length - kVirtualOdometerSampleCap,
-        );
-      }
+      _distance.addGpsFix(latitude, longitude);
     }
   }
 
@@ -842,16 +833,10 @@ class TripRecordingController {
   ///   3. the trapezoidal integral of buffered speed samples via
   ///      [VirtualOdometer], when the car exposes no odometer
   ///      (Peugeot 107 class) and no GPS track was captured.
-  double get currentDistanceKm {
-    final real = _realOdometerDeltaKm();
-    if (real != null) return real;
-    final gps = _gpsTrackDistanceKm();
-    if (gps != null) return gps;
-    return VirtualOdometer(
-      samples: _speedSamples,
-      maxGapSeconds: _integrationGapCapSeconds,
-    ).integrateKm();
-  }
+  double get currentDistanceKm => _distance.distanceKm(
+        odometerStartKm: _odometerStartKm,
+        odometerLatestKm: _odometerLatestKm,
+      );
 
   /// `'real'` when [currentDistanceKm] came from the car's odometer,
   /// `'gps'` when it came from the haversine-summed GPS track (#1979),
@@ -859,55 +844,17 @@ class TripRecordingController {
   /// (#800). Persisted on the finalised [TripSummary] so the fill-up
   /// flow and eco-analytics know whether to treat the km as a ground
   /// truth or as an estimate.
-  String get distanceSource {
-    if (_realOdometerDeltaKm() != null) return kDistanceSourceReal;
-    if (_gpsTrackDistanceKm() != null) return kDistanceSourceGps;
-    return kDistanceSourceVirtual;
-  }
-
-  /// `odometerLatest - odometerStart` if both are present and the
-  /// delta is above a small noise-floor epsilon (0.05 km — half the
-  /// 0.1 km quantisation most cars apply to PID A6). Returns null
-  /// otherwise so callers can fall back to the GPS / virtual odometer.
-  double? _realOdometerDeltaKm() {
-    final start = _odometerStartKm;
-    final latest = _odometerLatestKm;
-    if (start == null || latest == null) return null;
-    final delta = latest - start;
-    if (delta < 0.05) return null;
-    return delta;
-  }
-
-  /// Haversine-summed distance of the buffered GPS track, or null when
-  /// the track is too sparse to trust (#1979): fewer than
-  /// [kMinGpsFixesForDistanceSource] fixes, or a sub-50 m total (a
-  /// parked car's GPS scatter). Callers then fall back to the virtual
-  /// odometer.
-  double? _gpsTrackDistanceKm() {
-    if (_gpsTrack.length < kMinGpsFixesForDistanceSource) return null;
-    final km = GpsTrackDistance.haversineKm(_gpsTrack);
-    if (km < 0.05) return null;
-    return km;
-  }
+  String get distanceSource => _distance.distanceSource(
+        odometerStartKm: _odometerStartKm,
+        odometerLatestKm: _odometerLatestKm,
+      );
 
   /// Append a speed sample to the virtual-odometer buffer, dropping
   /// the oldest entry when the cap is hit. Called from the 5 Hz
-  /// vehicle-speed subscription.
-  void _recordSpeedSample(double speedKmh) {
-    _speedSamples.add(VirtualOdometerSample(
-      timestamp: _now(),
-      speedKmh: speedKmh,
-    ));
-    if (_speedSamples.length > kVirtualOdometerSampleCap) {
-      // Drop the oldest slice to keep memory bounded. Losing the
-      // early stretch biases the virtual-odometer low by the km we
-      // dropped; on a typical trip the cap is never hit.
-      _speedSamples.removeRange(
-        0,
-        _speedSamples.length - kVirtualOdometerSampleCap,
-      );
-    }
-  }
+  /// vehicle-speed subscription. Delegates to [TripDistanceResolver]
+  /// which owns the buffer (#2187).
+  void _recordSpeedSample(double speedKmh) =>
+      _distance.addSpeedSample(speedKmh);
 
   // ---------------------------------------------------------------------------
   // Scheduler wiring
@@ -1483,9 +1430,7 @@ class TripRecordingController {
     required double speedKmh,
     required DateTime at,
   }) {
-    _speedSamples.add(
-      VirtualOdometerSample(timestamp: at, speedKmh: speedKmh),
-    );
+    _distance.debugAddSpeedSample(speedKmh: speedKmh, at: at);
   }
 
   /// Exposed for tests: override the trip's start/latest odometer
@@ -1501,7 +1446,7 @@ class TripRecordingController {
   /// Exposed for tests: read-only view of the captured speed samples.
   @visibleForTesting
   List<VirtualOdometerSample> get debugSpeedSamples =>
-      List.unmodifiable(_speedSamples);
+      _distance.debugSpeedSamples;
 
   /// Exposed for tests: append a GPS fix to the #1979 track buffer
   /// without a live Geolocator stream, so tests can drive the
@@ -1509,6 +1454,6 @@ class TripRecordingController {
   /// deterministically.
   @visibleForTesting
   void debugAppendGpsFix({required double latitude, required double longitude}) {
-    _gpsTrack.add(GpsTrackPoint(latitude, longitude));
+    _distance.debugAddGpsFix(latitude: latitude, longitude: longitude);
   }
 }
