@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_bounding_box.dart';
 import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/services/bulk_migration_flags.dart';
 import 'package:tankstellen/core/services/country_service_registry.dart';
 import 'package:tankstellen/core/services/fuel_service_policy.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -125,6 +126,39 @@ void main() {
         final de = CountryServiceRegistry.policyFor('DE')!;
         expect(de.minInterval, equals(const Duration(seconds: 60)));
         expect(de.searchResultTtl, equals(const Duration(minutes: 5)));
+      });
+    });
+
+    // #2277 — staged-rollout flag contract: BOTH bulk migrations default OFF,
+    // so GB + FR keep their LEGACY polledApi policy until each flag is flipped.
+    // The selected policy must match the flag state (a const ternary in the
+    // registry), so flipping a flag both swaps the service AND the cache model.
+    group('bulk-migration flags (#2277)', () {
+      test('both bulk flags default to false (legacy is the default path)', () {
+        expect(BulkMigrationFlags.ukCmaBulk, isFalse,
+            reason: 'UK CMA bulk must be opt-in / staged');
+        expect(BulkMigrationFlags.frFluxBulk, isFalse,
+            reason: 'FR flux bulk must be opt-in / staged');
+      });
+
+      test('GB policy model follows the ukCmaBulk flag', () {
+        final model = CountryServiceRegistry.policyFor('GB')!.model;
+        expect(
+          model,
+          BulkMigrationFlags.ukCmaBulk
+              ? SourceModel.bulkFile
+              : SourceModel.polledApi,
+        );
+      });
+
+      test('FR policy model follows the frFluxBulk flag', () {
+        final model = CountryServiceRegistry.policyFor('FR')!.model;
+        expect(
+          model,
+          BulkMigrationFlags.frFluxBulk
+              ? SourceModel.bulkFile
+              : SourceModel.polledApi,
+        );
       });
     });
 

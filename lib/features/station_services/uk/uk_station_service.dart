@@ -161,8 +161,10 @@ class UkStationService with StationServiceHelpers implements StationService {
   /// filters to the search radius, dedupes by `site_id`, sorts by
   /// distance, and caps at 50 results.
   ///
-  /// Exposed for tests.
-  @visibleForTesting
+  /// Public shared parser: the legacy per-search fan-out and the #2277 bulk
+  /// consolidated path ([UkCmaBulkStationService]) both run their records
+  /// through this so a given area returns identical stations regardless of
+  /// which source delivered them.
   static List<Station> parseCmaStations(
     List<dynamic> items, {
     required double lat,

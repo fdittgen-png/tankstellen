@@ -14,6 +14,7 @@ import '../../features/station_services/australia/australia_station_service.dart
 import '../../features/station_services/austria/econtrol_station_service.dart';
 import '../../features/station_services/chile/chile_station_service.dart';
 import '../../features/station_services/denmark/denmark_station_service.dart';
+import '../../features/station_services/france/prix_carburants_flux_station_service.dart';
 import '../../features/station_services/france/prix_carburants_station_service.dart';
 import '../../features/station_services/germany/tankerkoenig_station_service.dart';
 import '../../features/station_services/greece/greece_station_service.dart';
@@ -25,7 +26,9 @@ import '../../features/station_services/romania/romania_station_service.dart';
 import '../../features/station_services/slovenia/slovenia_station_service.dart';
 import '../../features/station_services/south_korea/south_korea_station_service.dart';
 import '../../features/station_services/spain/miteco_station_service.dart';
+import '../../features/station_services/uk/uk_cma_bulk_station_service.dart';
 import '../../features/station_services/uk/uk_station_service.dart';
+import 'bulk_migration_flags.dart';
 import 'fuel_service_policy.dart';
 import 'impl/demo_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
@@ -179,9 +182,10 @@ const _ptPolicy = FuelServicePolicy(
   license: 'Open data (DGEG)',
 );
 
-/// UK CMA Fuel Finder — polled fan-out across retailer feeds published daily
-/// under the CMA scheme; cache each search 6 h.
-const _ukPolicy = FuelServicePolicy(
+/// UK CMA Fuel Finder — LEGACY polled fan-out across retailer feeds published
+/// daily under the CMA scheme; cache each search 6 h. Default until the bulk
+/// migration (#2277) is validated on-device.
+const _ukPolicyLegacy = FuelServicePolicy(
   model: SourceModel.polledApi,
   minInterval: Duration(minutes: 30),
   datasetTtlSoft: Duration.zero,
@@ -190,6 +194,24 @@ const _ukPolicy = FuelServicePolicy(
   attribution: 'CMA Fuel Finder (retailer feeds)',
   license: 'Open Government Licence v3.0',
 );
+
+/// UK CMA Fuel Finder — BULK consolidated twice-daily file (#2277): one
+/// whole-country download per ~12 h publication cadence, persisted and
+/// local-filtered. Soft TTL ≈ the publish cadence, hard TTL an offline-grace
+/// multiple. Selected only when `BulkMigrationFlags.ukCmaBulk` is `true`.
+const _ukPolicyBulk = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(hours: 1),
+  datasetTtlSoft: Duration(hours: 12),
+  datasetTtlHard: Duration(hours: 48),
+  searchResultTtl: Duration.zero,
+  attribution: 'CMA Fuel Finder (consolidated)',
+  license: 'Open Government Licence v3.0',
+);
+
+/// Staged-rollout selection (#2277): legacy by default, bulk when flagged.
+const _ukPolicy =
+    BulkMigrationFlags.ukCmaBulk ? _ukPolicyBulk : _ukPolicyLegacy;
 
 /// LU — government-regulated uniform prices, polled; a daily refresh is ample
 /// since the price changes only by ministerial arrêté.
@@ -318,9 +340,10 @@ const _dkPolicy = FuelServicePolicy(
   license: 'Provider terms',
 );
 
-/// FR Prix Carburants — currently a polled/OSM-enriched search; the bulk flux
-/// ZIP migration is a later batch, so it is modelled as polled for now.
-const _frPolicy = FuelServicePolicy(
+/// FR Prix Carburants — LEGACY polled/OSM-enriched per-search query against
+/// data.economie.gouv.fr. Default until the bulk migration (#2277) is
+/// validated on-device.
+const _frPolicyLegacy = FuelServicePolicy(
   model: SourceModel.polledApi,
   minInterval: Duration(minutes: 30),
   datasetTtlSoft: Duration.zero,
@@ -329,6 +352,24 @@ const _frPolicy = FuelServicePolicy(
   attribution: 'Prix Carburants (data.economie.gouv.fr)',
   license: 'Licence Ouverte 2.0',
 );
+
+/// FR Prix Carburants — BULK *flux instantané* ZIP (#2277): one whole-country
+/// download per ~10 min cadence, persisted and local-filtered (never poll
+/// per-station). Soft TTL ≈ the 10-min flux cadence, hard TTL an offline-grace
+/// multiple. Selected only when `BulkMigrationFlags.frFluxBulk` is `true`.
+const _frPolicyBulk = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(minutes: 10),
+  datasetTtlSoft: Duration(minutes: 10),
+  datasetTtlHard: Duration(hours: 6),
+  searchResultTtl: Duration.zero,
+  attribution: 'Prix Carburants (flux instantané)',
+  license: 'Licence Ouverte 2.0',
+);
+
+/// Staged-rollout selection (#2277): legacy by default, bulk when flagged.
+const _frPolicy =
+    BulkMigrationFlags.frFluxBulk ? _frPolicyBulk : _frPolicyLegacy;
 
 /// Central registry of all country-specific station services.
 ///
@@ -746,6 +787,16 @@ StationService _createTankerkoenig(Ref ref) {
 }
 
 StationService _createPrixCarburants(Ref ref) {
+  // #2277 — staged rollout: the bulk *flux instantané* ZIP service when the
+  // flag is on (persisted whole-country dataset, local-filtered), otherwise
+  // the legacy per-search polling service. The bulk service receives the
+  // shared CacheManager for the disk read-through, like the other bulk
+  // datasets.
+  if (BulkMigrationFlags.frFluxBulk) {
+    return PrixCarburantsFluxStationService(
+      cache: ref.read(cacheManagerProvider),
+    );
+  }
   final enricher = ref.watch(osmBrandEnricherProvider);
   return PrixCarburantsStationService(enricher: enricher);
 }
@@ -765,7 +816,13 @@ StationService _createDenmark(Ref ref) =>
 StationService _createArgentina(Ref ref) =>
     ArgentinaStationService(cache: ref.read(cacheManagerProvider));
 StationService _createPortugal(Ref ref) => PortugalStationService();
-StationService _createUk(Ref ref) => UkStationService();
+// #2277 — staged rollout: the consolidated CMA bulk-file service when the flag
+// is on (persisted whole-country dataset, local-filtered), otherwise the legacy
+// per-search retailer fan-out. The bulk service receives the shared
+// CacheManager for the disk read-through, like the other bulk datasets.
+StationService _createUk(Ref ref) => BulkMigrationFlags.ukCmaBulk
+    ? UkCmaBulkStationService(cache: ref.read(cacheManagerProvider))
+    : UkStationService();
 StationService _createAustralia(Ref ref) => const AustraliaStationService();
 StationService _createMexico(Ref ref) =>
     MexicoStationService(cache: ref.read(cacheManagerProvider));
