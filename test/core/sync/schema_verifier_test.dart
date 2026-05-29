@@ -29,6 +29,24 @@ void main() {
     });
   });
 
+  /// #2310 — checkSchema now fires its per-table existence probes in
+  /// parallel via Future.wait with `select('id').limit(0)` (was a
+  /// sequential `select('*')` loop). The live probes need a Supabase
+  /// client, so the only pure surface is the unconnected guard — these
+  /// pin that the parallel rewrite preserves the do-no-harm contract.
+  group('SchemaVerifier.checkSchema — unconnected guard (#2310)', () {
+    test('returns null when no client is connected', () async {
+      final schema = await SchemaVerifier.checkSchema();
+      expect(schema, isNull,
+          reason: 'no client → null, so callers fall back to the '
+              'not-ready render path rather than throwing');
+    });
+
+    test('isSchemaReady returns false when unconnected', () async {
+      expect(await SchemaVerifier.isSchemaReady(), isFalse);
+    });
+  });
+
   group('SchemaVerifier.getMigrationSql', () {
     test('returns only RLS SQL when all tables exist', () {
       final schema = <String, bool>{
