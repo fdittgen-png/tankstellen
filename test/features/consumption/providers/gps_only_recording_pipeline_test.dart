@@ -238,6 +238,10 @@ class _FakeHost implements RecordingPipelineHost {
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
+    String? vehicleId,
+    String? adapterMac,
+    String? adapterName,
+    String? adapterFirmware,
   }) async {
     saved.add(_Saved(
       summary: summary,

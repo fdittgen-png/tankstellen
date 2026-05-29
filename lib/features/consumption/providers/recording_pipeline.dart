@@ -46,6 +46,17 @@ abstract class RecordingPipeline {
   /// concrete type.
   bool get isGpsOnly;
 
+  /// Pause the live recording loop, if the pipeline has one. The
+  /// GPS-only pipeline ignores this (its position stream keeps running);
+  /// the OBD2 pipeline forwards it to the controller. Returns true when
+  /// the call actually paused a live recording so the notifier knows to
+  /// flip its `phase` to `paused`.
+  bool pause() => false;
+
+  /// Resume a paused recording. Mirror of [pause]; the GPS-only pipeline
+  /// is a no-op. Returns true when a live recording was resumed.
+  bool resume() => false;
+
   /// Tear the pipeline down, persist the finished trip, and return the
   /// [StoppedTripResult] the recording screen renders into its summary
   /// view. [automatic] tags the saved entry as auto-recorded (#1004).
@@ -89,12 +100,48 @@ abstract class RecordingPipelineHost {
   /// the implementation filters) flows through the same write so the
   /// stub-discard + trip-sync + auto-record-badge bookkeeping is applied
   /// identically regardless of pipeline.
+  ///
+  /// [vehicleId] / [adapterMac] / [adapterName] / [adapterFirmware] let
+  /// the OBD2 pipeline stamp the saved entry with the dongle identity it
+  /// snapshotted at start (#1312) and the baseline-store vehicle id; the
+  /// GPS-only path leaves them null and the detail card hides the rows.
   Future<void> saveToHistory(
     TripSummary summary, {
     bool automatic,
     List<TripSample> samples,
     List<GpsSampleDiagnostic> gpsSampleDiagnostics,
+    String? vehicleId,
+    String? adapterMac,
+    String? adapterName,
+    String? adapterFirmware,
   });
+}
+
+/// The wider host an [Obd2RecordingPipeline] needs (#2227): the base
+/// [RecordingPipelineHost] plus the active-trip WAL snapshot hooks.
+///
+/// The write-through persistence of an in-progress trip (#1303) and its
+/// cold-start recovery (#1347) stay on the notifier — they survive the
+/// recording loop being torn down (recovery runs with no pipeline at
+/// all), so they belong to the notifier, not the strategy. The OBD2
+/// pipeline drives them through these hooks so the snapshot cadence is
+/// byte-identical to the pre-extraction inline path. The GPS-only path
+/// has no WAL, so it only needs the narrower [RecordingPipelineHost] —
+/// keeping these hooks off the base interface means GPS-only fakes don't
+/// have to stub WAL methods they never exercise.
+abstract class Obd2RecordingPipelineHost implements RecordingPipelineHost {
+  /// Seed the active-trip snapshot once the OBD2 controller is started
+  /// and knows its session id + odometer reads (#1303).
+  void seedActiveSnapshot();
+
+  /// Cheap debounced WAL gate, called from the live-sample listener.
+  void maybeFlushActiveSnapshot();
+
+  /// Force / debounced WAL flush; phase transitions force it (#1303).
+  Future<void> flushActiveSnapshot({bool force});
+
+  /// Drop the persisted snapshot once the trip is finalised in history.
+  Future<void> clearActiveSnapshot();
 }
 
 /// Returned by [TripRecording.stop] / [RecordingPipeline.stop]. Bundles

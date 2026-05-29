@@ -61,6 +61,15 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   @override
   bool get isGpsOnly => true;
 
+  /// GPS-only recording has no live engine loop to pause — the position
+  /// stream keeps running. Returns false so the notifier leaves the
+  /// phase untouched (#2227).
+  @override
+  bool pause() => false;
+
+  @override
+  bool resume() => false;
+
   /// Pure accumulator — same recorder the OBD2 path uses, so the
   /// distance / harsh-event / idle integration is byte-identical.
   TripRecorder? _recorder;
