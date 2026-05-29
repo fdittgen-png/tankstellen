@@ -57,6 +57,10 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
       cng: station.cng,
     ));
 
+    // Guard before touching ref after the await — leaving the screen during
+    // recordPrice disposes the widget and Riverpod 3's WidgetRef throws
+    // StateError if invalidate runs on a dead ref (#2298).
+    if (!mounted) return;
     ref.invalidate(priceHistoryProvider(widget.stationId));
     if (mounted) setState(() => _recorded = true);
     await _fetchFromDatabaseIfNeeded();

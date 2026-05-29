@@ -10,8 +10,11 @@ import '../data/repositories/price_history_repository.dart';
 ///
 /// Creates a [PriceRecord] for each station and persists it via the
 /// repository. Deduplication (within 1 hour) is handled by the repository.
-void recordSearchResults(
-    List<Station> stations, PriceHistoryRepository repo) {
+///
+/// Made async so that a Hive write failure is caught by the per-record
+/// try/catch instead of escaping to the uncaught-error zone (#2309).
+Future<void> recordSearchResults(
+    List<Station> stations, PriceHistoryRepository repo) async {
   for (final station in stations) {
     try {
       final record = PriceRecord(
@@ -26,7 +29,7 @@ void recordSearchResults(
         lpg: station.lpg,
         cng: station.cng,
       );
-      repo.recordPrice(record);
+      await repo.recordPrice(record);
     } catch (e, st) {
       // Skip individual failures; don't abort remaining records.
       debugPrint('price_recorder: recordPrice failed for ${station.id}: $e\n$st');

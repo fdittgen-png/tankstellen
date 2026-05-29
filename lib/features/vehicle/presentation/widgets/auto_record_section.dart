@@ -154,8 +154,10 @@ class AutoRecordSection extends ConsumerWidget {
               value: profile.movementStartThresholdKmh,
               label: l?.autoRecordSpeedThresholdLabel ??
                   'Start speed (km/h)',
-              onChanged: (v) => _persist(
+              onChangeEnd: (v) => _persistWithFeedback(
+                context,
                 ref,
+                l,
                 profile.copyWith(movementStartThresholdKmh: v),
               ),
             ),
@@ -164,8 +166,10 @@ class AutoRecordSection extends ConsumerWidget {
               value: profile.disconnectSaveDelaySec,
               label: l?.autoRecordSaveDelayLabel ??
                   'Save delay after disconnect (seconds)',
-              onChanged: (v) => _persist(
+              onChangeEnd: (v) => _persistWithFeedback(
+                context,
                 ref,
+                l,
                 profile.copyWith(disconnectSaveDelaySec: v),
               ),
             ),
@@ -200,6 +204,28 @@ class AutoRecordSection extends ConsumerWidget {
 
   Future<void> _persist(WidgetRef ref, VehicleProfile next) {
     return ref.read(vehicleProfileListProvider.notifier).save(next);
+  }
+
+  /// Persist [next] at drag-end and surface any write error to the user via
+  /// [SnackBarHelper.showError] (#2314 — slider onChangeEnd guard).
+  Future<void> _persistWithFeedback(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations? l,
+    VehicleProfile next,
+  ) async {
+    try {
+      await _persist(ref, next);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: const {'where': 'AutoRecordSection._persistWithFeedback'}));
+      if (!context.mounted) return;
+      SnackBarHelper.showError(
+        context,
+        l?.autoRecordBackgroundLocationRequestFailedSnackbar ??
+            'Could not save setting',
+      );
+    }
   }
 
   /// Map the four real states the auto-record orchestrator gates on
@@ -558,34 +584,54 @@ class _PairAdapterLink extends StatelessWidget {
   }
 }
 
-class _SpeedThresholdSlider extends StatelessWidget {
+/// Speed-threshold slider that tracks intermediate drag values locally
+/// and only persists on [onChangeEnd] (#2314).
+class _SpeedThresholdSlider extends StatefulWidget {
   final double value;
   final String label;
-  final ValueChanged<double> onChanged;
+  final ValueChanged<double> onChangeEnd;
 
   const _SpeedThresholdSlider({
     required this.value,
     required this.label,
-    required this.onChanged,
+    required this.onChangeEnd,
   });
+
+  @override
+  State<_SpeedThresholdSlider> createState() => _SpeedThresholdSliderState();
+}
+
+class _SpeedThresholdSliderState extends State<_SpeedThresholdSlider> {
+  late double _current;
+
+  @override
+  void initState() {
+    super.initState();
+    _current = widget.value.clamp(1.0, 15.0).toDouble();
+  }
+
+  @override
+  void didUpdateWidget(_SpeedThresholdSlider old) {
+    super.didUpdateWidget(old);
+    // Keep local value in sync when the profile updates from outside.
+    if (old.value != widget.value) {
+      _current = widget.value.clamp(1.0, 15.0).toDouble();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Clamp persisted value into the slider's bounds — pre-#1004
-    // profiles may have any default; we render them at the edge so
-    // the user always sees a knob.
-    final v = value.clamp(1.0, 15.0).toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
             Expanded(
-              child: Text(label, style: theme.textTheme.bodyMedium),
+              child: Text(widget.label, style: theme.textTheme.bodyMedium),
             ),
             Text(
-              v.toStringAsFixed(0),
+              _current.toStringAsFixed(0),
               style: theme.textTheme.titleMedium,
             ),
           ],
@@ -595,39 +641,62 @@ class _SpeedThresholdSlider extends StatelessWidget {
           min: 1,
           max: 15,
           divisions: 14,
-          value: v,
-          onChanged: onChanged,
+          value: _current,
+          onChanged: (v) => setState(() => _current = v),
+          onChangeEnd: widget.onChangeEnd,
         ),
       ],
     );
   }
 }
 
-class _SaveDelaySlider extends StatelessWidget {
+/// Save-delay slider that tracks intermediate drag values locally
+/// and only persists on [onChangeEnd] (#2314).
+class _SaveDelaySlider extends StatefulWidget {
   final int value;
   final String label;
-  final ValueChanged<int> onChanged;
+  final ValueChanged<int> onChangeEnd;
 
   const _SaveDelaySlider({
     required this.value,
     required this.label,
-    required this.onChanged,
+    required this.onChangeEnd,
   });
+
+  @override
+  State<_SaveDelaySlider> createState() => _SaveDelaySliderState();
+}
+
+class _SaveDelaySliderState extends State<_SaveDelaySlider> {
+  late int _current;
+
+  @override
+  void initState() {
+    super.initState();
+    _current = widget.value.clamp(30, 300);
+  }
+
+  @override
+  void didUpdateWidget(_SaveDelaySlider old) {
+    super.didUpdateWidget(old);
+    if (old.value != widget.value) {
+      _current = widget.value.clamp(30, 300);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final v = value.clamp(30, 300);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
             Expanded(
-              child: Text(label, style: theme.textTheme.bodyMedium),
+              child: Text(widget.label, style: theme.textTheme.bodyMedium),
             ),
             Text(
-              v.toString(),
+              _current.toString(),
               style: theme.textTheme.titleMedium,
             ),
           ],
@@ -637,8 +706,9 @@ class _SaveDelaySlider extends StatelessWidget {
           min: 30,
           max: 300,
           divisions: 27,
-          value: v.toDouble(),
-          onChanged: (next) => onChanged(next.round()),
+          value: _current.toDouble(),
+          onChanged: (next) => setState(() => _current = next.round()),
+          onChangeEnd: (next) => widget.onChangeEnd(next.round()),
         ),
       ],
     );

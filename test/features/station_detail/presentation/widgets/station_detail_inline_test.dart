@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
@@ -76,7 +77,11 @@ void main() {
       expect(find.byType(ShimmerStationDetail), findsOneWidget);
     });
 
-    testWidgets('renders centered error text when provider throws',
+    // #2298 — error state must render ServiceChainErrorWidget, not raw
+    // Text(error.toString()). The widget provides a localized, retryable
+    // surface that matches the standalone StationDetailScreen.
+    testWidgets(
+        'renders ServiceChainErrorWidget (not raw text) when provider throws',
         (tester) async {
       await pumpApp(
         tester,
@@ -90,9 +95,10 @@ void main() {
         ],
       );
 
-      // Error text contains the exception message and lives in a Center.
-      expect(find.textContaining('boom'), findsOneWidget);
-      expect(find.byType(Center), findsWidgets);
+      // The localized, retryable error surface is mounted.
+      expect(find.byType(ServiceChainErrorWidget), findsOneWidget);
+      // The raw developer-facing exception string is NOT displayed verbatim.
+      expect(find.textContaining('Exception: boom'), findsNothing);
     });
 
     testWidgets(

@@ -28,12 +28,11 @@ class OsmBrandEnricher {
 
   OsmBrandEnricher(this._storage);
 
+  // Rate-limiting is handled by DioFactory's RateLimitInterceptor (#2315).
   static final _dio = DioFactory.create(
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 10),
   );
-
-  static DateTime? _lastRequest;
 
   Future<List<Station>> enrich(
     List<Station> stations, {
@@ -62,15 +61,6 @@ class OsmBrandEnricher {
     List<Station> stations, {
     CancelToken? cancelToken,
   }) async {
-    if (_lastRequest != null) {
-      final elapsed = DateTime.now().difference(_lastRequest!);
-      if (elapsed < const Duration(seconds: 2)) {
-        await Future<void>.delayed(
-          Duration(milliseconds: 2000 - elapsed.inMilliseconds),
-        );
-      }
-    }
-
     try {
       double minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
       for (final s in stations) {
@@ -81,8 +71,6 @@ class OsmBrandEnricher {
       }
       minLat -= 0.01; maxLat += 0.01;
       minLng -= 0.01; maxLng += 0.01;
-
-      _lastRequest = DateTime.now();
 
       final response = await _dio.get(
         'https://nominatim.openstreetmap.org/search',
@@ -110,6 +98,9 @@ class OsmBrandEnricher {
         }
       }
 
+      // Collect all writes first, then flush in one batched Future.wait
+      // instead of N sequential awaits (#2315).
+      final writes = <Future<void>>[];
       for (final s in stations) {
         if (!_needsBrand(s)) continue;
         _Poi? nearest;
@@ -125,10 +116,11 @@ class OsmBrandEnricher {
           final sanitized = sanitizeOsmBrand(nearest.name);
           if (sanitized != null) {
             _sessionCache[s.id] = sanitized;
-            await _storage.putSetting('brand_${s.id}', sanitized);
+            writes.add(_storage.putSetting('brand_${s.id}', sanitized));
           }
         }
       }
+      if (writes.isNotEmpty) await Future.wait(writes);
     } on DioException catch (e, st) { unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OSM brand enrichment failed'})); }
   }
 
