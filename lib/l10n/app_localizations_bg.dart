@@ -5529,6 +5529,67 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Минимизиране в плаваща плочка';
 
   @override
+  String get tripShareAction => 'Споделяне с друг акаунт';
+
+  @override
+  String get tripShareSheetTitle => 'Споделяне на това пътуване';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Дайте на друг акаунт в TankSync достъп само за четене до това записано пътуване.';
+
+  @override
+  String get tripShareEmailLabel => 'Имейл на получателя';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Сподели';
+
+  @override
+  String get tripShareCreateLinkButton => 'Създаване на връзка за споделяне';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Връзката за споделяне е копирана — изпратете я на получателя.';
+
+  @override
+  String get tripShareSuccess => 'Пътуването е споделено.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Няма акаунт в TankSync с този имейл.';
+
+  @override
+  String get tripShareError =>
+      'Пътуването не може да бъде споделено. Опитайте отново.';
+
+  @override
+  String get tripShareExistingTitle => 'Споделено с';
+
+  @override
+  String get tripShareExistingEmpty => 'Все още не е споделено с никого.';
+
+  @override
+  String get tripShareDirectRecipient => 'Акаунт';
+
+  @override
+  String get tripShareLinkRecipient => 'Връзка за споделяне (неизползвана)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Отмяна';
+
+  @override
+  String get tripShareRevoked => 'Споделянето е отменено.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Споделено с мен';
+
+  @override
+  String get trajetsSharedBadge => 'Споделено';
+
+  @override
   String get unifiedFilterFuel => 'Гориво';
 
   @override

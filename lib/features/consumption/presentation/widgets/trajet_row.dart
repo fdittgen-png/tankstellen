@@ -19,6 +19,12 @@ class TrajetRow extends StatelessWidget {
   final ThemeData theme;
   final VoidCallback onTap;
 
+  /// Whether this trip was shared WITH the user by another account
+  /// (#2240). Shared trips are read-only: the row carries a "Shared"
+  /// badge so it reads distinctly from owned trips. Defaults to false
+  /// — every owned trip renders exactly as before.
+  final bool shared;
+
   const TrajetRow({
     super.key,
     required this.entry,
@@ -26,6 +32,7 @@ class TrajetRow extends StatelessWidget {
     required this.l,
     required this.theme,
     required this.onTap,
+    this.shared = false,
   });
 
   @override
@@ -92,6 +99,11 @@ class TrajetRow extends StatelessWidget {
                       spacing: 12,
                       runSpacing: 4,
                       children: [
+                        if (shared)
+                          _Chip(
+                            icon: Icons.group,
+                            text: l?.trajetsSharedBadge ?? 'Shared',
+                          ),
                         _Chip(
                           icon: Icons.straighten,
                           text: l?.trajetsRowDistance(

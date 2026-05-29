@@ -5488,6 +5488,66 @@ class AppLocalizationsCs extends AppLocalizations {
       'Minimalizovat do plovoucí dlaždice';
 
   @override
+  String get tripShareAction => 'Sdílet s jiným účtem';
+
+  @override
+  String get tripShareSheetTitle => 'Sdílet tuto jízdu';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Poskytněte jinému účtu TankSync přístup pouze ke čtení k této zaznamenané jízdě.';
+
+  @override
+  String get tripShareEmailLabel => 'E-mail příjemce';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Sdílet';
+
+  @override
+  String get tripShareCreateLinkButton => 'Vytvořit odkaz ke sdílení';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Odkaz ke sdílení zkopírován — vložte jej příjemci.';
+
+  @override
+  String get tripShareSuccess => 'Jízda sdílena.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Tento e-mail nepoužívá žádný účet TankSync.';
+
+  @override
+  String get tripShareError => 'Jízdu se nepodařilo sdílet. Zkuste to znovu.';
+
+  @override
+  String get tripShareExistingTitle => 'Sdíleno s';
+
+  @override
+  String get tripShareExistingEmpty => 'Zatím s nikým nesdíleno.';
+
+  @override
+  String get tripShareDirectRecipient => 'Účet';
+
+  @override
+  String get tripShareLinkRecipient => 'Odkaz ke sdílení (nevyzvednutý)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Zrušit';
+
+  @override
+  String get tripShareRevoked => 'Sdílení zrušeno.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Sdíleno se mnou';
+
+  @override
+  String get trajetsSharedBadge => 'Sdíleno';
+
+  @override
   String get unifiedFilterFuel => 'Palivo';
 
   @override

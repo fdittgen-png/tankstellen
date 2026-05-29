@@ -5509,6 +5509,67 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Als schwebende Kachel minimieren';
 
   @override
+  String get tripShareAction => 'Mit anderem Konto teilen';
+
+  @override
+  String get tripShareSheetTitle => 'Diese Fahrt teilen';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Gib einem anderen TankSync-Konto Lesezugriff auf diese aufgezeichnete Fahrt.';
+
+  @override
+  String get tripShareEmailLabel => 'E-Mail des Empfängers';
+
+  @override
+  String get tripShareEmailHint => 'name@beispiel.de';
+
+  @override
+  String get tripShareSendButton => 'Teilen';
+
+  @override
+  String get tripShareCreateLinkButton => 'Freigabelink erstellen';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Freigabelink kopiert — füge ihn dem Empfänger ein.';
+
+  @override
+  String get tripShareSuccess => 'Fahrt geteilt.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Kein TankSync-Konto nutzt diese E-Mail.';
+
+  @override
+  String get tripShareError =>
+      'Fahrt konnte nicht geteilt werden. Versuche es erneut.';
+
+  @override
+  String get tripShareExistingTitle => 'Geteilt mit';
+
+  @override
+  String get tripShareExistingEmpty => 'Noch mit niemandem geteilt.';
+
+  @override
+  String get tripShareDirectRecipient => 'Ein Konto';
+
+  @override
+  String get tripShareLinkRecipient => 'Freigabelink (nicht eingelöst)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Widerrufen';
+
+  @override
+  String get tripShareRevoked => 'Freigabe widerrufen.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Mit mir geteilt';
+
+  @override
+  String get trajetsSharedBadge => 'Geteilt';
+
+  @override
   String get unifiedFilterFuel => 'Kraftstoff';
 
   @override

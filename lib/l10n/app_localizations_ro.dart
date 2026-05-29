@@ -5522,6 +5522,67 @@ class AppLocalizationsRo extends AppLocalizations {
       'Minimizează într-o casetă flotantă';
 
   @override
+  String get tripShareAction => 'Partajează cu alt cont';
+
+  @override
+  String get tripShareSheetTitle => 'Partajează acest traseu';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Acordă altui cont TankSync acces doar pentru citire la acest traseu înregistrat.';
+
+  @override
+  String get tripShareEmailLabel => 'E-mailul destinatarului';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Partajează';
+
+  @override
+  String get tripShareCreateLinkButton => 'Creează link de partajare';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Link de partajare copiat — lipește-l destinatarului.';
+
+  @override
+  String get tripShareSuccess => 'Traseu partajat.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Niciun cont TankSync nu folosește acest e-mail.';
+
+  @override
+  String get tripShareError =>
+      'Traseul nu a putut fi partajat. Încearcă din nou.';
+
+  @override
+  String get tripShareExistingTitle => 'Partajat cu';
+
+  @override
+  String get tripShareExistingEmpty => 'Încă nepartajat cu nimeni.';
+
+  @override
+  String get tripShareDirectRecipient => 'Un cont';
+
+  @override
+  String get tripShareLinkRecipient => 'Link de partajare (nerevendicat)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Revocă';
+
+  @override
+  String get tripShareRevoked => 'Partajare revocată.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Partajat cu mine';
+
+  @override
+  String get trajetsSharedBadge => 'Partajat';
+
+  @override
   String get unifiedFilterFuel => 'Combustibil';
 
   @override

@@ -5535,6 +5535,68 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Σμίκρυνση σε πλωτό πλακίδιο';
 
   @override
+  String get tripShareAction => 'Κοινοποίηση σε άλλον λογαριασμό';
+
+  @override
+  String get tripShareSheetTitle => 'Κοινοποίηση αυτής της διαδρομής';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Δώστε σε άλλον λογαριασμό TankSync πρόσβαση μόνο για ανάγνωση σε αυτή την καταγεγραμμένη διαδρομή.';
+
+  @override
+  String get tripShareEmailLabel => 'Email παραλήπτη';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Κοινοποίηση';
+
+  @override
+  String get tripShareCreateLinkButton => 'Δημιουργία συνδέσμου κοινοποίησης';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Ο σύνδεσμος κοινοποίησης αντιγράφηκε — επικολλήστε τον στον παραλήπτη.';
+
+  @override
+  String get tripShareSuccess => 'Η διαδρομή κοινοποιήθηκε.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Κανένας λογαριασμός TankSync δεν χρησιμοποιεί αυτό το email.';
+
+  @override
+  String get tripShareError => 'Δεν ήταν δυνατή η κοινοποίηση. Δοκιμάστε ξανά.';
+
+  @override
+  String get tripShareExistingTitle => 'Κοινοποιήθηκε σε';
+
+  @override
+  String get tripShareExistingEmpty =>
+      'Δεν έχει κοινοποιηθεί ακόμη σε κανέναν.';
+
+  @override
+  String get tripShareDirectRecipient => 'Ένας λογαριασμός';
+
+  @override
+  String get tripShareLinkRecipient =>
+      'Σύνδεσμος κοινοποίησης (μη εξαργυρωμένος)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Ανάκληση';
+
+  @override
+  String get tripShareRevoked => 'Η κοινοποίηση ανακλήθηκε.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Κοινοποιήθηκε σε εμένα';
+
+  @override
+  String get trajetsSharedBadge => 'Κοινόχρηστο';
+
+  @override
   String get unifiedFilterFuel => 'Καύσιμο';
 
   @override

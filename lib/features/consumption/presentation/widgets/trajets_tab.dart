@@ -25,6 +25,7 @@ import '../screens/trajets_map_screen.dart';
 import 'maintenance_suggestion_card.dart';
 import 'monthly_insights_card.dart';
 import 'obd2_adapter_picker.dart';
+import 'shared_trips_section.dart';
 import 'trajet_row.dart';
 import 'trip_start_progress.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -205,13 +206,26 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
 
     final Widget content;
     if (filtered.isEmpty) {
-      content = EmptyState(
-        key: const Key('trajets_empty_state'),
-        icon: Icons.route_outlined,
-        title: l?.trajetsEmptyStateTitle ?? 'No trips yet',
-        subtitle: l?.trajetsEmptyStateBody ??
-            'Tap Start recording to begin logging your drives.',
-        topBiased: true,
+      // No owned trips — still surface any trips shared WITH the user
+      // (#2240) below the empty-state so a recipient who hasn't recorded
+      // anything themselves isn't left staring at "No trips yet". The
+      // EmptyState's topBiased layout uses Spacer (flex), so it must sit
+      // in a bounded-height Expanded, not a scroll view.
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: EmptyState(
+              key: const Key('trajets_empty_state'),
+              icon: Icons.route_outlined,
+              title: l?.trajetsEmptyStateTitle ?? 'No trips yet',
+              subtitle: l?.trajetsEmptyStateBody ??
+                  'Tap Start recording to begin logging your drives.',
+              topBiased: true,
+            ),
+          ),
+          const SharedTripsSection(),
+        ],
       );
     } else {
       // Aggregate the (already vehicle-filtered) trips into the
@@ -293,6 +307,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
                     MonthlyInsightsCard(summary: monthlySummary),
                     const MaintenanceSuggestionList(),
                     mapAction,
+                    const SharedTripsSection(),
                   ],
                 ),
               ),
@@ -308,6 +323,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
             MonthlyInsightsCard(summary: monthlySummary),
             const MaintenanceSuggestionList(),
             mapAction,
+            const SharedTripsSection(),
             Expanded(child: trajetsList),
           ],
         );

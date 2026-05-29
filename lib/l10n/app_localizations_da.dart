@@ -5476,6 +5476,66 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimér til en svævende flise';
 
   @override
+  String get tripShareAction => 'Del med en anden konto';
+
+  @override
+  String get tripShareSheetTitle => 'Del denne tur';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Giv en anden TankSync-konto skrivebeskyttet adgang til denne registrerede tur.';
+
+  @override
+  String get tripShareEmailLabel => 'Modtagerens e-mail';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Del';
+
+  @override
+  String get tripShareCreateLinkButton => 'Opret delingslink';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Delingslink kopieret — indsæt det til modtageren.';
+
+  @override
+  String get tripShareSuccess => 'Tur delt.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Ingen TankSync-konto bruger den e-mail.';
+
+  @override
+  String get tripShareError => 'Kunne ikke dele denne tur. Prøv igen.';
+
+  @override
+  String get tripShareExistingTitle => 'Delt med';
+
+  @override
+  String get tripShareExistingEmpty => 'Ikke delt med nogen endnu.';
+
+  @override
+  String get tripShareDirectRecipient => 'En konto';
+
+  @override
+  String get tripShareLinkRecipient => 'Delingslink (ikke indløst)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Tilbagekald';
+
+  @override
+  String get tripShareRevoked => 'Deling tilbagekaldt.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Delt med mig';
+
+  @override
+  String get trajetsSharedBadge => 'Delt';
+
+  @override
   String get unifiedFilterFuel => 'Brændstof';
 
   @override
