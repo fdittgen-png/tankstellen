@@ -134,4 +134,35 @@ void main() {
       expect(UnitFormatter.pricePerUnitSuffix(countryCode: 'DK'), 'kr/L');
     });
   });
+
+  group('formatConsumption', () {
+    test('combustion renders the L/100 km mask', () {
+      expect(UnitFormatter.formatConsumption(6.4, isEv: false), '6.4 L/100 km');
+    });
+
+    test('EV renders the kWh/100 km mask', () {
+      expect(
+        UnitFormatter.formatConsumption(18.2, isEv: true),
+        '18.2 kWh/100 km',
+      );
+    });
+
+    test('keeps a DOT decimal even under a comma locale (FR setUp)', () {
+      // The mask is a language-neutral format mask, and shipped widget
+      // tests assert exact dot strings \u2014 so the active FR comma locale
+      // must NOT bleed into the value.
+      expect(UnitFormatter.formatConsumption(7.0, isEv: false), '7.0 L/100 km');
+    });
+
+    test('rounds to exactly one decimal', () {
+      expect(
+        UnitFormatter.formatConsumption(5.849, isEv: false),
+        '5.8 L/100 km',
+      );
+      expect(
+        UnitFormatter.formatConsumption(12, isEv: true),
+        '12.0 kWh/100 km',
+      );
+    });
+  });
 }

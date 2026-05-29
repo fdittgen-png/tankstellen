@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
@@ -113,7 +114,10 @@ class TrajetRow extends StatelessWidget {
                                   s.avgLPer100Km!.toStringAsFixed(1),
                                   avgUnit,
                                 ) ??
-                                '${s.avgLPer100Km!.toStringAsFixed(1)} $avgUnit',
+                                UnitFormatter.formatConsumption(
+                                  s.avgLPer100Km!,
+                                  isEv: isEv,
+                                ),
                           ),
                         if (s.coldStartSurcharge)
                           _Chip(

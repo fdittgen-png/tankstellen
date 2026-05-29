@@ -15,6 +15,7 @@ import '../../domain/route_search_strategy.dart';
 import '../helpers/batch_query_helper.dart';
 import 'eco_route_candidate.dart';
 import 'eco_route_scoring.dart';
+import 'route_geometry.dart';
 
 // Re-export the value types so existing imports of
 // `eco_route_search_strategy.dart` continue to resolve
@@ -203,7 +204,7 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
     final filtered = <SearchResultItem>[];
     for (final item in results) {
       if (item is FuelStationResult) {
-        final minDist = _minDistanceToPolyline(
+        final minDist = minDistanceToPolyline(
           item.station.lat,
           item.station.lng,
           route.geometry,
@@ -216,7 +217,7 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
       }
     }
 
-    _sortByItineraryOrder(filtered, route.geometry);
+    sortByItineraryOrder(filtered, route.geometry);
     return filtered;
   }
 
@@ -248,7 +249,7 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
             nearestSampleIdx = i;
           }
         }
-        final segmentIdx = (nearestSampleIdx * 15 / segmentKm).floor();
+        final segmentIdx = segmentIndexFor(nearestSampleIdx, segmentKm);
         final price = station.priceFor(fuelType);
         if (price != null) {
           final currentBestPrice = segmentCheapestPrice[segmentIdx];
@@ -261,32 +262,5 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
       }
     }
     return segmentCheapest;
-  }
-
-  double _minDistanceToPolyline(
-    double lat,
-    double lng,
-    List<LatLng> polyline,
-  ) {
-    if (polyline.isEmpty) return double.infinity;
-    double minDist = double.infinity;
-    final step = polyline.length > 300 ? 3 : 1;
-    for (int i = 0; i < polyline.length; i += step) {
-      final p = polyline[i];
-      final d = geo.distanceKm(lat, lng, p.latitude, p.longitude);
-      if (d < minDist) minDist = d;
-    }
-    return minDist;
-  }
-
-  void _sortByItineraryOrder(
-    List<SearchResultItem> items,
-    List<LatLng> geometry,
-  ) {
-    items.sort((a, b) {
-      final da = geo.distanceAlongPolyline(a.lat, a.lng, geometry);
-      final db = geo.distanceAlongPolyline(b.lat, b.lng, geometry);
-      return da.compareTo(db);
-    });
   }
 }

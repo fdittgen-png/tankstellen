@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/foundation.dart';
-import 'package:latlong2/latlong.dart';
 
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
@@ -12,6 +11,7 @@ import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
 import '../helpers/batch_query_helper.dart';
+import 'route_geometry.dart';
 
 /// Strategy that prioritizes finding the cheapest stations along the route.
 ///
@@ -61,7 +61,7 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
     final filtered = <SearchResultItem>[];
     for (final item in results) {
       if (item is FuelStationResult) {
-        final minDist = _minDistanceToPolyline(
+        final minDist = minDistanceToPolyline(
           item.station.lat, item.station.lng, route.geometry,
         );
         if (minDist <= detourLimit) {
@@ -73,7 +73,7 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
     }
 
     // Sort by position along route (itinerary order)
-    _sortByItineraryOrder(filtered, route.geometry);
+    sortByItineraryOrder(filtered, route.geometry);
 
     return filtered;
   }
@@ -108,7 +108,7 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
             nearestSampleIdx = i;
           }
         }
-        final segmentIdx = (nearestSampleIdx * 15 / segmentKm).floor();
+        final segmentIdx = segmentIndexFor(nearestSampleIdx, segmentKm);
 
         final price = station.priceFor(fuelType);
         if (price != null) {
@@ -124,29 +124,5 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
     }
 
     return segmentCheapest;
-  }
-
-  double _minDistanceToPolyline(double lat, double lng, List<LatLng> polyline) {
-    if (polyline.isEmpty) return double.infinity;
-    double minDist = double.infinity;
-    final step = polyline.length > 300 ? 3 : 1;
-    for (int i = 0; i < polyline.length; i += step) {
-      final p = polyline[i];
-      final d = distanceKm(lat, lng, p.latitude, p.longitude);
-      if (d < minDist) minDist = d;
-    }
-    return minDist;
-  }
-
-  /// Sorts results by their position along the route polyline (itinerary order).
-  void _sortByItineraryOrder(
-    List<SearchResultItem> items,
-    List<LatLng> geometry,
-  ) {
-    items.sort((a, b) {
-      final da = distanceAlongPolyline(a.lat, a.lng, geometry);
-      final db = distanceAlongPolyline(b.lat, b.lng, geometry);
-      return da.compareTo(db);
-    });
   }
 }

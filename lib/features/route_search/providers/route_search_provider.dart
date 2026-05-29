@@ -9,7 +9,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
 import '../../../core/logging/error_logger.dart';
-import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/country/country_provider.dart';
@@ -20,6 +19,7 @@ import '../../search/providers/ev_charging_service_provider.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/search_result_item.dart';
 import '../../profile/providers/profile_provider.dart';
+import '../data/strategies/route_geometry.dart';
 import '../data/services/routing_service.dart';
 import '../domain/entities/route_info.dart';
 import '../domain/route_search_result.dart';
@@ -267,11 +267,7 @@ class RouteSearchState extends _$RouteSearchState {
     }
 
     // Sort by position along route (itinerary order)
-    results.sort((a, b) {
-      final da = distanceAlongPolyline(a.lat, a.lng, route.geometry);
-      final db = distanceAlongPolyline(b.lat, b.lng, route.geometry);
-      return da.compareTo(db);
-    });
+    sortByItineraryOrder(results, route.geometry);
     return results;
   }
 

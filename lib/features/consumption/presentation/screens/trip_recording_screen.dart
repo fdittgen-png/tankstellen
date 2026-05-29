@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -754,7 +755,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     } else {
       avgValue = liveAvg == null
           ? '—'
-          : '${liveAvg.toStringAsFixed(1)} L/100 km';
+          : UnitFormatter.formatConsumption(liveAvg, isEv: false);
     }
 
     return Column(
@@ -826,7 +827,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       final stats = ConsumptionStats.fromFillUps(fills);
       final avg = stats.avgConsumptionL100km;
       if (avg == null) return null;
-      return '${avg.toStringAsFixed(1)} L/100 km';
+      return UnitFormatter.formatConsumption(avg, isEv: false);
     } catch (e, st) {
       // A malformed fill-up set must not crash the summary card —
       // but log the cause rather than hiding it silently (#1682).
@@ -863,7 +864,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           label: l?.tripMetricAvgConsumption ?? 'Avg',
           value: s.avgLPer100Km == null
               ? '—'
-              : '${s.avgLPer100Km!.toStringAsFixed(1)} L/100 km',
+              : UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: false),
         ),
         const SizedBox(height: 8),
         _MetricCard(
