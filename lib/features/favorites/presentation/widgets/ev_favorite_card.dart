@@ -4,19 +4,26 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_station.dart';
 
-/// Compact card for an EV charging station in the favorites list.
+/// Card for an EV charging station in the favorites list.
 ///
 /// Uses the canonical [ChargingStation] type (unified in #560) with
 /// the typed [EvConnector] instead of the previous free-form search
 /// side [Connector].
+///
+/// #2229 — shares the fuel `StationCard`'s frame (margins, elevation,
+/// shape, leading status dot, title/operator/distance block, right
+/// detail column) so both favorite cards have one silhouette; the only
+/// visual difference is the left accent stripe — [crystalBlue] here vs
+/// the grey `FuelType.all` stripe on fuel cards.
 class EvFavoriteCard extends StatelessWidget {
   /// Crystal-blue accent (#2143) — cool, glassy, distinct from the
-  /// muted-teal `FuelTypeElectric` (#3B8079). Pairs the EV card's
-  /// right-side detail column with the fuel cards' price column
-  /// without borrowing their fuel palette.
+  /// muted-teal `FuelTypeElectric` (#3B8079). Used for both the kW
+  /// headline and (since #2229) the left accent stripe that marks the
+  /// card as EV, without borrowing the fuel palette.
   static const Color crystalBlue = Color(0xFF4FC3F7);
 
   final ChargingStation station;
@@ -48,55 +55,118 @@ class EvFavoriteCard extends StatelessWidget {
         .toSet()
         .toList();
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.ev_station, size: 32, color: theme.colorScheme.primary),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      station.name,
-                      style: theme.textTheme.titleSmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (operatorName.isNotEmpty)
+    final availableLabel = l10n?.evStatusAvailable ?? 'available';
+    // Screen-reader parity with the fuel card's semantic label: the
+    // visual cards are intentionally identical except for the marker
+    // colour (#2229), so a11y leans on this label to convey "EV".
+    final semanticLabel = [
+      station.name,
+      if (operatorName.isNotEmpty) operatorName,
+      '${maxPower.round()} kW',
+      '$available/$total $availableLabel',
+    ].join(', ');
+
+    return Semantics(
+      label: semanticLabel,
+      button: true,
+      child: Card(
+        // #2229 — same frame as the fuel `StationCard` so both favorite
+        // cards share one silhouette; the only difference is the left
+        // accent stripe colour (blue here vs grey for FuelType.all fuel
+        // cards).
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        clipBehavior: Clip.antiAlias,
+        elevation: theme.brightness == Brightness.dark ? 1 : 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                left: BorderSide(color: crystalBlue, width: 4),
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _EvStatusDot(available: available),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
-                        operatorName,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        station.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                  ],
+                      if (operatorName.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          operatorName,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                      if (station.dist > 0) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          PriceFormatter.formatDistance(station.dist),
+                          style: theme.textTheme.bodySmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              _EvDetailColumn(
-                maxPowerKw: maxPower,
-                available: available,
-                total: total,
-                connectorTypes: connectorTypes,
-                availableLabel:
-                    l10n?.evStatusAvailable ?? 'available',
-                onFavoriteTap: onFavoriteTap,
-                removeFavoriteTooltip:
-                    l10n?.removeFavorite ?? 'Remove from favorites',
-              ),
-            ],
+                const SizedBox(width: 8),
+                _EvDetailColumn(
+                  maxPowerKw: maxPower,
+                  available: available,
+                  total: total,
+                  connectorTypes: connectorTypes,
+                  availableLabel: availableLabel,
+                  onFavoriteTap: onFavoriteTap,
+                  removeFavoriteTooltip:
+                      l10n?.removeFavorite ?? 'Remove from favorites',
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Leading availability dot — green when at least one connector is free,
+/// grey otherwise. Mirrors the fuel `StationCard`'s `_StatusColumn` dot
+/// so the two favorite cards share an identical leading silhouette
+/// (#2229).
+class _EvStatusDot extends StatelessWidget {
+  final int available;
+
+  const _EvStatusDot({required this.available});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: available > 0 ? DarkModeColors.success(context) : Colors.grey,
       ),
     );
   }

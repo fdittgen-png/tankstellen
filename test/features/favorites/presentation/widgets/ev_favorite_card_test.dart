@@ -28,7 +28,7 @@ ChargingStation _station({
 
 void main() {
   group('EvFavoriteCard', () {
-    testWidgets('renders name, operator, and ev_station icon',
+    testWidgets('renders name, operator, and a blue EV marker stripe',
         (tester) async {
       await pumpApp(
         tester,
@@ -36,7 +36,18 @@ void main() {
       );
       expect(find.text('IONITY Tournefeuille'), findsOneWidget);
       expect(find.text('IONITY'), findsOneWidget);
-      expect(find.byIcon(Icons.ev_station), findsOneWidget);
+      // #2229 — identical silhouette to the fuel card: the old
+      // ev_station leading icon is gone, replaced by the crystal-blue
+      // left accent stripe that marks the card as EV.
+      expect(find.byIcon(Icons.ev_station), findsNothing);
+      final blueStripe =
+          tester.widgetList<Container>(find.byType(Container)).where((c) {
+        final d = c.decoration;
+        return d is BoxDecoration &&
+            d.border is Border &&
+            (d.border! as Border).left.color == EvFavoriteCard.crystalBlue;
+      });
+      expect(blueStripe, isNotEmpty);
     });
 
     testWidgets('hides operator row when operator is empty',
