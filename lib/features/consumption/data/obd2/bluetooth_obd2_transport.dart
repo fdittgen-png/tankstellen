@@ -99,6 +99,27 @@ class BluetoothObd2Transport implements Obd2Transport {
     return completer.future;
   }
 
+  /// #2261 concern 4 — forward link-tuning to the underlying channel
+  /// when it is a BLE [Obd2LinkTuner]. No-op for channels that don't
+  /// expose tuning (Classic SPP, test fakes), so callers can tune
+  /// unconditionally. Best-effort: the channel itself swallows platform
+  /// rejections.
+  Future<void> tuneForRecording() async {
+    final ch = _channel;
+    if (ch is Obd2LinkTuner) {
+      await (ch as Obd2LinkTuner).tuneForRecording();
+    }
+  }
+
+  /// Drop the link to balanced priority when only the 1 Hz auto-record
+  /// stream is live (#2261 concern 4).
+  Future<void> tuneForBackground() async {
+    final ch = _channel;
+    if (ch is Obd2LinkTuner) {
+      await (ch as Obd2LinkTuner).tuneForBackground();
+    }
+  }
+
   @override
   Future<void> disconnect() async {
     _connected = false;

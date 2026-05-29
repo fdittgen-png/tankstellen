@@ -9,6 +9,7 @@ import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import 'adapter_capability.dart';
 import 'auto_record_trace_log.dart';
+import 'bluetooth_obd2_transport.dart';
 import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_diagnostics.dart';
@@ -1169,6 +1170,22 @@ class Obd2Service implements Obd2RawCommandPort {
     // track that proof — fall back to the local constant which is
     // both non-null and equal.
     return (id: _psaFuelLevelFrameId, payload: payload);
+  }
+
+  /// Ask the underlying BLE link for high throughput while actively
+  /// polling PIDs (#2261 concern 4) — high connection priority + a
+  /// best-effort MTU bump. No-op when the transport / channel doesn't
+  /// expose tuning (Classic SPP, fakes). Best-effort throughout.
+  Future<void> tuneLinkForRecording() async {
+    final t = _transport;
+    if (t is BluetoothObd2Transport) await t.tuneForRecording();
+  }
+
+  /// Drop the BLE link to balanced priority when only the 1 Hz
+  /// auto-record movement stream is live (#2261 concern 4).
+  Future<void> tuneLinkForBackground() async {
+    final t = _transport;
+    if (t is BluetoothObd2Transport) await t.tuneForBackground();
   }
 
   /// Close the transport connection. Safe to call multiple times.

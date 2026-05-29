@@ -45,9 +45,16 @@ class Elm327BleUuids {
 /// It is untested on iOS — flutter_blue_plus is cross-platform but
 /// iOS BLE ELM adapters are rare; add iOS-specific handling when the
 /// app starts supporting them.
-class FlutterBluePlusElmChannel implements ElmByteChannel {
+class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
   final BluetoothDevice _device;
   final Elm327BleUuids _uuids;
+
+  /// #2261 concern 4 — best-effort MTU to request on a high-throughput
+  /// (recording) link. 247 is the practical ATT payload ceiling on most
+  /// Android BLE stacks; the actual negotiated value is whatever the
+  /// peripheral grants. Skipped entirely on the autoConnect passive
+  /// path (FBP forbids requestMtu there).
+  static const int _recordingMtu = 247;
 
   /// Optional bounded timeout passed to `device.connect` (#2242). When
   /// null, `connect` is called with the legacy `mtu: null` form and no
@@ -186,6 +193,49 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
       },
     );
     _open = true;
+    // #2261 concern 4 — a freshly-opened ACTIVE link is a recording
+    // link: ask for high throughput (high priority + best-effort MTU).
+    // Skipped on the passive autoConnect path — FBP forbids requestMtu
+    // with autoConnect:true, and a parked-car passive wait wants low
+    // power, not high duty. Best-effort: any rejection is swallowed.
+    if (!_autoConnect) {
+      await tuneForRecording();
+    }
+  }
+
+  @override
+  Future<void> tuneForRecording() async {
+    await _setConnectionPriority(ConnectionPriority.high);
+    // requestMtu is forbidden with autoConnect:true (FBP throws); the
+    // passive path never calls this, but guard anyway.
+    if (_autoConnect) return;
+    try {
+      await _device.requestMtu(_recordingMtu);
+    } catch (e, st) {
+      // Many clones reject a non-default MTU — harmless, the default
+      // 23-byte MTU still works. PHY (2M) is deliberately NOT requested:
+      // it is a trap on BLE 4.0/4.1 clones.
+      debugPrint('FlutterBluePlusElmChannel requestMtu skipped: $e\n$st');
+    }
+  }
+
+  @override
+  Future<void> tuneForBackground() async {
+    await _setConnectionPriority(ConnectionPriority.balanced);
+  }
+
+  /// Best-effort connection-priority request (#2261 concern 4). Android
+  /// only — FBP throws `androidOnly` elsewhere — so the try/catch keeps
+  /// iOS / a rejecting clone from ever breaking a session.
+  Future<void> _setConnectionPriority(ConnectionPriority priority) async {
+    try {
+      await _device.requestConnectionPriority(
+        connectionPriorityRequest: priority,
+      );
+    } catch (e, st) {
+      debugPrint('FlutterBluePlusElmChannel requestConnectionPriority '
+          'skipped: $e\n$st');
+    }
   }
 
   @override
@@ -198,12 +248,14 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
     // the ELM327 replies via notify anyway.
     try {
       await char.write(bytes, withoutResponse: true);
+      // ignore: catch_no_st
     } catch (e) {
       // #2261 concern 1 — a write failing WHILE a disconnect edge is
       // pending confirms the drop immediately rather than waiting out
       // the rest of the debounce: the link has proven unusable. A lone
       // write failure on an otherwise-connected link is a no-op for the
-      // debouncer and falls through to the caller as before.
+      // debouncer and falls through to the caller as before. Rethrow-only
+      // (the caller / transport classifies it) — no stack trace needed.
       _dropDebouncer.noteCommandFailure();
       rethrow;
     }
