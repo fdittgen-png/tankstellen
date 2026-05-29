@@ -3915,6 +3915,107 @@ class AppLocalizationsRo extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Respingeți';
 
   @override
+  String get developerToolsSectionTitle => 'Instrumente pentru dezvoltatori';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnosticare și instrumente de depanare — vizibile doar în modul dezvoltator / depanare.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Jurnal de erori, alerte de test, diagnosticare';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Jurnal de erori';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Salvează jurnalul de erori ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Șterge jurnalul de erori';
+
+  @override
+  String get developerToolsViewErrorLog => 'Vezi jurnalul de erori';
+
+  @override
+  String get developerToolsErrorLogEmpty =>
+      'Nicio urmă de eroare înregistrată.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Alerte și notificări';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      'Trimite o notificare de test';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Notificare de test';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Dacă poți citi asta, notificările funcționează.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Notificare de test trimisă.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Notificările sunt blocate — activează-le din setările sistemului, apoi reîncearcă.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Rulează fluxul de alertă de test';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Alertă de test declanșată — fluxul a livrat $count notificare(i).';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Alertă de preț de test';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Potrivire sintetică: a fost găsită în apropiere o stație sub ținta ta.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnosticare';
+
+  @override
+  String get developerToolsFeatureFlagDump =>
+      'Inspector de indicatori de funcții';
+
+  @override
+  String get developerToolsFlagOn => 'Activat';
+
+  @override
+  String get developerToolsFlagOff => 'Dezactivat';
+
+  @override
+  String get developerToolsClearCaches => 'Golește memoriile cache';
+
+  @override
+  String get developerToolsCachesCleared => 'Memorii cache golite.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Copiază diagnosticarea';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnosticare copiată în clipboard.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Informații despre compilare';
+
+  @override
+  String get developerToolsBuildVersion => 'Versiunea aplicației';
+
+  @override
+  String get developerToolsBuildChannel => 'Canal de compilare';
+
+  @override
   String get insightCardTitle => 'Cele mai risipitoare comportamente';
 
   @override
@@ -4250,6 +4351,13 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Activează panoul de feedback pentru scanări eșuate care creează automat issues pe GitHub cu un Personal Access Token. Funcție pentru utilizatori avansați / contribuitori.';
+
+  @override
+  String get featureLabel_debugMode => 'Mod dezvoltator / depanare';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Afișează o secțiune Instrumente pentru dezvoltatori în setări cu diagnosticare: exportul jurnalului de erori, notificări de test, rularea fluxului de alertă de test, lista indicatorilor de funcții, golirea memoriilor cache și copierea diagnosticării.';
 
   @override
   String get feedbackConsentTitle => 'Trimiteți raportul pe GitHub?';

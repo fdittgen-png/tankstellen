@@ -3916,6 +3916,107 @@ class AppLocalizationsPt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Ignorar';
 
   @override
+  String get developerToolsSectionTitle => 'Ferramentas de programador';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnósticos e ferramentas de depuração — visíveis apenas no modo programador / depuração.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Registo de erros, alertas de teste, diagnósticos';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Registo de erros';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Guardar registo de erros ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Limpar registo de erros';
+
+  @override
+  String get developerToolsViewErrorLog => 'Ver registo de erros';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Nenhum rasto de erro registado.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Alertas e notificações';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      'Enviar notificação de teste';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Notificação de teste';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Se consegue ler isto, as notificações estão a funcionar.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Notificação de teste enviada.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'As notificações estão bloqueadas — ative-as nas definições do sistema e tente novamente.';
+
+  @override
+  String get developerToolsRunTestAlert =>
+      'Executar pipeline de alerta de teste';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Alerta de teste acionado — o pipeline entregou $count notificação(ões).';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Alerta de preço de teste';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Correspondência sintética: foi encontrada nas proximidades uma estação abaixo do seu objetivo.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnósticos';
+
+  @override
+  String get developerToolsFeatureFlagDump =>
+      'Inspetor de sinalizadores de funcionalidades';
+
+  @override
+  String get developerToolsFlagOn => 'Ativado';
+
+  @override
+  String get developerToolsFlagOff => 'Desativado';
+
+  @override
+  String get developerToolsClearCaches => 'Limpar caches';
+
+  @override
+  String get developerToolsCachesCleared => 'Caches limpas.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Copiar diagnósticos';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnósticos copiados para a área de transferência.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Informação da compilação';
+
+  @override
+  String get developerToolsBuildVersion => 'Versão da aplicação';
+
+  @override
+  String get developerToolsBuildChannel => 'Canal de compilação';
+
+  @override
   String get insightCardTitle => 'Comportamentos mais desperdiçadores';
 
   @override
@@ -4251,6 +4352,13 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Ativa o painel de feedback para scans com falha que cria automaticamente issues no GitHub com um Personal Access Token. Função para usuários avançados / colaboradores.';
+
+  @override
+  String get featureLabel_debugMode => 'Modo programador / depuração';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Mostra uma secção Ferramentas de programador nas definições com diagnósticos: exportação do registo de erros, notificações de teste, execução do pipeline de alerta de teste, despejo de sinalizadores de funcionalidades, limpeza de caches e cópia de diagnósticos.';
 
   @override
   String get feedbackConsentTitle => 'Enviar relatório para o GitHub?';

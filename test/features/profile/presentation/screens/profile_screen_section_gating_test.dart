@@ -172,6 +172,48 @@ void main() {
         expect(find.text('Consumption', skipOffstage: false), findsOneWidget);
       },
     );
+
+    // #2248 — the Developer tools tile is gated on Feature.debugMode and
+    // must never render for a production (default) user.
+    testWidgets(
+      'Developer tools tile hides when Feature.debugMode is off (default)',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(1200, 3200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        await pumpApp(
+          tester,
+          const ProfileScreen(),
+          overrides: overridesWithFlags(const <Feature>{}),
+        );
+
+        expect(
+          find.text('Developer tools', skipOffstage: false),
+          findsNothing,
+          reason: 'debugMode is default-off, so production users must '
+              'never see the Developer tools entry (#2248).',
+        );
+      },
+    );
+
+    testWidgets(
+      'Developer tools tile renders when Feature.debugMode is on',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(1200, 3200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        await pumpApp(
+          tester,
+          const ProfileScreen(),
+          overrides: overridesWithFlags(const <Feature>{Feature.debugMode}),
+        );
+
+        expect(
+          find.text('Developer tools', skipOffstage: false),
+          findsOneWidget,
+          reason: 'enabling debugMode must surface the Developer tools '
+              'entry in Settings (#2248).',
+        );
+      },
+    );
   });
 }
 

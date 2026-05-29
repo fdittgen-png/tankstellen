@@ -3919,6 +3919,107 @@ class AppLocalizationsBg extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Затвори';
 
   @override
+  String get developerToolsSectionTitle => 'Инструменти за разработчици';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Диагностика и инструменти за отстраняване на грешки — видими само в режим за разработчици / отстраняване на грешки.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Дневник на грешките, тестови сигнали, диагностика';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Дневник на грешките';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Запазване на дневника с грешки ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Изчистване на дневника с грешки';
+
+  @override
+  String get developerToolsViewErrorLog => 'Преглед на дневника с грешки';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Няма записани следи от грешки.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Сигнали и известия';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      'Изпращане на тестово известие';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Тестово известие';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Ако можете да прочетете това, известията работят.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Тестовото известие е изпратено.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Известията са блокирани — активирайте ги от системните настройки и опитайте отново.';
+
+  @override
+  String get developerToolsRunTestAlert =>
+      'Изпълнение на тестов поток за сигнали';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Тестовият сигнал е задействан — потокът достави $count известия.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Тестов ценови сигнал';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Синтетично съвпадение: наблизо е намерена станция под вашата цел.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Диагностика';
+
+  @override
+  String get developerToolsFeatureFlagDump =>
+      'Инспектор на флаговете за функции';
+
+  @override
+  String get developerToolsFlagOn => 'Вкл.';
+
+  @override
+  String get developerToolsFlagOff => 'Изкл.';
+
+  @override
+  String get developerToolsClearCaches => 'Изчистване на кешовете';
+
+  @override
+  String get developerToolsCachesCleared => 'Кешовете са изчистени.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Копиране на диагностиката';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Диагностиката е копирана в клипборда.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Информация за компилацията';
+
+  @override
+  String get developerToolsBuildVersion => 'Версия на приложението';
+
+  @override
+  String get developerToolsBuildChannel => 'Канал на компилацията';
+
+  @override
   String get insightCardTitle => 'Най-разточителни поведения';
 
   @override
@@ -4254,6 +4355,14 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Активира панела за обратна връзка при неуспешен скан, който автоматично създава GitHub issues с Personal Access Token. За опитни потребители/сътрудници.';
+
+  @override
+  String get featureLabel_debugMode =>
+      'Режим за разработчици / отстраняване на грешки';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Показва раздел Инструменти за разработчици в настройките с диагностика: експорт на дневника с грешки, тестови известия, изпълнение на тестов поток за сигнали, списък на флаговете за функции, изчистване на кешовете и копиране на диагностиката.';
 
   @override
   String get feedbackConsentTitle => 'Изпращане на доклад в GitHub?';

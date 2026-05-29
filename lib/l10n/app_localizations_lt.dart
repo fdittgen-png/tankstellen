@@ -3911,6 +3911,105 @@ class AppLocalizationsLt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Atmesti';
 
   @override
+  String get developerToolsSectionTitle => 'Kūrėjo įrankiai';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostika ir derinimo įrankiai — matomi tik kūrėjo / derinimo režimu.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Klaidų žurnalas, bandomieji įspėjimai, diagnostika';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Klaidų žurnalas';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Įrašyti klaidų žurnalą ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Išvalyti klaidų žurnalą';
+
+  @override
+  String get developerToolsViewErrorLog => 'Peržiūrėti klaidų žurnalą';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Klaidų pėdsakų neužregistruota.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Įspėjimai ir pranešimai';
+
+  @override
+  String get developerToolsFireTestNotification => 'Siųsti bandomąjį pranešimą';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Bandomasis pranešimas';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Jei tai skaitote, pranešimai veikia.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Bandomasis pranešimas išsiųstas.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Pranešimai užblokuoti — įjunkite juos sistemos nustatymuose ir bandykite dar kartą.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Vykdyti bandomąją įspėjimų giją';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Bandomasis įspėjimas suaktyvintas — gija pristatė $count pranešimų.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Bandomasis kainos įspėjimas';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Sintetinis atitikmuo: netoliese rasta stotelė, mažesnė už jūsų tikslą.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
+
+  @override
+  String get developerToolsFeatureFlagDump =>
+      'Funkcijų vėliavėlių inspektorius';
+
+  @override
+  String get developerToolsFlagOn => 'Įjungta';
+
+  @override
+  String get developerToolsFlagOff => 'Išjungta';
+
+  @override
+  String get developerToolsClearCaches => 'Išvalyti talpyklas';
+
+  @override
+  String get developerToolsCachesCleared => 'Talpyklos išvalytos.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopijuoti diagnostiką';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostika nukopijuota į iškarpinę.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Versijos informacija';
+
+  @override
+  String get developerToolsBuildVersion => 'Programos versija';
+
+  @override
+  String get developerToolsBuildChannel => 'Versijos kanalas';
+
+  @override
   String get insightCardTitle => 'Didžiausias kuro švaistymas';
 
   @override
@@ -4244,6 +4343,13 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Įjungia nepavykusio nuskaitymo atsiliepimų skydelį, kuris su Personal Access Token automatiškai sukuria GitHub problemas. Pažangių vartotojų / talkininkų funkcija.';
+
+  @override
+  String get featureLabel_debugMode => 'Kūrėjo / derinimo režimas';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Nustatymuose parodo skiltį Kūrėjo įrankiai su diagnostika: klaidų žurnalo eksportas, bandomieji pranešimai, bandomosios įspėjimų gijos vykdymas, funkcijų vėliavėlių sąrašas, talpyklų išvalymas ir diagnostikos kopijavimas.';
 
   @override
   String get feedbackConsentTitle => 'Siųsti ataskaitą į GitHub?';
