@@ -5539,6 +5539,16 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Минимизиране в плаваща плочка';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Винаги фиксирай при старт на записа';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Фиксирай формуляра автоматично при всяко пътуване, вместо да докосваш всеки път. Изразходва повече батерия.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Стартиране на записа…';
+
+  @override
   String get tripShareAction => 'Споделяне с друг акаунт';
 
   @override

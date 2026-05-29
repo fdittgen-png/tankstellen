@@ -9831,6 +9831,24 @@ abstract class AppLocalizations {
   /// **'Minimise to a floating tile'**
   String get tripRecordingMinimiseTooltip;
 
+  /// Title of the opt-in switch in the pin-help bottom sheet on the trip-recording screen (#2274). When on, the form pins itself (screen stays on, system bars hidden) automatically at the start of every recording instead of the user tapping the pin each drive. Off by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Always pin when recording starts'**
+  String get tripRecordingAutoPinTitle;
+
+  /// Subtitle under the always-pin opt-in switch in the pin-help bottom sheet (#2274). Explains the trade-off: convenience vs battery cost.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin the form automatically every drive instead of tapping each time. Uses more battery.'**
+  String get tripRecordingAutoPinSubtitle;
+
+  /// AppBar title shown on the trip-recording screen while the BLE adapter connect + odometer prime run, before the first live sample lands (#2274 start-now-connect-later). The screen is pushed immediately in this transient connecting state.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting recording…'**
+  String get tripRecordingConnectingTitle;
+
   /// Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account.
   ///
   /// In en, this message translates to:

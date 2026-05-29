@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/driving_coaching.dart' show DrivingCoachingHint;
+import '../domain/entities/trip_start_stage.dart';
 import '../domain/situation_classifier.dart';
 import 'trip_recording_phase.dart';
 
@@ -36,6 +37,13 @@ class TripRecordingState {
   /// Drives the three GPS-derived tiles in `MinimalDriveSummary`.
   final DrivingCoachingHint? gpsCoachingHint;
 
+  /// #2274 concern 2 — which beat of the connect+prime sequence the
+  /// start flow is on, surfaced while [phase] is
+  /// [TripRecordingPhase.connecting] so the recording screen renders the
+  /// inline [TripStartProgress] in place of the live metrics. Null in
+  /// every other phase.
+  final TripStartStage? connectStage;
+
   const TripRecordingState({
     this.phase = TripRecordingPhase.idle,
     this.live,
@@ -44,6 +52,7 @@ class TripRecordingState {
     this.liveDeltaFraction,
     this.dropReason,
     this.gpsCoachingHint,
+    this.connectStage,
   });
 
   TripRecordingState copyWith({
@@ -57,6 +66,8 @@ class TripRecordingState {
     bool clearDropReason = false,
     DrivingCoachingHint? gpsCoachingHint,
     bool clearGpsCoachingHint = false,
+    TripStartStage? connectStage,
+    bool clearConnectStage = false,
   }) =>
       TripRecordingState(
         phase: phase ?? this.phase,
@@ -72,10 +83,18 @@ class TripRecordingState {
         gpsCoachingHint: clearGpsCoachingHint
             ? null
             : (gpsCoachingHint ?? this.gpsCoachingHint),
+        connectStage: clearConnectStage
+            ? null
+            : (connectStage ?? this.connectStage),
       );
 
   bool get isActive =>
       phase == TripRecordingPhase.recording ||
       phase == TripRecordingPhase.paused ||
       phase == TripRecordingPhase.pausedDueToDrop;
+
+  /// #2274 concern 2 — true while the start-now-connect-later flow is
+  /// reaching the adapter and priming the recorder, before the first
+  /// live sample lands. Distinct from [isActive] (no trip exists yet).
+  bool get isConnecting => phase == TripRecordingPhase.connecting;
 }

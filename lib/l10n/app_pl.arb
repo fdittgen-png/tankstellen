@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Udostępnione mnie",
   "trajetsSharedBadge": "Udostępnione",
   "dataSourceAttribution": "Źródło: {source} ({license})",
-  "dataSourceAttributionSemantic": "Dane o cenach paliw dostarcza {source}, na licencji {license}."
+  "dataSourceAttributionSemantic": "Dane o cenach paliw dostarcza {source}, na licencji {license}.",
+  "tripRecordingAutoPinTitle": "Zawsze przypnij przy starcie nagrywania",
+  "tripRecordingAutoPinSubtitle": "Przypnij formularz automatycznie podczas każdej jazdy, zamiast dotykać za każdym razem. Zużywa więcej baterii.",
+  "tripRecordingConnectingTitle": "Rozpoczynanie nagrywania…"
 }

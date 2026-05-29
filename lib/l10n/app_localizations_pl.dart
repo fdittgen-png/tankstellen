@@ -5516,6 +5516,17 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zminimalizuj do pływającego kafelka';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Zawsze przypnij przy starcie nagrywania';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Przypnij formularz automatycznie podczas każdej jazdy, zamiast dotykać za każdym razem. Zużywa więcej baterii.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Rozpoczynanie nagrywania…';
+
+  @override
   String get tripShareAction => 'Udostępnij innemu kontu';
 
   @override

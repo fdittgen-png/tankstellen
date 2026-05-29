@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Споделено с мен",
   "trajetsSharedBadge": "Споделено",
   "dataSourceAttribution": "Източник: {source} ({license})",
-  "dataSourceAttributionSemantic": "Данните за цените на горивата са предоставени от {source}, лицензирани под {license}."
+  "dataSourceAttributionSemantic": "Данните за цените на горивата са предоставени от {source}, лицензирани под {license}.",
+  "tripRecordingAutoPinTitle": "Винаги фиксирай при старт на записа",
+  "tripRecordingAutoPinSubtitle": "Фиксирай формуляра автоматично при всяко пътуване, вместо да докосваш всеки път. Изразходва повече батерия.",
+  "tripRecordingConnectingTitle": "Стартиране на записа…"
 }

@@ -5519,6 +5519,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Als schwebende Kachel minimieren';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Beim Aufnahmestart immer anpinnen';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Das Formular bei jeder Fahrt automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Aufnahme wird gestartet …';
+
+  @override
   String get tripShareAction => 'Mit anderem Konto teilen';
 
   @override

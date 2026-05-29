@@ -5536,6 +5536,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimizar a un mosaico flotante';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Fijar siempre al iniciar la grabación';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Fija el formulario automáticamente en cada trayecto en lugar de tocar cada vez. Consume más batería.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Iniciando grabación…';
+
+  @override
   String get tripShareAction => 'Compartir con otra cuenta';
 
   @override

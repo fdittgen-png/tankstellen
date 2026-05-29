@@ -5516,6 +5516,17 @@ class AppLocalizationsSk extends AppLocalizations {
       'Minimalizovať do plávajúcej dlaždice';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Pri spustení nahrávania vždy pripnúť';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Pripnúť formulár automaticky pri každej jazde namiesto klepnutia zakaždým. Spotrebuje viac batérie.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Spúšťa sa nahrávanie…';
+
+  @override
   String get tripShareAction => 'Zdieľať s iným účtom';
 
   @override

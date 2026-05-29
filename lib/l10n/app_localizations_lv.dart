@@ -5522,6 +5522,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimizēt uz peldošu elementu';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Vienmēr piespraust, sākot ierakstu';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Automātiski piespraust veidlapu katrā braucienā, nevis pieskaroties katru reizi. Patērē vairāk akumulatora.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Notiek ieraksta sākšana…';
+
+  @override
   String get tripShareAction => 'Kopīgot ar citu kontu';
 
   @override

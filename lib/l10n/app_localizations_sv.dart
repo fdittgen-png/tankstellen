@@ -5487,6 +5487,17 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimera till en flytande ruta';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Fäst alltid när inspelningen startar';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Fäst formuläret automatiskt vid varje körning i stället för att trycka varje gång. Förbrukar mer batteri.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Startar inspelning…';
+
+  @override
   String get tripShareAction => 'Dela med ett annat konto';
 
   @override

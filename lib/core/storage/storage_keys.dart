@@ -124,4 +124,18 @@ class StorageKeys {
   static const String defaultAmenities = 'default_amenities';
   static const String defaultBrands = 'default_brands';
   static const String defaultExcludeHighway = 'default_exclude_highway';
+
+  /// #2274 concern 1 — JSON-encoded global [RecordingProfile]
+  /// (autoPin / autoEnterReducedOnStart / keepScreenAwake). Absent ⇒
+  /// every field off (the opt-in-each-drive default). Applied on the
+  /// recording screen's `initState` so a user who flips `autoPin` once
+  /// gets the screen pinned automatically on every subsequent start.
+  static const String recordingProfile = 'recording_profile';
+
+  /// #2274 concern 1 — prefix for a per-vehicle [RecordingProfile]
+  /// override. The full key is `<prefix><vehicleId>`; an override is
+  /// persisted only when it differs from the all-default profile, and a
+  /// missing override falls through to [recordingProfile].
+  static const String recordingProfileVehicleOverridePrefix =
+      'recording_profile_vehicle_';
 }

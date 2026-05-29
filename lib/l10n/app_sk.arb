@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Zdieľané so mnou",
   "trajetsSharedBadge": "Zdieľané",
   "dataSourceAttribution": "Zdroj: {source} ({license})",
-  "dataSourceAttributionSemantic": "Údaje o cenách palív poskytuje {source}, licencované pod {license}."
+  "dataSourceAttributionSemantic": "Údaje o cenách palív poskytuje {source}, licencované pod {license}.",
+  "tripRecordingAutoPinTitle": "Pri spustení nahrávania vždy pripnúť",
+  "tripRecordingAutoPinSubtitle": "Pripnúť formulár automaticky pri každej jazde namiesto klepnutia zakaždým. Spotrebuje viac batérie.",
+  "tripRecordingConnectingTitle": "Spúšťa sa nahrávanie…"
 }

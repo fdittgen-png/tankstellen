@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +8,6 @@ import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
@@ -63,50 +60,6 @@ class _FixedActiveVehicle extends ActiveVehicleProfile {
   VehicleProfile? build() => _value;
 }
 
-/// Records every [startTrip] call and surfaces a typed connection
-/// error so the SnackBar branch in `_onStartRecording` runs without
-/// having to mount the full OBD2 picker / BLE stack.
-class _RecordingThrowsTripRecording extends TripRecording {
-  int startTripCallCount = 0;
-
-  @override
-  TripRecordingState build() => const TripRecordingState();
-
-  @override
-  Future<StartTripOutcome> startTrip({
-    String? vehicleId,
-    String? adapterMac,
-    Obd2Service? service,
-    bool automatic = false,
-  }) async {
-    startTripCallCount++;
-    // Surfacing an Obd2ScanTimeout exercises the `on Obd2ConnectionError`
-    // catch arm — TrajetsTab should swallow it into a SnackBar.
-    throw const Obd2ScanTimeout('No OBD2 adapter found in range');
-  }
-}
-
-/// Fake whose `startTrip()` resolves on a [Completer] the test
-/// controls. Lets a test pump while the start flow is mid-flight so
-/// it can assert that the inline [TripStartProgress] card replaces
-/// the disabled button (#1230) instead of the screen looking frozen.
-class _PendingTripRecording extends TripRecording {
-  final Completer<StartTripOutcome> gate = Completer<StartTripOutcome>();
-
-  @override
-  TripRecordingState build() => const TripRecordingState();
-
-  @override
-  Future<StartTripOutcome> startTrip({
-    String? vehicleId,
-    String? adapterMac,
-    Obd2Service? service,
-    bool automatic = false,
-  }) {
-    return gate.future;
-  }
-}
-
 /// Default no-op fake — used when the test only needs to render the
 /// widget and doesn't tap the CTA.
 class _IdleTripRecording extends TripRecording {
@@ -124,29 +77,27 @@ class _IdleTripRecording extends TripRecording {
   }
 }
 
-/// Fake that returns [StartTripOutcome.needsPicker] — drives the
-/// picker code path in `_onStartRecording` (#1188).
-class _NeedsPickerTripRecording extends TripRecording {
-  int startTripCallCount = 0;
+/// #2274 concern 2 fake — records the start-now-connect-later sequence
+/// (`enterConnecting` → `start`) without the real provider's heavy
+/// connect/prime work. The base-class `enterConnecting` / `cancelConnecting`
+/// / `setConnectStage` mutate `state` for real (cheap copyWith), so the
+/// connecting phase is observable; only `start` is stubbed to a counter
+/// that flips the phase to recording.
+class _ConnectLaterTripRecording extends TripRecording {
   int startServiceCallCount = 0;
+  Obd2Service? lastStartedService;
 
   @override
   TripRecordingState build() => const TripRecordingState();
 
   @override
-  Future<StartTripOutcome> startTrip({
-    String? vehicleId,
-    String? adapterMac,
-    Obd2Service? service,
-    bool automatic = false,
-  }) async {
-    startTripCallCount++;
-    return StartTripOutcome.needsPicker;
-  }
-
-  @override
   Future<void> start(Obd2Service service, {bool automatic = false}) async {
     startServiceCallCount++;
+    lastStartedService = service;
+    state = state.copyWith(
+      phase: TripRecordingPhase.recording,
+      clearConnectStage: true,
+    );
   }
 }
 
@@ -156,15 +107,19 @@ class _NeedsPickerTripRecording extends TripRecording {
 /// Bluetooth stack. The constructor uses the existing fake permissions
 /// + bluetooth facades so the underlying scan path also stays inert.
 class _RecordingFakeConnection extends Obd2ConnectionService {
-  _RecordingFakeConnection({this.connectByMacResult})
-      : super(
+  _RecordingFakeConnection({
+    this.connectByMacDirectResult,
+  }) : super(
           registry: Obd2AdapterRegistry.defaults(),
           permissions: _AlwaysGrantedPermissions(),
           bluetooth: _EmptyBluetoothFacade(),
         );
 
-  final Obd2Service? connectByMacResult;
+  /// #2274 concern 3 — what the pre-warm direct-connect resolves to.
+  /// Null ⇒ pre-warm misses and the start flow falls back to the picker.
+  final Obd2Service? connectByMacDirectResult;
   final List<String> connectByMacCalls = [];
+  final List<String> connectByMacDirectCalls = [];
 
   @override
   Future<Obd2Service?> connectByMac(
@@ -172,7 +127,17 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
     Duration timeout = const Duration(seconds: 5),
   }) async {
     connectByMacCalls.add(mac);
-    return connectByMacResult;
+    return null;
+  }
+
+  @override
+  Future<Obd2Service?> connectByMacDirect(
+    String mac, {
+    Duration timeout = const Duration(seconds: 4),
+    bool fallbackToScan = true,
+  }) async {
+    connectByMacDirectCalls.add(mac);
+    return connectByMacDirectResult;
   }
 
   @override
@@ -507,52 +472,80 @@ void main() {
       expect(find.text('Start recording'), findsOneWidget);
     });
 
-    testWidgets('tapping the CTA invokes TripRecording.startTrip',
-        (tester) async {
-      final notifier = _RecordingThrowsTripRecording();
+    testWidgets(
+        '#2274 concern 2 — tapping the CTA enters the connecting phase and '
+        'consumes a pre-warmed service via start()', (tester) async {
+      final fakeService = _NoopObd2Service();
+      final connection = _RecordingFakeConnection(
+        connectByMacDirectResult: fakeService,
+      );
+      final notifier = _ConnectLaterTripRecording();
       await _pumpTab(
         tester,
         vehicleId: null,
+        // A pinned MAC so the pre-warm fires the direct connect on open.
+        activeVehicle: const VehicleProfile(
+          id: 'v1',
+          name: 'Daily Driver',
+          type: VehicleType.combustion,
+          obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
+          obd2AdapterName: 'vLinker FS',
+        ),
         trips: const [],
         recordingFactory: () => notifier,
+        obd2Connection: connection,
       );
-
-      expect(notifier.startTripCallCount, 0);
+      // Let the post-frame pre-warm fire + resolve.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 10));
+      expect(connection.connectByMacDirectCalls, ['AA:BB:CC:DD:EE:FF'],
+          reason: 'pre-warm (concern 3) fires the direct connect on open');
 
       await tester.tap(
         find.byKey(const Key('trajets_start_recording_button')),
       );
-      // Settle pumps the post-throw setState so `_starting` flips back
-      // and the SnackBar lands.
-      await tester.pumpAndSettle();
+      // Don't pumpAndSettle — the recording-screen push would build the
+      // full screen. A bounded pump lets the connect future chain.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
 
-      expect(notifier.startTripCallCount, 1);
+      // The pre-warmed service was consumed via start() — no second
+      // connect, no picker sheet.
+      expect(notifier.startServiceCallCount, 1);
+      expect(notifier.lastStartedService, same(fakeService));
+      expect(find.text('Pick an OBD2 adapter'), findsNothing);
     });
 
     testWidgets(
-        'a thrown Obd2ConnectionError surfaces a SnackBar with its message',
-        (tester) async {
+        '#2274 concern 2 — an unpaired vehicle (pre-warm miss) still opens '
+        'the picker sheet from the connecting flow', (tester) async {
+      final notifier = _ConnectLaterTripRecording();
+      // No pinned MAC ⇒ pre-warm misses ⇒ the start flow falls back to
+      // the picker, which opens its modal sheet.
       await _pumpTab(
         tester,
         vehicleId: null,
+        activeVehicle: const VehicleProfile(
+          id: 'v2',
+          name: 'Daily Driver',
+          type: VehicleType.combustion,
+        ),
         trips: const [],
-        recordingFactory: () => _RecordingThrowsTripRecording(),
+        recordingFactory: () => notifier,
+        obd2Connection: _RecordingFakeConnection(),
       );
+      await tester.pump();
 
       await tester.tap(
         find.byKey(const Key('trajets_start_recording_button')),
       );
-      await tester.pump(); // schedule the future
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
 
-      // SnackBarHelper.showError uses a plain SnackBar with the typed
-      // error's message. A long duration (5 s) is fine — we just need
-      // to find it before it animates out.
-      expect(find.byType(SnackBar), findsOneWidget);
-      expect(
-        find.text('No OBD2 adapter found in range'),
-        findsOneWidget,
-      );
+      // No pre-warm hit (no pinned MAC) → the picker sheet opens and no
+      // service reached start().
+      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+      expect(notifier.startServiceCallCount, 0);
     });
   });
 
@@ -711,12 +704,12 @@ void main() {
     });
   });
 
-  // #1188 — pinned-MAC fast path. When the active vehicle has an
-  // adapter paired (`obd2AdapterMac` non-null), tapping Start
-  // recording must NOT show the picker sheet. The picker calls
-  // `connectByMac` silently and pushes straight into the recording
-  // screen.
-  group('TrajetsTab — pinned-MAC fast path (#1188)', () {
+  // #2274 concern 3 — pre-warm BLE connect on the trajets/start screen
+  // open. For a pinned/bonded adapter the tab kicks `connectByMacDirect`
+  // the moment it opens, and the start flow consumes that warm link
+  // (skipping the picker). An unpaired vehicle warms nothing and falls
+  // back to the picker on Start.
+  group('TrajetsTab — pre-warm BLE connect (#2274 concern 3)', () {
     const pairedVehicle = VehicleProfile(
       id: 'v1',
       name: 'Daily Driver',
@@ -731,13 +724,13 @@ void main() {
     );
 
     testWidgets(
-        'paired vehicle skips the picker sheet on Start recording',
-        (tester) async {
+        'paired vehicle pre-warms connectByMacDirect on open and starts '
+        'with the warm service (no picker)', (tester) async {
       final fakeService = _NoopObd2Service();
       final connection = _RecordingFakeConnection(
-        connectByMacResult: fakeService,
+        connectByMacDirectResult: fakeService,
       );
-      final notifier = _NeedsPickerTripRecording();
+      final notifier = _ConnectLaterTripRecording();
 
       await _pumpTab(
         tester,
@@ -747,32 +740,28 @@ void main() {
         recordingFactory: () => notifier,
         obd2Connection: connection,
       );
+      // Post-frame pre-warm fires + resolves before any tap.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 10));
+      expect(connection.connectByMacDirectCalls, ['AA:BB:CC:DD:EE:FF']);
 
       await tester.tap(
         find.byKey(const Key('trajets_start_recording_button')),
       );
-      // Need to pump enough for the futures to chain through. Don't
-      // pumpAndSettle — the recording screen push would attempt to
-      // build the full TripRecordingScreen.
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
 
-      // startTrip fired and returned needsPicker.
-      expect(notifier.startTripCallCount, 1);
-      // Picker called connectByMac with the pinned MAC.
-      expect(connection.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
-      // Sheet title NEVER appears — the picker short-circuited.
-      expect(find.text('Pick an OBD2 adapter'), findsNothing);
-      // The notifier received the connected service from the silent
-      // pinned-MAC fast path.
+      // Warm link consumed via start(); picker never opens.
       expect(notifier.startServiceCallCount, 1);
+      expect(notifier.lastStartedService, same(fakeService));
+      expect(find.text('Pick an OBD2 adapter'), findsNothing);
     });
 
     testWidgets(
-        'unpaired vehicle still opens the picker sheet on Start recording',
+        'unpaired vehicle warms nothing on open and opens the picker on Start',
         (tester) async {
       final connection = _RecordingFakeConnection();
-      final notifier = _NeedsPickerTripRecording();
+      final notifier = _ConnectLaterTripRecording();
 
       await _pumpTab(
         tester,
@@ -782,6 +771,10 @@ void main() {
         recordingFactory: () => notifier,
         obd2Connection: connection,
       );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 10));
+      // No pinned MAC → nothing pre-warmed.
+      expect(connection.connectByMacDirectCalls, isEmpty);
 
       await tester.tap(
         find.byKey(const Key('trajets_start_recording_button')),
@@ -789,11 +782,9 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
 
-      expect(notifier.startTripCallCount, 1);
-      // No pinned MAC → picker did not attempt the silent connect.
-      expect(connection.connectByMacCalls, isEmpty);
-      // Sheet IS shown — the title text on the modal is rendered.
+      // Falls back to the picker sheet; no service reached start().
       expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+      expect(notifier.startServiceCallCount, 0);
     });
   });
 
@@ -844,51 +835,43 @@ void main() {
     );
   });
 
-  // Inline progress feedback during the start flow (#1232). Without
-  // this the user taps Start recording and the screen looks frozen for
-  // several seconds while the BLE connect + odometer/VIN reads happen
-  // — the disabled button gives no visual signal at all.
-  group('TrajetsTab — start-flow progress feedback', () {
+  // #2274 concern 2 — start-now-connect-later moved the visible
+  // progress onto the recording screen (pushed immediately in a
+  // connecting state). The tab CTA reflects the connecting phase by
+  // disabling + relabelling so a glance at the tab matches.
+  group('TrajetsTab — connecting-phase CTA (#2274 concern 2)', () {
     testWidgets(
-        'tapping Start recording swaps the button for the progress card',
+        'a connecting trip disables the CTA and shows the connecting label',
         (tester) async {
-      final notifier = _PendingTripRecording();
       await _pumpTab(
         tester,
         vehicleId: null,
         trips: const [],
-        recordingFactory: () => notifier,
+        recordingFactory: () => _ConnectingTrip(),
       );
+      await tester.pump();
 
-      // Baseline: button visible, progress card not.
-      expect(
-        find.byKey(const Key('trajets_start_recording_button')),
-        findsOneWidget,
-      );
+      // The inline progress card no longer exists on the tab.
       expect(find.byKey(const Key('trajets_start_progress')), findsNothing);
-
-      await tester.tap(
+      // CTA relabelled + disabled while connecting.
+      expect(find.text('Connecting to OBD2 adapter…'), findsOneWidget);
+      final button = tester.widget<FloatingActionButton>(
         find.byKey(const Key('trajets_start_recording_button')),
       );
-      // Pump twice so the `setState` lands and the AnimatedSwitcher
-      // commits the new child without waiting for the swap animation.
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 250));
-
-      // Progress card replaces the button while startTrip() is pending.
-      expect(find.byKey(const Key('trajets_start_progress')), findsOneWidget);
-      expect(
-        find.text('Connecting to OBD2 adapter…'),
-        findsOneWidget,
-      );
-
-      // Resolve the gate so the start flow can finish — keeps the
-      // widget tree clean for tearDown.
-      notifier.gate.complete(StartTripOutcome.alreadyActive);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 250));
+      expect(button.onPressed, isNull,
+          reason: 'CTA is disabled while a start is connecting');
     });
   });
+}
+
+/// A trip stuck in the transient connecting phase (#2274 concern 2) so
+/// the CTA renders its connecting shape without driving a real connect.
+class _ConnectingTrip extends TripRecording {
+  @override
+  TripRecordingState build() => const TripRecordingState(
+        phase: TripRecordingPhase.connecting,
+        connectStage: TripStartStage.connectingAdapter,
+      );
 }
 
 /// Returns an [TripRecordingState] whose [TripRecordingState.isActive] is

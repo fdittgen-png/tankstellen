@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Delt med meg",
   "trajetsSharedBadge": "Delt",
   "dataSourceAttribution": "Kilde: {source} ({license})",
-  "dataSourceAttributionSemantic": "Drivstoffprisdata levert av {source}, lisensiert under {license}."
+  "dataSourceAttributionSemantic": "Drivstoffprisdata levert av {source}, lisensiert under {license}.",
+  "tripRecordingAutoPinTitle": "Fest alltid når opptaket starter",
+  "tripRecordingAutoPinSubtitle": "Fest skjemaet automatisk hver tur i stedet for å trykke hver gang. Bruker mer batteri.",
+  "tripRecordingConnectingTitle": "Starter opptak…"
 }

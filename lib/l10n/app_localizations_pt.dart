@@ -5533,6 +5533,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'Minimizar para um mosaico flutuante';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Fixar sempre ao iniciar a gravação';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Fixa o formulário automaticamente em cada viagem em vez de tocar todas as vezes. Consome mais bateria.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'A iniciar a gravação…';
+
+  @override
   String get tripShareAction => 'Partilhar com outra conta';
 
   @override

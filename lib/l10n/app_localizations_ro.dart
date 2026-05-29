@@ -5532,6 +5532,17 @@ class AppLocalizationsRo extends AppLocalizations {
       'Minimizează într-o casetă flotantă';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Fixează întotdeauna la începerea înregistrării';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Fixează formularul automat la fiecare cursă în loc să atingi de fiecare dată. Consumă mai multă baterie.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Se pornește înregistrarea…';
+
+  @override
   String get tripShareAction => 'Partajează cu alt cont';
 
   @override

@@ -5461,6 +5461,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimise to a floating tile';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Always pin when recording starts';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Pin the form automatically every drive instead of tapping each time. Uses more battery.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Starting recording…';
+
+  @override
   String get tripShareAction => 'Share with another account';
 
   @override
@@ -11307,6 +11317,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripRecordingMinimiseTooltip =>
       '⟦Ṁîñîɱîšé ŧó á ƒłóáŧîñǧ ŧîłé ··········⟧';
+
+  @override
+  String get tripRecordingAutoPinTitle =>
+      '⟦Áłŵáýš ƥîñ ŵĥéñ řéçóřđîñǧ šŧářŧš ·············⟧';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      '⟦Ƥîñ ŧĥé ƒóřɱ áúŧóɱáŧîçáłłý éṽéřý đřîṽé îñšŧéáđ óƒ ŧáƥƥîñǧ éáçĥ ŧîɱé. Úšéš ɱóřé ƀáŧŧéřý. ································⟧';
+
+  @override
+  String get tripRecordingConnectingTitle => '⟦Šŧářŧîñǧ řéçóřđîñǧ… ········⟧';
 
   @override
   String get tripShareAction => '⟦Šĥářé ŵîŧĥ áñóŧĥéř áççóúñŧ ··········⟧';

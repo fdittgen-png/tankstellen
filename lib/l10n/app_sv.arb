@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Delad med mig",
   "trajetsSharedBadge": "Delad",
   "dataSourceAttribution": "Källa: {source} ({license})",
-  "dataSourceAttributionSemantic": "Bränsleprisdata tillhandahålls av {source}, licensierad under {license}."
+  "dataSourceAttributionSemantic": "Bränsleprisdata tillhandahålls av {source}, licensierad under {license}.",
+  "tripRecordingAutoPinTitle": "Fäst alltid när inspelningen startar",
+  "tripRecordingAutoPinSubtitle": "Fäst formuläret automatiskt vid varje körning i stället för att trycka varje gång. Förbrukar mer batteri.",
+  "tripRecordingConnectingTitle": "Startar inspelning…"
 }

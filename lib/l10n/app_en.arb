@@ -4333,6 +4333,18 @@
   "@tripRecordingMinimiseTooltip": {
     "description": "Tooltip on the minimise (Picture-in-Picture) icon button on the trip-recording screen (#1884). Tapping shrinks the app into a small floating tile that keeps showing live consumption over other apps. Android-only."
   },
+  "tripRecordingAutoPinTitle": "Always pin when recording starts",
+  "@tripRecordingAutoPinTitle": {
+    "description": "Title of the opt-in switch in the pin-help bottom sheet on the trip-recording screen (#2274). When on, the form pins itself (screen stays on, system bars hidden) automatically at the start of every recording instead of the user tapping the pin each drive. Off by default."
+  },
+  "tripRecordingAutoPinSubtitle": "Pin the form automatically every drive instead of tapping each time. Uses more battery.",
+  "@tripRecordingAutoPinSubtitle": {
+    "description": "Subtitle under the always-pin opt-in switch in the pin-help bottom sheet (#2274). Explains the trade-off: convenience vs battery cost."
+  },
+  "tripRecordingConnectingTitle": "Starting recording…",
+  "@tripRecordingConnectingTitle": {
+    "description": "AppBar title shown on the trip-recording screen while the BLE adapter connect + odometer prime run, before the first live sample lands (#2274 start-now-connect-later). The screen is pushed immediately in this transient connecting state."
+  },
   "tripShareAction": "Share with another account",
   "@tripShareAction": {
     "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."

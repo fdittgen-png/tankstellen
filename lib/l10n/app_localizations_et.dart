@@ -5480,6 +5480,17 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimeeri hõljuvaks paaniks';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Salvestuse alustamisel alati kinnita';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Kinnita vorm igal sõidul automaatselt, selle asemel et iga kord puudutada. Kasutab rohkem akut.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Salvestuse alustamine…';
+
+  @override
   String get tripShareAction => 'Jaga teise kontoga';
 
   @override

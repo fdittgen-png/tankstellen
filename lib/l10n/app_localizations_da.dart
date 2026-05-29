@@ -5486,6 +5486,17 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimér til en svævende flise';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Fastgør altid, når optagelsen starter';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Fastgør formularen automatisk hver tur i stedet for at trykke hver gang. Bruger mere batteri.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Starter optagelse…';
+
+  @override
   String get tripShareAction => 'Del med en anden konto';
 
   @override
