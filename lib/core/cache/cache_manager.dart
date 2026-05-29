@@ -22,13 +22,83 @@ part 'cache_manager.g.dart';
 /// | geocode        | 24 hours   | ZIP code coordinates are stable     |
 /// | stationData    | 30 min     | Favorites offline view              |
 /// | citySearch     | 30 min     | City name lookups are stable        |
+///
+/// ### Policy: these TTLs are intentionally compile-time
+///
+/// Every value below is a `const` baked in at build time. There is
+/// deliberately **no** runtime or remote-config override: the durations are
+/// tuned against the Tankerkoenig data contract (a 5-minute price update
+/// cadence and rate limit) rather than against per-user preference, so a
+/// tunable knob would mostly invite values that desync from upstream and
+/// either over-fetch (hammering the rate limit) or serve stale prices.
+/// Keeping them fixed also keeps the cache behaviour reproducible in tests.
+///
+/// This is a deliberate trade-off, not an oversight. If a future need arises
+/// to A/B-test freshness or to react to upstream changes without an app
+/// release, route these through a `RuntimeConfig` / remote-config layer that
+/// supplies overrides while falling back to the constants below as defaults.
 class CacheTtl {
   CacheTtl._();
+
+  /// TTL for nearby-station search results (price + position list).
+  ///
+  /// 5 minutes because the underlying fuel prices change frequently and a
+  /// search list is dominated by those prices; longer would surface stale
+  /// figures, shorter would defeat the cache between back-to-back queries.
+  /// Matches [prices] and the Tankerkoenig update cadence on purpose.
+  ///
+  /// Intentionally compile-time (see class-level policy note); a future
+  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration stationSearch = Duration(minutes: 5);
+
+  /// TTL for a single station's detail payload (address, hours, brand).
+  ///
+  /// 15 minutes because detail data is mostly slow-changing metadata
+  /// (opening hours, address) rather than live prices, so it tolerates a
+  /// longer cache than a search list while still refreshing within a visit.
+  ///
+  /// Intentionally compile-time (see class-level policy note); a future
+  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration stationDetail = Duration(minutes: 15);
+
+  /// TTL for a bulk price lookup keyed by station ids.
+  ///
+  /// 5 minutes to match the Tankerkoenig price-update cadence and rate
+  /// limit: refreshing faster cannot yield newer data and risks tripping
+  /// the upstream limit, refreshing slower serves stale prices.
+  ///
+  /// Intentionally compile-time (see class-level policy note); a future
+  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration prices = Duration(minutes: 5);
+
+  /// TTL for forward/reverse geocode results (ZIP <-> coordinates).
+  ///
+  /// 24 hours because ZIP-code centroids and place coordinates are
+  /// effectively static; caching for a day avoids repeated geocoder calls
+  /// for the same query with no meaningful staleness risk.
+  ///
+  /// Intentionally compile-time (see class-level policy note); a future
+  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration geocode = Duration(hours: 24);
+
+  /// TTL for a favourited station's cached snapshot (offline view).
+  ///
+  /// 30 minutes as a middle ground: long enough that opening the favourites
+  /// list offline shows a recent snapshot, short enough that a returning
+  /// online user re-fetches reasonably fresh prices.
+  ///
+  /// Intentionally compile-time (see class-level policy note); a future
+  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration stationData = Duration(minutes: 30);
+
+  /// TTL for city-name autocomplete / lookup results.
+  ///
+  /// 30 minutes because city-name -> location mappings are stable; caching
+  /// avoids re-querying the lookup service for the same typed prefix within
+  /// a session without risking stale results.
+  ///
+  /// Intentionally compile-time (see class-level policy note); a future
+  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration citySearch = Duration(minutes: 30);
 }
 

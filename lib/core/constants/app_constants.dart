@@ -25,11 +25,47 @@ class AppConstants {
   /// Shared User-Agent for all HTTP clients.
   static String get userAgent => '$appPackage/$appVersion';
 
+  // ---------------------------------------------------------------------------
+  // Search radius + auto-refresh policy.
+  //
+  // The radius and refresh values below are intentionally compile-time `const`
+  // with no runtime or remote-config override. They are bounded by the
+  // upstream Tankerkoenig contract (25 km max radius, 5-minute price cadence /
+  // rate limit), so a user- or server-tunable knob would mostly let callers
+  // pick values that desync from upstream and either over-fetch or show stale
+  // prices. Fixing them also keeps search and refresh behaviour reproducible
+  // in tests. This is a deliberate trade-off, not an oversight: if a future
+  // need arises to tune freshness per-user or react to upstream changes
+  // without an app release, route these through a `RuntimeConfig` /
+  // remote-config layer that supplies overrides while falling back to these
+  // constants as defaults.
+  // ---------------------------------------------------------------------------
+
+  /// Default nearby-search radius (km) for a fresh install / unset preference.
+  /// 10 km balances result coverage against query cost; sits inside the
+  /// [minSearchRadiusKm]..[maxSearchRadiusKm] band. Compile-time by policy.
   static const double defaultSearchRadiusKm = 10.0;
+
+  /// Upper bound the user may select for the search radius (km).
+  /// Pinned to the Tankerkoenig upstream cap (25 km); a larger value would be
+  /// rejected by the API. Compile-time by policy (mirrors
+  /// `ApiConstants.maxRadiusKm`).
   static const double maxSearchRadiusKm = 25.0;
+
+  /// Lower bound the user may select for the search radius (km).
+  /// 1 km keeps "nearby" meaningful and avoids zero-result queries.
+  /// Compile-time by policy.
   static const double minSearchRadiusKm = 1.0;
 
+  /// Floor for the auto-refresh cadence of the station/price list.
+  /// 5 minutes matches the Tankerkoenig price-update cadence and rate limit:
+  /// refreshing faster cannot surface newer data and risks the upstream
+  /// limit. Compile-time by policy (mirrors `ApiConstants.minRefreshInterval`).
   static const Duration minAutoRefreshInterval = Duration(minutes: 5);
+
+  /// Maximum random delay added to each auto-refresh tick to spread requests.
+  /// Up to 30 s of jitter de-synchronises many clients so they do not all hit
+  /// the upstream on the same wall-clock boundary. Compile-time by policy.
   static const Duration refreshJitterMax = Duration(seconds: 30);
 
   static const String osmTileUrl =
