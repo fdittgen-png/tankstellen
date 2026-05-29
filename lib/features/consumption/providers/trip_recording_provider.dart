@@ -31,6 +31,7 @@ import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/entities/trip_start_stage.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_recording_pipeline.dart';
 import 'recording_pipeline.dart';
@@ -60,6 +61,10 @@ export '../data/obd2/trip_recording_controller.dart' show TripDropReason;
 // seam to avoid a circular import. Re-export it so the ~10 callers that
 // import this provider keep resolving the type without a new import.
 export 'recording_pipeline.dart' show StoppedTripResult;
+// #2274 concern 2 — the connecting phase carries a TripStartStage on the
+// state; re-export it so callers that drive the start flow through this
+// provider resolve the stage type without a second import.
+export '../domain/entities/trip_start_stage.dart' show TripStartStage;
 
 part 'trip_recording_provider.g.dart';
 
@@ -315,6 +320,43 @@ class TripRecording extends _$TripRecording {
     return StartTripOutcome.needsPicker;
   }
 
+  /// #2274 concern 2 — enter the transient "connecting" phase so the
+  /// recording screen can be pushed IMMEDIATELY (mirroring the GPS-only
+  /// path) and resolve the connect+prime in-place, instead of the
+  /// trajets tab blocking on connect before navigating. Records the
+  /// vehicle id + start time up-front so the recording screen's
+  /// auto-pin / unpinned-warning logic resolves the right vehicle while
+  /// the link is still warming.
+  ///
+  /// No-op when a trip is already active or another start is in
+  /// progress — the caller falls through to its already-active branch.
+  void enterConnecting({String? vehicleId}) {
+    if (state.isActive || _startInProgress || state.isConnecting) return;
+    _lastTripVehicleId = vehicleId ?? _tryReadActiveVehicle()?.id;
+    _lastTripStartedAt = DateTime.now();
+    state = const TripRecordingState(
+      phase: TripRecordingPhase.connecting,
+      connectStage: TripStartStage.connectingAdapter,
+    );
+  }
+
+  /// #2274 concern 2 — advance the inline connect progress shown on the
+  /// recording screen while [TripRecordingPhase.connecting]. No-op once
+  /// the trip has gone active (the live metrics have taken over).
+  void setConnectStage(TripStartStage stage) {
+    if (state.phase != TripRecordingPhase.connecting) return;
+    state = state.copyWith(connectStage: stage);
+  }
+
+  /// #2274 concern 2 — abandon a connecting session (connect failed, or
+  /// the user backed out before the link came up). Returns to idle so
+  /// the trajets tab CTA reverts to "Start recording". No-op once the
+  /// trip has gone active.
+  void cancelConnecting() {
+    if (state.phase != TripRecordingPhase.connecting) return;
+    state = const TripRecordingState();
+  }
+
   /// Begin a recording session backed by [service]. The provider
   /// takes ownership of the service — don't disconnect it from the
   /// caller; [stop] handles the full teardown.
@@ -491,7 +533,13 @@ class TripRecording extends _$TripRecording {
       // if the OS kills us before the next debounce window).
       unawaited(_flushActiveSnapshot(force: true));
     });
-    state = state.copyWith(phase: TripRecordingPhase.recording);
+    // #2274 concern 2 — going live clears any connecting stage so the
+    // recording screen swaps the inline progress card for the live
+    // metrics on the same frame.
+    state = state.copyWith(
+      phase: TripRecordingPhase.recording,
+      clearConnectStage: true,
+    );
   }
 
   /// Map the controller's enum onto the provider's phase. Stays a

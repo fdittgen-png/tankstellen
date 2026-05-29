@@ -610,9 +610,35 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final state = ref.watch(tripRecordingProvider);
     final stopped = _stopped;
 
-    // #1884 — keep the native auto-PiP opt-in in sync with the
-    // recording state: the app shrinks into a PiP tile on leave only
-    // while a trip is actively recording on this foreground screen.
+    // #2274 concern 1 — the screen may have mounted in the connecting
+    // phase (concern 2) before any trip was active, so the initState
+    // auto-pin evaluation was deferred. Retry it the instant the phase
+    // first flips to a live trip. The `_autoPinEvaluated` one-shot guard
+    // keeps it from firing twice.
+    ref.listen<TripRecordingPhase>(
+      tripRecordingProvider.select((s) => s.phase),
+      (previous, next) {
+        if (!_autoPinEvaluated && next == TripRecordingPhase.recording) {
+          _maybeApplyAutoPin();
+        }
+      },
+    );
+
+    // #1884 + #2274 concern 4 — foreground-then-PiP auto-enter (Android).
+    // Keep the native auto-PiP opt-in in sync with the recording state:
+    // the app shrinks into a PiP tile when the user leaves (onUserLeaveHint
+    // on MainActivity) only while a trip is actively recording on this
+    // FOREGROUND screen. The opt-in is armed the instant the phase flips
+    // to recording — and because concern 2 now pushes this screen
+    // IMMEDIATELY (the connect runs underneath while the screen is already
+    // foreground+active), the activity is reliably foreground before the
+    // user can switch to Maps, so the system's auto-enter fires.
+    //
+    // Android-only: `PipController.isSupported` is false elsewhere and
+    // every call is an inert no-op (iOS PiP is video-only and cannot host
+    // app UI). The persisted [RecordingProfile.autoEnterReducedOnStart]
+    // is an additive opt-in hint — it never SUPPRESSES the existing
+    // always-armed behaviour, so the default is unchanged.
     final wantAutoPip = stopped == null && state.isActive;
     if (wantAutoPip != _autoPipRequested) {
       _autoPipRequested = wantAutoPip;
@@ -663,9 +689,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
 
     final title = stopped != null
         ? (l?.tripSummaryTitle ?? 'Trip summary')
-        : state.phase == TripRecordingPhase.paused
-            ? (l?.tripBannerPaused ?? 'Trip paused')
-            : (l?.tripRecordingTitle ?? 'Recording trip');
+        : state.isConnecting
+            // #2274 concern 2 — the connecting view is up while the
+            // link warms; title it accordingly rather than "Recording".
+            ? (l?.tripRecordingConnectingTitle ?? 'Starting recording…')
+            : state.phase == TripRecordingPhase.paused
+                ? (l?.tripBannerPaused ?? 'Trip paused')
+                : (l?.tripRecordingTitle ?? 'Recording trip');
 
     // After stop: show the summary. Until then: live view.
     // #1395 — wrap the title in a GestureDetector so the hidden
@@ -803,6 +833,21 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     AppLocalizations? l,
     TripRecordingState state,
   ) {
+    // #2274 concern 2 — start-now-connect-later: the screen is pushed
+    // immediately in the connecting phase while the BLE connect + prime
+    // run underneath. Render the inline progress card (the same one the
+    // trajets tab used to show) until the first live sample flips the
+    // phase to recording. Centred so it reads as a "warming up" state
+    // rather than an empty metrics column.
+    if (state.isConnecting) {
+      return Center(
+        child: TripStartProgress(
+          key: const Key('tripRecordingConnectingProgress'),
+          stage: state.connectStage ?? TripStartStage.connectingAdapter,
+        ),
+      );
+    }
+
     final r = state.live;
 
     // #1423 phase 5 — when the active vehicle's broken-MAP belief is

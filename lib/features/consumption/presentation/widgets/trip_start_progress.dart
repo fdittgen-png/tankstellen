@@ -4,22 +4,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/trip_start_stage.dart';
 
-/// Stage surfaced by the Trips-tab start flow while the OBD2 adapter
-/// is being reached and the recorder is warming up. Drives the inline
-/// progress card that replaces the disabled "Start recording" button
-/// during the silent connect/read window — without it the screen looks
-/// frozen for several seconds before the recording screen opens.
-enum TripStartStage {
-  /// Pinned-MAC connect over Bluetooth (or the picker hasn't returned yet).
-  connectingAdapter,
-
-  /// Recorder is reading the odometer / VIN and priming the polling loop.
-  readingVehicleData,
-
-  /// Final beat before pushing the live recording screen.
-  startingRecording,
-}
+// #2274 concern 2 — the stage enum moved to the domain layer so the
+// [TripRecordingState] can carry it without a provider→presentation
+// import. Re-exported here so the ~existing callers that import this
+// widget keep resolving `TripStartStage` unchanged.
+export '../../domain/entities/trip_start_stage.dart' show TripStartStage;
 
 /// Inline progress card shown on the Trips tab in place of the
 /// "Start recording" button while the trip-start flow runs. Combines
