@@ -193,6 +193,38 @@ class BrandRegistry {
     return null; // Unknown → "Others"
   }
 
+  /// Scan an arbitrary free-text [haystack] (an address, a receipt line,
+  /// an OSM `name`, a French `services` blob …) for the first recognisable
+  /// brand keyword and return its canonical name, or `null` when none is
+  /// found. This is the single-source-of-truth (#2186) replacement for the
+  /// hand-rolled `contains()` / keyword-scan tables that the receipt
+  /// detector and the France parser previously duplicated.
+  ///
+  /// Matching is case-insensitive and substring-based, driven entirely by
+  /// [brandAliases], so a rebrand (Star→Orlen, Caltex→Ampol, …) only ever
+  /// needs to be encoded once. Note that — unlike [canonicalize], which
+  /// expects a brand string and exact-matches first — this method is for
+  /// *text that may merely contain* a brand, so it is intentionally a pure
+  /// substring scan with no exact-match fast path.
+  ///
+  /// Callers that need keyword-anchoring (e.g. a trailing space to tell
+  /// `TOTAL ` apart from `TOTALENERGIES`, or `Total`→`Total` rather than
+  /// the canonical `TotalEnergies`) deliberately keep their own table —
+  /// those semantics diverge from the canonical vocabulary and folding
+  /// them in here would change observable output (see #2186 notes).
+  static String? canonicalFromText(String haystack) {
+    if (haystack.isEmpty) return null;
+    final lower = haystack.toLowerCase();
+    for (final entry in brandAliases.entries) {
+      for (final alias in entry.value) {
+        if (lower.contains(alias.toLowerCase())) {
+          return entry.key;
+        }
+      }
+    }
+    return null;
+  }
+
   /// Group stations by canonical brand. Unrecognized brands go to "Others".
   static Map<String, int> countByBrand(List<String> rawBrands) {
     final counts = <String, int>{};

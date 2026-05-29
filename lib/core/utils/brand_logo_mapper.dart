@@ -63,6 +63,15 @@ class BrandLogoMapper {
     'lukoil': 'lukoil.com',
   };
 
+  /// The set of brand keys this mapper owns a logo domain for.
+  ///
+  /// Exposed (#2186) so a guard test can assert every key is a known
+  /// `BrandRegistry` canonical name or alias — preventing the logo map
+  /// and the brand registry from drifting apart (e.g. listing `star`
+  /// here after Star was folded into Orlen in the registry). Behaviour
+  /// is unchanged: [logoUrl] still keys off the raw lowercased brand.
+  static Iterable<String> get knownBrandKeys => _brandDomains.keys;
+
   /// Returns a logo URL for the given [brand], or `null` if unknown.
   ///
   /// Uses Clearbit Logo API (free, no key required, returns 128px PNG).
