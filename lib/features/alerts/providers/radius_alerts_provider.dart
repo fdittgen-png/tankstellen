@@ -48,10 +48,14 @@ class RadiusAlerts extends _$RadiusAlerts {
     final store = ref.read(radiusAlertStoreProvider);
     try {
       await store.upsert(alert);
+      // Move the state update inside the try so a write failure does not
+      // surface a false-success state (#2314).
+      state = AsyncValue.data(await store.list());
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.add'}));
+      state = AsyncValue.error(e, st);
+      return;
     }
-    state = AsyncValue.data(await store.list());
     // #2246 — mirror the per-station AlertNotifier.addAlert path: request
     // the OS notification permission at the user-intent moment a radius
     // alert is created. Without it, Android 13+ schedules the WorkManager
@@ -76,10 +80,14 @@ class RadiusAlerts extends _$RadiusAlerts {
       // doesn't accumulate stale (alertId, stationId) entries after
       // the user deletes the alert.
       await dedup.clearForAlert(id);
+      // Move the state update inside the try so a write failure does not
+      // surface a false-success state (#2314).
+      state = AsyncValue.data(await store.list());
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.remove'}));
+      state = AsyncValue.error(e, st);
+      return;
     }
-    state = AsyncValue.data(await store.list());
     // #2210 — radius alerts must gate background polling too (not just
     // per-station price alerts), or radius-only users never get scheduled.
     await BackgroundService.reconcile();
@@ -101,10 +109,14 @@ class RadiusAlerts extends _$RadiusAlerts {
     final updated = match.first.copyWith(enabled: !match.first.enabled);
     try {
       await store.upsert(updated);
+      // Move the state update inside the try so a write failure does not
+      // surface a false-success state (#2314).
+      state = AsyncValue.data(await store.list());
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.toggle'}));
+      state = AsyncValue.error(e, st);
+      return;
     }
-    state = AsyncValue.data(await store.list());
     // #2246 — re-enabling a radius alert is the same user-intent moment as
     // creating one, so (re)request the notification permission here too.
     // Only on the enable transition: disabling shouldn't prompt.

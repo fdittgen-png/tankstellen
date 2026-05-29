@@ -13,6 +13,22 @@ import 'package:tankstellen/features/alerts/data/radius_alert_store.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
 
+/// [RadiusAlertStore] that always throws on [upsert] and [remove], used to
+/// verify that write failures surface as AsyncError rather than false success
+/// (#2314). [list] returns an empty list so build() succeeds.
+class _ThrowingRadiusAlertStore extends RadiusAlertStore {
+  @override
+  Future<List<RadiusAlert>> list() async => const [];
+
+  @override
+  Future<void> upsert(RadiusAlert alert) async =>
+      throw Exception('Simulated upsert failure (#2314)');
+
+  @override
+  Future<void> remove(String id) async =>
+      throw Exception('Simulated remove failure (#2314)');
+}
+
 /// No-op NotificationService that counts permission requests so the
 /// #2246 radius-permission tests can assert the prompt fires without
 /// touching real plugins.
@@ -187,6 +203,25 @@ void main() {
       expect(state, hasLength(1));
       expect(state.single.id, 'real');
       expect(state.single.enabled, isTrue);
+    });
+  });
+
+  group('write-error surfaces AsyncValue.error, not false success (#2314)', () {
+    test('add(): a store upsert failure sets AsyncError state', () async {
+      final throwingStore = _ThrowingRadiusAlertStore();
+      final container = ProviderContainer(
+        overrides: [
+          radiusAlertStoreProvider.overrideWithValue(throwingStore),
+        ],
+      );
+      addTearDown(container.dispose);
+      // Prime the provider so we start from a data state.
+      await container.read(radiusAlertsProvider.future);
+      expect(container.read(radiusAlertsProvider).hasValue, isTrue);
+
+      await container.read(radiusAlertsProvider.notifier).add(makeAlert());
+      // The write threw → state must be AsyncError, not stale data.
+      expect(container.read(radiusAlertsProvider).hasError, isTrue);
     });
   });
 
