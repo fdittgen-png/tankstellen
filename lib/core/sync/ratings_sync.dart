@@ -54,6 +54,42 @@ class RatingsSync {
     }
   }
 
+  /// Upsert many station ratings in a SINGLE round-trip (#2319).
+  ///
+  /// Mirrors [FavoritesSync.merge]'s batch-upsert pattern for the same
+  /// `(user_id, station_id)` table shape: instead of N serial
+  /// `upsert` calls on initial sync, build one row list and ship it in
+  /// one request. No-op when the map is empty or the session isn't
+  /// authenticated. All ratings default to owner-private
+  /// (`is_shared = false`) — the per-rating share toggle still goes
+  /// through [upsert].
+  static Future<void> upsertAll(Map<String, int> ratings) async {
+    if (ratings.isEmpty) return;
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) return;
+
+    final now = DateTime.now().toIso8601String();
+    final rows = ratings.entries
+        .map((e) => {
+              'user_id': userId,
+              'station_id': e.key,
+              'rating': e.value,
+              'is_shared': false,
+              'updated_at': now,
+            })
+        .toList();
+
+    try {
+      await client
+          .from('station_ratings')
+          .upsert(rows, onConflict: 'user_id,station_id');
+      debugPrint('RatingsSync.upsertAll: ${rows.length} ratings in 1 round-trip');
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.upsertAll FAILED'}));
+    }
+  }
+
   /// Delete a rating from the server. Typically called when the
   /// station is unfavorited (ratings live alongside favorites).
   static Future<void> delete(String stationId) async {

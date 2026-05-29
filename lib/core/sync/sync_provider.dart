@@ -213,10 +213,9 @@ class SyncState extends _$SyncState {
         if (favIds.isNotEmpty) await FavoritesSync.merge(favIds);
         final ignoredIds = storage.getIgnoredIds();
         if (ignoredIds.isNotEmpty) await IgnoredStationsSync.merge(ignoredIds);
-        final ratings = storage.getRatings();
-        for (final entry in ratings.entries) {
-          await RatingsSync.upsert(entry.key, entry.value);
-        }
+        // #2319 — batch every local rating into one upsert round-trip
+        // instead of N serial calls on connect.
+        await RatingsSync.upsertAll(storage.getRatings());
         debugPrint('InitialSync: complete');
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
