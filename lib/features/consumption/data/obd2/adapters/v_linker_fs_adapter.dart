@@ -27,4 +27,9 @@ class VLinkerFsAdapter implements Elm327Adapter {
 
   @override
   String preParse(String raw) => raw;
+
+  // #2268 concern 1 — the vLinker FS is a fast, clean implementation that
+  // answers the first command immediately; no standby compensation.
+  @override
+  WakePolicy get wakePolicy => const WakePolicy.noop();
 }

@@ -3,7 +3,10 @@
 
 import 'package:hive/hive.dart';
 
+import 'bluetooth_obd2_transport.dart';
+import 'elm_byte_channel.dart';
 import 'negotiated_protocol_cache.dart';
+import 'obd2_service.dart';
 import 'supported_pids_cache.dart';
 import '../../../../core/storage/hive_boxes.dart';
 
@@ -26,4 +29,43 @@ NegotiatedProtocolCache? openNegotiatedProtocolCache() {
   return NegotiatedProtocolCache(
     Hive.box<String>(HiveBoxes.obd2NegotiatedProtocol),
   );
+}
+
+/// Build the [Obd2Service] for a freshly-opened [channel], wiring in the
+/// #811 supported-PID cache (#2253) and the #2261 negotiated-protocol
+/// warm cache and stamping the adapter [mac]/[name]. Centralised here so
+/// the scan and direct/passive connect paths in [Obd2ConnectionService]
+/// produce a byte-for-byte identical session. The vehicle [make]/[model]/
+/// [year]/[vin] refine the cache keys; null fields collapse to
+/// adapterMac-only keying.
+Obd2Service buildObd2Session({
+  required ElmByteChannel channel,
+  required String mac,
+  required String name,
+  SupportedPidsCache? pidsCache,
+  NegotiatedProtocolCache? protocolCache,
+  String? make,
+  String? model,
+  int? year,
+  String? vin,
+}) {
+  final service = Obd2Service(
+    BluetoothObd2Transport(channel),
+    pidsCache: pidsCache,
+    vehicleFallbackKey: pidsCache == null
+        ? null
+        : SupportedPidsCache.productionKey(
+            adapterMac: mac,
+            make: make,
+            model: model,
+            year: year,
+          ),
+    protocolCache: protocolCache,
+    protocolCacheKey: protocolCache == null
+        ? null
+        : NegotiatedProtocolCache.keyFor(adapterMac: mac, vin: vin),
+  );
+  service.adapterMac = mac;
+  service.adapterName = name;
+  return service;
 }
