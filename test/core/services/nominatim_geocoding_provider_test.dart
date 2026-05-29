@@ -44,7 +44,8 @@ void main() {
       expect(provider.source, ServiceSource.nominatimGeocoding);
     });
 
-    test('zipCodeToCoordinates throws LocationException on network error', () {
+    test('zipCodeToCoordinates throws LocationException on network error',
+        tags: 'network', () {
       // Create a provider that will fail because the API returns error
       final provider = NominatimGeocodingProvider(countryCode: 'DE');
 
@@ -55,7 +56,8 @@ void main() {
       );
     });
 
-    test('coordinatesToAddress returns lat/lng string on failure', () async {
+    test('coordinatesToAddress returns lat/lng string on failure',
+        tags: 'network', () async {
       // The real provider returns "$lat, $lng" when API call fails
       final provider = NominatimGeocodingProvider(countryCode: 'ZZ');
 
@@ -65,7 +67,8 @@ void main() {
       expect(address, contains('0.0'));
     });
 
-    test('coordinatesToCountryCode returns null on failure', () async {
+    test('coordinatesToCountryCode returns null on failure',
+        tags: 'network', () async {
       // On network failure, should return null instead of throwing
       final provider = NominatimGeocodingProvider(countryCode: 'ZZ');
 
