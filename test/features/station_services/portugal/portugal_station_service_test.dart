@@ -272,6 +272,73 @@ void main() {
     });
   });
 
+  group('in-memory dataset cache (#2302)', () {
+    /// The DGEG endpoint returns the full national dataset with no
+    /// coordinate filter, so a moving user or a route fan-out across
+    /// coordinates re-downloaded ~10 000 rows on every call. The service
+    /// now caches the `resultado` list in memory (15-min TTL) and
+    /// re-filters per coordinate locally.
+    Object nationalReply() => {
+          'status': true,
+          'mensagem': 'sucesso',
+          'resultado': [
+            _row(
+              id: 1,
+              name: 'GALP Lisboa',
+              lat: 38.7223,
+              lng: -9.1393,
+              fuel: 'Gasolina simples 95',
+              preco: '1,719 €',
+            ),
+            _row(
+              id: 2,
+              name: 'GALP Porto',
+              lat: 41.1579,
+              lng: -8.6291,
+              fuel: 'Gasolina simples 95',
+              preco: '1,749 €',
+            ),
+          ],
+        };
+
+    test('repeat searches at different coordinates reuse the dataset '
+        '(one download)', () async {
+      final adapter = _FakeDgegAdapter(reply: nationalReply());
+      final service = _serviceWith(adapter);
+
+      // First search near Lisbon downloads the national dataset.
+      final lisbon = await service.searchStations(
+        const SearchParams(lat: 38.7223, lng: -9.1393, radiusKm: 10),
+      );
+      expect(lisbon.data.map((s) => s.id), contains('pt-1'));
+
+      // A second search near Porto — a different coordinate — must reuse the
+      // cached dataset, not hit the network again.
+      final porto = await service.searchStations(
+        const SearchParams(lat: 41.1579, lng: -8.6291, radiusKm: 10),
+      );
+      expect(porto.data.map((s) => s.id), contains('pt-2'),
+          reason: 'Porto search must resolve from the cached dataset');
+      expect(porto.data.map((s) => s.id), isNot(contains('pt-1')),
+          reason: 'radius filter still applies per coordinate');
+
+      expect(adapter.calls, hasLength(1),
+          reason: 'the national dataset must be downloaded exactly once '
+              'within the TTL (#2302)');
+    });
+
+    test('a repeat search at the same coordinate also reuses the cache',
+        () async {
+      final adapter = _FakeDgegAdapter(reply: nationalReply());
+      final service = _serviceWith(adapter);
+
+      await service.searchStations(_lisboaParams);
+      await service.searchStations(_lisboaParams);
+
+      expect(adapter.calls, hasLength(1));
+    });
+  });
+
   group('parseAndFilter (exposed parser)', () {
     test('skips rows missing Latitude / Longitude', () {
       final stations = PortugalStationService.parseAndFilter(

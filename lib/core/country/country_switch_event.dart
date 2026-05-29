@@ -35,8 +35,11 @@ CountrySwitchEvent? countrySwitchEvent(Ref ref) {
   final activeCountry = ref.watch(activeCountryProvider);
   if (detected == activeCountry.code) return null;
 
-  // Find a profile configured for the detected country
-  final allProfiles = ref.read(allProfilesProvider);
+  // Find a profile configured for the detected country. #2313 — watch (not
+  // read) so creating a profile for the currently-detected foreign country
+  // recomputes the switch event immediately, rather than waiting for the
+  // next GPS change to re-trigger detection.
+  final allProfiles = ref.watch(allProfilesProvider);
   final match = allProfiles
       .where((p) => p.countryCode == detected)
       .toList();
