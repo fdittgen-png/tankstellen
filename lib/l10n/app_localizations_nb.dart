@@ -5485,6 +5485,16 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimer til en flytende rute';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Fest alltid når opptaket starter';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Fest skjemaet automatisk hver tur i stedet for å trykke hver gang. Bruker mer batteri.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Starter opptak…';
+
+  @override
   String get tripShareAction => 'Del med en annen konto';
 
   @override

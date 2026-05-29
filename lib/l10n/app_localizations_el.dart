@@ -5545,6 +5545,17 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Σμίκρυνση σε πλωτό πλακίδιο';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Πάντα καρφίτσωμα κατά την έναρξη εγγραφής';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Καρφίτσωμα της φόρμας αυτόματα σε κάθε διαδρομή αντί να πατάτε κάθε φορά. Καταναλώνει περισσότερη μπαταρία.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Έναρξη εγγραφής…';
+
+  @override
   String get tripShareAction => 'Κοινοποίηση σε άλλον λογαριασμό';
 
   @override

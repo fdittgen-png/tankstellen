@@ -5498,6 +5498,17 @@ class AppLocalizationsCs extends AppLocalizations {
       'Minimalizovat do plovoucí dlaždice';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Při zahájení nahrávání vždy připnout';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Připnout formulář automaticky při každé jízdě místo klepání pokaždé. Spotřebuje více baterie.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Spouštění nahrávání…';
+
+  @override
   String get tripShareAction => 'Sdílet s jiným účtem';
 
   @override

@@ -5489,6 +5489,16 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Pienennä kelluvaksi ruuduksi';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Kiinnitä aina tallennuksen alkaessa';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Kiinnitä lomake automaattisesti joka ajolla sen sijaan, että napautat joka kerta. Kuluttaa enemmän akkua.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Aloitetaan tallennusta…';
+
+  @override
   String get tripShareAction => 'Jaa toiselle tilille';
 
   @override

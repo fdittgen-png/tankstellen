@@ -5534,6 +5534,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Kicsinyítés lebegő csempére';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Mindig rögzítse a felvétel indításakor';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Az űrlap automatikus rögzítése minden út során, ahelyett, hogy mindig megérintené. Több akkumulátort használ.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Felvétel indítása…';
+
+  @override
   String get tripShareAction => 'Megosztás másik fiókkal';
 
   @override

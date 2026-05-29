@@ -5521,6 +5521,16 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Sumažinti į slankųjį langelį';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Visada prisegti pradedant įrašymą';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Automatiškai prisegti formą kiekvienos kelionės metu, užuot lietus kiekvieną kartą. Naudoja daugiau baterijos.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Pradedamas įrašymas…';
+
+  @override
   String get tripShareAction => 'Bendrinti su kita paskyra';
 
   @override

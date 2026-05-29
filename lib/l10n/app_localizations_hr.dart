@@ -5509,6 +5509,17 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Smanji u plutajuću pločicu';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Uvijek prikvači pri pokretanju snimanja';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Automatski prikvači obrazac pri svakoj vožnji umjesto da dodirujete svaki put. Troši više baterije.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Pokretanje snimanja…';
+
+  @override
   String get tripShareAction => 'Podijeli s drugim računom';
 
   @override

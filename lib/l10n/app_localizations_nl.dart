@@ -5510,6 +5510,17 @@ class AppLocalizationsNl extends AppLocalizations {
       'Minimaliseren tot een zwevende tegel';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Altijd vastzetten bij start van de opname';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Zet het formulier automatisch vast bij elke rit in plaats van elke keer te tikken. Verbruikt meer batterij.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Opname starten…';
+
+  @override
   String get tripShareAction => 'Delen met een ander account';
 
   @override

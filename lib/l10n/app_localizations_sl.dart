@@ -5496,6 +5496,16 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Pomanjšaj v lebdečo ploščico';
 
   @override
+  String get tripRecordingAutoPinTitle => 'Ob začetku snemanja vedno pripni';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Obrazec samodejno pripni ob vsaki vožnji namesto dotika vsakič. Porabi več baterije.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Začenjanje snemanja…';
+
+  @override
   String get tripShareAction => 'Deli z drugim računom';
 
   @override

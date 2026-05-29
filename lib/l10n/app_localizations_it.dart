@@ -5521,6 +5521,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Riduci a riquadro mobile';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Fissa sempre all\'avvio della registrazione';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Fissa il modulo automaticamente a ogni viaggio invece di toccare ogni volta. Consuma più batteria.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Avvio della registrazione…';
+
+  @override
   String get tripShareAction => 'Condividi con un altro account';
 
   @override

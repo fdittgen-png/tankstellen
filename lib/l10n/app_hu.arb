@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Velem megosztva",
   "trajetsSharedBadge": "Megosztva",
   "dataSourceAttribution": "Forrás: {source} ({license})",
-  "dataSourceAttributionSemantic": "Az üzemanyagár-adatokat a(z) {source} biztosítja, a(z) {license} licenc alatt."
+  "dataSourceAttributionSemantic": "Az üzemanyagár-adatokat a(z) {source} biztosítja, a(z) {license} licenc alatt.",
+  "tripRecordingAutoPinTitle": "Mindig rögzítse a felvétel indításakor",
+  "tripRecordingAutoPinSubtitle": "Az űrlap automatikus rögzítése minden út során, ahelyett, hogy mindig megérintené. Több akkumulátort használ.",
+  "tripRecordingConnectingTitle": "Felvétel indítása…"
 }

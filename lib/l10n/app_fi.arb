@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Jaettu kanssani",
   "trajetsSharedBadge": "Jaettu",
   "dataSourceAttribution": "Lähde: {source} ({license})",
-  "dataSourceAttributionSemantic": "Polttoaineiden hintatiedot tarjoaa {source}, lisensoitu lisenssillä {license}."
+  "dataSourceAttributionSemantic": "Polttoaineiden hintatiedot tarjoaa {source}, lisensoitu lisenssillä {license}.",
+  "tripRecordingAutoPinTitle": "Kiinnitä aina tallennuksen alkaessa",
+  "tripRecordingAutoPinSubtitle": "Kiinnitä lomake automaattisesti joka ajolla sen sijaan, että napautat joka kerta. Kuluttaa enemmän akkua.",
+  "tripRecordingConnectingTitle": "Aloitetaan tallennusta…"
 }

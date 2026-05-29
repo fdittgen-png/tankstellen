@@ -5553,6 +5553,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Réduire en vignette flottante';
 
   @override
+  String get tripRecordingAutoPinTitle =>
+      'Toujours épingler au démarrage de l\'enregistrement';
+
+  @override
+  String get tripRecordingAutoPinSubtitle =>
+      'Épingler le formulaire automatiquement à chaque trajet au lieu d\'appuyer à chaque fois. Consomme plus de batterie.';
+
+  @override
+  String get tripRecordingConnectingTitle => 'Démarrage de l\'enregistrement…';
+
+  @override
   String get tripShareAction => 'Partager avec un autre compte';
 
   @override

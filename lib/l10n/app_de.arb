@@ -2292,6 +2292,9 @@
   "tripBannerOpenFromConsumptionTab": "Aktive Fahrt aus dem Verbrauchs-Tab öffnen",
   "tripRecordingUnpinnedWarning": "Bildschirm anpinnen, damit das GPS während der Fahrt aktiv bleibt — Android kann das GPS im Ruhezustand drosseln.",
   "tripRecordingMinimiseTooltip": "Als schwebende Kachel minimieren",
+  "tripRecordingAutoPinTitle": "Beim Aufnahmestart immer anpinnen",
+  "tripRecordingAutoPinSubtitle": "Das Formular bei jeder Fahrt automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.",
+  "tripRecordingConnectingTitle": "Aufnahme wird gestartet …",
   "tripShareAction": "Mit anderem Konto teilen",
   "@tripShareAction": {
     "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."

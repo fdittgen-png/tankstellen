@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Minuga jagatud",
   "trajetsSharedBadge": "Jagatud",
   "dataSourceAttribution": "Allikas: {source} ({license})",
-  "dataSourceAttributionSemantic": "Kütusehindade andmed pärinevad allikast {source}, litsentsitud litsentsi {license} alusel."
+  "dataSourceAttributionSemantic": "Kütusehindade andmed pärinevad allikast {source}, litsentsitud litsentsi {license} alusel.",
+  "tripRecordingAutoPinTitle": "Salvestuse alustamisel alati kinnita",
+  "tripRecordingAutoPinSubtitle": "Kinnita vorm igal sõidul automaatselt, selle asemel et iga kord puudutada. Kasutab rohkem akut.",
+  "tripRecordingConnectingTitle": "Salvestuse alustamine…"
 }

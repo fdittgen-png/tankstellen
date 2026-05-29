@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Kopīgots ar mani",
   "trajetsSharedBadge": "Kopīgots",
   "dataSourceAttribution": "Avots: {source} ({license})",
-  "dataSourceAttributionSemantic": "Degvielas cenu datus nodrošina {source}, licencēts saskaņā ar {license}."
+  "dataSourceAttributionSemantic": "Degvielas cenu datus nodrošina {source}, licencēts saskaņā ar {license}.",
+  "tripRecordingAutoPinTitle": "Vienmēr piespraust, sākot ierakstu",
+  "tripRecordingAutoPinSubtitle": "Automātiski piespraust veidlapu katrā braucienā, nevis pieskaroties katru reizi. Patērē vairāk akumulatora.",
+  "tripRecordingConnectingTitle": "Notiek ieraksta sākšana…"
 }

@@ -2086,5 +2086,8 @@
   "trajetsSharedSectionTitle": "Partagé avec moi",
   "trajetsSharedBadge": "Partagé",
   "dataSourceAttribution": "Source : {source} ({license})",
-  "dataSourceAttributionSemantic": "Données de prix des carburants fournies par {source}, sous licence {license}."
+  "dataSourceAttributionSemantic": "Données de prix des carburants fournies par {source}, sous licence {license}.",
+  "tripRecordingAutoPinTitle": "Toujours épingler au démarrage de l'enregistrement",
+  "tripRecordingAutoPinSubtitle": "Épingler le formulaire automatiquement à chaque trajet au lieu d'appuyer à chaque fois. Consomme plus de batterie.",
+  "tripRecordingConnectingTitle": "Démarrage de l'enregistrement…"
 }

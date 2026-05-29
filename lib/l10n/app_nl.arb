@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Met mij gedeeld",
   "trajetsSharedBadge": "Gedeeld",
   "dataSourceAttribution": "Bron: {source} ({license})",
-  "dataSourceAttributionSemantic": "Brandstofprijsgegevens geleverd door {source}, gelicentieerd onder {license}."
+  "dataSourceAttributionSemantic": "Brandstofprijsgegevens geleverd door {source}, gelicentieerd onder {license}.",
+  "tripRecordingAutoPinTitle": "Altijd vastzetten bij start van de opname",
+  "tripRecordingAutoPinSubtitle": "Zet het formulier automatisch vast bij elke rit in plaats van elke keer te tikken. Verbruikt meer batterij.",
+  "tripRecordingConnectingTitle": "Opname starten…"
 }

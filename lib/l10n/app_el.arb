@@ -1958,5 +1958,8 @@
   "trajetsSharedSectionTitle": "Κοινοποιήθηκε σε εμένα",
   "trajetsSharedBadge": "Κοινόχρηστο",
   "dataSourceAttribution": "Πηγή: {source} ({license})",
-  "dataSourceAttributionSemantic": "Δεδομένα τιμών καυσίμων από {source}, με άδεια {license}."
+  "dataSourceAttributionSemantic": "Δεδομένα τιμών καυσίμων από {source}, με άδεια {license}.",
+  "tripRecordingAutoPinTitle": "Πάντα καρφίτσωμα κατά την έναρξη εγγραφής",
+  "tripRecordingAutoPinSubtitle": "Καρφίτσωμα της φόρμας αυτόματα σε κάθε διαδρομή αντί να πατάτε κάθε φορά. Καταναλώνει περισσότερη μπαταρία.",
+  "tripRecordingConnectingTitle": "Έναρξη εγγραφής…"
 }
