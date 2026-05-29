@@ -4597,6 +4597,21 @@ class AppLocalizationsHu extends AppLocalizations {
       'A kamerát nem sikerült elindítani. Próbálja újra, vagy adja meg az értékeket kézzel.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Váltás vízszintes elrendezésre';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Váltás függőleges elrendezésre';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Túl sok fény — kissé döntse meg a tükröződések elkerülése érdekében';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Igazítsa a kijelzőt a keretbe, majd készítse el a felvételt';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mit tankolt';
 
   @override

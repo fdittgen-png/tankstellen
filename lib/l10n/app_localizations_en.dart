@@ -4536,6 +4536,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'The camera couldn\'t start. Try again or enter the values by hand.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Switch to horizontal layout';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Switch to vertical layout';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Too much glare — tilt slightly to avoid reflections';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Line up the display inside the frame, then capture';
+
+  @override
   String get fillUpSectionWhatTitle => 'What you filled';
 
   @override
@@ -10374,6 +10388,22 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get pumpCameraError =>
       '⟦Ŧĥé çáɱéřá çóúłđñ\'ŧ šŧářŧ. Ŧřý áǧáîñ óř éñŧéř ŧĥé ṽáłúéš ƀý ĥáñđ. ·······················⟧';
+
+  @override
+  String get pumpCameraOrientationHorizontal =>
+      '⟦Šŵîŧçĥ ŧó ĥóřîžóñŧáł łáýóúŧ ···········⟧';
+
+  @override
+  String get pumpCameraOrientationVertical =>
+      '⟦Šŵîŧçĥ ŧó ṽéřŧîçáł łáýóúŧ ··········⟧';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      '⟦Ŧóó ɱúçĥ ǧłářé — ŧîłŧ šłîǧĥŧłý ŧó áṽóîđ řéƒłéçŧîóñš ···················⟧';
+
+  @override
+  String get pumpCameraAlignHint =>
+      '⟦Łîñé úƥ ŧĥé đîšƥłáý îñšîđé ŧĥé ƒřáɱé, ŧĥéñ çáƥŧúřé ··················⟧';
 
   @override
   String get fillUpSectionWhatTitle => '⟦Ŵĥáŧ ýóú ƒîłłéđ ······⟧';

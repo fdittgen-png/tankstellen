@@ -4595,6 +4595,21 @@ class AppLocalizationsRo extends AppLocalizations {
       'Camera nu a putut porni. Încearcă din nou sau introdu valorile manual.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Comutați la aspectul orizontal';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Comutați la aspectul vertical';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Prea multă strălucire — înclinați ușor pentru a evita reflexiile';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Aliniați afișajul în cadru, apoi capturați';
+
+  @override
   String get fillUpSectionWhatTitle => 'Ce ați alimentat';
 
   @override

@@ -3203,6 +3203,22 @@
   "@pumpCameraError": {
     "description": "Shown when the in-app camera fails to initialise on the pump-display capture screen (#1868)."
   },
+  "pumpCameraOrientationHorizontal": "Switch to horizontal layout",
+  "@pumpCameraOrientationHorizontal": {
+    "description": "Tooltip on the orientation-toggle button when the overlay is currently vertical (#2276)."
+  },
+  "pumpCameraOrientationVertical": "Switch to vertical layout",
+  "@pumpCameraOrientationVertical": {
+    "description": "Tooltip on the orientation-toggle button when the overlay is currently horizontal (#2276)."
+  },
+  "pumpCameraGlareWarning": "Too much glare — tilt slightly to avoid reflections",
+  "@pumpCameraGlareWarning": {
+    "description": "Live amber feedback bar shown when the framed region is over-exposed by glare (#2276)."
+  },
+  "pumpCameraAlignHint": "Line up the display inside the frame, then capture",
+  "@pumpCameraAlignHint": {
+    "description": "Default hint shown in the live feedback bar on the guided alignment overlay (#2276)."
+  },
   "fillUpSectionWhatTitle": "What you filled",
   "@fillUpSectionWhatTitle": {
     "description": "Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2)."

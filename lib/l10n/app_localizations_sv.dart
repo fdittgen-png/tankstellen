@@ -4559,6 +4559,20 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kameran kunde inte startas. Försök igen eller ange värdena manuellt.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Byt till horisontell layout';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Byt till vertikal layout';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'För mycket bländning — luta något för att undvika reflexer';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Rikta in displayen i ramen och ta sedan en bild';
+
+  @override
   String get fillUpSectionWhatTitle => 'Vad du tankade';
 
   @override

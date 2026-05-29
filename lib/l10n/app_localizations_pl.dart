@@ -4582,6 +4582,20 @@ class AppLocalizationsPl extends AppLocalizations {
       'Nie udało się uruchomić aparatu. Spróbuj ponownie lub wprowadź wartości ręcznie.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Przełącz na układ poziomy';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Przełącz na układ pionowy';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Zbyt duże odblaski — lekko przechyl, aby uniknąć odblasków';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Ustaw wyświetlacz w ramce, a następnie zrób zdjęcie';
+
+  @override
   String get fillUpSectionWhatTitle => 'Co zatankowałeś';
 
   @override

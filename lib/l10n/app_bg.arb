@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Данните за цените на горивата са предоставени от {source}, лицензирани под {license}.",
   "tripRecordingAutoPinTitle": "Винаги фиксирай при старт на записа",
   "tripRecordingAutoPinSubtitle": "Фиксирай формуляра автоматично при всяко пътуване, вместо да докосваш всеки път. Изразходва повече батерия.",
-  "tripRecordingConnectingTitle": "Стартиране на записа…"
+  "tripRecordingConnectingTitle": "Стартиране на записа…",
+  "pumpCameraOrientationHorizontal": "Превключете към хоризонтално оформление",
+  "pumpCameraOrientationVertical": "Превключете към вертикално оформление",
+  "pumpCameraGlareWarning": "Прекалено много отблясъци — наклонете леко, за да избегнете отражения",
+  "pumpCameraAlignHint": "Наредете дисплея в рамката и след това заснемете"
 }

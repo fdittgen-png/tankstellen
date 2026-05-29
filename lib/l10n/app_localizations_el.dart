@@ -4607,6 +4607,20 @@ class AppLocalizationsEl extends AppLocalizations {
       'Η κάμερα δεν μπόρεσε να ξεκινήσει. Δοκιμάστε ξανά ή εισαγάγετε τις τιμές χειροκίνητα.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Εναλλαγή σε οριζόντια διάταξη';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Εναλλαγή σε κατακόρυφη διάταξη';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Πάρα πολλή αντανάκλαση — γείρετε ελαφρά για να αποφύγετε τις αντανακλάσεις';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Στοιχίστε την οθόνη εντός του πλαισίου και στη συνέχεια τραβήξτε φωτογραφία';
+
+  @override
   String get fillUpSectionWhatTitle => 'Τι ανεφοδιαστήκατε';
 
   @override

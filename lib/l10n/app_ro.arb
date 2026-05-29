@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Datele privind prețurile carburanților sunt furnizate de {source}, licențiate sub {license}.",
   "tripRecordingAutoPinTitle": "Fixează întotdeauna la începerea înregistrării",
   "tripRecordingAutoPinSubtitle": "Fixează formularul automat la fiecare cursă în loc să atingi de fiecare dată. Consumă mai multă baterie.",
-  "tripRecordingConnectingTitle": "Se pornește înregistrarea…"
+  "tripRecordingConnectingTitle": "Se pornește înregistrarea…",
+  "pumpCameraOrientationHorizontal": "Comutați la aspectul orizontal",
+  "pumpCameraOrientationVertical": "Comutați la aspectul vertical",
+  "pumpCameraGlareWarning": "Prea multă strălucire — înclinați ușor pentru a evita reflexiile",
+  "pumpCameraAlignHint": "Aliniați afișajul în cadru, apoi capturați"
 }

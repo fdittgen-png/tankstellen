@@ -18,6 +18,7 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
+import '../../data/ocr/pump_ocr_config.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/add_fill_up_fuel_resolver.dart';
 import '../../domain/add_fill_up_validators.dart';
@@ -110,6 +111,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   bool _scanning = false;
   bool _scanningPump = false;
   ReceiptScanService? _scanService;
+  // #2276 — loaded once on first pump-display scan; drives the guided
+  // alignment overlay with the correct orientation + field slots for
+  // the active country/brand pump template.
+  PumpOcrConfig? _ocrConfig;
   String? _vehicleId;
   bool _vehicleInitialized = false;
   ReceiptScanOutcome? _lastScan;
@@ -269,10 +274,27 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   }
 
   /// Pushes the #1868 in-app camera screen and returns the capture
-  /// (photo path + reticle ROI), or null on cancel / camera unavailable.
-  Future<PumpCaptureResult?> _capturePumpImage(BuildContext context) {
+  /// (photo path + overlay ROI), or null on cancel / camera unavailable.
+  ///
+  /// #2276 — loads the OCR brand template to seed the guided alignment
+  /// overlay with the correct orientation and per-field slot geometry.
+  Future<PumpCaptureResult?> _capturePumpImage(BuildContext context) async {
+    // Load the OCR config lazily (cached after first load).
+    final cfg = _ocrConfig ??= PumpOcrConfig();
+    await cfg.load();
+    final country = _activeCountryCode();
+    final template = country != null
+        ? cfg.templateFor(country: country)
+        : null;
+    if (!context.mounted) return null;
     return Navigator.of(context).push<PumpCaptureResult>(
-      MaterialPageRoute(builder: (_) => const PumpDisplayCameraScreen()),
+      MaterialPageRoute(
+        builder: (_) => PumpDisplayCameraScreen(
+          initialOrientation:
+              template?.displayOrientation ?? OcrDisplayOrientation.horizontal,
+          fieldSpec: template?.pumpDisplay,
+        ),
+      ),
     );
   }
 

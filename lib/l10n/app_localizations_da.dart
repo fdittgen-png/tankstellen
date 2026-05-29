@@ -4558,6 +4558,20 @@ class AppLocalizationsDa extends AppLocalizations {
       'Kameraet kunne ikke starte. Prøv igen, eller indtast værdierne manuelt.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Skift til vandret layout';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Skift til lodret layout';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'For meget blænding — vip lidt for at undgå refleksioner';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Juster displayet i rammen og tag derefter billede';
+
+  @override
   String get fillUpSectionWhatTitle => 'Hvad du tankede';
 
   @override

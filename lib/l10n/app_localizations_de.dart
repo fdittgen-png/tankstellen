@@ -4586,6 +4586,21 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Kamera konnte nicht gestartet werden. Versuche es erneut oder gib die Werte von Hand ein.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Zu horizontaler Anzeige wechseln';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Zu vertikaler Anzeige wechseln';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Zu viel Blendung — leicht neigen, um Reflexionen zu vermeiden';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Anzeige im Rahmen ausrichten, dann aufnehmen';
+
+  @override
   String get fillUpSectionWhatTitle => 'Was du getankt hast';
 
   @override

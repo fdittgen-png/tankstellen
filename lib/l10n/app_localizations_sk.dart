@@ -4586,6 +4586,21 @@ class AppLocalizationsSk extends AppLocalizations {
       'Kameru sa nepodarilo spustiť. Skúste to znova alebo zadajte hodnoty ručne.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Prepnúť na vodorovné rozloženie';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Prepnúť na zvislé rozloženie';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Príliš veľa odleskov — mierne nakloňte, aby ste sa vyhli odrazom';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Zarovnajte displej do rámčeka a potom odfotografujte';
+
+  @override
   String get fillUpSectionWhatTitle => 'Čo ste natankovali';
 
   @override

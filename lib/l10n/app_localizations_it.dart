@@ -4588,6 +4588,20 @@ class AppLocalizationsIt extends AppLocalizations {
       'La fotocamera non si è avviata. Riprova o inserisci i valori manualmente.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Passa a layout orizzontale';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Passa a layout verticale';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Troppi riflessi — inclina leggermente per evitare abbagliamenti';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Allinea il display nel riquadro, poi cattura';
+
+  @override
   String get fillUpSectionWhatTitle => 'Cosa hai rifornito';
 
   @override

@@ -2090,5 +2090,9 @@
   "dataSourceAttributionSemantic": "Données de prix des carburants fournies par {source}, sous licence {license}.",
   "tripRecordingAutoPinTitle": "Toujours épingler au démarrage de l'enregistrement",
   "tripRecordingAutoPinSubtitle": "Épingler le formulaire automatiquement à chaque trajet au lieu d'appuyer à chaque fois. Consomme plus de batterie.",
-  "tripRecordingConnectingTitle": "Démarrage de l'enregistrement…"
+  "tripRecordingConnectingTitle": "Démarrage de l'enregistrement…",
+  "pumpCameraOrientationHorizontal": "Passer en affichage horizontal",
+  "pumpCameraOrientationVertical": "Passer en affichage vertical",
+  "pumpCameraGlareWarning": "Trop de reflets — inclinez légèrement pour éviter les éblouissements",
+  "pumpCameraAlignHint": "Alignez l'afficheur dans le cadre, puis capturez"
 }

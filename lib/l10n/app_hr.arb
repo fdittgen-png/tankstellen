@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Podatke o cijenama goriva pruža {source}, licencirano pod {license}.",
   "tripRecordingAutoPinTitle": "Uvijek prikvači pri pokretanju snimanja",
   "tripRecordingAutoPinSubtitle": "Automatski prikvači obrazac pri svakoj vožnji umjesto da dodirujete svaki put. Troši više baterije.",
-  "tripRecordingConnectingTitle": "Pokretanje snimanja…"
+  "tripRecordingConnectingTitle": "Pokretanje snimanja…",
+  "pumpCameraOrientationHorizontal": "Prebaci na vodoravni raspored",
+  "pumpCameraOrientationVertical": "Prebaci na okomiti raspored",
+  "pumpCameraGlareWarning": "Previše sjaja — malo nagnite kako biste izbjegli odsjaj",
+  "pumpCameraAlignHint": "Poravnajte zaslon unutar okvira i snimite"
 }

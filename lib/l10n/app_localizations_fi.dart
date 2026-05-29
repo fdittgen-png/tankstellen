@@ -4559,6 +4559,20 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kameraa ei voitu käynnistää. Yritä uudelleen tai syötä arvot käsin.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Vaihda vaakaasetteluun';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Vaihda pystyasetteluun';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Liikaa heijastusta — kallista hieman välttääksesi heijastukset';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Kohdista näyttö kehykseen ja ota sitten kuva';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mitä tankkasite';
 
   @override

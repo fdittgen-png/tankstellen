@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Datos de precios de combustible proporcionados por {source}, con licencia {license}.",
   "tripRecordingAutoPinTitle": "Fijar siempre al iniciar la grabación",
   "tripRecordingAutoPinSubtitle": "Fija el formulario automáticamente en cada trayecto en lugar de tocar cada vez. Consume más batería.",
-  "tripRecordingConnectingTitle": "Iniciando grabación…"
+  "tripRecordingConnectingTitle": "Iniciando grabación…",
+  "pumpCameraOrientationHorizontal": "Cambiar a disposición horizontal",
+  "pumpCameraOrientationVertical": "Cambiar a disposición vertical",
+  "pumpCameraGlareWarning": "Demasiado brillo — inclina ligeramente para evitar reflejos",
+  "pumpCameraAlignHint": "Alinea el surtidor en el marco y captura"
 }

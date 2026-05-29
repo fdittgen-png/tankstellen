@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Dane o cenach paliw dostarcza {source}, na licencji {license}.",
   "tripRecordingAutoPinTitle": "Zawsze przypnij przy starcie nagrywania",
   "tripRecordingAutoPinSubtitle": "Przypnij formularz automatycznie podczas każdej jazdy, zamiast dotykać za każdym razem. Zużywa więcej baterii.",
-  "tripRecordingConnectingTitle": "Rozpoczynanie nagrywania…"
+  "tripRecordingConnectingTitle": "Rozpoczynanie nagrywania…",
+  "pumpCameraOrientationHorizontal": "Przełącz na układ poziomy",
+  "pumpCameraOrientationVertical": "Przełącz na układ pionowy",
+  "pumpCameraGlareWarning": "Zbyt duże odblaski — lekko przechyl, aby uniknąć odblasków",
+  "pumpCameraAlignHint": "Ustaw wyświetlacz w ramce, a następnie zrób zdjęcie"
 }

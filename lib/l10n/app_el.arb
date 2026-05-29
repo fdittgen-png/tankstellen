@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Δεδομένα τιμών καυσίμων από {source}, με άδεια {license}.",
   "tripRecordingAutoPinTitle": "Πάντα καρφίτσωμα κατά την έναρξη εγγραφής",
   "tripRecordingAutoPinSubtitle": "Καρφίτσωμα της φόρμας αυτόματα σε κάθε διαδρομή αντί να πατάτε κάθε φορά. Καταναλώνει περισσότερη μπαταρία.",
-  "tripRecordingConnectingTitle": "Έναρξη εγγραφής…"
+  "tripRecordingConnectingTitle": "Έναρξη εγγραφής…",
+  "pumpCameraOrientationHorizontal": "Εναλλαγή σε οριζόντια διάταξη",
+  "pumpCameraOrientationVertical": "Εναλλαγή σε κατακόρυφη διάταξη",
+  "pumpCameraGlareWarning": "Πάρα πολλή αντανάκλαση — γείρετε ελαφρά για να αποφύγετε τις αντανακλάσεις",
+  "pumpCameraAlignHint": "Στοιχίστε την οθόνη εντός του πλαισίου και στη συνέχεια τραβήξτε φωτογραφία"
 }

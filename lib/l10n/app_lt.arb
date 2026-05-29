@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Degalų kainų duomenis teikia {source}, licencijuota pagal {license}.",
   "tripRecordingAutoPinTitle": "Visada prisegti pradedant įrašymą",
   "tripRecordingAutoPinSubtitle": "Automatiškai prisegti formą kiekvienos kelionės metu, užuot lietus kiekvieną kartą. Naudoja daugiau baterijos.",
-  "tripRecordingConnectingTitle": "Pradedamas įrašymas…"
+  "tripRecordingConnectingTitle": "Pradedamas įrašymas…",
+  "pumpCameraOrientationHorizontal": "Perjungti į horizontalų išdėstymą",
+  "pumpCameraOrientationVertical": "Perjungti į vertikalų išdėstymą",
+  "pumpCameraGlareWarning": "Per daug atspindžių — šiek tiek pakreipkite, kad išvengtumėte atspindžių",
+  "pumpCameraAlignHint": "Sulygiuokite ekraną rėme ir tada fotografuokite"
 }

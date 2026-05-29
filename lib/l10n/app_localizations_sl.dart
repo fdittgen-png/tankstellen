@@ -4570,6 +4570,21 @@ class AppLocalizationsSl extends AppLocalizations {
       'Kamere ni bilo mogoče zagnati. Poskusite znova ali vnesite vrednosti ročno.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Preklopi na vodoravno postavitev';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Preklopi na navpično postavitev';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Preveč odbleska — rahlo nagnite, da se izognete odsevom';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Poravnajte zaslon v okvir in nato posnemite';
+
+  @override
   String get fillUpSectionWhatTitle => 'Kaj ste natočili';
 
   @override
