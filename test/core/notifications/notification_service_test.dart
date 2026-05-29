@@ -8,6 +8,12 @@ import 'package:tankstellen/core/notifications/notification_service.dart';
 /// A fake [NotificationService] for testing that call sites work against
 /// the abstract interface without touching platform channels.
 class FakeNotificationService implements NotificationService {
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> areNotificationsEnabled() async => true;
+
   bool initialized = false;
   final List<({int id, String title, String body, String? payload})>
       shownAlerts = [];

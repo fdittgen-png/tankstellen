@@ -8,8 +8,39 @@ import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/data/repositories/alert_repository.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/notifications/notification_providers.dart';
+import 'package:tankstellen/core/notifications/notification_service.dart';
 
 import '../../../fakes/fake_hive_storage.dart';
+import '../../../helpers/silence_error_logger.dart';
+
+/// No-op NotificationService so addAlert's permission request + the
+/// background reconcile don't touch real plugins/Hive in unit tests.
+class _NoopNotificationService implements NotificationService {
+  int requestPermissionCalls = 0;
+  @override
+  Future<void> initialize() async {}
+  @override
+  Future<bool> requestPermission() async {
+    requestPermissionCalls++;
+    return true;
+  }
+  @override
+  Future<bool> areNotificationsEnabled() async => true;
+  @override
+  Future<void> showPriceAlert(
+      {required int id,
+      required String title,
+      required String body,
+      String? payload}) async {}
+  @override
+  Future<void> showServiceReminder(
+      {required int id, required String title, required String body}) async {}
+  @override
+  Future<void> cancelNotification(int id) async {}
+  @override
+  Future<void> cancelAll() async {}
+}
 
 PriceAlert _makeAlert({
   String id = 'alert-1',
@@ -33,6 +64,7 @@ PriceAlert _makeAlert({
 }
 
 void main() {
+  silenceErrorLoggerSpool();
   late FakeHiveStorage fakeStorage;
 
   setUp(() {
@@ -164,14 +196,25 @@ void main() {
 
   group('AlertNotifier (via ProviderContainer)', () {
     late ProviderContainer container;
+    late _NoopNotificationService noopNotifier;
 
     setUp(() {
+      // addAlert now requests the notification permission (#2209) and
+      // reconciles background polling (#2210); keep both off real
+      // plugins/Hive (spool silenced at main()).
+      noopNotifier = _NoopNotificationService();
       container = ProviderContainer(
         overrides: [
           hiveStorageProvider.overrideWithValue(fakeStorage),
+          notificationServiceProvider.overrideWithValue(noopNotifier),
         ],
       );
       addTearDown(container.dispose);
+    });
+
+    test('addAlert requests the notification permission (#2209)', () async {
+      await container.read(alertProvider.notifier).addAlert(_makeAlert());
+      expect(noopNotifier.requestPermissionCalls, 1);
     });
 
     test('build() returns alerts from AlertRepository', () async {

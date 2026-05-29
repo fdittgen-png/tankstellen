@@ -8,8 +8,21 @@
 /// The default implementation is [LocalNotificationService] which
 /// wraps `flutter_local_notifications`.
 abstract class NotificationService {
-  /// Initialize the notification subsystem (channels, permissions, etc.).
+  /// Initialize the notification subsystem (registers channels + the
+  /// tap callback). Does NOT request the runtime permission — call
+  /// [requestPermission] from a foreground/user-intent moment.
   Future<void> initialize();
+
+  /// Request the OS runtime notification permission (Android 13+
+  /// `POST_NOTIFICATIONS`, iOS authorization). Returns whether it is
+  /// granted. #2209 — without this, `show()` silently no-ops on
+  /// Android 13+ and no alert ever appears.
+  Future<bool> requestPermission();
+
+  /// Whether the OS currently allows this app to post notifications.
+  /// Used to surface a "notifications are off" recovery banner when the
+  /// user has alerts but has denied/disabled the permission.
+  Future<bool> areNotificationsEnabled();
 
   /// Display a price-alert notification.
   ///

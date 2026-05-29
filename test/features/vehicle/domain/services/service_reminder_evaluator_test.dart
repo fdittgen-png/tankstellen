@@ -15,6 +15,12 @@ import 'package:tankstellen/features/vehicle/domain/services/service_reminder_ev
 /// Duplicated on purpose so this test file stays self-contained and
 /// doesn't reach into another test file at import time.
 class _FakeNotificationService implements NotificationService {
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> areNotificationsEnabled() async => true;
+
   final List<({int id, String title, String body})> serviceReminders = [];
 
   @override

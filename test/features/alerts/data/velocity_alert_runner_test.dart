@@ -19,6 +19,12 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 /// [LocalNotificationService] — the BG-isolate hook just needs
 /// `showPriceAlert` to reach it.
 class _FakeNotifier implements NotificationService {
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> areNotificationsEnabled() async => true;
+
   final List<({int id, String title, String body, String? payload})>
       priceAlerts = [];
 

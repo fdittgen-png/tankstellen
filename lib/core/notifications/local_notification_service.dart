@@ -52,6 +52,68 @@ class LocalNotificationService implements NotificationService {
       settings: initSettings,
       onDidReceiveNotificationResponse: _onDidReceiveNotificationResponse,
     );
+    // #2209 — create the channels explicitly at init so they exist
+    // before the first fire (v21 would lazily create on first show(),
+    // but explicit lets the user pre-configure them).
+    final android = plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    await android?.createNotificationChannel(const AndroidNotificationChannel(
+      _channelId,
+      _channelName,
+      description: _channelDescription,
+      importance: Importance.high,
+    ));
+    await android?.createNotificationChannel(const AndroidNotificationChannel(
+      _serviceChannelId,
+      _serviceChannelName,
+      description: _serviceChannelDescription,
+    ));
+  }
+
+  @override
+  Future<bool> requestPermission() async {
+    try {
+      final android = plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) {
+        // #2209 — Android 13+ requires the runtime POST_NOTIFICATIONS
+        // grant; the manifest declaration alone is insufficient and
+        // show() silently no-ops until this is granted.
+        return await android.requestNotificationsPermission() ?? false;
+      }
+      final ios = plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        return await ios.requestPermissions(
+              alert: true,
+              badge: true,
+              sound: true,
+            ) ??
+            false;
+      }
+      return true;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+          context: const {'where': 'NotificationService.requestPermission'}));
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> areNotificationsEnabled() async {
+    try {
+      final android = plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) {
+        return await android.areNotificationsEnabled() ?? true;
+      }
+      return true;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+        'where': 'NotificationService.areNotificationsEnabled',
+      }));
+      return true;
+    }
   }
 
   /// Static entry point so flutter_local_notifications keeps a stable

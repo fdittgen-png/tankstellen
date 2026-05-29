@@ -122,6 +122,34 @@ class BackgroundService {
     final fetcher = createBackgroundPriceFetcher();
     await fetcher.cancelAll();
   }
+
+  /// Start or stop background polling based on whether ANY user-consented
+  /// alert is active — a per-station [PriceAlert] OR a [RadiusAlert]
+  /// (#2210). Previously only price alerts gated the scheduler, so a
+  /// radius-only user got no WorkManager task and radius alerts never
+  /// fired. Idempotent: safe to call after every alert mutation and at
+  /// startup. Cancels only when BOTH alert kinds are empty.
+  static Future<void> reconcile() async {
+    try {
+      final hasPriceAlert =
+          HiveStorage().getAlerts().any((a) => a['isActive'] == true);
+      var hasRadiusAlert = false;
+      try {
+        hasRadiusAlert = (await RadiusAlertStore().list()).any((a) => a.enabled);
+      } catch (_) {
+        // Radius store unreadable (e.g. box not open) — treat as none.
+      }
+      if (hasPriceAlert || hasRadiusAlert) {
+        await init();
+      } else {
+        await cancelAll();
+      }
+    } catch (e, st) {
+      // Never let a scheduling hiccup crash an alert mutation or startup.
+      unawaited(errorLogger.log(ErrorLayer.background, e, st,
+          context: const {'where': 'BackgroundService.reconcile'}));
+    }
+  }
 }
 
 @pragma('vm:entry-point')

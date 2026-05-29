@@ -18,6 +18,12 @@ import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 /// [LocalNotificationService] — the service layer only needs
 /// `showPriceAlert` to reach it.
 class _FakeNotifier implements NotificationService {
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> areNotificationsEnabled() async => true;
+
   final List<({int id, String title, String body, String? payload})>
       priceAlerts = [];
 
