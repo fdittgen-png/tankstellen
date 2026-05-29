@@ -10,9 +10,10 @@ import '../../features/search/data/models/search_params.dart';
 import '../../features/search/domain/entities/station.dart';
 import '../cache/cache_manager.dart';
 import '../error/exceptions.dart';
+import 'fuel_service_policy.dart';
 import 'service_result.dart';
 import 'station_service.dart';
-import '../../core/logging/error_logger.dart';
+import 'station_service_chain_codec.dart';
 
 /// Orchestrates station data retrieval with fallback:
 ///
@@ -23,11 +24,34 @@ import '../../core/logging/error_logger.dart';
 ///
 /// Accumulated errors from each step are attached to the result,
 /// so the UI can show what went wrong even when data was served.
+///
+/// ### Bulk-vs-polled search caching (#2264)
+///
+/// [searchStations] branches on the source's [FuelServicePolicy.model]:
+///
+///  - [SourceModel.polledApi] — each search is an upstream request, so the
+///    result is cached per `search:<country>:<lat>:<lng>:<radius>:<fuel>` key
+///    with the policy's `searchResultTtl` (the historical behaviour).
+///  - [SourceModel.bulkFile] — the primary already holds the whole-country
+///    dataset and local-filters it, so a per-search-key cache only duplicates
+///    that work and can serve a stale slice of a fresh dataset. The chain
+///    answers nearby directly from the primary (still coalesced + transient-
+///    retried), and the dataset's own freshness is governed by the persisted
+///    dataset cache (concern 3), not by a per-key Hive entry.
+///
+/// When no policy is supplied (legacy call sites + most chain unit tests) the
+/// chain defaults to the polled path with [CacheTtl.stationSearch], so its
+/// observable behaviour is unchanged.
 class StationServiceChain implements StationService {
   final StationService _primary;
   final CacheStrategy _cache;
   final ServiceSource _errorSource;
   final String countryCode;
+
+  /// Data-source policy (#2264). Controls whether [searchStations] uses the
+  /// per-key TTL cache (polled) or local-filters a bulk dataset (bulkFile),
+  /// and supplies the per-key TTL for polled sources. Null → polled defaults.
+  final FuelServicePolicy? _policy;
 
   /// In-flight request deduplication: concurrent calls for the same cache key
   /// share a single Future instead of hitting the API multiple times.
@@ -42,7 +66,9 @@ class StationServiceChain implements StationService {
   StationServiceChain(this._primary, this._cache, {
     ServiceSource errorSource = ServiceSource.tankerkoenigApi,
     this.countryCode = '',
-  }) : _errorSource = errorSource;
+    FuelServicePolicy? policy,
+  })  : _errorSource = errorSource,
+        _policy = policy;
 
   /// Generic cache-through + request coalescing.
   ///
@@ -265,20 +291,72 @@ class StationServiceChain implements StationService {
   Future<ServiceResult<List<Station>>> searchStations(
     SearchParams params, {
     CancelToken? cancelToken,
-  }) =>
-      _throughChain<List<Station>>(
-        cacheKey: CacheKey.stationSearch(
-          params.lat, params.lng, params.radiusKm, params.fuelType.apiValue,
-          countryCode: countryCode,
-          postalCode: params.postalCode,
-          locationName: params.locationName,
-        ),
-        apiCall: () => _primary.searchStations(params, cancelToken: cancelToken),
-        serialize: _serializeStationList,
-        deserialize: _deserializeStationList,
-        ttl: CacheTtl.stationSearch,
-        isValid: (stations) => stations.isNotEmpty,
-      );
+  }) {
+    // #2264 — bulk-file sources local-filter a persisted whole-country
+    // dataset, so a per-search-key cache only duplicates that work and can
+    // serve a stale slice; answer nearby straight from the primary instead.
+    if (_policy?.isBulkFile ?? false) {
+      return _bulkSearch(params, cancelToken: cancelToken);
+    }
+
+    return _throughChain<List<Station>>(
+      cacheKey: CacheKey.stationSearch(
+        params.lat, params.lng, params.radiusKm, params.fuelType.apiValue,
+        countryCode: countryCode,
+        postalCode: params.postalCode,
+        locationName: params.locationName,
+      ),
+      apiCall: () => _primary.searchStations(params, cancelToken: cancelToken),
+      serialize: serializeStationList,
+      deserialize: deserializeStationList,
+      // Polled sources use the policy's per-key TTL; fall back to the global
+      // default for legacy call sites that supply no policy.
+      ttl: _policy?.searchResultTtl ?? CacheTtl.stationSearch,
+      isValid: (stations) => stations.isNotEmpty,
+    );
+  }
+
+  /// Bulk-dataset search path (#2264): no per-key Hive cache. Adds only the
+  /// resilience layers that matter — in-flight coalescing + the single
+  /// transient retry — then returns the primary's result verbatim, so search
+  /// results are byte-identical to calling the primary directly.
+  Future<ServiceResult<List<Station>>> _bulkSearch(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async {
+    _evictStaleInFlight();
+    final key = 'bulk:${CacheKey.stationSearch(
+      params.lat, params.lng, params.radiusKm, params.fuelType.apiValue,
+      countryCode: countryCode,
+      postalCode: params.postalCode,
+      locationName: params.locationName,
+    )}';
+
+    if (_inFlight.containsKey(key)) {
+      final result = await _inFlight[key]!;
+      if (result.data is List<Station>) {
+        return ServiceResult<List<Station>>(
+          data: result.data as List<Station>,
+          source: result.source,
+          fetchedAt: result.fetchedAt,
+          isStale: result.isStale,
+          errors: result.errors,
+        );
+      }
+    }
+
+    final future = _callWithTransientRetry(
+      () => _primary.searchStations(params, cancelToken: cancelToken),
+    );
+    _inFlight[key] = future;
+    _inFlightTimestamps[key] = DateTime.now();
+    try {
+      return await future;
+    } finally {
+      unawaited(_inFlight.remove(key) ?? Future<void>.value());
+      _inFlightTimestamps.remove(key);
+    }
+  }
 
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
@@ -287,8 +365,8 @@ class StationServiceChain implements StationService {
       _throughChain<StationDetail>(
         cacheKey: CacheKey.stationDetail(stationId),
         apiCall: () => _primary.getStationDetail(stationId),
-        serialize: _serializeStationDetail,
-        deserialize: _deserializeStationDetail,
+        serialize: serializeStationDetail,
+        deserialize: deserializeStationDetail,
         ttl: CacheTtl.stationDetail,
       );
 
@@ -299,8 +377,8 @@ class StationServiceChain implements StationService {
       _throughChain<Map<String, StationPrices>>(
         cacheKey: CacheKey.prices(ids),
         apiCall: () => _primary.getPrices(ids),
-        serialize: _serializePrices,
-        deserialize: _deserializePrices,
+        serialize: serializePrices,
+        deserialize: deserializePrices,
         ttl: CacheTtl.prices,
       );
 
@@ -319,68 +397,4 @@ class StationServiceChain implements StationService {
     }
   }
 
-  // --- Serialization helpers (JSON-safe for Hive storage) ---
-
-  Map<String, dynamic> _serializeStationList(List<Station> stations) => {
-        'stations': stations.map((s) => s.toJson()).toList(),
-      };
-
-  List<Station>? _deserializeStationList(Map<String, dynamic> data) {
-    try {
-      final list = data['stations'] as List<dynamic>?;
-      if (list == null) return null;
-      return list
-          .map((j) => Station.fromJson(Map<String, dynamic>.from(j as Map)))
-          .toList();
-    } on FormatException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Cache: station list parse failed'}));
-      return null;
-    }
-  }
-
-  Map<String, dynamic> _serializeStationDetail(StationDetail detail) => {
-        'station': detail.station.toJson(),
-        'openingTimes': detail.openingTimes.map((ot) => ot.toJson()).toList(),
-        'overrides': detail.overrides,
-        'wholeDay': detail.wholeDay,
-        'state': detail.state,
-      };
-
-  StationDetail? _deserializeStationDetail(Map<String, dynamic> data) {
-    try {
-      final stationJson = data['station'] as Map<String, dynamic>?;
-      if (stationJson == null) return null;
-
-      final otList = data['openingTimes'] as List<dynamic>? ?? [];
-      return StationDetail(
-        station: Station.fromJson(stationJson),
-        openingTimes: otList
-            .map((j) => OpeningTime.fromJson(Map<String, dynamic>.from(j as Map)))
-            .toList(),
-        overrides: List<String>.from(data['overrides'] as List? ?? []),
-        wholeDay: data['wholeDay'] as bool? ?? false,
-        state: data['state'] as String?,
-      );
-    } on FormatException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Cache: station detail parse failed'}));
-      return null;
-    }
-  }
-
-  Map<String, dynamic> _serializePrices(Map<String, StationPrices> prices) => {
-        'prices': prices.map((k, v) => MapEntry(k, v.toJson())),
-      };
-
-  Map<String, StationPrices>? _deserializePrices(Map<String, dynamic> data) {
-    try {
-      final raw = data['prices'] as Map<String, dynamic>?;
-      if (raw == null) return null;
-      return raw.map(
-        (k, v) => MapEntry(k, StationPrices.fromJson(Map<String, dynamic>.from(v as Map))),
-      );
-    } on FormatException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Cache: prices parse failed'}));
-      return null;
-    }
-  }
 }

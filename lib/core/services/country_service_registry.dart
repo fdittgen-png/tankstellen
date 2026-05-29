@@ -689,6 +689,9 @@ class CountryServiceRegistry {
       cache,
       errorSource: entry.errorSource,
       countryCode: countryCode,
+      // #2264 — the chain branches on this to local-filter bulk datasets
+      // (no per-key cache) vs keep the per-key TTL cache for polled APIs.
+      policy: entry.policy,
     );
   }
 
