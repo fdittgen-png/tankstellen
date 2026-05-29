@@ -5,11 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../core/location/geolocator_wrapper.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
@@ -33,13 +30,10 @@ import '../data/obd2/trip_recording_controller.dart';
 import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
-import '../domain/driving_coaching.dart'
-    show gpsCoachingHint, recentSamplesWithin;
 import '../domain/entities/gps_sample_diagnostic.dart';
-import '../domain/gps_driving_features.dart';
-import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/trip_recorder.dart';
-import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
+import 'gps_only_recording_pipeline.dart';
+import 'recording_pipeline.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
 import 'trip_haptic_controller.dart';
@@ -62,6 +56,10 @@ export 'trip_recording_state.dart' show TripRecordingState;
 // `tripRecordingProvider.select((s) => s.dropReason)` resolve the
 // type without a second import.
 export '../data/obd2/trip_recording_controller.dart' show TripDropReason;
+// #2190 — StoppedTripResult moved next to the RecordingPipeline strategy
+// seam to avoid a circular import. Re-export it so the ~10 callers that
+// import this provider keep resolving the type without a new import.
+export 'recording_pipeline.dart' show StoppedTripResult;
 
 part 'trip_recording_provider.g.dart';
 
@@ -103,16 +101,14 @@ class TripRecording extends _$TripRecording {
   String? _adapterName;
   String? _adapterFirmware;
 
-  // #2025 — GPS-only recording mode. When `_gpsOnlyMode` is true the
-  // notifier is running a parallel pipeline that taps Geolocator
-  // directly, feeds a pure [TripRecorder], and persists with
-  // `kind: TripKind.gpsOnly` on stop. No `_controller` / `_service` is
-  // created in this mode — the OBD2 polling loop simply isn't started.
-  bool _gpsOnlyMode = false;
-  TripRecorder? _gpsOnlyRecorder;
-  StreamSubscription<Position>? _gpsOnlySub;
-  final List<TripSample> _gpsOnlySamples = [];
-  DateTime? _gpsOnlyStartedAt;
+  // #2190 — the selected alternate recording strategy, or null for the
+  // inline OBD2 path (the historical default). Selected at start: the
+  // dongle-less #2025 flow installs a [GpsOnlyRecordingPipeline] here and
+  // every former `if (_gpsOnlyMode)` lifecycle branch collapses to a
+  // single `_pipeline != null` virtual dispatch. A future third source
+  // (CarPlay / Android Auto telemetry) becomes another implementation
+  // rather than another `_xMode` bool (open/closed — #2190 motivation).
+  RecordingPipeline? _pipeline;
 
   // #1458 phase 2 — most recent app lifecycle state observed by the
   // wiring layer's [WidgetsBindingObserver]. Read by the GPS stream
@@ -169,6 +165,14 @@ class TripRecording extends _$TripRecording {
   /// without spinning up a real polling clock. Null between trips.
   @visibleForTesting
   TripRecordingController? get debugController => _controller;
+
+  /// Exposed for tests (#2190): true when an alternate GPS-only
+  /// [RecordingPipeline] is the selected strategy (i.e. the trip was
+  /// started via [startGpsOnly]), false for the inline OBD2 path or when
+  /// no trip is running. Lets the strategy-selection test assert which
+  /// pipeline the notifier picked without depending on the concrete type.
+  @visibleForTesting
+  bool get debugIsGpsOnlyActive => _pipeline?.isGpsOnly ?? false;
 
   /// Snapshot of the vehicle the last [startTrip] call was scoped to.
   /// Exposed so the save-as-fill-up path can figure out which
@@ -230,6 +234,17 @@ class TripRecording extends _$TripRecording {
   @override
   TripRecordingState build() {
     return const TripRecordingState();
+  }
+
+  /// #2190 — read / publish the recording state on behalf of an alternate
+  /// [RecordingPipeline]. The Riverpod `state` getter + setter are
+  /// protected to the notifier instance, so the [RecordingPipelineHost]
+  /// adapter routes its access through these methods rather than touching
+  /// `state` from outside the class — mirroring the `_emitState()` seam the
+  /// controller exposes to its [DroppedSessionHost] (#2188).
+  TripRecordingState _stateForPipeline() => state;
+  void _setStateFromPipeline(TripRecordingState value) {
+    state = value;
   }
 
   /// Standalone entry point for starting a trajet (#888).
@@ -581,10 +596,13 @@ class TripRecording extends _$TripRecording {
   /// wrapper below) so the launcher-icon badge increments only when
   /// the coordinator was the one that decided to save.
   Future<StoppedTripResult> stop({bool automatic = false}) async {
-    // #2025 — GPS-only mode runs its own teardown that bypasses the
-    // OBD2 controller / service entirely.
-    if (_gpsOnlyMode) {
-      return _stopGpsOnly(automatic: automatic);
+    // #2190 — an alternate strategy (e.g. #2025 GPS-only) runs its own
+    // teardown that bypasses the OBD2 controller / service entirely.
+    final pipeline = _pipeline;
+    if (pipeline != null) {
+      final result = await pipeline.stop(automatic: automatic);
+      _pipeline = null;
+      return result;
     }
     final ctl = _controller;
     final svc = _service;
@@ -1217,19 +1235,21 @@ class TripRecording extends _$TripRecording {
   }
 
   // ---------------------------------------------------------------------------
-  // #2025 — GPS-only recording path. Lets users record a trajet without
-  // an OBD2 dongle: samples come from Geolocator, the TripRecorder
+  // #2025 / #2190 — GPS-only recording path. Lets users record a trajet
+  // without an OBD2 dongle: samples come from Geolocator, the TripRecorder
   // accumulator runs the same harsh-event / distance / idle integration
   // it does for OBD2 trips, and the persisted summary carries
   // `kind: TripKind.gpsOnly` so downstream surfaces (confidence-tier
-  // badge, recording-screen redesign) can adapt.
+  // badge, recording-screen redesign) can adapt. The pipeline itself now
+  // lives in [GpsOnlyRecordingPipeline], selected into `_pipeline` here
+  // and driven through the [RecordingPipelineHost] seam below.
   // ---------------------------------------------------------------------------
 
   /// Start a GPS-only trajet recording (#2025). Skips the OBD2 service
-  /// + adapter picker entirely; instead opens a Geolocator stream and
-  /// feeds a pure [TripRecorder] with synthetic samples (speed from
-  /// `Position.speed`, all engine fields null, lat/lon/altitude/bearing
-  /// from the fix).
+  /// + adapter picker entirely; instead installs a [GpsOnlyRecordingPipeline]
+  /// that opens a Geolocator stream and feeds a pure [TripRecorder] with
+  /// synthetic samples (speed from `Position.speed`, all engine fields
+  /// null, lat/lon/altitude/bearing from the fix).
   ///
   /// Returns:
   ///  - [StartTripOutcome.started] when the stream was opened. Caller
@@ -1242,147 +1262,16 @@ class TripRecording extends _$TripRecording {
     }
     _startInProgress = true;
     try {
-      _gpsOnlyMode = true;
-      _gpsOnlyRecorder = TripRecorder(maxIntegrationGapSeconds: 30);
-      _gpsOnlySamples.clear();
-      _gpsOnlyStartedAt = DateTime.now();
-      _lastTripStartedAt = DateTime.now();
-      _lastTripVehicleId = _tryReadActiveVehicle()?.id;
-      // Subscribe to the position stream at high accuracy — the
-      // post-trip map polyline + confidence-tier UX both want ~10 m
-      // precision. Permission failure is non-fatal: the stream errors
-      // and we log; the user sees an unmoving recording until they
-      // grant permission or stop.
-      final geo = ref.read(geolocatorWrapperProvider);
-      _gpsOnlySub = geo
-          .getPositionStream(
-            locationSettings: const LocationSettings(
-              accuracy: LocationAccuracy.high,
-            ),
-          )
-          .listen(
-            _onGpsOnlyPosition,
-            onError: (Object e, StackTrace st) {
-              unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.startGpsOnly: stream error'}));
-            },
-          );
-      // Seed the state so the recording screen renders immediately
-      // (the first GPS fix can be 1-3 s away on a cold start).
-      state = state.copyWith(
-        phase: TripRecordingPhase.recording,
-        live: const TripLiveReading(
-          elapsed: Duration.zero,
-          distanceKmSoFar: 0,
-        ),
+      final pipeline = GpsOnlyRecordingPipeline(
+        ref: ref,
+        host: _RecordingPipelineHostAdapter(this),
       );
+      _pipeline = pipeline;
+      pipeline.start();
       return StartTripOutcome.started;
     } finally {
       _startInProgress = false;
     }
-  }
-
-  void _onGpsOnlyPosition(Position p) {
-    final recorder = _gpsOnlyRecorder;
-    final startedAt = _gpsOnlyStartedAt;
-    if (recorder == null || startedAt == null || !_gpsOnlyMode) return;
-    // Geolocator can report a stale fix in the first emit before the
-    // GPS warms up — guard against speed = NaN / negative.
-    final speedMps = p.speed.isFinite && p.speed >= 0 ? p.speed : 0.0;
-    final sample = TripSample(
-      timestamp: p.timestamp,
-      speedKmh: speedMps * 3.6,
-      rpm: 0,
-      latitude: p.latitude.isFinite ? p.latitude : null,
-      longitude: p.longitude.isFinite ? p.longitude : null,
-      altitudeM: p.altitude.isFinite ? p.altitude : null,
-      hAccuracyM: p.accuracy.isFinite ? p.accuracy : null,
-      bearingDeg: p.heading.isFinite ? p.heading : null,
-    );
-    _gpsOnlySamples.add(sample);
-    recorder.onSample(sample);
-    final summary = recorder.buildSummary();
-    // #2058/#2174 — GPS coaching hint from the most recent 5 s of
-    // samples on every emit. recentSamplesWithin scans only a bounded
-    // tail so the per-emit cost is O(window), not O(trajet) — the old
-    // `.where` over the whole buffer grew linearly with trip length
-    // (despite a comment claiming O(window)).
-    final recent = recentSamplesWithin(
-      _gpsOnlySamples,
-      const Duration(seconds: 5),
-      sample.timestamp,
-    );
-    final coaching = gpsCoachingHint(recent);
-    state = state.copyWith(
-      phase: TripRecordingPhase.recording,
-      live: TripLiveReading(
-        speedKmh: sample.speedKmh,
-        distanceKmSoFar: summary.distanceKm,
-        elapsed: DateTime.now().difference(startedAt),
-      ),
-      gpsCoachingHint: coaching,
-      clearGpsCoachingHint: coaching == null,
-    );
-  }
-
-  Future<StoppedTripResult> _stopGpsOnly({bool automatic = false}) async {
-    final recorder = _gpsOnlyRecorder;
-    await _gpsOnlySub?.cancel();
-    _gpsOnlySub = null;
-    if (recorder == null) {
-      _gpsOnlyMode = false;
-      state = const TripRecordingState();
-      return const StoppedTripResult.empty();
-    }
-    final samples = List<TripSample>.unmodifiable(_gpsOnlySamples);
-    // #2025 — derive `kind` from the actual sample stream rather than
-    // hardcoding `gpsOnly`. If [_upgradeGpsOnlyToObd2] (or any future
-    // mid-trip path) injected OBD2 samples into the buffer, the
-    // resulting kind correctly flips to `gpsPlusObd2`.
-    var summary = recorder.buildSummary().copyWith(
-          kind: TripKind.fromSamples(samples),
-        );
-    // #2080 — for GPS-only / hybrid trips (no OBD2 fuel-rate
-    // coverage), feed the sample stream through GpsDrivingFeatures +
-    // the active vehicle's GpsCalibrationMatrix to impute
-    // `avgLPer100Km` and `fuelLitersConsumed`. The fields stay null
-    // when no active vehicle exists, when the trajet has no
-    // distance, or when the OBD2 path already populated them
-    // (gpsPlusObd2 trips skip this branch — `summary.kind` is the
-    // gate).
-    if (summary.kind == TripKind.gpsOnly &&
-        summary.avgLPer100Km == null) {
-      final features = GpsDrivingFeatures.from(samples);
-      if (features != null) {
-        final vehicle = ref.read(activeVehicleProfileProvider);
-        final matrix = vehicle?.gpsCalibration ??
-            GpsCalibrationMatrix.coldStart();
-        final est = GpsFuelEstimator.estimate(
-          matrix: matrix,
-          features: features,
-        );
-        if (est != null) {
-          summary = summary.copyWith(
-            avgLPer100Km: est.lPer100Km,
-            fuelLitersConsumed: est.litersConsumed,
-          );
-        }
-      }
-    }
-    await _saveToHistory(
-      summary,
-      samples: samples,
-      automatic: automatic,
-    );
-    _gpsOnlyMode = false;
-    _gpsOnlyRecorder = null;
-    _gpsOnlySamples.clear();
-    _gpsOnlyStartedAt = null;
-    state = const TripRecordingState();
-    return StoppedTripResult(
-      summary: summary,
-      odometerStartKm: null,
-      odometerLatestKm: null,
-    );
   }
 
   /// #2025 — mid-trip upgrade hook. Appends an externally-built
@@ -1397,48 +1286,52 @@ class TripRecording extends _$TripRecording {
   /// caller starts producing OBD2-flavoured samples.
   @visibleForTesting
   void debugAppendObd2SampleToGpsOnly(TripSample sample) {
-    if (!_gpsOnlyMode) return;
-    final recorder = _gpsOnlyRecorder;
-    if (recorder == null) return;
-    _gpsOnlySamples.add(sample);
-    recorder.onSample(sample);
+    final pipeline = _pipeline;
+    if (pipeline is! GpsOnlyRecordingPipeline) return;
+    pipeline.appendObd2Sample(sample);
   }
 }
 
-/// Returned by [TripRecording.stop]. Bundles the summary with the
-/// raw odometer reads so the save-as-fill-up flow can pre-fill the
-/// form.
-class StoppedTripResult {
-  final TripSummary summary;
-  final double? odometerStartKm;
-  final double? odometerLatestKm;
+/// Adapts the [TripRecording] notifier to the narrow
+/// [RecordingPipelineHost] seam an alternate [RecordingPipeline] needs
+/// (#2190). Lives in the same library as the notifier so it can reach the
+/// notifier's `state` setter, last-trip identity fields, the active-vehicle
+/// read, and the shared `_saveToHistory` write without widening the
+/// notifier's public API — mirroring the `_DroppedSessionHostAdapter`
+/// idiom on the controller (#2188).
+class _RecordingPipelineHostAdapter implements RecordingPipelineHost {
+  _RecordingPipelineHostAdapter(this._n);
 
-  const StoppedTripResult({
-    required this.summary,
-    required this.odometerStartKm,
-    required this.odometerLatestKm,
-  });
+  final TripRecording _n;
 
-  const StoppedTripResult.empty()
-      : summary = const TripSummary(
-          distanceKm: 0,
-          maxRpm: 0,
-          highRpmSeconds: 0,
-          idleSeconds: 0,
-          harshBrakes: 0,
-          harshAccelerations: 0,
-        ),
-        odometerStartKm = null,
-        odometerLatestKm = null;
+  @override
+  TripRecordingState get state => _n._stateForPipeline();
 
-  /// End-of-trip km, derived: latest odometer read if we have one,
-  /// otherwise start + integrated distance. Null when neither
-  /// odometer read ever succeeded.
-  double? get endOdometerKm =>
-      odometerLatestKm ??
-      (odometerStartKm == null
-          ? null
-          : odometerStartKm! + summary.distanceKm);
+  @override
+  set state(TripRecordingState value) => _n._setStateFromPipeline(value);
+
+  @override
+  set lastTripVehicleId(String? value) => _n._lastTripVehicleId = value;
+
+  @override
+  set lastTripStartedAt(DateTime? value) => _n._lastTripStartedAt = value;
+
+  @override
+  String? readActiveVehicleId() => _n._tryReadActiveVehicle()?.id;
+
+  @override
+  Future<void> saveToHistory(
+    TripSummary summary, {
+    bool automatic = false,
+    List<TripSample> samples = const [],
+    List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
+  }) =>
+      _n._saveToHistory(
+        summary,
+        automatic: automatic,
+        samples: samples,
+        gpsSampleDiagnostics: gpsSampleDiagnostics,
+      );
 }
 
 /// Outcome surfaced by [TripRecording.startTrip] so the UI layer can
