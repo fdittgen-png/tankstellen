@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Ei rajuja kiihdytyksiä tai jarrutuksia tällä matkalla – tasainen ajo pitää kulutuksen alhaisena.",
   "storageRecoveryTitle": "Tallennustila-ongelma",
   "storageRecoveryMessage": "Sparkilo ei voinut avata paikallista tietovarastoaan. Tallennustiedosto vaikuttaa vioittuneelta.",
-  "storageRecoveryGuidance": "Palauta tilanne tyhjentämällä sovelluksen tallennustila laitteen asetuksista tai asentamalla sovellus uudelleen. Suosikkisi ja historiasi tallennetaan vain tähän laitteeseen, joten niitä ei voi palauttaa automaattisesti."
+  "storageRecoveryGuidance": "Palauta tilanne tyhjentämällä sovelluksen tallennustila laitteen asetuksista tai asentamalla sovellus uudelleen. Suosikkisi ja historiasi tallennetaan vain tähän laitteeseen, joten niitä ei voi palauttaa automaattisesti.",
+  "locationConsentTitle": "Sijainnin käyttö",
+  "locationConsentSubtitle": "Tämä sovellus haluaa käyttää sijaintiasi löytääkseen huoltoasemia läheltäsi.",
+  "locationConsentWhatHappens": "Mitä sijaintitiedoillesi tapahtuu:",
+  "locationConsentBulletApi": "Koordinaattisi lähetetään polttoaineen hinta-API:lle lähistön asemien löytämiseksi.",
+  "locationConsentBulletNoServer": "Sijaintiasi ei tallenneta millekään palvelimelle — palvelinta ei ole.",
+  "locationConsentBulletNoTracking": "Sijaintitietoja ei käytetä mainontaan, analytiikkaan tai seurantaan.",
+  "locationConsentRevoke": "Voit peruuttaa sijainnin käyttöoikeuden milloin tahansa järjestelmäasetuksista. Vaihtoehtoisesti voit hakea postinumerolla.",
+  "locationConsentLegalBasis": "Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)",
+  "locationConsentDecline": "Hylkää",
+  "locationConsentAccept": "Hyväksy",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (tavoite: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} laski lähistön asemilla",
+  "velocityAlertNotificationBody": "{count} asemaa laski jopa {cents}¢ viimeisen tunnin aikana",
+  "radiusAlertGroupedTitle": "{label}: {count} asemaa ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} lisää"
 }

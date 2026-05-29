@@ -3404,6 +3404,45 @@ class AppLocalizationsSv extends AppLocalizations {
       'Genomför en resa på 30 km+ i jämn hastighet med ett mjukkörningspoäng på 90 eller högre.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (mål: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel har sjunkit på stationer i närheten';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count stationer sjönk med upp till $cents¢ den senaste timmen';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count stationer ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count till';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Prislarm i bakgrunden fungerar för närvarande endast för bensinstationer i Tyskland. Det här larmet sparas, men kanske aldrig meddelar dig förrän larm mellan länder blir tillgängliga.';
 
@@ -4896,6 +4935,42 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get home => 'Hem';
+
+  @override
+  String get locationConsentTitle => 'Platsåtkomst';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Den här appen vill använda din plats för att hitta bensinstationer i närheten.';
+
+  @override
+  String get locationConsentWhatHappens => 'Vad som händer med dina platsdata:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Dina koordinater skickas till bränslepris-API:et för att hitta stationer i närheten.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Din plats lagras inte på någon server — det finns ingen server.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Platsdata används inte för reklam, analys eller spårning.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Du kan när som helst återkalla platsåtkomsten i systeminställningarna. Du kan även söka på postnummer.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Rättslig grund: art. 6.1 a i GDPR (samtycke)';
+
+  @override
+  String get locationConsentDecline => 'Avböj';
+
+  @override
+  String get locationConsentAccept => 'Acceptera';
 
   @override
   String get loyaltySettingsTitle => 'Bränsleklubbskort';

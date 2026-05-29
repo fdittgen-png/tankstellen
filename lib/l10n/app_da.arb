@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Ingen hård acceleration eller opbremsning på denne tur – jævn kørsel holder forbruget lavt.",
   "storageRecoveryTitle": "Lagerproblem",
   "storageRecoveryMessage": "Sparkilo kunne ikke åbne sit lokale datalager. Lagerfilen ser ud til at være beskadiget.",
-  "storageRecoveryGuidance": "For at gendanne skal du rydde appens lager i enhedens indstillinger eller geninstallere appen. Dine favoritter og din historik gemmes kun på denne enhed og kan ikke gendannes automatisk."
+  "storageRecoveryGuidance": "For at gendanne skal du rydde appens lager i enhedens indstillinger eller geninstallere appen. Dine favoritter og din historik gemmes kun på denne enhed og kan ikke gendannes automatisk.",
+  "locationConsentTitle": "Placeringsadgang",
+  "locationConsentSubtitle": "Denne app vil bruge din placering til at finde tankstationer i nærheden.",
+  "locationConsentWhatHappens": "Hvad der sker med dine placeringsdata:",
+  "locationConsentBulletApi": "Dine koordinater sendes til brændstofpris-API'en for at finde tankstationer i nærheden.",
+  "locationConsentBulletNoServer": "Din placering gemmes ikke på nogen server — der er ingen server.",
+  "locationConsentBulletNoTracking": "Placeringsdata bruges ikke til reklame, analyse eller sporing.",
+  "locationConsentRevoke": "Du kan til enhver tid tilbagekalde placeringsadgangen i systemindstillingerne. Alternativt kan du søge på postnummer.",
+  "locationConsentLegalBasis": "Retsgrundlag: art. 6, stk. 1, litra a) i GDPR (samtykke)",
+  "locationConsentDecline": "Afvis",
+  "locationConsentAccept": "Acceptér",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (mål: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} faldet på tankstationer i nærheden",
+  "velocityAlertNotificationBody": "{count} tankstationer faldet med op til {cents}¢ inden for den seneste time",
+  "radiusAlertGroupedTitle": "{label}: {count} tankstationer ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} mere"
 }

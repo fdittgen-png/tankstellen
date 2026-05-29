@@ -3423,6 +3423,45 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fahre eine Tour von mindestens 30 km mit gleichmäßigem Tempo und einem Fahrstil-Score von 90 oder höher.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (Ziel: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel an Tankstellen in der Nähe gefallen';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count Tankstellen um bis zu $cents¢ in der letzten Stunde gefallen';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count Tankstellen ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count weitere';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Hintergrund-Preisalarme funktionieren derzeit nur für Tankstellen in Deutschland. Dieser Alarm wird gespeichert, benachrichtigt dich aber möglicherweise erst, wenn länderübergreifende Alarme verfügbar sind.';
 
@@ -4926,6 +4965,43 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get home => 'Startseite';
+
+  @override
+  String get locationConsentTitle => 'Standortfreigabe';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Diese App möchte Ihren Standort verwenden, um Tankstellen in Ihrer Nähe zu finden.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Was passiert mit Ihren Standortdaten:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Ihre Koordinaten werden an die Kraftstoffpreis-API gesendet, um Tankstellen in der Nähe zu finden.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Ihr Standort wird nicht auf Servern gespeichert — es gibt keine eigenen Server.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Standortdaten werden nicht für Werbung, Analyse oder Tracking verwendet.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Sie können die Standortfreigabe jederzeit in den Systemeinstellungen widerrufen. Alternativ können Sie per Postleitzahl suchen.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)';
+
+  @override
+  String get locationConsentDecline => 'Ablehnen';
+
+  @override
+  String get locationConsentAccept => 'Zustimmen';
 
   @override
   String get loyaltySettingsTitle => 'Tankstellen-Kundenkarten';

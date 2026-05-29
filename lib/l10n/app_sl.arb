@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Na tej vožnji ni bilo sunkovitega pospeševanja ali zaviranja – enakomerna vožnja ohranja nizko porabo.",
   "storageRecoveryTitle": "Težava s shrambo",
   "storageRecoveryMessage": "Sparkilo ni mogel odpreti svoje lokalne shrambe podatkov. Videti je, da je datoteka shrambe poškodovana.",
-  "storageRecoveryGuidance": "Za obnovitev počistite shrambo aplikacije v nastavitvah naprave ali znova namestite aplikacijo. Vaše priljubljene in zgodovina so shranjene samo v tej napravi, zato jih ni mogoče samodejno obnoviti."
+  "storageRecoveryGuidance": "Za obnovitev počistite shrambo aplikacije v nastavitvah naprave ali znova namestite aplikacijo. Vaše priljubljene in zgodovina so shranjene samo v tej napravi, zato jih ni mogoče samodejno obnoviti.",
+  "locationConsentTitle": "Dostop do lokacije",
+  "locationConsentSubtitle": "Ta aplikacija želi uporabiti vašo lokacijo za iskanje bližnjih bencinskih črpalk.",
+  "locationConsentWhatHappens": "Kaj se zgodi z vašimi podatki o lokaciji:",
+  "locationConsentBulletApi": "Vaše koordinate so poslane API-ju cen goriv za iskanje bližnjih črpalk.",
+  "locationConsentBulletNoServer": "Vaša lokacija ni shranjena na nobenem strežniku — strežnika ni.",
+  "locationConsentBulletNoTracking": "Podatki o lokaciji se ne uporabljajo za oglaševanje, analitiko ali sledenje.",
+  "locationConsentRevoke": "Dostop do lokacije lahko kadar koli prekličete v sistemskih nastavitvah. Lahko pa iščete tudi po poštni številki.",
+  "locationConsentLegalBasis": "Pravna podlaga: člen 6(1)(a) GDPR (privolitev)",
+  "locationConsentDecline": "Zavrni",
+  "locationConsentAccept": "Sprejmi",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (cilj: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} se je znižal na bližnjih črpalkah",
+  "velocityAlertNotificationBody": "{count} črpalk se je v zadnji uri znižalo do {cents}¢",
+  "radiusAlertGroupedTitle": "{label}: {count} črpalk ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ še {count}"
 }

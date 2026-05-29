@@ -3430,6 +3430,45 @@ class AppLocalizationsBg extends AppLocalizations {
       'Завършете пътуване от 30+ км с постоянна скорост и резултат за плавно шофиране 90 или повече.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (цел: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel поевтиня в близки бензиностанции';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count бензиностанции поевтиняха с до $cents¢ през последния час';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count бензиностанции ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ още $count';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Известията за цени във фонов режим в момента работят само за бензиностанции в Германия. Този известителен сигнал ще бъде запазен, но може никога да не ви уведоми, докато не станат достъпни междудържавните известия.';
 
@@ -4945,6 +4984,43 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get home => 'Начало';
+
+  @override
+  String get locationConsentTitle => 'Достъп до местоположението';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Това приложение иска да използва местоположението ви, за да намери бензиностанции близо до вас.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Какво се случва с данните за местоположението ви:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Координатите ви се изпращат към API-то за цени на горивата, за да се намерят близки бензиностанции.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Местоположението ви не се съхранява на нито един сървър — няма сървър.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Данните за местоположението не се използват за реклама, анализ или проследяване.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Можете да отмените достъпа до местоположението по всяко време в системните настройки. Като алтернатива търсете по пощенски код.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Правно основание: чл. 6, пар. 1, б. „а“ от ОРЗД (съгласие)';
+
+  @override
+  String get locationConsentDecline => 'Откажи';
+
+  @override
+  String get locationConsentAccept => 'Приеми';
 
   @override
   String get loyaltySettingsTitle => 'Карти за горивни клубове';

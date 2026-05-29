@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Ingen hard akselerasjon eller bremsing på denne turen – jevn kjøring holder forbruket lavt.",
   "storageRecoveryTitle": "Lagringsproblem",
   "storageRecoveryMessage": "Sparkilo kunne ikke åpne sitt lokale datalager. Lagringsfilen ser ut til å være skadet.",
-  "storageRecoveryGuidance": "For å gjenopprette må du tømme appens lagring i enhetsinnstillingene eller installere appen på nytt. Favorittene og historikken din lagres bare på denne enheten, så de kan ikke gjenopprettes automatisk."
+  "storageRecoveryGuidance": "For å gjenopprette må du tømme appens lagring i enhetsinnstillingene eller installere appen på nytt. Favorittene og historikken din lagres bare på denne enheten, så de kan ikke gjenopprettes automatisk.",
+  "locationConsentTitle": "Plasseringstilgang",
+  "locationConsentSubtitle": "Denne appen vil bruke plasseringen din til å finne bensinstasjoner i nærheten.",
+  "locationConsentWhatHappens": "Hva som skjer med plasseringsdataene dine:",
+  "locationConsentBulletApi": "Koordinatene dine sendes til drivstoffpris-API-et for å finne stasjoner i nærheten.",
+  "locationConsentBulletNoServer": "Plasseringen din lagres ikke på noen server — det finnes ingen server.",
+  "locationConsentBulletNoTracking": "Plasseringsdata brukes ikke til annonsering, analyse eller sporing.",
+  "locationConsentRevoke": "Du kan når som helst trekke tilbake plasseringstilgangen i systeminnstillingene. Alternativt kan du søke etter postnummer.",
+  "locationConsentLegalBasis": "Rettslig grunnlag: GDPR art. 6 nr. 1 bokstav a (samtykke)",
+  "locationConsentDecline": "Avslå",
+  "locationConsentAccept": "Godta",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (mål: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} har falt på stasjoner i nærheten",
+  "velocityAlertNotificationBody": "{count} stasjoner falt med opptil {cents}¢ den siste timen",
+  "radiusAlertGroupedTitle": "{label}: {count} stasjoner ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} til"
 }

@@ -3423,6 +3423,45 @@ class AppLocalizationsLt extends AppLocalizations {
       'Įvykdykite 30 km+ kelionę pastoviu greičiu su sklandaus vairavimo balu 90 ar daugiau.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (tikslas: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel atpigo netoliese esančiose degalinėse';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count degalinės atpigo iki $cents¢ per pastarąją valandą';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count degalinės ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ dar $count';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Foninės kainų perspėjimai šiuo metu veikia tik Vokietijos degalinėms. Šis perspėjimas bus išsaugotas, bet jis gali niekada jūsų neįspėti, kol bus prieinami tarptautiniai perspėjimai.';
 
@@ -4929,6 +4968,43 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get home => 'Pradžia';
+
+  @override
+  String get locationConsentTitle => 'Vietos prieiga';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Ši programa nori naudoti jūsų vietą, kad rastų netoliese esančias degalines.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Kas vyksta su jūsų vietos duomenimis:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Jūsų koordinatės siunčiamos į degalų kainų API, kad būtų rastos netoliese esančios degalinės.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Jūsų vieta nesaugoma jokiame serveryje — serverio nėra.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Vietos duomenys nenaudojami reklamai, analitikai ar sekimui.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Vietos prieigą galite bet kada atšaukti sistemos nustatymuose. Taip pat galite ieškoti pagal pašto kodą.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)';
+
+  @override
+  String get locationConsentDecline => 'Atmesti';
+
+  @override
+  String get locationConsentAccept => 'Sutikti';
 
   @override
   String get loyaltySettingsTitle => 'Degalų klubo kortelės';

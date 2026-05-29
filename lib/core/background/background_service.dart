@@ -3,8 +3,6 @@
 
 import 'dart:async';
 
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
@@ -34,6 +32,7 @@ import 'background_price_fetcher_provider.dart';
 import 'background_retry.dart';
 import 'daily_collection.dart';
 import 'hive_isolate_lock.dart';
+import 'notification_templates.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Constants and callback logic for background price refresh tasks.
@@ -141,6 +140,12 @@ class BackgroundService {
         // Radius store unreadable (e.g. box not open) — treat as none.
       }
       if (hasPriceAlert || hasRadiusAlert) {
+        // #2306 — resolve the localized notification templates HERE, in
+        // the main isolate, where the active in-app locale is known, and
+        // stash them in Hive settings. The OS-spawned background isolate
+        // has no BuildContext and an unreliable Platform.localeName, so it
+        // reads these templates back instead of branching de/en itself.
+        await _persistNotificationTemplates();
         await init();
       } else {
         await cancelAll();
@@ -149,6 +154,29 @@ class BackgroundService {
       // Never let a scheduling hiccup crash an alert mutation or startup.
       unawaited(errorLogger.log(ErrorLayer.background, e, st,
           context: const {'where': 'BackgroundService.reconcile'}));
+    }
+  }
+
+  /// #2306 — resolve the localized notification templates for the active
+  /// in-app language and persist them to Hive settings so the background
+  /// isolate can render alerts in the user's language without a
+  /// BuildContext. The active language mirrors `ActiveLanguage`'s
+  /// persisted `active_language_code` setting; absent (never picked) we
+  /// fall back to the platform locale, then English.
+  static Future<void> _persistNotificationTemplates() async {
+    try {
+      final lang =
+          HiveStorage().getSetting('active_language_code') as String?;
+      final templates =
+          BackgroundNotificationTemplates.resolveForLanguage(lang);
+      await HiveStorage().putSetting(
+          BackgroundNotificationTemplates.storageKey, templates.encode());
+    } catch (e, st) {
+      // Non-fatal: the isolate falls back to live resolution from the
+      // persisted language code if the blob is missing.
+      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+        'where': 'BackgroundService._persistNotificationTemplates'
+      }));
     }
   }
 }
@@ -189,6 +217,18 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     // Load API key
     await HiveStorage.loadApiKey();
     final apiKey = storage.getApiKey();
+
+    // #2306 — load the localized notification templates the main isolate
+    // stashed at reconcile() time. If absent (e.g. a task that outran the
+    // first reconcile, or a storage hiccup) resolve live from the
+    // persisted active language code so we still localize, never English.
+    final notificationTemplates = BackgroundNotificationTemplates.tryDecode(
+          storage.getSetting(BackgroundNotificationTemplates.storageKey)
+              as String?,
+        ) ??
+        BackgroundNotificationTemplates.resolveForLanguage(
+          storage.getSetting('active_language_code') as String?,
+        );
 
     // 1. Build the station-id set to fetch. Favorites + active-alert
     //    stations are always refreshed; #2212 — every previously-viewed
@@ -359,8 +399,14 @@ Future<void> _refreshPricesAndCheckAlerts() async {
 
           await notifier.showPriceAlert(
             id: alert.stationId.hashCode,
-            title: '${alert.stationName} - ${alert.fuelType.displayName}',
-            body: '${currentPrice.toStringAsFixed(3)} \u20ac (target: ${alert.targetPrice.toStringAsFixed(3)} \u20ac)',
+            title: notificationTemplates.renderPriceAlertTitle(
+              station: alert.stationName,
+              fuelType: alert.fuelType.displayName,
+            ),
+            body: notificationTemplates.renderPriceAlertBody(
+              price: currentPrice.toStringAsFixed(3),
+              target: alert.targetPrice.toStringAsFixed(3),
+            ),
           );
           notificationCount++;
 
@@ -398,6 +444,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           prices: prices,
           now: now,
           notifier: notifier,
+          templates: notificationTemplates,
         );
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: velocity detector failed'}));
@@ -428,6 +475,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         now: now,
         notifier: notifier,
         apiKey: apiKey,
+        templates: notificationTemplates,
       );
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: radius alert runner failed'}));
@@ -491,12 +539,13 @@ Future<void> _runVelocityDetector({
   required Map<String, Map<String, dynamic>> prices,
   required DateTime now,
   required LocalNotificationService notifier,
+  required BackgroundNotificationTemplates templates,
 }) async {
   final runner = VelocityAlertRunner(
     snapshotStore: PriceSnapshotStore(),
     cooldown: VelocityAlertCooldown(),
     notifier: notifier,
-    copyBuilder: _buildVelocityCopy,
+    copyBuilder: (event) => _buildVelocityCopy(event, templates),
   );
   final config = await runner.loadConfig();
   final fuelKey = _tankerkoenigKeyFor(config.fuelType);
@@ -560,26 +609,22 @@ String? _tankerkoenigKeyFor(FuelType fuelType) {
   };
 }
 
-/// Build notification copy for a velocity event. The BG isolate
-/// can't resolve the full ARB bundle (no BuildContext) so we pick
-/// German vs English from [Platform.localeName] and format with
-/// the same placeholders the ARB keys use.
-VelocityAlertCopy _buildVelocityCopy(VelocityAlertEvent event) {
+/// Build notification copy for a velocity event. #2306 — the copy now
+/// comes from the localized [BackgroundNotificationTemplates] the main
+/// isolate resolved for the active in-app language, replacing the old
+/// `Platform.localeName` de/en branch (which used the device locale, not
+/// the user's chosen language, and only ever offered two languages).
+VelocityAlertCopy _buildVelocityCopy(
+  VelocityAlertEvent event,
+  BackgroundNotificationTemplates templates,
+) {
   final fuelLabel = event.fuelType.displayName.toUpperCase();
-  final stationCount = event.stationCount;
-  final maxCents = event.maxDropCents.round();
-  final isGerman = Platform.localeName.toLowerCase().startsWith('de');
-  if (isGerman) {
-    return VelocityAlertCopy(
-      title: '$fuelLabel an Tankstellen in der Nähe gefallen',
-      body:
-          '$stationCount Tankstellen um bis zu $maxCents¢ in der letzten Stunde gefallen',
-    );
-  }
   return VelocityAlertCopy(
-    title: '$fuelLabel dropped at nearby stations',
-    body:
-        '$stationCount stations dropped by up to $maxCents¢ in the last hour',
+    title: templates.renderVelocityTitle(fuelLabel: fuelLabel),
+    body: templates.renderVelocityBody(
+      count: event.stationCount,
+      cents: event.maxDropCents.round(),
+    ),
   );
 }
 
@@ -601,6 +646,7 @@ Future<void> _runRadiusAlerts({
   required DateTime now,
   required LocalNotificationService notifier,
   required String? apiKey,
+  required BackgroundNotificationTemplates templates,
 }) async {
   final store = RadiusAlertStore();
   final alerts = await store.list();
@@ -630,7 +676,7 @@ Future<void> _runRadiusAlerts({
     store: store,
     dedup: RadiusAlertDedup(),
     notifier: notifier,
-    copyBuilder: _buildRadiusAlertCopy,
+    copyBuilder: (event) => _buildRadiusAlertCopy(event, templates),
   );
 
   final fired = await runner.run(
@@ -659,40 +705,40 @@ Future<void> _runRadiusAlerts({
 }
 
 /// Build notification copy for a radius alert (#1012 phase 2 grouped
-/// fire). The BG isolate can't resolve the full ARB bundle (no
-/// BuildContext), so we pick German vs English from
-/// [Platform.localeName] and interpolate placeholders the same way
-/// the main-isolate preview does.
+/// fire). #2306 — copy now comes from the localized
+/// [BackgroundNotificationTemplates] resolved in the main isolate for the
+/// active in-app language, replacing the old `Platform.localeName` de/en
+/// branch.
 ///
-/// Title summarises the alert as `<label>: N stations ≤ €X`. Body
-/// renders one line per top-N matching station (cheapest first) and
-/// appends `+ X more` when matches got truncated.
-RadiusAlertCopy _buildRadiusAlertCopy(RadiusAlertGroupedEvent event) {
+/// Title summarises the alert as `<label>: N stations ≤ €X`. Body renders
+/// one line per top-N matching station (cheapest first) and appends
+/// `+ X more` when matches got truncated.
+RadiusAlertCopy _buildRadiusAlertCopy(
+  RadiusAlertGroupedEvent event,
+  BackgroundNotificationTemplates templates,
+) {
   final threshold = event.alert.threshold.toStringAsFixed(3);
   final label = event.alert.label;
-  final isGerman = Platform.localeName.toLowerCase().startsWith('de');
+  final currency = templates.currencySymbol;
   // Total visible matches *plus* the truncated tail — the title number
   // should reflect everything the user could see if they tapped in.
   final total = event.matches.length + event.truncatedMoreCount;
   final lines = event.matches
-      // #2211 — show the station name, not the raw id.
-      .map((m) => '${m.name} ${m.pricePerLiter.toStringAsFixed(3)} €')
+      // #2211 — show the station name, not the raw id. The per-line
+      // "name price currency" mask is language-neutral.
+      .map((m) => '${m.name} ${m.pricePerLiter.toStringAsFixed(3)} $currency')
       .toList();
   if (event.truncatedMoreCount > 0) {
-    lines.add(isGerman
-        ? '+ ${event.truncatedMoreCount} weitere'
-        : '+ ${event.truncatedMoreCount} more');
-  }
-  final body = lines.join('\n');
-  if (isGerman) {
-    return RadiusAlertCopy(
-      title: '$label: $total Tankstellen ≤ $threshold €',
-      body: body,
-    );
+    lines.add(
+        templates.renderRadiusMore(count: event.truncatedMoreCount));
   }
   return RadiusAlertCopy(
-    title: '$label: $total stations ≤ $threshold €',
-    body: body,
+    title: templates.renderRadiusTitle(
+      label: label,
+      count: total,
+      threshold: threshold,
+    ),
+    body: lines.join('\n'),
   );
 }
 

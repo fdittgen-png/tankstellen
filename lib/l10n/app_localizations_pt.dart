@@ -3425,6 +3425,45 @@ class AppLocalizationsPt extends AppLocalizations {
       'Complete uma viagem de 30 km+ a velocidade constante com uma pontuação de condução suave de 90 ou superior.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (objetivo: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel desceu em postos próximos';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count postos desceram até $cents¢ na última hora';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count postos ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count mais';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Os alertas de preço em segundo plano atualmente só funcionam para postos na Alemanha. Este alerta será guardado, mas poderá nunca o notificar até que cheguem os alertas entre países.';
 
@@ -4936,6 +4975,43 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get home => 'Início';
+
+  @override
+  String get locationConsentTitle => 'Acesso à localização';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Esta aplicação gostaria de usar a sua localização para encontrar postos de combustível perto de si.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'O que acontece com os seus dados de localização:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'As suas coordenadas são enviadas para a API de preços de combustível para encontrar postos próximos.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'A sua localização não é armazenada em nenhum servidor — não existe servidor.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Os dados de localização não são usados para publicidade, análise ou rastreio.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Pode revogar o acesso à localização a qualquer momento nas definições do sistema. Em alternativa, pesquise por código postal.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Base jurídica: art. 6.º, n.º 1, al. a) do RGPD (consentimento)';
+
+  @override
+  String get locationConsentDecline => 'Recusar';
+
+  @override
+  String get locationConsentAccept => 'Aceitar';
 
   @override
   String get loyaltySettingsTitle => 'Cartões de clube de combustível';

@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Sin aceleraciones ni frenadas bruscas en este trayecto: una conducción constante mantiene bajo el consumo.",
   "storageRecoveryTitle": "Problema de almacenamiento",
   "storageRecoveryMessage": "Sparkilo no pudo abrir su almacén de datos local. El archivo de almacenamiento parece estar dañado.",
-  "storageRecoveryGuidance": "Para recuperarlo, borra el almacenamiento de la aplicación en los ajustes del dispositivo o reinstala la aplicación. Tus favoritos y tu historial se guardan solo en este dispositivo, por lo que no se pueden restaurar automáticamente."
+  "storageRecoveryGuidance": "Para recuperarlo, borra el almacenamiento de la aplicación en los ajustes del dispositivo o reinstala la aplicación. Tus favoritos y tu historial se guardan solo en este dispositivo, por lo que no se pueden restaurar automáticamente.",
+  "locationConsentTitle": "Acceso a la ubicación",
+  "locationConsentSubtitle": "Esta aplicación quiere usar tu ubicación para encontrar gasolineras cerca de ti.",
+  "locationConsentWhatHappens": "Qué pasa con tus datos de ubicación:",
+  "locationConsentBulletApi": "Tus coordenadas se envían a la API de precios de combustible para encontrar gasolineras cercanas.",
+  "locationConsentBulletNoServer": "Tu ubicación no se almacena en ningún servidor — no hay servidor.",
+  "locationConsentBulletNoTracking": "Los datos de ubicación no se usan para publicidad, análisis ni seguimiento.",
+  "locationConsentRevoke": "Puedes revocar el acceso a la ubicación en cualquier momento en los ajustes del sistema. También puedes buscar por código postal.",
+  "locationConsentLegalBasis": "Base jurídica: art. 6.1.a) del RGPD (consentimiento)",
+  "locationConsentDecline": "Rechazar",
+  "locationConsentAccept": "Aceptar",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (objetivo: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} bajó en gasolineras cercanas",
+  "velocityAlertNotificationBody": "{count} gasolineras bajaron hasta {cents}¢ en la última hora",
+  "radiusAlertGroupedTitle": "{label}: {count} gasolineras ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} más"
 }

@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Sem acelerações ou travagens bruscas nesta viagem – uma condução constante mantém o consumo baixo.",
   "storageRecoveryTitle": "Problema de armazenamento",
   "storageRecoveryMessage": "O Sparkilo não conseguiu abrir o seu armazenamento de dados local. O ficheiro de armazenamento parece estar danificado.",
-  "storageRecoveryGuidance": "Para recuperar, limpe o armazenamento da aplicação nas definições do dispositivo ou reinstale a aplicação. Os seus favoritos e o histórico são guardados apenas neste dispositivo, pelo que não podem ser restaurados automaticamente."
+  "storageRecoveryGuidance": "Para recuperar, limpe o armazenamento da aplicação nas definições do dispositivo ou reinstale a aplicação. Os seus favoritos e o histórico são guardados apenas neste dispositivo, pelo que não podem ser restaurados automaticamente.",
+  "locationConsentTitle": "Acesso à localização",
+  "locationConsentSubtitle": "Esta aplicação gostaria de usar a sua localização para encontrar postos de combustível perto de si.",
+  "locationConsentWhatHappens": "O que acontece com os seus dados de localização:",
+  "locationConsentBulletApi": "As suas coordenadas são enviadas para a API de preços de combustível para encontrar postos próximos.",
+  "locationConsentBulletNoServer": "A sua localização não é armazenada em nenhum servidor — não existe servidor.",
+  "locationConsentBulletNoTracking": "Os dados de localização não são usados para publicidade, análise ou rastreio.",
+  "locationConsentRevoke": "Pode revogar o acesso à localização a qualquer momento nas definições do sistema. Em alternativa, pesquise por código postal.",
+  "locationConsentLegalBasis": "Base jurídica: art. 6.º, n.º 1, al. a) do RGPD (consentimento)",
+  "locationConsentDecline": "Recusar",
+  "locationConsentAccept": "Aceitar",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (objetivo: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} desceu em postos próximos",
+  "velocityAlertNotificationBody": "{count} postos desceram até {cents}¢ na última hora",
+  "radiusAlertGroupedTitle": "{label}: {count} postos ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} mais"
 }

@@ -3420,6 +3420,45 @@ class AppLocalizationsSk extends AppLocalizations {
       'Dokončite jazdu 30+ km pri konštantnej rýchlosti so skóre plynulej jazdy 90 alebo vyšším.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (cieľ: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel zlacnel na blízkych staniciach';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count staníc zlacnelo až o $cents¢ za poslednú hodinu';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count staníc ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count ďalších';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Cenové upozornenia na pozadí momentálne fungujú iba pre čerpacie stanice v Nemecku. Toto upozornenie sa uloží, ale nemusí vás upozorniť, kým nebudú dostupné medzištátne upozornenia.';
 
@@ -4925,6 +4964,43 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get home => 'Domov';
+
+  @override
+  String get locationConsentTitle => 'Prístup k polohe';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Táto aplikácia chce použiť vašu polohu na vyhľadanie čerpacích staníc vo vašom okolí.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Čo sa deje s údajmi o vašej polohe:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Vaše súradnice sa odosielajú do API cien palív na vyhľadanie blízkych staníc.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Vaša poloha sa neukladá na žiadnom serveri — žiadny server neexistuje.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Údaje o polohe sa nepoužívajú na reklamu, analytiku ani sledovanie.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Prístup k polohe môžete kedykoľvek odvolať v nastaveniach systému. Prípadne môžete vyhľadávať podľa PSČ.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Právny základ: čl. 6 ods. 1 písm. a) GDPR (súhlas)';
+
+  @override
+  String get locationConsentDecline => 'Odmietnuť';
+
+  @override
+  String get locationConsentAccept => 'Prijať';
 
   @override
   String get loyaltySettingsTitle => 'Vernostné palivové karty';

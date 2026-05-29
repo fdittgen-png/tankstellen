@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Šioje kelionėje nebuvo staigaus greitėjimo ar stabdymo – tolygus vairavimas išlaiko mažas sąnaudas.",
   "storageRecoveryTitle": "Saugyklos problema",
   "storageRecoveryMessage": "„Sparkilo“ nepavyko atidaryti vietinės duomenų saugyklos. Atrodo, kad saugyklos failas pažeistas.",
-  "storageRecoveryGuidance": "Norėdami atkurti, įrenginio nustatymuose išvalykite programos saugyklą arba iš naujo įdiekite programą. Jūsų mėgstamiausi ir istorija saugomi tik šiame įrenginyje, todėl jų negalima atkurti automatiškai."
+  "storageRecoveryGuidance": "Norėdami atkurti, įrenginio nustatymuose išvalykite programos saugyklą arba iš naujo įdiekite programą. Jūsų mėgstamiausi ir istorija saugomi tik šiame įrenginyje, todėl jų negalima atkurti automatiškai.",
+  "locationConsentTitle": "Vietos prieiga",
+  "locationConsentSubtitle": "Ši programa nori naudoti jūsų vietą, kad rastų netoliese esančias degalines.",
+  "locationConsentWhatHappens": "Kas vyksta su jūsų vietos duomenimis:",
+  "locationConsentBulletApi": "Jūsų koordinatės siunčiamos į degalų kainų API, kad būtų rastos netoliese esančios degalinės.",
+  "locationConsentBulletNoServer": "Jūsų vieta nesaugoma jokiame serveryje — serverio nėra.",
+  "locationConsentBulletNoTracking": "Vietos duomenys nenaudojami reklamai, analitikai ar sekimui.",
+  "locationConsentRevoke": "Vietos prieigą galite bet kada atšaukti sistemos nustatymuose. Taip pat galite ieškoti pagal pašto kodą.",
+  "locationConsentLegalBasis": "Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)",
+  "locationConsentDecline": "Atmesti",
+  "locationConsentAccept": "Sutikti",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (tikslas: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} atpigo netoliese esančiose degalinėse",
+  "velocityAlertNotificationBody": "{count} degalinės atpigo iki {cents}¢ per pastarąją valandą",
+  "radiusAlertGroupedTitle": "{label}: {count} degalinės ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ dar {count}"
 }

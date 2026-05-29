@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Šajā braucienā nebija strauja paātrinājuma vai bremzēšanas – vienmērīga braukšana uztur zemu patēriņu.",
   "storageRecoveryTitle": "Krātuves problēma",
   "storageRecoveryMessage": "Sparkilo nevarēja atvērt savu vietējo datu krātuvi. Šķiet, ka krātuves fails ir bojāts.",
-  "storageRecoveryGuidance": "Lai atjaunotu, ierīces iestatījumos notīriet lietotnes krātuvi vai pārinstalējiet lietotni. Jūsu izlase un vēsture tiek glabāta tikai šajā ierīcē, tāpēc tās nevar atjaunot automātiski."
+  "storageRecoveryGuidance": "Lai atjaunotu, ierīces iestatījumos notīriet lietotnes krātuvi vai pārinstalējiet lietotni. Jūsu izlase un vēsture tiek glabāta tikai šajā ierīcē, tāpēc tās nevar atjaunot automātiski.",
+  "locationConsentTitle": "Atrašanās vietas piekļuve",
+  "locationConsentSubtitle": "Šī lietotne vēlas izmantot jūsu atrašanās vietu, lai atrastu tuvumā esošās degvielas uzpildes stacijas.",
+  "locationConsentWhatHappens": "Kas notiek ar jūsu atrašanās vietas datiem:",
+  "locationConsentBulletApi": "Jūsu koordinātes tiek nosūtītas degvielas cenu API, lai atrastu tuvumā esošās stacijas.",
+  "locationConsentBulletNoServer": "Jūsu atrašanās vieta netiek glabāta nevienā serverī — servera nav.",
+  "locationConsentBulletNoTracking": "Atrašanās vietas dati netiek izmantoti reklāmai, analītikai vai izsekošanai.",
+  "locationConsentRevoke": "Atrašanās vietas piekļuvi varat jebkurā laikā atsaukt sistēmas iestatījumos. Varat arī meklēt pēc pasta indeksa.",
+  "locationConsentLegalBasis": "Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)",
+  "locationConsentDecline": "Noraidīt",
+  "locationConsentAccept": "Piekrist",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (mērķis: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} kritās tuvumā esošajās stacijās",
+  "velocityAlertNotificationBody": "{count} stacijās cena kritās līdz pat {cents}¢ pēdējās stundas laikā",
+  "radiusAlertGroupedTitle": "{label}: {count} stacijas ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ vēl {count}"
 }

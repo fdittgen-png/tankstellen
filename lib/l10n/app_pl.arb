@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Brak gwałtownego przyspieszania i hamowania na tej trasie – równa jazda utrzymuje niskie zużycie.",
   "storageRecoveryTitle": "Problem z pamięcią",
   "storageRecoveryMessage": "Sparkilo nie mogło otworzyć lokalnej pamięci danych. Plik pamięci wydaje się uszkodzony.",
-  "storageRecoveryGuidance": "Aby odzyskać dane, wyczyść pamięć aplikacji w ustawieniach urządzenia lub zainstaluj aplikację ponownie. Twoje ulubione i historia są przechowywane tylko na tym urządzeniu, więc nie można ich automatycznie przywrócić."
+  "storageRecoveryGuidance": "Aby odzyskać dane, wyczyść pamięć aplikacji w ustawieniach urządzenia lub zainstaluj aplikację ponownie. Twoje ulubione i historia są przechowywane tylko na tym urządzeniu, więc nie można ich automatycznie przywrócić.",
+  "locationConsentTitle": "Dostęp do lokalizacji",
+  "locationConsentSubtitle": "Ta aplikacja chce użyć Twojej lokalizacji, aby znaleźć stacje paliw w pobliżu.",
+  "locationConsentWhatHappens": "Co dzieje się z danymi o Twojej lokalizacji:",
+  "locationConsentBulletApi": "Twoje współrzędne są wysyłane do API cen paliw w celu znalezienia pobliskich stacji.",
+  "locationConsentBulletNoServer": "Twoja lokalizacja nie jest przechowywana na żadnym serwerze — nie ma serwera.",
+  "locationConsentBulletNoTracking": "Dane o lokalizacji nie są wykorzystywane do reklam, analiz ani śledzenia.",
+  "locationConsentRevoke": "Dostęp do lokalizacji możesz cofnąć w dowolnym momencie w ustawieniach systemu. Możesz też wyszukiwać według kodu pocztowego.",
+  "locationConsentLegalBasis": "Podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda)",
+  "locationConsentDecline": "Odmów",
+  "locationConsentAccept": "Akceptuj",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (cel: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} spadło na pobliskich stacjach",
+  "velocityAlertNotificationBody": "{count} stacji potaniało nawet o {cents}¢ w ciągu ostatniej godziny",
+  "radiusAlertGroupedTitle": "{label}: {count} stacji ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} więcej"
 }

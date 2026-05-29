@@ -3400,6 +3400,45 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lõpeta 30 km+ reis ühtlase kiirusega ja sujuva sõidu tulemusega 90 või rohkem.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (eesmärk: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel langes lähedalasuvates tanklates';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count tanklat langes viimase tunni jooksul kuni $cents¢';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count tanklat ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count veel';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Tausta hinnateavitused töötavad praegu ainult Saksamaa tanklate puhul. See teavitus salvestatakse, kuid ei pruugi teid kunagi teavitada, kuni riikidevahelised teavitused saabuvad.';
 
@@ -4895,6 +4934,42 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get home => 'Avaleht';
+
+  @override
+  String get locationConsentTitle => 'Asukoha juurdepääs';
+
+  @override
+  String get locationConsentSubtitle =>
+      'See rakendus soovib kasutada teie asukohta, et leida läheduses asuvaid tanklaid.';
+
+  @override
+  String get locationConsentWhatHappens => 'Mis juhtub teie asukohaandmetega:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Teie koordinaadid saadetakse kütusehindade API-le, et leida lähedalasuvad tanklad.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Teie asukohta ei salvestata ühessegi serverisse — serverit ei ole.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Asukohaandmeid ei kasutata reklaami, analüütika ega jälgimise jaoks.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Saate asukoha juurdepääsu igal ajal süsteemiseadetes tühistada. Teise võimalusena otsige sihtnumbri järgi.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Õiguslik alus: isikuandmete kaitse üldmääruse art 6 lg 1 p a (nõusolek)';
+
+  @override
+  String get locationConsentDecline => 'Keeldu';
+
+  @override
+  String get locationConsentAccept => 'Nõustu';
 
   @override
   String get loyaltySettingsTitle => 'Kütuseklubi kaardid';

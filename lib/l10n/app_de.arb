@@ -1383,6 +1383,12 @@
   "@achievementHighwayMasterDesc": {
     "description": "Tooltip for the highwayMaster badge (#1041 phase 5)."
   },
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (Ziel: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
+  "velocityAlertNotificationBody": "{count} Tankstellen um bis zu {cents}¢ in der letzten Stunde gefallen",
+  "radiusAlertGroupedTitle": "{label}: {count} Tankstellen ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} weitere",
   "alertGatingNonDeStationWarning": "Hintergrund-Preisalarme funktionieren derzeit nur für Tankstellen in Deutschland. Dieser Alarm wird gespeichert, benachrichtigt dich aber möglicherweise erst, wenn länderübergreifende Alarme verfügbar sind.",
   "@alertGatingNonDeStationWarning": {
     "description": "Warning shown in the create-alert dialog when the station is outside Germany, because the on-device background evaluator is Tankerkönig-only today (#2246)."
@@ -2093,6 +2099,16 @@
   "invalidLinkTitle": "Ungültiger Link",
   "invalidLinkBody": "Der Link \"{path}\" ist ungültig.",
   "home": "Startseite",
+  "locationConsentTitle": "Standortfreigabe",
+  "locationConsentSubtitle": "Diese App möchte Ihren Standort verwenden, um Tankstellen in Ihrer Nähe zu finden.",
+  "locationConsentWhatHappens": "Was passiert mit Ihren Standortdaten:",
+  "locationConsentBulletApi": "Ihre Koordinaten werden an die Kraftstoffpreis-API gesendet, um Tankstellen in der Nähe zu finden.",
+  "locationConsentBulletNoServer": "Ihr Standort wird nicht auf Servern gespeichert — es gibt keine eigenen Server.",
+  "locationConsentBulletNoTracking": "Standortdaten werden nicht für Werbung, Analyse oder Tracking verwendet.",
+  "locationConsentRevoke": "Sie können die Standortfreigabe jederzeit in den Systemeinstellungen widerrufen. Alternativ können Sie per Postleitzahl suchen.",
+  "locationConsentLegalBasis": "Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)",
+  "locationConsentDecline": "Ablehnen",
+  "locationConsentAccept": "Zustimmen",
   "loyaltySettingsTitle": "Tankstellen-Kundenkarten",
   "loyaltySettingsSubtitle": "Treuerabatt automatisch auf den angezeigten Preis anwenden",
   "loyaltyMenuTitle": "Tankstellen-Kundenkarten",

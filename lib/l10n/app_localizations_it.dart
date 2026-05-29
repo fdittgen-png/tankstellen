@@ -3417,6 +3417,45 @@ class AppLocalizationsIt extends AppLocalizations {
       'Completa un percorso di 30 km o più a velocità costante con un punteggio di guida fluida di 90 o superiore.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (obiettivo: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel in calo nei distributori vicini';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count distributori in calo fino a $cents¢ nell\'ultima ora';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count distributori ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ altri $count';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Gli avvisi sui prezzi in background attualmente funzionano solo per le stazioni in Germania. Questo avviso verrà salvato, ma potrebbe non avvisarti mai finché non arriveranno gli avvisi tra paesi.';
 
@@ -4927,6 +4966,43 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get home => 'Home';
+
+  @override
+  String get locationConsentTitle => 'Accesso alla posizione';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Questa app vorrebbe usare la tua posizione per trovare distributori vicino a te.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Cosa succede con i tuoi dati di posizione:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Le tue coordinate vengono inviate all\'API dei prezzi dei carburanti per trovare i distributori vicini.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'La tua posizione non viene memorizzata su alcun server — non c\'è un server.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'I dati di posizione non vengono usati per pubblicità, analisi o tracciamento.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Puoi revocare l\'accesso alla posizione in qualsiasi momento nelle impostazioni di sistema. In alternativa, cerca per CAP.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Base giuridica: art. 6, par. 1, lett. a) del GDPR (consenso)';
+
+  @override
+  String get locationConsentDecline => 'Rifiuta';
+
+  @override
+  String get locationConsentAccept => 'Accetta';
 
   @override
   String get loyaltySettingsTitle => 'Carte fedeltà carburante';

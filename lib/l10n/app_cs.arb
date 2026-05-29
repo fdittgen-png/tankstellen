@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Tato jízda bez prudkého zrychlování a brzdění – plynulá jízda udržuje spotřebu nízkou.",
   "storageRecoveryTitle": "Problém s úložištěm",
   "storageRecoveryMessage": "Sparkilo nemohlo otevřít své místní úložiště dat. Soubor úložiště je zřejmě poškozený.",
-  "storageRecoveryGuidance": "Pro obnovu vymažte úložiště aplikace v nastavení zařízení nebo aplikaci přeinstalujte. Vaše oblíbené položky a historie jsou uloženy pouze v tomto zařízení, proto je nelze obnovit automaticky."
+  "storageRecoveryGuidance": "Pro obnovu vymažte úložiště aplikace v nastavení zařízení nebo aplikaci přeinstalujte. Vaše oblíbené položky a historie jsou uloženy pouze v tomto zařízení, proto je nelze obnovit automaticky.",
+  "locationConsentTitle": "Přístup k poloze",
+  "locationConsentSubtitle": "Tato aplikace chce použít vaši polohu k vyhledání čerpacích stanic ve vašem okolí.",
+  "locationConsentWhatHappens": "Co se děje s údaji o vaší poloze:",
+  "locationConsentBulletApi": "Vaše souřadnice se odesílají do API cen paliv pro vyhledání blízkých stanic.",
+  "locationConsentBulletNoServer": "Vaše poloha se neukládá na žádném serveru — žádný server neexistuje.",
+  "locationConsentBulletNoTracking": "Údaje o poloze se nepoužívají k reklamě, analytice ani sledování.",
+  "locationConsentRevoke": "Přístup k poloze můžete kdykoli odvolat v nastavení systému. Případně můžete vyhledávat podle PSČ.",
+  "locationConsentLegalBasis": "Právní základ: čl. 6 odst. 1 písm. a) GDPR (souhlas)",
+  "locationConsentDecline": "Odmítnout",
+  "locationConsentAccept": "Přijmout",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (cíl: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} zlevnil na blízkých stanicích",
+  "velocityAlertNotificationBody": "{count} stanic zlevnilo až o {cents}¢ za poslední hodinu",
+  "radiusAlertGroupedTitle": "{label}: {count} stanic ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} dalších"
 }

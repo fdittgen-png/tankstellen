@@ -3430,6 +3430,45 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ολοκληρώστε ένα ταξίδι 30+ km σε σταθερή ταχύτητα με βαθμολογία ομαλής οδήγησης 90 ή παραπάνω.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (στόχος: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel έπεσε σε κοντινά πρατήρια';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count πρατήρια έπεσαν έως και $cents¢ την τελευταία ώρα';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count πρατήρια ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count ακόμη';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Οι ειδοποιήσεις τιμών στο παρασκήνιο λειτουργούν προς το παρόν μόνο για πρατήρια στη Γερμανία. Αυτή η ειδοποίηση θα αποθηκευτεί, αλλά ενδέχεται να μην σας ειδοποιήσει ποτέ μέχρι να γίνουν διαθέσιμες οι διασυνοριακές ειδοποιήσεις.';
 
@@ -4947,6 +4986,43 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get home => 'Αρχική';
+
+  @override
+  String get locationConsentTitle => 'Πρόσβαση στην τοποθεσία';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Αυτή η εφαρμογή θέλει να χρησιμοποιήσει την τοποθεσία σας για να βρει πρατήρια καυσίμων κοντά σας.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Τι γίνεται με τα δεδομένα τοποθεσίας σας:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Οι συντεταγμένες σας αποστέλλονται στο API τιμών καυσίμων για την εύρεση κοντινών πρατηρίων.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Η τοποθεσία σας δεν αποθηκεύεται σε κανέναν διακομιστή — δεν υπάρχει διακομιστής.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Τα δεδομένα τοποθεσίας δεν χρησιμοποιούνται για διαφήμιση, ανάλυση ή παρακολούθηση.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Μπορείτε να ανακαλέσετε την πρόσβαση στην τοποθεσία ανά πάσα στιγμή στις ρυθμίσεις συστήματος. Εναλλακτικά, αναζητήστε με ταχυδρομικό κώδικα.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Νομική βάση: άρθρο 6 παρ. 1 στοιχ. α) ΓΚΠΔ (συγκατάθεση)';
+
+  @override
+  String get locationConsentDecline => 'Απόρριψη';
+
+  @override
+  String get locationConsentAccept => 'Αποδοχή';
 
   @override
   String get loyaltySettingsTitle => 'Κάρτες καυσίμων';

@@ -3388,6 +3388,45 @@ class AppLocalizationsEn extends AppLocalizations {
       'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (target: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel dropped at nearby stations';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count stations dropped by up to $cents¢ in the last hour';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count stations ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count more';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
 
@@ -4872,6 +4911,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get home => 'Home';
+
+  @override
+  String get locationConsentTitle => 'Location Access';
+
+  @override
+  String get locationConsentSubtitle =>
+      'This app would like to use your location to find fuel stations near you.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'What happens with your location data:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Your coordinates are sent to the fuel price API to find nearby stations.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Your location is not stored on any server — there is no server.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Location data is not used for advertising, analytics, or tracking.';
+
+  @override
+  String get locationConsentRevoke =>
+      'You can revoke location access anytime in system settings. Alternatively, search by postal code.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Legal basis: Art. 6(1)(a) GDPR (Consent)';
+
+  @override
+  String get locationConsentDecline => 'Decline';
+
+  @override
+  String get locationConsentAccept => 'Accept';
 
   @override
   String get loyaltySettingsTitle => 'Fuel club cards';
@@ -9229,6 +9305,45 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Çóɱƥłéŧé á 30 ķɱ+ ŧřîƥ áŧ çóñšîšŧéñŧ šƥééđ ŵîŧĥ á šɱóóŧĥ-đřîṽîñǧ šçóřé óƒ 90 óř ĥîǧĥéř. ·····························⟧';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '⟦$station - $fuelType⟧';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '⟦$price $currency (ŧářǧéŧ: $target $currency) ···⟧';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '⟦$fuelLabel đřóƥƥéđ áŧ ñéářƀý šŧáŧîóñš ··········⟧';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '⟦$count šŧáŧîóñš đřóƥƥéđ ƀý úƥ ŧó $cents¢ îñ ŧĥé łášŧ ĥóúř ···············⟧';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '⟦$label: $count šŧáŧîóñš ≤ $threshold $currency ····⟧';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '⟦+ $count ɱóřé ··⟧';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       '⟦Ɓáçķǧřóúñđ ƥřîçé áłéřŧš çúřřéñŧłý óñłý ŵóřķ ƒóř šŧáŧîóñš îñ Ǧéřɱáñý. Ŧĥîš áłéřŧ ŵîłł ƀé šáṽéđ ƀúŧ ɱáý ñéṽéř ñóŧîƒý ýóú úñŧîł çřóšš-çóúñŧřý áłéřŧš ářřîṽé. ·························································⟧';
 
@@ -10768,6 +10883,43 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get home => '⟦Ĥóɱé ··⟧';
+
+  @override
+  String get locationConsentTitle => '⟦Łóçáŧîóñ Áççéšš ······⟧';
+
+  @override
+  String get locationConsentSubtitle =>
+      '⟦Ŧĥîš áƥƥ ŵóúłđ łîķé ŧó úšé ýóúř łóçáŧîóñ ŧó ƒîñđ ƒúéł šŧáŧîóñš ñéář ýóú. ··························⟧';
+
+  @override
+  String get locationConsentWhatHappens =>
+      '⟦Ŵĥáŧ ĥáƥƥéñš ŵîŧĥ ýóúř łóçáŧîóñ đáŧá: ··············⟧';
+
+  @override
+  String get locationConsentBulletApi =>
+      '⟦Ýóúř çóóřđîñáŧéš ářé šéñŧ ŧó ŧĥé ƒúéł ƥřîçé ÁƤÎ ŧó ƒîñđ ñéářƀý šŧáŧîóñš. ···························⟧';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      '⟦Ýóúř łóçáŧîóñ îš ñóŧ šŧóřéđ óñ áñý šéřṽéř — ŧĥéřé îš ñó šéřṽéř. ······················⟧';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      '⟦Łóçáŧîóñ đáŧá îš ñóŧ úšéđ ƒóř áđṽéřŧîšîñǧ, áñáłýŧîçš, óř ŧřáçķîñǧ. ························⟧';
+
+  @override
+  String get locationConsentRevoke =>
+      '⟦Ýóú çáñ řéṽóķé łóçáŧîóñ áççéšš áñýŧîɱé îñ šýšŧéɱ šéŧŧîñǧš. Áłŧéřñáŧîṽéłý, šéářçĥ ƀý ƥóšŧáł çóđé. ····································⟧';
+
+  @override
+  String get locationConsentLegalBasis =>
+      '⟦Łéǧáł ƀášîš: Ářŧ. 6(1)(á) ǦĐƤŘ (Çóñšéñŧ) ···········⟧';
+
+  @override
+  String get locationConsentDecline => '⟦Đéçłîñé ···⟧';
+
+  @override
+  String get locationConsentAccept => '⟦Áççéƥŧ ···⟧';
 
   @override
   String get loyaltySettingsTitle => '⟦Ƒúéł çłúƀ çářđš ······⟧';

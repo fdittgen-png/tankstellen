@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Geen hard optrekken of remmen deze rit – gelijkmatig rijden houdt het verbruik laag.",
   "storageRecoveryTitle": "Opslagprobleem",
   "storageRecoveryMessage": "Sparkilo kon zijn lokale gegevensopslag niet openen. Het opslagbestand lijkt beschadigd te zijn.",
-  "storageRecoveryGuidance": "Wis voor herstel de opslag van de app in de apparaatinstellingen of installeer de app opnieuw. Je favorieten en geschiedenis worden alleen op dit apparaat opgeslagen en kunnen daarom niet automatisch worden hersteld."
+  "storageRecoveryGuidance": "Wis voor herstel de opslag van de app in de apparaatinstellingen of installeer de app opnieuw. Je favorieten en geschiedenis worden alleen op dit apparaat opgeslagen en kunnen daarom niet automatisch worden hersteld.",
+  "locationConsentTitle": "Locatietoegang",
+  "locationConsentSubtitle": "Deze app wil je locatie gebruiken om tankstations in de buurt te vinden.",
+  "locationConsentWhatHappens": "Wat er met je locatiegegevens gebeurt:",
+  "locationConsentBulletApi": "Je coördinaten worden naar de brandstofprijs-API gestuurd om tankstations in de buurt te vinden.",
+  "locationConsentBulletNoServer": "Je locatie wordt op geen enkele server opgeslagen — er is geen server.",
+  "locationConsentBulletNoTracking": "Locatiegegevens worden niet gebruikt voor advertenties, analyse of tracking.",
+  "locationConsentRevoke": "Je kunt de locatietoegang op elk moment intrekken in de systeeminstellingen. Je kunt ook zoeken op postcode.",
+  "locationConsentLegalBasis": "Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)",
+  "locationConsentDecline": "Weigeren",
+  "locationConsentAccept": "Accepteren",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (doel: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} gedaald bij tankstations in de buurt",
+  "velocityAlertNotificationBody": "{count} tankstations gedaald met tot wel {cents}¢ in het afgelopen uur",
+  "radiusAlertGroupedTitle": "{label}: {count} tankstations ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} meer"
 }

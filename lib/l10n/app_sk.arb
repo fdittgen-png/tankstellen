@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Žiadne prudké zrýchľovanie ani brzdenie na tejto jazde – plynulá jazda udržiava spotrebu nízku.",
   "storageRecoveryTitle": "Problém s úložiskom",
   "storageRecoveryMessage": "Sparkilo nedokázalo otvoriť svoje lokálne dátové úložisko. Súbor úložiska je zrejme poškodený.",
-  "storageRecoveryGuidance": "Na obnovu vymažte úložisko aplikácie v nastaveniach zariadenia alebo aplikáciu preinštalujte. Vaše obľúbené položky a história sú uložené iba v tomto zariadení, takže ich nemožno obnoviť automaticky."
+  "storageRecoveryGuidance": "Na obnovu vymažte úložisko aplikácie v nastaveniach zariadenia alebo aplikáciu preinštalujte. Vaše obľúbené položky a história sú uložené iba v tomto zariadení, takže ich nemožno obnoviť automaticky.",
+  "locationConsentTitle": "Prístup k polohe",
+  "locationConsentSubtitle": "Táto aplikácia chce použiť vašu polohu na vyhľadanie čerpacích staníc vo vašom okolí.",
+  "locationConsentWhatHappens": "Čo sa deje s údajmi o vašej polohe:",
+  "locationConsentBulletApi": "Vaše súradnice sa odosielajú do API cien palív na vyhľadanie blízkych staníc.",
+  "locationConsentBulletNoServer": "Vaša poloha sa neukladá na žiadnom serveri — žiadny server neexistuje.",
+  "locationConsentBulletNoTracking": "Údaje o polohe sa nepoužívajú na reklamu, analytiku ani sledovanie.",
+  "locationConsentRevoke": "Prístup k polohe môžete kedykoľvek odvolať v nastaveniach systému. Prípadne môžete vyhľadávať podľa PSČ.",
+  "locationConsentLegalBasis": "Právny základ: čl. 6 ods. 1 písm. a) GDPR (súhlas)",
+  "locationConsentDecline": "Odmietnuť",
+  "locationConsentAccept": "Prijať",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (cieľ: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} zlacnel na blízkych staniciach",
+  "velocityAlertNotificationBody": "{count} staníc zlacnelo až o {cents}¢ za poslednú hodinu",
+  "radiusAlertGroupedTitle": "{label}: {count} staníc ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} ďalších"
 }

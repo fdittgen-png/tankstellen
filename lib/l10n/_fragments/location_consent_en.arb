@@ -1,0 +1,42 @@
+{
+  "locationConsentTitle": "Location Access",
+  "@locationConsentTitle": {
+    "description": "Title of the GDPR location-consent dialog (#2306). Replaces the legacy _ConsentTexts map that only covered 10 of 23 locales for the title."
+  },
+  "locationConsentSubtitle": "This app would like to use your location to find fuel stations near you.",
+  "@locationConsentSubtitle": {
+    "description": "Bold lead sentence of the GDPR location-consent dialog explaining why location is requested (#2306)."
+  },
+  "locationConsentWhatHappens": "What happens with your location data:",
+  "@locationConsentWhatHappens": {
+    "description": "Heading above the three transparency bullets in the GDPR location-consent dialog (#2306)."
+  },
+  "locationConsentBulletApi": "Your coordinates are sent to the fuel price API to find nearby stations.",
+  "@locationConsentBulletApi": {
+    "description": "First transparency bullet in the GDPR location-consent dialog: coordinates leave the device only to query the fuel-price API (#2306)."
+  },
+  "locationConsentBulletNoServer": "Your location is not stored on any server — there is no server.",
+  "@locationConsentBulletNoServer": {
+    "description": "Second transparency bullet in the GDPR location-consent dialog: there is no backend that stores the user's location (#2306)."
+  },
+  "locationConsentBulletNoTracking": "Location data is not used for advertising, analytics, or tracking.",
+  "@locationConsentBulletNoTracking": {
+    "description": "Third transparency bullet in the GDPR location-consent dialog: location is never used for ads, analytics or tracking (#2306)."
+  },
+  "locationConsentRevoke": "You can revoke location access anytime in system settings. Alternatively, search by postal code.",
+  "@locationConsentRevoke": {
+    "description": "Notice in the GDPR location-consent dialog explaining how to revoke the grant and the postal-code alternative (#2306)."
+  },
+  "locationConsentLegalBasis": "Legal basis: Art. 6(1)(a) GDPR (Consent)",
+  "@locationConsentLegalBasis": {
+    "description": "Legal-basis footnote of the GDPR location-consent dialog. 'GDPR' is the established English/EU abbreviation; the article reference is the legal citation (#2306)."
+  },
+  "locationConsentDecline": "Decline",
+  "@locationConsentDecline": {
+    "description": "Decline button on the GDPR location-consent dialog (#2306)."
+  },
+  "locationConsentAccept": "Accept",
+  "@locationConsentAccept": {
+    "description": "Accept button on the GDPR location-consent dialog (#2306)."
+  }
+}
