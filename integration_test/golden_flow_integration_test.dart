@@ -503,6 +503,7 @@ void main() {
       final crossingSamples = [
         const StationPriceSample(
           stationId: 'gold-1-cheapest',
+          name: 'Gold Station',
           lat: 52.5200,
           lng: 13.4050,
           fuelType: 'diesel',
@@ -510,6 +511,7 @@ void main() {
         ),
         const StationPriceSample(
           stationId: 'gold-2',
+          name: 'Gold Station',
           lat: 52.5180,
           lng: 13.4030,
           fuelType: 'diesel',
@@ -558,6 +560,7 @@ void main() {
       final notCrossingSamples = [
         const StationPriceSample(
           stationId: 'gold-3',
+          name: 'Gold Station',
           lat: 52.5170,
           lng: 13.4020,
           fuelType: 'diesel',
