@@ -466,170 +466,154 @@ class _FeatureToggle extends ConsumerWidget {
 // Localised-string lookup helpers.
 //
 // `AppLocalizations` exposes one getter per key, so a per-feature switch
-// is the simplest mapping that stays static-analysis-friendly. Falls back
-// to the manifest's English string when the localisation lookup is null
-// (test fixtures that omit `AppLocalizations` get a sensible default).
+// is the simplest mapping that stays static-analysis-friendly (compile-
+// time exhaustiveness over `Feature`). When the localisation lookup is
+// null (test fixtures that omit `AppLocalizations`) the fallback reads the
+// English string straight off `FeatureManifest.defaultManifest` — the
+// single source of truth — instead of re-typing the same literal here
+// (#2189). The two features whose manifest text intentionally differs from
+// the toggle text keep a local literal, flagged inline below.
 // ---------------------------------------------------------------------------
 
 String _featureLabel(AppLocalizations? l, Feature f) {
+  final m = FeatureManifest.defaultManifest.entryFor(f);
   switch (f) {
     case Feature.obd2TripRecording:
-      return l?.featureLabel_obd2TripRecording ?? 'OBD2 trip recording';
+      return l?.featureLabel_obd2TripRecording ?? m.displayName;
     case Feature.gamification:
-      return l?.featureLabel_gamification ?? 'Gamification';
+      return l?.featureLabel_gamification ?? m.displayName;
     case Feature.hapticEcoCoach:
-      return l?.featureLabel_hapticEcoCoach ?? 'Haptic eco-coach';
+      return l?.featureLabel_hapticEcoCoach ?? m.displayName;
     case Feature.tankSync:
-      return l?.featureLabel_tankSync ?? 'TankSync';
+      return l?.featureLabel_tankSync ?? m.displayName;
     case Feature.consumptionAnalytics:
-      return l?.featureLabel_consumptionAnalytics ?? 'Consumption analytics';
+      return l?.featureLabel_consumptionAnalytics ?? m.displayName;
     case Feature.baselineSync:
-      return l?.featureLabel_baselineSync ?? 'Baseline sync';
+      return l?.featureLabel_baselineSync ?? m.displayName;
     case Feature.priceAlerts:
-      return l?.featureLabel_priceAlerts ?? 'Price alerts';
+      return l?.featureLabel_priceAlerts ?? m.displayName;
     case Feature.priceHistory:
-      return l?.featureLabel_priceHistory ?? 'Price history';
+      return l?.featureLabel_priceHistory ?? m.displayName;
     case Feature.routePlanning:
-      return l?.featureLabel_routePlanning ?? 'Route planning';
+      return l?.featureLabel_routePlanning ?? m.displayName;
     case Feature.evCharging:
-      return l?.featureLabel_evCharging ?? 'EV charging';
+      return l?.featureLabel_evCharging ?? m.displayName;
     case Feature.glideCoach:
-      return l?.featureLabel_glideCoach ?? 'Glide-coach';
+      return l?.featureLabel_glideCoach ?? m.displayName;
     case Feature.gpsTripPath:
-      return l?.featureLabel_gpsTripPath ?? 'GPS trip path';
+      return l?.featureLabel_gpsTripPath ?? m.displayName;
     case Feature.autoRecord:
-      return l?.featureLabel_autoRecord ?? 'Auto-record';
+      return l?.featureLabel_autoRecord ?? m.displayName;
     case Feature.showFuel:
-      return l?.featureLabel_showFuel ?? 'Show fuel stations';
+      return l?.featureLabel_showFuel ?? m.displayName;
     case Feature.showElectric:
-      return l?.featureLabel_showElectric ?? 'Show charging stations';
+      return l?.featureLabel_showElectric ?? m.displayName;
     case Feature.showConsumptionTab:
-      return l?.featureLabel_showConsumptionTab ?? 'Consumption tab';
+      return l?.featureLabel_showConsumptionTab ?? m.displayName;
     case Feature.manualConsumption:
-      // #1517: ARB strings to follow in a localisation pass; English-
-      // only fallback for now so the toggle is at least readable.
-      return 'Manual consumption logging';
+      // #1517: ARB strings to follow in a localisation pass; English-only
+      // fallback from the manifest SSoT (#2189) so the toggle is readable.
+      return m.displayName;
     case Feature.loyaltyCards:
-      // #1517: ARB strings to follow in a localisation pass; English-
-      // only fallback for now so the toggle is at least readable.
-      return 'Loyalty cards';
+      // #1517: ARB strings to follow in a localisation pass; English-only
+      // fallback from the manifest SSoT (#2189) so the toggle is readable.
+      return m.displayName;
     case Feature.tflitePricePrediction:
-      return l?.featureLabel_tflitePricePrediction ??
-          'TFLite price prediction';
+      return l?.featureLabel_tflitePricePrediction ?? m.displayName;
     case Feature.fuelCalculator:
-      return l?.featureLabel_fuelCalculator ?? 'Fuel calculator';
+      return l?.featureLabel_fuelCalculator ?? m.displayName;
     case Feature.carbonDashboard:
-      return l?.featureLabel_carbonDashboard ?? 'Carbon dashboard';
+      return l?.featureLabel_carbonDashboard ?? m.displayName;
     case Feature.experimentalOemPids:
-      return l?.featureLabel_experimentalOemPids ?? 'Experimental OEM PIDs';
+      return l?.featureLabel_experimentalOemPids ?? m.displayName;
     case Feature.paymentQrScan:
-      return l?.featureLabel_paymentQrScan ?? 'Scan payment QR';
+      return l?.featureLabel_paymentQrScan ?? m.displayName;
     case Feature.communityPriceReports:
-      return l?.featureLabel_communityPriceReports ??
-          'Community price reports';
+      return l?.featureLabel_communityPriceReports ?? m.displayName;
     case Feature.obd2Optional:
-      return l?.featureLabel_obd2Optional ?? 'Require OBD2 for trip recording';
+      return l?.featureLabel_obd2Optional ?? m.displayName;
     case Feature.addFillUpOcrReceipt:
-      return l?.featureLabel_addFillUpOcrReceipt ?? 'Receipt OCR';
+      return l?.featureLabel_addFillUpOcrReceipt ?? m.displayName;
     case Feature.addFillUpOcrPump:
-      return l?.featureLabel_addFillUpOcrPump ??
-          'Pump display OCR (experimental)';
+      return l?.featureLabel_addFillUpOcrPump ?? m.displayName;
     case Feature.developerPatToken:
-      return l?.featureLabel_developerPatToken ??
-          'Developer feedback (GitHub PAT)';
+      return l?.featureLabel_developerPatToken ?? m.displayName;
   }
 }
 
 String _featureDescription(AppLocalizations? l, Feature f) {
+  final m = FeatureManifest.defaultManifest.entryFor(f);
   switch (f) {
     case Feature.obd2TripRecording:
-      return l?.featureDescription_obd2TripRecording ??
-          'Capture trips automatically over OBD2.';
+      return l?.featureDescription_obd2TripRecording ?? m.description;
     case Feature.gamification:
-      return l?.featureDescription_gamification ??
-          'Driving scores and earned badges.';
+      return l?.featureDescription_gamification ?? m.description;
     case Feature.hapticEcoCoach:
-      return l?.featureDescription_hapticEcoCoach ??
-          'Real-time haptic feedback during a trip.';
+      return l?.featureDescription_hapticEcoCoach ?? m.description;
     case Feature.tankSync:
-      return l?.featureDescription_tankSync ??
-          'Cross-device sync via Supabase.';
+      return l?.featureDescription_tankSync ?? m.description;
     case Feature.consumptionAnalytics:
-      return l?.featureDescription_consumptionAnalytics ??
-          'Fill-up and trip analysis tab.';
+      return l?.featureDescription_consumptionAnalytics ?? m.description;
     case Feature.baselineSync:
-      return l?.featureDescription_baselineSync ??
-          'Sync driving baselines via TankSync.';
+      return l?.featureDescription_baselineSync ?? m.description;
     case Feature.priceAlerts:
-      return l?.featureDescription_priceAlerts ??
-          'Threshold-based price-drop notifications.';
+      return l?.featureDescription_priceAlerts ?? m.description;
     case Feature.priceHistory:
-      return l?.featureDescription_priceHistory ??
-          '30-day price charts on station details.';
+      return l?.featureDescription_priceHistory ?? m.description;
     case Feature.routePlanning:
-      return l?.featureDescription_routePlanning ??
-          'Cheapest stop along your route.';
+      return l?.featureDescription_routePlanning ?? m.description;
     case Feature.evCharging:
-      return l?.featureDescription_evCharging ??
-          'Charging stations via OpenChargeMap.';
+      return l?.featureDescription_evCharging ?? m.description;
     case Feature.glideCoach:
-      return l?.featureDescription_glideCoach ??
-          'Hypermiling guidance using OSM traffic signals.';
+      return l?.featureDescription_glideCoach ?? m.description;
     case Feature.gpsTripPath:
-      return l?.featureDescription_gpsTripPath ??
-          'Persist GPS path samples alongside each trip.';
+      return l?.featureDescription_gpsTripPath ?? m.description;
     case Feature.autoRecord:
-      return l?.featureDescription_autoRecord ??
-          'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+      return l?.featureDescription_autoRecord ?? m.description;
     case Feature.showFuel:
-      return l?.featureDescription_showFuel ??
-          'Display petrol/diesel station results in search and on the map.';
+      return l?.featureDescription_showFuel ?? m.description;
     case Feature.showElectric:
-      return l?.featureDescription_showElectric ??
-          'Display EV charging stations in search and on the map.';
+      return l?.featureDescription_showElectric ?? m.description;
     case Feature.showConsumptionTab:
-      return l?.featureDescription_showConsumptionTab ??
-          'Show the consumption analytics tab in the bottom navigation.';
+      return l?.featureDescription_showConsumptionTab ?? m.description;
     case Feature.manualConsumption:
-      // #1517: ARB strings to follow in a localisation pass.
-      return 'Track fuel fill-ups and EV charging sessions by hand (no OBD2 adapter required).';
+      // #1517: ARB strings to follow in a localisation pass; English-only
+      // fallback from the manifest SSoT (#2189).
+      return m.description;
     case Feature.loyaltyCards:
-      // #1517: ARB strings to follow in a localisation pass.
-      return 'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.';
+      // #1517: ARB strings to follow in a localisation pass; English-only
+      // fallback from the manifest SSoT (#2189).
+      return m.description;
     case Feature.tflitePricePrediction:
-      return l?.featureDescription_tflitePricePrediction ??
-          'On-device price forecast model — inference runs locally; '
-              'features and predictions never leave the device.';
+      return l?.featureDescription_tflitePricePrediction ?? m.description;
     case Feature.fuelCalculator:
-      return l?.featureDescription_fuelCalculator ??
-          'Reachable fuel-cost calculator from the search results.';
+      return l?.featureDescription_fuelCalculator ?? m.description;
     case Feature.carbonDashboard:
-      return l?.featureDescription_carbonDashboard ??
-          'CO2 footprint dashboard reachable from the Consumption tab.';
+      return l?.featureDescription_carbonDashboard ?? m.description;
     case Feature.experimentalOemPids:
-      return l?.featureDescription_experimentalOemPids ??
-          'Read exact tank litres via manufacturer-specific PIDs on '
-              'supported adapters.';
+      return l?.featureDescription_experimentalOemPids ?? m.description;
     case Feature.paymentQrScan:
-      return l?.featureDescription_paymentQrScan ??
-          'Scan-to-pay QR reader on the station detail screen.';
+      return l?.featureDescription_paymentQrScan ?? m.description;
     case Feature.communityPriceReports:
-      return l?.featureDescription_communityPriceReports ??
-          'Report a station price from the station detail screen.';
+      return l?.featureDescription_communityPriceReports ?? m.description;
     case Feature.obd2Optional:
+      // note: manifest differs — the manifest description carries an extra
+      // "Calibration drops to confidence tier A…" sentence the toggle
+      // subtitle intentionally omits, so keep the local literal here to
+      // preserve the existing user-facing text (#2189).
       return l?.featureDescription_obd2Optional ??
           'When off, the app records GPS-only trajets without needing an '
               'OBD2 adapter. Coaching is reduced — no instant L/100 km, '
               'fewer engine-derived signals.';
     case Feature.addFillUpOcrReceipt:
-      return l?.featureDescription_addFillUpOcrReceipt ??
-          'Scan a printed receipt on the Add fill-up screen to pre-fill '
-              'date, litres, total, and station.';
+      return l?.featureDescription_addFillUpOcrReceipt ?? m.description;
     case Feature.addFillUpOcrPump:
-      return l?.featureDescription_addFillUpOcrPump ??
-          'Scan a fuel pump display to pre-fill the form. Recognition '
-              'is unreliable today — opt in only if you want to test.';
+      return l?.featureDescription_addFillUpOcrPump ?? m.description;
     case Feature.developerPatToken:
+      // note: manifest differs — this subtitle adds a "Power-user /
+      // contributor feature." sentence absent from the manifest
+      // description, so keep the local literal to preserve the existing
+      // user-facing text (#2189).
       return l?.featureDescription_developerPatToken ??
           'Enable the bad-scan feedback panel that auto-files GitHub '
               'issues with a Personal Access Token. Power-user / '

@@ -43,6 +43,27 @@ void main() {
     }
   });
 
+  // #2189 — the feature-management section's `_featureLabel` /
+  // `_featureDescription` helpers now read their null-AppLocalizations
+  // fallback straight off the manifest entry instead of re-typing the same
+  // English literal (single source of truth). Those helpers are private to
+  // `feature_management_section.dart`, so this backstops the contract at the
+  // SSoT they depend on: every Feature must carry a non-empty displayName
+  // and description, or the toggle would render a blank label/subtitle in
+  // any context that supplies a null localisations object (test fixtures).
+  test('every manifest entry has a non-empty displayName and description '
+      '(#2189 fallback SSoT)', () {
+    for (final f in Feature.values) {
+      final entry = manifest.entryFor(f);
+      expect(entry.displayName.trim(), isNotEmpty,
+          reason: '$f needs a non-empty manifest displayName — it backs the '
+              'feature-toggle label fallback (#2189)');
+      expect(entry.description.trim(), isNotEmpty,
+          reason: '$f needs a non-empty manifest description — it backs the '
+              'feature-toggle subtitle fallback (#2189)');
+    }
+  });
+
   group('#1613 gates', () {
     test('fuelCalculator and carbonDashboard are present and default-on', () {
       for (final f in [Feature.fuelCalculator, Feature.carbonDashboard]) {
