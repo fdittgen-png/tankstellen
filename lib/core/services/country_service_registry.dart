@@ -751,10 +751,18 @@ StationService _createPrixCarburants(Ref ref) {
 }
 
 StationService _createEControl(Ref ref) => EControlStationService();
+
+// #2264 — bulk-dataset services receive the shared CacheManager so their
+// parsed national dataset is persisted to Hive (read-through on the next
+// search), surviving cold start + offline. The providers are keepAlive
+// (service_providers.dart) so the in-memory copy also survives rebuilds.
+// MITECO/Spain is wired in concern 6 alongside the province-keying fix.
 StationService _createMiteco(Ref ref) => MitecoStationService();
 StationService _createMise(Ref ref) => MiseStationService();
-StationService _createDenmark(Ref ref) => DenmarkStationService();
-StationService _createArgentina(Ref ref) => ArgentinaStationService();
+StationService _createDenmark(Ref ref) =>
+    DenmarkStationService(cache: ref.read(cacheManagerProvider));
+StationService _createArgentina(Ref ref) =>
+    ArgentinaStationService(cache: ref.read(cacheManagerProvider));
 StationService _createPortugal(Ref ref) => PortugalStationService();
 StationService _createUk(Ref ref) => UkStationService();
 StationService _createAustralia(Ref ref) => const AustraliaStationService();

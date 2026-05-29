@@ -2,9 +2,44 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/services/mixins/cached_dataset_mixin.dart';
+import 'package:tankstellen/core/services/persistent_dataset.dart';
+import 'package:tankstellen/core/services/service_result.dart';
 
 class _TestCached with CachedDatasetMixin {}
+
+/// Tiny in-memory CacheStrategy for the persistence tests.
+class _MemCache implements CacheStrategy {
+  final Map<String, CacheEntry> _store = {};
+
+  @override
+  Future<void> put(String key, Map<String, dynamic> data,
+      {required Duration ttl, required ServiceSource source}) async {
+    _store[key] = CacheEntry(
+        payload: data, storedAt: DateTime.now(), originalSource: source, ttl: ttl);
+  }
+
+  @override
+  CacheEntry? get(String key) => _store[key];
+
+  @override
+  CacheEntry? getFresh(String key) {
+    final e = _store[key];
+    if (e == null || e.isExpired) return null;
+    return e;
+  }
+}
+
+PersistentDataset<List<int>> _intDataset(CacheStrategy cache) =>
+    PersistentDataset<List<int>>(
+      cache: cache,
+      countryCode: 'XX',
+      datasetName: 'nums',
+      source: ServiceSource.cache,
+      serialize: (v) => {'v': v},
+      deserialize: (j) => (j['v'] as List).cast<int>(),
+    );
 
 void main() {
   late _TestCached cached;
@@ -112,6 +147,91 @@ void main() {
       expect(result, 'loaded');
       expect(fetchCalls, 1, reason: 'null cache must fetch regardless of TTL');
       expect(stored, 'loaded');
+    });
+  });
+
+  group('CachedDatasetMixin.loadPersistentDataset (#2264)', () {
+    test('fetches + persists when nothing is cached', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      var fetchCalls = 0;
+
+      final result = await cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: const Duration(hours: 1),
+        hardTtl: const Duration(hours: 6),
+        persistent: persistent,
+        fetch: () async {
+          fetchCalls++;
+          return [1, 2, 3];
+        },
+        store: (_) {},
+      );
+
+      expect(result, [1, 2, 3]);
+      expect(fetchCalls, 1);
+      expect(persistent.read()?.value, [1, 2, 3],
+          reason: 'fetched dataset must be persisted');
+    });
+
+    test('reads through from disk without fetching when persisted + fresh',
+        () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      await persistent.write([9, 9], hardTtl: const Duration(hours: 6));
+
+      var fetchCalls = 0;
+      List<int>? stored;
+      final result = await cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: const Duration(hours: 1),
+        hardTtl: const Duration(hours: 6),
+        persistent: persistent,
+        fetch: () async {
+          fetchCalls++;
+          return [0];
+        },
+        store: (v) => stored = v,
+      );
+
+      expect(result, [9, 9]);
+      expect(fetchCalls, 0, reason: 'fresh disk copy must skip the network');
+      expect(stored, [9, 9], reason: 'disk copy is rehydrated into memory');
+    });
+
+    test('falls back to persisted copy when fetch throws (offline)', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      await persistent.write([7], hardTtl: const Duration(hours: 6));
+
+      // Force a refresh attempt by leaving no in-memory copy and a soft TTL
+      // that the disk copy is already inside — but make fetch throw anyway by
+      // expiring it past soft via a zero soft TTL.
+      final result = await cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: Duration.zero,
+        hardTtl: const Duration(hours: 6),
+        persistent: persistent,
+        fetch: () async => throw Exception('offline'),
+        store: (_) {},
+      );
+
+      expect(result, [7], reason: 'offline must serve the persisted copy');
+    });
+
+    test('rethrows when fetch fails and nothing is persisted', () async {
+      final persistent = _intDataset(_MemCache());
+      expect(
+        () => cached.loadPersistentDataset<List<int>>(
+          cached: null,
+          softTtl: const Duration(hours: 1),
+          hardTtl: const Duration(hours: 6),
+          persistent: persistent,
+          fetch: () async => throw Exception('boom'),
+          store: (_) {},
+        ),
+        throwsException,
+      );
     });
   });
 }
