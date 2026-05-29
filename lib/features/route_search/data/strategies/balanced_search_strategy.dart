@@ -11,6 +11,7 @@ import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
 import '../helpers/batch_query_helper.dart';
+import 'route_filter_sort_isolate.dart';
 import 'route_geometry.dart';
 
 /// Balanced strategy: finds stations with a good balance between
@@ -49,32 +50,18 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
       onPartial: onPartial,
     );
 
-    // Filter by detour distance
+    // #2303 — detour filter + itinerary sort moved off the UI isolate. The
+    // returned ordering is purely itinerary position (the per-station balanced
+    // score only ever drives `computeBestStops`, never this list's order), so
+    // the result is bit-identical to the previous on-UI-isolate filter+sort:
+    // fuel stations farther than the detour limit drop, non-fuel results pass
+    // through, survivors come back in itinerary order.
     final detourLimit = maxDetourKm ?? searchRadiusKm;
-    final scored = <(SearchResultItem, double)>[];
-
-    for (final item in results) {
-      if (item is FuelStationResult) {
-        final minDist = minDistanceToPolyline(
-          item.station.lat, item.station.lng, route.geometry,
-        );
-        if (minDist <= detourLimit) {
-          final price = item.station.priceFor(fuelType) ?? 999;
-          // Score: lower is better. Combine normalized price and distance.
-          // Distance weight is higher to prefer stations close to route.
-          final score = price + (minDist * 0.1);
-          scored.add((item, score));
-        }
-      } else {
-        scored.add((item, 0));
-      }
-    }
-
-    // Sort by position along route (itinerary order)
-    final items = scored.map((e) => e.$1).toList();
-    sortByItineraryOrder(items, route.geometry);
-
-    return items;
+    return filterAndSortAlongRoute(
+      results: results,
+      polyline: route.geometry,
+      detourLimitKm: detourLimit,
+    );
   }
 
   @override

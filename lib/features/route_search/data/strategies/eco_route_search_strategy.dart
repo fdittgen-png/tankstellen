@@ -15,6 +15,7 @@ import '../../domain/route_search_strategy.dart';
 import '../helpers/batch_query_helper.dart';
 import 'eco_route_candidate.dart';
 import 'eco_route_scoring.dart';
+import 'route_filter_sort_isolate.dart';
 import 'route_geometry.dart';
 
 // Re-export the value types so existing imports of
@@ -200,25 +201,16 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
       onPartial: onPartial,
     );
 
+    // #2303 — detour filter + itinerary sort moved off the UI isolate.
+    // Behaviour is unchanged: fuel stations farther than the detour limit are
+    // dropped, non-fuel results pass through, survivors come back in
+    // itinerary order.
     final detourLimit = maxDetourKm ?? searchRadiusKm;
-    final filtered = <SearchResultItem>[];
-    for (final item in results) {
-      if (item is FuelStationResult) {
-        final minDist = minDistanceToPolyline(
-          item.station.lat,
-          item.station.lng,
-          route.geometry,
-        );
-        if (minDist <= detourLimit) {
-          filtered.add(item);
-        }
-      } else {
-        filtered.add(item);
-      }
-    }
-
-    sortByItineraryOrder(filtered, route.geometry);
-    return filtered;
+    return filterAndSortAlongRoute(
+      results: results,
+      polyline: route.geometry,
+      detourLimitKm: detourLimit,
+    );
   }
 
   @override

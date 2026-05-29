@@ -25,12 +25,20 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
   Future<void> init() async {
     await _workmanager.initialize(callbackDispatcher);
 
+    // #2300 — register both tasks with ExistingPeriodicWorkPolicy.update so a
+    // repeated init() (every app launch) is idempotent: it refreshes the
+    // existing chain instead of stacking duplicate periodic work that could
+    // fire two refresh isolates in the same window. Concurrent-access safety
+    // between the two cadences is still backstopped by HiveIsolateLock's
+    // exclusive lock.
+
     // Standard task: runs every 1h when battery is not low.
     // Skipped automatically by Android when battery drops below ~15%.
     await _workmanager.registerPeriodicTask(
       BackgroundService.priceRefreshTask,
       BackgroundService.priceRefreshTask,
       frequency: BackgroundService.refreshInterval,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: true,
@@ -43,6 +51,7 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
       BackgroundService.priceRefreshChargingTask,
       BackgroundService.priceRefreshChargingTask,
       frequency: BackgroundService.chargingRefreshInterval,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresCharging: true,
