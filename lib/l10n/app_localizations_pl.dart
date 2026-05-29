@@ -3414,11 +3414,11 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get alertGatingNonDeStationWarning =>
-      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+      'Powiadomienia o cenach w tle działają obecnie tylko dla stacji w Niemczech. To powiadomienie zostanie zapisane, ale może nigdy Cię nie powiadomić, dopóki nie pojawią się powiadomienia międzynarodowe.';
 
   @override
   String get alertGatingRadiusGermanyOnlyNote =>
-      'Radius alerts currently only check stations in Germany.';
+      'Alerty radiusowe sprawdzają obecnie tylko stacje w Niemczech.';
 
   @override
   String get approachOverlaySection =>
@@ -3911,6 +3911,106 @@ class AppLocalizationsPl extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Odrzuć';
 
   @override
+  String get developerToolsSectionTitle => 'Narzędzia programisty';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostyka i narzędzia do debugowania — widoczne tylko w trybie programisty / debugowania.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Dziennik błędów, alerty testowe, diagnostyka';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Dziennik błędów';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Zapisz dziennik błędów ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Wyczyść dziennik błędów';
+
+  @override
+  String get developerToolsViewErrorLog => 'Pokaż dziennik błędów';
+
+  @override
+  String get developerToolsErrorLogEmpty =>
+      'Nie zarejestrowano żadnych śladów błędów.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Alerty i powiadomienia';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      'Wyślij powiadomienie testowe';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Powiadomienie testowe';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Jeśli to czytasz, powiadomienia działają.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Wysłano powiadomienie testowe.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Powiadomienia są zablokowane — włącz je w ustawieniach systemu i spróbuj ponownie.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Uruchom potok alertu testowego';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Wyzwolono alert testowy — potok dostarczył $count powiadomień.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testowy alert cenowy';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Dopasowanie syntetyczne: w pobliżu znaleziono stację poniżej Twojego celu.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostyka';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Inspektor flag funkcji';
+
+  @override
+  String get developerToolsFlagOn => 'Wł.';
+
+  @override
+  String get developerToolsFlagOff => 'Wył.';
+
+  @override
+  String get developerToolsClearCaches => 'Wyczyść pamięci podręczne';
+
+  @override
+  String get developerToolsCachesCleared => 'Wyczyszczono pamięci podręczne.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopiuj diagnostykę';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Skopiowano diagnostykę do schowka.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Informacje o kompilacji';
+
+  @override
+  String get developerToolsBuildVersion => 'Wersja aplikacji';
+
+  @override
+  String get developerToolsBuildChannel => 'Kanał kompilacji';
+
+  @override
   String get insightCardTitle => 'Najczęstsze marnotrawstwa';
 
   @override
@@ -4244,6 +4344,13 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Włącza panel opinii o nieudanych skanowaniach, który automatycznie tworzy issue na GitHubie z Personal Access Token. Funkcja dla zaawansowanych użytkowników / współtwórców.';
+
+  @override
+  String get featureLabel_debugMode => 'Tryb programisty / debugowania';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Wyświetla w ustawieniach sekcję Narzędzia programisty z diagnostyką: eksport dziennika błędów, powiadomienia testowe, uruchomienie potoku alertu testowego, zrzut flag funkcji, czyszczenie pamięci podręcznych i kopiowanie diagnostyki.';
 
   @override
   String get feedbackConsentTitle => 'Wysłać zgłoszenie do GitHub?';

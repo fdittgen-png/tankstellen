@@ -66,5 +66,7 @@
   "featureLabel_addFillUpOcrPump": "Zapfsäulen-OCR (experimentell)",
   "featureDescription_addFillUpOcrPump": "Scannen Sie eine Zapfsäulenanzeige, um das Formular vorauszufüllen. Die Erkennung ist heute unzuverlässig — aktivieren Sie nur, wenn Sie testen möchten.",
   "featureLabel_developerPatToken": "Entwickler-Feedback (GitHub PAT)",
-  "featureDescription_developerPatToken": "Aktiviert das Fehler-Scan-Feedback-Panel, das mit einem Personal Access Token automatisch GitHub-Issues anlegt. Power-User-/Mitwirkenden-Funktion."
+  "featureDescription_developerPatToken": "Aktiviert das Fehler-Scan-Feedback-Panel, das mit einem Personal Access Token automatisch GitHub-Issues anlegt. Power-User-/Mitwirkenden-Funktion.",
+  "featureLabel_debugMode": "Entwickler-/Debug-Modus",
+  "featureDescription_debugMode": "Blendet einen Entwicklerwerkzeuge-Bereich in den Einstellungen ein mit Diagnosefunktionen: Fehlerprotokoll-Export, Test-Benachrichtigungen, ein Test-Alarm-Durchlauf, ein Feature-Flag-Auszug, Caches leeren und Diagnose kopieren."
 }

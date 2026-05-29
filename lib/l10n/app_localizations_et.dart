@@ -3401,11 +3401,11 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get alertGatingNonDeStationWarning =>
-      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+      'Tausta hinnateavitused töötavad praegu ainult Saksamaa tanklate puhul. See teavitus salvestatakse, kuid ei pruugi teid kunagi teavitada, kuni riikidevahelised teavitused saabuvad.';
 
   @override
   String get alertGatingRadiusGermanyOnlyNote =>
-      'Radius alerts currently only check stations in Germany.';
+      'Raadiuse teavitused kontrollivad praegu ainult Saksamaa tanklaid.';
 
   @override
   String get approachOverlaySection => 'Tankla lähenemise ülekate';
@@ -3894,6 +3894,102 @@ class AppLocalizationsEt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Sulge';
 
   @override
+  String get developerToolsSectionTitle => 'Arendaja tööriistad';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostika ja silumistööriistad — nähtavad ainult arendaja/silumisrežiimis.';
+
+  @override
+  String get developerToolsMenuSubtitle => 'Vealogi, testteatised, diagnostika';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Vealogi';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Salvesta vealogi ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Tühjenda vealogi';
+
+  @override
+  String get developerToolsViewErrorLog => 'Vaata vealogi';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Veajälgi pole salvestatud.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Hoiatused ja teatised';
+
+  @override
+  String get developerToolsFireTestNotification => 'Saada testteatis';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testteatis';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Kui sa seda loed, siis teatised töötavad.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Testteatis saadetud.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Teatised on blokeeritud — luba need süsteemiseadetes ja proovi uuesti.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Käivita testhoiatuse konveier';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testhoiatus käivitatud — konveier edastas $count teatist.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testhinnahoiatus';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Sünteetiline vaste: läheduses leiti sinu sihist odavam jaam.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Funktsioonilippude inspektor';
+
+  @override
+  String get developerToolsFlagOn => 'Sees';
+
+  @override
+  String get developerToolsFlagOff => 'Väljas';
+
+  @override
+  String get developerToolsClearCaches => 'Tühjenda vahemälud';
+
+  @override
+  String get developerToolsCachesCleared => 'Vahemälud tühjendatud.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopeeri diagnostika';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostika kopeeritud lõikelauale.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Järgu teave';
+
+  @override
+  String get developerToolsBuildVersion => 'Rakenduse versioon';
+
+  @override
+  String get developerToolsBuildChannel => 'Järgu kanal';
+
+  @override
   String get insightCardTitle => 'Kõige raiskavamad käitumised';
 
   @override
@@ -4225,6 +4321,13 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Lubab vigaste skannimiste tagasisidepaneeli, mis loob isikliku juurdepääsuvõtmega automaatselt GitHubi probleeme. Edasijõudnud kasutajate / kaastöötajate funktsioon.';
+
+  @override
+  String get featureLabel_debugMode => 'Arendaja/silumisrežiim';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Kuvab seadetes jaotise Arendaja tööriistad koos diagnostikaga: vealogi eksport, testteatised, testhoiatuse konveieri käivitamine, funktsioonilippude loend, vahemälude tühjendamine ja diagnostika kopeerimine.';
 
   @override
   String get feedbackConsentTitle => 'Saata raport GitHubile?';

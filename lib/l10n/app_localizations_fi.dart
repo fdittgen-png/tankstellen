@@ -3405,11 +3405,11 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get alertGatingNonDeStationWarning =>
-      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+      'Taustahintahälytykset toimivat tällä hetkellä vain Saksan huoltoasemilla. Tämä hälytys tallennetaan, mutta se ei välttämättä ilmoita sinulle ennen kuin maiden väliset hälytykset ovat käytettävissä.';
 
   @override
   String get alertGatingRadiusGermanyOnlyNote =>
-      'Radius alerts currently only check stations in Germany.';
+      'Sädehälytykset tarkistavat tällä hetkellä vain Saksan huoltoasemat.';
 
   @override
   String get approachOverlaySection => 'Aseman lähestymisilmoitus';
@@ -3898,6 +3898,103 @@ class AppLocalizationsFi extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Sulje';
 
   @override
+  String get developerToolsSectionTitle => 'Kehittäjätyökalut';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostiikka ja virheenkorjaustyökalut — näkyvät vain kehittäjä-/virheenkorjaustilassa.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Virheloki, testihälytykset, diagnostiikka';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Virheloki';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Tallenna virheloki ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Tyhjennä virheloki';
+
+  @override
+  String get developerToolsViewErrorLog => 'Näytä virheloki';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Virhejälkiä ei ole tallennettu.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Hälytykset ja ilmoitukset';
+
+  @override
+  String get developerToolsFireTestNotification => 'Lähetä testi-ilmoitus';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testi-ilmoitus';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Jos voit lukea tämän, ilmoitukset toimivat.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Testi-ilmoitus lähetetty.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Ilmoitukset on estetty — ota ne käyttöön järjestelmäasetuksissa ja yritä uudelleen.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Suorita testihälytysputki';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testihälytys laukaistu — putki toimitti $count ilmoitusta.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testihintahälytys';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostiikka';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Ominaisuuslippujen tarkastelu';
+
+  @override
+  String get developerToolsFlagOn => 'Päällä';
+
+  @override
+  String get developerToolsFlagOff => 'Pois';
+
+  @override
+  String get developerToolsClearCaches => 'Tyhjennä välimuistit';
+
+  @override
+  String get developerToolsCachesCleared => 'Välimuistit tyhjennetty.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopioi diagnostiikka';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostiikka kopioitu leikepöydälle.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Koontitiedot';
+
+  @override
+  String get developerToolsBuildVersion => 'Sovelluksen versio';
+
+  @override
+  String get developerToolsBuildChannel => 'Koontikanava';
+
+  @override
   String get insightCardTitle => 'Pahimmat tuhlaukset';
 
   @override
@@ -4227,6 +4324,13 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Ottaa käyttöön epäonnistuneiden skannausten palautepaneelin, joka luo automaattisesti GitHub-issueja Personal Access Tokenilla. Edistyneiden käyttäjien / avustajien ominaisuus.';
+
+  @override
+  String get featureLabel_debugMode => 'Kehittäjä-/virheenkorjaustila';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Näyttää asetuksissa Kehittäjätyökalut-osion, jossa on diagnostiikkaa: virhelokin vienti, testi-ilmoitukset, testihälytysputken suoritus, ominaisuuslippujen luettelo, välimuistien tyhjennys ja diagnostiikan kopiointi.';
 
   @override
   String get feedbackConsentTitle => 'Lähetetäänkö raportti GitHubiin?';

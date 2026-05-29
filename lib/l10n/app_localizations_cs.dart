@@ -3414,11 +3414,11 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get alertGatingNonDeStationWarning =>
-      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+      'Cenová upozornění na pozadí aktuálně fungují pouze pro čerpací stanice v Německu. Toto upozornění bude uloženo, ale nemusí vás upozornit, dokud nebudou k dispozici upozornění napříč zeměmi.';
 
   @override
   String get alertGatingRadiusGermanyOnlyNote =>
-      'Radius alerts currently only check stations in Germany.';
+      'Upozornění podle okruhu aktuálně kontrolují pouze čerpací stanice v Německu.';
 
   @override
   String get approachOverlaySection => 'Překryv při příjezdu k čerpací stanici';
@@ -3904,6 +3904,106 @@ class AppLocalizationsCs extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Zavřít';
 
   @override
+  String get developerToolsSectionTitle => 'Nástroje pro vývojáře';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostika a nástroje pro ladění — viditelné pouze ve vývojářském/ladicím režimu.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Protokol chyb, testovací upozornění, diagnostika';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Protokol chyb';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Uložit protokol chyb ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Vymazat protokol chyb';
+
+  @override
+  String get developerToolsViewErrorLog => 'Zobrazit protokol chyb';
+
+  @override
+  String get developerToolsErrorLogEmpty =>
+      'Nebyly zaznamenány žádné stopy chyb.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Upozornění a oznámení';
+
+  @override
+  String get developerToolsFireTestNotification => 'Odeslat testovací oznámení';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testovací oznámení';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Pokud toto čtete, oznámení fungují.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Testovací oznámení odesláno.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Oznámení jsou zablokována — povolte je v nastavení systému a zkuste to znovu.';
+
+  @override
+  String get developerToolsRunTestAlert =>
+      'Spustit testovací proces upozornění';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testovací upozornění spuštěno — proces doručil $count oznámení.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testovací cenové upozornění';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Syntetická shoda: poblíž byla nalezena stanice pod vaším cílem.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Inspektor příznaků funkcí';
+
+  @override
+  String get developerToolsFlagOn => 'Zapnuto';
+
+  @override
+  String get developerToolsFlagOff => 'Vypnuto';
+
+  @override
+  String get developerToolsClearCaches => 'Vymazat mezipaměti';
+
+  @override
+  String get developerToolsCachesCleared => 'Mezipaměti vymazány.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopírovat diagnostiku';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostika zkopírována do schránky.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Informace o sestavení';
+
+  @override
+  String get developerToolsBuildVersion => 'Verze aplikace';
+
+  @override
+  String get developerToolsBuildChannel => 'Kanál sestavení';
+
+  @override
   String get insightCardTitle => 'Nejméně úsporné způsoby jízdy';
 
   @override
@@ -4234,6 +4334,13 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Aktivuje panel pro hlášení neúspěšných skenů, který automaticky vytváří GitHub issues s Personal Access Token. Funkce pro pokročilé uživatele/přispěvatele.';
+
+  @override
+  String get featureLabel_debugMode => 'Vývojářský/ladicí režim';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Zobrazí v nastavení sekci Nástroje pro vývojáře s diagnostikou: export protokolu chyb, testovací oznámení, spuštění testovacího procesu upozornění, výpis příznaků funkcí, vymazání mezipamětí a kopírování diagnostiky.';
 
   @override
   String get feedbackConsentTitle => 'Odeslat hlášení na GitHub?';

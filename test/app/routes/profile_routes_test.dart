@@ -7,10 +7,11 @@ import 'package:tankstellen/app/routes/profile_routes.dart';
 
 void main() {
   group('profileRoutes', () {
-    test('returns exactly 6 routes', () {
+    test('returns exactly 9 routes', () {
       // Guards against accidental insert/delete — the Profile shell
-      // branch pushes onto these six sub-screens.
-      expect(profileRoutes.length, 6);
+      // branch pushes onto these sub-screens. #2248 added the three
+      // Developer-tools routes (/developer-tools[/error-log|/flags]).
+      expect(profileRoutes.length, 9);
     });
 
     test('route 0 path is "/vehicles"', () {
@@ -44,6 +45,21 @@ void main() {
       // #1120 — fuel-club / loyalty discount settings.
       final route = profileRoutes[5] as GoRoute;
       expect(route.path, '/loyalty-settings');
+    });
+
+    test('route 6 path is "/developer-tools" (#2248)', () {
+      final route = profileRoutes[6] as GoRoute;
+      expect(route.path, '/developer-tools');
+    });
+
+    test('route 7 path is "/developer-tools/error-log" (#2248)', () {
+      final route = profileRoutes[7] as GoRoute;
+      expect(route.path, '/developer-tools/error-log');
+    });
+
+    test('route 8 path is "/developer-tools/flags" (#2248)', () {
+      final route = profileRoutes[8] as GoRoute;
+      expect(route.path, '/developer-tools/flags');
     });
 
     test('every entry is a GoRoute', () {

@@ -59,10 +59,37 @@ class SupportedPidsResolver {
   /// errors: a broken cache must not break the connect flow — worst
   /// case we fall back to blind querying, which is exactly what the
   /// adapter did before this feature landed.
+  ///
+  /// HIT-skip-0902 (#2253): production keys the cache off
+  /// `adapterMac(+make:model:year)` via [_vehicleFallbackKey], which
+  /// needs no VIN to compute. So before paying a multi-frame Mode 09
+  /// PID 02 read just to derive a lookup key, [prime] probes the cache
+  /// with the static fallback key first. On a HIT it loads the cached
+  /// bitmap and returns — no 0902, no `01 XX` scan. Only on a miss (or
+  /// when no fallback key was supplied) does it fall through to the
+  /// precise, VIN-first resolution that older VIN-keyed entries use.
   Future<void> prime() async {
     final cache = _cache;
     if (cache == null) return;
     try {
+      // 1. VIN-free fast path (#2253): probe the static fallback key.
+      //    A HIT here means we never touch 0902 nor the 8 × 01 XX scan
+      //    this session — the whole point of keying off adapterMac +
+      //    make:model:year rather than the VIN.
+      final fallbackKey = _vehicleFallbackKey;
+      if (fallbackKey != null) {
+        final cachedByFallback = cache.get(fallbackKey);
+        if (cachedByFallback != null) {
+          _supportedPids = cachedByFallback;
+          debugPrint(
+              'OBD2 supported-PID cache HIT for fallback key "$fallbackKey" '
+              '(${cachedByFallback.length} PIDs) — skipping 0902 + scan');
+          return;
+        }
+      }
+      // 2. Miss (or no fallback key): resolve the precise key. This
+      //    reads the VIN (0902) and falls back to [_vehicleFallbackKey]
+      //    when the car returns none.
       final key = await _resolveVehicleCacheKey();
       if (key == null) {
         debugPrint(

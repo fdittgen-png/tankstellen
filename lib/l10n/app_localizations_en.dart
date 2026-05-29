@@ -3879,6 +3879,103 @@ class AppLocalizationsEn extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Dismiss';
 
   @override
+  String get developerToolsSectionTitle => 'Developer tools';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Error log, test alerts, diagnostics';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Error log';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Save error log ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Clear error log';
+
+  @override
+  String get developerToolsViewErrorLog => 'View error log';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+
+  @override
+  String get developerToolsFireTestNotification => 'Fire test notification';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Test notification';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'If you can read this, notifications are working.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Test notification sent.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Notifications are blocked — enable them in system settings, then retry.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Test alert fired — pipeline delivered $count notification(s).';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Test price alert';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Synthetic match: a station below your target was found nearby.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+
+  @override
+  String get developerToolsFlagOn => 'On';
+
+  @override
+  String get developerToolsFlagOff => 'Off';
+
+  @override
+  String get developerToolsClearCaches => 'Clear caches';
+
+  @override
+  String get developerToolsCachesCleared => 'Caches cleared.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostics copied to clipboard.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Build info';
+
+  @override
+  String get developerToolsBuildVersion => 'App version';
+
+  @override
+  String get developerToolsBuildChannel => 'Build channel';
+
+  @override
   String get insightCardTitle => 'Top wasteful behaviours';
 
   @override
@@ -4207,6 +4304,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Enable the bad-scan feedback panel that auto-files GitHub issues with a Personal Access Token. Power-user / contributor feature.';
+
+  @override
+  String get featureLabel_debugMode => 'Developer / Debug mode';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
 
   @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
@@ -9461,6 +9565,110 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get crossBorderDismissTooltip => '⟦Đîšɱîšš ···⟧';
 
   @override
+  String get developerToolsSectionTitle => '⟦Đéṽéłóƥéř ŧóółš ······⟧';
+
+  @override
+  String get developerToolsSubtitle =>
+      '⟦Đîáǧñóšŧîçš áñđ ŧóółš ƒóř đéƀúǧǧîñǧ — óñłý ṽîšîƀłé îñ Đéṽéłóƥéř / Đéƀúǧ ɱóđé. ····························⟧';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      '⟦Éřřóř łóǧ, ŧéšŧ áłéřŧš, đîáǧñóšŧîçš ·············⟧';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => '⟦Éřřóř łóǧ ····⟧';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return '⟦Šáṽé éřřóř łóǧ ($count) ·····⟧';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => '⟦Çłéář éřřóř łóǧ ······⟧';
+
+  @override
+  String get developerToolsViewErrorLog => '⟦Ṽîéŵ éřřóř łóǧ ·····⟧';
+
+  @override
+  String get developerToolsErrorLogEmpty =>
+      '⟦Ñó éřřóř ŧřáçéš řéçóřđéđ. ·········⟧';
+
+  @override
+  String get developerToolsAlertsGroupTitle =>
+      '⟦Áłéřŧš & ñóŧîƒîçáŧîóñš ·········⟧';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      '⟦Ƒîřé ŧéšŧ ñóŧîƒîçáŧîóñ ·········⟧';
+
+  @override
+  String get developerToolsTestNotificationTitle =>
+      '⟦Ŧéšŧ ñóŧîƒîçáŧîóñ ·······⟧';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      '⟦Îƒ ýóú çáñ řéáđ ŧĥîš, ñóŧîƒîçáŧîóñš ářé ŵóřķîñǧ. ··················⟧';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      '⟦Ŧéšŧ ñóŧîƒîçáŧîóñ šéñŧ. ·········⟧';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      '⟦Ñóŧîƒîçáŧîóñš ářé ƀłóçķéđ — éñáƀłé ŧĥéɱ îñ šýšŧéɱ šéŧŧîñǧš, ŧĥéñ řéŧřý. ··························⟧';
+
+  @override
+  String get developerToolsRunTestAlert =>
+      '⟦Řúñ ŧéšŧ áłéřŧ ƥîƥéłîñé ·········⟧';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return '⟦Ŧéšŧ áłéřŧ ƒîřéđ — ƥîƥéłîñé đéłîṽéřéđ $count ñóŧîƒîçáŧîóñ(š). ····················⟧';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => '⟦Ŧéšŧ ƥřîçé áłéřŧ ······⟧';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      '⟦Šýñŧĥéŧîç ɱáŧçĥ: á šŧáŧîóñ ƀéłóŵ ýóúř ŧářǧéŧ ŵáš ƒóúñđ ñéářƀý. ·······················⟧';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => '⟦Đîáǧñóšŧîçš ·····⟧';
+
+  @override
+  String get developerToolsFeatureFlagDump =>
+      '⟦Ƒéáŧúřé ƒłáǧ îñšƥéçŧóř ·········⟧';
+
+  @override
+  String get developerToolsFlagOn => '⟦Óñ ·⟧';
+
+  @override
+  String get developerToolsFlagOff => '⟦Óƒƒ ·⟧';
+
+  @override
+  String get developerToolsClearCaches => '⟦Çłéář çáçĥéš ·····⟧';
+
+  @override
+  String get developerToolsCachesCleared => '⟦Çáçĥéš çłéářéđ. ······⟧';
+
+  @override
+  String get developerToolsCopyDiagnostics => '⟦Çóƥý đîáǧñóšŧîçš ·······⟧';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      '⟦Đîáǧñóšŧîçš çóƥîéđ ŧó çłîƥƀóářđ. ·············⟧';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => '⟦Ɓúîłđ îñƒó ····⟧';
+
+  @override
+  String get developerToolsBuildVersion => '⟦Áƥƥ ṽéřšîóñ ·····⟧';
+
+  @override
+  String get developerToolsBuildChannel => '⟦Ɓúîłđ çĥáññéł ·····⟧';
+
+  @override
   String get insightCardTitle => '⟦Ŧóƥ ŵášŧéƒúł ƀéĥáṽîóúřš ·········⟧';
 
   @override
@@ -9802,6 +10010,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureDescription_developerPatToken =>
       '⟦Éñáƀłé ŧĥé ƀáđ-šçáñ ƒééđƀáçķ ƥáñéł ŧĥáŧ áúŧó-ƒîłéš ǦîŧĤúƀ îššúéš ŵîŧĥ á Ƥéřšóñáł Áççéšš Ŧóķéñ. Ƥóŵéř-úšéř / çóñŧřîƀúŧóř ƒéáŧúřé. ···············································⟧';
+
+  @override
+  String get featureLabel_debugMode => '⟦Đéṽéłóƥéř / Đéƀúǧ ɱóđé ········⟧';
+
+  @override
+  String get featureDescription_debugMode =>
+      '⟦Šúřƒáçé á Đéṽéłóƥéř ŧóółš šéçŧîóñ îñ Šéŧŧîñǧš ŵîŧĥ đîáǧñóšŧîçš: éřřóř-łóǧ éẋƥóřŧ, ŧéšŧ ñóŧîƒîçáŧîóñš, á ŧéšŧ-áłéřŧ ƥîƥéłîñé řúñ, á ƒéáŧúřé-ƒłáǧ đúɱƥ, çłéář çáçĥéš, áñđ çóƥý đîáǧñóšŧîçš. ····································································⟧';
 
   @override
   String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';

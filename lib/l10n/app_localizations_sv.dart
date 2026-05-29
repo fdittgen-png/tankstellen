@@ -3405,11 +3405,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get alertGatingNonDeStationWarning =>
-      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+      'Prislarm i bakgrunden fungerar för närvarande endast för bensinstationer i Tyskland. Det här larmet sparas, men kanske aldrig meddelar dig förrän larm mellan länder blir tillgängliga.';
 
   @override
   String get alertGatingRadiusGermanyOnlyNote =>
-      'Radius alerts currently only check stations in Germany.';
+      'Radielarm kontrollerar för närvarande endast bensinstationer i Tyskland.';
 
   @override
   String get approachOverlaySection => 'Inflygningsöverlägg';
@@ -3899,6 +3899,103 @@ class AppLocalizationsSv extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Avfärda';
 
   @override
+  String get developerToolsSectionTitle => 'Utvecklarverktyg';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostik och felsökningsverktyg — visas endast i utvecklar-/felsökningsläge.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Fellogg, testaviseringar, diagnostik';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Fellogg';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Spara fellogg ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Rensa fellogg';
+
+  @override
+  String get developerToolsViewErrorLog => 'Visa fellogg';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Inga felspår registrerade.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Varningar och aviseringar';
+
+  @override
+  String get developerToolsFireTestNotification => 'Skicka testavisering';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testavisering';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Om du kan läsa detta fungerar aviseringarna.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Testavisering skickad.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Aviseringar är blockerade — aktivera dem i systeminställningarna och försök igen.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Kör testvarningsflöde';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testvarning utlöst — flödet levererade $count avisering(ar).';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testprisvarning';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Syntetisk träff: en station under ditt mål hittades i närheten.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostik';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Inspektör för funktionsflaggor';
+
+  @override
+  String get developerToolsFlagOn => 'På';
+
+  @override
+  String get developerToolsFlagOff => 'Av';
+
+  @override
+  String get developerToolsClearCaches => 'Rensa cacheminnen';
+
+  @override
+  String get developerToolsCachesCleared => 'Cacheminnen rensade.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopiera diagnostik';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostik kopierad till urklipp.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Bygginformation';
+
+  @override
+  String get developerToolsBuildVersion => 'Appversion';
+
+  @override
+  String get developerToolsBuildChannel => 'Byggkanal';
+
+  @override
   String get insightCardTitle => 'Mest slösaktiga beteenden';
 
   @override
@@ -4228,6 +4325,13 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Aktiverar feedbackpanelen för misslyckade skanningar som automatiskt skapar GitHub-issues med en Personal Access Token. Funktion för avancerade användare / bidragsgivare.';
+
+  @override
+  String get featureLabel_debugMode => 'Utvecklar-/felsökningsläge';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Visar en sektion med utvecklarverktyg i inställningarna med diagnostik: export av fellogg, testaviseringar, körning av testvarningsflöde, lista över funktionsflaggor, rensning av cacheminnen och kopiering av diagnostik.';
 
   @override
   String get feedbackConsentTitle => 'Skicka rapport till GitHub?';
