@@ -4092,6 +4092,27 @@ class AppLocalizationsCs extends AppLocalizations {
       'Řaďte nahoru dříve, aby se motor usadil v nižších, úspornějších otáčkách.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Trvale vysoká rychlost ($pctTime % jízdy): zbytečně $liters l';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Trvale vysoká rychlost ($pctTime % jízdy)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Nad 110 km/h ubertte plyn – odpor vzduchu prudce roste, mírné zpomalení ušetří hodně paliva.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Plynulá jízda – skvělá práce!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Tato jízda bez prudkého zrychlování a brzdění – plynulá jízda udržuje spotřebu nízkou.';
+
+  @override
   String get drivingScoreCardTitle => 'Skóre jízdy';
 
   @override

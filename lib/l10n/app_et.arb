@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Lülitu horisontaalsele paigutusele",
   "pumpCameraOrientationVertical": "Lülitu vertikaalsele paigutusele",
   "pumpCameraGlareWarning": "Liiga palju läiget — kallutage veidi, et vältida peegeldusi",
-  "pumpCameraAlignHint": "Joondage ekraan raami sisse ja seejärel tehke foto"
+  "pumpCameraAlignHint": "Joondage ekraan raami sisse ja seejärel tehke foto",
+  "insightHighSpeedBand": "Püsiv suur kiirus ({pctTime}% sõidust): raisatud {liters} L",
+  "insightHighSpeedBandNoFuel": "Püsiv suur kiirus ({pctTime}% sõidust)",
+  "lessonAdviceHighSpeedBand": "Üle 110 km/h võta gaasi maha – õhutakistus kasvab järsult, veidi aeglasemalt säästab palju kütust.",
+  "lessonSmoothDrivingTitle": "Sujuv sõit – tubli töö!",
+  "lessonAdviceSmoothDriving": "Sellel sõidul polnud järsku kiirendamist ega pidurdamist – ühtlane sõit hoiab kulu madalal."
 }

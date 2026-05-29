@@ -4109,6 +4109,27 @@ class AppLocalizationsLv extends AppLocalizations {
       'Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs darbotos zemākos un ekonomiskākos apgriezienos.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Ilgstoši augsts ātrums ($pctTime% no brauciena): izšķērdēti $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Ilgstoši augsts ātrums ($pctTime% no brauciena)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Virs 110 km/h atlaidiet gāzi – gaisa pretestība strauji pieaug, nedaudz lēnāk ietaupa daudz degvielas.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Vienmērīga braukšana – lieliski!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Šajā braucienā nebija strauja paātrinājuma vai bremzēšanas – vienmērīga braukšana uztur zemu patēriņu.';
+
+  @override
   String get drivingScoreCardTitle => 'Braukšanas novērtējums';
 
   @override

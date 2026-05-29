@@ -5,8 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/lessons/driving_lesson_registry.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/hard_accel_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/high_rpm_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/high_speed_band_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/idling_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/low_gear_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/smooth_driving_rule.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:tankstellen/l10n/app_localizations_en.dart';
@@ -74,11 +76,19 @@ void main() {
   }
 
   group('registered rule set', () {
-    test('standard registry registers exactly the four migrated rules', () {
+    test('standard registry registers the migrated rules + the #2287 '
+        'analytics lessons, in declaration order', () {
       final reg = DrivingLessonRegistry.standard();
       expect(
         reg.rules.map((r) => r.id).toList(),
-        [lowGearLessonId, highRpmLessonId, hardAccelLessonId, idlingLessonId],
+        [
+          lowGearLessonId,
+          highRpmLessonId,
+          hardAccelLessonId,
+          idlingLessonId,
+          highSpeedBandLessonId,
+          smoothDrivingLessonId,
+        ],
       );
     });
 
@@ -199,7 +209,8 @@ void main() {
       expect(lessons.map((e) => e.id).toList(), [idlingLessonId]);
     });
 
-    test('clean short cruise + no low gear → no lessons (empty-state)', () {
+    test('clean short cruise + no low gear → no waste lessons, only the '
+        'smooth-driving praise (#2287)', () {
       final reg = DrivingLessonRegistry.standard();
       final samples = <TripSample>[
         TripSample(
@@ -215,7 +226,9 @@ void main() {
             rpm: 2000,
             fuelRateLPerHour: 5),
       ];
-      expect(reg.evaluate(summary(), samples, l), isEmpty);
+      final lessons = reg.evaluate(summary(), samples, l);
+      // A clean cruise IS smooth driving — the only lesson is the praise.
+      expect(lessons.map((e) => e.id).toList(), [smoothDrivingLessonId]);
     });
 
     test('idle trip with low gear → [lowGear, idling] in that order', () {

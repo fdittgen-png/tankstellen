@@ -3,7 +3,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,25 +14,17 @@ import '../../../core/sync/trips_sync.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
-import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
-import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/active_trip_repository.dart';
-import '../data/obd2/adapter_reconnect_scanner.dart';
-import '../data/obd2/obd2_connection_service.dart';
 import '../data/obd2/obd2_service.dart';
-import '../data/obd2/reconnect_connector.dart';
 import '../data/obd2/trip_recording_controller.dart';
-import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
-import '../domain/cold_start_baselines.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_start_stage.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_recording_pipeline.dart';
+import 'obd2_recording_pipeline.dart';
 import 'recording_pipeline.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
@@ -81,14 +72,6 @@ part 'trip_recording_provider.g.dart';
 /// it back on [stop].
 @Riverpod(keepAlive: true)
 class TripRecording extends _$TripRecording {
-  Obd2Service? _service;
-  TripRecordingController? _controller;
-
-  /// #2261 concern 6 — one-shot latch so the deferred multi-frame
-  /// capability probe is kicked exactly once, on the first live sample
-  /// of a recording. Reset at [start] so each new trip re-probes.
-  bool _capabilityReconcileKicked = false;
-
   // #1932 — re-entrancy guard for [start]. `state` is only marked
   // active by the last line of `start()`, but `start()` has `await`s
   // before that, so a second start racing in the window between would
@@ -97,28 +80,27 @@ class TripRecording extends _$TripRecording {
   // so the second call is rejected.
   bool _startInProgress = false;
 
-  StreamSubscription<TripLiveReading>? _liveSub;
-  StreamSubscription<TripRecordingControllerState>? _stateSub;
-
-  // #1312 — adapter identity captured at trip-start so it survives
-  // into the saved [TripHistoryEntry] even if the [Obd2Service] has
-  // been disconnected by the time `_saveToHistory` runs (`stop`
-  // disconnects the service before saving). Sourced from the service
-  // fields stamped by [Obd2ConnectionService] on connect; null when
-  // the service was constructed without going through the connection
-  // layer (test fakes).
-  String? _adapterMac;
-  String? _adapterName;
-  String? _adapterFirmware;
-
-  // #2190 — the selected alternate recording strategy, or null for the
-  // inline OBD2 path (the historical default). Selected at start: the
-  // dongle-less #2025 flow installs a [GpsOnlyRecordingPipeline] here and
-  // every former `if (_gpsOnlyMode)` lifecycle branch collapses to a
-  // single `_pipeline != null` virtual dispatch. A future third source
-  // (CarPlay / Android Auto telemetry) becomes another implementation
-  // rather than another `_xMode` bool (open/closed — #2190 motivation).
+  // #2190 / #2227 — the selected recording strategy. Both modes now run
+  // a [RecordingPipeline]: `start(service)` installs an
+  // [Obd2RecordingPipeline], the dongle-less #2025 flow installs a
+  // [GpsOnlyRecordingPipeline]. The historical `_pipeline == null`
+  // inline-OBD2 branch is gone — every lifecycle boundary dispatches
+  // through `_pipeline`. A future third source (CarPlay / Android Auto
+  // telemetry) becomes another implementation rather than another
+  // `_xMode` bool (open/closed — the #2190 motivation). Null only
+  // between trips and in the cold-start-recovered state (#1347), where
+  // the WAL snapshot — not a live pipeline — is the source of truth.
   RecordingPipeline? _pipeline;
+
+  /// The active OBD2 pipeline, or null when no trip is running, a
+  /// GPS-only trip is running, or we're in the recovered-no-controller
+  /// state. The notifier's WAL snapshot helpers, `pause` / `resume`, and
+  /// `debugController` reach the live [TripRecordingController] through
+  /// it (#2227).
+  Obd2RecordingPipeline? get _obd2 {
+    final p = _pipeline;
+    return p is Obd2RecordingPipeline ? p : null;
+  }
 
   // #1458 phase 2 — most recent app lifecycle state observed by the
   // wiring layer's [WidgetsBindingObserver]. Read by the GPS stream
@@ -174,7 +156,7 @@ class TripRecording extends _$TripRecording {
   /// deterministic buffer through [TripRecordingController.debugCaptureSample]
   /// without spinning up a real polling clock. Null between trips.
   @visibleForTesting
-  TripRecordingController? get debugController => _controller;
+  TripRecordingController? get debugController => _obd2?.controller;
 
   /// Exposed for tests (#2190): true when an alternate GPS-only
   /// [RecordingPipeline] is the selected strategy (i.e. the trip was
@@ -387,216 +369,42 @@ class TripRecording extends _$TripRecording {
     bool automatic = false,
   }) async {
     _lastTripStartedAt ??= DateTime.now();
-    _service = service;
-    // #2261 concern 6 — re-arm the deferred capability probe for this
-    // recording; the first live sample kicks it.
-    _capabilityReconcileKicked = false;
-    // #1312 — snapshot adapter identity NOW. The service is
-    // disconnected during `stop` before `_saveToHistory` runs, so we
-    // can't read these off the live service at save time. Best-effort
-    // — a null reading just means the trip detail card will hide the
-    // adapter row.
-    _adapterMac = service.adapterMac;
-    _adapterName = service.adapterName;
-    _adapterFirmware = service.adapterFirmware;
-    // #812 phase 3 — snapshot the active vehicle so the controller
-    // can hand it to `readFuelRateLPerHour` on every tick. The
-    // speed-density fallback reads engineDisplacementCc +
-    // volumetricEfficiency off the profile; a null vehicle or null
-    // fields fall back to the service-level defaults. We read the
-    // vehicle a second time below for the baseline-store
-    // bookkeeping; both reads are cheap Riverpod cache hits.
-    final activeVehicle = _tryReadActiveVehicle();
-    // Resolve the vehicle id up-front so the controller can tag any
-    // pause-on-drop snapshot it writes to the `obd2_paused_trips`
-    // Hive box (#797 phase 1). Cheap Riverpod cache hit — same
-    // provider call used again below for the baseline store.
-    final eagerVehicleId = _tryReadActiveVehicle()?.id;
-    // #797 phase 3 — pass the pinned MAC + a factory for the auto-
-    // reconnect scanner. Null MAC (unpaired vehicle) skips the
-    // scanner entirely and leaves the grace-window path as the sole
-    // recovery mechanism. The factory uses the already-wired
-    // [Obd2ConnectionService] to drive the BT scan + reconnect,
-    // keeping the controller free of plugin imports.
-    final pinnedMac = activeVehicle?.obd2AdapterMac;
-    // #1395 — wire the diagnostic breadcrumb sink for this trip. Both
-    // the controller (for `_deriveFuelRateLPerHour` snapshots) and
-    // the underlying [Obd2Service] (for the live PID 5E + MAF reads
-    // inside `readFuelRateLPerHour`) push through the SAME notifier
-    // — the provider keeps it keepAlive across recordings so the
-    // user can still inspect the trace from the overlay after the
-    // recording screen pops. Going through the notifier (which
-    // implements [Obd2BreadcrumbRecorder]) means every push also
-    // republishes the entries list to the overlay listeners.
-    final breadcrumbs = ref.read(obd2BreadcrumbsProvider.notifier);
-    // Clear any leftover breadcrumbs from a prior trip — we want a
-    // fresh suspicion-rate denominator for THIS recording.
-    breadcrumbs.clear();
-    service.breadcrumbCollector = breadcrumbs;
-    // #1422 phase 1 — match the active vehicle to the bundled catalog
-    // so the controller can fall through to the engine-tech-derived
-    // η_v default (e.g. 0.95 for a Dacia dCi VNT diesel) instead of
-    // the legacy 0.85 catalog literal until VeLearner converges. Null
-    // on a no-vehicle / no-catalog / no-match path; the controller then
-    // falls back to the stored profile value as before.
-    final matchedReference = _tryMatchReferenceVehicle(activeVehicle);
-    final ctl = TripRecordingController(
-      service: service,
-      vehicle: activeVehicle,
-      referenceVehicle: matchedReference,
-      vehicleId: eagerVehicleId,
-      pinnedAdapterMac: pinnedMac,
-      automatic: automatic,
-      reconnectScannerFactory: _buildReconnectScannerFactory(),
-      breadcrumbCollector: breadcrumbs,
+    // #769 — record the vehicle id the trip is scoped to up-front so the
+    // fill-up auto-link window resolves it even if the baseline load
+    // races. Cheap Riverpod cache hit.
+    _lastTripVehicleId ??= _tryReadActiveVehicle()?.id;
+    // #2227 — the OBD2 recording loop lives in [Obd2RecordingPipeline].
+    // The notifier selects it (mirroring the GPS-only selection in
+    // [startGpsOnly]) and delegates the live loop + teardown; the WAL
+    // snapshot (#1303) + cold-start recovery (#1347) stay here, driven
+    // through the [RecordingPipelineHost]. The collaborators are passed
+    // in (not reconstructed) so test counters accumulate as before.
+    final pipeline = Obd2RecordingPipeline(
+      ref: ref,
+      host: _RecordingPipelineHostAdapter(this),
+      haptics: _haptics,
+      gps: _gps,
+      baselines: _baselines,
+      oemFuel: _oemFuel,
+      readActiveVehicle: _tryReadActiveVehicle,
+      readOemPidsFlag: _readOemPidsFlag,
     );
-    _controller = ctl;
-
-    // #769 — resolve the active vehicle + fuel family and load its
-    // learned baselines from Hive (delegated to TripBaselineRecorder).
-    _lastTripVehicleId ??= activeVehicle?.id;
-    await _baselines.load();
-
-    await ctl.start();
-    // #1374 / #1981 — GPS trip-path sampling. Default-on for trip
-    // recorders (#1981) so consumption uses true road distance; the
-    // controller requests location permission and no-ops cleanly if
-    // the flag is off or permission is denied. Fire-and-forget — the
-    // permission round-trip must not block trip-start.
-    unawaited(_gps.start(ctl));
-    // #1615 — opt-in experimental OEM-PID exact-fuel-level poll. A
-    // no-op (no timer, no registry resolution) when the flag is off or
-    // the adapter is not OEM-PID-capable, so a default-config user pays
-    // nothing. The OEM read needs the VIN, which `ctl.start()` above
-    // has just resolved.
-    _oemFuel.start(
-      enabled: _readOemPidsFlag(),
-      vin: ctl.vin,
-      capability: service.capability,
-      port: service,
-      onLitres: ctl.updateOemFuelLevelLitres,
-    );
-    // #1303 — seed the active-trip snapshot identity now that the
-    // controller knows its session id + odometer reads. The first
-    // flush happens off the live-stream debounce below; if the
-    // process dies before the first sample lands, the empty
-    // snapshot is still enough to put the user back in the
-    // recording UI on next launch.
-    _seedActiveSnapshot();
-    _liveSub = ctl.live.listen((reading) {
-      // #2261 concern 6 — the multi-frame `0902` capability probe was
-      // pulled off the connect critical path; run it lazily now that the
-      // first samples are landing. Fire-and-forget + one-shot (the
-      // service no-ops after the first run), so it never blocks the
-      // sample pipeline and only ever tightens OEM-PID gating.
-      if (!_capabilityReconcileKicked) {
-        _capabilityReconcileKicked = true;
-        unawaited(_service?.ensureCapabilityReconciled() ?? Future.value());
-      }
-      final classified = _baselines.recordAndClassify(reading);
-      _haptics.fireForBandTransition(state.band, classified.band);
-      state = state.copyWith(
-        phase: _phaseFor(ctl),
-        live: reading,
-        situation: classified.situation,
-        band: classified.band,
-        liveDeltaFraction: classified.delta,
-      );
-      // #1303 — debounced write-through. Cheap when the gate
-      // rejects (a single timestamp comparison + counter bump).
-      _maybeFlushActiveSnapshot();
-    });
-    // #797 phase 1 — listen to explicit state changes so the UI
-    // surfaces "pausedDueToDrop" even when no TripLiveReading lands
-    // (the drop kills the per-PID callbacks that would have woken the
-    // live listener). Pure state transitions don't reshape band/delta,
-    // so we only copyWith the phase here.
-    _stateSub = ctl.stateChanges.listen((_) {
-      final newPhase = _phaseFor(ctl);
-      // #1330 phase 3 — surface the controller's drop reason so the
-      // pause banner can pick the right copy (transport error vs
-      // silent failure). Cleared when leaving the drop state.
-      if (newPhase == TripRecordingPhase.pausedDueToDrop) {
-        state = state.copyWith(
-          phase: newPhase,
-          dropReason: ctl.dropReason,
-        );
-      } else {
-        state = state.copyWith(
-          phase: newPhase,
-          clearDropReason: true,
-        );
-      }
-      // #1303 — phase transitions force an immediate snapshot so
-      // a recovered crash lands on the right phase (the controller
-      // moving from recording → pausedDueToDrop should NOT be lost
-      // if the OS kills us before the next debounce window).
-      unawaited(_flushActiveSnapshot(force: true));
-    });
-    // #2274 concern 2 — going live clears any connecting stage so the
-    // recording screen swaps the inline progress card for the live
-    // metrics on the same frame.
-    state = state.copyWith(
-      phase: TripRecordingPhase.recording,
-      clearConnectStage: true,
-    );
+    _pipeline = pipeline;
+    await pipeline.start(service, automatic: automatic);
   }
 
-  /// Map the controller's enum onto the provider's phase. Stays a
-  /// private helper so the provider's state model doesn't leak the
-  /// raw enum to widgets that should keep consuming `TripRecordingPhase`.
-  TripRecordingPhase _phaseFor(TripRecordingController ctl) {
-    switch (ctl.currentState) {
-      case TripRecordingControllerState.idle:
-        return TripRecordingPhase.idle;
-      case TripRecordingControllerState.recording:
-        return TripRecordingPhase.recording;
-      case TripRecordingControllerState.paused:
-        return TripRecordingPhase.paused;
-      case TripRecordingControllerState.pausedDueToDrop:
-        return TripRecordingPhase.pausedDueToDrop;
-      case TripRecordingControllerState.stopped:
-        return TripRecordingPhase.finished;
-    }
-  }
-
-  /// Map a [FuelType] apiValue onto a [ConsumptionFuelFamily] for
-  /// the cold-start tables. Everything that isn't diesel maps to
-  /// gasoline — LPG/CNG calorific values are close enough to petrol
-  /// that the cold-start number is within measurement noise.
   /// Read the active vehicle profile, swallowing any provider-wiring
   /// errors that show up in widget tests (where the Riverpod graph
   /// for the vehicle-active-profile chain isn't always overridden).
   /// Returns null — both a cold-start no-vehicle and an
-  /// unavailable-provider state — which the caller handles by
-  /// letting `readFuelRateLPerHour` fall back to its generic
-  /// defaults.
+  /// unavailable-provider state — which the [Obd2RecordingPipeline]
+  /// handles by letting `readFuelRateLPerHour` fall back to its
+  /// generic defaults.
   VehicleProfile? _tryReadActiveVehicle() {
     try {
       return ref.read(activeVehicleProfileProvider);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: active vehicle unavailable'}));
-      return null;
-    }
-  }
-
-  /// Resolve the catalog row for [profile], returning null when the
-  /// catalog hasn't loaded yet, the profile is null, or no tier of
-  /// [VehicleProfileCatalogMatcher.bestMatch] hits (#1422 phase 1).
-  /// Swallows provider-wiring errors the same way [_tryReadActiveVehicle]
-  /// does so widget tests don't have to override the catalog graph just
-  /// to start a recording.
-  ReferenceVehicle? _tryMatchReferenceVehicle(VehicleProfile? profile) {
-    if (profile == null) return null;
-    try {
-      final catalog = ref.read(referenceVehicleCatalogProvider).value;
-      if (catalog == null || catalog.isEmpty) return null;
-      return VehicleProfileCatalogMatcher.bestMatch(
-        profile: profile,
-        catalog: catalog,
-      );
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: reference catalog unavailable'}));
       return null;
     }
   }
@@ -618,35 +426,41 @@ class TripRecording extends _$TripRecording {
   }
 
   void pause() {
-    final ctl = _controller;
-    if (ctl == null || !state.isActive) return;
-    ctl.pause();
-    state = state.copyWith(phase: TripRecordingPhase.paused);
+    if (!state.isActive) return;
+    // #2227 — delegate the live pause to the active pipeline. The
+    // GPS-only pipeline is a no-op (its position stream keeps running);
+    // the OBD2 pipeline pauses the controller. Only flip the phase when a
+    // live recording was actually paused.
+    if (_pipeline?.pause() ?? false) {
+      state = state.copyWith(phase: TripRecordingPhase.paused);
+    }
   }
 
   void resume() {
-    final ctl = _controller;
-    if (ctl == null) {
-      // #1347 — cold-start recovery left us with a snapshot but no
-      // controller. The pause banner's Resume button reaches us
-      // here; without this path the tap is a silent no-op and the
-      // captured samples are stranded in Hive forever. True "continue
-      // recording" requires re-pairing the OBD2 adapter (out of scope
-      // — see the #1347 follow-up issue); the minimum correct
-      // behaviour is to finalise the snapshot into trip history so
-      // the partial drive is preserved.
-      if (_activeSnapshot != null &&
-          state.phase == TripRecordingPhase.pausedDueToDrop) {
-        unawaited(_finalizeRecoveredSnapshot());
+    // #2227 — a live pipeline owns the controller. Mirror the original
+    // ordering exactly: the phase guard is checked BEFORE the controller
+    // is resumed, so resume() is a no-op while recording.
+    final obd2 = _obd2;
+    if (obd2 != null && obd2.controller != null) {
+      if (state.phase != TripRecordingPhase.paused &&
+          state.phase != TripRecordingPhase.pausedDueToDrop) {
+        return;
       }
+      obd2.resume();
+      state = state.copyWith(phase: TripRecordingPhase.recording);
       return;
     }
-    if (state.phase != TripRecordingPhase.paused &&
-        state.phase != TripRecordingPhase.pausedDueToDrop) {
-      return;
+    // #1347 — cold-start recovery left us with a snapshot but no
+    // controller / pipeline. The pause banner's Resume button reaches us
+    // here; without this path the tap is a silent no-op and the captured
+    // samples are stranded in Hive forever. True "continue recording"
+    // requires re-pairing the OBD2 adapter (out of scope — see the #1347
+    // follow-up issue); the minimum correct behaviour is to finalise the
+    // snapshot into trip history so the partial drive is preserved.
+    if (_activeSnapshot != null &&
+        state.phase == TripRecordingPhase.pausedDueToDrop) {
+      unawaited(_finalizeRecoveredSnapshot());
     }
-    ctl.resume();
-    state = state.copyWith(phase: TripRecordingPhase.recording);
   }
 
   /// Stop the polling loop, refresh the odometer one last time,
@@ -661,100 +475,27 @@ class TripRecording extends _$TripRecording {
   /// wrapper below) so the launcher-icon badge increments only when
   /// the coordinator was the one that decided to save.
   Future<StoppedTripResult> stop({bool automatic = false}) async {
-    // #2190 — an alternate strategy (e.g. #2025 GPS-only) runs its own
-    // teardown that bypasses the OBD2 controller / service entirely.
+    // #2190 / #2227 — both modes run a [RecordingPipeline] now (OBD2 and
+    // GPS-only). Delegate the full teardown — the OBD2 pipeline owns the
+    // controller / service / subscriptions and drives the WAL clear
+    // through the host; the GPS-only pipeline owns its Geolocator stream.
     final pipeline = _pipeline;
     if (pipeline != null) {
       final result = await pipeline.stop(automatic: automatic);
       _pipeline = null;
       return result;
     }
-    final ctl = _controller;
-    final svc = _service;
-    if (ctl == null || svc == null) {
-      // #1347 — cold-start recovery left us with a snapshot on disk
-      // but no controller / service. The pause banner's End button
-      // reaches us here; without this path the tap silently throws
-      // away the captured samples (`StoppedTripResult.empty()` and a
-      // zero-state reset). Salvage the snapshot into trip history so
-      // the user keeps their partial drive.
-      if (_activeSnapshot != null &&
-          state.phase == TripRecordingPhase.pausedDueToDrop) {
-        return _finalizeRecoveredSnapshot();
-      }
-      state = const TripRecordingState();
-      return const StoppedTripResult.empty();
+    // #1347 — cold-start recovery left us with a snapshot on disk but no
+    // pipeline. The pause banner's End button reaches us here; without
+    // this path the tap silently throws away the captured samples
+    // (`StoppedTripResult.empty()` and a zero-state reset). Salvage the
+    // snapshot into trip history so the user keeps their partial drive.
+    if (_activeSnapshot != null &&
+        state.phase == TripRecordingPhase.pausedDueToDrop) {
+      return _finalizeRecoveredSnapshot();
     }
-    try {
-      await ctl.refreshOdometer();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: refreshOdometer failed'}));
-    }
-    // Snapshot the captured-samples buffer BEFORE stop() tears down
-    // the controller — without this the trip-detail charts render the
-    // "No samples recorded" empty state on every saved trip (#1040).
-    final capturedSamples = List<TripSample>.unmodifiable(ctl.capturedSamples);
-    // #1458 phase 2 — snapshot the GPS cadence diagnostics buffer
-    // BEFORE the controller is torn down, same reason as the sample
-    // buffer above. Always captured (empty list when the GPS feature
-    // flag was off for this trip) so the persistence path stays
-    // unconditional and the JSON encoder elides the key when empty.
-    final capturedGpsDiagnostics = List<GpsSampleDiagnostic>.unmodifiable(
-      ctl.capturedGpsSampleDiagnostics,
-    );
-    final summary = await ctl.stop();
-    final odometerStartKm = ctl.odometerStartKm;
-    final odometerLatestKm = ctl.odometerLatestKm;
-    await _liveSub?.cancel();
-    _liveSub = null;
-    await _stateSub?.cancel();
-    _stateSub = null;
-    // #1374 phase 1 — tear down the Geolocator subscription if one
-    // was opened (flag-on path only). Best-effort: a null sub is the
-    // common case (flag off) and a cancel that throws shouldn't
-    // block trip teardown.
-    await _gps.stop();
-    // #1615 — tear down the OEM-PID fuel-level poll. Best-effort: a
-    // null timer is the common case (flag off / incapable adapter).
-    await _oemFuel.stop();
-    _controller = null;
-    // #726 — persist to the trip history rolling log. Every trip
-    // (including discarded ones) is logged; the fill-up flow is a
-    // *separate* decision. Best-effort: a Hive write failure here
-    // shouldn't block service teardown.
-    await _saveToHistory(
-      summary,
-      samples: capturedSamples,
-      gpsSampleDiagnostics: capturedGpsDiagnostics,
-      automatic: automatic,
-    );
-    // #769 / #780 — flush learned baselines + fold in the server copy
-    // before releasing the service so the next trip starts from the
-    // updated values. Delegated to TripBaselineRecorder; best-effort.
-    await _baselines.flushAndSync();
-    // #1312 — clear the captured adapter identity once the trip has
-    // been persisted; the next [start] call snapshots fresh values
-    // from whichever service it receives.
-    _adapterMac = null;
-    _adapterName = null;
-    _adapterFirmware = null;
-    try {
-      await svc.disconnect();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: service disconnect failed'}));
-    }
-    _service = null;
-    // #1303 — the trip is finalised in history; the active-trip
-    // snapshot is no longer the source of truth and would lure the
-    // recovery service into resurrecting a stopped trip on next
-    // launch. Clear it. Best-effort.
-    await _clearActiveSnapshot();
-    state = state.copyWith(phase: TripRecordingPhase.finished);
-    return StoppedTripResult(
-      summary: summary,
-      odometerStartKm: odometerStartKm,
-      odometerLatestKm: odometerLatestKm,
-    );
+    state = const TripRecordingState();
+    return const StoppedTripResult.empty();
   }
 
   /// Typed entry point for the hands-free [AutoTripCoordinator]
@@ -817,7 +558,7 @@ class TripRecording extends _$TripRecording {
   /// after [start] succeeds. The snapshot is kept null until then so
   /// the lifecycle-paused hook on a never-started provider is a no-op.
   void _seedActiveSnapshot() {
-    final ctl = _controller;
+    final ctl = _obd2?.controller;
     if (ctl == null) return;
     final id = ctl.sessionId ?? DateTime.now().toIso8601String();
     final startedAt = _lastTripStartedAt ?? DateTime.now();
@@ -967,8 +708,8 @@ class TripRecording extends _$TripRecording {
     // counted with [_maybeFlushActiveSnapshot]. Keeping the param
     // makes the intent at the call site obvious without changing
     // behaviour.
-    if (!force && _controller == null) return;
-    final ctl = _controller;
+    final ctl = _obd2?.controller;
+    if (!force && ctl == null) return;
     if (ctl == null) return;
     final repo = _resolveActiveRepo();
     if (repo == null) return;
@@ -1106,7 +847,7 @@ class TripRecording extends _$TripRecording {
   /// hook is safe to fire on every backgrounding regardless of
   /// recording state.
   Future<void> onAppBackgrounded() async {
-    if (_controller == null) return;
+    if (_obd2?.controller == null) return;
     if (!state.isActive) return;
     await _flushActiveSnapshot(force: true);
   }
@@ -1157,59 +898,19 @@ class TripRecording extends _$TripRecording {
     return true;
   }
 
-  /// Build the reconnect-scanner factory handed to
-  /// [TripRecordingController] (#797 phase 3). The returned closure
-  /// is called once per drop with the pinned MAC + an onReconnect
-  /// hook; it wires the scanner's probe and connect callbacks to
-  /// the already-provided [Obd2ConnectionService].
-  ///
-  /// Returns null in tests / environments where [obd2ConnectionProvider]
-  /// can't be resolved — in that case the controller falls back to
-  /// the grace-window-only recovery.
-  AdapterReconnectScanner? Function(
-    String pinnedMac,
-    VoidCallback onReconnect,
-  )? _buildReconnectScannerFactory() {
-    final Obd2ConnectionService connection;
-    try {
-      connection = ref.read(obd2ConnectionProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: connection provider unavailable'}));
-      return null;
-    }
-    return (pinnedMac, onReconnect) {
-      // One connector per drop holds the gate bookkeeping across the
-      // scanner's repeated connect cycles. The connect callback prefers a
-      // DIRECT GATT connect — which works even for clones that stop
-      // advertising in standby (a scan would never re-see them) — and
-      // only falls back to an RSSI-gated scan. The scanner probe always
-      // returns true so the connect step (and thus the direct attempt)
-      // is reached on every cycle; gating on scan-visibility — as the
-      // old probe did — was the dominant standby-clone reconnect failure
-      // (#2245).
-      final connector = ReconnectConnector(
-        connection: connection,
-        onConnected: (svc) => _service = svc,
-      );
-      return AdapterReconnectScanner(
-        pinnedMac: pinnedMac,
-        probe: (mac) async => true,
-        connect: connector.attempt,
-        // #2261 concern 2 — after the active-scan miss ceiling, switch to
-        // a passive autoConnect GATT wait for the rest of the 15-min
-        // grace so a parked car stops burning the radio. The 15-min
-        // grace itself is untouched (owned by DroppedSessionManager).
-        passiveConnect: connector.attemptPassive,
-        onReconnect: onReconnect,
-      );
-    };
-  }
-
+  /// Persist a finished trip into the rolling trip-history log (#726).
+  /// Shared by both pipelines through the [RecordingPipelineHost]: the
+  /// OBD2 pipeline passes the baseline vehicle id + the adapter identity
+  /// it snapshotted at start (#1312); the GPS-only path leaves them null.
   Future<void> _saveToHistory(
     TripSummary summary, {
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
+    String? vehicleId,
+    String? adapterMac,
+    String? adapterName,
+    String? adapterFirmware,
   }) async {
     // Skip stub trips so they never clutter history (#1923). A trip is
     // a stub when the recorder never received a sample (`startedAt`
@@ -1228,16 +929,16 @@ class TripRecording extends _$TripRecording {
           DateTime.now().toIso8601String();
       await repo.save(TripHistoryEntry(
         id: id,
-        vehicleId: _baselines.vehicleId,
+        vehicleId: vehicleId,
         summary: summary,
         automatic: automatic,
         samples: samples,
         // #1312 — adapter identity snapshotted at [start] time. Null
         // for legacy / fake-service code paths; the detail card hides
         // the row entirely in that case.
-        adapterMac: _adapterMac,
-        adapterName: _adapterName,
-        adapterFirmware: _adapterFirmware,
+        adapterMac: adapterMac,
+        adapterName: adapterName,
+        adapterFirmware: adapterFirmware,
         // #1458 phase 2 — GPS cadence diagnostics captured during
         // recording. Empty when the GPS feature flag was off for this
         // trip; the entry's JSON serialiser elides the key in that case.
@@ -1267,7 +968,7 @@ class TripRecording extends _$TripRecording {
             (e) => e.id == id,
             orElse: () => TripHistoryEntry(
               id: id,
-              vehicleId: _baselines.vehicleId,
+              vehicleId: vehicleId,
               summary: summary,
               automatic: automatic,
             ),
@@ -1342,14 +1043,15 @@ class TripRecording extends _$TripRecording {
   }
 }
 
-/// Adapts the [TripRecording] notifier to the narrow
-/// [RecordingPipelineHost] seam an alternate [RecordingPipeline] needs
-/// (#2190). Lives in the same library as the notifier so it can reach the
-/// notifier's `state` setter, last-trip identity fields, the active-vehicle
-/// read, and the shared `_saveToHistory` write without widening the
-/// notifier's public API — mirroring the `_DroppedSessionHostAdapter`
-/// idiom on the controller (#2188).
-class _RecordingPipelineHostAdapter implements RecordingPipelineHost {
+/// Adapts the [TripRecording] notifier to the [Obd2RecordingPipelineHost]
+/// seam its pipelines need (#2190 / #2227). Lives in the same library as
+/// the notifier so it can reach the notifier's `state` setter, last-trip
+/// identity fields, the active-vehicle read, the shared `_saveToHistory`
+/// write, and the #1303 active-trip WAL snapshot helpers without widening
+/// the notifier's public API — mirroring the `_DroppedSessionHostAdapter`
+/// idiom on the controller (#2188). Implements the wider OBD2 host; a
+/// [GpsOnlyRecordingPipeline] only reaches the narrower base subset.
+class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   _RecordingPipelineHostAdapter(this._n);
 
   final TripRecording _n;
@@ -1375,13 +1077,37 @@ class _RecordingPipelineHostAdapter implements RecordingPipelineHost {
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
+    String? vehicleId,
+    String? adapterMac,
+    String? adapterName,
+    String? adapterFirmware,
   }) =>
       _n._saveToHistory(
         summary,
         automatic: automatic,
         samples: samples,
         gpsSampleDiagnostics: gpsSampleDiagnostics,
+        vehicleId: vehicleId,
+        adapterMac: adapterMac,
+        adapterName: adapterName,
+        adapterFirmware: adapterFirmware,
       );
+
+  // #2227 — WAL snapshot hooks driven by the OBD2 pipeline. The
+  // GPS-only pipeline does not use these (its [RecordingPipelineHost]
+  // calls keep to state + save), so they stay no-ops for it.
+  @override
+  void seedActiveSnapshot() => _n._seedActiveSnapshot();
+
+  @override
+  void maybeFlushActiveSnapshot() => _n._maybeFlushActiveSnapshot();
+
+  @override
+  Future<void> flushActiveSnapshot({bool force = false}) =>
+      _n._flushActiveSnapshot(force: force);
+
+  @override
+  Future<void> clearActiveSnapshot() => _n._clearActiveSnapshot();
 }
 
 /// Outcome surfaced by [TripRecording.startTrip] so the UI layer can

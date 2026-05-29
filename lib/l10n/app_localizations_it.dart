@@ -4103,6 +4103,27 @@ class AppLocalizationsIt extends AppLocalizations {
       'Sali di marcia prima così il motore si assesta a regimi più bassi e più efficienti.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Velocità elevata prolungata ($pctTime% del tragitto): sprecati $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Velocità elevata prolungata ($pctTime% del tragitto)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Sopra i 110 km/h alza il piede: la resistenza dell\'aria aumenta molto, andare un po\' più piano fa risparmiare parecchio carburante.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Guida fluida – ottimo lavoro!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Nessuna accelerazione o frenata brusca in questo tragitto: una guida costante mantiene bassi i consumi.';
+
+  @override
   String get drivingScoreCardTitle => 'Punteggio di guida';
 
   @override

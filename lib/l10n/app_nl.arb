@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Schakel naar horizontale weergave",
   "pumpCameraOrientationVertical": "Schakel naar verticale weergave",
   "pumpCameraGlareWarning": "Te veel glans — kantel iets om reflecties te vermijden",
-  "pumpCameraAlignHint": "Lijn het scherm uit in het kader en maak een foto"
+  "pumpCameraAlignHint": "Lijn het scherm uit in het kader en maak een foto",
+  "insightHighSpeedBand": "Aanhoudend hoge snelheid ({pctTime}% van de rit): {liters} L verspild",
+  "insightHighSpeedBandNoFuel": "Aanhoudend hoge snelheid ({pctTime}% van de rit)",
+  "lessonAdviceHighSpeedBand": "Laat boven 110 km/u het gas los – de luchtweerstand neemt sterk toe, iets langzamer bespaart veel brandstof.",
+  "lessonSmoothDrivingTitle": "Soepel rijden – goed gedaan!",
+  "lessonAdviceSmoothDriving": "Geen hard optrekken of remmen deze rit – gelijkmatig rijden houdt het verbruik laag."
 }

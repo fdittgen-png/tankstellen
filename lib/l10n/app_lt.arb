@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Perjungti į horizontalų išdėstymą",
   "pumpCameraOrientationVertical": "Perjungti į vertikalų išdėstymą",
   "pumpCameraGlareWarning": "Per daug atspindžių — šiek tiek pakreipkite, kad išvengtumėte atspindžių",
-  "pumpCameraAlignHint": "Sulygiuokite ekraną rėme ir tada fotografuokite"
+  "pumpCameraAlignHint": "Sulygiuokite ekraną rėme ir tada fotografuokite",
+  "insightHighSpeedBand": "Ilgalaikis didelis greitis ({pctTime}% kelionės): iššvaistyta {liters} L",
+  "insightHighSpeedBandNoFuel": "Ilgalaikis didelis greitis ({pctTime}% kelionės)",
+  "lessonAdviceHighSpeedBand": "Viršijus 110 km/h atleiskite akceleratorių – oro pasipriešinimas smarkiai auga, šiek tiek lėčiau sutaupysite daug kuro.",
+  "lessonSmoothDrivingTitle": "Tolygus vairavimas – puiku!",
+  "lessonAdviceSmoothDriving": "Šioje kelionėje nebuvo staigaus greitėjimo ar stabdymo – tolygus vairavimas išlaiko mažas sąnaudas."
 }

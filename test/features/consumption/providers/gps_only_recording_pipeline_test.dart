@@ -16,6 +16,8 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_state.
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../helpers/silence_error_logger.dart';
+
 /// Direct unit tests for the #2190 [GpsOnlyRecordingPipeline] strategy,
 /// driving it against a fake [RecordingPipelineHost] + a controllable
 /// fake Geolocator so the start / ingest / derive / finalise behaviour is
@@ -25,6 +27,8 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 /// the notifier and had no provider-level test exercising start →
 /// position → stop end to end.
 void main() {
+  silenceErrorLoggerSpool();
+
   group('GpsOnlyRecordingPipeline (#2190)', () {
     test('isGpsOnly is true', () {
       final harness = _Harness();
@@ -169,6 +173,32 @@ void main() {
 
       expect(harness.geo.activeListeners, 0);
     });
+
+    test('stopping a moving GPS-only trip is safe when the active-vehicle '
+        'read throws (#2228)', () async {
+      final harness = _Harness(vehicleProviderThrows: true);
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+      // Drive enough movement that GpsDrivingFeatures.from(samples) is
+      // non-null, so the stop path reaches the #2080 imputation branch
+      // that reads the active vehicle profile — the line that used to
+      // throw with an unwired provider graph.
+      final t0 = DateTime(2026, 5, 29, 9);
+      harness.geo.emit(_pos(43.4, 3.5, speedMps: 25.0, at: t0));
+      await _pump();
+      harness.geo.emit(_pos(43.41, 3.51,
+          speedMps: 27.0, at: t0.add(const Duration(seconds: 30))));
+      await _pump();
+
+      // Must not throw — the guarded read swallows the provider error and
+      // falls back to the cold-start calibration matrix.
+      final result = await harness.pipeline.stop();
+
+      expect(harness.host.saved, hasLength(1),
+          reason: 'the trip is still persisted despite the unwired '
+              'vehicle provider — the read degrades to cold-start');
+      expect(result.summary.kind, TripKind.gpsOnly);
+    });
   });
 }
 
@@ -176,14 +206,18 @@ Future<void> _pump() => Future<void>.delayed(Duration.zero);
 
 /// Wires a [GpsOnlyRecordingPipeline] to a fake host + fake Geolocator.
 class _Harness {
-  _Harness({String? activeVehicleId})
+  _Harness({String? activeVehicleId, bool vehicleProviderThrows = false})
       : host = _FakeHost(activeVehicleId: activeVehicleId) {
     container = ProviderContainer(overrides: [
       geolocatorWrapperProvider.overrideWithValue(geo),
       // No active vehicle → the #2080 GPS-fuel imputation branch sees a
       // null profile and leaves avg / litres null, mirroring a fresh
-      // install. (Production reads the real provider here.)
-      activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+      // install. (Production reads the real provider here.) When
+      // [vehicleProviderThrows] is set, the read throws instead — the
+      // #2228 regression: the stop path must degrade gracefully.
+      activeVehicleProfileProvider.overrideWith(
+        () => vehicleProviderThrows ? _ThrowingActiveVehicle() : _NoActiveVehicle(),
+      ),
     ]);
     // A tiny capturing provider hands us a real Ref to feed the pipeline.
     pipeline = container.read(_pipelineProvider(host));
@@ -213,6 +247,14 @@ class _NoActiveVehicle extends ActiveVehicleProfile {
   VehicleProfile? build() => null;
 }
 
+/// #2228 — a vehicle provider whose read throws, standing in for a
+/// test/widget harness without the full vehicle-active-profile graph.
+class _ThrowingActiveVehicle extends ActiveVehicleProfile {
+  @override
+  VehicleProfile? build() =>
+      throw StateError('vehicle provider graph not wired');
+}
+
 class _FakeHost implements RecordingPipelineHost {
   _FakeHost({this.activeVehicleId});
 
@@ -238,6 +280,10 @@ class _FakeHost implements RecordingPipelineHost {
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
+    String? vehicleId,
+    String? adapterMac,
+    String? adapterName,
+    String? adapterFirmware,
   }) async {
     saved.add(_Saved(
       summary: summary,

@@ -4079,6 +4079,27 @@ class AppLocalizationsEt extends AppLocalizations {
       'Vaheta varem kõrgemale käigule, et mootor töötaks madalamatel ja säästlikumatel pööretel.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Püsiv suur kiirus ($pctTime% sõidust): raisatud $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Püsiv suur kiirus ($pctTime% sõidust)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Üle 110 km/h võta gaasi maha – õhutakistus kasvab järsult, veidi aeglasemalt säästab palju kütust.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Sujuv sõit – tubli töö!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Sellel sõidul polnud järsku kiirendamist ega pidurdamist – ühtlane sõit hoiab kulu madalal.';
+
+  @override
   String get drivingScoreCardTitle => 'Sõiduhinnang';
 
   @override

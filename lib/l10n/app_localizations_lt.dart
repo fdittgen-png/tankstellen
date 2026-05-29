@@ -4106,6 +4106,27 @@ class AppLocalizationsLt extends AppLocalizations {
       'Perjunkite aukštesnę pavarą anksčiau, kad variklis suktųsi mažesnėmis ir ekonomiškesnėmis apsukomis.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Ilgalaikis didelis greitis ($pctTime% kelionės): iššvaistyta $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Ilgalaikis didelis greitis ($pctTime% kelionės)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Viršijus 110 km/h atleiskite akceleratorių – oro pasipriešinimas smarkiai auga, šiek tiek lėčiau sutaupysite daug kuro.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Tolygus vairavimas – puiku!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Šioje kelionėje nebuvo staigaus greitėjimo ar stabdymo – tolygus vairavimas išlaiko mažas sąnaudas.';
+
+  @override
   String get drivingScoreCardTitle => 'Vairavimo balas';
 
   @override

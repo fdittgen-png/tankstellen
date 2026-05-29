@@ -4081,6 +4081,27 @@ class AppLocalizationsNb extends AppLocalizations {
       'Gir opp tidligere slik at motoren legger seg på et lavere og mer økonomisk turtall.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Vedvarende høy fart ($pctTime % av turen): sløst bort $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Vedvarende høy fart ($pctTime % av turen)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Slipp opp gassen over 110 km/t – luftmotstanden øker kraftig, så litt saktere sparer mye drivstoff.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Jevn kjøring – godt jobbet!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Ingen hard akselerasjon eller bremsing på denne turen – jevn kjøring holder forbruket lavt.';
+
+  @override
   String get drivingScoreCardTitle => 'Kjørescore';
 
   @override

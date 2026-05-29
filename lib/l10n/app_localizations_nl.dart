@@ -4101,6 +4101,27 @@ class AppLocalizationsNl extends AppLocalizations {
       'Schakel eerder op zodat de motor in een lager, zuiniger toerental komt.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Aanhoudend hoge snelheid ($pctTime% van de rit): $liters L verspild';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Aanhoudend hoge snelheid ($pctTime% van de rit)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Laat boven 110 km/u het gas los – de luchtweerstand neemt sterk toe, iets langzamer bespaart veel brandstof.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Soepel rijden – goed gedaan!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Geen hard optrekken of remmen deze rit – gelijkmatig rijden houdt het verbruik laag.';
+
+  @override
   String get drivingScoreCardTitle => 'Rijscore';
 
   @override

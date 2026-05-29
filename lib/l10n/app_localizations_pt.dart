@@ -4114,6 +4114,27 @@ class AppLocalizationsPt extends AppLocalizations {
       'Suba de mudança mais cedo para que o motor fique em rotações mais baixas e económicas.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Velocidade alta prolongada ($pctTime% da viagem): desperdiçados $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Velocidade alta prolongada ($pctTime% da viagem)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Acima de 110 km/h alivie o acelerador – a resistência do ar sobe muito, ir um pouco mais devagar poupa bastante combustível.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Condução suave – bom trabalho!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Sem acelerações ou travagens bruscas nesta viagem – uma condução constante mantém o consumo baixo.';
+
+  @override
   String get drivingScoreCardTitle => 'Pontuação de condução';
 
   @override

@@ -4113,6 +4113,27 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sube de marcha antes para que el motor gire a menos revoluciones y consuma menos.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Velocidad alta sostenida ($pctTime% del trayecto): desperdiciados $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Velocidad alta sostenida ($pctTime% del trayecto)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Levanta el pie por encima de 110 km/h: la resistencia del aire sube mucho, así que ir algo más despacio ahorra mucho combustible.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Conducción suave: ¡bien hecho!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Sin aceleraciones ni frenadas bruscas en este trayecto: una conducción constante mantiene bajo el consumo.';
+
+  @override
   String get drivingScoreCardTitle => 'Puntuación de conducción';
 
   @override

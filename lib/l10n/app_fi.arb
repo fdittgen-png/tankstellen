@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Vaihda vaakaasetteluun",
   "pumpCameraOrientationVertical": "Vaihda pystyasetteluun",
   "pumpCameraGlareWarning": "Liikaa heijastusta — kallista hieman välttääksesi heijastukset",
-  "pumpCameraAlignHint": "Kohdista näyttö kehykseen ja ota sitten kuva"
+  "pumpCameraAlignHint": "Kohdista näyttö kehykseen ja ota sitten kuva",
+  "insightHighSpeedBand": "Jatkuva suuri nopeus ({pctTime} % matkasta): hukattu {liters} L",
+  "insightHighSpeedBandNoFuel": "Jatkuva suuri nopeus ({pctTime} % matkasta)",
+  "lessonAdviceHighSpeedBand": "Päästä kaasusta yli 110 km/h – ilmanvastus kasvaa jyrkästi, joten hieman hitaammin säästää paljon polttoainetta.",
+  "lessonSmoothDrivingTitle": "Tasaista ajoa – hyvin tehty!",
+  "lessonAdviceSmoothDriving": "Ei rajuja kiihdytyksiä tai jarrutuksia tällä matkalla – tasainen ajo pitää kulutuksen alhaisena."
 }

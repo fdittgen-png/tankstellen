@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Превключете към хоризонтално оформление",
   "pumpCameraOrientationVertical": "Превключете към вертикално оформление",
   "pumpCameraGlareWarning": "Прекалено много отблясъци — наклонете леко, за да избегнете отражения",
-  "pumpCameraAlignHint": "Наредете дисплея в рамката и след това заснемете"
+  "pumpCameraAlignHint": "Наредете дисплея в рамката и след това заснемете",
+  "insightHighSpeedBand": "Продължително висока скорост ({pctTime}% от пътуването): пропилени {liters} л",
+  "insightHighSpeedBandNoFuel": "Продължително висока скорост ({pctTime}% от пътуването)",
+  "lessonAdviceHighSpeedBand": "Над 110 км/ч отпуснете газта – въздушното съпротивление рязко нараства, малко по-бавно спестява много гориво.",
+  "lessonSmoothDrivingTitle": "Плавно шофиране – браво!",
+  "lessonAdviceSmoothDriving": "Това пътуване без резки ускорения и спирания – равномерното шофиране държи разхода нисък."
 }

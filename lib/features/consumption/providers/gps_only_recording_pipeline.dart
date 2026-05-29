@@ -9,6 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
+import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/trip_live_reading.dart';
 import '../domain/driving_coaching.dart'
@@ -60,6 +61,15 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
 
   @override
   bool get isGpsOnly => true;
+
+  /// GPS-only recording has no live engine loop to pause — the position
+  /// stream keeps running. Returns false so the notifier leaves the
+  /// phase untouched (#2227).
+  @override
+  bool pause() => false;
+
+  @override
+  bool resume() => false;
 
   /// Pure accumulator — same recorder the OBD2 path uses, so the
   /// distance / harsh-event / idle integration is byte-identical.
@@ -185,7 +195,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     if (summary.kind == TripKind.gpsOnly && summary.avgLPer100Km == null) {
       final features = GpsDrivingFeatures.from(samples);
       if (features != null) {
-        final vehicle = _ref.read(activeVehicleProfileProvider);
+        final vehicle = _tryReadActiveVehicle();
         final matrix =
             vehicle?.gpsCalibration ?? GpsCalibrationMatrix.coldStart();
         final est = GpsFuelEstimator.estimate(
@@ -232,5 +242,23 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     if (recorder == null) return;
     _samples.add(sample);
     recorder.onSample(sample);
+  }
+
+  /// #2228 — read the active vehicle profile for the #2080 GPS-fuel
+  /// imputation, swallowing provider-wiring errors the same way the OBD2
+  /// path's `_tryReadActiveVehicle` does. Before this, the stop path read
+  /// `activeVehicleProfileProvider` unguarded, so stopping a moving
+  /// GPS-only trip in a test/widget harness that lacks the vehicle
+  /// provider graph would throw (latent in production, where the graph is
+  /// wired). Returns null on error → the matrix falls back to cold-start.
+  VehicleProfile? _tryReadActiveVehicle() {
+    try {
+      return _ref.read(activeVehicleProfileProvider);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'GpsOnlyRecordingPipeline: active vehicle unavailable'
+      }));
+      return null;
+    }
   }
 }

@@ -4085,6 +4085,27 @@ class AppLocalizationsSv extends AppLocalizations {
       'Växla upp tidigare så att motorn lägger sig på ett lägre och mer bränslesnålt varvtal.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Ihållande hög hastighet ($pctTime % av resan): slösade $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Ihållande hög hastighet ($pctTime % av resan)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Lätta på gasen över 110 km/h – luftmotståndet ökar kraftigt, så lite långsammare sparar mycket bränsle.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Mjuk körning – bra jobbat!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Ingen hård acceleration eller inbromsning på den här resan – jämn körning håller förbrukningen låg.';
+
+  @override
   String get drivingScoreCardTitle => 'Körpoäng';
 
   @override

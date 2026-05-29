@@ -85,5 +85,38 @@
   "lessonAdviceLowGear": "Shift up sooner so the engine settles into a lower, more efficient gear.",
   "@lessonAdviceLowGear": {
     "description": "How-to-improve advice for the low-gear lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
+  },
+  "insightHighSpeedBand": "Sustained high speed ({pctTime}% of trip): wasted {liters} L",
+  "@insightHighSpeedBand": {
+    "description": "Post-trip lesson headline for the high-speed-band penalty (#2287) — time spent above ~110 km/h where aerodynamic drag dominates consumption. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHighSpeedBandNoFuel": "Sustained high speed ({pctTime}% of trip)",
+  "@insightHighSpeedBandNoFuel": {
+    "description": "High-speed-band lesson headline (#2287) for trips with no fuel-consumption figure (GPS-only / no fuel-rate PID) — same coaching without the wasted-litres clause.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceHighSpeedBand": "Ease off above 110 km/h — drag rises sharply, so a small speed cut saves a lot of fuel.",
+  "@lessonAdviceHighSpeedBand": {
+    "description": "How-to-improve advice for the high-speed-band lesson (#2287). Embedded in the GPX recording export."
+  },
+  "lessonSmoothDrivingTitle": "Smooth driving — nicely done!",
+  "@lessonSmoothDrivingTitle": {
+    "description": "Positive-reinforcement post-trip lesson headline (#2287) shown when a real trip had no harsh acceleration or braking events."
+  },
+  "lessonAdviceSmoothDriving": "No harsh acceleration or braking this trip — steady inputs like these keep consumption low.",
+  "@lessonAdviceSmoothDriving": {
+    "description": "Encouragement line for the smooth-driving praise lesson (#2287). Embedded in the GPX recording export."
   }
 }

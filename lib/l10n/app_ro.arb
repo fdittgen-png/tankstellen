@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Comutați la aspectul orizontal",
   "pumpCameraOrientationVertical": "Comutați la aspectul vertical",
   "pumpCameraGlareWarning": "Prea multă strălucire — înclinați ușor pentru a evita reflexiile",
-  "pumpCameraAlignHint": "Aliniați afișajul în cadru, apoi capturați"
+  "pumpCameraAlignHint": "Aliniați afișajul în cadru, apoi capturați",
+  "insightHighSpeedBand": "Viteză mare susținută ({pctTime}% din traseu): risipiți {liters} L",
+  "insightHighSpeedBandNoFuel": "Viteză mare susținută ({pctTime}% din traseu)",
+  "lessonAdviceHighSpeedBand": "Peste 110 km/h ridicați piciorul de pe accelerație – rezistența aerului crește puternic, puțin mai încet economisește mult combustibil.",
+  "lessonSmoothDrivingTitle": "Condus lin – bravo!",
+  "lessonAdviceSmoothDriving": "Fără accelerări sau frânări bruște în acest traseu – condusul constant menține consumul scăzut."
 }

@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Przełącz na układ poziomy",
   "pumpCameraOrientationVertical": "Przełącz na układ pionowy",
   "pumpCameraGlareWarning": "Zbyt duże odblaski — lekko przechyl, aby uniknąć odblasków",
-  "pumpCameraAlignHint": "Ustaw wyświetlacz w ramce, a następnie zrób zdjęcie"
+  "pumpCameraAlignHint": "Ustaw wyświetlacz w ramce, a następnie zrób zdjęcie",
+  "insightHighSpeedBand": "Utrzymująca się wysoka prędkość ({pctTime}% trasy): zmarnowano {liters} L",
+  "insightHighSpeedBandNoFuel": "Utrzymująca się wysoka prędkość ({pctTime}% trasy)",
+  "lessonAdviceHighSpeedBand": "Powyżej 110 km/h zdejmij nogę z gazu – opór powietrza gwałtownie rośnie, nieco wolniej oszczędza dużo paliwa.",
+  "lessonSmoothDrivingTitle": "Płynna jazda – dobra robota!",
+  "lessonAdviceSmoothDriving": "Brak gwałtownego przyspieszania i hamowania na tej trasie – równa jazda utrzymuje niskie zużycie."
 }

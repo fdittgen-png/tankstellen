@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Cambiar a disposición horizontal",
   "pumpCameraOrientationVertical": "Cambiar a disposición vertical",
   "pumpCameraGlareWarning": "Demasiado brillo — inclina ligeramente para evitar reflejos",
-  "pumpCameraAlignHint": "Alinea el surtidor en el marco y captura"
+  "pumpCameraAlignHint": "Alinea el surtidor en el marco y captura",
+  "insightHighSpeedBand": "Velocidad alta sostenida ({pctTime}% del trayecto): desperdiciados {liters} L",
+  "insightHighSpeedBandNoFuel": "Velocidad alta sostenida ({pctTime}% del trayecto)",
+  "lessonAdviceHighSpeedBand": "Levanta el pie por encima de 110 km/h: la resistencia del aire sube mucho, así que ir algo más despacio ahorra mucho combustible.",
+  "lessonSmoothDrivingTitle": "Conducción suave: ¡bien hecho!",
+  "lessonAdviceSmoothDriving": "Sin aceleraciones ni frenadas bruscas en este trayecto: una conducción constante mantiene bajo el consumo."
 }
