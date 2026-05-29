@@ -6,10 +6,42 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:tankstellen/core/notifications/notification_providers.dart';
+import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/alerts/data/radius_alert_store.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
+
+/// No-op NotificationService that counts permission requests so the
+/// #2246 radius-permission tests can assert the prompt fires without
+/// touching real plugins.
+class _NoopNotificationService implements NotificationService {
+  int requestPermissionCalls = 0;
+  @override
+  Future<void> initialize() async {}
+  @override
+  Future<bool> requestPermission() async {
+    requestPermissionCalls++;
+    return true;
+  }
+
+  @override
+  Future<bool> areNotificationsEnabled() async => true;
+  @override
+  Future<void> showPriceAlert(
+      {required int id,
+      required String title,
+      required String body,
+      String? payload}) async {}
+  @override
+  Future<void> showServiceReminder(
+      {required int id, required String title, required String body}) async {}
+  @override
+  Future<void> cancelNotification(int id) async {}
+  @override
+  Future<void> cancelAll() async {}
+}
 
 void main() {
   late Directory tempDir;
@@ -155,6 +187,58 @@ void main() {
       expect(state, hasLength(1));
       expect(state.single.id, 'real');
       expect(state.single.enabled, isTrue);
+    });
+  });
+
+  group('radius alert notification permission (#2246)', () {
+    late _NoopNotificationService noopNotifier;
+
+    ProviderContainer makeContainer() {
+      noopNotifier = _NoopNotificationService();
+      final container = ProviderContainer(
+        overrides: [
+          notificationServiceProvider.overrideWithValue(noopNotifier),
+        ],
+      );
+      addTearDown(container.dispose);
+      return container;
+    }
+
+    test('add() requests the OS notification permission', () async {
+      final container = makeContainer();
+      await container.read(radiusAlertsProvider.future);
+
+      await container
+          .read(radiusAlertsProvider.notifier)
+          .add(makeAlert(id: 'perm', enabled: true));
+
+      // unawaited fire-and-forget — let the microtask run.
+      await Future<void>.delayed(Duration.zero);
+      expect(noopNotifier.requestPermissionCalls, 1);
+    });
+
+    test('toggle() to enabled requests the permission; disabling does not',
+        () async {
+      final container = makeContainer();
+      await container.read(radiusAlertsProvider.future);
+      final notifier = container.read(radiusAlertsProvider.notifier);
+
+      // Start enabled (add prompts once).
+      await notifier.add(makeAlert(id: 'tog', enabled: true));
+      await Future<void>.delayed(Duration.zero);
+      final afterAdd = noopNotifier.requestPermissionCalls;
+
+      // Disable — should NOT prompt.
+      await notifier.toggle('tog');
+      await Future<void>.delayed(Duration.zero);
+      expect(noopNotifier.requestPermissionCalls, afterAdd,
+          reason: 'disabling an alert must not re-prompt');
+
+      // Re-enable — should prompt again.
+      await notifier.toggle('tog');
+      await Future<void>.delayed(Duration.zero);
+      expect(noopNotifier.requestPermissionCalls, afterAdd + 1,
+          reason: 're-enabling is a user-intent moment → request again');
     });
   });
 }
