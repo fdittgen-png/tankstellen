@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Pro naskenování displeje stojanu je potřeba přístup ke kameře. Povolte jej v nastavení zařízení.",
   "pumpCameraError": "Kameru se nepodařilo spustit. Zkuste to znovu nebo zadejte hodnoty ručně.",
   "scanPumpSuccess": "Displej pumpy naskenován — ověřte hodnoty.",
+  "scanPumpGlare": "Příliš mnoho odlesků na displeji — zkuste to znovu z mírného úhlu, aby čísla nebyla přezářená.",
   "scanPumpFailed": "Skenování pumpy selhalo: {error}",
   "badScanReportTitle": "Nahlásit chybu skenování",
   "badScanReportTitleReceipt": "Nahlásit chybu skenování — Účtenka",

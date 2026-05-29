@@ -4501,6 +4501,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get scanPumpSuccess => 'Afișajul pompei scanat — verificați valorile.';
 
   @override
+  String get scanPumpGlare =>
+      'Prea multă strălucire pe afișaj — încearcă din nou dintr-un unghi ușor, astfel încât cifrele să nu fie estompate.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Scanarea pompei a eșuat: $error';
   }

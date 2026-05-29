@@ -4497,6 +4497,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get scanPumpSuccess => 'Sūkņa displejs skenēts — pārbaudiet vērtības.';
 
   @override
+  String get scanPumpGlare =>
+      'Pārāk daudz atspīduma uz displeja — mēģiniet vēlreiz nelielā leņķī, lai cipari nebūtu pārgaismoti.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Sūkņa skenēšana neizdevās: $error';
   }

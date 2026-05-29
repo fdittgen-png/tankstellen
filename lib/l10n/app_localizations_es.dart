@@ -4506,6 +4506,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Pantalla del surtidor escaneada: verifica los valores.';
 
   @override
+  String get scanPumpGlare =>
+      'Demasiado reflejo en la pantalla — inténtalo de nuevo desde un ángulo ligeramente distinto para que los números no se vean lavados.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Error al escanear el surtidor: $error';
   }

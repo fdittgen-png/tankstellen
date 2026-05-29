@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "L'accesso alla fotocamera è necessario per scansionare il display della pompa. Abilitalo nelle impostazioni del dispositivo.",
   "pumpCameraError": "La fotocamera non si è avviata. Riprova o inserisci i valori manualmente.",
   "scanPumpSuccess": "Display pompa scansionato — verifica i valori.",
+  "scanPumpGlare": "Troppo riflesso sul display — riprova con una leggera angolazione in modo che i numeri non siano sovraesposti.",
   "scanPumpFailed": "Scansione pompa non riuscita: {error}",
   "badScanReportTitle": "Segnala un errore di scansione",
   "badScanReportTitleReceipt": "Segnala un errore di scansione — Scontrino",

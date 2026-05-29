@@ -4482,6 +4482,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Zaslon pumpe skeniran — provjerite vrijednosti.';
 
   @override
+  String get scanPumpGlare =>
+      'Previše odsjaja na zaslonu — pokušajte ponovno pod blagim kutom kako brojevi ne bi bili izblijedjeli.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skeniranje pumpe nije uspjelo: $error';
   }

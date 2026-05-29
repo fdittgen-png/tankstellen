@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Kameraåtkomst krävs för att skanna pumpdisplayen. Aktivera den i enhetens inställningar.",
   "pumpCameraError": "Kameran kunde inte startas. Försök igen eller ange värdena manuellt.",
   "scanPumpSuccess": "Pumpdisplay skannad – kontrollera värdena.",
+  "scanPumpGlare": "För mycket reflexer på displayen — försök igen i en liten vinkel så att siffrorna inte bleks ut.",
   "scanPumpFailed": "Pumpskanning misslyckades: {error}",
   "badScanReportTitle": "Rapportera ett skanningsfel",
   "badScanReportTitleReceipt": "Rapportera ett skanningsfel – Kvitto",

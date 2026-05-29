@@ -4517,6 +4517,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Affichage de la pompe scanné — vérifiez les valeurs.';
 
   @override
+  String get scanPumpGlare =>
+      'Trop de reflets sur l\'afficheur — réessayez en vous plaçant légèrement de biais pour que les chiffres ne soient pas surexposés.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Échec du scan de la pompe : $error';
   }

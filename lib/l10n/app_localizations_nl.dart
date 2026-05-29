@@ -4485,6 +4485,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get scanPumpSuccess => 'Pompdisplay gescand — verifieer de waarden.';
 
   @override
+  String get scanPumpGlare =>
+      'Te veel weerschijn op het display — probeer het opnieuw onder een lichte hoek zodat de cijfers niet overstraald zijn.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pompscan mislukt: $error';
   }

@@ -4503,6 +4503,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A kút kijelzője beolvasva — ellenőrizze az értékeket.';
 
   @override
+  String get scanPumpGlare =>
+      'Túl sok a tükröződés a kijelzőn — próbáld újra enyhe szögből, hogy a számok ne legyenek túlexponáltak.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Kút beolvasása sikertelen: $error';
   }

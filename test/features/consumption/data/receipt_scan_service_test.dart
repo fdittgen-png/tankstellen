@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
+import 'package:tankstellen/features/consumption/data/ocr/ocr_geometry.dart';
+import 'package:tankstellen/features/consumption/data/ocr/pump_ocr_config.dart';
 import 'package:tankstellen/features/consumption/data/pump_display_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
@@ -96,7 +98,7 @@ class _StubPumpDisplayParser extends PumpDisplayParser {
   final PumpDisplayParseResult result;
 
   @override
-  PumpDisplayParseResult parse(String rawText) {
+  PumpDisplayParseResult parse(String rawText, {OcrLocaleProfile? profile}) {
     return result;
   }
 }
@@ -412,9 +414,10 @@ void main() {
     });
   });
 
-  group('preprocessPumpDisplayForOcr (#1860)', () {
-    /// Scans every pixel and returns the min/max red-channel value —
-    /// on a grayscale image r == g == b, so this is the tonal range.
+  group('preprocessPumpDisplayForOcr (#2275 — adaptive binarization)', () {
+    /// Histogram of the (grayscale) output, bucketed coarsely. Used to
+    /// assert the output is a binary mask (ink + background), not a
+    /// continuous-tone image.
     ({int min, int max}) luminanceSpan(img.Image im) {
       var lo = 255;
       var hi = 0;
@@ -426,14 +429,19 @@ void main() {
       return (min: lo, max: hi);
     }
 
-    test('stretches a low-contrast capture toward the full tonal range',
+    test('binarizes a low-contrast capture into separated ink + background',
         () {
-      // A washed-out display: every pixel sits in a narrow 100–140
-      // grey band. After preprocessing the band must span far more of
-      // the 0–255 range so the digits separate from the background.
-      final src = img.Image(width: 40, height: 40);
+      // A washed-out display: thin dark *strokes* (like 7-segment bars)
+      // on a slightly lighter field, both inside a narrow grey band. The
+      // #1860 global normalize+contrast amplified glare; #2275's local
+      // Sauvola pass must instead separate the strokes into ink (dark)
+      // from background (light) — so the output spans nearly the full
+      // 0..255 range even though the input barely spanned 40 levels.
+      final src = img.Image(width: 80, height: 80);
       for (final p in src) {
-        final shade = p.y < 20 ? 100 : 140;
+        // Two thin horizontal bars (top + middle segment) of the digit.
+        final onBar = (p.y >= 16 && p.y <= 22) || (p.y >= 38 && p.y <= 44);
+        final shade = onBar ? 100 : 140;
         p.setRgb(shade, shade, shade);
       }
       final before = luminanceSpan(src);
@@ -445,15 +453,15 @@ void main() {
       expect(out, isNotNull);
       final after = luminanceSpan(img.decodeJpg(out!)!);
       expect(after.max - after.min, greaterThan(150),
-          reason: 'normalise + contrast must widen the tonal range so a '
-              'washed-out 7-segment LCD becomes legible.');
+          reason: 'adaptive thresholding must separate the dark strokes '
+              'from the lighter field so a washed-out LCD becomes legible.');
     });
 
     test('bakes EXIF orientation upright — dimensions swap, like #1711',
         () {
       // An 80×40 image tagged orientation 6 displays as 40×80; the
       // pump path must apply the same orientation bake the plain path
-      // does before it enhances contrast.
+      // does before it binarizes. (No ROI passed → full frame.)
       final src = img.Image(width: 80, height: 40);
       img.fill(src, color: img.ColorRgb8(60, 60, 60));
       src.exif.imageIfd['Orientation'] = 6;
@@ -464,6 +472,23 @@ void main() {
       final decoded = img.decodeJpg(out!)!;
       expect(decoded.width, 40);
       expect(decoded.height, 80);
+    });
+
+    test('crops to the ROI first when one is supplied', () {
+      // A 100×100 frame: passing a centred 0.2-wide ROI must shrink the
+      // processed output to ~that crop, proving the reticle is applied
+      // before anything else (#2275 concern 1).
+      final src = img.Image(width: 100, height: 100);
+      img.fill(src, color: img.ColorRgb8(60, 60, 60));
+      final out = preprocessPumpDisplayForOcr(
+        Uint8List.fromList(img.encodeJpg(src)),
+        roi: const OcrNormalizedRect(
+            left: 0.4, top: 0.4, width: 0.2, height: 0.2),
+      );
+      expect(out, isNotNull);
+      final decoded = img.decodeJpg(out!)!;
+      expect(decoded.width, lessThan(40));
+      expect(decoded.height, lessThan(40));
     });
 
     test('returns null for non-JPEG / garbage bytes', () {

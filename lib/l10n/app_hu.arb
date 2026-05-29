@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "A kút kijelzőjének beolvasásához kamera-hozzáférés szükséges. Engedélyezze az eszköz beállításaiban.",
   "pumpCameraError": "A kamerát nem sikerült elindítani. Próbálja újra, vagy adja meg az értékeket kézzel.",
   "scanPumpSuccess": "A kút kijelzője beolvasva — ellenőrizze az értékeket.",
+  "scanPumpGlare": "Túl sok a tükröződés a kijelzőn — próbáld újra enyhe szögből, hogy a számok ne legyenek túlexponáltak.",
   "scanPumpFailed": "Kút beolvasása sikertelen: {error}",
   "badScanReportTitle": "Beolvasási hiba jelentése",
   "badScanReportTitleReceipt": "Beolvasási hiba jelentése — Nyugta",

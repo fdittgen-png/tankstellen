@@ -4,6 +4,8 @@
 import '_pump_display_helpers.dart';
 import '_pump_display_patterns.dart';
 import '_pump_display_pollution.dart';
+import 'ocr/pump_ocr_config.dart';
+import 'ocr/pump_validation_gate.dart';
 import 'pump_display_parse_result.dart';
 
 // Re-export so existing callers that `import 'pump_display_parser.dart'`
@@ -32,9 +34,22 @@ export '_pump_display_pollution.dart' show stripPumpDisplayPollution;
 ///    consistency and exposes a [confidence] score, so callers can
 ///    choose to auto-fill only when the read is strongly corroborated.
 class PumpDisplayParser {
-  const PumpDisplayParser();
+  final PumpValidationGate _gate;
 
-  PumpDisplayParseResult parse(String rawText) {
+  const PumpDisplayParser({PumpValidationGate gate = const PumpValidationGate()})
+      : _gate = gate;
+
+  /// Parses ML-Kit OCR [rawText] into the three transaction values.
+  ///
+  /// When [profile] is supplied (the active country's
+  /// [OcrLocaleProfile], threaded from [PumpOcrConfig]) the result is
+  /// run through the per-country [PumpValidationGate]: the extracted
+  /// values must be in that country's sane ranges AND satisfy
+  /// `liters × €/L ≈ total`. The gate outcome is recorded on
+  /// [PumpDisplayParseResult.validated]; auto-fill should require it.
+  /// With no [profile] the parser behaves as before (no EUR/German
+  /// assumptions baked in), leaving `validated` false.
+  PumpDisplayParseResult parse(String rawText, {OcrLocaleProfile? profile}) {
     if (rawText.trim().isEmpty) {
       return const PumpDisplayParseResult();
     }
@@ -80,12 +95,25 @@ class PumpDisplayParser {
       price: price,
     );
 
+    final gateResult = _gate.evaluate(
+      total: total,
+      volume: liters,
+      pricePerLitre: price,
+      confidence: confidence,
+      profile: profile,
+    );
+
     return PumpDisplayParseResult(
       totalCost: total,
       liters: liters,
       pricePerLiter: price,
       pumpNumber: pump,
       confidence: confidence,
+      // Only claim "validated" when a country profile actually gated the
+      // read — without a profile the gate can't range-check, so we stay
+      // conservative and leave it false.
+      validated: profile != null && gateResult.accepted,
+      validationReason: gateResult.reason,
     );
   }
 

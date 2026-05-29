@@ -9,6 +9,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../data/receipt_scan_service.dart';
+import '../screens/pump_display_camera_screen.dart';
 import 'bad_scan_report_sheet.dart';
 import 'pump_scan_failure_sheet.dart';
 
@@ -55,10 +56,20 @@ class FillUpScanHostState {
   final bool Function() isMounted;
 
   /// Opens the pump-display capture surface — the #1868 in-app camera
-  /// screen with the framing reticle — and returns the captured
-  /// photo's file path, or null when the user cancels or the camera
-  /// is unavailable. A seam so widget tests can stub the capture.
-  final Future<String?> Function(BuildContext) capturePumpImage;
+  /// screen with the framing reticle — and returns the capture (photo
+  /// path + the normalized reticle rect the user framed, #2275), or
+  /// null when the user cancels or the camera is unavailable. A seam so
+  /// widget tests can stub the capture.
+  final Future<PumpCaptureResult?> Function(BuildContext) capturePumpImage;
+
+  /// ISO country code of the active region, threaded into the OCR so the
+  /// per-country validation gate (#2275) can range-check the read. Null
+  /// when unknown — the parser then skips range validation.
+  final String? activeCountry;
+
+  /// Station brand of the scanned pump, when known — selects the brand
+  /// template (FR/Tokheim pump-display ROIs) in the OCR config.
+  final String? stationBrand;
 
   const FillUpScanHostState({
     required this.litersCtrl,
@@ -73,6 +84,8 @@ class FillUpScanHostState {
     required this.setLastScan,
     required this.isMounted,
     required this.capturePumpImage,
+    this.activeCountry,
+    this.stationBrand,
   });
 }
 
@@ -159,11 +172,32 @@ Future<void> runPumpDisplayScan(
       state.writeService(service);
     }
     // #1868 — capture through the in-app camera screen (framing
-    // reticle), then OCR + parse the returned photo.
-    final path = await state.capturePumpImage(context);
-    if (path == null || !state.isMounted()) return;
-    final outcome = await service.parsePumpDisplayImage(path);
+    // reticle), then OCR + parse the returned photo. #2275 — pass the
+    // reticle ROI so the OCR crops to the framed readout first, and the
+    // active country/brand so the validation gate can range-check.
+    final capture = await state.capturePumpImage(context);
+    if (capture == null || !state.isMounted()) return;
+    final outcome = await service.parsePumpDisplayImage(
+      capture.path,
+      country: state.activeCountry,
+      brand: state.stationBrand,
+      roi: capture.roi,
+    );
     if (outcome == null || !state.isMounted()) return;
+    // #2275 — an over-glared frame gets a "re-angle" prompt, not the
+    // generic failure sheet: the fix is a different shooting angle.
+    if (outcome.glareRejected) {
+      await state.readService()?.deleteCapturedImage(outcome.imagePath);
+      if (state.isMounted() && context.mounted) {
+        SnackBarHelper.show(
+          context,
+          l?.scanPumpGlare ??
+              'Too much glare on the display — try again at a slight '
+                  'angle so the numbers aren\'t washed out.',
+        );
+      }
+      return;
+    }
     final result = outcome.parse;
     if (!result.hasUsableData) {
       if (context.mounted) {

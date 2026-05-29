@@ -4488,6 +4488,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wyświetlacz dystrybutora zeskanowany — sprawdź wartości.';
 
   @override
+  String get scanPumpGlare =>
+      'Zbyt duże odbicie na wyświetlaczu — spróbuj ponownie pod lekkim kątem, aby cyfry nie były prześwietlone.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skanowanie dystrybutora nie powiodło się: $error';
   }

@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Za optično branje zaslona točilne naprave je potreben dostop do kamere. Omogočite ga v nastavitvah naprave.",
   "pumpCameraError": "Kamere ni bilo mogoče zagnati. Poskusite znova ali vnesite vrednosti ročno.",
   "scanPumpSuccess": "Zaslon črpalke skeniran — preverite vrednosti.",
+  "scanPumpGlare": "Preveč bleščanja na zaslonu — poskusite znova pod rahlim kotom, da številke ne bodo presvetljene.",
   "scanPumpFailed": "Skeniranje črpalke ni uspelo: {error}",
   "badScanReportTitle": "Prijavi napako skeniranja",
   "badScanReportTitleReceipt": "Prijavi napako skeniranja — račun",

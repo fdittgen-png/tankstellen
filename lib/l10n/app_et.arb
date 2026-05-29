@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Tankla ekraani skannimiseks on vaja kaamera juurdepääsu. Lubage see seadme seadetes.",
   "pumpCameraError": "Kaamerat ei õnnestunud käivitada. Proovige uuesti või sisestage väärtused käsitsi.",
   "scanPumpSuccess": "Pumba kuvar skaneeritud — kontrolli väärtusi.",
+  "scanPumpGlare": "Ekraanil on liiga palju peegeldust — proovige uuesti väikese nurga alt, et numbrid ei oleks ülevalgustatud.",
   "scanPumpFailed": "Pumba skaneerimineen ebaõnnestus: {error}",
   "badScanReportTitle": "Teata skaneerimisveast",
   "badScanReportTitleReceipt": "Teata skaneerimisveast — kviitung",

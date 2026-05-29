@@ -4443,6 +4443,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanPumpSuccess => 'Pump display scanned — verify the values.';
 
   @override
+  String get scanPumpGlare =>
+      'Too much glare on the display — try again at a slight angle so the numbers aren\'t washed out.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pump scan failed: $error';
   }
@@ -10275,6 +10279,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get scanPumpSuccess =>
       '⟦Ƥúɱƥ đîšƥłáý šçáññéđ — ṽéřîƒý ŧĥé ṽáłúéš. ···············⟧';
+
+  @override
+  String get scanPumpGlare =>
+      '⟦Ŧóó ɱúçĥ ǧłářé óñ ŧĥé đîšƥłáý — ŧřý áǧáîñ áŧ á šłîǧĥŧ áñǧłé šó ŧĥé ñúɱƀéřš ářéñ\'ŧ ŵášĥéđ óúŧ. ································⟧';
 
   @override
   String scanPumpFailed(String error) {

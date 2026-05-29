@@ -4465,6 +4465,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get scanPumpSuccess => 'Pumpun näyttö skannattu — tarkista arvot.';
 
   @override
+  String get scanPumpGlare =>
+      'Näytössä on liikaa heijastusta — yritä uudelleen hieman vinosta kulmasta, jotta numerot eivät pala puhki.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumpun skannaus epäonnistui: $error';
   }

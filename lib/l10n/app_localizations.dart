@@ -8055,6 +8055,12 @@ abstract class AppLocalizations {
   /// **'Pump display scanned — verify the values.'**
   String get scanPumpSuccess;
 
+  /// Snackbar shown when the pump-display capture is rejected for excessive glare and the user is asked to re-angle (#2275).
+  ///
+  /// In en, this message translates to:
+  /// **'Too much glare on the display — try again at a slight angle so the numbers aren\'t washed out.'**
+  String get scanPumpGlare;
+
   /// Snackbar shown when the pump-display scan throws (#751).
   ///
   /// In en, this message translates to:

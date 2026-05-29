@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Kameratilgang trengs for å skanne pumpedisplayet. Aktiver det i enhetsinnstillingene.",
   "pumpCameraError": "Kameraet kunne ikke startes. Prøv igjen, eller skriv inn verdiene manuelt.",
   "scanPumpSuccess": "Pumpevisning skannet – verifiser verdiene.",
+  "scanPumpGlare": "For mye gjenskinn på displayet — prøv igjen i en liten vinkel slik at tallene ikke blir overstrålt.",
   "scanPumpFailed": "Pumpeskanning mislyktes: {error}",
   "badScanReportTitle": "Rapporter en skanningsfeil",
   "badScanReportTitleReceipt": "Rapporter en skanningsfeil – Kvittering",

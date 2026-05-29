@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/country/country_provider.dart';
 import '../../../../core/widgets/discard_changes_dialog.dart';
 
 import '../../../../core/widgets/page_scaffold.dart';
@@ -71,11 +72,12 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   @visibleForTesting
   final double? initialFuelLevelAfterL;
 
-  /// Test seam (#1868) — widget tests swap in a stub returning a
-  /// fixture image path instead of launching the in-app
-  /// [PumpDisplayCameraScreen]. Production callers leave this null.
+  /// Test seam (#1868 / #2275) — widget tests swap in a stub returning
+  /// a fixture [PumpCaptureResult] (path + reticle ROI) instead of
+  /// launching the in-app [PumpDisplayCameraScreen]. Production callers
+  /// leave this null.
   @visibleForTesting
-  final Future<String?> Function(BuildContext)? pumpImageCapture;
+  final Future<PumpCaptureResult?> Function(BuildContext)? pumpImageCapture;
 
   const AddFillUpScreen({
     super.key,
@@ -245,12 +247,31 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         setLastScan: (o) => setState(() => _lastScan = o),
         isMounted: () => mounted,
         capturePumpImage: widget.pumpImageCapture ?? _capturePumpImage,
+        // #2275 — the active country drives the per-country validation
+        // gate. Brand-template selection (a specific pump make) is a
+        // later signal; for now the country-only template is used, so
+        // we leave the brand null and let the config fall back. Read
+        // defensively: a partially-initialised container (some widget
+        // tests) must degrade to "no profile" rather than throw before
+        // the scan even runs.
+        activeCountry: _activeCountryCode(),
       );
 
-  /// Pushes the #1868 in-app camera screen and returns the captured
-  /// pump-display photo's path (null on cancel / camera unavailable).
-  Future<String?> _capturePumpImage(BuildContext context) {
-    return Navigator.of(context).push<String>(
+  /// The active country code for OCR validation, or null when it can't
+  /// be resolved (so the parser skips range-checking instead of the
+  /// screen failing to build the scan host).
+  String? _activeCountryCode() {
+    try {
+      return ref.read(activeCountryProvider).code;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Pushes the #1868 in-app camera screen and returns the capture
+  /// (photo path + reticle ROI), or null on cancel / camera unavailable.
+  Future<PumpCaptureResult?> _capturePumpImage(BuildContext context) {
+    return Navigator.of(context).push<PumpCaptureResult>(
       MaterialPageRoute(builder: (_) => const PumpDisplayCameraScreen()),
     );
   }

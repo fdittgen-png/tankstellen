@@ -4463,6 +4463,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get scanPumpSuccess => 'Pumba kuvar skaneeritud — kontrolli väärtusi.';
 
   @override
+  String get scanPumpGlare =>
+      'Ekraanil on liiga palju peegeldust — proovige uuesti väikese nurga alt, et numbrid ei oleks ülevalgustatud.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumba skaneerimineen ebaõnnestus: $error';
   }

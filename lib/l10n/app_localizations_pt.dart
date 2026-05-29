@@ -4503,6 +4503,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get scanPumpSuccess => 'Visor da bomba lido — verifique os valores.';
 
   @override
+  String get scanPumpGlare =>
+      'Reflexo em excesso no visor — tente novamente num ângulo ligeiro para que os números não fiquem apagados.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Leitura da bomba falhada: $error';
   }

@@ -10,7 +10,9 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
+import 'package:tankstellen/features/consumption/data/ocr/ocr_geometry.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
+import 'package:tankstellen/features/consumption/presentation/screens/pump_display_camera_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/bad_scan_report_sheet.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/pump_scan_failure_sheet.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
@@ -83,7 +85,12 @@ class _FakeFailingScanService extends ReceiptScanService {
   int deleteCalls = 0;
 
   @override
-  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(String path) async {
+  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(
+    String path, {
+    String? country,
+    String? brand,
+    OcrNormalizedRect? roi,
+  }) async {
     return const PumpDisplayScanOutcome(
       // confidence == 0 + only one usable field → !hasUsableData → opens
       // the failure-flow sheet.
@@ -123,7 +130,10 @@ void main() {
           scanService: scanService,
           // #1868 — stub the in-app camera so the test feeds a fixture
           // path straight into parsePumpDisplayImage.
-          pumpImageCapture: (_) async => '/tmp/fake-pump-failure.jpg',
+          pumpImageCapture: (_) async => const PumpCaptureResult(
+            path: '/tmp/fake-pump-failure.jpg',
+            roi: OcrNormalizedRect.full,
+          ),
         ),
         overrides: _withVehicle,
       );

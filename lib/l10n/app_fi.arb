@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Kameran käyttöoikeus tarvitaan mittarin näytön skannaamiseen. Ota se käyttöön laitteen asetuksista.",
   "pumpCameraError": "Kameraa ei voitu käynnistää. Yritä uudelleen tai syötä arvot käsin.",
   "scanPumpSuccess": "Pumpun näyttö skannattu — tarkista arvot.",
+  "scanPumpGlare": "Näytössä on liikaa heijastusta — yritä uudelleen hieman vinosta kulmasta, jotta numerot eivät pala puhki.",
   "scanPumpFailed": "Pumpun skannaus epäonnistui: {error}",
   "badScanReportTitle": "Ilmoita skannauksesta",
   "badScanReportTitleReceipt": "Ilmoita skannauksesta — Kuitti",

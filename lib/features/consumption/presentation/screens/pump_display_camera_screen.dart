@@ -7,6 +7,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../data/ocr/ocr_geometry.dart';
 import '../widgets/pump_display_reticle.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -18,9 +19,11 @@ import '../../../../core/logging/error_logger.dart';
 /// three-number display — cutting the metrology stickers, pump logos
 /// and card-reader text the OCR parser would otherwise have to strip.
 ///
-/// Pops with the captured JPEG's file path, or `null` when the user
-/// cancels or the camera is unavailable. The caller feeds the path
-/// into `ReceiptScanService.parsePumpDisplayImage`.
+/// Pops with a [PumpCaptureResult] (the captured JPEG's path + the
+/// normalized reticle rect the user framed), or `null` when the user
+/// cancels or the camera is unavailable. The caller feeds both into
+/// `ReceiptScanService.parsePumpDisplayImage` so the OCR crops to
+/// exactly what the user framed (#2275).
 class PumpDisplayCameraScreen extends StatefulWidget {
   const PumpDisplayCameraScreen({super.key});
 
@@ -89,7 +92,11 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
       );
       final controller = CameraController(
         back,
-        ResolutionPreset.high,
+        // #2275 — capture at the sensor's max so the cropped readout ROI
+        // keeps enough pixels for the 7-segment decoder. `high` (720p)
+        // left each digit only a few-dozen px tall after the crop, below
+        // what the segment-sampling windows need.
+        ResolutionPreset.max,
         enableAudio: false,
       );
       await controller.initialize();
@@ -133,7 +140,16 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
     setState(() => _capturing = true);
     try {
       final shot = await controller.takePicture();
-      if (mounted) Navigator.of(context).pop(shot.path);
+      // The captured photo is the sensor frame; the live preview the
+      // user framed against has the controller's aspect ratio. Compute
+      // the reticle rect over that ratio so the OCR crops to what the
+      // user saw, independent of capture resolution.
+      final roi = PumpDisplayReticle.normalizedRect(
+        controller.value.aspectRatio,
+      );
+      if (mounted) {
+        Navigator.of(context).pop(PumpCaptureResult(path: shot.path, roi: roi));
+      }
     } on CameraException {
       if (mounted) {
         setState(() {
@@ -279,4 +295,14 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
       ),
     );
   }
+}
+
+/// What [PumpDisplayCameraScreen] pops on a successful capture (#2275):
+/// the captured JPEG's [path] plus the normalized reticle [roi] the user
+/// framed, so the OCR pipeline can crop to exactly that region first.
+class PumpCaptureResult {
+  final String path;
+  final OcrNormalizedRect roi;
+
+  const PumpCaptureResult({required this.path, required this.roi});
 }
