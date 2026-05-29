@@ -27,7 +27,7 @@ import '../../../../core/logging/error_logger.dart';
 /// Column and produced a visible grey strip between the AppBar and
 /// the map whenever a fallback fired — a permanent ~32 dp tax on
 /// every "stations were fetched via the secondary API" session.
-class NearbyMapView extends ConsumerWidget {
+class NearbyMapView extends ConsumerStatefulWidget {
   final AsyncValue searchState;
   final dynamic selectedFuel;
   final double searchRadiusKm;
@@ -42,7 +42,37 @@ class NearbyMapView extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NearbyMapView> createState() => _NearbyMapViewState();
+
+  /// Decides whether a post-frame `fitCamera` should be scheduled for a
+  /// freshly-computed [next] fit target, given the [last] target we
+  /// already fitted to (null on first build). Extracted as a pure
+  /// predicate so the guard can be unit-tested without driving a real
+  /// [MapController] (#2177).
+  ///
+  /// The first fit (`last == null`) and any genuine change to the search
+  /// bounds return `true`; an identical re-fit returns `false`. flutter_map's
+  /// [LatLngBounds] implements value-based `==`/`hashCode`, so the
+  /// comparison is a cheap structural check on south/north/east/west.
+  @visibleForTesting
+  static bool shouldFit(LatLngBounds? last, LatLngBounds next) => last != next;
+}
+
+class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
+  /// The bounds the camera was last fitted to. Held in State so a redundant
+  /// rebuild (EV-toggle tap, app resume, unrelated provider change) does
+  /// not re-schedule an identical `fitCamera` (#2177). Set when we SCHEDULE
+  /// the post-frame fit — not inside the callback — so that if the fit
+  /// itself triggers a rebuild, the next build computes the same bounds,
+  /// sees they equal `_lastFitBounds`, and skips: no fit→rebuild→fit loop.
+  LatLngBounds? _lastFitBounds;
+
+  @override
+  Widget build(BuildContext context) {
+    final searchState = widget.searchState;
+    final selectedFuel = widget.selectedFuel;
+    final searchRadiusKm = widget.searchRadiusKm;
+    final mapController = widget.mapController;
     final l10n = AppLocalizations.of(context);
 
     return searchState.when(
@@ -99,20 +129,34 @@ class NearbyMapView extends ConsumerWidget {
         // Fit map viewport to the search radius when results change so the
         // user immediately sees the entire searched area instead of having
         // to zoom out manually.
+        //
+        // #2177 — guard the schedule against redundant per-build re-fits.
+        // `build` runs on every EV-toggle tap, app resume, and unrelated
+        // provider change; an unguarded post-frame `fitCamera` snapped the
+        // camera back to the search bounds each time (fighting the user's
+        // manual pan and, during the cold-start window, forcing a TileLayer
+        // reset). We only schedule when the fit target actually changed
+        // since the last fit. `_lastFitBounds` is set HERE (at schedule
+        // time, not in the callback) so a fit→rebuild→fit loop cannot form:
+        // the next build computes the same bounds, finds them equal, skips.
         final bounds =
             StationMapLayers.boundsForRadius(center, searchRadiusKm);
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          try {
-            mapController.fitCamera(
-              CameraFit.bounds(
-                bounds: bounds,
-                padding: const EdgeInsets.all(32),
-              ),
-            );
-          } catch (e, st) {
-            unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Map fitCamera failed'}));
-          }
-        });
+        if (NearbyMapView.shouldFit(_lastFitBounds, bounds)) {
+          _lastFitBounds = bounds;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            try {
+              mapController.fitCamera(
+                CameraFit.bounds(
+                  bounds: bounds,
+                  padding: const EdgeInsets.all(32),
+                ),
+              );
+            } catch (e, st) {
+              unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Map fitCamera failed'}));
+            }
+          });
+        }
 
         return Stack(
           children: [
@@ -188,7 +232,7 @@ class NearbyMapView extends ConsumerWidget {
               color: theme.colorScheme.primary.withValues(alpha: 0.3)),
           const SizedBox(width: 4),
           Text(
-            '${searchRadiusKm.round()} km ${l10n?.searchRadius ?? "radius"}',
+            '${widget.searchRadiusKm.round()} km ${l10n?.searchRadius ?? "radius"}',
             style: theme.textTheme.bodySmall,
           ),
           const Spacer(),
