@@ -6,30 +6,38 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/services/approach_detector.dart';
-import '../../../core/services/service_providers.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 import '../../profile/data/models/user_profile.dart' as profile_model;
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
+import 'fuel_station_radar_provider.dart';
 
 part 'approach_state_provider.g.dart';
 
-/// Real-data approach detector (#2163) — wires [ApproachDetector] to
-/// the live trip-recording flow.
+/// Real-data approach detector (#2163, #2283) — wires [ApproachDetector] to
+/// the live trip-recording flow, backed by the Fuel Station Radar.
 ///
 /// Active only while a trip is recording: cold-start cost (a GPS
-/// subscription + periodic search-chain calls) is bounded to the
-/// window where the user is actually driving. The detector is
-/// recreated whenever the user edits their profile's approach config
-/// or fuel type (per ADR 0011 — the detector itself does not watch
-/// the profile).
+/// subscription) is bounded to the window where the user is actually
+/// driving. The detector is recreated whenever the user edits their profile's
+/// approach config or fuel type (per ADR 0011 — the detector itself does not
+/// watch the profile).
 ///
-/// The UI consumes [effectiveApproachStateProvider] rather than this
-/// stream directly, so the in-app simulator (debug button on the
-/// trip-recording screen) can override the real signal for testing.
+/// ### Data source (#2283)
+///
+/// The detector's `fetchStations` is delegated to [fuelStationRadarProvider]
+/// instead of hitting the search chain on every poll. The radar serves the
+/// **cached wide-area corridor** locations (zero network while inside a
+/// covered tile) and JIT-fetches the price for only the imminent station(s).
+/// The detector's geofence (radius + heading lock) runs locally against that
+/// cached set — so the detector's public API and state machine are unchanged;
+/// only the bytes flowing into `fetchStations` moved off the per-poll network
+/// path onto the corridor cache.
+///
+/// The UI consumes [effectiveApproachStateProvider] rather than this stream
+/// directly, so the in-app simulator (debug button on the trip-recording
+/// screen) can override the real signal for testing.
 @Riverpod(keepAlive: true)
 Stream<ApproachState> approachState(Ref ref) {
   final tripState = ref.watch(tripRecordingProvider);
@@ -41,7 +49,7 @@ Stream<ApproachState> approachState(Ref ref) {
 
   final fuel = ref.watch(effectiveFuelTypeProvider);
   final geo = ref.read(geolocatorWrapperProvider);
-  final svc = ref.read(stationServiceProvider);
+  final radar = ref.read(fuelStationRadarProvider);
 
   final config = ApproachDetectorConfig(
     radiusMeters: (profile.approachRadiusKm * 1000).round(),
@@ -58,16 +66,15 @@ Stream<ApproachState> approachState(Ref ref) {
     ),
     fetchStations: (lat, lng, radiusKm, fuelTypeApiValue) async {
       try {
-        final result = await svc.searchStations(
-          SearchParams(
-            lat: lat,
-            lng: lng,
-            radiusKm: radiusKm,
-            fuelType: FuelType.fromString(fuelTypeApiValue),
-            sortBy: SortBy.distance,
-          ),
+        // Cached corridor locations (tier-1) + JIT price for the imminent
+        // station(s) (tier-3). Zero network when the tile is already cached
+        // and no imminent station needs a price refresh.
+        return await radar.fetchStations(
+          lat,
+          lng,
+          radiusKm,
+          fuelTypeApiValue,
         );
-        return result.data;
       } on Object {
         // Swallow — the detector treats this as "no stations in
         // radius" and keeps polling. The next iteration retries.
