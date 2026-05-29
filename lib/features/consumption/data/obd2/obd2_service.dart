@@ -13,6 +13,7 @@ import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_diagnostics.dart';
 import 'fuel_rate_estimator.dart' as estimator;
+import 'negotiated_protocol_cache.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
@@ -117,12 +118,26 @@ class Obd2Service implements Obd2RawCommandPort {
   /// raw [Obd2BreadcrumbCollector].
   Obd2BreadcrumbRecorder? breadcrumbCollector;
 
+  /// Persistent negotiated-protocol cache (#2261 concern 3). When
+  /// present and [_protocolCacheKey] resolves, a warm connect replays
+  /// `ATSP{n}` for the cached protocol instead of paying the multi-second
+  /// `ATSP0` auto-search. Null in tests / configs that don't exercise it
+  /// — connect then always runs the cold ATSP0 search, exactly as before.
+  final NegotiatedProtocolCache? _protocolCache;
+
+  /// Lookup key for [_protocolCache] — `adapterMac(:vin)`. Supplied by
+  /// the owner so the data layer never resolves vehicle identity itself.
+  final String? _protocolCacheKey;
+
   Obd2Service(
     this._transport, {
     SupportedPidsCache? pidsCache,
     String? vehicleFallbackKey,
+    NegotiatedProtocolCache? protocolCache,
+    String? protocolCacheKey,
     this.breadcrumbCollector,
-  }) {
+  })  : _protocolCache = protocolCache,
+        _protocolCacheKey = protocolCacheKey {
     // #1916 — the supported-PIDs prime + discovery run during connect,
     // when the BLE link is least settled. Wrap their `_send` callback
     // with the same one-shot retry the init handshake now uses, so a
@@ -187,6 +202,67 @@ class Obd2Service implements Obd2RawCommandPort {
     return s;
   }
 
+  /// Look up the protocol digit cached for this adapter+vehicle, or null
+  /// when no cache is wired / no key resolves / no entry exists (#2261
+  /// concern 3). A non-null result drives a warm `ATSP{n}` init.
+  String? _cachedProtocolDigit() {
+    final cache = _protocolCache;
+    final key = _protocolCacheKey;
+    if (cache == null || key == null) return null;
+    try {
+      return cache.get(key);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OBD2 negotiated-protocol cache read failed',
+      }));
+      return null;
+    }
+  }
+
+  /// Read `ATDPN`, strip the auto-flag, and persist the negotiated
+  /// protocol for next session (#2261 concern 3).
+  ///
+  /// When [warmConnect] is true (we pinned a cached `ATSP{n}`) and the
+  /// adapter cannot describe a working protocol — `ATDPN` returns a
+  /// NO-DATA / UNABLE / error placeholder — the cached protocol was
+  /// wrong (different car on the same adapter, ECU swapped). We then
+  /// invalidate the entry, fall back to the `ATSP0` auto-search, and
+  /// re-read ATDPN to re-cache the freshly negotiated value.
+  ///
+  /// Best-effort throughout: any send failure is swallowed so the
+  /// connect still succeeds with whatever protocol the init left active.
+  Future<void> _resolveAndCacheProtocol({required bool warmConnect}) async {
+    final cache = _protocolCache;
+    final key = _protocolCacheKey;
+    if (cache == null || key == null) return;
+    try {
+      var digit = Elm327Protocol.parseProtocolNumber(
+        await _withConnectRetry(
+          Elm327Protocol.describeProtocolNumberCommand,
+          _transport.sendCommand,
+        ),
+      );
+      if (digit == null && warmConnect) {
+        // The pinned protocol can't talk to this bus — drop it and
+        // re-run the cold ATSP0 auto-search, then re-read ATDPN.
+        await cache.invalidate(key);
+        await _transport.sendCommand(Elm327Protocol.autoProtocolCommand);
+        digit = Elm327Protocol.parseProtocolNumber(
+          await _transport.sendCommand(
+            Elm327Protocol.describeProtocolNumberCommand,
+          ),
+        );
+      }
+      if (digit != null) {
+        await cache.put(key, digit);
+      }
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OBD2 negotiated-protocol resolve/cache failed',
+      }));
+    }
+  }
+
   /// `true` when the underlying [Obd2Transport] currently has an open
   /// connection to the vehicle's ELM327 adapter.
   bool get isConnected => _transport.isConnected;
@@ -245,10 +321,24 @@ class Obd2Service implements Obd2RawCommandPort {
       // matches the legacy hardcoded behaviour byte-for-byte: the
       // shared ELM init list followed by 100 ms after the first
       // command (ATZ) and 100 ms between each subsequent command.
+      //
+      // #2261 concern 3 — on a WARM connect, replay the protocol pinned
+      // last session: swap the `ATSP0` auto-search for `ATSP{n}` so the
+      // ELM327 skips the multi-second protocol probe. On a cold connect
+      // (no cache hit) the sequence is untouched and ATSP0 runs as before.
+      final warmProtocol = _cachedProtocolDigit();
       final sequence = <String>[
         ...adapter.initSequence,
         ...adapter.extraInitCommands,
       ];
+      if (warmProtocol != null) {
+        for (var i = 0; i < sequence.length; i++) {
+          if (sequence[i] == Elm327Protocol.autoProtocolCommand) {
+            sequence[i] = Elm327Protocol.setProtocolCommand(warmProtocol);
+            break;
+          }
+        }
+      }
       for (var i = 0; i < sequence.length; i++) {
         // #1925 — time each handshake command for the opt-in OBD2
         // debug log (a no-op when debug logging is off).
@@ -314,6 +404,13 @@ class Obd2Service implements Obd2RawCommandPort {
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 ATI firmware read failed'}));
       }
+
+      // #2261 concern 3 — read ATDPN to learn the negotiated protocol
+      // and persist it for next session's warm connect. When a warm
+      // ATSP{n} was attempted but the protocol can't actually talk to
+      // the bus, this re-runs ATSP0 + re-caches. Non-fatal: any failure
+      // just leaves the cache as-is and the connect still succeeds.
+      await _resolveAndCacheProtocol(warmConnect: warmProtocol != null);
 
       await _pids.prime();
 

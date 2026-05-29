@@ -4,7 +4,6 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'adapter_registry.dart';
@@ -13,12 +12,13 @@ import 'bluetooth_obd2_transport.dart';
 import 'classic_bluetooth_facade.dart';
 import 'elm327_adapter.dart';
 import 'elm_byte_channel.dart';
+import 'negotiated_protocol_cache.dart';
+import 'obd2_cache_openers.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_permissions.dart';
 import 'obd2_service.dart';
 import 'supported_pids_cache.dart';
 import '../../../../core/logging/error_logger.dart';
-import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 
 part 'obd2_connection_service.g.dart';
@@ -28,7 +28,12 @@ part 'obd2_connection_service.g.dart';
 /// owner so the data layer never depends on the vehicle feature's
 /// providers directly — the Riverpod provider resolves the active
 /// profile and hands these three fields through.
-typedef Obd2VehicleKeyFields = ({String? make, String? model, int? year});
+typedef Obd2VehicleKeyFields = ({
+  String? make,
+  String? model,
+  int? year,
+  String? vin,
+});
 
 /// Binds scan results to the adapter registry and hands back a ready
 /// [Obd2Service] on connect (#741).
@@ -66,6 +71,12 @@ class Obd2ConnectionService {
   /// (blind PID querying, full support scan every connect).
   final SupportedPidsCache? supportedPidsCache;
 
+  /// Persistent negotiated-protocol cache (#2261 concern 3), wired into
+  /// every session built here. Null in tests / configs that don't
+  /// exercise it — the service then always runs the cold ATSP0
+  /// auto-search, exactly as before.
+  final NegotiatedProtocolCache? negotiatedProtocolCache;
+
   /// Lazily resolves the active vehicle's make / model / year so the
   /// supported-PID cache key can be refined past adapterMac-only
   /// (#2253). Read fresh on every connect because the active vehicle
@@ -78,6 +89,7 @@ class Obd2ConnectionService {
     required this.bluetooth,
     this.classicBluetooth,
     this.supportedPidsCache,
+    this.negotiatedProtocolCache,
     this.activeVehicleKeyFields,
   });
 
@@ -174,15 +186,21 @@ class Obd2ConnectionService {
     required String name,
   }) async {
     final transport = BluetoothObd2Transport(channel);
-    // #2253 — wire the dead #811 supported-PID cache into the live
-    // session. The key is rooted on the adapter MAC and refined with
-    // the active vehicle's make:model:year, so [Obd2Service.connect] →
-    // `prime()` can read a cached support bitmap WITHOUT first paying a
-    // multi-frame 0902 VIN read, and the recording loop skips PIDs the
-    // car doesn't implement. When no cache is wired this collapses to
-    // the pre-#2253 transport-only construction.
+    // #2253 — wire the #811 supported-PID cache into the live session.
+    // Key = adapterMac(+make:model:year), so `prime()` reads a cached
+    // support bitmap WITHOUT a multi-frame 0902 VIN read. No cache wired
+    // ⇒ pre-#2253 transport-only construction.
     final cache = supportedPidsCache;
     final vehicle = activeVehicleKeyFields?.call();
+    // #2261 concern 3 — resolve the warm-protocol cache key from the
+    // adapter MAC + the active vehicle's VIN (when known).
+    final protoCache = negotiatedProtocolCache;
+    final protoKey = protoCache == null
+        ? null
+        : NegotiatedProtocolCache.keyFor(
+            adapterMac: mac,
+            vin: vehicle?.vin,
+          );
     final service = Obd2Service(
       transport,
       pidsCache: cache,
@@ -194,6 +212,8 @@ class Obd2ConnectionService {
               model: vehicle?.model,
               year: vehicle?.year,
             ),
+      protocolCache: protoCache,
+      protocolCacheKey: protoKey,
     );
     service.adapterMac = mac;
     service.adapterName = name;
@@ -257,37 +277,19 @@ class Obd2ConnectionService {
     return connect(match);
   }
 
-  /// Direct-connect-by-MAC, NO scan (#2242). Shared infrastructure for
-  /// reliable in-trip reconnect and pre-warm: addresses the adapter via
-  /// `BluetoothDevice.fromId(mac)` and connects with a bounded ~4 s
-  /// timeout, skipping the ~5 s active scan that [connectByMac] does.
-  /// This is essential for ELM327 clones that stop advertising in
-  /// standby — a scan would never see them, but a direct GATT connect
-  /// still wakes them.
+  /// Direct-connect-by-MAC, NO scan (#2242). Addresses the adapter via
+  /// `BluetoothDevice.fromId(mac)` with a bounded ~4 s [timeout],
+  /// skipping the active scan — essential for ELM327 clones that stop
+  /// advertising in standby (a scan never sees them; a direct GATT
+  /// connect still wakes them). Tears down any prior direct channel
+  /// first (Android GATT_ERROR 133 on a stale client), runs the SAME
+  /// service-side init as [connect] via [_openAndInit].
   ///
-  /// Before opening, it tears down any channel left over from a prior
-  /// direct connect (`channel.close()` → `device.disconnect()`); Android
-  /// otherwise returns GATT_ERROR 133 on a stale GATT client and the
-  /// connect would silently fail. The channel's own `open()` also
-  /// pre-disconnects the device as a second guard.
-  ///
-  /// On timeout / any failure it FALLS BACK to the scan-based
-  /// [connectByMac] so behaviour is never worse than today: a successful
-  /// scan-path connect still returns a session; a genuinely-unreachable
-  /// adapter still returns null. Runs the SAME service-side init as the
-  /// scan path (via [_openAndInit]), so a direct connect yields a fully
-  /// initialised session identical to [connect].
-  ///
-  /// [timeout] bounds the GATT connect attempt (passed to the channel);
-  /// it is NOT a scan window. Returns null when both the direct attempt
-  /// and the scan fallback fail to produce a session.
-  ///
-  /// [fallbackToScan] (default `true`) controls the internal scan
-  /// fallback. The in-trip reconnect path (#2245) passes `false` so it
-  /// can own a single RSSI-gated scan fallback itself — gating the
-  /// connect on a relative-RSSI / two-consecutive-batch rule — rather
-  /// than double-scanning (once here, once in the reconnect probe). With
-  /// `false` a failed direct attempt returns null immediately.
+  /// On any failure it falls back to the scan-based [connectByMac], so
+  /// behaviour is never worse than today; returns null when both fail.
+  /// [fallbackToScan] `false` (the #2245 in-trip path, which owns its
+  /// own RSSI-gated scan) returns null immediately on a failed direct
+  /// attempt instead of double-scanning.
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
     Duration timeout = const Duration(seconds: 4),
@@ -329,16 +331,11 @@ class Obd2ConnectionService {
   /// Passive autoConnect reconnect (#2261 concern 2). Opens a channel
   /// with `autoConnect:true` and NO bounded timeout, so the OS holds a
   /// low-power background GATT request that resolves the instant the
-  /// pinned adapter advertises again. Used by the reconnect scanner once
-  /// its active-scan miss ceiling is reached — a parked car then stops
-  /// burning the radio on repeated active 8 s scans for the remainder of
-  /// the 15-min grace.
-  ///
-  /// Unlike [connectByMacDirect] there is NO scan fallback (a passive
-  /// wait is the fallback) and NO requestMtu bump (FBP forbids it with
-  /// autoConnect:true). Returns null on any failure so the scanner keeps
-  /// its schedule. Runs the SAME service-side init as every other path
-  /// via [_openAndInit].
+  /// pinned adapter advertises again — used by the reconnect scanner
+  /// past its active-scan miss ceiling so a parked car stops burning the
+  /// radio. NO scan fallback (the passive wait IS the fallback) and NO
+  /// requestMtu (FBP forbids it with autoConnect). Returns null on any
+  /// failure; runs the SAME service-side init via [_openAndInit].
   Future<Obd2Service?> connectByMacPassive(String mac) async {
     await _teardownLastDirectChannel();
     final generic = _genericBleProfile();
@@ -389,26 +386,17 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     bluetooth: const PluginBluetoothFacade(),
     classicBluetooth: const PluginClassicBluetoothFacade(),
     // #2253 — activate the #811 supported-PID cache in production.
-    supportedPidsCache: _openSupportedPidsCache(),
+    supportedPidsCache: openSupportedPidsCache(),
+    // #2261 concern 3 — activate the negotiated-protocol warm cache.
+    negotiatedProtocolCache: openNegotiatedProtocolCache(),
     activeVehicleKeyFields: () {
       // Defensive: the vehicle provider must never make a connect throw.
       try {
         final v = ref.read(activeVehicleProfileProvider);
-        return (make: v?.make, model: v?.model, year: v?.year);
+        return (make: v?.make, model: v?.model, year: v?.year, vin: v?.vin);
       } catch (_) {
-        return (make: null, model: null, year: null);
+        return (make: null, model: null, year: null, vin: null);
       }
     },
   );
-}
-
-/// Open the #811 supported-PID cache against the unencrypted box
-/// [HiveBoxes.init] opens after the first frame. Returns null when the
-/// box isn't open yet (early-boot connect, or a bare test harness that
-/// never initialised Hive) so building the connection service can never
-/// throw — the session then runs with the pre-#2253 no-cache behaviour
-/// (blind PID querying, full support scan every connect).
-SupportedPidsCache? _openSupportedPidsCache() {
-  if (!Hive.isBoxOpen(HiveBoxes.obd2SupportedPids)) return null;
-  return SupportedPidsCache(Hive.box<String>(HiveBoxes.obd2SupportedPids));
 }

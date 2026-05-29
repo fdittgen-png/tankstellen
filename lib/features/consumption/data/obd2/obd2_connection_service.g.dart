@@ -54,4 +54,4 @@ final class Obd2ConnectionProvider
   }
 }
 
-String _$obd2ConnectionHash() => r'e2282d7cbc02d7e0cf172c6fa3abeb1a2294224b';
+String _$obd2ConnectionHash() => r'f52d0cd5581de85e2965fe72f0d0702af07abe7c';

@@ -101,6 +101,19 @@ class Elm327Commands {
   /// Set protocol to automatic detection.
   static const autoProtocolCommand = 'ATSP0\r';
 
+  /// Describe the currently-active protocol as a NUMBER (#2261 concern
+  /// 3). After ATSP0 has auto-negotiated, `ATDPN` returns the resolved
+  /// protocol digit — prefixed with `A` when it was reached via the
+  /// auto-search (e.g. `A6` ⇒ auto-found protocol 6, `6` ⇒ pinned 6).
+  static const describeProtocolNumberCommand = 'ATDPN\r';
+
+  /// Pin the ELM327 to protocol [n] directly (#2261 concern 3) — a warm
+  /// connect skips the multi-second ATSP0 auto-search by replaying the
+  /// protocol cached from the previous session. [n] is the bare ELM327
+  /// protocol digit (1–9, A–C), i.e. the ATDPN value with the `A`
+  /// auto-flag stripped.
+  static String setProtocolCommand(String n) => 'ATSP$n\r';
+
   /// Turn off line feeds.
   static const lineFeedsOffCommand = 'ATL0\r';
 

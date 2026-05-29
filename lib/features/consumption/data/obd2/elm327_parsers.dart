@@ -36,6 +36,48 @@ class Elm327Parsers {
     return cleaned;
   }
 
+  /// Parse the ELM327 `ATDPN` (describe-protocol-number) reply into the
+  /// bare protocol digit, stripping the leading `A` auto-flag (#2261
+  /// concern 3).
+  ///
+  /// `ATDPN` returns the resolved protocol as a single digit (`1`–`9`,
+  /// `A`–`C` for the CAN variants), prefixed with `A` when the protocol
+  /// was reached via the ATSP0 auto-search — e.g. `A6` ⇒ auto-found
+  /// protocol 6, `6` ⇒ explicitly pinned protocol 6. Both map to the
+  /// same pinnable digit `6`. We strip ONLY a leading `A`; the `A`–`C`
+  /// CAN protocol digits are themselves preserved.
+  ///
+  /// Returns null when the response is empty / a NO-DATA / error
+  /// placeholder, or carries no recognisable protocol digit — the
+  /// caller then keeps the safe ATSP0 fallback.
+  static String? parseProtocolNumber(String raw) {
+    var s = raw
+        .replaceAll('>', '')
+        .replaceAll('\r', ' ')
+        .replaceAll('\n', ' ')
+        .toUpperCase()
+        .trim();
+    if (s.isEmpty ||
+        s.contains('NO DATA') ||
+        s.contains('UNABLE') ||
+        s.contains('ERROR') ||
+        s.contains('?')) {
+      return null;
+    }
+    // Strip a single leading auto-flag `A`, then take the first
+    // protocol-digit token (`0`–`9` or `A`–`C`).
+    if (s.startsWith('A') && s.length >= 2) {
+      s = s.substring(1).trim();
+    }
+    final match = RegExp(r'^([0-9A-C])').firstMatch(s);
+    if (match == null) return null;
+    final digit = match.group(1)!;
+    // Protocol 0 is "automatic" — not a concrete pinnable protocol, so
+    // it is treated as "nothing to cache".
+    if (digit == '0') return null;
+    return digit;
+  }
+
   /// Parse vehicle speed from Mode 01 PID 0D response.
   /// Response format: "41 0D XX" where XX is speed in km/h.
   static int? parseVehicleSpeed(String raw) {

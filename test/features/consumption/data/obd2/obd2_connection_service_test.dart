@@ -13,6 +13,8 @@ import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
+import 'package:tankstellen/features/consumption/data/obd2/'
+    'negotiated_protocol_cache.dart';
 import 'package:tankstellen/features/consumption/data/obd2/supported_pids_cache.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
@@ -499,7 +501,7 @@ void main() {
         ),
         supportedPidsCache: SupportedPidsCache(box),
         activeVehicleKeyFields: () =>
-            (make: 'Peugeot', model: '107', year: 2008),
+            (make: 'Peugeot', model: '107', year: 2008, vin: null),
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
@@ -528,7 +530,7 @@ void main() {
         ),
         supportedPidsCache: SupportedPidsCache(box),
         activeVehicleKeyFields: () =>
-            (make: 'Peugeot', model: '107', year: 2008),
+            (make: 'Peugeot', model: '107', year: 2008, vin: null),
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
@@ -564,6 +566,7 @@ Obd2ConnectionService _build({
   required Obd2PermissionState permState,
   required BluetoothFacade bt,
   SupportedPidsCache? supportedPidsCache,
+  NegotiatedProtocolCache? negotiatedProtocolCache,
   Obd2VehicleKeyFields Function()? activeVehicleKeyFields,
 }) =>
     Obd2ConnectionService(
@@ -571,6 +574,7 @@ Obd2ConnectionService _build({
       permissions: _FakePermissions(permState),
       bluetooth: bt,
       supportedPidsCache: supportedPidsCache,
+      negotiatedProtocolCache: negotiatedProtocolCache,
       activeVehicleKeyFields: activeVehicleKeyFields,
     );
 

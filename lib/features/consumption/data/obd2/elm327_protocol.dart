@@ -45,6 +45,10 @@ class Elm327Protocol {
   static const resetCommand = Elm327Commands.resetCommand;
   static const echoOffCommand = Elm327Commands.echoOffCommand;
   static const autoProtocolCommand = Elm327Commands.autoProtocolCommand;
+  static const describeProtocolNumberCommand =
+      Elm327Commands.describeProtocolNumberCommand;
+  static String setProtocolCommand(String n) =>
+      Elm327Commands.setProtocolCommand(n);
   static const lineFeedsOffCommand = Elm327Commands.lineFeedsOffCommand;
   static const headersOffCommand = Elm327Commands.headersOffCommand;
   static const adaptiveTimingCommand = Elm327Commands.adaptiveTimingCommand;
@@ -81,6 +85,9 @@ class Elm327Protocol {
   // ---------------------------------------------------------------------------
 
   static String? cleanResponse(String raw) => Elm327Parsers.cleanResponse(raw);
+
+  static String? parseProtocolNumber(String raw) =>
+      Elm327Parsers.parseProtocolNumber(raw);
 
   static int? parseVehicleSpeed(String raw) =>
       Elm327Parsers.parseVehicleSpeed(raw);
