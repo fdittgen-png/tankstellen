@@ -4,8 +4,10 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/logging/error_logger.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
@@ -14,8 +16,9 @@ import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/android_background_adapter_listener.dart';
 import '../data/obd2/auto_trip_coordinator.dart';
 import '../data/obd2/background_adapter_listener.dart';
-import '../data/obd2/obd2_connection_service.dart';
+import '../data/obd2/obd2_permissions.dart';
 import '../data/obd2/obd2_service.dart';
+import 'auto_record_orchestrator_factories.dart';
 import 'trip_recording_provider.dart';
 
 part 'auto_record_orchestrator.g.dart';
@@ -79,8 +82,40 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   final Map<String, _OrchestratorEntry> _entries =
       <String, _OrchestratorEntry>{};
 
+  /// Observes app resume so the foreground-active arming fallback
+  /// (#2282 concern 1) can fire while the app is in front. Owned here +
+  /// disposed in [onDispose]; mirrors the [NearestWidgetRefresh] pattern.
+  AppLifecycleListener? _lifecycle;
+
   @override
   void build() {
+    // #2282 concern 1 — arm a foreground-active direct connect on every
+    // resume. While the app is in front the (currently-disabled)
+    // foreground service can't deliver the `AdapterConnected` that
+    // starts the state machine, so each resume asks every active
+    // coordinator to open a direct connect to its paired adapter from
+    // the live engine. Idempotent on the coordinator side (no-op when a
+    // session is already held or a trip is recording), so a rapid
+    // background→foreground bounce never double-arms.
+    //
+    // `AppLifecycleListener` needs `WidgetsBinding.instance`; in a plain
+    // unit test (no binding) accessing it throws. Guard so the
+    // orchestrator's vehicle-diff + arming logic stays testable without
+    // a widget binding — the resume hook simply isn't wired there, and
+    // the `debugArmForegroundActive` seam drives the same path.
+    if (_lifecycle == null) {
+      try {
+        _lifecycle = AppLifecycleListener(
+          onResume: () => unawaited(_armForegroundActiveAll()),
+        );
+      } catch (e, st) {
+        debugPrint(
+          'AutoRecordOrchestrator: AppLifecycleListener unavailable '
+          '(no WidgetsBinding?) — foreground-active resume arming not '
+          'wired: $e\n$st',
+        );
+      }
+    }
     // Watch the central master gate (#1373 phase 3d). Any flip rebuilds
     // this provider and re-runs the diff against the current vehicle
     // list — when the gate goes off the diff sees an empty `wanted`
@@ -105,7 +140,28 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
       (prev, next) => _onVehicleListChanged(next),
       fireImmediately: true,
     );
-    ref.onDispose(_disposeAll);
+    ref.onDispose(() {
+      _lifecycle?.dispose();
+      _lifecycle = null;
+      unawaited(_disposeAll());
+    });
+  }
+
+  /// Ask every active coordinator to attempt a foreground-active direct
+  /// connect (#2282 concern 1). Sequenced through each entry; failures
+  /// are isolated so one coordinator's connect error can't abort the
+  /// others. Best-effort and idempotent — see [armForegroundActive].
+  Future<void> _armForegroundActiveAll() async {
+    for (final entry in _entries.values.toList()) {
+      try {
+        await entry.coordinator.armForegroundActive();
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {
+          'where': 'AutoRecordOrchestrator: foreground arm failed',
+          'mac': entry.armedMac,
+        }));
+      }
+    }
   }
 
   /// Test seam — returns the set of vehicle ids that currently have
@@ -120,6 +176,12 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   @visibleForTesting
   String? armedMacForTest(String vehicleId) =>
       _entries[vehicleId]?.coordinator.config.mac;
+
+  /// Test seam — drives the foreground-active arming path the production
+  /// [AppLifecycleListener.onResume] triggers (#2282 concern 1). A unit
+  /// test can't fire a real resume, so it calls this directly.
+  @visibleForTesting
+  Future<void> debugArmForegroundActive() => _armForegroundActiveAll();
 
   void _onVehicleListChanged(List<VehicleProfile> profiles) {
     final Map<String, VehicleProfile> wanted = <String, VehicleProfile>{};
@@ -191,6 +253,11 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
 
     final listenerFactory = ref.read(autoRecordListenerFactoryProvider);
     final sessionOpener = ref.read(autoRecordSessionOpenerFactoryProvider);
+    // #2282 concern 1 — the foreground-active arm uses a DIRECT connect
+    // (no scan) so it wakes ELM327 clones that stop advertising in
+    // standby while the app is in front.
+    final foregroundOpener =
+        ref.read(autoRecordForegroundSessionOpenerFactoryProvider);
 
     final listener = listenerFactory();
     final coordinator = AutoTripCoordinator(
@@ -218,6 +285,7 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
         await ref.read(tripRecordingProvider.notifier).stopAndSaveAutomatic();
       },
       sessionOpener: sessionOpener,
+      foregroundSessionOpener: foregroundOpener,
       config: _configFor(profile, mac),
     );
     return _OrchestratorEntry(
@@ -235,6 +303,27 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   }
 
   Future<void> _startEntry(_OrchestratorEntry entry) async {
+    // #2282 concern 2 — request POST_NOTIFICATIONS BEFORE arming so the
+    // Android 13+ runtime prompt appears at a moment the user
+    // understands ("I just enabled hands-free recording"). Graceful on
+    // denial: a `false` (or a thrown probe) never blocks arming — the
+    // foreground service simply runs without a visible notification, and
+    // on iOS / Android ≤ 12 the probe reports "may post" with no prompt.
+    try {
+      final granted =
+          await ref.read(obd2PermissionsProvider).requestNotifications();
+      if (!granted) {
+        debugPrint(
+          'AutoRecordOrchestrator: POST_NOTIFICATIONS denied (mac='
+          '${entry.armedMac}) — arming anyway, notification silenced',
+        );
+      }
+    } catch (e, st) {
+      debugPrint(
+        'AutoRecordOrchestrator: notification permission probe failed '
+        '(mac=${entry.armedMac}): $e\n$st',
+      );
+    }
     try {
       await entry.coordinator.start();
     } catch (e, st) {
@@ -280,38 +369,4 @@ class _OrchestratorEntry {
     required this.coordinator,
     required this.armedMac,
   });
-}
-
-/// Factory that returns a fresh [BackgroundAdapterListener] per
-/// coordinator. Each coordinator owns its own listener so a MAC change
-/// (drop + recreate) cannot leak the previous listener's
-/// `MethodChannel.start` into the new arm.
-typedef BackgroundAdapterListenerFactory = BackgroundAdapterListener
-    Function();
-
-/// Default factory: Android in production, an unimplemented stub
-/// elsewhere. Tests override this provider to inject a
-/// [FakeBackgroundAdapterListener] without touching platform-detection
-/// code.
-@Riverpod(keepAlive: true)
-BackgroundAdapterListenerFactory autoRecordListenerFactory(Ref ref) {
-  return () {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return AndroidBackgroundAdapterListener();
-    }
-    return const UnimplementedBackgroundAdapterListener();
-  };
-}
-
-/// Default opener: opens a fresh [Obd2Service] for the configured MAC
-/// via [Obd2ConnectionService.connectByMac] (#1004 phase 2b-3).
-/// Returns null when the adapter is out of range or the scan times
-/// out — the coordinator stays idle for that connect cycle and waits
-/// for the next `AdapterConnected`. Tests override this provider to
-/// inject a fake opener that returns a stub service.
-@Riverpod(keepAlive: true)
-Obd2SessionOpener autoRecordSessionOpenerFactory(Ref ref) {
-  return (String mac) async {
-    return ref.read(obd2ConnectionProvider).connectByMac(mac);
-  };
 }

@@ -9,9 +9,11 @@ import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log
 import 'package:tankstellen/features/consumption/data/obd2/auto_trip_coordinator.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
 import 'package:tankstellen/features/consumption/data/obd2/fake_background_adapter_listener.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/auto_record_orchestrator.dart';
+import 'package:tankstellen/features/consumption/providers/auto_record_orchestrator_factories.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
@@ -182,6 +184,12 @@ void main() {
   // identity between the opened service and the one passed to
   // [TripRecording.start].
   late Map<String, Obd2Service> servicesByMac;
+  // #2282 concern 2 — counts how many times the orchestrator asked for
+  // POST_NOTIFICATIONS before arming.
+  late _CountingPermissions permissions;
+  // #2282 concern 1 — MACs the foreground (direct-connect) opener was
+  // called for, in call order.
+  late List<String> foregroundOpenedMacs;
 
   setUp(() {
     AutoRecordTraceLog.clear();
@@ -189,6 +197,8 @@ void main() {
     fakeTripRecording = _FakeTripRecording();
     speedByMac = <String, Queue<int?>>{};
     servicesByMac = <String, Obd2Service>{};
+    permissions = _CountingPermissions();
+    foregroundOpenedMacs = <String>[];
   });
 
   tearDown(() async {
@@ -197,6 +207,19 @@ void main() {
 
   Obd2SessionOpener fakeOpener() {
     return (String mac) async {
+      final queue = speedByMac.putIfAbsent(mac, () => Queue<int?>());
+      final service = Obd2Service(_FakeTransport(queue));
+      servicesByMac[mac] = service;
+      return service;
+    };
+  }
+
+  // #2282 concern 1 — a direct-connect opener that records every MAC it
+  // is asked to wake. Reuses the same speed-queue so a foreground arm
+  // can drive the same threshold logic as the background path.
+  Obd2ForegroundSessionOpener fakeForegroundOpener() {
+    return (String mac) async {
+      foregroundOpenedMacs.add(mac);
       final queue = speedByMac.putIfAbsent(mac, () => Queue<int?>());
       final service = Obd2Service(_FakeTransport(queue));
       servicesByMac[mac] = service;
@@ -224,6 +247,9 @@ void main() {
         tripRecordingProvider.overrideWith(() => fakeTripRecording),
         autoRecordListenerFactoryProvider.overrideWithValue(harness.factory()),
         autoRecordSessionOpenerFactoryProvider.overrideWithValue(fakeOpener()),
+        autoRecordForegroundSessionOpenerFactoryProvider
+            .overrideWithValue(fakeForegroundOpener()),
+        obd2PermissionsProvider.overrideWithValue(permissions),
         featureFlagsProvider.overrideWith(() => _TestFeatureFlags(flags)),
       ],
     );
@@ -254,6 +280,86 @@ void main() {
         reason: 'A listener must be armed for the wanted MAC');
     expect(listener!.startCalls, 1);
     expect(listener.startedMacs, ['AA:BB:CC:DD:EE:FF']);
+  });
+
+  // -------------------------------------------------------------------------
+  // #2282 concern 2 — POST_NOTIFICATIONS requested before arming.
+  // -------------------------------------------------------------------------
+
+  group('POST_NOTIFICATIONS runtime request (#2282 concern 2)', () {
+    test('requests notifications before arming an eligible vehicle',
+        () async {
+      final list = _FakeVehicleProfileList([_profile(id: 'v1')]);
+      final container = makeContainer(vehicleList: list);
+      addTearDown(container.dispose);
+
+      container.read(autoRecordOrchestratorProvider);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(permissions.notificationRequests, 1,
+          reason: 'arming a coordinator must request POST_NOTIFICATIONS once');
+      // The arm still happens — the notification grant is best-effort.
+      expect(harness.listenerArmedFor('AA:BB:CC:DD:EE:FF'), isNotNull);
+    });
+
+    test('still arms when the notification permission is denied (graceful)',
+        () async {
+      permissions = _CountingPermissions(granted: false);
+      final list = _FakeVehicleProfileList([_profile(id: 'v1')]);
+      final container = makeContainer(vehicleList: list);
+      addTearDown(container.dispose);
+
+      container.read(autoRecordOrchestratorProvider);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(permissions.notificationRequests, 1);
+      final orchestrator =
+          container.read(autoRecordOrchestratorProvider.notifier);
+      expect(orchestrator.activeVehicleIdsForTest, {'v1'},
+          reason: 'a denied notification grant must NOT block arming');
+      expect(harness.listenerArmedFor('AA:BB:CC:DD:EE:FF')!.startCalls, 1);
+    });
+
+    test('does not request notifications when no vehicle is eligible',
+        () async {
+      final list =
+          _FakeVehicleProfileList([_profile(id: 'v1', autoRecord: false)]);
+      final container = makeContainer(vehicleList: list);
+      addTearDown(container.dispose);
+
+      container.read(autoRecordOrchestratorProvider);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(permissions.notificationRequests, 0,
+          reason: 'no arm → no notification prompt');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // #2282 concern 1 — foreground-active arming via app resume.
+  // -------------------------------------------------------------------------
+
+  group('foreground-active arming (#2282 concern 1)', () {
+    test('resume drives a DIRECT connect for each armed vehicle', () async {
+      final list = _FakeVehicleProfileList([_profile(id: 'v1')]);
+      final container = makeContainer(vehicleList: list);
+      addTearDown(container.dispose);
+
+      container.read(autoRecordOrchestratorProvider);
+      await Future<void>.delayed(Duration.zero);
+
+      // Simulate an app resume by invoking the orchestrator's
+      // foreground-arm path directly (the production trigger is an
+      // AppLifecycleListener.onResume, which a unit test can't fire).
+      await container
+          .read(autoRecordOrchestratorProvider.notifier)
+          .debugArmForegroundActive();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(foregroundOpenedMacs, ['AA:BB:CC:DD:EE:FF'],
+          reason: 'a resume must open a direct connect to the paired '
+              'adapter from the live engine');
+    });
   });
 
   test('vehicle with autoRecord=false is ignored', () async {
@@ -622,6 +728,28 @@ void main() {
       },
     );
   });
+}
+
+/// Counts POST_NOTIFICATIONS requests (#2282 concern 2) and reports a
+/// fixed grant decision. The Bluetooth scan/connect permissions report
+/// `granted` so they never interfere with arming.
+class _CountingPermissions implements Obd2Permissions {
+  _CountingPermissions({this.granted = true});
+
+  final bool granted;
+  int notificationRequests = 0;
+
+  @override
+  Future<Obd2PermissionState> current() async => Obd2PermissionState.granted;
+
+  @override
+  Future<Obd2PermissionState> request() async => Obd2PermissionState.granted;
+
+  @override
+  Future<bool> requestNotifications() async {
+    notificationRequests++;
+    return granted;
+  }
 }
 
 /// Synthetic in-memory [FeatureFlags] notifier used to drive the
