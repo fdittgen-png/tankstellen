@@ -142,10 +142,18 @@ class RouteSearchState extends _$RouteSearchState {
       ));
     } on DioException catch (e, st) {
       if (e.type == DioExceptionType.cancel) return;
+      // #2308 — log so an OSRM outage is distinguishable from a
+      // country-service exhaustion or a Dart error in exportable logs.
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+          context: const {'where': 'RouteSearchState.searchAlongRoute'}));
       state = AsyncValue.error(e, st);
     } on AppException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+          context: const {'where': 'RouteSearchState.searchAlongRoute'}));
       state = AsyncValue.error(e, st);
     } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+          context: const {'where': 'RouteSearchState.searchAlongRoute'}));
       state = AsyncValue.error(e, st);
     }
   }
