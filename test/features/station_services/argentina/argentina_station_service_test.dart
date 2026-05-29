@@ -311,7 +311,12 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
   });
 
   group('ArgentinaStationService searchStations', () {
-    test('searchStations throws ApiException on network failure', () async {
+    // #837 — hits the live datos.energia.gob.ar CSV, so the failure shape is
+    // nondeterministic across CI environments (flaked PR #2257). Tagged
+    // `network` so CI's --exclude-tags=network skips it; the deterministic
+    // error-path coverage lives in the withDio cert/connection tests below.
+    test('searchStations throws ApiException on network failure',
+        tags: 'network', () async {
       const params = SearchParams(
         lat: -34.6, lng: -58.4, radiusKm: 10.0,
       );
@@ -330,7 +335,8 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
       }
     });
 
-    test('searchStations returns valid ServiceResult type', () async {
+    test('searchStations returns valid ServiceResult type',
+        tags: 'network', () async {
       const params = SearchParams(
         lat: -34.6, lng: -58.4, radiusKm: 10.0,
       );
