@@ -29,12 +29,25 @@ class PumpDisplayParseResult {
   /// (totalCost ≈ liters * pricePerLiter within tolerance).
   final double confidence;
 
+  /// `true` when the read passed the per-country/brand validation gate
+  /// (#2275): every present field in its country's sane range AND, when
+  /// all three are present, `liters × €/L ≈ totalCost`. Auto-fill should
+  /// gate on this, not on [hasUsableData] alone. Defaults to `false` so
+  /// callers that never ran the gate stay conservative.
+  final bool validated;
+
+  /// Machine-readable reason from the validation gate (diagnostics, not
+  /// user-facing) — e.g. `consistent`, `price-out-of-range`.
+  final String? validationReason;
+
   const PumpDisplayParseResult({
     this.liters,
     this.totalCost,
     this.pricePerLiter,
     this.pumpNumber,
     this.confidence = 0,
+    this.validated = false,
+    this.validationReason,
   });
 
   /// `true` when the parser extracted at least two of the three
