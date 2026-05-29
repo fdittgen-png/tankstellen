@@ -5,8 +5,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../features/consumption/data/trip_history_repository.dart';
 import 'supabase_client.dart';
+import 'trips_sync_json.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Per-trip-summary sync with Supabase (#1479 phase 2).
@@ -102,7 +105,7 @@ class TripsSync {
       await client.from('trip_details').upsert({
         'id': entry.id,
         'user_id': userId,
-        'data': _detailsJson(entry),
+        'data': tripDetailsJson(entry),
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadDetails: uploaded ${entry.id}');
@@ -195,22 +198,16 @@ class TripsSync {
         if (id is String) serverIds.add(id);
       }
 
-      // Upload local-only entries — heals a missing server row from
-      // a previous offline save without waiting for the next stop.
+      // Upload local-only entries (heals a missing server row from a
+      // previous offline save). #2319 — batch the Nx2 round-trips into
+      // one upsert each instead of a serial per-entry loop.
       final localOnly =
           localEntries.where((e) => !serverIds.contains(e.id)).toList();
-      for (final entry in localOnly) {
-        // Reuse the single-row upload path to keep the JSON-shape
-        // contract centralised. Errors swallowed inside.
-        await uploadSummary(entry);
-      }
+      await _uploadBatch(client, userId, localOnly);
 
-      // Decode the server-only rows and return the union. The pure
-      // [mergeRows] step is what the app-launch caller persists back to
-      // the local Hive box — see `AppInitializer._runTripsSyncMerge`.
-      // Pinning that step in a unit test regression-guards the
-      // "download silently discarded" bug class (#2239 / the sibling
-      // AlertsSync defect).
+      // Decode server-only rows and return the union — the superset the
+      // app-launch caller persists back to Hive (see
+      // `AppInitializer._runTripsSyncMerge`; #2239 pins this seam).
       final merged = mergeRows(localEntries, serverRows);
       debugPrint('TripsSync.merge: local=${localEntries.length} '
           'server=${serverIds.length} '
@@ -220,6 +217,79 @@ class TripsSync {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TripsSync.merge FAILED'}));
       return localEntries;
     }
+  }
+
+  /// Bulk-upload [entries] to `trip_summaries` + `trip_details` in one
+  /// upsert each (#2319), preserving the single-trip contracts: null-
+  /// timestamp entries are skipped (NOT-NULL summary columns), entries
+  /// with no samples/gpsd add no details row, and the two upserts are
+  /// isolated so one failure never blocks the other. The single-trip
+  /// [uploadSummary] path is untouched.
+  static Future<void> _uploadBatch(
+    SupabaseClient client,
+    String userId,
+    List<TripHistoryEntry> entries,
+  ) async {
+    await _batchUpsert(client, 'trip_summaries', buildSummaryRows(entries, userId));
+    await _batchUpsert(client, 'trip_details', buildDetailRows(entries, userId));
+  }
+
+  static Future<void> _batchUpsert(
+    SupabaseClient client,
+    String table,
+    List<Map<String, dynamic>> rows,
+  ) async {
+    if (rows.isEmpty) return;
+    try {
+      await client.from(table).upsert(rows, onConflict: 'user_id,id');
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'TripsSync._batchUpsert $table FAILED'}));
+    }
+  }
+
+  /// Pure multi-row analogue of [buildSummaryRow]. Null-timestamp
+  /// entries are skipped (mirrors the [uploadSummary] guard) so the
+  /// NOT-NULL `started_at` / `ended_at` columns are never violated. A
+  /// unit-testable seam for the batch contract.
+  @visibleForTesting
+  static List<Map<String, dynamic>> buildSummaryRows(
+    List<TripHistoryEntry> entries,
+    String userId, {
+    DateTime? now,
+  }) {
+    final rows = <Map<String, dynamic>>[];
+    for (final entry in entries) {
+      if (entry.summary.startedAt == null || entry.summary.endedAt == null) {
+        continue;
+      }
+      rows.add(buildSummaryRow(entry, userId, now: now));
+    }
+    return rows;
+  }
+
+  /// Pure multi-row analogue of the single-trip [uploadDetails] payload.
+  /// Entries with no `samples` AND no `gpsd` contribute nothing (matches
+  /// the single-trip no-op guard). A unit-testable seam.
+  @visibleForTesting
+  static List<Map<String, dynamic>> buildDetailRows(
+    List<TripHistoryEntry> entries,
+    String userId, {
+    DateTime? now,
+  }) {
+    final stamp = (now ?? DateTime.now()).toIso8601String();
+    final rows = <Map<String, dynamic>>[];
+    for (final entry in entries) {
+      if (entry.samples.isEmpty && entry.gpsSampleDiagnostics.isEmpty) {
+        continue;
+      }
+      rows.add({
+        'id': entry.id,
+        'user_id': userId,
+        'data': tripDetailsJson(entry),
+        'updated_at': stamp,
+      });
+    }
+    return rows;
   }
 
   /// Wipe every synced trip for the current user from BOTH
@@ -293,7 +363,7 @@ class TripsSync {
       // 60-min commute is ~1 KB instead of ~250 KB. The full blob
       // (samples + gpsd) goes to `public.trip_details` in
       // [uploadDetails] right after.
-      'data': _compactSummaryJson(entry),
+      'data': compactSummaryJson(entry),
       'updated_at': (now ?? DateTime.now()).toIso8601String(),
     };
   }
@@ -330,33 +400,4 @@ class TripsSync {
     }
     return [...localEntries, ...downloaded];
   }
-}
-
-/// Strips the per-tick `samples` and GPS-diagnostics arrays from a
-/// [TripHistoryEntry]'s JSON form so the upload payload stays under
-/// the 1 KB target for `public.trip_summaries.data` (#1479 phase 2).
-///
-/// The full-detail blob (samples + gpsd) is the phase-4 concern and
-/// lands in `public.trip_details` — keeping the summary tight here
-/// means the cross-device list view (phase 3) can paginate without
-/// dragging a year of trip telemetry through every fetch.
-Map<String, dynamic> _compactSummaryJson(TripHistoryEntry entry) {
-  final json = entry.toJson();
-  json.remove('samples');
-  json.remove('gpsd');
-  return json;
-}
-
-/// Mirror of [_compactSummaryJson] for the heavy blob: returns just
-/// `samples` + `gpsd` so the `trip_details.data` payload stays
-/// focused on the per-tick telemetry. Empty arrays are emitted
-/// explicitly so a future fetch round-trips through
-/// `TripHistoryEntry.fromJson` cleanly even when only one of the
-/// two arrays was populated at recording time.
-Map<String, dynamic> _detailsJson(TripHistoryEntry entry) {
-  final json = entry.toJson();
-  return {
-    'samples': json['samples'] ?? const [],
-    'gpsd': json['gpsd'] ?? const [],
-  };
 }

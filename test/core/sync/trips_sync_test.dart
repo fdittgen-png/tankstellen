@@ -337,4 +337,93 @@ void main() {
       },
     );
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // #2319 — batch merge upload. merge() now collapses the Nx2 serial
+  // round-trips (uploadSummary + uploadDetails per local-only entry)
+  // into one upsert each, built by the pure [buildSummaryRows] /
+  // [buildDetailRows] seams. These pin that the batch path preserves
+  // the single-trip contracts: null-timestamp skip + samples/gpsd-empty
+  // skip + correct columns.
+  // ───────────────────────────────────────────────────────────────────
+  group('TripsSync.buildSummaryRows / buildDetailRows — batch (#2319)', () {
+    TripHistoryEntry batchEntry(
+      String id, {
+      DateTime? started,
+      DateTime? ended,
+      List<TripSample> samples = const [],
+    }) =>
+        TripHistoryEntry(
+          id: id,
+          vehicleId: 'veh-1',
+          summary: TripSummary(
+            startedAt: started,
+            endedAt: ended,
+            distanceKm: 10,
+            maxRpm: 2800,
+            highRpmSeconds: 0,
+            idleSeconds: 20,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+          ),
+          samples: samples,
+        );
+
+    test('builds one summary row per entry with non-null timestamps', () {
+      final started = DateTime.utc(2026, 5, 28, 8);
+      final ended = started.add(const Duration(minutes: 20));
+      final rows = TripsSync.buildSummaryRows(
+        [
+          batchEntry('a', started: started, ended: ended),
+          batchEntry('b', started: started, ended: ended),
+        ],
+        'user-1',
+      );
+      expect(rows, hasLength(2));
+      expect(rows.map((r) => r['id']), containsAll(<String>['a', 'b']));
+      expect(rows.every((r) => r['user_id'] == 'user-1'), isTrue);
+    });
+
+    test('skips entries with null timestamps (NOT-NULL column contract)',
+        () {
+      final started = DateTime.utc(2026, 5, 28, 8);
+      final rows = TripsSync.buildSummaryRows(
+        [
+          batchEntry('valid',
+              started: started, ended: started.add(const Duration(minutes: 5))),
+          batchEntry('null-ts'), // no started/ended → must be skipped
+        ],
+        'user-1',
+      );
+      expect(rows.map((r) => r['id']), ['valid'],
+          reason: 'a null-timestamp entry cannot satisfy the NOT-NULL '
+              'started_at/ended_at columns and must be dropped from the batch');
+    });
+
+    test('builds a detail row only for entries carrying samples/gpsd', () {
+      final started = DateTime.utc(2026, 5, 28, 8);
+      final ended = started.add(const Duration(minutes: 12));
+      final withSamples = batchEntry(
+        'heavy',
+        started: started,
+        ended: ended,
+        samples: [TripSample(timestamp: started, speedKmh: 10, rpm: 1200)],
+      );
+      final empty = batchEntry('light', started: started, ended: ended);
+
+      final rows = TripsSync.buildDetailRows([withSamples, empty], 'user-1');
+      expect(rows.map((r) => r['id']), ['heavy'],
+          reason: 'an entry with no samples and no gpsd must contribute no '
+              'details row (matches the single-trip no-op guard)');
+      final data = rows.first['data'] as Map<String, dynamic>;
+      expect(data.containsKey('samples'), isTrue);
+      expect(data.containsKey('gpsd'), isTrue);
+    });
+
+    test('empty input lists produce empty batches (no wasted round-trip)',
+        () {
+      expect(TripsSync.buildSummaryRows(const [], 'u'), isEmpty);
+      expect(TripsSync.buildDetailRows(const [], 'u'), isEmpty);
+    });
+  });
 }

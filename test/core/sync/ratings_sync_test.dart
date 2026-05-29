@@ -35,5 +35,21 @@ void main() {
       final map = await RatingsSync.fetchAll();
       expect(map, isEmpty);
     });
+
+    /// #2319 — batch upsert path. The wire `upsert` can't be exercised
+    /// without a live client, but the auth/empty guards (the only pure
+    /// surface) must hold so the initial-sync caller can fire it
+    /// unconditionally without a serial per-rating loop.
+    test('upsertAll is a no-op when unauthenticated', () async {
+      await RatingsSync.upsertAll({'st-1': 4, 'st-2': 5});
+    });
+
+    test('upsertAll short-circuits on an empty map without throwing',
+        () async {
+      // Empty map must early-return before touching the client so the
+      // caller (sync_provider initial sync) can pass getRatings()
+      // verbatim even when the user has rated nothing.
+      await RatingsSync.upsertAll(const {});
+    });
   });
 }

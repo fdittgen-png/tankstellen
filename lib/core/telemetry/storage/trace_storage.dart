@@ -157,8 +157,12 @@ class TraceStorage {
   /// surface schema-drift to the user (and to keep the unreadable
   /// payload available under `unparsedRaw` for offline debugging).
   String exportAsJson() {
-    final traces = getAll();
-    final unparsed = getUnparsedRaw();
+    // #2310 — single deserialise pass: partition the box into parsed
+    // traces + unparsed raw maps once, instead of the former
+    // getAll()+getUnparsedRaw() double walk (each re-ran
+    // ErrorTrace.fromJson over every entry).
+    final (:traces, :unparsed) = _partition();
+    traces.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return const JsonEncoder.withIndent('  ').convert({
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'traceCount': traces.length + unparsed.length,
@@ -169,12 +173,44 @@ class TraceStorage {
     });
   }
 
+  /// Single walk over `_box.values` that splits every entry into the
+  /// ones that decode via [ErrorTrace.fromJson] and the ones that don't
+  /// (returned as their coerced raw maps for offline debugging — #1301).
+  /// The shared seam behind [exportAsJson], so a corrupt-vs-valid box is
+  /// deserialised exactly once. The `traces` list is UNSORTED; callers
+  /// that need newest-first sort it themselves.
+  ({List<ErrorTrace> traces, List<Map<String, dynamic>> unparsed})
+      _partition() {
+    final traces = <ErrorTrace>[];
+    final unparsed = <Map<String, dynamic>>[];
+    for (final raw in _box.values) {
+      if (raw is! Map) continue;
+      final asMap = _jsonMapFrom(raw);
+      try {
+        traces.add(ErrorTrace.fromJson(asMap));
+      } on Object catch (e, st) {
+        // See [getAll] for the broad-catch rationale (#1301 / #1388).
+        debugPrint('TraceStorage: trace parse failed: $e\n$st');
+        unparsed.add(asMap);
+      }
+    }
+    return (traces: traces, unparsed: unparsed);
+  }
+
+  /// Prune on every error write. The common case (box at or under
+  /// [maxTraces] after the age filter) does exactly ONE deserialise +
+  /// sort pass: the age filter walks the single [getAll] list, then the
+  /// over-cap check is the O(1) [_box.length] — only when the box is
+  /// still over [maxTraces] do we re-fetch for the timestamp sort (#2310,
+  /// was two unconditional `getAll()` passes).
   Future<void> _prune() async {
     final cutoff = DateTime.now().subtract(maxAge);
     final all = getAll();
     for (final t in all) {
       if (t.timestamp.isBefore(cutoff)) await _box.delete(t.id);
     }
+    // O(1) box-length check — re-deserialise only when still over cap.
+    if (_box.length <= maxTraces) return;
     final remaining = getAll();
     if (remaining.length > maxTraces) {
       for (final t in remaining.sublist(maxTraces)) {

@@ -29,7 +29,11 @@ class TraceUploader {
     if (raw == null) return TraceUploadConfig.disabled;
     try {
       return TraceUploadConfig.fromJson(Map<String, dynamic>.from(raw as Map));
-    } on FormatException catch (e, st) {
+    } on Object catch (e, st) {
+      // #2311 — `raw as Map` (schema drift) throws TypeError, and
+      // fromJson's per-field casts can too. Catch broadly (the #1301
+      // TraceStorage precedent) so corrupt/drifted config disables
+      // upload instead of silently killing the path with nothing logged.
       debugPrint('TraceUploader: config parse failed: $e\n$st');
       return TraceUploadConfig.disabled;
     }
@@ -40,15 +44,21 @@ class TraceUploader {
   }
 
   /// Upload trace if enabled. Fire-and-forget — never throws.
+  ///
+  /// #2311 — getConfig() is now read INSIDE the try and the catch is
+  /// broadened from `on DioException` to `on Object`, so the documented
+  /// "never throws" contract holds even when a non-Dio pre-request error
+  /// fires (e.g. a TypeError surfacing from a drifted config read or a
+  /// PII-scrub failure) — the upload is dropped, never propagated.
   Future<void> uploadIfEnabled(ErrorTrace trace) async {
-    final config = getConfig();
-    if (!config.enabled ||
-        config.serverUrl == null ||
-        config.serverUrl!.isEmpty) {
-      return;
-    }
-
     try {
+      final config = getConfig();
+      if (!config.enabled ||
+          config.serverUrl == null ||
+          config.serverUrl!.isEmpty) {
+        return;
+      }
+
       final dio = DioFactory.create(
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 5),
@@ -70,7 +80,10 @@ class TraceUploader {
             'Authorization': 'Bearer ${config.authToken}',
         }),
       );
-    } on DioException catch (e, st) {
+    } on Object catch (e, st) {
+      // Broad by design (#2311): any error — Dio network failure, a
+      // TypeError from config drift, a scrub failure — is swallowed so
+      // the fire-and-forget caller never sees an exception.
       debugPrint('TraceUploader: upload failed: $e\n$st');
     }
   }

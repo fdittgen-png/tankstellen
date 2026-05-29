@@ -139,6 +139,116 @@ void main() {
       expect(all.first.id, 'trace-54');
     });
 
+    /// #2310 — prune is the single-pass fast path: store() triggers it
+    /// on every error write, so these pin that the age + maxTraces caps
+    /// are still correctly enforced after the redundant-pass removal.
+    group('prune single-pass (#2310)', () {
+      test('store() caps the box at maxTraces, keeping the newest', () async {
+        // Write maxTraces + 5 via the real store() path (which prunes).
+        final base = DateTime.now();
+        for (var i = 0; i < TraceStorage.maxTraces + 5; i++) {
+          final json = _makePlainJson(
+            id: 'trace-$i',
+            timestamp: base.add(Duration(seconds: i)),
+          );
+          final trace = ErrorTrace.fromJson(json);
+          await storage.store(trace);
+        }
+        // The box never exceeds the cap after a store-driven prune.
+        expect(storage.count, TraceStorage.maxTraces);
+        final ids = storage.getAll().map((t) => t.id).toSet();
+        // The 5 oldest were pruned; the newest survives.
+        expect(ids.contains('trace-${TraceStorage.maxTraces + 4}'), isTrue);
+        expect(ids.contains('trace-0'), isFalse);
+      });
+
+      test('store() drops entries older than maxAge in the same pass',
+          () async {
+        // One ancient trace (well beyond the 7-day window) + one fresh.
+        final ancient = _makePlainJson(
+          id: 'ancient',
+          timestamp: DateTime.now().subtract(const Duration(days: 30)),
+        );
+        await storage.store(ErrorTrace.fromJson(ancient));
+        final fresh = _makePlainJson(id: 'fresh', timestamp: DateTime.now());
+        await storage.store(ErrorTrace.fromJson(fresh));
+
+        final ids = storage.getAll().map((t) => t.id).toSet();
+        expect(ids, contains('fresh'));
+        expect(ids, isNot(contains('ancient')),
+            reason: 'the age filter must drop the >7d-old trace');
+      });
+
+      test(
+          'common case (under cap) leaves every recent trace intact after '
+          'store-driven prune', () async {
+        final base = DateTime.now();
+        for (var i = 0; i < 3; i++) {
+          await storage.store(ErrorTrace.fromJson(
+            _makePlainJson(id: 't-$i', timestamp: base.add(Duration(seconds: i))),
+          ));
+        }
+        expect(storage.count, 3);
+        expect(storage.getAll().map((t) => t.id),
+            containsAll(<String>['t-0', 't-1', 't-2']));
+      });
+    });
+
+    /// #2310 — exportAsJson now partitions the box in a single
+    /// deserialise pass. These pin that its output stays equivalent to
+    /// the previous getAll() + getUnparsedRaw() double-walk.
+    group('exportAsJson single-pass partition (#2310)', () {
+      Map<String, dynamic> brokenEntry(String id) =>
+          <String, dynamic>{'id': id, 'schemaVersion': 'unknown'};
+
+      test('parsed traces match getAll and unparsed match getUnparsedRaw',
+          () async {
+        final box = Hive.box('error_traces');
+        await box.put(
+            'v1', _makePlainJson(id: 'v1', timestamp: DateTime(2025, 1, 1)));
+        await box.put(
+            'v2', _makePlainJson(id: 'v2', timestamp: DateTime(2025, 2, 1)));
+        await box.put('bad', brokenEntry('bad'));
+
+        final decoded =
+            jsonDecode(storage.exportAsJson()) as Map<String, dynamic>;
+
+        // Parsed set equals getAll's ids (export sorts newest-first too).
+        final exportedTraceIds = (decoded['traces'] as List)
+            .map((t) => (t as Map<String, dynamic>)['id'])
+            .toList();
+        expect(exportedTraceIds, storage.getAll().map((t) => t.id).toList());
+
+        // Unparsed set equals getUnparsedRaw's ids.
+        final exportedUnparsedIds = (decoded['unparsedRaw'] as List)
+            .map((e) => (e as Map<String, dynamic>)['id'])
+            .toSet();
+        final rawIds =
+            storage.getUnparsedRaw().map((e) => e['id']).toSet();
+        expect(exportedUnparsedIds, rawIds);
+        expect(exportedUnparsedIds, {'bad'});
+
+        expect(decoded['parsedCount'], 2);
+        expect(decoded['unparsedCount'], 1);
+        expect(decoded['traceCount'], 3);
+      });
+
+      test('exported traces are sorted newest-first', () async {
+        final box = Hive.box('error_traces');
+        await box.put(
+            'old', _makePlainJson(id: 'old', timestamp: DateTime(2024, 1, 1)));
+        await box.put(
+            'new', _makePlainJson(id: 'new', timestamp: DateTime(2026, 1, 1)));
+
+        final decoded =
+            jsonDecode(storage.exportAsJson()) as Map<String, dynamic>;
+        final ids = (decoded['traces'] as List)
+            .map((t) => (t as Map<String, dynamic>)['id'])
+            .toList();
+        expect(ids, ['new', 'old']);
+      });
+    });
+
     test('getAll parses stored JSON back into ErrorTrace objects', () async {
       final json = _makePlainJson(id: 'parse-test');
       await Hive.box('error_traces').put('parse-test', json);

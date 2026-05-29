@@ -37,19 +37,30 @@ class SchemaVerifier {
   ///
   /// Returns a map of table name → exists (true/false).
   /// Returns null if the client is not connected.
+  ///
+  /// #2310 — the existence probes are independent, so they run in
+  /// parallel via [Future.wait] (was a sequential per-table loop on the
+  /// wizard's connect / re-check tap). Each probe selects only `id`
+  /// (was `select('*')`, needlessly broad) with `limit(0)` so it never
+  /// transfers row data — a missing table / failed probe maps to false.
   static Future<Map<String, bool>?> checkSchema() async {
     final client = TankSyncClient.client;
     if (client == null) return null;
 
-    final result = <String, bool>{};
-    for (final table in [...requiredTables, ...optionalTables]) {
-      try {
-        await client.from(table).select('*').limit(0);
-        result[table] = true;
-      } catch (e, st) { unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'SchemaVerifier: table check failed'}));
-        result[table] = false;
-      }
-    }
+    final entries = await Future.wait(
+      [...requiredTables, ...optionalTables].map(
+        (table) => client
+            .from(table)
+            .select('id')
+            .limit(0)
+            .then((_) => MapEntry(table, true))
+            .catchError((Object e, StackTrace st) {
+          unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'SchemaVerifier: table check failed'}));
+          return MapEntry(table, false);
+        }),
+      ),
+    );
+    final result = Map<String, bool>.fromEntries(entries);
 
     debugPrint('SchemaVerifier: ${result.entries.where((e) => e.value).length}/${result.length} tables found');
     return result;
