@@ -98,8 +98,8 @@ void main() {
 
   group('Obd2Service.connect with default GenericElm327Adapter (#1330)', () {
     test(
-      'sends the legacy init sequence in order with a ~100 ms gap '
-      'between commands',
+      'sends the legacy init sequence in order, settling only after ATZ '
+      '(#2261 concern 5 trimmed the inter-command sleeps)',
       () async {
         final transport = _RecordingObd2Transport({
           'ATZ': 'ELM327 v1.5>',
@@ -127,16 +127,22 @@ void main() {
           'ATI',
         ]);
 
-        // Inter-command intervals are at least the configured 100 ms
-        // delay. Generous upper bound (250 ms) avoids flakiness on
-        // slow CI runners — the assertion that matters is "we DID
-        // wait", not the exact wall-clock value.
-        for (var i = 1; i < transport.commands.length; i++) {
+        // #2261 concern 5 — the ONLY settle is the postResetDelay after
+        // ATZ (so ATE0, the command at index 1, follows a ~100 ms gap).
+        // Every later command is serialised by the transport prompt-wait
+        // with no extra blind sleep, so those gaps are near-zero.
+        final gapAfterReset =
+            transport.commands[1].at - transport.commands[0].at;
+        expect(gapAfterReset,
+            greaterThanOrEqualTo(const Duration(milliseconds: 90)),
+            reason: 'a settle must follow ATZ');
+        for (var i = 2; i < transport.commands.length; i++) {
           final gap = transport.commands[i].at - transport.commands[i - 1].at;
           expect(
             gap,
-            greaterThanOrEqualTo(const Duration(milliseconds: 90)),
-            reason: 'gap before command $i (${transport.commands[i].command})',
+            lessThan(const Duration(milliseconds: 90)),
+            reason: 'no fixed inter-command sleep before trivial AT echo '
+                '$i (${transport.commands[i].command})',
           );
         }
       },

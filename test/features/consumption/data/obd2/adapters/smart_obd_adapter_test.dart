@@ -141,7 +141,8 @@ void main() {
 
   group('Obd2Service.connect with SmartObdAdapter (#1330 phase 2)', () {
     test(
-      'waits 400 ms after ATZ and 200 ms between subsequent init commands',
+      'settles 400 ms after ATZ only — no inter-command sleep between '
+      'trivial AT echoes (#2261 concern 5)',
       () async {
         final transport = _RecordingObd2Transport({
           'ATZ': 'ELM327 v1.5>',
@@ -172,21 +173,16 @@ void main() {
           reason: 'postResetDelay (gap before ATE0)',
         );
 
-        // Subsequent gaps reflect the 200 ms interCommandDelay.
+        // #2261 concern 5 — the interCommandDelay is no longer paid
+        // between trivial AT echoes (the transport prompt-wait already
+        // serialises them), so subsequent gaps are near-zero.
         for (var i = 2; i < transport.commands.length; i++) {
           final gap = transport.commands[i].at - transport.commands[i - 1].at;
           expect(
             gap,
-            greaterThanOrEqualTo(const Duration(milliseconds: 180)),
-            reason:
-                'interCommandDelay (gap before command $i = ${transport.commands[i].command})',
-          );
-          expect(
-            gap,
-            lessThan(const Duration(milliseconds: 380)),
-            reason:
-                'gap before command $i should reflect 200 ms interCommandDelay, '
-                'not the 400 ms postResetDelay',
+            lessThan(const Duration(milliseconds: 180)),
+            reason: 'no fixed inter-command sleep before command $i = '
+                '${transport.commands[i].command}',
           );
         }
       },

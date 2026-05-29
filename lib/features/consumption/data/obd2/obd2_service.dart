@@ -264,6 +264,15 @@ class Obd2Service implements Obd2RawCommandPort {
     }
   }
 
+  /// Whether [command] is a reset / wake command that needs a settle
+  /// delay after it (#2261 concern 5) — ATZ (full reset) or ATWS (warm
+  /// start). Every other AT echo / OBD request is serialised by the
+  /// transport's prompt-wait and needs no extra sleep.
+  static bool _isResetCommand(String command) {
+    final c = command.trim().toUpperCase();
+    return c == 'ATZ' || c == 'ATWS';
+  }
+
   /// `true` when the underlying [Obd2Transport] currently has an open
   /// connection to the vehicle's ELM327 adapter.
   bool get isConnected => _transport.isConnected;
@@ -357,11 +366,17 @@ class Obd2Service implements Obd2RawCommandPort {
           response,
           sw.elapsedMilliseconds,
         );
-        // First command is the ATZ-style reset — its post-delay can
-        // differ from the rest on slow clones.
-        final delay =
-            i == 0 ? adapter.postResetDelay : adapter.interCommandDelay;
-        await Future.delayed(delay);
+        // #2261 concern 5 — drop the fixed inter-command sleep for
+        // trivial AT echoes: the prompt-wait in [BluetoothObd2Transport]
+        // already serialises one command per `>` reply, so a blind
+        // 100 ms sleep between ATE0/ATL0/ATH0/… is pure dead time on the
+        // critical path. Keep a SHORT settle ONLY after the reset/wake
+        // commands (ATZ/ATWS), where a slow clone re-enumerates and a
+        // back-to-back command can race the reset. The adapter still
+        // owns the actual settle duration via [postResetDelay].
+        if (_isResetCommand(sequence[i])) {
+          await Future.delayed(adapter.postResetDelay);
+        }
       }
 
       // Capture the firmware-version string and derive the runtime
