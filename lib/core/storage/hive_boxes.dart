@@ -319,6 +319,12 @@ class HiveBoxes {
     final cipher = await _loadCipher();
     await Hive.openBox(settings, encryptionCipher: cipher);
     await Hive.openBox(favorites, encryptionCipher: cipher);
+    // #2205 — the background widget-update path (HomeWidgetService via
+    // ProfilesHiveStore) reads the active profile for preferred fuel +
+    // last-known GPS. Without this the BG isolate threw
+    // `HiveError: Box not found` on every favorites/nearest widget
+    // refresh (32 field traces).
+    await Hive.openBox(profiles, encryptionCipher: cipher);
     await Hive.openBox(alerts, encryptionCipher: cipher);
     await Hive.openBox(cache, encryptionCipher: cipher);
     await Hive.openBox(priceHistory, encryptionCipher: cipher);
