@@ -7,6 +7,8 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show PlatformException;
+import 'package:hive/hive.dart' show HiveError;
 import 'package:home_widget/home_widget.dart';
 
 import '../../../core/country/country_config.dart';
@@ -57,16 +59,26 @@ String get _widgetGroupId =>
 // Single provider class (#713) — the widget toggles between favorites
 // and nearest modes internally. The old NearestWidgetProvider receiver
 // was dropped from the manifest.
-const _widgetAndroidName = 'FuelPriceWidgetProvider';
 
 /// #2206 — the AppWidgetProvider lives in the Gradle **namespace**
 /// `de.tankstellen.tankstellen` (the manifest `.FuelPriceWidgetProvider`
 /// receiver), which differs from the **applicationId**
-/// `de.tankstellen.fuelprices`. home_widget resolves [_widgetAndroidName]
-/// against the applicationId, so it looked for
+/// `de.tankstellen.fuelprices`. home_widget's `updateWidget` resolves the
+/// short `androidName` against the applicationId
+/// (`${packageName}.${androidName}`), so it looked for
 /// `de.tankstellen.fuelprices.FuelPriceWidgetProvider` and threw
-/// `ClassNotFoundException` on every update. Passing the fully-qualified
-/// name (used as-is by home_widget, ahead of androidName) fixes it.
+/// `ClassNotFoundException` on every update.
+///
+/// home_widget 0.9.2 resolves the provider class as
+/// `Class.forName(qualifiedAndroidName ?? "${packageName}.${androidName}")`
+/// — when `qualifiedAndroidName` is non-null it is used **as-is** and the
+/// short name is ignored for resolution. BUT the plugin's
+/// `ClassNotFoundException` message always prints the SHORT `androidName`
+/// ("No Widget found with Name FuelPriceWidgetProvider"), which made the
+/// device log misleading. We therefore pass ONLY the fully-qualified name
+/// at every call site (no short `androidName`), so the qualified class is
+/// always resolved and a future failure message reports `null` rather
+/// than the wrong short name. (#2207 field follow-up.)
 // i18n-ignore: Android class identifier, not user-facing text.
 const _widgetQualifiedAndroidName =
     'de.tankstellen.tankstellen.FuelPriceWidgetProvider';
@@ -107,7 +119,6 @@ class HomeWidgetService {
         await HomeWidget.saveWidgetData('station_count', 0);
         await HomeWidget.saveWidgetData('stations_json', '[]');
         await HomeWidget.updateWidget(
-          androidName: _widgetAndroidName,
           qualifiedAndroidName: _widgetQualifiedAndroidName,
         );
         return;
@@ -137,12 +148,11 @@ class HomeWidgetService {
       await _writeGlobalWidgetDefaults(profileStorage);
 
       await HomeWidget.updateWidget(
-        androidName: _widgetAndroidName,
         qualifiedAndroidName: _widgetQualifiedAndroidName,
       );
       debugPrint('HomeWidget: favorites updated with ${stations.length} stations');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget: favorites update failed'}));
+      _logWidgetUpdateFailure(e, st, 'HomeWidget: favorites update failed');
     }
   }
 
@@ -173,8 +183,9 @@ class HomeWidgetService {
           pricePredictor: pricePredictor,
         );
         final payload = await builder.build();
-        await HomeWidget.updateWidget(androidName: _widgetAndroidName,
-          qualifiedAndroidName: _widgetQualifiedAndroidName);
+        await HomeWidget.updateWidget(
+          qualifiedAndroidName: _widgetQualifiedAndroidName,
+        );
         debugPrint(
           'HomeWidget: nearest (real search) updated — '
           'count=${payload.stations.length} '
@@ -202,7 +213,6 @@ class HomeWidgetService {
         );
         await HomeWidget.saveWidgetData('nearest_is_stale', false);
         await HomeWidget.updateWidget(
-          androidName: _widgetAndroidName,
           qualifiedAndroidName: _widgetQualifiedAndroidName,
         );
         return;
@@ -240,12 +250,11 @@ class HomeWidgetService {
       await HomeWidget.saveWidgetData('nearest_lng', lng);
 
       await HomeWidget.updateWidget(
-        androidName: _widgetAndroidName,
         qualifiedAndroidName: _widgetQualifiedAndroidName,
       );
       debugPrint('HomeWidget: nearest updated with ${stations.length} stations');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget: nearest update failed'}));
+      _logWidgetUpdateFailure(e, st, 'HomeWidget: nearest update failed');
     }
   }
 
@@ -641,6 +650,35 @@ class HomeWidgetService {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'HomeWidget._writeGlobalWidgetDefaults'}));
     }
+  }
+
+  /// #2207 field follow-up — a home-widget update failure is non-critical
+  /// UI. Two classes of failure are EXPECTED and benign and must NOT spam
+  /// the user-exportable error log (the device log had 35 such entries):
+  ///
+  /// - **No widget placed / name-not-found** — `home_widget` throws a
+  ///   `PlatformException` (code `-3`, "No Widget found with Name …")
+  ///   whenever `updateWidget` runs but the user has not placed the
+  ///   widget on a home screen. This is the overwhelmingly common case.
+  /// - **Box not found** — a `HiveError` from a background isolate that
+  ///   reached the widget path before its boxes were opened. Now guarded
+  ///   by [HiveBoxes.initInIsolate], but kept here defensively.
+  ///
+  /// Benign failures are sent to [debugPrint] (visible in `flutter logs`,
+  /// invisible in release + the exportable log). Genuinely unexpected
+  /// failures still go to [errorLogger] so real regressions stay visible.
+  static void _logWidgetUpdateFailure(Object e, StackTrace st, String where) {
+    final isBenign = (e is PlatformException &&
+            (e.code == '-3' ||
+                (e.message?.contains('No Widget found') ?? false))) ||
+        (e is HiveError && e.message.toLowerCase().contains('not found'));
+    if (isBenign) {
+      debugPrint('HomeWidget: $where skipped (benign) — $e');
+      return;
+    }
+    unawaited(
+      errorLogger.log(ErrorLayer.storage, e, st, context: {'where': where}),
+    );
   }
 }
 
