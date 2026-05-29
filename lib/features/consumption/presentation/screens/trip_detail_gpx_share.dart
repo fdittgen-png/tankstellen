@@ -47,7 +47,7 @@ Future<void> shareTripGpx(
     messenger?.showSnackBar(SnackBarHelper.errorSnackBar(scheme, msg));
     return;
   }
-  final gpx = buildGpxXml(entry);
+  final gpx = buildGpxXml(entry, l: l);
   final bytes = Uint8List.fromList(utf8.encode(gpx));
   final fileName = gpxFileNameFor(entry);
   final override = debugTripDetailGpxShareOverride;
