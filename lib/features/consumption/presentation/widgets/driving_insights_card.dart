@@ -1,75 +1,50 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/driving_insight.dart';
+import '../../data/lessons/rules/hard_accel_rule.dart';
+import '../../data/lessons/rules/high_rpm_rule.dart';
+import '../../data/lessons/rules/idling_rule.dart';
+import '../../data/lessons/rules/low_gear_rule.dart';
+import '../../domain/lessons/driving_lesson.dart';
 
 /// "Top wasteful behaviours" card on the Trip detail screen
-/// (#1041 phase 2).
+/// (#1041 phase 2; registry-driven since #2251).
 ///
-/// Surfaces the up-to-three [DrivingInsight] cost lines produced by
-/// `analyzeTrip()` (phase 1) as a stack of [ListTile]-style rows. Each
-/// row shows:
-///   * a localized headline derived from [DrivingInsight.labelKey]
-///     (e.g. "Engine over 3000 RPM (12% of trip): wasted 0.6 L"),
-///   * a secondary "{x}% of trip" caption, and
-///   * a trailing "+{y} L" badge that re-states the wasted-fuel
-///     number for at-a-glance scanning.
+/// Renders the ranked [DrivingLesson]s produced by the
+/// `DrivingLessonRegistry` (#2251) as a stack of [ListTile]-style rows.
+/// Each row shows:
+///   * the lesson's localized [DrivingLesson.title] headline,
+///   * the lesson's [DrivingLesson.subtitle] caption (null → no caption,
+///     as the low-gear row), and
+///   * the lesson's [DrivingLesson.trailing] badge (null → no badge).
 ///
-/// Liters are formatted to a single decimal — telematics-grade
-/// precision is misleading given the analyzer's coarse counterfactual
-/// model (documented in `docs/guides/driving-insights.md`). Showing
-/// "0.6 L" coaches without overclaiming.
+/// The widget is purely presentational — the registry owns evaluation,
+/// ranking, and string resolution; the card trusts the caller's order
+/// (lessons arrive ranked by impact, the low-gear lesson first). Renders
+/// an empty-state message when [lessons] is empty so the card never
+/// silently disappears.
 ///
-/// Renders an empty-state message ("No notable inefficiencies — keep
-/// it up!") when [insights] is empty so the card never silently
-/// disappears — the user always knows the analysis ran.
-///
-/// The widget is purely presentational. Sorting / capping / metadata
-/// extraction all happen inside the analyzer; the card trusts the
-/// caller's order. Re-sorting here would let a future analyzer change
-/// (e.g. ranking by user-impact rather than litres) ship without UI
-/// edits.
+/// Before #2251 the card took the legacy `DrivingInsight` cost lines and
+/// a `secondsBelowOptimalGear` metric and built the headlines inline.
+/// That logic now lives in the lesson rules; the rendered output is
+/// unchanged — the same trips surface the same rows.
 class DrivingInsightsCard extends StatelessWidget {
-  /// Top-N cost lines from `analyzeTrip()` — already sorted by
-  /// `litersWasted` desc and capped at 3. Empty list → empty-state.
-  final List<DrivingInsight> insights;
-
-  /// Optional time-below-optimal-gear metric from `gear_inference.dart`
-  /// (#1263 phase 1) summed at trip end into
-  /// `TripSummary.secondsBelowOptimalGear` (phase 2). Surfaced here as
-  /// the gear-coaching row when non-null AND > 60s. Null on EV trips
-  /// or when the inference had insufficient samples / no centroids;
-  /// the parent screen also gates the entire card on EV / empty-trip.
-  ///
-  /// Rendered ABOVE the regular insight tiles. When the regular
-  /// `insights` list is empty and this metric fires, the gear row
-  /// renders ALONE — no empty-state — so the user always sees the
-  /// most actionable line.
-  final double? secondsBelowOptimalGear;
+  /// Ranked lessons from `DrivingLessonRegistry.evaluate()`. Empty list
+  /// → empty-state row.
+  final List<DrivingLesson> lessons;
 
   const DrivingInsightsCard({
     super.key,
-    required this.insights,
-    this.secondsBelowOptimalGear,
+    required this.lessons,
   });
-
-  /// True when the gear-coaching row should render — non-null metric
-  /// strictly greater than 60s (the issue-#1263 acceptance threshold).
-  bool get _showLowGearRow {
-    final s = secondsBelowOptimalGear;
-    return s != null && s > 60;
-  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final showLowGear = _showLowGearRow;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -83,16 +58,13 @@ class DrivingInsightsCard extends StatelessWidget {
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            if (showLowGear)
-              _LowGearTile(seconds: secondsBelowOptimalGear!),
-            if (insights.isEmpty && !showLowGear)
+            if (lessons.isEmpty)
               _EmptyState(
                 message: l?.insightEmptyState ??
                     'No notable inefficiencies — keep it up!',
               )
             else
-              for (final insight in insights)
-                _InsightTile(insight: insight),
+              for (final lesson in lessons) _LessonTile(lesson: lesson),
           ],
         ),
       ),
@@ -100,130 +72,58 @@ class DrivingInsightsCard extends StatelessWidget {
   }
 }
 
-/// Gear-coaching row (#1263 phase 3). Visual style mirrors
-/// [_InsightTile] — leading icon, headline title, no trailing badge
-/// (the metric is a duration, not a litres figure).
-class _LowGearTile extends StatelessWidget {
-  /// Total seconds the trip spent below the optimal-gear ceiling.
-  /// Only ever rendered when caller has confirmed `> 60`.
-  final double seconds;
+/// One row in the [DrivingInsightsCard], rendered from a
+/// [DrivingLesson]. Title always; subtitle / trailing only when the
+/// lesson carries them (the low-gear lesson has neither — matching the
+/// legacy gear-coaching row).
+class _LessonTile extends StatelessWidget {
+  final DrivingLesson lesson;
 
-  const _LowGearTile({required this.seconds});
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-
-    // `Math.max(1, round(seconds / 60))` so we never display "0
-    // minutes". The `> 60` guard already ensures `round()` returns
-    // at least 1 (round(60/60) = 1), but clamping defensively keeps
-    // the formatter honest for future callers.
-    final minutes = math.max(1, (seconds / 60).round()).toString();
-    final headline = l?.insightLowGear(minutes) ??
-        'Labouring in low gear ($minutes min)';
-
-    return ListTile(
-      key: const ValueKey('insight_tile_insightLowGear'),
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(
-        Icons.swap_vert,
-        color: theme.colorScheme.error,
-      ),
-      title: Text(headline),
-    );
-  }
-}
-
-/// One row in the [DrivingInsightsCard]. Renders a localized headline
-/// derived from [DrivingInsight.labelKey], a "% of trip" subtitle, and
-/// a trailing "+x L" badge.
-class _InsightTile extends StatelessWidget {
-  final DrivingInsight insight;
-
-  const _InsightTile({required this.insight});
+  const _LessonTile({required this.lesson});
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-
-    final litersFormatted = _formatLiters(insight.litersWasted);
-    final pctFormatted = _formatPercent(insight.percentOfTrip);
-    final headline = _buildHeadline(l, litersFormatted, pctFormatted);
-    final subtitle =
-        l?.insightSubtitlePctOfTrip(pctFormatted) ?? '$pctFormatted% of trip';
-    final trailing =
-        l?.insightTrailingLitersWasted(litersFormatted) ?? '+$litersFormatted L';
+    final subtitle = lesson.subtitle;
+    final trailing = lesson.trailing;
 
     return ListTile(
-      key: ValueKey('insight_tile_${insight.labelKey}'),
+      key: ValueKey('insight_tile_${lesson.id}'),
       contentPadding: EdgeInsets.zero,
       leading: Icon(
-        _iconFor(insight.labelKey),
+        _iconFor(lesson.id),
         color: theme.colorScheme.error,
       ),
-      title: Text(headline),
-      subtitle: Text(
-        subtitle,
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-      ),
-      trailing: Text(
-        trailing,
-        style: theme.textTheme.titleSmall?.copyWith(
-          color: theme.colorScheme.error,
-          fontFeatures: const [FontFeature.tabularFigures()],
-        ),
-      ),
+      title: Text(lesson.title),
+      subtitle: subtitle == null
+          ? null
+          : Text(
+              subtitle,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+      trailing: trailing == null
+          ? null
+          : Text(
+              trailing,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.error,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
     );
   }
 
-  /// Map an analyzer-emitted label key to the localized template.
-  /// Unknown keys fall back to a generic "+{liters} L" sentence so a
-  /// future analyzer category surfaces visibly even before its ARB
-  /// entry lands.
-  String _buildHeadline(
-    AppLocalizations? l,
-    String litersFormatted,
-    String pctFormatted,
-  ) {
-    switch (insight.labelKey) {
-      case 'insightHighRpm':
-        return l?.insightHighRpm(pctFormatted, litersFormatted) ??
-            'Engine over 3000 RPM ($pctFormatted% of trip): wasted $litersFormatted L';
-      case 'insightHardAccel':
-        // Hard-accel uses an event count, not a percent of trip; pull
-        // the count out of the metadata bag emitted by the analyzer.
-        final count =
-            (insight.metadata['eventCount'] ?? 0).toInt().toString();
-        return l?.insightHardAccel(count, litersFormatted) ??
-            '$count hard accelerations: wasted $litersFormatted L';
-      case 'insightIdling':
-        return l?.insightIdling(pctFormatted, litersFormatted) ??
-            'Idling ($pctFormatted% of trip): wasted $litersFormatted L';
-      default:
-        // Unknown key — show a defensive fallback rather than crash.
-        // Logged via the parent screen's tracing in production.
-        return '+$litersFormatted L';
-    }
-  }
-
-  IconData _iconFor(String labelKey) {
-    switch (labelKey) {
-      case 'insightHighRpm':
+  IconData _iconFor(String lessonId) {
+    switch (lessonId) {
+      case highRpmLessonId:
         return Icons.speed;
-      case 'insightHardAccel':
+      case hardAccelLessonId:
         return Icons.flash_on;
-      case 'insightIdling':
+      case idlingLessonId:
         return Icons.hourglass_empty;
-      case 'insightLowGear':
-        // Gear-coaching row (#1263 phase 3) doesn't go through this
-        // tile builder (it's rendered by [_LowGearTile] directly), but
-        // keep the icon mapping here so future analyzer-emitted
-        // 'insightLowGear' insights would render with the same gear-
-        // shift glyph.
+      case lowGearLessonId:
         return Icons.swap_vert;
       default:
         return Icons.info_outline;
@@ -231,8 +131,8 @@ class _InsightTile extends StatelessWidget {
   }
 }
 
-/// Empty-state row used when the analyzer found nothing above the
-/// noise floor. Kept inline rather than reusing `core/widgets/empty_state.dart`
+/// Empty-state row used when the registry found nothing above the noise
+/// floor. Kept inline rather than reusing `core/widgets/empty_state.dart`
 /// because that widget is full-screen and would dominate the trip detail
 /// scroll view.
 class _EmptyState extends StatelessWidget {
@@ -262,18 +162,4 @@ class _EmptyState extends StatelessWidget {
       ),
     );
   }
-}
-
-/// One-decimal litres formatter — "0.6", not "0.6000". Negative values
-/// (impossible in production but cheap to defend against) are clamped
-/// to zero so we never coach with a negative waste figure.
-String _formatLiters(double liters) {
-  final clamped = liters < 0 ? 0.0 : liters;
-  return clamped.toStringAsFixed(1);
-}
-
-/// Whole-number percent formatter — "12", not "12.345". Matches the
-/// analyzer's coaching-grade precision.
-String _formatPercent(double pct) {
-  return pct.toStringAsFixed(0);
 }

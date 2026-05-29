@@ -9,9 +9,12 @@ import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/driving_insights_analyzer.dart';
 import '../../data/driving_score_calculator.dart';
+import '../../data/lessons/driving_lesson_registry.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/driving_insight.dart';
 import '../../domain/driving_score.dart';
+import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/services/throttle_rpm_histogram_calculator.dart';
 import '../../domain/trip_recorder.dart';
 import 'driving_insights_card.dart';
@@ -92,6 +95,15 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   /// cases.
   late final DrivingScore _score = _computeScore();
 
+  /// The post-trip lesson registry (#2251). Stateless and cheap to
+  /// construct; held for the lifetime of this State so `build` reuses
+  /// the same instance across rebuilds. The card's lessons are resolved
+  /// in `build` (they depend on the active locale) but off the cached
+  /// [_insights] / [_score], so the O(n) analyzer / score passes don't
+  /// re-run on a theme / locale tick.
+  final DrivingLessonRegistry _lessonRegistry =
+      DrivingLessonRegistry.standard();
+
   List<DrivingInsight> _computeInsights() {
     if (widget.samples.isEmpty) return const [];
     // Insights are only meaningful for combustion trips — EV trips
@@ -160,6 +172,29 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     final hasEngineLoadSamples =
         widget.samples.any((s) => s.engineLoadPercent != null);
 
+    // Post-trip lessons (#2251) — resolved here because the localized
+    // titles depend on the active locale, but built off the cached
+    // [_insights] / [_score] (and the stored summary) so the O(n)
+    // analyzer / score passes don't re-run on a theme / locale rebuild.
+    // Empty for EV / empty trips on the same gating rule as the card
+    // below, and the registry returns [] when no rule fires (the
+    // empty-state path). `l == null` only in degenerate test harnesses;
+    // fall back to no lessons rather than crash.
+    final List<DrivingLesson> lessons =
+        (l == null || widget.isEv || widget.samples.isEmpty)
+            ? const []
+            : _lessonRegistry.evaluateContext(
+                LessonContext(
+                  summary: widget.entry.summary,
+                  samples: widget.samples.map(_toTripSample).toList(
+                        growable: false,
+                      ),
+                  score: _score,
+                  insights: _insights,
+                ),
+                l,
+              );
+
     // Wrap the report content in a [RepaintBoundary] so the Share
     // action (#1189) can call `boundary.toImage(...)` to produce a PNG
     // for the OS share sheet. The boundary covers Summary + Insights
@@ -191,21 +226,12 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         if (showGamification && !widget.isEv && widget.samples.isNotEmpty)
           DrivingScoreCard(score: _score),
         // Driving insights — combustion trips only. EV trips skip
-        // this card; phase 4 will land an EV-aware version.
-        //
-        // #1263 phase 3: also pass the gear-coaching metric
-        // (`secondsBelowOptimalGear`) so the card can render a
-        // "Labouring in low gear (X min)" row when the metric > 60s.
-        // Force null on EV trips defensively — the parent gate above
-        // already hides the card for EVs, but null-passing keeps the
-        // contract clean if that gate ever moves.
+        // this card; phase 4 will land an EV-aware version. Since #2251
+        // the card renders the registry's ranked lessons (high-RPM,
+        // hard-accel, idling, and the low-gear coaching row) — the same
+        // rows the inline analyzer + gear metric produced before.
         if (!widget.isEv && widget.samples.isNotEmpty)
-          DrivingInsightsCard(
-            insights: _insights,
-            secondsBelowOptimalGear: widget.isEv
-                ? null
-                : widget.entry.summary.secondsBelowOptimalGear,
-          ),
+          DrivingInsightsCard(lessons: lessons),
         // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
         // right below the insights card so the user reads "what was
         // wasteful" then immediately sees "here's the engine

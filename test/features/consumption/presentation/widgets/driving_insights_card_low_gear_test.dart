@@ -3,91 +3,66 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/driving_insight.dart';
+import 'package:tankstellen/features/consumption/domain/lessons/driving_lesson.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/driving_insights_card.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// Coverage for the gear-coaching row added to [DrivingInsightsCard]
-/// in #1263 phase 3.
+/// Card-level coverage for rendering the low-gear lesson
+/// (#1263 phase 3, registry-driven since #2251).
 ///
-/// The row surfaces `TripSummary.secondsBelowOptimalGear` (computed by
-/// `gear_inference.dart` in phase 1, persisted in phase 2) when the
-/// metric is non-null and strictly greater than 60s. Below the
-/// threshold, the row stays hidden so noisy short bursts don't dilute
-/// the coaching signal.
+/// The `> 60s` gate + minute formatting now live in `LowGearRule`
+/// (covered by the registry test). These tests pin how the CARD renders
+/// a low-gear lesson: a keyed tile with no trailing badge, rendered
+/// above the cost-line lessons when both are present.
+DrivingLesson _lowGear({int minutes = 3, double seconds = 180}) => DrivingLesson(
+      id: 'lowGear',
+      impact: 1000,
+      metricValue: seconds,
+      title: 'Labouring in low gear ($minutes min)',
+      // No subtitle / trailing — matches the legacy gear-coaching row.
+    );
+
+const _highRpmLesson = DrivingLesson(
+  id: 'highRpm',
+  impact: 0.6,
+  metricValue: 0.6,
+  title: 'Engine over 3000 RPM (12% of trip): wasted 0.6 L',
+  subtitle: '12% of trip',
+  trailing: '+0.6 L',
+);
+
 void main() {
-  const lowGearKey = ValueKey('insight_tile_insightLowGear');
+  const lowGearKey = ValueKey('insight_tile_lowGear');
 
-  group('DrivingInsightsCard — gear-coaching row visibility', () {
-    testWidgets('hidden when secondsBelowOptimalGear is null',
+  group('DrivingInsightsCard — low-gear lesson rendering', () {
+    testWidgets('not rendered when no low-gear lesson is present',
         (tester) async {
       await pumpApp(
         tester,
-        const DrivingInsightsCard(insights: []),
+        const DrivingInsightsCard(lessons: []),
       );
 
       expect(find.byKey(lowGearKey), findsNothing);
       expect(find.textContaining('Labouring'), findsNothing);
     });
 
-    testWidgets('hidden at the boundary — 60.0 is NOT > 60',
-        (tester) async {
+    testWidgets('renders the low-gear lesson title', (tester) async {
       await pumpApp(
         tester,
-        const DrivingInsightsCard(
-          insights: [],
-          secondsBelowOptimalGear: 60.0,
-        ),
-      );
-
-      expect(find.byKey(lowGearKey), findsNothing);
-      expect(find.textContaining('Labouring'), findsNothing);
-    });
-
-    testWidgets('rendered when secondsBelowOptimalGear is 65 — shows "1 min"',
-        (tester) async {
-      await pumpApp(
-        tester,
-        const DrivingInsightsCard(
-          insights: [],
-          secondsBelowOptimalGear: 65.0,
-        ),
+        DrivingInsightsCard(lessons: [_lowGear()]),
       );
 
       expect(find.byKey(lowGearKey), findsOneWidget);
-      expect(
-        find.text('Labouring in low gear (1 min)'),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('rendered when secondsBelowOptimalGear is 180 — shows "3 min"',
-        (tester) async {
-      await pumpApp(
-        tester,
-        const DrivingInsightsCard(
-          insights: [],
-          secondsBelowOptimalGear: 180.0,
-        ),
-      );
-
-      expect(find.byKey(lowGearKey), findsOneWidget);
-      expect(
-        find.text('Labouring in low gear (3 min)'),
-        findsOneWidget,
-      );
+      expect(find.text('Labouring in low gear (3 min)'), findsOneWidget);
     });
 
     testWidgets(
-        'when fired with no other insights, replaces empty-state — no '
-        '"keep it up" copy', (tester) async {
+        'when it is the only lesson, no "keep it up" empty-state copy',
+        (tester) async {
       await pumpApp(
         tester,
-        const DrivingInsightsCard(
-          insights: [],
-          secondsBelowOptimalGear: 180.0,
-        ),
+        DrivingInsightsCard(lessons: [_lowGear()]),
       );
 
       expect(find.byKey(lowGearKey), findsOneWidget);
@@ -98,38 +73,20 @@ void main() {
     });
 
     testWidgets(
-        'when fired alongside non-empty insights, BOTH render — gear row '
-        'first', (tester) async {
-      const insights = [
-        DrivingInsight(
-          labelKey: 'insightHighRpm',
-          litersWasted: 0.6,
-          percentOfTrip: 12.0,
-        ),
-      ];
-
+        'rendered alongside cost-line lessons — gear row first', (tester) async {
       await pumpApp(
         tester,
-        const DrivingInsightsCard(
-          insights: insights,
-          secondsBelowOptimalGear: 180.0,
-        ),
+        DrivingInsightsCard(lessons: [_lowGear(), _highRpmLesson]),
       );
 
-      // Both rows present.
       expect(find.byKey(lowGearKey), findsOneWidget);
-      expect(
-        find.text('Labouring in low gear (3 min)'),
-        findsOneWidget,
-      );
+      expect(find.text('Labouring in low gear (3 min)'), findsOneWidget);
       expect(
         find.text('Engine over 3000 RPM (12% of trip): wasted 0.6 L'),
         findsOneWidget,
       );
-      // ListTile count: gear row + 1 insight tile.
       expect(find.byType(ListTile), findsNWidgets(2));
 
-      // Gear row precedes the insight tile vertically (smaller dy).
       final gearTopLeft = tester.getTopLeft(find.byKey(lowGearKey));
       final insightTopLeft = tester.getTopLeft(
         find.text('Engine over 3000 RPM (12% of trip): wasted 0.6 L'),
@@ -141,10 +98,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        const DrivingInsightsCard(
-          insights: [],
-          secondsBelowOptimalGear: 180.0,
-        ),
+        DrivingInsightsCard(lessons: [_lowGear()]),
       );
 
       final tile = tester.widget<ListTile>(find.byKey(lowGearKey));
