@@ -102,7 +102,7 @@ final class PricePredictionProvider
   }
 }
 
-String _$pricePredictionHash() => r'd11db7fbfbcbc3bfddcb78134ae75712cec1e0ff';
+String _$pricePredictionHash() => r'99c1d56e4f9dda52ca30ef12d972108dd42e2562';
 
 /// Computes "best time to fill" predictions from locally stored price history.
 ///
