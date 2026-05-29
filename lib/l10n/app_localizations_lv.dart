@@ -3423,6 +3423,45 @@ class AppLocalizationsLv extends AppLocalizations {
       'Pabeidziet 30 km+ braucienu ar nemainīgu ātrumu un maigās braukšanas novērtējumu 90 vai augstāku.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (mērķis: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel kritās tuvumā esošajās stacijās';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count stacijās cena kritās līdz pat $cents¢ pēdējās stundas laikā';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count stacijas ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ vēl $count';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Fona cenu brīdinājumi pašlaik darbojas tikai Vācijas degvielas uzpildes stacijām. Šis brīdinājums tiks saglabāts, taču tas var nekad jūs nebrīdināt, līdz būs pieejami starpvalstu brīdinājumi.';
 
@@ -4929,6 +4968,43 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get home => 'Sākums';
+
+  @override
+  String get locationConsentTitle => 'Atrašanās vietas piekļuve';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Šī lietotne vēlas izmantot jūsu atrašanās vietu, lai atrastu tuvumā esošās degvielas uzpildes stacijas.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Kas notiek ar jūsu atrašanās vietas datiem:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Jūsu koordinātes tiek nosūtītas degvielas cenu API, lai atrastu tuvumā esošās stacijas.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Jūsu atrašanās vieta netiek glabāta nevienā serverī — servera nav.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Atrašanās vietas dati netiek izmantoti reklāmai, analītikai vai izsekošanai.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Atrašanās vietas piekļuvi varat jebkurā laikā atsaukt sistēmas iestatījumos. Varat arī meklēt pēc pasta indeksa.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)';
+
+  @override
+  String get locationConsentDecline => 'Noraidīt';
+
+  @override
+  String get locationConsentAccept => 'Piekrist';
 
   @override
   String get loyaltySettingsTitle => 'Degvielas kluba kartes';

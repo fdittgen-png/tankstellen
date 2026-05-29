@@ -3408,6 +3408,45 @@ class AppLocalizationsHr extends AppLocalizations {
       'Završite vožnju od 30 km+ pri konstantnoj brzini s ocjenom mirne vožnje 90 ili više.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (cilj: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel pao na obližnjim postajama';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count postaja pojeftinilo do $cents¢ u posljednjem satu';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count postaja ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ još $count';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Pozadinska upozorenja o cijenama trenutačno rade samo za benzinske postaje u Njemačkoj. Ovo upozorenje bit će spremljeno, ali možda vas nikada neće obavijestiti dok ne postanu dostupna međudržavna upozorenja.';
 
@@ -4914,6 +4953,43 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get home => 'Početna';
+
+  @override
+  String get locationConsentTitle => 'Pristup lokaciji';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Ova aplikacija želi koristiti vašu lokaciju za pronalaženje benzinskih postaja u blizini.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Što se događa s podacima o vašoj lokaciji:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Vaše se koordinate šalju API-ju cijena goriva radi pronalaženja obližnjih postaja.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Vaša se lokacija ne pohranjuje ni na jednom poslužitelju — poslužitelja nema.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Podaci o lokaciji ne koriste se za oglašavanje, analitiku ni praćenje.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Pristup lokaciji možete opozvati u bilo kojem trenutku u postavkama sustava. Alternativno, pretražujte prema poštanskom broju.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Pravna osnova: čl. 6. st. 1. t. (a) GDPR-a (privola)';
+
+  @override
+  String get locationConsentDecline => 'Odbij';
+
+  @override
+  String get locationConsentAccept => 'Prihvati';
 
   @override
   String get loyaltySettingsTitle => 'Kartice gorivnog kluba';

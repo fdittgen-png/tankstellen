@@ -3404,6 +3404,45 @@ class AppLocalizationsFi extends AppLocalizations {
       'Suorita vähintään 30 km matka tasaisella nopeudella ja tasaisen ajon pisteet 90 tai enemmän.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (tavoite: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel laski lähistön asemilla';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count asemaa laski jopa $cents¢ viimeisen tunnin aikana';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count asemaa ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count lisää';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Taustahintahälytykset toimivat tällä hetkellä vain Saksan huoltoasemilla. Tämä hälytys tallennetaan, mutta se ei välttämättä ilmoita sinulle ennen kuin maiden väliset hälytykset ovat käytettävissä.';
 
@@ -4895,6 +4934,42 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get home => 'Etusivu';
+
+  @override
+  String get locationConsentTitle => 'Sijainnin käyttö';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Tämä sovellus haluaa käyttää sijaintiasi löytääkseen huoltoasemia läheltäsi.';
+
+  @override
+  String get locationConsentWhatHappens => 'Mitä sijaintitiedoillesi tapahtuu:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Koordinaattisi lähetetään polttoaineen hinta-API:lle lähistön asemien löytämiseksi.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Sijaintiasi ei tallenneta millekään palvelimelle — palvelinta ei ole.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Sijaintitietoja ei käytetä mainontaan, analytiikkaan tai seurantaan.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Voit peruuttaa sijainnin käyttöoikeuden milloin tahansa järjestelmäasetuksista. Vaihtoehtoisesti voit hakea postinumerolla.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)';
+
+  @override
+  String get locationConsentDecline => 'Hylkää';
+
+  @override
+  String get locationConsentAccept => 'Hyväksy';
 
   @override
   String get loyaltySettingsTitle => 'Polttoainekortit';

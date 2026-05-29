@@ -3413,6 +3413,45 @@ class AppLocalizationsPl extends AppLocalizations {
       'Przejedź trasę 30 km+ ze stałą prędkością z wynikiem płynnej jazdy 90 lub więcej.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (cel: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel spadło na pobliskich stacjach';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count stacji potaniało nawet o $cents¢ w ciągu ostatniej godziny';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count stacji ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count więcej';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Powiadomienia o cenach w tle działają obecnie tylko dla stacji w Niemczech. To powiadomienie zostanie zapisane, ale może nigdy Cię nie powiadomić, dopóki nie pojawią się powiadomienia międzynarodowe.';
 
@@ -4921,6 +4960,43 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get home => 'Strona główna';
+
+  @override
+  String get locationConsentTitle => 'Dostęp do lokalizacji';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Ta aplikacja chce użyć Twojej lokalizacji, aby znaleźć stacje paliw w pobliżu.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Co dzieje się z danymi o Twojej lokalizacji:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Twoje współrzędne są wysyłane do API cen paliw w celu znalezienia pobliskich stacji.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Twoja lokalizacja nie jest przechowywana na żadnym serwerze — nie ma serwera.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Dane o lokalizacji nie są wykorzystywane do reklam, analiz ani śledzenia.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Dostęp do lokalizacji możesz cofnąć w dowolnym momencie w ustawieniach systemu. Możesz też wyszukiwać według kodu pocztowego.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda)';
+
+  @override
+  String get locationConsentDecline => 'Odmów';
+
+  @override
+  String get locationConsentAccept => 'Akceptuj';
 
   @override
   String get loyaltySettingsTitle => 'Karty paliwowe';

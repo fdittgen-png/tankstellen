@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Καμία απότομη επιτάχυνση ή φρενάρισμα σε αυτή τη διαδρομή – η σταθερή οδήγηση κρατά χαμηλή την κατανάλωση.",
   "storageRecoveryTitle": "Πρόβλημα αποθήκευσης",
   "storageRecoveryMessage": "Το Sparkilo δεν μπόρεσε να ανοίξει τον τοπικό χώρο αποθήκευσης δεδομένων του. Το αρχείο αποθήκευσης φαίνεται κατεστραμμένο.",
-  "storageRecoveryGuidance": "Για ανάκτηση, διαγράψτε τον αποθηκευτικό χώρο της εφαρμογής στις ρυθμίσεις της συσκευής ή επανεγκαταστήστε την εφαρμογή. Τα αγαπημένα και το ιστορικό σας αποθηκεύονται μόνο σε αυτήν τη συσκευή και δεν μπορούν να ανακτηθούν αυτόματα."
+  "storageRecoveryGuidance": "Για ανάκτηση, διαγράψτε τον αποθηκευτικό χώρο της εφαρμογής στις ρυθμίσεις της συσκευής ή επανεγκαταστήστε την εφαρμογή. Τα αγαπημένα και το ιστορικό σας αποθηκεύονται μόνο σε αυτήν τη συσκευή και δεν μπορούν να ανακτηθούν αυτόματα.",
+  "locationConsentTitle": "Πρόσβαση στην τοποθεσία",
+  "locationConsentSubtitle": "Αυτή η εφαρμογή θέλει να χρησιμοποιήσει την τοποθεσία σας για να βρει πρατήρια καυσίμων κοντά σας.",
+  "locationConsentWhatHappens": "Τι γίνεται με τα δεδομένα τοποθεσίας σας:",
+  "locationConsentBulletApi": "Οι συντεταγμένες σας αποστέλλονται στο API τιμών καυσίμων για την εύρεση κοντινών πρατηρίων.",
+  "locationConsentBulletNoServer": "Η τοποθεσία σας δεν αποθηκεύεται σε κανέναν διακομιστή — δεν υπάρχει διακομιστής.",
+  "locationConsentBulletNoTracking": "Τα δεδομένα τοποθεσίας δεν χρησιμοποιούνται για διαφήμιση, ανάλυση ή παρακολούθηση.",
+  "locationConsentRevoke": "Μπορείτε να ανακαλέσετε την πρόσβαση στην τοποθεσία ανά πάσα στιγμή στις ρυθμίσεις συστήματος. Εναλλακτικά, αναζητήστε με ταχυδρομικό κώδικα.",
+  "locationConsentLegalBasis": "Νομική βάση: άρθρο 6 παρ. 1 στοιχ. α) ΓΚΠΔ (συγκατάθεση)",
+  "locationConsentDecline": "Απόρριψη",
+  "locationConsentAccept": "Αποδοχή",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (στόχος: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} έπεσε σε κοντινά πρατήρια",
+  "velocityAlertNotificationBody": "{count} πρατήρια έπεσαν έως και {cents}¢ την τελευταία ώρα",
+  "radiusAlertGroupedTitle": "{label}: {count} πρατήρια ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} ακόμη"
 }

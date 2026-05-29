@@ -142,16 +142,17 @@ void main() {
       await future;
     });
 
-    testWidgets('falls back to English for a locale missing from the map',
+    testWidgets('renders Bulgarian labels for bg locale (#2306)',
         (tester) async {
-      // 'bg' (Bulgarian) is an app locale but is NOT in the
-      // `_ConsentTexts` map — the internal `_t` must return the
-      // English value rather than crash.
+      // #2306 — the legacy `_ConsentTexts` map did NOT cover 'bg', so
+      // Bulgarian users saw an English consent surface. The strings now
+      // route through AppLocalizations, so every shipped locale —
+      // including 'bg' — renders in the device language.
       final future = await _openDialog(tester, const Locale('bg'));
-      expect(find.text('Location Access'), findsOneWidget);
-      expect(find.text('Accept'), findsOneWidget);
-      expect(find.text('Decline'), findsOneWidget);
-      await tester.tap(find.text('Decline'));
+      expect(find.text('Достъп до местоположението'), findsOneWidget);
+      expect(find.text('Приеми'), findsOneWidget);
+      expect(find.text('Откажи'), findsOneWidget);
+      await tester.tap(find.text('Откажи'));
       await tester.pumpAndSettle();
       await future;
     });

@@ -2102,5 +2102,21 @@
   "lessonAdviceSmoothDriving": "Aucune accélération ni freinage brusque sur ce trajet : une conduite régulière maintient une faible consommation.",
   "storageRecoveryTitle": "Problème de stockage",
   "storageRecoveryMessage": "Sparkilo n'a pas pu ouvrir son stockage de données local. Le fichier de stockage semble endommagé.",
-  "storageRecoveryGuidance": "Pour récupérer, videz le stockage de l'application dans les réglages de l'appareil ou réinstallez l'application. Vos favoris et votre historique sont enregistrés uniquement sur cet appareil et ne peuvent pas être restaurés automatiquement."
+  "storageRecoveryGuidance": "Pour récupérer, videz le stockage de l'application dans les réglages de l'appareil ou réinstallez l'application. Vos favoris et votre historique sont enregistrés uniquement sur cet appareil et ne peuvent pas être restaurés automatiquement.",
+  "locationConsentTitle": "Accès à la localisation",
+  "locationConsentSubtitle": "Cette application souhaite utiliser votre position pour trouver les stations-service près de chez vous.",
+  "locationConsentWhatHappens": "Ce qui se passe avec vos données de localisation :",
+  "locationConsentBulletApi": "Vos coordonnées sont envoyées à l'API de prix des carburants pour trouver les stations proches.",
+  "locationConsentBulletNoServer": "Votre position n'est stockée sur aucun serveur — il n'y a pas de serveur.",
+  "locationConsentBulletNoTracking": "Les données de localisation ne sont pas utilisées pour la publicité, l'analyse ou le suivi.",
+  "locationConsentRevoke": "Vous pouvez révoquer l'accès à la localisation à tout moment dans les paramètres système. Vous pouvez aussi rechercher par code postal.",
+  "locationConsentLegalBasis": "Base juridique : art. 6, §1, a) du RGPD (consentement)",
+  "locationConsentDecline": "Refuser",
+  "locationConsentAccept": "Accepter",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (objectif : {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} en baisse dans les stations proches",
+  "velocityAlertNotificationBody": "{count} stations en baisse jusqu'à {cents}¢ au cours de la dernière heure",
+  "radiusAlertGroupedTitle": "{label} : {count} stations ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} autres"
 }

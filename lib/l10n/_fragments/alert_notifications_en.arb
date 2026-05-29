@@ -1,0 +1,51 @@
+{
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "@priceAlertNotificationTitle": {
+    "description": "Title of the background price-alert push notification: station name and fuel grade (#2306). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings.",
+    "placeholders": {
+      "station": { "type": "String" },
+      "fuelType": { "type": "String" }
+    }
+  },
+  "priceAlertNotificationBody": "{price} {currency} (target: {target} {currency})",
+  "@priceAlertNotificationBody": {
+    "description": "Body of the background price-alert push notification: current price and the user's target, both with the local currency symbol (#2306).",
+    "placeholders": {
+      "price": { "type": "String" },
+      "currency": { "type": "String" },
+      "target": { "type": "String" }
+    }
+  },
+  "velocityAlertNotificationTitle": "{fuelLabel} dropped at nearby stations",
+  "@velocityAlertNotificationTitle": {
+    "description": "Title of the background velocity-drop notification fired when a fuel grade drops at several nearby stations at once (#2306, #579).",
+    "placeholders": {
+      "fuelLabel": { "type": "String" }
+    }
+  },
+  "velocityAlertNotificationBody": "{count} stations dropped by up to {cents}¢ in the last hour",
+  "@velocityAlertNotificationBody": {
+    "description": "Body of the background velocity-drop notification: how many nearby stations dropped and by how much in the last hour (#2306, #579).",
+    "placeholders": {
+      "count": { "type": "String" },
+      "cents": { "type": "String" }
+    }
+  },
+  "radiusAlertGroupedTitle": "{label}: {count} stations ≤ {threshold} {currency}",
+  "@radiusAlertGroupedTitle": {
+    "description": "Title of the background grouped radius-alert notification: the user's alert label, how many stations are at or below the threshold, and the threshold price (#2306, #1012). Supersedes the single-station radiusAlertNotificationTitle for the grouped-fire path.",
+    "placeholders": {
+      "label": { "type": "String" },
+      "count": { "type": "String" },
+      "threshold": { "type": "String" },
+      "currency": { "type": "String" }
+    }
+  },
+  "radiusAlertGroupedMore": "+ {count} more",
+  "@radiusAlertGroupedMore": {
+    "description": "Trailing line in the background grouped radius-alert notification body when more matching stations exist than fit in the notification (#2306, #1012).",
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  }
+}

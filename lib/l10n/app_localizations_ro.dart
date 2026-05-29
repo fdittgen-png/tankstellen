@@ -3425,6 +3425,45 @@ class AppLocalizationsRo extends AppLocalizations {
       'Finalizați o călătorie de 30+ km la viteză constantă cu un scor de condus lin de 90 sau mai mult.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (țintă: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel a scăzut la benzinăriile din apropiere';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count benzinării au scăzut cu până la $cents¢ în ultima oră';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count benzinării ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ încă $count';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Alertele de preț în fundal funcționează momentan doar pentru stațiile din Germania. Această alertă va fi salvată, dar este posibil să nu vă notifice niciodată până când vor fi disponibile alertele între țări.';
 
@@ -4934,6 +4973,43 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get home => 'Acasă';
+
+  @override
+  String get locationConsentTitle => 'Acces la locație';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Această aplicație dorește să vă folosească locația pentru a găsi benzinării în apropiere.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Ce se întâmplă cu datele dvs. de locație:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Coordonatele dvs. sunt trimise către API-ul de prețuri ale carburanților pentru a găsi benzinării din apropiere.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Locația dvs. nu este stocată pe niciun server — nu există server.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Datele de locație nu sunt folosite pentru publicitate, analiză sau urmărire.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Puteți revoca accesul la locație oricând din setările sistemului. Alternativ, căutați după codul poștal.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)';
+
+  @override
+  String get locationConsentDecline => 'Refuză';
+
+  @override
+  String get locationConsentAccept => 'Acceptă';
 
   @override
   String get loyaltySettingsTitle => 'Carduri de fidelitate combustibil';

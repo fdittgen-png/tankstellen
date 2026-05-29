@@ -3426,6 +3426,45 @@ class AppLocalizationsHu extends AppLocalizations {
       'Teljesítsen egy 30 km-nél hosszabb utat egyenletes sebességgel, legalább 90-es sima-vezetési pontszámmal.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (cél: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel csökkent a közeli kutakon';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count kút ára akár $cents¢ értékkel csökkent az elmúlt órában';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count kút ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count további';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'A háttérben futó árriasztások jelenleg csak németországi töltőállomásokra működnek. Ez a riasztás mentésre kerül, de előfordulhat, hogy soha nem értesít, amíg az országok közötti riasztások meg nem érkeznek.';
 
@@ -4938,6 +4977,42 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get home => 'Kezdőlap';
+
+  @override
+  String get locationConsentTitle => 'Helyhozzáférés';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Ez az alkalmazás szeretné használni a tartózkodási helyét, hogy közeli benzinkutakat találjon.';
+
+  @override
+  String get locationConsentWhatHappens => 'Mi történik a helyadataival:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'A koordinátáit az üzemanyagár-API-nak küldjük el a közeli kutak megtalálásához.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'A tartózkodási helyét semmilyen szerver nem tárolja — nincs szerver.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'A helyadatokat nem használjuk reklámra, elemzésre vagy nyomon követésre.';
+
+  @override
+  String get locationConsentRevoke =>
+      'A helyhozzáférést bármikor visszavonhatja a rendszerbeállításokban. Másik lehetőségként irányítószám szerint is kereshet.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)';
+
+  @override
+  String get locationConsentDecline => 'Elutasítás';
+
+  @override
+  String get locationConsentAccept => 'Elfogadás';
 
   @override
   String get loyaltySettingsTitle => 'Üzemanyag-törzsvevő kártyák';

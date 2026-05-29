@@ -3433,6 +3433,45 @@ class AppLocalizationsFr extends AppLocalizations {
       'Réalisez un trajet de 30 km ou plus à vitesse constante avec un score de conduite souple supérieur ou égal à 90.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (objectif : $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel en baisse dans les stations proches';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count stations en baisse jusqu\'à $cents¢ au cours de la dernière heure';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label : $count stations ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count autres';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Les alertes de prix en arrière-plan ne fonctionnent actuellement que pour les stations en Allemagne. Cette alerte sera enregistrée, mais elle pourrait ne jamais vous notifier tant que les alertes transfrontalières ne sont pas disponibles.';
 
@@ -4952,6 +4991,43 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get home => 'Accueil';
+
+  @override
+  String get locationConsentTitle => 'Accès à la localisation';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Cette application souhaite utiliser votre position pour trouver les stations-service près de chez vous.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Ce qui se passe avec vos données de localisation :';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Vos coordonnées sont envoyées à l\'API de prix des carburants pour trouver les stations proches.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Votre position n\'est stockée sur aucun serveur — il n\'y a pas de serveur.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Les données de localisation ne sont pas utilisées pour la publicité, l\'analyse ou le suivi.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Vous pouvez révoquer l\'accès à la localisation à tout moment dans les paramètres système. Vous pouvez aussi rechercher par code postal.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Base juridique : art. 6, §1, a) du RGPD (consentement)';
+
+  @override
+  String get locationConsentDecline => 'Refuser';
+
+  @override
+  String get locationConsentAccept => 'Accepter';
 
   @override
   String get loyaltySettingsTitle => 'Mes cartes de fidélité';

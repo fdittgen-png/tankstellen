@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Nem volt heves gyorsítás vagy fékezés ezen az úton – az egyenletes vezetés alacsonyan tartja a fogyasztást.",
   "storageRecoveryTitle": "Tárolási probléma",
   "storageRecoveryMessage": "A Sparkilo nem tudta megnyitni a helyi adattárolóját. A tárolófájl sérültnek tűnik.",
-  "storageRecoveryGuidance": "A helyreállításhoz töröld az alkalmazás tárhelyét a készülék beállításaiban, vagy telepítsd újra az alkalmazást. A kedvenceid és az előzményeid csak ezen az eszközön tárolódnak, ezért nem állíthatók helyre automatikusan."
+  "storageRecoveryGuidance": "A helyreállításhoz töröld az alkalmazás tárhelyét a készülék beállításaiban, vagy telepítsd újra az alkalmazást. A kedvenceid és az előzményeid csak ezen az eszközön tárolódnak, ezért nem állíthatók helyre automatikusan.",
+  "locationConsentTitle": "Helyhozzáférés",
+  "locationConsentSubtitle": "Ez az alkalmazás szeretné használni a tartózkodási helyét, hogy közeli benzinkutakat találjon.",
+  "locationConsentWhatHappens": "Mi történik a helyadataival:",
+  "locationConsentBulletApi": "A koordinátáit az üzemanyagár-API-nak küldjük el a közeli kutak megtalálásához.",
+  "locationConsentBulletNoServer": "A tartózkodási helyét semmilyen szerver nem tárolja — nincs szerver.",
+  "locationConsentBulletNoTracking": "A helyadatokat nem használjuk reklámra, elemzésre vagy nyomon követésre.",
+  "locationConsentRevoke": "A helyhozzáférést bármikor visszavonhatja a rendszerbeállításokban. Másik lehetőségként irányítószám szerint is kereshet.",
+  "locationConsentLegalBasis": "Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)",
+  "locationConsentDecline": "Elutasítás",
+  "locationConsentAccept": "Elfogadás",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (cél: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} csökkent a közeli kutakon",
+  "velocityAlertNotificationBody": "{count} kút ára akár {cents}¢ értékkel csökkent az elmúlt órában",
+  "radiusAlertGroupedTitle": "{label}: {count} kút ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} további"
 }

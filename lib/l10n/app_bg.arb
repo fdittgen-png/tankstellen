@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Това пътуване без резки ускорения и спирания – равномерното шофиране държи разхода нисък.",
   "storageRecoveryTitle": "Проблем със съхранението",
   "storageRecoveryMessage": "Sparkilo не можа да отвори локалното си хранилище за данни. Файлът изглежда повреден.",
-  "storageRecoveryGuidance": "За възстановяване изчистете хранилището на приложението в настройките на устройството или преинсталирайте приложението. Любимите и историята ви се съхраняват само на това устройство и не могат да бъдат възстановени автоматично."
+  "storageRecoveryGuidance": "За възстановяване изчистете хранилището на приложението в настройките на устройството или преинсталирайте приложението. Любимите и историята ви се съхраняват само на това устройство и не могат да бъдат възстановени автоматично.",
+  "locationConsentTitle": "Достъп до местоположението",
+  "locationConsentSubtitle": "Това приложение иска да използва местоположението ви, за да намери бензиностанции близо до вас.",
+  "locationConsentWhatHappens": "Какво се случва с данните за местоположението ви:",
+  "locationConsentBulletApi": "Координатите ви се изпращат към API-то за цени на горивата, за да се намерят близки бензиностанции.",
+  "locationConsentBulletNoServer": "Местоположението ви не се съхранява на нито един сървър — няма сървър.",
+  "locationConsentBulletNoTracking": "Данните за местоположението не се използват за реклама, анализ или проследяване.",
+  "locationConsentRevoke": "Можете да отмените достъпа до местоположението по всяко време в системните настройки. Като алтернатива търсете по пощенски код.",
+  "locationConsentLegalBasis": "Правно основание: чл. 6, пар. 1, б. „а“ от ОРЗД (съгласие)",
+  "locationConsentDecline": "Откажи",
+  "locationConsentAccept": "Приеми",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (цел: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} поевтиня в близки бензиностанции",
+  "velocityAlertNotificationBody": "{count} бензиностанции поевтиняха с до {cents}¢ през последния час",
+  "radiusAlertGroupedTitle": "{label}: {count} бензиностанции ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ още {count}"
 }

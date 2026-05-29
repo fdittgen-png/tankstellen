@@ -1,0 +1,8 @@
+{
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (Ziel: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
+  "velocityAlertNotificationBody": "{count} Tankstellen um bis zu {cents}¢ in der letzten Stunde gefallen",
+  "radiusAlertGroupedTitle": "{label}: {count} Tankstellen ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ {count} weitere"
+}

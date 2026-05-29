@@ -1974,5 +1974,21 @@
   "lessonAdviceSmoothDriving": "Fără accelerări sau frânări bruște în acest traseu – condusul constant menține consumul scăzut.",
   "storageRecoveryTitle": "Problemă de stocare",
   "storageRecoveryMessage": "Sparkilo nu a putut deschide spațiul local de stocare a datelor. Fișierul de stocare pare deteriorat.",
-  "storageRecoveryGuidance": "Pentru recuperare, șterge spațiul de stocare al aplicației din setările dispozitivului sau reinstalează aplicația. Favoritele și istoricul tău sunt salvate doar pe acest dispozitiv, așa că nu pot fi restaurate automat."
+  "storageRecoveryGuidance": "Pentru recuperare, șterge spațiul de stocare al aplicației din setările dispozitivului sau reinstalează aplicația. Favoritele și istoricul tău sunt salvate doar pe acest dispozitiv, așa că nu pot fi restaurate automat.",
+  "locationConsentTitle": "Acces la locație",
+  "locationConsentSubtitle": "Această aplicație dorește să vă folosească locația pentru a găsi benzinării în apropiere.",
+  "locationConsentWhatHappens": "Ce se întâmplă cu datele dvs. de locație:",
+  "locationConsentBulletApi": "Coordonatele dvs. sunt trimise către API-ul de prețuri ale carburanților pentru a găsi benzinării din apropiere.",
+  "locationConsentBulletNoServer": "Locația dvs. nu este stocată pe niciun server — nu există server.",
+  "locationConsentBulletNoTracking": "Datele de locație nu sunt folosite pentru publicitate, analiză sau urmărire.",
+  "locationConsentRevoke": "Puteți revoca accesul la locație oricând din setările sistemului. Alternativ, căutați după codul poștal.",
+  "locationConsentLegalBasis": "Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)",
+  "locationConsentDecline": "Refuză",
+  "locationConsentAccept": "Acceptă",
+  "priceAlertNotificationTitle": "{station} - {fuelType}",
+  "priceAlertNotificationBody": "{price} {currency} (țintă: {target} {currency})",
+  "velocityAlertNotificationTitle": "{fuelLabel} a scăzut la benzinăriile din apropiere",
+  "velocityAlertNotificationBody": "{count} benzinării au scăzut cu până la {cents}¢ în ultima oră",
+  "radiusAlertGroupedTitle": "{label}: {count} benzinării ≤ {threshold} {currency}",
+  "radiusAlertGroupedMore": "+ încă {count}"
 }

@@ -3418,6 +3418,45 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voltooi een rit van 30 km of meer op constante snelheid met een soepele rijscore van 90 of hoger.';
 
   @override
+  String priceAlertNotificationTitle(String station, String fuelType) {
+    return '$station - $fuelType';
+  }
+
+  @override
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  ) {
+    return '$price $currency (doel: $target $currency)';
+  }
+
+  @override
+  String velocityAlertNotificationTitle(String fuelLabel) {
+    return '$fuelLabel gedaald bij tankstations in de buurt';
+  }
+
+  @override
+  String velocityAlertNotificationBody(String count, String cents) {
+    return '$count tankstations gedaald met tot wel $cents¢ in het afgelopen uur';
+  }
+
+  @override
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  ) {
+    return '$label: $count tankstations ≤ $threshold $currency';
+  }
+
+  @override
+  String radiusAlertGroupedMore(String count) {
+    return '+ $count meer';
+  }
+
+  @override
   String get alertGatingNonDeStationWarning =>
       'Prijswaarschuwingen op de achtergrond werken momenteel alleen voor tankstations in Duitsland. Deze waarschuwing wordt opgeslagen, maar geeft je mogelijk nooit een melding totdat grensoverschrijdende waarschuwingen beschikbaar zijn.';
 
@@ -4917,6 +4956,43 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get home => 'Home';
+
+  @override
+  String get locationConsentTitle => 'Locatietoegang';
+
+  @override
+  String get locationConsentSubtitle =>
+      'Deze app wil je locatie gebruiken om tankstations in de buurt te vinden.';
+
+  @override
+  String get locationConsentWhatHappens =>
+      'Wat er met je locatiegegevens gebeurt:';
+
+  @override
+  String get locationConsentBulletApi =>
+      'Je coördinaten worden naar de brandstofprijs-API gestuurd om tankstations in de buurt te vinden.';
+
+  @override
+  String get locationConsentBulletNoServer =>
+      'Je locatie wordt op geen enkele server opgeslagen — er is geen server.';
+
+  @override
+  String get locationConsentBulletNoTracking =>
+      'Locatiegegevens worden niet gebruikt voor advertenties, analyse of tracking.';
+
+  @override
+  String get locationConsentRevoke =>
+      'Je kunt de locatietoegang op elk moment intrekken in de systeeminstellingen. Je kunt ook zoeken op postcode.';
+
+  @override
+  String get locationConsentLegalBasis =>
+      'Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)';
+
+  @override
+  String get locationConsentDecline => 'Weigeren';
+
+  @override
+  String get locationConsentAccept => 'Accepteren';
 
   @override
   String get loyaltySettingsTitle => 'Tankpaskaarten';

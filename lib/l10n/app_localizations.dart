@@ -6297,6 +6297,51 @@ abstract class AppLocalizations {
   /// **'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.'**
   String get achievementHighwayMasterDesc;
 
+  /// Title of the background price-alert push notification: station name and fuel grade (#2306). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings.
+  ///
+  /// In en, this message translates to:
+  /// **'{station} - {fuelType}'**
+  String priceAlertNotificationTitle(String station, String fuelType);
+
+  /// Body of the background price-alert push notification: current price and the user's target, both with the local currency symbol (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'{price} {currency} (target: {target} {currency})'**
+  String priceAlertNotificationBody(
+    String price,
+    String currency,
+    String target,
+  );
+
+  /// Title of the background velocity-drop notification fired when a fuel grade drops at several nearby stations at once (#2306, #579).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuelLabel} dropped at nearby stations'**
+  String velocityAlertNotificationTitle(String fuelLabel);
+
+  /// Body of the background velocity-drop notification: how many nearby stations dropped and by how much in the last hour (#2306, #579).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stations dropped by up to {cents}¢ in the last hour'**
+  String velocityAlertNotificationBody(String count, String cents);
+
+  /// Title of the background grouped radius-alert notification: the user's alert label, how many stations are at or below the threshold, and the threshold price (#2306, #1012). Supersedes the single-station radiusAlertNotificationTitle for the grouped-fire path.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {count} stations ≤ {threshold} {currency}'**
+  String radiusAlertGroupedTitle(
+    String label,
+    String count,
+    String threshold,
+    String currency,
+  );
+
+  /// Trailing line in the background grouped radius-alert notification body when more matching stations exist than fit in the notification (#2306, #1012).
+  ///
+  /// In en, this message translates to:
+  /// **'+ {count} more'**
+  String radiusAlertGroupedMore(String count);
+
   /// Warning shown in the create-alert dialog when the station is outside Germany, because the on-device background evaluator is Tankerkönig-only today (#2246).
   ///
   /// In en, this message translates to:
@@ -8774,6 +8819,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Home'**
   String get home;
+
+  /// Title of the GDPR location-consent dialog (#2306). Replaces the legacy _ConsentTexts map that only covered 10 of 23 locales for the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Access'**
+  String get locationConsentTitle;
+
+  /// Bold lead sentence of the GDPR location-consent dialog explaining why location is requested (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'This app would like to use your location to find fuel stations near you.'**
+  String get locationConsentSubtitle;
+
+  /// Heading above the three transparency bullets in the GDPR location-consent dialog (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'What happens with your location data:'**
+  String get locationConsentWhatHappens;
+
+  /// First transparency bullet in the GDPR location-consent dialog: coordinates leave the device only to query the fuel-price API (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'Your coordinates are sent to the fuel price API to find nearby stations.'**
+  String get locationConsentBulletApi;
+
+  /// Second transparency bullet in the GDPR location-consent dialog: there is no backend that stores the user's location (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'Your location is not stored on any server — there is no server.'**
+  String get locationConsentBulletNoServer;
+
+  /// Third transparency bullet in the GDPR location-consent dialog: location is never used for ads, analytics or tracking (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'Location data is not used for advertising, analytics, or tracking.'**
+  String get locationConsentBulletNoTracking;
+
+  /// Notice in the GDPR location-consent dialog explaining how to revoke the grant and the postal-code alternative (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'You can revoke location access anytime in system settings. Alternatively, search by postal code.'**
+  String get locationConsentRevoke;
+
+  /// Legal-basis footnote of the GDPR location-consent dialog. 'GDPR' is the established English/EU abbreviation; the article reference is the legal citation (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'Legal basis: Art. 6(1)(a) GDPR (Consent)'**
+  String get locationConsentLegalBasis;
+
+  /// Decline button on the GDPR location-consent dialog (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get locationConsentDecline;
+
+  /// Accept button on the GDPR location-consent dialog (#2306).
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get locationConsentAccept;
 
   /// Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120).
   ///
