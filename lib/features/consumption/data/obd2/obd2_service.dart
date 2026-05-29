@@ -41,6 +41,33 @@ export 'fuel_rate_estimator.dart'
         applyFuelTrimCorrection,
         estimateFuelRateLPerHourFromMap;
 
+/// What the bounded wake window observed on the FIRST init command of a
+/// fresh connect (#2268 concern 2). Drives the per-MAC observed-outcome
+/// wake cache (#2268 concern 3): the connection service records
+/// `wakeNeeded` only on a [wokeAfterNudge] outcome, and records
+/// `never-needed` only on an [answeredImmediately] outcome.
+enum WakeObservation {
+  /// The wake window did not run — either no [WakePolicy] was active for
+  /// this connect or it was suppressed by the cache. The connect path
+  /// has no evidence either way, so the cache must NOT be updated.
+  notRun,
+
+  /// The wake window ran and the FIRST command answered on the first
+  /// attempt — this adapter did not need waking on this connect. Strong
+  /// evidence the MAC never needs the window.
+  answeredImmediately,
+
+  /// The wake window ran, the FIRST command timed out / threw, and a
+  /// re-send after the longer settle then succeeded — observed proof the
+  /// adapter was asleep and the window recovered it.
+  wokeAfterNudge,
+
+  /// The wake window ran and every attempt (original + all nudges)
+  /// failed. No positive evidence — connect will fail downstream; the
+  /// cache must NOT be updated on a failed connect.
+  failed,
+}
+
 /// High-level OBD-II service for reading vehicle data.
 ///
 /// Wraps [Obd2Transport] and [Elm327Protocol] to provide a clean API
@@ -149,6 +176,14 @@ class Obd2Service implements Obd2RawCommandPort {
   /// the owner so the data layer never resolves vehicle identity itself.
   final String? _protocolCacheKey;
 
+  /// What the bounded wake window observed on the most recent [connect]
+  /// (#2268 concern 2). [WakeObservation.notRun] until a connect with an
+  /// active (non-suppressed) [WakePolicy] runs the window. The connection
+  /// service reads this after connect to update the per-MAC wake cache
+  /// (#2268 concern 3). Never updated on a connect that didn't run the
+  /// window, so a generic-adapter connect leaves it [notRun].
+  WakeObservation wakeObservation = WakeObservation.notRun;
+
   Obd2Service(
     this._transport, {
     SupportedPidsCache? pidsCache,
@@ -202,6 +237,86 @@ class Obd2Service implements Obd2RawCommandPort {
       await Future<void>.delayed(connectRetryDelay);
       return inner(command);
     }
+  }
+
+  /// Hard ceiling on the per-nudge wake settle (#2268 concern 2) so a
+  /// mis-seeded [WakePolicy.wakeSettle] can never stall trip-start
+  /// indefinitely. The window the connect path actually applies is
+  /// `min(wakeSettle, wakeSettleCap)`.
+  static const Duration wakeSettleCap = Duration(seconds: 3);
+
+  /// Hard ceiling on [WakePolicy.maxNudges] (#2268 concern 2). One nudge
+  /// is the realistic value (a single re-send after the adapter has had
+  /// time to wake); the cap guards against a runaway seeded value
+  /// turning the wake batch into an unbounded retry loop.
+  static const int maxNudgeCap = 2;
+
+  /// Test hook to scale the real wake-settle down to milliseconds so the
+  /// concern-2 unit tests don't wait real seconds. Production keeps it at
+  /// `1.0`. Multiplies the (already-capped) settle just before sleeping.
+  @visibleForTesting
+  static double wakeSettleScale = 1.0;
+
+  /// Bounded extra-settle + first-command nudge for a sleeping adapter
+  /// (#2268 concern 2).
+  ///
+  /// Runs ONLY when [policy.isActive] — i.e. a distinctive STN-/OBDLink-
+  /// class adapter opted in (none paired today) and the cache did not
+  /// suppress it. The first init command on a fresh open gets a
+  /// purpose-built window: the original attempt, then up to
+  /// `min(policy.maxNudges, maxNudgeCap)` RE-SENDS, each preceded by a
+  /// settle of `min(policy.wakeSettle, wakeSettleCap)`. This is longer
+  /// than the steady-state [_withConnectRetry] blip guard and is NOT an
+  /// AT "wake byte" — a BLE client cannot wake an ATLP-sleeping ELM327
+  /// with a magic byte; the lever is "wait, then ask again".
+  ///
+  /// Sets [wakeObservation] to the outcome so the connection service can
+  /// feed the per-MAC wake cache (concern 3). Returns the successful
+  /// response, or rethrows the LAST failure when every attempt failed so
+  /// the surrounding connect still fails exactly as it would today.
+  Future<String> _sendFirstCommandWithWake(
+    String command,
+    WakePolicy policy,
+  ) async {
+    final cappedSettleUs = policy.wakeSettle.inMicroseconds
+        .clamp(0, wakeSettleCap.inMicroseconds);
+    final settle = Duration(
+      microseconds: (cappedSettleUs * wakeSettleScale).round(),
+    );
+    final nudges = policy.maxNudges.clamp(0, maxNudgeCap);
+
+    // Attempt 0 — the original send. Immediate success ⇒ the adapter was
+    // already awake; strong evidence the MAC never needs the window.
+    try {
+      final response = await _transport.sendCommand(command);
+      wakeObservation = WakeObservation.answeredImmediately;
+      return response;
+    } catch (e, st) {
+      debugPrint('OBD2 wake: first command "$command" failed ($e), '
+          'entering bounded wake window\n$st');
+    }
+
+    // Nudges — settle, then re-send. A success here is observed proof the
+    // adapter was asleep and the window recovered it.
+    Object lastError = StateError('wake window had no nudges to try');
+    StackTrace lastStack = StackTrace.current;
+    for (var n = 0; n < nudges; n++) {
+      await Future<void>.delayed(settle);
+      try {
+        final response = await _transport.sendCommand(command);
+        wakeObservation = WakeObservation.wokeAfterNudge;
+        return response;
+      } catch (e, st) {
+        lastError = e;
+        lastStack = st;
+        debugPrint('OBD2 wake: nudge ${n + 1}/$nudges for "$command" '
+            'failed ($e)\n$st');
+      }
+    }
+
+    // Every attempt failed — rethrow so connect fails as it would today.
+    wakeObservation = WakeObservation.failed;
+    Error.throwWithStackTrace(lastError, lastStack);
   }
 
   /// AT command that asks the ELM327 to identify itself. Returns a
@@ -329,8 +444,15 @@ class Obd2Service implements Obd2RawCommandPort {
   ///      saves 8 × `01 XX` Bluetooth round-trips every session.
   ///   3. On cache miss, runs [discoverSupportedPids] and persists
   ///      the result under the chosen key for next time.
+  /// [wakePolicyOverride] (#2268 concern 2/3) lets the connection service
+  /// override the adapter's own [Elm327Adapter.wakePolicy] for THIS
+  /// connect based on the per-MAC observed-outcome cache: pass
+  /// [WakePolicy.noop] to suppress the bounded wake window for a MAC the
+  /// cache recorded as never-needing it. Null ⇒ use the adapter's policy
+  /// (a no-op for every generic adapter, so behaviour is unchanged).
   Future<bool> connect({
     Elm327Adapter adapter = const GenericElm327Adapter(),
+    WakePolicy? wakePolicyOverride,
   }) async {
     // #1920 — trace the connect attempt so a failed recording session
     // can be analysed from the exportable OBD2 diagnostic log.
@@ -340,6 +462,10 @@ class Obd2Service implements Obd2RawCommandPort {
     );
     try {
       _adapter = adapter;
+      // #2268 concern 2 — a fresh connect resets the wake observation;
+      // it only moves off [WakeObservation.notRun] if the bounded wake
+      // window actually runs (active policy, not cache-suppressed).
+      wakeObservation = WakeObservation.notRun;
       await _transport.connect();
 
       // Clear the per-connection supported-PIDs cache. A new session
@@ -372,6 +498,12 @@ class Obd2Service implements Obd2RawCommandPort {
           }
         }
       }
+      // #2268 concern 2 — resolve the effective wake policy for THIS
+      // connect. The cache (concern 3) can suppress the window by passing
+      // a no-op override; otherwise the adapter's own policy applies — a
+      // no-op for every generic adapter, so the first command goes through
+      // the unchanged [_withConnectRetry] path below.
+      final wakePolicy = wakePolicyOverride ?? adapter.wakePolicy;
       for (var i = 0; i < sequence.length; i++) {
         // #1925 — time each handshake command for the opt-in OBD2
         // debug log (a no-op when debug logging is off).
@@ -379,10 +511,20 @@ class Obd2Service implements Obd2RawCommandPort {
         // transient BLE blip during the init sequence is absorbed
         // rather than failing the whole connect attempt.
         final sw = Stopwatch()..start();
-        final response = await _withConnectRetry(
-          sequence[i],
-          _transport.sendCommand,
-        );
+        // #2268 concern 2 — the FIRST command on a fresh open gets the
+        // purpose-built bounded wake window when (and only when) an active
+        // wake policy applies. Every other command — and every first
+        // command for a generic adapter — runs the unchanged steady-state
+        // retry path, so behaviour is byte-for-byte the same by default.
+        final String response;
+        if (i == 0 && wakePolicy.isActive) {
+          response = await _sendFirstCommandWithWake(sequence[i], wakePolicy);
+        } else {
+          response = await _withConnectRetry(
+            sequence[i],
+            _transport.sendCommand,
+          );
+        }
         sw.stop();
         Obd2DebugSessionRecorder.recordHandshakeCommand(
           sequence[i],
