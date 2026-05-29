@@ -1223,4 +1223,11 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
 
   @override
   bool get automatic => _c._automatic;
+
+  @override
+  List<TripSample> get capturedSamples => _c._sampleBuffer.capturedSamples;
+
+  @override
+  List<GpsSampleDiagnostic> get capturedGpsSampleDiagnostics =>
+      _c._sampleBuffer.capturedGpsSampleDiagnostics;
 }
