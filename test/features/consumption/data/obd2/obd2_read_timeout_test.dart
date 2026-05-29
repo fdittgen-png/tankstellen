@@ -144,6 +144,8 @@ class _SlowInterCommandAdapter implements Elm327Adapter {
   List<String> get extraInitCommands => const [];
   @override
   String preParse(String raw) => raw;
+  @override
+  WakePolicy get wakePolicy => const WakePolicy.noop();
 }
 
 /// Transport that answers every command instantly with OK.

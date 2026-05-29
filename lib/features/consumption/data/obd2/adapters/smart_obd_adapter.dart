@@ -40,4 +40,12 @@ class SmartObdAdapter implements Elm327Adapter {
     final body = raw.substring(0, lastIdx).replaceAll('>', '');
     return body + raw.substring(lastIdx);
   }
+
+  // #2268 concern 1 — SmartOBD clones are slow to settle after ATZ but do
+  // not enter an ATLP standby that needs a wake nudge; their longer
+  // [postResetDelay] already covers re-enumeration. Strict no-op here so
+  // the wake batch stays opt-in for the STN-/OBDLink-class adapters that
+  // actually sleep.
+  @override
+  WakePolicy get wakePolicy => const WakePolicy.noop();
 }

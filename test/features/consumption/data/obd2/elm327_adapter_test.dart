@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapters/smart_obd_adapter.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapters/v_linker_fs_adapter.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_adapter.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_commands.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
@@ -93,6 +95,76 @@ void main() {
         adapter.preParse('41 0C 0F A0>'),
         '41 0C 0F A0>',
       );
+    });
+
+    test('wakePolicy is the strict no-op default (#2268 concern 1)', () {
+      const adapter = GenericElm327Adapter();
+      final policy = adapter.wakePolicy;
+      expect(policy.maySleep, isFalse,
+          reason: 'a generic clone must not trigger any wake compensation');
+      expect(policy.wakeSettle, Duration.zero);
+      expect(policy.maxNudges, 0);
+      expect(policy.isActive, isFalse,
+          reason: 'a no-op policy must report itself inert so the connect '
+              'path short-circuits before any extra settle');
+    });
+  });
+
+  group('WakePolicy value object (#2268 concern 1)', () {
+    test('default constructor is a strict no-op', () {
+      const policy = WakePolicy();
+      expect(policy.maySleep, isFalse);
+      expect(policy.wakeSettle, Duration.zero);
+      expect(policy.maxNudges, 0);
+      expect(policy.isActive, isFalse);
+    });
+
+    test('named noop() constructor matches the default no-op', () {
+      const policy = WakePolicy.noop();
+      expect(policy.maySleep, isFalse);
+      expect(policy.wakeSettle, Duration.zero);
+      expect(policy.maxNudges, 0);
+      expect(policy.isActive, isFalse);
+    });
+
+    test('isActive is true only when maySleep AND a window/nudge is granted',
+        () {
+      // maySleep alone with a zero window + zero nudges stays inert.
+      expect(
+        const WakePolicy(maySleep: true).isActive,
+        isFalse,
+        reason: 'maySleep with no settle and no nudge is still a no-op',
+      );
+      // A settle window with maySleep activates it.
+      expect(
+        const WakePolicy(
+          maySleep: true,
+          wakeSettle: Duration(milliseconds: 600),
+        ).isActive,
+        isTrue,
+      );
+      // A nudge alone with maySleep activates it.
+      expect(
+        const WakePolicy(maySleep: true, maxNudges: 1).isActive,
+        isTrue,
+      );
+      // A settle window WITHOUT maySleep is inert — maySleep is the gate.
+      expect(
+        const WakePolicy(wakeSettle: Duration(seconds: 1), maxNudges: 1)
+            .isActive,
+        isFalse,
+        reason: 'maySleep:false must override any seeded window/nudge',
+      );
+    });
+  });
+
+  group('Subclass wakePolicy defaults stay no-op (#2268 concern 1)', () {
+    test('VLinkerFsAdapter is no-op', () {
+      expect(const VLinkerFsAdapter().wakePolicy.isActive, isFalse);
+    });
+
+    test('SmartObdAdapter is no-op', () {
+      expect(const SmartObdAdapter().wakePolicy.isActive, isFalse);
     });
   });
 
