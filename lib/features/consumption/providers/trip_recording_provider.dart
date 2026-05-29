@@ -964,15 +964,17 @@ class TripRecording extends _$TripRecording {
       // into the orchestrator so a manual stop path also benefits.
       try {
         if (ref.read(tripsSyncEnabledProvider)) {
-          final entry = repo.loadAll().firstWhere(
-            (e) => e.id == id,
-            orElse: () => TripHistoryEntry(
-              id: id,
-              vehicleId: vehicleId,
-              summary: summary,
-              automatic: automatic,
-            ),
-          );
+          // #2304 — O(1) box lookup for the richer serialised object to
+          // upload, instead of deserialising + sorting every entry just
+          // to discard all but the just-saved id. Falls back to a
+          // freshly-built entry if the read missed (corrupt payload).
+          final entry = repo.loadById(id) ??
+              TripHistoryEntry(
+                id: id,
+                vehicleId: vehicleId,
+                summary: summary,
+                automatic: automatic,
+              );
           // Fire-and-forget: an upload failure must not roll back the
           // local save. TripsSync swallows + debugPrints internally.
           unawaited(TripsSync.uploadSummary(entry));

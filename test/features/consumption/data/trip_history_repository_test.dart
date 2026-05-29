@@ -139,6 +139,51 @@ void main() {
       expect(all.first.summary.startedAt, b);
     });
 
+    test('loadById fetches one entry by id without a full box scan (#2304)',
+        () async {
+      final repo = TripHistoryRepository(box: box);
+      final a = DateTime(2026, 4, 20, 8);
+      final b = DateTime(2026, 4, 21, 9);
+      await repo.save(TripHistoryEntry(
+        id: a.toIso8601String(),
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: a, km: 5),
+        samples: [TripSample(timestamp: a, speedKmh: 40, rpm: 1600)],
+      ));
+      await repo.save(TripHistoryEntry(
+        id: b.toIso8601String(),
+        vehicleId: 'car-b',
+        summary: mkSummary(startedAt: b, km: 15),
+      ));
+
+      final got = repo.loadById(b.toIso8601String());
+      expect(got, isNotNull);
+      expect(got!.vehicleId, 'car-b');
+      expect(got.summary.distanceKm, 15);
+
+      // The richer serialised payload (samples) round-trips too — the
+      // upload path on trip stop relies on this.
+      final withSamples = repo.loadById(a.toIso8601String());
+      expect(withSamples!.samples, hasLength(1));
+      expect(withSamples.samples.first.speedKmh, 40);
+    });
+
+    test('loadById returns null for a missing id (#2304)', () async {
+      final repo = TripHistoryRepository(box: box);
+      await repo.save(TripHistoryEntry(
+        id: DateTime(2026, 4, 20).toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: DateTime(2026, 4, 20)),
+      ));
+      expect(repo.loadById('no-such-id'), isNull);
+    });
+
+    test('loadById returns null for a corrupt payload (#2304)', () async {
+      final repo = TripHistoryRepository(box: box);
+      await box.put('bad', '{not json');
+      expect(repo.loadById('bad'), isNull);
+    });
+
     test('nullable fields (no fuel rate, no end time) survive '
         'round-trip without throwing', () async {
       final repo = TripHistoryRepository(box: box);
