@@ -126,6 +126,16 @@ enum AutoRecordEventKind {
   /// pause-with-grace state was cleared and polling resumed (#1920).
   reconnectSucceeded,
 
+  /// The coordinator attempted a foreground-active direct connect on an
+  /// app resume (#2282 concern 1) — the disabled-FGS fallback that wakes
+  /// the paired adapter from the live engine.
+  foregroundArmAttempt,
+
+  /// A foreground-active arm was skipped because the coordinator was
+  /// already watching (session held / recording) — detail carries the
+  /// guard state (#2282 concern 1).
+  foregroundArmSkipped,
+
   /// Generic catch — detail carries a free-form message. Used
   /// sparingly so the enum stays the contract.
   error,

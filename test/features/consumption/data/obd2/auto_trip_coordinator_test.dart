@@ -141,6 +141,7 @@ void main() {
     Duration delay = shortDelay,
     double threshold = 5.0,
     Obd2SessionOpener? customOpener,
+    Obd2ForegroundSessionOpener? foregroundOpener,
   }) {
     return AutoTripCoordinator(
       listener: listener,
@@ -153,6 +154,7 @@ void main() {
         stopAndSaveCalls++;
       },
       sessionOpener: customOpener ?? opener.opener(),
+      foregroundSessionOpener: foregroundOpener,
       speedStreamFactory: (Obd2Service service, {String? mac}) {
         return Obd2SpeedStream(
           service,
@@ -599,4 +601,153 @@ void main() {
     expect(fake.transport.disconnectCalls, greaterThanOrEqualTo(1),
         reason: 'stop() must call service.disconnect() on the held session');
   });
+
+  // -------------------------------------------------------------------------
+  // #2282 concern 1 — foreground-active arming fallback.
+  // -------------------------------------------------------------------------
+
+  group('armForegroundActive (#2282 concern 1)', () {
+    test('opens a session via the DIRECT opener and watches speed', () async {
+      final direct = _SessionOpenerHarness();
+      final fake = buildFakeService([0, 0]);
+      direct.queue.add(fake.service);
+      // Scan opener stays empty — a foreground arm must use the direct
+      // opener, never the scan opener.
+      coordinator =
+          buildCoordinator(foregroundOpener: direct.opener());
+
+      await coordinator.start();
+      await coordinator.armForegroundActive();
+      await pumpSpeedTicks(2);
+
+      expect(direct.callCount, 1,
+          reason: 'foreground arm must call the DIRECT opener');
+      expect(direct.openedFor, [mac]);
+      expect(opener.callCount, 0,
+          reason: 'foreground arm must NOT touch the scan opener');
+      expect(coordinator.hasOpenSession, isTrue,
+          reason: 'a successful direct connect leaves a session watched');
+
+      final kinds =
+          AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+      expect(kinds.contains(AutoRecordEventKind.foregroundArmAttempt), isTrue);
+    });
+
+    test('is a no-op when a session is already held (idempotent resume)',
+        () async {
+      final direct = _SessionOpenerHarness();
+      final fake = buildFakeService([0, 0, 0]);
+      opener.queue.add(fake.service); // background connect opens this one.
+      coordinator = buildCoordinator(foregroundOpener: direct.opener());
+
+      await coordinator.start();
+      listener.emitConnected(mac); // background path opens + watches.
+      await pumpSpeedTicks(2);
+      expect(coordinator.hasOpenSession, isTrue);
+
+      // A resume now fires while a session is already held — must skip.
+      await coordinator.armForegroundActive();
+
+      expect(direct.callCount, 0,
+          reason: 'a held session means the resume arm is a no-op');
+      final kinds =
+          AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+      expect(kinds.contains(AutoRecordEventKind.foregroundArmSkipped), isTrue);
+    });
+
+    test('is a no-op when the coordinator is not started', () async {
+      final direct = _SessionOpenerHarness();
+      direct.queue.add(buildFakeService([0]).service);
+      coordinator = buildCoordinator(foregroundOpener: direct.opener());
+
+      // No start() call.
+      await coordinator.armForegroundActive();
+
+      expect(direct.callCount, 0,
+          reason: 'arming a stopped coordinator must do nothing');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // #2282 concern 4 — connectionPriority balanced-downgrade when only the
+  // 1 Hz auto-record movement stream is live.
+  // -------------------------------------------------------------------------
+
+  group('connectionPriority balanced-downgrade (#2282 concern 4)', () {
+    test('downgrades to balanced on connect (movement stream only)', () async {
+      // No supra-threshold speed → no hand-off; only the 1 Hz movement
+      // watch is live, exactly the "balanced" condition.
+      final service = _TuneTrackingService([0, 0, 0]);
+      opener.queue.add(service);
+      coordinator = buildCoordinator();
+
+      await coordinator.start();
+      listener.emitConnected(mac);
+      await pumpSpeedTicks(2);
+
+      expect(service.backgroundCalls, 1,
+          reason: 'opening the movement-watch session must drop the BLE '
+              'link to balanced priority');
+      expect(service.recordingCalls, 0,
+          reason: 'no trip has started, so the link stays balanced');
+    });
+
+    test('restores high priority on threshold-cross hand-off', () async {
+      final service = _TuneTrackingService([20, 25, 30, 40, 50]);
+      opener.queue.add(service);
+      coordinator = buildCoordinator();
+
+      await coordinator.start();
+      listener.emitConnected(mac);
+      await pumpSpeedTicks(5);
+
+      expect(startTripCalls, 1, reason: 'movement must trigger a start');
+      expect(service.backgroundCalls, 1,
+          reason: 'balanced while only the movement stream was live');
+      expect(service.recordingCalls, 1,
+          reason: 'high priority restored when the recorder takes over');
+    });
+
+    test('a non-BLE / untunable service is a safe no-op', () async {
+      // The plain `_FakeTransport` path is not a BLE transport, so the
+      // service-level tune calls no-op — the coordinator must not throw.
+      final fake = buildFakeService([0, 0, 0]);
+      opener.queue.add(fake.service);
+      coordinator = buildCoordinator();
+
+      await coordinator.start();
+      listener.emitConnected(mac);
+      await pumpSpeedTicks(2);
+
+      expect(coordinator.hasOpenSession, isTrue);
+    });
+  });
+}
+
+/// [Obd2Service] whose link-tuning + speed-read methods are overridden
+/// so a coordinator test can observe the #2282 concern-4 balanced /
+/// recording priority calls without driving the real BLE byte-channel
+/// protocol. Speed answers come from [_speeds]; an empty queue reads as
+/// `null` (a missed read), matching the production stream contract.
+class _TuneTrackingService extends Obd2Service {
+  _TuneTrackingService(List<int?> speeds)
+      : _speeds = Queue<int?>.of(speeds),
+        super(_FakeTransport(Queue<int?>()));
+
+  final Queue<int?> _speeds;
+  int recordingCalls = 0;
+  int backgroundCalls = 0;
+
+  @override
+  Future<int?> readSpeedKmh() async =>
+      _speeds.isEmpty ? null : _speeds.removeFirst();
+
+  @override
+  Future<void> tuneLinkForRecording() async => recordingCalls++;
+
+  @override
+  Future<void> tuneLinkForBackground() async => backgroundCalls++;
+
+  @override
+  Future<void> disconnect() async {}
 }

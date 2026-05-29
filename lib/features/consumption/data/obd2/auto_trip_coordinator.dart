@@ -60,6 +60,16 @@ class AutoRecordConfig {
 /// `readSpeedKmh()` is wired to a queue.
 typedef Obd2SessionOpener = Future<Obd2Service?> Function(String mac);
 
+/// Opener used by the foreground-active arming fallback (#2282
+/// concern 1). Distinct from [Obd2SessionOpener] only by intent:
+/// production wires this to `Obd2ConnectionService.connectByMacDirect`
+/// (a no-scan `BluetoothDevice.fromId` connect with `autoConnect`),
+/// which wakes ELM327 clones that stop advertising in standby — exactly
+/// the case the disabled foreground service can no longer cover while
+/// the app is in front. Same null-on-failure contract as the scan
+/// opener.
+typedef Obd2ForegroundSessionOpener = Future<Obd2Service?> Function(String mac);
+
 /// Factory that wraps an open [Obd2Service] in a polled km/h stream.
 /// Test seam — production code uses [Obd2SpeedStream.new]; tests pass
 /// a shorter `pollPeriod` so the timer fires inside `pumpEventQueue`.
@@ -145,6 +155,14 @@ class AutoTripCoordinator {
   /// one.
   final Obd2SessionOpener? sessionOpener;
 
+  /// Direct-connect opener for the foreground-active arming fallback
+  /// (#2282 concern 1). Used by [armForegroundActive] to wake the
+  /// paired adapter from the live engine while the app is in front,
+  /// independent of the (currently-disabled) foreground service. Falls
+  /// back to [sessionOpener] when null so existing wiring/tests behave
+  /// unchanged.
+  final Obd2ForegroundSessionOpener? foregroundSessionOpener;
+
   /// Wraps an open service in an [Obd2SpeedStream]. Defaults to
   /// `Obd2SpeedStream.new` with the production poll period; tests
   /// inject a factory that returns a stream with a much shorter
@@ -189,6 +207,7 @@ class AutoTripCoordinator {
     required this.stopAndSaveAutomatic,
     required this.config,
     this.sessionOpener,
+    this.foregroundSessionOpener,
     Obd2SpeedStreamFactory? speedStreamFactory,
     int? consecutiveSamplesWindow,
     DateTime Function()? now,
@@ -374,7 +393,52 @@ class AutoTripCoordinator {
     // open a new one — speed sampling is the recorder's job now.
     if (_tripActive) return;
 
-    final opener = sessionOpener;
+    await _openSessionAndWatch(sessionOpener);
+  }
+
+  /// Foreground-active arming fallback (#2282 concern 1).
+  ///
+  /// While the app is resumed and auto-record is on, the disabled
+  /// foreground service can't deliver the `AdapterConnected` that kicks
+  /// the state machine — so the orchestrator calls this on every resume
+  /// to open a DIRECT connect ([foregroundSessionOpener] →
+  /// `connectByMacDirect`) to the paired adapter from the live engine.
+  /// On success the coordinator watches the 1 Hz speed stream exactly as
+  /// it would after a background `AdapterConnected`, so engine-start
+  /// detection works TODAY even with the FGS gated to the backgrounded
+  /// transition.
+  ///
+  /// Idempotent + cheap: a no-op when not started, when a trip is
+  /// already active, or when a session is already held (a prior resume,
+  /// or a background connect, already armed the speed watch). Failure to
+  /// connect is logged and swallowed — the next resume retries.
+  Future<void> armForegroundActive() async {
+    if (!_started) return;
+    // Already watching (session held) or recording — nothing to arm.
+    if (_tripActive || _session != null || _speedSub != null) {
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.foregroundArmSkipped,
+        mac: config.mac,
+        detail: 'tripActive=$_tripActive sessionHeld=${_session != null} '
+            'watching=${_speedSub != null}',
+      );
+      return;
+    }
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.foregroundArmAttempt,
+      mac: config.mac,
+    );
+    // Prefer the direct opener; fall back to the scan opener so a caller
+    // that only wired one still arms.
+    await _openSessionAndWatch(foregroundSessionOpener ?? sessionOpener);
+  }
+
+  /// Shared "open an OBD2 session, then watch its 1 Hz speed stream"
+  /// tail used by both the background `AdapterConnected` path and the
+  /// foreground-active arm. [opener] selects the connect strategy
+  /// (scan-based vs direct). No-ops when no opener was wired (legacy /
+  /// event-only tests).
+  Future<void> _openSessionAndWatch(Obd2SessionOpener? opener) async {
     if (opener == null) {
       // Test / legacy mode: no opener was wired. The coordinator's
       // pre-2b-3 contract was "speed comes from a stream injected at
@@ -416,7 +480,7 @@ class AutoTripCoordinator {
     // opener and now (stop() was called, or a disconnect already fired
     // and queued ahead of us). Drop the freshly-opened service rather
     // than wire a dangling subscription.
-    if (!_started) {
+    if (!_started || _tripActive || _session != null) {
       try {
         await service.disconnect();
       } catch (e, st) {
@@ -426,8 +490,39 @@ class AutoTripCoordinator {
     }
 
     _session = service;
+    // #2282 concern 4 — only the 1 Hz auto-record movement stream is
+    // live at this point (the recorder hasn't taken over yet), so drop
+    // the BLE link to balanced connection priority. The recorder bumps
+    // it back to high on threshold-cross when it owns the session.
+    unawaited(_tuneLinkForBackground(service));
     final speedStream = speedStreamFactory(service, mac: config.mac);
     _speedSub = speedStream.stream.listen(_onSpeedSample);
+  }
+
+  /// Best-effort balanced-priority downgrade (#2282 concern 4). The
+  /// service no-ops for non-BLE transports / fakes and swallows platform
+  /// rejections internally, so this never throws into the connect path.
+  Future<void> _tuneLinkForBackground(Obd2Service service) async {
+    try {
+      await service.tuneLinkForBackground();
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+        'where': 'AutoTripCoordinator: tuneLinkForBackground failed',
+      }));
+    }
+  }
+
+  /// Best-effort high-priority restore on threshold-cross hand-off
+  /// (#2282 concern 4). Same swallow-and-log contract as
+  /// [_tuneLinkForBackground].
+  Future<void> _tuneLinkForRecording(Obd2Service service) async {
+    try {
+      await service.tuneLinkForRecording();
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+        'where': 'AutoTripCoordinator: tuneLinkForRecording failed',
+      }));
+    }
   }
 
   Future<void> _onDisconnected() async {
@@ -535,6 +630,12 @@ class AutoTripCoordinator {
     // double-issue PID 0x0D commands on the same transport.
     await _speedSub?.cancel();
     _speedSub = null;
+    // #2282 concern 4 — the movement watch is over and the recorder is
+    // about to drive the full-rate PID poll, so restore the high-
+    // throughput BLE link we downgraded to balanced while only the 1 Hz
+    // stream was live. Best-effort; the recorder gets a high-priority
+    // link for the trip either way (a fresh connect already tunes high).
+    await _tuneLinkForRecording(session);
     // Transfer ownership: null out the local pointer so neither
     // `stop()` nor `_onDisconnected()` will try to close a session
     // the recorder is using.
