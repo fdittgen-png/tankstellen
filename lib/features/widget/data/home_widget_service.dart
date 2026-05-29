@@ -59,6 +59,18 @@ String get _widgetGroupId =>
 // was dropped from the manifest.
 const _widgetAndroidName = 'FuelPriceWidgetProvider';
 
+/// #2206 — the AppWidgetProvider lives in the Gradle **namespace**
+/// `de.tankstellen.tankstellen` (the manifest `.FuelPriceWidgetProvider`
+/// receiver), which differs from the **applicationId**
+/// `de.tankstellen.fuelprices`. home_widget resolves [_widgetAndroidName]
+/// against the applicationId, so it looked for
+/// `de.tankstellen.fuelprices.FuelPriceWidgetProvider` and threw
+/// `ClassNotFoundException` on every update. Passing the fully-qualified
+/// name (used as-is by home_widget, ahead of androidName) fixes it.
+// i18n-ignore: Android class identifier, not user-facing text.
+const _widgetQualifiedAndroidName =
+    'de.tankstellen.tankstellen.FuelPriceWidgetProvider';
+
 /// Maximum number of stations to include in widget data.
 const _maxWidgetStations = 5;
 
@@ -96,6 +108,7 @@ class HomeWidgetService {
         await HomeWidget.saveWidgetData('stations_json', '[]');
         await HomeWidget.updateWidget(
           androidName: _widgetAndroidName,
+          qualifiedAndroidName: _widgetQualifiedAndroidName,
         );
         return;
       }
@@ -125,6 +138,7 @@ class HomeWidgetService {
 
       await HomeWidget.updateWidget(
         androidName: _widgetAndroidName,
+        qualifiedAndroidName: _widgetQualifiedAndroidName,
       );
       debugPrint('HomeWidget: favorites updated with ${stations.length} stations');
     } catch (e, st) {
@@ -159,7 +173,8 @@ class HomeWidgetService {
           pricePredictor: pricePredictor,
         );
         final payload = await builder.build();
-        await HomeWidget.updateWidget(androidName: _widgetAndroidName);
+        await HomeWidget.updateWidget(androidName: _widgetAndroidName,
+          qualifiedAndroidName: _widgetQualifiedAndroidName);
         debugPrint(
           'HomeWidget: nearest (real search) updated — '
           'count=${payload.stations.length} '
@@ -188,6 +203,7 @@ class HomeWidgetService {
         await HomeWidget.saveWidgetData('nearest_is_stale', false);
         await HomeWidget.updateWidget(
           androidName: _widgetAndroidName,
+          qualifiedAndroidName: _widgetQualifiedAndroidName,
         );
         return;
       }
@@ -225,6 +241,7 @@ class HomeWidgetService {
 
       await HomeWidget.updateWidget(
         androidName: _widgetAndroidName,
+        qualifiedAndroidName: _widgetQualifiedAndroidName,
       );
       debugPrint('HomeWidget: nearest updated with ${stations.length} stations');
     } catch (e, st) {
