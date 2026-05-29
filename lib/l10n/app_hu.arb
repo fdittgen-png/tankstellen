@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Visszavonás",
   "tripShareRevoked": "Megosztás visszavonva.",
   "trajetsSharedSectionTitle": "Velem megosztva",
-  "trajetsSharedBadge": "Megosztva"
+  "trajetsSharedBadge": "Megosztva",
+  "dataSourceAttribution": "Forrás: {source} ({license})",
+  "dataSourceAttributionSemantic": "Az üzemanyagár-adatokat a(z) {source} biztosítja, a(z) {license} licenc alatt."
 }

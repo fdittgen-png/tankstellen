@@ -3945,6 +3945,16 @@ class AppLocalizationsLt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Atmesti';
 
   @override
+  String dataSourceAttribution(String source, String license) {
+    return 'Šaltinis: $source ($license)';
+  }
+
+  @override
+  String dataSourceAttributionSemantic(String source, String license) {
+    return 'Degalų kainų duomenis teikia $source, licencijuota pagal $license.';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Kūrėjo įrankiai';
 
   @override

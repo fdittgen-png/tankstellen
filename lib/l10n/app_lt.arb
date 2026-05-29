@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Atšaukti",
   "tripShareRevoked": "Bendrinimas atšauktas.",
   "trajetsSharedSectionTitle": "Bendrinama su manimi",
-  "trajetsSharedBadge": "Bendrinama"
+  "trajetsSharedBadge": "Bendrinama",
+  "dataSourceAttribution": "Šaltinis: {source} ({license})",
+  "dataSourceAttributionSemantic": "Degalų kainų duomenis teikia {source}, licencijuota pagal {license}."
 }

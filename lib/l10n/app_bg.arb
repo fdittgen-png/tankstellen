@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Отмяна",
   "tripShareRevoked": "Споделянето е отменено.",
   "trajetsSharedSectionTitle": "Споделено с мен",
-  "trajetsSharedBadge": "Споделено"
+  "trajetsSharedBadge": "Споделено",
+  "dataSourceAttribution": "Източник: {source} ({license})",
+  "dataSourceAttributionSemantic": "Данните за цените на горивата са предоставени от {source}, лицензирани под {license}."
 }

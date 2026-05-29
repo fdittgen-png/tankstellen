@@ -3956,6 +3956,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Απόρριψη';
 
   @override
+  String dataSourceAttribution(String source, String license) {
+    return 'Πηγή: $source ($license)';
+  }
+
+  @override
+  String dataSourceAttributionSemantic(String source, String license) {
+    return 'Δεδομένα τιμών καυσίμων από $source, με άδεια $license.';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Εργαλεία προγραμματιστή';
 
   @override

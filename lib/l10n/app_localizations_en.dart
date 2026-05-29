@@ -3905,6 +3905,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Dismiss';
 
   @override
+  String dataSourceAttribution(String source, String license) {
+    return 'Source: $source ($license)';
+  }
+
+  @override
+  String dataSourceAttributionSemantic(String source, String license) {
+    return 'Fuel price data provided by $source, licensed under $license.';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Developer tools';
 
   @override
@@ -9691,6 +9701,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get crossBorderDismissTooltip => '⟦Đîšɱîšš ···⟧';
+
+  @override
+  String dataSourceAttribution(String source, String license) {
+    return '⟦Šóúřçé: $source ($license) ···⟧';
+  }
+
+  @override
+  String dataSourceAttributionSemantic(String source, String license) {
+    return '⟦Ƒúéł ƥřîçé đáŧá ƥřóṽîđéđ ƀý $source, łîçéñšéđ úñđéř $license. ················⟧';
+  }
 
   @override
   String get developerToolsSectionTitle => '⟦Đéṽéłóƥéř ŧóółš ······⟧';

@@ -3922,6 +3922,16 @@ class AppLocalizationsNb extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Lukk';
 
   @override
+  String dataSourceAttribution(String source, String license) {
+    return 'Kilde: $source ($license)';
+  }
+
+  @override
+  String dataSourceAttributionSemantic(String source, String license) {
+    return 'Drivstoffprisdata levert av $source, lisensiert under $license.';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Utviklerverktøy';
 
   @override

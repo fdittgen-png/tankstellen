@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Revoca",
   "tripShareRevoked": "Condivisione revocata.",
   "trajetsSharedSectionTitle": "Condiviso con me",
-  "trajetsSharedBadge": "Condiviso"
+  "trajetsSharedBadge": "Condiviso",
+  "dataSourceAttribution": "Fonte: {source} ({license})",
+  "dataSourceAttributionSemantic": "Dati sui prezzi dei carburanti forniti da {source}, con licenza {license}."
 }

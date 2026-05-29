@@ -1956,5 +1956,7 @@
   "tripShareRevokeTooltip": "Atsaukt",
   "tripShareRevoked": "Kopīgošana atsaukta.",
   "trajetsSharedSectionTitle": "Kopīgots ar mani",
-  "trajetsSharedBadge": "Kopīgots"
+  "trajetsSharedBadge": "Kopīgots",
+  "dataSourceAttribution": "Avots: {source} ({license})",
+  "dataSourceAttributionSemantic": "Degvielas cenu datus nodrošina {source}, licencēts saskaņā ar {license}."
 }
