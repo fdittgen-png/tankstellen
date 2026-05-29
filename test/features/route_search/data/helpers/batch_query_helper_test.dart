@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:dio/dio.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/route_search/data/helpers/batch_query_helper.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -345,6 +348,126 @@ void main() {
       for (var i = 1; i < emissions.length; i++) {
         expect(emissions[i], greaterThan(emissions[i - 1]));
       }
+    });
+  });
+
+  group('429 backoff on DioException (#2255)', () {
+    DioException dio429({String? retryAfter}) {
+      final o = RequestOptions(path: '/x');
+      return DioException(
+        requestOptions: o,
+        type: DioExceptionType.badResponse,
+        response: Response(
+          requestOptions: o,
+          statusCode: 429,
+          headers: retryAfter == null
+              ? Headers()
+              : (Headers()..set('retry-after', retryAfter)),
+        ),
+      );
+    }
+
+    /// Runs [helper.queryAll] over two sample points under [fakeAsync] with
+    /// `batchSize: 1` — the first point throws [failOnFirst], the second
+    /// succeeds — and returns the fake-clock gap (ms) between the two query
+    /// invocations. That gap is exactly the inter-batch pause the helper
+    /// applied (0 when the throttle never armed). Deterministic: no
+    /// wall-clock, so it can't flake under concurrent suite load.
+    int interBatchGapMs({
+      required Object failOnFirst,
+      required Duration backoffPause,
+    }) {
+      late int gap;
+      fakeAsync((async) {
+        final helper = BatchQueryHelper(batchSize: 1, backoffPause: backoffPause);
+        final callElapsedMs = <int>[];
+        var call = 0;
+        final start = async.elapsed;
+        var done = false;
+        // Capture the future so its completion can be awaited within the fake
+        // zone — leaving it dangling lets a thrown sub-future surface as an
+        // unhandled zone error under concurrent suite load (#2255 test flake).
+        helper
+            .queryAll(
+              samplePoints: [const LatLng(48, 2), const LatLng(49, 2)],
+              fuelType: FuelType.e10,
+              searchRadiusKm: 10,
+              queryStations: ({
+                required double lat,
+                required double lng,
+                required double radiusKm,
+                required FuelType fuelType,
+              }) async {
+                callElapsedMs.add((async.elapsed - start).inMilliseconds);
+                if (call++ == 0) throw failOnFirst;
+                return const <SearchResultItem>[];
+              },
+            )
+            .whenComplete(() => done = true);
+        // Advance the fake clock past any pause and flush all microtasks so
+        // the sweep fully settles before we read the recorded gap.
+        async.elapse(const Duration(seconds: 2));
+        async.flushMicrotasks();
+        expect(done, isTrue, reason: 'the sweep must complete');
+        expect(callElapsedMs, hasLength(2),
+            reason: 'both sample points must be queried');
+        gap = callElapsedMs[1] - callElapsedMs[0];
+      });
+      return gap;
+    }
+
+    test('a DioException 429 in the first batch arms the inter-batch pause '
+        '(the old http.ClientException catch was dead code)', () {
+      final gap = interBatchGapMs(
+        failOnFirst: dio429(),
+        backoffPause: const Duration(milliseconds: 300),
+      );
+      expect(gap, 300,
+          reason: 'a 429 must re-enable the inter-batch backoff pause');
+    });
+
+    test('honours the Retry-After header for the pause duration', () {
+      // Retry-After: 0 → the server told us not to wait, so the pause
+      // collapses to zero even though the rate-limit flag armed.
+      final gap = interBatchGapMs(
+        failOnFirst: dio429(retryAfter: '0'),
+        backoffPause: const Duration(milliseconds: 250),
+      );
+      expect(gap, 0,
+          reason: 'Retry-After: 0 overrides the flat pause with no wait');
+    });
+
+    test('a longer Retry-After widens the pause beyond backoffPause', () {
+      final gap = interBatchGapMs(
+        failOnFirst: dio429(retryAfter: '1'),
+        backoffPause: const Duration(milliseconds: 100),
+      );
+      expect(gap, 1000,
+          reason: 'Retry-After: 1s must override the 100 ms flat pause');
+    });
+
+    test('a typed rateLimited ApiException also arms the pause', () {
+      final gap = interBatchGapMs(
+        failOnFirst: const ApiException(
+          message: 'rate limited',
+          statusCode: 429,
+          kind: FailureKind.rateLimited,
+        ),
+        backoffPause: const Duration(milliseconds: 300),
+      );
+      expect(gap, 300,
+          reason: 'typed FailureKind.rateLimited must arm the backoff');
+    });
+
+    test('a non-rate-limit error (parse) does not arm the pause', () {
+      final gap = interBatchGapMs(
+        failOnFirst: const ApiException(
+          message: 'bad json',
+          kind: FailureKind.parse,
+        ),
+        backoffPause: const Duration(milliseconds: 300),
+      );
+      expect(gap, 0, reason: 'a parse failure is not rate-limited — no backoff');
     });
   });
 }
