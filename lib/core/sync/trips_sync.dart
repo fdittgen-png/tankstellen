@@ -59,20 +59,9 @@ class TripsSync {
       return;
     }
     try {
-      await client.from('trip_summaries').upsert({
-        'id': entry.id,
-        'user_id': userId,
-        'vehicle_id': entry.vehicleId,
-        'started_at': startedAt.toIso8601String(),
-        'ended_at': endedAt.toIso8601String(),
-        // The summary blob stays compact: just the entity's JSON form
-        // WITHOUT the per-tick `samples` and GPS-diagnostics arrays
-        // so a 60-min commute is ~1 KB instead of ~250 KB. The full-
-        // blob (samples + gpsd) goes to `public.trip_details` in
-        // [uploadDetails] right after.
-        'data': _compactSummaryJson(entry),
-        'updated_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'user_id,id');
+      await client
+          .from('trip_summaries')
+          .upsert(buildSummaryRow(entry, userId), onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadSummary: uploaded ${entry.id}');
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'TripsSync.uploadSummary FAILED for ${entry.id}'}));
@@ -205,7 +194,6 @@ class TripsSync {
         final id = r['id'];
         if (id is String) serverIds.add(id);
       }
-      final localIds = localEntries.map((e) => e.id).toSet();
 
       // Upload local-only entries — heals a missing server row from
       // a previous offline save without waiting for the next stop.
@@ -217,24 +205,17 @@ class TripsSync {
         await uploadSummary(entry);
       }
 
-      // Download server-only entries.
-      final downloaded = <TripHistoryEntry>[];
-      for (final r in serverRows) {
-        final id = r['id'];
-        if (id is! String || localIds.contains(id)) continue;
-        final data = r['data'];
-        if (data is! Map) continue;
-        try {
-          downloaded.add(
-            TripHistoryEntry.fromJson(data.cast<String, dynamic>()),
-          );
-        } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'TripsSync.merge decode failed for $id'}));
-        }
-      }
-      debugPrint('TripsSync.merge: local=${localIds.length} '
-          'server=${serverIds.length} downloaded=${downloaded.length}');
-      return [...localEntries, ...downloaded];
+      // Decode the server-only rows and return the union. The pure
+      // [mergeRows] step is what the app-launch caller persists back to
+      // the local Hive box — see `AppInitializer._runTripsSyncMerge`.
+      // Pinning that step in a unit test regression-guards the
+      // "download silently discarded" bug class (#2239 / the sibling
+      // AlertsSync defect).
+      final merged = mergeRows(localEntries, serverRows);
+      debugPrint('TripsSync.merge: local=${localEntries.length} '
+          'server=${serverIds.length} '
+          'downloaded=${merged.length - localEntries.length}');
+      return merged;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TripsSync.merge FAILED'}));
       return localEntries;
@@ -288,6 +269,66 @@ class TripsSync {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TripsSync.pruneOldDetails FAILED'}));
     }
+  }
+
+  /// Pure builder for one `public.trip_summaries` row — the exact
+  /// column map [uploadSummary] upserts. Extracted so a unit test can
+  /// pin every column (the wire `upsert` call can't be exercised
+  /// without a live Supabase client). [now] defaults to wall-clock and
+  /// is injectable so the `updated_at` assertion stays deterministic.
+  @visibleForTesting
+  static Map<String, dynamic> buildSummaryRow(
+    TripHistoryEntry entry,
+    String userId, {
+    DateTime? now,
+  }) {
+    return {
+      'id': entry.id,
+      'user_id': userId,
+      'vehicle_id': entry.vehicleId,
+      'started_at': entry.summary.startedAt!.toIso8601String(),
+      'ended_at': entry.summary.endedAt!.toIso8601String(),
+      // The summary blob stays compact: just the entity's JSON form
+      // WITHOUT the per-tick `samples` and GPS-diagnostics arrays so a
+      // 60-min commute is ~1 KB instead of ~250 KB. The full blob
+      // (samples + gpsd) goes to `public.trip_details` in
+      // [uploadDetails] right after.
+      'data': _compactSummaryJson(entry),
+      'updated_at': (now ?? DateTime.now()).toIso8601String(),
+    };
+  }
+
+  /// Pure merge step: returns `[...localEntries, ...server-only]` given
+  /// the raw `trip_summaries` rows fetched in [merge]. Server rows whose
+  /// id is already local are skipped (local wins), and a row that fails
+  /// to decode is dropped rather than aborting the whole merge.
+  ///
+  /// This is the value the app-launch caller persists back to the local
+  /// Hive box (`AppInitializer._runTripsSyncMerge`). It is the seam the
+  /// "download silently discarded" regression test (#2239) pins — the
+  /// sibling AlertsSync bug was the caller throwing this superset away,
+  /// so a trip recorded on another device never landed locally.
+  @visibleForTesting
+  static List<TripHistoryEntry> mergeRows(
+    List<TripHistoryEntry> localEntries,
+    List<Map<String, dynamic>> serverRows,
+  ) {
+    final localIds = localEntries.map((e) => e.id).toSet();
+    final downloaded = <TripHistoryEntry>[];
+    for (final r in serverRows) {
+      final id = r['id'];
+      if (id is! String || localIds.contains(id)) continue;
+      final data = r['data'];
+      if (data is! Map) continue;
+      try {
+        downloaded.add(
+          TripHistoryEntry.fromJson(data.cast<String, dynamic>()),
+        );
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'TripsSync.mergeRows decode failed for $id'}));
+      }
+    }
+    return [...localEntries, ...downloaded];
   }
 }
 
