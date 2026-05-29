@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Trajno visoka brzina ({pctTime}% vožnje)",
   "lessonAdviceHighSpeedBand": "Iznad 110 km/h skinite nogu s gasa – otpor zraka naglo raste, malo sporije štedi puno goriva.",
   "lessonSmoothDrivingTitle": "Mirna vožnja – odlično!",
-  "lessonAdviceSmoothDriving": "Nema naglog ubrzavanja ni kočenja na ovoj vožnji – ravnomjerna vožnja drži potrošnju niskom."
+  "lessonAdviceSmoothDriving": "Nema naglog ubrzavanja ni kočenja na ovoj vožnji – ravnomjerna vožnja drži potrošnju niskom.",
+  "storageRecoveryTitle": "Problem s pohranom",
+  "storageRecoveryMessage": "Sparkilo nije mogao otvoriti svoju lokalnu pohranu podataka. Datoteka pohrane čini se oštećenom.",
+  "storageRecoveryGuidance": "Za oporavak izbrišite pohranu aplikacije u postavkama uređaja ili ponovno instalirajte aplikaciju. Vaši favoriti i povijest pohranjeni su samo na ovom uređaju pa se ne mogu automatski vratiti."
 }

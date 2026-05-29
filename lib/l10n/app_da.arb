@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Vedvarende høj fart ({pctTime}% af turen)",
   "lessonAdviceHighSpeedBand": "Slip speederen over 110 km/t – luftmodstanden stiger kraftigt, så lidt langsommere sparer meget brændstof.",
   "lessonSmoothDrivingTitle": "Rolig kørsel – flot klaret!",
-  "lessonAdviceSmoothDriving": "Ingen hård acceleration eller opbremsning på denne tur – jævn kørsel holder forbruget lavt."
+  "lessonAdviceSmoothDriving": "Ingen hård acceleration eller opbremsning på denne tur – jævn kørsel holder forbruget lavt.",
+  "storageRecoveryTitle": "Lagerproblem",
+  "storageRecoveryMessage": "Sparkilo kunne ikke åbne sit lokale datalager. Lagerfilen ser ud til at være beskadiget.",
+  "storageRecoveryGuidance": "For at gendanne skal du rydde appens lager i enhedens indstillinger eller geninstallere appen. Dine favoritter og din historik gemmes kun på denne enhed og kan ikke gendannes automatisk."
 }

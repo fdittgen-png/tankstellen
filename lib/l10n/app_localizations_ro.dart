@@ -5204,6 +5204,17 @@ class AppLocalizationsRo extends AppLocalizations {
   String get splashLoadingLabel => 'Se încarcă Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Problemă de stocare';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo nu a putut deschide spațiul local de stocare a datelor. Fișierul de stocare pare deteriorat.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Pentru recuperare, șterge spațiul de stocare al aplicației din setările dispozitivului sau reinstalează aplicația. Favoritele și istoricul tău sunt salvate doar pe acest dispozitiv, așa că nu pot fi restaurate automat.';
+
+  @override
   String get tankLevelTitle => 'Nivel rezervor';
 
   @override

@@ -5183,6 +5183,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get splashLoadingLabel => 'Sparkilo laden';
 
   @override
+  String get storageRecoveryTitle => 'Opslagprobleem';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo kon zijn lokale gegevensopslag niet openen. Het opslagbestand lijkt beschadigd te zijn.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Wis voor herstel de opslag van de app in de apparaatinstellingen of installeer de app opnieuw. Je favorieten en geschiedenis worden alleen op dit apparaat opgeslagen en kunnen daarom niet automatisch worden hersteld.';
+
+  @override
   String get tankLevelTitle => 'Tankinhoud';
 
   @override

@@ -54,6 +54,7 @@ import '../features/widget/presentation/widget_uri_parser.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'router.dart';
+import 'widgets/storage_recovery_screen.dart';
 
 /// Drives the cold-start sequence in well-defined phases instead of one
 /// monolithic `main()` body. Splitting the work makes failures observable
@@ -97,7 +98,22 @@ class AppInitializer {
     _bootstrap();
     StartupTimer.instance.mark('binding');
 
-    await _initStorage();
+    // #2294 — a Hive box damaged beyond crash recovery throws a
+    // HiveCorruptionException out of the storage phase. Previously it
+    // escaped uncaught — `_initStorage` had no try/catch, `run()`/`main()`
+    // had no Zone handler, and the error handlers are only installed in
+    // `_launch` (after storage) — so the user froze on the splash with no
+    // message and (debugPrint silenced in release) no telemetry. Surface
+    // a localized recovery screen and route the exception through
+    // errorLogger so it lands in the trace pipeline / Sentry. Startup
+    // cannot continue without local storage, so we stop here.
+    try {
+      await _initStorage();
+    } on HiveCorruptionException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st));
+      runApp(const StorageRecoveryHost());
+      return;
+    }
     StartupTimer.instance.mark('storage_ready');
 
     await _initServicesInParallel();

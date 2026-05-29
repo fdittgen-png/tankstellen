@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Trvale vysoká rychlost ({pctTime} % jízdy)",
   "lessonAdviceHighSpeedBand": "Nad 110 km/h ubertte plyn – odpor vzduchu prudce roste, mírné zpomalení ušetří hodně paliva.",
   "lessonSmoothDrivingTitle": "Plynulá jízda – skvělá práce!",
-  "lessonAdviceSmoothDriving": "Tato jízda bez prudkého zrychlování a brzdění – plynulá jízda udržuje spotřebu nízkou."
+  "lessonAdviceSmoothDriving": "Tato jízda bez prudkého zrychlování a brzdění – plynulá jízda udržuje spotřebu nízkou.",
+  "storageRecoveryTitle": "Problém s úložištěm",
+  "storageRecoveryMessage": "Sparkilo nemohlo otevřít své místní úložiště dat. Soubor úložiště je zřejmě poškozený.",
+  "storageRecoveryGuidance": "Pro obnovu vymažte úložiště aplikace v nastavení zařízení nebo aplikaci přeinstalujte. Vaše oblíbené položky a historie jsou uloženy pouze v tomto zařízení, proto je nelze obnovit automaticky."
 }

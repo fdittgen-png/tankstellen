@@ -5182,6 +5182,17 @@ class AppLocalizationsHr extends AppLocalizations {
   String get splashLoadingLabel => 'Učitavanje Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Problem s pohranom';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo nije mogao otvoriti svoju lokalnu pohranu podataka. Datoteka pohrane čini se oštećenom.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Za oporavak izbrišite pohranu aplikacije u postavkama uređaja ili ponovno instalirajte aplikaciju. Vaši favoriti i povijest pohranjeni su samo na ovom uređaju pa se ne mogu automatski vratiti.';
+
+  @override
   String get tankLevelTitle => 'Razina goriva';
 
   @override

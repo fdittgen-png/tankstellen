@@ -5189,6 +5189,17 @@ class AppLocalizationsPl extends AppLocalizations {
   String get splashLoadingLabel => 'Ładowanie Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Problem z pamięcią';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo nie mogło otworzyć lokalnej pamięci danych. Plik pamięci wydaje się uszkodzony.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Aby odzyskać dane, wyczyść pamięć aplikacji w ustawieniach urządzenia lub zainstaluj aplikację ponownie. Twoje ulubione i historia są przechowywane tylko na tym urządzeniu, więc nie można ich automatycznie przywrócić.';
+
+  @override
   String get tankLevelTitle => 'Poziom paliwa w baku';
 
   @override

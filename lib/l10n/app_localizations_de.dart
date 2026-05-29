@@ -5193,6 +5193,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get splashLoadingLabel => 'Sparkilo wird geladen';
 
   @override
+  String get storageRecoveryTitle => 'Speicherproblem';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo konnte seinen lokalen Datenspeicher nicht öffnen. Die Speicherdatei scheint beschädigt zu sein.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.';
+
+  @override
   String get tankLevelTitle => 'Tankfüllstand';
 
   @override

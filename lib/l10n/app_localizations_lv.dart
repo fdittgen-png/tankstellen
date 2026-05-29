@@ -5198,6 +5198,17 @@ class AppLocalizationsLv extends AppLocalizations {
   String get splashLoadingLabel => 'Ielādē Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Krātuves problēma';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo nevarēja atvērt savu vietējo datu krātuvi. Šķiet, ka krātuves fails ir bojāts.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Lai atjaunotu, ierīces iestatījumos notīriet lietotnes krātuvi vai pārinstalējiet lietotni. Jūsu izlase un vēsture tiek glabāta tikai šajā ierīcē, tāpēc tās nevar atjaunot automātiski.';
+
+  @override
   String get tankLevelTitle => 'Tvertnes līmenis';
 
   @override

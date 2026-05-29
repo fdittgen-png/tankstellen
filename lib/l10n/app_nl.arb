@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Aanhoudend hoge snelheid ({pctTime}% van de rit)",
   "lessonAdviceHighSpeedBand": "Laat boven 110 km/u het gas los – de luchtweerstand neemt sterk toe, iets langzamer bespaart veel brandstof.",
   "lessonSmoothDrivingTitle": "Soepel rijden – goed gedaan!",
-  "lessonAdviceSmoothDriving": "Geen hard optrekken of remmen deze rit – gelijkmatig rijden houdt het verbruik laag."
+  "lessonAdviceSmoothDriving": "Geen hard optrekken of remmen deze rit – gelijkmatig rijden houdt het verbruik laag.",
+  "storageRecoveryTitle": "Opslagprobleem",
+  "storageRecoveryMessage": "Sparkilo kon zijn lokale gegevensopslag niet openen. Het opslagbestand lijkt beschadigd te zijn.",
+  "storageRecoveryGuidance": "Wis voor herstel de opslag van de app in de apparaatinstellingen of installeer de app opnieuw. Je favorieten en geschiedenis worden alleen op dit apparaat opgeslagen en kunnen daarom niet automatisch worden hersteld."
 }

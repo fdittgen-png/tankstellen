@@ -5160,6 +5160,17 @@ class AppLocalizationsEt extends AppLocalizations {
   String get splashLoadingLabel => 'Laen Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Salvestusprobleem';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo ei suutnud avada oma kohalikku andmehoidlat. Salvestusfail näib olevat kahjustatud.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Taastamiseks tühjenda rakenduse salvestusruum seadme seadetes või installi rakendus uuesti. Sinu lemmikud ja ajalugu salvestatakse ainult selles seadmes, mistõttu neid ei saa automaatselt taastada.';
+
+  @override
   String get tankLevelTitle => 'Paagi tase';
 
   @override
