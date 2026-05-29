@@ -81,22 +81,47 @@ class AppTheme {
     );
   }
 
-  /// The green **Eco** theme (#1712) — the app's signature look, named
-  /// for the fuel-savings identity in the app icon.
+  /// The green **Eco** theme (#1712, redesigned #2244) — the app's
+  /// signature look, named for the fuel-savings identity in the app icon.
   ///
   /// It is a light-family theme (never dark — no harsh green-on-black),
-  /// built on the green `FlexScheme.money` palette. The `blendLevel` is
-  /// raised well above [light]'s 7 so surfaces are softly green-tinted
-  /// rather than stark white, keeping the green/white contrast gentle
-  /// while staying bright and readable.
+  /// but it is now an *unmistakably* green theme rather than the faint
+  /// off-white variant of [light] it used to be (#2244). The user feedback
+  /// was that eco "is a very slight variation of light"; this redesign
+  /// makes it deliberately, recognisably green and pushes the brand
+  /// identity colour (the icon's `#2E7D32`) front and centre:
+  ///
+  ///   * It is built on the same brand [_forestGreen] palette as [light]
+  ///     and [dark] — not the generic `FlexScheme.money` — so the identity
+  ///     green is the literal `#2E7D32` from the app icon.
+  ///   * `surfaceMode` is [FlexSurfaceMode.highScaffoldLevelSurface] with a
+  ///     high `blendLevel` (40): the scaffold background gets a 3× green
+  ///     blend so the *background* reads as a clear soft green, while
+  ///     cards/dialogs (level surfaces, 1×) keep a gentler tint so text and
+  ///     content stay legible on them.
+  ///   * The AppBar is filled with the brand green
+  ///     (`appBarStyle: primary` + `appBarBackgroundSchemeColor: primary`)
+  ///     so the chrome reads "eco" at a glance. Foreground defaults to the
+  ///     onPrimary complement (white); `#2E7D32` vs white is 5.13:1,
+  ///     comfortably past the WCAG AA 4.5:1 floor (see
+  ///     `core/theme/contrast_utils.dart`).
+  ///   * `blendOnLevel` is lifted (16 → 24) so primary containers and
+  ///     accents carry more brand green throughout the app.
+  ///
+  /// Scope: this brand-green-forward push is intentionally contained to
+  /// eco. [light] and [dark] keep their surface-coloured app bars; a
+  /// green-app-bar repaint of the default themes is a separate change.
   static ThemeData eco() {
     return FlexThemeData.light(
-      scheme: FlexScheme.money,
-      surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-      blendLevel: 18,
+      colors: _forestGreen,
+      surfaceMode: FlexSurfaceMode.highScaffoldLevelSurface,
+      blendLevel: 40,
+      appBarStyle: FlexAppBarStyle.primary,
+      appBarElevation: 0.0,
       subThemesData: const FlexSubThemesData(
-        blendOnLevel: 16,
+        blendOnLevel: 24,
         blendOnColors: false,
+        appBarBackgroundSchemeColor: SchemeColor.primary,
         useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
         inputDecoratorBorderType: FlexInputBorderType.outline,
