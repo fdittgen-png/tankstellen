@@ -3915,101 +3915,106 @@ class AppLocalizationsEs extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Descartar';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Herramientas de desarrollo';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnósticos y herramientas de depuración: solo visibles en modo desarrollador / depuración.';
 
   @override
   String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+      'Registro de errores, alertas de prueba, diagnósticos';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Registro de errores';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Guardar registro de errores ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Borrar registro de errores';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Ver registro de errores';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty =>
+      'No hay trazas de error registradas.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Alertas y notificaciones';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification =>
+      'Enviar notificación de prueba';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Notificación de prueba';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Si puedes leer esto, las notificaciones funcionan.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent =>
+      'Notificación de prueba enviada.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Las notificaciones están bloqueadas: actívalas en los ajustes del sistema y vuelve a intentarlo.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert =>
+      'Ejecutar canalización de alerta de prueba';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Alerta de prueba activada: la canalización generó $count notificación(es).';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Alerta de precio de prueba';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Coincidencia sintética: se encontró cerca una estación por debajo de tu objetivo.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnósticos';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump =>
+      'Inspector de indicadores de funciones';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Activado';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Desactivado';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Vaciar cachés';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Cachés vaciadas.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Copiar diagnósticos';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnósticos copiados al portapapeles.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Información de compilación';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Versión de la aplicación';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Canal de compilación';
 
   @override
   String get insightCardTitle => 'Principales comportamientos derrochadores';
@@ -4350,11 +4355,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Activa el panel de feedback para escaneos fallidos que crea automáticamente issues de GitHub con un Personal Access Token. Función para usuarios avanzados/colaboradores.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode => 'Modo desarrollador / depuración';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'Muestra una sección Herramientas de desarrollo en los ajustes con diagnósticos: exportación del registro de errores, notificaciones de prueba, ejecución de la canalización de alerta de prueba, volcado de indicadores de funciones, vaciado de cachés y copia de diagnósticos.';
 
   @override
   String get feedbackConsentTitle => '¿Enviar el informe a GitHub?';

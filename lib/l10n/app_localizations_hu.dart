@@ -3919,101 +3919,101 @@ class AppLocalizationsHu extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Elvetés';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Fejlesztői eszközök';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnosztika és hibakeresési eszközök — csak fejlesztői/hibakeresési módban láthatók.';
 
   @override
   String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+      'Hibanapló, tesztriasztások, diagnosztika';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Hibanapló';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Hibanapló mentése ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Hibanapló törlése';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Hibanapló megtekintése';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty => 'Nincsenek rögzített hibanyomok.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Riasztások és értesítések';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification => 'Tesztértesítés küldése';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Tesztértesítés';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Ha ezt el tudja olvasni, az értesítések működnek.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent => 'Tesztértesítés elküldve.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Az értesítések le vannak tiltva — engedélyezze őket a rendszerbeállításokban, majd próbálja újra.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert => 'Tesztriasztási folyamat futtatása';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Tesztriasztás aktiválva — a folyamat $count értesítést kézbesített.';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Tesztár-riasztás';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Szintetikus egyezés: a közelben találtunk egy a céljánál olcsóbb állomást.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnosztika';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump => 'Funkciójelzők vizsgálója';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Be';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Ki';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Gyorsítótárak törlése';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Gyorsítótárak törölve.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Diagnosztika másolása';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnosztika a vágólapra másolva.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Build-információ';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Alkalmazás verziója';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Build-csatorna';
 
   @override
   String get insightCardTitle => 'Legpazarlóbb viselkedések';
@@ -4353,11 +4353,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Bekapcsolja a hibás szkenneléshez tartozó visszajelzési panelt, amely Personal Access Tokennel automatikusan létrehoz GitHub-issue-kat. Haladó felhasználói / közreműködői funkció.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode => 'Fejlesztői/hibakeresési mód';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'Megjelenít egy Fejlesztői eszközök szakaszt a beállításokban diagnosztikával: hibanapló exportálása, tesztértesítések, tesztriasztási folyamat futtatása, funkciójelzők listázása, gyorsítótárak törlése és diagnosztika másolása.';
 
   @override
   String get feedbackConsentTitle => 'Elküldi a jelentést GitHub-ra?';

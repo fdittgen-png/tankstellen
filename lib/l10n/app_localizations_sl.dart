@@ -3894,101 +3894,101 @@ class AppLocalizationsSl extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Zapri';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Razvijalska orodja';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnostika in orodja za odpravljanje napak — vidna samo v razvijalskem načinu / načinu za odpravljanje napak.';
 
   @override
   String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+      'Dnevnik napak, testna opozorila, diagnostika';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Dnevnik napak';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Shrani dnevnik napak ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Počisti dnevnik napak';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Prikaži dnevnik napak';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty => 'Ni zabeleženih sledi napak.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Opozorila in obvestila';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification => 'Pošlji testno obvestilo';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Testno obvestilo';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Če lahko to preberete, obvestila delujejo.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent => 'Testno obvestilo poslano.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Obvestila so blokirana — omogočite jih v sistemskih nastavitvah in poskusite znova.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert => 'Zaženi testni cevovod opozoril';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Testno opozorilo sproženo — cevovod je dostavil $count obvestil.';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Testno cenovno opozorilo';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Sintetično ujemanje: v bližini je bila najdena postaja pod vašim ciljem.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump => 'Pregledovalnik zastavic funkcij';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Vklopljeno';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Izklopljeno';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Počisti predpomnilnike';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Predpomnilniki počiščeni.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Kopiraj diagnostiko';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnostika kopirana v odložišče.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Podatki o gradnji';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Različica aplikacije';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Kanal gradnje';
 
   @override
   String get insightCardTitle => 'Najbolj potratna vedenja';
@@ -4325,11 +4325,12 @@ class AppLocalizationsSl extends AppLocalizations {
       'Omogoča ploščo povratnih informacij za neuspešna skeniranja, ki s Personal Access Tokenom samodejno ustvarja težave v GitHubu. Funkcija za napredne uporabnike / sodelavce.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode =>
+      'Razvijalski način / način za odpravljanje napak';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'V nastavitvah prikaže razdelek Razvijalska orodja z diagnostiko: izvoz dnevnika napak, testna obvestila, zagon testnega cevovoda opozoril, izpis zastavic funkcij, čiščenje predpomnilnikov in kopiranje diagnostike.';
 
   @override
   String get feedbackConsentTitle => 'Poslati poročilo na GitHub?';

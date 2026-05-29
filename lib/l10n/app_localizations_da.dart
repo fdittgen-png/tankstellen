@@ -3890,101 +3890,100 @@ class AppLocalizationsDa extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Afvis';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Udviklerværktøjer';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnostik og fejlfindingsværktøjer — kun synlige i udvikler-/fejlfindingstilstand.';
 
   @override
-  String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+  String get developerToolsMenuSubtitle => 'Fejllog, testadvarsler, diagnostik';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Fejllog';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Gem fejllog ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Ryd fejllog';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Vis fejllog';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty => 'Ingen fejlspor registreret.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Advarsler og notifikationer';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification => 'Send testnotifikation';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Testnotifikation';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Hvis du kan læse dette, virker notifikationerne.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent => 'Testnotifikation sendt.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Notifikationer er blokeret — aktivér dem i systemindstillingerne, og prøv igen.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert => 'Kør testadvarselsforløb';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Testadvarsel udløst — forløbet leverede $count notifikation(er).';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Testprisadvarsel';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Syntetisk match: en station under dit mål blev fundet i nærheden.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostik';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump => 'Inspektør for funktionsflag';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Til';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Fra';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Ryd cacher';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Cacher ryddet.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Kopiér diagnostik';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnostik kopieret til udklipsholderen.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Buildoplysninger';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Appversion';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Buildkanal';
 
   @override
   String get insightCardTitle => 'Mest spildende adfærd';
@@ -4318,11 +4317,11 @@ class AppLocalizationsDa extends AppLocalizations {
       'Aktiverer feedback-panelet for fejlskanninger, der automatisk opretter GitHub-issues med en Personal Access Token. Funktion for avancerede brugere/bidragsydere.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode => 'Udvikler-/fejlfindingstilstand';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'Viser en sektion med udviklerværktøjer i indstillingerne med diagnostik: eksport af fejllog, testnotifikationer, kørsel af testadvarselsforløb, oversigt over funktionsflag, rydning af cacher og kopiering af diagnostik.';
 
   @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';

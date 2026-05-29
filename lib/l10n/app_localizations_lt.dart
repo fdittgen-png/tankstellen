@@ -3911,101 +3911,103 @@ class AppLocalizationsLt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Atmesti';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Kūrėjo įrankiai';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnostika ir derinimo įrankiai — matomi tik kūrėjo / derinimo režimu.';
 
   @override
   String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+      'Klaidų žurnalas, bandomieji įspėjimai, diagnostika';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Klaidų žurnalas';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Įrašyti klaidų žurnalą ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Išvalyti klaidų žurnalą';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Peržiūrėti klaidų žurnalą';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty => 'Klaidų pėdsakų neužregistruota.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Įspėjimai ir pranešimai';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification => 'Siųsti bandomąjį pranešimą';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Bandomasis pranešimas';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Jei tai skaitote, pranešimai veikia.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent =>
+      'Bandomasis pranešimas išsiųstas.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Pranešimai užblokuoti — įjunkite juos sistemos nustatymuose ir bandykite dar kartą.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert => 'Vykdyti bandomąją įspėjimų giją';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Bandomasis įspėjimas suaktyvintas — gija pristatė $count pranešimų.';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Bandomasis kainos įspėjimas';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Sintetinis atitikmuo: netoliese rasta stotelė, mažesnė už jūsų tikslą.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump =>
+      'Funkcijų vėliavėlių inspektorius';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Įjungta';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Išjungta';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Išvalyti talpyklas';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Talpyklos išvalytos.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Kopijuoti diagnostiką';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnostika nukopijuota į iškarpinę.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Versijos informacija';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Programos versija';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Versijos kanalas';
 
   @override
   String get insightCardTitle => 'Didžiausias kuro švaistymas';
@@ -4343,11 +4345,11 @@ class AppLocalizationsLt extends AppLocalizations {
       'Įjungia nepavykusio nuskaitymo atsiliepimų skydelį, kuris su Personal Access Token automatiškai sukuria GitHub problemas. Pažangių vartotojų / talkininkų funkcija.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode => 'Kūrėjo / derinimo režimas';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'Nustatymuose parodo skiltį Kūrėjo įrankiai su diagnostika: klaidų žurnalo eksportas, bandomieji pranešimai, bandomosios įspėjimų gijos vykdymas, funkcijų vėliavėlių sąrašas, talpyklų išvalymas ir diagnostikos kopijavimas.';
 
   @override
   String get feedbackConsentTitle => 'Siųsti ataskaitą į GitHub?';

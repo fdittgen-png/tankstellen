@@ -3886,101 +3886,100 @@ class AppLocalizationsEt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Sulge';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Arendaja tööriistad';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnostika ja silumistööriistad — nähtavad ainult arendaja/silumisrežiimis.';
 
   @override
-  String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+  String get developerToolsMenuSubtitle => 'Vealogi, testteatised, diagnostika';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Vealogi';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Salvesta vealogi ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Tühjenda vealogi';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Vaata vealogi';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty => 'Veajälgi pole salvestatud.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Hoiatused ja teatised';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification => 'Saada testteatis';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Testteatis';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Kui sa seda loed, siis teatised töötavad.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent => 'Testteatis saadetud.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Teatised on blokeeritud — luba need süsteemiseadetes ja proovi uuesti.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert => 'Käivita testhoiatuse konveier';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Testhoiatus käivitatud — konveier edastas $count teatist.';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Testhinnahoiatus';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Sünteetiline vaste: läheduses leiti sinu sihist odavam jaam.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump => 'Funktsioonilippude inspektor';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Sees';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Väljas';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Tühjenda vahemälud';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Vahemälud tühjendatud.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Kopeeri diagnostika';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnostika kopeeritud lõikelauale.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Järgu teave';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Rakenduse versioon';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Järgu kanal';
 
   @override
   String get insightCardTitle => 'Kõige raiskavamad käitumised';
@@ -4316,11 +4315,11 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lubab vigaste skannimiste tagasisidepaneeli, mis loob isikliku juurdepääsuvõtmega automaatselt GitHubi probleeme. Edasijõudnud kasutajate / kaastöötajate funktsioon.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode => 'Arendaja/silumisrežiim';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'Kuvab seadetes jaotise Arendaja tööriistad koos diagnostikaga: vealogi eksport, testteatised, testhoiatuse konveieri käivitamine, funktsioonilippude loend, vahemälude tühjendamine ja diagnostika kopeerimine.';
 
   @override
   String get feedbackConsentTitle => 'Saata raport GitHubile?';

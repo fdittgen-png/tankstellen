@@ -3908,101 +3908,105 @@ class AppLocalizationsSk extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Zatvoriť';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Nástroje pre vývojárov';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnostika a nástroje na ladenie — viditeľné iba vo vývojárskom/ladiacom režime.';
 
   @override
   String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+      'Protokol chýb, testovacie upozornenia, diagnostika';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Protokol chýb';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Uložiť protokol chýb ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Vymazať protokol chýb';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Zobraziť protokol chýb';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty =>
+      'Nezaznamenali sa žiadne stopy chýb.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Upozornenia a oznámenia';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification =>
+      'Odoslať testovacie oznámenie';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Testovacie oznámenie';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Ak toto čítate, oznámenia fungujú.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent =>
+      'Testovacie oznámenie odoslané.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Oznámenia sú zablokované — povoľte ich v nastaveniach systému a skúste to znova.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert =>
+      'Spustiť testovací proces upozornenia';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Testovacie upozornenie spustené — proces doručil $count oznámení.';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Testovacie cenové upozornenie';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Syntetická zhoda: v okolí sa našla stanica pod vaším cieľom.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump => 'Inšpektor príznakov funkcií';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Zapnuté';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Vypnuté';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Vymazať vyrovnávacie pamäte';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Vyrovnávacie pamäte vymazané.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Kopírovať diagnostiku';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnostika skopírovaná do schránky.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Informácie o zostavení';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Verzia aplikácie';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Kanál zostavenia';
 
   @override
   String get insightCardTitle => 'Najväčšie plytvania';
@@ -4339,11 +4343,11 @@ class AppLocalizationsSk extends AppLocalizations {
       'Aktivuje panel spätnej väzby pre neúspešné skenovanie, ktorý automaticky vytvára GitHub issues s Personal Access Tokenom. Funkcia pre pokročilých používateľov / prispievateľov.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode => 'Vývojársky/ladiaci režim';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'Zobrazí v nastaveniach sekciu Nástroje pre vývojárov s diagnostikou: export protokolu chýb, testovacie oznámenia, spustenie testovacieho procesu upozornenia, výpis príznakov funkcií, vymazanie vyrovnávacích pamätí a kopírovanie diagnostiky.';
 
   @override
   String get feedbackConsentTitle => 'Odoslať hlásenie na GitHub?';

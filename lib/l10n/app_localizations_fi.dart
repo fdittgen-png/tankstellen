@@ -3890,101 +3890,101 @@ class AppLocalizationsFi extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Sulje';
 
   @override
-  String get developerToolsSectionTitle => 'Developer tools';
+  String get developerToolsSectionTitle => 'Kehittäjätyökalut';
 
   @override
   String get developerToolsSubtitle =>
-      'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
+      'Diagnostiikka ja virheenkorjaustyökalut — näkyvät vain kehittäjä-/virheenkorjaustilassa.';
 
   @override
   String get developerToolsMenuSubtitle =>
-      'Error log, test alerts, diagnostics';
+      'Virheloki, testihälytykset, diagnostiikka';
 
   @override
-  String get developerToolsErrorLogGroupTitle => 'Error log';
+  String get developerToolsErrorLogGroupTitle => 'Virheloki';
 
   @override
   String developerToolsExportErrorLog(int count) {
-    return 'Save error log ($count)';
+    return 'Tallenna virheloki ($count)';
   }
 
   @override
-  String get developerToolsClearErrorLog => 'Clear error log';
+  String get developerToolsClearErrorLog => 'Tyhjennä virheloki';
 
   @override
-  String get developerToolsViewErrorLog => 'View error log';
+  String get developerToolsViewErrorLog => 'Näytä virheloki';
 
   @override
-  String get developerToolsErrorLogEmpty => 'No error traces recorded.';
+  String get developerToolsErrorLogEmpty => 'Virhejälkiä ei ole tallennettu.';
 
   @override
-  String get developerToolsAlertsGroupTitle => 'Alerts & notifications';
+  String get developerToolsAlertsGroupTitle => 'Hälytykset ja ilmoitukset';
 
   @override
-  String get developerToolsFireTestNotification => 'Fire test notification';
+  String get developerToolsFireTestNotification => 'Lähetä testi-ilmoitus';
 
   @override
-  String get developerToolsTestNotificationTitle => 'Test notification';
+  String get developerToolsTestNotificationTitle => 'Testi-ilmoitus';
 
   @override
   String get developerToolsTestNotificationBody =>
-      'If you can read this, notifications are working.';
+      'Jos voit lukea tämän, ilmoitukset toimivat.';
 
   @override
-  String get developerToolsTestNotificationSent => 'Test notification sent.';
+  String get developerToolsTestNotificationSent => 'Testi-ilmoitus lähetetty.';
 
   @override
   String get developerToolsTestNotificationBlocked =>
-      'Notifications are blocked — enable them in system settings, then retry.';
+      'Ilmoitukset on estetty — ota ne käyttöön järjestelmäasetuksissa ja yritä uudelleen.';
 
   @override
-  String get developerToolsRunTestAlert => 'Run test alert pipeline';
+  String get developerToolsRunTestAlert => 'Suorita testihälytysputki';
 
   @override
   String developerToolsTestAlertFired(int count) {
-    return 'Test alert fired — pipeline delivered $count notification(s).';
+    return 'Testihälytys laukaistu — putki toimitti $count ilmoitusta.';
   }
 
   @override
-  String get developerToolsTestAlertTitle => 'Test price alert';
+  String get developerToolsTestAlertTitle => 'Testihintahälytys';
 
   @override
   String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+      'Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.';
 
   @override
-  String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostiikka';
 
   @override
-  String get developerToolsFeatureFlagDump => 'Feature flag inspector';
+  String get developerToolsFeatureFlagDump => 'Ominaisuuslippujen tarkastelu';
 
   @override
-  String get developerToolsFlagOn => 'On';
+  String get developerToolsFlagOn => 'Päällä';
 
   @override
-  String get developerToolsFlagOff => 'Off';
+  String get developerToolsFlagOff => 'Pois';
 
   @override
-  String get developerToolsClearCaches => 'Clear caches';
+  String get developerToolsClearCaches => 'Tyhjennä välimuistit';
 
   @override
-  String get developerToolsCachesCleared => 'Caches cleared.';
+  String get developerToolsCachesCleared => 'Välimuistit tyhjennetty.';
 
   @override
-  String get developerToolsCopyDiagnostics => 'Copy diagnostics';
+  String get developerToolsCopyDiagnostics => 'Kopioi diagnostiikka';
 
   @override
   String get developerToolsDiagnosticsCopied =>
-      'Diagnostics copied to clipboard.';
+      'Diagnostiikka kopioitu leikepöydälle.';
 
   @override
-  String get developerToolsBuildInfoGroupTitle => 'Build info';
+  String get developerToolsBuildInfoGroupTitle => 'Koontitiedot';
 
   @override
-  String get developerToolsBuildVersion => 'App version';
+  String get developerToolsBuildVersion => 'Sovelluksen versio';
 
   @override
-  String get developerToolsBuildChannel => 'Build channel';
+  String get developerToolsBuildChannel => 'Koontikanava';
 
   @override
   String get insightCardTitle => 'Pahimmat tuhlaukset';
@@ -4318,11 +4318,11 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ottaa käyttöön epäonnistuneiden skannausten palautepaneelin, joka luo automaattisesti GitHub-issueja Personal Access Tokenilla. Edistyneiden käyttäjien / avustajien ominaisuus.';
 
   @override
-  String get featureLabel_debugMode => 'Developer / Debug mode';
+  String get featureLabel_debugMode => 'Kehittäjä-/virheenkorjaustila';
 
   @override
   String get featureDescription_debugMode =>
-      'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
+      'Näyttää asetuksissa Kehittäjätyökalut-osion, jossa on diagnostiikkaa: virhelokin vienti, testi-ilmoitukset, testihälytysputken suoritus, ominaisuuslippujen luettelo, välimuistien tyhjennys ja diagnostiikan kopiointi.';
 
   @override
   String get feedbackConsentTitle => 'Lähetetäänkö raportti GitHubiin?';
