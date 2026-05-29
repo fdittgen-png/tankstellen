@@ -74,7 +74,6 @@ class EvFavoriteStations extends _$EvFavoriteStations {
     ref.watch(favoritesProvider);
     final storage = ref.read(storageRepositoryProvider);
     final favoriteIds = storage.getEvFavoriteIds();
-    debugPrint('[EvFavoriteStations.build] favoriteIds=$favoriteIds');
     if (favoriteIds.isEmpty) return const [];
 
     final stations = <ChargingStation>[];
@@ -82,10 +81,7 @@ class EvFavoriteStations extends _$EvFavoriteStations {
 
     for (final id in favoriteIds) {
       final data = storage.getEvFavoriteStationData(id);
-      debugPrint(
-          '[EvFavoriteStations.build] id=$id dataKeys=${data?.keys.toList()}');
       if (data == null) {
-        debugPrint('[EvFavoriteStations.build] MISSING DATA for id=$id');
         orphaned.add(id);
         continue;
       }
@@ -97,12 +93,9 @@ class EvFavoriteStations extends _$EvFavoriteStations {
       }
     }
 
-    if (orphaned.isNotEmpty) {
-      debugPrint(
-          '[EvFavoriteStations.build] ${orphaned.length} orphan id(s) skipped: $orphaned');
+    if (kDebugMode && orphaned.isNotEmpty) {
+      debugPrint('[EvFavoriteStations.build] ${orphaned.length} orphan id(s) skipped: $orphaned');
     }
-    debugPrint(
-        '[EvFavoriteStations.build] returning ${stations.length} stations');
     return stations;
   }
 }

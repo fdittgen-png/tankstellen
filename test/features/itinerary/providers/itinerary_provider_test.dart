@@ -9,8 +9,11 @@ import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/itinerary/providers/itinerary_provider.dart';
 
 import '../../../fakes/fake_hive_storage.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
+
   group('ItineraryNotifier', () {
     late FakeHiveStorage fakeStorage;
     late ProviderContainer container;

@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/data/storage_repository.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/itineraries_sync.dart';
 import '../../../core/sync/sync_provider.dart';
@@ -48,7 +50,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
         );
       }).toList();
     } catch (e, st) {
-      debugPrint('ItineraryNotifier._fromStorage FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ItineraryNotifier._fromStorage'}));
       return [];
     }
   }
@@ -86,10 +88,8 @@ class ItineraryNotifier extends _$ItineraryNotifier {
           await ItinerariesSync.save(localItem);
         }
       }
-
-      debugPrint('ItineraryNotifier: merged ${state.length} itineraries (${serverItineraries.length} from server)');
     } catch (e, st) {
-      debugPrint('ItineraryNotifier._loadAndMerge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier._loadAndMerge'}));
     }
   }
 
@@ -132,7 +132,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     try {
       await ItinerariesSync.save(itinerary);
     } catch (e, st) {
-      debugPrint('ItineraryNotifier.saveRoute sync FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier.saveRoute'}));
     }
 
     return true;
@@ -149,7 +149,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     try {
       await ItinerariesSync.delete(id);
     } catch (e, st) {
-      debugPrint('ItineraryNotifier.delete sync FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier.delete'}));
     }
   }
 
