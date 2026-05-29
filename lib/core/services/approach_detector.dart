@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'package:geolocator/geolocator.dart';
 
 import '../../features/search/domain/entities/station.dart';
+import '../logging/error_logger.dart';
 import '../utils/geo_utils.dart' as geo;
 import '../utils/num_extensions.dart';
 
@@ -195,7 +196,27 @@ class ApproachDetector {
       geo.distanceMeters(lat1, lng1, lat2, lng2);
 
   void _start() {
-    _gpsSub = _gps.listen(_onPosition);
+    // Drop any prior subscription before re-subscribing so the error-
+    // recovery restart (below) never leaks a second listener.
+    unawaited(_gpsSub?.cancel());
+    // #2297 — a mid-trip permission revoke or OS location kill emits an
+    // error on the position stream; without an onError the subscription
+    // terminates silently, the poll timer keeps firing against a frozen
+    // `_lastGps`, and the overlay shows stale state with no transition.
+    // Log it, reset to Idle, and re-subscribe so a later re-grant of the
+    // location permission recovers the overlay automatically.
+    _gpsSub = _gps.listen(
+      _onPosition,
+      onError: (Object e, StackTrace st) {
+        if (_disposed) return;
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+          'where': 'ApproachDetector GPS stream error',
+        }));
+        _emit(const ApproachIdle());
+        _start();
+      },
+      cancelOnError: false,
+    );
   }
 
   void _onPosition(Position p) {

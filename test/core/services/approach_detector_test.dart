@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../helpers/silence_error_logger.dart';
 
 Position _pos(double lat, double lng, {double speedMps = 0}) => Position(
       latitude: lat,
@@ -41,6 +42,7 @@ Station _station({
     );
 
 void main() {
+  silenceErrorLoggerSpool();
   group('ApproachDetector.computePollInterval', () {
     test('hard ceiling at speed = 0', () {
       final d = ApproachDetector.computePollInterval(
@@ -162,6 +164,53 @@ void main() {
       // (it fires on the timer, not immediately).
       expect(emitted.first, isA<ApproachPolling>());
       expect(callCount, 0);
+    });
+  });
+
+  // #2297 — a mid-trip GPS error (permission revoke / OS location kill)
+  // must NOT silently freeze the overlay on stale state. The detector
+  // resets to Idle and re-subscribes so a later re-grant recovers.
+  group('ApproachDetector GPS-stream error recovery (#2297)', () {
+    test(
+        'a GPS stream error resets to Idle and restarts — a later fix '
+        're-enters Polling', () async {
+      final gps = StreamController<Position>.broadcast();
+      final det = ApproachDetector(
+        gpsStream: gps.stream,
+        fetchStations: (_, _, _, _) async => const <Station>[],
+        config: const ApproachDetectorConfig(
+          radiusMeters: 1000,
+          priceMode: ApproachPriceMode.nearest,
+          minPollSeconds: 5,
+          fuelTypeApiValue: 'e10',
+        ),
+      );
+      final emitted = <ApproachState>[];
+      final sub = det.state.listen(emitted.add);
+
+      // First fix → Polling.
+      gps.add(_pos(48.0, 2.0, speedMps: 25));
+      await Future<void>.delayed(Duration.zero);
+      expect(emitted.last, isA<ApproachPolling>());
+
+      // GPS error mid-trip → the detector logs, resets to Idle and
+      // restarts the subscription.
+      gps.addError(Exception('location permission revoked'));
+      await Future<void>.delayed(Duration.zero);
+      expect(emitted.last, isA<ApproachIdle>(),
+          reason: 'a GPS error must reset the overlay to Idle, not freeze '
+              'on the last Polling state');
+
+      // A subsequent fix after re-grant is processed again → Polling,
+      // proving the restarted subscription is live.
+      gps.add(_pos(48.1, 2.1, speedMps: 25));
+      await Future<void>.delayed(Duration.zero);
+      expect(emitted.last, isA<ApproachPolling>(),
+          reason: 'the restarted GPS subscription must process new fixes');
+
+      await sub.cancel();
+      await det.dispose();
+      await gps.close();
     });
   });
 }

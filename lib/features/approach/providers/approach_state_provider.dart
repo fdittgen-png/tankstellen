@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/services/approach_detector.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 import '../../profile/data/models/user_profile.dart' as profile_model;
@@ -75,9 +78,14 @@ Stream<ApproachState> approachState(Ref ref) {
           radiusKm,
           fuelTypeApiValue,
         );
-      } on Object {
-        // Swallow — the detector treats this as "no stations in
-        // radius" and keeps polling. The next iteration retries.
+      } on Object catch (e, st) {
+        // #2297 — the detector treats this as "no stations in radius" and
+        // keeps polling (the next iteration retries), but a broken API
+        // key / country outage must leave a breadcrumb so it is
+        // distinguishable from a genuine "nothing nearby" in telemetry.
+        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: const {
+          'where': 'approachState.fetchStations',
+        }));
         return const <Station>[];
       }
     },
