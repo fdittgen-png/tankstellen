@@ -7,7 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/'
     'bluetooth_obd2_transport.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
+import 'package:tankstellen/features/consumption/data/obd2/elm327_adapter.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 
 /// TDD tests for the Bluetooth OBD2 transport (#716).
 ///
@@ -19,11 +21,14 @@ import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart'
 /// fake channel.
 void main() {
   group('BluetoothObd2Transport (#716)', () {
-    test('connect runs the ELM init sequence and leaves isConnected=true',
+    test(
+        'connect opens the channel and leaves isConnected=true WITHOUT '
+        'sending the ELM init (init is the service\'s job now, #2233)',
         () async {
       final channel = _ScriptedChannel();
-      // Scripted per-command responses — the channel streams each one
-      // when the transport writes the matching command.
+      // Scripted per-command responses — present but the transport must
+      // no longer fire them on connect(): #2233 moved the init burst to
+      // [Obd2Service.connect] so it is sent exactly once, not twice.
       channel.scriptResponse('ATZ\r', 'ELM327 v1.5>');
       channel.scriptResponse('ATE0\r', 'OK>');
       channel.scriptResponse('ATL0\r', 'OK>');
@@ -33,7 +38,48 @@ void main() {
       final transport = BluetoothObd2Transport(channel);
       await transport.connect();
 
-      expect(transport.isConnected, isTrue);
+      expect(transport.isConnected, isTrue,
+          reason: '_connected must flip true so the service-side init '
+              'can send — sendCommand throws on !_connected');
+      expect(channel.isOpen, isTrue);
+      expect(channel.writesAsStrings, isEmpty,
+          reason: 'the transport no longer self-inits (#2233)');
+    });
+
+    // #2233 — regression guard: the ELM327 init handshake must run EXACTLY
+    // ONCE across a full transport.connect() + service-driven init. Before
+    // #2233 the transport ran the six AT commands AND Obd2Service.connect
+    // re-sent them, so ATZ went out twice — the second reset wiped state
+    // and re-paid a 1–2 s clone re-enumeration.
+    test('ATZ is sent exactly once across transport + service connect',
+        () async {
+      final channel = _ScriptedChannel();
+      // Script the full init + the firmware probe the service sends after
+      // the init burst (#1401), so the service connect completes cleanly.
+      channel.scriptResponse('ATZ\r', 'ELM327 v1.5>');
+      channel.scriptResponse('ATE0\r', 'OK>');
+      channel.scriptResponse('ATL0\r', 'OK>');
+      channel.scriptResponse('ATH0\r', 'OK>');
+      channel.scriptResponse('ATSP0\r', 'OK>');
+      channel.scriptResponse('ATAT1\r', 'OK>');
+      channel.scriptResponse('ATI\r', 'ELM327 v1.5>');
+
+      // The transport connect (channel open + subscribe, no init) followed
+      // by the single init owner: Obd2Service.connect drives
+      // adapter.initSequence over the SAME transport.
+      final transport = BluetoothObd2Transport(channel);
+      final service = Obd2Service(transport);
+      final connected = await service.connect(
+        adapter: const GenericElm327Adapter(),
+      );
+
+      expect(connected, isTrue);
+      final atzCount = channel.writesAsStrings
+          .where((w) => w == Elm327Protocol.resetCommand)
+          .length;
+      expect(atzCount, 1,
+          reason: 'the init handshake must run once, not twice (#2233)');
+      // The rest of the init burst is likewise sent once, in order.
       expect(channel.writesAsStrings, containsAllInOrder([
         Elm327Protocol.resetCommand,
         Elm327Protocol.echoOffCommand,

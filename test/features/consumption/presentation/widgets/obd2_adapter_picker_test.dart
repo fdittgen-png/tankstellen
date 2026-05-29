@@ -53,11 +53,18 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
       await tester.tap(find.text('vLinker FD'));
       await tester.pump(); // state flip only — don't settle, the silent
-      // channel intentionally leaves a pending 5 s timeout that
+      // channel intentionally leaves a pending read timeout that
       // eventually surfaces as Obd2AdapterUnresponsive; we're only
       // asserting the optimistic "connecting" state got rendered.
       expect(find.byKey(const Key('obdPickerConnecting')), findsOneWidget);
-      // Drain the transport's 5s timeout so the test harness exits cleanly.
+      // Drain the init read timeouts so the test harness exits cleanly.
+      // #2233 moved the ELM327 init out of the transport into
+      // Obd2Service.connect, which wraps each command in a one-shot
+      // connect-retry (_withConnectRetry): the first ATZ times out
+      // (5 s), waits connectRetryDelay (150 ms), then retries and times
+      // out again (5 s). Pump past both timers + the retry delay so no
+      // timer is pending when the widget tree is disposed.
+      await tester.pump(const Duration(seconds: 6));
       await tester.pump(const Duration(seconds: 6));
       await tester.pump();
     });
