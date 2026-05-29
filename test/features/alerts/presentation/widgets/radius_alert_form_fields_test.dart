@@ -116,10 +116,13 @@ void main() {
           .toSet();
 
       expect(menuValues, isNot(contains(FuelType.all)));
-      // Sanity-check: the concrete fuels we exclude `all` from are present.
+      // #2211 — restricted to the BG-evaluable fuels (E5/E10/diesel);
+      // LPG/CNG/H2/EV are excluded because the radius search can't surface
+      // them (they only ever produced silently-dead alerts).
       expect(menuValues, contains(FuelType.diesel));
       expect(menuValues, contains(FuelType.e10));
-      expect(menuValues.length, FuelType.values.length - 1);
+      expect(menuValues, isNot(contains(FuelType.lpg)));
+      expect(menuValues.length, RadiusAlertFuelTypeField.evaluableFuels.length);
     });
   });
 
@@ -183,8 +186,8 @@ void main() {
       expect(find.text('12 km'), findsOneWidget);
     });
 
-    testWidgets('exposes min=1, max=50, divisions=49 with synced label',
-        (tester) async {
+    testWidgets('exposes min=1, max=25, divisions=24 with synced label '
+        '(#2211 — capped at the Tankerkönig radius limit)', (tester) async {
       await tester.pumpWidget(
         _wrap(RadiusAlertRadiusSlider(
           value: 7,
@@ -195,8 +198,8 @@ void main() {
 
       final slider = tester.widget<Slider>(find.byType(Slider));
       expect(slider.min, 1);
-      expect(slider.max, 50);
-      expect(slider.divisions, 49);
+      expect(slider.max, 25);
+      expect(slider.divisions, 24);
       expect(slider.label, '7 km');
       expect(slider.value, 7);
     });

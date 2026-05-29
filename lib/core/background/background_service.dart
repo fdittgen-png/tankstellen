@@ -667,7 +667,8 @@ RadiusAlertCopy _buildRadiusAlertCopy(RadiusAlertGroupedEvent event) {
   // should reflect everything the user could see if they tapped in.
   final total = event.matches.length + event.truncatedMoreCount;
   final lines = event.matches
-      .map((m) => '${m.stationId} ${m.pricePerLiter.toStringAsFixed(3)} €')
+      // #2211 — show the station name, not the raw id.
+      .map((m) => '${m.name} ${m.pricePerLiter.toStringAsFixed(3)} €')
       .toList();
   if (event.truncatedMoreCount > 0) {
     lines.add(isGerman

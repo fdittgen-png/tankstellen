@@ -93,6 +93,7 @@ void main() {
 
   StationPriceSample sample({double price = 1.540}) => StationPriceSample(
         stationId: 's1',
+        name: 'Test Station',
         lat: 43.505,
         lng: 3.505,
         fuelType: 'diesel',

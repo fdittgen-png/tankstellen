@@ -21,10 +21,14 @@ class RadiusAlertValidators {
   }
 
   /// Predicate that mirrors the "Save" button's enabled state. The
-  /// rules are: a non-empty trimmed label, a parseable strictly
-  /// positive threshold, AND a center — either GPS coordinates OR a
-  /// non-empty postal code (the phase-3 worker geocodes postal-only
-  /// entries later).
+  /// rules are: a non-empty trimmed label, a parseable strictly positive
+  /// threshold, AND real GPS coordinates for the center.
+  ///
+  /// #2211 — a real center is now REQUIRED. Postal-code-only entries used
+  /// to save with a (0,0) center and never matched anything (no
+  /// geocoding step exists), so they were silently dead. [postalCode] is
+  /// still accepted (it's surfaced in the label) but no longer enables
+  /// save on its own; the user must pick a location or use GPS.
   static bool canSave({
     required String label,
     required String thresholdRaw,
@@ -35,8 +39,6 @@ class RadiusAlertValidators {
     if (label.trim().isEmpty) return false;
     final threshold = parseThreshold(thresholdRaw);
     if (threshold == null || threshold <= 0) return false;
-    final hasGps = centerLat != null && centerLng != null;
-    final hasPostal = postalCode.trim().isNotEmpty;
-    return hasGps || hasPostal;
+    return centerLat != null && centerLng != null;
   }
 }

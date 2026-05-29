@@ -16,6 +16,11 @@ import 'entities/radius_alert.dart';
 /// fuelType) combination you care about.
 class StationPriceSample {
   final String stationId;
+
+  /// User-facing station name (brand → name → street fallback). #2211 —
+  /// carried so the grouped radius-alert notification shows real names
+  /// instead of raw station ids.
+  final String name;
   final double lat;
   final double lng;
 
@@ -31,6 +36,7 @@ class StationPriceSample {
 
   const StationPriceSample({
     required this.stationId,
+    required this.name,
     required this.lat,
     required this.lng,
     required this.fuelType,
@@ -55,6 +61,7 @@ class StationPriceSample {
       if (price == null) continue;
       out.add(StationPriceSample(
         stationId: station.id,
+        name: station.displayName,
         lat: station.lat,
         lng: station.lng,
         fuelType: fuel.apiValue,
