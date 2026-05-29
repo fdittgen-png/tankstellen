@@ -185,6 +185,32 @@ void main() {
       );
     });
 
+    test(
+        'enqueue does not leak an unhandled async error when Hive is '
+        'uninitialised (default box factory)', () async {
+      // Regression for the PR #2321 test(2) failure: when #2307 routed
+      // GPS-stream errors through `errorLogger.log`, an uninitialised
+      // Hive made `Hive.openBox` complete its internal `_openingBoxes`
+      // completer with an error that had no listener — surfacing as an
+      // *unhandled* async error that failed otherwise-green tests even
+      // though `enqueue` caught the rethrown copy. The fix wraps the
+      // open in a guarded zone; this test pins that the default box
+      // factory (real `Hive.openBox`) is orphan-error-safe with no Hive
+      // directory bound.
+      await Hive.close();
+      IsolateErrorSpool.resetBoxFactoryForTest();
+      await expectLater(
+        IsolateErrorSpool.enqueue(
+          isolateTaskName: 'gps_stream',
+          error: Exception('permission revoked'),
+        ),
+        completes,
+      );
+      // Drain pending microtasks; an orphaned completer rejection would
+      // surface here and fail the test zone if the guard regressed.
+      await Future<void>.delayed(Duration.zero);
+    });
+
     test('peek returns an empty list when the box factory throws',
         () async {
       IsolateErrorSpool.boxFactory = () async {

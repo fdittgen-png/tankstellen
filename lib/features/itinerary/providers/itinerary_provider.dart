@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/data/storage_repository.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/itineraries_sync.dart';
 import '../../../core/sync/sync_provider.dart';
@@ -20,6 +22,8 @@ part 'itinerary_provider.g.dart';
 /// - Sync only adds/changes, never deletes (except explicit user delete)
 @Riverpod(keepAlive: true)
 class ItineraryNotifier extends _$ItineraryNotifier {
+  bool _mergeInFlight = false;
+
   @override
   List<SavedItinerary> build() {
     // Start with local data immediately
@@ -48,17 +52,24 @@ class ItineraryNotifier extends _$ItineraryNotifier {
         );
       }).toList();
     } catch (e, st) {
-      debugPrint('ItineraryNotifier._fromStorage FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ItineraryNotifier._fromStorage'}));
       return [];
     }
   }
 
   /// Load from DB first, then merge with local (local wins on conflict).
+  ///
+  /// Concurrent invocations are coalesced: if a merge is already
+  /// in-flight the second caller returns immediately. This prevents the
+  /// double-fetch that would otherwise happen when build() and
+  /// initState() both call this at navigation time.
   Future<void> _loadAndMerge() async {
-    final syncState = ref.read(syncStateProvider);
-    if (!syncState.enabled) return;
-
+    if (_mergeInFlight) return;
+    _mergeInFlight = true;
     try {
+      final syncState = ref.read(syncStateProvider);
+      if (!syncState.enabled) return;
+
       final serverItineraries = await ItinerariesSync.fetchAll();
       if (serverItineraries.isEmpty) return;
 
@@ -79,17 +90,16 @@ class ItineraryNotifier extends _$ItineraryNotifier {
       merged.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       state = merged;
 
-      // Upload local-only items to server (sync adds, never deletes)
+      // Upload local-only items to server in parallel (sync adds, never deletes).
       final serverIds = serverItineraries.map((i) => i.id).toSet();
-      for (final localItem in state) {
-        if (!serverIds.contains(localItem.id)) {
-          await ItinerariesSync.save(localItem);
-        }
+      final localOnly = state.where((i) => !serverIds.contains(i.id)).toList();
+      if (localOnly.isNotEmpty) {
+        await Future.wait(localOnly.map(ItinerariesSync.save));
       }
-
-      debugPrint('ItineraryNotifier: merged ${state.length} itineraries (${serverItineraries.length} from server)');
     } catch (e, st) {
-      debugPrint('ItineraryNotifier._loadAndMerge FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier._loadAndMerge'}));
+    } finally {
+      _mergeInFlight = false;
     }
   }
 
@@ -132,7 +142,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     try {
       await ItinerariesSync.save(itinerary);
     } catch (e, st) {
-      debugPrint('ItineraryNotifier.saveRoute sync FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier.saveRoute'}));
     }
 
     return true;
@@ -149,7 +159,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     try {
       await ItinerariesSync.delete(id);
     } catch (e, st) {
-      debugPrint('ItineraryNotifier.delete sync FAILED: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier.delete'}));
     }
   }
 

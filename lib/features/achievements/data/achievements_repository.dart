@@ -1,11 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+import '../../../core/logging/error_logger.dart';
 import '../domain/achievement.dart';
 
 /// Hive-backed persistence of earned achievements (#781). One JSON
@@ -35,7 +36,7 @@ class AchievementsRepository {
         final earned = EarnedAchievement.fromJson(json);
         if (earned != null) result.add(earned);
       } catch (e, st) {
-        debugPrint('AchievementsRepository.loadAll: skipping $key: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'AchievementsRepository.loadAll', 'key': key.toString()}));
       }
     }
     result.sort((a, b) => b.earnedAt.compareTo(a.earnedAt));

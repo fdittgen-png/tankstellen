@@ -17,6 +17,8 @@ import 'package:tankstellen/features/favorites/providers/favorites_provider.dart
 import 'package:tankstellen/features/search/presentation/screens/ev_station_detail_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../helpers/silence_error_logger.dart';
+
 /// End-to-end TDD test for #566: tapping the star on the EV station
 /// detail screen must:
 ///   1. Persist the station to EV favorite storage (so Favorites tab shows it)
@@ -27,6 +29,8 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// `ev/` ChargingStation), backed by REAL Hive storage — no mocks for
 /// favorites or storage.
 void main() {
+  silenceErrorLoggerSpool();
+
   late Directory tempDir;
 
   setUp(() async {

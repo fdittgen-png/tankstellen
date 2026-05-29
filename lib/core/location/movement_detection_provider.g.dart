@@ -59,7 +59,7 @@ final class MovementDetectionProvider
   }
 }
 
-String _$movementDetectionHash() => r'a9e97d7a37313d4aae713844f74626da331ca9f7';
+String _$movementDetectionHash() => r'193b3db1bd6d93af2cc260dc95c95430ec1b8b00';
 
 /// Provides movement detection state for driving mode.
 ///

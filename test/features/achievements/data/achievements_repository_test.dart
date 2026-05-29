@@ -8,8 +8,11 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/features/achievements/data/achievements_repository.dart';
 import 'package:tankstellen/features/achievements/domain/achievement.dart';
 
+import '../../../helpers/silence_error_logger.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  silenceErrorLoggerSpool();
 
   late Directory tmpDir;
   late Box<String> box;
