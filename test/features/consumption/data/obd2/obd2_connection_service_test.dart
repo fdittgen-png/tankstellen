@@ -364,6 +364,36 @@ void main() {
       expect(ready, isNull);
       expect(fake.scanInvoked, isTrue);
     });
+
+    test(
+        'with fallbackToScan:false a failed direct attempt returns null '
+        'WITHOUT scanning (#2245)', () async {
+      // The in-trip reconnect path owns its own RSSI-gated scan fallback,
+      // so it opts out of the service's internal scan to avoid double
+      // scanning. A failed direct connect must surface as a plain null.
+      final fake = _FakeFacade(
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        directChannel: _FakeChannel(
+          openError: StateError('connect timed out'),
+        ),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready =
+          await svc.connectByMacDirect('aa:bb', fallbackToScan: false);
+      expect(ready, isNull);
+      expect(fake.scanInvoked, isFalse,
+          reason: 'fallbackToScan:false must skip the internal scan');
+    });
   });
 }
 

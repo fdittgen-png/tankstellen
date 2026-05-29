@@ -22,10 +22,10 @@ import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/active_trip_repository.dart';
-import '../data/obd2/adapter_registry.dart';
 import '../data/obd2/adapter_reconnect_scanner.dart';
 import '../data/obd2/obd2_connection_service.dart';
 import '../data/obd2/obd2_service.dart';
+import '../data/obd2/reconnect_connector.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
@@ -1113,43 +1113,23 @@ class TripRecording extends _$TripRecording {
       return null;
     }
     return (pinnedMac, onReconnect) {
-      ResolvedObd2Candidate? lastCandidate;
+      // One connector per drop holds the gate bookkeeping across the
+      // scanner's repeated connect cycles. The connect callback prefers a
+      // DIRECT GATT connect — which works even for clones that stop
+      // advertising in standby (a scan would never re-see them) — and
+      // only falls back to an RSSI-gated scan. The scanner probe always
+      // returns true so the connect step (and thus the direct attempt)
+      // is reached on every cycle; gating on scan-visibility — as the
+      // old probe did — was the dominant standby-clone reconnect failure
+      // (#2245).
+      final connector = ReconnectConnector(
+        connection: connection,
+        onConnected: (svc) => _service = svc,
+      );
       return AdapterReconnectScanner(
         pinnedMac: pinnedMac,
-        probe: (mac) async {
-          try {
-            // One scan window per probe — the service closes it at
-            // its built-in timeout. We take the first batch that
-            // contains the pinned MAC and short-circuit.
-            await for (final batch in connection.scan()) {
-              for (final c in batch) {
-                if (c.candidate.deviceId == mac) {
-                  lastCandidate = c;
-                  return true;
-                }
-              }
-            }
-          } catch (e, st) {
-            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording reconnect probe failed'}));
-          }
-          return false;
-        },
-        connect: (mac) async {
-          final candidate = lastCandidate;
-          if (candidate == null) return false;
-          try {
-            final svc = await connection.connect(candidate);
-            // Swap the controller's owned service pointer and
-            // hand ownership of the old (dead) service over to
-            // GC. The controller's scheduler will re-prime
-            // against the new transport on the next tick.
-            _service = svc;
-            return true;
-          } catch (e, st) {
-            unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording reconnect connect failed'}));
-            return false;
-          }
-        },
+        probe: (mac) async => true,
+        connect: connector.attempt,
         onReconnect: onReconnect,
       );
     };
