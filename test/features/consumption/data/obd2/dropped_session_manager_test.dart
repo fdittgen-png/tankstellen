@@ -1,0 +1,487 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapter_reconnect_scanner.dart';
+import 'package:tankstellen/features/consumption/data/obd2/dropped_session_host.dart';
+import 'package:tankstellen/features/consumption/data/obd2/dropped_session_manager.dart';
+import 'package:tankstellen/features/consumption/data/obd2/paused_trip_repository.dart';
+import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
+import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+
+/// Focused unit tests for the #2188 [DroppedSessionManager] — the
+/// connection-drop RECOVERY state machine extracted from
+/// `TripRecordingController`. Drives the manager against a fake
+/// [DroppedSessionHost] + in-memory Hive repos + a hand-driven scanner
+/// so every branch (persist-on-drop, silent window absorb vs escalate,
+/// reconnect-within / after-grace, grace auto-finalise) is exercised
+/// deterministically without a real `Obd2Service`, scheduler, or
+/// wall-clock timer.
+void main() {
+  group('DroppedSessionManager (#2188)', () {
+    late Directory tmpDir;
+    late Box<String> pausedBox;
+    late Box<String> historyBox;
+    late PausedTripRepository pausedRepo;
+    late TripHistoryRepository historyRepo;
+
+    setUp(() async {
+      tmpDir = Directory.systemTemp.createTempSync('dropped_session_test_');
+      Hive.init(tmpDir.path);
+      pausedBox = await Hive.openBox<String>(
+        'paused_${DateTime.now().microsecondsSinceEpoch}',
+      );
+      historyBox = await Hive.openBox<String>(
+        'history_${DateTime.now().microsecondsSinceEpoch}',
+      );
+      pausedRepo = PausedTripRepository(box: pausedBox);
+      historyRepo = TripHistoryRepository(box: historyBox);
+    });
+
+    tearDown(() async {
+      await pausedBox.deleteFromDisk();
+      await historyBox.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    DateTime now() => DateTime(2026, 5, 28, 12);
+
+    DroppedSessionManager build(
+      _FakeHost host, {
+      Duration grace = const Duration(hours: 1),
+      Duration silentWindow = Duration.zero,
+      String? pinnedMac,
+      AdapterReconnectScanner? Function(String, VoidCallback)? scannerFactory,
+    }) {
+      return DroppedSessionManager(
+        host: host,
+        now: now,
+        pauseGraceWindow: grace,
+        silentReconnectWindow: silentWindow,
+        pinnedAdapterMac: pinnedMac,
+        reconnectScannerFactory: scannerFactory,
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+      );
+    }
+
+    test('drop with silent window disabled persists the snapshot and '
+        'flips the host into the visible drop state', () {
+      final host = _FakeHost();
+      final mgr = build(host);
+
+      mgr.handleDrop();
+
+      expect(host.pausedDueToDrop, isTrue,
+          reason: 'a drop with no silent window must go straight to the '
+              'visible pause state');
+      expect(mgr.dropReason, TripDropReason.transportError);
+      expect(host.stopSchedulerCalls, 1,
+          reason: 'the scheduler must be stopped the instant a drop fires');
+      expect(host.clearErrorWindowCalls, 1);
+      expect(host.emitStateCalls, greaterThanOrEqualTo(1));
+      final saved = pausedRepo.loadAll();
+      expect(saved, hasLength(1),
+          reason: 'the in-progress snapshot must be persisted on drop');
+      expect(saved.single.id, host.sessionId);
+      expect(saved.single.vehicleId, host.vehicleId);
+    });
+
+    test('grace window expiry auto-finalises the paused trip into '
+        'history and removes the paused row', () async {
+      final host = _FakeHost();
+      final mgr = build(host);
+
+      mgr.handleDrop();
+      expect(pausedRepo.loadAll(), hasLength(1));
+
+      await mgr.expireGraceWindowNow();
+
+      expect(historyRepo.loadAll(), hasLength(1),
+          reason: 'grace expiry must finalise the partial trip into the '
+              'trip-history box');
+      expect(pausedRepo.loadAll(), isEmpty,
+          reason: 'the paused row must be deleted once finalised');
+      expect(host.stopped, isTrue);
+      expect(host.started, isFalse);
+      expect(host.pausedDueToDrop, isFalse);
+    });
+
+    test('grace expiry is a no-op when the host is no longer in the '
+        'paused-due-to-drop state (e.g. already resumed)', () async {
+      final host = _FakeHost();
+      final mgr = build(host);
+
+      mgr.handleDrop();
+      // Simulate a resume having already cleared the drop state.
+      host.pausedDueToDrop = false;
+      mgr.cancelGrace();
+
+      await mgr.expireGraceWindowNow();
+
+      expect(historyRepo.loadAll(), isEmpty,
+          reason: 'a cancelled / resumed session must not be finalised by '
+              'a late grace-window fire');
+    });
+
+    test('reconnect WITHIN the visible-drop window resumes the trip '
+        'via the host and stops the scanner before finalise', () async {
+      final host = _FakeHost();
+      VoidCallback? capturedOnReconnect;
+      final scanner = _FakeScanner();
+      final mgr = build(
+        host,
+        pinnedMac: 'AA:BB',
+        scannerFactory: (mac, onReconnect) {
+          capturedOnReconnect = onReconnect;
+          scanner.onReconnect = onReconnect;
+          return scanner;
+        },
+      );
+
+      mgr.handleDrop();
+      expect(host.pausedDueToDrop, isTrue);
+      expect(scanner.startCalls, 1,
+          reason: 'the visible drop must start the reconnect scanner');
+      expect(capturedOnReconnect, isNotNull);
+
+      // The scanner finds the adapter — fire its callback. (The fake
+      // wires resumeFromReconnect to clear the host state, mirroring
+      // the controller's resume().)
+      capturedOnReconnect!.call();
+
+      expect(host.resumeFromReconnectCalls, 1,
+          reason: 'a reconnect after the drop went visible must drive the '
+              'ordinary resume path');
+      expect(host.pausedDueToDrop, isFalse);
+
+      // The grace timer must have been cancelled by resume() — proven by
+      // a late grace-expiry being a no-op (no history written).
+      mgr.cancelGrace();
+      await mgr.expireGraceWindowNow();
+      expect(historyRepo.loadAll(), isEmpty,
+          reason: 'the scanner reconnect must beat the grace-window '
+              'auto-finalise to the punch');
+    });
+
+    test('reconnect AFTER the grace window finalised the trip is a '
+        'no-op — the host is already stopped', () async {
+      final host = _FakeHost();
+      VoidCallback? capturedOnReconnect;
+      final mgr = build(
+        host,
+        pinnedMac: 'AA:BB',
+        scannerFactory: (mac, onReconnect) {
+          capturedOnReconnect = onReconnect;
+          return _FakeScanner()..onReconnect = onReconnect;
+        },
+      );
+
+      mgr.handleDrop();
+      await mgr.expireGraceWindowNow();
+      expect(host.stopped, isTrue);
+      expect(historyRepo.loadAll(), hasLength(1));
+      final resumeCallsBefore = host.resumeFromReconnectCalls;
+
+      // A late scanner reconnect after finalise: pausedDueToDrop is
+      // already false, so onScannerReconnect must NOT re-resume.
+      capturedOnReconnect?.call();
+
+      expect(host.resumeFromReconnectCalls, resumeCallsBefore,
+          reason: 'a reconnect after the trip was finalised must not '
+              'resurrect it');
+      expect(historyRepo.loadAll(), hasLength(1),
+          reason: 'no duplicate finalisation from a late reconnect');
+    });
+
+    group('#1904 silent-reconnect window', () {
+      test('a transport drop with a silent window stays invisible — no '
+          'visible pause, scanner probing', () {
+        final host = _FakeHost();
+        final scanner = _FakeScanner();
+        final mgr = build(
+          host,
+          silentWindow: const Duration(seconds: 6),
+          pinnedMac: 'AA:BB',
+          scannerFactory: (mac, onReconnect) =>
+              scanner..onReconnect = onReconnect,
+        );
+
+        mgr.handleDrop();
+
+        expect(host.pausedDueToDrop, isFalse,
+            reason: 'a transport drop must NOT flip the visible state '
+                'while the silent window is open');
+        expect(mgr.silentlyReconnecting, isTrue);
+        expect(scanner.startCalls, 1,
+            reason: 'the scanner must probe during the silent window');
+        expect(host.emitStateCalls, 0,
+            reason: 'the silent window must stay invisible — no state '
+                'emission');
+        expect(pausedRepo.loadAll(), hasLength(1),
+            reason: 'the snapshot is still persisted so a process kill '
+                'mid-window is recoverable');
+      });
+
+      test('a silent reconnect inside the window resumes the scheduler '
+          'without ever showing a pause', () {
+        final host = _FakeHost();
+        VoidCallback? capturedOnReconnect;
+        final mgr = build(
+          host,
+          silentWindow: const Duration(seconds: 6),
+          pinnedMac: 'AA:BB',
+          scannerFactory: (mac, onReconnect) {
+            capturedOnReconnect = onReconnect;
+            return _FakeScanner()..onReconnect = onReconnect;
+          },
+        );
+
+        mgr.handleDrop();
+        expect(mgr.silentlyReconnecting, isTrue);
+
+        capturedOnReconnect!.call();
+
+        expect(mgr.silentlyReconnecting, isFalse,
+            reason: 'a successful silent reconnect must clear the flag');
+        expect(host.pausedDueToDrop, isFalse,
+            reason: 'the user never saw a pause');
+        expect(host.startSchedulerCalls, 1,
+            reason: 'a silent reconnect must restart the polling loop');
+        expect(host.resetDropDetectorCalls, 1);
+        expect(pausedRepo.loadAll(), isEmpty,
+            reason: 'a silent reconnect must clear the stranded partial');
+        expect(mgr.dropReason, isNull);
+      });
+
+      test('the silent window elapsing with no reconnect escalates to '
+          'the visible drop', () async {
+        final host = _FakeHost();
+        final mgr = build(
+          host,
+          // Tiny silent window so the real escalation timer fires fast.
+          silentWindow: const Duration(milliseconds: 30),
+          pinnedMac: 'AA:BB',
+          // A scanner that never calls onReconnect — adapter is gone.
+          scannerFactory: (mac, onReconnect) =>
+              _FakeScanner()..onReconnect = onReconnect,
+        );
+
+        mgr.handleDrop();
+        expect(host.pausedDueToDrop, isFalse,
+            reason: 'invisible while the silent window is still open');
+
+        // Wait past the 30 ms silent window so the escalation timer fires.
+        await Future<void>.delayed(const Duration(milliseconds: 120));
+
+        expect(mgr.silentlyReconnecting, isFalse);
+        expect(host.pausedDueToDrop, isTrue,
+            reason: 'an elapsed silent window with no reconnect must '
+                'surface the visible pause banner');
+        expect(mgr.dropReason, TripDropReason.transportError);
+
+        // Clean up the now-running grace timer.
+        mgr.cancelAllTimers();
+        await mgr.stopReconnectScanner();
+      });
+
+      test('a silentFailure drop bypasses the silent window — visible '
+          'immediately even when a silent window is configured', () {
+        final host = _FakeHost();
+        final mgr = build(
+          host,
+          silentWindow: const Duration(seconds: 6),
+          pinnedMac: 'AA:BB',
+          scannerFactory: (mac, onReconnect) =>
+              _FakeScanner()..onReconnect = onReconnect,
+        );
+
+        mgr.handleDrop(reason: TripDropReason.silentFailure);
+
+        expect(host.pausedDueToDrop, isTrue,
+            reason: 'a dead-ECU silentFailure cannot be cleared by a BT '
+                'reconnect, so it must go straight to the visible state');
+        expect(mgr.silentlyReconnecting, isFalse);
+        expect(mgr.dropReason, TripDropReason.silentFailure);
+      });
+    });
+
+    test('no pinned MAC / no factory → the scanner is never built; the '
+        'grace window is the sole recovery path', () async {
+      final host = _FakeHost();
+      var factoryCalls = 0;
+      final mgr = build(
+        host,
+        grace: const Duration(hours: 1),
+        scannerFactory: (mac, onReconnect) {
+          factoryCalls++;
+          return null;
+        },
+        // pinnedMac omitted → null.
+      );
+
+      mgr.handleDrop();
+      expect(factoryCalls, 0,
+          reason: 'the factory must not be invoked without a pinned MAC');
+      expect(mgr.reconnectScanner, isNull);
+
+      await mgr.expireGraceWindowNow();
+      expect(historyRepo.loadAll(), hasLength(1),
+          reason: 'without a scanner the grace-window auto-finalise is '
+              'the only recovery path');
+    });
+
+    test('restart with a persisted dropped session: a re-drop in a fresh '
+        'manager converges on the same paused-trips row', () {
+      // First "session" drops and persists.
+      final host1 = _FakeHost();
+      build(host1).handleDrop();
+      expect(pausedRepo.loadAll(), hasLength(1));
+
+      // Simulate an app restart: a brand-new manager + host with the
+      // SAME session id re-drops (e.g. the recovery service rehydrated
+      // the in-flight trip). The save overwrites at the same key, so the
+      // box still holds exactly one row for that session.
+      final host2 = _FakeHost()..sessionId = host1.sessionId;
+      build(host2).handleDrop();
+
+      final rows = pausedRepo.loadAll();
+      expect(rows, hasLength(1),
+          reason: 'a re-drop on the same session id must overwrite, not '
+              'duplicate, the persisted paused row');
+      expect(rows.single.id, host1.sessionId);
+    });
+
+    test('cancelAllTimers clears the silent flag so a stopped session '
+        'cannot escalate after teardown', () {
+      final host = _FakeHost();
+      final mgr = build(
+        host,
+        silentWindow: const Duration(seconds: 6),
+        pinnedMac: 'AA:BB',
+        scannerFactory: (mac, onReconnect) =>
+            _FakeScanner()..onReconnect = onReconnect,
+      );
+
+      mgr.handleDrop();
+      expect(mgr.silentlyReconnecting, isTrue);
+
+      mgr.cancelAllTimers();
+      expect(mgr.silentlyReconnecting, isFalse,
+          reason: 'stop()/cancelAllTimers must clear the silent flag so a '
+              'pending window can never escalate after teardown');
+    });
+  });
+}
+
+/// Deterministic fake of the recording session the manager recovers.
+/// Mirrors how `TripRecordingController` exposes its lifecycle to the
+/// manager: [resumeFromReconnect] clears the drop state the same way the
+/// real controller's resume() does, so the manager's reconnect path can
+/// be asserted end-to-end.
+class _FakeHost implements DroppedSessionHost {
+  int stopSchedulerCalls = 0;
+  int startSchedulerCalls = 0;
+  int resetDropDetectorCalls = 0;
+  int clearErrorWindowCalls = 0;
+  int emitStateCalls = 0;
+  int resumeFromReconnectCalls = 0;
+
+  @override
+  bool pausedDueToDrop = false;
+  @override
+  bool stopped = false;
+  @override
+  bool started = true;
+  @override
+  bool paused = false;
+
+  @override
+  String? sessionId = '2026-05-28T12:00:00.000';
+  @override
+  String? vehicleId = 'car-under-test';
+  @override
+  String? vin = 'WVWZZZ1JZXW000001';
+  @override
+  double? odometerStartKm = 1000.0;
+  @override
+  double? odometerLatestKm = 1005.0;
+  @override
+  bool automatic = false;
+
+  @override
+  void stopScheduler() => stopSchedulerCalls++;
+
+  @override
+  void startScheduler() => startSchedulerCalls++;
+
+  @override
+  void resetDropDetector() => resetDropDetectorCalls++;
+
+  @override
+  void clearDropDetectorErrorWindow() => clearErrorWindowCalls++;
+
+  @override
+  void emitState() => emitStateCalls++;
+
+  @override
+  void resumeFromReconnect() {
+    resumeFromReconnectCalls++;
+    // Mirror TripRecordingController.resume()'s drop-recovery half.
+    pausedDueToDrop = false;
+    startScheduler();
+  }
+
+  @override
+  TripSummary buildInProgressSummary() => _summary(distanceKm: 2.5);
+
+  @override
+  TripSummary buildFinalSummary() => _summary(distanceKm: 5.0);
+
+  TripSummary _summary({required double distanceKm}) => TripSummary(
+        distanceKm: distanceKm,
+        maxRpm: 2200,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        startedAt: DateTime(2026, 5, 28, 12),
+        endedAt: DateTime(2026, 5, 28, 12, 10),
+      );
+}
+
+/// Observation-only scanner: records start()/stop() counts and lets a
+/// test fire its [onReconnect] manually. The real backoff math is
+/// covered by `adapter_reconnect_scanner_test.dart`.
+class _FakeScanner implements AdapterReconnectScanner {
+  VoidCallback? onReconnect;
+  int startCalls = 0;
+  int stopCalls = 0;
+  bool _scanning = false;
+
+  @override
+  String get pinnedMac => 'AA:BB';
+
+  @override
+  Duration get currentBackoff => const Duration(seconds: 5);
+
+  @override
+  bool get isScanning => _scanning;
+
+  @override
+  Future<void> start() async {
+    _scanning = true;
+    startCalls++;
+  }
+
+  @override
+  Future<void> stop() async {
+    _scanning = false;
+    stopCalls++;
+  }
+}

@@ -4,9 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
 
-import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../domain/entities/gps_sample_diagnostic.dart';
@@ -14,7 +12,8 @@ import '../../domain/services/gear_inference.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
-import 'auto_record_trace_log.dart';
+import 'dropped_session_host.dart';
+import 'dropped_session_manager.dart';
 import 'elm327_protocol.dart';
 import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
@@ -37,6 +36,10 @@ import '../../../../core/logging/error_logger.dart';
 export 'trip_distance_source.dart'
     show kDistanceSourceReal, kDistanceSourceVirtual, kDistanceSourceGps;
 export 'trip_live_reading.dart' show TripLiveReading;
+// #2188 — TripDropReason moved with the drop-RECOVERY state machine into
+// DroppedSessionManager. Re-export it here so the providers / widgets /
+// tests that import it from this file keep working unchanged.
+export 'dropped_session_manager.dart' show TripDropReason;
 
 /// Public recording state exposed by [TripRecordingController]
 /// (#797 phase 1).
@@ -58,8 +61,8 @@ export 'trip_live_reading.dart' show TripLiveReading;
 /// scanner. Phase 1's job is to make the state observable so the
 /// follow-up PR can react to it.
 ///
-/// phase 3 (#797) wires an [AdapterReconnectScanner] into
-/// [_handleDrop]: while the controller is in
+/// phase 3 (#797) wires an [AdapterReconnectScanner] into the
+/// drop-recovery state machine: while the controller is in
 /// [TripRecordingControllerState.pausedDueToDrop] the scanner
 /// periodically probes for the pinned adapter's MAC. On a
 /// reconnect the scanner fires [TripRecordingController.resume]
@@ -70,26 +73,6 @@ enum TripRecordingControllerState {
   paused,
   pausedDueToDrop,
   stopped,
-}
-
-/// Why the controller transitioned into
-/// [TripRecordingControllerState.pausedDueToDrop] (#1330 phase 3).
-///
-/// Distinguishes the two failure modes that share the
-/// pause-with-grace recovery path:
-///
-///  * [transportError] — repeated transport-level failures
-///    (BT link dropped, three consecutive errors within the window,
-///    or a typed `Obd2DisconnectedException`). The user-visible
-///    surface is "OBD2 connection lost".
-///  * [silentFailure] — adapter is connected and answering, but every
-///    high-priority PID parse returns null for [_silentFailureThreshold]
-///    consecutive ticks. ECU off, vehicle protocol mismatch, defective
-///    adapter firmware. Without this signal the user sees "trip
-///    recorded" with empty charts and no notification (#1330).
-enum TripDropReason {
-  transportError,
-  silentFailure,
 }
 
 /// Drives the priority-tiered PID polling loop that feeds an
@@ -142,9 +125,9 @@ enum TripDropReason {
 ///   - the partial [TripSummary] (distance, fuel estimate so far,
 ///     harsh counters, odometer reads, VIN) is serialised to the
 ///     `obd2_paused_trips` Hive box,
-///   - a grace timer starts for [_pauseGraceWindow]; if [resume] isn't
-///     called before it fires, the paused entry is finalised into the
-///     normal trip history as if [stop] had run.
+///   - a grace timer starts for the configured pause-grace window; if
+///     [resume] isn't called before it fires, the paused entry is
+///     finalised into the normal trip history as if [stop] had run.
 ///
 /// Phase 1 exposes the state machine without wiring a UI banner —
 /// phase 2 brings the auto-reconnect scanner + snackbar UX.
@@ -205,62 +188,26 @@ class TripRecordingController {
   /// in [_runTransport].
   final Duration _schedulerTickRate;
 
-  /// Optional override — tests inject an in-memory box via a fake
-  /// repo so they don't have to spin up the real Hive box. Production
-  /// passes null and the controller resolves the box lazily from
-  /// [HiveBoxes.obd2PausedTrips] when a drop actually occurs.
-  final PausedTripRepository? _pausedRepoOverride;
-
-  /// Optional override — tests inject a lightweight fake that skips
-  /// the Hive round-trip when auto-finalising a paused trip after the
-  /// grace window elapses. Production uses [TripHistoryRepository]
-  /// against the `obd2_trip_history` Hive box.
-  final TripHistoryRepository? _historyRepoOverride;
-
-  /// Grace window before a paused-due-to-drop session auto-finalises
-  /// (#797 phase 1). Defaults to 15 minutes — long enough for a
-  /// toll-booth stop, short enough that a forgotten session can't
-  /// clog up the paused-trips box forever. Tests pass small values
-  /// (e.g. 100 ms) to exercise the auto-finalise path.
-  final Duration _pauseGraceWindow;
-
-  /// #1904 — how long a transport drop stays invisible while the
-  /// reconnect scanner tries to get the adapter back. If the scanner
-  /// reconnects inside this window the user never sees a pause; if it
-  /// elapses the controller escalates to the visible drop state.
-  /// `Duration.zero` disables the silent window (every drop is visible
-  /// at once — the pre-#1904 behaviour).
-  final Duration _silentReconnectWindow;
-
   /// Owns the connection-drop *detection* heuristics — the #797
   /// transport-error sliding window and the #1330 silent-failure
   /// null-parse counter — extracted into a focused collaborator
-  /// (#1679). The controller keeps the *reaction* ([_handleDrop],
-  /// grace timer, reconnect scanner). Built in the constructor body
-  /// so it can capture the resolved [_now] clock.
+  /// (#1679). The controller keeps only the lifecycle guard
+  /// ([_registerTransportError] / [_observeHighPriorityParse]); the
+  /// drop *reaction* (grace timer, reconnect scanner, paused/history
+  /// persistence) lives in [_droppedSession] (#2188). Built in the
+  /// constructor body so it can capture the resolved [_now] clock.
   late final TripDropDetector _dropDetector;
 
-  /// Pinned adapter MAC that the auto-reconnect scanner (#797 phase 3)
-  /// will search for when a drop flips us into
-  /// [TripRecordingControllerState.pausedDueToDrop]. Null-able
-  /// because the vehicle profile may not carry an adapter pairing
-  /// yet (fresh profiles, or users who never ran the picker). When
-  /// null the scanner is not started and the grace-window path
-  /// remains the only recovery mechanism.
-  final String? _pinnedAdapterMac;
-
-  /// Factory used by [_handleDrop] to construct the reconnect
-  /// scanner (#797 phase 3). Takes the pinned MAC + the callback to
-  /// fire on reconnect and returns a fresh scanner. Tests inject a
-  /// fake factory that returns an in-memory scanner with a clock
-  /// they control; production passes null and the controller builds
-  /// nothing — wiring the real BT scan layer is the provider's job.
-  final AdapterReconnectScanner? Function(
-    String pinnedMac,
-    VoidCallback onReconnect,
-  )? _reconnectScannerFactory;
-
-  AdapterReconnectScanner? _reconnectScanner;
+  /// Owns the connection-drop RECOVERY lifecycle — the #1904 silent-
+  /// reconnect window, the visible-drop escalation, the #797 grace
+  /// timer + auto-finalise, the reconnect-scanner orchestration and the
+  /// paused/history Hive persistence — extracted into a focused
+  /// collaborator (#2188). The controller keeps the emit loop, the
+  /// scheduler, the drop detector, and the trip-identity fields; the
+  /// manager reaches those through a [DroppedSessionHost] adapter. Built
+  /// in the constructor body so it can capture the resolved [_now]
+  /// clock + the host seam.
+  late final DroppedSessionManager _droppedSession;
 
   final StreamController<TripLiveReading> _liveController =
       StreamController<TripLiveReading>.broadcast();
@@ -270,7 +217,6 @@ class TripRecordingController {
 
   PidScheduler? _scheduler;
   Timer? _emitTimer;
-  Timer? _graceTimer;
   DateTime? _startedAt;
   DateTime? _lastSampleAt;
   double? _odometerStartKm;
@@ -296,27 +242,11 @@ class TripRecordingController {
   bool _stopped = false;
   String? _sessionId; // ISO start-ts, stable across pause→resume cycles
 
-  /// #1904 — true between a transport drop and either a silent
-  /// reconnect or the escalation to the visible [_pausedDueToDrop].
-  /// While set, the scheduler is stopped but the controller still
-  /// reports `recording` — the user sees no pause banner for a drop
-  /// the reconnect scanner is about to clear within seconds.
-  bool _silentlyReconnecting = false;
-
-  /// #1904 — fires when the silent reconnect window elapses without
-  /// the adapter coming back; escalates to the visible drop state.
-  Timer? _silentReconnectTimer;
-
-  /// Reason the most recent [_handleDrop] fired (#1330 phase 3).
-  /// Null when no drop has occurred. Read by the provider so the
-  /// pause banner can surface a different message on silent-failure
-  /// vs transport-error.
-  TripDropReason? _dropReason;
-
   /// Why the controller flipped into
   /// [TripRecordingControllerState.pausedDueToDrop] (#1330 phase 3).
-  /// Null when the controller is not in that state.
-  TripDropReason? get dropReason => _dropReason;
+  /// Null when the controller is not in that state. Delegates to the
+  /// drop-recovery state machine (#2188).
+  TripDropReason? get dropReason => _droppedSession.dropReason;
 
   /// Owns the trip's distance-resolution concern — the three-tier
   /// odometer-delta / GPS-track / virtual-odometer selection and the two
@@ -399,20 +329,24 @@ class TripRecordingController {
         _referenceVehicle = referenceVehicle,
         _vehicleId = vehicleId,
         _schedulerOverride = scheduler,
-        _pausedRepoOverride = pausedRepo,
-        _historyRepoOverride = historyRepo,
-        _pauseGraceWindow = pauseGraceWindow,
-        _silentReconnectWindow = silentReconnectWindow,
         _schedulerTickRate = schedulerTickRate,
-        _pinnedAdapterMac = pinnedAdapterMac,
         _automatic = automatic,
-        _reconnectScannerFactory = reconnectScannerFactory,
         _breadcrumbCollector = breadcrumbCollector {
     _dropDetector = TripDropDetector(
       now: _now,
       dropWindow: dropWindow,
       dropThreshold: dropThreshold,
       silentFailureThreshold: silentFailureThreshold,
+    );
+    _droppedSession = DroppedSessionManager(
+      host: _DroppedSessionHostAdapter(this),
+      now: _now,
+      pauseGraceWindow: pauseGraceWindow,
+      silentReconnectWindow: silentReconnectWindow,
+      pinnedAdapterMac: pinnedAdapterMac,
+      reconnectScannerFactory: reconnectScannerFactory,
+      pausedRepo: pausedRepo,
+      historyRepo: historyRepo,
     );
     _distance = TripDistanceResolver(
       maxIntegrationGapSeconds: _integrationGapCapSeconds,
@@ -486,10 +420,9 @@ class TripRecordingController {
   void resume() {
     if (!_paused && !_pausedDueToDrop) return;
     if (_pausedDueToDrop) {
-      _graceTimer?.cancel();
-      _graceTimer = null;
+      // Cancel the grace timer + clear the drop-reaction reason.
+      _droppedSession.cancelGrace();
       _pausedDueToDrop = false;
-      _dropReason = null;
       // #1330 phase 3 — clear the silent-failure latch so a
       // post-resume stretch of nulls can fire again. Without this,
       // a user who resumes after a silent-failure drop and then hits
@@ -501,8 +434,8 @@ class TripRecordingController {
       // tapped "Resume" manually on the pause banner before the
       // scanner reconnected. Either way, no scanner should survive
       // the resume transition.
-      unawaited(_stopReconnectScanner());
-      _clearPausedTripRow();
+      unawaited(_droppedSession.stopReconnectScanner());
+      _droppedSession.clearPausedTripRow();
     }
     _paused = false;
     _scheduler?.start();
@@ -644,14 +577,11 @@ class TripRecordingController {
     _scheduler?.stop();
     _emitTimer?.cancel();
     _emitTimer = null;
-    _graceTimer?.cancel();
-    _graceTimer = null;
-    // #1904 — tear down a pending silent-reconnect window so it can't
-    // escalate after the trip has stopped.
-    _silentReconnectTimer?.cancel();
-    _silentReconnectTimer = null;
-    _silentlyReconnecting = false;
-    await _stopReconnectScanner();
+    // #1904 / #2188 — tear down the grace timer + the pending silent-
+    // reconnect window so neither can fire after the trip has stopped,
+    // and stop the reconnect scanner.
+    _droppedSession.cancelAllTimers();
+    await _droppedSession.stopReconnectScanner();
     _started = false;
     _stopped = true;
     _pausedDueToDrop = false;
@@ -916,7 +846,7 @@ class TripRecordingController {
   void _registerTransportError(Object error) {
     if (_pausedDueToDrop || _stopped) return;
     if (_dropDetector.registerTransportError(error)) {
-      _handleDrop();
+      _droppedSession.handleDrop();
     }
   }
 
@@ -928,11 +858,12 @@ class TripRecordingController {
   /// different PID, because we're trying to detect "ECU is dead",
   /// not "this specific PID is unsupported".
   ///
-  /// Once the counter reaches [_silentFailureThreshold] AND the
+  /// Once the counter reaches the silent-failure threshold AND the
   /// transport-error drop hasn't already fired, [_onSilentFailure]
-  /// drives the same pause-with-grace path that [_handleDrop] does
-  /// for transport errors, but stamps a [TripDropReason.silentFailure]
-  /// reason so the UI can surface a different message.
+  /// drives the same pause-with-grace path that the drop-recovery
+  /// manager runs for transport errors, but stamps a
+  /// [TripDropReason.silentFailure] reason so the UI can surface a
+  /// different message.
   void _observeHighPriorityParse(Object? parsedValue) {
     if (parsedValue != null) {
       // ANY successful high-priority parse clears the window — we're
@@ -952,258 +883,16 @@ class TripRecordingController {
   /// Silent-failure handler (#1330 phase 3). Fired exactly once per
   /// recording session when the drop detector's consecutive-null
   /// counter crosses the threshold. Drives the same pause-with-grace
-  /// recovery as [_handleDrop] for transport errors, but tags the drop
-  /// with [TripDropReason.silentFailure] so the UI surfaces "OBD2
-  /// adapter connected but not returning data" instead of "OBD2
-  /// connection lost".
+  /// recovery the drop-recovery manager runs for transport errors, but
+  /// tags the drop with [TripDropReason.silentFailure] so the UI
+  /// surfaces "OBD2 adapter connected but not returning data" instead
+  /// of "OBD2 connection lost".
   void _onSilentFailure() {
     debugPrint(
       'TripRecordingController: silent-failure detected — '
       '${_dropDetector.consecutiveNullReads} consecutive null PID parses',
     );
-    _handleDrop(reason: TripDropReason.silentFailure);
-  }
-
-  /// React to a detected connection drop.
-  ///
-  /// #1904 — a `transportError` drop (the Bluetooth link hiccupped)
-  /// first enters an *invisible* reconnect window: the scheduler stops
-  /// and the reconnect scanner starts, but the controller keeps
-  /// reporting `recording`, so the user sees no pause banner. The
-  /// adapter is usually still in range and the scanner gets it back
-  /// within seconds — a reconnect inside the window resumes polling
-  /// silently. Only if [_silentReconnectWindow] elapses with no
-  /// reconnect — the adapter is genuinely gone — does the controller
-  /// escalate to the visible [_pausedDueToDrop] banner.
-  ///
-  /// A `silentFailure` drop (the ECU stopped answering while the link
-  /// is healthy) escalates straight to the visible state — reconnecting
-  /// the Bluetooth link cannot revive a dead ECU.
-  void _handleDrop({
-    TripDropReason reason = TripDropReason.transportError,
-  }) {
-    if (_pausedDueToDrop || _silentlyReconnecting) return;
-    // #1920 — trace every detected drop so a failed recording session
-    // can be analysed from the exportable OBD2 diagnostic log.
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.dropDetected,
-      mac: _pinnedAdapterMac,
-      detail: reason.name,
-    );
-    _scheduler?.stop();
-    _dropDetector.clearErrorWindow();
-    _persistPausedSnapshot();
-    if (reason == TripDropReason.transportError &&
-        _silentReconnectWindow > Duration.zero) {
-      _silentlyReconnecting = true;
-      _dropReason = reason;
-      // #1920 — record entry into the #1904 invisible reconnect window.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.silentReconnectStarted,
-        mac: _pinnedAdapterMac,
-      );
-      _startReconnectScanner();
-      _silentReconnectTimer?.cancel();
-      _silentReconnectTimer =
-          Timer(_silentReconnectWindow, _escalateToVisibleDrop);
-      // Deliberately no _emitState() — an in-presence drop the scanner
-      // is about to clear must stay invisible to the UI.
-      return;
-    }
-    _enterVisibleDrop(reason);
-  }
-
-  /// Flip into the visible pause-with-grace state: stop is already
-  /// done by [_handleDrop]; this starts the grace timer, ensures a
-  /// reconnect scanner is running, and emits so the pause banner
-  /// appears.
-  void _enterVisibleDrop(TripDropReason reason) {
-    _pausedDueToDrop = true;
-    _dropReason = reason;
-    _graceTimer?.cancel();
-    _graceTimer = Timer(_pauseGraceWindow, _onGraceWindowElapsed);
-    // The scanner may already be running from the silent window.
-    if (_reconnectScanner == null) _startReconnectScanner();
-    _emitState();
-  }
-
-  /// #1904 — the silent reconnect window elapsed without the adapter
-  /// coming back; surface the drop to the user.
-  void _escalateToVisibleDrop() {
-    _silentReconnectTimer = null;
-    if (!_silentlyReconnecting || _pausedDueToDrop || _stopped) return;
-    _silentlyReconnecting = false;
-    // #1920 — record the escalation: the silent window elapsed without
-    // the adapter coming back, so the drop is now visible to the user.
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.dropEscalatedToVisible,
-      mac: _pinnedAdapterMac,
-    );
-    _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
-  }
-
-  /// Delete this session's row from the paused-trips box — the session
-  /// is live again, so leaving the partial behind would let a later
-  /// pause stomp the in-memory state. Best-effort.
-  void _clearPausedTripRow() {
-    final id = _sessionId;
-    if (id == null) return;
-    _resolvePausedRepo()?.delete(id);
-  }
-
-  /// Kick off the auto-reconnect scanner (#797 phase 3) if both the
-  /// vehicle profile has a pinned adapter MAC AND the provider wired
-  /// in a scanner factory. No-op in either's absence — the grace
-  /// timer remains the sole recovery path in that case.
-  ///
-  /// The [AdapterReconnectScanner]'s `onReconnect` callback is set
-  /// to call [resume] here — which cancels the grace timer, clears
-  /// the paused-trips row, and resumes the scheduler. Tests that
-  /// want to observe the reconnect path can watch [stateChanges]
-  /// for the recording → pausedDueToDrop → recording sequence.
-  void _startReconnectScanner() {
-    final mac = _pinnedAdapterMac;
-    final factory = _reconnectScannerFactory;
-    if (mac == null || factory == null) return;
-    final scanner = factory(mac, _onScannerReconnect);
-    if (scanner == null) return;
-    _reconnectScanner = scanner;
-    // Fire-and-forget — start() is an async scheduler boot that
-    // shouldn't block the drop handler. Errors inside the scanner
-    // are already caught internally.
-    unawaited(scanner.start());
-  }
-
-  void _onScannerReconnect() {
-    // The scanner self-stops before firing this callback.
-    _reconnectScanner = null;
-    if (_silentlyReconnecting) {
-      // #1904 — reconnected inside the silent window: resume polling
-      // without the user ever having seen a pause. Mirrors the
-      // drop-recovery half of resume() but skips the _pausedDueToDrop
-      // teardown (it was never set) and the _emitState pause-banner
-      // churn — the state was `recording` throughout.
-      _silentReconnectTimer?.cancel();
-      _silentReconnectTimer = null;
-      _silentlyReconnecting = false;
-      _dropReason = null;
-      _dropDetector.reset();
-      _clearPausedTripRow();
-      // #1920 — record the silent-path recovery: the adapter came back
-      // inside the #1904 window and the user never saw a pause.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.silentReconnectSucceeded,
-        mac: _pinnedAdapterMac,
-      );
-      // Respect a user pause that landed during the silent window.
-      if (!_paused && !_stopped) _scheduler?.start();
-      _emitState();
-      return;
-    }
-    // Reconnected after the drop went visible — the ordinary resume()
-    // path cancels the grace timer and clears the paused-trips row.
-    if (_pausedDueToDrop) {
-      // #1920 — record the visible-path recovery: the adapter came back
-      // after the pause banner had already been shown.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.reconnectSucceeded,
-        mac: _pinnedAdapterMac,
-      );
-      resume();
-    }
-  }
-
-  Future<void> _stopReconnectScanner() async {
-    final scanner = _reconnectScanner;
-    if (scanner == null) return;
-    _reconnectScanner = null;
-    try {
-      await scanner.stop();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController stop reconnect scanner'}));
-    }
-  }
-
-  void _persistPausedSnapshot() {
-    final repo = _resolvePausedRepo();
-    final id = _sessionId;
-    if (repo == null || id == null) return;
-    final summary = _recorder.buildSummary();
-    final entry = PausedTripEntry(
-      id: id,
-      vehicleId: _vehicleId,
-      vin: _vin,
-      summary: summary,
-      odometerStartKm: _odometerStartKm,
-      odometerLatestKm: _odometerLatestKm,
-      pausedAt: _now(),
-      // #1004 phase 4-WAL — flag persists so the launch-time recovery
-      // service knows whether to bump the launcher-icon badge if the
-      // app is killed before the grace timer fires.
-      automatic: _automatic,
-    );
-    // Fire-and-forget: the save is best-effort; Hive errors are
-    // logged by the repo and must not throw back into the scheduler
-    // callback.
-    repo.save(entry);
-  }
-
-  Future<void> _onGraceWindowElapsed() async {
-    if (!_pausedDueToDrop) return;
-    // Stop the scanner before finalising — otherwise a late
-    // reconnect would race against an already-finalised trip.
-    await _stopReconnectScanner();
-    final id = _sessionId;
-    final repo = _resolvePausedRepo();
-    final historyRepo = _resolveHistoryRepo();
-    final summary = _finaliseSummary();
-    if (historyRepo != null && id != null) {
-      try {
-        await historyRepo.save(TripHistoryEntry(
-          id: id,
-          vehicleId: _vehicleId,
-          summary: summary,
-        ));
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController grace finalise failed'}));
-      }
-    }
-    if (repo != null && id != null) {
-      await repo.delete(id);
-    }
-    _pausedDueToDrop = false;
-    _stopped = true;
-    _started = false;
-    _graceTimer = null;
-    _emitState();
-  }
-
-  PausedTripRepository? _resolvePausedRepo() {
-    final override = _pausedRepoOverride;
-    if (override != null) return override;
-    if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return null;
-    try {
-      return PausedTripRepository(
-        box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
-      );
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController paused repo'}));
-      return null;
-    }
-  }
-
-  TripHistoryRepository? _resolveHistoryRepo() {
-    final override = _historyRepoOverride;
-    if (override != null) return override;
-    if (!Hive.isBoxOpen(TripHistoryRepository.boxName)) return null;
-    try {
-      return TripHistoryRepository(
-        box: Hive.box<String>(TripHistoryRepository.boxName),
-      );
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController history repo'}));
-      return null;
-    }
+    _droppedSession.handleDrop(reason: TripDropReason.silentFailure);
   }
 
   void _emitState() {
@@ -1234,7 +923,9 @@ class TripRecordingController {
     // scheduler is stopped then, so the snapshot is stale — feeding it
     // to the recorder would integrate phantom distance/fuel from a
     // frozen speed over real elapsed time.
-    if (_paused || _pausedDueToDrop || _silentlyReconnecting) return;
+    if (_paused || _pausedDueToDrop || _droppedSession.silentlyReconnecting) {
+      return;
+    }
     if (_liveController.isClosed) return;
 
     final snap = _liveSampleSnapshot;
@@ -1349,14 +1040,14 @@ class TripRecordingController {
   void debugTriggerDrop({
     TripDropReason reason = TripDropReason.transportError,
   }) {
-    _handleDrop(reason: reason);
+    _droppedSession.handleDrop(reason: reason);
   }
 
   /// Exposed for tests: whether the controller is inside the #1904
   /// invisible reconnect window (a transport drop the scanner is
   /// trying to clear before it ever reaches the pause banner).
   @visibleForTesting
-  bool get debugSilentlyReconnecting => _silentlyReconnecting;
+  bool get debugSilentlyReconnecting => _droppedSession.silentlyReconnecting;
 
   /// Exposed for tests: run one command through the retrying transport
   /// path so the #1904 single-retry-on-transient-error behaviour can
@@ -1389,18 +1080,18 @@ class TripRecordingController {
   /// finalisation path. Useful with fake-async patterns where
   /// elapsing real wall-clock time is awkward.
   @visibleForTesting
-  Future<void> debugExpireGraceWindow() async {
-    _graceTimer?.cancel();
-    await _onGraceWindowElapsed();
-  }
+  Future<void> debugExpireGraceWindow() =>
+      _droppedSession.expireGraceWindowNow();
 
   /// Exposed for tests: the auto-reconnect scanner instance created
-  /// by [_handleDrop] (#797 phase 3). Null when no scanner factory
-  /// is wired in or no pinned MAC is known — also null again after
-  /// a successful reconnect or a stop(), because the controller
-  /// releases the reference as soon as it's no longer needed.
+  /// by the drop-recovery state machine (#797 phase 3 / #2188). Null
+  /// when no scanner factory is wired in or no pinned MAC is known —
+  /// also null again after a successful reconnect or a stop(), because
+  /// the manager releases the reference as soon as it's no longer
+  /// needed.
   @visibleForTesting
-  AdapterReconnectScanner? get debugReconnectScanner => _reconnectScanner;
+  AdapterReconnectScanner? get debugReconnectScanner =>
+      _droppedSession.reconnectScanner;
 
   /// Exposed for tests: inject a hand-crafted [TripSample] directly
   /// into the underlying [TripRecorder]. Used by the #797 phase 1
@@ -1456,4 +1147,80 @@ class TripRecordingController {
   void debugAppendGpsFix({required double latitude, required double longitude}) {
     _distance.debugAddGpsFix(latitude: latitude, longitude: longitude);
   }
+}
+
+/// Adapts [TripRecordingController]'s recording loop to the narrow
+/// [DroppedSessionHost] seam the drop-recovery state machine needs
+/// (#2188). Lives in the same library as the controller so it can
+/// delegate to its private lifecycle flags + collaborators without
+/// widening the controller's public API.
+///
+/// Every method here is a thin pass-through; the behaviour-preserving
+/// extraction lives in [DroppedSessionManager]. The adapter exists only
+/// so the manager stays unit-testable against a fake host while
+/// production wires the real controller.
+class _DroppedSessionHostAdapter implements DroppedSessionHost {
+  _DroppedSessionHostAdapter(this._c);
+
+  final TripRecordingController _c;
+
+  @override
+  void stopScheduler() => _c._scheduler?.stop();
+
+  @override
+  void startScheduler() => _c._scheduler?.start();
+
+  @override
+  void resetDropDetector() => _c._dropDetector.reset();
+
+  @override
+  void clearDropDetectorErrorWindow() => _c._dropDetector.clearErrorWindow();
+
+  @override
+  void emitState() => _c._emitState();
+
+  @override
+  void resumeFromReconnect() => _c.resume();
+
+  @override
+  TripSummary buildInProgressSummary() => _c._recorder.buildSummary();
+
+  @override
+  TripSummary buildFinalSummary() => _c._finaliseSummary();
+
+  @override
+  bool get pausedDueToDrop => _c._pausedDueToDrop;
+  @override
+  set pausedDueToDrop(bool value) => _c._pausedDueToDrop = value;
+
+  @override
+  bool get stopped => _c._stopped;
+  @override
+  set stopped(bool value) => _c._stopped = value;
+
+  @override
+  bool get started => _c._started;
+  @override
+  set started(bool value) => _c._started = value;
+
+  @override
+  bool get paused => _c._paused;
+
+  @override
+  String? get sessionId => _c._sessionId;
+
+  @override
+  String? get vehicleId => _c._vehicleId;
+
+  @override
+  String? get vin => _c._vin;
+
+  @override
+  double? get odometerStartKm => _c._odometerStartKm;
+
+  @override
+  double? get odometerLatestKm => _c._odometerLatestKm;
+
+  @override
+  bool get automatic => _c._automatic;
 }
