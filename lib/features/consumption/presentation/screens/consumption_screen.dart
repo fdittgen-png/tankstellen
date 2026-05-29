@@ -183,15 +183,20 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
             icon: const Icon(Icons.eco_outlined),
             onPressed: () => context.push('/carbon'),
           ),
-        // #1946 — vehicle entry point in the consumption app bar.
-        IconButton(
-          key: const Key('open_vehicles'),
-          tooltip: l?.vehiclesMenuTitle ?? 'My vehicles',
-          icon: const Icon(Icons.directions_car_outlined),
-          onPressed: () => context.push('/vehicles'),
-        ),
         const SettingsAppBarAction(),
       ];
+
+  /// #2223 — the vehicles entry point, relocated from the trailing
+  /// actions to the app-bar leading slot so the car icon reads as part
+  /// of the title. Shared by every [ConsumptionSection] so the Trajets
+  /// and Carburant tabs stay visually consistent. Keeps the original
+  /// `open_vehicles` key, tooltip and `/vehicles` target (#1946).
+  Widget _vehiclesLeading(AppLocalizations? l) => IconButton(
+        key: const Key('open_vehicles'),
+        tooltip: l?.vehiclesMenuTitle ?? 'My vehicles',
+        icon: const Icon(Icons.directions_car_outlined),
+        onPressed: () => context.push('/vehicles'),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -229,6 +234,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     return PageScaffold(
       title: l?.trajetsTabLabel ?? 'Trips',
+      leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
       actions: _appBarActions(l),
       body: TrajetsTab(vehicleId: activeVehicle?.id),
@@ -252,6 +258,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     if (!showCharging) {
       return PageScaffold(
         title: l?.consumptionTabFuel ?? 'Fuel',
+        leading: _vehiclesLeading(l),
         bodyPadding: EdgeInsets.zero,
         actions: _appBarActions(l),
         floatingActionButton: _addFillUpFab(context, l),
@@ -265,6 +272,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     final isCharging = controller.index == 1;
     return PageScaffold(
       title: l?.consumptionTabFuel ?? 'Fuel',
+      leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
       actions: _appBarActions(l),
       floatingActionButton: isCharging
