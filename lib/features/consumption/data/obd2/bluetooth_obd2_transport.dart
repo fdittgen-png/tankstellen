@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'elm327_protocol.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
 import 'obd2_transport.dart';
@@ -58,9 +57,17 @@ class BluetoothObd2Transport implements Obd2Transport {
         _failPending(e);
       },
     );
-    for (final command in Elm327Protocol.initCommands) {
-      await _sendRaw(command);
-    }
+    // #2233 — the transport NO LONGER runs the ELM327 init handshake.
+    // The init (ATZ/ATE0/ATL0/ATH0/ATSP0/ATAT1) is owned solely by
+    // [Obd2Service.connect], which sends `adapter.initSequence`. Running
+    // it here too sent the six commands TWICE per connect — the second
+    // ATZ wiped the first init's echo/header/protocol state and re-paid
+    // a 1–2 s clone re-enumeration. We still flip `_connected=true` here
+    // once the channel is open and subscribed, because [sendCommand]
+    // throws on `!_connected` and the service-side init must be able to
+    // send. Every production caller routes through [Obd2Service.connect]
+    // (directly or via [Obd2ConnectionService.connect]/`connectByMac`),
+    // so the adapter still receives exactly one init burst.
     _connected = true;
   }
 
