@@ -1,10 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/storage_repository.dart';
 import '../services/service_result.dart';
 import '../storage/storage_providers.dart';
+import 'cache_eviction_policy.dart';
+
+export 'cache_eviction_policy.dart' show CacheEvictionPolicy;
 
 part 'cache_manager.g.dart';
 
@@ -295,5 +300,91 @@ class CacheManager implements CacheStrategy {
       }
     }
     return evicted;
+  }
+
+  /// #2264 — bounded periodic eviction, replacing the one-shot startup
+  /// 500-key cap. Three passes, cheapest first: (1) expiry (> 3x TTL);
+  /// (2) per-prefix budget — keep the newest [CacheEvictionPolicy.prefixBudget]
+  /// entries per `type:` prefix, so one noisy prefix can't starve the rest;
+  /// (3) global LRU byte ceiling — if total payload size still exceeds
+  /// [CacheEvictionPolicy.maxBytes], evict oldest-first by `storedAt` until
+  /// under it. Persisted `dataset:` entries (the offline backbone) are exempt
+  /// from the byte sweep but still obey their prefix budget. Returns the
+  /// number of evicted entries; idempotent.
+  Future<int> evictBounded({CacheEvictionPolicy policy = const CacheEvictionPolicy()}) async {
+    var evicted = 0;
+
+    // Snapshot the entries once: (key, entry).
+    final entries = <MapEntry<String, CacheEntry>>[];
+    for (final raw in _storage.cacheKeys.toList()) {
+      if (raw is! String) continue;
+      final entry = get(raw);
+      if (entry == null) continue;
+      entries.add(MapEntry(raw, entry));
+    }
+
+    // Pass 1 — expiry (> 3x TTL).
+    final survivors = <MapEntry<String, CacheEntry>>[];
+    for (final e in entries) {
+      if (e.value.age > e.value.ttl * 3) {
+        await _storage.deleteCacheEntry(e.key);
+        evicted++;
+      } else {
+        survivors.add(e);
+      }
+    }
+
+    // Pass 2 — per-prefix budget (keep newest, evict oldest beyond budget).
+    final byPrefix = <String, List<MapEntry<String, CacheEntry>>>{};
+    for (final e in survivors) {
+      byPrefix.putIfAbsent(_prefixOf(e.key), () => []).add(e);
+    }
+    final budgeted = <MapEntry<String, CacheEntry>>[];
+    for (final group in byPrefix.values) {
+      group.sort((a, b) => b.value.storedAt.compareTo(a.value.storedAt));
+      for (var i = 0; i < group.length; i++) {
+        if (i < policy.prefixBudget) {
+          budgeted.add(group[i]);
+        } else {
+          await _storage.deleteCacheEntry(group[i].key);
+          evicted++;
+        }
+      }
+    }
+
+    // Pass 3 — global LRU byte ceiling (dataset: entries are protected).
+    var totalBytes = budgeted.fold<int>(0, (sum, e) => sum + _approxBytes(e.value));
+    if (totalBytes > policy.maxBytes) {
+      final evictable = budgeted
+          .where((e) => !e.key.startsWith('dataset:'))
+          .toList()
+        ..sort((a, b) => a.value.storedAt.compareTo(b.value.storedAt));
+      for (final e in evictable) {
+        if (totalBytes <= policy.maxBytes) break;
+        await _storage.deleteCacheEntry(e.key);
+        totalBytes -= _approxBytes(e.value);
+        evicted++;
+      }
+    }
+
+    return evicted;
+  }
+
+  /// The `type:` prefix of a cache key (everything up to and including the
+  /// first colon), or the whole key when it carries no colon.
+  static String _prefixOf(String key) {
+    final i = key.indexOf(':');
+    return i < 0 ? key : key.substring(0, i + 1);
+  }
+
+  /// Cheap byte estimate for an entry — the length of its JSON-encoded
+  /// payload. Avoids re-encoding the Hive envelope; good enough to drive the
+  /// LRU ceiling.
+  static int _approxBytes(CacheEntry entry) {
+    try {
+      return jsonEncode(entry.payload).length;
+    } on Object {
+      return 0;
+    }
   }
 }

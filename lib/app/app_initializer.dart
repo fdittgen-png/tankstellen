@@ -113,7 +113,9 @@ class AppInitializer {
     // are not needed for the first frame, so they run here too.
     _deferPostFirstFrame(() async {
       unawaited(HiveBoxes.initDeferred());
-      await CacheManager(storage).evictExpired();
+      // #2264 — bounded eviction (expiry + per-prefix budget + LRU byte
+      // ceiling) replaces the one-shot 500-key expiry cap.
+      await CacheManager(storage).evictBounded();
       await ProfileRepository(storage).migrateProfileCountryLanguage();
     });
 
