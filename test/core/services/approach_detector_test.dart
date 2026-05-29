@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
@@ -27,6 +28,7 @@ Station _station({
   required double lat,
   required double lng,
   double? e10,
+  double? diesel,
 }) =>
     Station(
       id: id,
@@ -38,6 +40,7 @@ Station _station({
       lat: lat,
       lng: lng,
       e10: e10,
+      diesel: diesel,
       isOpen: true,
     );
 
@@ -211,6 +214,58 @@ void main() {
       await sub.cancel();
       await det.dispose();
       await gps.close();
+    });
+  });
+
+  // #2299 — cheapestInRadius must rank stations by the price for the
+  // REQUESTED fuel, not the min across all fuels each station carries.
+  group('ApproachDetector cheapestInRadius fuel-specific ranking (#2299)', () {
+    test('targets the cheapest DIESEL station, not the cheapest-any-fuel one',
+        () {
+      fakeAsync((async) {
+        // Two stations, both inside the radius (≈111 m and ≈111 m away).
+        //   A: diesel 1.849, e10 1.699  ← cheapest DIESEL of the two
+        //   B: diesel 1.999, e10 1.659  ← cheapest e10 (and cheapest of
+        //                                 ANY fuel) — the old min-across-
+        //                                 all-fuels bug would pick this.
+        final stations = [
+          _station(id: 'A', lat: 48.001, lng: 2.0, diesel: 1.849, e10: 1.699),
+          _station(id: 'B', lat: 48.0, lng: 2.001, diesel: 1.999, e10: 1.659),
+        ];
+
+        final gps = StreamController<Position>.broadcast();
+        final det = ApproachDetector(
+          gpsStream: gps.stream,
+          fetchStations: (_, _, _, _) async => stations,
+          config: const ApproachDetectorConfig(
+            radiusMeters: 1000,
+            priceMode: ApproachPriceMode.cheapestInRadius,
+            minPollSeconds: 5,
+            // Request DIESEL — A is the cheapest diesel station.
+            fuelTypeApiValue: 'diesel',
+          ),
+        );
+        final emitted = <ApproachState>[];
+        final sub = det.state.listen(emitted.add);
+
+        gps.add(_pos(48.0, 2.0, speedMps: 25));
+        async.flushMicrotasks();
+        // Advance well past the first poll (raw 0.2×1000/25 = 8 s) so the
+        // async fetch runs and the in-radius ranking emits.
+        async.elapse(const Duration(seconds: 30));
+        async.flushMicrotasks();
+
+        final inRadius = emitted.whereType<ApproachInRadius>().toList();
+        expect(inRadius, isNotEmpty,
+            reason: 'the poll must have produced an in-radius emit');
+        expect(inRadius.last.station.id, 'A',
+            reason: 'must target the cheapest DIESEL station (A=1.849), not '
+                'the cheapest-any-fuel station (B, by its 1.659 e10)');
+
+        sub.cancel();
+        det.dispose();
+        gps.close();
+      });
     });
   });
 }
