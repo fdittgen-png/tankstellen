@@ -538,6 +538,8 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_addFillUpOcrPump ?? m.displayName;
     case Feature.developerPatToken:
       return l?.featureLabel_developerPatToken ?? m.displayName;
+    case Feature.debugMode:
+      return l?.featureLabel_debugMode ?? m.displayName;
   }
 }
 
@@ -618,6 +620,8 @@ String _featureDescription(AppLocalizations? l, Feature f) {
           'Enable the bad-scan feedback panel that auto-files GitHub '
               'issues with a Personal Access Token. Power-user / '
               'contributor feature.';
+    case Feature.debugMode:
+      return l?.featureDescription_debugMode ?? m.description;
   }
 }
 
@@ -674,6 +678,7 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.addFillUpOcrReceipt:
     case Feature.addFillUpOcrPump:
     case Feature.developerPatToken:
+    case Feature.debugMode:
       return 'Prerequisites not met';
   }
 }

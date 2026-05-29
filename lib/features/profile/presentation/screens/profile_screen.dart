@@ -227,6 +227,22 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
+          // #2248 — Developer / Debug tools. Only renders when the user
+          // has flipped `Feature.debugMode` on (from the Feature
+          // management section directly above). Production users never
+          // see it. Placed right below Feature management so a developer
+          // who just enabled the mode discovers the entry immediately.
+          if (enabledFlags.contains(Feature.debugMode)) ...[
+            SettingsMenuTile(
+              icon: Icons.developer_mode,
+              title: l?.developerToolsSectionTitle ?? 'Developer tools',
+              subtitle: l?.developerToolsMenuSubtitle ??
+                  'Error log, test alerts, diagnostics',
+              onTap: () => context.push('/developer-tools'),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // #534 — About moved to the very end, below Privacy.
           SectionHeader(
             leadingIcon: Icons.info_outline,

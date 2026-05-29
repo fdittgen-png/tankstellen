@@ -2364,6 +2364,134 @@
   "@crossBorderDismissTooltip": {
     "description": "Tooltip on the cross-border banner's dismiss icon."
   },
+  "developerToolsSectionTitle": "Developer tools",
+  "@developerToolsSectionTitle": {
+    "description": "Title of the Settings section / screen hosting dev-only diagnostics, shown only when Developer / Debug mode is on (#2248)."
+  },
+  "developerToolsSubtitle": "Diagnostics and tools for debugging — only visible in Developer / Debug mode.",
+  "@developerToolsSubtitle": {
+    "description": "One-line subtitle under the Developer tools section explaining it is gated on Developer / Debug mode (#2248)."
+  },
+  "developerToolsMenuSubtitle": "Error log, test alerts, diagnostics",
+  "@developerToolsMenuSubtitle": {
+    "description": "Subtitle on the Settings menu tile that opens the Developer tools screen (#2248)."
+  },
+  "developerToolsErrorLogGroupTitle": "Error log",
+  "@developerToolsErrorLogGroupTitle": {
+    "description": "Group header above the error-log export / clear actions in the Developer tools screen (#2248)."
+  },
+  "developerToolsExportErrorLog": "Save error log ({count})",
+  "@developerToolsExportErrorLog": {
+    "description": "Label for the action that exports the buffered error log. {count} is the number of buffered traces (#2248).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "developerToolsClearErrorLog": "Clear error log",
+  "@developerToolsClearErrorLog": {
+    "description": "Tooltip / label for the action that clears the buffered error log in the Developer tools screen (#2248)."
+  },
+  "developerToolsViewErrorLog": "View error log",
+  "@developerToolsViewErrorLog": {
+    "description": "Label for the action that opens a raw, in-app viewer of the buffered error traces (#2248)."
+  },
+  "developerToolsErrorLogEmpty": "No error traces recorded.",
+  "@developerToolsErrorLogEmpty": {
+    "description": "Empty-state text shown in the raw error-log viewer when no traces are buffered (#2248)."
+  },
+  "developerToolsAlertsGroupTitle": "Alerts & notifications",
+  "@developerToolsAlertsGroupTitle": {
+    "description": "Group header above the test-notification / test-alert actions in the Developer tools screen (#2248)."
+  },
+  "developerToolsFireTestNotification": "Fire test notification",
+  "@developerToolsFireTestNotification": {
+    "description": "Label for the action that posts a test notification through NotificationService to verify the permission, channel and delivery (#2248)."
+  },
+  "developerToolsTestNotificationTitle": "Test notification",
+  "@developerToolsTestNotificationTitle": {
+    "description": "Title of the test notification fired by the Developer tools 'Fire test notification' action (#2248)."
+  },
+  "developerToolsTestNotificationBody": "If you can read this, notifications are working.",
+  "@developerToolsTestNotificationBody": {
+    "description": "Body of the test notification fired by the Developer tools 'Fire test notification' action (#2248)."
+  },
+  "developerToolsTestNotificationSent": "Test notification sent.",
+  "@developerToolsTestNotificationSent": {
+    "description": "Confirmation snackbar after the test notification is posted (#2248)."
+  },
+  "developerToolsTestNotificationBlocked": "Notifications are blocked — enable them in system settings, then retry.",
+  "@developerToolsTestNotificationBlocked": {
+    "description": "Snackbar shown when the OS notification permission is denied so the test notification cannot be delivered (#2248)."
+  },
+  "developerToolsRunTestAlert": "Run test alert pipeline",
+  "@developerToolsRunTestAlert": {
+    "description": "Label for the action that runs the radius-alert evaluation pipeline end-to-end against a synthetic in-range match (#2248)."
+  },
+  "developerToolsTestAlertFired": "Test alert fired — pipeline delivered {count} notification(s).",
+  "@developerToolsTestAlertFired": {
+    "description": "Confirmation snackbar after the synthetic test-alert pipeline run, with the number of notifications it produced (#2248).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "developerToolsTestAlertTitle": "Test price alert",
+  "@developerToolsTestAlertTitle": {
+    "description": "Notification title produced by the synthetic test-alert pipeline run (#2248)."
+  },
+  "developerToolsTestAlertBody": "Synthetic match: a station below your target was found nearby.",
+  "@developerToolsTestAlertBody": {
+    "description": "Notification body produced by the synthetic test-alert pipeline run (#2248)."
+  },
+  "developerToolsDiagnosticsGroupTitle": "Diagnostics",
+  "@developerToolsDiagnosticsGroupTitle": {
+    "description": "Group header above the feature-flag dump / clear-caches / copy-diagnostics actions in the Developer tools screen (#2248)."
+  },
+  "developerToolsFeatureFlagDump": "Feature flag inspector",
+  "@developerToolsFeatureFlagDump": {
+    "description": "Label for the action that opens a dump of every Feature flag and its current enabled/disabled state (#2248)."
+  },
+  "developerToolsFlagOn": "On",
+  "@developerToolsFlagOn": {
+    "description": "Trailing label shown next to an enabled feature flag in the feature-flag inspector (#2248)."
+  },
+  "developerToolsFlagOff": "Off",
+  "@developerToolsFlagOff": {
+    "description": "Trailing label shown next to a disabled feature flag in the feature-flag inspector (#2248)."
+  },
+  "developerToolsClearCaches": "Clear caches",
+  "@developerToolsClearCaches": {
+    "description": "Label for the action that clears the station / price-history cache without deleting user data (#2248)."
+  },
+  "developerToolsCachesCleared": "Caches cleared.",
+  "@developerToolsCachesCleared": {
+    "description": "Confirmation snackbar after the clear-caches action completes (#2248)."
+  },
+  "developerToolsCopyDiagnostics": "Copy diagnostics",
+  "@developerToolsCopyDiagnostics": {
+    "description": "Label for the action that copies a build / device / flag diagnostics blob to the clipboard (#2248)."
+  },
+  "developerToolsDiagnosticsCopied": "Diagnostics copied to clipboard.",
+  "@developerToolsDiagnosticsCopied": {
+    "description": "Confirmation snackbar after the copy-diagnostics action copies the blob to the clipboard (#2248)."
+  },
+  "developerToolsBuildInfoGroupTitle": "Build info",
+  "@developerToolsBuildInfoGroupTitle": {
+    "description": "Group header above the read-only app version / channel build-info rows in the Developer tools screen (#2248)."
+  },
+  "developerToolsBuildVersion": "App version",
+  "@developerToolsBuildVersion": {
+    "description": "Row label for the running app version in the Developer tools build-info group (#2248)."
+  },
+  "developerToolsBuildChannel": "Build channel",
+  "@developerToolsBuildChannel": {
+    "description": "Row label for the active build channel in the Developer tools build-info group (#2248)."
+  },
   "insightCardTitle": "Top wasteful behaviours",
   "@insightCardTitle": {
     "description": "Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2)."
@@ -2781,6 +2909,14 @@
   "featureDescription_developerPatToken": "Enable the bad-scan feedback panel that auto-files GitHub issues with a Personal Access Token. Power-user / contributor feature.",
   "@featureDescription_developerPatToken": {
     "description": "Settings toggle description for the bad-scan-feedback PAT panel (#2116-6)."
+  },
+  "featureLabel_debugMode": "Developer / Debug mode",
+  "@featureLabel_debugMode": {
+    "description": "Settings toggle label for Developer / Debug mode (#2248). Default-off — gates the Developer tools section with dev-only diagnostics."
+  },
+  "featureDescription_debugMode": "Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.",
+  "@featureDescription_debugMode": {
+    "description": "Settings toggle description for Developer / Debug mode (#2248)."
   },
   "feedbackConsentTitle": "Send report to GitHub?",
   "@feedbackConsentTitle": {

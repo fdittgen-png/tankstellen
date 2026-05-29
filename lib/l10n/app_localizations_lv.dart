@@ -3915,6 +3915,103 @@ class AppLocalizationsLv extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Aizvērt';
 
   @override
+  String get developerToolsSectionTitle => 'Izstrādātāja rīki';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostika un atkļūdošanas rīki — redzami tikai izstrādātāja/atkļūdošanas režīmā.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Kļūdu žurnāls, testa brīdinājumi, diagnostika';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Kļūdu žurnāls';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Saglabāt kļūdu žurnālu ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Notīrīt kļūdu žurnālu';
+
+  @override
+  String get developerToolsViewErrorLog => 'Skatīt kļūdu žurnālu';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Nav reģistrētu kļūdu pēdu.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Brīdinājumi un paziņojumi';
+
+  @override
+  String get developerToolsFireTestNotification => 'Sūtīt testa paziņojumu';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testa paziņojums';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Ja jūs to varat izlasīt, paziņojumi darbojas.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Testa paziņojums nosūtīts.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Paziņojumi ir bloķēti — iespējojiet tos sistēmas iestatījumos un mēģiniet vēlreiz.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Palaist testa brīdinājumu plūsmu';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testa brīdinājums aktivizēts — plūsma piegādāja $count paziņojumus.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testa cenas brīdinājums';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Sintētiska atbilstība: tuvumā tika atrasta stacija zem jūsu mērķa.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Funkciju karodziņu inspektors';
+
+  @override
+  String get developerToolsFlagOn => 'Ieslēgts';
+
+  @override
+  String get developerToolsFlagOff => 'Izslēgts';
+
+  @override
+  String get developerToolsClearCaches => 'Notīrīt kešatmiņas';
+
+  @override
+  String get developerToolsCachesCleared => 'Kešatmiņas notīrītas.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopēt diagnostiku';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostika nokopēta starpliktuvē.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Būvējuma informācija';
+
+  @override
+  String get developerToolsBuildVersion => 'Lietotnes versija';
+
+  @override
+  String get developerToolsBuildChannel => 'Būvējuma kanāls';
+
+  @override
   String get insightCardTitle => 'Galvenie izšķērdīgākie paradumi';
 
   @override
@@ -4250,6 +4347,13 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Iespējo neveiksmīgu skenējumu atsauksmju paneli, kas ar Personal Access Token automātiski izveido GitHub problēmas. Pieredzējušu lietotāju / līdzdalībnieku funkcija.';
+
+  @override
+  String get featureLabel_debugMode => 'Izstrādātāja/atkļūdošanas režīms';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Iestatījumos parāda sadaļu Izstrādātāja rīki ar diagnostiku: kļūdu žurnāla eksports, testa paziņojumi, testa brīdinājumu plūsmas palaišana, funkciju karodziņu saraksts, kešatmiņu notīrīšana un diagnostikas kopēšana.';
 
   @override
   String get feedbackConsentTitle => 'Nosūtīt ziņojumu uz GitHub?';

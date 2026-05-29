@@ -387,5 +387,14 @@ class FeatureManifest {
           'Enable the bad-scan feedback panel that auto-files GitHub '
               'issues with a Personal Access Token.',
     ),
+    // Default-off (#2248): gates the Developer tools section. No prereqs.
+    Feature.debugMode: FeatureManifestEntry.allChannels(
+      feature: Feature.debugMode,
+      defaultOn: false,
+      displayName: 'Developer / Debug mode',
+      description: 'Surface a Developer tools section in Settings with '
+          'diagnostics: error-log export, test notifications, a test-alert '
+          'pipeline run, a feature-flag dump, clear caches, and diagnostics.',
+    ),
   });
 }

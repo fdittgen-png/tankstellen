@@ -3890,6 +3890,102 @@ class AppLocalizationsDa extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Afvis';
 
   @override
+  String get developerToolsSectionTitle => 'Udviklerværktøjer';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostik og fejlfindingsværktøjer — kun synlige i udvikler-/fejlfindingstilstand.';
+
+  @override
+  String get developerToolsMenuSubtitle => 'Fejllog, testadvarsler, diagnostik';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Fejllog';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Gem fejllog ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Ryd fejllog';
+
+  @override
+  String get developerToolsViewErrorLog => 'Vis fejllog';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Ingen fejlspor registreret.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Advarsler og notifikationer';
+
+  @override
+  String get developerToolsFireTestNotification => 'Send testnotifikation';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testnotifikation';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Hvis du kan læse dette, virker notifikationerne.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Testnotifikation sendt.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Notifikationer er blokeret — aktivér dem i systemindstillingerne, og prøv igen.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Kør testadvarselsforløb';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testadvarsel udløst — forløbet leverede $count notifikation(er).';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testprisadvarsel';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Syntetisk match: en station under dit mål blev fundet i nærheden.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostik';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Inspektør for funktionsflag';
+
+  @override
+  String get developerToolsFlagOn => 'Til';
+
+  @override
+  String get developerToolsFlagOff => 'Fra';
+
+  @override
+  String get developerToolsClearCaches => 'Ryd cacher';
+
+  @override
+  String get developerToolsCachesCleared => 'Cacher ryddet.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopiér diagnostik';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostik kopieret til udklipsholderen.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Buildoplysninger';
+
+  @override
+  String get developerToolsBuildVersion => 'Appversion';
+
+  @override
+  String get developerToolsBuildChannel => 'Buildkanal';
+
+  @override
   String get insightCardTitle => 'Mest spildende adfærd';
 
   @override
@@ -4219,6 +4315,13 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Aktiverer feedback-panelet for fejlskanninger, der automatisk opretter GitHub-issues med en Personal Access Token. Funktion for avancerede brugere/bidragsydere.';
+
+  @override
+  String get featureLabel_debugMode => 'Udvikler-/fejlfindingstilstand';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Viser en sektion med udviklerværktøjer i indstillingerne med diagnostik: eksport af fejllog, testnotifikationer, kørsel af testadvarselsforløb, oversigt over funktionsflag, rydning af cacher og kopiering af diagnostik.';
 
   @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';
