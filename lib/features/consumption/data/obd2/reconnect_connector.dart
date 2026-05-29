@@ -117,4 +117,24 @@ class ReconnectConnector {
     }
     return false;
   }
+
+  /// Passive-wait connect cycle for [mac] (#2261 concern 2). Handed to
+  /// the [AdapterReconnectScanner] as its `passiveConnect` callback: once
+  /// the scanner hits its active-scan miss ceiling it stops burning the
+  /// radio and waits on a low-power autoConnect GATT request instead.
+  /// Returns `true` once a session is established. Never throws.
+  Future<bool> attemptPassive(String mac) async {
+    try {
+      final svc = await connection.connectByMacPassive(mac);
+      if (svc != null) {
+        onConnected(svc);
+        return true;
+      }
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'ReconnectConnector passive connect failed',
+      }));
+    }
+    return false;
+  }
 }

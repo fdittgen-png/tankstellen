@@ -9,10 +9,12 @@ import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import 'adapter_capability.dart';
 import 'auto_record_trace_log.dart';
+import 'bluetooth_obd2_transport.dart';
 import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_diagnostics.dart';
 import 'fuel_rate_estimator.dart' as estimator;
+import 'negotiated_protocol_cache.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
@@ -88,9 +90,28 @@ class Obd2Service implements Obd2RawCommandPort {
   /// no production call site branches on this value yet.
   Obd2AdapterCapability _capability = Obd2AdapterCapability.standardOnly;
 
+  /// Firmware-string-claimed tier, captured at connect (#2261 concern
+  /// 6). The lazy multi-frame probe in [ensureCapabilityReconciled]
+  /// reconciles [_capability] down from this if the adapter can't
+  /// actually route a multi-frame request.
+  Obd2AdapterCapability _claimedCapability =
+      Obd2AdapterCapability.standardOnly;
+
+  /// `true` once the multi-frame `0902` probe has reconciled (or was
+  /// unnecessary because the claimed tier is already standardOnly). Lets
+  /// [ensureCapabilityReconciled] run at most once per connect (#2261).
+  bool _capabilityReconciled = true;
+
   /// Runtime capability tier of the connected adapter (#1401 phase 1).
   /// See [_capability] for semantics.
   Obd2AdapterCapability get capability => _capability;
+
+  /// `true` when the lazy multi-frame capability probe (#2261 concern 6)
+  /// still needs to run — i.e. the firmware claimed a tier above
+  /// standardOnly and [ensureCapabilityReconciled] hasn't confirmed it
+  /// yet. Exposed for the recorder to know whether a deferred probe is
+  /// still pending.
+  bool get capabilityNeedsReconcile => !_capabilityReconciled;
 
   /// Per-adapter ELM327 quirks (#1330). Set by [connect] from the
   /// caller-supplied `adapter` parameter; defaults to the
@@ -117,12 +138,26 @@ class Obd2Service implements Obd2RawCommandPort {
   /// raw [Obd2BreadcrumbCollector].
   Obd2BreadcrumbRecorder? breadcrumbCollector;
 
+  /// Persistent negotiated-protocol cache (#2261 concern 3). When
+  /// present and [_protocolCacheKey] resolves, a warm connect replays
+  /// `ATSP{n}` for the cached protocol instead of paying the multi-second
+  /// `ATSP0` auto-search. Null in tests / configs that don't exercise it
+  /// — connect then always runs the cold ATSP0 search, exactly as before.
+  final NegotiatedProtocolCache? _protocolCache;
+
+  /// Lookup key for [_protocolCache] — `adapterMac(:vin)`. Supplied by
+  /// the owner so the data layer never resolves vehicle identity itself.
+  final String? _protocolCacheKey;
+
   Obd2Service(
     this._transport, {
     SupportedPidsCache? pidsCache,
     String? vehicleFallbackKey,
+    NegotiatedProtocolCache? protocolCache,
+    String? protocolCacheKey,
     this.breadcrumbCollector,
-  }) {
+  })  : _protocolCache = protocolCache,
+        _protocolCacheKey = protocolCacheKey {
     // #1916 — the supported-PIDs prime + discovery run during connect,
     // when the BLE link is least settled. Wrap their `_send` callback
     // with the same one-shot retry the init handshake now uses, so a
@@ -187,6 +222,76 @@ class Obd2Service implements Obd2RawCommandPort {
     return s;
   }
 
+  /// Look up the protocol digit cached for this adapter+vehicle, or null
+  /// when no cache is wired / no key resolves / no entry exists (#2261
+  /// concern 3). A non-null result drives a warm `ATSP{n}` init.
+  String? _cachedProtocolDigit() {
+    final cache = _protocolCache;
+    final key = _protocolCacheKey;
+    if (cache == null || key == null) return null;
+    try {
+      return cache.get(key);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OBD2 negotiated-protocol cache read failed',
+      }));
+      return null;
+    }
+  }
+
+  /// Read `ATDPN`, strip the auto-flag, and persist the negotiated
+  /// protocol for next session (#2261 concern 3).
+  ///
+  /// When [warmConnect] is true (we pinned a cached `ATSP{n}`) and the
+  /// adapter cannot describe a working protocol — `ATDPN` returns a
+  /// NO-DATA / UNABLE / error placeholder — the cached protocol was
+  /// wrong (different car on the same adapter, ECU swapped). We then
+  /// invalidate the entry, fall back to the `ATSP0` auto-search, and
+  /// re-read ATDPN to re-cache the freshly negotiated value.
+  ///
+  /// Best-effort throughout: any send failure is swallowed so the
+  /// connect still succeeds with whatever protocol the init left active.
+  Future<void> _resolveAndCacheProtocol({required bool warmConnect}) async {
+    final cache = _protocolCache;
+    final key = _protocolCacheKey;
+    if (cache == null || key == null) return;
+    try {
+      var digit = Elm327Protocol.parseProtocolNumber(
+        await _withConnectRetry(
+          Elm327Protocol.describeProtocolNumberCommand,
+          _transport.sendCommand,
+        ),
+      );
+      if (digit == null && warmConnect) {
+        // The pinned protocol can't talk to this bus — drop it and
+        // re-run the cold ATSP0 auto-search, then re-read ATDPN.
+        await cache.invalidate(key);
+        await _transport.sendCommand(Elm327Protocol.autoProtocolCommand);
+        digit = Elm327Protocol.parseProtocolNumber(
+          await _transport.sendCommand(
+            Elm327Protocol.describeProtocolNumberCommand,
+          ),
+        );
+      }
+      if (digit != null) {
+        await cache.put(key, digit);
+      }
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OBD2 negotiated-protocol resolve/cache failed',
+      }));
+    }
+  }
+
+  /// Whether [command] is a reset / wake command that needs a settle
+  /// delay after it (#2261 concern 5) — ATZ (full reset) or ATWS (warm
+  /// start). Every other AT echo / OBD request is serialised by the
+  /// transport's prompt-wait and needs no extra sleep.
+  static bool _isResetCommand(String command) {
+    final c = command.trim().toUpperCase();
+    return c == 'ATZ' || c == 'ATWS';
+  }
+
   /// `true` when the underlying [Obd2Transport] currently has an open
   /// connection to the vehicle's ELM327 adapter.
   bool get isConnected => _transport.isConnected;
@@ -240,15 +345,33 @@ class Obd2Service implements Obd2RawCommandPort {
       // Clear the per-connection supported-PIDs cache. A new session
       // may be a different car / different adapter firmware.
       _pids.resetForNewConnection();
+      // #2261 concern 6 — a fresh connect re-arms the lazy capability
+      // probe; it stays armed only when the ATI block below claims a
+      // tier above standardOnly.
+      _capabilityReconciled = true;
 
       // Adapter-driven init sequence (#1330). [GenericElm327Adapter]
       // matches the legacy hardcoded behaviour byte-for-byte: the
       // shared ELM init list followed by 100 ms after the first
       // command (ATZ) and 100 ms between each subsequent command.
+      //
+      // #2261 concern 3 — on a WARM connect, replay the protocol pinned
+      // last session: swap the `ATSP0` auto-search for `ATSP{n}` so the
+      // ELM327 skips the multi-second protocol probe. On a cold connect
+      // (no cache hit) the sequence is untouched and ATSP0 runs as before.
+      final warmProtocol = _cachedProtocolDigit();
       final sequence = <String>[
         ...adapter.initSequence,
         ...adapter.extraInitCommands,
       ];
+      if (warmProtocol != null) {
+        for (var i = 0; i < sequence.length; i++) {
+          if (sequence[i] == Elm327Protocol.autoProtocolCommand) {
+            sequence[i] = Elm327Protocol.setProtocolCommand(warmProtocol);
+            break;
+          }
+        }
+      }
       for (var i = 0; i < sequence.length; i++) {
         // #1925 — time each handshake command for the opt-in OBD2
         // debug log (a no-op when debug logging is off).
@@ -266,11 +389,17 @@ class Obd2Service implements Obd2RawCommandPort {
           response,
           sw.elapsedMilliseconds,
         );
-        // First command is the ATZ-style reset — its post-delay can
-        // differ from the rest on slow clones.
-        final delay =
-            i == 0 ? adapter.postResetDelay : adapter.interCommandDelay;
-        await Future.delayed(delay);
+        // #2261 concern 5 — drop the fixed inter-command sleep for
+        // trivial AT echoes: the prompt-wait in [BluetoothObd2Transport]
+        // already serialises one command per `>` reply, so a blind
+        // 100 ms sleep between ATE0/ATL0/ATH0/… is pure dead time on the
+        // critical path. Keep a SHORT settle ONLY after the reset/wake
+        // commands (ATZ/ATWS), where a slow clone re-enumerates and a
+        // back-to-back command can race the reset. The adapter still
+        // owns the actual settle duration via [postResetDelay].
+        if (_isResetCommand(sequence[i])) {
+          await Future.delayed(adapter.postResetDelay);
+        }
       }
 
       // Capture the firmware-version string and derive the runtime
@@ -299,21 +428,27 @@ class Obd2Service implements Obd2RawCommandPort {
           adapterFirmware = firmware;
         }
         _capability = detectCapabilityFromFirmwareString(firmware);
-
-        // #1614 — the ATI firmware string can lie: a v2.1-class clone
-        // routinely reports `v2.2` and is then classed oemPidsCapable,
-        // which would hang the OBD-II loop on OEM commands it cannot
-        // route. When the string claims a tier above standardOnly, run
-        // a runtime multi-frame ISO 15765 probe and downgrade if the
-        // adapter cannot actually reassemble a multi-frame reply.
-        if (_capability != Obd2AdapterCapability.standardOnly) {
-          final probe =
-              await probeMultiFrameCapability(_transport.sendCommand);
-          _capability = reconcileCapabilityWithProbe(_capability, probe);
-        }
+        // #2261 concern 6 — the multi-frame `0902` probe that downgrades
+        // a lying clone (#1614) used to run HERE, blocking connect for up
+        // to 4 s on the start critical path. It is now deferred to
+        // [ensureCapabilityReconciled], run lazily after the first
+        // samples, so perceived start is not delayed. The claimed tier
+        // above is what gating sees until then — safe, because standard
+        // PID collection never depends on it, and the lazy probe only
+        // ever LOWERS the tier (never enables a feature prematurely).
+        _claimedCapability = _capability;
+        _capabilityReconciled =
+            _capability == Obd2AdapterCapability.standardOnly;
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 ATI firmware read failed'}));
       }
+
+      // #2261 concern 3 — read ATDPN to learn the negotiated protocol
+      // and persist it for next session's warm connect. When a warm
+      // ATSP{n} was attempted but the protocol can't actually talk to
+      // the bus, this re-runs ATSP0 + re-caches. Non-fatal: any failure
+      // just leaves the cache as-is and the connect still succeeds.
+      await _resolveAndCacheProtocol(warmConnect: warmProtocol != null);
 
       await _pids.prime();
 
@@ -1072,6 +1207,49 @@ class Obd2Service implements Obd2RawCommandPort {
     // track that proof — fall back to the local constant which is
     // both non-null and equal.
     return (id: _psaFuelLevelFrameId, payload: payload);
+  }
+
+  /// Ask the underlying BLE link for high throughput while actively
+  /// polling PIDs (#2261 concern 4) — high connection priority + a
+  /// best-effort MTU bump. No-op when the transport / channel doesn't
+  /// expose tuning (Classic SPP, fakes). Best-effort throughout.
+  Future<void> tuneLinkForRecording() async {
+    final t = _transport;
+    if (t is BluetoothObd2Transport) await t.tuneForRecording();
+  }
+
+  /// Drop the BLE link to balanced priority when only the 1 Hz
+  /// auto-record movement stream is live (#2261 concern 4).
+  Future<void> tuneLinkForBackground() async {
+    final t = _transport;
+    if (t is BluetoothObd2Transport) await t.tuneForBackground();
+  }
+
+  /// Run the deferred multi-frame ISO 15765 capability probe (#2261
+  /// concern 6) at most once per connect, reconciling [capability] down
+  /// if the adapter can't actually route a multi-frame `0902` request.
+  ///
+  /// This is the work that #1614 used to do synchronously inside
+  /// [connect]; it is now pulled OFF the start critical path so a fresh
+  /// connect returns without waiting up to 1.5 s for the probe. The
+  /// recorder calls this lazily after the first samples — by then the
+  /// trip is already capturing standard PIDs, and the probe (which can
+  /// only LOWER the tier) tightens OEM-PID gating a moment later.
+  ///
+  /// A no-op when the claimed tier is already standardOnly (nothing to
+  /// downgrade) or when it has already run this connect. Never throws.
+  Future<void> ensureCapabilityReconciled() async {
+    if (_capabilityReconciled) return;
+    _capabilityReconciled = true;
+    if (_claimedCapability == Obd2AdapterCapability.standardOnly) return;
+    try {
+      final probe = await probeMultiFrameCapability(_transport.sendCommand);
+      _capability = reconcileCapabilityWithProbe(_claimedCapability, probe);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OBD2 deferred capability probe failed',
+      }));
+    }
   }
 
   /// Close the transport connection. Safe to call multiple times.

@@ -13,6 +13,8 @@ import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
+import 'package:tankstellen/features/consumption/data/obd2/'
+    'negotiated_protocol_cache.dart';
 import 'package:tankstellen/features/consumption/data/obd2/supported_pids_cache.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
@@ -399,6 +401,64 @@ void main() {
     });
   });
 
+  group('Obd2ConnectionService.connectByMacPassive (#2261 concern 2)', () {
+    test(
+        'opens an autoConnect channel, NO scan, NO bounded timeout, '
+        'runs init', () async {
+      final passiveChannel = _FakeChannel(respondTo: _elmOkResponses());
+      final fake = _FakeFacade(
+        // A non-empty batch would be observable via scanInvoked if the
+        // passive path ever scanned — it must not.
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        directChannel: passiveChannel,
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacPassive('aa:bb');
+
+      expect(ready, isNotNull);
+      expect(ready!.isConnected, isTrue);
+      expect(fake.directAutoConnect, isTrue,
+          reason: 'passive reconnect must request an autoConnect channel');
+      expect(fake.scanInvoked, isFalse,
+          reason: 'the passive wait must never scan — a passive GATT wait '
+              'IS the fallback');
+      await ready.disconnect();
+    });
+
+    test('returns null on failure WITHOUT a scan fallback', () async {
+      final fake = _FakeFacade(
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        directChannel: _FakeChannel(openError: StateError('passive wait off')),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacPassive('aa:bb');
+      expect(ready, isNull);
+      expect(fake.scanInvoked, isFalse,
+          reason: 'a failed passive wait does not scan — the scanner will '
+              're-arm another passive wait itself');
+    });
+  });
+
   group('Obd2ConnectionService supported-PID cache wiring — #2253', () {
     late Directory tmpDir;
     late Box<String> box;
@@ -441,7 +501,7 @@ void main() {
         ),
         supportedPidsCache: SupportedPidsCache(box),
         activeVehicleKeyFields: () =>
-            (make: 'Peugeot', model: '107', year: 2008),
+            (make: 'Peugeot', model: '107', year: 2008, vin: null),
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
@@ -470,7 +530,7 @@ void main() {
         ),
         supportedPidsCache: SupportedPidsCache(box),
         activeVehicleKeyFields: () =>
-            (make: 'Peugeot', model: '107', year: 2008),
+            (make: 'Peugeot', model: '107', year: 2008, vin: null),
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
@@ -506,6 +566,7 @@ Obd2ConnectionService _build({
   required Obd2PermissionState permState,
   required BluetoothFacade bt,
   SupportedPidsCache? supportedPidsCache,
+  NegotiatedProtocolCache? negotiatedProtocolCache,
   Obd2VehicleKeyFields Function()? activeVehicleKeyFields,
 }) =>
     Obd2ConnectionService(
@@ -513,6 +574,7 @@ Obd2ConnectionService _build({
       permissions: _FakePermissions(permState),
       bluetooth: bt,
       supportedPidsCache: supportedPidsCache,
+      negotiatedProtocolCache: negotiatedProtocolCache,
       activeVehicleKeyFields: activeVehicleKeyFields,
     );
 
@@ -581,6 +643,7 @@ class _FakeFacade implements BluetoothFacade {
   /// Args captured from the most recent [channelForDirect] call.
   String? directMac;
   Duration? directTimeout;
+  bool directAutoConnect = false;
   int directCalls = 0;
 
   _FakeFacade({
@@ -619,10 +682,12 @@ class _FakeFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) {
     directCalls++;
     directMac = mac;
     directTimeout = connectTimeout;
+    directAutoConnect = autoConnect;
     return directChannel ?? channel ?? _FakeChannel(silent: true);
   }
 }
@@ -655,6 +720,7 @@ class _SequencedDirectFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) {
     onDirect();
     return sequence[_i++];

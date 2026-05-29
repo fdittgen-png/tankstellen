@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
+import 'obd2_read_timeout.dart';
 import 'obd2_transport.dart';
 
 /// [Obd2Transport] that moves bytes over a generic [ElmByteChannel]
@@ -30,6 +31,12 @@ class BluetoothObd2Transport implements Obd2Transport {
   Completer<String>? _pending;
   bool _connected = false;
 
+  /// #2261 concern 5 — true until the FIRST command of a fresh link
+  /// completes. The first command faces a waking ECU / a pending
+  /// protocol search, so it gets a longer read-timeout class than the
+  /// same command would later. Reset on every [connect].
+  bool _firstCommandPending = true;
+
   /// Tail of the command queue. Every [sendCommand] chains onto this so
   /// overlapping callers — e.g. the VIN reader racing the auto-record
   /// PID poller, both sharing one transport — serialise instead of
@@ -49,6 +56,7 @@ class BluetoothObd2Transport implements Obd2Transport {
   @override
   Future<void> connect() async {
     if (_connected) return;
+    _firstCommandPending = true;
     await _channel.open();
     _subscription = _channel.incoming.listen(
       _onBytes,
@@ -99,6 +107,27 @@ class BluetoothObd2Transport implements Obd2Transport {
     return completer.future;
   }
 
+  /// #2261 concern 4 — forward link-tuning to the underlying channel
+  /// when it is a BLE [Obd2LinkTuner]. No-op for channels that don't
+  /// expose tuning (Classic SPP, test fakes), so callers can tune
+  /// unconditionally. Best-effort: the channel itself swallows platform
+  /// rejections.
+  Future<void> tuneForRecording() async {
+    final ch = _channel;
+    if (ch is Obd2LinkTuner) {
+      await (ch as Obd2LinkTuner).tuneForRecording();
+    }
+  }
+
+  /// Drop the link to balanced priority when only the 1 Hz auto-record
+  /// stream is live (#2261 concern 4).
+  Future<void> tuneForBackground() async {
+    final ch = _channel;
+    if (ch is Obd2LinkTuner) {
+      await (ch as Obd2LinkTuner).tuneForBackground();
+    }
+  }
+
   @override
   Future<void> disconnect() async {
     _connected = false;
@@ -119,17 +148,27 @@ class BluetoothObd2Transport implements Obd2Transport {
         'BluetoothObd2Transport: concurrent sendCommand is not allowed',
       );
     }
+    // #2261 concern 5 — right-size the read timeout per command class
+    // instead of a flat 5 s. Clamped to the configured [_readTimeout] so
+    // an explicit override still acts as a hard ceiling.
+    final cls = classifyReadTimeout(
+      command,
+      firstCommandOnFreshLink: _firstCommandPending,
+    );
+    _firstCommandPending = false;
+    final timeout = cls.timeout > _readTimeout ? _readTimeout : cls.timeout;
+
     _buffer.clear();
     final completer = Completer<String>();
     _pending = completer;
     await _channel.write(command.codeUnits);
     return completer.future.timeout(
-      _readTimeout,
+      timeout,
       onTimeout: () {
         _pending = null;
         throw TimeoutException(
-          'ELM327 did not respond within $_readTimeout',
-          _readTimeout,
+          'ELM327 did not respond within $timeout',
+          timeout,
         );
       },
     );

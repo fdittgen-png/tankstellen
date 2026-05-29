@@ -723,11 +723,41 @@ void main() {
     );
 
     // #1614 — runtime feature-probe that downgrades clones whose ATI
-    // firmware string lies about their tier.
-    group('runtime capability probe (#1614)', () {
+    // firmware string lies about their tier. #2261 concern 6 — the probe
+    // is now DEFERRED off the connect critical path: connect() leaves the
+    // claimed tier in place and ensureCapabilityReconciled() (run lazily
+    // after the first samples) does the downgrade.
+    group('runtime capability probe (#1614 / deferred #2261 concern 6)', () {
       test(
-          'a lying clone — ATI reports v2.2 but the multi-frame probe '
-          'fails — is downgraded below oemPidsCapable', () async {
+          'connect() does NOT send 0902 — the probe is off the critical '
+          'path (#2261 concern 6)', () async {
+        final sent = <String>[];
+        final transport = _RecordingTransport(
+          {
+            'ATZ': 'ELM327 v2.2>',
+            'ATE0': 'OK>',
+            'ATL0': 'OK>',
+            'ATH0': 'OK>',
+            'ATSP0': 'OK>',
+            'ATI': 'ELM327 v2.2>',
+            '0902': 'CAN ERROR>',
+          },
+          sent,
+        );
+        final service = Obd2Service(transport);
+        await service.connect();
+
+        expect(sent, isNot(contains('0902')),
+            reason: 'the multi-frame probe must not delay connect');
+        expect(service.capability, Obd2AdapterCapability.oemPidsCapable,
+            reason: 'connect leaves the firmware-claimed tier until the '
+                'deferred probe reconciles it');
+        expect(service.capabilityNeedsReconcile, isTrue);
+      });
+
+      test(
+          'a lying clone — ATI reports v2.2 but the deferred multi-frame '
+          'probe fails — is downgraded below oemPidsCapable', () async {
         final transport = FakeObd2Transport({
           'ATZ': 'ELM327 v2.2>',
           'ATE0': 'OK>',
@@ -740,6 +770,7 @@ void main() {
         });
         final service = Obd2Service(transport);
         await service.connect();
+        await service.ensureCapabilityReconciled();
 
         expect(service.capability, Obd2AdapterCapability.standardOnly);
         expect(
@@ -747,10 +778,11 @@ void main() {
               Obd2AdapterCapability.oemPidsCapable.index,
           isTrue,
         );
+        expect(service.capabilityNeedsReconcile, isFalse);
       });
 
       test(
-          'a genuine v2.2 adapter — ATI reports v2.2 and the probe '
+          'a genuine v2.2 adapter — ATI reports v2.2 and the deferred probe '
           'returns a valid multi-frame VIN reply — keeps oemPidsCapable',
           () async {
         final transport = FakeObd2Transport({
@@ -764,13 +796,39 @@ void main() {
         });
         final service = Obd2Service(transport);
         await service.connect();
+        await service.ensureCapabilityReconciled();
 
         expect(service.capability, Obd2AdapterCapability.oemPidsCapable);
       });
 
       test(
-          'a standardOnly adapter (ATI v1.5) skips the probe — no 0902 '
-          'is sent', () async {
+          'ensureCapabilityReconciled is a one-shot — a second call sends '
+          'no further 0902', () async {
+        final sent = <String>[];
+        final transport = _RecordingTransport(
+          {
+            'ATZ': 'ELM327 v2.2>',
+            'ATE0': 'OK>',
+            'ATL0': 'OK>',
+            'ATH0': 'OK>',
+            'ATSP0': 'OK>',
+            'ATI': 'ELM327 v2.2>',
+            '0902': 'CAN ERROR>',
+          },
+          sent,
+        );
+        final service = Obd2Service(transport);
+        await service.connect();
+        await service.ensureCapabilityReconciled();
+        await service.ensureCapabilityReconciled();
+
+        expect(sent.where((c) => c == '0902').length, 1,
+            reason: 'the deferred probe runs at most once per connect');
+      });
+
+      test(
+          'a standardOnly adapter (ATI v1.5) never probes — no 0902 even '
+          'after ensureCapabilityReconciled', () async {
         final sent = <String>[];
         final transport = _RecordingTransport(
           {
@@ -785,6 +843,10 @@ void main() {
         );
         final service = Obd2Service(transport);
         await service.connect();
+        expect(service.capabilityNeedsReconcile, isFalse,
+            reason: 'standardOnly has nothing to downgrade — no deferred '
+                'probe is armed');
+        await service.ensureCapabilityReconciled();
 
         expect(service.capability, Obd2AdapterCapability.standardOnly);
         expect(sent, isNot(contains('0902')));

@@ -56,8 +56,24 @@ class AdapterReconnectScanner {
   final String _pinnedMac;
   final AdapterInRangeProbe _probe;
   final AdapterConnectAttempt _connect;
+
+  /// Passive-wait connect callback used once the active-scan miss
+  /// ceiling is reached (#2261 concern 2). Null ⇒ the scanner keeps
+  /// active-scanning for the whole grace (pre-#2261 behaviour).
+  final AdapterConnectAttempt? _passiveConnect;
+
   final VoidCallback _onReconnect;
   final Duration _maxBackoff;
+
+  /// Number of consecutive active-scan misses after which the scanner
+  /// switches from battery-burning active 8 s scans to a single passive
+  /// autoConnect GATT wait for the remainder of the grace (#2261
+  /// concern 2). On a parked car the adapter never comes back, so after
+  /// ~5–6 fruitless active scans there is no point spinning the radio —
+  /// a passive GATT wait costs nothing and still wakes the link the
+  /// instant the adapter powers back up. Ignored when [_passiveConnect]
+  /// is null.
+  final int _missCeiling;
 
   /// Delay before the FIRST probe after a drop (#1991). A fresh drop is
   /// most often a transient BLE blip; probing near-immediately — rather
@@ -72,17 +88,28 @@ class AdapterReconnectScanner {
   bool _scanning = false;
   bool _cycleInFlight = false;
 
+  /// Consecutive active-scan misses so far this drop (#2261 concern 2).
+  int _consecutiveMisses = 0;
+
+  /// Latches `true` once [_missCeiling] is reached, so every later cycle
+  /// uses the cheap passive wait instead of an active scan (#2261).
+  bool _passiveMode = false;
+
   AdapterReconnectScanner({
     required String pinnedMac,
     required AdapterInRangeProbe probe,
     required AdapterConnectAttempt connect,
     required VoidCallback onReconnect,
+    AdapterConnectAttempt? passiveConnect,
+    int missCeiling = 5,
     Duration initialBackoff = const Duration(seconds: 5),
     Duration maxBackoff = const Duration(seconds: 60),
     Duration firstProbeDelay = const Duration(seconds: 1),
   })  : _pinnedMac = pinnedMac,
         _probe = probe,
         _connect = connect,
+        _passiveConnect = passiveConnect,
+        _missCeiling = missCeiling,
         _onReconnect = onReconnect,
         _maxBackoff = maxBackoff,
         _firstProbeDelay = firstProbeDelay,
@@ -102,6 +129,17 @@ class AdapterReconnectScanner {
   /// directly rather than timing successive fake-async advances.
   @visibleForTesting
   Duration get currentBackoff => _currentBackoff;
+
+  /// `true` once the active-scan miss ceiling was reached and the
+  /// scanner switched to the passive autoConnect GATT wait (#2261
+  /// concern 2). Exposed for tests + diagnostics.
+  @visibleForTesting
+  bool get isPassiveWaiting => _passiveMode;
+
+  /// Consecutive active-scan misses recorded this drop (#2261). Exposed
+  /// for tests asserting the ceiling switch.
+  @visibleForTesting
+  int get consecutiveMisses => _consecutiveMisses;
 
   /// Schedule the first probe cycle. Safe to call repeatedly — a
   /// second call while already scanning is a no-op so the caller
@@ -132,20 +170,28 @@ class AdapterReconnectScanner {
 
   /// One probe + optional connect round. Doubles backoff on miss /
   /// connect failure, fires [onReconnect] + self-stops on success.
+  ///
+  /// #2261 concern 2 — once [_consecutiveMisses] reaches [_missCeiling]
+  /// (and a [_passiveConnect] callback was supplied) the cycle switches
+  /// to passive mode: it skips the active in-range probe entirely and
+  /// instead does a single long-lived passive autoConnect GATT wait,
+  /// rescheduling at the capped backoff if that wait times out. This
+  /// stops the radio from burning battery on a parked car while still
+  /// waking the link the instant the adapter powers back up.
   Future<void> _runCycle() async {
     // Overlapping ticks would let two connects race each other,
     // which the transport is not designed to handle. Cheap guard.
     if (_cycleInFlight || !_scanning) return;
     _cycleInFlight = true;
     try {
+      if (_passiveMode) {
+        await _runPassiveCycle();
+        return;
+      }
       final inRange = await _probeSafely();
       if (!_scanning) return; // stop() raced — honour it
       if (!inRange) {
-        // Schedule the next retry at the current backoff, THEN double
-        // it — so the first retry after a fast first probe uses
-        // `initialBackoff`, not `initialBackoff × 2` (#1991).
-        _scheduleNext();
-        _doubleBackoff();
+        _registerMiss();
         return;
       }
       final ok = await _connectSafely();
@@ -159,13 +205,48 @@ class AdapterReconnectScanner {
         return;
       }
       // Probe said "in range" but connect failed (adapter busy,
-      // dance interrupted). Treat as a miss — schedule the retry,
-      // then double the backoff so we don't hammer the adapter.
-      _scheduleNext();
-      _doubleBackoff();
+      // dance interrupted). Treat as a miss.
+      _registerMiss();
     } finally {
       _cycleInFlight = false;
     }
+  }
+
+  /// A passive-mode cycle: wait on a passive autoConnect GATT connect
+  /// (no active scan). On success, fire [onReconnect] + self-stop; on a
+  /// timeout, reschedule another passive wait at the capped backoff.
+  Future<void> _runPassiveCycle() async {
+    final ok = await _connectSafely(passive: true);
+    if (!_scanning) return; // stop() raced during the passive wait
+    if (ok) {
+      await stop();
+      _onReconnect();
+      return;
+    }
+    // Passive wait timed out within its window — schedule the next one.
+    // Backoff is already pinned at maxBackoff (passive mode latched
+    // there), so this just paces the re-arm.
+    _scheduleNext();
+  }
+
+  /// Record an active-scan miss: schedule the next retry at the current
+  /// backoff (THEN double it — so the first retry after a fast first
+  /// probe uses `initialBackoff`, not `initialBackoff × 2`, #1991), and
+  /// flip into passive mode once the miss ceiling is reached (#2261).
+  void _registerMiss() {
+    _consecutiveMisses++;
+    if (_passiveConnect != null && _consecutiveMisses >= _missCeiling) {
+      // Ceiling reached — stop burning the radio. Pin the backoff at the
+      // ceiling so the passive-wait re-arm is paced, and run the first
+      // passive wait promptly.
+      _passiveMode = true;
+      _currentBackoff = _maxBackoff;
+      _timer?.cancel();
+      _timer = Timer(_firstProbeDelay, _runCycle);
+      return;
+    }
+    _scheduleNext();
+    _doubleBackoff();
   }
 
   Future<bool> _probeSafely() async {
@@ -177,9 +258,11 @@ class AdapterReconnectScanner {
     }
   }
 
-  Future<bool> _connectSafely() async {
+  Future<bool> _connectSafely({bool passive = false}) async {
+    final attempt = passive ? _passiveConnect : _connect;
+    if (attempt == null) return false;
     try {
-      return await _connect(_pinnedMac);
+      return await attempt(_pinnedMac);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AdapterReconnectScanner connect failed'}));
       return false;

@@ -55,11 +55,13 @@ class HiveBoxes {
   static const String achievements = 'achievements';
 
   /// Supported-PID bitmap cache (#811). Keyed by VIN (preferred) or
-  /// `make:model:year` (fallback when the car doesn't return a VIN).
-  /// Values are sorted `List<int>` of PID indices the car implements
-  /// for Mode 01. Small, not PII, opened unencrypted like the other
-  /// OBD2 boxes.
+  /// `make:model:year` (fallback). Sorted `List<int>` of Mode-01 PID
+  /// indices the car implements. Small, not PII, opened unencrypted.
   static const String obd2SupportedPids = 'obd2_supported_pids';
+
+  /// Negotiated ELM327 protocol cache (#2261). Keyed `adapterMac(:vin)`;
+  /// value is the `ATDPN` protocol digit for warm `ATSP{n}` connects.
+  static const String obd2NegotiatedProtocol = 'obd2_negotiated_protocol';
 
   /// Odometer-based service reminders (#584). One JSON payload per
   /// reminder keyed by reminder id. Not PII (label + interval +
@@ -77,21 +79,17 @@ class HiveBoxes {
   static const String obd2PausedTrips = 'obd2_paused_trips';
 
   /// Write-through snapshot of the currently-recording OBD2 trip
-  /// (#1303). At most ONE entry — keyed on a fixed sentinel — that
-  /// the [TripRecording] provider rewrites every few seconds while a
-  /// trip is live. Survives a process death so the recovery service
-  /// can put the user back on the recording screen with their
-  /// captured samples on next launch. Same privacy treatment as the
-  /// other OBD2 boxes — unencrypted, opened once at startup.
+  /// (#1303). At most ONE entry — keyed on a fixed sentinel — that the
+  /// [TripRecording] provider rewrites every few seconds while a trip is
+  /// live. Survives a process death so the recovery service can put the
+  /// user back on the recording screen with their captured samples on
+  /// next launch. Unencrypted, opened once at startup.
   static const String obd2ActiveTrip = 'obd2_active_trip';
 
   /// Rolling price snapshots used by the price-drop velocity detector
-  /// (#579). One JSON payload per (station, fuel, timestamp) with a
-  /// synthetic key. Coords are captured per-snapshot so the detector
-  /// can filter by radius without re-joining against station data.
-  /// Pruned to the last 6 h on every write to keep the box small.
-  /// Unencrypted like the other OBD2 boxes — contains no PII beyond
-  /// public station coordinates.
+  /// (#579). One JSON payload per (station, fuel, timestamp); coords are
+  /// captured per-snapshot for radius filtering. Pruned to the last 6 h
+  /// on every write. Unencrypted — no PII beyond public coordinates.
   static const String priceSnapshots = 'price_snapshots';
 
   /// Ring buffer of background-isolate errors awaiting foreground
@@ -220,6 +218,7 @@ class HiveBoxes {
     obd2TripHistory,
     achievements,
     obd2SupportedPids,
+    obd2NegotiatedProtocol,
     serviceReminders,
     obd2PausedTrips,
     obd2ActiveTrip,
@@ -363,6 +362,7 @@ class HiveBoxes {
     await Hive.openBox<String>(serviceReminders);
     // #797 — paused trips box, string-typed JSON, matches runtime.
     await Hive.openBox<String>(obd2PausedTrips);
+    await Hive.openBox<String>(obd2NegotiatedProtocol); // #2261
     // #1303 — active-trip snapshot box, string-typed JSON.
     await Hive.openBox<String>(obd2ActiveTrip);
     // #579 — velocity detector snapshots. String-typed JSON so the

@@ -79,6 +79,11 @@ class TripRecording extends _$TripRecording {
   Obd2Service? _service;
   TripRecordingController? _controller;
 
+  /// #2261 concern 6 — one-shot latch so the deferred multi-frame
+  /// capability probe is kicked exactly once, on the first live sample
+  /// of a recording. Reset at [start] so each new trip re-probes.
+  bool _capabilityReconcileKicked = false;
+
   // #1932 — re-entrancy guard for [start]. `state` is only marked
   // active by the last line of `start()`, but `start()` has `await`s
   // before that, so a second start racing in the window between would
@@ -341,6 +346,9 @@ class TripRecording extends _$TripRecording {
   }) async {
     _lastTripStartedAt ??= DateTime.now();
     _service = service;
+    // #2261 concern 6 — re-arm the deferred capability probe for this
+    // recording; the first live sample kicks it.
+    _capabilityReconcileKicked = false;
     // #1312 — snapshot adapter identity NOW. The service is
     // disconnected during `stop` before `_saveToHistory` runs, so we
     // can't read these off the live service at save time. Best-effort
@@ -434,6 +442,15 @@ class TripRecording extends _$TripRecording {
     // recording UI on next launch.
     _seedActiveSnapshot();
     _liveSub = ctl.live.listen((reading) {
+      // #2261 concern 6 — the multi-frame `0902` capability probe was
+      // pulled off the connect critical path; run it lazily now that the
+      // first samples are landing. Fire-and-forget + one-shot (the
+      // service no-ops after the first run), so it never blocks the
+      // sample pipeline and only ever tightens OEM-PID gating.
+      if (!_capabilityReconcileKicked) {
+        _capabilityReconcileKicked = true;
+        unawaited(_service?.ensureCapabilityReconciled() ?? Future.value());
+      }
       final classified = _baselines.recordAndClassify(reading);
       _haptics.fireForBandTransition(state.band, classified.band);
       state = state.copyWith(
@@ -1130,6 +1147,11 @@ class TripRecording extends _$TripRecording {
         pinnedMac: pinnedMac,
         probe: (mac) async => true,
         connect: connector.attempt,
+        // #2261 concern 2 — after the active-scan miss ceiling, switch to
+        // a passive autoConnect GATT wait for the rest of the 15-min
+        // grace so a parked car stops burning the radio. The 15-min
+        // grace itself is untouched (owned by DroppedSessionManager).
+        passiveConnect: connector.attemptPassive,
         onReconnect: onReconnect,
       );
     };

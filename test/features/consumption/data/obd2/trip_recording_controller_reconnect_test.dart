@@ -571,6 +571,12 @@ class _ObservableScanner implements AdapterReconnectScanner {
   bool get isScanning => _scanning;
 
   @override
+  bool get isPassiveWaiting => false;
+
+  @override
+  int get consecutiveMisses => 0;
+
+  @override
   Duration get currentBackoff => const Duration(seconds: 5);
 
   @override

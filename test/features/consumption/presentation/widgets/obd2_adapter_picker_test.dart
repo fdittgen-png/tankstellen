@@ -351,6 +351,7 @@ class _StreamingFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) =>
       _SilentChannel();
 }

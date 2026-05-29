@@ -157,7 +157,7 @@ CapabilityProbeResult classifyMultiFrameProbeResponse(String raw) {
 /// probe never throws — the connect flow stays resilient.
 Future<CapabilityProbeResult> probeMultiFrameCapability(
   Future<String> Function(String command) sendCommand, {
-  Duration timeout = const Duration(seconds: 4),
+  Duration timeout = const Duration(milliseconds: 1500),
 }) async {
   try {
     final raw = await sendCommand(multiFrameProbeCommand).timeout(timeout);
