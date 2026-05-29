@@ -20,10 +20,13 @@ import 'event_channel_cancel.dart';
 ///    `{"type": "connect"|"disconnect", "mac": "...", "atMillis": <ms>}`
 ///    payloads, one per BLE GATT transition for the armed adapter.
 ///
-/// This file is the bridge file. Phase 2b-1 ships it present-but-unused
-/// so the existing [AutoTripCoordinator] (Refs #1004 phase 2a) has a
-/// real listener to bind against in phase 2b-2 — this PR does NOT wire
-/// it into any production Riverpod provider yet.
+/// `AutoRecordOrchestrator` selects this listener on Android and binds
+/// the [AutoTripCoordinator] to it (phase 2b-2). Note the Kotlin
+/// `<service>` is currently commented out in the manifest pending the
+/// Google Play "Foreground Service Use" form (#1498), so `start(mac)` is
+/// effectively a no-op in shipped builds until the service is restored;
+/// the foreground-active arming fallback (#2282 concern 1) covers
+/// engine detection while the app is in front.
 ///
 /// Channels are constructor-injected so unit tests can swap the names
 /// to per-test channels and exercise the parsing without colliding

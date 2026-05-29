@@ -4,11 +4,17 @@
 /// Abstract event source for the OS-level Bluetooth auto-connect
 /// bridge that drives hands-free trip recording (#1004 phase 2).
 ///
-/// The native Android foreground service (phase 2b — not yet shipped)
-/// observes BLE connect / disconnect transitions for the user's paired
-/// ELM327 adapter and bridges them through a `MethodChannel` /
-/// `EventChannel` into [BackgroundAdapterListener.events]. Tests inject
-/// a [FakeBackgroundAdapterListener] from
+/// The native Android foreground service (shipped as
+/// [AndroidBackgroundAdapterListener] + the Kotlin
+/// `AutoRecordForegroundService`) observes BLE connect / disconnect
+/// transitions for the user's paired ELM327 adapter and bridges them
+/// through a `MethodChannel` / `EventChannel` into
+/// [BackgroundAdapterListener.events]. The service `<service>` entry is
+/// currently commented out in the manifest pending the Google Play
+/// "Foreground Service Use" form (#1498); while it is disabled, the
+/// foreground-active arming fallback (#2282 concern 1) drives
+/// engine-start detection from the live engine instead. Tests inject a
+/// [FakeBackgroundAdapterListener] from
 /// `fake_background_adapter_listener.dart` to drive the
 /// [AutoTripCoordinator] state machine deterministically without any
 /// real Bluetooth stack.
@@ -38,10 +44,12 @@ sealed class BackgroundAdapterEvent {
   const BackgroundAdapterEvent();
 }
 
-/// The paired adapter has come into BLE range and a session is open.
-/// In production this maps to the native foreground service receiving
-/// `ACTION_ACL_CONNECTED` (or the equivalent flutter_blue_plus state)
-/// for the device matching the configured MAC.
+/// The paired adapter has come into BLE range and a GATT link is up.
+/// In production this maps to the native foreground service's
+/// `BluetoothGattCallback.onConnectionStateChange` reporting
+/// `STATE_CONNECTED` for the device matching the configured MAC (the
+/// service holds an `autoConnect=true` GATT client, not an
+/// `ACTION_ACL_CONNECTED` broadcast receiver).
 class AdapterConnected extends BackgroundAdapterEvent {
   @override
   final String mac;
@@ -99,26 +107,29 @@ abstract class BackgroundAdapterListener {
   Future<void> stop();
 }
 
-/// Production stub for the time between this PR (phase 2a, Dart
-/// scaffolding only) and phase 2b (the native Android bridge).
+/// Non-Android stub for the background bridge.
 ///
-/// Every method throws so a Riverpod provider that accidentally wires
-/// the coordinator into production before the native bridge is ready
-/// fails loudly on the first event read instead of silently consuming
-/// every disconnect. This is the same defensive pattern as
-/// `UnimplementedError` on a `freezed` `union` arm — the program never
-/// reaches the `throw` in practice (the auto-record flow is gated on
-/// the `autoRecord` flag in [VehicleProfile], which stays `false` by
-/// default), but if someone forgets the gate the failure is loud.
+/// The Android foreground-service bridge ships as
+/// [AndroidBackgroundAdapterListener]; this stub stands in only on
+/// platforms that have no native background BLE bridge yet (iOS,
+/// desktop). The orchestrator constructs it solely when
+/// `defaultTargetPlatform` is non-Android, so non-Android builds keep
+/// compiling without a runtime arming. Every method throws so that if a
+/// future caller ever wires it into a live flow on such a platform, the
+/// mistake fails loudly on the first event read instead of silently
+/// swallowing connect/disconnect transitions. (On those platforms the
+/// foreground-active arming fallback — #2282 concern 1 — provides
+/// engine-start detection while the app is in front.)
 class UnimplementedBackgroundAdapterListener
     implements BackgroundAdapterListener {
   const UnimplementedBackgroundAdapterListener();
 
   static const String _why =
-      'Phase 2 native foreground service not yet implemented '
-      '(#1004 phase 2). AutoTripCoordinator should be gated on the '
-      'autoRecord vehicle config; until the native bridge lands the '
-      'coordinator should never be wired.';
+      'No native background BLE bridge on this platform — '
+      'UnimplementedBackgroundAdapterListener is a non-Android stub and '
+      'must not be wired into a live auto-record flow. The orchestrator '
+      'only constructs it on non-Android platforms to keep builds '
+      'compiling; engine detection there uses the foreground-active arm.';
 
   @override
   Stream<BackgroundAdapterEvent> get events => throw UnimplementedError(_why);

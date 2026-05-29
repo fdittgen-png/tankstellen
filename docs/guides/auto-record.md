@@ -5,8 +5,19 @@
 
 # Hands-free trip auto-record (Android)
 
-Status: phase 2b-2 — native bridge shipped, `AutoTripCoordinator` wired
-to the active vehicle list via `AutoRecordOrchestrator`.
+Status: phase 2b-3 — `AutoTripCoordinator` wired to the active vehicle
+list via `AutoRecordOrchestrator`, speed sourced from OBD2 PID 0x0D.
+
+**The foreground-service `<service>` entry is currently commented out in
+the manifest** pending the Google Play "Foreground Service Use" form
+(#1498), so the OS-level background bridge does not run in shipped
+builds yet. While it is disabled, the **foreground-active arming
+fallback** (#2282 concern 1) drives engine-start detection from the
+live Flutter engine whenever the app is resumed: on every app resume the
+orchestrator opens a direct connect (`connectByMacDirect`) to the paired
+adapter and the coordinator watches PID 0x0D for movement. The native
+foreground service below is the backgrounded-detection path that the
+form approval will re-enable.
 
 This document explains the Android-side foreground service that drives
 hands-free trip auto-record (issue #1004) and how to verify a build.
@@ -35,7 +46,9 @@ Declared in `android/app/src/main/AndroidManifest.xml`:
 | `android.permission.POST_NOTIFICATIONS` | Android 13+ runtime permission so the persistent low-importance auto-record notification can render. Without it the service still runs but the channel is silenced. |
 | `android.permission.BLUETOOTH_CONNECT` (already declared for #716) | Needed for `getRemoteDevice()` + `connectGatt()` on Android 12+. |
 
-The service entry inside `<application>`:
+The service entry inside `<application>` (currently commented out —
+restore it alongside the `FOREGROUND_SERVICE*` permissions once the
+Play "Foreground Service Use" form #1498 is approved):
 
 ```xml
 <service
@@ -94,52 +107,68 @@ translates those maps into the sealed `AdapterConnected` /
 
 ## Test plan for the user
 
-1. Install a build that has phase 2b-2 wiring (this PR is bridge-only,
-   so the auto-record toggle in the consumption screen does not yet
-   start the service).
-2. Pair the OBD2 adapter once via Android settings.
-3. Enable auto-record on the active vehicle profile.
-4. Lock the phone, walk to the car, plug the adapter in (or step into
-   range if it's permanently plugged).
-5. Verify within ~60 s:
-   * The persistent notification "Trip auto-record — Watching for your
-     OBD2 adapter" is visible.
-   * `AutoRecordTraceLog` shows a `connect` line for your MAC.
-6. Drive for 5 minutes, then exit the car / turn off the ignition.
-7. Verify:
-   * `AutoRecordTraceLog` shows a `disconnect` line.
-   * After the configured `disconnectSaveDelay` (default 60 s) the
-     trip is saved to history.
+While the foreground service is disabled in the manifest, only the
+**foreground-active** path (app open) is exercisable; the
+backgrounded/locked-phone steps below apply once the service is
+re-enabled.
 
-## Production wiring (phase 2b-2)
+1. Pair the OBD2 adapter once (via the in-app picker or Android
+   settings) so the active vehicle has an `obd2AdapterMac`.
+2. Enable auto-record on the active vehicle profile.
+3. Foreground-active path: with the app open, get in and start driving.
+   Within a few seconds of crossing the movement threshold,
+   `AutoRecordTraceLog` shows a `foregroundArmAttempt` followed by
+   `thresholdCrossed` → `tripStarted` and the recording banner appears.
+4. (Backgrounded path — once the service is re-enabled) Lock the phone,
+   walk to the car, plug the adapter in. Verify within ~60 s the
+   persistent "Trip auto-record" notification is visible and
+   `AutoRecordTraceLog` shows a `connect` line for your MAC.
+5. Drive for 5 minutes, then exit the car / turn off the ignition.
+6. Verify `AutoRecordTraceLog` shows a `disconnect` line and, after the
+   configured `disconnectSaveDelay` (default 60 s), the trip is saved to
+   history.
+
+## Production wiring
 
 `AutoRecordOrchestrator` (`lib/features/consumption/providers/auto_record_orchestrator.dart`)
-is the single Riverpod-keepAlive provider that turns the foreground
-service on. Boot sequence:
+is the single Riverpod-keepAlive provider that drives the hands-free
+flow. Boot sequence:
 
 1. `AppInitializer._launch` reads `autoRecordOrchestratorProvider` from
    a post-first-frame microtask. Failures are logged but never block
    the launch path — a bug in the listener factory cannot crash boot.
 2. The orchestrator subscribes to `vehicleProfileListProvider` and
    diffs every change. Any vehicle with both `autoRecord: true` and a
-   non-null `pairedAdapterMac` gets a fresh `AutoTripCoordinator`.
+   non-null `obd2AdapterMac` (via `autoRecordAdapterMac`) gets a fresh
+   `AutoTripCoordinator`. Before arming, the orchestrator requests
+   runtime `POST_NOTIFICATIONS` (#2282 concern 2).
 3. The coordinator constructs its own `BackgroundAdapterListener`. On
    Android (`defaultTargetPlatform == TargetPlatform.android`) this is
-   `AndroidBackgroundAdapterListener` — calling `start(mac)` triggers
-   the Kotlin foreground service. On other platforms the orchestrator
-   falls back to `UnimplementedBackgroundAdapterListener` so iOS /
-   desktop builds still compile.
-4. A vehicle that flips `autoRecord` off, drops its paired MAC, or
-   gets deleted has its coordinator stopped. A `pairedAdapterMac`
+   `AndroidBackgroundAdapterListener` — `start(mac)` would trigger the
+   Kotlin foreground service (currently disabled in the manifest, so a
+   no-op until #1498). On other platforms the orchestrator falls back to
+   `UnimplementedBackgroundAdapterListener` so iOS / desktop builds
+   still compile.
+4. Foreground-active arming (#2282 concern 1): the orchestrator owns an
+   `AppLifecycleListener` whose `onResume` asks every active coordinator
+   to `armForegroundActive()` — a direct `connectByMacDirect` to the
+   paired adapter from the live engine. This is the path that works
+   today while the foreground service is disabled.
+5. A vehicle that flips `autoRecord` off, drops its paired MAC, or
+   gets deleted has its coordinator stopped. An `obd2AdapterMac`
    change is treated as drop + recreate: the foreground service
    watches a single MAC, so re-arming is the only way to switch.
-5. Speed is sourced from `Geolocator.getPositionStream`
-   (m/s → km/h) for phase 2b-2. Phase 2b-3 will switch to OBD2 PID
-   0x0D once the on-connect session-handoff design is decided.
-6. On orchestrator dispose (Riverpod container teardown / app exit)
+6. Speed is sourced from OBD2 PID 0x0D (phase 2b-3): on connect the
+   coordinator opens an `Obd2Service` for the paired MAC, polls PID 0x0D
+   at 1 Hz via `Obd2SpeedStream`, and hands the live session to
+   `TripRecording.start` on threshold-cross. The BLE link is dropped to
+   balanced connection priority while only that 1 Hz movement stream is
+   live and restored to high on hand-off (#2282 concern 4).
+7. On orchestrator dispose (Riverpod container teardown / app exit)
    every coordinator is stopped, which in turn calls
-   `AndroidBackgroundAdapterListener.stop()` and the foreground
-   service is dismissed.
+   `AndroidBackgroundAdapterListener.stop()` (and the foreground service
+   is dismissed when it is enabled). The `AppLifecycleListener` is also
+   disposed.
 
 ## Files
 
