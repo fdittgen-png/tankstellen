@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../../core/utils/num_extensions.dart';
 import '../entities/eco_score.dart';
 import '../entities/fill_up.dart';
 
@@ -96,8 +97,7 @@ class EcoScoreCalculator {
     }
     if (baselineSamples.isEmpty) return null;
 
-    final baseline =
-        baselineSamples.reduce((a, b) => a + b) / baselineSamples.length;
+    final baseline = baselineSamples.average;
     if (baseline <= 0) return null;
 
     final deltaPercent = (currentLp100 - baseline) / baseline * 100;

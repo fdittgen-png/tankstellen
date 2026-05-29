@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../../core/data/storage_repository.dart';
+import '../../../../core/utils/num_extensions.dart';
 import '../../domain/entities/price_stats.dart';
 import '../models/price_record.dart';
 
@@ -87,7 +88,7 @@ class PriceHistoryRepository {
     final current = prices.first;
     final min = prices.reduce((a, b) => a < b ? a : b);
     final max = prices.reduce((a, b) => a > b ? a : b);
-    final avg = prices.reduce((a, b) => a + b) / prices.length;
+    final avg = prices.average;
 
     // Trend: compare newest vs oldest in window
     final trend = _calculateTrend(prices);

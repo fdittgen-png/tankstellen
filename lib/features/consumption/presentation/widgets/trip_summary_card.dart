@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/num_extensions.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
@@ -153,11 +154,7 @@ class TripSummaryCard extends ConsumerWidget {
     String unknown,
   ) {
     if (samples.isEmpty) return unknown;
-    var sum = 0.0;
-    for (final s in samples) {
-      sum += s.speedKmh;
-    }
-    final avg = sum / samples.length;
+    final avg = samples.map((s) => s.speedKmh).average;
     return '${avg.toStringAsFixed(1)} km/h';
   }
 

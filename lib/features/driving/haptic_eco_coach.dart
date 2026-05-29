@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/logging/error_logger.dart';
+import '../../core/utils/num_extensions.dart';
 import '../consumption/data/obd2/trip_live_reading.dart';
 
 /// One coach fire decision (#1273).
@@ -220,8 +221,7 @@ class HapticEcoCoach {
         .whereType<double>()
         .toList(growable: false);
     if (throttleSamples.isEmpty) return false;
-    final avgThrottle =
-        throttleSamples.reduce((a, b) => a + b) / throttleSamples.length;
+    final avgThrottle = throttleSamples.average;
     if (avgThrottle <= throttleThresholdPercent) return false;
 
     final speedSamples = _window

@@ -4,6 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/country/country_config.dart';
+import '../../../core/utils/num_extensions.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
@@ -77,7 +78,7 @@ PricePrediction? pricePrediction(
     hourBuckets.putIfAbsent(v.hourOfDay, () => []).add(v.priceEur);
   }
   final hourlyAverages = hourBuckets.entries.map((e) {
-    final avg = e.value.reduce((a, b) => a + b) / e.value.length;
+    final avg = e.value.average;
     return HourlyAverage(
       hour: e.key,
       avgPrice: double.parse(avg.toStringAsFixed(4)),
@@ -92,7 +93,7 @@ PricePrediction? pricePrediction(
     dayBuckets.putIfAbsent(v.dayOfWeek, () => []).add(v.priceEur);
   }
   final dailyAverages = dayBuckets.entries.map((e) {
-    final avg = e.value.reduce((a, b) => a + b) / e.value.length;
+    final avg = e.value.average;
     return DayOfWeekAverage(
       dayOfWeek: e.key,
       avgPrice: double.parse(avg.toStringAsFixed(4)),
@@ -200,10 +201,8 @@ double? _computeHolidayPremium(List<FeatureVector> vectors) {
   if (holidayPrices.length < _kMinHolidaySamples) return null;
   if (nonHolidayPrices.isEmpty) return null;
 
-  final hAvg =
-      holidayPrices.reduce((a, b) => a + b) / holidayPrices.length;
-  final nAvg = nonHolidayPrices.reduce((a, b) => a + b) /
-      nonHolidayPrices.length;
+  final hAvg = holidayPrices.average;
+  final nAvg = nonHolidayPrices.average;
   final delta = hAvg - nAvg;
   return double.parse(delta.toStringAsFixed(3));
 }

@@ -3,6 +3,7 @@
 
 import 'dart:math' as math;
 
+import '../../../core/utils/num_extensions.dart';
 import '../../consumption/data/trip_history_repository.dart';
 import '../../consumption/domain/trip_recorder.dart';
 
@@ -167,7 +168,7 @@ class TripMetrics {
       if (s.speedKmh >= _movingSpeedThresholdKmh) moving.add(s.speedKmh);
     }
     if (moving.length < 2) return double.infinity;
-    final mean = moving.reduce((a, b) => a + b) / moving.length;
+    final mean = moving.average;
     var sumSq = 0.0;
     for (final v in moving) {
       final d = v - mean;
