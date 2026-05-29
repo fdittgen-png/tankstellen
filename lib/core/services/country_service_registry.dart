@@ -163,7 +163,14 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: 49.5, maxLat: 61.0, minLng: -9.0, maxLng: 2.0,
       ),
-      availableFuelTypes: _defaultFuelTypes,
+      // GB (#2180): UkStationService parses the CMA feed into e5
+      // (E5/unleaded), e10 (E10), e98 (super_unleaded), diesel
+      // (B7/diesel). _defaultFuelTypes omitted e98, so super-unleaded
+      // stations could not be searched — promote to the explicit set.
+      availableFuelTypes: [
+        FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+        FuelType.electric, FuelType.all,
+      ],
       createService: _createUk,
     ),
     CountryServiceEntry(
@@ -199,12 +206,15 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: 45.3, maxLat: 47.0, minLng: 13.3, maxLng: 16.7,
       ),
-      // Slovenia (#575): NMB-95 (e5), NMB-100 (e98), Dizel, Dizel
-      // Premium, LPG.
+      // Slovenia (#575): NMB-95 → e5 (also surfaced as e10 — single
+      // 95-octane grade), NMB-100/98 → e98, Dizel → diesel, Dizel
+      // Premium → dieselPremium, avtoplin-lpg → lpg, cng → cng. #2180:
+      // e10 + cng were missing here though SloveniaStationService emits
+      // both; added to match the service and the picker's supported set.
       availableFuelTypes: [
-        FuelType.e5, FuelType.e98, FuelType.diesel,
-        FuelType.dieselPremium, FuelType.lpg, FuelType.electric,
-        FuelType.all,
+        FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+        FuelType.dieselPremium, FuelType.lpg, FuelType.cng,
+        FuelType.electric, FuelType.all,
       ],
       createService: _createSlovenia,
     ),
@@ -304,7 +314,16 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: -56.0, maxLat: -21.0, minLng: -74.0, maxLng: -53.0,
       ),
-      availableFuelTypes: _defaultFuelTypes,
+      // AR (#2180): ArgentinaStationService emits Nafta súper → e5/e10,
+      // Nafta premium → e98, Gas oil → diesel, Gas oil premium →
+      // dieselPremium, GNC → cng. Promoted off _defaultFuelTypes (which
+      // dropped cng/e98/dieselPremium) so the selector surfaces every
+      // fuel the CSV actually publishes — GNC stations were unsearchable.
+      availableFuelTypes: [
+        FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+        FuelType.dieselPremium, FuelType.cng, FuelType.electric,
+        FuelType.all,
+      ],
       createService: _createArgentina,
     ),
     CountryServiceEntry(
@@ -313,7 +332,16 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: -44.0, maxLat: -9.5, minLng: 112.5, maxLng: 154.0,
       ),
-      availableFuelTypes: _defaultFuelTypes,
+      // AU (#2180): NSW FuelCheck publishes U91 → e5, U95 → e10, U98 →
+      // e98, Diesel → diesel, LPG → lpg. AustraliaStationService is a
+      // documented stub pending a working endpoint (#804), so there is no
+      // live emission to converge on; this mirrors the config's
+      // FuelCheck grade set instead of the unrelated _defaultFuelTypes
+      // fallback, keeping the picker and selector in agreement.
+      availableFuelTypes: [
+        FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+        FuelType.lpg, FuelType.electric, FuelType.all,
+      ],
       createService: _createAustralia,
     ),
     CountryServiceEntry(
