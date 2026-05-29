@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/country/border_proximity.dart';
 import '../../../core/country/country_provider.dart';
 import '../../../core/location/user_position_provider.dart';
+import '../../../core/utils/num_extensions.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../domain/entities/cross_border_comparison.dart';
 import 'search_provider.dart';
@@ -51,7 +52,7 @@ List<CrossBorderComparison> crossBorderComparisons(Ref ref) {
 
   if (prices.isEmpty) return const [];
 
-  final avgPrice = prices.reduce((a, b) => a + b) / prices.length;
+  final avgPrice = prices.average;
 
   return nearbyBorders.map((border) {
     return CrossBorderComparison(

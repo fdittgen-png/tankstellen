@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../../core/utils/num_extensions.dart';
 import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../gps_driving_features.dart';
 
@@ -98,9 +99,7 @@ class GpsMatrixReconciler {
       ),
       residual * residual,
     ];
-    final variance = updatedResiduals.isEmpty
-        ? 0.0
-        : updatedResiduals.reduce((a, b) => a + b) / updatedResiduals.length;
+    final variance = updatedResiduals.average;
 
     return matrix
         .copyWith(

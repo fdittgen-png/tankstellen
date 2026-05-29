@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../utils/num_extensions.dart';
+
 /// Per-country price validation to flag suspicious fuel prices.
 ///
 /// Checks prices against absolute thresholds and relative deviation
@@ -66,7 +68,7 @@ class PriceSanity {
   static double? average(List<double?> prices) {
     final valid = prices.whereType<double>().where((p) => p > 0).toList();
     if (valid.isEmpty) return null;
-    return valid.reduce((a, b) => a + b) / valid.length;
+    return valid.average;
   }
 
   /// Get the threshold range for a country (for display/testing).

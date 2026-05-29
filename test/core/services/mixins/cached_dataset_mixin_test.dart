@@ -46,4 +46,72 @@ void main() {
       expect(other.isDatasetFresh(const Duration(minutes: 5)), false);
     });
   });
+
+  group('CachedDatasetMixin.loadDataset', () {
+    test('returns cached without fetching when fresh', () async {
+      var fetchCalls = 0;
+      var storeCalls = 0;
+      // Stamp the cache as fresh first.
+      cached.markDatasetRefreshed();
+
+      final result = await cached.loadDataset<List<int>>(
+        cached: const [1, 2, 3],
+        ttl: const Duration(minutes: 5),
+        fetch: () async {
+          fetchCalls++;
+          return const [9, 9, 9];
+        },
+        store: (_) => storeCalls++,
+      );
+
+      expect(result, const [1, 2, 3]);
+      expect(fetchCalls, 0, reason: 'fresh cache must not trigger a fetch');
+      expect(storeCalls, 0, reason: 'fresh cache must not re-store');
+    });
+
+    test('fetches, stores and marks fresh when stale', () async {
+      var fetchCalls = 0;
+      int? stored;
+      // Marked, but TTL of zero makes it immediately stale.
+      cached.markDatasetRefreshed();
+      expect(cached.isDatasetFresh(Duration.zero), false);
+
+      final result = await cached.loadDataset<int>(
+        cached: 1,
+        ttl: Duration.zero,
+        fetch: () async {
+          fetchCalls++;
+          return 42;
+        },
+        store: (value) => stored = value,
+      );
+
+      expect(result, 42);
+      expect(fetchCalls, 1);
+      expect(stored, 42);
+      // markDatasetRefreshed was called, so a positive TTL is now fresh.
+      expect(cached.isDatasetFresh(const Duration(minutes: 5)), true);
+    });
+
+    test('fetches when cached is null even within TTL', () async {
+      var fetchCalls = 0;
+      String? stored;
+      // Fresh by time, but no cached value yet.
+      cached.markDatasetRefreshed();
+
+      final result = await cached.loadDataset<String>(
+        cached: null,
+        ttl: const Duration(minutes: 5),
+        fetch: () async {
+          fetchCalls++;
+          return 'loaded';
+        },
+        store: (value) => stored = value,
+      );
+
+      expect(result, 'loaded');
+      expect(fetchCalls, 1, reason: 'null cache must fetch regardless of TTL');
+      expect(stored, 'loaded');
+    });
+  });
 }

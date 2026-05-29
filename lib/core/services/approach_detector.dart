@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../features/search/domain/entities/station.dart';
 import '../utils/geo_utils.dart' as geo;
+import '../utils/num_extensions.dart';
 
 /// State emitted by [ApproachDetector] (#2085 / ADR 0011).
 ///
@@ -219,10 +220,7 @@ class ApproachDetector {
     }
   }
 
-  double _avgSpeed() {
-    if (_recentSpeeds.isEmpty) return 0;
-    return _recentSpeeds.reduce((a, b) => a + b) / _recentSpeeds.length;
-  }
+  double _avgSpeed() => _recentSpeeds.average;
 
   void _schedulePoll() {
     _pollTimer?.cancel();

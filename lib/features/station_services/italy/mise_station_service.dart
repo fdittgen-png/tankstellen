@@ -93,23 +93,32 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
     }
   }
 
-  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) async {
-    // Refresh cache every 2 hours
-    if (_cachedStations != null &&
-        _cachedPrices != null &&
-        isDatasetFresh(const Duration(hours: 2))) {
-      return;
-    }
-
-    // Download both files in parallel
-    final results = await Future.wait([
-      _dio.get<String>(_stationsUrl, cancelToken: cancelToken),
-      _dio.get<String>(_pricesUrl, cancelToken: cancelToken),
-    ]);
-
-    _cachedStations = _parseStationsCsv(results[0].data ?? '');
-    _cachedPrices = _parsePricesCsv(results[1].data ?? '');
-    markDatasetRefreshed();
+  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) {
+    // Refresh cache every 2 hours. Both maps are populated from a single
+    // download, so they're cached together as a record — present only when
+    // both are non-null.
+    final cached = (_cachedStations != null && _cachedPrices != null)
+        ? (_cachedStations!, _cachedPrices!)
+        : null;
+    return loadDataset<(Map<String, _StationData>, Map<String, _PriceData>)>(
+      cached: cached,
+      ttl: const Duration(hours: 2),
+      fetch: () async {
+        // Download both files in parallel
+        final results = await Future.wait([
+          _dio.get<String>(_stationsUrl, cancelToken: cancelToken),
+          _dio.get<String>(_pricesUrl, cancelToken: cancelToken),
+        ]);
+        return (
+          _parseStationsCsv(results[0].data ?? ''),
+          _parsePricesCsv(results[1].data ?? ''),
+        );
+      },
+      store: (value) {
+        _cachedStations = value.$1;
+        _cachedPrices = value.$2;
+      },
+    );
   }
 
   Map<String, _StationData> _parseStationsCsv(String csv) {

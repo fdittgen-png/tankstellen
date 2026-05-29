@@ -3,11 +3,11 @@
 
 import 'dart:async';
 
-import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/storage_repository.dart';
 import '../../storage/storage_providers.dart';
+import '../../utils/geo_utils.dart' as geo;
 import '../dio_factory.dart';
 import '../../../features/search/domain/entities/brand_registry.dart';
 import '../../../features/search/domain/entities/station.dart';
@@ -203,14 +203,11 @@ class OsmBrandEnricher {
     return trimmed;
   }
 
-  static double _distKm(double lat1, double lng1, double lat2, double lng2) {
-    final dLat = (lat2 - lat1) * pi / 180;
-    final dLng = (lng2 - lng1) * pi / 180;
-    final a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(lat1 * pi / 180) * cos(lat2 * pi / 180) *
-        sin(dLng / 2) * sin(dLng / 2);
-    return 6371 * 2 * atan2(sqrt(a), sqrt(1 - a));
-  }
+  // #2169 — delegate to the canonical geo_utils.distanceKm rather than a
+  // hand-rolled haversine. Real POI/station coords only, so the (0,0)
+  // null-island short-circuit never triggers here.
+  static double _distKm(double lat1, double lng1, double lat2, double lng2) =>
+      geo.distanceKm(lat1, lng1, lat2, lng2);
 }
 
 class _Poi {

@@ -172,7 +172,7 @@ final class CrossBorderSuggestionProvider
 }
 
 String _$crossBorderSuggestionHash() =>
-    r'3be95edb40f9144ee405eb3dfa42bbf8c511397a';
+    r'94789eb3147da0736e6490d83daf77a739721e1d';
 
 /// Set of neighbor country codes the user has dismissed during this
 /// session. Resets on app restart (StateNotifier with no persistence).

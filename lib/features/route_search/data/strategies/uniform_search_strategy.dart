@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
@@ -239,7 +238,7 @@ List<String> _filterAndSortIsolate(_FilterSortPayload payload) {
   for (final p in payload.points) {
     double minDist = double.infinity;
     for (int i = 0; i < polyLen; i += step) {
-      final d = _haversineKm(
+      final d = distanceKm(
         p.lat,
         p.lng,
         payload.polyLats[i],
@@ -265,37 +264,24 @@ List<String> _filterAndSortIsolate(_FilterSortPayload payload) {
   return [for (final entry in survivors) entry.$1.id];
 }
 
-double _haversineKm(double lat1, double lng1, double lat2, double lng2) {
-  const earthKm = 6371.0;
-  const deg2rad = 3.141592653589793 / 180.0;
-  final dLat = (lat2 - lat1) * deg2rad;
-  final dLng = (lng2 - lng1) * deg2rad;
-  final a = _sin(dLat / 2) * _sin(dLat / 2) +
-      _cos(lat1 * deg2rad) *
-          _cos(lat2 * deg2rad) *
-          _sin(dLng / 2) *
-          _sin(dLng / 2);
-  return 2 * earthKm * _atan2(_sqrt(a), _sqrt(1 - a));
-}
-
 double _distanceAlongPolylineKm(
   double lat,
   double lng,
   List<double> polyLats,
   List<double> polyLngs,
 ) {
-  // Same shape as core/utils/geo_utils.dart distanceAlongPolyline,
-  // re-implemented inline so the isolate has no UI-side imports.
+  // #2169 — uses the isolate-safe geo_utils.distanceKm (only dart:math
+  // + latlong2 imports), matching the survivors loop above.
   double accumulated = 0;
   double bestAlong = 0;
   double bestDist = double.infinity;
   for (int i = 0; i < polyLats.length - 1; i++) {
-    final segStart = _haversineKm(lat, lng, polyLats[i], polyLngs[i]);
+    final segStart = distanceKm(lat, lng, polyLats[i], polyLngs[i]);
     if (segStart < bestDist) {
       bestDist = segStart;
       bestAlong = accumulated;
     }
-    accumulated += _haversineKm(
+    accumulated += distanceKm(
       polyLats[i],
       polyLngs[i],
       polyLats[i + 1],
@@ -304,7 +290,7 @@ double _distanceAlongPolylineKm(
   }
   // Final point.
   if (polyLats.isNotEmpty) {
-    final last = _haversineKm(
+    final last = distanceKm(
         lat, lng, polyLats.last, polyLngs.last);
     if (last < bestDist) {
       bestAlong = accumulated;
@@ -313,7 +299,3 @@ double _distanceAlongPolylineKm(
   return bestAlong;
 }
 
-double _sin(double x) => math.sin(x);
-double _cos(double x) => math.cos(x);
-double _atan2(double y, double x) => math.atan2(y, x);
-double _sqrt(double x) => math.sqrt(x);

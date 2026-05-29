@@ -63,21 +63,21 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
     }
   }
 
-  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) async {
-    if (_cachedStations != null && isDatasetFresh(const Duration(minutes: 5))) {
-      return;
-    }
-
-    // Fetch all 3 sources in parallel
-    final results = await Future.wait([
-      _fetchOk(cancelToken: cancelToken),
-      _fetchShell(cancelToken: cancelToken),
-      _fetchQ8(),
-    ]);
-
-    _cachedStations = [...results[0], ...results[1], ...results[2]];
-    markDatasetRefreshed();
-  }
+  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) =>
+      loadDataset<List<Station>>(
+        cached: _cachedStations,
+        ttl: const Duration(minutes: 5),
+        fetch: () async {
+          // Fetch all 3 sources in parallel
+          final results = await Future.wait([
+            _fetchOk(cancelToken: cancelToken),
+            _fetchShell(cancelToken: cancelToken),
+            _fetchQ8(),
+          ]);
+          return [...results[0], ...results[1], ...results[2]];
+        },
+        store: (value) => _cachedStations = value,
+      );
 
   /// OK — https://mobility-prices.ok.dk/api/v1/fuel-prices
   Future<List<Station>> _fetchOk({CancelToken? cancelToken}) async {

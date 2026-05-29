@@ -11,6 +11,7 @@ import '../../../core/location/user_position_provider.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/utils/num_extensions.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../data/models/search_params.dart';
 import '../domain/entities/cross_border_suggestion.dart';
@@ -83,7 +84,7 @@ Future<CrossBorderSuggestion?> crossBorderSuggestion(Ref ref) async {
       .where((p) => p > 0)
       .toList();
   if (localPrices.isEmpty) return null;
-  final localAvg = localPrices.reduce((a, b) => a + b) / localPrices.length;
+  final localAvg = localPrices.average;
 
   // Detect nearby borders within the issue's 25 km radius.
   final nearbyBorders = detectNearbyBorders(
@@ -128,8 +129,7 @@ Future<CrossBorderSuggestion?> crossBorderSuggestion(Ref ref) async {
         .where((p) => p > 0)
         .toList();
     if (neighborPrices.isEmpty) continue;
-    final neighborAvg =
-        neighborPrices.reduce((a, b) => a + b) / neighborPrices.length;
+    final neighborAvg = neighborPrices.average;
 
     final delta = localAvg - neighborAvg;
     if (delta <= 0) continue; // not actually cheaper — skip
