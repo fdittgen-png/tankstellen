@@ -305,6 +305,38 @@ void main() {
     });
   });
 
+  group('Startup-time breadcrumb (#2320)', () {
+    test(
+        '_launch emits the cold-start total as a "startup" breadcrumb after '
+        'StartupTimer.finish()', () {
+      // #2320 — StartupTimer.finish() only prints under kDebugMode, so a
+      // startup-latency regression was invisible in production. Pushing
+      // the total onto BreadcrumbCollector (already drained into every
+      // error trace by the nav + dio observers) makes it visible in
+      // production error traces.
+      final launchBody = _extractMethodBody(initSource, 'static void _launch');
+      expect(launchBody, isNotNull);
+
+      final finishIdx = launchBody!.indexOf('StartupTimer.instance.finish()');
+      final breadcrumbIdx = launchBody.indexOf("BreadcrumbCollector.add('startup'");
+      expect(finishIdx, isNonNegative, reason: 'finish() must still be called');
+      expect(breadcrumbIdx, isNonNegative,
+          reason: 'a "startup" breadcrumb must be emitted with the total ms');
+      expect(finishIdx, lessThan(breadcrumbIdx),
+          reason: 'the breadcrumb must read totalMs AFTER finish() has '
+              'stopped the timer and recorded the total');
+      expect(launchBody, contains('totalMs'),
+          reason: 'the breadcrumb detail must carry the cold-start total');
+
+      expect(
+        initSource,
+        contains(
+            "import '../core/telemetry/collectors/breadcrumb_collector.dart';"),
+        reason: 'BreadcrumbCollector must be imported so the wiring compiles',
+      );
+    });
+  });
+
   group('Widget cold-launch URI dispatch (#2159)', () {
     test(
         '_stashWidgetLaunchUri intercepts refresh URIs before stashing',

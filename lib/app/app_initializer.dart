@@ -17,6 +17,7 @@ import '../core/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
 import '../core/feedback/auto_record_badge_provider.dart';
+import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/storage/isolate_error_spool.dart';
 import '../core/telemetry/storage/trace_storage.dart';
 import '../core/telemetry/trace_recorder.dart';
@@ -900,6 +901,16 @@ class AppInitializer {
 
     StartupTimer.instance.mark('first_frame');
     StartupTimer.instance.finish();
+    // #2320 — surface the cold-start total as a trace breadcrumb so a
+    // startup-latency regression is visible in production error traces
+    // (StartupTimer.finish() otherwise only prints under kDebugMode).
+    // BreadcrumbCollector is already drained into every error trace by
+    // the nav + dio observers, so a single add here puts the figure in
+    // the same ring buffer.
+    final totalMs = StartupTimer.instance.totalMs;
+    if (totalMs != null) {
+      BreadcrumbCollector.add('startup', detail: '${totalMs}ms');
+    }
     runApp(
       UncontrolledProviderScope(
         container: container,
