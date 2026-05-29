@@ -5511,6 +5511,67 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Sumažinti į slankųjį langelį';
 
   @override
+  String get tripShareAction => 'Bendrinti su kita paskyra';
+
+  @override
+  String get tripShareSheetTitle => 'Bendrinti šią kelionę';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Suteikite kitai „TankSync“ paskyrai tik skaitymo prieigą prie šios įrašytos kelionės.';
+
+  @override
+  String get tripShareEmailLabel => 'Gavėjo el. paštas';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Bendrinti';
+
+  @override
+  String get tripShareCreateLinkButton => 'Sukurti bendrinimo nuorodą';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Bendrinimo nuoroda nukopijuota — įklijuokite ją gavėjui.';
+
+  @override
+  String get tripShareSuccess => 'Kelionė bendrinama.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Jokia „TankSync“ paskyra nenaudoja šio el. pašto.';
+
+  @override
+  String get tripShareError =>
+      'Nepavyko bendrinti kelionės. Bandykite dar kartą.';
+
+  @override
+  String get tripShareExistingTitle => 'Bendrinama su';
+
+  @override
+  String get tripShareExistingEmpty => 'Dar su niekuo nebendrinama.';
+
+  @override
+  String get tripShareDirectRecipient => 'Paskyra';
+
+  @override
+  String get tripShareLinkRecipient => 'Bendrinimo nuoroda (neatsiimta)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Atšaukti';
+
+  @override
+  String get tripShareRevoked => 'Bendrinimas atšauktas.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Bendrinama su manimi';
+
+  @override
+  String get trajetsSharedBadge => 'Bendrinama';
+
+  @override
   String get unifiedFilterFuel => 'Kuras';
 
   @override

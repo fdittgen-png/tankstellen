@@ -5543,6 +5543,66 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Réduire en vignette flottante';
 
   @override
+  String get tripShareAction => 'Partager avec un autre compte';
+
+  @override
+  String get tripShareSheetTitle => 'Partager ce trajet';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Donnez à un autre compte TankSync un accès en lecture seule à ce trajet enregistré.';
+
+  @override
+  String get tripShareEmailLabel => 'E-mail du destinataire';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Partager';
+
+  @override
+  String get tripShareCreateLinkButton => 'Créer un lien de partage';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Lien de partage copié — transmettez-le au destinataire.';
+
+  @override
+  String get tripShareSuccess => 'Trajet partagé.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Aucun compte TankSync n\'utilise cet e-mail.';
+
+  @override
+  String get tripShareError => 'Impossible de partager ce trajet. Réessayez.';
+
+  @override
+  String get tripShareExistingTitle => 'Partagé avec';
+
+  @override
+  String get tripShareExistingEmpty => 'Pas encore partagé avec personne.';
+
+  @override
+  String get tripShareDirectRecipient => 'Un compte';
+
+  @override
+  String get tripShareLinkRecipient => 'Lien de partage (non réclamé)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Révoquer';
+
+  @override
+  String get tripShareRevoked => 'Partage révoqué.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Partagé avec moi';
+
+  @override
+  String get trajetsSharedBadge => 'Partagé';
+
+  @override
   String get unifiedFilterFuel => 'Carburant';
 
   @override

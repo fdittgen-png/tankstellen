@@ -5479,6 +5479,66 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Pienennä kelluvaksi ruuduksi';
 
   @override
+  String get tripShareAction => 'Jaa toiselle tilille';
+
+  @override
+  String get tripShareSheetTitle => 'Jaa tämä matka';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Anna toiselle TankSync-tilille vain luku -oikeus tähän tallennettuun matkaan.';
+
+  @override
+  String get tripShareEmailLabel => 'Vastaanottajan sähköposti';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Jaa';
+
+  @override
+  String get tripShareCreateLinkButton => 'Luo jakolinkki';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Jakolinkki kopioitu — liitä se vastaanottajalle.';
+
+  @override
+  String get tripShareSuccess => 'Matka jaettu.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Mikään TankSync-tili ei käytä tätä sähköpostia.';
+
+  @override
+  String get tripShareError => 'Matkan jakaminen epäonnistui. Yritä uudelleen.';
+
+  @override
+  String get tripShareExistingTitle => 'Jaettu käyttäjälle';
+
+  @override
+  String get tripShareExistingEmpty => 'Ei vielä jaettu kenellekään.';
+
+  @override
+  String get tripShareDirectRecipient => 'Tili';
+
+  @override
+  String get tripShareLinkRecipient => 'Jakolinkki (lunastamaton)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Peruuta';
+
+  @override
+  String get tripShareRevoked => 'Jakaminen peruutettu.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Jaettu kanssani';
+
+  @override
+  String get trajetsSharedBadge => 'Jaettu';
+
+  @override
   String get unifiedFilterFuel => 'Polttoaine';
 
   @override

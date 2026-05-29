@@ -5511,6 +5511,66 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Riduci a riquadro mobile';
 
   @override
+  String get tripShareAction => 'Condividi con un altro account';
+
+  @override
+  String get tripShareSheetTitle => 'Condividi questo viaggio';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Concedi a un altro account TankSync l\'accesso in sola lettura a questo viaggio registrato.';
+
+  @override
+  String get tripShareEmailLabel => 'Email del destinatario';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Condividi';
+
+  @override
+  String get tripShareCreateLinkButton => 'Crea link di condivisione';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Link di condivisione copiato: incollalo al destinatario.';
+
+  @override
+  String get tripShareSuccess => 'Viaggio condiviso.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Nessun account TankSync usa questa email.';
+
+  @override
+  String get tripShareError => 'Impossibile condividere il viaggio. Riprova.';
+
+  @override
+  String get tripShareExistingTitle => 'Condiviso con';
+
+  @override
+  String get tripShareExistingEmpty => 'Non ancora condiviso con nessuno.';
+
+  @override
+  String get tripShareDirectRecipient => 'Un account';
+
+  @override
+  String get tripShareLinkRecipient => 'Link di condivisione (non riscattato)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Revoca';
+
+  @override
+  String get tripShareRevoked => 'Condivisione revocata.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Condiviso con me';
+
+  @override
+  String get trajetsSharedBadge => 'Condiviso';
+
+  @override
   String get unifiedFilterFuel => 'Carburante';
 
   @override

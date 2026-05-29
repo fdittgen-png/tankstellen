@@ -5470,6 +5470,66 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimeeri hõljuvaks paaniks';
 
   @override
+  String get tripShareAction => 'Jaga teise kontoga';
+
+  @override
+  String get tripShareSheetTitle => 'Jaga seda sõitu';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Anna teisele TankSynci kontole sellele salvestatud sõidule kirjutuskaitstud juurdepääs.';
+
+  @override
+  String get tripShareEmailLabel => 'Saaja e-post';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Jaga';
+
+  @override
+  String get tripShareCreateLinkButton => 'Loo jagamislink';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Jagamislink kopeeritud — kleebi see saajale.';
+
+  @override
+  String get tripShareSuccess => 'Sõit jagatud.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Ükski TankSynci konto ei kasuta seda e-posti.';
+
+  @override
+  String get tripShareError => 'Sõitu ei õnnestunud jagada. Proovi uuesti.';
+
+  @override
+  String get tripShareExistingTitle => 'Jagatud kasutajaga';
+
+  @override
+  String get tripShareExistingEmpty => 'Pole veel kellegagi jagatud.';
+
+  @override
+  String get tripShareDirectRecipient => 'Konto';
+
+  @override
+  String get tripShareLinkRecipient => 'Jagamislink (lunastamata)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Tühista';
+
+  @override
+  String get tripShareRevoked => 'Jagamine tühistatud.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Minuga jagatud';
+
+  @override
+  String get trajetsSharedBadge => 'Jagatud';
+
+  @override
   String get unifiedFilterFuel => 'Kütus';
 
   @override

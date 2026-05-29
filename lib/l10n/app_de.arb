@@ -2264,6 +2264,82 @@
   "tripBannerOpenFromConsumptionTab": "Aktive Fahrt aus dem Verbrauchs-Tab öffnen",
   "tripRecordingUnpinnedWarning": "Bildschirm anpinnen, damit das GPS während der Fahrt aktiv bleibt — Android kann das GPS im Ruhezustand drosseln.",
   "tripRecordingMinimiseTooltip": "Als schwebende Kachel minimieren",
+  "tripShareAction": "Mit anderem Konto teilen",
+  "@tripShareAction": {
+    "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."
+  },
+  "tripShareSheetTitle": "Diese Fahrt teilen",
+  "@tripShareSheetTitle": {
+    "description": "Title of the cross-account trip-sharing bottom sheet (#2240)."
+  },
+  "tripShareSheetSubtitle": "Gib einem anderen TankSync-Konto Lesezugriff auf diese aufgezeichnete Fahrt.",
+  "@tripShareSheetSubtitle": {
+    "description": "Subtitle under the cross-account trip-sharing sheet title explaining that sharing grants read-only access (#2240)."
+  },
+  "tripShareEmailLabel": "E-Mail des Empfängers",
+  "@tripShareEmailLabel": {
+    "description": "Label for the email text field in the cross-account trip-sharing sheet where the user types the recipient's TankSync account email (#2240)."
+  },
+  "tripShareEmailHint": "name@beispiel.de",
+  "@tripShareEmailHint": {
+    "description": "Hint text inside the recipient-email field of the trip-sharing sheet (#2240). A neutral placeholder address."
+  },
+  "tripShareSendButton": "Teilen",
+  "@tripShareSendButton": {
+    "description": "Button that submits the recipient email to create a direct account-to-account trip share (#2240)."
+  },
+  "tripShareCreateLinkButton": "Freigabelink erstellen",
+  "@tripShareCreateLinkButton": {
+    "description": "Button in the trip-sharing sheet that mints an unguessable share link the user can send to anyone; the recipient claims it to gain read access (#2240)."
+  },
+  "tripShareLinkCreated": "Freigabelink kopiert — füge ihn dem Empfänger ein.",
+  "@tripShareLinkCreated": {
+    "description": "Snackbar shown after a trip share link is generated and handed to the OS share sheet (#2240)."
+  },
+  "tripShareSuccess": "Fahrt geteilt.",
+  "@tripShareSuccess": {
+    "description": "Snackbar confirming a direct account-to-account trip share succeeded (#2240)."
+  },
+  "tripShareRecipientNotFound": "Kein TankSync-Konto nutzt diese E-Mail.",
+  "@tripShareRecipientNotFound": {
+    "description": "Snackbar shown when the recipient email entered in the trip-sharing sheet does not match any TankSync account (#2240)."
+  },
+  "tripShareError": "Fahrt konnte nicht geteilt werden. Versuche es erneut.",
+  "@tripShareError": {
+    "description": "Snackbar shown when creating a trip share fails for a non-specific reason (network / server) (#2240)."
+  },
+  "tripShareExistingTitle": "Geteilt mit",
+  "@tripShareExistingTitle": {
+    "description": "Section header above the list of accounts / links this trip is already shared with, in the trip-sharing sheet (#2240)."
+  },
+  "tripShareExistingEmpty": "Noch mit niemandem geteilt.",
+  "@tripShareExistingEmpty": {
+    "description": "Empty-state caption under the 'Shared with' header when the trip has no active shares yet (#2240)."
+  },
+  "tripShareDirectRecipient": "Ein Konto",
+  "@tripShareDirectRecipient": {
+    "description": "Label for a direct account-to-account share row in the 'Shared with' list when the recipient's email isn't surfaced to the owner for privacy (#2240)."
+  },
+  "tripShareLinkRecipient": "Freigabelink (nicht eingelöst)",
+  "@tripShareLinkRecipient": {
+    "description": "Label for a link-share row in the 'Shared with' list that no recipient has claimed yet (#2240)."
+  },
+  "tripShareRevokeTooltip": "Widerrufen",
+  "@tripShareRevokeTooltip": {
+    "description": "Tooltip on the revoke (delete) button next to a share row in the 'Shared with' list (#2240)."
+  },
+  "tripShareRevoked": "Freigabe widerrufen.",
+  "@tripShareRevoked": {
+    "description": "Snackbar confirming a trip share was revoked (#2240)."
+  },
+  "trajetsSharedSectionTitle": "Mit mir geteilt",
+  "@trajetsSharedSectionTitle": {
+    "description": "Section header on the Trajets tab above the list of trips other accounts have shared with the current user (#2240)."
+  },
+  "trajetsSharedBadge": "Geteilt",
+  "@trajetsSharedBadge": {
+    "description": "Small badge on a trip row indicating the trip was shared with the user by another account and is read-only (#2240)."
+  },
   "unifiedFilterFuel": "Kraftstoff",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Beide",

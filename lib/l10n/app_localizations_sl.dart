@@ -5486,6 +5486,66 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Pomanjšaj v lebdečo ploščico';
 
   @override
+  String get tripShareAction => 'Deli z drugim računom';
+
+  @override
+  String get tripShareSheetTitle => 'Deli to vožnjo';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Drugemu računu TankSync dajte dostop samo za branje do te zabeležene vožnje.';
+
+  @override
+  String get tripShareEmailLabel => 'E-pošta prejemnika';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Deli';
+
+  @override
+  String get tripShareCreateLinkButton => 'Ustvari povezavo za deljenje';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Povezava za deljenje kopirana — prilepite jo prejemniku.';
+
+  @override
+  String get tripShareSuccess => 'Vožnja deljena.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Noben račun TankSync ne uporablja tega e-naslova.';
+
+  @override
+  String get tripShareError => 'Vožnje ni bilo mogoče deliti. Poskusite znova.';
+
+  @override
+  String get tripShareExistingTitle => 'Deljeno z';
+
+  @override
+  String get tripShareExistingEmpty => 'Še ni deljeno z nikomer.';
+
+  @override
+  String get tripShareDirectRecipient => 'Račun';
+
+  @override
+  String get tripShareLinkRecipient => 'Povezava za deljenje (neprevzeta)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Prekliči';
+
+  @override
+  String get tripShareRevoked => 'Deljenje preklicano.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Deljeno z mano';
+
+  @override
+  String get trajetsSharedBadge => 'Deljeno';
+
+  @override
   String get unifiedFilterFuel => 'Gorivo';
 
   @override

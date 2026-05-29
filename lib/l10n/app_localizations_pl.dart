@@ -5506,6 +5506,67 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zminimalizuj do pływającego kafelka';
 
   @override
+  String get tripShareAction => 'Udostępnij innemu kontu';
+
+  @override
+  String get tripShareSheetTitle => 'Udostępnij tę trasę';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Daj innemu kontu TankSync dostęp tylko do odczytu do tej zarejestrowanej trasy.';
+
+  @override
+  String get tripShareEmailLabel => 'E-mail odbiorcy';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Udostępnij';
+
+  @override
+  String get tripShareCreateLinkButton => 'Utwórz link udostępniania';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Link udostępniania skopiowano — wklej go odbiorcy.';
+
+  @override
+  String get tripShareSuccess => 'Trasa udostępniona.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Żadne konto TankSync nie używa tego e-maila.';
+
+  @override
+  String get tripShareError =>
+      'Nie udało się udostępnić trasy. Spróbuj ponownie.';
+
+  @override
+  String get tripShareExistingTitle => 'Udostępniono';
+
+  @override
+  String get tripShareExistingEmpty => 'Jeszcze nikomu nie udostępniono.';
+
+  @override
+  String get tripShareDirectRecipient => 'Konto';
+
+  @override
+  String get tripShareLinkRecipient => 'Link udostępniania (nieodebrany)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Cofnij';
+
+  @override
+  String get tripShareRevoked => 'Udostępnianie cofnięte.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Udostępnione mnie';
+
+  @override
+  String get trajetsSharedBadge => 'Udostępnione';
+
+  @override
   String get unifiedFilterFuel => 'Paliwo';
 
   @override

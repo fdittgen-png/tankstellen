@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
+import '../../../../core/sync/trip_shares_sync_enabled_provider.dart';
 import '../../../../core/sync/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -18,9 +19,11 @@ import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
+import '../../providers/shared_trips_provider.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
 import '../widgets/trip_detail_charts.dart';
+import '../widgets/trip_share_sheet.dart';
 import 'trip_detail_gpx_share.dart';
 import 'trip_detail_sample_converter.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -118,11 +121,26 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final trips = ref.watch(tripHistoryListProvider);
-    final entry = trips.where((t) => t.id == widget.tripId).firstOrNull;
+    final ownedEntry = trips.where((t) => t.id == widget.tripId).firstOrNull;
+    // #2240 — a trip shared WITH the user isn't in their local Hive
+    // history; fall back to the live "shared with me" list so tapping a
+    // shared row opens a read-only detail. `isShared` gates the owner-
+    // only actions (cross-account share / delete) off for these.
+    final sharedTrips = ref.watch(sharedTripsProvider).value ?? const [];
+    final isShared = ownedEntry == null;
+    final entry = ownedEntry ??
+        sharedTrips.where((t) => t.id == widget.tripId).firstOrNull;
     _maybeDecrementBadge(entry);
-    _maybeHydrateDetails(entry);
+    if (!isShared) _maybeHydrateDetails(entry);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final vehicles = ref.watch(vehicleProfileListProvider);
+    // Cross-account sharing (#2240) — only offered when trip sync is
+    // enabled (email-backed account ∧ cloudSync ∧ syncTrips), since a
+    // trip can only be shared once it's actually synced to the server.
+    // Never offered for a trip that was shared WITH you (you're not the
+    // owner) — re-sharing / deleting someone else's trip isn't allowed.
+    final canShareCrossAccount =
+        !isShared && ref.watch(tripSharesSyncEnabledProvider);
 
     // Resolve the per-trip vehicle so the summary card can show the
     // friendly name. Fall back to the active vehicle when the trip
@@ -163,6 +181,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       unawaited(_onShare(context, l, entry, vehicle));
                     case 'gpx':
                       unawaited(shareTripGpx(context, l, entry));
+                    case 'cross_account':
+                      unawaited(showTripShareSheet(context, entry.id));
                   }
                 },
                 itemBuilder: (_) => <PopupMenuEntry<String>>[
@@ -194,14 +214,31 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                             ),
                     ),
                   ),
+                  // #2240 — cross-account share, only when trip sync is
+                  // on (you can't share a trip the server doesn't have).
+                  if (canShareCrossAccount)
+                    PopupMenuItem<String>(
+                      key: const Key('trip_detail_share_cross_account_option'),
+                      value: 'cross_account',
+                      child: ListTile(
+                        leading: const Icon(Icons.group_add_outlined),
+                        title: Text(
+                          l?.tripShareAction ?? 'Share with another account',
+                        ),
+                      ),
+                    ),
                 ],
               ),
-              IconButton(
-                key: const Key('trip_detail_delete_button'),
-                icon: const Icon(Icons.delete_outline),
-                tooltip: l?.trajetDetailDeleteAction ?? 'Delete',
-                onPressed: () => _onDelete(context, ref, l),
-              ),
+              // Delete mutates the local Hive history — meaningless for
+              // a trip shared WITH you (you don't own it). Hidden for
+              // shared trips (#2240); revocation is the owner's job.
+              if (!isShared)
+                IconButton(
+                  key: const Key('trip_detail_delete_button'),
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: l?.trajetDetailDeleteAction ?? 'Delete',
+                  onPressed: () => _onDelete(context, ref, l),
+                ),
             ],
       bodyPadding: EdgeInsets.zero,
       body: entry == null

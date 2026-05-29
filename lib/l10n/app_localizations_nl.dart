@@ -5500,6 +5500,66 @@ class AppLocalizationsNl extends AppLocalizations {
       'Minimaliseren tot een zwevende tegel';
 
   @override
+  String get tripShareAction => 'Delen met een ander account';
+
+  @override
+  String get tripShareSheetTitle => 'Deze rit delen';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Geef een ander TankSync-account alleen-lezentoegang tot deze opgenomen rit.';
+
+  @override
+  String get tripShareEmailLabel => 'E-mail van ontvanger';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Delen';
+
+  @override
+  String get tripShareCreateLinkButton => 'Deellink maken';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Deellink gekopieerd — plak hem voor de ontvanger.';
+
+  @override
+  String get tripShareSuccess => 'Rit gedeeld.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Geen TankSync-account gebruikt dat e-mailadres.';
+
+  @override
+  String get tripShareError => 'Kan deze rit niet delen. Probeer het opnieuw.';
+
+  @override
+  String get tripShareExistingTitle => 'Gedeeld met';
+
+  @override
+  String get tripShareExistingEmpty => 'Nog met niemand gedeeld.';
+
+  @override
+  String get tripShareDirectRecipient => 'Een account';
+
+  @override
+  String get tripShareLinkRecipient => 'Deellink (niet geclaimd)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Intrekken';
+
+  @override
+  String get tripShareRevoked => 'Delen ingetrokken.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Met mij gedeeld';
+
+  @override
+  String get trajetsSharedBadge => 'Gedeeld';
+
+  @override
   String get unifiedFilterFuel => 'Brandstof';
 
   @override

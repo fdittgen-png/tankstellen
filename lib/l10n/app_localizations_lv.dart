@@ -5512,6 +5512,66 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimizēt uz peldošu elementu';
 
   @override
+  String get tripShareAction => 'Kopīgot ar citu kontu';
+
+  @override
+  String get tripShareSheetTitle => 'Kopīgot šo braucienu';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Piešķiriet citam TankSync kontam tikai lasīšanas piekļuvi šim ierakstītajam braucienam.';
+
+  @override
+  String get tripShareEmailLabel => 'Saņēmēja e-pasts';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Kopīgot';
+
+  @override
+  String get tripShareCreateLinkButton => 'Izveidot kopīgošanas saiti';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Kopīgošanas saite nokopēta — ielīmējiet to saņēmējam.';
+
+  @override
+  String get tripShareSuccess => 'Brauciens kopīgots.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Neviens TankSync konts neizmanto šo e-pastu.';
+
+  @override
+  String get tripShareError => 'Neizdevās kopīgot braucienu. Mēģiniet vēlreiz.';
+
+  @override
+  String get tripShareExistingTitle => 'Kopīgots ar';
+
+  @override
+  String get tripShareExistingEmpty => 'Vēl ne ar vienu nav kopīgots.';
+
+  @override
+  String get tripShareDirectRecipient => 'Konts';
+
+  @override
+  String get tripShareLinkRecipient => 'Kopīgošanas saite (nepieprasīta)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Atsaukt';
+
+  @override
+  String get tripShareRevoked => 'Kopīgošana atsaukta.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Kopīgots ar mani';
+
+  @override
+  String get trajetsSharedBadge => 'Kopīgots';
+
+  @override
   String get unifiedFilterFuel => 'Degviela';
 
   @override

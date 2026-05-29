@@ -5451,6 +5451,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Minimise to a floating tile';
 
   @override
+  String get tripShareAction => 'Share with another account';
+
+  @override
+  String get tripShareSheetTitle => 'Share this trip';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Give another TankSync account read-only access to this recorded trip.';
+
+  @override
+  String get tripShareEmailLabel => 'Recipient email';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Share';
+
+  @override
+  String get tripShareCreateLinkButton => 'Create share link';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Share link copied — paste it to the recipient.';
+
+  @override
+  String get tripShareSuccess => 'Trip shared.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'No TankSync account uses that email.';
+
+  @override
+  String get tripShareError => 'Couldn\'t share this trip. Try again.';
+
+  @override
+  String get tripShareExistingTitle => 'Shared with';
+
+  @override
+  String get tripShareExistingEmpty => 'Not shared with anyone yet.';
+
+  @override
+  String get tripShareDirectRecipient => 'An account';
+
+  @override
+  String get tripShareLinkRecipient => 'Share link (unclaimed)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Revoke';
+
+  @override
+  String get tripShareRevoked => 'Share revoked.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Shared with me';
+
+  @override
+  String get trajetsSharedBadge => 'Shared';
+
+  @override
   String get unifiedFilterFuel => 'Fuel';
 
   @override
@@ -11227,6 +11287,68 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripRecordingMinimiseTooltip =>
       '⟦Ṁîñîɱîšé ŧó á ƒłóáŧîñǧ ŧîłé ··········⟧';
+
+  @override
+  String get tripShareAction => '⟦Šĥářé ŵîŧĥ áñóŧĥéř áççóúñŧ ··········⟧';
+
+  @override
+  String get tripShareSheetTitle => '⟦Šĥářé ŧĥîš ŧřîƥ ······⟧';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      '⟦Ǧîṽé áñóŧĥéř ŦáñķŠýñç áççóúñŧ řéáđ-óñłý áççéšš ŧó ŧĥîš řéçóřđéđ ŧřîƥ. ··························⟧';
+
+  @override
+  String get tripShareEmailLabel => '⟦Řéçîƥîéñŧ éɱáîł ······⟧';
+
+  @override
+  String get tripShareEmailHint => '⟦ñáɱé@éẋáɱƥłé.çóɱ ······⟧';
+
+  @override
+  String get tripShareSendButton => '⟦Šĥářé ··⟧';
+
+  @override
+  String get tripShareCreateLinkButton => '⟦Çřéáŧé šĥářé łîñķ ·······⟧';
+
+  @override
+  String get tripShareLinkCreated =>
+      '⟦Šĥářé łîñķ çóƥîéđ — ƥášŧé îŧ ŧó ŧĥé řéçîƥîéñŧ. ················⟧';
+
+  @override
+  String get tripShareSuccess => '⟦Ŧřîƥ šĥářéđ. ·····⟧';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      '⟦Ñó ŦáñķŠýñç áççóúñŧ úšéš ŧĥáŧ éɱáîł. ··············⟧';
+
+  @override
+  String get tripShareError =>
+      '⟦Çóúłđñ\'ŧ šĥářé ŧĥîš ŧřîƥ. Ŧřý áǧáîñ. ·············⟧';
+
+  @override
+  String get tripShareExistingTitle => '⟦Šĥářéđ ŵîŧĥ ·····⟧';
+
+  @override
+  String get tripShareExistingEmpty =>
+      '⟦Ñóŧ šĥářéđ ŵîŧĥ áñýóñé ýéŧ. ··········⟧';
+
+  @override
+  String get tripShareDirectRecipient => '⟦Áñ áççóúñŧ ····⟧';
+
+  @override
+  String get tripShareLinkRecipient => '⟦Šĥářé łîñķ (úñçłáîɱéđ) ········⟧';
+
+  @override
+  String get tripShareRevokeTooltip => '⟦Řéṽóķé ···⟧';
+
+  @override
+  String get tripShareRevoked => '⟦Šĥářé řéṽóķéđ. ·····⟧';
+
+  @override
+  String get trajetsSharedSectionTitle => '⟦Šĥářéđ ŵîŧĥ ɱé ·····⟧';
+
+  @override
+  String get trajetsSharedBadge => '⟦Šĥářéđ ···⟧';
 
   @override
   String get unifiedFilterFuel => '⟦Ƒúéł ··⟧';

@@ -5524,6 +5524,67 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripRecordingMinimiseTooltip => 'Kicsinyítés lebegő csempére';
 
   @override
+  String get tripShareAction => 'Megosztás másik fiókkal';
+
+  @override
+  String get tripShareSheetTitle => 'Az út megosztása';
+
+  @override
+  String get tripShareSheetSubtitle =>
+      'Adjon egy másik TankSync-fióknak csak olvasási hozzáférést ehhez a rögzített úthoz.';
+
+  @override
+  String get tripShareEmailLabel => 'Címzett e-mail-címe';
+
+  @override
+  String get tripShareEmailHint => 'name@example.com';
+
+  @override
+  String get tripShareSendButton => 'Megosztás';
+
+  @override
+  String get tripShareCreateLinkButton => 'Megosztási hivatkozás létrehozása';
+
+  @override
+  String get tripShareLinkCreated =>
+      'Megosztási hivatkozás másolva — illessze be a címzettnek.';
+
+  @override
+  String get tripShareSuccess => 'Út megosztva.';
+
+  @override
+  String get tripShareRecipientNotFound =>
+      'Egyetlen TankSync-fiók sem használja ezt az e-mail-címet.';
+
+  @override
+  String get tripShareError =>
+      'Az utat nem sikerült megosztani. Próbálja újra.';
+
+  @override
+  String get tripShareExistingTitle => 'Megosztva vele';
+
+  @override
+  String get tripShareExistingEmpty => 'Még senkivel sincs megosztva.';
+
+  @override
+  String get tripShareDirectRecipient => 'Egy fiók';
+
+  @override
+  String get tripShareLinkRecipient => 'Megosztási hivatkozás (nem igényelt)';
+
+  @override
+  String get tripShareRevokeTooltip => 'Visszavonás';
+
+  @override
+  String get tripShareRevoked => 'Megosztás visszavonva.';
+
+  @override
+  String get trajetsSharedSectionTitle => 'Velem megosztva';
+
+  @override
+  String get trajetsSharedBadge => 'Megosztva';
+
+  @override
   String get unifiedFilterFuel => 'Üzemanyag';
 
   @override

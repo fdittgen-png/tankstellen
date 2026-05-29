@@ -9819,6 +9819,120 @@ abstract class AppLocalizations {
   /// **'Minimise to a floating tile'**
   String get tripRecordingMinimiseTooltip;
 
+  /// Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with another account'**
+  String get tripShareAction;
+
+  /// Title of the cross-account trip-sharing bottom sheet (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Share this trip'**
+  String get tripShareSheetTitle;
+
+  /// Subtitle under the cross-account trip-sharing sheet title explaining that sharing grants read-only access (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Give another TankSync account read-only access to this recorded trip.'**
+  String get tripShareSheetSubtitle;
+
+  /// Label for the email text field in the cross-account trip-sharing sheet where the user types the recipient's TankSync account email (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient email'**
+  String get tripShareEmailLabel;
+
+  /// Hint text inside the recipient-email field of the trip-sharing sheet (#2240). A neutral placeholder address.
+  ///
+  /// In en, this message translates to:
+  /// **'name@example.com'**
+  String get tripShareEmailHint;
+
+  /// Button that submits the recipient email to create a direct account-to-account trip share (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get tripShareSendButton;
+
+  /// Button in the trip-sharing sheet that mints an unguessable share link the user can send to anyone; the recipient claims it to gain read access (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Create share link'**
+  String get tripShareCreateLinkButton;
+
+  /// Snackbar shown after a trip share link is generated and handed to the OS share sheet (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Share link copied — paste it to the recipient.'**
+  String get tripShareLinkCreated;
+
+  /// Snackbar confirming a direct account-to-account trip share succeeded (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Trip shared.'**
+  String get tripShareSuccess;
+
+  /// Snackbar shown when the recipient email entered in the trip-sharing sheet does not match any TankSync account (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'No TankSync account uses that email.'**
+  String get tripShareRecipientNotFound;
+
+  /// Snackbar shown when creating a trip share fails for a non-specific reason (network / server) (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t share this trip. Try again.'**
+  String get tripShareError;
+
+  /// Section header above the list of accounts / links this trip is already shared with, in the trip-sharing sheet (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Shared with'**
+  String get tripShareExistingTitle;
+
+  /// Empty-state caption under the 'Shared with' header when the trip has no active shares yet (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Not shared with anyone yet.'**
+  String get tripShareExistingEmpty;
+
+  /// Label for a direct account-to-account share row in the 'Shared with' list when the recipient's email isn't surfaced to the owner for privacy (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'An account'**
+  String get tripShareDirectRecipient;
+
+  /// Label for a link-share row in the 'Shared with' list that no recipient has claimed yet (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Share link (unclaimed)'**
+  String get tripShareLinkRecipient;
+
+  /// Tooltip on the revoke (delete) button next to a share row in the 'Shared with' list (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get tripShareRevokeTooltip;
+
+  /// Snackbar confirming a trip share was revoked (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Share revoked.'**
+  String get tripShareRevoked;
+
+  /// Section header on the Trajets tab above the list of trips other accounts have shared with the current user (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Shared with me'**
+  String get trajetsSharedSectionTitle;
+
+  /// Small badge on a trip row indicating the trip was shared with the user by another account and is read-only (#2240).
+  ///
+  /// In en, this message translates to:
+  /// **'Shared'**
+  String get trajetsSharedBadge;
+
   /// Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c).
   ///
   /// In en, this message translates to:
