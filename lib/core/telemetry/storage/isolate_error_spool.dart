@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -63,7 +64,45 @@ class IsolateErrorSpool {
     if (Hive.isBoxOpen(boxName)) {
       return Hive.box<String>(boxName);
     }
-    return Hive.openBox<String>(boxName);
+    // `Hive.openBox` is a double-edged failure path: when Hive has not
+    // been initialised (e.g. a unit test that stands up a provider
+    // graph without a Hive temp dir, or a background isolate that woke
+    // before `Hive.init`) it both `rethrow`s to the awaiter AND
+    // completes its internal `_openingBoxes` completer with the same
+    // error. That cached completer has no listener, so its rejection
+    // surfaces as an *unhandled* async error in the surrounding zone —
+    // which derails the caller even though `enqueue` faithfully catches
+    // the rethrown copy. Run the open inside a guarded zone so the
+    // orphaned completer error is absorbed here instead of leaking to
+    // the root / test zone, preserving the "never throws" contract.
+    final completer = Completer<Box<String>>();
+    // The guarded zone returns the body future; we deliberately do not
+    // await it here — `enqueue` awaits `completer.future` instead, and
+    // the zone's onError absorbs the orphaned completer rejection.
+    unawaited(
+      runZonedGuarded<Future<void>>(
+        () async {
+          try {
+            completer.complete(await Hive.openBox<String>(boxName));
+          } catch (e, st) {
+            if (!completer.isCompleted) {
+              completer.completeError(e, st);
+            }
+          }
+        },
+        (error, stack) {
+          // The orphaned `_openingBoxes` completer rejection lands
+          // here. If our own completer hasn't resolved yet, forward the
+          // failure so `enqueue`'s try/catch can swallow it
+          // deterministically; otherwise the error is a duplicate and
+          // is dropped.
+          if (!completer.isCompleted) {
+            completer.completeError(error, stack);
+          }
+        },
+      ),
+    );
+    return completer.future;
   }
 
   /// Reset the test seam back to the default. Call from `tearDown`.
