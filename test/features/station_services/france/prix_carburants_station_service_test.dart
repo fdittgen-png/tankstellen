@@ -1072,6 +1072,55 @@ void main() {
       expect(result.data, isNotEmpty);
     });
   });
+
+  // #2193 — the baseUrl override surface mirrors the Dio injection style:
+  // an injected baseUrl must be the host the request is actually sent to,
+  // so tests can point the service at a fake endpoint.
+  group('PrixCarburantsStationService baseUrl injection (#2193)', () {
+    test('defaultBaseUrl points at the gouv.fr flux-instantane dataset', () {
+      expect(
+        PrixCarburantsStationService.defaultBaseUrl,
+        contains('data.economie.gouv.fr'),
+      );
+      expect(
+        PrixCarburantsStationService.defaultBaseUrl,
+        endsWith('/records'),
+      );
+    });
+
+    test('injected baseUrl is used as the request URL', () async {
+      final adapter = _TrackingMockAdapter()..addResponse({'results': const []});
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(
+        dio: dio,
+        baseUrl: 'https://fake.test/prix/records',
+      );
+
+      await svc.searchStations(const SearchParams(
+        lat: 48.85, lng: 2.35, radiusKm: 5.0,
+      ));
+
+      expect(adapter.requestCount, 1);
+      expect(adapter.lastRequestUri, startsWith('https://fake.test/prix/records'));
+      expect(
+        adapter.lastRequestUri,
+        isNot(contains('data.economie.gouv.fr')),
+        reason: 'the default URL must not be hit when baseUrl is overridden',
+      );
+    });
+
+    test('defaults to defaultBaseUrl when baseUrl is omitted', () async {
+      final adapter = _TrackingMockAdapter()..addResponse({'results': const []});
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      await svc.searchStations(const SearchParams(
+        lat: 48.85, lng: 2.35, radiusKm: 5.0,
+      ));
+
+      expect(adapter.lastRequestUri, startsWith('https://data.economie.gouv.fr'));
+    });
+  });
 }
 
 /// Mock Dio adapter that tracks requests and returns canned responses.

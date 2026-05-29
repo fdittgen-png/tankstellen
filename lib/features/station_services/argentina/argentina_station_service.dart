@@ -26,15 +26,20 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
   // resource under TLS, so there's no reason to fetch the open-data
   // CSV in clear text (MITM could inject malicious rows, and the
   // integrity check downstream only catches the header schema).
-  static const _csvUrl =
+  static const String defaultCsvUrl =
       'https://datos.energia.gob.ar/dataset/'
       '1c181390-5045-475e-94dc-410429be4b17/resource/'
       '80ac25de-a44a-4445-9215-090cf55cfda5/download/'
       'precios-en-surtidor-resolucin-3142016.csv';
 
   /// Default production constructor.
-  ArgentinaStationService()
-      : _dio = DioFactory.create(
+  ///
+  /// #2193 — accepts an optional [baseUrl] (the CSV endpoint) so tests can
+  /// point the service at a fake host; defaults to [defaultCsvUrl] so
+  /// production + the registry factory are unaffected.
+  ArgentinaStationService({String? baseUrl})
+      : _csvUrl = baseUrl ?? defaultCsvUrl,
+        _dio = DioFactory.create(
           connectTimeout: const Duration(seconds: 20),
           receiveTimeout: const Duration(seconds: 60),
           responseType: ResponseType.plain,
@@ -42,11 +47,14 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
 
   /// Test-only constructor that accepts a preconfigured [Dio] (usually with
   /// a [MockAdapter]) so the cert-error classification path (#837) can be
-  /// driven without hitting the network.
+  /// driven without hitting the network. #2193 — also accepts an optional
+  /// [baseUrl] (the CSV endpoint), defaulting to [defaultCsvUrl].
   @visibleForTesting
-  ArgentinaStationService.withDio(this._dio);
+  ArgentinaStationService.withDio(this._dio, {String? baseUrl})
+      : _csvUrl = baseUrl ?? defaultCsvUrl;
 
   final Dio _dio;
+  final String _csvUrl;
 
   // Cache parsed stations
   List<_RawStation>? _cachedStations;
@@ -162,10 +170,14 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
     }
   }
 
-  /// Hostname of the Argentina open-data CSV — kept in a constant so the
-  /// certificate error message names the exact provider the user should
-  /// contact (#837).
-  static const _csvHost = 'datos.energia.gob.ar';
+  /// Hostname of the Argentina open-data CSV — derived from [_csvUrl] so
+  /// the certificate error message names the exact provider the user should
+  /// contact (#837). Falls back to the default host when the URL has no
+  /// authority (e.g. a relative test URL).
+  String get _csvHost {
+    final host = Uri.tryParse(_csvUrl)?.host ?? '';
+    return host.isNotEmpty ? host : 'datos.energia.gob.ar';
+  }
 
   /// Detect whether a [DioException] is a TLS/certificate validation
   /// failure. Dio 5.x signals most cert errors via
