@@ -32,11 +32,12 @@ void main() {
 
     test('error message names the issue and the gate', () {
       const listener = UnimplementedBackgroundAdapterListener();
-      // The gate hint is the load-bearing part: it tells the next
-      // developer where to look (`autoRecord` flag) before they think
-      // they need to implement the bridge. Inspect the thrown error
-      // via `throwsA(predicate)` rather than a try/catch on the Error
-      // subclass (which the analyzer flags as `avoid_catching_errors`).
+      // The hint is the load-bearing part: it tells the next developer
+      // this is the NON-ANDROID stub (the Android bridge ships as
+      // `AndroidBackgroundAdapterListener`) and must not be wired into a
+      // live flow. Inspect the thrown error via `throwsA(predicate)`
+      // rather than a try/catch on the Error subclass (which the
+      // analyzer flags as `avoid_catching_errors`).
       expect(
         () => listener.events,
         throwsA(
@@ -44,8 +45,8 @@ void main() {
             (e) => e.message,
             'message',
             allOf(
-              contains('#1004 phase 2'),
-              contains('autoRecord'),
+              contains('non-Android'),
+              contains('auto-record'),
             ),
           ),
         ),

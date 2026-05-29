@@ -200,6 +200,18 @@ abstract class VehicleProfile with _$VehicleProfile {
     String? obd2AdapterMac,
     String? obd2AdapterName,
 
+    // iOS CoreBluetooth peripheral UUID for the paired adapter (#2282
+    // concern 3). iOS does not expose a stable BLE MAC — every app sees
+    // a per-app CBPeripheral UUID instead, and CoreBluetooth state
+    // restoration (the iOS analogue of the Android foreground service)
+    // keys reconnection on that UUID, NOT on a MAC. We capture it at
+    // pairing time (it is the same `deviceId` flutter_blue_plus reports
+    // as `remoteId.str`, which on iOS IS the CBPeripheral UUID) so the
+    // later iOS auto-record path has the restoration key it needs. Null
+    // on Android profiles + on every profile paired before this field
+    // shipped — those deserialize cleanly via `@Default(null)`.
+    String? pairedAdapterUuidIos,
+
     // Vehicle Identification Number (#812 phase 2). Optional — the
     // VIN decoder may pre-fill engine fields when present, and the
     // value is persisted so a subsequent edit still shows what the

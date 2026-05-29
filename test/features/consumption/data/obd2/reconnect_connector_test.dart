@@ -181,6 +181,8 @@ class _GrantPermissions implements Obd2Permissions {
   Future<Obd2PermissionState> current() async => Obd2PermissionState.granted;
   @override
   Future<Obd2PermissionState> request() async => Obd2PermissionState.granted;
+  @override
+  Future<bool> requestNotifications() async => true;
 }
 
 class _FakeFacade implements BluetoothFacade {

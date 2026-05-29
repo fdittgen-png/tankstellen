@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -294,12 +295,22 @@ class _Obd2AdapterPickerSheetState
       final name = candidate.candidate.deviceName.isEmpty
           ? candidate.profile.displayName
           : candidate.candidate.deviceName;
-      if (active.obd2AdapterMac == mac && active.obd2AdapterName == name) {
+      // #2282 concern 3 — on iOS the `deviceId` IS the CBPeripheral UUID
+      // (flutter_blue_plus surfaces `remoteId.str`, which on iOS is the
+      // per-app peripheral UUID, not a MAC). Capture it so the later iOS
+      // CoreBluetooth state-restoration path has its reconnection key.
+      // On Android `deviceId` is the MAC already stored in
+      // `obd2AdapterMac`, so we leave the iOS-UUID field null there.
+      final uuidIos = Platform.isIOS ? mac : null;
+      if (active.obd2AdapterMac == mac &&
+          active.obd2AdapterName == name &&
+          active.pairedAdapterUuidIos == uuidIos) {
         return; // already persisted — skip the redundant write.
       }
       final updated = active.copyWith(
         obd2AdapterMac: mac,
         obd2AdapterName: name,
+        pairedAdapterUuidIos: uuidIos,
       );
       await ref.read(vehicleProfileListProvider.notifier).save(updated);
     } catch (e, st) {
