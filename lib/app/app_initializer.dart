@@ -42,6 +42,7 @@ import '../features/consumption/providers/obd2_debug_logging_provider.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
 import '../features/consumption/providers/trip_ve_recompute_provider.dart';
 import '../features/feature_management/application/legacy_toggle_migration_provider.dart';
+import '../features/price_history/data/repositories/price_history_repository.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
@@ -116,6 +117,12 @@ class AppInitializer {
       // #2264 — bounded eviction (expiry + per-prefix budget + LRU byte
       // ceiling) replaces the one-shot 500-key expiry cap.
       await CacheManager(storage).evictBounded();
+      // #2317 — trim price-history rows past the 30-day retention window
+      // once per cold start. The foreground record path (station detail)
+      // never trims, so without this hook a heavy user accumulates
+      // ~175k dead rows/year; reads already filter to the last 30 days,
+      // so this caps storage growth, not a correctness bug.
+      await PriceHistoryRepository(storage).evictOldRecords();
       await ProfileRepository(storage).migrateProfileCountryLanguage();
     });
 
