@@ -14,6 +14,7 @@ import '../../features/station_services/australia/australia_station_service.dart
 import '../../features/station_services/austria/econtrol_station_service.dart';
 import '../../features/station_services/chile/chile_station_service.dart';
 import '../../features/station_services/denmark/denmark_station_service.dart';
+import '../../features/station_services/france/prix_carburants_flux_station_service.dart';
 import '../../features/station_services/france/prix_carburants_station_service.dart';
 import '../../features/station_services/germany/tankerkoenig_station_service.dart';
 import '../../features/station_services/greece/greece_station_service.dart';
@@ -339,9 +340,10 @@ const _dkPolicy = FuelServicePolicy(
   license: 'Provider terms',
 );
 
-/// FR Prix Carburants — currently a polled/OSM-enriched search; the bulk flux
-/// ZIP migration is a later batch, so it is modelled as polled for now.
-const _frPolicy = FuelServicePolicy(
+/// FR Prix Carburants — LEGACY polled/OSM-enriched per-search query against
+/// data.economie.gouv.fr. Default until the bulk migration (#2277) is
+/// validated on-device.
+const _frPolicyLegacy = FuelServicePolicy(
   model: SourceModel.polledApi,
   minInterval: Duration(minutes: 30),
   datasetTtlSoft: Duration.zero,
@@ -350,6 +352,24 @@ const _frPolicy = FuelServicePolicy(
   attribution: 'Prix Carburants (data.economie.gouv.fr)',
   license: 'Licence Ouverte 2.0',
 );
+
+/// FR Prix Carburants — BULK *flux instantané* ZIP (#2277): one whole-country
+/// download per ~10 min cadence, persisted and local-filtered (never poll
+/// per-station). Soft TTL ≈ the 10-min flux cadence, hard TTL an offline-grace
+/// multiple. Selected only when `BulkMigrationFlags.frFluxBulk` is `true`.
+const _frPolicyBulk = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(minutes: 10),
+  datasetTtlSoft: Duration(minutes: 10),
+  datasetTtlHard: Duration(hours: 6),
+  searchResultTtl: Duration.zero,
+  attribution: 'Prix Carburants (flux instantané)',
+  license: 'Licence Ouverte 2.0',
+);
+
+/// Staged-rollout selection (#2277): legacy by default, bulk when flagged.
+const _frPolicy =
+    BulkMigrationFlags.frFluxBulk ? _frPolicyBulk : _frPolicyLegacy;
 
 /// Central registry of all country-specific station services.
 ///
@@ -767,6 +787,16 @@ StationService _createTankerkoenig(Ref ref) {
 }
 
 StationService _createPrixCarburants(Ref ref) {
+  // #2277 — staged rollout: the bulk *flux instantané* ZIP service when the
+  // flag is on (persisted whole-country dataset, local-filtered), otherwise
+  // the legacy per-search polling service. The bulk service receives the
+  // shared CacheManager for the disk read-through, like the other bulk
+  // datasets.
+  if (BulkMigrationFlags.frFluxBulk) {
+    return PrixCarburantsFluxStationService(
+      cache: ref.read(cacheManagerProvider),
+    );
+  }
   final enricher = ref.watch(osmBrandEnricherProvider);
   return PrixCarburantsStationService(enricher: enricher);
 }
