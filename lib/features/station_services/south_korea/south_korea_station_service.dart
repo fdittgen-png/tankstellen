@@ -133,29 +133,39 @@ class SouthKoreaStationService
       final radiusMeters =
           (params.radiusKm * 1000).clamp(1000, 50 * 1000).round();
 
-      // Fetch per-product payloads and merge by UNI_ID so a single
-      // station ends up with all four fuel prices on one [Station].
+      // OPINET returns prices one product at a time, so a full multi-fuel
+      // search needs four calls. Issue them in parallel instead of serially
+      // (#2301) — serial awaits multiplied latency 4× (4-12 s typical, up to
+      // 100 s worst case). The fixed [entries] order is the contract that
+      // lets us zip each response back to its fuel type positionally:
+      // responses[i] is the payload for entries[i].value, so a slow/failed
+      // call can never merge a price under the wrong fuel.
+      final entries =
+          OpinetProductCodes.fuelForProductCode.entries.toList(growable: false);
+
+      final responses = await Future.wait([
+        for (final entry in entries)
+          _dio.get(
+            _baseUrl,
+            queryParameters: {
+              'code': _apiKey,
+              'x': params.lng,
+              'y': params.lat,
+              'radius': radiusMeters,
+              'prodcd': entry.key,
+              'sort': 1, // 1 = by price ascending; server still returns all
+              'out': 'json',
+            },
+            cancelToken: cancelToken,
+          ),
+      ]);
+
+      // Merge by UNI_ID so a single station ends up with all four fuel
+      // prices on one [Station]. Pair each response with its fuel type by
+      // index — Future.wait preserves order regardless of completion order.
       final byId = <String, OpinetStationAccumulator>{};
-
-      for (final entry in OpinetProductCodes.fuelForProductCode.entries) {
-        final productCode = entry.key;
-        final fuelType = entry.value;
-
-        final response = await _dio.get(
-          _baseUrl,
-          queryParameters: {
-            'code': _apiKey,
-            'x': params.lng,
-            'y': params.lat,
-            'radius': radiusMeters,
-            'prodcd': productCode,
-            'sort': 1, // 1 = by price ascending; server still returns all
-            'out': 'json',
-          },
-          cancelToken: cancelToken,
-        );
-
-        mergeOpinetProductResponse(response.data, byId, fuelType);
+      for (var i = 0; i < entries.length; i++) {
+        mergeOpinetProductResponse(responses[i].data, byId, entries[i].value);
       }
 
       final stations = byId.values

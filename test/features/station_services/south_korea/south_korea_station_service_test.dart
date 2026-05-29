@@ -162,6 +162,59 @@ void main() {
         expect(s.dist, closeTo(0.4, 0.1));
       });
 
+      test('fans out the four product calls in parallel with correct '
+          'fuel mapping even when responses complete out of order (#2301)',
+          () async {
+        // Give each product a different delay so the completion order is the
+        // reverse of the request order. Future.wait preserves positional
+        // order, so the price→fuel pairing must stay correct regardless.
+        const delays = <String, int>{
+          'B027': 40, // gasoline (e5) — slowest
+          'B034': 30, // premium (e98)
+          'D047': 20, // diesel
+          'K015': 10, // lpg — fastest
+        };
+        var inFlight = 0;
+        var maxInFlight = 0;
+
+        when(() => mockDio.get(
+              any(),
+              queryParameters: any(named: 'queryParameters'),
+              cancelToken: any(named: 'cancelToken'),
+            )).thenAnswer((invocation) async {
+          inFlight++;
+          maxInFlight = maxInFlight > inFlight ? maxInFlight : inFlight;
+          final qp = invocation.namedArguments[#queryParameters]
+              as Map<String, dynamic>;
+          final code = qp['prodcd'] as String;
+          await Future<void>.delayed(Duration(milliseconds: delays[code]!));
+          inFlight--;
+          const prices = {
+            'B027': 1689,
+            'B034': 1999,
+            'D047': 1520,
+            'K015': 1050,
+          };
+          return response(_envelope([_opinetStation(priceWon: prices[code])]));
+        });
+
+        const params =
+            SearchParams(lat: 37.4997, lng: 127.0287, radiusKm: 5.0);
+        final result = await service.searchStations(params);
+
+        expect(maxInFlight, greaterThan(1),
+            reason: 'product calls must overlap (parallel fan-out, not serial)');
+
+        expect(result.data, hasLength(1));
+        final s = result.data.first;
+        // Each price must land on its own fuel slot despite the out-of-order
+        // completion — proving the positional zip pairs response→fuel safely.
+        expect(s.e5, closeTo(1689, 0.001));
+        expect(s.e98, closeTo(1999, 0.001));
+        expect(s.diesel, closeTo(1520, 0.001));
+        expect(s.lpg, closeTo(1050, 0.001));
+      });
+
       test('sends API key and coordinates in query parameters', () async {
         when(() => mockDio.get(
               any(),
