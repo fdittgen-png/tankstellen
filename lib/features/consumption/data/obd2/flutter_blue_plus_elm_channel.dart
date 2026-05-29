@@ -6,7 +6,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
+import 'connection_drop_debouncer.dart';
 import 'elm_byte_channel.dart';
+import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Standard SPP-over-BLE UUIDs exposed by Vgate vLinker and most
@@ -59,16 +61,40 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
   BluetoothCharacteristic? _writeChar;
   BluetoothCharacteristic? _notifyChar;
   StreamSubscription<List<int>>? _subscription;
+  StreamSubscription<BluetoothConnectionState>? _connStateSubscription;
   final StreamController<List<int>> _incoming =
       StreamController<List<int>>.broadcast();
   bool _open = false;
+
+  /// #2261 concern 1 — debounces a raw `connectionState == disconnected`
+  /// edge into a confirmed drop so a self-healing RF blip within the BLE
+  /// supervision timeout doesn't tear down a recoverable session, while
+  /// a genuine disconnect still surfaces in ~1–2 s (not the ~15 s read
+  /// timeout). On confirmation it pushes a typed [Obd2DisconnectedException]
+  /// onto the byte stream, which the transport's pending-command completer
+  /// re-throws so [TripDropDetector] classifies it as a typed drop.
+  late final ConnectionDropDebouncer _dropDebouncer;
 
   FlutterBluePlusElmChannel(
     this._device, {
     Elm327BleUuids? uuids,
     Duration? connectTimeout,
+    Duration dropDebounce = const Duration(milliseconds: 1500),
   })  : _uuids = uuids ?? Elm327BleUuids.vgate,
-        _connectTimeout = connectTimeout;
+        _connectTimeout = connectTimeout {
+    _dropDebouncer = ConnectionDropDebouncer(
+      debounce: dropDebounce,
+      onConfirmed: _onDropConfirmed,
+    );
+  }
+
+  /// Push the typed disconnect onto the byte stream so the transport's
+  /// in-flight `sendCommand` completer fails fast with a classified
+  /// error instead of waiting out the read timeout (#2261 concern 1).
+  void _onDropConfirmed() {
+    if (_incoming.isClosed) return;
+    _incoming.addError(const Obd2DisconnectedException());
+  }
 
   @override
   bool get isOpen => _open;
@@ -127,6 +153,20 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
         debugPrint('FlutterBluePlusElmChannel notify error: $e');
       },
     );
+    // #2261 concern 1 — subscribe to the device's connection-state
+    // stream so a real disconnect is noticed in ~1–2 s. The first
+    // emission is the current state (`connected`, since we just
+    // connected); the debouncer ignores `connected` edges, so this is a
+    // no-op until the link actually drops.
+    _dropDebouncer.reset();
+    _connStateSubscription = _device.connectionState.listen(
+      (state) => _dropDebouncer.noteConnectionState(
+        disconnected: state == BluetoothConnectionState.disconnected,
+      ),
+      onError: (e, st) {
+        debugPrint('FlutterBluePlusElmChannel connectionState error: $e');
+      },
+    );
     _open = true;
   }
 
@@ -138,12 +178,25 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
     }
     // withoutResponse lets the adapter write as fast as BLE allows;
     // the ELM327 replies via notify anyway.
-    await char.write(bytes, withoutResponse: true);
+    try {
+      await char.write(bytes, withoutResponse: true);
+    } catch (e) {
+      // #2261 concern 1 — a write failing WHILE a disconnect edge is
+      // pending confirms the drop immediately rather than waiting out
+      // the rest of the debounce: the link has proven unusable. A lone
+      // write failure on an otherwise-connected link is a no-op for the
+      // debouncer and falls through to the caller as before.
+      _dropDebouncer.noteCommandFailure();
+      rethrow;
+    }
   }
 
   @override
   Future<void> close() async {
     _open = false;
+    _dropDebouncer.dispose();
+    await _connStateSubscription?.cancel();
+    _connStateSubscription = null;
     await _subscription?.cancel();
     _subscription = null;
     try {
