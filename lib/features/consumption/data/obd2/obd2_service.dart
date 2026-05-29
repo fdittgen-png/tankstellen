@@ -90,9 +90,28 @@ class Obd2Service implements Obd2RawCommandPort {
   /// no production call site branches on this value yet.
   Obd2AdapterCapability _capability = Obd2AdapterCapability.standardOnly;
 
+  /// Firmware-string-claimed tier, captured at connect (#2261 concern
+  /// 6). The lazy multi-frame probe in [ensureCapabilityReconciled]
+  /// reconciles [_capability] down from this if the adapter can't
+  /// actually route a multi-frame request.
+  Obd2AdapterCapability _claimedCapability =
+      Obd2AdapterCapability.standardOnly;
+
+  /// `true` once the multi-frame `0902` probe has reconciled (or was
+  /// unnecessary because the claimed tier is already standardOnly). Lets
+  /// [ensureCapabilityReconciled] run at most once per connect (#2261).
+  bool _capabilityReconciled = true;
+
   /// Runtime capability tier of the connected adapter (#1401 phase 1).
   /// See [_capability] for semantics.
   Obd2AdapterCapability get capability => _capability;
+
+  /// `true` when the lazy multi-frame capability probe (#2261 concern 6)
+  /// still needs to run — i.e. the firmware claimed a tier above
+  /// standardOnly and [ensureCapabilityReconciled] hasn't confirmed it
+  /// yet. Exposed for the recorder to know whether a deferred probe is
+  /// still pending.
+  bool get capabilityNeedsReconcile => !_capabilityReconciled;
 
   /// Per-adapter ELM327 quirks (#1330). Set by [connect] from the
   /// caller-supplied `adapter` parameter; defaults to the
@@ -326,6 +345,10 @@ class Obd2Service implements Obd2RawCommandPort {
       // Clear the per-connection supported-PIDs cache. A new session
       // may be a different car / different adapter firmware.
       _pids.resetForNewConnection();
+      // #2261 concern 6 — a fresh connect re-arms the lazy capability
+      // probe; it stays armed only when the ATI block below claims a
+      // tier above standardOnly.
+      _capabilityReconciled = true;
 
       // Adapter-driven init sequence (#1330). [GenericElm327Adapter]
       // matches the legacy hardcoded behaviour byte-for-byte: the
@@ -405,18 +428,17 @@ class Obd2Service implements Obd2RawCommandPort {
           adapterFirmware = firmware;
         }
         _capability = detectCapabilityFromFirmwareString(firmware);
-
-        // #1614 — the ATI firmware string can lie: a v2.1-class clone
-        // routinely reports `v2.2` and is then classed oemPidsCapable,
-        // which would hang the OBD-II loop on OEM commands it cannot
-        // route. When the string claims a tier above standardOnly, run
-        // a runtime multi-frame ISO 15765 probe and downgrade if the
-        // adapter cannot actually reassemble a multi-frame reply.
-        if (_capability != Obd2AdapterCapability.standardOnly) {
-          final probe =
-              await probeMultiFrameCapability(_transport.sendCommand);
-          _capability = reconcileCapabilityWithProbe(_capability, probe);
-        }
+        // #2261 concern 6 — the multi-frame `0902` probe that downgrades
+        // a lying clone (#1614) used to run HERE, blocking connect for up
+        // to 4 s on the start critical path. It is now deferred to
+        // [ensureCapabilityReconciled], run lazily after the first
+        // samples, so perceived start is not delayed. The claimed tier
+        // above is what gating sees until then — safe, because standard
+        // PID collection never depends on it, and the lazy probe only
+        // ever LOWERS the tier (never enables a feature prematurely).
+        _claimedCapability = _capability;
+        _capabilityReconciled =
+            _capability == Obd2AdapterCapability.standardOnly;
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 ATI firmware read failed'}));
       }
@@ -1201,6 +1223,33 @@ class Obd2Service implements Obd2RawCommandPort {
   Future<void> tuneLinkForBackground() async {
     final t = _transport;
     if (t is BluetoothObd2Transport) await t.tuneForBackground();
+  }
+
+  /// Run the deferred multi-frame ISO 15765 capability probe (#2261
+  /// concern 6) at most once per connect, reconciling [capability] down
+  /// if the adapter can't actually route a multi-frame `0902` request.
+  ///
+  /// This is the work that #1614 used to do synchronously inside
+  /// [connect]; it is now pulled OFF the start critical path so a fresh
+  /// connect returns without waiting up to 1.5 s for the probe. The
+  /// recorder calls this lazily after the first samples — by then the
+  /// trip is already capturing standard PIDs, and the probe (which can
+  /// only LOWER the tier) tightens OEM-PID gating a moment later.
+  ///
+  /// A no-op when the claimed tier is already standardOnly (nothing to
+  /// downgrade) or when it has already run this connect. Never throws.
+  Future<void> ensureCapabilityReconciled() async {
+    if (_capabilityReconciled) return;
+    _capabilityReconciled = true;
+    if (_claimedCapability == Obd2AdapterCapability.standardOnly) return;
+    try {
+      final probe = await probeMultiFrameCapability(_transport.sendCommand);
+      _capability = reconcileCapabilityWithProbe(_claimedCapability, probe);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OBD2 deferred capability probe failed',
+      }));
+    }
   }
 
   /// Close the transport connection. Safe to call multiple times.
