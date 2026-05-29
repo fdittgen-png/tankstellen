@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Ilgalaikis didelis greitis ({pctTime}% kelionės)",
   "lessonAdviceHighSpeedBand": "Viršijus 110 km/h atleiskite akceleratorių – oro pasipriešinimas smarkiai auga, šiek tiek lėčiau sutaupysite daug kuro.",
   "lessonSmoothDrivingTitle": "Tolygus vairavimas – puiku!",
-  "lessonAdviceSmoothDriving": "Šioje kelionėje nebuvo staigaus greitėjimo ar stabdymo – tolygus vairavimas išlaiko mažas sąnaudas."
+  "lessonAdviceSmoothDriving": "Šioje kelionėje nebuvo staigaus greitėjimo ar stabdymo – tolygus vairavimas išlaiko mažas sąnaudas.",
+  "storageRecoveryTitle": "Saugyklos problema",
+  "storageRecoveryMessage": "„Sparkilo“ nepavyko atidaryti vietinės duomenų saugyklos. Atrodo, kad saugyklos failas pažeistas.",
+  "storageRecoveryGuidance": "Norėdami atkurti, įrenginio nustatymuose išvalykite programos saugyklą arba iš naujo įdiekite programą. Jūsų mėgstamiausi ir istorija saugomi tik šiame įrenginyje, todėl jų negalima atkurti automatiškai."
 }

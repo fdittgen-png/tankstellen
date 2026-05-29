@@ -5197,6 +5197,17 @@ class AppLocalizationsLt extends AppLocalizations {
   String get splashLoadingLabel => 'Kraunamas Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Saugyklos problema';
+
+  @override
+  String get storageRecoveryMessage =>
+      '„Sparkilo“ nepavyko atidaryti vietinės duomenų saugyklos. Atrodo, kad saugyklos failas pažeistas.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Norėdami atkurti, įrenginio nustatymuose išvalykite programos saugyklą arba iš naujo įdiekite programą. Jūsų mėgstamiausi ir istorija saugomi tik šiame įrenginyje, todėl jų negalima atkurti automatiškai.';
+
+  @override
   String get tankLevelTitle => 'Bako lygis';
 
   @override

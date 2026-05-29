@@ -5209,6 +5209,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get splashLoadingLabel => 'Sparkilo betöltése';
 
   @override
+  String get storageRecoveryTitle => 'Tárolási probléma';
+
+  @override
+  String get storageRecoveryMessage =>
+      'A Sparkilo nem tudta megnyitni a helyi adattárolóját. A tárolófájl sérültnek tűnik.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'A helyreállításhoz töröld az alkalmazás tárhelyét a készülék beállításaiban, vagy telepítsd újra az alkalmazást. A kedvenceid és az előzményeid csak ezen az eszközön tárolódnak, ezért nem állíthatók helyre automatikusan.';
+
+  @override
   String get tankLevelTitle => 'Tartályszint';
 
   @override

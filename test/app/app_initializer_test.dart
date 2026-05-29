@@ -266,6 +266,77 @@ void main() {
     });
   });
 
+  group('Price-history eviction cold-start hook (#2317)', () {
+    test(
+        'run() evicts old price-history records on cold start inside a '
+        '_deferPostFirstFrame block, next to CacheManager eviction', () {
+      // #2317 — PriceHistoryRepository.evictOldRecords existed + was
+      // tested but had zero production call sites, so the foreground
+      // record path grew the box unbounded (~175k dead rows/year for a
+      // heavy user). The fix mirrors the existing CacheManager cold-start
+      // eviction hook: trim the price-history box once per cold start
+      // off the first-frame critical path.
+      final runBody = _extractMethodBody(initSource, 'static Future<void> run');
+      expect(runBody, isNotNull);
+
+      expect(runBody, contains('PriceHistoryRepository(storage).evictOldRecords'),
+          reason: 'run() must call evictOldRecords on cold start so the '
+              'price-history box stops growing unbounded (#2317)');
+
+      // It must live next to the existing CacheManager eviction so it is
+      // deferred past the first frame (not on the critical path).
+      final evictBoundedIdx = runBody!.indexOf('evictBounded');
+      final evictOldIdx = runBody.indexOf('evictOldRecords');
+      final deferIdx = runBody.indexOf('_deferPostFirstFrame');
+      expect(evictBoundedIdx, isNonNegative);
+      expect(evictOldIdx, isNonNegative);
+      expect(deferIdx, isNonNegative);
+      expect(deferIdx, lessThan(evictOldIdx),
+          reason: 'price-history eviction must be scheduled inside a '
+              '_deferPostFirstFrame block so it never blocks the first paint');
+
+      expect(
+        initSource,
+        contains(
+            "import '../features/price_history/data/repositories/price_history_repository.dart';"),
+        reason: 'the repository must be imported so the eviction wiring '
+            'compiles',
+      );
+    });
+  });
+
+  group('Startup-time breadcrumb (#2320)', () {
+    test(
+        '_launch emits the cold-start total as a "startup" breadcrumb after '
+        'StartupTimer.finish()', () {
+      // #2320 — StartupTimer.finish() only prints under kDebugMode, so a
+      // startup-latency regression was invisible in production. Pushing
+      // the total onto BreadcrumbCollector (already drained into every
+      // error trace by the nav + dio observers) makes it visible in
+      // production error traces.
+      final launchBody = _extractMethodBody(initSource, 'static void _launch');
+      expect(launchBody, isNotNull);
+
+      final finishIdx = launchBody!.indexOf('StartupTimer.instance.finish()');
+      final breadcrumbIdx = launchBody.indexOf("BreadcrumbCollector.add('startup'");
+      expect(finishIdx, isNonNegative, reason: 'finish() must still be called');
+      expect(breadcrumbIdx, isNonNegative,
+          reason: 'a "startup" breadcrumb must be emitted with the total ms');
+      expect(finishIdx, lessThan(breadcrumbIdx),
+          reason: 'the breadcrumb must read totalMs AFTER finish() has '
+              'stopped the timer and recorded the total');
+      expect(launchBody, contains('totalMs'),
+          reason: 'the breadcrumb detail must carry the cold-start total');
+
+      expect(
+        initSource,
+        contains(
+            "import '../core/telemetry/collectors/breadcrumb_collector.dart';"),
+        reason: 'BreadcrumbCollector must be imported so the wiring compiles',
+      );
+    });
+  });
+
   group('Widget cold-launch URI dispatch (#2159)', () {
     test(
         '_stashWidgetLaunchUri intercepts refresh URIs before stashing',

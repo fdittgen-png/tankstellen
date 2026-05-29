@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Trajno visoka hitrost ({pctTime}% vožnje)",
   "lessonAdviceHighSpeedBand": "Nad 110 km/h spustite plin – zračni upor strmo narašča, malo počasneje prihrani veliko goriva.",
   "lessonSmoothDrivingTitle": "Umirjena vožnja – odlično!",
-  "lessonAdviceSmoothDriving": "Na tej vožnji ni bilo sunkovitega pospeševanja ali zaviranja – enakomerna vožnja ohranja nizko porabo."
+  "lessonAdviceSmoothDriving": "Na tej vožnji ni bilo sunkovitega pospeševanja ali zaviranja – enakomerna vožnja ohranja nizko porabo.",
+  "storageRecoveryTitle": "Težava s shrambo",
+  "storageRecoveryMessage": "Sparkilo ni mogel odpreti svoje lokalne shrambe podatkov. Videti je, da je datoteka shrambe poškodovana.",
+  "storageRecoveryGuidance": "Za obnovitev počistite shrambo aplikacije v nastavitvah naprave ali znova namestite aplikacijo. Vaše priljubljene in zgodovina so shranjene samo v tej napravi, zato jih ni mogoče samodejno obnoviti."
 }

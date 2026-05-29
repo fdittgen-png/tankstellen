@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Viteză mare susținută ({pctTime}% din traseu)",
   "lessonAdviceHighSpeedBand": "Peste 110 km/h ridicați piciorul de pe accelerație – rezistența aerului crește puternic, puțin mai încet economisește mult combustibil.",
   "lessonSmoothDrivingTitle": "Condus lin – bravo!",
-  "lessonAdviceSmoothDriving": "Fără accelerări sau frânări bruște în acest traseu – condusul constant menține consumul scăzut."
+  "lessonAdviceSmoothDriving": "Fără accelerări sau frânări bruște în acest traseu – condusul constant menține consumul scăzut.",
+  "storageRecoveryTitle": "Problemă de stocare",
+  "storageRecoveryMessage": "Sparkilo nu a putut deschide spațiul local de stocare a datelor. Fișierul de stocare pare deteriorat.",
+  "storageRecoveryGuidance": "Pentru recuperare, șterge spațiul de stocare al aplicației din setările dispozitivului sau reinstalează aplicația. Favoritele și istoricul tău sunt salvate doar pe acest dispozitiv, așa că nu pot fi restaurate automat."
 }

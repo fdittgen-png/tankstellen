@@ -5173,6 +5173,17 @@ class AppLocalizationsSl extends AppLocalizations {
   String get splashLoadingLabel => 'Nalaganje Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Težava s shrambo';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo ni mogel odpreti svoje lokalne shrambe podatkov. Videti je, da je datoteka shrambe poškodovana.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Za obnovitev počistite shrambo aplikacije v nastavitvah naprave ali znova namestite aplikacijo. Vaše priljubljene in zgodovina so shranjene samo v tej napravi, zato jih ni mogoče samodejno obnoviti.';
+
+  @override
   String get tankLevelTitle => 'Raven goriva';
 
   @override

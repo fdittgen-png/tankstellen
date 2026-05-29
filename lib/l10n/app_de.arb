@@ -2186,6 +2186,9 @@
   "@splashLoadingLabel": {
     "description": "Barrierefreiheits-Label, das TalkBack/VoiceOver während des animierten Splash-Screens ansagt. Wird nicht sichtbar gerendert; kurz und sprechbar halten."
   },
+  "storageRecoveryTitle": "Speicherproblem",
+  "storageRecoveryMessage": "Sparkilo konnte seinen lokalen Datenspeicher nicht öffnen. Die Speicherdatei scheint beschädigt zu sein.",
+  "storageRecoveryGuidance": "Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.",
   "tankLevelTitle": "Tankfüllstand",
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km Reichweite",

@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Velocidad alta sostenida ({pctTime}% del trayecto)",
   "lessonAdviceHighSpeedBand": "Levanta el pie por encima de 110 km/h: la resistencia del aire sube mucho, así que ir algo más despacio ahorra mucho combustible.",
   "lessonSmoothDrivingTitle": "Conducción suave: ¡bien hecho!",
-  "lessonAdviceSmoothDriving": "Sin aceleraciones ni frenadas bruscas en este trayecto: una conducción constante mantiene bajo el consumo."
+  "lessonAdviceSmoothDriving": "Sin aceleraciones ni frenadas bruscas en este trayecto: una conducción constante mantiene bajo el consumo.",
+  "storageRecoveryTitle": "Problema de almacenamiento",
+  "storageRecoveryMessage": "Sparkilo no pudo abrir su almacén de datos local. El archivo de almacenamiento parece estar dañado.",
+  "storageRecoveryGuidance": "Para recuperarlo, borra el almacenamiento de la aplicación en los ajustes del dispositivo o reinstala la aplicación. Tus favoritos y tu historial se guardan solo en este dispositivo, por lo que no se pueden restaurar automáticamente."
 }

@@ -1,0 +1,14 @@
+{
+  "storageRecoveryTitle": "Storage problem",
+  "@storageRecoveryTitle": {
+    "description": "Title of the cold-start recovery screen shown when a Hive box is corrupted beyond repair and the app cannot open its local data store (#2294)."
+  },
+  "storageRecoveryMessage": "Sparkilo couldn't open its local data store. The storage file appears to be damaged.",
+  "@storageRecoveryMessage": {
+    "description": "Body text of the storage-corruption recovery screen explaining that the local Hive data store could not be opened (#2294)."
+  },
+  "storageRecoveryGuidance": "To recover, clear the app's storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.",
+  "@storageRecoveryGuidance": {
+    "description": "Guidance text on the storage-corruption recovery screen telling the user how to recover — clear app storage or reinstall (#2294)."
+  }
+}

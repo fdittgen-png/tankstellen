@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Ihållande hög hastighet ({pctTime} % av resan)",
   "lessonAdviceHighSpeedBand": "Lätta på gasen över 110 km/h – luftmotståndet ökar kraftigt, så lite långsammare sparar mycket bränsle.",
   "lessonSmoothDrivingTitle": "Mjuk körning – bra jobbat!",
-  "lessonAdviceSmoothDriving": "Ingen hård acceleration eller inbromsning på den här resan – jämn körning håller förbrukningen låg."
+  "lessonAdviceSmoothDriving": "Ingen hård acceleration eller inbromsning på den här resan – jämn körning håller förbrukningen låg.",
+  "storageRecoveryTitle": "Lagringsproblem",
+  "storageRecoveryMessage": "Sparkilo kunde inte öppna sitt lokala datalager. Lagringsfilen verkar vara skadad.",
+  "storageRecoveryGuidance": "För att återställa rensar du appens lagring i enhetens inställningar eller installerar om appen. Dina favoriter och din historik sparas endast på den här enheten och kan därför inte återställas automatiskt."
 }

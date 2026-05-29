@@ -5162,6 +5162,17 @@ class AppLocalizationsFi extends AppLocalizations {
   String get splashLoadingLabel => 'Ladataan Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Tallennustila-ongelma';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo ei voinut avata paikallista tietovarastoaan. Tallennustiedosto vaikuttaa vioittuneelta.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Palauta tilanne tyhjentämällä sovelluksen tallennustila laitteen asetuksista tai asentamalla sovellus uudelleen. Suosikkisi ja historiasi tallennetaan vain tähän laitteeseen, joten niitä ei voi palauttaa automaattisesti.';
+
+  @override
   String get tankLevelTitle => 'Tankin taso';
 
   @override

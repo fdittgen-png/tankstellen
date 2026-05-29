@@ -5137,6 +5137,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Storage problem';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo couldn\'t open its local data store. The storage file appears to be damaged.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.';
+
+  @override
   String get tankLevelTitle => 'Tank level';
 
   @override
@@ -11025,6 +11036,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get splashLoadingLabel => '⟦Łóáđîñǧ Šƥářķîłó ·······⟧';
+
+  @override
+  String get storageRecoveryTitle => '⟦Šŧóřáǧé ƥřóƀłéɱ ······⟧';
+
+  @override
+  String get storageRecoveryMessage =>
+      '⟦Šƥářķîłó çóúłđñ\'ŧ óƥéñ îŧš łóçáł đáŧá šŧóřé. Ŧĥé šŧóřáǧé ƒîłé áƥƥéářš ŧó ƀé đáɱáǧéđ. ·······························⟧';
+
+  @override
+  String get storageRecoveryGuidance =>
+      '⟦Ŧó řéçóṽéř, çłéář ŧĥé áƥƥ\'š šŧóřáǧé îñ ýóúř đéṽîçé šéŧŧîñǧš, óř řéîñšŧáłł ŧĥé áƥƥ. Ýóúř ƒáṽóúřîŧéš áñđ ĥîšŧóřý ářé šŧóřéđ óñ ŧĥîš đéṽîçé óñłý, šó ŧĥéý çáññóŧ ƀé řéšŧóřéđ áúŧóɱáŧîçáłłý. ···································································⟧';
 
   @override
   String get tankLevelTitle => '⟦Ŧáñķ łéṽéł ····⟧';

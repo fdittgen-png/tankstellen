@@ -9249,6 +9249,24 @@ abstract class AppLocalizations {
   /// **'Loading Sparkilo'**
   String get splashLoadingLabel;
 
+  /// Title of the cold-start recovery screen shown when a Hive box is corrupted beyond repair and the app cannot open its local data store (#2294).
+  ///
+  /// In en, this message translates to:
+  /// **'Storage problem'**
+  String get storageRecoveryTitle;
+
+  /// Body text of the storage-corruption recovery screen explaining that the local Hive data store could not be opened (#2294).
+  ///
+  /// In en, this message translates to:
+  /// **'Sparkilo couldn\'t open its local data store. The storage file appears to be damaged.'**
+  String get storageRecoveryMessage;
+
+  /// Guidance text on the storage-corruption recovery screen telling the user how to recover — clear app storage or reinstall (#2294).
+  ///
+  /// In en, this message translates to:
+  /// **'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.'**
+  String get storageRecoveryGuidance;
+
   /// Title of the tank-level card on the Fuel tab — shows the current estimated litres in the tank above the consumption stats card (#1195).
   ///
   /// In en, this message translates to:
