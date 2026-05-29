@@ -6,9 +6,11 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/cache/cache_manager.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
+import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
@@ -24,13 +26,45 @@ import '../../../core/logging/error_logger.dart';
 class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin implements StationService {
   final Dio _dio;
 
+  /// #2264 — optional disk persistence (read-through). When a [CacheStrategy]
+  /// is supplied (the registry factory passes the shared CacheManager) the
+  /// parsed national dataset is persisted to Hive so it survives a cold start
+  /// and works offline. Null in unit tests that don't exercise persistence.
+  final PersistentDataset<List<Station>>? _persistent;
+
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
-  DenmarkStationService({Dio? dio})
+  /// #2264 — [cache] enables the disk read-through; omit it for the pure
+  /// in-memory behaviour the existing parser tests rely on.
+  DenmarkStationService({Dio? dio, CacheStrategy? cache})
       : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 15),
-            );
+            ),
+        _persistent = cache == null
+            ? null
+            : PersistentDataset<List<Station>>(
+                cache: cache,
+                countryCode: 'DK',
+                datasetName: 'stations',
+                source: ServiceSource.denmarkApi,
+                serialize: (stations) =>
+                    {'stations': stations.map((s) => s.toJson()).toList()},
+                deserialize: (json) {
+                  final list = json['stations'] as List<dynamic>?;
+                  if (list == null) return null;
+                  return list
+                      .map((j) =>
+                          Station.fromJson(Map<String, dynamic>.from(j as Map)))
+                      .toList();
+                },
+              );
+
+  // #2264 — soft/hard dataset TTLs mirror the DK FuelServicePolicy in the
+  // registry (soft 2 h, hard 12 h). The legacy 5-minute in-memory TTL is
+  // superseded; the persisted read-through governs freshness now.
+  static const Duration _softTtl = Duration(hours: 2);
+  static const Duration _hardTtl = Duration(hours: 12);
 
   // In-memory cache
   List<Station>? _cachedStations;
@@ -63,21 +97,37 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
     }
   }
 
-  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) =>
-      loadDataset<List<Station>>(
+  Future<List<Station>> _fetchAll({CancelToken? cancelToken}) async {
+    // Fetch all 3 sources in parallel
+    final results = await Future.wait([
+      _fetchOk(cancelToken: cancelToken),
+      _fetchShell(cancelToken: cancelToken),
+      _fetchQ8(),
+    ]);
+    return [...results[0], ...results[1], ...results[2]];
+  }
+
+  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) {
+    final persistent = _persistent;
+    if (persistent == null) {
+      // No cache wired (unit tests) — preserve the legacy in-memory path.
+      return loadDataset<List<Station>>(
         cached: _cachedStations,
         ttl: const Duration(minutes: 5),
-        fetch: () async {
-          // Fetch all 3 sources in parallel
-          final results = await Future.wait([
-            _fetchOk(cancelToken: cancelToken),
-            _fetchShell(cancelToken: cancelToken),
-            _fetchQ8(),
-          ]);
-          return [...results[0], ...results[1], ...results[2]];
-        },
+        fetch: () => _fetchAll(cancelToken: cancelToken),
         store: (value) => _cachedStations = value,
       );
+    }
+    // #2264 — disk read-through: survives cold start + offline.
+    return loadPersistentDataset<List<Station>>(
+      cached: _cachedStations,
+      softTtl: _softTtl,
+      hardTtl: _hardTtl,
+      persistent: persistent,
+      fetch: () => _fetchAll(cancelToken: cancelToken),
+      store: (value) => _cachedStations = value,
+    );
+  }
 
   /// OK — https://mobility-prices.ok.dk/api/v1/fuel-prices
   Future<List<Station>> _fetchOk({CancelToken? cancelToken}) async {

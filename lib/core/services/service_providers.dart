@@ -54,7 +54,16 @@ Dio tankerkoenigDio(Ref ref) {
 /// truth for per-country service wiring — including Germany. Countries
 /// that require an API key fall back to [DemoStationService] from inside
 /// the registry's factory function when no key is configured.
-@riverpod
+///
+/// #2264 — `keepAlive`: bulk-dataset services (ES/IT/AR/DK) hold the parsed
+/// whole-country dataset in instance fields. Under the previous auto-dispose
+/// provider the service was rebuilt — and the in-memory dataset thrown away —
+/// every time the last listener detached, forcing a re-download far more
+/// often than the dataset's TTL. Keeping the provider alive lets the dataset
+/// (and its persisted Hive read-through) survive across the session; it still
+/// rebuilds when [activeCountryProvider] changes, which is the only time the
+/// service identity should change.
+@Riverpod(keepAlive: true)
 StationService stationService(Ref ref) {
   final country = ref.watch(activeCountryProvider);
   return _resolveServiceForCountry(ref, country.code);
@@ -68,7 +77,12 @@ StationService stationService(Ref ref) {
 /// Exposed as a `Provider.family` so tests can override per-country
 /// services without standing up the full `CountryServiceRegistry`.
 /// Production paths use the [stationServiceForCountry] sync helper.
-@riverpod
+///
+/// #2264 — `keepAlive` for the same bulk-dataset reason as
+/// [stationServiceProvider]: a per-country bulk service keeps its parsed
+/// dataset alive across rebuilds instead of re-downloading the whole country
+/// on every cross-country lookup.
+@Riverpod(keepAlive: true)
 StationService perCountryStationService(
   Ref ref,
   String countryCode,

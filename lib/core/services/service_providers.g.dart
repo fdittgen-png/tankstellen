@@ -55,6 +55,15 @@ String _$tankerkoenigDioHash() => r'bf30524d1ff9225e6dd29e0a4b92c6cac725a4e3';
 /// truth for per-country service wiring — including Germany. Countries
 /// that require an API key fall back to [DemoStationService] from inside
 /// the registry's factory function when no key is configured.
+///
+/// #2264 — `keepAlive`: bulk-dataset services (ES/IT/AR/DK) hold the parsed
+/// whole-country dataset in instance fields. Under the previous auto-dispose
+/// provider the service was rebuilt — and the in-memory dataset thrown away —
+/// every time the last listener detached, forcing a re-download far more
+/// often than the dataset's TTL. Keeping the provider alive lets the dataset
+/// (and its persisted Hive read-through) survive across the session; it still
+/// rebuilds when [activeCountryProvider] changes, which is the only time the
+/// service identity should change.
 
 @ProviderFor(stationService)
 final stationServiceProvider = StationServiceProvider._();
@@ -65,6 +74,15 @@ final stationServiceProvider = StationServiceProvider._();
 /// truth for per-country service wiring — including Germany. Countries
 /// that require an API key fall back to [DemoStationService] from inside
 /// the registry's factory function when no key is configured.
+///
+/// #2264 — `keepAlive`: bulk-dataset services (ES/IT/AR/DK) hold the parsed
+/// whole-country dataset in instance fields. Under the previous auto-dispose
+/// provider the service was rebuilt — and the in-memory dataset thrown away —
+/// every time the last listener detached, forcing a re-download far more
+/// often than the dataset's TTL. Keeping the provider alive lets the dataset
+/// (and its persisted Hive read-through) survive across the session; it still
+/// rebuilds when [activeCountryProvider] changes, which is the only time the
+/// service identity should change.
 
 final class StationServiceProvider
     extends $FunctionalProvider<StationService, StationService, StationService>
@@ -75,13 +93,22 @@ final class StationServiceProvider
   /// truth for per-country service wiring — including Germany. Countries
   /// that require an API key fall back to [DemoStationService] from inside
   /// the registry's factory function when no key is configured.
+  ///
+  /// #2264 — `keepAlive`: bulk-dataset services (ES/IT/AR/DK) hold the parsed
+  /// whole-country dataset in instance fields. Under the previous auto-dispose
+  /// provider the service was rebuilt — and the in-memory dataset thrown away —
+  /// every time the last listener detached, forcing a re-download far more
+  /// often than the dataset's TTL. Keeping the provider alive lets the dataset
+  /// (and its persisted Hive read-through) survive across the session; it still
+  /// rebuilds when [activeCountryProvider] changes, which is the only time the
+  /// service identity should change.
   StationServiceProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'stationServiceProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -108,7 +135,7 @@ final class StationServiceProvider
   }
 }
 
-String _$stationServiceHash() => r'67078979202079f40e27b6893f6f83287e9571e7';
+String _$stationServiceHash() => r'1a5459fd2f967babafab83d85d20b0c32fd0e358';
 
 /// Cross-country station service lookup (#753 widget tap path, #514
 /// favorites currency, #515 route search). Resolves the
@@ -118,6 +145,11 @@ String _$stationServiceHash() => r'67078979202079f40e27b6893f6f83287e9571e7';
 /// Exposed as a `Provider.family` so tests can override per-country
 /// services without standing up the full `CountryServiceRegistry`.
 /// Production paths use the [stationServiceForCountry] sync helper.
+///
+/// #2264 — `keepAlive` for the same bulk-dataset reason as
+/// [stationServiceProvider]: a per-country bulk service keeps its parsed
+/// dataset alive across rebuilds instead of re-downloading the whole country
+/// on every cross-country lookup.
 
 @ProviderFor(perCountryStationService)
 final perCountryStationServiceProvider = PerCountryStationServiceFamily._();
@@ -130,6 +162,11 @@ final perCountryStationServiceProvider = PerCountryStationServiceFamily._();
 /// Exposed as a `Provider.family` so tests can override per-country
 /// services without standing up the full `CountryServiceRegistry`.
 /// Production paths use the [stationServiceForCountry] sync helper.
+///
+/// #2264 — `keepAlive` for the same bulk-dataset reason as
+/// [stationServiceProvider]: a per-country bulk service keeps its parsed
+/// dataset alive across rebuilds instead of re-downloading the whole country
+/// on every cross-country lookup.
 
 final class PerCountryStationServiceProvider
     extends $FunctionalProvider<StationService, StationService, StationService>
@@ -142,13 +179,18 @@ final class PerCountryStationServiceProvider
   /// Exposed as a `Provider.family` so tests can override per-country
   /// services without standing up the full `CountryServiceRegistry`.
   /// Production paths use the [stationServiceForCountry] sync helper.
+  ///
+  /// #2264 — `keepAlive` for the same bulk-dataset reason as
+  /// [stationServiceProvider]: a per-country bulk service keeps its parsed
+  /// dataset alive across rebuilds instead of re-downloading the whole country
+  /// on every cross-country lookup.
   PerCountryStationServiceProvider._({
     required PerCountryStationServiceFamily super.from,
     required String super.argument,
   }) : super(
          retry: null,
          name: r'perCountryStationServiceProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -195,7 +237,7 @@ final class PerCountryStationServiceProvider
 }
 
 String _$perCountryStationServiceHash() =>
-    r'5c02f86c7bbf87b4ef08fdd20c2c9c93f6103ba1';
+    r'79b833834003864cb3a193f9e8f7ea184c6fe0f6';
 
 /// Cross-country station service lookup (#753 widget tap path, #514
 /// favorites currency, #515 route search). Resolves the
@@ -205,6 +247,11 @@ String _$perCountryStationServiceHash() =>
 /// Exposed as a `Provider.family` so tests can override per-country
 /// services without standing up the full `CountryServiceRegistry`.
 /// Production paths use the [stationServiceForCountry] sync helper.
+///
+/// #2264 — `keepAlive` for the same bulk-dataset reason as
+/// [stationServiceProvider]: a per-country bulk service keeps its parsed
+/// dataset alive across rebuilds instead of re-downloading the whole country
+/// on every cross-country lookup.
 
 final class PerCountryStationServiceFamily extends $Family
     with $FunctionalFamilyOverride<StationService, String> {
@@ -214,7 +261,7 @@ final class PerCountryStationServiceFamily extends $Family
         name: r'perCountryStationServiceProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   /// Cross-country station service lookup (#753 widget tap path, #514
@@ -225,6 +272,11 @@ final class PerCountryStationServiceFamily extends $Family
   /// Exposed as a `Provider.family` so tests can override per-country
   /// services without standing up the full `CountryServiceRegistry`.
   /// Production paths use the [stationServiceForCountry] sync helper.
+  ///
+  /// #2264 — `keepAlive` for the same bulk-dataset reason as
+  /// [stationServiceProvider]: a per-country bulk service keeps its parsed
+  /// dataset alive across rebuilds instead of re-downloading the whole country
+  /// on every cross-country lookup.
 
   PerCountryStationServiceProvider call(String countryCode) =>
       PerCountryStationServiceProvider._(argument: countryCode, from: this);

@@ -26,6 +26,7 @@ import '../../features/station_services/slovenia/slovenia_station_service.dart';
 import '../../features/station_services/south_korea/south_korea_station_service.dart';
 import '../../features/station_services/spain/miteco_station_service.dart';
 import '../../features/station_services/uk/uk_station_service.dart';
+import 'fuel_service_policy.dart';
 import 'impl/demo_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
 import 'service_providers.dart';
@@ -85,6 +86,13 @@ class CountryServiceEntry {
   /// Whether this country requires a user-provided API key.
   final bool requiresApiKey;
 
+  /// Typed data-source policy (#2264) — the single source of truth for the
+  /// cache TTLs and rate-limit interval the service layer reads. The
+  /// [StationServiceChain] branches on [FuelServicePolicy.model] to decide
+  /// whether to local-filter a persisted bulk dataset or keep a per-search-key
+  /// TTL cache; the rate limiter reads [FuelServicePolicy.minInterval].
+  final FuelServicePolicy policy;
+
   /// Factory that creates the raw [StationService] for this country.
   /// Receives a [Ref] for dependency injection.
   final StationService Function(Ref ref) createService;
@@ -94,6 +102,7 @@ class CountryServiceEntry {
     required this.errorSource,
     required this.boundingBox,
     required this.availableFuelTypes,
+    required this.policy,
     this.requiresApiKey = false,
     required this.createService,
   });
@@ -110,6 +119,216 @@ const List<FuelType> _defaultFuelTypes = [
   FuelType.electric,
   FuelType.all,
 ];
+
+// ---------------------------------------------------------------------------
+// Per-service data-source policies (#2264)
+// ---------------------------------------------------------------------------
+// Seeded from the Epic #2249 per-service audit. Each [CountryServiceEntry]
+// references exactly one of these; they are the single source of truth for
+// the cache TTLs + rate-limit interval the chain and Dio layer read. Values
+// are deliberately conservative — for bulk files the soft TTL is roughly the
+// upstream publish cadence and the hard TTL is a multiple of it (offline
+// grace), for polled APIs `searchResultTtl` matches how fast prices move and
+// `minInterval` matches the published / inferred rate limit.
+
+/// DE Tankerkönig — polled API, ~1 request/min published policy, prices on a
+/// 5-minute cadence. (#2264)
+const _dePolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(seconds: 60),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(minutes: 5),
+  attribution: 'Tankerkönig',
+  license: 'CC BY 4.0',
+);
+
+/// AT e-control — polled API; the Spritpreisrechner refreshes hourly, so a
+/// 1–2 h search TTL and a gentle 1 h min-interval keep us inside policy.
+const _atPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(hours: 1),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 2),
+  attribution: 'E-Control (Spritpreisrechner)',
+  license: 'CC BY 3.0 AT',
+);
+
+/// MX CRE — polled-then-merged feed that updates several times daily; cache
+/// the merged result 4 h and don't re-pull more often than that.
+const _mxPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(hours: 4),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 4),
+  attribution: 'Comisión Reguladora de Energía (CRE)',
+  license: 'Libre Uso MX',
+);
+
+/// PT DGEG — polled API; the portal publishes daily, so a 12 h search TTL and
+/// a 1 h min-interval are comfortable.
+const _ptPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(hours: 1),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 12),
+  attribution: 'DGEG (preçoscombustíveis)',
+  license: 'Open data (DGEG)',
+);
+
+/// UK CMA Fuel Finder — polled fan-out across retailer feeds published daily
+/// under the CMA scheme; cache each search 6 h.
+const _ukPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(minutes: 30),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 6),
+  attribution: 'CMA Fuel Finder (retailer feeds)',
+  license: 'Open Government Licence v3.0',
+);
+
+/// LU — government-regulated uniform prices, polled; a daily refresh is ample
+/// since the price changes only by ministerial arrêté.
+const _luPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(hours: 6),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 12),
+  attribution: 'gouvernement.lu',
+  license: 'CC0 1.0',
+);
+
+/// SI goriva.si — polled API; daily-ish updates.
+const _siPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(hours: 1),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 6),
+  attribution: 'goriva.si / Ministrstvo za gospodarstvo',
+  license: 'Open data (gov.si)',
+);
+
+/// KR OPINET — polled API; near-real-time prices, 5-minute search TTL.
+const _krPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(seconds: 60),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(minutes: 30),
+  attribution: 'OPINET (KNOC)',
+  license: 'KOGL Type 1',
+);
+
+/// CL CNE Bencina en Línea — polled API; daily-ish updates.
+const _clPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(hours: 1),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 6),
+  attribution: 'CNE (Comisión Nacional de Energía)',
+  license: 'Datos Abiertos CL',
+);
+
+/// GR Paratiritirio Timon — polled API (community FastAPI wrapper); prefecture
+/// observatory updates roughly daily.
+const _grPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(hours: 1),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 6),
+  attribution: 'Παρατηρητήριο Τιμών Υγρών Καυσίμων',
+  license: 'Open data (data.gov.gr)',
+);
+
+/// RO Monitorul Prețurilor — polled API; 15-minute upstream updates.
+const _roPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(minutes: 15),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(minutes: 30),
+  attribution: 'Consiliul Concurenței (Monitorul Prețurilor)',
+  license: 'Open data (RO)',
+);
+
+/// AU FuelCheck — stub (#804); throws on every search. Policy still recorded
+/// so the row exists once an endpoint lands; polled when it does.
+const _auPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(seconds: 60),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(minutes: 30),
+  attribution: 'NSW Government FuelCheck',
+  license: 'CC BY 4.0',
+);
+
+/// ES MITECO — bulk national dataset (~12k stations) downloaded per province
+/// and filtered locally; published daily.
+const _esPolicy = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(minutes: 30),
+  datasetTtlSoft: Duration(hours: 6),
+  datasetTtlHard: Duration(hours: 24),
+  searchResultTtl: Duration.zero,
+  attribution: 'Geoportal Gasolineras (MITECO)',
+  license: 'Open data (MITECO)',
+);
+
+/// IT MIMIT (osservaprezzi) — bulk CSV dataset published daily at 08:00.
+const _itPolicy = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(minutes: 30),
+  datasetTtlSoft: Duration(hours: 6),
+  datasetTtlHard: Duration(hours: 24),
+  searchResultTtl: Duration.zero,
+  attribution: 'MIMIT (osservaprezzi)',
+  license: 'IODL 2.0',
+);
+
+/// AR Secretaría de Energía — bulk CSV dataset (Resolución 314/2016); a few
+/// updates per day, large file.
+const _arPolicy = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(hours: 1),
+  datasetTtlSoft: Duration(hours: 6),
+  datasetTtlHard: Duration(hours: 24),
+  searchResultTtl: Duration.zero,
+  attribution: 'Secretaría de Energía (datos.energia.gob.ar)',
+  license: 'Open data (AR)',
+);
+
+/// DK — bulk national aggregate across OK / Shell / Q8 feeds, filtered
+/// locally; refreshed a few times daily.
+const _dkPolicy = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(minutes: 15),
+  datasetTtlSoft: Duration(hours: 2),
+  datasetTtlHard: Duration(hours: 12),
+  searchResultTtl: Duration.zero,
+  attribution: 'OK / Shell / Q8 (DK)',
+  license: 'Provider terms',
+);
+
+/// FR Prix Carburants — currently a polled/OSM-enriched search; the bulk flux
+/// ZIP migration is a later batch, so it is modelled as polled for now.
+const _frPolicy = FuelServicePolicy(
+  model: SourceModel.polledApi,
+  minInterval: Duration(minutes: 30),
+  datasetTtlSoft: Duration.zero,
+  datasetTtlHard: Duration.zero,
+  searchResultTtl: Duration(hours: 6),
+  attribution: 'Prix Carburants (data.economie.gouv.fr)',
+  license: 'Licence Ouverte 2.0',
+);
 
 /// Central registry of all country-specific station services.
 ///
@@ -155,6 +374,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
+      policy: _ptPolicy,
       createService: _createPortugal,
     ),
     CountryServiceEntry(
@@ -171,6 +391,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
         FuelType.electric, FuelType.all,
       ],
+      policy: _ukPolicy,
       createService: _createUk,
     ),
     CountryServiceEntry(
@@ -180,6 +401,7 @@ class CountryServiceRegistry {
         minLat: 54.0, maxLat: 58.0, minLng: 7.5, maxLng: 15.5,
       ),
       availableFuelTypes: _defaultFuelTypes,
+      policy: _dkPolicy,
       createService: _createDenmark,
     ),
     CountryServiceEntry(
@@ -196,6 +418,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
+      policy: _luPolicy,
       createService: _createLuxembourg,
     ),
     CountryServiceEntry(
@@ -216,6 +439,7 @@ class CountryServiceRegistry {
         FuelType.dieselPremium, FuelType.lpg, FuelType.cng,
         FuelType.electric, FuelType.all,
       ],
+      policy: _siPolicy,
       createService: _createSlovenia,
     ),
     // ── Continental EU (test order matters for shadow neighbours) ─────
@@ -226,6 +450,7 @@ class CountryServiceRegistry {
         minLat: 46.0, maxLat: 49.5, minLng: 9.0, maxLng: 17.5,
       ),
       availableFuelTypes: _defaultFuelTypes,
+      policy: _atPolicy,
       createService: _createEControl,
     ),
     CountryServiceEntry(
@@ -241,6 +466,7 @@ class CountryServiceRegistry {
         FuelType.e10, FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.e85, FuelType.lpg, FuelType.electric, FuelType.all,
       ],
+      policy: _frPolicy,
       createService: _createPrixCarburants,
     ),
     CountryServiceEntry(
@@ -254,6 +480,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.diesel, FuelType.lpg, FuelType.cng,
         FuelType.electric, FuelType.all,
       ],
+      policy: _itPolicy,
       createService: _createMise,
     ),
     CountryServiceEntry(
@@ -269,6 +496,7 @@ class CountryServiceRegistry {
         FuelType.dieselPremium, FuelType.lpg, FuelType.electric,
         FuelType.all,
       ],
+      policy: _esPolicy,
       createService: _createMiteco,
     ),
     CountryServiceEntry(
@@ -280,6 +508,7 @@ class CountryServiceRegistry {
       ),
       // DE: Tankerkönig publishes E5, E10, Diesel.
       availableFuelTypes: _defaultFuelTypes,
+      policy: _dePolicy,
       createService: _createTankerkoenig,
     ),
     // ── Non-EU countries (no overlap concerns) ─────────────────────────
@@ -290,6 +519,7 @@ class CountryServiceRegistry {
         minLat: 14.0, maxLat: 33.0, minLng: -119.0, maxLng: -86.0,
       ),
       availableFuelTypes: _defaultFuelTypes,
+      policy: _mxPolicy,
       createService: _createMexico,
     ),
     // CL before AR: Chile's narrow strip sits inside AR's generous
@@ -306,6 +536,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
+      policy: _clPolicy,
       createService: _createChile,
     ),
     CountryServiceEntry(
@@ -324,6 +555,7 @@ class CountryServiceRegistry {
         FuelType.dieselPremium, FuelType.cng, FuelType.electric,
         FuelType.all,
       ],
+      policy: _arPolicy,
       createService: _createArgentina,
     ),
     CountryServiceEntry(
@@ -342,6 +574,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
+      policy: _auPolicy,
       createService: _createAustralia,
     ),
     CountryServiceEntry(
@@ -358,6 +591,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
+      policy: _krPolicy,
       createService: _createSouthKorea,
     ),
     CountryServiceEntry(
@@ -374,6 +608,7 @@ class CountryServiceRegistry {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
+      policy: _grPolicy,
       createService: _createGreece,
     ),
     CountryServiceEntry(
@@ -392,6 +627,7 @@ class CountryServiceRegistry {
         FuelType.dieselPremium, FuelType.lpg, FuelType.electric,
         FuelType.all,
       ],
+      policy: _roPolicy,
       createService: _createRomania,
     ),
   ];
@@ -411,6 +647,11 @@ class CountryServiceRegistry {
   /// Returns the bounding box for [countryCode], or null when unregistered.
   static CountryBoundingBox? boundingBoxFor(String countryCode) =>
       _byCode[countryCode]?.boundingBox;
+
+  /// Returns the [FuelServicePolicy] for [countryCode], or null when
+  /// unregistered (#2264).
+  static FuelServicePolicy? policyFor(String countryCode) =>
+      _byCode[countryCode]?.policy;
 
   /// Ordered list of fuel types for [countryCode], or the default minimal
   /// set when the code is unregistered. Mirrors the historical
@@ -448,6 +689,9 @@ class CountryServiceRegistry {
       cache,
       errorSource: entry.errorSource,
       countryCode: countryCode,
+      // #2264 — the chain branches on this to local-filter bulk datasets
+      // (no per-key cache) vs keep the per-key TTL cache for polled APIs.
+      policy: entry.policy,
     );
   }
 
@@ -507,10 +751,18 @@ StationService _createPrixCarburants(Ref ref) {
 }
 
 StationService _createEControl(Ref ref) => EControlStationService();
-StationService _createMiteco(Ref ref) => MitecoStationService();
+
+// #2264 — bulk-dataset services receive the shared CacheManager so their
+// parsed national dataset is persisted to Hive (read-through on the next
+// search), surviving cold start + offline. The providers are keepAlive
+// (service_providers.dart) so the in-memory copy also survives rebuilds.
+StationService _createMiteco(Ref ref) =>
+    MitecoStationService(cache: ref.read(cacheManagerProvider));
 StationService _createMise(Ref ref) => MiseStationService();
-StationService _createDenmark(Ref ref) => DenmarkStationService();
-StationService _createArgentina(Ref ref) => ArgentinaStationService();
+StationService _createDenmark(Ref ref) =>
+    DenmarkStationService(cache: ref.read(cacheManagerProvider));
+StationService _createArgentina(Ref ref) =>
+    ArgentinaStationService(cache: ref.read(cacheManagerProvider));
 StationService _createPortugal(Ref ref) => PortugalStationService();
 StationService _createUk(Ref ref) => UkStationService();
 StationService _createAustralia(Ref ref) => const AustraliaStationService();

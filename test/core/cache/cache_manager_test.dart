@@ -567,4 +567,99 @@ void main() {
       }
     });
   });
+
+  group('CacheManager - evictBounded (#2264)', () {
+    // Store a fresh entry with an explicit storedAt + payload size.
+    Future<void> store(String key, DateTime storedAt, {int padBytes = 0}) {
+      return fakeStorage.cacheData(key, {
+        'payload': {'p': 'x' * padBytes},
+        'storedAt': storedAt.millisecondsSinceEpoch,
+        'source': ServiceSource.cache.index,
+        'ttlMs': const Duration(hours: 1).inMilliseconds,
+      });
+    }
+
+    test('still evicts entries older than 3x TTL', () async {
+      await fakeStorage.cacheData('very-old', {
+        'payload': {'stale': true},
+        'storedAt': DateTime.now()
+            .subtract(const Duration(hours: 1))
+            .millisecondsSinceEpoch,
+        'source': ServiceSource.cache.index,
+        'ttlMs': 1,
+      });
+      await cache.put('fresh', {'v': 1},
+          ttl: const Duration(hours: 24), source: ServiceSource.cache);
+
+      final evicted = await cache.evictBounded();
+      expect(evicted, equals(1));
+      expect(cache.get('very-old'), isNull);
+      expect(cache.get('fresh'), isNotNull);
+    });
+
+    test('enforces the per-prefix budget, keeping the newest', () async {
+      final now = DateTime.now();
+      // 5 search: entries, budget 3 → 2 oldest evicted.
+      for (var i = 0; i < 5; i++) {
+        await store('search:$i', now.subtract(Duration(minutes: i)));
+      }
+      // 2 detail: entries — both under budget, both survive.
+      await store('detail:a', now);
+      await store('detail:b', now);
+
+      final evicted =
+          await cache.evictBounded(policy: const CacheEvictionPolicy(prefixBudget: 3));
+
+      expect(evicted, equals(2));
+      // The two oldest searches (highest i) are gone.
+      expect(cache.get('search:4'), isNull);
+      expect(cache.get('search:3'), isNull);
+      expect(cache.get('search:0'), isNotNull);
+      expect(cache.get('detail:a'), isNotNull);
+      expect(cache.get('detail:b'), isNotNull);
+    });
+
+    test('evicts oldest-first once the byte ceiling is exceeded', () async {
+      final now = DateTime.now();
+      // Three ~1 KB entries; ceiling 2 KB → oldest must be evicted.
+      await store('search:old', now.subtract(const Duration(minutes: 10)),
+          padBytes: 1000);
+      await store('search:mid', now.subtract(const Duration(minutes: 5)),
+          padBytes: 1000);
+      await store('search:new', now, padBytes: 1000);
+
+      final evicted = await cache.evictBounded(
+        policy: const CacheEvictionPolicy(prefixBudget: 100, maxBytes: 2200),
+      );
+
+      expect(evicted, greaterThanOrEqualTo(1));
+      expect(cache.get('search:old'), isNull,
+          reason: 'oldest evicted first under byte pressure');
+      expect(cache.get('search:new'), isNotNull);
+    });
+
+    test('protects dataset: entries from the byte sweep', () async {
+      final now = DateTime.now();
+      // A large persisted dataset + two large searches; tiny ceiling.
+      await store('dataset:ES:stations',
+          now.subtract(const Duration(hours: 1)), padBytes: 2000);
+      await store('search:a', now.subtract(const Duration(minutes: 2)),
+          padBytes: 2000);
+      await store('search:b', now, padBytes: 2000);
+
+      await cache.evictBounded(
+        policy: const CacheEvictionPolicy(prefixBudget: 100, maxBytes: 1000),
+      );
+
+      expect(cache.get('dataset:ES:stations'), isNotNull,
+          reason: 'persisted dataset is exempt from the LRU byte sweep');
+    });
+
+    test('returns 0 when everything is within budget + ceiling', () async {
+      await cache.put('search:x', {'v': 1},
+          ttl: const Duration(hours: 1), source: ServiceSource.cache);
+      final evicted = await cache.evictBounded();
+      expect(evicted, equals(0));
+    });
+  });
 }

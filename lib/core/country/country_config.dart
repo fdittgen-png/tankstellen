@@ -339,6 +339,14 @@ class Countries {
     exampleCity: 'Sydney',
     // AU forecourts quote cents-per-litre on signage.
     pricePerUnitSuffix: 'c/L',
+    // #2264 — AustraliaStationService is a documented stub that throws on
+    // every search (the legacy FuelCheckApp/v2 endpoint is retired and the
+    // replacement needs OAuth2 we don't ship; tracked in #804). Advertising
+    // it as verified put a country in the picker that can only ever error,
+    // so gate it out until #804 lands a working endpoint. The entry stays
+    // *registered* — an `au-` station id still resolves — it is only hidden
+    // from the user-facing pickers via [Countries.verified].
+    verified: false,
   );
 
   static const slovenia = CountryConfig(

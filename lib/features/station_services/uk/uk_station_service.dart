@@ -240,19 +240,17 @@ class UkStationService with StationServiceHelpers implements StationService {
     return price > 10 ? price / 100 : price;
   }
 
+  // #2264 — route the unsupported endpoints through the shared helpers
+  // (throwDetailUnavailable / emptyPricesResult) like the other services.
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(String stationId) async {
-    throw const ApiException(message: 'Station detail not supported for UK');
+    throwDetailUnavailable('CMA Fuel Finder');
   }
 
   @override
   Future<ServiceResult<Map<String, StationPrices>>> getPrices(
     List<String> ids,
   ) async {
-    return ServiceResult(
-      data: const {},
-      source: ServiceSource.ukApi,
-      fetchedAt: DateTime.now(),
-    );
+    return emptyPricesResult(ServiceSource.ukApi);
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_bounding_box.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/services/country_service_registry.dart';
+import 'package:tankstellen/core/services/fuel_service_policy.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
@@ -51,6 +52,79 @@ void main() {
           reason: 'Registry entries and Countries.all should have '
               'the same number of entries',
         );
+      });
+    });
+
+    group('FuelServicePolicy (#2264)', () {
+      test('every entry carries a policy', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          expect(entry.policy, isNotNull,
+              reason: '${entry.countryCode} must declare a FuelServicePolicy');
+        }
+      });
+
+      test('policyFor returns the entry policy and null for unregistered', () {
+        expect(CountryServiceRegistry.policyFor('DE'), isNotNull);
+        expect(CountryServiceRegistry.policyFor('XX'), isNull);
+      });
+
+      test('every policy has non-empty attribution + license', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          expect(entry.policy.attribution, isNotEmpty,
+              reason: '${entry.countryCode} attribution');
+          expect(entry.policy.license, isNotEmpty,
+              reason: '${entry.countryCode} license');
+        }
+      });
+
+      test('every policy has a positive min-interval', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          expect(entry.policy.minInterval, greaterThan(Duration.zero),
+              reason: '${entry.countryCode} minInterval');
+        }
+      });
+
+      test('bulk-file policies declare soft <= hard dataset TTLs > 0', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          if (!entry.policy.isBulkFile) continue;
+          expect(entry.policy.datasetTtlSoft, greaterThan(Duration.zero),
+              reason: '${entry.countryCode} datasetTtlSoft');
+          expect(
+            entry.policy.datasetTtlHard >= entry.policy.datasetTtlSoft,
+            isTrue,
+            reason: '${entry.countryCode} hard >= soft',
+          );
+        }
+      });
+
+      test('polled-api policies declare a positive search-result TTL', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          if (!entry.policy.isPolledApi) continue;
+          expect(entry.policy.searchResultTtl, greaterThan(Duration.zero),
+              reason: '${entry.countryCode} searchResultTtl');
+        }
+      });
+
+      test('ES / IT / AR / DK are modelled as bulkFile', () {
+        for (final code in ['ES', 'IT', 'AR', 'DK']) {
+          expect(CountryServiceRegistry.policyFor(code)!.model,
+              equals(SourceModel.bulkFile),
+              reason: '$code should be a bulk-file source');
+        }
+      });
+
+      test('DE / AT / MX / PT / UK are modelled as polledApi', () {
+        for (final code in ['DE', 'AT', 'MX', 'PT', 'GB']) {
+          expect(CountryServiceRegistry.policyFor(code)!.model,
+              equals(SourceModel.polledApi),
+              reason: '$code should be a polled-api source');
+        }
+      });
+
+      test('DE Tankerkönig polls at 1/min, prices fresh 5 min', () {
+        final de = CountryServiceRegistry.policyFor('DE')!;
+        expect(de.minInterval, equals(const Duration(seconds: 60)));
+        expect(de.searchResultTtl, equals(const Duration(minutes: 5)));
       });
     });
 
