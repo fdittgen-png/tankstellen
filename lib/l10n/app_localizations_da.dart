@@ -3928,19 +3928,19 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get lessonAdviceIdling =>
-      'Turn the engine off at long stops instead of letting it idle.';
+      'Sluk motoren ved lange stop i stedet for at lade den gå i tomgang.';
 
   @override
   String get lessonAdviceHighRpm =>
-      'Shift up earlier to keep the engine out of the high-RPM band.';
+      'Skift tidligere op for at holde motoren uden for det høje omdrejningsområde.';
 
   @override
   String get lessonAdviceHardAccel =>
-      'Ease onto the throttle — smooth acceleration uses less fuel.';
+      'Giv blødt gas — jævn acceleration bruger mindre brændstof.';
 
   @override
   String get lessonAdviceLowGear =>
-      'Shift up sooner so the engine settles into a lower, more efficient gear.';
+      'Skift op tidligere, så motoren falder til ro i et lavere, mere økonomisk gear.';
 
   @override
   String get drivingScoreCardTitle => 'Kørescore';

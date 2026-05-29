@@ -3960,19 +3960,19 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get lessonAdviceIdling =>
-      'Turn the engine off at long stops instead of letting it idle.';
+      'Σβήνετε τον κινητήρα στις μεγάλες στάσεις αντί να τον αφήνετε στο ρελαντί.';
 
   @override
   String get lessonAdviceHighRpm =>
-      'Shift up earlier to keep the engine out of the high-RPM band.';
+      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση για να κρατάτε τον κινητήρα εκτός της ζώνης υψηλών στροφών.';
 
   @override
   String get lessonAdviceHardAccel =>
-      'Ease onto the throttle — smooth acceleration uses less fuel.';
+      'Πατάτε απαλά το γκάζι — η ομαλή επιτάχυνση καταναλώνει λιγότερο καύσιμο.';
 
   @override
   String get lessonAdviceLowGear =>
-      'Shift up sooner so the engine settles into a lower, more efficient gear.';
+      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση ώστε ο κινητήρας να σταθεροποιείται σε χαμηλότερες, πιο οικονομικές στροφές.';
 
   @override
   String get drivingScoreCardTitle => 'Βαθμολογία οδήγησης';

@@ -3957,19 +3957,19 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get lessonAdviceIdling =>
-      'Turn the engine off at long stops instead of letting it idle.';
+      'Hosszú megállóknál kapcsolja ki a motort, ahelyett hogy üresjáraton hagyná.';
 
   @override
   String get lessonAdviceHighRpm =>
-      'Shift up earlier to keep the engine out of the high-RPM band.';
+      'Kapcsoljon feljebb korábban, hogy a motor a magas fordulatszámú tartományon kívül maradjon.';
 
   @override
   String get lessonAdviceHardAccel =>
-      'Ease onto the throttle — smooth acceleration uses less fuel.';
+      'Finoman adjon gázt — az egyenletes gyorsítás kevesebb üzemanyagot fogyaszt.';
 
   @override
   String get lessonAdviceLowGear =>
-      'Shift up sooner so the engine settles into a lower, more efficient gear.';
+      'Kapcsoljon feljebb hamarabb, hogy a motor alacsonyabb, takarékosabb fordulatszámon járjon.';
 
   @override
   String get drivingScoreCardTitle => 'Vezetési pontszám';

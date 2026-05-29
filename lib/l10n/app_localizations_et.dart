@@ -3924,19 +3924,19 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get lessonAdviceIdling =>
-      'Turn the engine off at long stops instead of letting it idle.';
+      'Pikkadel peatustel lülita mootor välja, selle asemel et seda tühikäigul töötada lasta.';
 
   @override
   String get lessonAdviceHighRpm =>
-      'Shift up earlier to keep the engine out of the high-RPM band.';
+      'Vaheta varem kõrgemale käigule, et hoida mootor kõrgete pöörete tsoonist eemal.';
 
   @override
   String get lessonAdviceHardAccel =>
-      'Ease onto the throttle — smooth acceleration uses less fuel.';
+      'Vajuta gaasi sujuvalt — ühtlane kiirendus kulutab vähem kütust.';
 
   @override
   String get lessonAdviceLowGear =>
-      'Shift up sooner so the engine settles into a lower, more efficient gear.';
+      'Vaheta varem kõrgemale käigule, et mootor töötaks madalamatel ja säästlikumatel pööretel.';
 
   @override
   String get drivingScoreCardTitle => 'Sõiduhinnang';
