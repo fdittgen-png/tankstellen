@@ -3388,6 +3388,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Radius alerts currently only check stations in Germany.';
+
+  @override
   String get approachOverlaySection => 'Approach-station overlay';
 
   @override
@@ -8943,6 +8951,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get achievementHighwayMasterDesc =>
       '⟦Çóɱƥłéŧé á 30 ķɱ+ ŧřîƥ áŧ çóñšîšŧéñŧ šƥééđ ŵîŧĥ á šɱóóŧĥ-đřîṽîñǧ šçóřé óƒ 90 óř ĥîǧĥéř. ·····························⟧';
+
+  @override
+  String get alertGatingNonDeStationWarning =>
+      '⟦Ɓáçķǧřóúñđ ƥřîçé áłéřŧš çúřřéñŧłý óñłý ŵóřķ ƒóř šŧáŧîóñš îñ Ǧéřɱáñý. Ŧĥîš áłéřŧ ŵîłł ƀé šáṽéđ ƀúŧ ɱáý ñéṽéř ñóŧîƒý ýóú úñŧîł çřóšš-çóúñŧřý áłéřŧš ářřîṽé. ·························································⟧';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      '⟦Řáđîúš áłéřŧš çúřřéñŧłý óñłý çĥéçķ šŧáŧîóñš îñ Ǧéřɱáñý. ·····················⟧';
 
   @override
   String get approachOverlaySection => '⟦Áƥƥřóáçĥ-šŧáŧîóñ óṽéřłáý ··········⟧';

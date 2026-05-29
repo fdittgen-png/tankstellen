@@ -322,6 +322,14 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         final stationPrices = prices[alert.stationId];
         if (stationPrices == null || stationPrices[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
 
+        // #2246 — the switch intentionally stays at e5/e10/diesel: those
+        // are the ONLY fuels Tankerkönig's prices feed exposes (the German
+        // MTS-K mandate). e98/dieselPremium/e85/lpg/cng are not in the
+        // upstream feed, so there is nothing to evaluate — extending the
+        // switch would only pretend. The create dialog is now gated to the
+        // same three fuels (mirrors the radius #2211 fix), so new alerts
+        // can never land on the `default` branch; legacy alerts on dead
+        // fuels fall through to `continue` and are skipped, same as before.
         double? currentPrice;
         switch (alert.fuelType) {
           case FuelTypeE5():

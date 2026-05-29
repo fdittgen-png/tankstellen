@@ -3404,6 +3404,14 @@ class AppLocalizationsSv extends AppLocalizations {
       'Genomför en resa på 30 km+ i jämn hastighet med ett mjukkörningspoäng på 90 eller högre.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Radius alerts currently only check stations in Germany.';
+
+  @override
   String get approachOverlaySection => 'Inflygningsöverlägg';
 
   @override

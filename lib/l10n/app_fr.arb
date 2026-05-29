@@ -2021,5 +2021,7 @@
   "approachTestUnavailable": "Ajoutez une station favorite pour tester l'overlay d'approche",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Les alertes de prix en arrière-plan ne fonctionnent actuellement que pour les stations en Allemagne. Cette alerte sera enregistrée, mais elle pourrait ne jamais vous notifier tant que les alertes transfrontalières ne sont pas disponibles.",
+  "alertGatingRadiusGermanyOnlyNote": "Les alertes de zone ne vérifient actuellement que les stations en Allemagne."
 }

@@ -3423,6 +3423,14 @@ class AppLocalizationsLv extends AppLocalizations {
       'Pabeidziet 30 km+ braucienu ar nemainīgu ātrumu un maigās braukšanas novērtējumu 90 vai augstāku.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Radius alerts currently only check stations in Germany.';
+
+  @override
   String get approachOverlaySection =>
       'Pārklājums tuvojoties degvielas uzpildes stacijai';
 

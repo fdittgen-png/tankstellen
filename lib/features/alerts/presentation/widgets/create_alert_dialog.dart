@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import '../../../../core/country/country_config.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -32,17 +33,25 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
   late FuelType _selectedFuelType;
   late TextEditingController _priceController;
 
-  // Fuel types that make sense for alerts (exclude 'all')
+  // #2246 — restricted to the fuels the on-device background evaluator
+  // can actually resolve. Tankerkönig's prices feed only exposes e5/e10/
+  // diesel (the German MTS-K mandate); e98/dieselPremium/e85/lpg/cng are
+  // not in the upstream feed, so offering them produced silently-dead
+  // alerts that could never fire. Mirrors the radius sheet's #2211 fix.
   static const _alertFuelTypes = [
     FuelType.e5,
     FuelType.e10,
-    FuelType.e98,
     FuelType.diesel,
-    FuelType.dieselPremium,
-    FuelType.e85,
-    FuelType.lpg,
-    FuelType.cng,
   ];
+
+  /// True when the station's id prefix resolves to a non-DE country.
+  /// The background evaluator is Tankerkönig-only today, so a non-DE
+  /// alert is saved but can't fire — we warn the user at creation
+  /// rather than letting it silently never notify (#2246).
+  bool get _isNonDeStation {
+    final country = Countries.countryCodeForStationId(widget.stationId);
+    return country != null && country != 'DE';
+  }
 
   @override
   void initState() {
@@ -134,6 +143,18 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
                 return null;
               },
             ),
+            // #2246 — honest creation gating: the on-device background
+            // evaluator is Tankerkönig-only, so an alert on a non-DE
+            // station is saved but can't fire yet. Surface that instead
+            // of letting it silently never notify.
+            if (_isNonDeStation) ...[
+              const SizedBox(height: 16),
+              _NonDeStationWarning(
+                message: l10n?.alertGatingNonDeStationWarning ??
+                    'Background price alerts currently only work for '
+                        'stations in Germany.',
+              ),
+            ],
           ],
         ),
       ),
@@ -166,5 +187,41 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
     );
 
     Navigator.of(context).pop(alert);
+  }
+}
+
+/// Inline amber warning banner shown when the alert's station is outside
+/// Germany — the on-device background evaluator can't reach it yet
+/// (#2246).
+class _NonDeStationWarning extends StatelessWidget {
+  const _NonDeStationWarning({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.tertiary;
+    return Container(
+      key: const Key('alert_non_de_warning'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 18, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(color: color),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

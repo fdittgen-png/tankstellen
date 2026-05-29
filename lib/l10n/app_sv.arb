@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Lägg till en favoritstation för att testa närmandeöverlägget",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Prislarm i bakgrunden fungerar för närvarande endast för bensinstationer i Tyskland. Det här larmet sparas, men kanske aldrig meddelar dig förrän larm mellan länder blir tillgängliga.",
+  "alertGatingRadiusGermanyOnlyNote": "Radielarm kontrollerar för närvarande endast bensinstationer i Tyskland."
 }

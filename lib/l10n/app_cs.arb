@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Přidejte oblíbenou stanici, abyste mohli překryv přiblížení otestovat",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Cenová upozornění na pozadí aktuálně fungují pouze pro čerpací stanice v Německu. Toto upozornění bude uloženo, ale nemusí vás upozornit, dokud nebudou k dispozici upozornění napříč zeměmi.",
+  "alertGatingRadiusGermanyOnlyNote": "Upozornění podle okruhu aktuálně kontrolují pouze čerpací stanice v Německu."
 }

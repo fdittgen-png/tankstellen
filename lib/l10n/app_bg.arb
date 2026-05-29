@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Добавете любима станция, за да тествате наслагването при приближаване",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Известията за цени във фонов режим в момента работят само за бензиностанции в Германия. Този известителен сигнал ще бъде запазен, но може никога да не ви уведоми, докато не станат достъпни междудържавните известия.",
+  "alertGatingRadiusGermanyOnlyNote": "Известията по радиус в момента проверяват само бензиностанции в Германия."
 }

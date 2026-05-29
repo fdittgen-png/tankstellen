@@ -3418,6 +3418,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voltooi een rit van 30 km of meer op constante snelheid met een soepele rijscore van 90 of hoger.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Radius alerts currently only check stations in Germany.';
+
+  @override
   String get approachOverlaySection =>
       'Overlay bij nadering van een tankstation';
 

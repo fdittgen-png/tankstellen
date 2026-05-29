@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Pridėkite mėgstamą stotelę, kad galėtumėte testuoti artėjimo perdangą",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Foninės kainų perspėjimai šiuo metu veikia tik Vokietijos degalinėms. Šis perspėjimas bus išsaugotas, bet jis gali niekada jūsų neįspėti, kol bus prieinami tarptautiniai perspėjimai.",
+  "alertGatingRadiusGermanyOnlyNote": "Spindulio perspėjimai šiuo metu tikrina tik Vokietijos degalines."
 }

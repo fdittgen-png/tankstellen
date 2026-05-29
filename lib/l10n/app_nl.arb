@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Voeg een favoriete tankstation toe om de naderingsoverlay te testen",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Prijswaarschuwingen op de achtergrond werken momenteel alleen voor tankstations in Duitsland. Deze waarschuwing wordt opgeslagen, maar geeft je mogelijk nooit een melding totdat grensoverschrijdende waarschuwingen beschikbaar zijn.",
+  "alertGatingRadiusGermanyOnlyNote": "Straalwaarschuwingen controleren momenteel alleen tankstations in Duitsland."
 }

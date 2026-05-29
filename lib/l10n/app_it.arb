@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Aggiungi una stazione preferita per provare l'overlay di avvicinamento",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Gli avvisi sui prezzi in background attualmente funzionano solo per le stazioni in Germania. Questo avviso verrà salvato, ma potrebbe non avvisarti mai finché non arriveranno gli avvisi tra paesi.",
+  "alertGatingRadiusGermanyOnlyNote": "Gli avvisi per raggio attualmente controllano solo le stazioni in Germania."
 }

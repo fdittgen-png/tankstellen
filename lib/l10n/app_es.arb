@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Añade una gasolinera favorita para probar la superposición de aproximación",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Las alertas de precio en segundo plano actualmente solo funcionan para estaciones en Alemania. Esta alerta se guardará, pero puede que nunca te notifique hasta que lleguen las alertas entre países.",
+  "alertGatingRadiusGermanyOnlyNote": "Las alertas por radio actualmente solo comprueban estaciones en Alemania."
 }

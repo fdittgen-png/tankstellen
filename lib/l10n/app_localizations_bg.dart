@@ -3430,6 +3430,14 @@ class AppLocalizationsBg extends AppLocalizations {
       'Завършете пътуване от 30+ км с постоянна скорост и резултат за плавно шофиране 90 или повече.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Radius alerts currently only check stations in Germany.';
+
+  @override
   String get approachOverlaySection =>
       'Наложение при приближаване до бензиностанция';
 

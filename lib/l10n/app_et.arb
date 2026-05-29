@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Lisage lemmikjaam, et lähenemise ülekatet testida",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Tausta hinnateavitused töötavad praegu ainult Saksamaa tanklate puhul. See teavitus salvestatakse, kuid ei pruugi teid kunagi teavitada, kuni riikidevahelised teavitused saabuvad.",
+  "alertGatingRadiusGermanyOnlyNote": "Raadiuse teavitused kontrollivad praegu ainult Saksamaa tanklaid."
 }

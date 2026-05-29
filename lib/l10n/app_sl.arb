@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Dodajte priljubljeno postajo, da preizkusite prekrivanje približevanja",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Cenovna opozorila v ozadju trenutno delujejo samo za bencinske črpalke v Nemčiji. To opozorilo bo shranjeno, vendar vas morda nikoli ne bo obvestilo, dokler ne bodo na voljo čezmejna opozorila.",
+  "alertGatingRadiusGermanyOnlyNote": "Opozorila po polmeru trenutno preverjajo samo bencinske črpalke v Nemčiji."
 }

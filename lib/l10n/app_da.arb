@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Tilføj en favoritstation for at teste tilnærmelsesoverlayet",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Baggrunds-prisalarmer fungerer i øjeblikket kun for tankstationer i Tyskland. Denne alarm gemmes, men giver dig måske aldrig besked, før alarmer på tværs af lande bliver tilgængelige.",
+  "alertGatingRadiusGermanyOnlyNote": "Radiusalarmer tjekker i øjeblikket kun tankstationer i Tyskland."
 }

@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Adăugați o stație preferată pentru a testa suprapunerea de apropiere",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Alertele de preț în fundal funcționează momentan doar pentru stațiile din Germania. Această alertă va fi salvată, dar este posibil să nu vă notifice niciodată până când vor fi disponibile alertele între țări.",
+  "alertGatingRadiusGermanyOnlyNote": "Alertele pe rază verifică momentan doar stațiile din Germania."
 }

@@ -6297,6 +6297,18 @@ abstract class AppLocalizations {
   /// **'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.'**
   String get achievementHighwayMasterDesc;
 
+  /// Warning shown in the create-alert dialog when the station is outside Germany, because the on-device background evaluator is Tankerkönig-only today (#2246).
+  ///
+  /// In en, this message translates to:
+  /// **'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.'**
+  String get alertGatingNonDeStationWarning;
+
+  /// Informational note in the radius-alert create sheet that the on-device background runner only evaluates German (Tankerkönig) stations today (#2246).
+  ///
+  /// In en, this message translates to:
+  /// **'Radius alerts currently only check stations in Germany.'**
+  String get alertGatingRadiusGermanyOnlyNote;
+
   /// Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065).
   ///
   /// In en, this message translates to:

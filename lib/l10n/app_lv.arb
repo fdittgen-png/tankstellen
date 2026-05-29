@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Pievienojiet iecienītāko staciju, lai testētu tuvošanās pārklājumu",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Fona cenu brīdinājumi pašlaik darbojas tikai Vācijas degvielas uzpildes stacijām. Šis brīdinājums tiks saglabāts, taču tas var nekad jūs nebrīdināt, līdz būs pieejami starpvalstu brīdinājumi.",
+  "alertGatingRadiusGermanyOnlyNote": "Rādiusa brīdinājumi pašlaik pārbauda tikai Vācijas degvielas uzpildes stacijas."
 }

@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Dodajte omiljenu postaju za testiranje sloja približavanja",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Pozadinska upozorenja o cijenama trenutačno rade samo za benzinske postaje u Njemačkoj. Ovo upozorenje bit će spremljeno, ali možda vas nikada neće obavijestiti dok ne postanu dostupna međudržavna upozorenja.",
+  "alertGatingRadiusGermanyOnlyNote": "Upozorenja po radijusu trenutačno provjeravaju samo benzinske postaje u Njemačkoj."
 }

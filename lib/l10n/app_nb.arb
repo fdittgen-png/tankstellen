@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Legg til en favorittstasjon for å teste nærmingsoverlegget",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Prisvarsler i bakgrunnen fungerer foreløpig bare for bensinstasjoner i Tyskland. Dette varselet lagres, men varsler deg kanskje aldri før varsler på tvers av land blir tilgjengelige.",
+  "alertGatingRadiusGermanyOnlyNote": "Radiusvarsler sjekker foreløpig bare bensinstasjoner i Tyskland."
 }

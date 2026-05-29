@@ -1893,5 +1893,7 @@
   "approachTestUnavailable": "Adicione um posto favorito para testar a sobreposição de aproximação",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
-  }
+  },
+  "alertGatingNonDeStationWarning": "Os alertas de preço em segundo plano atualmente só funcionam para postos na Alemanha. Este alerta será guardado, mas poderá nunca o notificar até que cheguem os alertas entre países.",
+  "alertGatingRadiusGermanyOnlyNote": "Os alertas por raio atualmente só verificam postos na Alemanha."
 }
