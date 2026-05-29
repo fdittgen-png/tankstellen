@@ -159,32 +159,33 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
 
   Future<List<Map<String, dynamic>>> _fetchStationsByProvince(
     String provinceId, {CancelToken? cancelToken}
-  ) async {
+  ) {
     // Use cache if fresh (< 10 minutes)
-    if (_cachedStations != null && isDatasetFresh(const Duration(minutes: 10))) {
-      return _cachedStations!;
-    }
+    return loadDataset<List<Map<String, dynamic>>>(
+      cached: _cachedStations,
+      ttl: const Duration(minutes: 10),
+      fetch: () async {
+        final response = await _dio.get(
+          '$_baseUrl/EstacionesTerrestres/FiltroProvincia/$provinceId',
+          cancelToken: cancelToken,
+        );
 
-    final response = await _dio.get(
-      '$_baseUrl/EstacionesTerrestres/FiltroProvincia/$provinceId',
-      cancelToken: cancelToken,
+        final data = response.data;
+        if (data is! Map<String, dynamic>) {
+          throw const ApiException(message: 'Invalid MITECO response');
+        }
+
+        if (data['ResultadoConsulta'] != 'OK') {
+          throw ApiException(
+            message: data['ResultadoConsulta']?.toString() ?? 'API error',
+          );
+        }
+
+        final list = data['ListaEESSPrecio'] as List<dynamic>? ?? [];
+        return list.cast<Map<String, dynamic>>();
+      },
+      store: (value) => _cachedStations = value,
     );
-
-    final data = response.data;
-    if (data is! Map<String, dynamic>) {
-      throw const ApiException(message: 'Invalid MITECO response');
-    }
-
-    if (data['ResultadoConsulta'] != 'OK') {
-      throw ApiException(
-        message: data['ResultadoConsulta']?.toString() ?? 'API error',
-      );
-    }
-
-    final list = data['ListaEESSPrecio'] as List<dynamic>? ?? [];
-    _cachedStations = list.cast<Map<String, dynamic>>();
-    markDatasetRefreshed();
-    return _cachedStations!;
   }
 
   Station? _parseStation(

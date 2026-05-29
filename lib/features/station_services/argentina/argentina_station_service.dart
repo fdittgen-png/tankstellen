@@ -183,15 +183,17 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
         haystack.contains('HANDSHAKE');
   }
 
-  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) async {
-    if (_cachedStations != null && isDatasetFresh(const Duration(hours: 6))) {
-      return;
-    }
-
-    final response = await _dio.get<String>(_csvUrl, cancelToken: cancelToken);
-    _cachedStations = await compute(_parseCsv, response.data ?? '');
-    markDatasetRefreshed();
-  }
+  Future<void> _ensureDataLoaded({CancelToken? cancelToken}) =>
+      loadDataset<List<_RawStation>>(
+        cached: _cachedStations,
+        ttl: const Duration(hours: 6),
+        fetch: () async {
+          final response =
+              await _dio.get<String>(_csvUrl, cancelToken: cancelToken);
+          return compute(_parseCsv, response.data ?? '');
+        },
+        store: (value) => _cachedStations = value,
+      );
 
   /// Expected CSV header columns from the Argentina open data endpoint.
   /// Used as an integrity check to detect MITM tampering or format changes
