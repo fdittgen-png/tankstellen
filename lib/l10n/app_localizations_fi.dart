@@ -4084,6 +4084,27 @@ class AppLocalizationsFi extends AppLocalizations {
       'Vaihda aiemmin suuremmalle, jotta moottori asettuu matalammille ja taloudellisemmille kierroksille.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Jatkuva suuri nopeus ($pctTime % matkasta): hukattu $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Jatkuva suuri nopeus ($pctTime % matkasta)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Päästä kaasusta yli 110 km/h – ilmanvastus kasvaa jyrkästi, joten hieman hitaammin säästää paljon polttoainetta.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Tasaista ajoa – hyvin tehty!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Ei rajuja kiihdytyksiä tai jarrutuksia tällä matkalla – tasainen ajo pitää kulutuksen alhaisena.';
+
+  @override
   String get drivingScoreCardTitle => 'Ajopisteet';
 
   @override

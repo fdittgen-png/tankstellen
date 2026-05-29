@@ -4087,6 +4087,27 @@ class AppLocalizationsSl extends AppLocalizations {
       'Prej prestavite navzgor, da se motor umiri pri nižjih in varčnejših vrtljajih.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Trajno visoka hitrost ($pctTime% vožnje): zapravljeno $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Trajno visoka hitrost ($pctTime% vožnje)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Nad 110 km/h spustite plin – zračni upor strmo narašča, malo počasneje prihrani veliko goriva.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Umirjena vožnja – odlično!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Na tej vožnji ni bilo sunkovitega pospeševanja ali zaviranja – enakomerna vožnja ohranja nizko porabo.';
+
+  @override
   String get drivingScoreCardTitle => 'Ocena vožnje';
 
   @override

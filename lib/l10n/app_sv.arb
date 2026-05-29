@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Byt till horisontell layout",
   "pumpCameraOrientationVertical": "Byt till vertikal layout",
   "pumpCameraGlareWarning": "För mycket bländning — luta något för att undvika reflexer",
-  "pumpCameraAlignHint": "Rikta in displayen i ramen och ta sedan en bild"
+  "pumpCameraAlignHint": "Rikta in displayen i ramen och ta sedan en bild",
+  "insightHighSpeedBand": "Ihållande hög hastighet ({pctTime} % av resan): slösade {liters} L",
+  "insightHighSpeedBandNoFuel": "Ihållande hög hastighet ({pctTime} % av resan)",
+  "lessonAdviceHighSpeedBand": "Lätta på gasen över 110 km/h – luftmotståndet ökar kraftigt, så lite långsammare sparar mycket bränsle.",
+  "lessonSmoothDrivingTitle": "Mjuk körning – bra jobbat!",
+  "lessonAdviceSmoothDriving": "Ingen hård acceleration eller inbromsning på den här resan – jämn körning håller förbrukningen låg."
 }

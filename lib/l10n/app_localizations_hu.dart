@@ -4113,6 +4113,27 @@ class AppLocalizationsHu extends AppLocalizations {
       'Kapcsoljon feljebb hamarabb, hogy a motor alacsonyabb, takarékosabb fordulatszámon járjon.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Tartósan nagy sebesség (az út $pctTime%-a): elpazarolt $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Tartósan nagy sebesség (az út $pctTime%-a)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      '110 km/h fölött vegye le a gázt – a légellenállás meredeken nő, kicsit lassabban sok üzemanyag megspórolható.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Egyenletes vezetés – szép munka!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Nem volt heves gyorsítás vagy fékezés ezen az úton – az egyenletes vezetés alacsonyan tartja a fogyasztást.';
+
+  @override
   String get drivingScoreCardTitle => 'Vezetési pontszám';
 
   @override

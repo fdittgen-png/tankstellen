@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Passa a layout orizzontale",
   "pumpCameraOrientationVertical": "Passa a layout verticale",
   "pumpCameraGlareWarning": "Troppi riflessi — inclina leggermente per evitare abbagliamenti",
-  "pumpCameraAlignHint": "Allinea il display nel riquadro, poi cattura"
+  "pumpCameraAlignHint": "Allinea il display nel riquadro, poi cattura",
+  "insightHighSpeedBand": "Velocità elevata prolungata ({pctTime}% del tragitto): sprecati {liters} L",
+  "insightHighSpeedBandNoFuel": "Velocità elevata prolungata ({pctTime}% del tragitto)",
+  "lessonAdviceHighSpeedBand": "Sopra i 110 km/h alza il piede: la resistenza dell'aria aumenta molto, andare un po' più piano fa risparmiare parecchio carburante.",
+  "lessonSmoothDrivingTitle": "Guida fluida – ottimo lavoro!",
+  "lessonAdviceSmoothDriving": "Nessuna accelerazione o frenata brusca in questo tragitto: una guida costante mantiene bassi i consumi."
 }

@@ -4108,6 +4108,28 @@ class AppLocalizationsDe extends AppLocalizations {
       'Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Anhaltend hohe Geschwindigkeit ($pctTime% der Fahrt): $liters L verschwendet';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Anhaltend hohe Geschwindigkeit ($pctTime% der Fahrt)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Über 110 km/h Gas wegnehmen – der Luftwiderstand steigt stark, schon etwas langsamer spart viel Sprit.';
+
+  @override
+  String get lessonSmoothDrivingTitle =>
+      'Vorausschauend gefahren – gut gemacht!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Diese Fahrt ohne starkes Beschleunigen oder Bremsen – gleichmäßiges Fahren hält den Verbrauch niedrig.';
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override

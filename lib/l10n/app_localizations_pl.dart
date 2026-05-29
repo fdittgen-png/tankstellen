@@ -4100,6 +4100,27 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zmieniaj na wyższy bieg wcześniej, aby silnik pracował na niższych, oszczędniejszych obrotach.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Utrzymująca się wysoka prędkość ($pctTime% trasy): zmarnowano $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Utrzymująca się wysoka prędkość ($pctTime% trasy)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Powyżej 110 km/h zdejmij nogę z gazu – opór powietrza gwałtownie rośnie, nieco wolniej oszczędza dużo paliwa.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Płynna jazda – dobra robota!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Brak gwałtownego przyspieszania i hamowania na tej trasie – równa jazda utrzymuje niskie zużycie.';
+
+  @override
   String get drivingScoreCardTitle => 'Wynik jazdy';
 
   @override

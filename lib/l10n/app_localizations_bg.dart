@@ -4117,6 +4117,27 @@ class AppLocalizationsBg extends AppLocalizations {
       'Превключвайте нагоре по-рано, за да влезе двигателят в по-нисък и по-икономичен режим.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Продължително висока скорост ($pctTime% от пътуването): пропилени $liters л';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Продължително висока скорост ($pctTime% от пътуването)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Над 110 км/ч отпуснете газта – въздушното съпротивление рязко нараства, малко по-бавно спестява много гориво.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Плавно шофиране – браво!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Това пътуване без резки ускорения и спирания – равномерното шофиране държи разхода нисък.';
+
+  @override
   String get drivingScoreCardTitle => 'Резултат за шофиране';
 
   @override

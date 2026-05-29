@@ -10,5 +10,10 @@
   "lessonAdviceIdling": "Bei längeren Stopps den Motor ausschalten statt im Leerlauf laufen zu lassen.",
   "lessonAdviceHighRpm": "Früher hochschalten, um den Motor aus dem hohen Drehzahlbereich zu halten.",
   "lessonAdviceHardAccel": "Sanfter Gas geben – gleichmäßiges Beschleunigen spart Sprit.",
-  "lessonAdviceLowGear": "Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft."
+  "lessonAdviceLowGear": "Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.",
+  "insightHighSpeedBand": "Anhaltend hohe Geschwindigkeit ({pctTime}% der Fahrt): {liters} L verschwendet",
+  "insightHighSpeedBandNoFuel": "Anhaltend hohe Geschwindigkeit ({pctTime}% der Fahrt)",
+  "lessonAdviceHighSpeedBand": "Über 110 km/h Gas wegnehmen – der Luftwiderstand steigt stark, schon etwas langsamer spart viel Sprit.",
+  "lessonSmoothDrivingTitle": "Vorausschauend gefahren – gut gemacht!",
+  "lessonAdviceSmoothDriving": "Diese Fahrt ohne starkes Beschleunigen oder Bremsen – gleichmäßiges Fahren hält den Verbrauch niedrig."
 }

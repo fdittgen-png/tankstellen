@@ -2094,5 +2094,10 @@
   "pumpCameraOrientationHorizontal": "Passer en affichage horizontal",
   "pumpCameraOrientationVertical": "Passer en affichage vertical",
   "pumpCameraGlareWarning": "Trop de reflets — inclinez légèrement pour éviter les éblouissements",
-  "pumpCameraAlignHint": "Alignez l'afficheur dans le cadre, puis capturez"
+  "pumpCameraAlignHint": "Alignez l'afficheur dans le cadre, puis capturez",
+  "insightHighSpeedBand": "Vitesse élevée prolongée ({pctTime} % du trajet) : {liters} L gaspillés",
+  "insightHighSpeedBandNoFuel": "Vitesse élevée prolongée ({pctTime} % du trajet)",
+  "lessonAdviceHighSpeedBand": "Levez le pied au-dessus de 110 km/h : la résistance de l'air augmente fortement, rouler un peu moins vite économise beaucoup de carburant.",
+  "lessonSmoothDrivingTitle": "Conduite souple – bien joué !",
+  "lessonAdviceSmoothDriving": "Aucune accélération ni freinage brusque sur ce trajet : une conduite régulière maintient une faible consommation."
 }

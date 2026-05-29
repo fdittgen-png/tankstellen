@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Prepnúť na vodorovné rozloženie",
   "pumpCameraOrientationVertical": "Prepnúť na zvislé rozloženie",
   "pumpCameraGlareWarning": "Príliš veľa odleskov — mierne nakloňte, aby ste sa vyhli odrazom",
-  "pumpCameraAlignHint": "Zarovnajte displej do rámčeka a potom odfotografujte"
+  "pumpCameraAlignHint": "Zarovnajte displej do rámčeka a potom odfotografujte",
+  "insightHighSpeedBand": "Trvalo vysoká rýchlosť ({pctTime} % jazdy): zbytočne {liters} l",
+  "insightHighSpeedBandNoFuel": "Trvalo vysoká rýchlosť ({pctTime} % jazdy)",
+  "lessonAdviceHighSpeedBand": "Nad 110 km/h ubertte plyn – odpor vzduchu prudko rastie, mierne spomalenie ušetrí veľa paliva.",
+  "lessonSmoothDrivingTitle": "Plynulá jazda – výborne!",
+  "lessonAdviceSmoothDriving": "Žiadne prudké zrýchľovanie ani brzdenie na tejto jazde – plynulá jazda udržiava spotrebu nízku."
 }

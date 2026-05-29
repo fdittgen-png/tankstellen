@@ -11,8 +11,10 @@ import '../driving_insights_analyzer.dart';
 import '../driving_score_calculator.dart';
 import 'rules/hard_accel_rule.dart';
 import 'rules/high_rpm_rule.dart';
+import 'rules/high_speed_band_rule.dart';
 import 'rules/idling_rule.dart';
 import 'rules/low_gear_rule.dart';
+import 'rules/smooth_driving_rule.dart';
 
 /// Holds the post-trip [DrivingLessonRule]s and turns a trip into its
 /// ranked list of firing [DrivingLesson]s (#2251).
@@ -41,20 +43,25 @@ class DrivingLessonRegistry {
         );
 
   /// The production registry — every post-trip lesson the trip-detail
-  /// Insights group surfaces today, migrated to rules (#2251):
-  ///   * [LowGearRule]   — labouring in too-low a gear (> 60 s);
-  ///   * [HighRpmRule]   — time over 3000 RPM;
-  ///   * [HardAccelRule] — hard-acceleration events;
-  ///   * [IdlingRule]    — engine-on-stationary waste.
+  /// Insights group + the GPX export surface:
+  ///   * [LowGearRule]       — labouring in too-low a gear (> 60 s) (#2251);
+  ///   * [HighRpmRule]       — time over 3000 RPM (#2251);
+  ///   * [HardAccelRule]     — hard-acceleration events (#2251);
+  ///   * [IdlingRule]        — engine-on-stationary waste (#2251);
+  ///   * [HighSpeedBandRule] — drag-dominated high-speed penalty (#2287);
+  ///   * [SmoothDrivingRule] — positive reinforcement (#2287).
   ///
   /// Declaration order is the tie-break for equal-impact lessons (see
   /// [evaluate]); the low-gear rule is first so it keeps its
-  /// rendered-above-cost-lines position.
+  /// rendered-above-cost-lines position, and the smooth-driving praise is
+  /// last so it never outranks an actual waste lesson.
   factory DrivingLessonRegistry.standard() => DrivingLessonRegistry(const [
         LowGearRule(),
         HighRpmRule(),
         HardAccelRule(),
         IdlingRule(),
+        HighSpeedBandRule(),
+        SmoothDrivingRule(),
       ]);
 
   /// Evaluate every rule against the trip and return the firing lessons

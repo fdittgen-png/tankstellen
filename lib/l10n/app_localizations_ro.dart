@@ -4113,6 +4113,27 @@ class AppLocalizationsRo extends AppLocalizations {
       'Schimbați mai devreme într-o treaptă superioară pentru ca motorul să funcționeze la turații mai mici și mai economice.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Viteză mare susținută ($pctTime% din traseu): risipiți $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Viteză mare susținută ($pctTime% din traseu)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Peste 110 km/h ridicați piciorul de pe accelerație – rezistența aerului crește puternic, puțin mai încet economisește mult combustibil.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Condus lin – bravo!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Fără accelerări sau frânări bruște în acest traseu – condusul constant menține consumul scăzut.';
+
+  @override
   String get drivingScoreCardTitle => 'Scor de condus';
 
   @override

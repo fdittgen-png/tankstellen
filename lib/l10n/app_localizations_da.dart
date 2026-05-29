@@ -4083,6 +4083,27 @@ class AppLocalizationsDa extends AppLocalizations {
       'Skift op tidligere, så motoren falder til ro i et lavere, mere økonomisk gear.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Vedvarende høj fart ($pctTime% af turen): spildt $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Vedvarende høj fart ($pctTime% af turen)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Slip speederen over 110 km/t – luftmodstanden stiger kraftigt, så lidt langsommere sparer meget brændstof.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Rolig kørsel – flot klaret!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Ingen hård acceleration eller opbremsning på denne tur – jævn kørsel holder forbruget lavt.';
+
+  @override
   String get drivingScoreCardTitle => 'Kørescore';
 
   @override

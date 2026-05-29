@@ -7407,6 +7407,36 @@ abstract class AppLocalizations {
   /// **'Shift up sooner so the engine settles into a lower, more efficient gear.'**
   String get lessonAdviceLowGear;
 
+  /// Post-trip lesson headline for the high-speed-band penalty (#2287) — time spent above ~110 km/h where aerodynamic drag dominates consumption. Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sustained high speed ({pctTime}% of trip): wasted {liters} L'**
+  String insightHighSpeedBand(String pctTime, String liters);
+
+  /// High-speed-band lesson headline (#2287) for trips with no fuel-consumption figure (GPS-only / no fuel-rate PID) — same coaching without the wasted-litres clause.
+  ///
+  /// In en, this message translates to:
+  /// **'Sustained high speed ({pctTime}% of trip)'**
+  String insightHighSpeedBandNoFuel(String pctTime);
+
+  /// How-to-improve advice for the high-speed-band lesson (#2287). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Ease off above 110 km/h — drag rises sharply, so a small speed cut saves a lot of fuel.'**
+  String get lessonAdviceHighSpeedBand;
+
+  /// Positive-reinforcement post-trip lesson headline (#2287) shown when a real trip had no harsh acceleration or braking events.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth driving — nicely done!'**
+  String get lessonSmoothDrivingTitle;
+
+  /// Encouragement line for the smooth-driving praise lesson (#2287). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'No harsh acceleration or braking this trip — steady inputs like these keep consumption low.'**
+  String get lessonAdviceSmoothDriving;
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:

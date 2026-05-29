@@ -4120,6 +4120,27 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αλλάζετε νωρίτερα σε υψηλότερη σχέση ώστε ο κινητήρας να σταθεροποιείται σε χαμηλότερες, πιο οικονομικές στροφές.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Παρατεταμένη υψηλή ταχύτητα ($pctTime% της διαδρομής): σπαταλήθηκαν $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Παρατεταμένη υψηλή ταχύτητα ($pctTime% της διαδρομής)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Πάνω από 110 km/h αφήστε το γκάζι – η αντίσταση του αέρα αυξάνεται απότομα, λίγο πιο αργά εξοικονομεί πολύ καύσιμο.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Ομαλή οδήγηση – μπράβο!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Καμία απότομη επιτάχυνση ή φρενάρισμα σε αυτή τη διαδρομή – η σταθερή οδήγηση κρατά χαμηλή την κατανάλωση.';
+
+  @override
   String get drivingScoreCardTitle => 'Βαθμολογία οδήγησης';
 
   @override

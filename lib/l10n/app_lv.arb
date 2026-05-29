@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Pārslēgties uz horizontālo izkārtojumu",
   "pumpCameraOrientationVertical": "Pārslēgties uz vertikālo izkārtojumu",
   "pumpCameraGlareWarning": "Pārāk daudz atspulgu — nedaudz nolieciet, lai izvairītos no atspīdumiem",
-  "pumpCameraAlignHint": "Novietojiet displeju rāmītī un pēc tam fotografējiet"
+  "pumpCameraAlignHint": "Novietojiet displeju rāmītī un pēc tam fotografējiet",
+  "insightHighSpeedBand": "Ilgstoši augsts ātrums ({pctTime}% no brauciena): izšķērdēti {liters} L",
+  "insightHighSpeedBandNoFuel": "Ilgstoši augsts ātrums ({pctTime}% no brauciena)",
+  "lessonAdviceHighSpeedBand": "Virs 110 km/h atlaidiet gāzi – gaisa pretestība strauji pieaug, nedaudz lēnāk ietaupa daudz degvielas.",
+  "lessonSmoothDrivingTitle": "Vienmērīga braukšana – lieliski!",
+  "lessonAdviceSmoothDriving": "Šajā braucienā nebija strauja paātrinājuma vai bremzēšanas – vienmērīga braukšana uztur zemu patēriņu."
 }

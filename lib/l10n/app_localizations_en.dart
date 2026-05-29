@@ -4064,6 +4064,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shift up sooner so the engine settles into a lower, more efficient gear.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Sustained high speed ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Sustained high speed ($pctTime% of trip)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Ease off above 110 km/h — drag rises sharply, so a small speed cut saves a lot of fuel.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Smooth driving — nicely done!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'No harsh acceleration or braking this trip — steady inputs like these keep consumption low.';
+
+  @override
   String get drivingScoreCardTitle => 'Driving score';
 
   @override
@@ -9896,6 +9917,28 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get lessonAdviceLowGear =>
       '⟦Šĥîƒŧ úƥ šóóñéř šó ŧĥé éñǧîñé šéŧŧłéš îñŧó á łóŵéř, ɱóřé éƒƒîçîéñŧ ǧéář. ··························⟧';
+
+  @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return '⟦Šúšŧáîñéđ ĥîǧĥ šƥééđ ($pctTime% óƒ ŧřîƥ): ŵášŧéđ $liters Ł ··············⟧';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return '⟦Šúšŧáîñéđ ĥîǧĥ šƥééđ ($pctTime% óƒ ŧřîƥ) ···········⟧';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      '⟦Éášé óƒƒ áƀóṽé 110 ķɱ/ĥ — đřáǧ řîšéš šĥářƥłý, šó á šɱáłł šƥééđ çúŧ šáṽéš á łóŧ óƒ ƒúéł. ····························⟧';
+
+  @override
+  String get lessonSmoothDrivingTitle =>
+      '⟦Šɱóóŧĥ đřîṽîñǧ — ñîçéłý đóñé! ··········⟧';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      '⟦Ñó ĥářšĥ áççéłéřáŧîóñ óř ƀřáķîñǧ ŧĥîš ŧřîƥ — šŧéáđý îñƥúŧš łîķé ŧĥéšé ķééƥ çóñšúɱƥŧîóñ łóŵ. ··································⟧';
 
   @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';

@@ -4127,6 +4127,27 @@ class AppLocalizationsFr extends AppLocalizations {
       'Passez la vitesse supérieure plus tôt pour que le moteur tourne à un régime plus bas et plus économique.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Vitesse élevée prolongée ($pctTime % du trajet) : $liters L gaspillés';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Vitesse élevée prolongée ($pctTime % du trajet)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Levez le pied au-dessus de 110 km/h : la résistance de l\'air augmente fortement, rouler un peu moins vite économise beaucoup de carburant.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Conduite souple – bien joué !';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Aucune accélération ni freinage brusque sur ce trajet : une conduite régulière maintient une faible consommation.';
+
+  @override
   String get drivingScoreCardTitle => 'Score de conduite';
 
   @override

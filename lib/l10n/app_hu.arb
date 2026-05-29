@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Váltás vízszintes elrendezésre",
   "pumpCameraOrientationVertical": "Váltás függőleges elrendezésre",
   "pumpCameraGlareWarning": "Túl sok fény — kissé döntse meg a tükröződések elkerülése érdekében",
-  "pumpCameraAlignHint": "Igazítsa a kijelzőt a keretbe, majd készítse el a felvételt"
+  "pumpCameraAlignHint": "Igazítsa a kijelzőt a keretbe, majd készítse el a felvételt",
+  "insightHighSpeedBand": "Tartósan nagy sebesség (az út {pctTime}%-a): elpazarolt {liters} L",
+  "insightHighSpeedBandNoFuel": "Tartósan nagy sebesség (az út {pctTime}%-a)",
+  "lessonAdviceHighSpeedBand": "110 km/h fölött vegye le a gázt – a légellenállás meredeken nő, kicsit lassabban sok üzemanyag megspórolható.",
+  "lessonSmoothDrivingTitle": "Egyenletes vezetés – szép munka!",
+  "lessonAdviceSmoothDriving": "Nem volt heves gyorsítás vagy fékezés ezen az úton – az egyenletes vezetés alacsonyan tartja a fogyasztást."
 }

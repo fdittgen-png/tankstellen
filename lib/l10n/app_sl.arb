@@ -1966,5 +1966,10 @@
   "pumpCameraOrientationHorizontal": "Preklopi na vodoravno postavitev",
   "pumpCameraOrientationVertical": "Preklopi na navpično postavitev",
   "pumpCameraGlareWarning": "Preveč odbleska — rahlo nagnite, da se izognete odsevom",
-  "pumpCameraAlignHint": "Poravnajte zaslon v okvir in nato posnemite"
+  "pumpCameraAlignHint": "Poravnajte zaslon v okvir in nato posnemite",
+  "insightHighSpeedBand": "Trajno visoka hitrost ({pctTime}% vožnje): zapravljeno {liters} L",
+  "insightHighSpeedBandNoFuel": "Trajno visoka hitrost ({pctTime}% vožnje)",
+  "lessonAdviceHighSpeedBand": "Nad 110 km/h spustite plin – zračni upor strmo narašča, malo počasneje prihrani veliko goriva.",
+  "lessonSmoothDrivingTitle": "Umirjena vožnja – odlično!",
+  "lessonAdviceSmoothDriving": "Na tej vožnji ni bilo sunkovitega pospeševanja ali zaviranja – enakomerna vožnja ohranja nizko porabo."
 }

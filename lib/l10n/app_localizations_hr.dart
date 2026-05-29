@@ -4093,6 +4093,27 @@ class AppLocalizationsHr extends AppLocalizations {
       'Mijenjajte u viši stupanj ranije kako bi motor radio na nižim, ekonomičnijim okretajima.';
 
   @override
+  String insightHighSpeedBand(String pctTime, String liters) {
+    return 'Trajno visoka brzina ($pctTime% vožnje): potrošeno bez potrebe $liters L';
+  }
+
+  @override
+  String insightHighSpeedBandNoFuel(String pctTime) {
+    return 'Trajno visoka brzina ($pctTime% vožnje)';
+  }
+
+  @override
+  String get lessonAdviceHighSpeedBand =>
+      'Iznad 110 km/h skinite nogu s gasa – otpor zraka naglo raste, malo sporije štedi puno goriva.';
+
+  @override
+  String get lessonSmoothDrivingTitle => 'Mirna vožnja – odlično!';
+
+  @override
+  String get lessonAdviceSmoothDriving =>
+      'Nema naglog ubrzavanja ni kočenja na ovoj vožnji – ravnomjerna vožnja drži potrošnju niskom.';
+
+  @override
   String get drivingScoreCardTitle => 'Ocjena vožnje';
 
   @override
