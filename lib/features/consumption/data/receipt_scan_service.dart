@@ -10,6 +10,8 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
+import 'ocr/ocr_image_preprocessor.dart';
+import 'ocr/pump_ocr_config.dart';
 import 'pump_display_parser.dart';
 import 'receipt_parser.dart';
 import '../../../core/logging/error_logger.dart';
@@ -45,10 +47,16 @@ class PumpDisplayScanOutcome {
   final String ocrText;
   final String imagePath;
 
+  /// `true` when the captured ROI was rejected for excessive glare
+  /// (#2275) — the caller shows a "re-angle" prompt instead of the
+  /// generic failure sheet.
+  final bool glareRejected;
+
   const PumpDisplayScanOutcome({
     required this.parse,
     required this.ocrText,
     required this.imagePath,
+    this.glareRejected = false,
   });
 }
 
@@ -66,16 +74,22 @@ class ReceiptScanService {
   final TextRecognizer _recognizer;
   final ReceiptParser _parser;
   final PumpDisplayParser _pumpParser;
+  final PumpOcrConfig _ocrConfig;
+  final OcrImagePreprocessor _preprocessor;
 
   ReceiptScanService({
     ImagePicker? picker,
     TextRecognizer? recognizer,
     ReceiptParser? parser,
     PumpDisplayParser? pumpParser,
+    PumpOcrConfig? ocrConfig,
+    OcrImagePreprocessor? preprocessor,
   })  : _picker = picker ?? ImagePicker(),
         _recognizer = recognizer ?? TextRecognizer(),
         _parser = parser ?? const ReceiptParser(),
-        _pumpParser = pumpParser ?? const PumpDisplayParser();
+        _pumpParser = pumpParser ?? const PumpDisplayParser(),
+        _ocrConfig = ocrConfig ?? PumpOcrConfig(),
+        _preprocessor = preprocessor ?? const OcrImagePreprocessor();
 
   /// Opens the camera, captures a receipt photo, runs OCR, and parses
   /// the result. Returns null if the user cancels the camera or OCR
@@ -108,10 +122,19 @@ class ReceiptScanService {
   /// [PumpDisplayScanOutcome.imagePath] and decide when to clean up
   /// (#953 added the bad-scan reporting flow for pump displays, which
   /// needs the image bytes long after parse returned).
-  Future<PumpDisplayScanOutcome?> scanPumpDisplay() async {
+  Future<PumpDisplayScanOutcome?> scanPumpDisplay({
+    String? country,
+    String? brand,
+    OcrNormalizedRect? roi,
+  }) async {
     final capture = await _capture();
     if (capture == null) return null;
-    return parsePumpDisplayImage(capture);
+    return parsePumpDisplayImage(
+      capture,
+      country: country,
+      brand: brand,
+      roi: roi,
+    );
   }
 
   /// Runs OCR + parsing on an already-captured pump-display photo at
@@ -123,20 +146,63 @@ class ReceiptScanService {
   /// step — same #1860 contrast preprocessing, same "delete on OCR
   /// failure, keep on success for the #953 bad-scan report" policy.
   /// Returns null when OCR recognises no text.
-  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(String path) async {
-    // #1860 — the pump path runs an extra grayscale + contrast pass so
-    // ML Kit can read 7-segment LCDs and sky-washed displays. Scoped
-    // here so the prose-receipt OCR is not affected.
-    final text = await _recognise(path, enhanceContrast: true);
+  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(
+    String path, {
+    String? country,
+    String? brand,
+    OcrNormalizedRect? roi,
+  }) async {
+    // #2275 — auto-reject an over-glared frame BEFORE OCR so the caller
+    // can prompt a re-angle rather than show a generic failure.
+    if (await _isOverGlared(path, roi)) {
+      return PumpDisplayScanOutcome(
+        parse: const PumpDisplayParseResult(),
+        ocrText: '',
+        imagePath: path,
+        glareRejected: true,
+      );
+    }
+    // Crop to the reticle ROI FIRST, then run the 7-segment
+    // preprocessing pass (adaptive Sauvola binarization, replacing the
+    // glare-amplifying #1860 global contrast). ML Kit still reads the
+    // printed PRIX/VOLUME/PRIX-DU-LITRE labels off the cleaned crop; the
+    // result is parsed against the active country's config profile so
+    // the validation gate can range-check + cross-check it.
+    final text = await _recognise(path, enhanceContrast: true, roi: roi);
     if (text == null) {
       await _tryDelete(path);
       return null;
     }
+    OcrLocaleProfile? profile;
+    if (country != null) {
+      await _ocrConfig.load();
+      profile = _ocrConfig.profileFor(country);
+    }
     return PumpDisplayScanOutcome(
-      parse: _pumpParser.parse(text),
+      parse: _pumpParser.parse(text, profile: profile),
       ocrText: text,
       imagePath: path,
     );
+  }
+
+  /// Decodes [path], crops to [roi], and returns `true` when the ROI is
+  /// over-glared per [GlarePolicy.standard]. Best-effort: a decode error
+  /// returns `false` so a quirky image still reaches OCR (#2275).
+  Future<bool> _isOverGlared(String path, OcrNormalizedRect? roi) async {
+    try {
+      final bytes = await File(path).readAsBytes();
+      final decoded = img.decodeJpg(bytes);
+      if (decoded == null) return false;
+      final upright = img.bakeOrientation(decoded);
+      final region =
+          roi != null ? _preprocessor.cropToRoi(upright, roi) : upright;
+      return _preprocessor.glareFraction(region) >
+          GlarePolicy.standard.rejectAbove;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: const {'where': 'pump glare check failed'}));
+      return false;
+    }
   }
 
   Future<String?> _capture() async {
@@ -162,10 +228,18 @@ class ReceiptScanService {
   /// #1860 — when [enhanceContrast] is set (the pump-display path) the
   /// temp copy also gets a grayscale + histogram-normalise + contrast
   /// pass so 7-segment LCDs and washed-out displays become readable.
-  Future<String?> _recognise(String path, {bool enhanceContrast = false}) async {
+  Future<String?> _recognise(
+    String path, {
+    bool enhanceContrast = false,
+    OcrNormalizedRect? roi,
+  }) async {
     String? uprightTemp;
     try {
-      uprightTemp = await _writeUprightCopy(path, enhanceContrast: enhanceContrast);
+      uprightTemp = await _writeUprightCopy(
+        path,
+        enhanceContrast: enhanceContrast,
+        roi: roi,
+      );
       final inputImage = InputImage.fromFilePath(uprightTemp ?? path);
       final recognized = await _recognizer.processImage(inputImage);
       final text = recognized.text;
@@ -190,11 +264,12 @@ class ReceiptScanService {
   Future<String?> _writeUprightCopy(
     String path, {
     bool enhanceContrast = false,
+    OcrNormalizedRect? roi,
   }) async {
     try {
       final bytes = await File(path).readAsBytes();
       final upright = enhanceContrast
-          ? preprocessPumpDisplayForOcr(bytes)
+          ? preprocessPumpDisplayForOcr(bytes, roi: roi, preprocessor: _preprocessor)
           : bakeImageOrientation(bytes);
       if (upright == null) return null;
       final tempPath = '$path.upright.jpg';
@@ -250,35 +325,45 @@ Uint8List? bakeImageOrientation(Uint8List jpegBytes) {
   }
 }
 
-/// Re-encodes a pump-display capture for OCR (#1860).
+/// Re-encodes a pump-display capture for OCR (#2275, replacing #1860).
 ///
-/// Bakes EXIF orientation (exactly as [bakeImageOrientation] does) and
-/// then applies a three-step enhancement pass:
+/// The #1860 pass did `grayscale → normalize → contrast(140)` over the
+/// **whole frame** — a *global* operation that AMPLIFIES specular glare
+/// (a bright reflection drags the whole histogram and crushes the
+/// digits beside it) and never used the reticle the user framed. This
+/// rebuild:
 ///
-///   1. **grayscale** — colour carries no signal on a monochrome LCD
-///      and only adds noise for the recognizer.
-///   2. **histogram normalise** — stretches the tonal range to the
-///      full 0–255 span, the fix for sky-washed / grey-on-grey
-///      displays whose digits and background sit a few levels apart.
-///   3. **contrast boost** — crisps the 7-segment edges so ML Kit's
-///      general recognizer stops dropping/misreading segment digits.
+///   1. **bakes EXIF orientation** (phone-hold correction);
+///   2. **crops to the reticle [roi]** FIRST so all downstream work is
+///      on the readout, not the metrology stickers / card reader;
+///   3. **grayscale** — colour is noise on a monochrome LCD;
+///   4. **denoise** — a light blur before thresholding;
+///   5. **Sauvola adaptive (local) binarization** — each pixel is
+///      thresholded against its own neighbourhood, so a reflection on
+///      one corner no longer blows out the digits elsewhere;
+///   6. **morphological close** — bridges the gaps adaptive
+///      thresholding leaves between a glyph's strokes.
 ///
 /// Scoped to the pump-display path only — [scanReceipt]'s prose-receipt
-/// OCR keeps the plain [bakeImageOrientation] path, since this much
-/// contrast would crush faint thermal-receipt print and regress
-/// full-page recognition (#1860 acceptance).
-///
-/// Returns the processed JPEG bytes, or `null` when the input cannot be
-/// decoded as a JPEG — the caller then OCRs the original unchanged.
-Uint8List? preprocessPumpDisplayForOcr(Uint8List jpegBytes) {
+/// OCR keeps the plain [bakeImageOrientation] path. Returns the
+/// processed JPEG bytes, or `null` when the input cannot be decoded.
+Uint8List? preprocessPumpDisplayForOcr(
+  Uint8List jpegBytes, {
+  OcrNormalizedRect? roi,
+  OcrImagePreprocessor preprocessor = const OcrImagePreprocessor(),
+}) {
   try {
     final decoded = img.decodeJpg(jpegBytes);
     if (decoded == null) return null;
     final upright = img.bakeOrientation(decoded);
-    final gray = img.grayscale(upright);
-    final normalized = img.normalize(gray, min: 0, max: 255);
-    final boosted = img.contrast(normalized, contrast: 140);
-    return img.encodeJpg(boosted, quality: 90);
+    final cropped = roi != null
+        ? preprocessor.cropToRoi(upright, roi)
+        : upright;
+    final gray = preprocessor.toGrayscale(cropped);
+    final denoised = preprocessor.denoise(gray);
+    final binary = preprocessor.sauvolaBinarize(denoised);
+    final closed = preprocessor.morphologicalClose(binary);
+    return img.encodeJpg(closed, quality: 90);
   } catch (e, st) {
     // A malformed / non-JPEG file is not fatal — OCR the original.
     unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'preprocessPumpDisplayForOcr: decode failed'}));

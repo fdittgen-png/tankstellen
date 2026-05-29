@@ -4464,6 +4464,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get scanPumpSuccess => 'Pumpdisplay skannad – kontrollera värdena.';
 
   @override
+  String get scanPumpGlare =>
+      'För mycket reflexer på displayen — försök igen i en liten vinkel så att siffrorna inte bleks ut.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumpskanning misslyckades: $error';
   }

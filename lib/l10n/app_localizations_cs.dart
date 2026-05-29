@@ -4476,6 +4476,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get scanPumpSuccess => 'Displej pumpy naskenován — ověřte hodnoty.';
 
   @override
+  String get scanPumpGlare =>
+      'Příliš mnoho odlesků na displeji — zkuste to znovu z mírného úhlu, aby čísla nebyla přezářená.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skenování pumpy selhalo: $error';
   }

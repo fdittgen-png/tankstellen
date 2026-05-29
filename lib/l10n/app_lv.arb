@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Lai skenētu uzpildes ekrānu, nepieciešama piekļuve kamerai. Iespējojiet to ierīces iestatījumos.",
   "pumpCameraError": "Kameru neizdevās palaist. Mēģiniet vēlreiz vai ievadiet vērtības manuāli.",
   "scanPumpSuccess": "Sūkņa displejs skenēts — pārbaudiet vērtības.",
+  "scanPumpGlare": "Pārāk daudz atspīduma uz displeja — mēģiniet vēlreiz nelielā leņķī, lai cipari nebūtu pārgaismoti.",
   "scanPumpFailed": "Sūkņa skenēšana neizdevās: {error}",
   "badScanReportTitle": "Ziņot par skenēšanas kļūdu",
   "badScanReportTitleReceipt": "Ziņot par skenēšanas kļūdu — čeks",

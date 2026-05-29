@@ -9,8 +9,10 @@ import 'package:tankstellen/features/consumption/data/pump_display_parser.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
+import 'package:tankstellen/features/consumption/data/ocr/ocr_geometry.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
+import 'package:tankstellen/features/consumption/presentation/screens/pump_display_camera_screen.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
@@ -92,7 +94,12 @@ class _RoutingScanService extends ReceiptScanService {
   }
 
   @override
-  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(String path) async {
+  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(
+    String path, {
+    String? country,
+    String? brand,
+    OcrNormalizedRect? roi,
+  }) async {
     pumpCalls++;
     return null;
   }
@@ -172,7 +179,10 @@ void main() {
           scanService: fake,
           // #1868 — stub the in-app camera so the handler reaches
           // parsePumpDisplayImage without launching a real camera.
-          pumpImageCapture: (_) async => '/tmp/fake-pump.jpg',
+          pumpImageCapture: (_) async => const PumpCaptureResult(
+            path: '/tmp/fake-pump.jpg',
+            roi: OcrNormalizedRect.full,
+          ),
         ),
         overrides: _withVehicle,
       );

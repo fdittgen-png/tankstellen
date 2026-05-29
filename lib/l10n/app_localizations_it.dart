@@ -4493,6 +4493,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Display pompa scansionato — verifica i valori.';
 
   @override
+  String get scanPumpGlare =>
+      'Troppo riflesso sul display — riprova con una leggera angolazione in modo che i numeri non siano sovraesposti.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Scansione pompa non riuscita: $error';
   }

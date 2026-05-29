@@ -4512,6 +4512,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Η οθόνη αντλίας σαρώθηκε — επαληθεύστε τις τιμές.';
 
   @override
+  String get scanPumpGlare =>
+      'Πάρα πολλή αντανάκλαση στην οθόνη — δοκιμάστε ξανά υπό μικρή γωνία ώστε οι αριθμοί να μην ξεθωριάζουν.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Αποτυχία σάρωσης αντλίας: $error';
   }

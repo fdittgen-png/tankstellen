@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Se necesita acceso a la cámara para escanear el surtidor. Actívalo en los ajustes del dispositivo.",
   "pumpCameraError": "La cámara no pudo iniciarse. Inténtalo de nuevo o introduce los valores a mano.",
   "scanPumpSuccess": "Pantalla del surtidor escaneada: verifica los valores.",
+  "scanPumpGlare": "Demasiado reflejo en la pantalla — inténtalo de nuevo desde un ángulo ligeramente distinto para que los números no se vean lavados.",
   "scanPumpFailed": "Error al escanear el surtidor: {error}",
   "badScanReportTitle": "Informar de un error de escaneo",
   "badScanReportTitleReceipt": "Informar de un error de escaneo: recibo",

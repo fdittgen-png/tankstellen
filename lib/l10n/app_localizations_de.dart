@@ -4493,6 +4493,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get scanPumpSuccess => 'Zapfsäule gescannt — Werte prüfen.';
 
   @override
+  String get scanPumpGlare =>
+      'Zu viel Blendung auf der Anzeige — bitte leicht schräg erneut versuchen, damit die Zahlen nicht überstrahlt werden.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Zapfsäulen-Scan fehlgeschlagen: $error';
   }

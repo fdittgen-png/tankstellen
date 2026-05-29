@@ -4476,6 +4476,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zaslon črpalke skeniran — preverite vrednosti.';
 
   @override
+  String get scanPumpGlare =>
+      'Preveč bleščanja na zaslonu — poskusite znova pod rahlim kotom, da številke ne bodo presvetljene.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skeniranje črpalke ni uspelo: $error';
   }

@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Norint nuskaityti degalinės ekraną, reikia prieigos prie kameros. Įjunkite ją įrenginio nustatymuose.",
   "pumpCameraError": "Nepavyko paleisti kameros. Bandykite dar kartą arba įveskite reikšmes rankiniu būdu.",
   "scanPumpSuccess": "Siurblio ekranas nuskaitytas — patikrinkite reikšmes.",
+  "scanPumpGlare": "Per daug atspindžių ekrane — bandykite dar kartą šiek tiek kampu, kad skaičiai nebūtų peršviesti.",
   "scanPumpFailed": "Siurblio nuskaitymas nepavyko: {error}",
   "badScanReportTitle": "Pranešti apie nuskaitymo klaidą",
   "badScanReportTitleReceipt": "Pranešti apie nuskaitymo klaidą — Kvitas",

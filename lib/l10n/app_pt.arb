@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "É necessário acesso à câmera para digitalizar o visor da bomba. Ative-o nas configurações do dispositivo.",
   "pumpCameraError": "A câmera não pôde iniciar. Tente novamente ou insira os valores manualmente.",
   "scanPumpSuccess": "Visor da bomba lido — verifique os valores.",
+  "scanPumpGlare": "Reflexo em excesso no visor — tente novamente num ângulo ligeiro para que os números não fiquem apagados.",
   "scanPumpFailed": "Leitura da bomba falhada: {error}",
   "badScanReportTitle": "Reportar um erro de leitura",
   "badScanReportTitleReceipt": "Reportar um erro de leitura — Recibo",

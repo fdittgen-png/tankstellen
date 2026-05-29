@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Accesul la cameră este necesar pentru a scana afișajul pompei. Activează-l în setările dispozitivului.",
   "pumpCameraError": "Camera nu a putut porni. Încearcă din nou sau introdu valorile manual.",
   "scanPumpSuccess": "Afișajul pompei scanat — verificați valorile.",
+  "scanPumpGlare": "Prea multă strălucire pe afișaj — încearcă din nou dintr-un unghi ușor, astfel încât cifrele să nu fie estompate.",
   "scanPumpFailed": "Scanarea pompei a eșuat: {error}",
   "badScanReportTitle": "Raportați o eroare de scanare",
   "badScanReportTitleReceipt": "Raportați o eroare de scanare — Bon",

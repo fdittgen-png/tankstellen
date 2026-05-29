@@ -4507,6 +4507,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Дисплеят на помпата е сканиран — проверете стойностите.';
 
   @override
+  String get scanPumpGlare =>
+      'Твърде много отблясъци по дисплея — опитайте отново под лек ъгъл, за да не са преекспонирани цифрите.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Сканирането на помпата не успя: $error';
   }

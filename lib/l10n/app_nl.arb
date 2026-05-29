@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Cameratoegang is nodig om het pompdisplay te scannen. Schakel het in bij de apparaatinstellingen.",
   "pumpCameraError": "De camera kon niet starten. Probeer opnieuw of voer de waarden handmatig in.",
   "scanPumpSuccess": "Pompdisplay gescand — verifieer de waarden.",
+  "scanPumpGlare": "Te veel weerschijn op het display — probeer het opnieuw onder een lichte hoek zodat de cijfers niet overstraald zijn.",
   "scanPumpFailed": "Pompscan mislukt: {error}",
   "badScanReportTitle": "Scanfout melden",
   "badScanReportTitleReceipt": "Scanfout melden — Bon",

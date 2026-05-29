@@ -4493,6 +4493,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Siurblio ekranas nuskaitytas — patikrinkite reikšmes.';
 
   @override
+  String get scanPumpGlare =>
+      'Per daug atspindžių ekrane — bandykite dar kartą šiek tiek kampu, kad skaičiai nebūtų peršviesti.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Siurblio nuskaitymas nepavyko: $error';
   }

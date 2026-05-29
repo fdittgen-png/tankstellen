@@ -1748,6 +1748,7 @@
   "pumpCameraPermissionDenied": "L'accès à la caméra est nécessaire pour scanner l'afficheur de la pompe. Activez-le dans les réglages de l'appareil.",
   "pumpCameraError": "La caméra n'a pas pu démarrer. Réessayez ou saisissez les valeurs manuellement.",
   "scanPumpSuccess": "Affichage de la pompe scanné — vérifiez les valeurs.",
+  "scanPumpGlare": "Trop de reflets sur l'afficheur — réessayez en vous plaçant légèrement de biais pour que les chiffres ne soient pas surexposés.",
   "scanPumpFailed": "Échec du scan de la pompe : {error}",
   "badScanReportTitle": "Signaler une erreur de scan",
   "badScanReportHint": "Nous partagerons la photo du reçu et les deux ensembles de valeurs pour que la prochaine version apprenne cette mise en page.",

@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Pristup kameri potreban je za skeniranje zaslona crpke. Omogućite ga u postavkama uređaja.",
   "pumpCameraError": "Kamera se nije mogla pokrenuti. Pokušajte ponovno ili unesite vrijednosti ručno.",
   "scanPumpSuccess": "Zaslon pumpe skeniran — provjerite vrijednosti.",
+  "scanPumpGlare": "Previše odsjaja na zaslonu — pokušajte ponovno pod blagim kutom kako brojevi ne bi bili izblijedjeli.",
   "scanPumpFailed": "Skeniranje pumpe nije uspjelo: {error}",
   "badScanReportTitle": "Prijavi grešku skeniranja",
   "badScanReportTitleReceipt": "Prijavi grešku skeniranja — Račun",

@@ -4464,6 +4464,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get scanPumpSuccess => 'Pumpevisning skannet – verifiser verdiene.';
 
   @override
+  String get scanPumpGlare =>
+      'For mye gjenskinn på displayet — prøv igjen i en liten vinkel slik at tallene ikke blir overstrålt.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumpeskanning mislyktes: $error';
   }

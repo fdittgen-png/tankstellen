@@ -3113,6 +3113,10 @@
   "@scanPumpSuccess": {
     "description": "Snackbar shown after a successful pump-display scan (#751)."
   },
+  "scanPumpGlare": "Too much glare on the display — try again at a slight angle so the numbers aren't washed out.",
+  "@scanPumpGlare": {
+    "description": "Snackbar shown when the pump-display capture is rejected for excessive glare and the user is asked to re-angle (#2275)."
+  },
   "scanPumpFailed": "Pump scan failed: {error}",
   "@scanPumpFailed": {
     "description": "Snackbar shown when the pump-display scan throws (#751).",

@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Dostęp do aparatu jest potrzebny do zeskanowania wyświetlacza dystrybutora. Włącz go w ustawieniach urządzenia.",
   "pumpCameraError": "Nie udało się uruchomić aparatu. Spróbuj ponownie lub wprowadź wartości ręcznie.",
   "scanPumpSuccess": "Wyświetlacz dystrybutora zeskanowany — sprawdź wartości.",
+  "scanPumpGlare": "Zbyt duże odbicie na wyświetlaczu — spróbuj ponownie pod lekkim kątem, aby cyfry nie były prześwietlone.",
   "scanPumpFailed": "Skanowanie dystrybutora nie powiodło się: {error}",
   "badScanReportTitle": "Zgłoś błąd skanowania",
   "badScanReportTitleReceipt": "Zgłoś błąd skanowania — paragon",

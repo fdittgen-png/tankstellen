@@ -1292,6 +1292,7 @@
   "pumpCameraPermissionDenied": "Kameraadgang er nødvendig for at scanne standerdisplayet. Aktivér det i enhedens indstillinger.",
   "pumpCameraError": "Kameraet kunne ikke starte. Prøv igen, eller indtast værdierne manuelt.",
   "scanPumpSuccess": "Pumpedisplay scannet — verificér værdierne.",
+  "scanPumpGlare": "For meget genskin på displayet — prøv igen i en let vinkel, så tallene ikke bliver overstrålet.",
   "scanPumpFailed": "Pumpe-scanning mislykkedes: {error}",
   "badScanReportTitle": "Rapporter en scanningsfejl",
   "badScanReportTitleReceipt": "Rapporter en scanningsfejl — Kvittering",

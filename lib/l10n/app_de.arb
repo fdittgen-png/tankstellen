@@ -1894,6 +1894,7 @@
   "scanReceiptFailed": "Scan fehlgeschlagen: {error}",
   "scanPumpUnreadable": "Zapfsäule nicht lesbar — bitte erneut versuchen",
   "scanPumpSuccess": "Zapfsäule gescannt — Werte prüfen.",
+  "scanPumpGlare": "Zu viel Blendung auf der Anzeige — bitte leicht schräg erneut versuchen, damit die Zahlen nicht überstrahlt werden.",
   "scanPumpFailed": "Zapfsäulen-Scan fehlgeschlagen: {error}",
   "badScanReportTitle": "Scan-Fehler melden",
   "badScanReportTitleReceipt": "Scan-Fehler melden — Beleg",
