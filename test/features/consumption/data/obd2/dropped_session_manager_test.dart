@@ -11,6 +11,7 @@ import 'package:tankstellen/features/consumption/data/obd2/dropped_session_host.
 import 'package:tankstellen/features/consumption/data/obd2/dropped_session_manager.dart';
 import 'package:tankstellen/features/consumption/data/obd2/paused_trip_repository.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
+import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 /// Focused unit tests for the #2188 [DroppedSessionManager] — the
@@ -110,6 +111,48 @@ void main() {
       expect(host.stopped, isTrue);
       expect(host.started, isFalse);
       expect(host.pausedDueToDrop, isFalse);
+    });
+
+    test('grace-finalised trip persists the live sample buffer + GPS '
+        'diagnostics and the automatic flag (#2291)', () async {
+      final host = _FakeHost()
+        ..automatic = true
+        ..capturedSamples = [
+          TripSample(
+            timestamp: DateTime(2026, 5, 28, 12, 0, 1),
+            speedKmh: 30,
+            rpm: 1500,
+          ),
+          TripSample(
+            timestamp: DateTime(2026, 5, 28, 12, 0, 2),
+            speedKmh: 42,
+            rpm: 1800,
+          ),
+        ]
+        ..capturedGpsSampleDiagnostics = [
+          GpsSampleDiagnostic(
+            index: 0,
+            timestamp: DateTime(2026, 5, 28, 12, 0, 1),
+            lifecycleState: 'resumed',
+          ),
+        ];
+      final mgr = build(host);
+
+      mgr.handleDrop();
+      await mgr.expireGraceWindowNow();
+
+      final finalised = historyRepo.loadAll();
+      expect(finalised, hasLength(1));
+      final entry = finalised.single;
+      expect(entry.samples, hasLength(2),
+          reason: 'the still-live captured-sample buffer must be persisted '
+              'so trip-detail charts render instead of the empty state');
+      expect(entry.samples.first.speedKmh, 30);
+      expect(entry.gpsSampleDiagnostics, hasLength(1),
+          reason: 'GPS cadence diagnostics must round-trip too');
+      expect(entry.automatic, isTrue,
+          reason: 'an auto-recovered trip must keep its automatic flag, not '
+              'default to manual');
     });
 
     test('grace expiry is a no-op when the host is no longer in the '
@@ -413,6 +456,12 @@ class _FakeHost implements DroppedSessionHost {
   double? odometerLatestKm = 1005.0;
   @override
   bool automatic = false;
+
+  @override
+  List<TripSample> capturedSamples = [];
+
+  @override
+  List<GpsSampleDiagnostic> capturedGpsSampleDiagnostics = [];
 
   @override
   void stopScheduler() => stopSchedulerCalls++;

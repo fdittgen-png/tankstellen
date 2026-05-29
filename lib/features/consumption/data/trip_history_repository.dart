@@ -351,20 +351,29 @@ class TripHistoryRepository {
     }
   }
 
+  /// Deserialise the row stored under [key], or null when absent or
+  /// corrupt (a single bad write is logged + skipped, never thrown).
+  TripHistoryEntry? _decode(Object key) {
+    final raw = _box.get(key);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      return TripHistoryEntry.fromJson(json);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: {'where': 'TripHistoryRepository._decode: skipping $key'}));
+      return null;
+    }
+  }
+
   /// Return every persisted trip, sorted newest-first. Corrupt
   /// payloads are silently skipped so one bad write doesn't hide the
   /// whole list.
   List<TripHistoryEntry> loadAll() {
     final result = <TripHistoryEntry>[];
     for (final key in _box.keys) {
-      final raw = _box.get(key);
-      if (raw == null || raw.isEmpty) continue;
-      try {
-        final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
-        result.add(TripHistoryEntry.fromJson(json));
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'TripHistoryRepository.loadAll: skipping $key'}));
-      }
+      final entry = _decode(key);
+      if (entry != null) result.add(entry);
     }
     result.sort((a, b) {
       final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -373,6 +382,11 @@ class TripHistoryRepository {
     });
     return result;
   }
+
+  /// O(1) lookup of one persisted trip by [id] (#2304) — the box is keyed
+  /// by `entry.id`, so this avoids the deserialise-everything + sort that
+  /// `loadAll().firstWhere` paid just to fetch one row on trip stop.
+  TripHistoryEntry? loadById(String id) => _decode(id);
 
   Future<void> delete(String id) async {
     await _box.delete(id);

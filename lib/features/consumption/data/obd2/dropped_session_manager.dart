@@ -305,14 +305,11 @@ class DroppedSessionManager {
     _resolvePausedRepo()?.delete(id);
   }
 
-  /// Grace-window auto-finalise (#797). Stops the scanner first so a
-  /// late reconnect can't race an already-finalised trip, finalises the
-  /// partial into the trip-history box, deletes the paused row, then
-  /// flips the host into the stopped state.
+  /// Grace-window auto-finalise (#797). Stops the scanner first (so a late
+  /// reconnect can't race an already-finalised trip), finalises the partial
+  /// into trip-history, deletes the paused row, then stops the host.
   Future<void> _onGraceWindowElapsed() async {
     if (!_host.pausedDueToDrop) return;
-    // Stop the scanner before finalising — otherwise a late reconnect
-    // would race against an already-finalised trip.
     await stopReconnectScanner();
     final id = _host.sessionId;
     final repo = _resolvePausedRepo();
@@ -320,16 +317,20 @@ class DroppedSessionManager {
     final summary = _host.buildFinalSummary();
     if (historyRepo != null && id != null) {
       try {
+        // #2291 — pass the still-live buffer + GPS diagnostics + automatic
+        // flag (never cleared by `buildFinalSummary()`) so a grace-finalised
+        // trip renders charts + is labelled like a normal stop.
         await historyRepo.save(TripHistoryEntry(
           id: id,
           vehicleId: _host.vehicleId,
           summary: summary,
+          samples: _host.capturedSamples,
+          gpsSampleDiagnostics: _host.capturedGpsSampleDiagnostics,
+          automatic: _host.automatic,
         ));
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-            context: const {
-              'where': 'DroppedSessionManager grace finalise failed'
-            }));
+            context: const {'where': 'DroppedSessionManager grace finalise'}));
       }
     }
     if (repo != null && id != null) {
@@ -348,8 +349,7 @@ class DroppedSessionManager {
     if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return null;
     try {
       return PausedTripRepository(
-        box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
-      );
+          box: Hive.box<String>(HiveBoxes.obd2PausedTrips));
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: const {'where': 'DroppedSessionManager paused repo'}));

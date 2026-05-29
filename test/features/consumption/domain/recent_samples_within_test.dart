@@ -89,5 +89,59 @@ void main() {
       );
       expect(got.length, 2);
     });
+
+    test('per-fix cost is amortized O(window): touches only the in-window '
+        'tail, not the whole buffer or maxScan (#2318)', () {
+      // 100_000 in-order 1 Hz samples — a multi-day buffer.
+      final raw = [
+        for (var i = 0; i < 100000; i++)
+          _sampleAt(base.add(Duration(seconds: i))),
+      ];
+      final counting = _AccessCountingList(raw);
+      final reference = raw.last.timestamp;
+      const window = Duration(seconds: 5);
+
+      final got = recentSamplesWithin(counting, window, reference);
+
+      // Output is the same 5 strictly-in-window samples...
+      expect(got.length, 5);
+      // ...and the backward walk read only ~window+1 elements (one extra
+      // to detect the cutoff boundary), NOT the whole buffer and NOT the
+      // 600-entry maxScan tail. The old filter scanned every maxScan
+      // entry on every fix.
+      expect(counting.indexReads, lessThanOrEqualTo(8),
+          reason: 'a 5 s window must read ~6 elements regardless of the '
+              '100k-sample trip length');
+    });
   });
+}
+
+/// A read-only [List] proxy that counts `[]` index reads so a test can
+/// assert the per-fix scan is bounded by the window, not the buffer
+/// length or maxScan (#2318). Only the members [recentSamplesWithin]
+/// touches (`length`, `operator []`, `sublist`) are instrumented; every
+/// other member routes through [noSuchMethod] to the inner list.
+class _AccessCountingList implements List<TripSample> {
+  _AccessCountingList(this._inner);
+
+  final List<TripSample> _inner;
+  int indexReads = 0;
+
+  @override
+  int get length => _inner.length;
+
+  @override
+  TripSample operator [](int index) {
+    indexReads++;
+    return _inner[index];
+  }
+
+  @override
+  List<TripSample> sublist(int start, [int? end]) => _inner.sublist(start, end);
+
+  // recentSamplesWithin only touches length / operator[] / sublist, so no
+  // other List member is reached at runtime; this stub exists solely so
+  // `implements List` type-checks.
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

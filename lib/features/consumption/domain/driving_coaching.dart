@@ -180,16 +180,24 @@ String? formatInstantConsumption(TripLiveReading r) {
 /// The window is expected to be ~5 seconds of samples (recorder
 /// owns the buffer length, the function is window-agnostic).
 /// Returns the trailing samples whose timestamp is after
-/// `reference - window`, scanning only the last [maxScan] samples so the
-/// per-emit cost is O(window) instead of O(trip) (#2174).
+/// `reference - window`, in original order.
 ///
-/// Previously the GPS-only recorder filtered the *entire* trip buffer on
-/// every position fix (`.where(...)` over all samples), making the cost
-/// grow linearly with trip duration. The samples arrive in timestamp
-/// order, so the recent window is a suffix; [maxScan] is far larger than
-/// any few-second window at GPS cadence, so the bounded scan still
-/// captures the full window even if a fix lands mildly out of order
-/// (gpsCoachingHint re-sorts internally regardless).
+/// Walks the buffer *backward* from the tail, stopping at the first
+/// sample at or before the cutoff — so the per-fix cost is genuinely
+/// amortized O(window), not O(trip) and not even O([maxScan]): an
+/// in-order 1 Hz stream over a 5 s window touches ~6 entries no matter
+/// how long the trajet has been running (#2318). Previously the GPS-only
+/// recorder filtered the *entire* trip buffer on every position fix
+/// (`.where(...)` over all samples), making the cost grow linearly with
+/// trip duration; the first pass at this (#2174) bounded the filter to
+/// the last [maxScan] entries, which is constant but still scanned all
+/// [maxScan] of them every fix.
+///
+/// [maxScan] remains a hard safety cap on how far back the walk reaches,
+/// guarding against a pathological burst of mildly out-of-order fixes —
+/// it is far larger than any few-second window at GPS cadence, so the
+/// bounded walk still captures the full window even if a fix lands mildly
+/// out of order (gpsCoachingHint re-sorts internally regardless).
 List<TripSample> recentSamplesWithin(
   List<TripSample> samples,
   Duration window,
@@ -197,11 +205,16 @@ List<TripSample> recentSamplesWithin(
   int maxScan = 600,
 }) {
   final cutoff = reference.subtract(window);
-  final start = samples.length > maxScan ? samples.length - maxScan : 0;
-  return [
-    for (final s in samples.getRange(start, samples.length))
-      if (s.timestamp.isAfter(cutoff)) s,
-  ];
+  final lowerBound = samples.length > maxScan ? samples.length - maxScan : 0;
+  // Find the first index (scanning backward, bounded by maxScan) whose
+  // timestamp is at or before the cutoff. Everything after it is the
+  // in-window suffix.
+  var firstInWindow = samples.length;
+  for (var i = samples.length - 1; i >= lowerBound; i--) {
+    if (!samples[i].timestamp.isAfter(cutoff)) break;
+    firstInWindow = i;
+  }
+  return samples.sublist(firstInWindow);
 }
 
 DrivingCoachingHint? gpsCoachingHint(List<TripSample> recent) {
