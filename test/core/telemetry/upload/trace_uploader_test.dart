@@ -128,20 +128,40 @@ void main() {
       expect(retrieved.authToken, 'my-token');
     });
 
-    test('getConfig throws on non-map stored data (code limitation)', () async {
-      // The `as Map` cast in getConfig throws TypeError, which is not caught
-      // by the FormatException handler. This documents the current behavior.
+    test('getConfig disables (no throw) on non-map stored data (#2311)',
+        () async {
+      // The `as Map` cast throws TypeError on schema drift. The broad
+      // `on Object` catch (#2311) must absorb it and disable upload
+      // rather than letting it escape and silently kill the path.
       await fakeStorage.putSetting('trace_upload_config', 'not-a-map');
-      expect(() => uploader.getConfig(), throwsA(isA<TypeError>()));
+      late TraceUploadConfig config;
+      expect(() => config = uploader.getConfig(), returnsNormally);
+      expect(config.enabled, isFalse,
+          reason: 'corrupt config must fall back to disabled');
     });
 
-    test('getConfig throws on map with wrong types (code limitation)', () async {
-      // fromJson does `as bool?` cast on the 'enabled' field. A string value
-      // throws TypeError, not FormatException. Documents this limitation.
+    test('getConfig disables (no throw) on a map with wrong field types '
+        '(#2311)', () async {
+      // fromJson's `as bool?` cast on a String 'enabled' throws TypeError,
+      // not FormatException — the broadened catch now handles it too.
       await fakeStorage.putSetting('trace_upload_config', <String, dynamic>{
         'enabled': 'not-a-bool',
       });
-      expect(() => uploader.getConfig(), throwsA(isA<TypeError>()));
+      late TraceUploadConfig config;
+      expect(() => config = uploader.getConfig(), returnsNormally);
+      expect(config.enabled, isFalse);
+    });
+
+    test('uploadIfEnabled never throws even with a non-map config (#2311)',
+        () async {
+      // The whole contract: a drifted config that would throw inside
+      // getConfig() (now read INSIDE the try) must not propagate out of
+      // the fire-and-forget upload path.
+      await fakeStorage.putSetting('trace_upload_config', 'not-a-map');
+      await expectLater(
+        uploader.uploadIfEnabled(_makeTrace()),
+        completes,
+      );
     });
 
     test('uploadIfEnabled does nothing when disabled', () async {
