@@ -37,6 +37,13 @@ class _FakeFlutterLocalNotificationsPlugin extends Fake
     return true;
   }
 
+  // #2209 — initialize() now resolves the Android impl to create
+  // channels; return null so the test skips that platform-specific path.
+  @override
+  T? resolvePlatformSpecificImplementation<
+          T extends FlutterLocalNotificationsPlatform>() =>
+      null;
+
   @override
   Future<void> show({
     required int id,

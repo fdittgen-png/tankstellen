@@ -116,6 +116,12 @@ class _CapturingNotificationService implements NotificationService {
   Future<void> initialize() async {}
 
   @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> areNotificationsEnabled() async => true;
+
+  @override
   Future<void> showPriceAlert({
     required int id,
     required String title,

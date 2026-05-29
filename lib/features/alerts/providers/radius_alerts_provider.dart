@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/radius_alert_dedup.dart';
 import '../data/radius_alert_store.dart';
 import '../domain/entities/radius_alert.dart';
+import '../../../core/background/background_service.dart';
 import '../../../core/logging/error_logger.dart';
 
 part 'radius_alerts_provider.g.dart';
@@ -50,6 +51,9 @@ class RadiusAlerts extends _$RadiusAlerts {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.add'}));
     }
     state = AsyncValue.data(await store.list());
+    // #2210 — radius alerts must gate background polling too (not just
+    // per-station price alerts), or radius-only users never get scheduled.
+    await BackgroundService.reconcile();
   }
 
   /// Remove the alert with [id] and refresh state. No-op if unknown.
@@ -66,6 +70,9 @@ class RadiusAlerts extends _$RadiusAlerts {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.remove'}));
     }
     state = AsyncValue.data(await store.list());
+    // #2210 — radius alerts must gate background polling too (not just
+    // per-station price alerts), or radius-only users never get scheduled.
+    await BackgroundService.reconcile();
   }
 
   /// Flip [RadiusAlert.enabled] on the alert with [id]. No-op when
@@ -88,5 +95,8 @@ class RadiusAlerts extends _$RadiusAlerts {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.toggle'}));
     }
     state = AsyncValue.data(await store.list());
+    // #2210 — radius alerts must gate background polling too (not just
+    // per-station price alerts), or radius-only users never get scheduled.
+    await BackgroundService.reconcile();
   }
 }

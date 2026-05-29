@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/background/background_service.dart';
+import '../../../core/notifications/notification_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/alerts_sync.dart';
@@ -29,25 +30,26 @@ class AlertNotifier extends _$AlertNotifier {
   }
 
   Future<void> addAlert(PriceAlert alert) async {
-    final hadActive = _hasActive(state);
     final repo = ref.read(alertRepositoryProvider);
     await repo.saveAlert(alert);
     state = repo.getAlerts();
+    // #2209 — request the OS notification permission at the moment the
+    // user creates their first alert (clear intent → highest grant
+    // rate). Without it, Android 13+ silently drops every alert.
+    unawaited(ref.read(notificationServiceProvider).requestPermission());
     await _syncAlertsIfConnected();
-    await _reconcileBackgroundPolling(hadActive: hadActive);
+    await BackgroundService.reconcile();
   }
 
   Future<void> removeAlert(String id) async {
-    final hadActive = _hasActive(state);
     final repo = ref.read(alertRepositoryProvider);
     await repo.deleteAlert(id);
     state = repo.getAlerts();
     await _syncAlertsIfConnected();
-    await _reconcileBackgroundPolling(hadActive: hadActive);
+    await BackgroundService.reconcile();
   }
 
   Future<void> toggleAlert(String id) async {
-    final hadActive = _hasActive(state);
     final repo = ref.read(alertRepositoryProvider);
     final alerts = repo.getAlerts();
     final index = alerts.indexWhere((a) => a.id == id);
@@ -57,29 +59,8 @@ class AlertNotifier extends _$AlertNotifier {
     await repo.saveAlert(alert.copyWith(isActive: !alert.isActive));
     state = repo.getAlerts();
     await _syncAlertsIfConnected();
-    await _reconcileBackgroundPolling(hadActive: hadActive);
+    await BackgroundService.reconcile();
   }
-
-  /// Keep the WorkManager periodic task aligned with user intent (#713):
-  /// it only runs when at least one active alert exists — alerts are the
-  /// only user-consented reason to poll station prices on a schedule.
-  /// Transitioning false→true starts the task, true→false cancels it.
-  Future<void> _reconcileBackgroundPolling({required bool hadActive}) async {
-    final hasActive = _hasActive(state);
-    if (hadActive == hasActive) return;
-    try {
-      if (hasActive) {
-        await BackgroundService.init();
-      } else {
-        await BackgroundService.cancelAll();
-      }
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'AlertNotifier: background task reconcile failed'}));
-    }
-  }
-
-  static bool _hasActive(List<PriceAlert> alerts) =>
-      alerts.any((a) => a.isActive);
 
   Future<void> _syncAlertsIfConnected() async {
     try {
