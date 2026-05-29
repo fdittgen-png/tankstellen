@@ -14,7 +14,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ServiceError {
 
- ServiceSource get source; String get message; int? get statusCode; DateTime get occurredAt;
+ ServiceSource get source; String get message; int? get statusCode; DateTime get occurredAt;/// Typed classification of the failure (#2255). Defaults to
+/// [FailureKind.unknown] for non-HTTP failures (geocoding, GPS, …).
+ FailureKind get kind;/// Upstream-suggested backoff parsed from a `Retry-After` header when
+/// [kind] is [FailureKind.rateLimited]; null otherwise.
+ Duration? get retryAfter;
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +29,16 @@ $ServiceErrorCopyWith<ServiceError> get copyWith => _$ServiceErrorCopyWithImpl<S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt);
+int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt,kind,retryAfter);
 
 @override
 String toString() {
-  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt)';
+  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt, kind: $kind, retryAfter: $retryAfter)';
 }
 
 
@@ -45,7 +49,7 @@ abstract mixin class $ServiceErrorCopyWith<$Res>  {
   factory $ServiceErrorCopyWith(ServiceError value, $Res Function(ServiceError) _then) = _$ServiceErrorCopyWithImpl;
 @useResult
 $Res call({
- ServiceSource source, String message, int? statusCode, DateTime occurredAt
+ ServiceSource source, String message, int? statusCode, DateTime occurredAt, FailureKind kind, Duration? retryAfter
 });
 
 
@@ -62,13 +66,15 @@ class _$ServiceErrorCopyWithImpl<$Res>
 
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,Object? kind = null,Object? retryAfter = freezed,}) {
   return _then(_self.copyWith(
 source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as ServiceSource,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,statusCode: freezed == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
 as int?,occurredAt: null == occurredAt ? _self.occurredAt : occurredAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as FailureKind,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
+as Duration?,
   ));
 }
 
@@ -153,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ServiceError() when $default != null:
-return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt);case _:
+return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter);case _:
   return orElse();
 
 }
@@ -174,10 +180,10 @@ return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter)  $default,) {final _that = this;
 switch (_that) {
 case _ServiceError():
-return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt);case _:
+return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +200,10 @@ return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter)?  $default,) {final _that = this;
 switch (_that) {
 case _ServiceError() when $default != null:
-return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt);case _:
+return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter);case _:
   return null;
 
 }
@@ -209,13 +215,19 @@ return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt);ca
 
 
 class _ServiceError implements ServiceError {
-  const _ServiceError({required this.source, required this.message, this.statusCode, required this.occurredAt});
+  const _ServiceError({required this.source, required this.message, this.statusCode, required this.occurredAt, this.kind = FailureKind.unknown, this.retryAfter});
   
 
 @override final  ServiceSource source;
 @override final  String message;
 @override final  int? statusCode;
 @override final  DateTime occurredAt;
+/// Typed classification of the failure (#2255). Defaults to
+/// [FailureKind.unknown] for non-HTTP failures (geocoding, GPS, …).
+@override@JsonKey() final  FailureKind kind;
+/// Upstream-suggested backoff parsed from a `Retry-After` header when
+/// [kind] is [FailureKind.rateLimited]; null otherwise.
+@override final  Duration? retryAfter;
 
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +239,16 @@ _$ServiceErrorCopyWith<_ServiceError> get copyWith => __$ServiceErrorCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt);
+int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt,kind,retryAfter);
 
 @override
 String toString() {
-  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt)';
+  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt, kind: $kind, retryAfter: $retryAfter)';
 }
 
 
@@ -247,7 +259,7 @@ abstract mixin class _$ServiceErrorCopyWith<$Res> implements $ServiceErrorCopyWi
   factory _$ServiceErrorCopyWith(_ServiceError value, $Res Function(_ServiceError) _then) = __$ServiceErrorCopyWithImpl;
 @override @useResult
 $Res call({
- ServiceSource source, String message, int? statusCode, DateTime occurredAt
+ ServiceSource source, String message, int? statusCode, DateTime occurredAt, FailureKind kind, Duration? retryAfter
 });
 
 
@@ -264,13 +276,15 @@ class __$ServiceErrorCopyWithImpl<$Res>
 
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,Object? kind = null,Object? retryAfter = freezed,}) {
   return _then(_ServiceError(
 source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as ServiceSource,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,statusCode: freezed == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
 as int?,occurredAt: null == occurredAt ? _self.occurredAt : occurredAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as FailureKind,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
+as Duration?,
   ));
 }
 

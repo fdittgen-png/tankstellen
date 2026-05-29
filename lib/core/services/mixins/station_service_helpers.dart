@@ -8,6 +8,7 @@ import '../../../features/search/domain/entities/station.dart';
 import '../../error/exceptions.dart';
 import '../../utils/geo_utils.dart';
 import '../../utils/station_extensions.dart';
+import '../rate_limit_interceptor.dart';
 import '../service_result.dart';
 import '../station_service.dart';
 
@@ -46,6 +47,12 @@ mixin StationServiceHelpers {
     final apiException = ApiException(
       message: '${e.type.name}: $detail (path: $path)',
       statusCode: e.response?.statusCode,
+      kind: failureKindFromDio(e),
+      // #2255 — the RetryAfterInterceptor stashes the parsed Retry-After on
+      // `requestOptions.extra` before the error propagates; fall back to
+      // parsing the response header directly for the (rare) path where no
+      // interceptor ran.
+      retryAfter: retryAfterFromDio(e),
     );
     if (stackTrace != null) {
       Error.throwWithStackTrace(apiException, stackTrace);
@@ -109,7 +116,10 @@ mixin StationServiceHelpers {
 
   /// Throw [ApiException] for services that don't support single-station detail.
   Never throwDetailUnavailable(String apiName) {
-    throw ApiException(message: 'Detail not available from $apiName');
+    throw ApiException(
+      message: 'Detail not available from $apiName',
+      kind: FailureKind.unsupported,
+    );
   }
 
   /// Return an empty prices map for services that don't support batch price refresh.
