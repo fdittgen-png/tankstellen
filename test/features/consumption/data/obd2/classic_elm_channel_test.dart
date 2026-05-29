@@ -185,35 +185,39 @@ void main() {
     });
 
     test(
-        'survives errors on plugin.incoming — debugPrint swallow keeps the '
-        'channel functional', () async {
+        '#2295 — forwards plugin.incoming errors onto channel.incoming so the '
+        'transport fails the pending command immediately, and stays functional',
+        () async {
       final channel = ClassicElmChannel(address: 'AA:BB', plugin: fake);
       await channel.open();
 
-      // Suppress debugPrint output during the test.
-      final originalDebugPrint = debugPrintOverride();
-      try {
-        fake.incomingController.addError(
-          Exception('simulated incoming error'),
-        );
-        await Future<void>.delayed(Duration.zero);
+      final received = <List<int>>[];
+      final errors = <Object>[];
+      final sub = channel.incoming.listen(
+        received.add,
+        onError: errors.add,
+      );
 
-        // Channel still functional after the error.
-        expect(channel.isOpen, isTrue);
+      final boom = Exception('simulated incoming error');
+      fake.incomingController.addError(boom);
+      await Future<void>.delayed(Duration.zero);
 
-        // Subsequent good bytes still flow through.
-        final received = <List<int>>[];
-        final sub = channel.incoming.listen(received.add);
-        fake.incomingController.add([0x99]);
-        await Future<void>.delayed(Duration.zero);
-        expect(received, [
-          [0x99],
-        ]);
-        await sub.cancel();
-      } finally {
-        restoreDebugPrint(originalDebugPrint);
-      }
+      // #2295 — the error is forwarded, not swallowed: a downstream
+      // consumer (the transport) sees it and can fail-fast instead of
+      // waiting out the 5 s read timeout.
+      expect(errors, hasLength(1));
+      expect(errors.single, same(boom));
 
+      // The broadcast controller is NOT closed by a forwarded error, so
+      // the channel stays functional and later good bytes still flow.
+      expect(channel.isOpen, isTrue);
+      fake.incomingController.add([0x99]);
+      await Future<void>.delayed(Duration.zero);
+      expect(received, [
+        [0x99],
+      ]);
+
+      await sub.cancel();
       await channel.close();
     });
   });

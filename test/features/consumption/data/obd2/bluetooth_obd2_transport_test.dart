@@ -163,6 +163,37 @@ void main() {
       );
     });
 
+    test(
+        '#2295 — a notify-stream error fails the pending command IMMEDIATELY '
+        '(no read-timeout wait)', () async {
+      final channel = _ScriptedChannel();
+      channel.scriptResponse('ATZ\r', 'ELM327>');
+      // Script a reply that NEVER contains the '>' prompt, so the command
+      // can only ever complete via the injected error path — never on a
+      // happy-path prompt. A bounded read timeout that would dominate if
+      // the error were swallowed: the fail-fast path must beat it.
+      channel.scriptResponse('010D\r', '41 0D 3C ');
+      final transport = BluetoothObd2Transport(
+        channel,
+        readTimeout: const Duration(seconds: 5),
+      );
+      await transport.connect();
+
+      final sw = Stopwatch()..start();
+      final pending = transport.sendCommand('010D\r');
+      // Inject a GATT/ATT-style error on the channel's incoming stream
+      // while the command is in flight — exactly what the BLE/Classic
+      // channels now forward via `_incoming.addError` (#2295).
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      channel.injectError(Exception('simulated GATT error'));
+
+      await expectLater(pending, throwsA(isA<Exception>()));
+      sw.stop();
+      expect(sw.elapsed, lessThan(const Duration(seconds: 1)),
+          reason: 'must fail-fast via the forwarded error, not wait out '
+              'the 5 s read timeout');
+    });
+
     test('disconnect closes the channel and flips isConnected to false',
         () async {
       final channel = _ScriptedChannel();
@@ -199,6 +230,12 @@ class _ScriptedChannel implements ElmByteChannel {
   void scriptChunkedResponse(String command, List<String> chunks) {
     _chunksByCommand[command] =
         chunks.map((c) => c.codeUnits).toList();
+  }
+
+  /// #2295 — simulate a forwarded notify-stream error (what the real BLE
+  /// / Classic channels now push via `_incoming.addError`).
+  void injectError(Object error) {
+    _controller.addError(error);
   }
 
   List<String> get writesAsStrings =>

@@ -3,8 +3,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
@@ -59,7 +57,13 @@ class ClassicElmChannel implements ElmByteChannel {
     _subscription = _plugin.incoming.listen(
       _incoming.add,
       onError: (Object e, StackTrace st) {
-        debugPrint('ClassicElmChannel: incoming error: $e');
+        // #2295 — forward the socket error onto the byte stream so the
+        // transport's pending `sendCommand` completer fails IMMEDIATELY
+        // (via `_failPending`) instead of waiting out the read timeout,
+        // and log it so the drop is visible in release.
+        if (!_incoming.isClosed) _incoming.addError(e, st);
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+            context: const {'where': 'ClassicElmChannel notify error'}));
       },
       onDone: () {
         _open = false;
