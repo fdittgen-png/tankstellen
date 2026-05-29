@@ -32,6 +32,7 @@ import '../storage/storage_keys.dart';
 import '../utils/json_extensions.dart';
 import 'background_price_fetcher_provider.dart';
 import 'background_retry.dart';
+import 'daily_collection.dart';
 import 'hive_isolate_lock.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -189,7 +190,11 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     await HiveStorage.loadApiKey();
     final apiKey = storage.getApiKey();
 
-    // 1. Get favorite + alert station IDs (union for batch price fetch)
+    // 1. Build the station-id set to fetch. Favorites + active-alert
+    //    stations are always refreshed; #2212 — every previously-viewed
+    //    ("collected") station is also gathered ONCE PER DAY so its price
+    //    history keeps growing even if it isn't a favorite.
+    final now = DateTime.now();
     final favoriteIds = storage.getFavoriteIds();
     final repo = AlertRepository(storage);
     final alerts = repo.getAlerts();
@@ -197,8 +202,23 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         .where((a) => a.isActive)
         .map((a) => a.stationId)
         .toSet();
-    final allStationIds = {...favoriteIds, ...alertStationIds}.toList();
-    debugPrint('BackgroundService: ${favoriteIds.length} favorites, ${alertStationIds.length} alert stations, ${allStationIds.length} total');
+    bool collectedToday(String id) {
+      final recs = storage.getPriceRecords(id);
+      if (recs.isEmpty) return false;
+      final last =
+          DateTime.tryParse(recs.last['recordedAt']?.toString() ?? '');
+      return last != null && isSameDay(last, now);
+    }
+
+    final allStationIds = stationsToCollect(
+      favorites: favoriteIds,
+      alerts: alertStationIds.toList(),
+      viewed: storage.getPriceHistoryKeys(),
+      collectedToday: collectedToday,
+    );
+    debugPrint('BackgroundService: ${favoriteIds.length} favorites, '
+        '${alertStationIds.length} alert stations, '
+        '${allStationIds.length} total (incl. once-a-day viewed)');
 
     if (allStationIds.isEmpty) {
       // #609 — users without favorites still need a populated nearest
@@ -210,7 +230,6 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     // 2. Fetch prices for all stations via the shared Tankerkoenig batch
     //    fetcher. The fetcher handles chunking + parsing + retry — see
     //    TankerkoenigBatchPriceFetcher.
-    final now = DateTime.now();
     final dio = Dio(BaseOptions(
       connectTimeout: BackgroundService.bgConnectTimeout,
       receiveTimeout: BackgroundService.bgReceiveTimeout,
