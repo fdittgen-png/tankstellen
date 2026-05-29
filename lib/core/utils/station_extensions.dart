@@ -41,3 +41,10 @@ extension StationDisplay on Station {
   }
 }
 
+/// Truncate [brand] to [maxLength] characters, appending an ellipsis when
+/// it overflows. Shared by the map and driving marker builders (#2196).
+String truncateBrand(String brand, {required int maxLength}) {
+  if (brand.length <= maxLength) return brand;
+  return '${brand.substring(0, maxLength - 1)}…';
+}
+

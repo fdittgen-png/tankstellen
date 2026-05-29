@@ -11,6 +11,7 @@ import 'adapter_capability.dart';
 import 'auto_record_trace_log.dart';
 import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
+import 'fuel_rate_diagnostics.dart';
 import 'fuel_rate_estimator.dart' as estimator;
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_debug_session.dart';
@@ -630,10 +631,24 @@ class Obd2Service implements Obd2RawCommandPort {
         (isDiesel
             ? estimator.kDieselDensityGPerL
             : estimator.kPetrolDensityGPerL);
-    // #1395 — pre-coerce displacement to double for breadcrumb pushes
-    // (the recorder typed displacement as `double?` so the overlay can
-    // render it as a plain number; the estimator below stays on int).
-    final displacementForCrumb = engineDisplacementCc.toDouble();
+    // #1395 / #2191 — the diagnostic side-channel (breadcrumb trace +
+    // the suspicious-low / 5E-vs-MAF sanity bounds) lives in this
+    // collaborator so the fallback chain below reads clean: compute
+    // the value, delegate the diagnostics. It captures the per-call
+    // resolved constants here (displacement pre-coerced to double for
+    // the recorder, which renders it as a plain number) plus the
+    // live-read tear-offs the cross-checks need.
+    final diagnostics = FuelRateDiagnostics(
+      collector: breadcrumbCollector,
+      afr: afr,
+      fuelDensityGPerL: fuelDensityGPerL,
+      engineDisplacementCc: engineDisplacementCc.toDouble(),
+      volumetricEfficiency: volumetricEfficiency,
+      readRpm: readRpm,
+      isMafSupported: () => isPidSupported(0x10),
+      readMaf: readMafGramsPerSecond,
+    );
+
     // Step 1: direct fuel-rate PID (already post-trim — no correction).
     // Skipped when #811 discovery proved the car doesn't implement PID 5E.
     double? directRate;
@@ -644,63 +659,8 @@ class Obd2Service implements Obd2RawCommandPort {
         label: 'fuelRate',
       );
     }
-
-    // #1395 — record the PID 5E read into the diagnostic collector
-    // BEFORE returning it. The caller surfaces the value to the trip
-    // integrator unchanged; the breadcrumb is the only place a
-    // suspicious-low / 5E-vs-MAF guard can fire without polluting the
-    // hot path.
     if (directRate != null) {
-      // Cross-check sanity bound A: implausibly-low at non-idle RPM.
-      // PID 5E values < 0.3 L/h while the engine is spinning above
-      // 1500 RPM are almost always sensor noise / stuck PID — flag
-      // but DON'T drop, the integrator still uses the value and the
-      // trip-end suspicion ratio rolls up to TripSummary.fuelRateSuspect.
-      String? lowFlag;
-      String? lowDetail;
-      double? rpmAtSample;
-      if (directRate < 0.3) {
-        rpmAtSample = await readRpm();
-        if (rpmAtSample != null && rpmAtSample > 1500) {
-          lowFlag = Obd2BreadcrumbCollector.flagSuspiciousLow;
-          lowDetail = 'directRate=${directRate.toStringAsFixed(2)};'
-              'rpm=${rpmAtSample.toStringAsFixed(0)}';
-        }
-      }
-      breadcrumbCollector?.record(
-        branch: Obd2BranchTag.pid5E,
-        fuelRateLPerHour: directRate,
-        pid5ELPerHour: directRate,
-        rpm: rpmAtSample,
-        afr: afr,
-        fuelDensityGPerL: fuelDensityGPerL,
-        engineDisplacementCc: displacementForCrumb,
-        volumetricEfficiency: volumetricEfficiency,
-        flag: lowFlag,
-        flagDetail: lowDetail,
-      );
-
-      // Cross-check sanity bound B: when MAF is also available, run
-      // the MAF-derived rate and compare. > 50 % divergence flags the
-      // sample as 5e-vs-maf-divergent. We do this even after the
-      // direct return below because the diagnostic value is in
-      // having BOTH numbers side-by-side — the integrator still uses
-      // the direct PID 5E reading.
-      if (isPidSupported(0x10)) {
-        final mafCross = await readMafGramsPerSecond();
-        if (mafCross != null) {
-          final mafDerived = mafCross * 3600.0 / (afr * fuelDensityGPerL);
-          if (mafDerived > 0 &&
-              (directRate - mafDerived).abs() / mafDerived > 0.5) {
-            breadcrumbCollector?.recordFlag(
-              Obd2BreadcrumbCollector.flag5eVsMafDivergent,
-              'direct=${directRate.toStringAsFixed(2)};'
-                  'mafDerived=${mafDerived.toStringAsFixed(2)};'
-                  'maf=${mafCross.toStringAsFixed(2)}',
-            );
-          }
-        }
-      }
+      await diagnostics.recordPid5E(directRate);
       return directRate;
     }
 
@@ -713,15 +673,7 @@ class Obd2Service implements Obd2RawCommandPort {
         // Stoichiometric L/h = MAF × 3600 / (AFR × density).
         final rate = maf * 3600.0 / (afr * fuelDensityGPerL);
         final corrected = await _applyFuelTrimCorrection(rate);
-        breadcrumbCollector?.record(
-          branch: Obd2BranchTag.maf,
-          fuelRateLPerHour: corrected,
-          mafGramsPerSecond: maf,
-          afr: afr,
-          fuelDensityGPerL: fuelDensityGPerL,
-          engineDisplacementCc: displacementForCrumb,
-          volumetricEfficiency: volumetricEfficiency,
-        );
+        diagnostics.recordMaf(corrected: corrected, maf: maf);
         return corrected;
       }
     }
@@ -732,28 +684,17 @@ class Obd2Service implements Obd2RawCommandPort {
     if (!isPidSupported(0x0B) ||
         !isPidSupported(0x0F) ||
         !isPidSupported(0x0C)) {
-      breadcrumbCollector?.record(
-        branch: Obd2BranchTag.none,
-        afr: afr,
-        fuelDensityGPerL: fuelDensityGPerL,
-        engineDisplacementCc: displacementForCrumb,
-        volumetricEfficiency: volumetricEfficiency,
-      );
+      diagnostics.recordNoBranch();
       return null;
     }
     final mapKpa = await readManifoldPressureKpa();
     final iatCelsius = await readIntakeAirTempCelsius();
     final rpm = await readRpm();
     if (mapKpa == null || iatCelsius == null || rpm == null) {
-      breadcrumbCollector?.record(
-        branch: Obd2BranchTag.none,
+      diagnostics.recordNoBranch(
         mapKpa: mapKpa,
         iatCelsius: iatCelsius,
         rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: fuelDensityGPerL,
-        engineDisplacementCc: displacementForCrumb,
-        volumetricEfficiency: volumetricEfficiency,
       );
       return null;
     }
@@ -768,29 +709,19 @@ class Obd2Service implements Obd2RawCommandPort {
       etaVCurve: etaVCurve,
     );
     if (rate == null) {
-      breadcrumbCollector?.record(
-        branch: Obd2BranchTag.none,
+      diagnostics.recordNoBranch(
         mapKpa: mapKpa,
         iatCelsius: iatCelsius,
         rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: fuelDensityGPerL,
-        engineDisplacementCc: displacementForCrumb,
-        volumetricEfficiency: volumetricEfficiency,
       );
       return null;
     }
     final corrected = await _applyFuelTrimCorrection(rate);
-    breadcrumbCollector?.record(
-      branch: Obd2BranchTag.speedDensity,
-      fuelRateLPerHour: corrected,
+    diagnostics.recordSpeedDensity(
+      corrected: corrected,
       mapKpa: mapKpa,
       iatCelsius: iatCelsius,
       rpm: rpm,
-      afr: afr,
-      fuelDensityGPerL: fuelDensityGPerL,
-      engineDisplacementCc: displacementForCrumb,
-      volumetricEfficiency: volumetricEfficiency,
     );
     return corrected;
   }

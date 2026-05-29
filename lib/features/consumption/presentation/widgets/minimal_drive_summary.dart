@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/driving_coaching.dart';
 import '../../providers/trip_recording_provider.dart';
@@ -60,7 +61,7 @@ class MinimalDriveSummary extends ConsumerWidget {
     final scheme = theme.colorScheme;
     final headline = liveAvg == null
         ? '—'
-        : '${liveAvg.toStringAsFixed(1)} L/100 km';
+        : UnitFormatter.formatConsumption(liveAvg, isEv: false);
 
     // #2058 — when the trajet has no fuel-rate data (GPS-only mode),
     // swap the OBD2-derived tile triplet (shift-up / shift-down /

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/num_extensions.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
@@ -46,7 +47,6 @@ class TripSummaryCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final s = entry.summary;
     final unknown = l?.trajetDetailFieldValueUnknown ?? '—';
-    final avgUnit = isEv ? 'kWh/100 km' : 'L/100 km';
 
     // #1209 — estimated trip cost from the most recent fill-up's
     // price-per-litre. Hidden on EV trips (the helper still returns
@@ -64,7 +64,7 @@ class TripSummaryCard extends ConsumerWidget {
         : unknown;
     final avgConsumption = s.avgLPer100Km == null
         ? unknown
-        : '${s.avgLPer100Km!.toStringAsFixed(1)} $avgUnit';
+        : UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: isEv);
     final fuelUsed = s.fuelLitersConsumed == null
         ? unknown
         : '${s.fuelLitersConsumed!.toStringAsFixed(2)} L';

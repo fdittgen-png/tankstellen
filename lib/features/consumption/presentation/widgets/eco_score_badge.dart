@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/eco_score.dart';
 
@@ -34,8 +35,8 @@ class EcoScoreBadge extends StatelessWidget {
 
     // Compose the badge text from the localised consumption unit +
     // the raw delta; the delta itself (+/− and %) is locale-neutral.
-    final consumptionText =
-        l10n?.ecoScoreConsumption(lp100Text) ?? '$lp100Text L/100 km';
+    final consumptionText = l10n?.ecoScoreConsumption(lp100Text) ??
+        UnitFormatter.formatConsumption(score.litersPer100Km, isEv: false);
     final badgeText = '$consumptionText · $deltaText';
 
     final tooltip = l10n?.ecoScoreTooltip(avgText) ??

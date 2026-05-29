@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/foundation.dart';
-import 'package:latlong2/latlong.dart';
 
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
@@ -12,6 +11,7 @@ import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
 import '../helpers/batch_query_helper.dart';
+import 'route_geometry.dart';
 
 /// Balanced strategy: finds stations with a good balance between
 /// price and distance from route (minimal detour).
@@ -55,7 +55,7 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
 
     for (final item in results) {
       if (item is FuelStationResult) {
-        final minDist = _minDistanceToPolyline(
+        final minDist = minDistanceToPolyline(
           item.station.lat, item.station.lng, route.geometry,
         );
         if (minDist <= detourLimit) {
@@ -72,11 +72,7 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
 
     // Sort by position along route (itinerary order)
     final items = scored.map((e) => e.$1).toList();
-    items.sort((a, b) {
-      final da = distanceAlongPolyline(a.lat, a.lng, route.geometry);
-      final db = distanceAlongPolyline(b.lat, b.lng, route.geometry);
-      return da.compareTo(db);
-    });
+    sortByItineraryOrder(items, route.geometry);
 
     return items;
   }
@@ -106,12 +102,12 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
             nearestSampleIdx = i;
           }
         }
-        final segmentIdx = (nearestSampleIdx * 15 / segmentKm).floor();
+        final segmentIdx = segmentIndexFor(nearestSampleIdx, segmentKm);
 
         final price = station.priceFor(fuelType);
         if (price != null) {
           // Balanced score: price + distance penalty
-          final routeDist = _minDistanceToPolyline(
+          final routeDist = minDistanceToPolyline(
             station.lat, station.lng, route.geometry,
           );
           final score = price + (routeDist * 0.1);
@@ -125,17 +121,5 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
     }
 
     return segmentBest.map((k, v) => MapEntry(k, v.$1));
-  }
-
-  double _minDistanceToPolyline(double lat, double lng, List<LatLng> polyline) {
-    if (polyline.isEmpty) return double.infinity;
-    double minDist = double.infinity;
-    final step = polyline.length > 300 ? 3 : 1;
-    for (int i = 0; i < polyline.length; i += step) {
-      final p = polyline[i];
-      final d = distanceKm(lat, lng, p.latitude, p.longitude);
-      if (d < minDist) minDist = d;
-    }
-    return minDist;
   }
 }

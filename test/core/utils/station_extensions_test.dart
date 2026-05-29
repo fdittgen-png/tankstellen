@@ -143,4 +143,22 @@ void main() {
       expect(station.fullLocation, '12345 Berlin');
     });
   });
+
+  group('truncateBrand (#2196)', () {
+    test('returns the brand unchanged when within the limit', () {
+      expect(truncateBrand('Shell', maxLength: 14), 'Shell');
+      expect(truncateBrand('Exactly14chars', maxLength: 14), 'Exactly14chars');
+    });
+
+    test('truncates with an ellipsis when over the limit', () {
+      final out = truncateBrand('SuperLongBrandName', maxLength: 14);
+      expect(out, 'SuperLongBran…');
+      expect(out.length, 14);
+    });
+
+    test('respects a different maxLength', () {
+      expect(truncateBrand('SuperLongBrandName', maxLength: 16),
+          'SuperLongBrandN…');
+    });
+  });
 }

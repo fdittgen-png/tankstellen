@@ -103,6 +103,18 @@ class UnitFormatter {
   static String pricePerUnitSuffix({String? countryCode}) =>
       _resolve(countryCode).pricePerUnitSuffix;
 
+  /// Format an average / instantaneous consumption value with its
+  /// unit mask — `L/100 km` for combustion, `kWh/100 km` for EV.
+  ///
+  /// SSoT for the consumption mask that was previously copy-pasted
+  /// across the consumption widgets (#2185). Intentionally keeps the
+  /// **dot** decimal (`toStringAsFixed(1)`) rather than the active
+  /// locale's separator: the shipped consumption widget tests assert
+  /// exact strings like `6.4 L/100 km`, and the mask itself is a
+  /// language-neutral format mask, so it stays as-is.
+  static String formatConsumption(double value, {required bool isEv}) =>
+      '${value.toStringAsFixed(1)} ${isEv ? 'kWh/100 km' : 'L/100 km'}';
+
   /// Format a double with one decimal in the *active locale* so
   /// metric countries render "2,3 km" (comma) and English-locale
   /// countries render "2.3 km" (dot). Using `toStringAsFixed` would

@@ -155,7 +155,10 @@ class FillUpCard extends StatelessWidget {
                 l?.ecoScoreConsumption(
                       rawLPer100Km!.toStringAsFixed(1),
                     ) ??
-                    '${rawLPer100Km!.toStringAsFixed(1)} L/100 km',
+                    UnitFormatter.formatConsumption(
+                      rawLPer100Km!,
+                      isEv: false,
+                    ),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,

@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'price_gradient.dart';
+
 /// Price tier classification for accessibility — ensures price levels
 /// are distinguishable without relying on color alone (WCAG 1.4.1).
 enum PriceTier {
@@ -27,8 +29,9 @@ enum PriceTier {
 /// - expensive: 66%–100%
 PriceTier priceTierOf(double? price, double minPrice, double maxPrice) {
   if (price == null) return PriceTier.unknown;
-  if (maxPrice <= minPrice) return PriceTier.cheap;
-  final t = ((price - minPrice) / (maxPrice - minPrice)).clamp(0.0, 1.0);
+  // #2196 — share normalizedPrice with the marker gradient. A degenerate
+  // range yields 0 → cheap, matching the previous max<=min behaviour.
+  final t = normalizedPrice(price, minPrice, maxPrice);
   if (t < 0.33) return PriceTier.cheap;
   if (t < 0.66) return PriceTier.average;
   return PriceTier.expensive;

@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/price_gradient.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -44,7 +45,7 @@ class StationMarkerBuilder {
     final price = priceForFuelType(station, fuel);
     final baseColor = priceColor(price, minPrice, maxPrice);
     final color = pastel ? _toPastel(baseColor) : baseColor;
-    final brand = _truncateBrand(station.displayName);
+    final brand = truncateBrand(station.displayName, maxLength: _maxBrandLength);
 
     // Accessibility (#566): TalkBack/VoiceOver read this as "Brand, price
     // EUR per litre, double-tap to view details" — otherwise the marker is
@@ -115,28 +116,28 @@ class StationMarkerBuilder {
   }
 
   /// Green (cheapest) -> Yellow -> Orange -> Red (most expensive).
-  static Color priceColor(double? price, double minPrice, double maxPrice) {
-    if (price == null) return Colors.grey;
-    if (maxPrice <= minPrice) return Colors.green;
-    final t = ((price - minPrice) / (maxPrice - minPrice)).clamp(0.0, 1.0);
-    if (t < 0.33) {
-      return Color.lerp(Colors.green, Colors.yellow, t / 0.33)!;
-    } else if (t < 0.66) {
-      return Color.lerp(Colors.yellow, Colors.orange, (t - 0.33) / 0.33)!;
-    } else {
-      return Color.lerp(Colors.orange, Colors.red, (t - 0.66) / 0.34)!;
-    }
-  }
+  /// #2196 \u2014 thin wrapper over the shared [priceGradientColor]; kept
+  /// public because tests assert its boundary colours directly.
+  static const _priceStops = [
+    Colors.green,
+    Colors.yellow,
+    Colors.orange,
+    Colors.red,
+  ];
+
+  static Color priceColor(double? price, double minPrice, double maxPrice) =>
+      priceGradientColor(
+        price,
+        minPrice,
+        maxPrice,
+        stops: _priceStops,
+        nullColor: Colors.grey,
+        flatColor: Colors.green,
+      );
 
   /// Convert a vivid color to a pastel/muted variant.
   static Color _toPastel(Color color) {
     // Blend with white at 60% to create pastel
     return Color.lerp(color, Colors.white, 0.6)!;
-  }
-
-  /// Truncate brand name if longer than [_maxBrandLength].
-  static String _truncateBrand(String brand) {
-    if (brand.length <= _maxBrandLength) return brand;
-    return '${brand.substring(0, _maxBrandLength - 1)}\u2026';
   }
 }
