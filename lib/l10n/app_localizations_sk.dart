@@ -4053,6 +4053,22 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Pri dlhých zastaveniach vypínajte motor, namiesto toho aby ste ho nechávali bežať na voľnobeh.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Preraďte nahor skôr, aby ste udržali motor mimo pásma vysokých otáčok.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Plynulo pridávajte plyn — rovnomerné zrýchľovanie spotrebuje menej paliva.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Preraďte nahor skôr, aby sa motor ustálil na nižších, úspornejších otáčkach.';
+
+  @override
   String get drivingScoreCardTitle => 'Jazdné skóre';
 
   @override

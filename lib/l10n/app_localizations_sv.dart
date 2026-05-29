@@ -4033,6 +4033,22 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Stäng av motorn vid långa stopp i stället för att låta den gå på tomgång.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Växla upp tidigare för att hålla motorn utanför det höga varvtalsområdet.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Ge mjukt gas — jämn acceleration drar mindre bränsle.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Växla upp tidigare så att motorn lägger sig på ett lägre och mer bränslesnålt varvtal.';
+
+  @override
   String get drivingScoreCardTitle => 'Körpoäng';
 
   @override

@@ -4048,6 +4048,22 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Podczas dłuższych postojów wyłączaj silnik, zamiast pozostawiać go na biegu jałowym.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Zmieniaj na wyższy bieg wcześniej, aby utrzymać silnik poza zakresem wysokich obrotów.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Naciskaj gaz płynnie — równomierne przyspieszanie zużywa mniej paliwa.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Zmieniaj na wyższy bieg wcześniej, aby silnik pracował na niższych, oszczędniejszych obrotach.';
+
+  @override
   String get drivingScoreCardTitle => 'Wynik jazdy';
 
   @override

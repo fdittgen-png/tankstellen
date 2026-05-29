@@ -4057,6 +4057,22 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Garās apstāšanās reizēs izslēdziet dzinēju, nevis ļaujiet tam darboties tukšgaitā.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs nebūtu augsto apgriezienu zonā.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Spiediet gāzi vienmērīgi — gluda paātrināšanās patērē mazāk degvielas.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs darbotos zemākos un ekonomiskākos apgriezienos.';
+
+  @override
   String get drivingScoreCardTitle => 'Braukšanas novērtējums';
 
   @override

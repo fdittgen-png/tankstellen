@@ -4027,6 +4027,22 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Pikkadel peatustel lülita mootor välja, selle asemel et seda tühikäigul töötada lasta.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Vaheta varem kõrgemale käigule, et hoida mootor kõrgete pöörete tsoonist eemal.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Vajuta gaasi sujuvalt — ühtlane kiirendus kulutab vähem kütust.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Vaheta varem kõrgemale käigule, et mootor töötaks madalamatel ja säästlikumatel pööretel.';
+
+  @override
   String get drivingScoreCardTitle => 'Sõiduhinnang';
 
   @override

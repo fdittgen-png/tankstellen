@@ -6,5 +6,9 @@
   "insightIdling": "Leerlauf ({pctTime}% der Fahrt): {liters} L verschwendet",
   "insightSubtitlePctOfTrip": "{pctTime}% der Fahrt",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Im niedrigen Gang gefahren ({minutes} Min.)"
+  "insightLowGear": "Im niedrigen Gang gefahren ({minutes} Min.)",
+  "lessonAdviceIdling": "Bei längeren Stopps den Motor ausschalten statt im Leerlauf laufen zu lassen.",
+  "lessonAdviceHighRpm": "Früher hochschalten, um den Motor aus dem hohen Drehzahlbereich zu halten.",
+  "lessonAdviceHardAccel": "Sanfter Gas geben – gleichmäßiges Beschleunigen spart Sprit.",
+  "lessonAdviceLowGear": "Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft."
 }

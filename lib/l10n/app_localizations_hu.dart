@@ -4061,6 +4061,22 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Hosszú megállóknál kapcsolja ki a motort, ahelyett hogy üresjáraton hagyná.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Kapcsoljon feljebb korábban, hogy a motor a magas fordulatszámú tartományon kívül maradjon.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Finoman adjon gázt — az egyenletes gyorsítás kevesebb üzemanyagot fogyaszt.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Kapcsoljon feljebb hamarabb, hogy a motor alacsonyabb, takarékosabb fordulatszámon járjon.';
+
+  @override
   String get drivingScoreCardTitle => 'Vezetési pontszám';
 
   @override

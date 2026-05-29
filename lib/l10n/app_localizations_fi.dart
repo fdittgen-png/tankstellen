@@ -4032,6 +4032,22 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Sammuta moottori pitkien pysähdysten ajaksi sen sijaan, että annat sen käydä tyhjäkäynnillä.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Vaihda aiemmin suuremmalle vaihteelle pitääksesi moottorin pois korkean kierrosluvun alueelta.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Paina kaasua pehmeästi — tasainen kiihdytys kuluttaa vähemmän polttoainetta.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Vaihda aiemmin suuremmalle, jotta moottori asettuu matalammille ja taloudellisemmille kierroksille.';
+
+  @override
   String get drivingScoreCardTitle => 'Ajopisteet';
 
   @override

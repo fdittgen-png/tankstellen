@@ -4056,6 +4056,22 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Bei längeren Stopps den Motor ausschalten statt im Leerlauf laufen zu lassen.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Früher hochschalten, um den Motor aus dem hohen Drehzahlbereich zu halten.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Sanfter Gas geben – gleichmäßiges Beschleunigen spart Sprit.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.';
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override

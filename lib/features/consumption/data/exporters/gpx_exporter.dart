@@ -3,7 +3,18 @@
 
 import 'package:xml/xml.dart';
 
+import '../../../../l10n/app_localizations.dart';
+import '../../domain/lessons/driving_lesson.dart';
+import '../lessons/driving_lesson_registry.dart';
 import '../trip_history_repository.dart';
+
+/// Namespace URI for the tankstellen GPX extensions (#2251). Carrying
+/// the post-trip lessons inside a vendor namespace keeps the document
+/// schema-valid — GPX 1.1 explicitly allows arbitrary namespaced
+/// children inside `<extensions>`. The prefix `tankstellen` is declared
+/// on the `<gpx>` root and used on every lesson element.
+// i18n-ignore: namespace URI, not user-facing text
+const String tankstellenGpxNamespace = 'https://tankstellen.de/gpx/1';
 
 /// Builds a GPX 1.1 document from a single [TripHistoryEntry].
 ///
@@ -13,27 +24,31 @@ import '../trip_history_repository.dart';
 /// teleport in any consuming tool. Altitude is included as `<ele>`
 /// when present.
 ///
+/// When [l] is supplied the computed post-trip driving lessons (#2251)
+/// for the trip are embedded in the track's `<extensions>` as a
+/// namespaced `<tankstellen:lessons>` block — one `<tankstellen:lesson>`
+/// per firing lesson carrying its `id`, `value`, `impact`, and a
+/// localized `<tankstellen:message>`. The block is omitted entirely when
+/// no lessons fire or when [l] is null (no localizer to resolve the
+/// messages). Lessons are computed via [registry], defaulting to the
+/// standard production set.
+///
 /// Returns the full XML document as a UTF-8 string suitable for
 /// writing to a `.gpx` file or handing to the OS share sheet.
 String buildGpxXml(
   TripHistoryEntry entry, {
   String creator = 'tankstellen',
   String? appVersion,
+  AppLocalizations? l,
+  DrivingLessonRegistry? registry,
 }) {
   final builder = XmlBuilder();
   builder.processing('xml', 'version="1.0" encoding="UTF-8"');
   final creatorAttr = appVersion == null ? creator : '$creator $appVersion';
+  final lessons = _lessonsFor(entry, l, registry);
   builder.element(
     'gpx',
-    attributes: <String, String>{
-      'version': '1.1',
-      'creator': creatorAttr,
-      'xmlns': 'http://www.topografix.com/GPX/1/1',
-      'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-      'xsi:schemaLocation':
-          'http://www.topografix.com/GPX/1/1 '
-              'http://www.topografix.com/GPX/1/1/gpx.xsd',
-    },
+    attributes: _gpxRootAttributes(creatorAttr, includeLessonsNs: lessons.isNotEmpty),
     nest: () {
       builder.element('metadata', nest: () {
         builder.element('name', nest: () {
@@ -50,6 +65,7 @@ String buildGpxXml(
         builder.element('name', nest: () {
           builder.text(_trackName(entry));
         });
+        _appendLessonsExtensions(builder, lessons);
         builder.element('trkseg', nest: () {
           for (final s in entry.samples) {
             final lat = s.latitude;
@@ -77,28 +93,92 @@ String buildGpxXml(
   return builder.buildDocument().toXmlString(pretty: true, indent: '  ');
 }
 
+/// Root `<gpx>` attributes. The tankstellen extensions namespace is
+/// declared only when at least one trk carries a lessons block, so a
+/// lessons-free export is byte-identical to the pre-#2251 document.
+Map<String, String> _gpxRootAttributes(
+  String creatorAttr, {
+  required bool includeLessonsNs,
+}) {
+  final attrs = <String, String>{
+    'version': '1.1',
+    'creator': creatorAttr,
+    'xmlns': 'http://www.topografix.com/GPX/1/1',
+    'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+    'xsi:schemaLocation': 'http://www.topografix.com/GPX/1/1 '
+        'http://www.topografix.com/GPX/1/1/gpx.xsd',
+  };
+  if (includeLessonsNs) {
+    attrs['xmlns:tankstellen'] = tankstellenGpxNamespace;
+  }
+  return attrs;
+}
+
+/// Computes the post-trip lessons for [entry] via [registry] (defaulting
+/// to the standard set). Returns an empty list when [l] is null — there
+/// is no localizer to resolve the lesson messages, so the GPX simply
+/// omits the block.
+List<DrivingLesson> _lessonsFor(
+  TripHistoryEntry entry,
+  AppLocalizations? l,
+  DrivingLessonRegistry? registry,
+) {
+  if (l == null) return const [];
+  final reg = registry ?? DrivingLessonRegistry.standard();
+  return reg.evaluate(entry.summary, entry.samples, l);
+}
+
+/// Appends a `<extensions>` block carrying the trip's driving lessons to
+/// the open `<trk>` element. No-op when [lessons] is empty so the
+/// document is unchanged for trips with no firing lessons (and for the
+/// no-localizer path).
+void _appendLessonsExtensions(XmlBuilder builder, List<DrivingLesson> lessons) {
+  if (lessons.isEmpty) return;
+  builder.element('extensions', nest: () {
+    builder.element('tankstellen:lessons', nest: () {
+      for (final lesson in lessons) {
+        builder.element('tankstellen:lesson', attributes: <String, String>{
+          'id': lesson.id,
+          'value': lesson.metricValue.toStringAsFixed(3),
+          'impact': lesson.impact.toStringAsFixed(3),
+        }, nest: () {
+          builder.element('tankstellen:title', nest: () {
+            builder.text(lesson.title);
+          });
+          if (lesson.advice.isNotEmpty) {
+            builder.element('tankstellen:message', nest: () {
+              builder.text(lesson.advice);
+            });
+          }
+        });
+      }
+    });
+  });
+}
+
 /// Builds a GPX 1.1 document aggregating multiple trips. Each
 /// [TripHistoryEntry] becomes its own `<trk>` element so consuming
 /// tools can render them as distinct tracks.
+///
+/// When [l] is supplied each track embeds its own post-trip lessons
+/// block (#2251), identical in shape to [buildGpxXml]'s.
 String buildAggregateGpxXml(
   Iterable<TripHistoryEntry> entries, {
   String creator = 'tankstellen',
   String? appVersion,
+  AppLocalizations? l,
+  DrivingLessonRegistry? registry,
 }) {
   final builder = XmlBuilder();
   builder.processing('xml', 'version="1.0" encoding="UTF-8"');
   final creatorAttr = appVersion == null ? creator : '$creator $appVersion';
+  final lessonsByEntry = <TripHistoryEntry, List<DrivingLesson>>{
+    for (final entry in entries) entry: _lessonsFor(entry, l, registry),
+  };
+  final anyLessons = lessonsByEntry.values.any((v) => v.isNotEmpty);
   builder.element(
     'gpx',
-    attributes: <String, String>{
-      'version': '1.1',
-      'creator': creatorAttr,
-      'xmlns': 'http://www.topografix.com/GPX/1/1',
-      'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-      'xsi:schemaLocation':
-          'http://www.topografix.com/GPX/1/1 '
-              'http://www.topografix.com/GPX/1/1/gpx.xsd',
-    },
+    attributes: _gpxRootAttributes(creatorAttr, includeLessonsNs: anyLessons),
     nest: () {
       builder.element('metadata', nest: () {
         builder.element('name', nest: () {
@@ -110,6 +190,10 @@ String buildAggregateGpxXml(
           builder.element('name', nest: () {
             builder.text(_trackName(entry));
           });
+          _appendLessonsExtensions(
+            builder,
+            lessonsByEntry[entry] ?? const [],
+          );
           builder.element('trkseg', nest: () {
             for (final s in entry.samples) {
               final lat = s.latitude;

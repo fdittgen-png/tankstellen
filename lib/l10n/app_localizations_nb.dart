@@ -4029,6 +4029,22 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Slå av motoren ved lange stopp i stedet for å la den gå på tomgang.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Gir opp tidligere for å holde motoren utenfor det høye turtallsområdet.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Gi mykt gass — jevn akselerasjon bruker mindre drivstoff.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Gir opp tidligere slik at motoren legger seg på et lavere og mer økonomisk turtall.';
+
+  @override
   String get drivingScoreCardTitle => 'Kjørescore';
 
   @override

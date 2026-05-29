@@ -4075,6 +4075,22 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Coupez le moteur lors des arrêts prolongés au lieu de le laisser tourner au ralenti.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Passez les rapports plus tôt pour garder le moteur hors de la plage de régime élevé.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Accélérez en douceur : une accélération progressive consomme moins de carburant.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Passez la vitesse supérieure plus tôt pour que le moteur tourne à un régime plus bas et plus économique.';
+
+  @override
   String get drivingScoreCardTitle => 'Score de conduite';
 
   @override

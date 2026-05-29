@@ -4061,6 +4061,22 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Opriți motorul la opririle lungi în loc să-l lăsați la ralanti.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Schimbați mai devreme într-o treaptă superioară pentru a menține motorul în afara zonei de turații înalte.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Apăsați lin pedala de accelerație — o accelerare uniformă consumă mai puțin combustibil.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Schimbați mai devreme într-o treaptă superioară pentru ca motorul să funcționeze la turații mai mici și mai economice.';
+
+  @override
   String get drivingScoreCardTitle => 'Scor de condus';
 
   @override

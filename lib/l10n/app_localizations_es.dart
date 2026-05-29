@@ -4061,6 +4061,22 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Apaga el motor en las paradas largas en lugar de dejarlo al ralentí.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Cambia antes a una marcha más larga para mantener el motor fuera de la banda de altas revoluciones.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Acelera suavemente: una aceleración progresiva consume menos combustible.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Sube de marcha antes para que el motor gire a menos revoluciones y consuma menos.';
+
+  @override
   String get drivingScoreCardTitle => 'Puntuación de conducción';
 
   @override

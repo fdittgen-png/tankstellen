@@ -4012,6 +4012,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Turn the engine off at long stops instead of letting it idle.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Shift up earlier to keep the engine out of the high-RPM band.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Ease onto the throttle — smooth acceleration uses less fuel.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Shift up sooner so the engine settles into a lower, more efficient gear.';
+
+  @override
   String get drivingScoreCardTitle => 'Driving score';
 
   @override
@@ -9704,6 +9720,22 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String insightLowGear(String minutes) {
     return '⟦Łáƀóúřîñǧ îñ łóŵ ǧéář ($minutes ɱîñ) ·········⟧';
   }
+
+  @override
+  String get lessonAdviceIdling =>
+      '⟦Ŧúřñ ŧĥé éñǧîñé óƒƒ áŧ łóñǧ šŧóƥš îñšŧéáđ óƒ łéŧŧîñǧ îŧ îđłé. ······················⟧';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      '⟦Šĥîƒŧ úƥ éářłîéř ŧó ķééƥ ŧĥé éñǧîñé óúŧ óƒ ŧĥé ĥîǧĥ-ŘƤṀ ƀáñđ. ······················⟧';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      '⟦Éášé óñŧó ŧĥé ŧĥřóŧŧłé — šɱóóŧĥ áççéłéřáŧîóñ úšéš łéšš ƒúéł. ······················⟧';
+
+  @override
+  String get lessonAdviceLowGear =>
+      '⟦Šĥîƒŧ úƥ šóóñéř šó ŧĥé éñǧîñé šéŧŧłéš îñŧó á łóŵéř, ɱóřé éƒƒîçîéñŧ ǧéář. ··························⟧';
 
   @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';

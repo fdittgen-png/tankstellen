@@ -121,7 +121,7 @@ class TrajetsMapScreen extends ConsumerWidget {
   ) async {
     final messenger = ScaffoldMessenger.maybeOf(context);
     final scheme = Theme.of(context).colorScheme;
-    final gpx = buildAggregateGpxXml(trips);
+    final gpx = buildAggregateGpxXml(trips, l: l);
     final bytes = Uint8List.fromList(utf8.encode(gpx));
     final fileName = trips.length == 1
         ? gpxFileNameFor(trips.first)

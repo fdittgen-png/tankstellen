@@ -4068,6 +4068,22 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Σβήνετε τον κινητήρα στις μεγάλες στάσεις αντί να τον αφήνετε στο ρελαντί.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση για να κρατάτε τον κινητήρα εκτός της ζώνης υψηλών στροφών.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Πατάτε απαλά το γκάζι — η ομαλή επιτάχυνση καταναλώνει λιγότερο καύσιμο.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση ώστε ο κινητήρας να σταθεροποιείται σε χαμηλότερες, πιο οικονομικές στροφές.';
+
+  @override
   String get drivingScoreCardTitle => 'Βαθμολογία οδήγησης';
 
   @override

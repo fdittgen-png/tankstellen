@@ -4065,6 +4065,22 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Изключвайте двигателя при дълги престои, вместо да го оставяте на празен ход.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Превключвайте по-рано нагоре, за да държите двигателя извън зоната на високите обороти.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Натискайте газта плавно — равномерното ускоряване изразходва по-малко гориво.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Превключвайте нагоре по-рано, за да влезе двигателят в по-нисък и по-икономичен режим.';
+
+  @override
   String get drivingScoreCardTitle => 'Резултат за шофиране';
 
   @override

@@ -4051,6 +4051,22 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Spegni il motore durante le soste lunghe invece di lasciarlo al minimo.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Cambia marcia prima per tenere il motore fuori dalla fascia degli alti regimi.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Accelera con dolcezza: un\'accelerazione graduale consuma meno carburante.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Sali di marcia prima così il motore si assesta a regimi più bassi e più efficienti.';
+
+  @override
   String get drivingScoreCardTitle => 'Punteggio di guida';
 
   @override

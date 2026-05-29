@@ -4062,6 +4062,22 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Desligue o motor em paragens longas em vez de o deixar ao ralenti.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Mude de mudança mais cedo para manter o motor fora da faixa de rotações altas.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Acelere suavemente — uma aceleração gradual gasta menos combustível.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Suba de mudança mais cedo para que o motor fique em rotações mais baixas e económicas.';
+
+  @override
   String get drivingScoreCardTitle => 'Pontuação de condução';
 
   @override

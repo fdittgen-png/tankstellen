@@ -4054,6 +4054,22 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String get lessonAdviceIdling =>
+      'Ilgų sustojimų metu išjunkite variklį, užuot palikę jį veikti tuščiąja eiga.';
+
+  @override
+  String get lessonAdviceHighRpm =>
+      'Anksčiau perjunkite aukštesnę pavarą, kad variklis liktų ne aukštų apsukų zonoje.';
+
+  @override
+  String get lessonAdviceHardAccel =>
+      'Spauskite akceleratorių tolygiai — sklandus įsibėgėjimas naudoja mažiau degalų.';
+
+  @override
+  String get lessonAdviceLowGear =>
+      'Perjunkite aukštesnę pavarą anksčiau, kad variklis suktųsi mažesnėmis ir ekonomiškesnėmis apsukomis.';
+
+  @override
   String get drivingScoreCardTitle => 'Vairavimo balas';
 
   @override
