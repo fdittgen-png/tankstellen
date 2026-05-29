@@ -176,5 +176,62 @@ void main() {
         expect(BrandRegistry.canonicalize('API'), 'IP');
       });
     });
+
+    // #2186 — single-source-of-truth substring scan that replaces the
+    // hand-rolled keyword tables in the receipt detector and FR parser.
+    group('canonicalFromText', () {
+      test('returns null for empty text', () {
+        expect(BrandRegistry.canonicalFromText(''), isNull);
+      });
+
+      test('returns null when no brand keyword is present', () {
+        expect(
+          BrandRegistry.canonicalFromText('garage du coin, rue de la paix'),
+          isNull,
+        );
+      });
+
+      test('finds a brand embedded in surrounding text', () {
+        expect(
+          BrandRegistry.canonicalFromText('TOTALENERGIES station service'),
+          'TotalEnergies',
+        );
+        expect(
+          BrandRegistry.canonicalFromText('bienvenue chez Shell autoroute'),
+          'Shell',
+        );
+        expect(
+          BrandRegistry.canonicalFromText('AUCHAN CENTRE COMMERCIAL'),
+          'Auchan',
+        );
+      });
+
+      test('is case-insensitive', () {
+        expect(BrandRegistry.canonicalFromText('aral autobahn'), 'Aral');
+        expect(BrandRegistry.canonicalFromText('CARREFOUR MARKET'), 'Carrefour');
+      });
+
+      // Rebrand cases the issue (#2186) explicitly calls out — these are
+      // the drift hot-spots when a brand is renamed across countries.
+      test('folds rebranded aliases to the canonical name', () {
+        expect(BrandRegistry.canonicalFromText('Star Tankstelle'), 'Orlen');
+        expect(BrandRegistry.canonicalFromText('Caltex highway'), 'Ampol');
+        expect(
+          BrandRegistry.canonicalFromText('Total Access péage A7'),
+          'TotalEnergies',
+        );
+        expect(BrandRegistry.canonicalFromText('Moeve estación'), 'Cepsa');
+      });
+
+      test('agrees with canonicalize for a clean brand string', () {
+        for (final brand in ['Shell', 'Repsol', 'Aral', 'Carrefour', 'YPF']) {
+          expect(
+            BrandRegistry.canonicalFromText(brand),
+            BrandRegistry.canonicalize(brand),
+            reason: 'text scan should match canonicalize for "$brand"',
+          );
+        }
+      });
+    });
   });
 }

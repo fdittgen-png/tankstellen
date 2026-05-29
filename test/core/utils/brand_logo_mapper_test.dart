@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/utils/brand_logo_mapper.dart';
+import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
 
 void main() {
   group('BrandLogoMapper', () {
@@ -84,6 +85,33 @@ void main() {
 
       test('returns false for empty string', () {
         expect(BrandLogoMapper.hasLogo(''), isFalse);
+      });
+    });
+
+    // #2186 — drift guard. Every brand key the logo mapper owns a domain
+    // for must be a known BrandRegistry canonical name or alias, so the
+    // two vocabularies can never silently disagree (the original audit
+    // found `star` listed here after Star was folded into Orlen).
+    group('registry drift guard', () {
+      test('every logo key is a known BrandRegistry canonical or alias', () {
+        final knownLower = <String>{};
+        for (final entry in BrandRegistry.brandAliases.entries) {
+          knownLower.add(entry.key.toLowerCase());
+          for (final alias in entry.value) {
+            knownLower.add(alias.toLowerCase());
+          }
+        }
+
+        final orphans = BrandLogoMapper.knownBrandKeys
+            .where((k) => !knownLower.contains(k.toLowerCase()))
+            .toList();
+
+        expect(
+          orphans,
+          isEmpty,
+          reason: 'logo domains exist for keys absent from BrandRegistry '
+              '(would drift on a rebrand): $orphans',
+        );
       });
     });
   });
