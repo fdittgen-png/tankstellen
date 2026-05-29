@@ -11,6 +11,20 @@ import '../persistent_dataset.dart';
 mixin CachedDatasetMixin {
   DateTime? _datasetCachedAt;
 
+  /// #2313 — the single in-flight network fetch, shared by all concurrent
+  /// callers. Without it, two searches that arrive while the cache is cold
+  /// (or soft-stale) each `await fetch()` independently and both download the
+  /// full national dataset — wasted bandwidth on a large CSV. We dedupe by
+  /// storing the running future and handing it to every concurrent caller,
+  /// clearing the slot on completion so the next (later) call refetches.
+  ///
+  /// The shared future closes over the *first* caller's `CancelToken` (the
+  /// fetch closure is built by that caller). A second caller's token therefore
+  /// does not cancel the shared future — it only ever awaits it. Stored as
+  /// `Future<dynamic>` because one mixin host has a single dataset type `T`
+  /// per call site; the public wrappers cast it back.
+  Future<dynamic>? _pendingLoad;
+
   /// Whether the in-memory dataset is still fresh.
   bool isDatasetFresh(Duration ttl) =>
       _datasetCachedAt != null &&
@@ -39,10 +53,28 @@ mixin CachedDatasetMixin {
     required void Function(T value) store,
   }) async {
     if (cached != null && isDatasetFresh(ttl)) return cached;
-    final value = await fetch();
+    // #2313 — dedupe concurrent downloads so two simultaneous cold searches
+    // issue one fetch, not two.
+    final value = await _dedupedFetch<T>(fetch);
     store(value);
     markDatasetRefreshed();
     return value;
+  }
+
+  /// Runs [fetch], collapsing concurrent calls onto a single in-flight future
+  /// (#2313). The first caller starts the fetch; later callers that arrive
+  /// while it is still running await the same future. The slot is cleared once
+  /// the fetch settles (success or failure) so a subsequent call refetches.
+  Future<T> _dedupedFetch<T>(Future<T> Function() fetch) {
+    final inFlight = _pendingLoad;
+    if (inFlight != null) return inFlight.then((v) => v as T);
+    final started = fetch();
+    _pendingLoad = started;
+    return started.whenComplete(() {
+      // Only clear if it's still our future (a later refetch may have
+      // replaced it).
+      if (identical(_pendingLoad, started)) _pendingLoad = null;
+    });
   }
 
   /// Persistence-aware variant of [loadDataset] (#2264). Adds a disk
@@ -81,7 +113,12 @@ mixin CachedDatasetMixin {
     }
 
     try {
-      final value = await fetch();
+      // #2313 — dedupe concurrent downloads (one fetch for N simultaneous
+      // cold/soft-stale searches). The disk write below runs only for the
+      // caller that actually performed the fetch; piggy-backing callers skip
+      // it (they get the same value back), which is harmless — the dataset is
+      // identical and already persisted by the leader.
+      final value = await _dedupedFetch<T>(fetch);
       store(value);
       markDatasetRefreshed();
       await persistent.write(value, hardTtl: hardTtl);
