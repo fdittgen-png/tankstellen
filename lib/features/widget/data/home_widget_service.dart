@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'dart:convert';
 import 'dart:io' show Platform;
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
@@ -14,6 +13,7 @@ import '../../../core/country/country_config.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_keys.dart';
+import '../../../core/utils/geo_utils.dart' as geo;
 import '../../profile/data/models/user_profile.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import 'home_widget_json.dart';
@@ -473,29 +473,17 @@ class HomeWidgetService {
 
   /// Haversine formula to calculate distance in km between two GPS points.
   ///
-  /// Public for testing.
+  /// Public for testing. #2169 — delegates to the canonical
+  /// geo_utils.distanceKm (same 6371 km radius) instead of a hand-rolled
+  /// haversine copy.
   @visibleForTesting
   static double haversineDistanceKm(
     double lat1,
     double lon1,
     double lat2,
     double lon2,
-  ) {
-    const earthRadiusKm = 6371.0;
-    final dLat = _degreesToRadians(lat2 - lat1);
-    final dLon = _degreesToRadians(lon2 - lon1);
-
-    final a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_degreesToRadians(lat1)) *
-            cos(_degreesToRadians(lat2)) *
-            sin(dLon / 2) *
-            sin(dLon / 2);
-    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return earthRadiusKm * c;
-  }
-
-  static double _degreesToRadians(double degrees) => degrees * pi / 180;
+  ) =>
+      geo.distanceKm(lat1, lon1, lat2, lon2);
 
   static double? _toDouble(dynamic value) {
     if (value is double) return value;
