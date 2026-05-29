@@ -632,6 +632,14 @@ class _UnusedBluetoothFacade implements BluetoothFacade {
   ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile) {
     throw UnimplementedError();
   }
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+  }) {
+    throw UnimplementedError();
+  }
 }
 
 class _NoOpRecorder implements TraceRecorder {

@@ -304,6 +304,17 @@ class _UnusedBluetoothFacade implements BluetoothFacade {
       'tests — connectBest is overridden directly.',
     );
   }
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+  }) {
+    throw UnimplementedError(
+      'BluetoothFacade.channelForDirect is not used by '
+      'Obd2VinReaderService tests.',
+    );
+  }
 }
 
 /// Test transport that returns a fixed response for one specific

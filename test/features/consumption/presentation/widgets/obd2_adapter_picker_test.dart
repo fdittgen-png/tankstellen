@@ -346,6 +346,13 @@ class _StreamingFacade implements BluetoothFacade {
     Obd2AdapterProfile profile,
   ) =>
       _SilentChannel();
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+  }) =>
+      _SilentChannel();
 }
 
 /// Silent channel — never answers, so the transport's init sequence

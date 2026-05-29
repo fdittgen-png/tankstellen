@@ -35,6 +35,21 @@ abstract class BluetoothFacade {
   /// the given [profile] UUIDs. The returned channel is un-opened;
   /// the transport layer calls `open()` to run the GATT dance.
   ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile);
+
+  /// Build a byte channel straight from a known [mac] with NO scan
+  /// (#2242). Used by the direct-connect reconnect / pre-warm path:
+  /// `BluetoothDevice.fromId(mac)` addresses the adapter without first
+  /// re-discovering it over the air, which is essential for clones that
+  /// stop advertising in standby. No scan means no resolved profile, so
+  /// the generic FFF0 Nordic-UART UUIDs are used — the dominant ELM327
+  /// clone family. The returned channel's `open()` applies a bounded
+  /// connect timeout and tears down any stale GATT client first
+  /// (Android returns GATT_ERROR 133 otherwise). The channel is
+  /// un-opened; the caller runs `open()`.
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout,
+  });
 }
 
 /// Production façade — the only place in the codebase that directly
@@ -154,6 +169,25 @@ class PluginBluetoothFacade implements BluetoothFacade {
         writeChar: Guid(profile.writeCharUuid),
         notifyChar: Guid(profile.notifyCharUuid),
       ),
+    );
+  }
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+  }) {
+    // No scan ⇒ no resolved profile. The FFF0 Nordic-UART family
+    // (Elm327BleUuids.vgate, = the generic-fff0 profile UUIDs) is the
+    // dominant ELM327 BLE clone, so it is the safe default for a
+    // direct-by-MAC connect. The 4 s connectTimeout is LOAD-BEARING:
+    // FBP `autoConnect:false` can otherwise block ~35 s on a sleeping
+    // adapter (#2242).
+    final device = BluetoothDevice.fromId(mac);
+    return FlutterBluePlusElmChannel(
+      device,
+      uuids: Elm327BleUuids.vgate,
+      connectTimeout: connectTimeout,
     );
   }
 }
