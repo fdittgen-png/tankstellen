@@ -22,21 +22,23 @@ void main() {
     });
   });
 
-  group('Countries.verified (#1828)', () {
-    test('contains exactly the 13 verified-endpoint countries', () {
-      expect(Countries.verified.length, equals(13));
+  group('Countries.verified (#1828, #2264)', () {
+    test('contains exactly the 12 verified-endpoint countries', () {
+      expect(Countries.verified.length, equals(12));
       expect(
         Countries.verified.map((c) => c.code).toSet(),
         equals({
-          'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU',
+          'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB',
           'MX', 'LU', 'SI',
         }),
       );
     });
 
-    test('excludes the 4 unverified-endpoint countries', () {
+    test('excludes the 5 unverified-endpoint countries', () {
       final codes = Countries.verified.map((c) => c.code).toSet();
-      for (final gated in ['KR', 'CL', 'GR', 'RO']) {
+      // #2264 — AU joins the gated set: its service is a throwing stub
+      // (#804), so it can only ever error and must leave the picker.
+      for (final gated in ['KR', 'CL', 'GR', 'RO', 'AU']) {
         expect(codes, isNot(contains(gated)),
             reason: '$gated has an unverified endpoint — must be gated');
       }
@@ -48,12 +50,13 @@ void main() {
       expect(Countries.slovenia.verified, isTrue);
     });
 
-    test('KR / CL / GR / RO are flagged unverified', () {
+    test('KR / CL / GR / RO / AU are flagged unverified', () {
       for (final c in [
         Countries.southKorea,
         Countries.chile,
         Countries.greece,
         Countries.romania,
+        Countries.australia,
       ]) {
         expect(c.verified, isFalse, reason: '${c.code} must be gated');
       }
