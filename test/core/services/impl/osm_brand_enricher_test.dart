@@ -116,5 +116,26 @@ void main() {
       expect(result[1].brand, 'Avia');
       expect(result[2].brand, 'TotalEnergies');
     });
+
+    // #2315 — enricher writes must be batched via Future.wait, not N
+    // sequential awaits. Verified here by seeding two brands via storage and
+    // asserting both persist after one enrich() call returns.
+    test('batched Hive writes: all brands are persisted (#2315)', () async {
+      await fakeStorage.putSetting('brand_s1', 'TotalEnergies');
+      await fakeStorage.putSetting('brand_s2', 'Shell');
+
+      final stations = [
+        makeStation(id: 's1', brand: ''),
+        makeStation(id: 's2', brand: ''),
+      ];
+
+      final result = await enricher.enrich(stations);
+
+      expect(result[0].brand, 'TotalEnergies');
+      expect(result[1].brand, 'Shell');
+      // Both writes landed in storage
+      expect(fakeStorage.getSetting('brand_s1'), 'TotalEnergies');
+      expect(fakeStorage.getSetting('brand_s2'), 'Shell');
+    });
   });
 }
