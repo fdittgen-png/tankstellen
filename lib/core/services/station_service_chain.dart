@@ -10,6 +10,7 @@ import '../../features/search/data/models/search_params.dart';
 import '../../features/search/domain/entities/station.dart';
 import '../cache/cache_manager.dart';
 import '../error/exceptions.dart';
+import '../logging/error_logger.dart';
 import 'fuel_service_policy.dart';
 import 'service_result.dart';
 import 'station_service.dart';
@@ -165,7 +166,14 @@ class StationServiceChain implements StationService {
         source: result.source,
       );
       return result;
-    } on Exception catch (e, st) { // ignore: unused_catch_stack
+    } on Exception catch (e, st) {
+      // #2296 — log the API-failure path (stack was previously discarded)
+      // so a sustained upstream outage leaves a breadcrumb. Non-fatal.
+      unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+        'where': 'StationServiceChain.apiCall',
+        'country': countryCode,
+        'key': cacheKey,
+      }));
       errors.add(ServiceError(
         source: _errorSource,
         message: e.toString(),
@@ -222,20 +230,15 @@ class StationServiceChain implements StationService {
       return await apiCall();
     } on ApiException catch (e, st) {
       if (!_isTransient(e)) rethrow;
-      // Single retry — log to the dev console so debug builds surface
-      // the recovered call (production has no listener attached). The
-      // stack trace is included to satisfy the
-      // `catch_block_stacktrace_coverage` lint (#1103) and to help a
-      // future bug report identify which upstream code path triggered
-      // the retry without re-running under a debugger.
+      // Single retry — dev-console only (no production listener). Stack
+      // included to satisfy `catch_block_stacktrace_coverage` (#1103).
       debugPrint(
         'StationServiceChain: retrying after transient error '
         '(status=${e.statusCode}, kind=${_effectiveKind(e).name})\n$st',
       );
-      // Honour an upstream-suggested Retry-After when present (#2255) but cap
-      // it at [transientRetryDelay] so a long server hint never stretches the
-      // user-visible latency of the in-chain retry — sustained rate-limits
-      // fall through to stale cache instead.
+      // Honour an upstream Retry-After (#2255) but cap it at
+      // [transientRetryDelay] so a long server hint never stretches the
+      // in-chain retry latency — sustained rate-limits fall through to cache.
       final delay = e.retryAfter != null && e.retryAfter! < transientRetryDelay
           ? e.retryAfter!
           : transientRetryDelay;

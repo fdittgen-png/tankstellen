@@ -12,6 +12,8 @@ import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
+import '../../helpers/silence_error_logger.dart';
+
 /// Throws a scripted sequence, then succeeds.
 class _ScriptedService implements StationService {
   _ScriptedService({required this.script, this.stations = const []});
@@ -78,6 +80,7 @@ const _station = Station(
 );
 
 void main() {
+  silenceErrorLoggerSpool();
   setUp(() {
     StationServiceChain.transientRetryDelay = const Duration(milliseconds: 1);
   });

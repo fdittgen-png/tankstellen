@@ -23,7 +23,13 @@ List<Station>? deserializeStationList(Map<String, dynamic> data) {
     return list
         .map((j) => Station.fromJson(Map<String, dynamic>.from(j as Map)))
         .toList();
-  } on FormatException catch (e, st) {
+    // #2296 — catch Object, not just FormatException: a `j as Map` cast on
+    // a corrupted or older-schema Hive entry throws a TypeError (an Error,
+    // not an Exception), which would otherwise escape the catch, propagate
+    // through _executeChain (no surrounding try/catch at the call sites) and
+    // crash the UI — bypassing the stale-cache fallback. Treat any corrupt
+    // entry as a cache miss (return null) + log.
+  } on Object catch (e, st) {
     unawaited(errorLogger.log(ErrorLayer.other, e, st,
         context: const {'where': 'Cache: station list parse failed'}));
     return null;
@@ -53,7 +59,11 @@ StationDetail? deserializeStationDetail(Map<String, dynamic> data) {
       wholeDay: data['wholeDay'] as bool? ?? false,
       state: data['state'] as String?,
     );
-  } on FormatException catch (e, st) {
+    // #2296 — catch Object (TypeError from a bad cast on a corrupt /
+    // older-schema entry is an Error, not an Exception) so a corrupt cache
+    // entry is treated as a miss, not a UI crash that bypasses the
+    // stale-cache fallback.
+  } on Object catch (e, st) {
     unawaited(errorLogger.log(ErrorLayer.other, e, st,
         context: const {'where': 'Cache: station detail parse failed'}));
     return null;
@@ -72,7 +82,11 @@ Map<String, StationPrices>? deserializePrices(Map<String, dynamic> data) {
       (k, v) =>
           MapEntry(k, StationPrices.fromJson(Map<String, dynamic>.from(v as Map))),
     );
-  } on FormatException catch (e, st) {
+    // #2296 — catch Object (a `v as Map` cast on a corrupt / older-schema
+    // entry throws a TypeError, an Error not an Exception) so the corrupt
+    // entry becomes a cache miss instead of crashing the UI past the
+    // stale-cache fallback.
+  } on Object catch (e, st) {
     unawaited(errorLogger.log(ErrorLayer.other, e, st,
         context: const {'where': 'Cache: prices parse failed'}));
     return null;
