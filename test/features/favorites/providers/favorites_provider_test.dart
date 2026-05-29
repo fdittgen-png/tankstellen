@@ -219,7 +219,7 @@ void main() {
       container.read(favoritesProvider);
 
       var notifyCount = 0;
-      final sub = container.listen(favoritesProvider, (_, __) => notifyCount++);
+      final sub = container.listen(favoritesProvider, (prev, next) => notifyCount++);
       addTearDown(sub.close);
 
       await container.read(favoritesProvider.notifier).add('fuel-1');
