@@ -5221,6 +5221,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get splashLoadingLabel => 'Chargement de Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Problème de stockage';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo n\'a pas pu ouvrir son stockage de données local. Le fichier de stockage semble endommagé.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Pour récupérer, videz le stockage de l\'application dans les réglages de l\'appareil ou réinstallez l\'application. Vos favoris et votre historique sont enregistrés uniquement sur cet appareil et ne peuvent pas être restaurés automatiquement.';
+
+  @override
   String get tankLevelTitle => 'Niveau du réservoir';
 
   @override

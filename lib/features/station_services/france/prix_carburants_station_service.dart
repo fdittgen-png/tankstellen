@@ -224,28 +224,62 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     List<String> ids,
   ) async {
     final prices = <String, StationPrices>{};
-    for (final id in ids.take(10)) {
-      // #753 — same strip-and-restore pattern as `getStationDetail`: the
-      // upstream id is bare numeric, but the result map is keyed by the
-      // caller's original id shape so favorites/alerts that store the
-      // canonical `fr-<id>` form get matching keys back.
+    final batch = ids.take(10).toList();
+    if (batch.isEmpty) {
+      return ServiceResult(
+        data: prices,
+        source: ServiceSource.prixCarburantsApi,
+        fetchedAt: DateTime.now(),
+      );
+    }
+
+    // #2301 — the previous implementation issued one serial `id=<n>` GET per
+    // favorite (up to 10), turning a favorites refresh into up to ~150 s
+    // worst case. Collapse the fan-out into a single OR-batched ODSQL query
+    // (`id=1 OR id=2 OR …`, limit 10) so the refresh costs one round-trip.
+    //
+    // #753 — the upstream id is bare numeric; favorites/alerts store the
+    // canonical `fr-<id>` form. We strip the prefix for the query, then map
+    // each returned record back to the caller's original id via its own `id`
+    // field — never by response position — so a missing/reordered record can
+    // never assign prices to the wrong station (per-station isolation).
+    final originalForUpstream = <String, String>{};
+    final whereClauses = <String>[];
+    for (final id in batch) {
       final upstreamId = id.startsWith('fr-') ? id.substring(3) : id;
-      try {
-        final response = await _dio.get(_baseUrl, queryParameters: {
-          'where': 'id=$upstreamId',
-          'limit': 1,
-        });
-        final results = parser.extractPrixCarburantsResults(response.data);
-        if (results.isNotEmpty) {
-          final r = results[0];
-          prices[id] = StationPrices(
-            e5: _toDouble(r['sp95_prix']),
-            e10: _toDouble(r['e10_prix']),
-            diesel: _toDouble(r['gazole_prix']),
-            status: 'open',
-          );
-        }
-      } on DioException catch (e, st) { unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants detail fetch failed'})); }
+      if (upstreamId.isEmpty) continue;
+      originalForUpstream[upstreamId] = id;
+      whereClauses.add('id=$upstreamId');
+    }
+
+    if (whereClauses.isEmpty) {
+      return ServiceResult(
+        data: prices,
+        source: ServiceSource.prixCarburantsApi,
+        fetchedAt: DateTime.now(),
+      );
+    }
+
+    try {
+      final response = await _dio.get(_baseUrl, queryParameters: {
+        'where': whereClauses.join(' OR '),
+        'limit': batch.length,
+      });
+      final results = parser.extractPrixCarburantsResults(response.data);
+      for (final r in results) {
+        final recordId = r['id']?.toString() ?? '';
+        final originalId = originalForUpstream[recordId];
+        if (originalId == null) continue; // unrequested / unmatched record
+        prices[originalId] = StationPrices(
+          e5: _toDouble(r['sp95_prix']),
+          e10: _toDouble(r['e10_prix']),
+          diesel: _toDouble(r['gazole_prix']),
+          status: 'open',
+        );
+      }
+    } on DioException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+          context: const {'where': 'Prix-Carburants batch prices fetch failed'}));
     }
     return ServiceResult(
       data: prices,

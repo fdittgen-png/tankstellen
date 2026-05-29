@@ -5163,6 +5163,17 @@ class AppLocalizationsNb extends AppLocalizations {
   String get splashLoadingLabel => 'Laster Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Lagringsproblem';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo kunne ikke åpne sitt lokale datalager. Lagringsfilen ser ut til å være skadet.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'For å gjenopprette må du tømme appens lagring i enhetsinnstillingene eller installere appen på nytt. Favorittene og historikken din lagres bare på denne enheten, så de kan ikke gjenopprettes automatisk.';
+
+  @override
   String get tankLevelTitle => 'Tanknivå';
 
   @override

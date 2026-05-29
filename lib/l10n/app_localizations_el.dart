@@ -5216,6 +5216,17 @@ class AppLocalizationsEl extends AppLocalizations {
   String get splashLoadingLabel => 'Φόρτωση Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Πρόβλημα αποθήκευσης';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Το Sparkilo δεν μπόρεσε να ανοίξει τον τοπικό χώρο αποθήκευσης δεδομένων του. Το αρχείο αποθήκευσης φαίνεται κατεστραμμένο.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Για ανάκτηση, διαγράψτε τον αποθηκευτικό χώρο της εφαρμογής στις ρυθμίσεις της συσκευής ή επανεγκαταστήστε την εφαρμογή. Τα αγαπημένα και το ιστορικό σας αποθηκεύονται μόνο σε αυτήν τη συσκευή και δεν μπορούν να ανακτηθούν αυτόματα.';
+
+  @override
   String get tankLevelTitle => 'Στάθμη ντεπόζιτου';
 
   @override

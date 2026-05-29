@@ -141,5 +141,58 @@ void main() {
       expect(c.read(countrySwitchEventProvider)!.action,
           CountrySwitchAction.noProfile);
     });
+
+    test('recomputes immediately when a matching profile is created while '
+        'abroad — watch, not read (#2313)', () {
+      // Backing store the overridden allProfilesProvider WATCHES, so a change
+      // here must invalidate countrySwitchEvent without a new GPS fix.
+      final c = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(fakeStorage),
+        detectedCountryProvider
+            .overrideWith(() => _FixedDetectedCountry('DE')),
+        activeCountryProvider
+            .overrideWith(() => _FixedActiveCountry(Countries.france)),
+        profilesStoreProvider.overrideWith(_MutableProfiles.new),
+        allProfilesProvider
+            .overrideWith((ref) => ref.watch(profilesStoreProvider)),
+      ]);
+      addTearDown(c.dispose);
+
+      // Keep the provider alive so it recomputes on dependency change.
+      final sub = c.listen(countrySwitchEventProvider, (_, _) {});
+      addTearDown(sub.close);
+
+      // Abroad in DE with only a FR profile → no DE profile yet.
+      expect(c.read(countrySwitchEventProvider)!.action,
+          CountrySwitchAction.noProfile);
+
+      // User creates a DE profile while still abroad — no GPS change.
+      c.read(profilesStoreProvider.notifier).set(const [
+        _frenchProfile,
+        _germanProfile,
+      ]);
+
+      // The switch event must recompute right away (watch, not read).
+      final ev = c.read(countrySwitchEventProvider);
+      expect(ev!.action, CountrySwitchAction.suggest,
+          reason: 'creating a matching profile must re-fire the switch prompt '
+              'immediately (#2313)');
+      expect(ev.matchingProfile?.id, 'p-de');
+    });
   });
+}
+
+/// Mutable profile store the test drives to simulate the user creating a
+/// profile while abroad. Replaces the Riverpod-2 `StateProvider` (moved to
+/// `legacy.dart` in Riverpod 3) with a plain [Notifier].
+final profilesStoreProvider =
+    NotifierProvider<_MutableProfiles, List<UserProfile>>(
+  _MutableProfiles.new,
+);
+
+class _MutableProfiles extends Notifier<List<UserProfile>> {
+  @override
+  List<UserProfile> build() => const [_frenchProfile];
+
+  void set(List<UserProfile> profiles) => state = profiles;
 }

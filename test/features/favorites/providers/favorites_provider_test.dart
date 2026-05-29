@@ -208,6 +208,28 @@ void main() {
       expect(fakeStorage.getFavoriteStationData(testStation.id),
           testStation.toJson());
     });
+
+    // #2314 — fuel-station add() must trigger exactly one widget refresh
+    // (the early-emit _reload() before the sync round-trip). The
+    // second, trailing _reload() was removed because sync never mutates
+    // local storage, so it caused extra widget IO with no state change.
+    test('add() fuel station triggers exactly one state notification (#2314)',
+        () async {
+      container = createContainer();
+      container.read(favoritesProvider);
+
+      var notifyCount = 0;
+      final sub = container.listen(favoritesProvider, (prev, next) => notifyCount++);
+      addTearDown(sub.close);
+
+      await container.read(favoritesProvider.notifier).add('fuel-1');
+
+      // Exactly one notification from the early _reload(); sync is
+      // fire-and-forget on the fake (no Supabase) so no extra call.
+      expect(notifyCount, 1,
+          reason: 'Fuel add must emit state exactly once — the early _reload()');
+      expect(container.read(favoritesProvider), contains('fuel-1'));
+    });
   });
 
   group('isFavoriteProvider', () {

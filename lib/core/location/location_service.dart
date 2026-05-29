@@ -21,8 +21,10 @@ class LocationService {
   Future<Position> getCurrentPosition() async {
     final bool serviceEnabled = await _geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      // English diagnostic per exceptions.dart contract (#2316).
+      // User-facing text is handled by ErrorLocalizer → ARB.
       throw const LocationException(
-        message: 'Standortdienste sind deaktiviert.',
+        message: 'Location services are disabled.',
       );
     }
 
@@ -30,17 +32,16 @@ class LocationService {
     if (permission == LocationPermission.denied) {
       permission = await _geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        // English diagnostic per exceptions.dart contract (#2316).
         throw const LocationException(
-          message: 'Standortberechtigung wurde verweigert.',
+          message: 'Location permission denied.',
         );
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       throw const LocationException(
-        message:
-            'Location permission permanently denied. '
-            'Please enable it in Settings.',
+        message: 'Location permission permanently denied.',
       );
     }
 

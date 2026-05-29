@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Püsiv suur kiirus ({pctTime}% sõidust)",
   "lessonAdviceHighSpeedBand": "Üle 110 km/h võta gaasi maha – õhutakistus kasvab järsult, veidi aeglasemalt säästab palju kütust.",
   "lessonSmoothDrivingTitle": "Sujuv sõit – tubli töö!",
-  "lessonAdviceSmoothDriving": "Sellel sõidul polnud järsku kiirendamist ega pidurdamist – ühtlane sõit hoiab kulu madalal."
+  "lessonAdviceSmoothDriving": "Sellel sõidul polnud järsku kiirendamist ega pidurdamist – ühtlane sõit hoiab kulu madalal.",
+  "storageRecoveryTitle": "Salvestusprobleem",
+  "storageRecoveryMessage": "Sparkilo ei suutnud avada oma kohalikku andmehoidlat. Salvestusfail näib olevat kahjustatud.",
+  "storageRecoveryGuidance": "Taastamiseks tühjenda rakenduse salvestusruum seadme seadetes või installi rakendus uuesti. Sinu lemmikud ja ajalugu salvestatakse ainult selles seadmes, mistõttu neid ei saa automaatselt taastada."
 }

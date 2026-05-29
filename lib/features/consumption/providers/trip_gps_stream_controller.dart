@@ -116,8 +116,8 @@ class TripGpsStreamController {
           // flow that the evaluator itself runs.
           unawaited(_maybeFireGlideCoach(ctl, pos));
         },
-        onError: (Object error) {
-          debugPrint('TripRecording GPS stream error: $error');
+        onError: (Object error, StackTrace st) {
+          unawaited(errorLogger.log(ErrorLayer.providers, error, st, context: const {'where': 'TripRecording GPS stream'}));
         },
       );
     } catch (e, st) {

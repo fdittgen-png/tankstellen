@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../domain/entities/gps_sample_diagnostic.dart';
 import '../../domain/trip_recorder.dart';
 
 /// Seam the `DroppedSessionManager` uses to read and drive the
@@ -73,4 +74,15 @@ abstract class DroppedSessionHost {
   double? get odometerStartKm;
   double? get odometerLatestKm;
   bool get automatic;
+
+  /// The per-tick recording profile captured so far (#2291). The buffer
+  /// is still live in memory when the grace timer fires (it is never
+  /// cleared by the finalise-summary path), so the grace-window
+  /// auto-finalise can persist the same charts a normal stop would.
+  List<TripSample> get capturedSamples;
+
+  /// The per-fix GPS cadence diagnostics captured so far (#2291).
+  /// Persisted alongside [capturedSamples] so a grace-finalised trip
+  /// carries the same diagnostics payload as a normally-stopped one.
+  List<GpsSampleDiagnostic> get capturedGpsSampleDiagnostics;
 }

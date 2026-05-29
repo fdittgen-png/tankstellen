@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'supabase_client.dart';
+import 'trips_sync.dart';
 import '../../core/logging/error_logger.dart';
 
 /// GDPR data-management operations over the user's full server-side
@@ -79,18 +80,53 @@ class UserDataSync {
     }
   }
 
+  /// Every server-side table [deleteAll] must wipe for the GDPR
+  /// right-to-be-forgotten path, paired with the column the user's id
+  /// lives in (most are `user_id`; `price_reports` keys on
+  /// `reporter_id`). `trip_summaries` / `trip_details` are wiped via
+  /// [TripsSync.forgetAllForUser] rather than listed here, so they are
+  /// pinned by the `forgetAllForUser` helper instead.
+  ///
+  /// Kept `@visibleForTesting` and asserted against [fetchAll]'s read
+  /// set so a future table that becomes exportable but not deletable is
+  /// caught — the #2292 regression where trip history, itineraries,
+  /// OBD2 baselines and station ratings survived account deletion.
+  @visibleForTesting
+  static const deletableTables = <String, String>{
+    'favorites': 'user_id',
+    'alerts': 'user_id',
+    'push_tokens': 'user_id',
+    'price_reports': 'reporter_id',
+    'vehicles': 'user_id',
+    'fill_ups': 'user_id',
+    'itineraries': 'user_id',
+    'obd2_baselines': 'user_id',
+    'station_ratings': 'user_id',
+  };
+
   /// Delete every row the user owns across every sync table (GDPR
   /// right-to-be-forgotten). No-op when unauthenticated.
+  ///
+  /// Each table is deleted independently so a transient failure on one
+  /// (e.g. RLS hiccup on a table the user has no rows in) doesn't abort
+  /// the rest of the wipe — the user already confirmed the destructive
+  /// action.
   static Future<void> deleteAll() async {
     final client = TankSyncClient.client;
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
 
-    await client.from('favorites').delete().eq('user_id', userId);
-    await client.from('alerts').delete().eq('user_id', userId);
-    await client.from('push_tokens').delete().eq('user_id', userId);
-    await client.from('price_reports').delete().eq('reporter_id', userId);
-    await client.from('vehicles').delete().eq('user_id', userId);
-    await client.from('fill_ups').delete().eq('user_id', userId);
+    for (final entry in deletableTables.entries) {
+      try {
+        await client.from(entry.key).delete().eq(entry.value, userId);
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.other, e, st,
+            context: {'where': 'UserDataSync.deleteAll FAILED for ${entry.key}'}));
+      }
+    }
+
+    // trip_summaries + trip_details — delegate to the canonical
+    // trip-wipe helper so the column contract stays in one place.
+    await TripsSync.forgetAllForUser();
   }
 }

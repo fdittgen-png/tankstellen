@@ -982,10 +982,15 @@ class TripRecordingController {
       Obd2DebugSessionRecorder.recordData(nowTs, speedKmh: speedKmh, rpm: rpm);
       _sampleBuffer.maybeCapture(sample);
     }
+    // #2304 — build the integrated summary once per tick and reuse it for
+    // the fuel-litres and distance reads below. Computed after the sample
+    // (if any) was fed to the recorder so it reflects this tick. Was two
+    // separate `buildSummary()` calls = two TripSummary allocations per
+    // 4 Hz emit.
+    final summary = _recorder.buildSummary();
     if (fuelRate != null) {
       _fuelRateSeen = true;
-      _fuelLitersSoFar =
-          (_recorder.buildSummary().fuelLitersConsumed) ?? _fuelLitersSoFar;
+      _fuelLitersSoFar = summary.fuelLitersConsumed ?? _fuelLitersSoFar;
     }
     final reading = TripLiveReading(
       speedKmh: speedKmh,
@@ -1000,7 +1005,7 @@ class TripRecordingController {
       engineLoadPercent: engineLoadPercent,
       throttlePercent: throttlePercent,
       coolantTempC: coolantTempC,
-      distanceKmSoFar: _recorder.buildSummary().distanceKm,
+      distanceKmSoFar: summary.distanceKm,
       fuelLitersSoFar: _fuelRateSeen ? _fuelLitersSoFar : null,
       elapsed: nowTs.difference(_startedAt ?? nowTs),
       odometerStartKm: _odometerStartKm,
@@ -1223,4 +1228,11 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
 
   @override
   bool get automatic => _c._automatic;
+
+  @override
+  List<TripSample> get capturedSamples => _c._sampleBuffer.capturedSamples;
+
+  @override
+  List<GpsSampleDiagnostic> get capturedGpsSampleDiagnostics =>
+      _c._sampleBuffer.capturedGpsSampleDiagnostics;
 }

@@ -6,11 +6,13 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/features/station_services/uk/uk_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 /// Fake HTTP adapter that returns a canned response per URL.
 ///
@@ -91,6 +93,11 @@ String _cmaFeed({
 const _searchParams = SearchParams(lat: 51.5, lng: -0.12, radiusKm: 50);
 
 void main() {
+  // #2301 — per-feed DioException failures now route through errorLogger
+  // (release-safe breadcrumb). Hive isn't initialised in tests, so silence
+  // the spool to keep the fire-and-forget log from failing the test.
+  silenceErrorLoggerSpool();
+
   group('UkStationService (public surface)', () {
     test('implements StationService interface', () {
       expect(UkStationService(), isA<StationService>());
@@ -274,6 +281,53 @@ void main() {
       );
       expect(result.data, hasLength(1));
       expect(result.data.first.name, 'London');
+    });
+
+    test('logs per-feed DioException failures (release breadcrumb #2301)',
+        () async {
+      // The previous implementation used debugPrint, which is stripped in
+      // release — with 14 parallel feeds a partial failure left no trace.
+      // Capture spool enqueues to prove the failure is now logged.
+      final logged = <Map<String, dynamic>?>[];
+      errorLogger.spoolEnqueueOverride = ({
+        required String isolateTaskName,
+        required Object error,
+        StackTrace? stack,
+        Map<String, dynamic>? contextMap,
+        DateTime? timestamp,
+      }) async {
+        logged.add(contextMap);
+      };
+      addTearDown(errorLogger.resetForTest);
+
+      const good = 'https://good.example/feed.json';
+      const brokenUrl = 'https://broken.example/feed.json';
+      final dio = _dioWith({
+        good: _cmaFeed(
+          siteId: 'G1',
+          brand: 'Good',
+          name: 'Good Station',
+          lat: 51.5,
+          lng: -0.12,
+        ),
+        brokenUrl: 502, // 502 ≥ 500 → bubbles as a DioException per-feed.
+      });
+      final service = UkStationService(
+        dio: dio,
+        feedUrls: const [good, brokenUrl],
+      );
+
+      final result = await service.searchStations(_searchParams);
+      // Good feed still resolves.
+      expect(result.data, hasLength(1));
+      // The broken feed left a breadcrumb instead of failing silently.
+      expect(logged, isNotEmpty,
+          reason: 'a per-feed DioException must be logged (#2301)');
+      expect(
+        logged.any((c) => c?['where'] == 'UK feed' && c?.containsKey('type') == true),
+        isTrue,
+        reason: 'breadcrumb must carry where=UK feed and the Dio error type',
+      );
     });
   });
 

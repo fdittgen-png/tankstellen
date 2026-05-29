@@ -11,6 +11,7 @@ import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
 import '../helpers/batch_query_helper.dart';
+import 'route_filter_sort_isolate.dart';
 import 'route_geometry.dart';
 
 /// Strategy that prioritizes finding the cheapest stations along the route.
@@ -56,26 +57,16 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
       onPartial: onPartial,
     );
 
-    // Filter by detour distance (more generous for cheapest strategy)
+    // #2303 — detour filter + itinerary sort moved off the UI isolate. Same
+    // generous (1.5×) detour limit and EV-passthrough semantics as before;
+    // fuel stations farther than the limit are dropped, non-fuel results are
+    // kept, and survivors are returned in itinerary order.
     final detourLimit = (maxDetourKm ?? searchRadiusKm) * 1.5;
-    final filtered = <SearchResultItem>[];
-    for (final item in results) {
-      if (item is FuelStationResult) {
-        final minDist = minDistanceToPolyline(
-          item.station.lat, item.station.lng, route.geometry,
-        );
-        if (minDist <= detourLimit) {
-          filtered.add(item);
-        }
-      } else {
-        filtered.add(item);
-      }
-    }
-
-    // Sort by position along route (itinerary order)
-    sortByItineraryOrder(filtered, route.geometry);
-
-    return filtered;
+    return filterAndSortAlongRoute(
+      results: results,
+      polyline: route.geometry,
+      detourLimitKm: detourLimit,
+    );
   }
 
   @override

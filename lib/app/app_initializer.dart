@@ -17,6 +17,7 @@ import '../core/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
 import '../core/feedback/auto_record_badge_provider.dart';
+import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/storage/isolate_error_spool.dart';
 import '../core/telemetry/storage/trace_storage.dart';
 import '../core/telemetry/trace_recorder.dart';
@@ -42,6 +43,7 @@ import '../features/consumption/providers/obd2_debug_logging_provider.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
 import '../features/consumption/providers/trip_ve_recompute_provider.dart';
 import '../features/feature_management/application/legacy_toggle_migration_provider.dart';
+import '../features/price_history/data/repositories/price_history_repository.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
@@ -52,6 +54,7 @@ import '../features/widget/presentation/widget_uri_parser.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'router.dart';
+import 'widgets/storage_recovery_screen.dart';
 
 /// Drives the cold-start sequence in well-defined phases instead of one
 /// monolithic `main()` body. Splitting the work makes failures observable
@@ -95,7 +98,22 @@ class AppInitializer {
     _bootstrap();
     StartupTimer.instance.mark('binding');
 
-    await _initStorage();
+    // #2294 — a Hive box damaged beyond crash recovery throws a
+    // HiveCorruptionException out of the storage phase. Previously it
+    // escaped uncaught — `_initStorage` had no try/catch, `run()`/`main()`
+    // had no Zone handler, and the error handlers are only installed in
+    // `_launch` (after storage) — so the user froze on the splash with no
+    // message and (debugPrint silenced in release) no telemetry. Surface
+    // a localized recovery screen and route the exception through
+    // errorLogger so it lands in the trace pipeline / Sentry. Startup
+    // cannot continue without local storage, so we stop here.
+    try {
+      await _initStorage();
+    } on HiveCorruptionException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st));
+      runApp(const StorageRecoveryHost());
+      return;
+    }
     StartupTimer.instance.mark('storage_ready');
 
     await _initServicesInParallel();
@@ -116,6 +134,12 @@ class AppInitializer {
       // #2264 — bounded eviction (expiry + per-prefix budget + LRU byte
       // ceiling) replaces the one-shot 500-key expiry cap.
       await CacheManager(storage).evictBounded();
+      // #2317 — trim price-history rows past the 30-day retention window
+      // once per cold start. The foreground record path (station detail)
+      // never trims, so without this hook a heavy user accumulates
+      // ~175k dead rows/year; reads already filter to the last 30 days,
+      // so this caps storage growth, not a correctness bug.
+      await PriceHistoryRepository(storage).evictOldRecords();
       await ProfileRepository(storage).migrateProfileCountryLanguage();
     });
 
@@ -893,6 +917,16 @@ class AppInitializer {
 
     StartupTimer.instance.mark('first_frame');
     StartupTimer.instance.finish();
+    // #2320 — surface the cold-start total as a trace breadcrumb so a
+    // startup-latency regression is visible in production error traces
+    // (StartupTimer.finish() otherwise only prints under kDebugMode).
+    // BreadcrumbCollector is already drained into every error trace by
+    // the nav + dio observers, so a single add here puts the figure in
+    // the same ring buffer.
+    final totalMs = StartupTimer.instance.totalMs;
+    if (totalMs != null) {
+      BreadcrumbCollector.add('startup', detail: '${totalMs}ms');
+    }
     runApp(
       UncontrolledProviderScope(
         container: container,

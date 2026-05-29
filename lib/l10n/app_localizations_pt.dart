@@ -5204,6 +5204,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get splashLoadingLabel => 'A carregar Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Problema de armazenamento';
+
+  @override
+  String get storageRecoveryMessage =>
+      'O Sparkilo não conseguiu abrir o seu armazenamento de dados local. O ficheiro de armazenamento parece estar danificado.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Para recuperar, limpe o armazenamento da aplicação nas definições do dispositivo ou reinstale a aplicação. Os seus favoritos e o histórico são guardados apenas neste dispositivo, pelo que não podem ser restaurados automaticamente.';
+
+  @override
   String get tankLevelTitle => 'Nível do depósito';
 
   @override

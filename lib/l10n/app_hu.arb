@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Tartósan nagy sebesség (az út {pctTime}%-a)",
   "lessonAdviceHighSpeedBand": "110 km/h fölött vegye le a gázt – a légellenállás meredeken nő, kicsit lassabban sok üzemanyag megspórolható.",
   "lessonSmoothDrivingTitle": "Egyenletes vezetés – szép munka!",
-  "lessonAdviceSmoothDriving": "Nem volt heves gyorsítás vagy fékezés ezen az úton – az egyenletes vezetés alacsonyan tartja a fogyasztást."
+  "lessonAdviceSmoothDriving": "Nem volt heves gyorsítás vagy fékezés ezen az úton – az egyenletes vezetés alacsonyan tartja a fogyasztást.",
+  "storageRecoveryTitle": "Tárolási probléma",
+  "storageRecoveryMessage": "A Sparkilo nem tudta megnyitni a helyi adattárolóját. A tárolófájl sérültnek tűnik.",
+  "storageRecoveryGuidance": "A helyreállításhoz töröld az alkalmazás tárhelyét a készülék beállításaiban, vagy telepítsd újra az alkalmazást. A kedvenceid és az előzményeid csak ezen az eszközön tárolódnak, ezért nem állíthatók helyre automatikusan."
 }

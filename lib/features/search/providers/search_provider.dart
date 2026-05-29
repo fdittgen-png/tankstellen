@@ -4,6 +4,7 @@
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/location/location_service.dart';
+import '../../../core/telemetry/collectors/app_state_collector.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
@@ -85,6 +86,27 @@ class SearchState extends _$SearchState {
     await replay();
   }
 
+  /// #2320 — record an anonymised breadcrumb of the most recent search
+  /// onto [AppStateCollector] so search-failure error traces carry the
+  /// search context (which entry point, fuel, radius, sort). Deliberately
+  /// PII-free: coordinates, ZIP codes and location labels are NEVER
+  /// included — only the search *mode* and the non-identifying filter
+  /// knobs. Nulls fall back to "default" (the value will be resolved from
+  /// the active profile inside the search closure).
+  void _recordLastSearch(
+    String mode, {
+    FuelType? fuelType,
+    double? radiusKm,
+    SortBy? sortBy,
+  }) {
+    final fuel = fuelType?.name ?? 'default';
+    final radius = radiusKm?.toStringAsFixed(0) ?? 'default';
+    final sort = sortBy?.apiValue ?? 'default';
+    AppStateCollector.updateLastSearch(
+      'mode=$mode fuel=$fuel radiusKm=$radius sort=$sort',
+    );
+  }
+
   /// Wraps a search closure with standard loading state + error
   /// handling. Cancellations are silently dropped; every other
   /// exception flows into [AsyncValue.error] via [classifySearchError]
@@ -124,6 +146,8 @@ class SearchState extends _$SearchState {
           radiusKm: radiusKm,
           sortBy: sortBy,
         );
+    _recordLastSearch('gps',
+        fuelType: fuelType, radiusKm: radiusKm, sortBy: sortBy);
     await _runSearch((cancelToken) async {
       final position =
           await ref.read(locationServiceProvider).getCurrentPosition();
@@ -192,6 +216,10 @@ class SearchState extends _$SearchState {
           radiusKm: radiusKm,
           sortBy: sortBy,
         );
+    // #2320 — zipCode itself is omitted on purpose: it is a coarse
+    // location identifier and must not leak into error traces.
+    _recordLastSearch('zip',
+        fuelType: fuelType, radiusKm: radiusKm, sortBy: sortBy);
     await _runSearch((cancelToken) async {
       await autoUpdatePositionIfEnabled(ref);
       if (!ref.mounted) return;
@@ -270,6 +298,9 @@ class SearchState extends _$SearchState {
           fuelType: fuelType,
           radiusKm: radiusKm,
         );
+    // #2320 — lat/lng/postalCode/locationName are all location PII and
+    // are intentionally excluded from the breadcrumb.
+    _recordLastSearch('coordinates', fuelType: fuelType, radiusKm: radiusKm);
     await _runSearch((cancelToken) async {
       await autoUpdatePositionIfEnabled(ref);
       if (!ref.mounted) return;

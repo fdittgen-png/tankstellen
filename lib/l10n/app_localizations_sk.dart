@@ -5191,6 +5191,17 @@ class AppLocalizationsSk extends AppLocalizations {
   String get splashLoadingLabel => 'Načítava sa Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Problém s úložiskom';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo nedokázalo otvoriť svoje lokálne dátové úložisko. Súbor úložiska je zrejme poškodený.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'Na obnovu vymažte úložisko aplikácie v nastaveniach zariadenia alebo aplikáciu preinštalujte. Vaše obľúbené položky a história sú uložené iba v tomto zariadení, takže ich nemožno obnoviť automaticky.';
+
+  @override
   String get tankLevelTitle => 'Hladina nádrže';
 
   @override

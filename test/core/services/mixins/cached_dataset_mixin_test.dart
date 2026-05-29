@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/services/mixins/cached_dataset_mixin.dart';
@@ -232,6 +234,114 @@ void main() {
         ),
         throwsException,
       );
+    });
+  });
+
+  group('concurrent-fetch guard (#2313)', () {
+    test('loadDataset: two simultaneous cold calls issue ONE fetch', () async {
+      var fetchCalls = 0;
+      var storeCalls = 0;
+      final gate = Completer<void>();
+
+      Future<int> slowFetch() async {
+        fetchCalls++;
+        await gate.future; // hold the download open until both callers wait
+        return 42;
+      }
+
+      // Both calls start while the cache is cold — they must share one fetch.
+      final a = cached.loadDataset<int>(
+        cached: null,
+        ttl: const Duration(minutes: 5),
+        fetch: slowFetch,
+        store: (_) => storeCalls++,
+      );
+      final b = cached.loadDataset<int>(
+        cached: null,
+        ttl: const Duration(minutes: 5),
+        fetch: slowFetch,
+        store: (_) => storeCalls++,
+      );
+
+      gate.complete();
+      final results = await Future.wait([a, b]);
+
+      expect(results, [42, 42]);
+      expect(fetchCalls, 1,
+          reason: 'concurrent cold searches must download the dataset once');
+      // Both callers still get a result; only the in-flight fetch is shared.
+      expect(storeCalls, greaterThanOrEqualTo(1));
+    });
+
+    test('loadDataset: a later call after completion refetches', () async {
+      var fetchCalls = 0;
+      // Zero TTL → always stale, so each *sequential* call must refetch.
+      cached.markDatasetRefreshed();
+
+      await cached.loadDataset<int>(
+        cached: 1,
+        ttl: Duration.zero,
+        fetch: () async {
+          fetchCalls++;
+          return 1;
+        },
+        store: (_) {},
+      );
+      await cached.loadDataset<int>(
+        cached: 1,
+        ttl: Duration.zero,
+        fetch: () async {
+          fetchCalls++;
+          return 1;
+        },
+        store: (_) {},
+      );
+
+      expect(fetchCalls, 2,
+          reason: 'the in-flight slot clears on completion → later call '
+              'refetches (no permanent dedupe)');
+    });
+
+    test('loadPersistentDataset: two simultaneous cold calls issue ONE '
+        'fetch + ONE persist', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      var fetchCalls = 0;
+      final gate = Completer<void>();
+
+      Future<List<int>> slowFetch() async {
+        fetchCalls++;
+        await gate.future;
+        return [5, 5];
+      }
+
+      final a = cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: const Duration(hours: 1),
+        hardTtl: const Duration(hours: 6),
+        persistent: persistent,
+        fetch: slowFetch,
+        store: (_) {},
+      );
+      final b = cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: const Duration(hours: 1),
+        hardTtl: const Duration(hours: 6),
+        persistent: persistent,
+        fetch: slowFetch,
+        store: (_) {},
+      );
+
+      gate.complete();
+      final results = await Future.wait([a, b]);
+
+      expect(results, [
+        [5, 5],
+        [5, 5],
+      ]);
+      expect(fetchCalls, 1,
+          reason: 'concurrent cold searches must download the CSV once');
+      expect(persistent.read()?.value, [5, 5]);
     });
   });
 }

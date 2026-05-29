@@ -1073,6 +1073,107 @@ void main() {
     });
   });
 
+  // #2301 — getPrices used to issue one serial `id=<n>` GET per favorite
+  // (up to 10), up to ~150 s worst case. It now sends a single OR-batched
+  // ODSQL query and maps each record back to the caller's id by the record's
+  // own `id` field (never by response position).
+  group('PrixCarburantsStationService getPrices batching (#2301)', () {
+    test('issues a single OR-batched query for multiple ids', () async {
+      final adapter = _TrackingMockAdapter()
+        ..addResponse({
+          'results': [
+            {'id': '1', 'sp95_prix': 1.80, 'e10_prix': 1.70, 'gazole_prix': 1.60},
+            {'id': '2', 'sp95_prix': 1.85, 'e10_prix': 1.75, 'gazole_prix': 1.65},
+          ],
+        });
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final result = await svc.getPrices(['fr-1', 'fr-2']);
+
+      // Exactly one round-trip, not N.
+      expect(adapter.requestCount, 1,
+          reason: 'all ids must batch into a single OR query (#2301)');
+      // The OR query carries both ids (URL-encoded `id%3D1+OR+id%3D2`).
+      expect(adapter.lastRequestUri, contains('id%3D1'));
+      expect(adapter.lastRequestUri, contains('id%3D2'));
+      expect(adapter.lastRequestUri, contains('OR'));
+
+      // Result map is keyed by the caller's canonical fr- ids.
+      expect(result.data.keys.toSet(), {'fr-1', 'fr-2'});
+      expect(result.data['fr-1']!.e5, closeTo(1.80, 0.0001));
+      expect(result.data['fr-2']!.diesel, closeTo(1.65, 0.0001));
+    });
+
+    test('maps records back to the caller id by record id, not position',
+        () async {
+      // Response order is reversed and id 3 is missing entirely. Each price
+      // must still land under the correct fr- id, and the missing id is
+      // simply absent — never mis-assigned (per-station isolation).
+      final adapter = _TrackingMockAdapter()
+        ..addResponse({
+          'results': [
+            {'id': '2', 'sp95_prix': 1.85},
+            {'id': '1', 'sp95_prix': 1.80},
+          ],
+        });
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final result = await svc.getPrices(['fr-1', 'fr-2', 'fr-3']);
+
+      expect(result.data.keys.toSet(), {'fr-1', 'fr-2'},
+          reason: 'fr-3 returned no record → absent, not mis-keyed');
+      expect(result.data['fr-1']!.e5, closeTo(1.80, 0.0001));
+      expect(result.data['fr-2']!.e5, closeTo(1.85, 0.0001));
+    });
+
+    test('tolerates legacy unprefixed ids and re-keys to the caller form',
+        () async {
+      final adapter = _TrackingMockAdapter()
+        ..addResponse({
+          'results': [
+            {'id': '42', 'sp95_prix': 1.90},
+          ],
+        });
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final result = await svc.getPrices(['42']);
+      expect(adapter.requestCount, 1);
+      expect(result.data.keys, contains('42'));
+      expect(result.data['42']!.e5, closeTo(1.90, 0.0001));
+    });
+
+    test('returns empty map without any request for an empty id list',
+        () async {
+      final adapter = _TrackingMockAdapter();
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final result = await svc.getPrices([]);
+      expect(result.data, isEmpty);
+      expect(adapter.requestCount, 0);
+      expect(result.source, ServiceSource.prixCarburantsApi);
+    });
+
+    test('caps the batch at 10 ids', () async {
+      final adapter = _TrackingMockAdapter()
+        ..addResponse({'results': const []});
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final ids = List.generate(15, (i) => 'fr-$i');
+      await svc.getPrices(ids);
+
+      // Still one request; the 11th..15th ids are dropped, so id 14 must not
+      // appear in the where clause.
+      expect(adapter.requestCount, 1);
+      expect(adapter.lastRequestUri, contains('id%3D0'));
+      expect(adapter.lastRequestUri, isNot(contains('id%3D14')));
+    });
+  });
+
   // #2193 — the baseUrl override surface mirrors the Dio injection style:
   // an injected baseUrl must be the host the request is actually sent to,
   // so tests can point the service at a fake endpoint.

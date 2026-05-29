@@ -1971,5 +1971,8 @@
   "insightHighSpeedBandNoFuel": "Jatkuva suuri nopeus ({pctTime} % matkasta)",
   "lessonAdviceHighSpeedBand": "Päästä kaasusta yli 110 km/h – ilmanvastus kasvaa jyrkästi, joten hieman hitaammin säästää paljon polttoainetta.",
   "lessonSmoothDrivingTitle": "Tasaista ajoa – hyvin tehty!",
-  "lessonAdviceSmoothDriving": "Ei rajuja kiihdytyksiä tai jarrutuksia tällä matkalla – tasainen ajo pitää kulutuksen alhaisena."
+  "lessonAdviceSmoothDriving": "Ei rajuja kiihdytyksiä tai jarrutuksia tällä matkalla – tasainen ajo pitää kulutuksen alhaisena.",
+  "storageRecoveryTitle": "Tallennustila-ongelma",
+  "storageRecoveryMessage": "Sparkilo ei voinut avata paikallista tietovarastoaan. Tallennustiedosto vaikuttaa vioittuneelta.",
+  "storageRecoveryGuidance": "Palauta tilanne tyhjentämällä sovelluksen tallennustila laitteen asetuksista tai asentamalla sovellus uudelleen. Suosikkisi ja historiasi tallennetaan vain tähän laitteeseen, joten niitä ei voi palauttaa automaattisesti."
 }

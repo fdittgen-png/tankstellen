@@ -148,8 +148,12 @@ class UkStationService with StationServiceHelpers implements StationService {
       }
       if (data is List) return List<dynamic>.from(data);
       return null;
-    } on DioException catch (e, st) { // ignore: unused_catch_stack
-      debugPrint('UK feed $url failed: ${e.type.name}');
+    } on DioException catch (e, st) {
+      // #2301 — log per-feed failures through errorLogger (release-safe).
+      // debugPrint is stripped in release, so with 14 parallel feeds a
+      // silent partial failure produced sparse results with no breadcrumb.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+          context: {'where': 'UK feed', 'type': e.type.name}));
       return null;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'UK feed $url parse error'}));

@@ -26,13 +26,11 @@ class ItinerariesScreen extends ConsumerStatefulWidget {
 }
 
 class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      ref.read(itineraryProvider.notifier).loadFromServer();
-    });
-  }
+  // initState() intentionally omitted: the keepAlive ItineraryNotifier
+  // already kicks off _loadAndMerge() via a microtask in build(). A
+  // second unconditional fetch here would cause a redundant Supabase
+  // round-trip on every navigation. Use pull-to-refresh for an explicit
+  // reload (#2312).
 
   @override
   Widget build(BuildContext context) {

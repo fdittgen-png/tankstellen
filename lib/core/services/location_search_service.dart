@@ -27,13 +27,14 @@ class ResolvedLocation {
 /// What kind of input the user typed.
 enum LocationInputType { gps, zip, city }
 
-/// Detects input type, searches cities via Nominatim with caching
-/// and rate-limiting (1 req/sec per Nominatim policy).
+/// Detects input type, searches cities via Nominatim with caching.
+///
+/// Rate-limiting (1 req/sec per Nominatim policy) is handled by
+/// [DioFactory.create]'s built-in [RateLimitInterceptor]. The former manual
+/// `_lastRequest` / delay block has been removed to avoid double-gating (#2315).
 class LocationSearchService {
   final CacheStrategy _cache;
   final Dio _dio;
-
-  DateTime _lastRequest = DateTime.fromMillisecondsSinceEpoch(0);
 
   LocationSearchService(this._cache, {Dio? dio})
       : _dio = dio ?? DioFactory.create(
@@ -83,13 +84,7 @@ class LocationSearchService {
       return _deserializeLocations(cached.payload);
     }
 
-    // Rate limit: wait if <1s since last request
-    final elapsed = DateTime.now().difference(_lastRequest);
-    if (elapsed < const Duration(seconds: 1)) {
-      await Future<void>.delayed(const Duration(seconds: 1) - elapsed);
-    }
-    _lastRequest = DateTime.now();
-
+    // Rate-limiting is handled by DioFactory's RateLimitInterceptor (#2315).
     try {
       final response = await _dio.get(
         '/search',

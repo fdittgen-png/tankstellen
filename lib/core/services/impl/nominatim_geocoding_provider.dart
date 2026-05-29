@@ -13,17 +13,20 @@ import '../service_result.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Geocoding via OpenStreetMap Nominatim API.
-/// Available on all platforms. Enforces 1 req/sec rate limit.
-/// Country-aware: passes the correct country code to Nominatim.
 ///
+/// Country-aware: passes the correct country code to Nominatim.
 /// For French arrondissement postal codes (Paris 75001–75020,
 /// Lyon 69001–69009, Marseille 13001–13016), a city hint is added
 /// to prevent Nominatim from returning coordinates outside the
 /// target area.
+///
+/// Rate-limiting is handled exclusively by [DioFactory.create]'s built-in
+/// [RateLimitInterceptor] (1 req/sec). The former manual `_enforceRateLimit`
+/// + `_lastRequest` has been removed to avoid double-gating (~2 s per call)
+/// (#2315).
 class NominatimGeocodingProvider implements GeocodingProvider {
   final Dio _dio;
   final String _countryCode;
-  DateTime? _lastRequest;
 
   NominatimGeocodingProvider({String countryCode = 'de', @visibleForTesting Dio? dio})
       : _countryCode = countryCode.toLowerCase(),
@@ -44,10 +47,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
     String zipCode, {
     CancelToken? cancelToken,
   }) async {
-    await _enforceRateLimit();
-
     try {
-      _lastRequest = DateTime.now();
       // Numeric queries use the structured postalcode endpoint (with
       // French arrondissement city hints). Non-numeric queries like
       // "Paris" go through the free-text `q=` parameter so the user
@@ -106,10 +106,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
     double lat, double lng, {
     CancelToken? cancelToken,
   }) async {
-    await _enforceRateLimit();
-
     try {
-      _lastRequest = DateTime.now();
       final response = await _dio.get<Map<String, dynamic>>(
         '/reverse',
         queryParameters: {
@@ -143,9 +140,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
     double lat, double lng, {
     CancelToken? cancelToken,
   }) async {
-    await _enforceRateLimit();
     try {
-      _lastRequest = DateTime.now();
       final response = await _dio.get<Map<String, dynamic>>(
         '/reverse',
         queryParameters: {
@@ -183,16 +178,5 @@ class NominatimGeocodingProvider implements GeocodingProvider {
     if (code >= 13001 && code <= 13016) return 'Marseille';
 
     return null;
-  }
-
-  Future<void> _enforceRateLimit() async {
-    if (_lastRequest != null) {
-      final elapsed = DateTime.now().difference(_lastRequest!);
-      if (elapsed < const Duration(seconds: 1)) {
-        await Future<void>.delayed(
-          Duration(milliseconds: 1000 - elapsed.inMilliseconds),
-        );
-      }
-    }
   }
 }

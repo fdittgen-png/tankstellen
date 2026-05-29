@@ -168,14 +168,17 @@ class Favorites extends _$Favorites {
       // card stays empty while `FavoritesSync.merge` blocks on
       // Supabase (often > 1 s on flaky networks), and users perceive
       // the tap as a no-op until the next search redraws the row.
-      // The trailing `_reload()` below stays as a safety re-emit
-      // (idempotent — same id set).
       _reload();
       await SyncHelper.syncIfEnabled(
         ref,
         'Favorites.add',
         () => FavoritesSync.merge(storage.getFavoriteIds()),
       );
+      // No second _reload() here — fuel-station sync never mutates local
+      // storage, so a second call would only trigger extra widget IO with
+      // no state change (#2314).
+      debugPrint('[Favorites.add] state after reload=$state');
+      return;
     }
 
     _reload();

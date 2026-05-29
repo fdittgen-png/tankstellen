@@ -102,6 +102,33 @@ void main() {
       );
     });
 
+    // #2316 — all LocationException messages must be English diagnostics
+    // per the exceptions.dart contract; they appear verbatim in GitHub
+    // error-report payloads (ErrorLocalizer maps to ARB for the UI).
+    test('all LocationException messages are English (#2316)', () async {
+      // disabled
+      fakeGeolocator.serviceEnabled = false;
+      LocationException? ex;
+      try { await service.getCurrentPosition(); } on LocationException catch (e) { ex = e; }
+      expect(ex?.message, isNot(contains('Standort')));
+      expect(ex?.message, isNot(contains('deaktiviert')));
+
+      // denied after request
+      fakeGeolocator
+        ..serviceEnabled = true
+        ..permission = LocationPermission.denied
+        ..requestResult = LocationPermission.denied;
+      try { await service.getCurrentPosition(); } on LocationException catch (e) { ex = e; }
+      expect(ex?.message, isNot(contains('verweigert')));
+
+      // permanently denied
+      fakeGeolocator
+        ..permission = LocationPermission.deniedForever
+        ..requestResult = null;
+      try { await service.getCurrentPosition(); } on LocationException catch (e) { ex = e; }
+      expect(ex?.message, isNot(contains('Standort')));
+    });
+
     test('distanceBetween delegates to wrapper', () {
       final distance = service.distanceBetween(52.0, 13.0, 53.0, 14.0);
       expect(distance, 1000.0);

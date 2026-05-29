@@ -13,6 +13,7 @@ import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -61,11 +62,25 @@ import '../../../core/logging/error_logger.dart';
 /// dot before parsing. Stations are merged across fuel-type rows by
 /// `Id` so a single [Station] carries all known prices.
 class PortugalStationService
-    with StationServiceHelpers
+    with StationServiceHelpers, CachedDatasetMixin
     implements StationService {
   final Dio _dio;
   final String _baseUrl;
   final String _fuelTypeIds;
+
+  /// In-memory copy of the last DGEG `resultado` payload (one row per
+  /// station-fuel). The previous implementation re-downloaded the full
+  /// ~10 000-row national dataset on every search; a moving user or a
+  /// route fan-out across coordinates re-fetched it repeatedly. The
+  /// dataset is national (no coordinate filter on the wire), so it is
+  /// cached here with a short TTL and re-filtered per coordinate in
+  /// [parseAndFilter] — correctness is unaffected (#2302).
+  List<dynamic>? _cachedResultado;
+
+  /// Dataset cache TTL. DGEG refreshes prices a few times a day; 15 min
+  /// keeps a moving user / route fan-out off the wire without serving
+  /// stale prices for long.
+  static const Duration _datasetTtl = Duration(minutes: 15);
 
   PortugalStationService({
     Dio? dio,
@@ -98,32 +113,7 @@ class PortugalStationService
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await _dio.get<dynamic>(
-        '$_baseUrl/PesquisarPostos',
-        queryParameters: {
-          'idsTiposComb': _fuelTypeIds,
-          'idMarca': '',
-          'idTipoPosto': '',
-          'idDistrito': '',
-          'idsMunicipios': '',
-          'qtdPorPagina': 10000,
-          'pagina': 1,
-        },
-        cancelToken: cancelToken,
-      );
-
-      final data = response.data;
-      if (data is! Map<String, dynamic>) {
-        throw const ApiException(
-          message: 'Invalid DGEG response (not an object)',
-        );
-      }
-      final resultado = data['resultado'];
-      if (resultado is! List) {
-        throw const ApiException(
-          message: 'Invalid DGEG response (resultado is not a list)',
-        );
-      }
+      final resultado = await _ensureDataLoaded(cancelToken: cancelToken);
 
       final stations = parseAndFilter(
         resultado,
@@ -140,6 +130,48 @@ class PortugalStationService
     } on DioException catch (e, st) {
       throwApiException(e, defaultMessage: 'DGEG API error', stackTrace: st);
     }
+  }
+
+  /// Returns the national DGEG dataset, served from the fresh in-memory
+  /// copy when within [_datasetTtl], otherwise re-downloaded once and
+  /// cached (#2302). The endpoint has no coordinate filter, so the same
+  /// payload serves every search point until it expires.
+  Future<List<dynamic>> _ensureDataLoaded({CancelToken? cancelToken}) async {
+    final cached = _cachedResultado;
+    if (cached != null && isDatasetFresh(_datasetTtl)) {
+      return cached;
+    }
+
+    final response = await _dio.get<dynamic>(
+      '$_baseUrl/PesquisarPostos',
+      queryParameters: {
+        'idsTiposComb': _fuelTypeIds,
+        'idMarca': '',
+        'idTipoPosto': '',
+        'idDistrito': '',
+        'idsMunicipios': '',
+        'qtdPorPagina': 10000,
+        'pagina': 1,
+      },
+      cancelToken: cancelToken,
+    );
+
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException(
+        message: 'Invalid DGEG response (not an object)',
+      );
+    }
+    final resultado = data['resultado'];
+    if (resultado is! List) {
+      throw const ApiException(
+        message: 'Invalid DGEG response (resultado is not a list)',
+      );
+    }
+
+    _cachedResultado = resultado;
+    markDatasetRefreshed();
+    return resultado;
   }
 
   /// Groups [resultado] rows by station `Id`, attaches fuel prices,

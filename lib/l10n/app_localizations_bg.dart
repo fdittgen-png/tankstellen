@@ -5214,6 +5214,17 @@ class AppLocalizationsBg extends AppLocalizations {
   String get splashLoadingLabel => 'Зареждане на Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Проблем със съхранението';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo не можа да отвори локалното си хранилище за данни. Файлът изглежда повреден.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'За възстановяване изчистете хранилището на приложението в настройките на устройството или преинсталирайте приложението. Любимите и историята ви се съхраняват само на това устройство и не могат да бъдат възстановени автоматично.';
+
+  @override
   String get tankLevelTitle => 'Ниво на резервоара';
 
   @override

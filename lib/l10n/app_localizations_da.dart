@@ -5162,6 +5162,17 @@ class AppLocalizationsDa extends AppLocalizations {
   String get splashLoadingLabel => 'Indlæser Sparkilo';
 
   @override
+  String get storageRecoveryTitle => 'Lagerproblem';
+
+  @override
+  String get storageRecoveryMessage =>
+      'Sparkilo kunne ikke åbne sit lokale datalager. Lagerfilen ser ud til at være beskadiget.';
+
+  @override
+  String get storageRecoveryGuidance =>
+      'For at gendanne skal du rydde appens lager i enhedens indstillinger eller geninstallere appen. Dine favoritter og din historik gemmes kun på denne enhed og kan ikke gendannes automatisk.';
+
+  @override
   String get tankLevelTitle => 'Tankniveau';
 
   @override
