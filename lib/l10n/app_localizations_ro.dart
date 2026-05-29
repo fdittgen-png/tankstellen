@@ -3856,6 +3856,32 @@ class AppLocalizationsRo extends AppLocalizations {
   String get consoSubsectionToggles => 'Condus';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Precizie: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Ridicată';
+
+  @override
+  String get consumptionAccuracyMedium => 'Medie';
+
+  @override
+  String get consumptionAccuracyLow => 'Scăzută';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Calibrare completă: alimentări plus călătorii înregistrate cu OBD2. Valoarea L/100 km urmărește realitatea în limita câtorva procente.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Alimentările au ancorat modelul de consum, dar nicio călătorie OBD2 nu a fost încă procesată. Înregistrează una cu OBD2 conectat pentru a atinge precizia ridicată.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Doar GPS — nicio alimentare nu a ancorat încă modelul de consum. Adaugă câteva alimentări complete pentru a îmbunătăți precizia.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

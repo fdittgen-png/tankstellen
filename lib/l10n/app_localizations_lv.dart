@@ -3856,6 +3856,32 @@ class AppLocalizationsLv extends AppLocalizations {
   String get consoSubsectionToggles => 'Braukšana';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Precizitāte: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Augsta';
+
+  @override
+  String get consumptionAccuracyMedium => 'Vidēja';
+
+  @override
+  String get consumptionAccuracyLow => 'Zema';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Pilna kalibrēšana: uzpildes plus ar OBD2 ierakstīti braucieni. L/100 km rādītājs atbilst realitātei dažu procentu robežās.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Uzpildes ir nostiprinājušas patēriņa modeli, taču neviens OBD2 brauciens vēl nav apstrādāts. Ierakstiet vienu ar pievienotu OBD2, lai sasniegtu augstu precizitāti.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Tikai GPS — neviena uzpilde vēl nav nostiprinājusi patēriņa modeli. Pievienojiet dažas pilnas uzpildes, lai uzlabotu precizitāti.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

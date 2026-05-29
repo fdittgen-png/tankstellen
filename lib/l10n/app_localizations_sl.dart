@@ -3835,6 +3835,32 @@ class AppLocalizationsSl extends AppLocalizations {
   String get consoSubsectionToggles => 'Vožnja';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Natančnost: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Visoka';
+
+  @override
+  String get consumptionAccuracyMedium => 'Srednja';
+
+  @override
+  String get consumptionAccuracyLow => 'Nizka';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Popolna kalibracija: točenja goriva ter vožnje, posnete prek OBD2. Vrednost L/100 km sledi resničnosti znotraj nekaj odstotkov.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Točenja so zasidrala model porabe, vendar še ni bila obdelana nobena vožnja OBD2. Posnemite eno s povezanim OBD2, da dosežete visoko natančnost.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Samo GPS — še nobeno točenje ni zasidralo modela porabe. Dodajte nekaj polnih točenj za izboljšanje natančnosti.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

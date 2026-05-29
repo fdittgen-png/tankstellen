@@ -3863,6 +3863,32 @@ class AppLocalizationsEl extends AppLocalizations {
   String get consoSubsectionToggles => 'Οδήγηση';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Ακρίβεια: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Υψηλή';
+
+  @override
+  String get consumptionAccuracyMedium => 'Μέτρια';
+
+  @override
+  String get consumptionAccuracyLow => 'Χαμηλή';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Πλήρης βαθμονόμηση: ανεφοδιασμοί συν διαδρομές καταγεγραμμένες με OBD2. Η τιμή L/100 km ακολουθεί την πραγματικότητα με απόκλιση λίγων ποσοστιαίων μονάδων.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Οι ανεφοδιασμοί έχουν αγκυρώσει το μοντέλο κατανάλωσης, αλλά δεν έχει τροφοδοτηθεί ακόμη διαδρομή OBD2. Καταγράψτε μία με συνδεδεμένο OBD2 για να φτάσετε σε υψηλή ακρίβεια.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Μόνο GPS — κανένας ανεφοδιασμός δεν έχει αγκυρώσει ακόμη το μοντέλο κατανάλωσης. Προσθέστε μερικούς πλήρεις ανεφοδιασμούς για να βελτιώσετε την ακρίβεια.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

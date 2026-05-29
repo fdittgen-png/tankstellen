@@ -3814,6 +3814,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consoSubsectionToggles => 'Driving';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Accuracy: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'High';
+
+  @override
+  String get consumptionAccuracyMedium => 'Medium';
+
+  @override
+  String get consumptionAccuracyLow => 'Low';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Full calibration: fill-ups plus OBD2-recorded trips. The L/100 km figure tracks reality to within a few percent.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Fill-ups have anchored the consumption model, but no OBD2 trip has fed the loop yet. Record one with OBD2 connected to reach High accuracy.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'GPS-only — no fill-ups have anchored the consumption model yet. Add a couple of full fill-ups to improve the accuracy.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -9488,6 +9514,32 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get consoSubsectionToggles => '⟦Đřîṽîñǧ ···⟧';
+
+  @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return '⟦Áççúřáçý: $level · $band ····⟧';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => '⟦Ĥîǧĥ ··⟧';
+
+  @override
+  String get consumptionAccuracyMedium => '⟦Ṁéđîúɱ ···⟧';
+
+  @override
+  String get consumptionAccuracyLow => '⟦Łóŵ ·⟧';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      '⟦Ƒúłł çáłîƀřáŧîóñ: ƒîłł-úƥš ƥłúš ÓƁĐ2-řéçóřđéđ ŧřîƥš. Ŧĥé Ł/100 ķɱ ƒîǧúřé ŧřáçķš řéáłîŧý ŧó ŵîŧĥîñ á ƒéŵ ƥéřçéñŧ. ·······································⟧';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      '⟦Ƒîłł-úƥš ĥáṽé áñçĥóřéđ ŧĥé çóñšúɱƥŧîóñ ɱóđéł, ƀúŧ ñó ÓƁĐ2 ŧřîƥ ĥáš ƒéđ ŧĥé łóóƥ ýéŧ. Řéçóřđ óñé ŵîŧĥ ÓƁĐ2 çóññéçŧéđ ŧó řéáçĥ Ĥîǧĥ áççúřáçý. ··················································⟧';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      '⟦ǦƤŠ-óñłý — ñó ƒîłł-úƥš ĥáṽé áñçĥóřéđ ŧĥé çóñšúɱƥŧîóñ ɱóđéł ýéŧ. Áđđ á çóúƥłé óƒ ƒúłł ƒîłł-úƥš ŧó îɱƥřóṽé ŧĥé áççúřáçý. ··········································⟧';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {

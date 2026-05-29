@@ -3860,6 +3860,32 @@ class AppLocalizationsHu extends AppLocalizations {
   String get consoSubsectionToggles => 'Vezetés';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Pontosság: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Magas';
+
+  @override
+  String get consumptionAccuracyMedium => 'Közepes';
+
+  @override
+  String get consumptionAccuracyLow => 'Alacsony';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Teljes kalibrálás: tankolások és OBD2-vel rögzített utak. A L/100 km érték néhány százalékon belül követi a valóságot.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'A tankolások rögzítették a fogyasztási modellt, de OBD2-út még nem került feldolgozásra. Rögzíts egyet csatlakoztatott OBD2-vel a magas pontosság eléréséhez.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Csak GPS — még egyetlen tankolás sem rögzítette a fogyasztási modellt. Adj hozzá néhány teljes tankolást a pontosság javításához.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -3853,6 +3853,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get consoSubsectionToggles => 'Fahren';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Genauigkeit: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Hoch';
+
+  @override
+  String get consumptionAccuracyMedium => 'Mittel';
+
+  @override
+  String get consumptionAccuracyLow => 'Niedrig';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Vollständige Kalibrierung: Tankfüllungen plus mit OBD2 aufgezeichnete Fahrten. Der L/100-km-Wert entspricht der Realität bis auf wenige Prozent.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Tankfüllungen haben das Verbrauchsmodell verankert, aber es wurde noch keine OBD2-Fahrt in die Berechnung eingespeist. Zeichne eine Fahrt mit verbundenem OBD2 auf, um hohe Genauigkeit zu erreichen.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Nur GPS – noch keine Tankfüllungen haben das Verbrauchsmodell verankert. Füge ein paar volle Tankfüllungen hinzu, um die Genauigkeit zu verbessern.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

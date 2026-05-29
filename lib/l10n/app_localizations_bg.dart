@@ -3859,6 +3859,32 @@ class AppLocalizationsBg extends AppLocalizations {
   String get consoSubsectionToggles => 'Шофиране';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Точност: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Висока';
+
+  @override
+  String get consumptionAccuracyMedium => 'Средна';
+
+  @override
+  String get consumptionAccuracyLow => 'Ниска';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Пълна калибрация: зареждания плюс пътувания, записани с OBD2. Стойността L/100 km съответства на реалността с точност до няколко процента.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Зарежданията са фиксирали модела на разход, но все още не е подавано OBD2 пътуване. Запишете едно със свързан OBD2, за да достигнете висока точност.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Само GPS — все още няма зареждания, които да фиксират модела на разход. Добавете няколко пълни зареждания, за да подобрите точността.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

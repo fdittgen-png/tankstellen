@@ -3839,6 +3839,32 @@ class AppLocalizationsCs extends AppLocalizations {
   String get consoSubsectionToggles => 'Jízda';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Přesnost: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Vysoká';
+
+  @override
+  String get consumptionAccuracyMedium => 'Střední';
+
+  @override
+  String get consumptionAccuracyLow => 'Nízká';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Plná kalibrace: tankování plus jízdy zaznamenané přes OBD2. Hodnota L/100 km odpovídá realitě s odchylkou několika procent.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Tankování ukotvila model spotřeby, ale zatím nebyla zpracována žádná jízda z OBD2. Zaznamenejte jednu s připojeným OBD2 pro dosažení vysoké přesnosti.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Pouze GPS — model spotřeby zatím neukotvilo žádné tankování. Přidejte několik plných tankování pro zlepšení přesnosti.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

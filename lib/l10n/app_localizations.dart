@@ -7011,6 +7011,48 @@ abstract class AppLocalizations {
   /// **'Driving'**
   String get consoSubsectionToggles;
 
+  /// #2262 — plain-language accuracy indicator on the consumption stats card, replacing the back-to-front A/B/C confidence letters. `level` is one of the localized High/Medium/Low words; `band` is the language-neutral expected-error mask (e.g. ±3-7%).
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy: {level} · {band}'**
+  String consumptionAccuracyLabel(String level, String band);
+
+  /// #2262 — accuracy word for the fully-calibrated tier (fill-ups + OBD2 trips). Highest trust.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get consumptionAccuracyHigh;
+
+  /// #2262 — accuracy word for the fill-ups-anchored-but-no-OBD2-trip tier.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get consumptionAccuracyMedium;
+
+  /// #2262 — accuracy word for the GPS-only, no-fill-ups tier. Lowest trust.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get consumptionAccuracyLow;
+
+  /// #2262 — tooltip for the High accuracy indicator. No improvement action needed.
+  ///
+  /// In en, this message translates to:
+  /// **'Full calibration: fill-ups plus OBD2-recorded trips. The L/100 km figure tracks reality to within a few percent.'**
+  String get consumptionAccuracyTooltipHigh;
+
+  /// #2262 — tooltip for the Medium accuracy indicator. Tells the user to record an OBD2 trip to improve.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-ups have anchored the consumption model, but no OBD2 trip has fed the loop yet. Record one with OBD2 connected to reach High accuracy.'**
+  String get consumptionAccuracyTooltipMedium;
+
+  /// #2262 — tooltip for the Low accuracy indicator. Tells the user to add full fill-ups to improve.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS-only — no fill-ups have anchored the consumption model yet. Add a couple of full fill-ups to improve the accuracy.'**
+  String get consumptionAccuracyTooltipLow;
+
   /// Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.
   ///
   /// In en, this message translates to:

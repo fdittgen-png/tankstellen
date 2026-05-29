@@ -3830,6 +3830,32 @@ class AppLocalizationsNb extends AppLocalizations {
   String get consoSubsectionToggles => 'Kjøring';
 
   @override
+  String consumptionAccuracyLabel(String level, String band) {
+    return 'Nøyaktighet: $level · $band';
+  }
+
+  @override
+  String get consumptionAccuracyHigh => 'Høy';
+
+  @override
+  String get consumptionAccuracyMedium => 'Middels';
+
+  @override
+  String get consumptionAccuracyLow => 'Lav';
+
+  @override
+  String get consumptionAccuracyTooltipHigh =>
+      'Full kalibrering: fyllinger pluss turer registrert med OBD2. L/100 km-tallet følger virkeligheten innenfor noen få prosent.';
+
+  @override
+  String get consumptionAccuracyTooltipMedium =>
+      'Fyllinger har forankret forbruksmodellen, men ingen OBD2-tur er ennå behandlet. Registrer en med OBD2 tilkoblet for å nå høy nøyaktighet.';
+
+  @override
+  String get consumptionAccuracyTooltipLow =>
+      'Kun GPS — ingen fyllinger har ennå forankret forbruksmodellen. Legg til et par fulle fyllinger for å forbedre nøyaktigheten.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
