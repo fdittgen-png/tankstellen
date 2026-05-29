@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Drivstoffprisdata levert av {source}, lisensiert under {license}.",
   "tripRecordingAutoPinTitle": "Fest alltid når opptaket starter",
   "tripRecordingAutoPinSubtitle": "Fest skjemaet automatisk hver tur i stedet for å trykke hver gang. Bruker mer batteri.",
-  "tripRecordingConnectingTitle": "Starter opptak…"
+  "tripRecordingConnectingTitle": "Starter opptak…",
+  "pumpCameraOrientationHorizontal": "Bytt til horisontal layout",
+  "pumpCameraOrientationVertical": "Bytt til vertikal layout",
+  "pumpCameraGlareWarning": "For mye blending — vipp litt for å unngå refleksjoner",
+  "pumpCameraAlignHint": "Juster displayet i rammen og ta deretter bilde"
 }

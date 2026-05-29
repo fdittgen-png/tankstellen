@@ -8223,6 +8223,30 @@ abstract class AppLocalizations {
   /// **'The camera couldn\'t start. Try again or enter the values by hand.'**
   String get pumpCameraError;
 
+  /// Tooltip on the orientation-toggle button when the overlay is currently vertical (#2276).
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to horizontal layout'**
+  String get pumpCameraOrientationHorizontal;
+
+  /// Tooltip on the orientation-toggle button when the overlay is currently horizontal (#2276).
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to vertical layout'**
+  String get pumpCameraOrientationVertical;
+
+  /// Live amber feedback bar shown when the framed region is over-exposed by glare (#2276).
+  ///
+  /// In en, this message translates to:
+  /// **'Too much glare — tilt slightly to avoid reflections'**
+  String get pumpCameraGlareWarning;
+
+  /// Default hint shown in the live feedback bar on the guided alignment overlay (#2276).
+  ///
+  /// In en, this message translates to:
+  /// **'Line up the display inside the frame, then capture'**
+  String get pumpCameraAlignHint;
+
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///
   /// In en, this message translates to:

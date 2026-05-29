@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Az üzemanyagár-adatokat a(z) {source} biztosítja, a(z) {license} licenc alatt.",
   "tripRecordingAutoPinTitle": "Mindig rögzítse a felvétel indításakor",
   "tripRecordingAutoPinSubtitle": "Az űrlap automatikus rögzítése minden út során, ahelyett, hogy mindig megérintené. Több akkumulátort használ.",
-  "tripRecordingConnectingTitle": "Felvétel indítása…"
+  "tripRecordingConnectingTitle": "Felvétel indítása…",
+  "pumpCameraOrientationHorizontal": "Váltás vízszintes elrendezésre",
+  "pumpCameraOrientationVertical": "Váltás függőleges elrendezésre",
+  "pumpCameraGlareWarning": "Túl sok fény — kissé döntse meg a tükröződések elkerülése érdekében",
+  "pumpCameraAlignHint": "Igazítsa a kijelzőt a keretbe, majd készítse el a felvételt"
 }

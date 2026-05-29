@@ -4556,6 +4556,22 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kaamerat ei õnnestunud käivitada. Proovige uuesti või sisestage väärtused käsitsi.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Lülitu horisontaalsele paigutusele';
+
+  @override
+  String get pumpCameraOrientationVertical =>
+      'Lülitu vertikaalsele paigutusele';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Liiga palju läiget — kallutage veidi, et vältida peegeldusi';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Joondage ekraan raami sisse ja seejärel tehke foto';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mida täitsid';
 
   @override

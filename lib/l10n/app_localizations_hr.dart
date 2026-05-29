@@ -4576,6 +4576,19 @@ class AppLocalizationsHr extends AppLocalizations {
       'Kamera se nije mogla pokrenuti. Pokušajte ponovno ili unesite vrijednosti ručno.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Prebaci na vodoravni raspored';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Prebaci na okomiti raspored';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Previše sjaja — malo nagnite kako biste izbjegli odsjaj';
+
+  @override
+  String get pumpCameraAlignHint => 'Poravnajte zaslon unutar okvira i snimite';
+
+  @override
   String get fillUpSectionWhatTitle => 'Što ste natočili';
 
   @override

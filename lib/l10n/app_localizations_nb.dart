@@ -4559,6 +4559,20 @@ class AppLocalizationsNb extends AppLocalizations {
       'Kameraet kunne ikke startes. Prøv igjen, eller skriv inn verdiene manuelt.';
 
   @override
+  String get pumpCameraOrientationHorizontal => 'Bytt til horisontal layout';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Bytt til vertikal layout';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'For mye blending — vipp litt for å unngå refleksjoner';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Juster displayet i rammen og ta deretter bilde';
+
+  @override
   String get fillUpSectionWhatTitle => 'Hva du fylte';
 
   @override

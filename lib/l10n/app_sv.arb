@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Bränsleprisdata tillhandahålls av {source}, licensierad under {license}.",
   "tripRecordingAutoPinTitle": "Fäst alltid när inspelningen startar",
   "tripRecordingAutoPinSubtitle": "Fäst formuläret automatiskt vid varje körning i stället för att trycka varje gång. Förbrukar mer batteri.",
-  "tripRecordingConnectingTitle": "Startar inspelning…"
+  "tripRecordingConnectingTitle": "Startar inspelning…",
+  "pumpCameraOrientationHorizontal": "Byt till horisontell layout",
+  "pumpCameraOrientationVertical": "Byt till vertikal layout",
+  "pumpCameraGlareWarning": "För mycket bländning — luta något för att undvika reflexer",
+  "pumpCameraAlignHint": "Rikta in displayen i ramen och ta sedan en bild"
 }

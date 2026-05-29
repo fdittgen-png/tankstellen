@@ -4611,6 +4611,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'La caméra n\'a pas pu démarrer. Réessayez ou saisissez les valeurs manuellement.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Passer en affichage horizontal';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Passer en affichage vertical';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Trop de reflets — inclinez légèrement pour éviter les éblouissements';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Alignez l\'afficheur dans le cadre, puis capturez';
+
+  @override
   String get fillUpSectionWhatTitle => 'Votre plein';
 
   @override

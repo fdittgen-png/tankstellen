@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Údaje o cenách palív poskytuje {source}, licencované pod {license}.",
   "tripRecordingAutoPinTitle": "Pri spustení nahrávania vždy pripnúť",
   "tripRecordingAutoPinSubtitle": "Pripnúť formulár automaticky pri každej jazde namiesto klepnutia zakaždým. Spotrebuje viac batérie.",
-  "tripRecordingConnectingTitle": "Spúšťa sa nahrávanie…"
+  "tripRecordingConnectingTitle": "Spúšťa sa nahrávanie…",
+  "pumpCameraOrientationHorizontal": "Prepnúť na vodorovné rozloženie",
+  "pumpCameraOrientationVertical": "Prepnúť na zvislé rozloženie",
+  "pumpCameraGlareWarning": "Príliš veľa odleskov — mierne nakloňte, aby ste sa vyhli odrazom",
+  "pumpCameraAlignHint": "Zarovnajte displej do rámčeka a potom odfotografujte"
 }

@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Dados de preços de combustível fornecidos por {source}, licenciados sob {license}.",
   "tripRecordingAutoPinTitle": "Fixar sempre ao iniciar a gravação",
   "tripRecordingAutoPinSubtitle": "Fixa o formulário automaticamente em cada viagem em vez de tocar todas as vezes. Consome mais bateria.",
-  "tripRecordingConnectingTitle": "A iniciar a gravação…"
+  "tripRecordingConnectingTitle": "A iniciar a gravação…",
+  "pumpCameraOrientationHorizontal": "Mudar para layout horizontal",
+  "pumpCameraOrientationVertical": "Mudar para layout vertical",
+  "pumpCameraGlareWarning": "Muito brilho — incline levemente para evitar reflexos",
+  "pumpCameraAlignHint": "Alinhe o visor dentro da moldura e capture"
 }

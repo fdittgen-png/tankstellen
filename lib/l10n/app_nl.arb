@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Brandstofprijsgegevens geleverd door {source}, gelicentieerd onder {license}.",
   "tripRecordingAutoPinTitle": "Altijd vastzetten bij start van de opname",
   "tripRecordingAutoPinSubtitle": "Zet het formulier automatisch vast bij elke rit in plaats van elke keer te tikken. Verbruikt meer batterij.",
-  "tripRecordingConnectingTitle": "Opname starten…"
+  "tripRecordingConnectingTitle": "Opname starten…",
+  "pumpCameraOrientationHorizontal": "Schakel naar horizontale weergave",
+  "pumpCameraOrientationVertical": "Schakel naar verticale weergave",
+  "pumpCameraGlareWarning": "Te veel glans — kantel iets om reflecties te vermijden",
+  "pumpCameraAlignHint": "Lijn het scherm uit in het kader en maak een foto"
 }

@@ -10,6 +10,29 @@ import 'package:flutter/services.dart';
 import '../../../../core/logging/error_logger.dart';
 import 'ocr_geometry.dart';
 
+/// The physical orientation of a pump display readout (#2276).
+///
+/// [horizontal] — the three value groups are arranged in a wide,
+/// left-to-right strip (e.g. Tokheim FR pumps with PRIX | VOLUME |
+/// PRIX DU LITRE side by side, which is the default and matches the
+/// existing 16∶5 reticle).
+///
+/// [vertical] — the values are stacked top-to-bottom, common on many
+/// German / Italian pumps (Betrag on top, Abgabe in the middle, Preis
+/// below).  The reticle switches to a narrow portrait aspect for these.
+enum OcrDisplayOrientation {
+  horizontal,
+  vertical;
+
+  /// Parse from a JSON string (`"horizontal"` / `"vertical"`). Returns
+  /// [horizontal] for any unknown / missing value so old config entries
+  /// are always forward-compatible.
+  static OcrDisplayOrientation fromJson(Object? raw) {
+    if (raw == 'vertical') return vertical;
+    return horizontal;
+  }
+}
+
 /// Country-scoped numeric expectations for a pump readout (#2275).
 ///
 /// Drops the old EUR-hardcoded assumptions: the currency, decimal
@@ -90,17 +113,29 @@ class OcrLocaleProfile {
 
 /// The three value fields of a pump display, each with the normalized
 /// ROI the segment recognizer should read (relative to the upright,
-/// reticle-cropped frame).
+/// reticle-cropped frame), plus the data label shown on the physical
+/// display (e.g. "PRIX", "VOLUME") so the alignment overlay can draw
+/// the correct guide text without hard-coding any locale-specific name.
 @immutable
 class OcrPumpFieldSpec {
   final OcrNormalizedRect total;
   final OcrNormalizedRect volume;
   final OcrNormalizedRect pricePerLitre;
 
+  /// Label printed on the pump display for each field, keyed by field
+  /// name (`"total"` / `"volume"` / `"pricePerLitre"`). These are DATA
+  /// values from the JSON (e.g. "PRIX", "VOLUME", "PRIX DU LITRE") and
+  /// are never user-facing text in the ARB sense — they replicate what
+  /// the user can already see printed on the physical display.
+  ///
+  /// Null entries fall back to a generic slot label in the overlay.
+  final Map<String, String?> displayLabels;
+
   const OcrPumpFieldSpec({
     required this.total,
     required this.volume,
     required this.pricePerLitre,
+    this.displayLabels = const {},
   });
 
   static OcrPumpFieldSpec? fromJson(Object? raw) {
@@ -109,10 +144,16 @@ class OcrPumpFieldSpec {
     final volume = OcrNormalizedRect.fromJson(raw['volume']);
     final ppl = OcrNormalizedRect.fromJson(raw['pricePerLitre']);
     if (total == null || volume == null || ppl == null) return null;
+    final labels = <String, String?>{};
+    for (final key in ['total', 'volume', 'pricePerLitre']) {
+      final v = raw['${key}Label'];
+      labels[key] = v is String && v.isNotEmpty ? v : null;
+    }
     return OcrPumpFieldSpec(
       total: total,
       volume: volume,
       pricePerLitre: ppl,
+      displayLabels: labels,
     );
   }
 }
@@ -136,11 +177,21 @@ class OcrBrandTemplate {
   /// receipt hints (forward-compatible).
   final OcrPumpFieldSpec? pumpDisplay;
 
+  /// How the three numeric fields are physically laid out on the pump
+  /// display (#2276). Drives the aspect ratio of the framing overlay
+  /// (wide strip for [OcrDisplayOrientation.horizontal], narrow column
+  /// for [OcrDisplayOrientation.vertical]).
+  ///
+  /// Defaults to [OcrDisplayOrientation.horizontal] so existing entries
+  /// without the key continue to work unchanged.
+  final OcrDisplayOrientation displayOrientation;
+
   const OcrBrandTemplate({
     required this.brand,
     required this.country,
     required this.label,
     this.pumpDisplay,
+    this.displayOrientation = OcrDisplayOrientation.horizontal,
   });
 
   static OcrBrandTemplate? fromJson(Object? raw) {
@@ -155,6 +206,8 @@ class OcrBrandTemplate {
       country: country.toUpperCase(),
       label: label is String ? label : brand,
       pumpDisplay: OcrPumpFieldSpec.fromJson(raw['pumpDisplay']),
+      displayOrientation:
+          OcrDisplayOrientation.fromJson(raw['displayOrientation']),
     );
   }
 }

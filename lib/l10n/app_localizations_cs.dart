@@ -4569,6 +4569,21 @@ class AppLocalizationsCs extends AppLocalizations {
       'Kameru se nepodařilo spustit. Zkuste to znovu nebo zadejte hodnoty ručně.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Přepnout na vodorovné rozložení';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Přepnout na svislé rozložení';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Příliš mnoho odlesků — mírně nakloňte, abyste se vyhnuli odrazům';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Zarovnejte displej do rámečku a poté vyfotografujte';
+
+  @override
   String get fillUpSectionWhatTitle => 'Co jste natankovali';
 
   @override

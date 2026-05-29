@@ -4601,6 +4601,20 @@ class AppLocalizationsEs extends AppLocalizations {
       'La cámara no pudo iniciarse. Inténtalo de nuevo o introduce los valores a mano.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Cambiar a disposición horizontal';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Cambiar a disposición vertical';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Demasiado brillo — inclina ligeramente para evitar reflejos';
+
+  @override
+  String get pumpCameraAlignHint => 'Alinea el surtidor en el marco y captura';
+
+  @override
   String get fillUpSectionWhatTitle => 'Qué repostaste';
 
   @override

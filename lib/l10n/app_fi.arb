@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Polttoaineiden hintatiedot tarjoaa {source}, lisensoitu lisenssillä {license}.",
   "tripRecordingAutoPinTitle": "Kiinnitä aina tallennuksen alkaessa",
   "tripRecordingAutoPinSubtitle": "Kiinnitä lomake automaattisesti joka ajolla sen sijaan, että napautat joka kerta. Kuluttaa enemmän akkua.",
-  "tripRecordingConnectingTitle": "Aloitetaan tallennusta…"
+  "tripRecordingConnectingTitle": "Aloitetaan tallennusta…",
+  "pumpCameraOrientationHorizontal": "Vaihda vaakaasetteluun",
+  "pumpCameraOrientationVertical": "Vaihda pystyasetteluun",
+  "pumpCameraGlareWarning": "Liikaa heijastusta — kallista hieman välttääksesi heijastukset",
+  "pumpCameraAlignHint": "Kohdista näyttö kehykseen ja ota sitten kuva"
 }

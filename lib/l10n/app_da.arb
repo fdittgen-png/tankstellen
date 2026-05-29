@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Brændstofprisdata leveret af {source}, licenseret under {license}.",
   "tripRecordingAutoPinTitle": "Fastgør altid, når optagelsen starter",
   "tripRecordingAutoPinSubtitle": "Fastgør formularen automatisk hver tur i stedet for at trykke hver gang. Bruger mere batteri.",
-  "tripRecordingConnectingTitle": "Starter optagelse…"
+  "tripRecordingConnectingTitle": "Starter optagelse…",
+  "pumpCameraOrientationHorizontal": "Skift til vandret layout",
+  "pumpCameraOrientationVertical": "Skift til lodret layout",
+  "pumpCameraGlareWarning": "For meget blænding — vip lidt for at undgå refleksioner",
+  "pumpCameraAlignHint": "Juster displayet i rammen og tag derefter billede"
 }

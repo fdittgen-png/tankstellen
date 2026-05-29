@@ -1962,5 +1962,9 @@
   "dataSourceAttributionSemantic": "Dati sui prezzi dei carburanti forniti da {source}, con licenza {license}.",
   "tripRecordingAutoPinTitle": "Fissa sempre all'avvio della registrazione",
   "tripRecordingAutoPinSubtitle": "Fissa il modulo automaticamente a ogni viaggio invece di toccare ogni volta. Consuma più batteria.",
-  "tripRecordingConnectingTitle": "Avvio della registrazione…"
+  "tripRecordingConnectingTitle": "Avvio della registrazione…",
+  "pumpCameraOrientationHorizontal": "Passa a layout orizzontale",
+  "pumpCameraOrientationVertical": "Passa a layout verticale",
+  "pumpCameraGlareWarning": "Troppi riflessi — inclina leggermente per evitare abbagliamenti",
+  "pumpCameraAlignHint": "Allinea il display nel riquadro, poi cattura"
 }

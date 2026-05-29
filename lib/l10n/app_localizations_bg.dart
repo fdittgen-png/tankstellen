@@ -4602,6 +4602,22 @@ class AppLocalizationsBg extends AppLocalizations {
       'Камерата не можа да се стартира. Опитайте отново или въведете стойностите ръчно.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Превключете към хоризонтално оформление';
+
+  @override
+  String get pumpCameraOrientationVertical =>
+      'Превключете към вертикално оформление';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Прекалено много отблясъци — наклонете леко, за да избегнете отражения';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Наредете дисплея в рамката и след това заснемете';
+
+  @override
   String get fillUpSectionWhatTitle => 'Какво сте заредили';
 
   @override

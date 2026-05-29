@@ -4578,6 +4578,21 @@ class AppLocalizationsNl extends AppLocalizations {
       'De camera kon niet starten. Probeer opnieuw of voer de waarden handmatig in.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Schakel naar horizontale weergave';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Schakel naar verticale weergave';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Te veel glans — kantel iets om reflecties te vermijden';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Lijn het scherm uit in het kader en maak een foto';
+
+  @override
   String get fillUpSectionWhatTitle => 'Wat je getankt hebt';
 
   @override

@@ -4588,6 +4588,21 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nepavyko paleisti kameros. Bandykite dar kartą arba įveskite reikšmes rankiniu būdu.';
 
   @override
+  String get pumpCameraOrientationHorizontal =>
+      'Perjungti į horizontalų išdėstymą';
+
+  @override
+  String get pumpCameraOrientationVertical => 'Perjungti į vertikalų išdėstymą';
+
+  @override
+  String get pumpCameraGlareWarning =>
+      'Per daug atspindžių — šiek tiek pakreipkite, kad išvengtumėte atspindžių';
+
+  @override
+  String get pumpCameraAlignHint =>
+      'Sulygiuokite ekraną rėme ir tada fotografuokite';
+
+  @override
   String get fillUpSectionWhatTitle => 'Ką pildėte';
 
   @override
