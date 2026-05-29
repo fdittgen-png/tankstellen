@@ -186,8 +186,12 @@ class _PrivacyDashboardScreenState
         return;
       }
       if (!mounted) return;
-      // #1993 — also drop a copy into Downloads so the user can grab the
-      // file from the file manager without re-running the share flow.
+      // #1993 — drop a copy into Downloads so the user can grab the file
+      // from the file manager. This is the SINGLE Downloads write for the
+      // large-log path: [_shareErrorLogAsFile] no longer saves to
+      // Downloads itself (it only feeds the widget-test share seam), so
+      // the file is written exactly once instead of twice (the double
+      // `tankstellen-error-log.json` + `… (1).json` field bug).
       await _saveExportToDownloads(
         text: json,
         fileName: 'tankstellen-error-log.json',
@@ -237,44 +241,30 @@ class _PrivacyDashboardScreenState
     );
   }
 
+  /// Routes the large error-log payload to the widget-test share seam
+  /// only. The actual Downloads write happens exactly once in the caller
+  /// via [_saveExportToDownloads] — see the duplicate-write fix note in
+  /// [_exportErrorLog].
+  ///
+  /// 2026-05-24 follow-up — file exports go straight to the device's
+  /// public Downloads folder. The test seam below is preserved so widget
+  /// tests can still observe the outgoing [ShareParams] payload; in
+  /// production (no sink installed) this is a no-op and the single save
+  /// is owned by the caller.
   Future<void> _shareErrorLogAsFile(String json) async {
-    // 2026-05-24 follow-up — file exports go straight to the device's
-    // public Downloads folder. The test seam is preserved so widget
-    // tests can still observe the outgoing ShareParams payload, but
-    // production runs only the PublicFileExporter save.
     final sink = debugPrivacyShareSinkOverride;
-    if (sink != null) {
-      final tempDirProvider =
-          debugPrivacyTempDirectoryOverride ?? getTemporaryDirectory;
-      final tempDir = await tempDirProvider();
-      final filePath = '${tempDir.path}/tankstellen-error-log.json';
-      final file = File(filePath);
-      await file.writeAsString(json, flush: true);
-      final params = ShareParams(
-        files: [XFile(filePath, mimeType: 'application/json')],
-        subject: 'tankstellen-error-log.json',
-      );
-      await sink(params);
-      return;
-    }
-    try {
-      await PublicFileExporter.saveTextToDownloads(
-        text: json,
-        fileName: 'tankstellen-error-log.json',
-        mimeType: 'application/json',
-      );
-      if (!mounted) return;
-      final l = AppLocalizations.of(context);
-      SnackBarHelper.showSuccess(
-        context,
-        l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
-      );
-    } on Object catch (e, st) {
-      // #2146 — surface on the log the user is about to export.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'PrivacyDashboard._shareErrorLogAsFile',
-      }));
-    }
+    if (sink == null) return;
+    final tempDirProvider =
+        debugPrivacyTempDirectoryOverride ?? getTemporaryDirectory;
+    final tempDir = await tempDirProvider();
+    final filePath = '${tempDir.path}/tankstellen-error-log.json';
+    final file = File(filePath);
+    await file.writeAsString(json, flush: true);
+    final params = ShareParams(
+      files: [XFile(filePath, mimeType: 'application/json')],
+      subject: 'tankstellen-error-log.json',
+    );
+    await sink(params);
   }
 
   Future<void> _exportDataCsv() async {
