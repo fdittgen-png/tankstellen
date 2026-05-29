@@ -13,6 +13,7 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 import '../../fakes/fake_hive_storage.dart';
+import '../../helpers/silence_error_logger.dart';
 
 // ---------------------------------------------------------------------------
 // Test doubles
@@ -177,6 +178,7 @@ const _params = SearchParams(
 // ---------------------------------------------------------------------------
 
 void main() {
+  silenceErrorLoggerSpool();
   group('StationServiceChain edge cases', () {
     late _FakeStationService fakeService;
     late _FakeCacheManager fakeCache;
@@ -269,12 +271,14 @@ void main() {
     // -----------------------------------------------------------------------
     group('corrupted cache', () {
       test(
-          'corrupted JSON in cache causes TypeError (catches FormatException but not TypeError)',
-          () async {
-        // Put corrupted data in cache (payload.stations is a string, not list).
-        // This exposes a real edge case: the deserializer catches
-        // FormatException but the type cast `as List<dynamic>?` throws
-        // TypeError which propagates. This test documents this behavior.
+          '#2296 — a corrupt fresh-cache entry is a cache miss, not a UI '
+          'crash (broadened catch swallows TypeError too)', () async {
+        // payload.stations is a String, so the deserializer's
+        // `data['stations'] as List<dynamic>?` cast throws a TypeError —
+        // an Error, not an Exception. Before #2296 the `on FormatException`
+        // catch let it escape and crash the UI, bypassing the stale-cache
+        // fallback. Now the broadened `on Object` catch treats it as a
+        // miss and the chain proceeds.
         final cacheKey = CacheKey.stationSearch(
           _params.lat,
           _params.lng,
@@ -284,19 +288,18 @@ void main() {
         );
         fakeCache.insertCorrupted(cacheKey);
 
-        // API also fails => the corrupted cache triggers a TypeError.
+        // API also fails and there is no (valid) stale cache, so the chain
+        // exhausts cleanly with its typed exception — NOT a raw TypeError.
         fakeService.errorToThrow = const ApiException(message: 'down');
-        expect(
-          () => chain.searchStations(_params),
-          throwsA(isA<TypeError>()),
+        await expectLater(
+          chain.searchStations(_params),
+          throwsA(isA<ServiceChainExhaustedException>()),
         );
       });
 
-      test('corrupted stale cache with working API succeeds because API returns first',
-          () async {
-        // When fresh cache has corrupted data, it throws TypeError during
-        // deserialization. API is not reached because the error propagates.
-        // This documents the current behavior.
+      test(
+          '#2296 — a corrupt fresh-cache entry falls through to a working '
+          'API instead of crashing', () async {
         final cacheKey = CacheKey.stationSearch(
           _params.lat,
           _params.lng,
@@ -305,17 +308,11 @@ void main() {
           countryCode: 'DE',
         );
 
-        // Insert corrupted data as STALE (expired) so fresh cache returns
-        // null and the chain proceeds to API.
-        fakeCache.insertExpired(
-          cacheKey,
-          {'stations': 'not-a-list'},
-          source: ServiceSource.cache,
-          ttl: const Duration(minutes: 5),
-          storedAt: DateTime.now().subtract(const Duration(hours: 1)),
-        );
+        // Corrupt data as a FRESH entry — the deserializer hits a TypeError
+        // on the cast, which the broadened catch turns into a miss so the
+        // chain continues to the API rather than crashing.
+        fakeCache.insertCorrupted(cacheKey);
 
-        // API succeeds => should get API data.
         fakeService.stationsToReturn = [_makeStation('s1')];
         final result = await chain.searchStations(_params);
         expect(result.data, hasLength(1));

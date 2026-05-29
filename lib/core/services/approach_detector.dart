@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:geolocator/geolocator.dart';
 
+import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/search/domain/entities/station.dart';
+import '../logging/error_logger.dart';
 import '../utils/geo_utils.dart' as geo;
 import '../utils/num_extensions.dart';
+import '../utils/station_extensions.dart';
 
 /// State emitted by [ApproachDetector] (#2085 / ADR 0011).
 ///
@@ -195,7 +197,27 @@ class ApproachDetector {
       geo.distanceMeters(lat1, lng1, lat2, lng2);
 
   void _start() {
-    _gpsSub = _gps.listen(_onPosition);
+    // Drop any prior subscription before re-subscribing so the error-
+    // recovery restart (below) never leaks a second listener.
+    unawaited(_gpsSub?.cancel());
+    // #2297 — a mid-trip permission revoke or OS location kill emits an
+    // error on the position stream; without an onError the subscription
+    // terminates silently, the poll timer keeps firing against a frozen
+    // `_lastGps`, and the overlay shows stale state with no transition.
+    // Log it, reset to Idle, and re-subscribe so a later re-grant of the
+    // location permission recovers the overlay automatically.
+    _gpsSub = _gps.listen(
+      _onPosition,
+      onError: (Object e, StackTrace st) {
+        if (_disposed) return;
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+          'where': 'ApproachDetector GPS stream error',
+        }));
+        _emit(const ApproachIdle());
+        _start();
+      },
+      cancelOnError: false,
+    );
   }
 
   void _onPosition(Position p) {
@@ -327,24 +349,14 @@ class ApproachDetector {
         _lockedStation = target;
       }
     } else {
-      // cheapestInRadius — re-evaluate every poll.
-      double priceOf(Station s) {
-        // Generic "lowest price" across whatever the station carries.
-        // Caller's fuel-type filter has already narrowed the
-        // upstream search; the price field that matches the requested
-        // fuel is what landed in the band.
-        final ps = <double>[
-          if (s.e5 != null) s.e5!,
-          if (s.e10 != null) s.e10!,
-          if (s.diesel != null) s.diesel!,
-          if (s.e85 != null) s.e85!,
-          if (s.lpg != null) s.lpg!,
-          if (s.cng != null) s.cng!,
-          if (s.e98 != null) s.e98!,
-        ];
-        if (ps.isEmpty) return double.infinity;
-        return ps.reduce(math.min);
-      }
+      // cheapestInRadius — re-evaluate every poll. #2299 — rank by the
+      // price for the REQUESTED fuel only. The Tankerkoenig list API
+      // returns every fuel price per station regardless of the `type`
+      // filter, so taking the min across all fuels would target a diesel
+      // station by its (cheaper) e10 price — i.e. the cheapest-any-fuel
+      // station, not the cheapest-for-the-driver's-fuel one.
+      final fuel = FuelType.fromString(_config.fuelTypeApiValue);
+      double priceOf(Station s) => s.priceFor(fuel) ?? double.infinity;
 
       inRadius.sort((a, b) => priceOf(a.$1).compareTo(priceOf(b.$1)));
       target = inRadius.first.$1;

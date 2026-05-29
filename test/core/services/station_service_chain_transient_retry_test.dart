@@ -12,6 +12,8 @@ import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
+import '../../helpers/silence_error_logger.dart';
+
 /// Fake upstream that hands the caller a scripted sequence of outcomes —
 /// throw on the first N calls, then return [stations]. Used to verify
 /// that the chain retries transient errors exactly once and recovers
@@ -99,6 +101,7 @@ SearchParams _params() => const SearchParams(
     );
 
 void main() {
+  silenceErrorLoggerSpool();
   // Pin the retry delay near-zero so the test runs in milliseconds.
   // We're verifying the retry happens, not the wall-clock spacing.
   setUp(() {

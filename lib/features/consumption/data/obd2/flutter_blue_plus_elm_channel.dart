@@ -175,7 +175,13 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
     _subscription = _notifyChar!.lastValueStream.listen(
       (bytes) => _incoming.add(bytes),
       onError: (e, st) {
-        debugPrint('FlutterBluePlusElmChannel notify error: $e');
+        // #2295 — forward the GATT/ATT error onto the byte stream so the
+        // transport's pending `sendCommand` completer fails IMMEDIATELY
+        // (via `_failPending`) instead of sitting until the 5 s read
+        // timeout, and log it so the drop is visible in release.
+        if (!_incoming.isClosed) _incoming.addError(e, st);
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+            context: const {'where': 'FlutterBluePlusElmChannel notify error'}));
       },
     );
     // #2261 concern 1 — subscribe to the device's connection-state
@@ -274,6 +280,9 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'FlutterBluePlusElmChannel: disconnect failed'}));
     }
+    // #2295 — close the broadcast controller on dispose (symmetry with
+    // ClassicElmChannel.close()) so it doesn't leak across a reconnect.
+    if (!_incoming.isClosed) await _incoming.close();
     _writeChar = null;
     _notifyChar = null;
   }

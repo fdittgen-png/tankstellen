@@ -12,6 +12,8 @@ import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
+import '../../helpers/silence_error_logger.dart';
+
 class MockStationService extends Mock implements StationService {}
 
 class MockCacheManager extends Mock implements CacheManager {}
@@ -19,6 +21,7 @@ class MockCacheManager extends Mock implements CacheManager {}
 class FakeSearchParams extends Fake implements SearchParams {}
 
 void main() {
+  silenceErrorLoggerSpool();
   late MockStationService mockPrimary;
   late MockCacheManager mockCache;
   late StationServiceChain chain;

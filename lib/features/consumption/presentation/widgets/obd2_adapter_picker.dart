@@ -314,9 +314,13 @@ class _Obd2AdapterPickerSheetState
       );
       await ref.read(vehicleProfileListProvider.notifier).save(updated);
     } catch (e, st) {
-      debugPrint(
-        'Obd2AdapterPickerSheet._persistPickedAdapterToActiveVehicle: $e\n$st',
-      );
+      // #2308 — this write is the ONLY path that pre-populates the
+      // pinned-MAC fast-connect; a HiveError here silently drops the
+      // adapter MAC and breaks auto-connect on every later session, so
+      // it must leave a release-visible breadcrumb (not just debugPrint).
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': '_persistPickedAdapterToActiveVehicle',
+      }));
     }
   }
 
