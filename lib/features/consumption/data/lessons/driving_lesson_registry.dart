@@ -1,0 +1,114 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import '../../../../l10n/app_localizations.dart';
+import '../../domain/driving_insight.dart';
+import '../../domain/driving_score.dart';
+import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/lessons/driving_lesson_rule.dart';
+import '../../domain/trip_recorder.dart';
+import '../driving_insights_analyzer.dart';
+import '../driving_score_calculator.dart';
+import 'rules/hard_accel_rule.dart';
+import 'rules/high_rpm_rule.dart';
+import 'rules/idling_rule.dart';
+import 'rules/low_gear_rule.dart';
+
+/// Holds the post-trip [DrivingLessonRule]s and turns a trip into its
+/// ranked list of firing [DrivingLesson]s (#2251).
+///
+/// This is the single plug-in point the issue/epic asks for: the
+/// trip-detail Insights card and the GPX exporter both render the output
+/// of [evaluate]. Adding a lesson = add a rule file + one entry in
+/// [standard] — no edits to the calculator, the card, or the exporter.
+///
+/// The registry runs the legacy cost-line analyzer (`analyzeTrip`) and
+/// the composite score calculator ONCE, packs them into a
+/// [LessonContext], and feeds every rule the same context — so the
+/// migrated cost-line lessons are bit-for-bit the coaching the old card
+/// showed, and the O(n) passes are paid once rather than per rule.
+class DrivingLessonRegistry {
+  /// The registered rules, in declaration order. Two rules may not share
+  /// an [DrivingLessonRule.id] — the constructor asserts uniqueness so a
+  /// duplicate is caught in debug/test rather than silently shadowing a
+  /// lesson in the GPX export.
+  final List<DrivingLessonRule> rules;
+
+  DrivingLessonRegistry(this.rules)
+      : assert(
+          rules.map((r) => r.id).toSet().length == rules.length,
+          'DrivingLessonRule ids must be unique',
+        );
+
+  /// The production registry — every post-trip lesson the trip-detail
+  /// Insights group surfaces today, migrated to rules (#2251):
+  ///   * [LowGearRule]   — labouring in too-low a gear (> 60 s);
+  ///   * [HighRpmRule]   — time over 3000 RPM;
+  ///   * [HardAccelRule] — hard-acceleration events;
+  ///   * [IdlingRule]    — engine-on-stationary waste.
+  ///
+  /// Declaration order is the tie-break for equal-impact lessons (see
+  /// [evaluate]); the low-gear rule is first so it keeps its
+  /// rendered-above-cost-lines position.
+  factory DrivingLessonRegistry.standard() => DrivingLessonRegistry(const [
+        LowGearRule(),
+        HighRpmRule(),
+        HardAccelRule(),
+        IdlingRule(),
+      ]);
+
+  /// Evaluate every rule against the trip and return the firing lessons
+  /// ranked by [DrivingLesson.impact] descending. Ties keep registration
+  /// order (stable) so the output is deterministic.
+  ///
+  /// [score] / [insights] are optional — when omitted they are computed
+  /// from [samples] (`computeDrivingScore` / `analyzeTrip`), so callers
+  /// that don't already hold them (the GPX exporter) don't have to. The
+  /// trip-detail body already caches both across rebuilds and passes
+  /// them in to avoid re-running the O(n) passes on every locale / theme
+  /// tick.
+  List<DrivingLesson> evaluate(
+    TripSummary summary,
+    List<TripSample> samples,
+    AppLocalizations l, {
+    DrivingScore? score,
+    List<DrivingInsight>? insights,
+  }) {
+    return evaluateContext(
+      LessonContext(
+        summary: summary,
+        samples: samples,
+        score: score ?? computeDrivingScore(samples),
+        insights: insights ?? analyzeTrip(samples),
+      ),
+      l,
+    );
+  }
+
+  /// Run every rule against an already-built [context] and return the
+  /// firing lessons ranked by impact descending (ties → registration
+  /// order, stable). The lower-level entry point for callers that
+  /// already hold the analyzer output + score and want to avoid
+  /// recomputing them.
+  List<DrivingLesson> evaluateContext(
+    LessonContext context,
+    AppLocalizations l,
+  ) {
+    // Collect firing lessons, tagging each with its rule index so the
+    // sort can break ties by registration order (Dart's List.sort is
+    // not guaranteed stable).
+    final fired = <(int, DrivingLesson)>[];
+    for (var i = 0; i < rules.length; i++) {
+      final lesson = rules[i].evaluate(context, l);
+      if (lesson != null) fired.add((i, lesson));
+    }
+
+    fired.sort((a, b) {
+      final byImpact = b.$2.impact.compareTo(a.$2.impact);
+      if (byImpact != 0) return byImpact;
+      return a.$1.compareTo(b.$1);
+    });
+
+    return fired.map((e) => e.$2).toList(growable: false);
+  }
+}

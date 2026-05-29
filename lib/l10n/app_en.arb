@@ -2435,6 +2435,22 @@
       }
     }
   },
+  "lessonAdviceIdling": "Turn the engine off at long stops instead of letting it idle.",
+  "@lessonAdviceIdling": {
+    "description": "How-to-improve advice for the idling lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export; the trip-detail card keeps its existing percent-of-trip caption."
+  },
+  "lessonAdviceHighRpm": "Shift up earlier to keep the engine out of the high-RPM band.",
+  "@lessonAdviceHighRpm": {
+    "description": "How-to-improve advice for the high-RPM lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
+  },
+  "lessonAdviceHardAccel": "Ease onto the throttle — smooth acceleration uses less fuel.",
+  "@lessonAdviceHardAccel": {
+    "description": "How-to-improve advice for the hard-acceleration lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
+  },
+  "lessonAdviceLowGear": "Shift up sooner so the engine settles into a lower, more efficient gear.",
+  "@lessonAdviceLowGear": {
+    "description": "How-to-improve advice for the low-gear lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
+  },
   "drivingScoreCardTitle": "Driving score",
   "@drivingScoreCardTitle": {
     "description": "Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A)."

@@ -7143,6 +7143,30 @@ abstract class AppLocalizations {
   /// **'Labouring in low gear ({minutes} min)'**
   String insightLowGear(String minutes);
 
+  /// How-to-improve advice for the idling lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export; the trip-detail card keeps its existing percent-of-trip caption.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn the engine off at long stops instead of letting it idle.'**
+  String get lessonAdviceIdling;
+
+  /// How-to-improve advice for the high-RPM lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift up earlier to keep the engine out of the high-RPM band.'**
+  String get lessonAdviceHighRpm;
+
+  /// How-to-improve advice for the hard-acceleration lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Ease onto the throttle — smooth acceleration uses less fuel.'**
+  String get lessonAdviceHardAccel;
+
+  /// How-to-improve advice for the low-gear lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift up sooner so the engine settles into a lower, more efficient gear.'**
+  String get lessonAdviceLowGear;
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:
