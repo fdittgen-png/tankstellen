@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "Versão da aplicação",
   "developerToolsBuildChannel": "Canal de compilação",
   "featureLabel_debugMode": "Modo programador / depuração",
-  "featureDescription_debugMode": "Mostra uma secção Ferramentas de programador nas definições com diagnósticos: exportação do registo de erros, notificações de teste, execução do pipeline de alerta de teste, despejo de sinalizadores de funcionalidades, limpeza de caches e cópia de diagnósticos."
+  "featureDescription_debugMode": "Mostra uma secção Ferramentas de programador nas definições com diagnósticos: exportação do registo de erros, notificações de teste, execução do pipeline de alerta de teste, despejo de sinalizadores de funcionalidades, limpeza de caches e cópia de diagnósticos.",
+  "alertGatingNonDeStationWarning": "Os alertas de preço em segundo plano atualmente só funcionam para postos na Alemanha. Este alerta será guardado, mas poderá nunca o notificar até que cheguem os alertas entre países.",
+  "alertGatingRadiusGermanyOnlyNote": "Os alertas por raio atualmente só verificam postos na Alemanha."
 }

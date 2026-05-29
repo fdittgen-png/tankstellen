@@ -3424,6 +3424,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Completa un viaje de más de 30 km a velocidad constante con una puntuación de conducción suave de 90 o más.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Las alertas de precio en segundo plano actualmente solo funcionan para estaciones en Alemania. Esta alerta se guardará, pero puede que nunca te notifique hasta que lleguen las alertas entre países.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Las alertas por radio actualmente solo comprueban estaciones en Alemania.';
+
+  @override
   String get approachOverlaySection =>
       'Superposición al acercarse a una estación';
 

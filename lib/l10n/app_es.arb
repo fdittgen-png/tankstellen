@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "Versión de la aplicación",
   "developerToolsBuildChannel": "Canal de compilación",
   "featureLabel_debugMode": "Modo desarrollador / depuración",
-  "featureDescription_debugMode": "Muestra una sección Herramientas de desarrollo en los ajustes con diagnósticos: exportación del registro de errores, notificaciones de prueba, ejecución de la canalización de alerta de prueba, volcado de indicadores de funciones, vaciado de cachés y copia de diagnósticos."
+  "featureDescription_debugMode": "Muestra una sección Herramientas de desarrollo en los ajustes con diagnósticos: exportación del registro de errores, notificaciones de prueba, ejecución de la canalización de alerta de prueba, volcado de indicadores de funciones, vaciado de cachés y copia de diagnósticos.",
+  "alertGatingNonDeStationWarning": "Las alertas de precio en segundo plano actualmente solo funcionan para estaciones en Alemania. Esta alerta se guardará, pero puede que nunca te notifique hasta que lleguen las alertas entre países.",
+  "alertGatingRadiusGermanyOnlyNote": "Las alertas por radio actualmente solo comprueban estaciones en Alemania."
 }

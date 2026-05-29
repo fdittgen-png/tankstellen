@@ -3400,6 +3400,14 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lõpeta 30 km+ reis ühtlase kiirusega ja sujuva sõidu tulemusega 90 või rohkem.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Tausta hinnateavitused töötavad praegu ainult Saksamaa tanklate puhul. See teavitus salvestatakse, kuid ei pruugi teid kunagi teavitada, kuni riikidevahelised teavitused saabuvad.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Raadiuse teavitused kontrollivad praegu ainult Saksamaa tanklaid.';
+
+  @override
   String get approachOverlaySection => 'Tankla lähenemise ülekate';
 
   @override

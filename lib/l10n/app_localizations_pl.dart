@@ -3413,6 +3413,14 @@ class AppLocalizationsPl extends AppLocalizations {
       'Przejedź trasę 30 km+ ze stałą prędkością z wynikiem płynnej jazdy 90 lub więcej.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Powiadomienia o cenach w tle działają obecnie tylko dla stacji w Niemczech. To powiadomienie zostanie zapisane, ale może nigdy Cię nie powiadomić, dopóki nie pojawią się powiadomienia międzynarodowe.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Alerty radiusowe sprawdzają obecnie tylko stacje w Niemczech.';
+
+  @override
   String get approachOverlaySection =>
       'Nakładka podczas zbliżania się do stacji';
 

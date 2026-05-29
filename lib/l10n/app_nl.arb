@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "App-versie",
   "developerToolsBuildChannel": "Build-kanaal",
   "featureLabel_debugMode": "Ontwikkelaars-/foutopsporingsmodus",
-  "featureDescription_debugMode": "Toont een sectie Ontwikkelaarstools in de instellingen met diagnostiek: export van het foutenlogboek, testmeldingen, een testwaarschuwingspijplijn, een functievlag-overzicht, caches wissen en diagnostiek kopiëren."
+  "featureDescription_debugMode": "Toont een sectie Ontwikkelaarstools in de instellingen met diagnostiek: export van het foutenlogboek, testmeldingen, een testwaarschuwingspijplijn, een functievlag-overzicht, caches wissen en diagnostiek kopiëren.",
+  "alertGatingNonDeStationWarning": "Prijswaarschuwingen op de achtergrond werken momenteel alleen voor tankstations in Duitsland. Deze waarschuwing wordt opgeslagen, maar geeft je mogelijk nooit een melding totdat grensoverschrijdende waarschuwingen beschikbaar zijn.",
+  "alertGatingRadiusGermanyOnlyNote": "Straalwaarschuwingen controleren momenteel alleen tankstations in Duitsland."
 }

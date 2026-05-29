@@ -10,6 +10,7 @@ import '../data/radius_alert_store.dart';
 import '../domain/entities/radius_alert.dart';
 import '../../../core/background/background_service.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/notifications/notification_providers.dart';
 
 part 'radius_alerts_provider.g.dart';
 
@@ -51,6 +52,15 @@ class RadiusAlerts extends _$RadiusAlerts {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.add'}));
     }
     state = AsyncValue.data(await store.list());
+    // #2246 — mirror the per-station AlertNotifier.addAlert path: request
+    // the OS notification permission at the user-intent moment a radius
+    // alert is created. Without it, Android 13+ schedules the WorkManager
+    // task and calls showPriceAlert, but the OS silently drops every
+    // radius notification. Idempotent on the OS side — re-requesting an
+    // already-granted permission is a no-op, so it never re-prompts.
+    if (alert.enabled) {
+      unawaited(ref.read(notificationServiceProvider).requestPermission());
+    }
     // #2210 — radius alerts must gate background polling too (not just
     // per-station price alerts), or radius-only users never get scheduled.
     await BackgroundService.reconcile();
@@ -95,6 +105,12 @@ class RadiusAlerts extends _$RadiusAlerts {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.toggle'}));
     }
     state = AsyncValue.data(await store.list());
+    // #2246 — re-enabling a radius alert is the same user-intent moment as
+    // creating one, so (re)request the notification permission here too.
+    // Only on the enable transition: disabling shouldn't prompt.
+    if (updated.enabled) {
+      unawaited(ref.read(notificationServiceProvider).requestPermission());
+    }
     // #2210 — radius alerts must gate background polling too (not just
     // per-station price alerts), or radius-only users never get scheduled.
     await BackgroundService.reconcile();

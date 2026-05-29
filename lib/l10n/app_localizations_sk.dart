@@ -3420,6 +3420,14 @@ class AppLocalizationsSk extends AppLocalizations {
       'Dokončite jazdu 30+ km pri konštantnej rýchlosti so skóre plynulej jazdy 90 alebo vyšším.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Cenové upozornenia na pozadí momentálne fungujú iba pre čerpacie stanice v Nemecku. Toto upozornenie sa uloží, ale nemusí vás upozorniť, kým nebudú dostupné medzištátne upozornenia.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Upozornenia podľa okruhu momentálne kontrolujú iba čerpacie stanice v Nemecku.';
+
+  @override
   String get approachOverlaySection => 'Prekryv pri približovaní k stanici';
 
   @override

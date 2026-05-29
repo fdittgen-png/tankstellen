@@ -3426,6 +3426,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Teljesítsen egy 30 km-nél hosszabb utat egyenletes sebességgel, legalább 90-es sima-vezetési pontszámmal.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'A háttérben futó árriasztások jelenleg csak németországi töltőállomásokra működnek. Ez a riasztás mentésre kerül, de előfordulhat, hogy soha nem értesít, amíg az országok közötti riasztások meg nem érkeznek.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'A sugár alapú riasztások jelenleg csak németországi töltőállomásokat ellenőriznek.';
+
+  @override
   String get approachOverlaySection => 'Töltőállomás-megközelítési átfedés';
 
   @override

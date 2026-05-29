@@ -3423,6 +3423,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fahre eine Tour von mindestens 30 km mit gleichmäßigem Tempo und einem Fahrstil-Score von 90 oder höher.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Hintergrund-Preisalarme funktionieren derzeit nur für Tankstellen in Deutschland. Dieser Alarm wird gespeichert, benachrichtigt dich aber möglicherweise erst, wenn länderübergreifende Alarme verfügbar sind.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Umkreis-Alarme prüfen derzeit nur Tankstellen in Deutschland.';
+
+  @override
   String get approachOverlaySection => 'Tankstellen-Annäherungs-Overlay';
 
   @override

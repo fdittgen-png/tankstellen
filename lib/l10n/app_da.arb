@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "Appversion",
   "developerToolsBuildChannel": "Buildkanal",
   "featureLabel_debugMode": "Udvikler-/fejlfindingstilstand",
-  "featureDescription_debugMode": "Viser en sektion med udviklerværktøjer i indstillingerne med diagnostik: eksport af fejllog, testnotifikationer, kørsel af testadvarselsforløb, oversigt over funktionsflag, rydning af cacher og kopiering af diagnostik."
+  "featureDescription_debugMode": "Viser en sektion med udviklerværktøjer i indstillingerne med diagnostik: eksport af fejllog, testnotifikationer, kørsel af testadvarselsforløb, oversigt over funktionsflag, rydning af cacher og kopiering af diagnostik.",
+  "alertGatingNonDeStationWarning": "Baggrunds-prisalarmer fungerer i øjeblikket kun for tankstationer i Tyskland. Denne alarm gemmes, men giver dig måske aldrig besked, før alarmer på tværs af lande bliver tilgængelige.",
+  "alertGatingRadiusGermanyOnlyNote": "Radiusalarmer tjekker i øjeblikket kun tankstationer i Tyskland."
 }

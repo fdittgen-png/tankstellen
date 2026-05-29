@@ -3430,6 +3430,14 @@ class AppLocalizationsBg extends AppLocalizations {
       'Завършете пътуване от 30+ км с постоянна скорост и резултат за плавно шофиране 90 или повече.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Известията за цени във фонов режим в момента работят само за бензиностанции в Германия. Този известителен сигнал ще бъде запазен, но може никога да не ви уведоми, докато не станат достъпни междудържавните известия.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Известията по радиус в момента проверяват само бензиностанции в Германия.';
+
+  @override
   String get approachOverlaySection =>
       'Наложение при приближаване до бензиностанция';
 

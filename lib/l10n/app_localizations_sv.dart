@@ -3404,6 +3404,14 @@ class AppLocalizationsSv extends AppLocalizations {
       'Genomför en resa på 30 km+ i jämn hastighet med ett mjukkörningspoäng på 90 eller högre.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Prislarm i bakgrunden fungerar för närvarande endast för bensinstationer i Tyskland. Det här larmet sparas, men kanske aldrig meddelar dig förrän larm mellan länder blir tillgängliga.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Radielarm kontrollerar för närvarande endast bensinstationer i Tyskland.';
+
+  @override
   String get approachOverlaySection => 'Inflygningsöverlägg';
 
   @override

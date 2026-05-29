@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "Programos versija",
   "developerToolsBuildChannel": "Versijos kanalas",
   "featureLabel_debugMode": "Kūrėjo / derinimo režimas",
-  "featureDescription_debugMode": "Nustatymuose parodo skiltį Kūrėjo įrankiai su diagnostika: klaidų žurnalo eksportas, bandomieji pranešimai, bandomosios įspėjimų gijos vykdymas, funkcijų vėliavėlių sąrašas, talpyklų išvalymas ir diagnostikos kopijavimas."
+  "featureDescription_debugMode": "Nustatymuose parodo skiltį Kūrėjo įrankiai su diagnostika: klaidų žurnalo eksportas, bandomieji pranešimai, bandomosios įspėjimų gijos vykdymas, funkcijų vėliavėlių sąrašas, talpyklų išvalymas ir diagnostikos kopijavimas.",
+  "alertGatingNonDeStationWarning": "Foninės kainų perspėjimai šiuo metu veikia tik Vokietijos degalinėms. Šis perspėjimas bus išsaugotas, bet jis gali niekada jūsų neįspėti, kol bus prieinami tarptautiniai perspėjimai.",
+  "alertGatingRadiusGermanyOnlyNote": "Spindulio perspėjimai šiuo metu tikrina tik Vokietijos degalines."
 }

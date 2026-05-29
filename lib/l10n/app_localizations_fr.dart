@@ -3433,6 +3433,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Réalisez un trajet de 30 km ou plus à vitesse constante avec un score de conduite souple supérieur ou égal à 90.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Les alertes de prix en arrière-plan ne fonctionnent actuellement que pour les stations en Allemagne. Cette alerte sera enregistrée, mais elle pourrait ne jamais vous notifier tant que les alertes transfrontalières ne sont pas disponibles.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Les alertes de zone ne vérifient actuellement que les stations en Allemagne.';
+
+  @override
   String get approachOverlaySection => 'Overlay à l\'approche d\'une station';
 
   @override

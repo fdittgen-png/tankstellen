@@ -3418,6 +3418,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voltooi een rit van 30 km of meer op constante snelheid met een soepele rijscore van 90 of hoger.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Prijswaarschuwingen op de achtergrond werken momenteel alleen voor tankstations in Duitsland. Deze waarschuwing wordt opgeslagen, maar geeft je mogelijk nooit een melding totdat grensoverschrijdende waarschuwingen beschikbaar zijn.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Straalwaarschuwingen controleren momenteel alleen tankstations in Duitsland.';
+
+  @override
   String get approachOverlaySection =>
       'Overlay bij nadering van een tankstation';
 

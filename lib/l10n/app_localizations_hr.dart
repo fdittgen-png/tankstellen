@@ -3408,6 +3408,14 @@ class AppLocalizationsHr extends AppLocalizations {
       'Završite vožnju od 30 km+ pri konstantnoj brzini s ocjenom mirne vožnje 90 ili više.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Pozadinska upozorenja o cijenama trenutačno rade samo za benzinske postaje u Njemačkoj. Ovo upozorenje bit će spremljeno, ali možda vas nikada neće obavijestiti dok ne postanu dostupna međudržavna upozorenja.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Upozorenja po radijusu trenutačno provjeravaju samo benzinske postaje u Njemačkoj.';
+
+  @override
   String get approachOverlaySection =>
       'Preklapanje pri prilasku benzinskoj postaji';
 

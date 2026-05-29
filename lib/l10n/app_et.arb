@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "Rakenduse versioon",
   "developerToolsBuildChannel": "Järgu kanal",
   "featureLabel_debugMode": "Arendaja/silumisrežiim",
-  "featureDescription_debugMode": "Kuvab seadetes jaotise Arendaja tööriistad koos diagnostikaga: vealogi eksport, testteatised, testhoiatuse konveieri käivitamine, funktsioonilippude loend, vahemälude tühjendamine ja diagnostika kopeerimine."
+  "featureDescription_debugMode": "Kuvab seadetes jaotise Arendaja tööriistad koos diagnostikaga: vealogi eksport, testteatised, testhoiatuse konveieri käivitamine, funktsioonilippude loend, vahemälude tühjendamine ja diagnostika kopeerimine.",
+  "alertGatingNonDeStationWarning": "Tausta hinnateavitused töötavad praegu ainult Saksamaa tanklate puhul. See teavitus salvestatakse, kuid ei pruugi teid kunagi teavitada, kuni riikidevahelised teavitused saabuvad.",
+  "alertGatingRadiusGermanyOnlyNote": "Raadiuse teavitused kontrollivad praegu ainult Saksamaa tanklaid."
 }

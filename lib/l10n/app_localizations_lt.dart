@@ -3423,6 +3423,14 @@ class AppLocalizationsLt extends AppLocalizations {
       'Įvykdykite 30 km+ kelionę pastoviu greičiu su sklandaus vairavimo balu 90 ar daugiau.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Foninės kainų perspėjimai šiuo metu veikia tik Vokietijos degalinėms. Šis perspėjimas bus išsaugotas, bet jis gali niekada jūsų neįspėti, kol bus prieinami tarptautiniai perspėjimai.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Spindulio perspėjimai šiuo metu tikrina tik Vokietijos degalines.';
+
+  @override
   String get approachOverlaySection => 'Užklotis artėjant prie degalinės';
 
   @override

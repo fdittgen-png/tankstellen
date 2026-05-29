@@ -3402,6 +3402,14 @@ class AppLocalizationsDa extends AppLocalizations {
       'Gennemfør en tur på 30 km+ i ensartet hastighed med en blød kørescore på 90 eller derover.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Baggrunds-prisalarmer fungerer i øjeblikket kun for tankstationer i Tyskland. Denne alarm gemmes, men giver dig måske aldrig besked, før alarmer på tværs af lande bliver tilgængelige.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Radiusalarmer tjekker i øjeblikket kun tankstationer i Tyskland.';
+
+  @override
   String get approachOverlaySection => 'Indflyvningsoverlay';
 
   @override

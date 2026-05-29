@@ -51,6 +51,55 @@ final class AlertRepositoryProvider
 
 String _$alertRepositoryHash() => r'fc65d74649a3f18c253681736b245db8f6e43249';
 
+/// Injectable merge function. Production code uses the real
+/// [AlertsSync.merge]; tests override this provider with a fake.
+
+@ProviderFor(alertsMergeFn)
+final alertsMergeFnProvider = AlertsMergeFnProvider._();
+
+/// Injectable merge function. Production code uses the real
+/// [AlertsSync.merge]; tests override this provider with a fake.
+
+final class AlertsMergeFnProvider
+    extends $FunctionalProvider<AlertsMergeFn, AlertsMergeFn, AlertsMergeFn>
+    with $Provider<AlertsMergeFn> {
+  /// Injectable merge function. Production code uses the real
+  /// [AlertsSync.merge]; tests override this provider with a fake.
+  AlertsMergeFnProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'alertsMergeFnProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$alertsMergeFnHash();
+
+  @$internal
+  @override
+  $ProviderElement<AlertsMergeFn> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  AlertsMergeFn create(Ref ref) {
+    return alertsMergeFn(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AlertsMergeFn value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AlertsMergeFn>(value),
+    );
+  }
+}
+
+String _$alertsMergeFnHash() => r'6ec72990e3b88e6041de3ae2ae7711c643aaf6ec';
+
 @ProviderFor(AlertNotifier)
 final alertProvider = AlertNotifierProvider._();
 
@@ -83,7 +132,7 @@ final class AlertNotifierProvider
   }
 }
 
-String _$alertNotifierHash() => r'ee847f2012edc3b0c03d076425abe2fd89d9fabf';
+String _$alertNotifierHash() => r'a31007c9f66874972bd29d7d3eab99faca8dfc7c';
 
 abstract class _$AlertNotifier extends $Notifier<List<PriceAlert>> {
   List<PriceAlert> build();

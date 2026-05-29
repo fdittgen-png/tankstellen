@@ -3404,6 +3404,14 @@ class AppLocalizationsFi extends AppLocalizations {
       'Suorita vähintään 30 km matka tasaisella nopeudella ja tasaisen ajon pisteet 90 tai enemmän.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Taustahintahälytykset toimivat tällä hetkellä vain Saksan huoltoasemilla. Tämä hälytys tallennetaan, mutta se ei välttämättä ilmoita sinulle ennen kuin maiden väliset hälytykset ovat käytettävissä.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Sädehälytykset tarkistavat tällä hetkellä vain Saksan huoltoasemat.';
+
+  @override
   String get approachOverlaySection => 'Aseman lähestymisilmoitus';
 
   @override

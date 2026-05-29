@@ -15,6 +15,25 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('RadiusAlertCreateSheet (#578 phase 2)', () {
+    testWidgets('shows the Germany-only gating note (#2246)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const RadiusAlertCreateSheet(),
+        overrides: [
+          ...test.overrides,
+          radiusAlertsProvider.overrideWith(_CapturingRadiusAlerts.new),
+        ],
+      );
+
+      expect(
+        find.byKey(const Key('radius_alert_germany_only_note')),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('save button builds a RadiusAlert and calls add()',
         (tester) async {
       final test = standardTestOverrides();
@@ -336,7 +355,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(RadiusAlertCreateSheet), findsOneWidget);
-      await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
+      final cancelBtn = find.widgetWithText(OutlinedButton, 'Cancel');
+      await tester.scrollUntilVisible(
+        cancelBtn,
+        80,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(cancelBtn);
       await tester.pumpAndSettle();
 
       expect(find.byType(RadiusAlertCreateSheet), findsNothing);

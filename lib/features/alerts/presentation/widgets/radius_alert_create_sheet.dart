@@ -206,6 +206,18 @@ class _RadiusAlertCreateSheetState
             value: _fuelType,
             onChanged: (v) => setState(() => _fuelType = v),
           ),
+          const SizedBox(height: 8),
+          // #2246 — honest gating: the background radius runner is
+          // Tankerkönig-only, so a centre outside Germany returns no
+          // samples and the alert never fires. State that up front.
+          Text(
+            l10n?.alertGatingRadiusGermanyOnlyNote ??
+                'Radius alerts currently only check stations in Germany.',
+            key: const Key('radius_alert_germany_only_note'),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 16),
           RadiusAlertThresholdField(
             controller: _thresholdController,

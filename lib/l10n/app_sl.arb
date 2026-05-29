@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "Različica aplikacije",
   "developerToolsBuildChannel": "Kanal gradnje",
   "featureLabel_debugMode": "Razvijalski način / način za odpravljanje napak",
-  "featureDescription_debugMode": "V nastavitvah prikaže razdelek Razvijalska orodja z diagnostiko: izvoz dnevnika napak, testna obvestila, zagon testnega cevovoda opozoril, izpis zastavic funkcij, čiščenje predpomnilnikov in kopiranje diagnostike."
+  "featureDescription_debugMode": "V nastavitvah prikaže razdelek Razvijalska orodja z diagnostiko: izvoz dnevnika napak, testna obvestila, zagon testnega cevovoda opozoril, izpis zastavic funkcij, čiščenje predpomnilnikov in kopiranje diagnostike.",
+  "alertGatingNonDeStationWarning": "Cenovna opozorila v ozadju trenutno delujejo samo za bencinske črpalke v Nemčiji. To opozorilo bo shranjeno, vendar vas morda nikoli ne bo obvestilo, dokler ne bodo na voljo čezmejna opozorila.",
+  "alertGatingRadiusGermanyOnlyNote": "Opozorila po polmeru trenutno preverjajo samo bencinske črpalke v Nemčiji."
 }

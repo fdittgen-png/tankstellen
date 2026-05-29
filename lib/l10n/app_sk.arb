@@ -1924,5 +1924,7 @@
   "developerToolsBuildVersion": "Verzia aplikácie",
   "developerToolsBuildChannel": "Kanál zostavenia",
   "featureLabel_debugMode": "Vývojársky/ladiaci režim",
-  "featureDescription_debugMode": "Zobrazí v nastaveniach sekciu Nástroje pre vývojárov s diagnostikou: export protokolu chýb, testovacie oznámenia, spustenie testovacieho procesu upozornenia, výpis príznakov funkcií, vymazanie vyrovnávacích pamätí a kopírovanie diagnostiky."
+  "featureDescription_debugMode": "Zobrazí v nastaveniach sekciu Nástroje pre vývojárov s diagnostikou: export protokolu chýb, testovacie oznámenia, spustenie testovacieho procesu upozornenia, výpis príznakov funkcií, vymazanie vyrovnávacích pamätí a kopírovanie diagnostiky.",
+  "alertGatingNonDeStationWarning": "Cenové upozornenia na pozadí momentálne fungujú iba pre čerpacie stanice v Nemecku. Toto upozornenie sa uloží, ale nemusí vás upozorniť, kým nebudú dostupné medzištátne upozornenia.",
+  "alertGatingRadiusGermanyOnlyNote": "Upozornenia podľa okruhu momentálne kontrolujú iba čerpacie stanice v Nemecku."
 }

@@ -3425,6 +3425,14 @@ class AppLocalizationsRo extends AppLocalizations {
       'Finalizați o călătorie de 30+ km la viteză constantă cu un scor de condus lin de 90 sau mai mult.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Alertele de preț în fundal funcționează momentan doar pentru stațiile din Germania. Această alertă va fi salvată, dar este posibil să nu vă notifice niciodată până când vor fi disponibile alertele între țări.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Alertele pe rază verifică momentan doar stațiile din Germania.';
+
+  @override
   String get approachOverlaySection => 'Suprapunere la apropierea de stație';
 
   @override

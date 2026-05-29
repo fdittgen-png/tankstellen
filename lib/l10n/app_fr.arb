@@ -2052,5 +2052,7 @@
   "developerToolsBuildVersion": "Version de l'application",
   "developerToolsBuildChannel": "Canal de build",
   "featureLabel_debugMode": "Mode développeur / débogage",
-  "featureDescription_debugMode": "Affiche une section Outils de développement dans les réglages avec des diagnostics : export du journal d'erreurs, notifications de test, exécution du pipeline d'alerte de test, inspection des drapeaux de fonctionnalités, vidage des caches et copie des diagnostics."
+  "featureDescription_debugMode": "Affiche une section Outils de développement dans les réglages avec des diagnostics : export du journal d'erreurs, notifications de test, exécution du pipeline d'alerte de test, inspection des drapeaux de fonctionnalités, vidage des caches et copie des diagnostics.",
+  "alertGatingNonDeStationWarning": "Les alertes de prix en arrière-plan ne fonctionnent actuellement que pour les stations en Allemagne. Cette alerte sera enregistrée, mais elle pourrait ne jamais vous notifier tant que les alertes transfrontalières ne sont pas disponibles.",
+  "alertGatingRadiusGermanyOnlyNote": "Les alertes de zone ne vérifient actuellement que les stations en Allemagne."
 }

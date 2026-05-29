@@ -3430,6 +3430,14 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ολοκληρώστε ένα ταξίδι 30+ km σε σταθερή ταχύτητα με βαθμολογία ομαλής οδήγησης 90 ή παραπάνω.';
 
   @override
+  String get alertGatingNonDeStationWarning =>
+      'Οι ειδοποιήσεις τιμών στο παρασκήνιο λειτουργούν προς το παρόν μόνο για πρατήρια στη Γερμανία. Αυτή η ειδοποίηση θα αποθηκευτεί, αλλά ενδέχεται να μην σας ειδοποιήσει ποτέ μέχρι να γίνουν διαθέσιμες οι διασυνοριακές ειδοποιήσεις.';
+
+  @override
+  String get alertGatingRadiusGermanyOnlyNote =>
+      'Οι ειδοποιήσεις ακτίνας ελέγχουν προς το παρόν μόνο πρατήρια στη Γερμανία.';
+
+  @override
   String get approachOverlaySection =>
       'Επικάλυψη κατά την προσέγγιση πρατηρίου';
 

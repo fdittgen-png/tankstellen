@@ -1,0 +1,10 @@
+{
+  "alertGatingNonDeStationWarning": "Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.",
+  "@alertGatingNonDeStationWarning": {
+    "description": "Warning shown in the create-alert dialog when the station is outside Germany, because the on-device background evaluator is Tankerkönig-only today (#2246)."
+  },
+  "alertGatingRadiusGermanyOnlyNote": "Radius alerts currently only check stations in Germany.",
+  "@alertGatingRadiusGermanyOnlyNote": {
+    "description": "Informational note in the radius-alert create sheet that the on-device background runner only evaluates German (Tankerkönig) stations today (#2246)."
+  }
+}
