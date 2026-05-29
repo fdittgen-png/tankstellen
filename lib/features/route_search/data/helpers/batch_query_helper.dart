@@ -3,10 +3,14 @@
 
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/error/exceptions.dart';
+import '../../../../core/services/rate_limit_interceptor.dart';
+import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../profile/data/models/user_profile.dart';
@@ -62,6 +66,10 @@ class BatchQueryHelper {
     int successCount = 0;
     int failCount = 0;
     bool rateLimited = false;
+    // #2255 — longest upstream-suggested Retry-After seen this sweep. When
+    // present it replaces the flat [backoffPause] so we honour the server's
+    // own pacing instead of always pausing the same 200 ms.
+    Duration? retryAfter;
 
     for (var batchStart = 0;
         batchStart < samplePoints.length;
@@ -91,35 +99,24 @@ class BatchQueryHelper {
               criterion: criterion,
             ),
             rateLimited: false,
-          );
-        } on http.ClientException catch (e, st) {
-          debugPrint(
-              'BatchQuery: point ${point.latitude},${point.longitude} '
-              'failed (ClientException): $e\n$st');
-          return (
-            point: point,
-            stations: const <SearchResultItem>[],
-            rateLimited: _isRateLimit(e),
-          );
-        } on SocketException catch (e, st) {
-          debugPrint(
-              'BatchQuery: point ${point.latitude},${point.longitude} '
-              'failed (SocketException): $e\n$st');
-          // Connection-class blip — kick the throttle on for the rest
-          // of the sweep to give the upstream room to recover.
-          return (
-            point: point,
-            stations: const <SearchResultItem>[],
-            rateLimited: true,
+            retryAfter: null,
           );
         } catch (e, st) {
+          // #2255 — the services throw [DioException] / [ApiException] /
+          // [ServiceChainExhaustedException], never http.ClientException, so
+          // the old type-specific catches were dead code. Classify any
+          // failure here: a 429 (raw or typed) re-enables the throttle and
+          // carries the parsed Retry-After; a connection-class blip also
+          // throttles to give the upstream room to recover.
+          final (limited: isLimited, retryAfter: ra) = _classifyFailure(e);
           debugPrint(
               'BatchQuery: point ${point.latitude},${point.longitude} '
-              'failed: $e\n$st');
+              'failed (${e.runtimeType}, rateLimited=$isLimited): $e\n$st');
           return (
             point: point,
             stations: const <SearchResultItem>[],
-            rateLimited: false,
+            rateLimited: isLimited,
+            retryAfter: ra,
           );
         }
       });
@@ -128,6 +125,10 @@ class BatchQueryHelper {
 
       for (final r in batchResults) {
         if (r.rateLimited) rateLimited = true;
+        if (r.retryAfter != null &&
+            (retryAfter == null || r.retryAfter! > retryAfter)) {
+          retryAfter = r.retryAfter;
+        }
         if (r.stations.isNotEmpty) {
           successCount++;
         } else {
@@ -146,9 +147,10 @@ class BatchQueryHelper {
 
       // #2104 lever D — pause only after a 429 / connection-class
       // failure has been observed in this sweep. Healthy sweeps run
-      // back-to-back; degraded sweeps fall back to the original 200 ms.
+      // back-to-back; degraded sweeps pause for the upstream-suggested
+      // Retry-After (#2255) if one was sent, else the flat [backoffPause].
       if (batchEnd < samplePoints.length && rateLimited) {
-        await Future<void>.delayed(backoffPause);
+        await Future<void>.delayed(retryAfter ?? backoffPause);
       }
     }
 
@@ -216,8 +218,70 @@ class BatchQueryHelper {
     return [...fuel.take(topN), ...other];
   }
 
-  static bool _isRateLimit(http.ClientException e) {
-    final msg = e.message.toLowerCase();
-    return msg.contains('429') || msg.contains('too many requests');
+  /// Classify a per-point failure for throttle purposes (#2255).
+  ///
+  /// Returns `(limited, retryAfter)` where `limited` re-enables the inter-batch
+  /// pause for the rest of the sweep, and `retryAfter` is the upstream-suggested
+  /// backoff when one was carried. Detects the rate-limit signal across every
+  /// shape the data layer can surface:
+  /// - a raw [DioException] with `response.statusCode == 429` (or a
+  ///   `Retry-After` header) — the real services throw these;
+  /// - a typed [ApiException] / [ServiceError] with
+  ///   [FailureKind.rateLimited] — the chain stamps these (and connection /
+  ///   timeout kinds also throttle);
+  /// - a [ServiceChainExhaustedException] carrying any rate-limited
+  ///   [ServiceError]; and
+  /// - the legacy [http.ClientException] / [SocketException] string forms, for
+  ///   any non-Dio caller.
+  static ({bool limited, Duration? retryAfter}) _classifyFailure(Object e) {
+    if (e is DioException) {
+      final code = e.response?.statusCode;
+      final header = e.response?.headers.value('retry-after');
+      if (code == 429 || header != null) {
+        return (limited: true, retryAfter: parseRetryAfter(header));
+      }
+      // Connection-class blip — throttle to give the upstream room.
+      final t = e.type;
+      final connClass = t == DioExceptionType.connectionError ||
+          t == DioExceptionType.connectionTimeout ||
+          t == DioExceptionType.receiveTimeout ||
+          t == DioExceptionType.sendTimeout;
+      return (limited: connClass, retryAfter: null);
+    }
+    if (e is ApiException) {
+      final limited = e.kind == FailureKind.rateLimited ||
+          e.kind == FailureKind.network ||
+          e.kind == FailureKind.timeout;
+      return (limited: limited, retryAfter: e.retryAfter);
+    }
+    if (e is ServiceChainExhaustedException) {
+      Duration? ra;
+      var limited = false;
+      for (final err in e.errors) {
+        if (err is ServiceError) {
+          if (err.kind == FailureKind.rateLimited ||
+              err.kind == FailureKind.network ||
+              err.kind == FailureKind.timeout) {
+            limited = true;
+          }
+          if (err.retryAfter != null &&
+              (ra == null || err.retryAfter! > ra)) {
+            ra = err.retryAfter;
+          }
+        }
+      }
+      return (limited: limited, retryAfter: ra);
+    }
+    if (e is SocketException) {
+      // Connection-class blip — throttle for the rest of the sweep.
+      return (limited: true, retryAfter: null);
+    }
+    if (e is http.ClientException) {
+      final msg = e.message.toLowerCase();
+      final limited =
+          msg.contains('429') || msg.contains('too many requests');
+      return (limited: limited, retryAfter: null);
+    }
+    return (limited: false, retryAfter: null);
   }
 }

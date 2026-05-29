@@ -3,6 +3,10 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../error/failure_kind.dart';
+
+export '../error/failure_kind.dart';
+
 part 'service_result.freezed.dart';
 
 /// Identifies which service or fallback provided the data.
@@ -83,5 +87,13 @@ abstract class ServiceError with _$ServiceError {
     required String message,
     int? statusCode,
     required DateTime occurredAt,
+
+    /// Typed classification of the failure (#2255). Defaults to
+    /// [FailureKind.unknown] for non-HTTP failures (geocoding, GPS, …).
+    @Default(FailureKind.unknown) FailureKind kind,
+
+    /// Upstream-suggested backoff parsed from a `Retry-After` header when
+    /// [kind] is [FailureKind.rateLimited]; null otherwise.
+    Duration? retryAfter,
   }) = _ServiceError;
 }
