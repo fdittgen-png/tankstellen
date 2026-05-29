@@ -212,8 +212,12 @@ class Countries {
     apiProvider: 'OK / Shell / Q8',
     attribution: 'Data: ok.dk, shell.dk, q8.dk',
     fuelTypes: ['Blyfri 95', 'Diesel'],
+    // #2180 — DenmarkStationService surfaces the single 95-octane grade
+    // ("Blyfri 95") as both e5 and e10, plus diesel. Add e10 so the
+    // profile picker matches what the search selector already shows.
     supportedFuelTypes: {
       FuelType.e5,
+      FuelType.e10,
       FuelType.diesel,
       FuelType.electric,
     },
@@ -236,9 +240,16 @@ class Countries {
     apiProvider: 'Secretaría de Energía',
     attribution: 'Datos: datos.energia.gob.ar',
     fuelTypes: ['Nafta', 'Gas Oil', 'GNC'],
+    // #2180 — aligned to what ArgentinaStationService actually emits:
+    // Nafta súper → e5/e10, Nafta premium → e98, Gas oil → diesel, Gas
+    // oil premium → dieselPremium, GNC → cng (see classifyArgentinaProduct
+    // and argentina_station_service.dart's Station mapping).
     supportedFuelTypes: {
       FuelType.e5,
+      FuelType.e10,
+      FuelType.e98,
       FuelType.diesel,
+      FuelType.dieselPremium,
       FuelType.cng,
       FuelType.electric,
     },
@@ -283,12 +294,15 @@ class Countries {
     postalCodeLabel: 'Postcode',
     apiProvider: 'CMA Fuel Finder',
     attribution: 'Data: Competition and Markets Authority',
-    fuelTypes: ['Unleaded', 'Super Unleaded', 'Diesel', 'Premium Diesel'],
+    fuelTypes: ['Unleaded', 'Super Unleaded', 'E10', 'Diesel'],
+    // #2180 — UkStationService parses the CMA feed into e5 (E5/unleaded),
+    // e10 (E10), e98 (super_unleaded), diesel (B7/diesel). It never emits
+    // dieselPremium, so drop it and add e10 to match the live selector.
     supportedFuelTypes: {
       FuelType.e5,
+      FuelType.e10,
       FuelType.e98,
       FuelType.diesel,
-      FuelType.dieselPremium,
       FuelType.electric,
     },
     examplePostalCode: 'SW1A 1AA',
@@ -366,9 +380,13 @@ class Countries {
     apiProvider: 'CRE / datos.gob.mx',
     attribution: 'Datos: Comisión Reguladora de Energía',
     fuelTypes: ['Regular', 'Premium', 'Diesel'],
+    // #2180 — MexicoStationService maps CRE's gas_price types to Station
+    // fields as regular → e5, premium → e10, diesel → diesel. The premium
+    // grade lands in the e10 slot, never e98, so the picker must offer e10
+    // (not e98) to match the data the search selector surfaces.
     supportedFuelTypes: {
       FuelType.e5,
-      FuelType.e98,
+      FuelType.e10,
       FuelType.diesel,
       FuelType.electric,
     },
