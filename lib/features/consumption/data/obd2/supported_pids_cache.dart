@@ -44,6 +44,38 @@ class SupportedPidsCache {
         '$year';
   }
 
+  /// Build the production lookup key (#2253): `adapterMac(+make:model:
+  /// year)`. This is the key the live [Obd2ConnectionService] hands to
+  /// [Obd2Service] as its `vehicleFallbackKey`, so the supported-PID
+  /// prime can resolve a cached bitmap WITHOUT first reading the VIN
+  /// (0902) — the VIN is a multi-frame read we want to skip on a hit.
+  ///
+  /// The key is rooted on [adapterMac] (different adapters can expose
+  /// different effective PID sets on the same car — clones vary), then
+  /// refined with the vehicle's make:model:year when the active profile
+  /// supplies all three. When any vehicle field is missing the key
+  /// degrades gracefully to adapterMac-only — still far better than
+  /// re-scanning every connect. Returns null when even the MAC is
+  /// unavailable (an unstamped service), which makes the resolver fall
+  /// back to its VIN-first path.
+  static String? productionKey({
+    required String? adapterMac,
+    String? make,
+    String? model,
+    int? year,
+  }) {
+    final mac = adapterMac?.trim();
+    if (mac == null || mac.isEmpty) return null;
+    final hasVehicle = make != null &&
+        make.trim().isNotEmpty &&
+        model != null &&
+        model.trim().isNotEmpty &&
+        year != null;
+    if (!hasVehicle) return mac.toLowerCase();
+    return '${mac.toLowerCase()}:'
+        '${fallbackKey(make: make, model: model, year: year)}';
+  }
+
   /// Look up the cached supported-PID set for [key], or null when
   /// there's no entry / the entry is corrupt.
   Set<int>? get(String key) {
