@@ -270,5 +270,13 @@
   "featureDescription_developerPatToken": "Enable the bad-scan feedback panel that auto-files GitHub issues with a Personal Access Token. Power-user / contributor feature.",
   "@featureDescription_developerPatToken": {
     "description": "Settings toggle description for the bad-scan-feedback PAT panel (#2116-6)."
+  },
+  "featureLabel_debugMode": "Developer / Debug mode",
+  "@featureLabel_debugMode": {
+    "description": "Settings toggle label for Developer / Debug mode (#2248). Default-off — gates the Developer tools section with dev-only diagnostics."
+  },
+  "featureDescription_debugMode": "Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.",
+  "@featureDescription_debugMode": {
+    "description": "Settings toggle description for Developer / Debug mode (#2248)."
   }
 }

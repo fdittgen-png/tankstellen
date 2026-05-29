@@ -3907,6 +3907,105 @@ class AppLocalizationsIt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Ignora';
 
   @override
+  String get developerToolsSectionTitle => 'Strumenti di sviluppo';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostica e strumenti di debug: visibili solo in modalità sviluppatore / debug.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Registro errori, avvisi di prova, diagnostica';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Registro errori';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Salva registro errori ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Cancella registro errori';
+
+  @override
+  String get developerToolsViewErrorLog => 'Visualizza registro errori';
+
+  @override
+  String get developerToolsErrorLogEmpty =>
+      'Nessuna traccia di errore registrata.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Avvisi e notifiche';
+
+  @override
+  String get developerToolsFireTestNotification => 'Invia notifica di prova';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Notifica di prova';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Se riesci a leggere questo, le notifiche funzionano.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Notifica di prova inviata.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Le notifiche sono bloccate: attivale nelle impostazioni di sistema, poi riprova.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Esegui pipeline avviso di prova';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Avviso di prova attivato: la pipeline ha generato $count notifica/e.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Avviso di prezzo di prova';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Corrispondenza sintetica: è stata trovata nelle vicinanze una stazione sotto il tuo obiettivo.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostica';
+
+  @override
+  String get developerToolsFeatureFlagDump =>
+      'Ispettore dei flag delle funzionalità';
+
+  @override
+  String get developerToolsFlagOn => 'Attivo';
+
+  @override
+  String get developerToolsFlagOff => 'Disattivo';
+
+  @override
+  String get developerToolsClearCaches => 'Svuota cache';
+
+  @override
+  String get developerToolsCachesCleared => 'Cache svuotate.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Copia diagnostica';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostica copiata negli appunti.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Informazioni build';
+
+  @override
+  String get developerToolsBuildVersion => 'Versione app';
+
+  @override
+  String get developerToolsBuildChannel => 'Canale build';
+
+  @override
   String get insightCardTitle => 'Comportamenti più dispendiosi';
 
   @override
@@ -4259,6 +4358,13 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Abilita il pannello di feedback per le scansioni non riuscite che crea automaticamente issue GitHub con un Personal Access Token. Funzione per utenti esperti / collaboratori.';
+
+  @override
+  String get featureLabel_debugMode => 'Modalità sviluppatore / debug';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Mostra una sezione Strumenti di sviluppo nelle impostazioni con diagnostica: esportazione del registro errori, notifiche di prova, esecuzione della pipeline di avviso di prova, dump dei flag delle funzionalità, svuotamento cache e copia della diagnostica.';
 
   @override
   String get feedbackConsentTitle => 'Inviare la segnalazione su GitHub?';

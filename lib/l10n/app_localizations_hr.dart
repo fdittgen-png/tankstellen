@@ -3898,6 +3898,104 @@ class AppLocalizationsHr extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Odbaci';
 
   @override
+  String get developerToolsSectionTitle => 'Razvojni alati';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Dijagnostika i alati za otklanjanje pogrešaka — vidljivi samo u razvojnom načinu / načinu za otklanjanje pogrešaka.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Zapisnik pogrešaka, testna upozorenja, dijagnostika';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Zapisnik pogrešaka';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Spremi zapisnik pogrešaka ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Očisti zapisnik pogrešaka';
+
+  @override
+  String get developerToolsViewErrorLog => 'Prikaži zapisnik pogrešaka';
+
+  @override
+  String get developerToolsErrorLogEmpty =>
+      'Nema zabilježenih tragova pogrešaka.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Upozorenja i obavijesti';
+
+  @override
+  String get developerToolsFireTestNotification => 'Pošalji testnu obavijest';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testna obavijest';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Ako ovo možete pročitati, obavijesti rade.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Testna obavijest poslana.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Obavijesti su blokirane — omogućite ih u postavkama sustava pa pokušajte ponovno.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Pokreni testni tijek upozorenja';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testno upozorenje pokrenuto — tijek je isporučio $count obavijesti.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testno cjenovno upozorenje';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Sintetičko podudaranje: u blizini je pronađena postaja ispod vašeg cilja.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Dijagnostika';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Inspektor zastavica značajki';
+
+  @override
+  String get developerToolsFlagOn => 'Uključeno';
+
+  @override
+  String get developerToolsFlagOff => 'Isključeno';
+
+  @override
+  String get developerToolsClearCaches => 'Očisti predmemorije';
+
+  @override
+  String get developerToolsCachesCleared => 'Predmemorije očišćene.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Kopiraj dijagnostiku';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Dijagnostika kopirana u međuspremnik.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Informacije o međuverziji';
+
+  @override
+  String get developerToolsBuildVersion => 'Verzija aplikacije';
+
+  @override
+  String get developerToolsBuildChannel => 'Kanal međuverzije';
+
+  @override
   String get insightCardTitle => 'Najrastrošnija ponašanja';
 
   @override
@@ -4248,6 +4346,14 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Omogućuje ploču povratnih informacija za neuspjela skeniranja koja automatski stvara GitHub issues uz Personal Access Token. Funkcija za napredne korisnike / suradnike.';
+
+  @override
+  String get featureLabel_debugMode =>
+      'Razvojni način / način za otklanjanje pogrešaka';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Prikazuje odjeljak Razvojni alati u postavkama s dijagnostikom: izvoz zapisnika pogrešaka, testne obavijesti, pokretanje testnog tijeka upozorenja, popis zastavica značajki, čišćenje predmemorija i kopiranje dijagnostike.';
 
   @override
   String get feedbackConsentTitle => 'Poslati izvješće na GitHub?';

@@ -3912,6 +3912,105 @@ class AppLocalizationsDe extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Schließen';
 
   @override
+  String get developerToolsSectionTitle => 'Entwicklerwerkzeuge';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnose und Werkzeuge zur Fehlersuche — nur im Entwickler-/Debug-Modus sichtbar.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Fehlerprotokoll, Test-Alarme, Diagnose';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Fehlerprotokoll';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Fehlerprotokoll speichern ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Fehlerprotokoll löschen';
+
+  @override
+  String get developerToolsViewErrorLog => 'Fehlerprotokoll ansehen';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Keine Fehlerspuren aufgezeichnet.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Alarme & Benachrichtigungen';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      'Test-Benachrichtigung senden';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Test-Benachrichtigung';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Wenn du das lesen kannst, funktionieren Benachrichtigungen.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Test-Benachrichtigung gesendet.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Benachrichtigungen sind blockiert — aktiviere sie in den Systemeinstellungen und versuche es erneut.';
+
+  @override
+  String get developerToolsRunTestAlert => 'Test-Alarm-Pipeline ausführen';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Test-Alarm ausgelöst — die Pipeline hat $count Benachrichtigung(en) geliefert.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Test-Preisalarm';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Synthetischer Treffer: eine Tankstelle unter deinem Zielpreis wurde in der Nähe gefunden.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnose';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Feature-Flag-Inspektor';
+
+  @override
+  String get developerToolsFlagOn => 'An';
+
+  @override
+  String get developerToolsFlagOff => 'Aus';
+
+  @override
+  String get developerToolsClearCaches => 'Caches leeren';
+
+  @override
+  String get developerToolsCachesCleared => 'Caches geleert.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Diagnose kopieren';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnose in die Zwischenablage kopiert.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Build-Informationen';
+
+  @override
+  String get developerToolsBuildVersion => 'App-Version';
+
+  @override
+  String get developerToolsBuildChannel => 'Build-Kanal';
+
+  @override
   String get insightCardTitle => 'Größte Spritfresser';
 
   @override
@@ -4260,6 +4359,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Aktiviert das Fehler-Scan-Feedback-Panel, das mit einem Personal Access Token automatisch GitHub-Issues anlegt. Power-User-/Mitwirkenden-Funktion.';
+
+  @override
+  String get featureLabel_debugMode => 'Entwickler-/Debug-Modus';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Blendet einen Entwicklerwerkzeuge-Bereich in den Einstellungen ein mit Diagnosefunktionen: Fehlerprotokoll-Export, Test-Benachrichtigungen, ein Test-Alarm-Durchlauf, ein Feature-Flag-Auszug, Caches leeren und Diagnose kopieren.';
 
   @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';

@@ -3906,6 +3906,104 @@ class AppLocalizationsNl extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Sluiten';
 
   @override
+  String get developerToolsSectionTitle => 'Ontwikkelaarstools';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnostiek en hulpmiddelen om te debuggen — alleen zichtbaar in ontwikkelaars-/foutopsporingsmodus.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Foutenlogboek, testmeldingen, diagnostiek';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Foutenlogboek';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Foutenlogboek opslaan ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Foutenlogboek wissen';
+
+  @override
+  String get developerToolsViewErrorLog => 'Foutenlogboek bekijken';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Geen fouttraces geregistreerd.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Waarschuwingen en meldingen';
+
+  @override
+  String get developerToolsFireTestNotification => 'Testmelding versturen';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Testmelding';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Als je dit kunt lezen, werken meldingen.';
+
+  @override
+  String get developerToolsTestNotificationSent => 'Testmelding verzonden.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Meldingen zijn geblokkeerd — schakel ze in via de systeeminstellingen en probeer het opnieuw.';
+
+  @override
+  String get developerToolsRunTestAlert =>
+      'Testwaarschuwingspijplijn uitvoeren';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Testwaarschuwing geactiveerd — pijplijn leverde $count melding(en).';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Testprijswaarschuwing';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Synthetische match: er is in de buurt een station onder je doel gevonden.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnostiek';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Inspecteur voor functievlaggen';
+
+  @override
+  String get developerToolsFlagOn => 'Aan';
+
+  @override
+  String get developerToolsFlagOff => 'Uit';
+
+  @override
+  String get developerToolsClearCaches => 'Caches wissen';
+
+  @override
+  String get developerToolsCachesCleared => 'Caches gewist.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Diagnostiek kopiëren';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnostiek gekopieerd naar klembord.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Build-informatie';
+
+  @override
+  String get developerToolsBuildVersion => 'App-versie';
+
+  @override
+  String get developerToolsBuildChannel => 'Build-kanaal';
+
+  @override
   String get insightCardTitle => 'Meest verspillende rijgedrag';
 
   @override
@@ -4253,6 +4351,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Schakelt het feedbackpaneel voor mislukte scans in dat met een Personal Access Token automatisch GitHub-issues aanmaakt. Functie voor gevorderde gebruikers / bijdragers.';
+
+  @override
+  String get featureLabel_debugMode => 'Ontwikkelaars-/foutopsporingsmodus';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Toont een sectie Ontwikkelaarstools in de instellingen met diagnostiek: export van het foutenlogboek, testmeldingen, een testwaarschuwingspijplijn, een functievlag-overzicht, caches wissen en diagnostiek kopiëren.';
 
   @override
   String get feedbackConsentTitle => 'Rapport versturen naar GitHub?';

@@ -161,4 +161,14 @@ enum Feature {
   /// Power users / contributors flip this on from Feature management
   /// to surface the PAT panel + auto-file scan-failure issues.
   developerPatToken,
+
+  /// Developer / Debug mode (#2248). Default-off. When on it surfaces a
+  /// Developer tools section in Settings hosting dev-only diagnostics:
+  /// the error-log export, a fire-a-test-notification action, an
+  /// end-to-end test-alert pipeline run, a feature-flag dump, a
+  /// clear-caches action, and a copy-diagnostics action. No prerequisites
+  /// — the gate IS the developer opt-in. Production users never see the
+  /// section because the flag stays off and the manifest declares it
+  /// opt-in across every channel.
+  debugMode,
 }

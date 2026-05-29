@@ -3915,6 +3915,108 @@ class AppLocalizationsEs extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Descartar';
 
   @override
+  String get developerToolsSectionTitle => 'Herramientas de desarrollo';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Diagnósticos y herramientas de depuración: solo visibles en modo desarrollador / depuración.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Registro de errores, alertas de prueba, diagnósticos';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Registro de errores';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Guardar registro de errores ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Borrar registro de errores';
+
+  @override
+  String get developerToolsViewErrorLog => 'Ver registro de errores';
+
+  @override
+  String get developerToolsErrorLogEmpty =>
+      'No hay trazas de error registradas.';
+
+  @override
+  String get developerToolsAlertsGroupTitle => 'Alertas y notificaciones';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      'Enviar notificación de prueba';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Notificación de prueba';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Si puedes leer esto, las notificaciones funcionan.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Notificación de prueba enviada.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Las notificaciones están bloqueadas: actívalas en los ajustes del sistema y vuelve a intentarlo.';
+
+  @override
+  String get developerToolsRunTestAlert =>
+      'Ejecutar canalización de alerta de prueba';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Alerta de prueba activada: la canalización generó $count notificación(es).';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Alerta de precio de prueba';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Coincidencia sintética: se encontró cerca una estación por debajo de tu objetivo.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Diagnósticos';
+
+  @override
+  String get developerToolsFeatureFlagDump =>
+      'Inspector de indicadores de funciones';
+
+  @override
+  String get developerToolsFlagOn => 'Activado';
+
+  @override
+  String get developerToolsFlagOff => 'Desactivado';
+
+  @override
+  String get developerToolsClearCaches => 'Vaciar cachés';
+
+  @override
+  String get developerToolsCachesCleared => 'Cachés vaciadas.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Copiar diagnósticos';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Diagnósticos copiados al portapapeles.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Información de compilación';
+
+  @override
+  String get developerToolsBuildVersion => 'Versión de la aplicación';
+
+  @override
+  String get developerToolsBuildChannel => 'Canal de compilación';
+
+  @override
   String get insightCardTitle => 'Principales comportamientos derrochadores';
 
   @override
@@ -4267,6 +4369,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Activa el panel de feedback para escaneos fallidos que crea automáticamente issues de GitHub con un Personal Access Token. Función para usuarios avanzados/colaboradores.';
+
+  @override
+  String get featureLabel_debugMode => 'Modo desarrollador / depuración';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Muestra una sección Herramientas de desarrollo en los ajustes con diagnósticos: exportación del registro de errores, notificaciones de prueba, ejecución de la canalización de alerta de prueba, volcado de indicadores de funciones, vaciado de cachés y copia de diagnósticos.';
 
   @override
   String get feedbackConsentTitle => '¿Enviar el informe a GitHub?';

@@ -3922,6 +3922,107 @@ class AppLocalizationsEl extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Απόρριψη';
 
   @override
+  String get developerToolsSectionTitle => 'Εργαλεία προγραμματιστή';
+
+  @override
+  String get developerToolsSubtitle =>
+      'Διαγνωστικά και εργαλεία εντοπισμού σφαλμάτων — ορατά μόνο σε λειτουργία προγραμματιστή / εντοπισμού σφαλμάτων.';
+
+  @override
+  String get developerToolsMenuSubtitle =>
+      'Αρχείο καταγραφής σφαλμάτων, δοκιμαστικές ειδοποιήσεις, διαγνωστικά';
+
+  @override
+  String get developerToolsErrorLogGroupTitle => 'Αρχείο καταγραφής σφαλμάτων';
+
+  @override
+  String developerToolsExportErrorLog(int count) {
+    return 'Αποθήκευση αρχείου σφαλμάτων ($count)';
+  }
+
+  @override
+  String get developerToolsClearErrorLog => 'Εκκαθάριση αρχείου σφαλμάτων';
+
+  @override
+  String get developerToolsViewErrorLog => 'Προβολή αρχείου σφαλμάτων';
+
+  @override
+  String get developerToolsErrorLogEmpty => 'Δεν καταγράφηκαν ίχνη σφαλμάτων.';
+
+  @override
+  String get developerToolsAlertsGroupTitle =>
+      'Ειδοποιήσεις και γνωστοποιήσεις';
+
+  @override
+  String get developerToolsFireTestNotification =>
+      'Αποστολή δοκιμαστικής γνωστοποίησης';
+
+  @override
+  String get developerToolsTestNotificationTitle => 'Δοκιμαστική γνωστοποίηση';
+
+  @override
+  String get developerToolsTestNotificationBody =>
+      'Αν μπορείτε να το διαβάσετε αυτό, οι γνωστοποιήσεις λειτουργούν.';
+
+  @override
+  String get developerToolsTestNotificationSent =>
+      'Η δοκιμαστική γνωστοποίηση στάλθηκε.';
+
+  @override
+  String get developerToolsTestNotificationBlocked =>
+      'Οι γνωστοποιήσεις είναι αποκλεισμένες — ενεργοποιήστε τες στις ρυθμίσεις συστήματος και δοκιμάστε ξανά.';
+
+  @override
+  String get developerToolsRunTestAlert =>
+      'Εκτέλεση δοκιμαστικής ροής ειδοποιήσεων';
+
+  @override
+  String developerToolsTestAlertFired(int count) {
+    return 'Η δοκιμαστική ειδοποίηση ενεργοποιήθηκε — η ροή παρέδωσε $count γνωστοποίηση/εις.';
+  }
+
+  @override
+  String get developerToolsTestAlertTitle => 'Δοκιμαστική ειδοποίηση τιμής';
+
+  @override
+  String get developerToolsTestAlertBody =>
+      'Συνθετική αντιστοίχιση: βρέθηκε κοντά ένας σταθμός κάτω από τον στόχο σας.';
+
+  @override
+  String get developerToolsDiagnosticsGroupTitle => 'Διαγνωστικά';
+
+  @override
+  String get developerToolsFeatureFlagDump => 'Επιθεωρητής σημαιών λειτουργιών';
+
+  @override
+  String get developerToolsFlagOn => 'Ενεργό';
+
+  @override
+  String get developerToolsFlagOff => 'Ανενεργό';
+
+  @override
+  String get developerToolsClearCaches => 'Εκκαθάριση κρυφών μνημών';
+
+  @override
+  String get developerToolsCachesCleared => 'Οι κρυφές μνήμες εκκαθαρίστηκαν.';
+
+  @override
+  String get developerToolsCopyDiagnostics => 'Αντιγραφή διαγνωστικών';
+
+  @override
+  String get developerToolsDiagnosticsCopied =>
+      'Τα διαγνωστικά αντιγράφηκαν στο πρόχειρο.';
+
+  @override
+  String get developerToolsBuildInfoGroupTitle => 'Πληροφορίες έκδοσης';
+
+  @override
+  String get developerToolsBuildVersion => 'Έκδοση εφαρμογής';
+
+  @override
+  String get developerToolsBuildChannel => 'Κανάλι έκδοσης';
+
+  @override
   String get insightCardTitle => 'Πιο σπάταλες συμπεριφορές';
 
   @override
@@ -4274,6 +4375,14 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get featureDescription_developerPatToken =>
       'Ενεργοποιεί τον πίνακα σχολίων για αποτυχημένες σαρώσεις, ο οποίος δημιουργεί αυτόματα GitHub issues με ένα Personal Access Token. Λειτουργία για προχωρημένους χρήστες/συνεισφέροντες.';
+
+  @override
+  String get featureLabel_debugMode =>
+      'Λειτουργία προγραμματιστή / εντοπισμού σφαλμάτων';
+
+  @override
+  String get featureDescription_debugMode =>
+      'Εμφανίζει μια ενότητα Εργαλεία προγραμματιστή στις ρυθμίσεις με διαγνωστικά: εξαγωγή αρχείου σφαλμάτων, δοκιμαστικές γνωστοποιήσεις, εκτέλεση δοκιμαστικής ροής ειδοποιήσεων, καταγραφή σημαιών λειτουργιών, εκκαθάριση κρυφών μνημών και αντιγραφή διαγνωστικών.';
 
   @override
   String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';

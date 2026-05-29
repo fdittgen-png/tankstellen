@@ -7095,6 +7095,180 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get crossBorderDismissTooltip;
 
+  /// Title of the Settings section / screen hosting dev-only diagnostics, shown only when Developer / Debug mode is on (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Developer tools'**
+  String get developerToolsSectionTitle;
+
+  /// One-line subtitle under the Developer tools section explaining it is gated on Developer / Debug mode (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostics and tools for debugging — only visible in Developer / Debug mode.'**
+  String get developerToolsSubtitle;
+
+  /// Subtitle on the Settings menu tile that opens the Developer tools screen (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Error log, test alerts, diagnostics'**
+  String get developerToolsMenuSubtitle;
+
+  /// Group header above the error-log export / clear actions in the Developer tools screen (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Error log'**
+  String get developerToolsErrorLogGroupTitle;
+
+  /// Label for the action that exports the buffered error log. {count} is the number of buffered traces (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Save error log ({count})'**
+  String developerToolsExportErrorLog(int count);
+
+  /// Tooltip / label for the action that clears the buffered error log in the Developer tools screen (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear error log'**
+  String get developerToolsClearErrorLog;
+
+  /// Label for the action that opens a raw, in-app viewer of the buffered error traces (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'View error log'**
+  String get developerToolsViewErrorLog;
+
+  /// Empty-state text shown in the raw error-log viewer when no traces are buffered (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'No error traces recorded.'**
+  String get developerToolsErrorLogEmpty;
+
+  /// Group header above the test-notification / test-alert actions in the Developer tools screen (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts & notifications'**
+  String get developerToolsAlertsGroupTitle;
+
+  /// Label for the action that posts a test notification through NotificationService to verify the permission, channel and delivery (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Fire test notification'**
+  String get developerToolsFireTestNotification;
+
+  /// Title of the test notification fired by the Developer tools 'Fire test notification' action (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Test notification'**
+  String get developerToolsTestNotificationTitle;
+
+  /// Body of the test notification fired by the Developer tools 'Fire test notification' action (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'If you can read this, notifications are working.'**
+  String get developerToolsTestNotificationBody;
+
+  /// Confirmation snackbar after the test notification is posted (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Test notification sent.'**
+  String get developerToolsTestNotificationSent;
+
+  /// Snackbar shown when the OS notification permission is denied so the test notification cannot be delivered (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are blocked — enable them in system settings, then retry.'**
+  String get developerToolsTestNotificationBlocked;
+
+  /// Label for the action that runs the radius-alert evaluation pipeline end-to-end against a synthetic in-range match (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Run test alert pipeline'**
+  String get developerToolsRunTestAlert;
+
+  /// Confirmation snackbar after the synthetic test-alert pipeline run, with the number of notifications it produced (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Test alert fired — pipeline delivered {count} notification(s).'**
+  String developerToolsTestAlertFired(int count);
+
+  /// Notification title produced by the synthetic test-alert pipeline run (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Test price alert'**
+  String get developerToolsTestAlertTitle;
+
+  /// Notification body produced by the synthetic test-alert pipeline run (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Synthetic match: a station below your target was found nearby.'**
+  String get developerToolsTestAlertBody;
+
+  /// Group header above the feature-flag dump / clear-caches / copy-diagnostics actions in the Developer tools screen (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostics'**
+  String get developerToolsDiagnosticsGroupTitle;
+
+  /// Label for the action that opens a dump of every Feature flag and its current enabled/disabled state (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Feature flag inspector'**
+  String get developerToolsFeatureFlagDump;
+
+  /// Trailing label shown next to an enabled feature flag in the feature-flag inspector (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get developerToolsFlagOn;
+
+  /// Trailing label shown next to a disabled feature flag in the feature-flag inspector (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get developerToolsFlagOff;
+
+  /// Label for the action that clears the station / price-history cache without deleting user data (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear caches'**
+  String get developerToolsClearCaches;
+
+  /// Confirmation snackbar after the clear-caches action completes (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Caches cleared.'**
+  String get developerToolsCachesCleared;
+
+  /// Label for the action that copies a build / device / flag diagnostics blob to the clipboard (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Copy diagnostics'**
+  String get developerToolsCopyDiagnostics;
+
+  /// Confirmation snackbar after the copy-diagnostics action copies the blob to the clipboard (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostics copied to clipboard.'**
+  String get developerToolsDiagnosticsCopied;
+
+  /// Group header above the read-only app version / channel build-info rows in the Developer tools screen (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Build info'**
+  String get developerToolsBuildInfoGroupTitle;
+
+  /// Row label for the running app version in the Developer tools build-info group (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'App version'**
+  String get developerToolsBuildVersion;
+
+  /// Row label for the active build channel in the Developer tools build-info group (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Build channel'**
+  String get developerToolsBuildChannel;
+
   /// Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2).
   ///
   /// In en, this message translates to:
@@ -7664,6 +7838,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enable the bad-scan feedback panel that auto-files GitHub issues with a Personal Access Token. Power-user / contributor feature.'**
   String get featureDescription_developerPatToken;
+
+  /// Settings toggle label for Developer / Debug mode (#2248). Default-off — gates the Developer tools section with dev-only diagnostics.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer / Debug mode'**
+  String get featureLabel_debugMode;
+
+  /// Settings toggle description for Developer / Debug mode (#2248).
+  ///
+  /// In en, this message translates to:
+  /// **'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.'**
+  String get featureDescription_debugMode;
 
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
