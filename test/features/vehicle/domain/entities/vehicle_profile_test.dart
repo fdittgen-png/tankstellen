@@ -152,6 +152,7 @@ void main() {
         // OBD2 pairing
         obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
         obd2AdapterName: 'vLinker FS',
+        pairedAdapterUuidIos: '0E5C4A1B-2F3D-4E5F-9A8B-7C6D5E4F3A2B',
         // VIN
         vin: 'WVWZZZ1JZXW000001',
         // Calibration
@@ -484,6 +485,50 @@ void main() {
       };
       final restored = ChargingPreferences.fromJson(json);
       expect(restored.preferredNetworks, ['B', 'A', 'C']);
+    });
+  });
+
+  group('VehicleProfile.pairedAdapterUuidIos (#2282 concern 3)', () {
+    test('defaults to null on a profile that never set it', () {
+      const v = VehicleProfile(id: 'no-uuid', name: 'No UUID');
+      expect(v.pairedAdapterUuidIos, isNull);
+    });
+
+    test('round-trips a populated CBPeripheral UUID through JSON', () {
+      const uuid = '0E5C4A1B-2F3D-4E5F-9A8B-7C6D5E4F3A2B';
+      const original = VehicleProfile(
+        id: 'ios-paired',
+        name: 'iPhone-paired car',
+        obd2AdapterMac: uuid, // iOS surfaces the UUID as the deviceId/MAC.
+        obd2AdapterName: 'vLinker FS',
+        pairedAdapterUuidIos: uuid,
+      );
+
+      final restored = VehicleProfile.fromJson(original.toJson());
+
+      expect(restored, equals(original));
+      expect(restored.pairedAdapterUuidIos, uuid);
+    });
+
+    test('legacy payload without the key deserializes the UUID as null', () {
+      // Pre-#2282 Hive payloads simply omit the field — freezed's
+      // implicit null default must absorb that without a migration.
+      final json = <String, dynamic>{
+        'id': 'legacy',
+        'name': 'Legacy car',
+        'obd2AdapterMac': 'AA:BB:CC:DD:EE:FF',
+      };
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored.pairedAdapterUuidIos, isNull);
+      expect(restored.obd2AdapterMac, 'AA:BB:CC:DD:EE:FF');
+    });
+
+    test('copyWith updates the UUID independently of the MAC', () {
+      const v = VehicleProfile(id: 'c', name: 'Car');
+      final updated =
+          v.copyWith(pairedAdapterUuidIos: 'UUID-123', obd2AdapterMac: 'MAC-1');
+      expect(updated.pairedAdapterUuidIos, 'UUID-123');
+      expect(updated.obd2AdapterMac, 'MAC-1');
     });
   });
 }

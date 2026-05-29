@@ -62,6 +62,7 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
       curbWeightKg: (json['curbWeightKg'] as num?)?.toInt(),
       obd2AdapterMac: json['obd2AdapterMac'] as String?,
       obd2AdapterName: json['obd2AdapterName'] as String?,
+      pairedAdapterUuidIos: json['pairedAdapterUuidIos'] as String?,
       vin: json['vin'] as String?,
       calibrationMode: json['calibrationMode'] == null
           ? VehicleCalibrationMode.rule
@@ -144,6 +145,7 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'curbWeightKg': instance.curbWeightKg,
   'obd2AdapterMac': instance.obd2AdapterMac,
   'obd2AdapterName': instance.obd2AdapterName,
+  'pairedAdapterUuidIos': instance.pairedAdapterUuidIos,
   'vin': instance.vin,
   'calibrationMode': const VehicleCalibrationModeJsonConverter().toJson(
     instance.calibrationMode,
