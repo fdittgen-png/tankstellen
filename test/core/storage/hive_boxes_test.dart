@@ -148,7 +148,7 @@ void main() {
         }
       });
 
-      test('initInIsolate() opens the five background boxes', () {
+      test('initInIsolate() opens the six background boxes', () {
         final source =
             File('lib/core/storage/hive_boxes.dart').readAsStringSync();
 
@@ -159,11 +159,14 @@ void main() {
         expect(isolateMatch, isNotNull);
         final isolateBody = isolateMatch!.group(1)!;
 
-        // Background isolate opens settings, favorites, alerts, cache,
-        // priceHistory (not profiles)
+        // Background isolate opens settings, favorites, profiles, alerts,
+        // cache, priceHistory. #2205 — profiles is required: the BG
+        // widget-update path reads the active profile, and omitting it
+        // threw `HiveError: Box not found` in the field.
         for (final boxName in [
           'settings',
           'favorites',
+          'profiles',
           'alerts',
           'cache',
           'priceHistory',

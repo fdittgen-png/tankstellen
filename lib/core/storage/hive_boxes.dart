@@ -319,6 +319,7 @@ class HiveBoxes {
     final cipher = await _loadCipher();
     await Hive.openBox(settings, encryptionCipher: cipher);
     await Hive.openBox(favorites, encryptionCipher: cipher);
+    await Hive.openBox(profiles, encryptionCipher: cipher); // #2205 BG widget
     await Hive.openBox(alerts, encryptionCipher: cipher);
     await Hive.openBox(cache, encryptionCipher: cipher);
     await Hive.openBox(priceHistory, encryptionCipher: cipher);
