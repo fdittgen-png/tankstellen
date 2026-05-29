@@ -49,6 +49,7 @@ abstract class BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout,
+    bool autoConnect,
   });
 }
 
@@ -176,6 +177,7 @@ class PluginBluetoothFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) {
     // No scan ⇒ no resolved profile. The FFF0 Nordic-UART family
     // (Elm327BleUuids.vgate, = the generic-fff0 profile UUIDs) is the
@@ -183,11 +185,17 @@ class PluginBluetoothFacade implements BluetoothFacade {
     // direct-by-MAC connect. The 4 s connectTimeout is LOAD-BEARING:
     // FBP `autoConnect:false` can otherwise block ~35 s on a sleeping
     // adapter (#2242).
+    //
+    // #2261 concern 2 — `autoConnect:true` switches to a passive GATT
+    // wait (no bounded timeout): the reconnect scanner uses this once
+    // its active-scan miss ceiling is reached, so a parked car stops
+    // burning the radio on repeated active scans.
     final device = BluetoothDevice.fromId(mac);
     return FlutterBluePlusElmChannel(
       device,
       uuids: Elm327BleUuids.vgate,
-      connectTimeout: connectTimeout,
+      connectTimeout: autoConnect ? null : connectTimeout,
+      autoConnect: autoConnect,
     );
   }
 }

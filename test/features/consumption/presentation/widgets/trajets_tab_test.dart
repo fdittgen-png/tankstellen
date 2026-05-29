@@ -210,6 +210,7 @@ class _EmptyBluetoothFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) {
     throw UnimplementedError('not used in trajets_tab tests');
   }

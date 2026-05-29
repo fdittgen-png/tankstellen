@@ -474,6 +474,12 @@ class _FakeScanner implements AdapterReconnectScanner {
   bool get isScanning => _scanning;
 
   @override
+  bool get isPassiveWaiting => false;
+
+  @override
+  int get consecutiveMisses => 0;
+
+  @override
   Future<void> start() async {
     _scanning = true;
     startCalls++;

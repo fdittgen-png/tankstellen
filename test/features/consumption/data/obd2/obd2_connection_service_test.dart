@@ -399,6 +399,64 @@ void main() {
     });
   });
 
+  group('Obd2ConnectionService.connectByMacPassive (#2261 concern 2)', () {
+    test(
+        'opens an autoConnect channel, NO scan, NO bounded timeout, '
+        'runs init', () async {
+      final passiveChannel = _FakeChannel(respondTo: _elmOkResponses());
+      final fake = _FakeFacade(
+        // A non-empty batch would be observable via scanInvoked if the
+        // passive path ever scanned — it must not.
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        directChannel: passiveChannel,
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacPassive('aa:bb');
+
+      expect(ready, isNotNull);
+      expect(ready!.isConnected, isTrue);
+      expect(fake.directAutoConnect, isTrue,
+          reason: 'passive reconnect must request an autoConnect channel');
+      expect(fake.scanInvoked, isFalse,
+          reason: 'the passive wait must never scan — a passive GATT wait '
+              'IS the fallback');
+      await ready.disconnect();
+    });
+
+    test('returns null on failure WITHOUT a scan fallback', () async {
+      final fake = _FakeFacade(
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        directChannel: _FakeChannel(openError: StateError('passive wait off')),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacPassive('aa:bb');
+      expect(ready, isNull);
+      expect(fake.scanInvoked, isFalse,
+          reason: 'a failed passive wait does not scan — the scanner will '
+              're-arm another passive wait itself');
+    });
+  });
+
   group('Obd2ConnectionService supported-PID cache wiring — #2253', () {
     late Directory tmpDir;
     late Box<String> box;
@@ -581,6 +639,7 @@ class _FakeFacade implements BluetoothFacade {
   /// Args captured from the most recent [channelForDirect] call.
   String? directMac;
   Duration? directTimeout;
+  bool directAutoConnect = false;
   int directCalls = 0;
 
   _FakeFacade({
@@ -619,10 +678,12 @@ class _FakeFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) {
     directCalls++;
     directMac = mac;
     directTimeout = connectTimeout;
+    directAutoConnect = autoConnect;
     return directChannel ?? channel ?? _FakeChannel(silent: true);
   }
 }
@@ -655,6 +716,7 @@ class _SequencedDirectFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) {
     onDirect();
     return sequence[_i++];

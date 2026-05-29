@@ -46,6 +46,33 @@ void main() {
       await connected!.disconnect();
     });
 
+    test('attemptPassive opens an autoConnect channel and NEVER scans (#2261)',
+        () async {
+      final fake = _FakeFacade(
+        directChannel: _FakeChannel(respondTo: _elmOk()),
+        batches: [
+          [_cand('aa:bb', -55)],
+        ],
+      );
+      Obd2Service? connected;
+      final connector = ReconnectConnector(
+        connection: _build(fake),
+        onConnected: (s) => connected = s,
+      );
+
+      final ok = await connector.attemptPassive('aa:bb');
+
+      expect(ok, isTrue);
+      expect(connected, isNotNull);
+      expect(fake.passiveCalls, 1,
+          reason: 'the passive path must request an autoConnect channel');
+      expect(fake.directCalls, 0,
+          reason: 'the passive path must not use the active direct connect');
+      expect(fake.scanInvoked, isFalse,
+          reason: 'a passive GATT wait IS the fallback — it never scans');
+      await connected!.disconnect();
+    });
+
     test('falls back to the scan path only when direct fails — and scans '
         'exactly once', () async {
       final fake = _FakeFacade(
@@ -164,6 +191,7 @@ class _FakeFacade implements BluetoothFacade {
   bool scanInvoked = false;
   int scanCount = 0;
   int directCalls = 0;
+  int passiveCalls = 0;
 
   _FakeFacade({required this.batches, this.channel, this.directChannel});
 
@@ -190,8 +218,13 @@ class _FakeFacade implements BluetoothFacade {
   ElmByteChannel channelForDirect(
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
   }) {
-    directCalls++;
+    if (autoConnect) {
+      passiveCalls++;
+    } else {
+      directCalls++;
+    }
     return directChannel ?? channel ?? _FakeChannel(silent: true);
   }
 }

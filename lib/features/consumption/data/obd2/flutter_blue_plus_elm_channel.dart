@@ -58,6 +58,16 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
   /// stale GATT client to dodge Android GATT_ERROR 133.
   final Duration? _connectTimeout;
 
+  /// #2261 concern 2 — passive autoConnect GATT wait. When true, `open()`
+  /// connects with `autoConnect:true` and NO bounded timeout: the OS
+  /// holds a low-power background GATT connection request that resolves
+  /// the instant the adapter (re)advertises. Used by the reconnect
+  /// scanner once its active-scan miss ceiling is reached, so a parked
+  /// car doesn't burn the radio on repeated active scans. autoConnect:true
+  /// forbids requestMtu (FBP throws), so the concern-4 MTU bump is
+  /// skipped entirely on this path.
+  final bool _autoConnect;
+
   BluetoothCharacteristic? _writeChar;
   BluetoothCharacteristic? _notifyChar;
   StreamSubscription<List<int>>? _subscription;
@@ -79,9 +89,11 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
     this._device, {
     Elm327BleUuids? uuids,
     Duration? connectTimeout,
+    bool autoConnect = false,
     Duration dropDebounce = const Duration(milliseconds: 1500),
   })  : _uuids = uuids ?? Elm327BleUuids.vgate,
-        _connectTimeout = connectTimeout {
+        _connectTimeout = connectTimeout,
+        _autoConnect = autoConnect {
     _dropDebouncer = ConnectionDropDebouncer(
       debounce: dropDebounce,
       onConfirmed: _onDropConfirmed,
@@ -106,7 +118,13 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
   Future<void> open() async {
     if (_open) return;
     final timeout = _connectTimeout;
-    if (timeout == null) {
+    if (_autoConnect) {
+      // #2261 concern 2 — passive autoConnect GATT wait. No bounded
+      // timeout: the OS keeps a low-power background connection request
+      // that resolves the moment the adapter advertises again.
+      // requestMtu is forbidden with autoConnect:true, so `mtu: null`.
+      await _device.connect(autoConnect: true, mtu: null);
+    } else if (timeout == null) {
       await _device.connect(autoConnect: false, mtu: null);
     } else {
       // Direct-by-MAC path (#2242). Tear down any stale GATT client for

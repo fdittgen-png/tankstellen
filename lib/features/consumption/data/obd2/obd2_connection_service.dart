@@ -326,6 +326,40 @@ class Obd2ConnectionService {
     }
   }
 
+  /// Passive autoConnect reconnect (#2261 concern 2). Opens a channel
+  /// with `autoConnect:true` and NO bounded timeout, so the OS holds a
+  /// low-power background GATT request that resolves the instant the
+  /// pinned adapter advertises again. Used by the reconnect scanner once
+  /// its active-scan miss ceiling is reached — a parked car then stops
+  /// burning the radio on repeated active 8 s scans for the remainder of
+  /// the 15-min grace.
+  ///
+  /// Unlike [connectByMacDirect] there is NO scan fallback (a passive
+  /// wait is the fallback) and NO requestMtu bump (FBP forbids it with
+  /// autoConnect:true). Returns null on any failure so the scanner keeps
+  /// its schedule. Runs the SAME service-side init as every other path
+  /// via [_openAndInit].
+  Future<Obd2Service?> connectByMacPassive(String mac) async {
+    await _teardownLastDirectChannel();
+    final generic = _genericBleProfile();
+    final channel = bluetooth.channelForDirect(mac, autoConnect: true);
+    _lastDirectChannel = channel;
+    try {
+      return await _openAndInit(
+        channel: channel,
+        adapter: generic.adapter,
+        mac: mac,
+        name: generic.displayName,
+      );
+    } on Object catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'Obd2ConnectionService.connectByMacPassive failed',
+      }));
+      await _teardownLastDirectChannel();
+      return null;
+    }
+  }
+
   Future<void> _teardownLastDirectChannel() async {
     final prior = _lastDirectChannel;
     _lastDirectChannel = null;

@@ -1130,6 +1130,11 @@ class TripRecording extends _$TripRecording {
         pinnedMac: pinnedMac,
         probe: (mac) async => true,
         connect: connector.attempt,
+        // #2261 concern 2 — after the active-scan miss ceiling, switch to
+        // a passive autoConnect GATT wait for the rest of the 15-min
+        // grace so a parked car stops burning the radio. The 15-min
+        // grace itself is untouched (owned by DroppedSessionManager).
+        passiveConnect: connector.attemptPassive,
         onReconnect: onReconnect,
       );
     };

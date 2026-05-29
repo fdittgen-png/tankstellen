@@ -265,5 +265,102 @@ void main() {
 
       await scanner.stop();
     });
+
+    group('bounded scan → passive autoConnect wait (#2261 concern 2)', () {
+      test('after the miss ceiling, switches to the passive connect path',
+          () async {
+        var activeConnectCalls = 0;
+        var passiveConnectCalls = 0;
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          // Probe always says in-range; the active connect always fails,
+          // so every cycle is a miss and the ceiling is reached.
+          probe: (_) async => true,
+          connect: (_) async {
+            activeConnectCalls++;
+            return false;
+          },
+          passiveConnect: (_) async {
+            passiveConnectCalls++;
+            return false; // keep waiting so we can observe the mode
+          },
+          onReconnect: () {},
+          missCeiling: 3,
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+
+        await _waitFor(() => scanner.isPassiveWaiting,
+            timeout: const Duration(seconds: 3));
+        expect(scanner.isPassiveWaiting, isTrue,
+            reason: 'the scanner must flip to passive mode at the ceiling');
+        expect(activeConnectCalls, 3,
+            reason: 'exactly missCeiling active attempts before the switch');
+
+        await _waitFor(() => passiveConnectCalls >= 1,
+            timeout: const Duration(seconds: 2));
+        expect(passiveConnectCalls, greaterThanOrEqualTo(1),
+            reason: 'passive connect drives the remaining grace');
+        await scanner.stop();
+      });
+
+      test('a passive connect success fires onReconnect and self-stops',
+          () async {
+        var passiveCalls = 0;
+        var reconnects = 0;
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          probe: (_) async => true,
+          connect: (_) async => false,
+          passiveConnect: (_) async {
+            passiveCalls++;
+            return true; // the parked car came back
+          },
+          onReconnect: () => reconnects++,
+          missCeiling: 2,
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+
+        await _waitFor(() => reconnects > 0,
+            timeout: const Duration(seconds: 3));
+        expect(passiveCalls, 1);
+        expect(reconnects, 1);
+        expect(scanner.isScanning, isFalse,
+            reason: 'a passive reconnect must self-stop the scanner');
+        await scanner.stop();
+      });
+
+      test('with NO passiveConnect, stays in active-scan mode forever',
+          () async {
+        var activeConnectCalls = 0;
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          probe: (_) async => true,
+          connect: (_) async {
+            activeConnectCalls++;
+            return false;
+          },
+          onReconnect: () {},
+          // No passiveConnect — pre-#2261 behaviour preserved.
+          missCeiling: 2,
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+
+        await _waitFor(() => activeConnectCalls >= 4,
+            timeout: const Duration(seconds: 3));
+        expect(scanner.isPassiveWaiting, isFalse,
+            reason: 'without a passiveConnect callback the scanner never '
+                'switches — behaviour is unchanged from before #2261');
+        await scanner.stop();
+      });
+    });
   });
 }
