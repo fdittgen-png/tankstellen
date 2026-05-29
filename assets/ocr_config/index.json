@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "localeProfiles": [
+    {
+      "country": "FR",
+      "currency": "EUR",
+      "decimalSeparator": ",",
+      "priceMin": 0.5,
+      "priceMax": 4.0,
+      "volumeMax": 200.0,
+      "totalMax": 500.0
+    },
+    {
+      "country": "DE",
+      "currency": "EUR",
+      "decimalSeparator": ",",
+      "priceMin": 0.5,
+      "priceMax": 4.0,
+      "volumeMax": 200.0,
+      "totalMax": 500.0
+    },
+    {
+      "country": "GB",
+      "currency": "GBP",
+      "decimalSeparator": ".",
+      "priceMin": 0.8,
+      "priceMax": 3.0,
+      "volumeMax": 200.0,
+      "totalMax": 500.0
+    }
+  ],
+  "brands": [
+    {
+      "brand": "tokheim",
+      "country": "FR",
+      "label": "Tokheim pump (FR)",
+      "pumpDisplay": {
+        "total": { "left": 0.30, "top": 0.30, "width": 0.20, "height": 0.07 },
+        "volume": { "left": 0.30, "top": 0.37, "width": 0.20, "height": 0.07 },
+        "pricePerLitre": { "left": 0.44, "top": 0.31, "width": 0.10, "height": 0.10 }
+      }
+    }
+  ]
+}

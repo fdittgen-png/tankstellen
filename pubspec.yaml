@@ -155,6 +155,7 @@ flutter:
     # at the assets/ root, so it is listed explicitly.
     - assets/tanksync_config.json
     - assets/models/
+    - assets/ocr_config/index.json
     - assets/receipt_overrides/index.json
     - assets/reference_vehicles/vehicles.json
     - assets/schemas/
