@@ -174,4 +174,31 @@ void main() {
       expect(outdatedScript, contains('Major version updates available'));
     });
   });
+
+  // #2347 — both nightlies must pin the same Flutter version as ci.yml,
+  // so a floating stable-channel bump can't silently change the nightly
+  // SDK and spam the tracking issues with spurious red.
+  group('nightly Flutter version pin (#2347)', () {
+    // Single source of truth: whatever ci.yml pins, the nightlies match.
+    late String pinnedVersion;
+
+    setUpAll(() {
+      final match =
+          RegExp(r'''flutter-version:\s*["']([\d.]+)["']''').firstMatch(ciYaml);
+      expect(match, isNotNull,
+          reason: 'ci.yml must pin a flutter-version');
+      pinnedVersion = match!.group(1)!;
+    });
+
+    test('nightly-full pins the same flutter-version as ci.yml', () {
+      final yaml = File('.github/workflows/nightly-full.yml').readAsStringSync();
+      expect(yaml, contains('flutter-version: "$pinnedVersion"'));
+    });
+
+    test('nightly-flaky pins the same flutter-version as ci.yml', () {
+      final yaml =
+          File('.github/workflows/nightly-flaky.yml').readAsStringSync();
+      expect(yaml, contains('flutter-version: "$pinnedVersion"'));
+    });
+  });
 }
