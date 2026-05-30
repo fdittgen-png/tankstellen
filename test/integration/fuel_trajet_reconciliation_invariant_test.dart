@@ -11,7 +11,10 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/consumption/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/consumption/domain/services/reconciliation_basis.dart';
+import 'package:tankstellen/features/consumption/domain/services/trip_consumed_liters.dart';
+import 'package:tankstellen/features/consumption/domain/services/trip_length_aggregator.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/pending_reconciliation_provider.dart';
@@ -79,7 +82,9 @@ void main() {
     required String id,
     required DateTime startedAt,
     required double distanceKm,
-    required double fuelLitersConsumed,
+    double? fuelLitersConsumed,
+    double? avgLPer100Km,
+    TripKind kind = TripKind.gpsPlusObd2,
   }) {
     return historyRepo.save(TripHistoryEntry(
       id: id,
@@ -92,8 +97,10 @@ void main() {
         harshBrakes: 0,
         harshAccelerations: 0,
         fuelLitersConsumed: fuelLitersConsumed,
+        avgLPer100Km: avgLPer100Km,
         startedAt: startedAt,
         endedAt: startedAt.add(const Duration(minutes: 30)),
+        kind: kind,
       ),
     ));
   }
@@ -402,6 +409,152 @@ void main() {
       final basis = basisForWindow(container);
       expect(basis.trajetsTotalLiters, closeTo(0, 1e-6));
       expect(basis.residualLiters, closeTo(42, 1e-6));
+    });
+  });
+
+  // ── #2447 — STRUCTURAL: the trajets surfaces always agree, outside the
+  // dialog. The three independent trajets-total computations (the
+  // reconciliation basis, the Carbon length-bucket charts, the monthly
+  // card) must all sum the SAME canonical trip litres, so a null-fuel
+  // GPS/EV trip carrying a GPS estimate contributes that estimate (not
+  // zero) on every surface, and a negative gap never biases the totals.
+  group('#2447 — structural: null-fuel GPS trips count their estimate '
+      'and every trajets surface agrees', () {
+    /// The canonical trajets-litres total over the loaded history, summed
+    /// directly through [tripConsumedLiters] — the single source of truth
+    /// both aggregators are routed through.
+    double canonicalTrajetsTotal() => historyRepo
+        .loadAll()
+        .map((e) => tripConsumedLiters(e.summary))
+        .fold<double>(0, (a, b) => a + b);
+
+    /// The Carbon charts trajets-litres sum (#1191 surface).
+    double chartsTotal() {
+      final b = aggregateByTripLength(historyRepo.loadAll());
+      return b.short.totalLitres + b.medium.totalLitres + b.long.totalLitres;
+    }
+
+    /// The monthly card's current-month litres, re-derived from the
+    /// surface the user sees: avg L/100 km × distance ÷ 100. Pin `now`
+    /// inside the seeded month so every trip lands in the current bucket.
+    double monthlyCurrentMonthLitres(DateTime now) {
+      final s = aggregateMonthlyInsights(historyRepo.loadAll(), now);
+      final avg = s.currentMonthAvgConsumptionLPer100km;
+      if (avg == null) return 0;
+      return avg / 100.0 * s.currentMonthDistanceKm;
+    }
+
+    test(
+        'a null-fuel GPS-only trip with a GPS estimate contributes its '
+        'estimate on EVERY surface (not zero)', () async {
+      // One measured trip (12 L) + one GPS-only trip with NO measured
+      // litres but a 8.0 L/100 km estimate over 100 km ⇒ 8.0 L estimated.
+      await seedTrip(
+        id: 'measured',
+        startedAt: windowStart.add(const Duration(hours: 1)),
+        distanceKm: 150,
+        fuelLitersConsumed: 12,
+      );
+      await seedTrip(
+        id: 'gps-only-null-fuel',
+        startedAt: windowStart.add(const Duration(hours: 4)),
+        distanceKm: 100,
+        // fuelLitersConsumed stays null — the field the OLD code dropped.
+        avgLPer100Km: 8.0,
+        kind: TripKind.gpsOnly,
+      );
+
+      // Canonical: 12 (measured) + 8.0 (estimate) = 20 L — the GPS-only
+      // trip is COUNTED, not dropped to zero.
+      final canonical = canonicalTrajetsTotal();
+      expect(canonical, closeTo(20.0, 1e-6),
+          reason: 'the null-fuel GPS trip contributes its 8 L estimate');
+
+      // Carbon charts agree with the canonical sum.
+      expect(chartsTotal(), closeTo(canonical, 1e-6),
+          reason: 'the Carbon charts route through the same canonical litres');
+
+      // The monthly card (no per-tick samples here → summary fallback)
+      // agrees too: it now counts the estimate rather than dropping the
+      // null-fuel trip from the average.
+      final monthlyLitres =
+          monthlyCurrentMonthLitres(windowStart.add(const Duration(days: 10)));
+      expect(monthlyLitres, closeTo(canonical, 1e-6),
+          reason: 'the monthly card sums the same canonical trip litres');
+    });
+
+    test(
+        'the reconciliation basis trajets total counts the GPS estimate, '
+        'shrinking the residual against the pump', () async {
+      final container = makeContainer();
+      // GPS-only trip: 9.5 L/100 km × 200 km = 19 L estimated, no measured.
+      await seedTrip(
+        id: 'gps-only',
+        startedAt: windowStart.add(const Duration(hours: 1)),
+        distanceKm: 200,
+        avgLPer100Km: 9.5,
+        kind: TripKind.gpsOnly,
+      );
+      final notifier = container.read(fillUpListProvider.notifier);
+      await notifier.add(mkFillUp(
+        id: 'plein-open',
+        date: windowStart,
+        liters: 30,
+        odometerKm: 30000,
+      ));
+      await notifier.add(mkFillUp(
+        id: 'plein-close',
+        date: DateTime(2026, 4, 15, 18),
+        liters: 20,
+        odometerKm: 30800,
+      ));
+
+      final basis = basisForWindow(container);
+      // Trajets side counts the 19 L estimate — NOT zero.
+      expect(basis.trajetsTotalLiters, closeTo(19.0, 1e-6),
+          reason: 'a null-fuel trip would have shown 0 before #2447');
+      // Residual is the honest small gap (20 pumped − 19 estimate), not
+      // the full 20 L the old zero-litre behaviour produced.
+      expect(basis.residualLiters, closeTo(1.0, 1e-6));
+    });
+  });
+
+  group('#2447 — a negative-gap window does not bias the totals', () {
+    test(
+        'trips exceeding pumped leave a SIGNED negative residual; the '
+        'trajets total is the full canonical sum, never clamped', () async {
+      final container = makeContainer();
+      // One measured trip burns 40 L; the user only pumped 30 L (the
+      // integrator ran hot). The trajets total must stay the full 40 L —
+      // discarding the overshoot would silently bias the trips total down
+      // and the views apart.
+      await seedTrip(
+        id: 'hot-trip',
+        startedAt: windowStart.add(const Duration(hours: 1)),
+        distanceKm: 500,
+        fuelLitersConsumed: 40,
+      );
+      final notifier = container.read(fillUpListProvider.notifier);
+      await notifier.add(mkFillUp(
+        id: 'plein-open',
+        date: windowStart,
+        liters: 30,
+        odometerKm: 30000,
+      ));
+      await notifier.add(mkFillUp(
+        id: 'plein-close',
+        date: DateTime(2026, 4, 15, 18),
+        liters: 30,
+        odometerKm: 30800,
+      ));
+
+      final basis = basisForWindow(container);
+      expect(basis.fuelTotalLiters, closeTo(30, 1e-6));
+      expect(basis.trajetsTotalLiters, closeTo(40, 1e-6),
+          reason: 'the full canonical sum — the overshoot is not discarded');
+      // Symmetric handling: the residual carries the negative gap with its
+      // sign, so over-counting trips is as visible as under-counting them.
+      expect(basis.residualLiters, closeTo(-10, 1e-6));
     });
   });
 }

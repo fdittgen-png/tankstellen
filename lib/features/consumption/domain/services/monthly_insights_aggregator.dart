@@ -11,16 +11,19 @@
 ///   * trip count
 ///   * total drive time (wall-clock from `startedAt` -> `endedAt`)
 ///   * total distance (sample-integrated when samples exist; else
-///     `summary.distanceKm` if non-null; else 0 + dropped from the
-///     consumption average)
-///   * average L/100 km (fuel litres summed from `fuelRateLPerHour`
-///     samples / total distance × 100). Returns null when distance
-///     stays under [_minDistanceForConsumptionKm] — the noise floor
-///     below which "average consumption" is misleading.
+///     `summary.distanceKm`)
+///   * average L/100 km. Fuel litres come from per-tick `fuelRateLPerHour`
+///     samples when present, else the canonical [tripConsumedLitersOrNull]
+///     (#2447 — the summary's measured/GPS-estimated litres), divided by
+///     the matching distance × 100. Returns null when distance stays under
+///     [_minDistanceForConsumptionKm] — the noise floor below which
+///     "average consumption" is misleading.
 ///
 /// Trips with empty samples STILL count for trip-count + drive-time
 /// (those metrics come from the wall-clock timestamps, which every
-/// trip carries). They drop out of distance + consumption only.
+/// trip carries). They contribute to the consumption average via their
+/// summary litres (#2447); only trips with neither a litres figure nor a
+/// GPS estimate (honest "no data") stay out of the average.
 ///
 /// The aggregator takes a `now` parameter so widget tests can pin a
 /// deterministic month boundary; production callers should pass
@@ -35,6 +38,7 @@ library;
 
 import '../../data/trip_history_repository.dart';
 import '../trip_recorder.dart';
+import 'trip_consumed_liters.dart';
 
 /// Bands the aggregator considers "noise" for the consumption average.
 /// Below 5 km a single coast or a long warm-up dominates the figure.
@@ -194,14 +198,23 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
       if (hadFuelRate && distanceKm > 0) {
         bucket.fuelLitres += fuelLitres;
         bucket.consumptionDistanceKm += distanceKm;
+      } else {
+        // #2447 — samples carried no per-tick fuel rate (GPS-only / EV /
+        // no-fuel-PID). Rather than dropping the trip from the
+        // consumption average, count the canonical trip litres (the
+        // summary's GPS estimate) over the trip's distance, so this
+        // surface agrees with the Carbon charts + reconciliation basis.
+        _addSummaryFuelFallback(bucket, entry.summary, distanceKm);
       }
     } else {
-      // No samples — use the persisted summary as-is. We cannot
-      // compute a consumption average without per-tick fuel-rate
-      // samples, so this trip drops out of the consumption denominator
-      // even when summary.avgLPer100Km is set (mixing pre-aggregated
-      // averages with per-sample sums would skew the result).
-      bucket.distanceKm += entry.summary.distanceKm;
+      // No samples — use the persisted summary. We cannot re-integrate a
+      // per-sample series, but the canonical trip litres (#2447) still
+      // give an honest consumption contribution from the summary's
+      // measured/estimated figure, so legacy + estimate-only trips no
+      // longer silently drop out of the average.
+      final summaryDistance = entry.summary.distanceKm;
+      bucket.distanceKm += summaryDistance;
+      _addSummaryFuelFallback(bucket, entry.summary, summaryDistance);
     }
   }
 
@@ -222,6 +235,25 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
     previousMonthAvgConsumptionLPer100km: previousAvg,
     isComparisonReliable: reliable,
   );
+}
+
+/// #2447 — fold a trip's canonical litres into the consumption average
+/// from the summary, used when no per-tick fuel-rate series exists
+/// (GPS-only / EV / no-fuel-PID / legacy). Adds the canonical litres
+/// over [distanceKm] only when BOTH are meaningful — a trip with no
+/// litres figure and no GPS estimate ([tripConsumedLitersOrNull] null)
+/// or zero distance stays out of the average, so honest "no data" is
+/// never zero-filled.
+void _addSummaryFuelFallback(
+  _MonthBucket bucket,
+  TripSummary summary,
+  double distanceKm,
+) {
+  if (distanceKm <= 0) return;
+  final litres = tripConsumedLitersOrNull(summary);
+  if (litres == null || litres <= 0) return;
+  bucket.fuelLitres += litres;
+  bucket.consumptionDistanceKm += distanceKm;
 }
 
 /// Walk the per-tick samples and return `(distanceKm, fuelLitres,
