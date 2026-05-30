@@ -48,6 +48,9 @@ TripRecordingState _activeState({
   DrivingSituation situation = DrivingSituation.highwayCruise,
   double? delta,
   double? distance,
+  double? speedKmh,
+  double? fuelRateLPerHour,
+  double? gpsEstimatedLPer100Km,
 }) {
   return TripRecordingState(
     phase: TripRecordingPhase.recording,
@@ -59,6 +62,9 @@ TripRecordingState _activeState({
         : TripLiveReading(
             distanceKmSoFar: distance,
             elapsed: const Duration(minutes: 1),
+            speedKmh: speedKmh,
+            fuelRateLPerHour: fuelRateLPerHour,
+            gpsEstimatedLPer100Km: gpsEstimatedLPer100Km,
           ),
   );
 }
@@ -363,6 +369,69 @@ void main() {
         isNot(FuelColors.forType(FuelType.e85)),
         reason: 'no approach → the driving-band palette must win',
       );
+    });
+  });
+
+  // #2390 — the banner strip mirrors the PiP: on a GPS-only trajet the
+  // consumption slot (normally OBD2-only) shows the live physics
+  // estimate as "~X.X L/100"; OBD2 trips stay tilde-free; warm-up
+  // (null estimate) leaves the slot silent.
+  group('TripRecordingBanner GPS-only estimate strip (#2390)', () {
+    testWidgets('GPS-only trip with an estimate → "~X.X L/100" in the strip',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(
+              distance: 1.2,
+              fuelRateLPerHour: null, // GPS-only: no OBD2 fuel rate
+              gpsEstimatedLPer100Km: 6.4,
+            )),
+          ),
+        ],
+      );
+      expect(find.text('~6.4 L/100'), findsOneWidget);
+    });
+
+    testWidgets('OBD2 trip → real measured value, no "~"', (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(
+              distance: 1.2,
+              speedKmh: 70,
+              fuelRateLPerHour: 4.06, // OBD2 measured
+              gpsEstimatedLPer100Km: 6.4, // present but must be ignored
+            )),
+          ),
+        ],
+      );
+      // 4.06 L/h at 70 km/h → ~5.8 L/100, tilde-free.
+      expect(find.text('5.8 L/100'), findsOneWidget);
+      expect(find.textContaining('~'), findsNothing);
+    });
+
+    testWidgets('GPS-only warm-up (null estimate) → no consumption text',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(
+              distance: 1.2,
+              fuelRateLPerHour: null,
+              gpsEstimatedLPer100Km: null,
+            )),
+          ),
+        ],
+      );
+      expect(find.textContaining('L/100'), findsNothing);
+      expect(find.textContaining('~'), findsNothing);
     });
   });
 }

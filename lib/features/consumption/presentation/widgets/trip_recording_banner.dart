@@ -231,8 +231,21 @@ class _Content extends StatelessWidget {
     // eco-coaching chip surfaced from the live reading. Both pieces
     // are silent when the data isn't available so the strip degrades
     // gracefully on cars without a fuel-rate PID.
-    final instantConsumption =
-        (live != null && !paused) ? formatInstantConsumption(live) : null;
+    //
+    // #2390 — on a GPS-only trajet there's no OBD2 fuel rate, so
+    // `formatInstantConsumption` returns null; fall back to the live
+    // physics estimate rendered as `~X.X L/100` (reusing the OBD2 unit
+    // token, leading `~` flagging it an estimate per ADR 0012). The OBD2
+    // measured path stays tilde-free; a null estimate (warm-up / OBD2
+    // trip) leaves the slot silent as before.
+    final gpsEstimate =
+        (live != null && !paused) ? live.gpsEstimatedLPer100Km : null;
+    final instantConsumption = (live != null && !paused)
+        ? (formatInstantConsumption(live) ??
+            (gpsEstimate != null
+                ? '~${gpsEstimate.toStringAsFixed(1)} L/100'
+                : null))
+        : null;
     final coachingHintValue = (live != null && !paused)
         ? coachingHint(live, situation: state.situation, band: state.band)
         : null;
