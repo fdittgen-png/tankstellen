@@ -2776,6 +2776,38 @@
   "@lessonAdviceSmoothDriving": {
     "description": "Encouragement line for the smooth-driving praise lesson (#2287). Embedded in the GPX recording export."
   },
+  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "@insightFullThrottle": {
+    "description": "Cost-line copy for the full-throttle insight on the Trip detail screen (#2461) — time spent at pedal/throttle >= 90 %. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "@lessonAdviceFullThrottle": {
+    "description": "How-to-improve advice for the full-throttle lesson (#2461). Embedded in the GPX recording export."
+  },
+  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "@insightLambdaEnrichment": {
+    "description": "Cost-line copy for the lambda-enrichment insight on the Trip detail screen (#2461) — time the ECU commanded a mixture richer than stoichiometric (lambda < 1), dumping extra fuel under heavy load. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "@lessonAdviceLambdaEnrichment": {
+    "description": "How-to-improve advice for the lambda-enrichment lesson (#2461). Embedded in the GPX recording export."
+  },
   "drivingScoreCardTitle": "Driving score",
   "@drivingScoreCardTitle": {
     "description": "Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A)."
@@ -2815,7 +2847,43 @@
   },
   "drivingScorePenaltyFullThrottle": "Full throttle",
   "@drivingScorePenaltyFullThrottle": {
-    "description": "Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor — currently unused while throttle is not persisted (#1041 phase 5a Card A)."
+    "description": "Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor. Since #2460 throttle/pedal is persisted, so this penalty now fires."
+  },
+  "drivingScoreClassVeryGood": "Very good",
+  "@drivingScoreClassVeryGood": {
+    "description": "Headline classification band shown above the driving-score number when the score is 85-100 (#2460)."
+  },
+  "drivingScoreClassGood": "Good",
+  "@drivingScoreClassGood": {
+    "description": "Headline classification band shown above the driving-score number when the score is 70-84 (#2460)."
+  },
+  "drivingScoreClassAverage": "Average",
+  "@drivingScoreClassAverage": {
+    "description": "Headline classification band shown above the driving-score number when the score is 50-69 (#2460)."
+  },
+  "drivingScoreClassBad": "Needs work",
+  "@drivingScoreClassBad": {
+    "description": "Headline classification band shown above the driving-score number when the score is below 50 (#2460)."
+  },
+  "drivingScorePenaltyLugging": "Lugging",
+  "@drivingScorePenaltyLugging": {
+    "description": "Breakdown chip beneath the driving-score number when labouring below the optimal gear (lugging) was a top contributor (#2460)."
+  },
+  "drivingScorePenaltySmoothness": "Jerky driving",
+  "@drivingScorePenaltySmoothness": {
+    "description": "Breakdown chip beneath the driving-score number when jerky / uneven speed and pedal inputs (low smoothness) were a top contributor (#2460)."
+  },
+  "drivingScorePenaltyHighSpeed": "High speed",
+  "@drivingScorePenaltyHighSpeed": {
+    "description": "Breakdown chip beneath the driving-score number when sustained high speed (drag-dominated, above 110 km/h) was a top contributor (#2460)."
+  },
+  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "@drivingScorePenaltyPedalVelocity": {
+    "description": "Breakdown chip beneath the driving-score number when stabbing the accelerator pedal (high pedal velocity) was a top contributor (#2460)."
+  },
+  "drivingScorePenaltyLambda": "Rich mixture",
+  "@drivingScorePenaltyLambda": {
+    "description": "Breakdown chip beneath the driving-score number when the engine ran a rich mixture (lambda < 1) under load, dumping extra fuel, as a top contributor (#2460)."
   },
   "ecoRouteOption": "Eco",
   "@ecoRouteOption": {
@@ -4770,6 +4838,22 @@
   "trajetDetailChartEngineLoad": "Engine load (%)",
   "@trajetDetailChartEngineLoad": {
     "description": "Section title above the engine-load-over-time chart on the Trip detail screen (#1262 phase 3). Hidden when no sample carries an engineLoadPercent value (cars without OBD2 PID 0x04)."
+  },
+  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "@trajetDetailChartThrottle": {
+    "description": "Section title above the throttle/pedal-position-over-time chart on the Trip detail screen (#2461). Plots accelerator-pedal % (PID 0x49-0x4B) when present, else throttle % (PID 0x11). Hidden when no sample carries either value."
+  },
+  "trajetDetailChartCoolant": "Coolant (°C)",
+  "@trajetDetailChartCoolant": {
+    "description": "Section title above the coolant-temperature-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries a coolantTempC value (cars without OBD2 PID 0x05)."
+  },
+  "trajetDetailChartAltitude": "Altitude (m)",
+  "@trajetDetailChartAltitude": {
+    "description": "Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix)."
+  },
+  "trajetDetailChartLambda": "Commanded λ",
+  "@trajetDetailChartLambda": {
+    "description": "Section title above the commanded-lambda-over-time chart on the Trip detail screen (#2461). Lambda is the commanded equivalence ratio (PID 0x44); values below 1 mean an enriched mixture. The Greek letter lambda is a universal automotive symbol — kept untranslated. Hidden when no sample carries a lambda value."
   },
   "trajetDetailChartsSection": "Charts",
   "@trajetDetailChartsSection": {

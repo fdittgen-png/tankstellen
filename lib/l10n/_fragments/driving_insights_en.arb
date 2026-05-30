@@ -118,5 +118,37 @@
   "lessonAdviceSmoothDriving": "No harsh acceleration or braking this trip — steady inputs like these keep consumption low.",
   "@lessonAdviceSmoothDriving": {
     "description": "Encouragement line for the smooth-driving praise lesson (#2287). Embedded in the GPX recording export."
+  },
+  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "@insightFullThrottle": {
+    "description": "Cost-line copy for the full-throttle insight on the Trip detail screen (#2461) — time spent at pedal/throttle >= 90 %. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "@lessonAdviceFullThrottle": {
+    "description": "How-to-improve advice for the full-throttle lesson (#2461). Embedded in the GPX recording export."
+  },
+  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "@insightLambdaEnrichment": {
+    "description": "Cost-line copy for the lambda-enrichment insight on the Trip detail screen (#2461) — time the ECU commanded a mixture richer than stoichiometric (lambda < 1), dumping extra fuel under heavy load. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "@lessonAdviceLambdaEnrichment": {
+    "description": "How-to-improve advice for the lambda-enrichment lesson (#2461). Embedded in the GPX recording export."
   }
 }

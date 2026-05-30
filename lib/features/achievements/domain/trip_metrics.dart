@@ -4,6 +4,7 @@
 import 'dart:math' as math;
 
 import '../../../core/utils/num_extensions.dart';
+import '../../consumption/data/driving_score_calculator.dart';
 import '../../consumption/data/trip_history_repository.dart';
 import '../../consumption/domain/trip_recorder.dart';
 
@@ -17,36 +18,20 @@ import '../../consumption/domain/trip_recorder.dart';
 /// needs simple ints/doubles.
 ///
 /// Concretely:
-///   * [tripDrivingScore] — 0-100 composite from the [TripSummary]
-///     fields (idle ratio, high-RPM ratio, harsh events). Mirrors the
-///     "driving score" envisaged in #1041 Card A; shipped here so the
-///     achievement rules have something concrete to threshold even
-///     before Card A's UI lands.
-///   * [tripColdStartExcessLiters] — best-effort estimate of the
-///     fuel a trip burned above its own steady-state baseline during
-///     the first few minutes. Used to evaluate the
-///     `coldStartAware` badge on a per-month aggregate.
-///   * [tripSpeedStdDev] — std-dev of non-idle speed samples,
-///     used by the `highwayMaster` rule.
+///   * [drivingScore] — 0-100 composite for a single trip. Since #2460
+///     this is a thin wrapper over the ONE canonical
+///     `computeDrivingScoreFromSummary` (the divergent per-summary
+///     formula that used to live here is gone). The achievement engine
+///     thresholds the same number the trip-detail card shows, so the
+///     two surfaces can never disagree again.
+///   * [coldStartExcessLiters] — best-effort estimate of the fuel a
+///     trip burned above its own steady-state baseline during the first
+///     few minutes. Used to evaluate the `coldStartAware` badge on a
+///     per-month aggregate.
+///   * [speedStdDev] — std-dev of non-idle speed samples, used by the
+///     `highwayMaster` rule.
 class TripMetrics {
   TripMetrics._();
-
-  /// Floor / ceiling for the score so a single insane reading doesn't
-  /// blow it up beyond what a user can interpret.
-  static const int _scoreMin = 0;
-  static const int _scoreMax = 100;
-
-  /// Idle-ratio penalty cap (points). 30% of the score budget.
-  static const double _idlePenaltyCap = 30.0;
-
-  /// High-RPM-ratio penalty cap (points). 25% of the score budget.
-  static const double _highRpmPenaltyCap = 25.0;
-
-  /// Per-event harsh-driving penalty (points). Brakes and accels
-  /// each. Capped at 25 points combined so one rough trip can still
-  /// score in the mid-30s rather than 0.
-  static const double _harshEventPenalty = 5.0;
-  static const double _harshPenaltyCap = 25.0;
 
   /// Speed (km/h) below which a sample is treated as idle / stopped
   /// for std-dev calculations. Same threshold the analyzer uses for
@@ -60,39 +45,14 @@ class TripMetrics {
   /// is good enough for an achievement signal.
   static const Duration _coldStartWindow = Duration(minutes: 5);
 
-  /// Compute a 0-100 driving score for a single trip from its
-  /// summary fields. Higher is better. The formula intentionally
-  /// uses only [TripSummary] (no per-sample scan) so it is cheap
-  /// even on long trips and works for legacy trips that do not have
-  /// per-sample data.
-  ///
-  /// Trips shorter than 1 minute return 100 — there is not enough
-  /// data to penalise driver behaviour. Trips with no duration
-  /// (missing `startedAt`/`endedAt`) also return 100.
-  static int drivingScore(TripSummary summary) {
-    final start = summary.startedAt;
-    final end = summary.endedAt;
-    final durationSeconds = (start != null && end != null)
-        ? end.difference(start).inSeconds.toDouble()
-        : 0.0;
-    if (durationSeconds <= 60) return _scoreMax;
-
-    final idleRatio = (summary.idleSeconds / durationSeconds).clamp(0.0, 1.0);
-    final highRpmRatio =
-        (summary.highRpmSeconds / durationSeconds).clamp(0.0, 1.0);
-
-    final idlePenalty = idleRatio * _idlePenaltyCap;
-    final rpmPenalty = highRpmRatio * _highRpmPenaltyCap;
-
-    final harshEvents = summary.harshBrakes + summary.harshAccelerations;
-    final harshPenalty = math.min(
-      harshEvents * _harshEventPenalty,
-      _harshPenaltyCap,
-    );
-
-    final raw = _scoreMax - idlePenalty - rpmPenalty - harshPenalty;
-    return raw.clamp(_scoreMin.toDouble(), _scoreMax.toDouble()).round();
-  }
+  /// Compute a 0-100 driving score for a single trip from its summary
+  /// (#2460). Delegates to the ONE canonical summary-only calculator so
+  /// the achievement engine and the trip-detail card never diverge.
+  /// Higher is better; legacy trips without per-sample data score off
+  /// the summary fields. Trips < 1 minute, or with no duration, score
+  /// 100 (insufficient signal) — the canonical calc enforces that.
+  static int drivingScore(TripSummary summary) =>
+      computeDrivingScoreFromSummary(summary).score;
 
   /// Estimate the litres burned above this trip's own steady-state
   /// baseline during the first [_coldStartWindow]. Returns 0 when the

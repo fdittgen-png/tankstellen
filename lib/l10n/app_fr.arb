@@ -2539,5 +2539,106 @@
   "@pumpCameraRotateToLandscape": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "@insightFullThrottle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "@lessonAdviceFullThrottle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "@insightLambdaEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "@lessonAdviceLambdaEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScoreClassVeryGood": "Very good",
+  "@drivingScoreClassVeryGood": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScoreClassGood": "Good",
+  "@drivingScoreClassGood": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScoreClassAverage": "Average",
+  "@drivingScoreClassAverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScoreClassBad": "Needs work",
+  "@drivingScoreClassBad": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScorePenaltyLugging": "Lugging",
+  "@drivingScorePenaltyLugging": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScorePenaltySmoothness": "Jerky driving",
+  "@drivingScorePenaltySmoothness": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScorePenaltyHighSpeed": "High speed",
+  "@drivingScorePenaltyHighSpeed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "@drivingScorePenaltyPedalVelocity": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScorePenaltyLambda": "Rich mixture",
+  "@drivingScorePenaltyLambda": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "@trajetDetailChartThrottle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailChartCoolant": "Coolant (°C)",
+  "@trajetDetailChartCoolant": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailChartAltitude": "Altitude (m)",
+  "@trajetDetailChartAltitude": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailChartLambda": "Commanded λ",
+  "@trajetDetailChartLambda": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

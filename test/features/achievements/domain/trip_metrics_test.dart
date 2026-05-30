@@ -27,7 +27,12 @@ TripSummary _summary({
 }
 
 void main() {
-  group('TripMetrics.drivingScore (#1041 phase 5)', () {
+  // #2460 — TripMetrics.drivingScore now delegates to the ONE canonical
+  // summary-only calculator (computeDrivingScoreFromSummary). The
+  // expected numbers therefore follow the canonical caps (idle 25,
+  // high-RPM 20, harsh-accel + harsh-brake 3/event capped at 15 each),
+  // not the old divergent per-summary formula.
+  group('TripMetrics.drivingScore (#2460 — canonical delegate)', () {
     test('clean trip with no penalties scores 100', () {
       final s = _summary(duration: const Duration(minutes: 30));
       expect(TripMetrics.drivingScore(s), 100);
@@ -54,37 +59,36 @@ void main() {
       expect(TripMetrics.drivingScore(s), 100);
     });
 
-    test('100% idle trip drops at least 30 points (idle penalty cap)',
-        () {
+    test('100% idle trip drops the canonical idle cap (25 points)', () {
       final s = _summary(
         duration: const Duration(minutes: 10),
         idleSeconds: 600,
       );
-      expect(TripMetrics.drivingScore(s), 70);
+      expect(TripMetrics.drivingScore(s), 75);
     });
 
-    test('two harsh events take 10 points off (5 per event)', () {
+    test('one brake + one accel take 6 points off (3 per event)', () {
       final s = _summary(
         duration: const Duration(minutes: 30),
         harshBrakes: 1,
         harshAccels: 1,
       );
-      expect(TripMetrics.drivingScore(s), 90);
+      expect(TripMetrics.drivingScore(s), 94);
     });
 
-    test('many harsh events cap at 25 points off', () {
+    test('many harsh events cap each family at 15 (30 off total)', () {
       final s = _summary(
         duration: const Duration(minutes: 30),
         harshBrakes: 10,
         harshAccels: 10,
       );
-      // 20 events × 5 = 100 → capped at 25.
-      expect(TripMetrics.drivingScore(s), 75);
+      // accel cap 15 + brake cap 15 = 30 off → 70.
+      expect(TripMetrics.drivingScore(s), 70);
     });
 
     test('compound penalties never push the score below 0', () {
-      // 100% idle (-30) + 100% high RPM (-25) + 20 harsh events
-      // (cap -25) = -80; still leaves 20.
+      // 100% idle (-25) + 100% high RPM (-20) + harsh caps (-15 -15)
+      // = -75; still leaves 25.
       final s = _summary(
         duration: const Duration(minutes: 10),
         idleSeconds: 600,
@@ -92,7 +96,7 @@ void main() {
         harshBrakes: 10,
         harshAccels: 10,
       );
-      expect(TripMetrics.drivingScore(s), 20);
+      expect(TripMetrics.drivingScore(s), 25);
     });
   });
 

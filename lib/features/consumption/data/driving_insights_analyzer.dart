@@ -44,6 +44,30 @@ const double _highRpmCounterfactualRatio = 0.6;
 /// petrol passenger cars at warm idle (~700-900 RPM).
 const double _idleFuelRateAssumptionLPerHour = 0.6;
 
+/// Pedal / throttle percent at/above which a sample is "full throttle"
+/// (#2461). Canonical with `driving_score_calculator.dart`.
+const double _fullThrottlePercent = 90.0;
+
+/// Counterfactual fuel rate for full-throttle segments as a fraction of
+/// the measured rate (#2461). 0.7 ≈ "easing onto the throttle would have
+/// burned ~70 % of what flooring it did over those windows".
+const double _fullThrottleCounterfactualRatio = 0.7;
+
+/// Fallback fuel rate (L/h) assumed at full throttle when no measured
+/// fuel-rate samples are available (#2461). High because WOT pulls a lot
+/// of fuel; the counterfactual ratio above is then applied.
+const double _fullThrottleFallbackLPerHour = 14.0;
+
+/// Counterfactual fuel rate for λ-enrichment segments as a fraction of
+/// the measured rate (#2461). An enriched mixture (λ < 1) dumps extra
+/// fuel; running stoichiometric would have burned ~85 % of it.
+const double _lambdaEnrichmentCounterfactualRatio = 0.85;
+
+/// Fallback fuel rate (L/h) at λ-enrichment when no measured rate is
+/// available (#2461) — enrichment shows up under load, so assume a
+/// moderately high rate.
+const double _lambdaEnrichmentFallbackLPerHour = 10.0;
+
 /// Categories below this many liters are dropped — they're indistinguishable
 /// from sensor noise.
 const double _noiseFloorLiters = 0.05;
@@ -84,6 +108,16 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
   double idleSeconds = 0;
   double idleWastedLiters = 0;
 
+  // #2461 — full-throttle (pedal else throttle ≥ 90 %) and λ-enrichment
+  // (commanded mixture richer than stoich) cost lines.
+  double fullThrottleSeconds = 0;
+  double fullThrottleWastedLiters = 0;
+  bool sawFuelRateInFullThrottle = false;
+
+  double lambdaEnrichSeconds = 0;
+  double lambdaEnrichWastedLiters = 0;
+  bool sawFuelRateInLambda = false;
+
   for (var i = 1; i < sorted.length; i++) {
     final prev = sorted[i - 1];
     final cur = sorted[i];
@@ -91,6 +125,35 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
         cur.timestamp.difference(prev.timestamp).inMicroseconds /
             Duration.microsecondsPerSecond;
     if (dt <= 0) continue;
+
+    // Full-throttle cost: pedal (PID 0x49-0x4B, driver intent) preferred,
+    // else throttle (PID 0x11). Counterfactual = easing on ≈ 70 % of the
+    // measured rate; falls back to a synthetic WOT rate when unmeasured.
+    final pedal = prev.pedalPercent ?? prev.throttlePercent;
+    if (pedal != null && pedal >= _fullThrottlePercent) {
+      fullThrottleSeconds += dt;
+      final measuredRate = prev.fuelRateLPerHour;
+      if (measuredRate != null && measuredRate > 0) {
+        sawFuelRateInFullThrottle = true;
+        fullThrottleWastedLiters +=
+            measuredRate * (1 - _fullThrottleCounterfactualRatio) * dt / 3600.0;
+      }
+    }
+
+    // λ-enrichment cost: commanded mixture richer than stoichiometric
+    // (λ < 1). The extra fuel over a stoich counterfactual is the waste.
+    final lambda = prev.lambda;
+    if (lambda != null && lambda > 0 && lambda < 1.0) {
+      lambdaEnrichSeconds += dt;
+      final measuredRate = prev.fuelRateLPerHour;
+      if (measuredRate != null && measuredRate > 0) {
+        sawFuelRateInLambda = true;
+        lambdaEnrichWastedLiters += measuredRate *
+            (1 - _lambdaEnrichmentCounterfactualRatio) *
+            dt /
+            3600.0;
+      }
+    }
 
     // High-RPM cost: time fraction above the threshold weighted by
     // measured-vs-counterfactual fuel rate. Mirrors TripRecorder's
@@ -191,6 +254,50 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
         'pctTime': pctTime,
       },
     ));
+  }
+
+  // Full-throttle cost line (#2461).
+  if (fullThrottleSeconds > 0) {
+    final liters = sawFuelRateInFullThrottle
+        ? fullThrottleWastedLiters
+        : _fullThrottleFallbackLPerHour *
+            (1 - _fullThrottleCounterfactualRatio) *
+            fullThrottleSeconds /
+            3600.0;
+    final pctTime = fullThrottleSeconds / totalDt * 100.0;
+    if (liters >= _noiseFloorLiters) {
+      candidates.add(DrivingInsight(
+        labelKey: 'insightFullThrottle',
+        litersWasted: liters,
+        percentOfTrip: pctTime,
+        metadata: {
+          'fullThrottleSeconds': fullThrottleSeconds,
+          'pctTime': pctTime,
+        },
+      ));
+    }
+  }
+
+  // λ-enrichment cost line (#2461).
+  if (lambdaEnrichSeconds > 0) {
+    final liters = sawFuelRateInLambda
+        ? lambdaEnrichWastedLiters
+        : _lambdaEnrichmentFallbackLPerHour *
+            (1 - _lambdaEnrichmentCounterfactualRatio) *
+            lambdaEnrichSeconds /
+            3600.0;
+    final pctTime = lambdaEnrichSeconds / totalDt * 100.0;
+    if (liters >= _noiseFloorLiters) {
+      candidates.add(DrivingInsight(
+        labelKey: 'insightLambdaEnrichment',
+        litersWasted: liters,
+        percentOfTrip: pctTime,
+        metadata: {
+          'lambdaEnrichSeconds': lambdaEnrichSeconds,
+          'pctTime': pctTime,
+        },
+      ));
+    }
   }
 
   // Sort by wasted litres descending and cap at [_topN].

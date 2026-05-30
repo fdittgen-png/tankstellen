@@ -174,11 +174,11 @@ void main() {
       expect(result.hardAccelPenalty, 0);
     });
 
-    test('full-throttle penalty stays 0 (no throttle data persisted today)',
+    test('full-throttle penalty stays 0 when no pedal/throttle is recorded',
         () {
-      // The TripSample schema does not carry throttle %, so the
-      // calculator can never accumulate full-throttle time today. The
-      // penalty must stay 0 regardless of what other categories fire.
+      // Cars exposing neither PID 0x49-0x4B (pedal) nor PID 0x11
+      // (throttle) carry null on every sample — the penalty is the
+      // honest "no signal" 0, not a hard-coded zero (#2460).
       final samples = <TripSample>[
         for (var i = 0; i <= 10; i++)
           TripSample(
@@ -320,6 +320,289 @@ void main() {
         final result = computeDrivingScore(s);
         expect(result.score, inInclusiveRange(0, 100));
       }
+    });
+  });
+
+  group('canonical metrics (#2460)', () {
+    final start = DateTime.utc(2026);
+
+    test('full-throttle penalty NOW FIRES from persisted pedal %', () {
+      // 10 min flooring it — pedal pinned at 100 %. The old code
+      // hard-coded fullThrottleSeconds = 0; the canonical calc reads the
+      // persisted pedal and saturates the 10-point cap.
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 80,
+            rpm: 2500,
+            pedalPercent: 100,
+          ),
+      ];
+      final result = computeDrivingScore(samples);
+      expect(result.fullThrottlePenalty, closeTo(10, 0.5));
+    });
+
+    test('full-throttle falls back to throttle % when pedal is absent', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 80,
+            rpm: 2500,
+            throttlePercent: 95,
+          ),
+      ];
+      final result = computeDrivingScore(samples);
+      expect(result.fullThrottlePenalty, greaterThan(0));
+    });
+
+    test('full-throttle boundary: exactly 90 % IS full throttle', () {
+      final samples = <TripSample>[
+        TripSample(timestamp: start, speedKmh: 80, rpm: 2500, pedalPercent: 90),
+        TripSample(
+          timestamp: start.add(const Duration(minutes: 5)),
+          speedKmh: 80,
+          rpm: 2500,
+          pedalPercent: 90,
+        ),
+      ];
+      expect(computeDrivingScore(samples).fullThrottlePenalty, greaterThan(0));
+    });
+
+    test('fuel-cut coast is credited (positive eco bonus)', () {
+      // Whole trip coasting: moving > 20 km/h, fuel rate ~0 (injectors
+      // off). Detected before #2460 but never credited; now +10 max.
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 60,
+            rpm: 1500,
+            fuelRateLPerHour: 0.0,
+          ),
+      ];
+      final result = computeDrivingScore(samples);
+      expect(result.ecoCreditCoast, closeTo(10, 0.5));
+      // The credit lifts the score back to 100 on an otherwise clean trip.
+      expect(result.score, 100);
+    });
+
+    test('eco credit lifts an otherwise-penalised score', () {
+      // Half the trip coasting, half idling — the coast credit offsets
+      // part of the idle penalty so the score is higher than idle alone.
+      final coast = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 60,
+            rpm: 1500,
+            fuelRateLPerHour: 0.0,
+          ),
+      ];
+      final result = computeDrivingScore(coast);
+      expect(result.ecoCreditCoast, greaterThan(0));
+    });
+
+    test('smoothness is CONTINUOUS — jerky speed costs points', () {
+      // Speed sawtooths 40/120/40/120 every minute while moving — high
+      // speed std-dev → a non-zero, sub-cap smoothness penalty (not a
+      // binary all-or-nothing gate).
+      final samples = <TripSample>[
+        for (var i = 0; i <= 12; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: i.isEven ? 40 : 120,
+            rpm: 2000,
+          ),
+      ];
+      final result = computeDrivingScore(samples);
+      expect(result.smoothnessPenalty, greaterThan(0));
+    });
+
+    test('smooth constant-speed cruise has zero smoothness penalty', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 90,
+            rpm: 2000,
+          ),
+      ];
+      expect(computeDrivingScore(samples).smoothnessPenalty, 0);
+    });
+
+    test('lugging penalty comes from secondsBelowOptimalGear input', () {
+      // 10-minute trip, half of it lugging below the optimal gear.
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 50,
+            rpm: 1800,
+          ),
+      ];
+      final without = computeDrivingScore(samples);
+      final with300 =
+          computeDrivingScore(samples, secondsBelowOptimalGear: 300);
+      expect(without.luggingPenalty, 0);
+      expect(with300.luggingPenalty, greaterThan(0));
+      expect(with300.score, lessThan(without.score));
+    });
+
+    test('λ-enrichment penalty fires when commanded λ < 1', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 100,
+            rpm: 3000,
+            lambda: 0.85,
+          ),
+      ];
+      final result = computeDrivingScore(samples);
+      expect(result.lambdaEnrichmentPenalty, greaterThan(0));
+    });
+
+    test('λ == 1 (stoichiometric) is NOT enrichment', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 100,
+            rpm: 3000,
+            lambda: 1.0,
+          ),
+      ];
+      expect(computeDrivingScore(samples).lambdaEnrichmentPenalty, 0);
+    });
+
+    test('speed-efficiency penalty fires above 110 km/h', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 130,
+            rpm: 2800,
+          ),
+      ];
+      expect(
+        computeDrivingScore(samples).speedEfficiencyPenalty,
+        greaterThan(0),
+      );
+    });
+
+    test('rev-while-stationary penalty fires on a high-RPM standstill', () {
+      // Stationary (speed 0) but revving 2500 RPM > 1500 threshold.
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i * 5)),
+            speedKmh: 0,
+            rpm: 2500,
+          ),
+      ];
+      expect(
+        computeDrivingScore(samples).revWhileStationaryPenalty,
+        greaterThan(0),
+      );
+    });
+
+    test('classification bands map score → DrivingStyleClass', () {
+      expect(DrivingStyleClass.fromScore(100), DrivingStyleClass.veryGood);
+      expect(DrivingStyleClass.fromScore(85), DrivingStyleClass.veryGood);
+      expect(DrivingStyleClass.fromScore(84), DrivingStyleClass.good);
+      expect(DrivingStyleClass.fromScore(70), DrivingStyleClass.good);
+      expect(DrivingStyleClass.fromScore(69), DrivingStyleClass.average);
+      expect(DrivingStyleClass.fromScore(50), DrivingStyleClass.average);
+      expect(DrivingStyleClass.fromScore(49), DrivingStyleClass.bad);
+      expect(DrivingStyleClass.fromScore(0), DrivingStyleClass.bad);
+    });
+
+    test('a clean cruise classifies VERY-GOOD', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 90,
+            rpm: 2000,
+            fuelRateLPerHour: 5,
+          ),
+      ];
+      expect(computeDrivingScore(samples).styleClass,
+          DrivingStyleClass.veryGood);
+    });
+  });
+
+  group('computeDrivingScoreFromSummary (#2460 legacy summary path)', () {
+    final start = DateTime.utc(2026);
+
+    TripSummary summary({
+      required Duration duration,
+      double idleSeconds = 0,
+      double highRpmSeconds = 0,
+      int harshBrakes = 0,
+      int harshAccels = 0,
+      double? secondsBelowOptimalGear,
+    }) =>
+        TripSummary(
+          distanceKm: 20,
+          maxRpm: 2000,
+          highRpmSeconds: highRpmSeconds,
+          idleSeconds: idleSeconds,
+          harshBrakes: harshBrakes,
+          harshAccelerations: harshAccels,
+          startedAt: start,
+          endedAt: start.add(duration),
+          secondsBelowOptimalGear: secondsBelowOptimalGear,
+        );
+
+    test('clean trip with no penalties scores 100', () {
+      expect(
+        computeDrivingScoreFromSummary(
+          summary(duration: const Duration(minutes: 30)),
+        ).score,
+        100,
+      );
+    });
+
+    test('trip under 1 minute returns perfect (insufficient signal)', () {
+      expect(
+        computeDrivingScoreFromSummary(
+          summary(duration: const Duration(seconds: 30), idleSeconds: 30),
+        ),
+        DrivingScore.perfect,
+      );
+    });
+
+    test('100% idle drops the idle cap (25 points)', () {
+      final s = computeDrivingScoreFromSummary(
+        summary(duration: const Duration(minutes: 10), idleSeconds: 600),
+      );
+      expect(s.idlingPenalty, closeTo(25, 0.5));
+      expect(s.score, closeTo(75, 1));
+    });
+
+    test('harsh events subtract per-event, capped', () {
+      final s = computeDrivingScoreFromSummary(
+        summary(
+          duration: const Duration(minutes: 30),
+          harshBrakes: 10,
+          harshAccels: 10,
+        ),
+      );
+      // Each family caps at 15 → 30 off → 70.
+      expect(s.score, 70);
+    });
+
+    test('summary lugging is included', () {
+      final s = computeDrivingScoreFromSummary(
+        summary(
+          duration: const Duration(minutes: 10),
+          secondsBelowOptimalGear: 600,
+        ),
+      );
+      expect(s.luggingPenalty, greaterThan(0));
     });
   });
 

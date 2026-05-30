@@ -4179,6 +4179,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Fahrt ohne starkes Beschleunigen oder Bremsen – gleichmäßiges Fahren hält den Verbrauch niedrig.';
 
   @override
+  String insightFullThrottle(String pctTime, String liters) {
+    return 'Vollgas ($pctTime% der Fahrt): $liters L verschwendet';
+  }
+
+  @override
+  String get lessonAdviceFullThrottle =>
+      'Sanfter Gas geben – mit etwa 70 % Pedalweg kommst du mit deutlich weniger Sprit auf Tempo.';
+
+  @override
+  String insightLambdaEnrichment(String pctTime, String liters) {
+    return 'Fettes Gemisch unter Last ($pctTime% der Fahrt): $liters L verschwendet';
+  }
+
+  @override
+  String get lessonAdviceLambdaEnrichment =>
+      'Hohe Dauerlast lässt den Motor anfetten – früher hochschalten und an langen Steigungen Gas wegnehmen, damit das Gemisch mager bleibt.';
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override
@@ -4207,6 +4225,33 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get drivingScorePenaltyFullThrottle => 'Vollgas';
+
+  @override
+  String get drivingScoreClassVeryGood => 'Sehr gut';
+
+  @override
+  String get drivingScoreClassGood => 'Gut';
+
+  @override
+  String get drivingScoreClassAverage => 'Durchschnittlich';
+
+  @override
+  String get drivingScoreClassBad => 'Verbesserungswürdig';
+
+  @override
+  String get drivingScorePenaltyLugging => 'Untertouriges Fahren';
+
+  @override
+  String get drivingScorePenaltySmoothness => 'Unruhiges Fahren';
+
+  @override
+  String get drivingScorePenaltyHighSpeed => 'Hohe Geschwindigkeit';
+
+  @override
+  String get drivingScorePenaltyPedalVelocity => 'Aggressives Gas';
+
+  @override
+  String get drivingScorePenaltyLambda => 'Fettes Gemisch';
 
   @override
   String get ecoRouteOption => 'Sparsam';
@@ -5830,6 +5875,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trajetDetailChartEngineLoad => 'Motorlast (%)';
+
+  @override
+  String get trajetDetailChartThrottle => 'Drosselklappe / Pedal (%)';
+
+  @override
+  String get trajetDetailChartCoolant => 'Kühlmittel (°C)';
+
+  @override
+  String get trajetDetailChartAltitude => 'Höhe (m)';
+
+  @override
+  String get trajetDetailChartLambda => 'Soll-λ';
 
   @override
   String get trajetDetailChartsSection => 'Diagramme';

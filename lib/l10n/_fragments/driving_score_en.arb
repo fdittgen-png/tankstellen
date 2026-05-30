@@ -38,6 +38,42 @@
   },
   "drivingScorePenaltyFullThrottle": "Full throttle",
   "@drivingScorePenaltyFullThrottle": {
-    "description": "Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor — currently unused while throttle is not persisted (#1041 phase 5a Card A)."
+    "description": "Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor. Since #2460 throttle/pedal is persisted, so this penalty now fires."
+  },
+  "drivingScoreClassVeryGood": "Very good",
+  "@drivingScoreClassVeryGood": {
+    "description": "Headline classification band shown above the driving-score number when the score is 85-100 (#2460)."
+  },
+  "drivingScoreClassGood": "Good",
+  "@drivingScoreClassGood": {
+    "description": "Headline classification band shown above the driving-score number when the score is 70-84 (#2460)."
+  },
+  "drivingScoreClassAverage": "Average",
+  "@drivingScoreClassAverage": {
+    "description": "Headline classification band shown above the driving-score number when the score is 50-69 (#2460)."
+  },
+  "drivingScoreClassBad": "Needs work",
+  "@drivingScoreClassBad": {
+    "description": "Headline classification band shown above the driving-score number when the score is below 50 (#2460)."
+  },
+  "drivingScorePenaltyLugging": "Lugging",
+  "@drivingScorePenaltyLugging": {
+    "description": "Breakdown chip beneath the driving-score number when labouring below the optimal gear (lugging) was a top contributor (#2460)."
+  },
+  "drivingScorePenaltySmoothness": "Jerky driving",
+  "@drivingScorePenaltySmoothness": {
+    "description": "Breakdown chip beneath the driving-score number when jerky / uneven speed and pedal inputs (low smoothness) were a top contributor (#2460)."
+  },
+  "drivingScorePenaltyHighSpeed": "High speed",
+  "@drivingScorePenaltyHighSpeed": {
+    "description": "Breakdown chip beneath the driving-score number when sustained high speed (drag-dominated, above 110 km/h) was a top contributor (#2460)."
+  },
+  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "@drivingScorePenaltyPedalVelocity": {
+    "description": "Breakdown chip beneath the driving-score number when stabbing the accelerator pedal (high pedal velocity) was a top contributor (#2460)."
+  },
+  "drivingScorePenaltyLambda": "Rich mixture",
+  "@drivingScorePenaltyLambda": {
+    "description": "Breakdown chip beneath the driving-score number when the engine ran a rich mixture (lambda < 1) under load, dumping extra fuel, as a top contributor (#2460)."
   }
 }

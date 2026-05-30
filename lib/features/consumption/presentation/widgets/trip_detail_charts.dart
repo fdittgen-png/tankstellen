@@ -13,6 +13,11 @@ import '../../../../l10n/app_localizations.dart';
 // part shares this file's library scope.
 part 'trip_detail_line_painter.dart';
 
+// #2461 — the throttle/pedal + coolant + altitude + λ charts live in a part
+// file so this widget file stays under the 400-line guard. They share this
+// library's scope (the private `_TripDetailLineChart` painter wrapper).
+part 'trip_detail_signal_charts.dart';
+
 /// One sample of the trip recording profile (#890).
 ///
 /// Mirrors the fields of `TripSample` in the domain layer but lives in
@@ -83,6 +88,22 @@ class TripDetailSample {
   /// [latitude]; the two fields are always written and read together.
   final double? longitude;
 
+  /// Accelerator-pedal position % (PIDs 0x49-0x4B, #2461). Driver
+  /// intent. Null when the car exposes no pedal PID or for trips
+  /// persisted before #2459. Drives the Throttle/Pedal chart together
+  /// with [throttlePercent] (pedal preferred when present).
+  final double? pedalPercent;
+
+  /// Commanded equivalence ratio / λ (PID 0x44, #2461). Null when the
+  /// car doesn't expose PID 0x44 or for legacy trips. Drives the
+  /// optional λ chart and the λ-enrichment eco-insight.
+  final double? lambda;
+
+  /// GPS altitude in metres (#2461 / #1935). Null when GPS path was
+  /// off, before the first fix, or for legacy trips. Drives the
+  /// optional altitude chart.
+  final double? altitudeM;
+
   const TripDetailSample({
     required this.timestamp,
     required this.speedKmh,
@@ -94,6 +115,9 @@ class TripDetailSample {
     this.coolantTempC,
     this.latitude,
     this.longitude,
+    this.pedalPercent,
+    this.lambda,
+    this.altitudeM,
   });
 }
 

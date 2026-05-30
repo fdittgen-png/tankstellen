@@ -418,4 +418,73 @@ void main() {
       expect(original, snapshot);
     });
   });
+
+  group('full-throttle + λ-enrichment insights (#2461)', () {
+    final start = DateTime.utc(2026);
+
+    TripSample s(
+      int minute, {
+      double speedKmh = 80,
+      double rpm = 2500,
+      double? pedalPercent,
+      double? throttlePercent,
+      double? lambda,
+      double? fuelRate,
+    }) =>
+        TripSample(
+          timestamp: start.add(Duration(minutes: minute)),
+          speedKmh: speedKmh,
+          rpm: rpm,
+          pedalPercent: pedalPercent,
+          throttlePercent: throttlePercent,
+          lambda: lambda,
+          fuelRateLPerHour: fuelRate,
+        );
+
+    DrivingInsight? find(List<DrivingInsight> list, String key) {
+      for (final i in list) {
+        if (i.labelKey == key) return i;
+      }
+      return null;
+    }
+
+    test('full-throttle cost line surfaces from persisted pedal %', () {
+      final samples = [
+        for (var i = 0; i <= 10; i++)
+          s(i, pedalPercent: 100, fuelRate: 16),
+      ];
+      final insight = find(analyzeTrip(samples), 'insightFullThrottle');
+      expect(insight, isNotNull);
+      expect(insight!.litersWasted, greaterThan(0));
+    });
+
+    test('full-throttle falls back to a synthetic rate without fuel data', () {
+      final samples = [for (var i = 0; i <= 10; i++) s(i, pedalPercent: 95)];
+      final insight = find(analyzeTrip(samples), 'insightFullThrottle');
+      expect(insight, isNotNull);
+    });
+
+    test('no full-throttle line when pedal/throttle stay below 90 %', () {
+      final samples = [for (var i = 0; i <= 10; i++) s(i, pedalPercent: 40)];
+      expect(find(analyzeTrip(samples), 'insightFullThrottle'), isNull);
+    });
+
+    test('λ-enrichment cost line surfaces when commanded λ < 1', () {
+      final samples = [
+        for (var i = 0; i <= 10; i++)
+          s(i, lambda: 0.85, fuelRate: 12),
+      ];
+      final insight = find(analyzeTrip(samples), 'insightLambdaEnrichment');
+      expect(insight, isNotNull);
+      expect(insight!.litersWasted, greaterThan(0));
+    });
+
+    test('no λ-enrichment line at stoichiometric λ == 1', () {
+      final samples = [
+        for (var i = 0; i <= 10; i++)
+          s(i, lambda: 1.0, fuelRate: 12),
+      ];
+      expect(find(analyzeTrip(samples), 'insightLambdaEnrichment'), isNull);
+    });
+  });
 }

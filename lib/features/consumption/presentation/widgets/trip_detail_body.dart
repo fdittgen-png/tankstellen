@@ -125,7 +125,13 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     final tripSamples = widget.samples.map(_toTripSample).toList(
           growable: false,
         );
-    return computeDrivingScore(tripSamples);
+    // #2460 — thread the trip-end lugging metric stored on the summary
+    // into the canonical score so the over-rev/shift family includes it
+    // (the calculator can't recompute gear inference from samples alone).
+    return computeDrivingScore(
+      tripSamples,
+      secondsBelowOptimalGear: widget.entry.summary.secondsBelowOptimalGear,
+    );
   }
 
   ThrottleRpmHistogram _computeHistogram() {
@@ -171,6 +177,21 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // rendering an empty card.
     final hasEngineLoadSamples =
         widget.samples.any((s) => s.engineLoadPercent != null);
+
+    // #2461 — the new driving-signal chart sections follow the same
+    // if-any-non-null gate as RPM / engine-load. Throttle/pedal renders
+    // when EITHER pedal (PID 0x49-0x4B) or throttle (PID 0x11) is
+    // present; coolant / altitude / λ each gate on their own signal.
+    // Cars (and legacy trips) without the PID emit null on every sample,
+    // so the section header is silently skipped.
+    final hasThrottleSamples = widget.samples.any(
+      (s) => s.pedalPercent != null || s.throttlePercent != null,
+    );
+    final hasCoolantSamples =
+        widget.samples.any((s) => s.coolantTempC != null);
+    final hasAltitudeSamples =
+        widget.samples.any((s) => s.altitudeM != null);
+    final hasLambdaSamples = widget.samples.any((s) => s.lambda != null);
 
     // Post-trip lessons (#2251) — resolved here because the localized
     // titles depend on the active locale, but built off the cached
@@ -284,6 +305,28 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
                   title: l?.trajetDetailChartEngineLoad ?? 'Engine load (%)',
                   chart: TripDetailEngineLoadChart(samples: widget.samples),
                 ),
+              // #2461 — driving-signal charts, each gated on its own
+              // if-any-non-null signal (mirrors RPM / engine-load).
+              if (hasThrottleSamples)
+                _ChartSection(
+                  title: l?.trajetDetailChartThrottle ?? 'Throttle / pedal (%)',
+                  chart: TripDetailThrottleChart(samples: widget.samples),
+                ),
+              if (hasCoolantSamples)
+                _ChartSection(
+                  title: l?.trajetDetailChartCoolant ?? 'Coolant (°C)',
+                  chart: TripDetailCoolantChart(samples: widget.samples),
+                ),
+              if (hasAltitudeSamples)
+                _ChartSection(
+                  title: l?.trajetDetailChartAltitude ?? 'Altitude (m)',
+                  chart: TripDetailAltitudeChart(samples: widget.samples),
+                ),
+              if (hasLambdaSamples)
+                _ChartSection(
+                  title: l?.trajetDetailChartLambda ?? 'Commanded λ',
+                  chart: TripDetailLambdaChart(samples: widget.samples),
+                ),
             ],
           ),
         ),
@@ -322,6 +365,13 @@ TripSample _toTripSample(TripDetailSample s) => TripSample(
       speedKmh: s.speedKmh,
       rpm: s.rpm ?? 0,
       fuelRateLPerHour: s.fuelRateLPerHour,
+      // #2460 — carry the persisted driver-intent + mixture signals so
+      // the canonical score computes the full-throttle, pedal-velocity,
+      // smoothness, and λ-enrichment terms (the old converter dropped
+      // them, which is why the full-throttle penalty appeared dead).
+      throttlePercent: s.throttlePercent,
+      pedalPercent: s.pedalPercent,
+      lambda: s.lambda,
     );
 
 class _ChartSection extends StatelessWidget {

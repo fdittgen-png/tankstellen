@@ -7494,6 +7494,30 @@ abstract class AppLocalizations {
   /// **'No harsh acceleration or braking this trip — steady inputs like these keep consumption low.'**
   String get lessonAdviceSmoothDriving;
 
+  /// Cost-line copy for the full-throttle insight on the Trip detail screen (#2461) — time spent at pedal/throttle >= 90 %. Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Full throttle ({pctTime}% of trip): wasted {liters} L'**
+  String insightFullThrottle(String pctTime, String liters);
+
+  /// How-to-improve advice for the full-throttle lesson (#2461). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.'**
+  String get lessonAdviceFullThrottle;
+
+  /// Cost-line copy for the lambda-enrichment insight on the Trip detail screen (#2461) — time the ECU commanded a mixture richer than stoichiometric (lambda < 1), dumping extra fuel under heavy load. Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Rich mixture under load ({pctTime}% of trip): wasted {liters} L'**
+  String insightLambdaEnrichment(String pctTime, String liters);
+
+  /// How-to-improve advice for the lambda-enrichment lesson (#2461). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.'**
+  String get lessonAdviceLambdaEnrichment;
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:
@@ -7542,11 +7566,65 @@ abstract class AppLocalizations {
   /// **'High RPM'**
   String get drivingScorePenaltyHighRpm;
 
-  /// Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor — currently unused while throttle is not persisted (#1041 phase 5a Card A).
+  /// Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor. Since #2460 throttle/pedal is persisted, so this penalty now fires.
   ///
   /// In en, this message translates to:
   /// **'Full throttle'**
   String get drivingScorePenaltyFullThrottle;
+
+  /// Headline classification band shown above the driving-score number when the score is 85-100 (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Very good'**
+  String get drivingScoreClassVeryGood;
+
+  /// Headline classification band shown above the driving-score number when the score is 70-84 (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get drivingScoreClassGood;
+
+  /// Headline classification band shown above the driving-score number when the score is 50-69 (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get drivingScoreClassAverage;
+
+  /// Headline classification band shown above the driving-score number when the score is below 50 (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Needs work'**
+  String get drivingScoreClassBad;
+
+  /// Breakdown chip beneath the driving-score number when labouring below the optimal gear (lugging) was a top contributor (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Lugging'**
+  String get drivingScorePenaltyLugging;
+
+  /// Breakdown chip beneath the driving-score number when jerky / uneven speed and pedal inputs (low smoothness) were a top contributor (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Jerky driving'**
+  String get drivingScorePenaltySmoothness;
+
+  /// Breakdown chip beneath the driving-score number when sustained high speed (drag-dominated, above 110 km/h) was a top contributor (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'High speed'**
+  String get drivingScorePenaltyHighSpeed;
+
+  /// Breakdown chip beneath the driving-score number when stabbing the accelerator pedal (high pedal velocity) was a top contributor (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Aggressive pedal'**
+  String get drivingScorePenaltyPedalVelocity;
+
+  /// Breakdown chip beneath the driving-score number when the engine ran a rich mixture (lambda < 1) under load, dumping extra fuel, as a top contributor (#2460).
+  ///
+  /// In en, this message translates to:
+  /// **'Rich mixture'**
+  String get drivingScorePenaltyLambda;
 
   /// Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time.
   ///
@@ -10220,6 +10298,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Engine load (%)'**
   String get trajetDetailChartEngineLoad;
+
+  /// Section title above the throttle/pedal-position-over-time chart on the Trip detail screen (#2461). Plots accelerator-pedal % (PID 0x49-0x4B) when present, else throttle % (PID 0x11). Hidden when no sample carries either value.
+  ///
+  /// In en, this message translates to:
+  /// **'Throttle / pedal (%)'**
+  String get trajetDetailChartThrottle;
+
+  /// Section title above the coolant-temperature-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries a coolantTempC value (cars without OBD2 PID 0x05).
+  ///
+  /// In en, this message translates to:
+  /// **'Coolant (°C)'**
+  String get trajetDetailChartCoolant;
+
+  /// Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix).
+  ///
+  /// In en, this message translates to:
+  /// **'Altitude (m)'**
+  String get trajetDetailChartAltitude;
+
+  /// Section title above the commanded-lambda-over-time chart on the Trip detail screen (#2461). Lambda is the commanded equivalence ratio (PID 0x44); values below 1 mean an enriched mixture. The Greek letter lambda is a universal automotive symbol — kept untranslated. Hidden when no sample carries a lambda value.
+  ///
+  /// In en, this message translates to:
+  /// **'Commanded λ'**
+  String get trajetDetailChartLambda;
 
   /// Header of the collapsible section that groups all per-trip telemetry charts on the Trip detail screen (#1895). Collapsed by default — the trip summary and insight cards stay visible above it.
   ///

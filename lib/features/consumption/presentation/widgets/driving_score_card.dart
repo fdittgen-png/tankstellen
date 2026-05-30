@@ -55,6 +55,7 @@ class DrivingScoreCard extends StatelessWidget {
             'Driving score $scoreText out of 100';
 
     final topPenalties = _topPenalties(l);
+    final classLabel = _classLabel(l, score.styleClass);
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -66,6 +67,17 @@ class DrivingScoreCard extends StatelessWidget {
             Text(
               l?.drivingScoreCardTitle ?? 'Driving score',
               style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            // #2460 — the coarse VERY-GOOD / GOOD / AVERAGE / BAD band, so
+            // the driver reads a verdict before the bare number.
+            Text(
+              classLabel,
+              key: const Key('driving_score_class'),
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: _scoreColor(theme, score.score),
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
             Semantics(
@@ -151,12 +163,47 @@ class DrivingScoreCard extends StatelessWidget {
         value: score.fullThrottlePenalty,
         label: l?.drivingScorePenaltyFullThrottle ?? 'Full throttle',
       ),
+      // #2460 — the new canonical sub-scores join the breakdown ranking.
+      _NamedPenalty(
+        value: score.luggingPenalty,
+        label: l?.drivingScorePenaltyLugging ?? 'Lugging',
+      ),
+      _NamedPenalty(
+        value: score.smoothnessPenalty,
+        label: l?.drivingScorePenaltySmoothness ?? 'Jerky driving',
+      ),
+      _NamedPenalty(
+        value: score.speedEfficiencyPenalty,
+        label: l?.drivingScorePenaltyHighSpeed ?? 'High speed',
+      ),
+      _NamedPenalty(
+        value: score.pedalVelocityPenalty,
+        label: l?.drivingScorePenaltyPedalVelocity ?? 'Aggressive pedal',
+      ),
+      _NamedPenalty(
+        value: score.lambdaEnrichmentPenalty,
+        label: l?.drivingScorePenaltyLambda ?? 'Rich mixture',
+      ),
     ]..sort((a, b) => b.value.compareTo(a.value));
 
     return [
       for (final e in entries)
         if (e.value >= 1.0) e.label,
     ].take(2).toList(growable: false);
+  }
+
+  /// Localized headline for the coarse classification band (#2460).
+  String _classLabel(AppLocalizations? l, DrivingStyleClass c) {
+    switch (c) {
+      case DrivingStyleClass.veryGood:
+        return l?.drivingScoreClassVeryGood ?? 'Very good';
+      case DrivingStyleClass.good:
+        return l?.drivingScoreClassGood ?? 'Good';
+      case DrivingStyleClass.average:
+        return l?.drivingScoreClassAverage ?? 'Average';
+      case DrivingStyleClass.bad:
+        return l?.drivingScoreClassBad ?? 'Needs work';
+    }
   }
 
   /// Map the numeric score to a colour band: red below 50, amber
