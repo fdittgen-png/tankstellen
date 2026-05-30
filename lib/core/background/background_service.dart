@@ -56,6 +56,12 @@ class BackgroundService {
   /// Task name for the charging-only periodic price refresh.
   static const priceRefreshChargingTask = 'priceRefreshCharging';
 
+  /// One-off task name enqueued by the Android [BootReceiver] after a
+  /// reboot (#2413). Handling it re-registers the periodic tasks so the
+  /// schedule survives a device restart even if WorkManager's own boot
+  /// reschedule did not fire. Must match `BootReceiver.BOOT_REREGISTER_TASK`.
+  static const bootReregisterTask = 'bootReregister';
+
   /// Standard refresh interval when on battery (not low).
   /// Android may delay based on Doze mode; 1h is the minimum WorkManager honors reliably.
   static const refreshInterval = Duration(hours: 1);
@@ -179,6 +185,14 @@ class BackgroundService {
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
+    // #2413 — boot re-arm: re-register the periodic tasks rather than scan.
+    // The BootReceiver enqueues this one-off after a reboot.
+    if (task == BackgroundService.bootReregisterTask) {
+      debugPrint('BackgroundService: re-registering periodic tasks after boot');
+      await BackgroundService.init();
+      return true;
+    }
+
     final trigger = _triggerForTask(task);
     if (trigger == null) {
       debugPrint('BackgroundService: ignoring unknown task "$task"');

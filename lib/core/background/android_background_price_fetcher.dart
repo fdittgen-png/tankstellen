@@ -12,6 +12,12 @@ import 'background_service.dart';
 /// adaptive battery-aware scheduling:
 /// - Standard task: every 1h, skipped when battery is low
 /// - Charging task: every 30min, only when device is plugged in
+///
+/// #2413 — both tasks carry a `NetworkType.connected` constraint so a wake
+/// without connectivity is deferred by WorkManager instead of firing a dead
+/// request. The schedule is re-established after a reboot by [BootReceiver]
+/// (Android) re-running [BackgroundService.init] via the `bootReregister`
+/// one-off task.
 class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
   final Workmanager _workmanager;
 

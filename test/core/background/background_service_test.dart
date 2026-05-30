@@ -509,4 +509,57 @@ void main() {
       );
     });
   });
+
+  // #2413 — WorkManager hardening: re-arm the periodic schedule on reboot.
+  group('boot re-registration (#2413)', () {
+    test('bootReregisterTask constant matches the native BootReceiver', () {
+      // BootReceiver.BOOT_REREGISTER_TASK and BackgroundService
+      // .bootReregisterTask are two ends of the same WorkManager input-data
+      // contract; they must stay byte-identical.
+      expect(BackgroundService.bootReregisterTask, 'bootReregister');
+      final kt = File(
+        'android/app/src/main/kotlin/de/tankstellen/tankstellen/BootReceiver.kt',
+      ).readAsStringSync();
+      expect(
+        kt.contains('"bootReregister"'),
+        isTrue,
+        reason: 'BootReceiver must enqueue the bootReregister Dart task',
+      );
+    });
+
+    test('callbackDispatcher re-registers on the boot task', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+      // The boot branch must re-register (init), not run a scan.
+      final idx = source.indexOf('BackgroundService.bootReregisterTask');
+      expect(idx, greaterThan(0),
+          reason: 'dispatcher must special-case the boot re-register task');
+      final initIdx = source.indexOf('BackgroundService.init()', idx);
+      final scanIdx = source.indexOf('.scan(', idx);
+      expect(initIdx, greaterThan(0));
+      expect(initIdx, lessThan(scanIdx),
+          reason: 'boot task must re-register before the scan branch');
+    });
+
+    test('manifest declares RECEIVE_BOOT_COMPLETED + the BootReceiver', () {
+      final manifest =
+          File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
+      expect(
+        manifest.contains('android.permission.RECEIVE_BOOT_COMPLETED'),
+        isTrue,
+        reason: 'boot re-registration needs RECEIVE_BOOT_COMPLETED',
+      );
+      expect(
+        manifest.contains('.BootReceiver'),
+        isTrue,
+        reason: 'the BootReceiver must be registered',
+      );
+      expect(
+        manifest.contains('android.intent.action.BOOT_COMPLETED'),
+        isTrue,
+        reason: 'the receiver must filter the boot broadcast',
+      );
+    });
+  });
 }
