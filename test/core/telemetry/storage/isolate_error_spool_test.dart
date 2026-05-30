@@ -1,7 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -9,6 +11,31 @@ import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/storage/isolate_error_spool.dart';
 import 'package:tankstellen/core/telemetry/storage/isolate_error_spool_entry.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
+
+/// Top-level entry point spawned by [Isolate.spawn]. Runs in a fresh
+/// isolate where Hive was never `init`ed — the exact orphaned-completer
+/// scenario fixed in #2321: `Hive.openBox` rethrows AND completes its
+/// internal `_openingBoxes` completer with an error that has no
+/// listener. If the guard in [IsolateErrorSpool._defaultOpenBox]
+/// regressed, that rejection would surface as an *unhandled* async
+/// error and kill the spawned isolate before it sends `'done'` back —
+/// so the parent's `onExit`/timeout would fire instead of `'done'`.
+///
+/// The isolate sends `'done'` only if [IsolateErrorSpool.enqueue]
+/// returned normally with no escaped async error.
+Future<void> spawnedEnqueueEntry(SendPort reply) async {
+  // Mirror the real background-isolate wake-up: no Hive.init has run.
+  await IsolateErrorSpool.enqueue(
+    isolateTaskName: 'spawned_price_refresh',
+    error: Exception('boom from a real isolate'),
+    contextMap: const <String, dynamic>{'attempt': 1},
+  );
+  // Drain microtasks so an orphaned-completer rejection (if the guard
+  // regressed) gets a chance to surface inside this isolate before we
+  // report success.
+  await Future<void>.delayed(Duration.zero);
+  reply.send('done');
+}
 
 /// Minimal fake [TraceRecorder] that captures every call to `record`.
 ///
@@ -230,6 +257,66 @@ void main() {
       final replayed = await IsolateErrorSpool.drain(recorder);
       expect(replayed, 0);
       expect(recorder.calls, isEmpty);
+    });
+  });
+
+  group('IsolateErrorSpool from a spawned isolate (#2321 orphan leak)', () {
+    test(
+        'enqueue completes normally in a real Isolate.spawn context with no '
+        'Hive.init — no orphaned-completer leak kills the isolate', () async {
+      // This is the path the PR #2321 fix was about: the `boxFactory`
+      // seam exists, but only a *real* isolate (not a swapped factory)
+      // reproduces the `_openingBoxes` orphaned-completer rejection. We
+      // spawn a fresh isolate, run the default (real `Hive.openBox`)
+      // enqueue inside it, and require it to report `'done'`. A
+      // regression of the guarded zone would surface as an unhandled
+      // async error that terminates the isolate before `'done'`, so the
+      // `onExit` sentinel / timeout trips instead.
+      final reply = ReceivePort();
+      final exitPort = ReceivePort();
+      final errorPort = ReceivePort();
+
+      final isolate = await Isolate.spawn(
+        spawnedEnqueueEntry,
+        reply.sendPort,
+        onExit: exitPort.sendPort,
+        onError: errorPort.sendPort,
+        errorsAreFatal: true,
+      );
+
+      Object? isolateError;
+      errorPort.listen((dynamic e) => isolateError = e);
+
+      final completer = Completer<Object?>();
+      reply.listen((dynamic msg) {
+        if (!completer.isCompleted) completer.complete(msg);
+      });
+      // If the isolate dies (e.g. an unhandled async error with
+      // `errorsAreFatal`) before sending `'done'`, onExit fires with no
+      // prior reply — complete with a sentinel so the test fails loudly
+      // rather than hanging.
+      exitPort.listen((_) {
+        if (!completer.isCompleted) {
+          completer.complete(#isolateExitedWithoutReply);
+        }
+      });
+
+      final result = await completer.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => #timedOut,
+      );
+
+      isolate.kill(priority: Isolate.immediate);
+      reply.close();
+      exitPort.close();
+      errorPort.close();
+
+      expect(isolateError, isNull,
+          reason: 'enqueue must not let an error escape the spawned isolate; '
+              'an orphaned `_openingBoxes` rejection would land here.');
+      expect(result, 'done',
+          reason: 'the spawned isolate must reach `reply.send(\'done\')`; a '
+              'sentinel means it died (orphan leak) or hung.');
     });
   });
 
