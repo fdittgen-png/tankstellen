@@ -6,9 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/services/approach_detector.dart';
-import '../../../../core/theme/contrast_utils.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/theme/fuel_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/effective_approach_state_provider.dart';
 import '../../../profile/providers/effective_fuel_type_provider.dart';
@@ -22,6 +19,7 @@ import '../../providers/trip_recording_provider.dart';
 import 'coaching_chip.dart';
 import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
+import 'trip_recording_banner_palette.dart';
 import 'trip_recording_pip_view.dart';
 
 /// Persistent indicator of an active OBD2 trip (#726 + #768).
@@ -82,7 +80,7 @@ class TripRecordingBanner extends ConsumerWidget {
       );
     }
 
-    final bandColor = _bandColor(context, state.band, state.phase);
+    final bandColor = bandPalette(context, state.band, state.phase);
     final l = AppLocalizations.of(context);
     return Column(
       children: [
@@ -153,8 +151,8 @@ class TripRecordingBanner extends ConsumerWidget {
     final inApproach =
         approachState is ApproachInRadius || approachState is ApproachLeaving;
     final palette = inApproach
-        ? _approachPalette(fuelType)
-        : _bandColor(context, state.band, state.phase);
+        ? approachOverlayPalette(fuelType)
+        : bandPalette(context, state.band, state.phase);
     return TripRecordingPipView(
       state: state,
       backgroundColor: palette.background,
@@ -162,21 +160,6 @@ class TripRecordingBanner extends ConsumerWidget {
       // #2163 — null outside any radius → PiP keeps the default layout.
       approachState: approachState,
       fuelType: fuelType,
-    );
-  }
-
-  /// Fuel-type-coloured palette for the approach overlay (#2382). The
-  /// background is [FuelColors.forType]; the foreground is whichever of
-  /// black / white wins the WCAG contrast against it, so the huge price
-  /// figure stays legible on every fuel hue (each tone is muted/dark, so
-  /// white wins in practice, but the check keeps the choice principled).
-  static _BannerPalette _approachPalette(FuelType fuelType) {
-    final background = FuelColors.forType(fuelType);
-    final onWhite = ContrastUtils.contrastRatio(Colors.white, background);
-    final onBlack = ContrastUtils.contrastRatio(Colors.black, background);
-    return _BannerPalette(
-      background: background,
-      foreground: onWhite >= onBlack ? Colors.white : Colors.black,
     );
   }
 
@@ -220,54 +203,12 @@ class TripRecordingBanner extends ConsumerWidget {
     }
   }
 
-  _BannerPalette _bandColor(
-    BuildContext context,
-    ConsumptionBand band,
-    TripRecordingPhase phase,
-  ) {
-    // Paused always wins — UI should reflect "not recording" over
-    // any consumption signal from a stale reading.
-    if (phase == TripRecordingPhase.paused) {
-      return _BannerPalette(
-        background: Theme.of(context).colorScheme.surfaceContainerHighest,
-        foreground: Theme.of(context).colorScheme.onSurface,
-      );
-    }
-    switch (band) {
-      case ConsumptionBand.eco:
-        return _BannerPalette(
-            background: DarkModeColors.success(context),
-            foreground: Colors.white);
-      case ConsumptionBand.normal:
-        return _BannerPalette(
-          background: Theme.of(context).colorScheme.primary,
-          foreground: Theme.of(context).colorScheme.onPrimary,
-        );
-      case ConsumptionBand.heavy:
-        return _BannerPalette(
-            background: DarkModeColors.warning(context),
-            foreground: Colors.black);
-      case ConsumptionBand.veryHeavy:
-        return _BannerPalette(
-            background: DarkModeColors.error(context),
-            foreground: Colors.white);
-      case ConsumptionBand.transient:
-        return _BannerPalette(
-            background: Colors.teal.shade400, foreground: Colors.white);
-    }
-  }
-}
-
-class _BannerPalette {
-  final Color background;
-  final Color foreground;
-  const _BannerPalette({required this.background, required this.foreground});
 }
 
 
 class _Content extends StatelessWidget {
   final TripRecordingState state;
-  final _BannerPalette palette;
+  final BannerPalette palette;
 
   const _Content({required this.state, required this.palette});
 

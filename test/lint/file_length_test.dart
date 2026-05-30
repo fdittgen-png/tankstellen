@@ -86,8 +86,12 @@ void main() {
     'lib/features/consumption/providers/trip_recording_provider.dart': 1162,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
     'lib/features/map/presentation/widgets/station_map_layers.dart': 544,
+    // #2382 — +5 for Feature.approachOverlay's three per-feature switch
+    // cases (label / description / blocked-enable). Intrinsic per-feature
+    // growth in this switch-based section; full decomposition is its own
+    // task, so the snapshot tracks the new size.
     'lib/features/profile/presentation/widgets/feature_management_section.dart':
-        706,
+        711,
     'lib/features/vehicle/domain/entities/vehicle_profile.dart': 453,
     'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 806,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,
