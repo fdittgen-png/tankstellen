@@ -173,6 +173,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildSearchContent(BuildContext context) {
     final country = ref.watch(activeCountryProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -218,7 +219,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         // Results dominate the remaining vertical space.
         Expanded(
           child: Semantics(
-            label: 'Search results',
+            label: l10n?.searchResultsSemanticLabel ?? 'Search results',
             child: SearchResultsContent(onGpsRetry: _performGpsSearch),
           ),
         ),

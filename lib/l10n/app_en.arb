@@ -3526,6 +3526,142 @@
   "@hapticEcoCoachSnackBarMessage": {
     "description": "SnackBar copy shown on the trip-recording screen when the eco-coach heuristic fires (#1273). Co-located with the haptic; same toggle gates both surfaces."
   },
+  "semanticsNavigateTo": "Navigate to {name}",
+  "@semanticsNavigateTo": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Aral Hauptstraße"
+      }
+    }
+  },
+  "semanticsRemoveFromFavorites": "Remove {name} from favorites",
+  "@semanticsRemoveFromFavorites": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Aral Hauptstraße"
+      }
+    }
+  },
+  "showOnMapSemanticLabel": "Show stations on map",
+  "searchResultsSemanticLabel": "Search results",
+  "searchCriteriaSemanticLabel": "Search criteria summary. Tap to edit.",
+  "noFavoritesSemanticLabel": "No favorites yet. Tap the star on a station to save it as a favorite.",
+  "stationStatusSemantic": "{open, select, true{Station is open} false{Station is closed} other{Station is closed}}",
+  "@stationStatusSemantic": {
+    "placeholders": {
+      "open": {
+        "type": "String"
+      }
+    }
+  },
+  "countryChipSemantic": "{selected, select, true{Country {name}, selected} false{Country {name}} other{Country {name}}}",
+  "@countryChipSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Germany"
+      },
+      "selected": {
+        "type": "String"
+      }
+    }
+  },
+  "languageChipSemantic": "{selected, select, true{Language {name}, selected} false{Language {name}} other{Language {name}}}",
+  "@languageChipSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Deutsch"
+      },
+      "selected": {
+        "type": "String"
+      }
+    }
+  },
+  "sortBySemantic": "{selected, select, true{Sort by {option}, selected} false{Sort by {option}} other{Sort by {option}}}",
+  "@sortBySemantic": {
+    "placeholders": {
+      "option": {
+        "type": "String",
+        "example": "Price"
+      },
+      "selected": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelTypeSemantic": "{selected, select, true{Fuel type {type}, selected} false{Fuel type {type}} other{Fuel type {type}}}",
+  "@fuelTypeSemantic": {
+    "placeholders": {
+      "type": {
+        "type": "String",
+        "example": "Diesel"
+      },
+      "selected": {
+        "type": "String"
+      }
+    }
+  },
+  "evChargingStationSemantic": "EV charging station {name}, {power} kW",
+  "@evChargingStationSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Ionity Park"
+      },
+      "power": {
+        "type": "int",
+        "example": "150"
+      }
+    }
+  },
+  "shieldIllustrationSemantic": "Privacy shield with fuel drop",
+  "globeIllustrationSemantic": "Globe with fuel station markers",
+  "fuelPumpIllustrationSemantic": "Fuel pump with price ticker",
+  "countryInfoSemantic": "{name}, data source: {provider}, {keyRequirement}, fuel types: {fuelTypes}",
+  "@countryInfoSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Germany"
+      },
+      "provider": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "keyRequirement": {
+        "type": "String",
+        "example": "API key required"
+      },
+      "fuelTypes": {
+        "type": "String",
+        "example": "e5, e10, diesel"
+      }
+    }
+  },
+  "countryInfoApiKeyRequired": "API key required",
+  "countryInfoNoKeyNeeded": "Free, no key needed",
+  "countryInfoDataSource": "Data: {provider}",
+  "@countryInfoDataSource": {
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Tankerkönig"
+      }
+    }
+  },
+  "countryInfoFuelTypes": "Fuel types: {fuelTypes}",
+  "@countryInfoFuelTypes": {
+    "placeholders": {
+      "fuelTypes": {
+        "type": "String",
+        "example": "e5, e10, diesel"
+      }
+    }
+  },
+  "countryInfoDemoSource": "Demo",
   "anonKeyLabel": "Anon Key",
   "anonKeyHideTooltip": "Hide key",
   "anonKeyShowTooltip": "Show key to verify",

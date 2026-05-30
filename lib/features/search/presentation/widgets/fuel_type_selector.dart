@@ -60,7 +60,9 @@ class FuelTypeSelector extends ConsumerWidget {
           return Padding(
             padding: const EdgeInsets.only(right: 6),
             child: Semantics(
-              label: 'Fuel type $label${selected == type ? ", selected" : ""}',
+              label: AppLocalizations.of(context)
+                      ?.fuelTypeSemantic(label, '${selected == type}') ??
+                  'Fuel type $label',
               child: ChoiceChip(
                 avatar: selected == type
                     ? null

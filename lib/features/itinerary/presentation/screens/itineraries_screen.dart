@@ -55,6 +55,9 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                 itemCount: itineraries.length,
                 itemBuilder: (context, index) {
                   final it = itineraries[index];
+                  final highwaysSuffix = it.avoidHighways
+                      ? ' · ${l10n?.avoidHighways ?? 'no highways'}'
+                      : '';
                   return SwipeToDelete(
                     dismissKey: ValueKey(it.id),
                     onDismissed: () {
@@ -66,7 +69,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                       title: Text(it.name, maxLines: 1, overflow: TextOverflow.ellipsis),
                       subtitle: Text(
                         '${it.distanceKm.round()} km · ${it.durationMinutes.round()} min'
-                        '${it.avoidHighways ? ' · no highways' : ''}',
+                        '$highwaysSuffix',
                       ),
                       trailing: Text(
                         _formatDate(it.updatedAt),

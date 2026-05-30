@@ -4801,6 +4801,126 @@ class AppLocalizationsHr extends AppLocalizations {
       'Polako s gasom — klizanje više štedi';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navigiraj do $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Ukloni $name iz favorita';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Prikaži postaje na karti';
+
+  @override
+  String get searchResultsSemanticLabel => 'Rezultati pretraživanja';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Sažetak kriterija pretraživanja. Dodirnite za uređivanje.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Još nema favorita. Dodirnite zvjezdicu postaje da biste je spremili kao favorit.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Postaja je otvorena',
+      'false': 'Postaja je zatvorena',
+      'other': 'Postaja je zatvorena',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Država $name, odabrano',
+      'false': 'Država $name',
+      'other': 'Država $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Jezik $name, odabrano',
+      'false': 'Jezik $name',
+      'other': 'Jezik $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Sortiraj po $option, odabrano',
+      'false': 'Sortiraj po $option',
+      'other': 'Sortiraj po $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Gorivo $type, odabrano',
+      'false': 'Gorivo $type',
+      'other': 'Gorivo $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Stanica za punjenje $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic =>
+      'Štit privatnosti s kapljicom goriva';
+
+  @override
+  String get globeIllustrationSemantic =>
+      'Globus s oznakama benzinskih postaja';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      'Crpka za gorivo s prikazom cijena';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, izvor podataka: $provider, $keyRequirement, vrste goriva: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Potreban je API ključ';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Besplatno, ključ nije potreban';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Podaci: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Vrste goriva: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Anon ključ';
 
   @override

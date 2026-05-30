@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../l10n/app_localizations.dart';
+
 /// Placeholder onboarding illustration for the Country/Language step (#593).
 ///
 /// "Minimal real, app-style close" — not a provisional SPLASH-text box.
@@ -24,8 +26,9 @@ class GlobeIllustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: 'Globe with fuel station markers',
+      label: l10n?.globeIllustrationSemantic ?? 'Globe with fuel station markers',
       image: true,
       child: SizedBox(
         width: size,

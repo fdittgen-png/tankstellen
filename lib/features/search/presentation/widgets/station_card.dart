@@ -119,7 +119,10 @@ class StationCard extends StatelessWidget {
       price,
       currencyOverride: currencyOverride,
     );
-    final semanticStatus = station.isOpen ? 'Open' : 'Closed';
+    final l10n = AppLocalizations.of(context);
+    final semanticStatus = station.isOpen
+        ? (l10n?.open ?? 'Open')
+        : (l10n?.closed ?? 'Closed');
     final semanticLabel =
         '${_hasBrand ? station.brand : station.name}, ${station.street}, '
         '$formattedPrice, $semanticStatus';

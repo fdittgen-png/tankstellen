@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/charging_station.dart';
 
 /// Visual marker representing an EV [ChargingStation] on the flutter_map.
@@ -52,6 +53,7 @@ class EvMarkerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = colorFor(context, station);
     final maxPower = station.maxPowerKw.round();
+    final l10n = AppLocalizations.of(context);
 
     // #2178 — isolate each marker's raster, matching the fuel marker
     // (StationMarker). Without it, a repaint of one marker dirties the
@@ -60,7 +62,8 @@ class EvMarkerWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Semantics(
-          label: 'EV charging station ${station.name}, $maxPower kW',
+          label: l10n?.evChargingStationSemantic(station.name, maxPower) ??
+              'EV charging station ${station.name}, $maxPower kW',
           button: true,
           child: Container(
             decoration: BoxDecoration(

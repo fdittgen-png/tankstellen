@@ -112,8 +112,11 @@ class UnitFormatter {
   /// locale's separator: the shipped consumption widget tests assert
   /// exact strings like `6.4 L/100 km`, and the mask itself is a
   /// language-neutral format mask, so it stays as-is.
-  static String formatConsumption(double value, {required bool isEv}) =>
-      '${value.toStringAsFixed(1)} ${isEv ? 'kWh/100 km' : 'L/100 km'}';
+  static String formatConsumption(double value, {required bool isEv}) {
+    // i18n-ignore: language-neutral consumption unit format mask (#2185)
+    final mask = isEv ? 'kWh/100 km' : 'L/100 km';
+    return '${value.toStringAsFixed(1)} $mask';
+  }
 
   /// Format a double with one decimal in the *active locale* so
   /// metric countries render "2,3 km" (comma) and English-locale

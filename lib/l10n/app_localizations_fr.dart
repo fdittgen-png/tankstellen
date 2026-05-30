@@ -4838,6 +4838,126 @@ class AppLocalizationsFr extends AppLocalizations {
       'Doucement sur l\'accélérateur — la roue libre économise plus';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Naviguer vers $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Retirer $name des favoris';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Afficher les stations sur la carte';
+
+  @override
+  String get searchResultsSemanticLabel => 'Résultats de recherche';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Résumé des critères de recherche. Appuyez pour modifier.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Aucun favori pour l\'instant. Appuyez sur l\'étoile d\'une station pour l\'enregistrer en favori.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'La station est ouverte',
+      'false': 'La station est fermée',
+      'other': 'La station est fermée',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Pays $name, sélectionné',
+      'false': 'Pays $name',
+      'other': 'Pays $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Langue $name, sélectionné',
+      'false': 'Langue $name',
+      'other': 'Langue $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Trier par $option, sélectionné',
+      'false': 'Trier par $option',
+      'other': 'Trier par $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Carburant $type, sélectionné',
+      'false': 'Carburant $type',
+      'other': 'Carburant $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Borne de recharge $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic =>
+      'Bouclier de confidentialité avec goutte de carburant';
+
+  @override
+  String get globeIllustrationSemantic =>
+      'Globe avec marqueurs de stations-service';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      'Pompe à carburant avec ticker de prix';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, source de données : $provider, $keyRequirement, types de carburant : $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Clé API requise';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Gratuit, aucune clé nécessaire';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Données : $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Types de carburant : $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Démo';
+
+  @override
   String get anonKeyLabel => 'Clé Anon';
 
   @override

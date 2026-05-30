@@ -15,12 +15,14 @@ class SyncDoneStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final successTitle = l10n?.syncSuccessTitle ?? 'Successfully connected!';
+    final successDescription = l10n?.syncSuccessDescription ??
+        'Your data will now sync automatically.';
     return Column(
       children: [
         const SizedBox(height: 40),
         Semantics(
-          label:
-              'Successfully connected. Your data will now sync automatically.',
+          label: '$successTitle $successDescription',
           liveRegion: true,
           child: Column(
             children: [
@@ -33,14 +35,13 @@ class SyncDoneStep extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                l10n?.syncSuccessTitle ?? 'Successfully connected!',
+                successTitle,
                 style: theme.textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                l10n?.syncSuccessDescription ??
-                    'Your data will now sync automatically.',
+                successDescription,
                 style: theme.textTheme.bodyMedium
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 textAlign: TextAlign.center,

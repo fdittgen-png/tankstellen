@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/country/country_config.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'country_status_badge.dart';
 
 /// Setup screen card summarising a [CountryConfig]: flag, name, API data
@@ -20,10 +21,23 @@ class CountryInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final dataSource =
+        country.apiProvider ?? (l10n?.countryInfoDemoSource ?? 'Demo');
+    final keyRequirement = country.requiresApiKey
+        ? (l10n?.countryInfoApiKeyRequired ?? 'API key required')
+        : (l10n?.countryInfoNoKeyNeeded ?? 'Free, no key needed');
+    final fuelTypesList = country.fuelTypes.join(', ');
+    final semanticLabel = l10n?.countryInfoSemantic(
+          country.name,
+          dataSource,
+          keyRequirement,
+          fuelTypesList,
+        ) ??
+        '${country.name}, data source: $dataSource, $keyRequirement, '
+            'fuel types: $fuelTypesList';
     return Semantics(
-      label: '${country.name}, data source: ${country.apiProvider ?? 'Demo'}, '
-          '${country.requiresApiKey ? 'API key required' : 'Free, no key needed'}, '
-          'fuel types: ${country.fuelTypes.join(', ')}',
+      label: semanticLabel,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -51,7 +65,8 @@ class CountryInfoCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Data: ${country.apiProvider ?? 'Demo'}',
+                            l10n?.countryInfoDataSource(dataSource) ??
+                                'Data: $dataSource',
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
@@ -64,7 +79,8 @@ class CountryInfoCard extends StatelessWidget {
               const SizedBox(height: 8),
               ExcludeSemantics(
                 child: Text(
-                  'Fuel types: ${country.fuelTypes.join(', ')}',
+                  l10n?.countryInfoFuelTypes(fuelTypesList) ??
+                      'Fuel types: $fuelTypesList',
                   style: theme.textTheme.bodySmall,
                 ),
               ),

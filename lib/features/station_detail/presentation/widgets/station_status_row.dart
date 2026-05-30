@@ -43,11 +43,14 @@ class StationStatusRow extends ConsumerWidget {
         ? DarkModeColors.success(context)
         : DarkModeColors.error(context);
 
+    final statusSemantic = l10n?.stationStatusSemantic('${station.isOpen}') ??
+        (station.isOpen ? 'Station is open' : 'Station is closed');
+
     return Row(
       children: [
         Expanded(
           child: Semantics(
-            label: 'Station is ${station.isOpen ? 'open' : 'closed'}',
+            label: statusSemantic,
             child: Row(
               children: [
                 ExcludeSemantics(

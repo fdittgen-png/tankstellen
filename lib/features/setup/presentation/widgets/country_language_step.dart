@@ -43,8 +43,11 @@ class CountryLanguageStep extends ConsumerWidget {
             children: AppLanguages.all.map((lang) {
               final isSelected = lang.code == language.code;
               return Semantics(
-                label:
-                    'Language ${lang.nativeName}${isSelected ? ", selected" : ""}',
+                label: l10n?.languageChipSemantic(
+                      lang.nativeName,
+                      '$isSelected',
+                    ) ??
+                    'Language ${lang.nativeName}',
                 child: ChoiceChip(
                   label: Text(lang.nativeName),
                   selected: isSelected,
@@ -72,8 +75,8 @@ class CountryLanguageStep extends ConsumerWidget {
             children: Countries.verified.map((c) {
               final isSelected = c.code == country.code;
               return Semantics(
-                label:
-                    'Country ${c.name}${isSelected ? ", selected" : ""}',
+                label: l10n?.countryChipSemantic(c.name, '$isSelected') ??
+                    'Country ${c.name}',
                 child: ChoiceChip(
                   label: Text('${c.flag} ${c.name}'),
                   selected: isSelected,
@@ -111,7 +114,11 @@ class CountryLanguageStep extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              'Data: ${country.apiProvider ?? 'Demo'}',
+                              l10n?.countryInfoDataSource(
+                                    country.apiProvider ??
+                                        (l10n.countryInfoDemoSource),
+                                  ) ??
+                                  'Data: ${country.apiProvider ?? 'Demo'}',
                               style: theme.textTheme.bodySmall,
                             ),
                           ],

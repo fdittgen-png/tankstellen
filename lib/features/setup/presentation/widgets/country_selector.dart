@@ -36,7 +36,8 @@ class CountrySelector extends StatelessWidget {
           children: Countries.verified.map((c) {
             final isSelected = c.code == selected.code;
             return Semantics(
-              label: 'Country ${c.name}${isSelected ? ", selected" : ""}',
+              label: l10n?.countryChipSemantic(c.name, '$isSelected') ??
+                  'Country ${c.name}',
               child: ChoiceChip(
                 label: Text('${c.flag} ${c.name}'),
                 selected: isSelected,

@@ -47,7 +47,8 @@ class SearchSummaryBar extends ConsumerWidget {
     final kmText = radius.round().toString();
 
     return Semantics(
-      label: 'Search criteria summary. Tap to edit.',
+      label: l10n?.searchCriteriaSemanticLabel ??
+          'Search criteria summary. Tap to edit.',
       button: true,
       child: Material(
         color: theme.colorScheme.surfaceContainerHighest,

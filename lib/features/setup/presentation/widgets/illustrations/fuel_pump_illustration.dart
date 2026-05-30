@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../l10n/app_localizations.dart';
+
 /// Placeholder onboarding illustration for the Preferences step (#593).
 ///
 /// Centered fuel-pump icon sitting on a faux "price ticker" — a rounded
@@ -21,8 +23,9 @@ class FuelPumpIllustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: 'Fuel pump with price ticker',
+      label: l10n?.fuelPumpIllustrationSemantic ?? 'Fuel pump with price ticker',
       image: true,
       child: SizedBox(
         width: size,

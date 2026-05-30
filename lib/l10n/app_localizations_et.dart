@@ -4782,6 +4782,123 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kerge gaasiga — libisemine säästab rohkem';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navigeeri sihtkohta $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Eemalda $name lemmikutest';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Näita jaamu kaardil';
+
+  @override
+  String get searchResultsSemanticLabel => 'Otsingutulemused';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Otsingukriteeriumide kokkuvõte. Puudutage muutmiseks.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Lemmikuid pole veel. Puudutage jaama tärni, et salvestada see lemmikuks.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Jaam on avatud',
+      'false': 'Jaam on suletud',
+      'other': 'Jaam on suletud',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Riik $name, valitud',
+      'false': 'Riik $name',
+      'other': 'Riik $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Keel $name, valitud',
+      'false': 'Keel $name',
+      'other': 'Keel $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Sortimine: $option, valitud',
+      'false': 'Sortimine: $option',
+      'other': 'Sortimine: $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Kütus $type, valitud',
+      'false': 'Kütus $type',
+      'other': 'Kütus $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Laadimisjaam $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic => 'Privaatsuskilp kütusepiisaga';
+
+  @override
+  String get globeIllustrationSemantic => 'Maakera tanklatähistega';
+
+  @override
+  String get fuelPumpIllustrationSemantic => 'Kütusepump hinnanäidikuga';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, andmeallikas: $provider, $keyRequirement, kütuseliigid: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Vajalik on API võti';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Tasuta, võtit pole vaja';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Andmed: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Kütuseliigid: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Anon võti';
 
   @override

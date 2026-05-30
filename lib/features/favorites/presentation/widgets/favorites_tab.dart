@@ -35,7 +35,7 @@ class FavoritesTab extends ConsumerWidget {
 
     if (favoriteIds.isEmpty) {
       return Semantics(
-        label:
+        label: l10n?.noFavoritesSemanticLabel ??
             'No favorites yet. Tap the star on a station to save it as a favorite.',
         child: EmptyState(
           icon: Icons.star_outline,

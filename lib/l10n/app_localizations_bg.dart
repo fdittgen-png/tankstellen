@@ -4831,6 +4831,125 @@ class AppLocalizationsBg extends AppLocalizations {
       'По-леко с педала — инерцията спестява повече';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Навигация до $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Премахни $name от любими';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Показване на станциите на картата';
+
+  @override
+  String get searchResultsSemanticLabel => 'Резултати от търсенето';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Обобщение на критериите за търсене. Докоснете за редактиране.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Все още няма любими. Докоснете звездата на станция, за да я запазите като любима.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Станцията е отворена',
+      'false': 'Станцията е затворена',
+      'other': 'Станцията е затворена',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Държава $name, избрана',
+      'false': 'Държава $name',
+      'other': 'Държава $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Език $name, избрано',
+      'false': 'Език $name',
+      'other': 'Език $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Сортиране по $option, избрано',
+      'false': 'Сортиране по $option',
+      'other': 'Сортиране по $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Гориво $type, избрано',
+      'false': 'Гориво $type',
+      'other': 'Гориво $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Зарядна станция $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic =>
+      'Щит за поверителност с капка гориво';
+
+  @override
+  String get globeIllustrationSemantic => 'Глобус с маркери за бензиностанции';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      'Колонка за гориво с ценови индикатор';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, източник на данни: $provider, $keyRequirement, видове гориво: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Изисква се API ключ';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Безплатно, без ключ';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Данни: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Видове гориво: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Демо';
+
+  @override
   String get anonKeyLabel => 'Анонимен ключ';
 
   @override

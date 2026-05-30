@@ -125,7 +125,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
               _ViewToggleButton(),
               const SizedBox(width: 4),
               Semantics(
-                label: 'Show stations on map',
+                label: l10n?.showOnMapSemanticLabel ?? 'Show stations on map',
                 button: true,
                 child: InkWell(
                   onTap: () => context.go('/map'),

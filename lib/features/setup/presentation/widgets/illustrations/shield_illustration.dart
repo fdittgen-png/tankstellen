@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../l10n/app_localizations.dart';
+
 /// Placeholder onboarding illustration for the Completion / privacy step
 /// (#593). Same fuel-drop-inside-shield motif as the adaptive app icon
 /// — the identity is consistent across icon, splash, and onboarding so
@@ -19,8 +21,9 @@ class ShieldIllustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: 'Privacy shield with fuel drop',
+      label: l10n?.shieldIllustrationSemantic ?? 'Privacy shield with fuel drop',
       image: true,
       child: SizedBox(
         width: size,
