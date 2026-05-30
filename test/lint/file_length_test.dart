@@ -110,7 +110,12 @@ void main() {
     // Both must stay on `FillUpList` / its trip-history sibling because
     // they mutate provider state; the workflow UI + launcher are
     // extracted. Decomposition tracked under #2187/#2188/#2190.
-    'lib/features/consumption/providers/consumption_providers.dart': 964,
+    // #2445 — re-grandfathered 964 → 975: the surface-or-clear branch
+    // gained a keep-prior-gap guard so a clean later plein never silently
+    // drops a still-unresolved deferred gap (the decision is never lost).
+    // Lives on `FillUpList` because it reads + mutates the pending-gap
+    // provider in the same save path. Decomposition tracked #2187/#2188.
+    'lib/features/consumption/providers/consumption_providers.dart': 975,
     // #2392 — re-grandfathered 1125 → 1162: wired the OBD2-ground-truth
     // physicsScale calibration into `_saveToHistory` (one fire-and-forget
     // call + the `_calibratePhysicsScale` resolve/persist helper; the EWMA

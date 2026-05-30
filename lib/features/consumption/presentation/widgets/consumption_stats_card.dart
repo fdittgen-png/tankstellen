@@ -9,29 +9,28 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../domain/entities/consumption_stats.dart';
+import '../../providers/pending_reconciliation_provider.dart';
 import 'confidence_tier_badge.dart';
+import 'resolve_gap_banner.dart';
 
 /// Card summarising aggregated consumption statistics.
 ///
-/// Since #1362 the card grows two optional decorations on top of the
-/// existing stat tiles:
-///
-///   * a grey **open-window banner** when partial fills sit after the
-///     most recent plein-complet — those fills are excluded from the
-///     average and the user is told why.
-///   * an orange-tinted **correction-share hint** when more than 5 %
-///     of the totalled fuel volume came from auto-generated corrections,
-///     nudging the user to review the orange entries in the list.
-///
-/// When neither condition fires, the card renders exactly as before so
+/// Since #1362 the card grows two optional decorations on top of the stat
+/// tiles: a grey **open-window banner** when partial fills sit after the
+/// most recent plein-complet (excluded from the average), and an orange
+/// **correction-share hint** when more than 5 % of the totalled fuel came
+/// from auto-corrections. When neither fires the card renders as before so
 /// the all-plein, no-corrections case keeps its calm UX.
 ///
-/// #2433 — the consumption-confidence indicator (ConfidenceTierBadge)
-/// and the debug-only raw η_v chip ride a subtitle row directly under
-/// the card title. They previously lived here (pre-#2383), briefly moved
-/// to the Carburant app-bar in #2383, and #2433 brings them back into the
-/// Verbrauchsstatistik card so the precision rating sits next to the
-/// figures it qualifies.
+/// #2445 — when a reconciliation gap was deferred and is still unresolved
+/// the card grows a tappable [ResolveGapBanner] that re-opens the guided
+/// workflow; it REPLACES the accusatory correction-share hint while a gap
+/// is pending (the actionable affordance supersedes the passive nudge).
+///
+/// #2433 — the consumption-confidence indicator (ConfidenceTierBadge) and
+/// the debug-only raw η_v chip ride a subtitle row under the card title
+/// (moved out to the app-bar in #2383, brought back here in #2433) so the
+/// precision rating sits next to the figures it qualifies.
 class ConsumptionStatsCard extends ConsumerWidget {
   final ConsumptionStats stats;
 
@@ -77,8 +76,14 @@ class ConsumptionStatsCard extends ConsumerWidget {
     final avgConsumption = stats.avgConsumptionL100km;
     final avgCostKm = stats.avgCostPerKm;
 
+    // #2445 — a deferred-but-unresolved gap takes precedence over the
+    // passive correction-share hint: surface the actionable 'Resolve gap'
+    // banner instead so the user can return to the decision they put off.
+    final pendingGap = ref.watch(pendingReconciliationsProvider);
+    final showResolveGapBanner = pendingGap != null;
     final showOpenWindowBanner = stats.openWindowFillCount > 0;
-    final showCorrectionHint = stats.correctionShare > 0.05;
+    final showCorrectionHint =
+        !showResolveGapBanner && stats.correctionShare > 0.05;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -95,6 +100,10 @@ class ConsumptionStatsCard extends ConsumerWidget {
                     '${stats.openWindowFillCount} partial fill(s) pending '
                         'plein complet — not in average',
               ),
+              const SizedBox(height: 8),
+            ],
+            if (showResolveGapBanner) ...[
+              ResolveGapBanner(pending: pendingGap),
               const SizedBox(height: 8),
             ],
             if (showCorrectionHint) ...[

@@ -267,8 +267,9 @@ void main() {
     );
   });
 
-  test('a created gap is cleared when a later clean window needs none',
-      () async {
+  test(
+      'a same-vehicle UNRESOLVED gap survives a later clean window (#2445 — '
+      'the deferred decision is never lost)', () async {
     final container = makeContainer();
 
     // First window: high discrepancy → created → pending gap set.
@@ -292,10 +293,14 @@ void main() {
       liters: 12,
       odometerKm: 10100,
     ));
-    expect(container.read(pendingReconciliationsProvider), isNotNull);
+    final firstGap = container.read(pendingReconciliationsProvider);
+    expect(firstGap, isNotNull);
 
-    // Second window: matched integrator → skippedBelowThreshold → the
-    // stale gap must be cleared, not left dangling.
+    // The user defers (never completes the workflow), then logs a later
+    // clean window: matched integrator → skippedBelowThreshold. Pre-#2445
+    // this silently cleared the dangling gap; #2445 inverts that — a still
+    // -unresolved gap for the SAME vehicle must NOT be lost (the 'Resolve
+    // gap' affordance re-opens it), and must not be re-published/duplicated.
     await seedTrip(
       id: 't2',
       vehicleId: 'veh-a',
@@ -310,8 +315,68 @@ void main() {
       odometerKm: 10200,
     ));
 
+    final still = container.read(pendingReconciliationsProvider);
+    expect(still, isNotNull,
+        reason: 'a clean later window must not drop the deferred gap');
+    expect(still, firstGap,
+        reason: 'the same gap is retained, not duplicated/re-published');
+  });
+
+  test(
+      'a stale gap from a DIFFERENT vehicle is cleared by a clean window '
+      '(#2445)', () async {
+    final container = makeContainer();
+
+    // First window on veh-a: high discrepancy → created → pending gap.
+    await seedTrip(
+      id: 't1',
+      vehicleId: 'veh-a',
+      startedAt: DateTime(2026, 4, 1, 9),
+      distanceKm: 100,
+      fuelLitersConsumed: 5,
+    );
+    final notifier = container.read(fillUpListProvider.notifier);
+    await notifier.add(mkFillUp(
+      id: 'opening-a',
+      date: DateTime(2026, 4, 1, 8),
+      liters: 30,
+      odometerKm: 10000,
+    ));
+    await notifier.add(mkFillUp(
+      id: 'closing-a',
+      date: DateTime(2026, 4, 2, 18),
+      liters: 12,
+      odometerKm: 10100,
+    ));
+    expect(container.read(pendingReconciliationsProvider), isNotNull);
+
+    // A clean window for a DIFFERENT vehicle (veh-b). The veh-a gap is
+    // stale here — it must be cleared (only same-vehicle deferred gaps
+    // survive).
+    await seedTrip(
+      id: 't2',
+      vehicleId: 'veh-b',
+      startedAt: DateTime(2026, 4, 3, 9),
+      distanceKm: 100,
+      fuelLitersConsumed: 11.8,
+    );
+    await notifier.add(mkFillUp(
+      id: 'opening-b',
+      date: DateTime(2026, 4, 3, 8),
+      vehicleId: 'veh-b',
+      liters: 30,
+      odometerKm: 20000,
+    ));
+    await notifier.add(mkFillUp(
+      id: 'closing-b',
+      date: DateTime(2026, 4, 4, 18),
+      vehicleId: 'veh-b',
+      liters: 12,
+      odometerKm: 20100,
+    ));
+
     expect(container.read(pendingReconciliationsProvider), isNull,
-        reason: 'a clean window clears the previous pending gap');
+        reason: 'a clean window clears a stale gap from another vehicle');
   });
 }
 

@@ -39,6 +39,31 @@ Future<void> runReconciliationWorkflowIfPending({
   // save.
   if (pending.vehicleId != savedFillUp.vehicleId) return;
 
+  await runReconciliationWorkflow(
+    context: context,
+    ref: ref,
+    pending: pending,
+  );
+}
+
+/// Re-opens the guided reconciliation workflow for an EXISTING pending
+/// gap and applies the chosen resolution. This is the shared seam behind
+/// both entry points (#2445):
+///
+///   * the post-plein launcher ([runReconciliationWorkflowIfPending]),
+///     which raises it automatically when a fresh gap was published, and
+///   * the persistent **'Resolve gap'** affordance on the consumption
+///     stats card, which lets the user return to a gap they chose to
+///     "Decide later" on — the decision is never lost.
+///
+/// NEVER silent: a correction or virtual trajet is created ONLY when the
+/// user completes the workflow. "Decide later" / dismiss leaves [pending]
+/// intact so the affordance keeps offering re-entry.
+Future<void> runReconciliationWorkflow({
+  required BuildContext context,
+  required WidgetRef ref,
+  required PendingReconciliation pending,
+}) async {
   final locale = Localizations.localeOf(context).toString();
   final nf = NumberFormat.decimalPattern(locale)..maximumFractionDigits = 1;
   final defaultDistanceKm = virtualDistanceEstimateKm(pending);

@@ -4380,6 +4380,19 @@
   "@reconcileVirtualTrajetDelete": {
     "description": "Destructive button on the virtual trajet edit sheet that removes the synthetic trip (#2444)."
   },
+  "reconcileResolveGapBanner": "Unresolved fuel/trip gap of {gap} L — tap to resolve",
+  "@reconcileResolveGapBanner": {
+    "description": "Tappable banner on the consumption stats card when a reconciliation gap was deferred ('Decide later') and is still unresolved. Tapping re-opens the guided workflow for that gap (#2445). Replaces the old accusatory auto-correction-share hint. The litres figure is pre-formatted by the caller in the active locale.",
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileResolveGapSemanticLabel": "Resolve unresolved fuel and trip gap",
+  "@reconcileResolveGapSemanticLabel": {
+    "description": "Accessibility label for the tappable 'Resolve gap' banner on the consumption stats card (#2445)."
+  },
   "refuelUnitPerLiter": "/L",
   "@refuelUnitPerLiter": {
     "description": "Trailing unit suffix on a fuel-pump price in the unified RefuelOptionCard (#1116 phase 3b). Renders below the numeric price (e.g. \"1,799\" + \"/L\" → \"1,799 /L\")."

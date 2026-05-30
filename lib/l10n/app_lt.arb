@@ -2392,5 +2392,20 @@
   "@reconcileVirtualTrajetDelete": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "reconcileResolveGapBanner": "Unresolved fuel/trip gap of {gap} L — tap to resolve",
+  "@reconcileResolveGapBanner": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileResolveGapSemanticLabel": "Resolve unresolved fuel and trip gap",
+  "@reconcileResolveGapSemanticLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

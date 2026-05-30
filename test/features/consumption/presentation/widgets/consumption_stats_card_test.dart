@@ -4,9 +4,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
+import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/consumption/domain/entities/pending_reconciliation.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/consumption_stats_card.dart';
+import 'package:tankstellen/features/consumption/providers/pending_reconciliation_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -21,6 +25,36 @@ class _DebugModeOn extends FeatureFlags {
 /// Overrides list that enables Developer mode for the calibration-chip
 /// tests below.
 final _debugOn = [featureFlagsProvider.overrideWith(() => _DebugModeOn())];
+
+/// #2445 — seeds a live [PendingReconciliation] so the 'Resolve gap'
+/// affordance renders. Mirrors a deferred gap a user chose to decide
+/// later on.
+class _PendingGap extends PendingReconciliations {
+  @override
+  PendingReconciliation? build() => PendingReconciliation(
+        correction: FillUp(
+          id: 'correction_x',
+          date: DateTime(2026, 4, 10),
+          liters: 7,
+          totalCost: 0,
+          odometerKm: 10050,
+          fuelType: FuelType.e10,
+          vehicleId: 'veh-a',
+          isCorrection: true,
+          isFullTank: false,
+        ),
+        pumped: 12,
+        consumed: 5,
+        gap: 7,
+        windowMidpointDate: DateTime(2026, 4, 10),
+        windowMidpointOdometerKm: 10050,
+        vehicleId: 'veh-a',
+      );
+}
+
+final _pendingGapOverride = [
+  pendingReconciliationsProvider.overrideWith(() => _PendingGap()),
+];
 
 /// Builds a [ConsumptionStats] with sensible defaults so each test only
 /// spells out the field it cares about. Mirrors the freezed factory at
@@ -482,6 +516,79 @@ void main() {
       // the calibration pills group sits in exactly one Wrap so
       // their layout stays harmonised.
       expect(wraps.length, greaterThanOrEqualTo(1));
+    });
+  });
+
+  // ─── #2445 — 'Resolve gap' deferred-reconciliation affordance ──────
+  //
+  // When a reconciliation gap was deferred and is still unresolved (a
+  // PendingReconciliation is live), the card grows a tappable 'Resolve
+  // gap' banner that REPLACES the accusatory correction-share hint.
+
+  group("ConsumptionStatsCard — 'Resolve gap' banner (#2445)", () {
+    testWidgets('shows the tappable banner when a gap is pending',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(stats: _stats(fillUpCount: 3)),
+        overrides: _pendingGapOverride,
+      );
+      expect(find.byKey(const Key('resolve-gap-banner')), findsOneWidget);
+      expect(find.byType(InkWell), findsWidgets);
+      expect(find.textContaining('tap to resolve'), findsOneWidget);
+    });
+
+    testWidgets('hides the banner when no gap is pending (default state)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(stats: _stats(fillUpCount: 3)),
+      );
+      expect(find.byKey(const Key('resolve-gap-banner')), findsNothing);
+    });
+
+    testWidgets(
+        'the banner REPLACES the correction-share hint while a gap is pending',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(
+            fillUpCount: 3,
+            totalLiters: 100,
+            correctionLitersTotal: 12,
+            correctionShare: 0.12,
+          ),
+        ),
+        overrides: _pendingGapOverride,
+      );
+      // The actionable affordance supersedes the passive nudge.
+      expect(find.byKey(const Key('resolve-gap-banner')), findsOneWidget);
+      expect(
+        find.textContaining('% of fuel from auto-corrections'),
+        findsNothing,
+      );
+    });
+
+    testWidgets(
+        'the correction-share hint still fires when NO gap is pending',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(
+            fillUpCount: 3,
+            totalLiters: 100,
+            correctionLitersTotal: 12,
+            correctionShare: 0.12,
+          ),
+        ),
+      );
+      expect(find.byKey(const Key('resolve-gap-banner')), findsNothing);
+      expect(
+        find.textContaining('% of fuel from auto-corrections'),
+        findsOneWidget,
+      );
     });
   });
 

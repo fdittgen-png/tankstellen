@@ -482,9 +482,20 @@ class FillUpList extends _$FillUpList {
         );
         ref.read(pendingReconciliationsProvider.notifier).set(pending);
       } else {
-        // No correction this window — clear any stale gap so the
-        // workflow seam never reads one from a prior window.
-        ref.read(pendingReconciliationsProvider.notifier).set(null);
+        // No correction this window. Clear any stale gap so the workflow
+        // seam never reads one from a prior window — BUT never silently
+        // drop a still-unresolved gap the user deferred (#2445). Such a
+        // gap belongs to an EARLIER window for the same vehicle; this
+        // clean window doesn't touch it, so the "Decide later" decision
+        // (and the 'Resolve gap' affordance that re-opens it) survives a
+        // subsequent plein. A gap for a DIFFERENT vehicle is stale here
+        // and is cleared as before.
+        final prior = ref.read(pendingReconciliationsProvider);
+        final keepPriorGap =
+            prior != null && prior.vehicleId == fillUp.vehicleId;
+        if (!keepPriorGap) {
+          ref.read(pendingReconciliationsProvider.notifier).set(null);
+        }
       }
       // Sum the window-trip distances — used by the broken-MAP hook
       // to convert pumped/consumed litres into L/100 km. Mirrors the

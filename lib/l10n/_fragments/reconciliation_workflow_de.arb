@@ -20,5 +20,7 @@
   "reconcileVirtualTrajetLabel": "Virtuelle Fahrt — zum Bearbeiten tippen",
   "reconcileVirtualTrajetEditTitle": "Virtuelle Fahrt bearbeiten",
   "reconcileVirtualTrajetEditExplainer": "Diese Fahrt wurde hinzugefügt, um Kraftstoff zu erfassen, den du beim Fahren ohne Aufzeichnung verbraucht hast. Passe Strecke oder Kraftstoff an oder lösche sie.",
-  "reconcileVirtualTrajetDelete": "Virtuelle Fahrt löschen"
+  "reconcileVirtualTrajetDelete": "Virtuelle Fahrt löschen",
+  "reconcileResolveGapBanner": "Ungeklärte Kraftstoff-/Fahrten-Differenz von {gap} L — zum Klären tippen",
+  "reconcileResolveGapSemanticLabel": "Ungeklärte Kraftstoff- und Fahrten-Differenz klären"
 }
