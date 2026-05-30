@@ -89,7 +89,14 @@ void main() {
         439,
     'lib/features/consumption/presentation/widgets/trip_path_map_card.dart':
         463,
-    'lib/features/consumption/providers/consumption_providers.dart': 879,
+    // #2441 — re-grandfathered 879 → 911: split the trip-vs-pump
+    // reconciliation into a detect-vs-apply seam. The detector still
+    // lives in reconciler.dart; the apply step (`applyReconciliation`)
+    // and the surface-or-clear branch must stay on `FillUpList` because
+    // they mutate its state. The PendingReconciliation value object and
+    // the PendingReconciliations notifier were already extracted to
+    // their own files; only the seam wiring remains here.
+    'lib/features/consumption/providers/consumption_providers.dart': 911,
     // #2392 — re-grandfathered 1125 → 1162: wired the OBD2-ground-truth
     // physicsScale calibration into `_saveToHistory` (one fire-and-forget
     // call + the `_calibratePhysicsScale` resolve/persist helper; the EWMA

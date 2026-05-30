@@ -26,11 +26,13 @@ import '../data/trip_history_repository.dart';
 import '../domain/entities/consumption_stats.dart';
 import '../domain/entities/eco_score.dart';
 import '../domain/entities/fill_up.dart';
+import '../domain/entities/pending_reconciliation.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/services/eco_score_calculator.dart';
 import '../domain/services/gps_matrix_reconciler.dart';
 import '../domain/services/reconciler.dart';
 import '../domain/trip_recorder.dart';
+import 'pending_reconciliation_provider.dart';
 import 'trip_history_provider.dart';
 
 part 'consumption_providers.g.dart';
@@ -462,9 +464,23 @@ class FillUpList extends _$FillUpList {
       );
       if (result == null) return null;
       final correction = result.correction;
-      if (correction != null) {
-        await fillRepo.save(correction);
-        state = fillRepo.getAll();
+      if (correction != null && result.action == ReconciliationAction.created) {
+        // Detect → apply seam (Epic #2439 / #2441): (1) surface the gap
+        // as a PendingReconciliation the workflow (#2442) can read, then
+        // (2) apply it. Behaviour-neutral — [applyReconciliation] still
+        // performs the silent save exactly as before.
+        final pending = PendingReconciliation.fromCorrection(
+          correction: correction,
+          pumped: result.pumped,
+          consumed: result.consumed,
+          gap: result.gap,
+        );
+        ref.read(pendingReconciliationsProvider.notifier).set(pending);
+        await applyReconciliation(pending);
+      } else {
+        // No correction this window — clear any stale gap so the
+        // workflow seam never reads one from a prior window.
+        ref.read(pendingReconciliationsProvider.notifier).set(null);
       }
       // Sum the window-trip distances — used by the broken-MAP hook
       // to convert pumped/consumed litres into L/100 km. Mirrors the
@@ -484,6 +500,22 @@ class FillUpList extends _$FillUpList {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: trip-vs-pump reconciliation failed'}));
       return null;
     }
+  }
+
+  /// Apply step of the detect-vs-apply seam (Epic #2439 / #2441) — the
+  /// single place ALL correction creation flows through. The detector
+  /// ([Reconciler.reconcile]) only DETECTS the gap and hands a
+  /// [PendingReconciliation] here; this method decides what to do.
+  ///
+  /// TODO #2442: replace silent save with the guided reconciliation
+  /// workflow — per Epic #2439 a correction must NEVER be created
+  /// without the user's consent. Until that lands this stays
+  /// behaviour-neutral: it persists the proposed correction exactly as
+  /// the pre-seam code did, so nothing the user sees changes on this PR.
+  Future<void> applyReconciliation(PendingReconciliation pending) async {
+    final repo = ref.read(fillUpRepositoryProvider);
+    await repo.save(pending.correction);
+    state = repo.getAll();
   }
 
   /// Sum the [TripSummary.distanceKm] across every trip in the same
