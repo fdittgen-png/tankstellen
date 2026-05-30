@@ -2,14 +2,39 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_screen.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/user_position_bar.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+
+/// Spy [SearchState] that counts `repeatLastSearch` invocations without
+/// hitting the network — lets the #2401 test assert the fuel-chip change
+/// re-triggers the search exactly once.
+class _SpySearchState extends SearchState {
+  int repeatCount = 0;
+
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() =>
+      AsyncValue.data(ServiceResult(
+        data: const [],
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      ));
+
+  @override
+  Future<void> repeatLastSearch() async {
+    repeatCount++;
+  }
+}
 
 void main() {
   group('SearchScreen (results-first layout)', () {
@@ -143,6 +168,50 @@ void main() {
         matching: find.widgetWithIcon(IconButton, Icons.refresh),
       );
       expect(refreshInAppBar, findsOneWidget);
+    });
+
+    testWidgets(
+        'changing the selected fuel re-triggers the search exactly once (#2401)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      final spy = _SpySearchState();
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+          searchStateProvider.overrideWith(() => spy),
+        ],
+      );
+      // A pump settles initState's post-frame auto-search attempt.
+      await tester.pump();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(SearchScreen)),
+      );
+
+      // No fuel change yet → the listener has not fired.
+      expect(spy.repeatCount, 0);
+
+      // Change the selected fuel chip → exactly one repeatLastSearch.
+      container.read(selectedFuelTypeProvider.notifier).select(FuelType.diesel);
+      await tester.pump();
+      expect(spy.repeatCount, 1,
+          reason: 'a fuel-chip change must re-run the last search once');
+
+      // Selecting the SAME fuel again must NOT fire (prev == next).
+      container.read(selectedFuelTypeProvider.notifier).select(FuelType.diesel);
+      await tester.pump();
+      expect(spy.repeatCount, 1,
+          reason: 'an unchanged selection must not re-trigger the search');
+
+      // A genuinely different fuel fires once more.
+      container.read(selectedFuelTypeProvider.notifier).select(FuelType.e5);
+      await tester.pump();
+      expect(spy.repeatCount, 2);
     });
 
     testWidgets('results area dominates the viewport (≥60% vertical)',
