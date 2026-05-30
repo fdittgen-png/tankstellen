@@ -19,6 +19,21 @@ class TripSample {
   final double rpm;
   final double? fuelRateLPerHour;
 
+  /// GPS-physics **estimated** fuel rate in L/h (#2431). Populated ONLY
+  /// for OBD2/hybrid trips whose adapter+ECU supported none of the fuel
+  /// PIDs (PID 5E / MAF 0110 / speed-density MAP 010B), so
+  /// [fuelRateLPerHour] is null on every sample. It is the per-sample
+  /// distribution of the trip's GPS-physics L/100 km estimate over the
+  /// sample's speed (`L/100 km / 100 × speedKmh`), letting the
+  /// trip-detail fuel-rate chart render a clearly-marked *estimated*
+  /// series instead of "Keine Messwerte". Deliberately a SEPARATE field
+  /// from [fuelRateLPerHour] so a measured value and an estimate are
+  /// never confused — when a real fuel PID was seen this stays null and
+  /// the chart shows the measured series. Null for legacy trips, for
+  /// trips that DID get a real fuel signal, and at a standstill (no
+  /// per-distance figure is meaningful at v ≈ 0).
+  final double? estimatedFuelRateLPerHour;
+
   /// Throttle position in percent (PID 0x11), if available. Cars
   /// without PID 11 report null — the trip-detail throttle / RPM
   /// histogram falls back to the RPM axis only in that case (#1261).
@@ -84,6 +99,7 @@ class TripSample {
     required this.speedKmh,
     required this.rpm,
     this.fuelRateLPerHour,
+    this.estimatedFuelRateLPerHour,
     this.throttlePercent,
     this.engineLoadPercent,
     this.coolantTempC,
@@ -94,6 +110,30 @@ class TripSample {
     this.bearingDeg,
     this.accelG,
   });
+
+  /// Return a copy with [estimatedFuelRateLPerHour] replaced (#2431).
+  /// The OBD2 GPS-estimate fallback uses it to stamp the per-sample
+  /// estimated fuel-rate series onto an already-captured sample without
+  /// disturbing its measured speed / RPM / GPS fields. Only the one
+  /// field is overridable because that is the sole post-capture mutation
+  /// the fallback performs.
+  TripSample copyWithEstimatedFuelRate(double? estimatedFuelRateLPerHour) =>
+      TripSample(
+        timestamp: timestamp,
+        speedKmh: speedKmh,
+        rpm: rpm,
+        fuelRateLPerHour: fuelRateLPerHour,
+        estimatedFuelRateLPerHour: estimatedFuelRateLPerHour,
+        throttlePercent: throttlePercent,
+        engineLoadPercent: engineLoadPercent,
+        coolantTempC: coolantTempC,
+        latitude: latitude,
+        longitude: longitude,
+        altitudeM: altitudeM,
+        hAccuracyM: hAccuracyM,
+        bearingDeg: bearingDeg,
+        accelG: accelG,
+      );
 }
 
 /// Pure-logic accumulator that turns a stream of OBD2 [TripSample]s

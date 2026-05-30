@@ -5710,6 +5710,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Ingen prøver registrert';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Del';
 
   @override

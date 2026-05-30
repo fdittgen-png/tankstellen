@@ -5683,6 +5683,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trajetDetailChartEmpty => 'No samples recorded';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Share';
 
   @override
@@ -11908,6 +11911,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetDetailChartEmpty => '⟦Ñó šáɱƥłéš řéçóřđéđ ········⟧';
+
+  @override
+  String get trajetDetailChartEstimatedBadge => '⟦éšŧîɱáŧéđ ····⟧';
 
   @override
   String get trajetDetailShareAction => '⟦Šĥářé ··⟧';

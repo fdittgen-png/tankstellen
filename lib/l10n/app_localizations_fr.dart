@@ -5776,6 +5776,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Aucun échantillon enregistré';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Partager';
 
   @override

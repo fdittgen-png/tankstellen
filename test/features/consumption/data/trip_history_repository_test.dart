@@ -313,6 +313,63 @@ void main() {
       expect(loaded.first.samples.first.fuelRateLPerHour, 4.2);
     });
 
+    test(
+        'sample with estimatedFuelRateLPerHour round-trips through save / '
+        'loadAll under the new "fe" key (#2431)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 30);
+      final ts = start.add(const Duration(seconds: 5));
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: ts,
+            speedKmh: 90,
+            rpm: 2200,
+            // No measured fuel rate (no-fuel-PID trip); only the estimate.
+            estimatedFuelRateLPerHour: 6.3,
+          ),
+        ],
+      ));
+
+      final sample = repo.loadAll().first.samples.first;
+      expect(sample.estimatedFuelRateLPerHour, 6.3);
+      // The measured field stays null — the two are distinguishable.
+      expect(sample.fuelRateLPerHour, isNull);
+
+      // Stored under the compact 'fe' key; the measured 'f' key is absent.
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final stored = (decoded['samples'] as List).cast<Map>().first;
+      expect(stored.containsKey('fe'), isTrue);
+      expect(stored.containsKey('f'), isFalse);
+    });
+
+    test(
+        'a legacy sample with no "fe" key deserialises '
+        'estimatedFuelRateLPerHour null (#2431)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 30, 1);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: start.add(const Duration(seconds: 5)),
+            speedKmh: 60,
+            rpm: 2000,
+            fuelRateLPerHour: 4.0,
+          ),
+        ],
+      ));
+      final sample = repo.loadAll().first.samples.first;
+      expect(sample.estimatedFuelRateLPerHour, isNull);
+      expect(sample.fuelRateLPerHour, 4.0);
+    });
+
     test('sample with GPS altitude round-trips through save / loadAll '
         '(#1935 child A)', () async {
       final repo = TripHistoryRepository(box: box);

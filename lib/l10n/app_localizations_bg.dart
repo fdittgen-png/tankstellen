@@ -5765,6 +5765,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Не са записани проби';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Сподели';
 
   @override

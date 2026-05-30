@@ -17,6 +17,7 @@ import '../data/obd2/obd2_service.dart';
 import '../data/obd2/reconnect_connector.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/services/obd2_gps_estimate_fallback.dart';
 import '../domain/trip_recorder.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'recording_pipeline.dart';
@@ -29,25 +30,22 @@ import 'trip_recording_state.dart';
 
 /// Concrete OBD2 recording strategy (#2227), completing the
 /// [RecordingPipeline] seam #2190 opened with [GpsOnlyRecordingPipeline].
-///
 /// Owns the sensor-rich OBD2 recording loop that used to be inline on the
 /// [TripRecording] notifier (the `_pipeline == null` default path): the
 /// owned [Obd2Service], the [TripRecordingController] + its live /
 /// stateChanges subscriptions, the adapter-identity snapshot (#1312), the
 /// one-shot capability-probe latch (#2261), and the auto-reconnect scanner
 /// factory (#797 / #2245). The four focused collaborators are *injected*
-/// from the notifier (not reconstructed) so they outlive a single
-/// recording and the test counters accumulate exactly as the inline fields
-/// did.
+/// from the notifier so they outlive a single recording and the test
+/// counters accumulate exactly as the inline fields did.
 ///
 /// Deliberately NOT owned: the Riverpod `state`, the last-trip identity
 /// fields, the shared `_saveToHistory` write, and the #1303 active-trip WAL
 /// snapshot (+ its #1347 cold-start recovery) stay on the notifier and are
-/// reached through the [Obd2RecordingPipelineHost]. The WAL survives the
-/// recording loop being torn down — recovery runs with no pipeline at all
-/// — so it belongs to the notifier, not the strategy. Behaviour-preserving:
-/// the seed / flush cadence is driven through the same host hooks the
-/// inline path invoked directly.
+/// reached through the [Obd2RecordingPipelineHost] — the WAL survives the
+/// recording loop being torn down (recovery runs with no pipeline at all),
+/// so it belongs to the notifier. Behaviour-preserving: the seed / flush
+/// cadence is driven through the same host hooks the inline path used.
 class Obd2RecordingPipeline implements RecordingPipeline {
   Obd2RecordingPipeline({
     required Ref ref,
@@ -128,10 +126,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // controller can tag any pause-on-drop snapshot (#797 phase 1).
     final activeVehicle = _readActiveVehicle();
     final eagerVehicleId = _readActiveVehicle()?.id;
-    // #797 phase 3 — pass the pinned MAC + a factory for the auto-
-    // reconnect scanner. Null MAC (unpaired vehicle) skips the scanner
-    // entirely and leaves the grace-window path as the sole recovery
-    // mechanism.
+    // #797 phase 3 — pass the pinned MAC + a factory for the auto-reconnect
+    // scanner. Null MAC (unpaired vehicle) skips the scanner entirely and
+    // leaves the grace-window path as the sole recovery mechanism.
     final pinnedMac = activeVehicle?.obd2AdapterMac;
     // #1395 — wire the diagnostic breadcrumb sink for this trip. Both
     // the controller and the underlying [Obd2Service] push through the
@@ -268,7 +265,15 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     final capturedGpsDiagnostics = List<GpsSampleDiagnostic>.unmodifiable(
       ctl.capturedGpsSampleDiagnostics,
     );
-    final summary = await ctl.stop();
+    // #2431 — back-fill consumption from the GPS-physics estimate when the
+    // adapter+ECU supported no fuel PID (all-null → blank fuel branch);
+    // a no-op when any real fuel signal was seen (see fillWhenNoFuelPid).
+    final filled = Obd2GpsEstimateFallback.fillWhenNoFuelPid(
+      summary: await ctl.stop(),
+      samples: capturedSamples,
+      vehicle: _readActiveVehicle(),
+    );
+    final summary = filled.summary;
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
     await _liveSub?.cancel();
@@ -286,7 +291,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // is a *separate* decision. Best-effort.
     await _host.saveToHistory(
       summary,
-      samples: capturedSamples,
+      samples: filled.samples,
       gpsSampleDiagnostics: capturedGpsDiagnostics,
       automatic: automatic,
       vehicleId: _baselines.vehicleId,

@@ -10085,6 +10085,12 @@ abstract class AppLocalizations {
   /// **'No samples recorded'**
   String get trajetDetailChartEmpty;
 
+  /// Badge overlaid on the Trip detail fuel-rate chart when the car's adapter supported no fuel PID, so the plotted series is the GPS-physics estimate rather than a measurement (#2431). Rendered with a leading '~' (~ estimated) so the user reads it as an estimate, never as measured data. Keep it short — it sits in a small chip in the chart corner.
+  ///
+  /// In en, this message translates to:
+  /// **'estimated'**
+  String get trajetDetailChartEstimatedBadge;
+
   /// AppBar action tooltip for the share-trip button on the Trip detail screen (#890, #1189).
   ///
   /// In en, this message translates to:

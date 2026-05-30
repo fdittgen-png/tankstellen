@@ -5720,6 +5720,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Žádné vzorky nezaznamenány';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Sdílet';
 
   @override

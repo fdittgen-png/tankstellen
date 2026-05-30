@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/trip_recorder.dart';
+import 'trip_sample_codec.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// One finalised trip as shown in the Trip history list (#726).
@@ -107,7 +108,7 @@ class TripHistoryEntry {
         'summary': _summaryToJson(summary),
         if (automatic) 'automatic': true,
         if (samples.isNotEmpty)
-          'samples': samples.map(_sampleToJson).toList(growable: false),
+          'samples': samples.map(sampleToJson).toList(growable: false),
         // #1312 — adapter identity. Compact keys so the per-trip JSON
         // payload doesn't balloon (most trips carry one MAC + one
         // name; firmware stays null until the connect path captures
@@ -136,7 +137,7 @@ class TripHistoryEntry {
         automatic: (json['automatic'] as bool?) ?? false,
         samples: (json['samples'] as List?)
                 ?.map(
-                    (e) => _sampleFromJson((e as Map).cast<String, dynamic>()))
+                    (e) => sampleFromJson((e as Map).cast<String, dynamic>()))
                 .toList(growable: false) ??
             const [],
         // #1312 — adapter identity. Reads as `String?` so legacy
@@ -157,50 +158,6 @@ class TripHistoryEntry {
             const [],
       );
 }
-
-/// Serialise a single [TripSample]. Compact key names
-/// ('t','s','r','f','th','el','ct','la','lo') keep per-trip JSON small
-/// — a 39-min trip × 1 Hz lands around 19 KB compressed at this
-/// density. Use millisecondsSinceEpoch for the timestamp so the JSON
-/// parses fast and round-trips precisely. The optional `'th'` (#1261),
-/// `'el'` and `'ct'` (#1262) keys are only emitted when the
-/// corresponding PID was actually read; the `'la'` / `'lo'` keys
-/// (#1374 phase 1) are only emitted when the GPS-trip-path feature
-/// flag is enabled AND a fix landed for that tick. Legacy trips
-/// written before each key landed deserialise with the field null.
-Map<String, dynamic> _sampleToJson(TripSample s) => {
-      't': s.timestamp.millisecondsSinceEpoch,
-      's': s.speedKmh,
-      'r': s.rpm,
-      if (s.fuelRateLPerHour != null) 'f': s.fuelRateLPerHour,
-      if (s.throttlePercent != null) 'th': s.throttlePercent,
-      if (s.engineLoadPercent != null) 'el': s.engineLoadPercent,
-      if (s.coolantTempC != null) 'ct': s.coolantTempC,
-      if (s.latitude != null) 'la': s.latitude,
-      if (s.longitude != null) 'lo': s.longitude,
-      if (s.altitudeM != null) 'al': s.altitudeM,
-      if (s.hAccuracyM != null) 'ha': s.hAccuracyM,
-      if (s.bearingDeg != null) 'be': s.bearingDeg,
-      if (s.accelG != null) 'ag': s.accelG,
-    };
-
-TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
-      timestamp: DateTime.fromMillisecondsSinceEpoch(
-        (j['t'] as num).toInt(),
-      ),
-      speedKmh: (j['s'] as num).toDouble(),
-      rpm: (j['r'] as num).toDouble(),
-      fuelRateLPerHour: (j['f'] as num?)?.toDouble(),
-      throttlePercent: (j['th'] as num?)?.toDouble(),
-      engineLoadPercent: (j['el'] as num?)?.toDouble(),
-      coolantTempC: (j['ct'] as num?)?.toDouble(),
-      latitude: (j['la'] as num?)?.toDouble(),
-      longitude: (j['lo'] as num?)?.toDouble(),
-      altitudeM: (j['al'] as num?)?.toDouble(),
-      hAccuracyM: (j['ha'] as num?)?.toDouble(),
-      bearingDeg: (j['be'] as num?)?.toDouble(),
-      accelG: (j['ag'] as num?)?.toDouble(),
-    );
 
 Map<String, dynamic> _summaryToJson(TripSummary s) => {
       'distanceKm': s.distanceKm,

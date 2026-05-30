@@ -2453,6 +2453,7 @@
   "trajetsRowColdStartChip": "Kaltstart",
   "trajetsRowColdStartTooltip": "Der Motor erreichte während dieser Fahrt nicht die Betriebstemperatur — der Verbrauch war höher als üblich.",
   "trajetDetailChartEmpty": "Keine Messwerte",
+  "trajetDetailChartEstimatedBadge": "geschätzt",
   "trajetDetailShareAction": "Teilen",
   "trajetDetailShareImageOption": "Bild teilen",
   "trajetDetailShareGpxOption": "GPS-Track (GPX) teilen",

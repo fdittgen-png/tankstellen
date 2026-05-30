@@ -5754,6 +5754,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Niciun eșantion înregistrat';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Partajați';
 
   @override

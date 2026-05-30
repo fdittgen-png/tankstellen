@@ -5739,6 +5739,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Žiadne zaznamenané vzorky';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Zdieľať';
 
   @override

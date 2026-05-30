@@ -5749,6 +5749,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Nav ierakstītu paraugu';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Kopīgot';
 
   @override

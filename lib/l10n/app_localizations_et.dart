@@ -5704,6 +5704,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Näidiseid pole salvestatud';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Jaga';
 
   @override

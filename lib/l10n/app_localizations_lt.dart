@@ -5746,6 +5746,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Nėra įrašytų mėginių';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Bendrinti';
 
   @override

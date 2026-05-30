@@ -5712,6 +5712,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Ingen prøver registreret';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Del';
 
   @override
