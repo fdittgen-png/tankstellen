@@ -16,6 +16,7 @@ import 'fuel_rate_diagnostics.dart';
 import 'fuel_rate_estimator.dart' as estimator;
 import 'negotiated_protocol_cache.dart';
 import 'obd2_breadcrumb_collector.dart';
+import 'obd2_comm_diagnostics.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
@@ -101,6 +102,15 @@ class Obd2Service implements Obd2RawCommandPort {
   /// back to the registry's display name when the BLE advertisement
   /// is empty. Stamped at the same moment as [adapterMac].
   String? adapterName;
+
+  /// Transport flavour backing this session — `'ble'` / `'classic'`
+  /// (#2465). Stamped by [Obd2ConnectionService] alongside [adapterMac]
+  /// so [connect] can open the comm-diagnostics session with the link
+  /// kind without the data layer reaching back into the registry. Null
+  /// for test fakes / direct transport construction (the diagnostics
+  /// session then records a null link kind, which is fine — it is gated
+  /// off in production anyway).
+  String? linkKind;
 
   /// ELM327 firmware string (whatever `ATI` returned during init), if
   /// the adapter reported one (#1312, #1401). Populated by [connect]
@@ -475,6 +485,16 @@ class Obd2Service implements Obd2RawCommandPort {
       wakeObservation = WakeObservation.notRun;
       await _transport.connect();
 
+      // #2465 — open a comm-diagnostics session for this connect and tee
+      // the adapter identity + handshake transcript into it below. A pure
+      // no-op unless Feature.debugMode armed the collector (the gate
+      // provider flips `enabled`); the begin/record calls early-return on
+      // `!enabled`, so production pays one cached-bool read per event.
+      Obd2CommDiagnostics.instance.beginSession(
+        linkKind: linkKind,
+        redactedMac: redactObd2Mac(adapterMac),
+      );
+
       // Clear the per-connection supported-PIDs cache. A new session
       // may be a different car / different adapter firmware.
       _pids.resetForNewConnection();
@@ -538,6 +558,13 @@ class Obd2Service implements Obd2RawCommandPort {
           response,
           sw.elapsedMilliseconds,
         );
+        // #2465 — tee the same timed handshake line into the comm-health
+        // collector (gated; no-op unless Feature.debugMode is on).
+        Obd2CommDiagnostics.instance.recordHandshakeLine(
+          sequence[i],
+          response,
+          sw.elapsedMilliseconds,
+        );
         // #2261 concern 5 — drop the fixed inter-command sleep for
         // trivial AT echoes: the prompt-wait in [BluetoothObd2Transport]
         // already serialises one command per `>` reply, so a blind
@@ -572,6 +599,12 @@ class Obd2Service implements Obd2RawCommandPort {
           raw,
           atiSw.elapsedMilliseconds,
         );
+        // #2465 — tee the ATI probe into the comm-health collector too.
+        Obd2CommDiagnostics.instance.recordHandshakeLine(
+          _atiCommand,
+          raw,
+          atiSw.elapsedMilliseconds,
+        );
         final firmware = _parseFirmwareString(raw);
         if (firmware != null && firmware.isNotEmpty) {
           adapterFirmware = firmware;
@@ -598,6 +631,20 @@ class Obd2Service implements Obd2RawCommandPort {
       // the bus, this re-runs ATSP0 + re-caches. Non-fatal: any failure
       // just leaves the cache as-is and the connect still succeeds.
       await _resolveAndCacheProtocol(warmConnect: warmProtocol != null);
+
+      // #2465 — stamp the resolved adapter identity into the comm-health
+      // session (gated; no-op unless Feature.debugMode is on). The
+      // protocol digit is whatever the warm-replay pinned or the cold
+      // ATSP0 search just negotiated + re-cached; `warmStart` records
+      // whether this connect replayed a cached protocol. The capability
+      // tier here is the firmware-CLAIMED value (Wave 1) — the lazy
+      // multi-frame probe that reconciles it lands in Wave 2.
+      Obd2CommDiagnostics.instance.recordAdapterIdentity(
+        elmVersion: adapterFirmware,
+        protocolDigit: _cachedProtocolDigit(),
+        warmStart: warmProtocol != null,
+        capabilityTier: _capability.name,
+      );
 
       await _pids.prime();
 
