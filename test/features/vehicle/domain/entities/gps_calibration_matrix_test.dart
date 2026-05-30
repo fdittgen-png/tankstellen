@@ -130,6 +130,7 @@ void main() {
         accelEventCost: 0.6,
         fillUpReconciliationCount: 4,
         residualVariance: 0.8,
+        physicsScale: 1.12,
       );
       final json = m.toJson();
       final decoded = GpsCalibrationMatrix.fromJson(json);
@@ -140,6 +141,44 @@ void main() {
       expect(decoded.fillUpReconciliationCount,
           m.fillUpReconciliationCount);
       expect(decoded.residualVariance, m.residualVariance);
+      expect(decoded.physicsScale, m.physicsScale);
+    });
+  });
+
+  group('GpsCalibrationMatrix.physicsScale', () {
+    test('defaults to 1.0 on a freshly-constructed matrix', () {
+      const m = GpsCalibrationMatrix();
+      expect(m.physicsScale, 1.0);
+    });
+
+    test('cold-start seeds physicsScale to the 1.0 default', () {
+      final m = GpsCalibrationMatrix.coldStart(wltp: 6.0);
+      expect(m.physicsScale, 1.0);
+    });
+
+    test('survives a JSON round-trip', () {
+      const m = GpsCalibrationMatrix(physicsScale: 0.93);
+      final decoded = GpsCalibrationMatrix.fromJson(m.toJson());
+      expect(decoded.physicsScale, 0.93);
+    });
+
+    test('legacy blob without physicsScale deserialises to the 1.0 default',
+        () {
+      // A pre-#2388 Hive payload simply omits the field — freezed's
+      // @Default(1.0) must fill it in (free migration, no data loss).
+      final legacy = <String, dynamic>{
+        'baseline': 6.5,
+        'idleCost': 1.2,
+        'highSpeedPenalty': 2.0,
+        'accelEventCost': 0.5,
+        'fillUpReconciliationCount': 3,
+        'residualVariance': 0.4,
+      };
+      final decoded = GpsCalibrationMatrix.fromJson(legacy);
+      expect(decoded.physicsScale, 1.0);
+      // The rest of the legacy payload still maps across cleanly.
+      expect(decoded.baseline, 6.5);
+      expect(decoded.fillUpReconciliationCount, 3);
     });
   });
 }
