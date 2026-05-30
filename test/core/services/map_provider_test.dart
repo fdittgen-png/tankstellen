@@ -115,9 +115,12 @@ void main() {
       expect(provider.name, 'OpenStreetMap');
     });
 
-    test('tileConfig returns OSM tile URL from AppConstants', () {
+    test('tileConfig returns the effective (proxy) tile URL from AppConstants',
+        () {
       final config = provider.tileConfig;
-      expect(config.urlTemplate, AppConstants.osmTileUrl);
+      // #2396 — flipped to the Supabase OSM caching proxy via
+      // `effectiveTileUrl` (OSM-direct retained as the empty-proxy fallback).
+      expect(config.urlTemplate, AppConstants.effectiveTileUrl);
       expect(config.userAgent, AppConstants.osmUserAgent);
       expect(config.attribution, AppConstants.osmAttribution);
     });

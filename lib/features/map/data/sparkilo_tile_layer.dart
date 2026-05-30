@@ -70,7 +70,10 @@ import 'retry_network_tile_provider.dart';
 /// Routes that need to force a tile reset on layout-settle pass a
 /// broadcast stream via [reset]; most callers leave it null.
 class SparkiloTileLayer extends StatefulWidget {
-  /// OSM tile-URL template. Defaults to [AppConstants.osmTileUrl].
+  /// Tile-URL template. Defaults to [AppConstants.effectiveTileUrl] — the
+  /// Supabase OSM caching proxy ([AppConstants.tileProxyUrl]) when set,
+  /// else OSM-direct ([AppConstants.osmTileUrl]) as a clean fallback
+  /// (#2396). Custom OSM endpoints (e.g. self-hosted) override this.
   final String? urlTemplate;
 
   /// User-Agent header per OSM tile-usage policy. Defaults to
@@ -140,7 +143,7 @@ class _SparkiloTileLayerState extends State<SparkiloTileLayer> {
   @override
   Widget build(BuildContext context) {
     return TileLayer(
-      urlTemplate: widget.urlTemplate ?? AppConstants.osmTileUrl,
+      urlTemplate: widget.urlTemplate ?? AppConstants.effectiveTileUrl,
       userAgentPackageName:
           widget.userAgentPackageName ?? AppConstants.osmUserAgent,
       maxNativeZoom: widget.maxNativeZoom,

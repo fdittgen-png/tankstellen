@@ -22,10 +22,12 @@ class FlutterMapProvider implements MapProvider {
   String get name => 'OpenStreetMap';
 
   @override
-  // #2396 — now `const`: `osmUserAgent` became a compile-time `const`
-  // (version-free) so all three args are constant.
-  TileLayerConfig get tileConfig => const TileLayerConfig(
-        urlTemplate: AppConstants.osmTileUrl,
+  // #2396 — default through the Supabase OSM caching proxy
+  // ([AppConstants.effectiveTileUrl]: proxy when set, OSM-direct fallback
+  // otherwise). `effectiveTileUrl` is a getter, so this is no longer
+  // `const`; `userAgent` stays the stable version-free OSM UA.
+  TileLayerConfig get tileConfig => TileLayerConfig(
+        urlTemplate: AppConstants.effectiveTileUrl,
         userAgent: AppConstants.osmUserAgent,
         attribution: AppConstants.osmAttribution,
       );
