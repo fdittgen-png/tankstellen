@@ -1848,8 +1848,8 @@
   "featureBlockedEnable_showFuel": "Voraussetzungen nicht erfüllt",
   "featureBlockedEnable_showElectric": "Voraussetzungen nicht erfüllt",
   "featureBlockedEnable_showConsumptionTab": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
-  "featureLabel_tflitePricePrediction": "TFLite-Preisvorhersage",
-  "featureDescription_tflitePricePrediction": "On-Device Preisprognose – die Inferenz läuft lokal; Merkmale und Vorhersagen verlassen das Gerät nie.",
+  "featureLabel_tflitePricePrediction": "Bester Zeitpunkt zum Tanken",
+  "featureDescription_tflitePricePrediction": "Empfehlung zum besten Tankzeitpunkt, berechnet aus deinem lokalen Preisverlauf – nichts verlässt das Gerät.",
   "featureBlockedEnable_tflitePricePrediction": "Aktiviere zuerst den Preisverlauf",
   "featureLabel_fuelCalculator": "Tankkostenrechner",
   "featureDescription_fuelCalculator": "Erreichbarer Tankkostenrechner aus den Suchergebnissen.",
@@ -1885,6 +1885,154 @@
   "feedbackTokenClear": "Löschen",
   "feedbackTokenDialogTitle": "GitHub-PAT",
   "feedbackTokenFieldLabel": "Personal Access Token",
+  "fillUpGuidanceTitle": "Bester Zeitpunkt zum Tanken",
+  "@fillUpGuidanceTitle": {
+    "description": "Title of the on-device 'best time to fill up' guidance card on the price-history screen (#1543)."
+  },
+  "fillUpGuidanceGoodTimeNow": "Der aktuelle Preis gehört zu den günstigsten der letzten {days} Tage – ein guter Zeitpunkt zum Tanken.",
+  "@fillUpGuidanceGoodTimeNow": {
+    "description": "Guidance shown when the current price sits in the cheapest band of the trailing window (#1543).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "fillUpGuidanceWaitCheaper": "Die Preise liegen nahe ihrem Höchststand der letzten {days} Tage. {window} ist es meist günstiger – warten lohnt sich vielleicht.",
+  "@fillUpGuidanceWaitCheaper": {
+    "description": "Guidance shown when the current price is high but a reliably cheaper day/time window exists (#1543).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      },
+      "window": {
+        "type": "String",
+        "example": "Dienstagvormittags"
+      }
+    }
+  },
+  "fillUpGuidanceFillSoon": "Die Preise steigen – bald tanken kann sich lohnen.",
+  "@fillUpGuidanceFillSoon": {
+    "description": "Guidance shown when the short-term price trend is clearly rising (#1543)."
+  },
+  "fillUpGuidanceNeutral": "Der heutige Preis liegt etwa im Durchschnitt der letzten {days} Tage.",
+  "@fillUpGuidanceNeutral": {
+    "description": "Neutral guidance shown when no strong cheap/dear/trend signal is present (#1543).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "fillUpGuidanceSaving": "Mit gutem Timing sind etwa {amount}/L Ersparnis möglich.",
+  "@fillUpGuidanceSaving": {
+    "description": "Optional line appended when a meaningful per-litre saving between cheap and dear windows is detected (#1543).",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "0,05 €"
+      }
+    }
+  },
+  "fillUpGuidanceSampleNote": "{count, plural, =1{Basierend auf 1 Preismessung} other{Basierend auf {count} Preismessungen}}",
+  "@fillUpGuidanceSampleNote": {
+    "description": "Confidence footnote showing how many local price readings the guidance is based on (#1543).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "24"
+      }
+    }
+  },
+  "fillUpGuidanceWindowDayAndPart": "{day} {part}",
+  "@fillUpGuidanceWindowDayAndPart": {
+    "description": "Composed cheap-window phrase combining a weekday and a time-of-day part, e.g. 'Tuesday mornings' (#1543).",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Dienstags"
+      },
+      "part": {
+        "type": "String",
+        "example": "vormittags"
+      }
+    }
+  },
+  "fillUpGuidanceWindowDayOnly": "{day}",
+  "@fillUpGuidanceWindowDayOnly": {
+    "description": "Cheap-window phrase when only a weekday signal is available, e.g. 'on Tuesdays' (#1543).",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Dienstags"
+      }
+    }
+  },
+  "fillUpGuidanceWindowPartOnly": "{part}",
+  "@fillUpGuidanceWindowPartOnly": {
+    "description": "Cheap-window phrase when only a time-of-day signal is available, e.g. 'in the mornings' (#1543).",
+    "placeholders": {
+      "part": {
+        "type": "String",
+        "example": "vormittags"
+      }
+    }
+  },
+  "fillUpGuidanceWindowGeneric": "zu anderen Zeiten",
+  "@fillUpGuidanceWindowGeneric": {
+    "description": "Fallback cheap-window phrase when neither a weekday nor a time-of-day signal cleared the sample-size guard (#1543)."
+  },
+  "fillUpGuidanceWeekday1": "montags",
+  "@fillUpGuidanceWeekday1": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Monday) (#1543)."
+  },
+  "fillUpGuidanceWeekday2": "dienstags",
+  "@fillUpGuidanceWeekday2": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Tuesday) (#1543)."
+  },
+  "fillUpGuidanceWeekday3": "mittwochs",
+  "@fillUpGuidanceWeekday3": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Wednesday) (#1543)."
+  },
+  "fillUpGuidanceWeekday4": "donnerstags",
+  "@fillUpGuidanceWeekday4": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Thursday) (#1543)."
+  },
+  "fillUpGuidanceWeekday5": "freitags",
+  "@fillUpGuidanceWeekday5": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Friday) (#1543)."
+  },
+  "fillUpGuidanceWeekday6": "samstags",
+  "@fillUpGuidanceWeekday6": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Saturday) (#1543)."
+  },
+  "fillUpGuidanceWeekday7": "sonntags",
+  "@fillUpGuidanceWeekday7": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Sunday) (#1543)."
+  },
+  "fillUpGuidancePartEarlyMorning": "frühmorgens",
+  "@fillUpGuidancePartEarlyMorning": {
+    "description": "Time-of-day part name (06:00-08:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartMorning": "vormittags",
+  "@fillUpGuidancePartMorning": {
+    "description": "Time-of-day part name (09:00-11:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartAfternoon": "nachmittags",
+  "@fillUpGuidancePartAfternoon": {
+    "description": "Time-of-day part name (12:00-17:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartEvening": "abends",
+  "@fillUpGuidancePartEvening": {
+    "description": "Time-of-day part name (18:00-23:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartNight": "nachts",
+  "@fillUpGuidancePartNight": {
+    "description": "Time-of-day part name (00:00-05:59) used inside the cheap-window phrase (#1543)."
+  },
   "fillUpReconciliationVerifiedBadgeLabel": "Vom Adapter bestätigt",
   "fillUpReconciliationVarianceDialogTitle": "Stimmt nicht mit Adapter überein",
   "fillUpReconciliationVarianceDialogBody": "Deine Eingabe: {userL} L. Adapter meldet: {adapterL} L (Differenz aus Tankstand vor/nach dem Tanken). Adapterwert übernehmen?",

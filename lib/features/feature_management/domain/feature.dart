@@ -93,12 +93,15 @@ enum Feature {
   /// by the `AppProfile.full` preset.
   loyaltyCards,
 
-  /// On-device TFLite price-prediction model (#1543, future). Requires
+  /// On-device price-prediction guidance (#1543). Requires
   /// [priceHistory] — the predictor consumes the same 30-day window the
-  /// history feature already collects. Default-off and gated by a
-  /// compile-time `kTflitePredictorEnabled` const so the toggle is a
-  /// no-op until a trained `.tflite` artifact is committed and the
-  /// const is flipped. Heuristic fallback always covers the gap.
+  /// history feature already collects. As of #1543 this flag gates the
+  /// no-ML, fully on-device "best time to fill up?" heuristic
+  /// (`fillUpGuidanceProvider` / `FillUpGuidanceCard`); the enum value
+  /// keeps its `tflite…` name purely to avoid a persistence-key
+  /// migration. The dormant TFLite inference path is independently
+  /// gated by the compile-time `kTflitePredictorEnabled` const and is
+  /// unaffected by this flag. Default-off and opt-in.
   tflitePricePrediction,
 
   /// The fuel-cost Calculator (#1613). The screen + logic already exist

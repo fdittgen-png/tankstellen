@@ -4487,6 +4487,98 @@ class AppLocalizationsSv extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Personlig åtkomsttoken';
 
   @override
+  String get fillUpGuidanceTitle => 'Best time to fill up';
+
+  @override
+  String fillUpGuidanceGoodTimeNow(int days) {
+    return 'The current price is among the cheapest of the last $days days — a good time to fill up.';
+  }
+
+  @override
+  String fillUpGuidanceWaitCheaper(int days, String window) {
+    return 'Prices are near their $days-day high. They are usually cheaper $window — consider waiting.';
+  }
+
+  @override
+  String get fillUpGuidanceFillSoon =>
+      'Prices are trending up — consider filling up soon.';
+
+  @override
+  String fillUpGuidanceNeutral(int days) {
+    return 'Today\'s price is around the $days-day average.';
+  }
+
+  @override
+  String fillUpGuidanceSaving(String amount) {
+    return 'Could save about $amount/L by timing your fill-up.';
+  }
+
+  @override
+  String fillUpGuidanceSampleNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Based on $count price readings',
+      one: 'Based on 1 price reading',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayAndPart(String day, String part) {
+    return '$day $part';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayOnly(String day) {
+    return 'on $day';
+  }
+
+  @override
+  String fillUpGuidanceWindowPartOnly(String part) {
+    return 'in the $part';
+  }
+
+  @override
+  String get fillUpGuidanceWindowGeneric => 'at other times';
+
+  @override
+  String get fillUpGuidanceWeekday1 => 'Mondays';
+
+  @override
+  String get fillUpGuidanceWeekday2 => 'Tuesdays';
+
+  @override
+  String get fillUpGuidanceWeekday3 => 'Wednesdays';
+
+  @override
+  String get fillUpGuidanceWeekday4 => 'Thursdays';
+
+  @override
+  String get fillUpGuidanceWeekday5 => 'Fridays';
+
+  @override
+  String get fillUpGuidanceWeekday6 => 'Saturdays';
+
+  @override
+  String get fillUpGuidanceWeekday7 => 'Sundays';
+
+  @override
+  String get fillUpGuidancePartEarlyMorning => 'early mornings';
+
+  @override
+  String get fillUpGuidancePartMorning => 'mornings';
+
+  @override
+  String get fillUpGuidancePartAfternoon => 'afternoons';
+
+  @override
+  String get fillUpGuidancePartEvening => 'evenings';
+
+  @override
+  String get fillUpGuidancePartNight => 'nights';
+
+  @override
   String get fillUpReconciliationVerifiedBadgeLabel => 'Verifierad av adapter';
 
   @override

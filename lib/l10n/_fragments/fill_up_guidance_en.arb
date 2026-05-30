@@ -1,0 +1,150 @@
+{
+  "fillUpGuidanceTitle": "Best time to fill up",
+  "@fillUpGuidanceTitle": {
+    "description": "Title of the on-device 'best time to fill up' guidance card on the price-history screen (#1543)."
+  },
+  "fillUpGuidanceGoodTimeNow": "The current price is among the cheapest of the last {days} days — a good time to fill up.",
+  "@fillUpGuidanceGoodTimeNow": {
+    "description": "Guidance shown when the current price sits in the cheapest band of the trailing window (#1543).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "fillUpGuidanceWaitCheaper": "Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.",
+  "@fillUpGuidanceWaitCheaper": {
+    "description": "Guidance shown when the current price is high but a reliably cheaper day/time window exists (#1543).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      },
+      "window": {
+        "type": "String",
+        "example": "Tuesday mornings"
+      }
+    }
+  },
+  "fillUpGuidanceFillSoon": "Prices are trending up — consider filling up soon.",
+  "@fillUpGuidanceFillSoon": {
+    "description": "Guidance shown when the short-term price trend is clearly rising (#1543)."
+  },
+  "fillUpGuidanceNeutral": "Today's price is around the {days}-day average.",
+  "@fillUpGuidanceNeutral": {
+    "description": "Neutral guidance shown when no strong cheap/dear/trend signal is present (#1543).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "fillUpGuidanceSaving": "Could save about {amount}/L by timing your fill-up.",
+  "@fillUpGuidanceSaving": {
+    "description": "Optional line appended when a meaningful per-litre saving between cheap and dear windows is detected (#1543).",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "0.05 €"
+      }
+    }
+  },
+  "fillUpGuidanceSampleNote": "{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}",
+  "@fillUpGuidanceSampleNote": {
+    "description": "Confidence footnote showing how many local price readings the guidance is based on (#1543).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "24"
+      }
+    }
+  },
+  "fillUpGuidanceWindowDayAndPart": "{day} {part}",
+  "@fillUpGuidanceWindowDayAndPart": {
+    "description": "Composed cheap-window phrase combining a weekday and a time-of-day part, e.g. 'Tuesday mornings' (#1543).",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Tuesday"
+      },
+      "part": {
+        "type": "String",
+        "example": "mornings"
+      }
+    }
+  },
+  "fillUpGuidanceWindowDayOnly": "on {day}",
+  "@fillUpGuidanceWindowDayOnly": {
+    "description": "Cheap-window phrase when only a weekday signal is available, e.g. 'on Tuesdays' (#1543).",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Tuesdays"
+      }
+    }
+  },
+  "fillUpGuidanceWindowPartOnly": "in the {part}",
+  "@fillUpGuidanceWindowPartOnly": {
+    "description": "Cheap-window phrase when only a time-of-day signal is available, e.g. 'in the mornings' (#1543).",
+    "placeholders": {
+      "part": {
+        "type": "String",
+        "example": "mornings"
+      }
+    }
+  },
+  "fillUpGuidanceWindowGeneric": "at other times",
+  "@fillUpGuidanceWindowGeneric": {
+    "description": "Fallback cheap-window phrase when neither a weekday nor a time-of-day signal cleared the sample-size guard (#1543)."
+  },
+  "fillUpGuidanceWeekday1": "Mondays",
+  "@fillUpGuidanceWeekday1": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Monday) (#1543)."
+  },
+  "fillUpGuidanceWeekday2": "Tuesdays",
+  "@fillUpGuidanceWeekday2": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Tuesday) (#1543)."
+  },
+  "fillUpGuidanceWeekday3": "Wednesdays",
+  "@fillUpGuidanceWeekday3": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Wednesday) (#1543)."
+  },
+  "fillUpGuidanceWeekday4": "Thursdays",
+  "@fillUpGuidanceWeekday4": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Thursday) (#1543)."
+  },
+  "fillUpGuidanceWeekday5": "Fridays",
+  "@fillUpGuidanceWeekday5": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Friday) (#1543)."
+  },
+  "fillUpGuidanceWeekday6": "Saturdays",
+  "@fillUpGuidanceWeekday6": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Saturday) (#1543)."
+  },
+  "fillUpGuidanceWeekday7": "Sundays",
+  "@fillUpGuidanceWeekday7": {
+    "description": "Plural weekday name used inside the cheap-window phrase (Sunday) (#1543)."
+  },
+  "fillUpGuidancePartEarlyMorning": "early mornings",
+  "@fillUpGuidancePartEarlyMorning": {
+    "description": "Time-of-day part name (06:00-08:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartMorning": "mornings",
+  "@fillUpGuidancePartMorning": {
+    "description": "Time-of-day part name (09:00-11:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartAfternoon": "afternoons",
+  "@fillUpGuidancePartAfternoon": {
+    "description": "Time-of-day part name (12:00-17:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartEvening": "evenings",
+  "@fillUpGuidancePartEvening": {
+    "description": "Time-of-day part name (18:00-23:59) used inside the cheap-window phrase (#1543)."
+  },
+  "fillUpGuidancePartNight": "nights",
+  "@fillUpGuidancePartNight": {
+    "description": "Time-of-day part name (00:00-05:59) used inside the cheap-window phrase (#1543)."
+  }
+}

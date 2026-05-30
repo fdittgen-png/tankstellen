@@ -4386,11 +4386,12 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite-Preisvorhersage';
+  String get featureLabel_tflitePricePrediction =>
+      'Bester Zeitpunkt zum Tanken';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-Device Preisprognose – die Inferenz läuft lokal; Merkmale und Vorhersagen verlassen das Gerät nie.';
+      'Empfehlung zum besten Tankzeitpunkt, berechnet aus deinem lokalen Preisverlauf – nichts verlässt das Gerät.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
@@ -4512,6 +4513,98 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get feedbackTokenFieldLabel => 'Personal Access Token';
+
+  @override
+  String get fillUpGuidanceTitle => 'Bester Zeitpunkt zum Tanken';
+
+  @override
+  String fillUpGuidanceGoodTimeNow(int days) {
+    return 'Der aktuelle Preis gehört zu den günstigsten der letzten $days Tage – ein guter Zeitpunkt zum Tanken.';
+  }
+
+  @override
+  String fillUpGuidanceWaitCheaper(int days, String window) {
+    return 'Die Preise liegen nahe ihrem Höchststand der letzten $days Tage. $window ist es meist günstiger – warten lohnt sich vielleicht.';
+  }
+
+  @override
+  String get fillUpGuidanceFillSoon =>
+      'Die Preise steigen – bald tanken kann sich lohnen.';
+
+  @override
+  String fillUpGuidanceNeutral(int days) {
+    return 'Der heutige Preis liegt etwa im Durchschnitt der letzten $days Tage.';
+  }
+
+  @override
+  String fillUpGuidanceSaving(String amount) {
+    return 'Mit gutem Timing sind etwa $amount/L Ersparnis möglich.';
+  }
+
+  @override
+  String fillUpGuidanceSampleNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Basierend auf $count Preismessungen',
+      one: 'Basierend auf 1 Preismessung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayAndPart(String day, String part) {
+    return '$day $part';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayOnly(String day) {
+    return '$day';
+  }
+
+  @override
+  String fillUpGuidanceWindowPartOnly(String part) {
+    return '$part';
+  }
+
+  @override
+  String get fillUpGuidanceWindowGeneric => 'zu anderen Zeiten';
+
+  @override
+  String get fillUpGuidanceWeekday1 => 'montags';
+
+  @override
+  String get fillUpGuidanceWeekday2 => 'dienstags';
+
+  @override
+  String get fillUpGuidanceWeekday3 => 'mittwochs';
+
+  @override
+  String get fillUpGuidanceWeekday4 => 'donnerstags';
+
+  @override
+  String get fillUpGuidanceWeekday5 => 'freitags';
+
+  @override
+  String get fillUpGuidanceWeekday6 => 'samstags';
+
+  @override
+  String get fillUpGuidanceWeekday7 => 'sonntags';
+
+  @override
+  String get fillUpGuidancePartEarlyMorning => 'frühmorgens';
+
+  @override
+  String get fillUpGuidancePartMorning => 'vormittags';
+
+  @override
+  String get fillUpGuidancePartAfternoon => 'nachmittags';
+
+  @override
+  String get fillUpGuidancePartEvening => 'abends';
+
+  @override
+  String get fillUpGuidancePartNight => 'nachts';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel => 'Vom Adapter bestätigt';

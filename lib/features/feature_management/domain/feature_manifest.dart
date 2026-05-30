@@ -275,18 +275,21 @@ class FeatureManifest {
     ),
     Feature.tflitePricePrediction: FeatureManifestEntry.allChannels(
       feature: Feature.tflitePricePrediction,
-      // Default-off and double-gated. The compile-time
-      // `kTflitePredictorEnabled` const in
-      // `lib/features/price_history/data/tflite_price_predictor.dart`
-      // stays false until the trained `.tflite` artifact ships under
-      // `assets/models/`. With either gate off, the heuristic
-      // `pricePredictionProvider` renders unchanged.
+      // #1543 — this flag now drives the no-ML, on-device "best time to
+      // fill up?" heuristic (`fillUpGuidanceProvider`) instead of the
+      // dormant TFLite path. Kept default-off and opt-in (it is in no
+      // AppProfile preset bundle — see app_profile.dart) so users
+      // deliberately turn it on from Feature management; `requires:
+      // {priceHistory}` scopes it to users who collect the local
+      // history it reads. The original TFLite path stays dormant behind
+      // its own compile-time `kTflitePredictorEnabled` const, unaffected
+      // by this flag.
       defaultOn: false,
       requires: {Feature.priceHistory},
-      displayName: 'TFLite price prediction',
+      displayName: 'Best time to fill up',
       description:
-          'On-device price forecast model — inference runs locally; '
-              'features and predictions never leave the device.',
+          'On-device guidance on when to fill up, computed from your '
+              'local price history — nothing leaves the device.',
     ),
     Feature.fuelCalculator: FeatureManifestEntry.allChannels(
       feature: Feature.fuelCalculator,

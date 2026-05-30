@@ -7848,16 +7848,16 @@ abstract class AppLocalizations {
   /// **'Enable OBD2 trip recording first'**
   String get featureBlockedEnable_showConsumptionTab;
 
-  /// Settings toggle label for the on-device TFLite price-prediction model (#1543).
+  /// Settings toggle label for the on-device price-prediction guidance (#1543).
   ///
   /// In en, this message translates to:
-  /// **'TFLite price prediction'**
+  /// **'Best time to fill up'**
   String get featureLabel_tflitePricePrediction;
 
-  /// Settings toggle description for the on-device TFLite price-prediction model (#1543). Emphasises that no data leaves the device.
+  /// Settings toggle description for the on-device price-prediction guidance (#1543). Emphasises that the heuristic runs locally and no data leaves the device.
   ///
   /// In en, this message translates to:
-  /// **'On-device price forecast model — inference runs locally; features and predictions never leave the device.'**
+  /// **'On-device guidance on when to fill up, computed from your local price history — nothing leaves the device.'**
   String get featureDescription_tflitePricePrediction;
 
   /// Tooltip shown on the disabled TFLite-prediction toggle when its prerequisite (priceHistory) is off.
@@ -8069,6 +8069,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Personal Access Token'**
   String get feedbackTokenFieldLabel;
+
+  /// Title of the on-device 'best time to fill up' guidance card on the price-history screen (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Best time to fill up'**
+  String get fillUpGuidanceTitle;
+
+  /// Guidance shown when the current price sits in the cheapest band of the trailing window (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'The current price is among the cheapest of the last {days} days — a good time to fill up.'**
+  String fillUpGuidanceGoodTimeNow(int days);
+
+  /// Guidance shown when the current price is high but a reliably cheaper day/time window exists (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.'**
+  String fillUpGuidanceWaitCheaper(int days, String window);
+
+  /// Guidance shown when the short-term price trend is clearly rising (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices are trending up — consider filling up soon.'**
+  String get fillUpGuidanceFillSoon;
+
+  /// Neutral guidance shown when no strong cheap/dear/trend signal is present (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s price is around the {days}-day average.'**
+  String fillUpGuidanceNeutral(int days);
+
+  /// Optional line appended when a meaningful per-litre saving between cheap and dear windows is detected (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Could save about {amount}/L by timing your fill-up.'**
+  String fillUpGuidanceSaving(String amount);
+
+  /// Confidence footnote showing how many local price readings the guidance is based on (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}'**
+  String fillUpGuidanceSampleNote(int count);
+
+  /// Composed cheap-window phrase combining a weekday and a time-of-day part, e.g. 'Tuesday mornings' (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'{day} {part}'**
+  String fillUpGuidanceWindowDayAndPart(String day, String part);
+
+  /// Cheap-window phrase when only a weekday signal is available, e.g. 'on Tuesdays' (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'on {day}'**
+  String fillUpGuidanceWindowDayOnly(String day);
+
+  /// Cheap-window phrase when only a time-of-day signal is available, e.g. 'in the mornings' (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'in the {part}'**
+  String fillUpGuidanceWindowPartOnly(String part);
+
+  /// Fallback cheap-window phrase when neither a weekday nor a time-of-day signal cleared the sample-size guard (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'at other times'**
+  String get fillUpGuidanceWindowGeneric;
+
+  /// Plural weekday name used inside the cheap-window phrase (Monday) (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Mondays'**
+  String get fillUpGuidanceWeekday1;
+
+  /// Plural weekday name used inside the cheap-window phrase (Tuesday) (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesdays'**
+  String get fillUpGuidanceWeekday2;
+
+  /// Plural weekday name used inside the cheap-window phrase (Wednesday) (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesdays'**
+  String get fillUpGuidanceWeekday3;
+
+  /// Plural weekday name used inside the cheap-window phrase (Thursday) (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Thursdays'**
+  String get fillUpGuidanceWeekday4;
+
+  /// Plural weekday name used inside the cheap-window phrase (Friday) (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Fridays'**
+  String get fillUpGuidanceWeekday5;
+
+  /// Plural weekday name used inside the cheap-window phrase (Saturday) (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Saturdays'**
+  String get fillUpGuidanceWeekday6;
+
+  /// Plural weekday name used inside the cheap-window phrase (Sunday) (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'Sundays'**
+  String get fillUpGuidanceWeekday7;
+
+  /// Time-of-day part name (06:00-08:59) used inside the cheap-window phrase (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'early mornings'**
+  String get fillUpGuidancePartEarlyMorning;
+
+  /// Time-of-day part name (09:00-11:59) used inside the cheap-window phrase (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'mornings'**
+  String get fillUpGuidancePartMorning;
+
+  /// Time-of-day part name (12:00-17:59) used inside the cheap-window phrase (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'afternoons'**
+  String get fillUpGuidancePartAfternoon;
+
+  /// Time-of-day part name (18:00-23:59) used inside the cheap-window phrase (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'evenings'**
+  String get fillUpGuidancePartEvening;
+
+  /// Time-of-day part name (00:00-05:59) used inside the cheap-window phrase (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'nights'**
+  String get fillUpGuidancePartNight;
 
   /// Chip label rendered on a fill-up card when both fuelLevelBeforeL and fuelLevelAfterL were captured by the OBD2 adapter, signalling the pumped litres match the car's own tank-level sensor delta (#1401 phase 7b).
   ///
