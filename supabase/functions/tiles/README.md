@@ -7,7 +7,7 @@
 
 Epic #2394 Layer 2 (#2397). Proxies `https://tile.openstreetmap.org` with a
 stable, policy-compliant identity and a 7-day cache so the app no longer
-fetches OSM tiles directly. See `docs/decisions/0012-map-tile-proxy.md` for the
+fetches OSM tiles directly. See `docs/decisions/0013-map-tile-proxy.md` for the
 full decision.
 
 ## What it does
