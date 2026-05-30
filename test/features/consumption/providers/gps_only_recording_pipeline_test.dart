@@ -105,6 +105,20 @@ void main() {
       // Clamped to the same plausibility band the post-trip estimator uses.
       expect(estimate, greaterThanOrEqualTo(GpsFuelEstimator.minLPer100Km));
       expect(estimate, lessThanOrEqualTo(GpsFuelEstimator.maxLPer100Km));
+
+      // #2391 — the recording-screen Avg + Fuel-used cards read the
+      // smoother running figures off the same estimator state: a
+      // running-average L/100 km (clamped) and a positive litres-so-far
+      // integral. Both must be present once the trip is moving.
+      final live = harness.host.state.live!;
+      expect(live.gpsEstimatedAvgLPer100Km, isNotNull,
+          reason: 'a moving GPS-only trip must surface a running average');
+      expect(live.gpsEstimatedAvgLPer100Km,
+          greaterThanOrEqualTo(GpsFuelEstimator.minLPer100Km));
+      expect(live.gpsEstimatedAvgLPer100Km,
+          lessThanOrEqualTo(GpsFuelEstimator.maxLPer100Km));
+      expect(live.gpsEstimatedFuelLitersSoFar, isNotNull);
+      expect(live.gpsEstimatedFuelLitersSoFar, greaterThan(0));
     });
 
     test('a stationary fix carries a null GPS estimate (no per-distance '

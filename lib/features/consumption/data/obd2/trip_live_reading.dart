@@ -59,10 +59,29 @@ class TripLiveReading {
   ///
   /// On OBD2 trips this stays null — the real measured fuel-rate /
   /// [fuelLitersSoFar] is the source of truth and is never overwritten by
-  /// the estimate. The PiP / banner display of this figure (with a
-  /// leading "~" and a confidence signal) is deferred to #2390 / #2391;
-  /// this field is purely the data source those issues will read.
+  /// the estimate. The PiP / banner render this instantaneous figure
+  /// (with a leading "~" and a confidence signal) per #2390; the
+  /// recording-screen Avg card (#2391) uses the *running-average*
+  /// companion [gpsEstimatedAvgLPer100Km] instead.
   final double? gpsEstimatedLPer100Km;
+
+  /// Live GPS-estimated **running-average** L/100 km (#2391 / Epic
+  /// #2385) — litres-so-far ÷ distance-so-far, as produced by the
+  /// physics estimator's `runningAvgLPer100Km`. Smoother than the
+  /// per-tick [gpsEstimatedLPer100Km]; this is what the recording
+  /// screen's Avg card renders (with a leading "~" + the calibration-
+  /// maturity badge). Null on OBD2 trips (the measured
+  /// [liveAvgLPer100Km] wins) and before the vehicle has covered
+  /// distance.
+  final double? gpsEstimatedAvgLPer100Km;
+
+  /// Live GPS-estimated litres burned so far (#2391) — the estimator's
+  /// running `litersSoFar` integral. Fills the recording screen's
+  /// Fuel-used card for GPS-only trips, which would otherwise show `—`
+  /// the whole drive (there is no measured [fuelLitersSoFar]). Rendered
+  /// with a leading "~". Null on OBD2 trips + before the first moving
+  /// sample.
+  final double? gpsEstimatedFuelLitersSoFar;
 
   const TripLiveReading({
     this.speedKmh,
@@ -79,6 +98,8 @@ class TripLiveReading {
     this.odometerStartKm,
     this.odometerNowKm,
     this.gpsEstimatedLPer100Km,
+    this.gpsEstimatedAvgLPer100Km,
+    this.gpsEstimatedFuelLitersSoFar,
   });
 
   /// Live L/100 km estimate — uses trip-so-far totals, so early

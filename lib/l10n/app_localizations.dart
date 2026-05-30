@@ -8700,6 +8700,12 @@ abstract class AppLocalizations {
   /// **'GPS matrix has converged ({count} fill-ups). Estimates are within ~2 % of real-world burn.'**
   String gpsMatrixMaturityConvergedTooltip(int count);
 
+  /// Info tooltip on the recording-screen Average-consumption card (#2391) explaining that the leading '~' marks a GPS-modelled estimate (not a measured fuel-sensor reading) and that accuracy improves with calibration maturity.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.'**
+  String get tripAvgGpsEstimateTooltip;
+
   /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
   ///
   /// In en, this message translates to:

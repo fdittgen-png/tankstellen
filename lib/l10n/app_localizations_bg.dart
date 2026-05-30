@@ -4916,6 +4916,10 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get tripAvgGpsEstimateTooltip =>
+      'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Шофиране';
 
   @override

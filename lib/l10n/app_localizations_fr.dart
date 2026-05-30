@@ -4923,6 +4923,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get tripAvgGpsEstimateTooltip =>
+      'Estimation GPS (~) — aucun capteur de carburant sur ce trajet. La valeur est modélisée à partir de la vitesse et de l\'étalonnage de votre véhicule ; la précision s\'améliore à mesure que la matrice mûrit.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Conduite';
 
   @override

@@ -2191,6 +2191,10 @@
       }
     }
   },
+  "tripAvgGpsEstimateTooltip": "GPS-Schätzung (~) — auf dieser Fahrt kein Kraftstoffsensor. Der Wert wird aus Geschwindigkeit und der Kalibrierung deines Fahrzeugs modelliert; die Genauigkeit steigt mit zunehmender Reife der Matrix.",
+  "@tripAvgGpsEstimateTooltip": {
+    "description": "Info tooltip on the recording-screen Average-consumption card (#2391) explaining that the leading '~' marks a GPS-modelled estimate (not a measured fuel-sensor reading) and that accuracy improves with calibration maturity."
+  },
   "hapticEcoCoachSectionTitle": "Fahrweise",
   "hapticEcoCoachSettingTitle": "Echtzeit-Eco-Coaching",
   "hapticEcoCoachSettingSubtitle": "Sanftes Vibrieren + Hinweis am Bildschirm, wenn du beim Cruisen aufs Pedal trittst",
