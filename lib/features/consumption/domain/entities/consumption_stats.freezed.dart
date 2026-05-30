@@ -14,11 +14,19 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ConsumptionStats implements DiagnosticableTreeMixin {
 
- int get fillUpCount; double get totalLiters; double get totalSpent; double get totalDistanceKm; double get totalCo2Kg; double? get avgConsumptionL100km; double? get avgCostPerKm; double? get avgPricePerLiter; double? get avgCo2PerKm; DateTime? get periodStart; DateTime? get periodEnd;/// Sum of `liters` from `isCorrection: true` fill-ups inside CLOSED
+ int get fillUpCount;/// Σ real PUMPED litres — fills where NOT [FillUp.isCorrection]
+/// (#2446 / Epic #2439 decision #4). The headline "Total L" the
+/// user sees: correction entries are excluded so it stays honest
+/// about what actually came out of the pump, and are surfaced
+/// separately via [correctionLitersTotal].
+ double get totalLiters; double get totalSpent; double get totalDistanceKm; double get totalCo2Kg; double? get avgConsumptionL100km; double? get avgCostPerKm; double? get avgPricePerLiter; double? get avgCo2PerKm; DateTime? get periodStart; DateTime? get periodEnd;/// Sum of `liters` from `isCorrection: true` fill-ups inside CLOSED
 /// plein-to-plein windows (#1362). Always 0 when no corrections
 /// landed in a closed window.
- double get correctionLitersTotal;/// Fraction of [totalLiters] that came from auto-corrections inside
-/// closed windows (#1362). Range 0..1; 0 when [totalLiters] is 0.
+ double get correctionLitersTotal;/// Fraction of pumped-plus-correction litres that came from
+/// corrections inside closed windows (#1362). Denominator is
+/// `totalLiters + correctionLitersTotal` (NOT the correction-
+/// excluded [totalLiters] headline — #2446), so the hint keeps its
+/// original meaning. Range 0..1; 0 when there are no litres at all.
 /// The UI surfaces a hint when this exceeds 5 %.
  double get correctionShare;/// Number of fills inside the in-progress window — i.e. after the
 /// most recent plein-complet (#1362). 0 when the latest fill is
@@ -241,6 +249,11 @@ class _ConsumptionStats extends ConsumptionStats with DiagnosticableTreeMixin {
   
 
 @override final  int fillUpCount;
+/// Σ real PUMPED litres — fills where NOT [FillUp.isCorrection]
+/// (#2446 / Epic #2439 decision #4). The headline "Total L" the
+/// user sees: correction entries are excluded so it stays honest
+/// about what actually came out of the pump, and are surfaced
+/// separately via [correctionLitersTotal].
 @override final  double totalLiters;
 @override final  double totalSpent;
 @override final  double totalDistanceKm;
@@ -255,8 +268,11 @@ class _ConsumptionStats extends ConsumptionStats with DiagnosticableTreeMixin {
 /// plein-to-plein windows (#1362). Always 0 when no corrections
 /// landed in a closed window.
 @override@JsonKey() final  double correctionLitersTotal;
-/// Fraction of [totalLiters] that came from auto-corrections inside
-/// closed windows (#1362). Range 0..1; 0 when [totalLiters] is 0.
+/// Fraction of pumped-plus-correction litres that came from
+/// corrections inside closed windows (#1362). Denominator is
+/// `totalLiters + correctionLitersTotal` (NOT the correction-
+/// excluded [totalLiters] headline — #2446), so the hint keeps its
+/// original meaning. Range 0..1; 0 when there are no litres at all.
 /// The UI surfaces a hint when this exceeds 5 %.
 @override@JsonKey() final  double correctionShare;
 /// Number of fills inside the in-progress window — i.e. after the

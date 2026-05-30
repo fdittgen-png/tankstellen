@@ -30,6 +30,12 @@ abstract class ConsumptionStats with _$ConsumptionStats {
 
   const factory ConsumptionStats({
     required int fillUpCount,
+
+    /// Σ real PUMPED litres — fills where NOT [FillUp.isCorrection]
+    /// (#2446 / Epic #2439 decision #4). The headline "Total L" the
+    /// user sees: correction entries are excluded so it stays honest
+    /// about what actually came out of the pump, and are surfaced
+    /// separately via [correctionLitersTotal].
     required double totalLiters,
     required double totalSpent,
     required double totalDistanceKm,
@@ -46,8 +52,11 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     /// landed in a closed window.
     @Default(0) double correctionLitersTotal,
 
-    /// Fraction of [totalLiters] that came from auto-corrections inside
-    /// closed windows (#1362). Range 0..1; 0 when [totalLiters] is 0.
+    /// Fraction of pumped-plus-correction litres that came from
+    /// corrections inside closed windows (#1362). Denominator is
+    /// `totalLiters + correctionLitersTotal` (NOT the correction-
+    /// excluded [totalLiters] headline — #2446), so the hint keeps its
+    /// original meaning. Range 0..1; 0 when there are no litres at all.
     /// The UI surfaces a hint when this exceeds 5 %.
     @Default(0) double correctionShare,
 
@@ -92,9 +101,24 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     // pass data in any order.
     final sorted = [...fillUps]..sort((a, b) => a.date.compareTo(b.date));
 
-    final totalLiters = sorted.fold<double>(0, (sum, f) => sum + f.liters);
-    final totalSpent = sorted.fold<double>(0, (sum, f) => sum + f.totalCost);
-    final totalCo2 = Co2Calculator.cumulativeCo2(sorted);
+    // #2446 — Total L honesty (Epic #2439 decision #4). The headline
+    // "Total L" reflects only what the user actually PUMPED, so
+    // correction entries are excluded from it; they are surfaced
+    // transparently on their own line via [correctionLitersTotal]
+    // rather than silently folded into the headline. Corrections
+    // always carry totalCost 0, so [totalSpent] is unaffected either
+    // way — the explicit filter just keeps the intent legible.
+    final totalLiters = sorted.fold<double>(
+      0,
+      (sum, f) => f.isCorrection ? sum : sum + f.liters,
+    );
+    final totalSpent = sorted.fold<double>(
+      0,
+      (sum, f) => f.isCorrection ? sum : sum + f.totalCost,
+    );
+    final totalCo2 = Co2Calculator.cumulativeCo2(
+      sorted.where((f) => !f.isCorrection).toList(growable: false),
+    );
 
     final firstOdo = sorted.first.odometerKm;
     final lastOdo = sorted.last.odometerKm;
@@ -175,8 +199,13 @@ abstract class ConsumptionStats with _$ConsumptionStats {
 
     final avgPriceLiter = totalLiters > 0 ? totalSpent / totalLiters : null;
 
-    final correctionShare = totalLiters > 0
-        ? (closedCorrectionLiters / totalLiters).clamp(0, 1).toDouble()
+    // #2446 — share denominator is pumped + corrections (NOT the
+    // correction-excluded headline [totalLiters]), so the "% of fuel
+    // from corrections" hint keeps its original meaning now that
+    // [totalLiters] no longer carries correction litres.
+    final litersInclCorrections = totalLiters + closedCorrectionLiters;
+    final correctionShare = litersInclCorrections > 0
+        ? (closedCorrectionLiters / litersInclCorrections).clamp(0, 1).toDouble()
         : 0.0;
 
     debugPrint(

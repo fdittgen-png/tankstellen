@@ -69,8 +69,15 @@ void main() {
     // explanatory rationale, not behaviour. Decomposition of this god-class
     // is tracked under #2187/#2188/#2190.
     'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1241,
+    // #2442 — re-grandfathered 496 → 513: the save flow now raises the
+    // guided reconciliation workflow after a plein save (a 7-line
+    // await-then-route call into the extracted
+    // `runReconciliationWorkflowIfPending` launcher + its rationale
+    // comment). The workflow + apply logic itself lives in the extracted
+    // launcher/widget; only the trigger call stays on the screen.
+    // Decomposition of this god-class is tracked under #2187/#2188/#2190.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        496,
+        513,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
@@ -96,7 +103,14 @@ void main() {
     // they mutate its state. The PendingReconciliation value object and
     // the PendingReconciliations notifier were already extracted to
     // their own files; only the seam wiring remains here.
-    'lib/features/consumption/providers/consumption_providers.dart': 911,
+    // #2442/#2444 — re-grandfathered 911 → 964: the silent save is gone
+    // (the seam now only publishes the gap), and the two CONSENTED apply
+    // paths landed here — `applyReconciliation` (Path A, consented
+    // correction) and `applyVirtualTrajet` (Path B, virtual trajet).
+    // Both must stay on `FillUpList` / its trip-history sibling because
+    // they mutate provider state; the workflow UI + launcher are
+    // extracted. Decomposition tracked under #2187/#2188/#2190.
+    'lib/features/consumption/providers/consumption_providers.dart': 964,
     // #2392 — re-grandfathered 1125 → 1162: wired the OBD2-ground-truth
     // physicsScale calibration into `_saveToHistory` (one fire-and-forget
     // call + the `_calibratePhysicsScale` resolve/persist helper; the EWMA

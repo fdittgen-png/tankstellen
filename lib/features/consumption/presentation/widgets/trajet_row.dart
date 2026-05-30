@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
@@ -38,6 +39,13 @@ class TrajetRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = entry.summary;
+    // #2444 — synthetic reconciliation trajets render DISTINCTLY (a
+    // warning-coloured row, like the orange correction fill-up) so the
+    // user always knows which trips are real vs. injected stand-ins for
+    // unrecorded driving. Tapping opens the virtual-trip edit sheet.
+    if (s.isVirtual) {
+      return _VirtualTrajetRow(entry: entry, l: l, theme: theme, onTap: onTap);
+    }
     final startedAt = s.startedAt;
     final durationSec = startedAt != null && s.endedAt != null
         ? s.endedAt!.difference(startedAt).inSeconds
@@ -160,6 +168,74 @@ class TrajetRow extends StatelessWidget {
     final h = d.hour.toString().padLeft(2, '0');
     final min = d.minute.toString().padLeft(2, '0');
     return '$y-$m-$day $h:$min';
+  }
+}
+
+/// Distinct row for a synthetic reconciliation trajet (#2444). Mirrors
+/// the orange correction-fill-up row: a warning-coloured slim card with
+/// an "auto-fix" icon, the missing distance + fuel, and a tap target
+/// that opens the virtual-trip edit sheet.
+class _VirtualTrajetRow extends StatelessWidget {
+  final TripHistoryEntry entry;
+  final AppLocalizations? l;
+  final ThemeData theme;
+  final VoidCallback onTap;
+
+  const _VirtualTrajetRow({
+    required this.entry,
+    required this.l,
+    required this.theme,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final s = entry.summary;
+    final color = DarkModeColors.warning(context);
+    final fuel = s.fuelLitersConsumed;
+    final detail = StringBuffer('${s.distanceKm.toStringAsFixed(1)} km');
+    if (fuel != null) detail.write(' · ${fuel.toStringAsFixed(1)} L');
+
+    return Card(
+      key: ValueKey('virtual-trajet-${entry.id}'),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: color, width: 2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              Icon(Icons.auto_fix_high, size: 18, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l?.reconcileVirtualTrajetLabel ?? 'Virtual trip — tap to edit',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                detail.toString(),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

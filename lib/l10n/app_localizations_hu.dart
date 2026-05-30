@@ -3950,6 +3950,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String statCorrectionLiters(String liters) {
+    return 'Corrections: +$liters L';
+  }
+
+  @override
   String get fillUpCorrectionLabel =>
       'Automatikus korrekció — szerkesztéshez érintsen';
 
@@ -5466,6 +5471,88 @@ class AppLocalizationsHu extends AppLocalizations {
   String radiusAlertNotificationBody(String price, String threshold) {
     return 'Egy állomáson $price € az ár (cél: $threshold €)';
   }
+
+  @override
+  String get reconcileWorkflowTitle => 'Reconcile your fuel';
+
+  @override
+  String reconcileWorkflowExplainHeadline(String gap) {
+    return 'We found a $gap L gap';
+  }
+
+  @override
+  String reconcileWorkflowExplainBody(
+    String pumped,
+    String consumed,
+    String gap,
+  ) {
+    return 'You pumped $pumped L, but your recorded trips only account for $consumed L. That leaves $gap L unexplained.';
+  }
+
+  @override
+  String get reconcileWorkflowExplainCauses =>
+      'This usually means a drive wasn\'t recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.';
+
+  @override
+  String get reconcileWorkflowExplainConsequence =>
+      'Until this is resolved, your fuel total and your trips total won\'t match.';
+
+  @override
+  String get reconcileWorkflowAttributeQuestion => 'Help us attribute the gap';
+
+  @override
+  String get reconcileWorkflowFillUpsCompleteQuestion =>
+      'Are all your fill-ups for this tank complete and correct?';
+
+  @override
+  String get reconcileWorkflowDrivesRecordedQuestion =>
+      'Are all your drives recorded?';
+
+  @override
+  String get reconcileWorkflowAnswerYes => 'Yes';
+
+  @override
+  String get reconcileWorkflowAnswerNo => 'No';
+
+  @override
+  String get reconcileWorkflowPathAHint =>
+      'A fill-up is missing or wrong — we\'ll add a correction so your fill-ups add up.';
+
+  @override
+  String get reconcileWorkflowPathBHint =>
+      'Your fill-ups are right and a drive went unrecorded — we\'ll add a virtual trip for the missing distance.';
+
+  @override
+  String get reconcileWorkflowCorrectionLitersLabel => 'Correction litres';
+
+  @override
+  String get reconcileWorkflowVirtualDistanceLabel =>
+      'How far was the unrecorded drive? (km)';
+
+  @override
+  String get reconcileWorkflowDecideLater => 'Decide later';
+
+  @override
+  String get reconcileWorkflowBack => 'Back';
+
+  @override
+  String get reconcileWorkflowNext => 'Next';
+
+  @override
+  String get reconcileWorkflowApply => 'Apply';
+
+  @override
+  String get reconcileVirtualTrajetLabel => 'Virtual trip — tap to edit';
+
+  @override
+  String get reconcileVirtualTrajetEditTitle => 'Edit virtual trip';
+
+  @override
+  String get reconcileVirtualTrajetEditExplainer =>
+      'This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.';
+
+  @override
+  String get reconcileVirtualTrajetDelete => 'Delete virtual trip';
 
   @override
   String get refuelUnitPerLiter => '/L';

@@ -409,6 +409,49 @@ void main() {
         expect(stats.avgConsumptionL100km, 4.5);
         expect(stats.correctionLitersTotal, 5);
         expect(stats.correctionShare, closeTo(5 / 95, 0.0001));
+        // #2446 — Total L is REAL pumped litres only (50 + 40 = 90),
+        // the correction (5 L) is NOT folded into the headline.
+        expect(stats.totalLiters, 90);
+      },
+    );
+
+    test(
+      '#2446 — Total L excludes corrections; corrections surfaced separately',
+      () {
+        // pumped: 30 (opening) + 12 (closing) = 42; one 7 L correction.
+        final stats = ConsumptionStats.fromFillUps([
+          _f(
+            id: '1',
+            date: DateTime(2026, 2, 1),
+            liters: 30,
+            cost: 45,
+            odo: 20000,
+          ),
+          _f(
+            id: 'c',
+            date: DateTime(2026, 2, 5),
+            liters: 7,
+            cost: 0,
+            odo: 20300,
+            isFullTank: false,
+            isCorrection: true,
+          ),
+          _f(
+            id: '2',
+            date: DateTime(2026, 2, 10),
+            liters: 12,
+            cost: 18,
+            odo: 20600,
+          ),
+        ]);
+        // Headline Total L = real pumped only (30 + 12), NOT 49.
+        expect(stats.totalLiters, 42);
+        // Total spent likewise ignores the (cost-0) correction.
+        expect(stats.totalSpent, 63);
+        // The correction litres remain visible on their own line.
+        expect(stats.correctionLitersTotal, 7);
+        // Share denominator is pumped + corrections (42 + 7 = 49).
+        expect(stats.correctionShare, closeTo(7 / 49, 0.0001));
       },
     );
 

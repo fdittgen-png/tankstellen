@@ -17,16 +17,15 @@ import 'package:tankstellen/features/consumption/providers/pending_reconciliatio
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import '../../../helpers/silence_error_logger.dart';
 
-/// Detect-vs-apply seam coverage (Epic #2439 / #2441).
+/// Detect-vs-publish seam coverage (Epic #2439 / #2442).
 ///
-/// Verifies the split introduced for the guided reconciliation
-/// workflow:
-///   - on a created action the [PendingReconciliations] provider
-///     surfaces the gap + the proposed correction (the read-side hook
-///     #2442 will consume), AND
-///   - the apply seam STILL performs the silent save today — the
-///     correction round-trips into the fill-up log exactly as before
-///     (behaviour-neutral; the behaviour flip is PR3/#2442), AND
+/// Verifies the NEVER-SILENT flip: when a gap is detected the seam now
+///   - surfaces the gap + the proposed correction via the
+///     [PendingReconciliations] provider (the read-side hook the guided
+///     workflow consumes), AND
+///   - creates NOTHING by itself — the silent save is GONE. No
+///     correction fill-up and no virtual trajet exist until the user
+///     completes the workflow (the silent-save regression guard), AND
 ///   - non-created outcomes (skipped-below-threshold, clamped-negative,
 ///     no-trips) surface NO pending gap.
 ///
@@ -108,7 +107,7 @@ void main() {
 
   test(
       'created action → PendingReconciliations exposes the gap + correction '
-      'AND the silent save still happens (behaviour-neutral)', () async {
+      'AND NOTHING is created (silent-save regression guard)', () async {
     final container = makeContainer();
 
     // Integrator only saw 5 L across 100 km; the closing plein pumps
@@ -156,13 +155,20 @@ void main() {
       pending.correction.odometerKm,
     );
 
-    // Behaviour-neutral: the apply seam STILL saved the correction.
+    // NEVER SILENT (#2442): the seam created NOTHING. No correction
+    // fill-up exists until the user completes the workflow.
     final stored = container.read(fillUpListProvider);
-    final corrections = stored.where((f) => f.isCorrection).toList();
-    expect(corrections, hasLength(1),
-        reason: 'the silent save still persists exactly one correction');
-    expect(corrections.single.liters, closeTo(7, 1e-9));
-    expect(corrections.single.id, 'correction_closing');
+    expect(
+      stored.where((f) => f.isCorrection),
+      isEmpty,
+      reason: 'no correction is created without the guided workflow',
+    );
+    // And no virtual trajet was injected either.
+    expect(
+      historyRepo.loadAll().where((e) => e.summary.isVirtual),
+      isEmpty,
+      reason: 'no virtual trajet is created without the guided workflow',
+    );
   });
 
   test('skippedBelowThreshold (pumped ≈ consumed) surfaces NO pending gap',

@@ -3903,6 +3903,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String statCorrectionLiters(String liters) {
+    return 'Corrections: +$liters L';
+  }
+
+  @override
   String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
 
   @override
@@ -5395,6 +5400,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String radiusAlertNotificationBody(String price, String threshold) {
     return 'A station is at $price € (target: $threshold €)';
   }
+
+  @override
+  String get reconcileWorkflowTitle => 'Reconcile your fuel';
+
+  @override
+  String reconcileWorkflowExplainHeadline(String gap) {
+    return 'We found a $gap L gap';
+  }
+
+  @override
+  String reconcileWorkflowExplainBody(
+    String pumped,
+    String consumed,
+    String gap,
+  ) {
+    return 'You pumped $pumped L, but your recorded trips only account for $consumed L. That leaves $gap L unexplained.';
+  }
+
+  @override
+  String get reconcileWorkflowExplainCauses =>
+      'This usually means a drive wasn\'t recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.';
+
+  @override
+  String get reconcileWorkflowExplainConsequence =>
+      'Until this is resolved, your fuel total and your trips total won\'t match.';
+
+  @override
+  String get reconcileWorkflowAttributeQuestion => 'Help us attribute the gap';
+
+  @override
+  String get reconcileWorkflowFillUpsCompleteQuestion =>
+      'Are all your fill-ups for this tank complete and correct?';
+
+  @override
+  String get reconcileWorkflowDrivesRecordedQuestion =>
+      'Are all your drives recorded?';
+
+  @override
+  String get reconcileWorkflowAnswerYes => 'Yes';
+
+  @override
+  String get reconcileWorkflowAnswerNo => 'No';
+
+  @override
+  String get reconcileWorkflowPathAHint =>
+      'A fill-up is missing or wrong — we\'ll add a correction so your fill-ups add up.';
+
+  @override
+  String get reconcileWorkflowPathBHint =>
+      'Your fill-ups are right and a drive went unrecorded — we\'ll add a virtual trip for the missing distance.';
+
+  @override
+  String get reconcileWorkflowCorrectionLitersLabel => 'Correction litres';
+
+  @override
+  String get reconcileWorkflowVirtualDistanceLabel =>
+      'How far was the unrecorded drive? (km)';
+
+  @override
+  String get reconcileWorkflowDecideLater => 'Decide later';
+
+  @override
+  String get reconcileWorkflowBack => 'Back';
+
+  @override
+  String get reconcileWorkflowNext => 'Next';
+
+  @override
+  String get reconcileWorkflowApply => 'Apply';
+
+  @override
+  String get reconcileVirtualTrajetLabel => 'Virtual trip — tap to edit';
+
+  @override
+  String get reconcileVirtualTrajetEditTitle => 'Edit virtual trip';
+
+  @override
+  String get reconcileVirtualTrajetEditExplainer =>
+      'This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.';
+
+  @override
+  String get reconcileVirtualTrajetDelete => 'Delete virtual trip';
 
   @override
   String get refuelUnitPerLiter => '/L';
@@ -10079,6 +10166,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
+  String statCorrectionLiters(String liters) {
+    return '⟦Çóřřéçŧîóñš: +$liters Ł ·····⟧';
+  }
+
+  @override
   String get fillUpCorrectionLabel =>
       '⟦Áúŧó-çóřřéçŧîóñ — ŧáƥ ŧó éđîŧ ··········⟧';
 
@@ -11619,6 +11711,91 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String radiusAlertNotificationBody(String price, String threshold) {
     return '⟦Á šŧáŧîóñ îš áŧ $price € (ŧářǧéŧ: $threshold €) ········⟧';
   }
+
+  @override
+  String get reconcileWorkflowTitle => '⟦Řéçóñçîłé ýóúř ƒúéł ········⟧';
+
+  @override
+  String reconcileWorkflowExplainHeadline(String gap) {
+    return '⟦Ŵé ƒóúñđ á $gap Ł ǧáƥ ·····⟧';
+  }
+
+  @override
+  String reconcileWorkflowExplainBody(
+    String pumped,
+    String consumed,
+    String gap,
+  ) {
+    return '⟦Ýóú ƥúɱƥéđ $pumped Ł, ƀúŧ ýóúř řéçóřđéđ ŧřîƥš óñłý áççóúñŧ ƒóř $consumed Ł. Ŧĥáŧ łéáṽéš $gap Ł úñéẋƥłáîñéđ. ······························⟧';
+  }
+
+  @override
+  String get reconcileWorkflowExplainCauses =>
+      '⟦Ŧĥîš úšúáłłý ɱéáñš á đřîṽé ŵášñ\'ŧ řéçóřđéđ (ŧĥé áđáƥŧéř ŵáš úñƥłúǧǧéđ óř ŧĥé áƥƥ ŵáš çłóšéđ), óř á ƒîłł-úƥ îš ɱîššîñǧ óř ɱîšŧýƥéđ. ··············································⟧';
+
+  @override
+  String get reconcileWorkflowExplainConsequence =>
+      '⟦Úñŧîł ŧĥîš îš řéšółṽéđ, ýóúř ƒúéł ŧóŧáł áñđ ýóúř ŧřîƥš ŧóŧáł ŵóñ\'ŧ ɱáŧçĥ. ··························⟧';
+
+  @override
+  String get reconcileWorkflowAttributeQuestion =>
+      '⟦Ĥéłƥ úš áŧŧřîƀúŧé ŧĥé ǧáƥ ·········⟧';
+
+  @override
+  String get reconcileWorkflowFillUpsCompleteQuestion =>
+      '⟦Ářé áłł ýóúř ƒîłł-úƥš ƒóř ŧĥîš ŧáñķ çóɱƥłéŧé áñđ çóřřéçŧ? ·····················⟧';
+
+  @override
+  String get reconcileWorkflowDrivesRecordedQuestion =>
+      '⟦Ářé áłł ýóúř đřîṽéš řéçóřđéđ? ···········⟧';
+
+  @override
+  String get reconcileWorkflowAnswerYes => '⟦Ýéš ·⟧';
+
+  @override
+  String get reconcileWorkflowAnswerNo => '⟦Ñó ·⟧';
+
+  @override
+  String get reconcileWorkflowPathAHint =>
+      '⟦Á ƒîłł-úƥ îš ɱîššîñǧ óř ŵřóñǧ — ŵé\'łł áđđ á çóřřéçŧîóñ šó ýóúř ƒîłł-úƥš áđđ úƥ. ···························⟧';
+
+  @override
+  String get reconcileWorkflowPathBHint =>
+      '⟦Ýóúř ƒîłł-úƥš ářé řîǧĥŧ áñđ á đřîṽé ŵéñŧ úñřéçóřđéđ — ŵé\'łł áđđ á ṽîřŧúáł ŧřîƥ ƒóř ŧĥé ɱîššîñǧ đîšŧáñçé. ·····································⟧';
+
+  @override
+  String get reconcileWorkflowCorrectionLitersLabel =>
+      '⟦Çóřřéçŧîóñ łîŧřéš ·······⟧';
+
+  @override
+  String get reconcileWorkflowVirtualDistanceLabel =>
+      '⟦Ĥóŵ ƒář ŵáš ŧĥé úñřéçóřđéđ đřîṽé? (ķɱ) ·············⟧';
+
+  @override
+  String get reconcileWorkflowDecideLater => '⟦Đéçîđé łáŧéř ·····⟧';
+
+  @override
+  String get reconcileWorkflowBack => '⟦Ɓáçķ ··⟧';
+
+  @override
+  String get reconcileWorkflowNext => '⟦Ñéẋŧ ··⟧';
+
+  @override
+  String get reconcileWorkflowApply => '⟦Áƥƥłý ··⟧';
+
+  @override
+  String get reconcileVirtualTrajetLabel =>
+      '⟦Ṽîřŧúáł ŧřîƥ — ŧáƥ ŧó éđîŧ ·········⟧';
+
+  @override
+  String get reconcileVirtualTrajetEditTitle => '⟦Éđîŧ ṽîřŧúáł ŧřîƥ ·······⟧';
+
+  @override
+  String get reconcileVirtualTrajetEditExplainer =>
+      '⟦Ŧĥîš ŧřîƥ ŵáš áđđéđ ŧó áççóúñŧ ƒóř ƒúéł ýóú úšéđ ŵĥîłé đřîṽîñǧ ŵîŧĥóúŧ řéçóřđîñǧ. Áđĵúšŧ ŧĥé đîšŧáñçé óř ƒúéł, óř đéłéŧé îŧ. ·············································⟧';
+
+  @override
+  String get reconcileVirtualTrajetDelete => '⟦Đéłéŧé ṽîřŧúáł ŧřîƥ ········⟧';
 
   @override
   String get refuelUnitPerLiter => '⟦/Ł⟧';

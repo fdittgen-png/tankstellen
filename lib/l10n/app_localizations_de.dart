@@ -3944,6 +3944,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String statCorrectionLiters(String liters) {
+    return 'Korrekturen: +$liters L';
+  }
+
+  @override
   String get fillUpCorrectionLabel => 'Auto-Korrektur — zum Bearbeiten tippen';
 
   @override
@@ -5452,6 +5457,90 @@ class AppLocalizationsDe extends AppLocalizations {
   String radiusAlertNotificationBody(String price, String threshold) {
     return 'Eine Tankstelle bietet $price € (Grenze: $threshold €)';
   }
+
+  @override
+  String get reconcileWorkflowTitle => 'Kraftstoff abgleichen';
+
+  @override
+  String reconcileWorkflowExplainHeadline(String gap) {
+    return 'Wir haben eine Differenz von $gap L gefunden';
+  }
+
+  @override
+  String reconcileWorkflowExplainBody(
+    String pumped,
+    String consumed,
+    String gap,
+  ) {
+    return 'Du hast $pumped L getankt, aber deine erfassten Fahrten erklären nur $consumed L. Damit bleiben $gap L ungeklärt.';
+  }
+
+  @override
+  String get reconcileWorkflowExplainCauses =>
+      'Das bedeutet meist, dass eine Fahrt nicht erfasst wurde (der Adapter war abgezogen oder die App war geschlossen) oder eine Betankung fehlt bzw. falsch eingetragen ist.';
+
+  @override
+  String get reconcileWorkflowExplainConsequence =>
+      'Solange dies nicht geklärt ist, stimmen deine Kraftstoffsumme und deine Fahrtensumme nicht überein.';
+
+  @override
+  String get reconcileWorkflowAttributeQuestion =>
+      'Hilf uns, die Differenz zuzuordnen';
+
+  @override
+  String get reconcileWorkflowFillUpsCompleteQuestion =>
+      'Sind alle Betankungen für diesen Tank vollständig und korrekt?';
+
+  @override
+  String get reconcileWorkflowDrivesRecordedQuestion =>
+      'Sind alle deine Fahrten erfasst?';
+
+  @override
+  String get reconcileWorkflowAnswerYes => 'Ja';
+
+  @override
+  String get reconcileWorkflowAnswerNo => 'Nein';
+
+  @override
+  String get reconcileWorkflowPathAHint =>
+      'Eine Betankung fehlt oder ist falsch — wir fügen eine Korrektur hinzu, damit deine Betankungen aufgehen.';
+
+  @override
+  String get reconcileWorkflowPathBHint =>
+      'Deine Betankungen stimmen und eine Fahrt wurde nicht erfasst — wir fügen eine virtuelle Fahrt für die fehlende Strecke hinzu.';
+
+  @override
+  String get reconcileWorkflowCorrectionLitersLabel => 'Korrektur-Liter';
+
+  @override
+  String get reconcileWorkflowVirtualDistanceLabel =>
+      'Wie weit war die nicht erfasste Fahrt? (km)';
+
+  @override
+  String get reconcileWorkflowDecideLater => 'Später entscheiden';
+
+  @override
+  String get reconcileWorkflowBack => 'Zurück';
+
+  @override
+  String get reconcileWorkflowNext => 'Weiter';
+
+  @override
+  String get reconcileWorkflowApply => 'Übernehmen';
+
+  @override
+  String get reconcileVirtualTrajetLabel =>
+      'Virtuelle Fahrt — zum Bearbeiten tippen';
+
+  @override
+  String get reconcileVirtualTrajetEditTitle => 'Virtuelle Fahrt bearbeiten';
+
+  @override
+  String get reconcileVirtualTrajetEditExplainer =>
+      'Diese Fahrt wurde hinzugefügt, um Kraftstoff zu erfassen, den du beim Fahren ohne Aufzeichnung verbraucht hast. Passe Strecke oder Kraftstoff an oder lösche sie.';
+
+  @override
+  String get reconcileVirtualTrajetDelete => 'Virtuelle Fahrt löschen';
 
   @override
   String get refuelUnitPerLiter => '/L';

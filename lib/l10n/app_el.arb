@@ -2256,5 +2256,141 @@
   "@trajetDetailChartEstimatedBadge": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "statCorrectionLiters": "Corrections: +{liters} L",
+  "@statCorrectionLiters": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileWorkflowTitle": "Reconcile your fuel",
+  "@reconcileWorkflowTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowExplainHeadline": "We found a {gap} L gap",
+  "@reconcileWorkflowExplainHeadline": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileWorkflowExplainBody": "You pumped {pumped} L, but your recorded trips only account for {consumed} L. That leaves {gap} L unexplained.",
+  "@reconcileWorkflowExplainBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pumped": {
+        "type": "String"
+      },
+      "consumed": {
+        "type": "String"
+      },
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileWorkflowExplainCauses": "This usually means a drive wasn't recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.",
+  "@reconcileWorkflowExplainCauses": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowExplainConsequence": "Until this is resolved, your fuel total and your trips total won't match.",
+  "@reconcileWorkflowExplainConsequence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowAttributeQuestion": "Help us attribute the gap",
+  "@reconcileWorkflowAttributeQuestion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowFillUpsCompleteQuestion": "Are all your fill-ups for this tank complete and correct?",
+  "@reconcileWorkflowFillUpsCompleteQuestion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowDrivesRecordedQuestion": "Are all your drives recorded?",
+  "@reconcileWorkflowDrivesRecordedQuestion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowAnswerYes": "Yes",
+  "@reconcileWorkflowAnswerYes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowAnswerNo": "No",
+  "@reconcileWorkflowAnswerNo": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowPathAHint": "A fill-up is missing or wrong — we'll add a correction so your fill-ups add up.",
+  "@reconcileWorkflowPathAHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowPathBHint": "Your fill-ups are right and a drive went unrecorded — we'll add a virtual trip for the missing distance.",
+  "@reconcileWorkflowPathBHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowCorrectionLitersLabel": "Correction litres",
+  "@reconcileWorkflowCorrectionLitersLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowVirtualDistanceLabel": "How far was the unrecorded drive? (km)",
+  "@reconcileWorkflowVirtualDistanceLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowDecideLater": "Decide later",
+  "@reconcileWorkflowDecideLater": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowBack": "Back",
+  "@reconcileWorkflowBack": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowNext": "Next",
+  "@reconcileWorkflowNext": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileWorkflowApply": "Apply",
+  "@reconcileWorkflowApply": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileVirtualTrajetLabel": "Virtual trip — tap to edit",
+  "@reconcileVirtualTrajetLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileVirtualTrajetEditTitle": "Edit virtual trip",
+  "@reconcileVirtualTrajetEditTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileVirtualTrajetEditExplainer": "This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.",
+  "@reconcileVirtualTrajetEditExplainer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "reconcileVirtualTrajetDelete": "Delete virtual trip",
+  "@reconcileVirtualTrajetDelete": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

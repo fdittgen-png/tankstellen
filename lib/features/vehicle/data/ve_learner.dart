@@ -313,6 +313,11 @@ class VeLearner {
     final all = tripHistoryLoader();
     return all.where((e) {
       if (e.vehicleId != vehicleId) return false;
+      // #2444 — synthetic reconciliation trajets carry no real OBD2
+      // samples (their fuel IS the unaccounted gap), so feeding them
+      // to the η_v learner would rescale efficiency against fabricated
+      // data. Exclude them from the recompute entirely.
+      if (e.summary.isVirtual) return false;
       final started = e.summary.startedAt;
       if (started == null) return false;
       if (from != null && !started.isAfter(from)) return false;

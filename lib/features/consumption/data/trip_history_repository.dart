@@ -201,6 +201,10 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // zero bytes added.
       if (s.harshEvents.isNotEmpty)
         'he': s.harshEvents.map((e) => e.toJson()).toList(growable: false),
+      // #2444: synthetic reconciliation trajet flag. Compact key 'virt'.
+      // Omitted when false (every real trip) so legacy trips round-trip
+      // with zero bytes added.
+      if (s.isVirtual) 'virt': true,
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -244,6 +248,10 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
                   HarshEvent.fromJson((e as Map).cast<String, dynamic>()))
               .toList(growable: false) ??
           const [],
+      // #2444: synthetic reconciliation trajet flag. Missing key →
+      // false so every real trip and every legacy trip deserialises
+      // as a normal, fully-counted trajet.
+      isVirtual: (j['virt'] as bool?) ?? false,
     );
 
 /// Hive-backed list of finalised trips (#726).
