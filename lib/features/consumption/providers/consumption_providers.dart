@@ -465,10 +465,15 @@ class FillUpList extends _$FillUpList {
       if (result == null) return null;
       final correction = result.correction;
       if (correction != null && result.action == ReconciliationAction.created) {
-        // Detect → apply seam (Epic #2439 / #2441): (1) surface the gap
-        // as a PendingReconciliation the workflow (#2442) can read, then
-        // (2) apply it. Behaviour-neutral — [applyReconciliation] still
-        // performs the silent save exactly as before.
+        // Detect → publish seam (Epic #2439 / #2442 — NEVER silent):
+        // surface the gap as a PendingReconciliation for the guided
+        // workflow to pick up. We DO NOT apply anything here anymore —
+        // no correction or virtual trajet is ever created without the
+        // user completing the workflow. The UI (add_fill_up_screen)
+        // reads this pending gap after the plein save and raises the
+        // workflow, which then calls [applyReconciliation] (Path A) or
+        // [applyVirtualTrajet] (Path B), or leaves the gap intact on
+        // "Decide later".
         final pending = PendingReconciliation.fromCorrection(
           correction: correction,
           pumped: result.pumped,
@@ -476,7 +481,6 @@ class FillUpList extends _$FillUpList {
           gap: result.gap,
         );
         ref.read(pendingReconciliationsProvider.notifier).set(pending);
-        await applyReconciliation(pending);
       } else {
         // No correction this window — clear any stale gap so the
         // workflow seam never reads one from a prior window.
@@ -502,20 +506,69 @@ class FillUpList extends _$FillUpList {
     }
   }
 
-  /// Apply step of the detect-vs-apply seam (Epic #2439 / #2441) — the
-  /// single place ALL correction creation flows through. The detector
-  /// ([Reconciler.reconcile]) only DETECTS the gap and hands a
-  /// [PendingReconciliation] here; this method decides what to do.
+  /// Path A of the guided reconciliation workflow (#2443) — persist a
+  /// CONSENTED correction fill-up. Called by the workflow ONLY after
+  /// the user confirmed a fill-up was missing/mistyped and (optionally)
+  /// edited the proposed litres. Never invoked silently — the detector
+  /// merely publishes a [PendingReconciliation]; this is the explicit
+  /// "the user chose to correct the fill-ups" apply.
   ///
-  /// TODO #2442: replace silent save with the guided reconciliation
-  /// workflow — per Epic #2439 a correction must NEVER be created
-  /// without the user's consent. Until that lands this stays
-  /// behaviour-neutral: it persists the proposed correction exactly as
-  /// the pre-seam code did, so nothing the user sees changes on this PR.
-  Future<void> applyReconciliation(PendingReconciliation pending) async {
+  /// [correction] is the (possibly user-edited) synthetic correction
+  /// FillUp — it keeps `isCorrection: true` so it renders distinctly
+  /// and is excluded from the honest Total L (#2446). After saving we
+  /// clear the pending gap: the window now reconciles
+  /// ([reconciliationBasis] residual == 0).
+  Future<void> applyReconciliation(FillUp correction) async {
     final repo = ref.read(fillUpRepositoryProvider);
-    await repo.save(pending.correction);
+    await repo.save(correction);
     state = repo.getAll();
+    ref.read(pendingReconciliationsProvider.notifier).set(null);
+  }
+
+  /// Path B of the guided reconciliation workflow (#2444) — inject a
+  /// CONSENTED virtual trajet. Called by the workflow ONLY after the
+  /// user confirmed their fill-ups are correct and a drive went
+  /// unrecorded (including the "both sides individually correct →
+  /// gap is unrecorded driving" elimination case).
+  ///
+  /// Builds a synthetic [TripHistoryEntry] (`isVirtual: true`,
+  /// `fuelLitersConsumed` = the gap, user-supplied [distanceKm],
+  /// `startedAt` = the window midpoint) and persists it via
+  /// [TripHistoryRepository]. No fill-up is created, so the headline
+  /// Total L stays real pump litres (#2446). The virtual trip counts
+  /// on the TRAJETS side of [reconciliationBasis] (via the
+  /// `isVirtualTrip` predicate), driving the window residual to 0, but
+  /// is excluded from the η_v learner and from the next window's
+  /// recorded `consumed` so a re-run never double-counts the gap.
+  Future<void> applyVirtualTrajet({
+    required PendingReconciliation pending,
+    required double gapLiters,
+    required double distanceKm,
+  }) async {
+    final startedAt = pending.windowMidpointDate;
+    final entry = TripHistoryEntry(
+      id: 'virtual_${pending.correction.id}',
+      vehicleId: pending.vehicleId,
+      summary: TripSummary(
+        distanceKm: distanceKm,
+        maxRpm: 0,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        fuelLitersConsumed: gapLiters,
+        avgLPer100Km:
+            distanceKm > 0 ? gapLiters / distanceKm * 100 : null,
+        startedAt: startedAt,
+        endedAt: startedAt,
+        isVirtual: true,
+      ),
+    );
+    // Persist + refresh via the list notifier so the Trajets list picks
+    // up the synthetic trip immediately. No-op when the trip-history
+    // box isn't open (widget tests without Hive).
+    await ref.read(tripHistoryListProvider.notifier).save(entry);
+    ref.read(pendingReconciliationsProvider.notifier).set(null);
   }
 
   /// Sum the [TripSummary.distanceKm] across every trip in the same

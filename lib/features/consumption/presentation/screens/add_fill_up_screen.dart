@@ -30,6 +30,7 @@ import '../../providers/current_obd2_fuel_level_provider.dart';
 import '../widgets/add_fill_up_form_fields.dart';
 import '../widgets/fill_up_no_vehicle_cta.dart';
 import '../widgets/fill_up_pinned_save_bar.dart';
+import '../widgets/fill_up_reconciliation_launcher.dart';
 import '../widgets/fill_up_scan_handlers.dart';
 import '../widgets/fill_up_variance_prompt.dart';
 import 'pump_display_camera_screen.dart';
@@ -380,6 +381,22 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
 
     await ref.read(fillUpListProvider.notifier).add(fillUp);
     if (!mounted) return;
+
+    // Guided reconciliation workflow (Epic #2439 / #2442) — the plein
+    // save above may have published a pending gap (recorded trips
+    // didn't account for all the pumped fuel). NEVER silent: raise the
+    // guided workflow now, before we pop, so the user attributes +
+    // resolves the gap. "Decide later" / dismiss leaves the pending
+    // gap intact (#2445). Logic lives in the extracted launcher so this
+    // save flow stays lean. Mirrors the await-choice-then-route shape
+    // of the variance prompt above.
+    await runReconciliationWorkflowIfPending(
+      context: context,
+      ref: ref,
+      savedFillUp: fillUp,
+    );
+    if (!mounted) return;
+
     context.pop();
     messenger.showSnackBar(
       SnackBarHelper.successSnackBar(scheme, savedMessage),

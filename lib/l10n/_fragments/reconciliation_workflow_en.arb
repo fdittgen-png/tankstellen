@@ -1,0 +1,106 @@
+{
+  "reconcileWorkflowTitle": "Reconcile your fuel",
+  "@reconcileWorkflowTitle": {
+    "description": "Title of the guided reconciliation workflow dialog raised after a full-tank fill-up when recorded trips don't account for all the pumped fuel (#2442)."
+  },
+  "reconcileWorkflowExplainHeadline": "We found a {gap} L gap",
+  "@reconcileWorkflowExplainHeadline": {
+    "description": "Step 1 headline of the reconciliation workflow, stating the size of the gap between pumped and recorded fuel (#2442).",
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileWorkflowExplainBody": "You pumped {pumped} L, but your recorded trips only account for {consumed} L. That leaves {gap} L unexplained.",
+  "@reconcileWorkflowExplainBody": {
+    "description": "Step 1 body of the reconciliation workflow, comparing pumped litres to recorded-trip litres and stating the difference (#2442). All numbers are pre-formatted by the caller in the active locale.",
+    "placeholders": {
+      "pumped": {
+        "type": "String"
+      },
+      "consumed": {
+        "type": "String"
+      },
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileWorkflowExplainCauses": "This usually means a drive wasn't recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.",
+  "@reconcileWorkflowExplainCauses": {
+    "description": "Step 1 likely-causes copy in the reconciliation workflow (#2442)."
+  },
+  "reconcileWorkflowExplainConsequence": "Until this is resolved, your fuel total and your trips total won't match.",
+  "@reconcileWorkflowExplainConsequence": {
+    "description": "Step 1 consequence copy in the reconciliation workflow, explaining what happens if the gap is left unresolved (#2442)."
+  },
+  "reconcileWorkflowAttributeQuestion": "Help us attribute the gap",
+  "@reconcileWorkflowAttributeQuestion": {
+    "description": "Step 2 headline of the reconciliation workflow, introducing the attribution questions (#2442)."
+  },
+  "reconcileWorkflowFillUpsCompleteQuestion": "Are all your fill-ups for this tank complete and correct?",
+  "@reconcileWorkflowFillUpsCompleteQuestion": {
+    "description": "Step 2 first attribution question in the reconciliation workflow — whether the fill-ups are complete/correct (#2442)."
+  },
+  "reconcileWorkflowDrivesRecordedQuestion": "Are all your drives recorded?",
+  "@reconcileWorkflowDrivesRecordedQuestion": {
+    "description": "Step 2 second attribution question in the reconciliation workflow — whether all drives were recorded (#2442)."
+  },
+  "reconcileWorkflowAnswerYes": "Yes",
+  "@reconcileWorkflowAnswerYes": {
+    "description": "Affirmative answer chip for the reconciliation workflow attribution questions (#2442)."
+  },
+  "reconcileWorkflowAnswerNo": "No",
+  "@reconcileWorkflowAnswerNo": {
+    "description": "Negative answer chip for the reconciliation workflow attribution questions (#2442)."
+  },
+  "reconcileWorkflowPathAHint": "A fill-up is missing or wrong — we'll add a correction so your fill-ups add up.",
+  "@reconcileWorkflowPathAHint": {
+    "description": "Hint shown in the reconciliation workflow when the attribution routes to Path A (correct the fill-ups) (#2442/#2443)."
+  },
+  "reconcileWorkflowPathBHint": "Your fill-ups are right and a drive went unrecorded — we'll add a virtual trip for the missing distance.",
+  "@reconcileWorkflowPathBHint": {
+    "description": "Hint shown in the reconciliation workflow when the attribution routes to Path B (add a virtual trajet) (#2442/#2444)."
+  },
+  "reconcileWorkflowCorrectionLitersLabel": "Correction litres",
+  "@reconcileWorkflowCorrectionLitersLabel": {
+    "description": "Field label for the editable correction litres in the reconciliation workflow Path A (#2443)."
+  },
+  "reconcileWorkflowVirtualDistanceLabel": "How far was the unrecorded drive? (km)",
+  "@reconcileWorkflowVirtualDistanceLabel": {
+    "description": "Field label for the editable unrecorded-drive distance in the reconciliation workflow Path B (#2444)."
+  },
+  "reconcileWorkflowDecideLater": "Decide later",
+  "@reconcileWorkflowDecideLater": {
+    "description": "Button in the reconciliation workflow that defers the decision, creating nothing and keeping the gap (#2442/#2445)."
+  },
+  "reconcileWorkflowBack": "Back",
+  "@reconcileWorkflowBack": {
+    "description": "Button in the reconciliation workflow that returns to the previous step (#2442)."
+  },
+  "reconcileWorkflowNext": "Next",
+  "@reconcileWorkflowNext": {
+    "description": "Button in the reconciliation workflow that advances to the next step (#2442)."
+  },
+  "reconcileWorkflowApply": "Apply",
+  "@reconcileWorkflowApply": {
+    "description": "Button in the reconciliation workflow that applies the chosen resolution (#2442)."
+  },
+  "reconcileVirtualTrajetLabel": "Virtual trip — tap to edit",
+  "@reconcileVirtualTrajetLabel": {
+    "description": "Inline label on a synthetic reconciliation trajet row in the Trajets list, indicating it was added by the reconciliation workflow and that tapping opens the edit sheet (#2444)."
+  },
+  "reconcileVirtualTrajetEditTitle": "Edit virtual trip",
+  "@reconcileVirtualTrajetEditTitle": {
+    "description": "Title of the bottom sheet that opens when the user taps a virtual reconciliation trajet (#2444)."
+  },
+  "reconcileVirtualTrajetEditExplainer": "This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.",
+  "@reconcileVirtualTrajetEditExplainer": {
+    "description": "Explanatory copy at the top of the virtual trajet edit sheet (#2444)."
+  },
+  "reconcileVirtualTrajetDelete": "Delete virtual trip",
+  "@reconcileVirtualTrajetDelete": {
+    "description": "Destructive button on the virtual trajet edit sheet that removes the synthetic trip (#2444)."
+  }
+}
