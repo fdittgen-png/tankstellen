@@ -34,6 +34,59 @@ const double kPetrolDensityGPerL = 740.0;
 /// ~820–845 g/L; 832 is the EN 590 reference point.
 const double kDieselDensityGPerL = 832.0;
 
+/// Stoichiometric AFR for E85 (#2432). ~9.8 kg of air per kg of fuel —
+/// far richer than petrol because ethanol is partially oxygenated and
+/// needs much less air to burn completely. Sources put pure-ethanol
+/// stoich at ~9.0 and the E85 blend (≈85 % ethanol / 15 % petrol) at
+/// 9.7–9.9; 9.8 is the commonly cited blend figure. This low AFR is
+/// the whole point of #2432: the old binary diesel/petrol branch sent
+/// E85 down the petrol path (14.7), which divides the air-mass flow by
+/// a ~50 % larger denominator and under-counts E85 L/h by ~33 %.
+const double kE85Afr = 9.8;
+
+/// E85 density in g/L at ~15 °C (#2432). Ethanol is ~789 g/L and the
+/// petrol fraction is lighter, so the E85 blend lands near 781–785;
+/// 785 is the representative value used here.
+const double kE85DensityGPerL = 785.0;
+
+/// Stoichiometric AFR for LPG / autogas (#2432). A propane/butane mix
+/// burns at ~15.5–15.7 kg air per kg fuel; 15.6 is the common autogas
+/// figure.
+const double kLpgAfr = 15.6;
+
+/// LPG (autogas) liquid density in g/L at ~15 °C (#2432). In the tank
+/// LPG is a pressurised liquid at ~510–570 g/L depending on the
+/// propane/butane ratio; 535 is a representative European autogas
+/// value. The speed-density model emits L/h, and an LPG vehicle's
+/// fuel system meters liquid from the tank, so the liquid density is
+/// the correct denominator here.
+const double kLpgDensityGPerL = 535.0;
+
+/// Stoichiometric AFR for CNG (compressed natural gas, ~methane)
+/// (#2432). ~17.2 kg air per kg fuel — the leanest of the common road
+/// fuels.
+///
+/// NOTE: CNG is gaseous and is metered / sold by mass (kg) or by
+/// standard cubic metre (m³ at a reference pressure), never by litre.
+/// There is no meaningful "litres of CNG per hour" that maps onto a
+/// liquid-density `g/L` denominator the way petrol / diesel / E85 / LPG
+/// do: plugging a liquid-like density into
+/// [estimateFuelRateLPerHourFromMap] would emit a number whose unit
+/// isn't L/h at all. Rather than invent a fake density and silently
+/// mis-scale (the exact failure #2432 fixes for E85),
+/// [resolveAfrDensity] treats CNG as the petrol default (matching the
+/// documented "unknown → petrol, safer to under-count" rule), so the
+/// emitted figure stays a defined petrol-equivalent L/h rather than a
+/// unit-less artefact. [kCngAfr] / [kCngEquivalentDensityGPerL] are
+/// exposed for a future native-units (kg/m³) follow-up. See #2432.
+const double kCngAfr = 17.2;
+
+/// Petrol-equivalent density used for CNG (#2432). CNG has no
+/// meaningful liquid g/L (see [kCngAfr]); we reuse the petrol density
+/// so the L/h figure stays a defined petrol-equivalent rather than a
+/// silently mis-scaled artefact.
+const double kCngEquivalentDensityGPerL = kPetrolDensityGPerL;
+
 /// Fallback engine displacement used by the speed-density fuel-rate
 /// estimator when the active vehicle profile doesn't expose one
 /// (#810, #812). 1000 cc = 1.0 L NA petrol — matches the Peugeot 107
@@ -52,19 +105,78 @@ const double kDefaultVolumetricEfficiency = 0.85;
 /// ideal-gas-law air-mass step of [estimateFuelRateLPerHourFromMap].
 const double _gasConstant = 287.0;
 
-/// `true` when [vehicle]'s preferred fuel type reads like a diesel
-/// variant (#800). Matching is done on the normalised string instead
-/// of a typed enum because `preferredFuelType` is a free-text field
-/// populated from several sources (user onboarding, VIN decoder,
-/// home-widget mirror) — all of which use `"diesel"` /
-/// `"dieselPremium"` as the key. Returns `false` for null, empty, or
-/// any non-diesel value (which is the safe default — petrol AFR /
-/// density produce slightly lower L/h numbers than diesel at the
-/// same MAF, so under-counting is preferable to over-counting).
-bool isDieselProfile(VehicleProfile? vehicle) {
-  final key = vehicle?.preferredFuelType?.trim().toLowerCase();
-  if (key == null || key.isEmpty) return false;
-  return key.contains('diesel');
+/// Single source of truth for the (AFR, density) pair the MAF /
+/// speed-density fuel-rate math divides by (#2432). Both
+/// [Obd2Service.readFuelRateLPerHour] and
+/// [LiveSampleSnapshot.deriveFuelRateLPerHour] call this so the live
+/// integrator and the pull-mode estimator can never disagree on which
+/// fuel a tick is scaled for.
+///
+/// Resolution order:
+///   1. [VehicleProfile.manualAfrOverride] /
+///      [VehicleProfile.manualFuelDensityGPerLOverride] win whenever
+///      set — the user pinned them through the calibration card and
+///      they must beat any inferred value. Either can be set
+///      independently; an unset one falls through to the mapped value.
+///   2. otherwise the free-text [VehicleProfile.preferredFuelType] (or
+///      the optional [fallbackFuelType], used when there is no profile
+///      but a reference-catalog row carries a fuel string) is normalised
+///      and mapped to the matching constants.
+///   3. null / empty / unrecognised → petrol defaults. Petrol is the
+///      safe default the pre-#800 path used: at the same MAF it produces
+///      slightly lower L/h than diesel, so an unknown fuel under-counts
+///      rather than over-counts.
+///
+/// Matching is on the normalised string rather than a typed enum
+/// because `preferredFuelType` is free text populated from several
+/// sources (user onboarding, VIN decoder, home-widget mirror) using a
+/// handful of key spellings. `contains` is used for diesel so the
+/// `"dieselPremium"` variant matches; the other branches match the
+/// known key spellings explicitly.
+///
+/// Before #2432 the callers used a binary diesel-vs-petrol branch, so
+/// E85 / LPG / CNG silently fell into the petrol default and
+/// under-counted (E85 by ~33 %). This lookup fixes that under-count.
+({double afr, double densityGPerL}) resolveAfrDensity(
+  VehicleProfile? vehicle, {
+  String? fallbackFuelType,
+}) {
+  final overrideAfr = vehicle?.manualAfrOverride;
+  final overrideDensity = vehicle?.manualFuelDensityGPerLOverride;
+
+  final key = (vehicle?.preferredFuelType ?? fallbackFuelType)
+      ?.trim()
+      .toLowerCase();
+  final mapped = _afrDensityForFuelKey(key);
+
+  return (
+    afr: overrideAfr ?? mapped.afr,
+    densityGPerL: overrideDensity ?? mapped.densityGPerL,
+  );
+}
+
+/// Maps a normalised free-text fuel key to its (AFR, density) pair
+/// (#2432). Returns the petrol defaults for null / empty / unknown.
+({double afr, double densityGPerL}) _afrDensityForFuelKey(String? key) {
+  if (key == null || key.isEmpty) {
+    return (afr: kPetrolAfr, densityGPerL: kPetrolDensityGPerL);
+  }
+  // Diesel uses `contains` so the `"dieselPremium"` variant matches.
+  if (key.contains('diesel')) {
+    return (afr: kDieselAfr, densityGPerL: kDieselDensityGPerL);
+  }
+  if (key.contains('e85') || key.contains('ethanol')) {
+    return (afr: kE85Afr, densityGPerL: kE85DensityGPerL);
+  }
+  if (key.contains('lpg') || key.contains('autogas')) {
+    return (afr: kLpgAfr, densityGPerL: kLpgDensityGPerL);
+  }
+  // CNG is gaseous (no meaningful liquid g/L) → petrol default, matching
+  // the documented "unknown → petrol, safer to under-count" rule
+  // (obd2_service_maf_fallback_test). [kCngAfr] is exposed for a future
+  // native-units (kg/m³) follow-up — see #2432.
+  // petrol / e10 / e5 / super / gasoline / cng / any unknown value.
+  return (afr: kPetrolAfr, densityGPerL: kPetrolDensityGPerL);
 }
 
 /// Pure-math fuel-trim correction factor (#813). Exposed for unit
