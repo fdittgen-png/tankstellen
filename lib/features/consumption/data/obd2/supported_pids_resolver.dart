@@ -1,13 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 
 import 'elm327_protocol.dart';
 import 'supported_pids_cache.dart';
-import '../../../../core/logging/error_logger.dart';
 
 /// Owns the #811 supported-PID concern, extracted from [Obd2Service]
 /// (#1679): the per-connection set of Mode 01 PIDs the car implements,
@@ -110,8 +107,15 @@ class SupportedPidsResolver {
       if (discovered.isNotEmpty) {
         await cache.put(key, discovered);
       }
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 supported-PID cache prime failed'}));
+    } catch (_) {
+      // #2424 (follow-up to #2379) — prime() is best-effort: a transient
+      // on a flaky/slow ELM327 (TimeoutException, the legacy concurrent-
+      // sendCommand StateError, device-not-connected) is EXPECTED and
+      // recoverable — the method just returns and the session falls back
+      // to blind querying. The graceful degradation IS the signal, so it
+      // must NOT pollute the user error log.
+      debugPrint('OBD2 supported-PID cache prime failed — '
+          'scanning blindly this session');
     }
   }
 
@@ -124,8 +128,13 @@ class SupportedPidsResolver {
       final response = await _send(Elm327Protocol.vinCommand);
       final vin = Elm327Protocol.parseVin(response);
       if (vin != null && vin.isNotEmpty) return vin;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OBD2 VIN read for cache key failed'}));
+    } catch (_) {
+      // #2424 (follow-up to #2379) — the VIN (0902) probe is best-effort:
+      // an engine-off / slow ELM327 times this out routinely, and many
+      // old ECUs / clone adapters never answer it. That's EXPECTED and
+      // recoverable — we fall back to [_vehicleFallbackKey] below, so a
+      // transient here must NOT pollute the user error log.
+      debugPrint('OBD2 VIN read for cache key failed — using fallback key');
     }
     return _vehicleFallbackKey;
   }
@@ -162,8 +171,16 @@ class SupportedPidsResolver {
         // flag. If it's not in the set we just parsed, stop walking.
         final nextRangeFlag = groupBase + 32;
         if (!bitmap.contains(nextRangeFlag)) break;
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'OBD2 discoverSupportedPids failed on $command'}));
+      } catch (_) {
+        // #2424 (follow-up to #2379) — the supported-PID scan is best-
+        // effort: a transient on a flaky/slow ELM327 (TimeoutException,
+        // the legacy concurrent-sendCommand StateError, device-not-
+        // connected) is EXPECTED and recoverable — we break and return
+        // whatever we've gathered (possibly empty → blind query). The
+        // graceful degradation IS the signal, so it must NOT pollute the
+        // user error log.
+        debugPrint('OBD2 discoverSupportedPids failed on $command — '
+            'returning ${supported.length} PIDs gathered so far');
         break;
       }
     }
