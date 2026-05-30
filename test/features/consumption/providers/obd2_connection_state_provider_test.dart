@@ -17,37 +17,6 @@ void main() {
       expect(s.hasVisibleIndicator, isFalse);
     });
 
-    test('markAttempting records adapter + switches state — '
-        'indicator becomes visible even before the connect resolves',
-        () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      container.read(obd2ConnectionStatusProvider.notifier).markAttempting(
-            adapterName: 'vLinker FS',
-            adapterMac: 'A4:C1:38:00:00:01',
-          );
-      final s = container.read(obd2ConnectionStatusProvider);
-      expect(s.state, Obd2ConnectionState.attempting);
-      expect(s.adapterName, 'vLinker FS');
-      expect(s.hasVisibleIndicator, isTrue);
-    });
-
-    test('markUnreachable keeps the adapter label so the popover '
-        'can still name the target', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      final notifier =
-          container.read(obd2ConnectionStatusProvider.notifier);
-      notifier.markAttempting(
-        adapterName: 'vLinker FS',
-        adapterMac: 'AA:BB',
-      );
-      notifier.markUnreachable();
-      final s = container.read(obd2ConnectionStatusProvider);
-      expect(s.state, Obd2ConnectionState.unreachable);
-      expect(s.adapterName, 'vLinker FS');
-    });
-
     test('markIdle clears everything — "forget adapter" flow', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -68,16 +37,15 @@ void main() {
       expect(s.hasVisibleIndicator, isFalse);
     });
 
-    test('attempting → connected preserves the adapter label', () {
+    test('markConnected with name + MAC stamps both fields', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier =
           container.read(obd2ConnectionStatusProvider.notifier);
-      notifier.markAttempting(
+      notifier.markConnected(
         adapterName: 'vLinker FS',
         adapterMac: 'AA:BB',
       );
-      notifier.markConnected();
       final s = container.read(obd2ConnectionStatusProvider);
       expect(s.state, Obd2ConnectionState.connected);
       expect(s.adapterName, 'vLinker FS');
@@ -90,7 +58,7 @@ void main() {
       addTearDown(container.dispose);
       final notifier =
           container.read(obd2ConnectionStatusProvider.notifier);
-      notifier.markAttempting(
+      notifier.markConnected(
         adapterName: 'vLinker FS',
         adapterMac: 'AA:BB',
       );

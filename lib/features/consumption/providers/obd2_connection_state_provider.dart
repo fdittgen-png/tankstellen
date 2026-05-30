@@ -10,20 +10,15 @@ part 'obd2_connection_state_provider.g.dart';
 
 /// Coarse live state of the app-wide OBD2 adapter connection (#784).
 ///
-/// Mirrors the 5 cases the UI must distinguish:
+/// Mirrors the 3 cases the UI must distinguish:
 /// - [idle] — no saved adapter, or Bluetooth off; nothing to show.
-/// - [attempting] — a background reconnect is in flight.
 /// - [connected] — the adapter is paired and reachable; the app is
 ///   either actively recording or ready to.
-/// - [unreachable] — the last attempt failed (adapter off, out of
-///   range, already in use by another app). Retries in backoff.
 /// - [permissionDenied] — Bluetooth permission not granted; user
 ///   action required before any further attempts.
 enum Obd2ConnectionState {
   idle,
-  attempting,
   connected,
-  unreachable,
   permissionDenied,
 }
 
@@ -74,33 +69,12 @@ class Obd2ConnectionSnapshot {
 }
 
 /// App-wide owner of the OBD2 connection status (#784).
-///
-/// Phase-1 scope: state machine + API for callers (boot probe,
-/// manual disconnect, permission changes) to drive it. The actual
-/// boot-time Bluetooth scan + auto-connect isolate is deferred to
-/// the follow-up PR so this lands without coupling to the native
-/// plugin surface.
 @Riverpod(keepAlive: true)
 class Obd2ConnectionStatus extends _$Obd2ConnectionStatus {
   @override
   Obd2ConnectionSnapshot build() => const Obd2ConnectionSnapshot();
 
-  /// Record that a connection attempt is starting for the saved
-  /// [adapterName] / [adapterMac]. Called by the boot probe and by
-  /// manual retry actions. Drops any stale capability from a prior
-  /// connect — the new attempt will re-probe `ATI`.
-  void markAttempting({required String adapterName, required String adapterMac}) {
-    state = state.copyWith(
-      state: Obd2ConnectionState.attempting,
-      adapterName: adapterName,
-      adapterMac: adapterMac,
-      clearCapability: true,
-    );
-  }
-
-  /// Record that the adapter is now connected. Preserves the
-  /// adapter label in case a previous [markAttempting] never fired
-  /// (e.g. on a reconnection from a persisted cache).
+  /// Record that the adapter is now connected.
   ///
   /// [capability] should be the value read from the live
   /// `Obd2Service.capability` getter after init completes (#1401
@@ -117,17 +91,6 @@ class Obd2ConnectionStatus extends _$Obd2ConnectionStatus {
       adapterName: adapterName,
       adapterMac: adapterMac,
       capability: capability,
-    );
-  }
-
-  /// Record that the last attempt failed. The adapter label stays
-  /// so the popover can still name the thing the app is trying to
-  /// reach. Capability is dropped — the failure means we never got
-  /// (or trust) an `ATI` reading.
-  void markUnreachable() {
-    state = state.copyWith(
-      state: Obd2ConnectionState.unreachable,
-      clearCapability: true,
     );
   }
 
