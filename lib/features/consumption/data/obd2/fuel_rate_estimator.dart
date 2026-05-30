@@ -222,21 +222,36 @@ double effectiveAfrForLambda(double stoichAfr, double? lambda) {
   return (afr: kPetrolAfr, densityGPerL: kPetrolDensityGPerL);
 }
 
-/// Pure-math fuel-trim correction factor (#813). Exposed for unit
-/// tests and for callers that already hold the trim values.
+/// Pure-math fuel-trim correction factor (#813, bank-2 #2458). Exposed
+/// for unit tests and for callers that already hold the trim values.
 ///
-/// Formula: `corrected = raw × (1 + (STFT + LTFT) / 100)`. Positive
-/// trims mean the ECU is enriching the mixture — real fuel flow is
-/// higher than what stoichiometric math predicts. Negative trims
-/// mean the opposite. Summing STFT and LTFT is standard practice
-/// (HEM Data's canonical formula); they capture fast and slow
-/// corrections respectively.
+/// Formula: `corrected = raw × (1 + meanTrim / 100)`, where `meanTrim`
+/// is the bank-averaged sum of short- + long-term trims. Positive trims
+/// mean the ECU is enriching the mixture — real fuel flow is higher than
+/// what stoichiometric math predicts. Negative trims mean the opposite.
+/// Summing STFT and LTFT is standard practice (HEM Data's canonical
+/// formula); they capture fast and slow corrections respectively.
+///
+/// #2458 — when the car exposes bank-2 trims ([stftBank2] / [ltftBank2],
+/// PIDs 08 / 09), the two banks' (STFT + LTFT) totals are averaged so a
+/// V / boxer engine running asymmetric correction (e.g. bank 1 +6 %,
+/// bank 2 −2 %) gets the true mean (+2 %) instead of only bank 1. Either
+/// bank-2 trim being null (inline engine, or it hasn't landed yet) falls
+/// back to the bank-1-only total — byte-for-byte the pre-#2458 result.
 double applyFuelTrimCorrection(
   double raw, {
   required double stft,
   required double ltft,
+  double? stftBank2,
+  double? ltftBank2,
 }) {
-  return raw * (1.0 + (stft + ltft) / 100.0);
+  final bank1Total = stft + ltft;
+  if (stftBank2 == null || ltftBank2 == null) {
+    return raw * (1.0 + bank1Total / 100.0);
+  }
+  final bank2Total = stftBank2 + ltftBank2;
+  final meanTotal = (bank1Total + bank2Total) / 2.0;
+  return raw * (1.0 + meanTotal / 100.0);
 }
 
 /// Linearly interpolates an η_v(rpm) curve (#1625) at engine speed

@@ -44,6 +44,47 @@ void main() {
     });
   });
 
+  group('applyFuelTrimCorrection bank 2 — #2458', () {
+    test('null bank-2 trims → bank-1-only (unchanged from pre-#2458)', () {
+      // Both null → exactly the bank-1 result.
+      expect(
+        applyFuelTrimCorrection(10.0,
+            stft: 6.0, ltft: 4.0, stftBank2: null, ltftBank2: null),
+        closeTo(applyFuelTrimCorrection(10.0, stft: 6.0, ltft: 4.0), 0.0001),
+      );
+    });
+
+    test('one bank-2 trim null → falls back to bank-1-only', () {
+      // STFT2 present but LTFT2 null → can\'t form a bank-2 total, so
+      // the correction stays bank-1-only.
+      expect(
+        applyFuelTrimCorrection(10.0,
+            stft: 6.0, ltft: 4.0, stftBank2: 0.0, ltftBank2: null),
+        closeTo(11.0, 0.001),
+      );
+    });
+
+    test('both banks present → bank-averaged total', () {
+      // Bank 1 total +10 % (6+4), bank 2 total -2 % (-1-1) →
+      // mean +4 % → factor 1.04.
+      expect(
+        applyFuelTrimCorrection(10.0,
+            stft: 6.0, ltft: 4.0, stftBank2: -1.0, ltftBank2: -1.0),
+        closeTo(10.4, 0.001),
+      );
+    });
+
+    test('symmetric banks → same as a single bank (mean = bank total)', () {
+      // Both banks +10 % → mean +10 % → factor 1.10, identical to the
+      // bank-1-only +10 % result.
+      expect(
+        applyFuelTrimCorrection(20.0,
+            stft: 6.0, ltft: 4.0, stftBank2: 6.0, ltftBank2: 4.0),
+        closeTo(22.0, 0.001),
+      );
+    });
+  });
+
   group('estimateFuelRateLPerHourFromMap — #800', () {
     test('Peugeot 107 cruise canonical reading: 2500 RPM, 65 kPa, '
         '30 °C → plausible 2.5–6 L/h', () {

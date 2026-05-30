@@ -72,6 +72,32 @@ class LiveSampleSnapshot {
   double? _latestLambda;
   double? _latestBaroKpa;
 
+  // #2458 — bank-2 fuel trims (PIDs 0x08 / 0x09). Fold into the MAF /
+  // speed-density trim correction on dual-bank (V / boxer) engines;
+  // null on inline engines, where the correction stays bank-1-only.
+  double? _latestStftBank2;
+  double? _latestLtftBank2;
+
+  // #2458 — absolute load (PID 0x43, a boosted-engine high-load proxy
+  // that can exceed 100 %) and accelerator-pedal position (PIDs 0x49 /
+  // 0x4A / 0x4B; the snapshot stores the max of whichever channels the
+  // car exposes). Both acquired + persisted here; the driving-style
+  // consumption of pedal is #2460.
+  double? _latestAbsLoadPercent;
+  // Per-channel pedal latches (PIDs 0x49 / 0x4A / 0x4B). The three track
+  // the same physical pedal; `latestPedalPercent` returns the max of the
+  // most-recent non-null channels (the least-damped reading) rather than
+  // a running max across callbacks, which could never decrease.
+  double? _latestPedalD;
+  double? _latestPedalE;
+  double? _latestPedalF;
+
+  // #2459 — optional diagnostic-context thermal signals: engine oil
+  // temperature (PID 0x5C) and ambient air temperature (PID 0x46). Null
+  // on cars that don't expose them.
+  double? _latestOilTempC;
+  double? _latestAmbientTempC;
+
   // #1374 phase 1 — most recent GPS fix, pushed in by the provider
   // when the `Feature.gpsTripPath` flag is enabled. The controller
   // does NOT subscribe to Geolocator itself — that decision lives at
@@ -105,6 +131,31 @@ class LiveSampleSnapshot {
   double? get latestLongitude => _latestLongitude;
   double? get latestAltitudeM => _latestAltitudeM;
   double? get latestOemFuelLevelLitres => _latestOemFuelLevelLitres;
+
+  // #2456 / #2458 / #2459 — latest-value getters for the signals the
+  // controller's `_emit` persists onto each TripSample (#2459). The
+  // raw mixture inputs (MAF / MAP / STFT / LTFT) are read here too so the
+  // diagnostic-capture path can stamp them for post-hoc re-derivation.
+  double? get latestLambda => _latestLambda;
+  double? get latestBaroKpa => _latestBaroKpa;
+  double? get latestAbsLoadPercent => _latestAbsLoadPercent;
+
+  /// Accelerator-pedal position (%) — the max of whichever of the three
+  /// channels (D / E / F, PIDs 0x49 / 0x4A / 0x4B) have landed (#2458).
+  /// Null until at least one channel reports.
+  double? get latestPedalPercent {
+    double? best;
+    for (final v in [_latestPedalD, _latestPedalE, _latestPedalF]) {
+      if (v != null && (best == null || v > best)) best = v;
+    }
+    return best;
+  }
+  double? get latestOilTempC => _latestOilTempC;
+  double? get latestAmbientTempC => _latestAmbientTempC;
+  double? get latestMaf => _latestMaf;
+  double? get latestMapKpa => _latestMapKpa;
+  double? get latestStft => _latestStft;
+  double? get latestLtft => _latestLtft;
 
   /// Push the most recent GPS fix into the per-tick snapshot
   /// (#1374 phase 1; altitude added #1935 child A). Pass `null` for a
@@ -175,7 +226,36 @@ class LiveSampleSnapshot {
       if (v != null) _latestThrottlePercent = v;
       _onHighPriorityParse(v);
     });
-    // #2458 slot: accelerator-pedal (0149/014A/014B) — driver intent, 5 Hz.
+    // #2458 — accelerator-pedal (0149/014A/014B) — driver intent, 5 Hz.
+    // Three channels track the same physical pedal; subscribe whichever
+    // the car exposes and keep the running max (the least-damped reading).
+    // All optionalPid-gated, so a car with none subscribes none and
+    // _latestPedalPercent stays null. Pedal is acquired + persisted here;
+    // the driving-style consumption is #2460.
+    _sub(scheduler, Elm327Protocol.acceleratorPedalDCommand,
+        hz: 5.0,
+        priority: PidPriority.high,
+        tier: PidTier.dynamics,
+        optionalPid: 0x49, (r) {
+      final v = Elm327Protocol.parseAcceleratorPedalD(r);
+      if (v != null) _latestPedalD = v;
+    });
+    _sub(scheduler, Elm327Protocol.acceleratorPedalECommand,
+        hz: 5.0,
+        priority: PidPriority.high,
+        tier: PidTier.dynamics,
+        optionalPid: 0x4A, (r) {
+      final v = Elm327Protocol.parseAcceleratorPedalE(r);
+      if (v != null) _latestPedalE = v;
+    });
+    _sub(scheduler, Elm327Protocol.acceleratorPedalFCommand,
+        hz: 5.0,
+        priority: PidPriority.high,
+        tier: PidTier.dynamics,
+        optionalPid: 0x4B, (r) {
+      final v = Elm327Protocol.parseAcceleratorPedalF(r);
+      if (v != null) _latestPedalF = v;
+    });
     //
     // The fuel-rate driver: subscribe whichever the car exposes (015E
     // direct → MAF → MAP speed-density) and let the snapshot derivation
@@ -223,7 +303,13 @@ class LiveSampleSnapshot {
       final v = Elm327Protocol.parseEngineLoad(r);
       if (v != null) _latestEngineLoadPercent = v;
     });
-    // #2458 slot: absolute load (0143), bank-2 fuel trims (0108/0109).
+    // #2458 — absolute load (0143). High-load proxy (>100 % on boosted
+    // engines); optionalPid-gated, acquired + persisted. Mixture tier.
+    _sub(scheduler, Elm327Protocol.absoluteLoadCommand,
+        hz: 2.0, tier: PidTier.mixture, optionalPid: 0x43, (r) {
+      final v = Elm327Protocol.parseAbsoluteLoad(r);
+      if (v != null) _latestAbsLoadPercent = v;
+    });
 
     // ---- SLOW-CORRECTION tier (~0.5 Hz, medium priority) -----------
     // Fuel trims + IAT drift slowly; the corrections only matter at the
@@ -237,6 +323,19 @@ class LiveSampleSnapshot {
         hz: 0.5, tier: PidTier.slowCorrection, (r) {
       final v = Elm327Protocol.parseLongTermFuelTrim(r);
       if (v != null) _latestLtft = v;
+    });
+    // #2458 — bank-2 fuel trims (0108/0109). Only dual-bank (V / boxer)
+    // engines expose them; optionalPid-gated, so inline engines never
+    // subscribe and the trim correction stays bank-1-only. Slow tier.
+    _sub(scheduler, Elm327Protocol.shortTermFuelTrimBank2Command,
+        hz: 0.5, tier: PidTier.slowCorrection, optionalPid: 0x08, (r) {
+      final v = Elm327Protocol.parseShortTermFuelTrimBank2(r);
+      if (v != null) _latestStftBank2 = v;
+    });
+    _sub(scheduler, Elm327Protocol.longTermFuelTrimBank2Command,
+        hz: 0.5, tier: PidTier.slowCorrection, optionalPid: 0x09, (r) {
+      final v = Elm327Protocol.parseLongTermFuelTrimBank2(r);
+      if (v != null) _latestLtftBank2 = v;
     });
     _sub(scheduler, Elm327Protocol.intakeAirTempCommand,
         hz: 0.5, tier: PidTier.slowCorrection, (r) {
@@ -268,8 +367,19 @@ class LiveSampleSnapshot {
       final v = Elm327Protocol.parseFuelLevelPercent(r);
       if (v != null) _latestFuelLevelPercent = v;
     });
-    // #2458 slot: oil temp (015C), ambient air (0146), control-module
-    // voltage (0142) — all thermal/context, all 0.1 Hz.
+    // #2459 — oil temp (015C) + ambient air (0146): optional
+    // diagnostic-context thermal signals. Both optionalPid-gated and
+    // persisted only when present; thermal tier, 0.1 Hz.
+    _sub(scheduler, Elm327Protocol.engineOilTempCommand,
+        hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext, (r) {
+      final v = Elm327Protocol.parseEngineOilTempCelsius(r);
+      if (v != null) _latestOilTempC = v;
+    }, optionalPid: 0x5C);
+    _sub(scheduler, Elm327Protocol.ambientAirTempCommand,
+        hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext, (r) {
+      final v = Elm327Protocol.parseAmbientAirTempCelsius(r);
+      if (v != null) _latestAmbientTempC = v;
+    }, optionalPid: 0x46);
   }
 
   /// Register one tier subscription on [scheduler] (#2457). Centralises
@@ -524,13 +634,22 @@ class LiveSampleSnapshot {
   }
 
   /// Apply the STFT + LTFT correction used on the MAF / speed-density
-  /// branches (#813). Returns [raw] unchanged when either trim hasn't
-  /// landed yet — better an uncorrected estimate than one shifted by
-  /// half the real signal.
+  /// branches (#813; bank-2 #2458). Returns [raw] unchanged when either
+  /// bank-1 trim hasn't landed yet — better an uncorrected estimate than
+  /// one shifted by half the real signal. When the car also exposes
+  /// bank-2 trims (PIDs 0x08 / 0x09), they're folded in so dual-bank
+  /// engines get the bank-averaged correction; null bank-2 trims fall
+  /// back to bank-1-only (byte-for-byte the pre-#2458 result).
   double _applyTrim(double raw) {
     final stft = _latestStft;
     final ltft = _latestLtft;
     if (stft == null || ltft == null) return raw;
-    return Obd2Service.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
+    return Obd2Service.applyFuelTrimCorrection(
+      raw,
+      stft: stft,
+      ltft: ltft,
+      stftBank2: _latestStftBank2,
+      ltftBank2: _latestLtftBank2,
+    );
   }
 }

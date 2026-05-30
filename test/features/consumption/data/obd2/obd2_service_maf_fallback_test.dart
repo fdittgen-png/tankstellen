@@ -192,6 +192,43 @@ void main() {
     });
 
     test(
+        'MAF path folds in bank-2 trims when present — dual-bank engine '
+        'gets the bank-averaged correction (#2458)', () async {
+      // Bank 1 total +10 % (STFT +6 %, LTFT +4 %), bank 2 total -10 %
+      // (STFT -6 %, LTFT -4 %) → mean 0 % → factor 1.0 → raw MAF rate.
+      // 0x86 = +6.25 %, 0x80 = 0 %, 0x7A = -6.25 % approx; pick clean
+      // symmetric values: bank1 +6.25/+6.25, bank2 -6.25/-6.25 → mean 0.
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': mafLine,
+        '0106': '41 06 88>', // STFT b1: (136-128)*100/128 = +6.25 %
+        '0107': '41 07 88>', // LTFT b1: +6.25 %
+        '0108': '41 08 78>', // STFT b2: (120-128)*100/128 = -6.25 %
+        '0109': '41 09 78>', // LTFT b2: -6.25 %
+      });
+      final rate = await service.readFuelRateLPerHour();
+      // Symmetric banks → mean trim 0 → no correction → raw petrol rate.
+      expect(rate, closeTo(3.389, 0.02));
+    });
+
+    test(
+        'inline engine (bank-2 NO DATA) → bank-1-only correction, '
+        'byte-for-byte the pre-#2458 result (#2458)', () async {
+      // Bank-1 +6.25/+6.25 = +12.5 % → factor 1.125. Bank-2 absent.
+      final withBank2 = await _connected({
+        '015E': 'NO DATA>',
+        '0110': mafLine,
+        '0106': '41 06 88>',
+        '0107': '41 07 88>',
+        '0108': 'NO DATA>', // inline engine: no bank 2
+        '0109': 'NO DATA>',
+      });
+      final rate = await withBank2.readFuelRateLPerHour();
+      // 3.389 × 1.125 ≈ 3.813.
+      expect(rate, closeTo(3.813, 0.03));
+    });
+
+    test(
         'nothing supported (5E / 10 / MAP / IAT / RPM all NO DATA) '
         'returns null — pre-#800 contract', () async {
       final service = await _connected({

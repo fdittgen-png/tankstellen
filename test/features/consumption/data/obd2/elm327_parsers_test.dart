@@ -994,4 +994,167 @@ void main() {
       expect(Elm327Parsers.parseFuelType('41 51'), isNull);
     });
   });
+
+  group('parseShortTermFuelTrimBank2 (PID 08) — #2458', () {
+    test('41 08 80 -> 0% (stoichiometric)', () {
+      expect(
+        Elm327Parsers.parseShortTermFuelTrimBank2('41 08 80'),
+        closeTo(0.0, 0.0001),
+      );
+    });
+
+    test('41 08 90 -> ~12.5% (same encoding as bank 1)', () {
+      expect(
+        Elm327Parsers.parseShortTermFuelTrimBank2('41 08 90'),
+        closeTo(12.5, 0.0001),
+      );
+    });
+
+    test('41 08 00 -> -100%', () {
+      expect(
+        Elm327Parsers.parseShortTermFuelTrimBank2('41 08 00'),
+        closeTo(-100.0, 0.0001),
+      );
+    });
+
+    test('wrong PID (06 bank-1) returns null — PID echo isolation', () {
+      expect(Elm327Parsers.parseShortTermFuelTrimBank2('41 06 80'), isNull);
+    });
+
+    test('NO DATA (inline engine) returns null', () {
+      expect(Elm327Parsers.parseShortTermFuelTrimBank2('NO DATA'), isNull);
+    });
+  });
+
+  group('parseLongTermFuelTrimBank2 (PID 09) — #2458', () {
+    test('41 09 80 -> 0% (stoichiometric)', () {
+      expect(
+        Elm327Parsers.parseLongTermFuelTrimBank2('41 09 80'),
+        closeTo(0.0, 0.0001),
+      );
+    });
+
+    test('41 09 78 -> -6.25%', () {
+      // (120-128)*100/128 = -8*100/128 = -6.25
+      expect(
+        Elm327Parsers.parseLongTermFuelTrimBank2('41 09 78'),
+        closeTo(-6.25, 0.0001),
+      );
+    });
+
+    test('wrong PID (07 bank-1) returns null — PID echo isolation', () {
+      expect(Elm327Parsers.parseLongTermFuelTrimBank2('41 07 80'), isNull);
+    });
+
+    test('NO DATA (inline engine) returns null', () {
+      expect(Elm327Parsers.parseLongTermFuelTrimBank2('NO DATA'), isNull);
+    });
+  });
+
+  group('parseAbsoluteLoad (PID 43) — #2458', () {
+    test('41 43 00 FF -> 100% (255 = full NA reference)', () {
+      // (256*0 + 255)*100/255 = 100
+      expect(
+        Elm327Parsers.parseAbsoluteLoad('41 43 00 FF'),
+        closeTo(100.0, 0.0001),
+      );
+    });
+
+    test('41 43 01 00 -> ~100.39% (boosted, exceeds 100%)', () {
+      // (256*1 + 0)*100/255 = 256*100/255 ≈ 100.392
+      expect(
+        Elm327Parsers.parseAbsoluteLoad('41 43 01 00'),
+        closeTo(100.3922, 0.001),
+      );
+    });
+
+    test('41 43 02 00 -> ~200.78% (heavy boost)', () {
+      // (512)*100/255 ≈ 200.784
+      expect(
+        Elm327Parsers.parseAbsoluteLoad('41 43 02 00'),
+        closeTo(200.784, 0.01),
+      );
+    });
+
+    test('41 43 00 00 -> 0%', () {
+      expect(Elm327Parsers.parseAbsoluteLoad('41 43 00 00'), 0.0);
+    });
+
+    test('wrong PID echo (04 engine load) returns null', () {
+      expect(Elm327Parsers.parseAbsoluteLoad('41 04 00 FF'), isNull);
+    });
+
+    test('short (1-byte) response returns null', () {
+      expect(Elm327Parsers.parseAbsoluteLoad('41 43 00'), isNull);
+    });
+
+    test('NO DATA returns null', () {
+      expect(Elm327Parsers.parseAbsoluteLoad('NO DATA'), isNull);
+    });
+  });
+
+  group('accelerator-pedal D/E/F (PIDs 49/4A/4B) — #2458', () {
+    test('41 49 FF -> 100%', () {
+      expect(
+        Elm327Parsers.parseAcceleratorPedalD('41 49 FF'),
+        closeTo(100.0, 0.0001),
+      );
+    });
+
+    test('41 49 80 -> ~50.2%', () {
+      // 128*100/255 ≈ 50.196
+      expect(
+        Elm327Parsers.parseAcceleratorPedalD('41 49 80'),
+        closeTo(50.196, 0.001),
+      );
+    });
+
+    test('41 4A 00 -> 0% (channel E)', () {
+      expect(Elm327Parsers.parseAcceleratorPedalE('41 4A 00'), 0.0);
+    });
+
+    test('41 4B FF -> 100% (channel F)', () {
+      expect(
+        Elm327Parsers.parseAcceleratorPedalF('41 4B FF'),
+        closeTo(100.0, 0.0001),
+      );
+    });
+
+    test('channel D parser rejects a channel-E echo (PID isolation)', () {
+      expect(Elm327Parsers.parseAcceleratorPedalD('41 4A 80'), isNull);
+    });
+
+    test('NO DATA returns null on every channel', () {
+      expect(Elm327Parsers.parseAcceleratorPedalD('NO DATA'), isNull);
+      expect(Elm327Parsers.parseAcceleratorPedalE('NO DATA'), isNull);
+      expect(Elm327Parsers.parseAcceleratorPedalF('NO DATA'), isNull);
+    });
+  });
+
+  group('engine-oil / ambient temp (PIDs 5C / 46) — #2459', () {
+    test('41 5C 5A -> 50°C (A - 40)', () {
+      expect(Elm327Parsers.parseEngineOilTempCelsius('41 5C 5A'), 50.0);
+    });
+
+    test('41 5C 28 -> 0°C', () {
+      expect(Elm327Parsers.parseEngineOilTempCelsius('41 5C 28'), 0.0);
+    });
+
+    test('41 46 32 -> 10°C ambient', () {
+      expect(Elm327Parsers.parseAmbientAirTempCelsius('41 46 32'), 10.0);
+    });
+
+    test('41 46 00 -> -40°C (coldest)', () {
+      expect(Elm327Parsers.parseAmbientAirTempCelsius('41 46 00'), -40.0);
+    });
+
+    test('oil-temp parser rejects an ambient echo (PID isolation)', () {
+      expect(Elm327Parsers.parseEngineOilTempCelsius('41 46 5A'), isNull);
+    });
+
+    test('NO DATA returns null', () {
+      expect(Elm327Parsers.parseEngineOilTempCelsius('NO DATA'), isNull);
+      expect(Elm327Parsers.parseAmbientAirTempCelsius('NO DATA'), isNull);
+    });
+  });
 }

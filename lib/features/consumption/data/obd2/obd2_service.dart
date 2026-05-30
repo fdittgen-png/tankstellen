@@ -1111,7 +1111,20 @@ class Obd2Service implements Obd2RawCommandPort {
     final stft = await readShortTermFuelTrimPercent();
     final ltft = await readLongTermFuelTrimPercent();
     if (stft == null || ltft == null) return raw;
-    return estimator.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
+    // #2458 — fold in bank-2 trims (PIDs 08 / 09) when the car exposes
+    // them so dual-bank engines get the bank-averaged correction. Both
+    // supportsPid-gated; absent → null → bank-1-only, unchanged.
+    final stft2 =
+        isPidSupported(0x08) ? await readShortTermFuelTrimBank2Percent() : null;
+    final ltft2 =
+        isPidSupported(0x09) ? await readLongTermFuelTrimBank2Percent() : null;
+    return estimator.applyFuelTrimCorrection(
+      raw,
+      stft: stft,
+      ltft: ltft,
+      stftBank2: stft2,
+      ltftBank2: ltft2,
+    );
   }
 
   /// Pure-math fuel-trim correction factor (#813).
@@ -1123,8 +1136,16 @@ class Obd2Service implements Obd2RawCommandPort {
     double raw, {
     required double stft,
     required double ltft,
+    double? stftBank2,
+    double? ltftBank2,
   }) =>
-      estimator.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
+      estimator.applyFuelTrimCorrection(
+        raw,
+        stft: stft,
+        ltft: ltft,
+        stftBank2: stftBank2,
+        ltftBank2: ltftBank2,
+      );
 
   /// Pure-math speed-density fuel-rate estimator (#800).
   ///
@@ -1211,6 +1232,32 @@ class Obd2Service implements Obd2RawCommandPort {
         Elm327Protocol.longTermFuelTrimCommand,
         Elm327Protocol.parseLongTermFuelTrim,
         label: 'longTermFuelTrim',
+      );
+
+  /// Read short-term fuel trim bank 2 (%) via Mode 01 PID 0x08 (#2458).
+  /// Only dual-bank (V / boxer) engines answer; inline engines return
+  /// null and the correction stays on bank 1 alone.
+  Future<double?> readShortTermFuelTrimBank2Percent() => _readDouble(
+        Elm327Protocol.shortTermFuelTrimBank2Command,
+        Elm327Protocol.parseShortTermFuelTrimBank2,
+        label: 'shortTermFuelTrimBank2',
+      );
+
+  /// Read long-term fuel trim bank 2 (%) via Mode 01 PID 0x09 (#2458).
+  /// Same dual-bank semantics as [readShortTermFuelTrimBank2Percent].
+  Future<double?> readLongTermFuelTrimBank2Percent() => _readDouble(
+        Elm327Protocol.longTermFuelTrimBank2Command,
+        Elm327Protocol.parseLongTermFuelTrimBank2,
+        label: 'longTermFuelTrimBank2',
+      );
+
+  /// Read absolute load value (%) via Mode 01 PID 0x43 (#2458). Exceeds
+  /// 100 % on boosted engines under positive manifold pressure — a clean
+  /// high-load proxy. Returns null when unsupported.
+  Future<double?> readAbsoluteLoadPercent() => _readDouble(
+        Elm327Protocol.absoluteLoadCommand,
+        Elm327Protocol.parseAbsoluteLoad,
+        label: 'absoluteLoad',
       );
 
   /// Read fuel tank level, 0–100 %. (#717)
