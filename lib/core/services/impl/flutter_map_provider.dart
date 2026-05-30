@@ -22,7 +22,9 @@ class FlutterMapProvider implements MapProvider {
   String get name => 'OpenStreetMap';
 
   @override
-  TileLayerConfig get tileConfig => TileLayerConfig(
+  // #2396 — now `const`: `osmUserAgent` became a compile-time `const`
+  // (version-free) so all three args are constant.
+  TileLayerConfig get tileConfig => const TileLayerConfig(
         urlTemplate: AppConstants.osmTileUrl,
         userAgent: AppConstants.osmUserAgent,
         attribution: AppConstants.osmAttribution,

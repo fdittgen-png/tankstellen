@@ -70,7 +70,32 @@ class AppConstants {
 
   static const String osmTileUrl =
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-  static String get osmUserAgent => userAgent;
+
+  /// Stable, version-free identity sent on every OSM/tile request
+  /// (#2396). OSM's tile-usage policy wants a *stable* User-Agent that
+  /// identifies the app, NOT one that changes on every release — a
+  /// per-version UA looks like many distinct clients to their abuse
+  /// heuristics. So this is deliberately the bare package id with no
+  /// `/appVersion` suffix. The versioned [userAgent] above is still used
+  /// by the data-API HTTP clients, where per-release identification is
+  /// useful for upstream debugging. Not user-facing (an HTTP header).
+  static const String osmUserAgent = appPackage;
+
+  /// Tile-proxy URL template (LAYER 2 / #2397). A Supabase `tiles` edge
+  /// function will fetch from OSM with a stable server-side UA and serve
+  /// tiles back with a 7-day `Cache-Control`, taking direct tile load off
+  /// OSM. NOT wired up yet: [SparkiloTileLayer] still defaults to
+  /// [osmTileUrl] (OSM-direct) until the proxy is deployed. When #2397
+  /// ships, #2396 flips SparkiloTileLayer's default to this constant and
+  /// pins the real deployed project subdomain. Not user-facing (a URL).
+  static const String tileProxyUrl =
+      'https://tankstellen.supabase.co/functions/v1/tiles/{z}/{x}/{y}';
+
+  /// Stable OSM-facing User-Agent the [tileProxyUrl] edge function imports
+  /// to identify itself to OSM (LAYER 2 / #2397). Carries a contact URL
+  /// per OSM policy. Not user-facing (an HTTP header).
+  static const String tileProxyOsmUserAgent =
+      'de.tankstellen.tile-proxy/1.0 (+https://github.com/fdittgen-png/tankstellen)';
 
   static const String tankerkoenigAttribution =
       'Daten von Tankerkoenig.de (CC BY 4.0)';
