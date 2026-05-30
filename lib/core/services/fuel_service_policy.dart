@@ -85,6 +85,18 @@ class FuelServicePolicy {
   // i18n-ignore: data, rendered in a later batch
   final String license;
 
+  /// Canonical `https://` homepage of the upstream data source (#2373).
+  ///
+  /// The search screen's country-service header is a tappable link that
+  /// opens this URL via `url_launcher`, relocating the open-data attribution
+  /// from the old bottom footer into a credit-and-link affordance at the top.
+  /// It is the provider's own dataset / homepage so the credit links straight
+  /// back to the source the open-data licences require us to acknowledge.
+  ///
+  /// DATA (a URL), not a translatable string — see [attribution].
+  // i18n-ignore: data — canonical source URL, not translatable
+  final String sourceUrl;
+
   const FuelServicePolicy({
     required this.model,
     required this.minInterval,
@@ -93,6 +105,7 @@ class FuelServicePolicy {
     required this.searchResultTtl,
     required this.attribution,
     required this.license,
+    required this.sourceUrl,
   });
 
   /// `true` when this source downloads a whole-country dataset and filters

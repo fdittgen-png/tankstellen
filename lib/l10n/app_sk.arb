@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Zdieľanie zrušené.",
   "trajetsSharedSectionTitle": "Zdieľané so mnou",
   "trajetsSharedBadge": "Zdieľané",
-  "dataSourceAttribution": "Zdroj: {source} ({license})",
-  "dataSourceAttributionSemantic": "Údaje o cenách palív poskytuje {source}, licencované pod {license}.",
   "tripRecordingAutoPinTitle": "Pri spustení nahrávania vždy pripnúť",
   "tripRecordingAutoPinSubtitle": "Pripnúť formulár automaticky pri každej jazde namiesto klepnutia zakaždým. Spotrebuje viac batérie.",
   "tripRecordingConnectingTitle": "Spúšťa sa nahrávanie…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

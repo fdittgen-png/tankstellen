@@ -43,7 +43,10 @@ void main() {
     'lib/app/app_initializer.dart': 934,
     'lib/core/background/background_service.dart': 782,
     'lib/core/country/country_config.dart': 723,
-    'lib/core/services/country_service_registry.dart': 868,
+    // #2373 — re-grandfathered 868 → 887: one required `sourceUrl` field
+    // added to every per-country FuelServicePolicy row (19 data lines) so
+    // the country-service header can link the upstream data source.
+    'lib/core/services/country_service_registry.dart': 887,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     'lib/features/consumption/data/obd2/elm327_parsers.dart': 457,

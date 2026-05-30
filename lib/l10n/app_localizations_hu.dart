@@ -3992,13 +3992,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Elvetés';
 
   @override
-  String dataSourceAttribution(String source, String license) {
-    return 'Forrás: $source ($license)';
-  }
-
-  @override
-  String dataSourceAttributionSemantic(String source, String license) {
-    return 'Az üzemanyagár-adatokat a(z) $source biztosítja, a(z) $license licenc alatt.';
+  String dataSourceLinkSemantic(String source, String license) {
+    return 'Open the $source data source ($license) in your browser';
   }
 
   @override

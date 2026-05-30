@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Partajare revocată.",
   "trajetsSharedSectionTitle": "Partajat cu mine",
   "trajetsSharedBadge": "Partajat",
-  "dataSourceAttribution": "Sursă: {source} ({license})",
-  "dataSourceAttributionSemantic": "Datele privind prețurile carburanților sunt furnizate de {source}, licențiate sub {license}.",
   "tripRecordingAutoPinTitle": "Fixează întotdeauna la începerea înregistrării",
   "tripRecordingAutoPinSubtitle": "Fixează formularul automat la fiecare cursă în loc să atingi de fiecare dată. Consumă mai multă baterie.",
   "tripRecordingConnectingTitle": "Se pornește înregistrarea…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

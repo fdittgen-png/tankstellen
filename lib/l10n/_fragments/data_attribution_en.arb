@@ -1,21 +1,7 @@
 {
-  "dataSourceAttribution": "Source: {source} ({license})",
-  "@dataSourceAttribution": {
-    "description": "Small non-intrusive line under the search results crediting the upstream fuel-price provider for the active country, satisfying the open-data licences that mandate visible attribution (CC BY / Licence Ouverte / OGL / IODL). 'Source:' is the localised label; {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy (#2270).",
-    "placeholders": {
-      "source": {
-        "type": "String",
-        "example": "Tankerkönig"
-      },
-      "license": {
-        "type": "String",
-        "example": "CC BY 4.0"
-      }
-    }
-  },
-  "dataSourceAttributionSemantic": "Fuel price data provided by {source}, licensed under {license}.",
-  "@dataSourceAttributionSemantic": {
-    "description": "Screen-reader label for the data-source attribution line under the search results — spells out the abbreviated 'Source: … (…)' visual into a full sentence (#2270). {source} and {license} are data (provider + licence names) from the country's FuelServicePolicy.",
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "description": "Accessibility label and tooltip for the tappable country-service header on the search screen, which opens the active country's upstream fuel-price data source in the browser (#2373). Relocates the open-data attribution from the old bottom footer into the link, so the provider name and licence stay available to screen-reader and long-press users (CC BY / Licence Ouverte / OGL / IODL all mandate visible attribution). {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy.",
     "placeholders": {
       "source": {
         "type": "String",

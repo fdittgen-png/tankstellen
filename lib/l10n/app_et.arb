@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Jagamine tühistatud.",
   "trajetsSharedSectionTitle": "Minuga jagatud",
   "trajetsSharedBadge": "Jagatud",
-  "dataSourceAttribution": "Allikas: {source} ({license})",
-  "dataSourceAttributionSemantic": "Kütusehindade andmed pärinevad allikast {source}, litsentsitud litsentsi {license} alusel.",
   "tripRecordingAutoPinTitle": "Salvestuse alustamisel alati kinnita",
   "tripRecordingAutoPinSubtitle": "Kinnita vorm igal sõidul automaatselt, selle asemel et iga kord puudutada. Kasutab rohkem akut.",
   "tripRecordingConnectingTitle": "Salvestuse alustamine…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

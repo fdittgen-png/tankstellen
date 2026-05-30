@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Η κοινοποίηση ανακλήθηκε.",
   "trajetsSharedSectionTitle": "Κοινοποιήθηκε σε εμένα",
   "trajetsSharedBadge": "Κοινόχρηστο",
-  "dataSourceAttribution": "Πηγή: {source} ({license})",
-  "dataSourceAttributionSemantic": "Δεδομένα τιμών καυσίμων από {source}, με άδεια {license}.",
   "tripRecordingAutoPinTitle": "Πάντα καρφίτσωμα κατά την έναρξη εγγραφής",
   "tripRecordingAutoPinSubtitle": "Καρφίτσωμα της φόρμας αυτόματα σε κάθε διαδρομή αντί να πατάτε κάθε φορά. Καταναλώνει περισσότερη μπαταρία.",
   "tripRecordingConnectingTitle": "Έναρξη εγγραφής…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }
