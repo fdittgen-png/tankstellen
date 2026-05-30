@@ -45,9 +45,14 @@ void main() {
   });
 
   group('Field names adoption regression', () {
-    test('background_service uses TankerkoenigFields', () {
+    test('background scan runner uses TankerkoenigFields', () {
+      // #2411 — the background price fetch+parse moved out of the now-thin
+      // background_service.dart into background_scan_runners.dart (the
+      // shared scan path every trigger funnels through). The regression
+      // follows the code: the runner must still use the typed field
+      // constants, never bare Tankerkönig strings.
       final source = File(
-        'lib/core/background/background_service.dart',
+        'lib/core/background/background_scan_runners.dart',
       ).readAsStringSync();
 
       expect(source, contains('TankerkoenigFields.'));
