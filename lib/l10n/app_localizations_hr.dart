@@ -5413,6 +5413,147 @@ class AppLocalizationsHr extends AppLocalizations {
   String get obd2DebugSessionShareLabel => 'Podijeli zapisnik OBD2 sesije';
 
   @override
+  String get obd2DiagnosticsTitle => 'OBD2 communication health';
+
+  @override
+  String obd2DiagnosticsHeader(String percent, String duty, int drops) {
+    String _temp0 = intl.Intl.pluralLogic(
+      drops,
+      locale: localeName,
+      other: '$drops drops',
+      one: '1 drop',
+      zero: 'no drops',
+    );
+    return '$percent% complete · $duty% duty · $_temp0';
+  }
+
+  @override
+  String get obd2DiagnosticsAdapterSection => 'Adapter';
+
+  @override
+  String get obd2DiagnosticsConnectionSection => 'Connection lifecycle';
+
+  @override
+  String get obd2DiagnosticsPidSection => 'Per-PID outcomes';
+
+  @override
+  String get obd2DiagnosticsSchedulerSection => 'Scheduler health';
+
+  @override
+  String get obd2DiagnosticsCompletenessSection => 'Completeness';
+
+  @override
+  String get obd2DiagnosticsSupportSection => 'Discovered-supported PIDs';
+
+  @override
+  String get obd2DiagnosticsFuelSection => 'Fuel-tier rollup';
+
+  @override
+  String obd2DiagnosticsAdapterIdentity(
+    String mac,
+    String firmware,
+    String protocol,
+    String mtu,
+  ) {
+    return '$mac · $firmware · protocol $protocol · MTU $mtu';
+  }
+
+  @override
+  String obd2DiagnosticsConnectionLine(
+    int attempts,
+    int successes,
+    int drops,
+    String p50,
+    String p95,
+  ) {
+    return '$attempts attempts · $successes ok · $drops drops · time-to-connect p50 $p50 / p95 $p95';
+  }
+
+  @override
+  String obd2DiagnosticsReconnectLine(int silent, int visible) {
+    return 'Reconnects: $silent silent · $visible visible';
+  }
+
+  @override
+  String obd2DiagnosticsSchedulerLine(
+    String tickRate,
+    int skips,
+    int demotions,
+  ) {
+    return '$tickRate Hz tick · $skips back-pressure skips · $demotions demotions';
+  }
+
+  @override
+  String get obd2DiagnosticsStarved =>
+      'Dynamics tier starved — RPM / speed fell below the governor floor.';
+
+  @override
+  String obd2DiagnosticsCompletenessLine(String percent, String duty) {
+    return 'Overall $percent% · active duty $duty%';
+  }
+
+  @override
+  String obd2DiagnosticsTierLine(String tier, String percent) {
+    return '$tier: $percent%';
+  }
+
+  @override
+  String obd2DiagnosticsSupportLine(
+    int supported,
+    int unsupported,
+    int unknown,
+  ) {
+    return '$supported supported · $unsupported unsupported · $unknown unknown';
+  }
+
+  @override
+  String obd2DiagnosticsFuelLine(int suspicious, int total) {
+    return 'Suspicious $suspicious of $total samples';
+  }
+
+  @override
+  String obd2DiagnosticsPidRow(
+    String pid,
+    int polled,
+    int ok,
+    int noData,
+    int timeout,
+    int error,
+    int p50,
+    int p95,
+    String effectiveHz,
+    String targetHz,
+  ) {
+    return '$pid: $polled polled · $ok ok · $noData ND · $timeout TO · $error err · p50 $p50 / p95 $p95 ms · $effectiveHz/$targetHz Hz';
+  }
+
+  @override
+  String get obd2DiagnosticsEmpty =>
+      'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.';
+
+  @override
+  String get obd2DiagnosticsExplain =>
+      'Captured while recording to debug the dongle↔app communication — only collected in Developer mode.';
+
+  @override
+  String get obd2HealthScreenTitle => 'OBD2 communication health';
+
+  @override
+  String get obd2HealthNavLabel => 'OBD2 communication health';
+
+  @override
+  String get obd2HealthLiveSection => 'Live session';
+
+  @override
+  String get obd2HealthHistorySection => 'Recent sessions';
+
+  @override
+  String get obd2HealthCopyJson => 'Copy as JSON';
+
+  @override
+  String get obd2HealthCopied => 'OBD2 diagnostics copied to clipboard.';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nije moguće dosegnuti \'$adapterName\' — odaberite drugi adapter';
   }

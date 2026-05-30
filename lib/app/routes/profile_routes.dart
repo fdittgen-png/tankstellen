@@ -8,6 +8,7 @@ import '../../features/loyalty/presentation/loyalty_settings_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/developer_tools_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/error_log_viewer_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/feature_flag_dump_screen.dart';
+import '../../features/profile/presentation/screens/developer_tools/obd2_health_screen.dart';
 import '../../features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import '../../features/profile/presentation/screens/theme_settings_screen.dart';
 import '../../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
@@ -68,5 +69,11 @@ List<RouteBase> get profileRoutes => [
       GoRoute(
         path: '/developer-tools/flags',
         builder: (context, state) => const FeatureFlagDumpScreen(),
+      ),
+      // #2471 — OBD2 communication-health diagnostics (Epic #2463 TAIL).
+      // Self-guards on `Feature.debugMode` like the rest of the dev tools.
+      GoRoute(
+        path: '/developer-tools/obd2-health',
+        builder: (context, state) => const Obd2HealthScreen(),
       ),
     ];

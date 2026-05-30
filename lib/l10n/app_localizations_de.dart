@@ -5421,6 +5421,147 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2DebugSessionShareLabel => 'OBD2-Sitzungsprotokoll teilen';
 
   @override
+  String get obd2DiagnosticsTitle => 'OBD2-Kommunikationszustand';
+
+  @override
+  String obd2DiagnosticsHeader(String percent, String duty, int drops) {
+    String _temp0 = intl.Intl.pluralLogic(
+      drops,
+      locale: localeName,
+      other: '$drops Abbrüche',
+      one: '1 Abbruch',
+      zero: 'keine Abbrüche',
+    );
+    return '$percent% vollständig · $duty% Auslastung · $_temp0';
+  }
+
+  @override
+  String get obd2DiagnosticsAdapterSection => 'Adapter';
+
+  @override
+  String get obd2DiagnosticsConnectionSection => 'Verbindungsverlauf';
+
+  @override
+  String get obd2DiagnosticsPidSection => 'Ergebnisse pro PID';
+
+  @override
+  String get obd2DiagnosticsSchedulerSection => 'Scheduler-Zustand';
+
+  @override
+  String get obd2DiagnosticsCompletenessSection => 'Vollständigkeit';
+
+  @override
+  String get obd2DiagnosticsSupportSection => 'Erkannte unterstützte PIDs';
+
+  @override
+  String get obd2DiagnosticsFuelSection => 'Kraftstoff-Tier-Übersicht';
+
+  @override
+  String obd2DiagnosticsAdapterIdentity(
+    String mac,
+    String firmware,
+    String protocol,
+    String mtu,
+  ) {
+    return '$mac · $firmware · Protokoll $protocol · MTU $mtu';
+  }
+
+  @override
+  String obd2DiagnosticsConnectionLine(
+    int attempts,
+    int successes,
+    int drops,
+    String p50,
+    String p95,
+  ) {
+    return '$attempts Versuche · $successes ok · $drops Abbrüche · Verbindungszeit p50 $p50 / p95 $p95';
+  }
+
+  @override
+  String obd2DiagnosticsReconnectLine(int silent, int visible) {
+    return 'Wiederverbindungen: $silent still · $visible sichtbar';
+  }
+
+  @override
+  String obd2DiagnosticsSchedulerLine(
+    String tickRate,
+    int skips,
+    int demotions,
+  ) {
+    return '$tickRate Hz Takt · $skips Rückstau-Auslassungen · $demotions Herabstufungen';
+  }
+
+  @override
+  String get obd2DiagnosticsStarved =>
+      'Dynamik-Tier ausgehungert — Drehzahl / Geschwindigkeit fielen unter die Governor-Untergrenze.';
+
+  @override
+  String obd2DiagnosticsCompletenessLine(String percent, String duty) {
+    return 'Gesamt $percent% · aktive Auslastung $duty%';
+  }
+
+  @override
+  String obd2DiagnosticsTierLine(String tier, String percent) {
+    return '$tier: $percent%';
+  }
+
+  @override
+  String obd2DiagnosticsSupportLine(
+    int supported,
+    int unsupported,
+    int unknown,
+  ) {
+    return '$supported unterstützt · $unsupported nicht unterstützt · $unknown unbekannt';
+  }
+
+  @override
+  String obd2DiagnosticsFuelLine(int suspicious, int total) {
+    return 'Verdächtig $suspicious von $total Messungen';
+  }
+
+  @override
+  String obd2DiagnosticsPidRow(
+    String pid,
+    int polled,
+    int ok,
+    int noData,
+    int timeout,
+    int error,
+    int p50,
+    int p95,
+    String effectiveHz,
+    String targetHz,
+  ) {
+    return '$pid: $polled abgefragt · $ok ok · $noData ND · $timeout TO · $error Fehler · p50 $p50 / p95 $p95 ms · $effectiveHz/$targetHz Hz';
+  }
+
+  @override
+  String get obd2DiagnosticsEmpty =>
+      'Noch keine OBD2-Sitzung aufgezeichnet — verbinde einen Adapter und zeichne eine Fahrt mit aktiviertem Entwicklermodus auf.';
+
+  @override
+  String get obd2DiagnosticsExplain =>
+      'Während der Aufzeichnung erfasst, um die Dongle↔App-Kommunikation zu debuggen — nur im Entwicklermodus erfasst.';
+
+  @override
+  String get obd2HealthScreenTitle => 'OBD2-Kommunikationszustand';
+
+  @override
+  String get obd2HealthNavLabel => 'OBD2-Kommunikationszustand';
+
+  @override
+  String get obd2HealthLiveSection => 'Live-Sitzung';
+
+  @override
+  String get obd2HealthHistorySection => 'Letzte Sitzungen';
+
+  @override
+  String get obd2HealthCopyJson => 'Als JSON kopieren';
+
+  @override
+  String get obd2HealthCopied => 'OBD2-Diagnose in die Zwischenablage kopiert.';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

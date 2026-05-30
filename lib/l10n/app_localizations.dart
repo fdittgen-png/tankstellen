@@ -9509,6 +9509,198 @@ abstract class AppLocalizations {
   /// **'Share OBD2 session log'**
   String get obd2DebugSessionShareLabel;
 
+  /// Title of the read-only OBD2 communication-health diagnostics card on the Trip detail screen + the dev-tools screen (#2470/#2471, Epic #2463). The OBD2 analogue of the GPS sampling diagnostics card. Only visible in Developer / Debug mode.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 communication health'**
+  String get obd2DiagnosticsTitle;
+
+  /// Collapsed-header summary line of the OBD2 diagnostics card (#2470). At-a-glance triple: overall session completeness percentage, active-duty-cycle percentage, and the number of detected mid-session link drops. percent and duty are pre-formatted integers.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}'**
+  String obd2DiagnosticsHeader(String percent, String duty, int drops);
+
+  /// Section header above the adapter-identity rows (redacted MAC, ELM firmware version, protocol digit, MTU, warm/cold start, capability tier) on the OBD2 diagnostics card (#2470).
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter'**
+  String get obd2DiagnosticsAdapterSection;
+
+  /// Section header above the connection-lifecycle rows (attempts, successes, drops, silent/visible reconnects, time-to-connect percentiles) on the OBD2 diagnostics card (#2470).
+  ///
+  /// In en, this message translates to:
+  /// **'Connection lifecycle'**
+  String get obd2DiagnosticsConnectionSection;
+
+  /// Section header above the per-PID outcome table (polled/ok/no-data/timeout/error counts + p50/p95 round-trip latency + effective-vs-target Hz) on the OBD2 diagnostics card (#2470).
+  ///
+  /// In en, this message translates to:
+  /// **'Per-PID outcomes'**
+  String get obd2DiagnosticsPidSection;
+
+  /// Section header above the scheduler-health rows (achieved tick-rate, back-pressure skips, governor demotions, starvation) on the OBD2 diagnostics card (#2470).
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduler health'**
+  String get obd2DiagnosticsSchedulerSection;
+
+  /// Section header above the completeness rollup rows (overall % + per-tier %) on the OBD2 diagnostics card (#2470).
+  ///
+  /// In en, this message translates to:
+  /// **'Completeness'**
+  String get obd2DiagnosticsCompletenessSection;
+
+  /// Section header above the discovered-supported tri-state counts (supported / unsupported / unknown) on the OBD2 diagnostics card (#2470).
+  ///
+  /// In en, this message translates to:
+  /// **'Discovered-supported PIDs'**
+  String get obd2DiagnosticsSupportSection;
+
+  /// Section header above the per-tick fuel-resolution-tier distribution + downgrade-suspicion rollup on the OBD2 diagnostics card (#2470).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel-tier rollup'**
+  String get obd2DiagnosticsFuelSection;
+
+  /// Adapter-identity line on the OBD2 diagnostics card (#2470). mac is the redacted MAC, firmware the ELM banner version, protocol the auto-detected OBD protocol digit, mtu the negotiated BLE ATT MTU. All pre-formatted strings (an em-dash placeholder is supplied for any unknown field).
+  ///
+  /// In en, this message translates to:
+  /// **'{mac} · {firmware} · protocol {protocol} · MTU {mtu}'**
+  String obd2DiagnosticsAdapterIdentity(
+    String mac,
+    String firmware,
+    String protocol,
+    String mtu,
+  );
+
+  /// Connection-lifecycle summary line on the OBD2 diagnostics card (#2470). attempts/successes/drops are counts; p50/p95 are pre-formatted time-to-connect latency strings (em-dash when unknown).
+  ///
+  /// In en, this message translates to:
+  /// **'{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}'**
+  String obd2DiagnosticsConnectionLine(
+    int attempts,
+    int successes,
+    int drops,
+    String p50,
+    String p95,
+  );
+
+  /// Reconnect-breakdown line on the OBD2 diagnostics card (#2470): silent reconnects recovered the link without the user seeing a disconnect; visible reconnects surfaced a disconnect first.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnects: {silent} silent · {visible} visible'**
+  String obd2DiagnosticsReconnectLine(int silent, int visible);
+
+  /// Scheduler-health summary line on the OBD2 diagnostics card (#2470). tickRate is the pre-formatted achieved tick-rate in Hz; skips and demotions are counts.
+  ///
+  /// In en, this message translates to:
+  /// **'{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions'**
+  String obd2DiagnosticsSchedulerLine(
+    String tickRate,
+    int skips,
+    int demotions,
+  );
+
+  /// Warning line shown on the OBD2 diagnostics card (#2470) when the scheduler reported starvation: the dynamics tier dropped below its protected reads-per-second floor on a slow link.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamics tier starved — RPM / speed fell below the governor floor.'**
+  String get obd2DiagnosticsStarved;
+
+  /// Overall-completeness line on the OBD2 diagnostics card (#2470). percent is overall session completeness, duty the active-duty-cycle, both pre-formatted integers.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall {percent}% · active duty {duty}%'**
+  String obd2DiagnosticsCompletenessLine(String percent, String duty);
+
+  /// Per-tier completeness row on the OBD2 diagnostics card (#2470). tier is the cadence-tier name (dynamics / mixture / slowCorrection / thermalContext), percent the pre-formatted per-tier completeness integer.
+  ///
+  /// In en, this message translates to:
+  /// **'{tier}: {percent}%'**
+  String obd2DiagnosticsTierLine(String tier, String percent);
+
+  /// Discovered-supported tri-state counts line on the OBD2 diagnostics card (#2470). supported/unsupported are PIDs the resolver confirmed; unknown is every command when the supported-PID probe never ran (probe-less clone / blind session).
+  ///
+  /// In en, this message translates to:
+  /// **'{supported} supported · {unsupported} unsupported · {unknown} unknown'**
+  String obd2DiagnosticsSupportLine(
+    int supported,
+    int unsupported,
+    int unknown,
+  );
+
+  /// Fuel-downgrade rollup line on the OBD2 diagnostics card (#2470): how many fuel-rate samples tripped a sanity flag (suspicious-low / 5E-vs-MAF divergent) out of the total seen this session.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspicious {suspicious} of {total} samples'**
+  String obd2DiagnosticsFuelLine(int suspicious, int total);
+
+  /// One per-PID row on the OBD2 diagnostics card (#2470). pid is the poll command (e.g. 010C); polled/ok/noData/timeout/error are the 5-way outcome counts; p50/p95 the round-trip latency percentiles; effectiveHz/targetHz the achieved-vs-target refresh rate (pre-formatted strings). ND = no-data, TO = timeout.
+  ///
+  /// In en, this message translates to:
+  /// **'{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz'**
+  String obd2DiagnosticsPidRow(
+    String pid,
+    int polled,
+    int ok,
+    int noData,
+    int timeout,
+    int error,
+    int p50,
+    int p95,
+    String effectiveHz,
+    String targetHz,
+  );
+
+  /// Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.'**
+  String get obd2DiagnosticsEmpty;
+
+  /// Subtle one-line explanation at the bottom of the OBD2 diagnostics card (#2470) reminding the developer why the card exists and that it is gated on Developer mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Captured while recording to debug the dongle↔app communication — only collected in Developer mode.'**
+  String get obd2DiagnosticsExplain;
+
+  /// AppBar title of the dev-tools 'OBD2 Communication Health' screen (#2471), gated on Developer / Debug mode.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 communication health'**
+  String get obd2HealthScreenTitle;
+
+  /// Label of the Developer-tools menu row that opens the OBD2 communication-health screen (#2471).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 communication health'**
+  String get obd2HealthNavLabel;
+
+  /// Section header above the live (in-progress) OBD2 session diagnostics on the OBD2 communication-health screen (#2471).
+  ///
+  /// In en, this message translates to:
+  /// **'Live session'**
+  String get obd2HealthLiveSection;
+
+  /// Section header above the capped ring of finished OBD2 session diagnostics on the OBD2 communication-health screen (#2471).
+  ///
+  /// In en, this message translates to:
+  /// **'Recent sessions'**
+  String get obd2HealthHistorySection;
+
+  /// Label for the action that copies the OBD2 session diagnostics (per-PID table + counters) to the clipboard as JSON, on the OBD2 communication-health screen (#2471).
+  ///
+  /// In en, this message translates to:
+  /// **'Copy as JSON'**
+  String get obd2HealthCopyJson;
+
+  /// Confirmation snackbar after the OBD2 communication-health screen copies the session diagnostics JSON to the clipboard (#2471).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 diagnostics copied to clipboard.'**
+  String get obd2HealthCopied;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

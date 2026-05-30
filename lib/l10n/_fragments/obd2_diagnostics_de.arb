@@ -1,0 +1,177 @@
+{
+  "obd2DiagnosticsTitle": "OBD2-Kommunikationszustand",
+  "obd2DiagnosticsHeader": "{percent}% vollständig · {duty}% Auslastung · {drops, plural, =0{keine Abbrüche} =1{1 Abbruch} other{{drops} Abbrüche}}",
+  "@obd2DiagnosticsHeader": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "duty": {
+        "type": "String"
+      },
+      "drops": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsAdapterSection": "Adapter",
+  "obd2DiagnosticsConnectionSection": "Verbindungsverlauf",
+  "obd2DiagnosticsPidSection": "Ergebnisse pro PID",
+  "obd2DiagnosticsSchedulerSection": "Scheduler-Zustand",
+  "obd2DiagnosticsCompletenessSection": "Vollständigkeit",
+  "obd2DiagnosticsSupportSection": "Erkannte unterstützte PIDs",
+  "obd2DiagnosticsFuelSection": "Kraftstoff-Tier-Übersicht",
+  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · Protokoll {protocol} · MTU {mtu}",
+  "@obd2DiagnosticsAdapterIdentity": {
+    "placeholders": {
+      "mac": {
+        "type": "String"
+      },
+      "firmware": {
+        "type": "String"
+      },
+      "protocol": {
+        "type": "String"
+      },
+      "mtu": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsConnectionLine": "{attempts} Versuche · {successes} ok · {drops} Abbrüche · Verbindungszeit p50 {p50} / p95 {p95}",
+  "@obd2DiagnosticsConnectionLine": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      },
+      "successes": {
+        "type": "int"
+      },
+      "drops": {
+        "type": "int"
+      },
+      "p50": {
+        "type": "String"
+      },
+      "p95": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsReconnectLine": "Wiederverbindungen: {silent} still · {visible} sichtbar",
+  "@obd2DiagnosticsReconnectLine": {
+    "placeholders": {
+      "silent": {
+        "type": "int"
+      },
+      "visible": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz Takt · {skips} Rückstau-Auslassungen · {demotions} Herabstufungen",
+  "@obd2DiagnosticsSchedulerLine": {
+    "placeholders": {
+      "tickRate": {
+        "type": "String"
+      },
+      "skips": {
+        "type": "int"
+      },
+      "demotions": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsStarved": "Dynamik-Tier ausgehungert — Drehzahl / Geschwindigkeit fielen unter die Governor-Untergrenze.",
+  "obd2DiagnosticsCompletenessLine": "Gesamt {percent}% · aktive Auslastung {duty}%",
+  "@obd2DiagnosticsCompletenessLine": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "duty": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsTierLine": "{tier}: {percent}%",
+  "@obd2DiagnosticsTierLine": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsSupportLine": "{supported} unterstützt · {unsupported} nicht unterstützt · {unknown} unbekannt",
+  "@obd2DiagnosticsSupportLine": {
+    "placeholders": {
+      "supported": {
+        "type": "int"
+      },
+      "unsupported": {
+        "type": "int"
+      },
+      "unknown": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsFuelLine": "Verdächtig {suspicious} von {total} Messungen",
+  "@obd2DiagnosticsFuelLine": {
+    "placeholders": {
+      "suspicious": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsPidRow": "{pid}: {polled} abgefragt · {ok} ok · {noData} ND · {timeout} TO · {error} Fehler · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "@obd2DiagnosticsPidRow": {
+    "placeholders": {
+      "pid": {
+        "type": "String"
+      },
+      "polled": {
+        "type": "int"
+      },
+      "ok": {
+        "type": "int"
+      },
+      "noData": {
+        "type": "int"
+      },
+      "timeout": {
+        "type": "int"
+      },
+      "error": {
+        "type": "int"
+      },
+      "p50": {
+        "type": "int"
+      },
+      "p95": {
+        "type": "int"
+      },
+      "effectiveHz": {
+        "type": "String"
+      },
+      "targetHz": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsEmpty": "Noch keine OBD2-Sitzung aufgezeichnet — verbinde einen Adapter und zeichne eine Fahrt mit aktiviertem Entwicklermodus auf.",
+  "obd2DiagnosticsExplain": "Während der Aufzeichnung erfasst, um die Dongle↔App-Kommunikation zu debuggen — nur im Entwicklermodus erfasst.",
+  "obd2HealthScreenTitle": "OBD2-Kommunikationszustand",
+  "obd2HealthNavLabel": "OBD2-Kommunikationszustand",
+  "obd2HealthLiveSection": "Live-Sitzung",
+  "obd2HealthHistorySection": "Letzte Sitzungen",
+  "obd2HealthCopyJson": "Als JSON kopieren",
+  "obd2HealthCopied": "OBD2-Diagnose in die Zwischenablage kopiert."
+}

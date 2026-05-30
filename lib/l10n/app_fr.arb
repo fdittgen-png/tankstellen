@@ -2640,5 +2640,268 @@
   "@trajetDetailChartLambda": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsTitle": "OBD2 communication health",
+  "@obd2DiagnosticsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsHeader": "{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}",
+  "@obd2DiagnosticsHeader": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "duty": {
+        "type": "String"
+      },
+      "drops": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsAdapterSection": "Adapter",
+  "@obd2DiagnosticsAdapterSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsConnectionSection": "Connection lifecycle",
+  "@obd2DiagnosticsConnectionSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsPidSection": "Per-PID outcomes",
+  "@obd2DiagnosticsPidSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsSchedulerSection": "Scheduler health",
+  "@obd2DiagnosticsSchedulerSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsCompletenessSection": "Completeness",
+  "@obd2DiagnosticsCompletenessSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsSupportSection": "Discovered-supported PIDs",
+  "@obd2DiagnosticsSupportSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsFuelSection": "Fuel-tier rollup",
+  "@obd2DiagnosticsFuelSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocol {protocol} · MTU {mtu}",
+  "@obd2DiagnosticsAdapterIdentity": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "mac": {
+        "type": "String"
+      },
+      "firmware": {
+        "type": "String"
+      },
+      "protocol": {
+        "type": "String"
+      },
+      "mtu": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsConnectionLine": "{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}",
+  "@obd2DiagnosticsConnectionLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      },
+      "successes": {
+        "type": "int"
+      },
+      "drops": {
+        "type": "int"
+      },
+      "p50": {
+        "type": "String"
+      },
+      "p95": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsReconnectLine": "Reconnects: {silent} silent · {visible} visible",
+  "@obd2DiagnosticsReconnectLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "silent": {
+        "type": "int"
+      },
+      "visible": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions",
+  "@obd2DiagnosticsSchedulerLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "tickRate": {
+        "type": "String"
+      },
+      "skips": {
+        "type": "int"
+      },
+      "demotions": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsStarved": "Dynamics tier starved — RPM / speed fell below the governor floor.",
+  "@obd2DiagnosticsStarved": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsCompletenessLine": "Overall {percent}% · active duty {duty}%",
+  "@obd2DiagnosticsCompletenessLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "duty": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsTierLine": "{tier}: {percent}%",
+  "@obd2DiagnosticsTierLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsSupportLine": "{supported} supported · {unsupported} unsupported · {unknown} unknown",
+  "@obd2DiagnosticsSupportLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "supported": {
+        "type": "int"
+      },
+      "unsupported": {
+        "type": "int"
+      },
+      "unknown": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsFuelLine": "Suspicious {suspicious} of {total} samples",
+  "@obd2DiagnosticsFuelLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "suspicious": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsPidRow": "{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "@obd2DiagnosticsPidRow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pid": {
+        "type": "String"
+      },
+      "polled": {
+        "type": "int"
+      },
+      "ok": {
+        "type": "int"
+      },
+      "noData": {
+        "type": "int"
+      },
+      "timeout": {
+        "type": "int"
+      },
+      "error": {
+        "type": "int"
+      },
+      "p50": {
+        "type": "int"
+      },
+      "p95": {
+        "type": "int"
+      },
+      "effectiveHz": {
+        "type": "String"
+      },
+      "targetHz": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "@obd2DiagnosticsEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
+  "@obd2DiagnosticsExplain": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthScreenTitle": "OBD2 communication health",
+  "@obd2HealthScreenTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthNavLabel": "OBD2 communication health",
+  "@obd2HealthNavLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthLiveSection": "Live session",
+  "@obd2HealthLiveSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthHistorySection": "Recent sessions",
+  "@obd2HealthHistorySection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthCopyJson": "Copy as JSON",
+  "@obd2HealthCopyJson": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
+  "@obd2HealthCopied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

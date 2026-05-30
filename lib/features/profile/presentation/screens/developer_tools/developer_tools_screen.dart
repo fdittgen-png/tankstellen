@@ -136,6 +136,16 @@ class DeveloperToolsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
+          // #2471 — OBD2 communication-health diagnostics (Epic #2463).
+          OutlinedButton.icon(
+            key: const ValueKey('debug-obd2-health'),
+            onPressed: () => context.push('/developer-tools/obd2-health'),
+            icon: const Icon(Icons.bluetooth_searching_outlined),
+            label: Text(
+              l?.obd2HealthNavLabel ?? 'OBD2 communication health',
+            ),
+          ),
+          const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const ValueKey('debug-clear-caches'),
             onPressed: () => _clearCaches(context, ref),

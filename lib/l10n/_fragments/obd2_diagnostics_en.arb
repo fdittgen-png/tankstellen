@@ -1,0 +1,238 @@
+{
+  "obd2DiagnosticsTitle": "OBD2 communication health",
+  "@obd2DiagnosticsTitle": {
+    "description": "Title of the read-only OBD2 communication-health diagnostics card on the Trip detail screen + the dev-tools screen (#2470/#2471, Epic #2463). The OBD2 analogue of the GPS sampling diagnostics card. Only visible in Developer / Debug mode."
+  },
+  "obd2DiagnosticsHeader": "{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}",
+  "@obd2DiagnosticsHeader": {
+    "description": "Collapsed-header summary line of the OBD2 diagnostics card (#2470). At-a-glance triple: overall session completeness percentage, active-duty-cycle percentage, and the number of detected mid-session link drops. percent and duty are pre-formatted integers.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "duty": {
+        "type": "String"
+      },
+      "drops": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsAdapterSection": "Adapter",
+  "@obd2DiagnosticsAdapterSection": {
+    "description": "Section header above the adapter-identity rows (redacted MAC, ELM firmware version, protocol digit, MTU, warm/cold start, capability tier) on the OBD2 diagnostics card (#2470)."
+  },
+  "obd2DiagnosticsConnectionSection": "Connection lifecycle",
+  "@obd2DiagnosticsConnectionSection": {
+    "description": "Section header above the connection-lifecycle rows (attempts, successes, drops, silent/visible reconnects, time-to-connect percentiles) on the OBD2 diagnostics card (#2470)."
+  },
+  "obd2DiagnosticsPidSection": "Per-PID outcomes",
+  "@obd2DiagnosticsPidSection": {
+    "description": "Section header above the per-PID outcome table (polled/ok/no-data/timeout/error counts + p50/p95 round-trip latency + effective-vs-target Hz) on the OBD2 diagnostics card (#2470)."
+  },
+  "obd2DiagnosticsSchedulerSection": "Scheduler health",
+  "@obd2DiagnosticsSchedulerSection": {
+    "description": "Section header above the scheduler-health rows (achieved tick-rate, back-pressure skips, governor demotions, starvation) on the OBD2 diagnostics card (#2470)."
+  },
+  "obd2DiagnosticsCompletenessSection": "Completeness",
+  "@obd2DiagnosticsCompletenessSection": {
+    "description": "Section header above the completeness rollup rows (overall % + per-tier %) on the OBD2 diagnostics card (#2470)."
+  },
+  "obd2DiagnosticsSupportSection": "Discovered-supported PIDs",
+  "@obd2DiagnosticsSupportSection": {
+    "description": "Section header above the discovered-supported tri-state counts (supported / unsupported / unknown) on the OBD2 diagnostics card (#2470)."
+  },
+  "obd2DiagnosticsFuelSection": "Fuel-tier rollup",
+  "@obd2DiagnosticsFuelSection": {
+    "description": "Section header above the per-tick fuel-resolution-tier distribution + downgrade-suspicion rollup on the OBD2 diagnostics card (#2470)."
+  },
+  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocol {protocol} · MTU {mtu}",
+  "@obd2DiagnosticsAdapterIdentity": {
+    "description": "Adapter-identity line on the OBD2 diagnostics card (#2470). mac is the redacted MAC, firmware the ELM banner version, protocol the auto-detected OBD protocol digit, mtu the negotiated BLE ATT MTU. All pre-formatted strings (an em-dash placeholder is supplied for any unknown field).",
+    "placeholders": {
+      "mac": {
+        "type": "String"
+      },
+      "firmware": {
+        "type": "String"
+      },
+      "protocol": {
+        "type": "String"
+      },
+      "mtu": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsConnectionLine": "{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}",
+  "@obd2DiagnosticsConnectionLine": {
+    "description": "Connection-lifecycle summary line on the OBD2 diagnostics card (#2470). attempts/successes/drops are counts; p50/p95 are pre-formatted time-to-connect latency strings (em-dash when unknown).",
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      },
+      "successes": {
+        "type": "int"
+      },
+      "drops": {
+        "type": "int"
+      },
+      "p50": {
+        "type": "String"
+      },
+      "p95": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsReconnectLine": "Reconnects: {silent} silent · {visible} visible",
+  "@obd2DiagnosticsReconnectLine": {
+    "description": "Reconnect-breakdown line on the OBD2 diagnostics card (#2470): silent reconnects recovered the link without the user seeing a disconnect; visible reconnects surfaced a disconnect first.",
+    "placeholders": {
+      "silent": {
+        "type": "int"
+      },
+      "visible": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions",
+  "@obd2DiagnosticsSchedulerLine": {
+    "description": "Scheduler-health summary line on the OBD2 diagnostics card (#2470). tickRate is the pre-formatted achieved tick-rate in Hz; skips and demotions are counts.",
+    "placeholders": {
+      "tickRate": {
+        "type": "String"
+      },
+      "skips": {
+        "type": "int"
+      },
+      "demotions": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsStarved": "Dynamics tier starved — RPM / speed fell below the governor floor.",
+  "@obd2DiagnosticsStarved": {
+    "description": "Warning line shown on the OBD2 diagnostics card (#2470) when the scheduler reported starvation: the dynamics tier dropped below its protected reads-per-second floor on a slow link."
+  },
+  "obd2DiagnosticsCompletenessLine": "Overall {percent}% · active duty {duty}%",
+  "@obd2DiagnosticsCompletenessLine": {
+    "description": "Overall-completeness line on the OBD2 diagnostics card (#2470). percent is overall session completeness, duty the active-duty-cycle, both pre-formatted integers.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "duty": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsTierLine": "{tier}: {percent}%",
+  "@obd2DiagnosticsTierLine": {
+    "description": "Per-tier completeness row on the OBD2 diagnostics card (#2470). tier is the cadence-tier name (dynamics / mixture / slowCorrection / thermalContext), percent the pre-formatted per-tier completeness integer.",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsSupportLine": "{supported} supported · {unsupported} unsupported · {unknown} unknown",
+  "@obd2DiagnosticsSupportLine": {
+    "description": "Discovered-supported tri-state counts line on the OBD2 diagnostics card (#2470). supported/unsupported are PIDs the resolver confirmed; unknown is every command when the supported-PID probe never ran (probe-less clone / blind session).",
+    "placeholders": {
+      "supported": {
+        "type": "int"
+      },
+      "unsupported": {
+        "type": "int"
+      },
+      "unknown": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsFuelLine": "Suspicious {suspicious} of {total} samples",
+  "@obd2DiagnosticsFuelLine": {
+    "description": "Fuel-downgrade rollup line on the OBD2 diagnostics card (#2470): how many fuel-rate samples tripped a sanity flag (suspicious-low / 5E-vs-MAF divergent) out of the total seen this session.",
+    "placeholders": {
+      "suspicious": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsPidRow": "{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "@obd2DiagnosticsPidRow": {
+    "description": "One per-PID row on the OBD2 diagnostics card (#2470). pid is the poll command (e.g. 010C); polled/ok/noData/timeout/error are the 5-way outcome counts; p50/p95 the round-trip latency percentiles; effectiveHz/targetHz the achieved-vs-target refresh rate (pre-formatted strings). ND = no-data, TO = timeout.",
+    "placeholders": {
+      "pid": {
+        "type": "String"
+      },
+      "polled": {
+        "type": "int"
+      },
+      "ok": {
+        "type": "int"
+      },
+      "noData": {
+        "type": "int"
+      },
+      "timeout": {
+        "type": "int"
+      },
+      "error": {
+        "type": "int"
+      },
+      "p50": {
+        "type": "int"
+      },
+      "p95": {
+        "type": "int"
+      },
+      "effectiveHz": {
+        "type": "String"
+      },
+      "targetHz": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "@obd2DiagnosticsEmpty": {
+    "description": "Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet."
+  },
+  "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
+  "@obd2DiagnosticsExplain": {
+    "description": "Subtle one-line explanation at the bottom of the OBD2 diagnostics card (#2470) reminding the developer why the card exists and that it is gated on Developer mode."
+  },
+  "obd2HealthScreenTitle": "OBD2 communication health",
+  "@obd2HealthScreenTitle": {
+    "description": "AppBar title of the dev-tools 'OBD2 Communication Health' screen (#2471), gated on Developer / Debug mode."
+  },
+  "obd2HealthNavLabel": "OBD2 communication health",
+  "@obd2HealthNavLabel": {
+    "description": "Label of the Developer-tools menu row that opens the OBD2 communication-health screen (#2471)."
+  },
+  "obd2HealthLiveSection": "Live session",
+  "@obd2HealthLiveSection": {
+    "description": "Section header above the live (in-progress) OBD2 session diagnostics on the OBD2 communication-health screen (#2471)."
+  },
+  "obd2HealthHistorySection": "Recent sessions",
+  "@obd2HealthHistorySection": {
+    "description": "Section header above the capped ring of finished OBD2 session diagnostics on the OBD2 communication-health screen (#2471)."
+  },
+  "obd2HealthCopyJson": "Copy as JSON",
+  "@obd2HealthCopyJson": {
+    "description": "Label for the action that copies the OBD2 session diagnostics (per-PID table + counters) to the clipboard as JSON, on the OBD2 communication-health screen (#2471)."
+  },
+  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
+  "@obd2HealthCopied": {
+    "description": "Confirmation snackbar after the OBD2 communication-health screen copies the session diagnostics JSON to the clipboard (#2471)."
+  }
+}

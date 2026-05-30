@@ -20,6 +20,7 @@ import '../../domain/trip_recorder.dart';
 import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
 import 'gps_diagnostics_card.dart';
+import 'obd2_diagnostics_trip_card.dart';
 import 'throttle_rpm_histogram_card.dart';
 import 'trip_detail_charts.dart';
 import 'trip_path_map_card.dart';
@@ -270,6 +271,10 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
           GpsDiagnosticsCard(
             diagnostics: widget.entry.gpsSampleDiagnostics,
           ),
+        // OBD2 communication-health diagnostics (#2470). Dev-only — the
+        // card self-hides unless Feature.debugMode is on AND a session was
+        // captured, the OBD2 analogue of the GPS card above.
+        const Obd2DiagnosticsTripCard(),
         // #1895 — the per-trip telemetry charts are folded into one
         // collapsible section, collapsed by default, so the summary
         // and insight cards above stay the focus on open. maintainState

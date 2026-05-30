@@ -14,6 +14,7 @@ import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../data/obd2/adapter_reconnect_scanner.dart';
 import '../data/obd2/obd2_connection_service.dart';
 import '../data/obd2/obd2_service.dart';
+import '../data/obd2/obd2_session_context_block.dart';
 import '../data/obd2/reconnect_connector.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
@@ -280,15 +281,13 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     _liveSub = null;
     await _stateSub?.cancel();
     _stateSub = null;
-    // #1374 phase 1 — tear down the Geolocator subscription if one was
-    // opened. Best-effort.
+    // #1374 phase 1 — tear down the Geolocator subscription. Best-effort.
     await _gps.stop();
     // #1615 — tear down the OEM-PID fuel-level poll. Best-effort.
     await _oemFuel.stop();
     _controller = null;
-    // #726 — persist to the trip history rolling log through the host.
-    // Every trip (including discarded ones) is logged; the fill-up flow
-    // is a *separate* decision. Best-effort.
+    // #726 — persist every trip (incl. discarded) to history; the fill-up
+    // flow is a *separate* decision. Best-effort.
     await _host.saveToHistory(
       summary,
       samples: filled.samples,
@@ -309,9 +308,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     try {
       await svc.disconnect();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
-        'where': 'Obd2RecordingPipeline.stop: service disconnect failed'
-      }));
+      // #2472 — context adds the obd2Session block only when dev-armed.
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+          context: obd2DisconnectTraceContext()));
     }
     _service = null;
     // #1303 — the trip is finalised in history; clear the WAL snapshot
