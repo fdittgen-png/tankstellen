@@ -8,6 +8,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'connection_drop_debouncer.dart';
 import 'elm_byte_channel.dart';
+import 'obd2_comm_diagnostics.dart';
 import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -111,6 +112,13 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
   /// in-flight `sendCommand` completer fails fast with a classified
   /// error instead of waiting out the read timeout (#2261 concern 1).
   void _onDropConfirmed() {
+    // #2466 — a debounce-CONFIRMED drop is a real mid-session link loss.
+    // Count it as a drop (gated; no-op unless Feature.debugMode is on).
+    // Raw `disconnected` edges that self-heal inside the debounce are
+    // binned separately below as `raw-edge-drop` so the confirmed-drop
+    // total stays a tally of genuine losses.
+    final diag = Obd2CommDiagnostics.instance;
+    if (diag.enabled) diag.noteConnectionEvent(drop: true);
     if (_incoming.isClosed) return;
     _incoming.addError(const Obd2DisconnectedException());
   }
@@ -124,6 +132,38 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
   @override
   Future<void> open() async {
     if (_open) return;
+    // #2466 — gated comm-diagnostics connect-lifecycle tee. The whole
+    // block is a no-op unless `Feature.debugMode` armed the collector
+    // (the gate provider flips `enabled`); each call early-returns on
+    // `!enabled`, so production pays one cached-bool read per event.
+    final diag = Obd2CommDiagnostics.instance;
+    final connectSw = diag.enabled ? (Stopwatch()..start()) : null;
+    if (diag.enabled) diag.noteConnectionEvent(attempt: true);
+    try {
+      await _connectAndDiscover();
+      // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
+    } catch (e) {
+      if (diag.enabled) {
+        diag.noteConnectionEvent(
+          failureReason: _classifyBleConnectFailure(e),
+        );
+      }
+      rethrow;
+    }
+    if (connectSw != null) {
+      connectSw.stop();
+      diag.noteConnectionEvent(
+        success: true,
+        timeToConnectMs: connectSw.elapsedMilliseconds,
+      );
+    }
+  }
+
+  /// The connect → service-discovery → notify-subscribe body of [open],
+  /// extracted so [open] can wrap it with the gated connect-lifecycle
+  /// diagnostics tee (#2466) without interleaving counters through the
+  /// platform calls.
+  Future<void> _connectAndDiscover() async {
     final timeout = _connectTimeout;
     if (_autoConnect) {
       // #2261 concern 2 — passive autoConnect GATT wait. No bounded
@@ -179,7 +219,13 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
     );
     await _notifyChar!.setNotifyValue(true);
     _subscription = _notifyChar!.lastValueStream.listen(
-      (bytes) => _incoming.add(bytes),
+      (bytes) {
+        // #2467 — tee the raw chunk into the gated comm-diagnostics
+        // wire-framing counters. Double-gated (kReleaseMode +
+        // collector.enabled), so production pays nothing.
+        noteObd2Framing(bytes);
+        _incoming.add(bytes);
+      },
       onError: (e, st) {
         // #2295 — forward the GATT/ATT error onto the byte stream so the
         // transport's pending `sendCommand` completer fails IMMEDIATELY
@@ -200,9 +246,23 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
     // no-op until the link actually drops.
     _dropDebouncer.reset();
     _connStateSubscription = _device.connectionState.listen(
-      (state) => _dropDebouncer.noteConnectionState(
-        disconnected: state == BluetoothConnectionState.disconnected,
-      ),
+      (state) {
+        final disconnected =
+            state == BluetoothConnectionState.disconnected;
+        // #2466 — a raw `disconnected` EDGE (before the debouncer
+        // confirms it) is binned as a recoverable transient, not a
+        // confirmed drop: most edges self-heal inside the supervision
+        // window. Only count it while the debouncer is idle, so a
+        // single drop episode contributes one raw-edge tally, not one
+        // per repeated edge. Gated; no-op unless Feature.debugMode is on.
+        if (disconnected) {
+          final diag = Obd2CommDiagnostics.instance;
+          if (diag.enabled && !_dropDebouncer.isPending) {
+            diag.noteConnectionEvent(failureReason: 'raw-edge-drop');
+          }
+        }
+        _dropDebouncer.noteConnectionState(disconnected: disconnected);
+      },
       onError: (e, st) {
         debugPrint('FlutterBluePlusElmChannel connectionState error: $e');
       },
@@ -225,7 +285,13 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
     // passive path never calls this, but guard anyway.
     if (_autoConnect) return;
     try {
-      await _device.requestMtu(_recordingMtu);
+      final granted = await _device.requestMtu(_recordingMtu);
+      // #2466 — record the negotiated ATT MTU into the gated comm-health
+      // session (no-op unless Feature.debugMode armed the collector). The
+      // peripheral may grant less than requested; the granted value is the
+      // diagnostic one.
+      final diag = Obd2CommDiagnostics.instance;
+      if (diag.enabled) diag.recordAdapterIdentity(mtu: granted);
     } catch (e, st) {
       // Many clones reject a non-default MTU — harmless, the default
       // 23-byte MTU still works. PHY (2M) is deliberately NOT requested:
@@ -237,6 +303,31 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
   @override
   Future<void> tuneForBackground() async {
     await _setConnectionPriority(ConnectionPriority.balanced);
+  }
+
+  /// Bin a BLE `open()` failure into a stable, low-cardinality reason tag
+  /// for the gated comm-diagnostics `failuresByReason` map (#2466). Kept
+  /// coarse + platform-derived so an exported error-log shows *why* a
+  /// connect failed (GATT timeout vs missing ELM service vs other) without
+  /// leaking a high-cardinality raw message.
+  static String _classifyBleConnectFailure(Object e) {
+    final msg = e.toString().toUpperCase();
+    if (msg.contains('TIMEOUT') || msg.contains('GATT_CONNECTION_TIMEOUT')) {
+      return 'gatt-connection-timeout';
+    }
+    // Android GATT_ERROR 133 — the catch-all "stack gave up" code, most
+    // often a stale GATT client or an out-of-range adapter.
+    if (msg.contains('133') || msg.contains('GATT_ERROR')) {
+      return 'gatt-error-133';
+    }
+    // The service / characteristic discovery `StateError`s thrown above.
+    if (e is StateError &&
+        (msg.contains('ELM327 SERVICE') ||
+            msg.contains('WRITE CHARACTERISTIC') ||
+            msg.contains('NOTIFY CHARACTERISTIC'))) {
+      return 'service-not-found';
+    }
+    return 'other';
   }
 
   /// Best-effort connection-priority request (#2261 concern 4). Android
@@ -271,6 +362,11 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
       // write failure on an otherwise-connected link is a no-op for the
       // debouncer and falls through to the caller as before. Rethrow-only
       // (the caller / transport classifies it) — no stack trace needed.
+      // #2466 — bin the write failure as a recoverable transient reason
+      // (gated; no-op unless Feature.debugMode is on). It is distinct
+      // from a confirmed drop: a write can fail on a link that recovers.
+      final diag = Obd2CommDiagnostics.instance;
+      if (diag.enabled) diag.noteConnectionEvent(failureReason: 'write-fail');
       _dropDebouncer.noteCommandFailure();
       rethrow;
     }

@@ -483,17 +483,16 @@ class Obd2Service implements Obd2RawCommandPort {
       // it only moves off [WakeObservation.notRun] if the bounded wake
       // window actually runs (active policy, not cache-suppressed).
       wakeObservation = WakeObservation.notRun;
-      await _transport.connect();
 
-      // #2465 — open a comm-diagnostics session for this connect and tee
-      // the adapter identity + handshake transcript into it below. A pure
-      // no-op unless Feature.debugMode armed the collector (the gate
-      // provider flips `enabled`); the begin/record calls early-return on
-      // `!enabled`, so production pays one cached-bool read per event.
+      // #2465 — open a gated comm-diagnostics session (no-op unless
+      // Feature.debugMode armed the collector). #2466 — begin it BEFORE
+      // `_transport.connect()` opens the channel so the channel's gated
+      // connect-lifecycle counters attach to THIS session.
       Obd2CommDiagnostics.instance.beginSession(
         linkKind: linkKind,
         redactedMac: redactObd2Mac(adapterMac),
       );
+      await _transport.connect();
 
       // Clear the per-connection supported-PIDs cache. A new session
       // may be a different car / different adapter firmware.
