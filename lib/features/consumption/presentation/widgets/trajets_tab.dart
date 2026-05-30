@@ -25,6 +25,7 @@ import 'maintenance_suggestion_card.dart';
 import 'monthly_insights_card.dart';
 import 'obd2_adapter_picker.dart';
 import 'recording_start_coordinator.dart';
+import 'edit_virtual_trajet_sheet.dart';
 import 'shared_trips_section.dart';
 import 'trajet_row.dart';
 
@@ -264,7 +265,17 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
             vehicle: vehicle,
             l: l,
             theme: theme,
-            onTap: () => context.push('/trip/${entry.id}'),
+            // #2444 — a virtual reconciliation trajet opens the
+            // dedicated edit sheet (it has no recorded path / samples
+            // to show on the trip-detail screen); a real trip routes
+            // to its detail page as before.
+            onTap: entry.summary.isVirtual
+                ? () => showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) => EditVirtualTrajetSheet(entry: entry),
+                    )
+                : () => context.push('/trip/${entry.id}'),
           );
         },
       );
