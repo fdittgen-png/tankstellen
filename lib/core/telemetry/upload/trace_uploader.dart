@@ -25,16 +25,19 @@ class TraceUploader {
   TraceUploader(this._storage);
 
   TraceUploadConfig getConfig() {
-    final raw = _storage.getSetting(_configKey);
-    if (raw == null) return TraceUploadConfig.disabled;
     try {
+      final raw = _storage.getSetting(_configKey);
+      if (raw == null) return TraceUploadConfig.disabled;
       return TraceUploadConfig.fromJson(Map<String, dynamic>.from(raw as Map));
     } on Object catch (e, st) {
       // #2311 — `raw as Map` (schema drift) throws TypeError, and
-      // fromJson's per-field casts can too. Catch broadly (the #1301
-      // TraceStorage precedent) so corrupt/drifted config disables
-      // upload instead of silently killing the path with nothing logged.
-      debugPrint('TraceUploader: config parse failed: $e\n$st');
+      // fromJson's per-field casts can too.
+      // #2366 — the `_storage.getSetting` read is now INSIDE the try too:
+      // a closed/corrupt Hive box would otherwise escape this method's
+      // documented "never throws" contract. Catch broadly (the #1301
+      // TraceStorage precedent) so any failure disables upload instead of
+      // silently killing the path with nothing logged.
+      debugPrint('TraceUploader: config read/parse failed: $e\n$st');
       return TraceUploadConfig.disabled;
     }
   }
