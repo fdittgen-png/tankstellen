@@ -2329,6 +2329,14 @@
   "onboardingObd2VinReadFailed": "VIN konnte nicht ausgelesen werden — bitte manuell eingeben",
   "onboardingObd2ConnectFailed": "Adapter konnte nicht verbunden werden. Du kannst es erneut versuchen oder überspringen.",
   "onboardingPickUseMode": "Wähle einen Nutzungsmodus, um fortzufahren.",
+  "tripRecordingPipEstConsumptionCaption": "gesch. L/100 km",
+  "@tripRecordingPipEstConsumptionCaption": {
+    "description": "#2393 — unit caption under the big GPS-estimated consumption figure on the PiP tile (the GPS-only branch added by #2390). Marks the value as an estimate ('est.') so it reads distinctly from the OBD2-measured 'L/100 km' caption — the leading '~' on the figure carries the same meaning visually. Short, fits a narrow PiP window."
+  },
+  "tripRecordingEstimatedInfo": "Geschätzter Wert (~) — auf dieser Fahrt kein Kraftstoffsensor, daher wird der L/100-km-Wert aus GPS-Geschwindigkeit und der Kalibrierung deines Fahrzeugs modelliert. Er ist ein Näherungswert (typischerweise ±10–30 %, genauer mit zunehmender Kalibrierung), keine Messung.",
+  "@tripRecordingEstimatedInfo": {
+    "description": "#2393 — long-press tooltip / accessibility label on the GPS-estimated consumption value shown on the trip-recording PiP tile and banner strip (#2390). Explains that the leading '~' means the figure is a GPS physics estimate, not a measured OBD2 value, and gives the expected accuracy band. Never shown on OBD2-measured trips."
+  },
   "tripRecordingPipElapsedCaption": "vergangen",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."

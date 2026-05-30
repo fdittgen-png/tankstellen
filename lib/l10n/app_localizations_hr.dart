@@ -5386,6 +5386,13 @@ class AppLocalizationsHr extends AppLocalizations {
   String get onboardingPickUseMode => 'Odaberite način korištenja za nastavak.';
 
   @override
+  String get tripRecordingPipEstConsumptionCaption => 'est. L/100 km';
+
+  @override
+  String get tripRecordingEstimatedInfo =>
+      'Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle\'s calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.';
+
+  @override
   String get tripRecordingPipElapsedCaption => 'proteklo';
 
   @override

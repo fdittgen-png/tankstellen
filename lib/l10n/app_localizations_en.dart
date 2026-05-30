@@ -5338,6 +5338,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPickUseMode => 'Pick a use mode to continue.';
 
   @override
+  String get tripRecordingPipEstConsumptionCaption => 'est. L/100 km';
+
+  @override
+  String get tripRecordingEstimatedInfo =>
+      'Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle\'s calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.';
+
+  @override
   String get tripRecordingPipElapsedCaption => 'elapsed';
 
   @override
@@ -11545,6 +11552,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get onboardingPickUseMode =>
       '⟦Ƥîçķ á úšé ɱóđé ŧó çóñŧîñúé. ··········⟧';
+
+  @override
+  String get tripRecordingPipEstConsumptionCaption => '⟦éšŧ. Ł/100 ķɱ ···⟧';
+
+  @override
+  String get tripRecordingEstimatedInfo =>
+      '⟦Éšŧîɱáŧéđ ṽáłúé (~) — ñó ƒúéł šéñšóř óñ ŧĥîš ŧřîƥ, šó ŧĥé Ł/100 ķɱ ƒîǧúřé îš ɱóđéłłéđ ƒřóɱ ǦƤŠ šƥééđ áñđ ýóúř ṽéĥîçłé\'š çáłîƀřáŧîóñ. Îŧ îš áƥƥřóẋîɱáŧé (ŧýƥîçáłłý ±10–30 %, ŧîǧĥŧéñîñǧ áš ŧĥé çáłîƀřáŧîóñ ɱáŧúřéš), ñóŧ á ɱéášúřéđ řéáđîñǧ. ··············································································⟧';
 
   @override
   String get tripRecordingPipElapsedCaption => '⟦éłáƥšéđ ···⟧';

@@ -395,6 +395,60 @@ void main() {
       expect(find.text('~6.4 L/100'), findsOneWidget);
     });
 
+    testWidgets('GPS-only estimate → approximate tooltip on the value (#2393)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(
+              distance: 1.2,
+              fuelRateLPerHour: null,
+              gpsEstimatedLPer100Km: 6.4,
+            )),
+          ),
+        ],
+      );
+      // The estimate value is wrapped in a Tooltip carrying the
+      // approximate-explanation message (long-press affordance).
+      final tooltip = tester.widget<Tooltip>(
+        find.ancestor(
+          of: find.text('~6.4 L/100'),
+          matching: find.byType(Tooltip),
+        ),
+      );
+      expect(tooltip.message, isNotNull);
+      expect(tooltip.message, contains('GPS'));
+    });
+
+    testWidgets(
+        'GPS-only estimate → disclaimer folded into the banner a11y label '
+        '(#2393)', (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(
+              distance: 1.2,
+              fuelRateLPerHour: null,
+              gpsEstimatedLPer100Km: 6.4,
+            )),
+          ),
+        ],
+      );
+      final handle = tester.ensureSemantics();
+      final label = tester
+          .getSemantics(find.byKey(const Key('tripRecordingBanner')).first)
+          .getSemanticsData()
+          .label;
+      // The outer Semantics label (content is ExcludeSemantics'd) carries
+      // the estimate disclaimer so screen-reader users hear it.
+      expect(label, contains('GPS'));
+      handle.dispose();
+    });
+
     testWidgets('OBD2 trip → real measured value, no "~"', (tester) async {
       await pumpApp(
         tester,
@@ -413,6 +467,15 @@ void main() {
       // 4.06 L/h at 70 km/h → ~5.8 L/100, tilde-free.
       expect(find.text('5.8 L/100'), findsOneWidget);
       expect(find.textContaining('~'), findsNothing);
+      // #2393 — the measured value is NOT wrapped in an estimate Tooltip
+      // (it is a real reading, no approximate disclaimer).
+      expect(
+        find.ancestor(
+          of: find.text('5.8 L/100'),
+          matching: find.byType(Tooltip),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('GPS-only warm-up (null estimate) → no consumption text',
