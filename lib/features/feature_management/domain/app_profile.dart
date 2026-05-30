@@ -69,6 +69,8 @@ enum AppProfile {
 ///   #2025 GPS-only path kicks in on Start
 /// - `gpsTripPath` — GPS samples persisted so the post-trip map +
 ///   GPX export work for GPS-only trajets
+/// - `approachOverlay` — the in-trip approach overlay (#2382), default-ON
+///   for Medium; needs no OBD2 (the live detector geofences off GPS)
 ///
 /// **Full** — Medium + OBD2 required + ergonomics
 /// - All Medium features
@@ -115,6 +117,10 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.obd2TripRecording,
     Feature.consumptionAnalytics,
     Feature.gpsTripPath,
+    // #2382 — the in-trip approach overlay is default-ON for the Medium
+    // tier. It needs no OBD2 (the live detector geofences off GPS) so it
+    // fits the GPS-only Medium recording path.
+    Feature.approachOverlay,
   },
   AppProfile.full: {
     Feature.showFuel,
@@ -140,6 +146,9 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     // (Start → adapter picker → OBD2-driven recording) for users who
     // pick Full from the wizard.
     Feature.obd2Optional,
+    // #2382 — the in-trip approach overlay is default-ON for the Full
+    // tier too.
+    Feature.approachOverlay,
   },
   // The custom sentinel has no bundle — the user's flag set is
   // whatever they last persisted, and re-selecting `custom` from the

@@ -1859,6 +1859,8 @@
   "featureDescription_developerPatToken": "Aktiviert das Fehler-Scan-Feedback-Panel, das mit einem Personal Access Token automatisch GitHub-Issues anlegt. Power-User-/Mitwirkenden-Funktion.",
   "featureLabel_debugMode": "Entwickler-/Debug-Modus",
   "featureDescription_debugMode": "Blendet einen Entwicklerwerkzeuge-Bereich in den Einstellungen ein mit Diagnosefunktionen: Fehlerprotokoll-Export, Test-Benachrichtigungen, ein Test-Alarm-Durchlauf, ein Feature-Flag-Auszug, Caches leeren und Diagnose kopieren.",
+  "featureLabel_approachOverlay": "Annäherungs-Overlay",
+  "featureDescription_approachOverlay": "Während einer aufgezeichneten Fahrt wechselt die schwebende Kachel zur Farbe der Kraftstoffsorte und zeigt den Preis an, wenn Sie sich einer Tankstelle nähern.",
   "feedbackConsentTitle": "Bericht an GitHub senden?",
   "feedbackConsentBody": "Damit wird ein öffentliches Ticket in unserem GitHub-Repository mit deinem Foto und dem OCR-Text erstellt. Es werden keine personenbezogenen Daten (Standort, Konto-ID) gesendet. Fortfahren?",
   "feedbackConsentContinue": "Fortfahren",

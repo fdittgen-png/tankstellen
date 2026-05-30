@@ -131,7 +131,7 @@ void main() {
           );
         }
       }
-      expect(Feature.values.length, 29,
+      expect(Feature.values.length, 30,
           reason: '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord (14); phase 3c bundled showFuel + showElectric + '
               'showConsumptionTab (17); #1517 added manualConsumption + '
@@ -142,7 +142,7 @@ void main() {
               'unifiedSearchResults (24); #2024 added obd2Optional (25); '
               '#2110 added addFillUpOcrReceipt + addFillUpOcrPump (27); '
               '#2116-6 added developerPatToken (28); #2248 added '
-              'debugMode (29). '
+              'debugMode (29); #2382 added approachOverlay (30). '
               'Update the test if a new feature was added or removed.');
     });
 

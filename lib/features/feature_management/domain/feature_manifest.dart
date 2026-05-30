@@ -3,75 +3,9 @@
 
 import 'build_channel.dart';
 import 'feature.dart';
+import 'feature_manifest_entry.dart';
 
-/// Metadata for a single [Feature] in the manifest (#1373 phase 1).
-///
-/// Plain immutable class — the codebase prefers Dart 3 native sealed/enum
-/// + plain classes over Freezed multi-constructor unions for this kind of
-/// declarative descriptor (see #1377 PR notes).
-class FeatureManifestEntry {
-  /// The feature this entry describes.
-  final Feature feature;
-
-  /// Build channels this feature exists in (#1670 / #1673). A feature
-  /// absent from a channel is completely unavailable there — force-off
-  /// and hidden from that channel's feature-management UI.
-  final Set<BuildChannel> availableChannels;
-
-  /// Build channels where the feature defaults ON (opt-out). In an
-  /// available channel NOT listed here the feature defaults OFF
-  /// (opt-in). Always a subset of [availableChannels].
-  final Set<BuildChannel> defaultEnabledChannels;
-
-  /// Hard prerequisites — every feature here must be enabled before
-  /// [feature] can be enabled. Cycles are rejected by
-  /// `assertNoCycles` at provider construction.
-  final Set<Feature> requires;
-
-  /// Human-readable label used by Phase 2 settings UI. English only;
-  /// localisation is Phase 2's concern.
-  final String displayName;
-
-  /// One-line description shown next to the toggle in Phase 2 UI.
-  /// English only; localisation is Phase 2's concern.
-  final String description;
-
-  const FeatureManifestEntry({
-    required this.feature,
-    required this.availableChannels,
-    this.defaultEnabledChannels = const {},
-    required this.displayName,
-    required this.description,
-    this.requires = const {},
-  });
-
-  /// Convenience for a feature available in every build channel — the
-  /// shape of every feature that predates the channel model (#1673).
-  /// [defaultOn] sets opt-out (on) vs opt-in (off) uniformly across
-  /// channels, mirroring the old single `defaultEnabled` bool.
-  const FeatureManifestEntry.allChannels({
-    required this.feature,
-    required bool defaultOn,
-    required this.displayName,
-    required this.description,
-    this.requires = const {},
-  })  : availableChannels = const {
-          BuildChannel.production,
-          BuildChannel.beta,
-        },
-        defaultEnabledChannels = defaultOn
-            ? const {BuildChannel.production, BuildChannel.beta}
-            : const {};
-
-  /// Whether [feature] exists at all in [channel].
-  bool isAvailableIn(BuildChannel channel) =>
-      availableChannels.contains(channel);
-
-  /// Whether [feature] defaults enabled in [channel]. Always `false`
-  /// for a channel the feature is not available in.
-  bool defaultEnabledIn(BuildChannel channel) =>
-      defaultEnabledChannels.contains(channel);
-}
+export 'feature_manifest_entry.dart';
 
 /// Declarative registry of every [Feature] the app knows about.
 ///
@@ -398,6 +332,19 @@ class FeatureManifest {
       description: 'Surface a Developer tools section in Settings with '
           'diagnostics: error-log export, test notifications, a test-alert '
           'pipeline run, a feature-flag dump, clear caches, and diagnostics.',
+    ),
+    // Default-off in the manifest baseline (#2382); the `AppProfile.medium`
+    // and `AppProfile.full` presets flip it ON so the in-trip approach
+    // overlay is opt-out for the active driving tiers. No prerequisite —
+    // the live detector only runs while a trip is recording and degrades
+    // gracefully on GPS-only trajets.
+    Feature.approachOverlay: FeatureManifestEntry.allChannels(
+      feature: Feature.approachOverlay,
+      defaultOn: false,
+      displayName: 'Approach overlay',
+      description:
+          'During a recorded trip, flip the floating tile to the fuel '
+              'type\'s colour and show the price as you near a fuel station.',
     ),
   });
 }

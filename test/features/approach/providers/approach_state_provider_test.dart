@@ -14,6 +14,7 @@ import 'package:tankstellen/features/approach/providers/approach_state_provider.
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
+import 'package:tankstellen/features/profile/providers/approach_overlay_enabled_provider.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -143,6 +144,10 @@ ProviderContainer _container({
   required TripRecordingPhase phase,
   UserProfile? profile = _profile,
   FuelType fuel = FuelType.e10,
+  // #2382 — the live detector is gated on the approach-overlay flag.
+  // Default the gate ON here so the lifecycle tests exercise the
+  // recording path; the gate's own behaviour gets dedicated tests.
+  bool overlayEnabled = true,
 }) {
   final holder = _TripPhaseHolder(phase);
   return ProviderContainer(
@@ -152,6 +157,7 @@ ProviderContainer _container({
       tripRecordingProvider.overrideWith(() => _FakeTripRecording(holder)),
       activeProfileProvider.overrideWith(() => _FakeActiveProfile(profile)),
       effectiveFuelTypeProvider.overrideWithValue(fuel),
+      approachOverlayEnabledProvider.overrideWithValue(overlayEnabled),
     ],
   );
 }
@@ -188,6 +194,49 @@ void main() {
           reason: 'idle trip yields the constant idle stream');
       expect(geo.controller.hasListener, isFalse,
           reason: 'cost-bounded: no GPS subscription unless recording');
+    });
+
+    test(
+        'feature flag OFF → ApproachIdle + GPS NOT subscribed even while '
+        'recording (#2382)', () async {
+      final container = _container(
+        geo: geo,
+        radar: radar,
+        phase: TripRecordingPhase.recording,
+        overlayEnabled: false,
+      );
+      addTearDown(container.dispose);
+
+      final sub = container.listen(approachStateProvider, (_, _) {});
+      addTearDown(sub.close);
+
+      await container.read(approachStateProvider.future);
+
+      expect(sub.read().value, isA<ApproachIdle>(),
+          reason: 'overlay disabled → detector never starts');
+      expect(geo.controller.hasListener, isFalse,
+          reason: 'cost-bounded: the GPS subscription must not start when '
+              'the approach overlay feature is off');
+    });
+
+    test(
+        'feature flag ON + recording → GPS subscribed (the gate lets the '
+        'detector through) (#2382)', () async {
+      final container = _container(
+        geo: geo,
+        radar: radar,
+        phase: TripRecordingPhase.recording,
+        overlayEnabled: true,
+      );
+      addTearDown(container.dispose);
+
+      final sub = container.listen(approachStateProvider, (_, _) {});
+      addTearDown(sub.close);
+      sub.read();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(geo.controller.hasListener, isTrue,
+          reason: 'overlay enabled + recording → detector subscribes');
     });
 
     test('profile == null → ApproachIdle even when a trip is active',
@@ -282,6 +331,8 @@ void main() {
           tripRecordingProvider.overrideWith(() => _FakeTripRecording(holder)),
           activeProfileProvider.overrideWith(() => _FakeActiveProfile(_profile)),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+          // #2382 — gate ON so the recording path is exercised.
+          approachOverlayEnabledProvider.overrideWithValue(true),
         ],
       );
       addTearDown(container.dispose);

@@ -4480,6 +4480,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Megjelenít egy Fejlesztői eszközök szakaszt a beállításokban diagnosztikával: hibanapló exportálása, tesztértesítések, tesztriasztási folyamat futtatása, funkciójelzők listázása, gyorsítótárak törlése és diagnosztika másolása.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Elküldi a jelentést GitHub-ra?';
 
   @override

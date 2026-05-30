@@ -7992,6 +7992,18 @@ abstract class AppLocalizations {
   /// **'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.'**
   String get featureDescription_debugMode;
 
+  /// Settings toggle label for the in-trip approach overlay (#2382). Default-on for the Medium and Full use-modes.
+  ///
+  /// In en, this message translates to:
+  /// **'Approach overlay'**
+  String get featureLabel_approachOverlay;
+
+  /// Settings toggle description for the in-trip approach overlay (#2382).
+  ///
+  /// In en, this message translates to:
+  /// **'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.'**
+  String get featureDescription_approachOverlay;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

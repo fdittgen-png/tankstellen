@@ -540,6 +540,8 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_developerPatToken ?? m.displayName;
     case Feature.debugMode:
       return l?.featureLabel_debugMode ?? m.displayName;
+    case Feature.approachOverlay:
+      return l?.featureLabel_approachOverlay ?? m.displayName;
   }
 }
 
@@ -622,6 +624,8 @@ String _featureDescription(AppLocalizations? l, Feature f) {
               'contributor feature.';
     case Feature.debugMode:
       return l?.featureDescription_debugMode ?? m.description;
+    case Feature.approachOverlay:
+      return l?.featureDescription_approachOverlay ?? m.description;
   }
 }
 
@@ -679,6 +683,7 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.addFillUpOcrPump:
     case Feature.developerPatToken:
     case Feature.debugMode:
+    case Feature.approachOverlay:
       return 'Prerequisites not met';
   }
 }

@@ -4460,6 +4460,13 @@ class AppLocalizationsHr extends AppLocalizations {
       'Prikazuje odjeljak Razvojni alati u postavkama s dijagnostikom: izvoz zapisnika pogrešaka, testne obavijesti, pokretanje testnog tijeka upozorenja, popis zastavica značajki, čišćenje predmemorija i kopiranje dijagnostike.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati izvješće na GitHub?';
 
   @override

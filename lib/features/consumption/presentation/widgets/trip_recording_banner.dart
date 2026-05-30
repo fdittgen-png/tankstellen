@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/services/approach_detector.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/effective_approach_state_provider.dart';
 import '../../../profile/providers/effective_fuel_type_provider.dart';
@@ -20,6 +19,7 @@ import '../../providers/trip_recording_provider.dart';
 import 'coaching_chip.dart';
 import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
+import 'trip_recording_banner_palette.dart';
 import 'trip_recording_pip_view.dart';
 
 /// Persistent indicator of an active OBD2 trip (#726 + #768).
@@ -80,7 +80,7 @@ class TripRecordingBanner extends ConsumerWidget {
       );
     }
 
-    final bandColor = _bandColor(context, state.band, state.phase);
+    final bandColor = bandPalette(context, state.band, state.phase);
     final l = AppLocalizations.of(context);
     return Column(
       children: [
@@ -144,7 +144,15 @@ class TripRecordingBanner extends ConsumerWidget {
       // shell (and its nav bar) back into the tile in the meantime.
       return Material(color: Theme.of(context).colorScheme.surface);
     }
-    final palette = _bandColor(context, state.band, state.phase);
+    // #2382 — in approach mode (in-radius or the leaving grace) the tile
+    // adopts the FUEL TYPE's colour so it matches the same hue the fuel
+    // wears everywhere else in the app (price columns, map markers).
+    // Outside approach mode it keeps the driving-band palette.
+    final inApproach =
+        approachState is ApproachInRadius || approachState is ApproachLeaving;
+    final palette = inApproach
+        ? approachOverlayPalette(fuelType)
+        : bandPalette(context, state.band, state.phase);
     return TripRecordingPipView(
       state: state,
       backgroundColor: palette.background,
@@ -195,54 +203,12 @@ class TripRecordingBanner extends ConsumerWidget {
     }
   }
 
-  _BannerPalette _bandColor(
-    BuildContext context,
-    ConsumptionBand band,
-    TripRecordingPhase phase,
-  ) {
-    // Paused always wins — UI should reflect "not recording" over
-    // any consumption signal from a stale reading.
-    if (phase == TripRecordingPhase.paused) {
-      return _BannerPalette(
-        background: Theme.of(context).colorScheme.surfaceContainerHighest,
-        foreground: Theme.of(context).colorScheme.onSurface,
-      );
-    }
-    switch (band) {
-      case ConsumptionBand.eco:
-        return _BannerPalette(
-            background: DarkModeColors.success(context),
-            foreground: Colors.white);
-      case ConsumptionBand.normal:
-        return _BannerPalette(
-          background: Theme.of(context).colorScheme.primary,
-          foreground: Theme.of(context).colorScheme.onPrimary,
-        );
-      case ConsumptionBand.heavy:
-        return _BannerPalette(
-            background: DarkModeColors.warning(context),
-            foreground: Colors.black);
-      case ConsumptionBand.veryHeavy:
-        return _BannerPalette(
-            background: DarkModeColors.error(context),
-            foreground: Colors.white);
-      case ConsumptionBand.transient:
-        return _BannerPalette(
-            background: Colors.teal.shade400, foreground: Colors.white);
-    }
-  }
-}
-
-class _BannerPalette {
-  final Color background;
-  final Color foreground;
-  const _BannerPalette({required this.background, required this.foreground});
 }
 
 
 class _Content extends StatelessWidget {
   final TripRecordingState state;
-  final _BannerPalette palette;
+  final BannerPalette palette;
 
   const _Content({required this.state, required this.palette});
 

@@ -31,6 +31,9 @@ void main() {
       expect(basic, isNot(contains(Feature.gamification)));
       expect(basic, isNot(contains(Feature.loyaltyCards)));
       expect(basic, isNot(contains(Feature.consumptionAnalytics)));
+      // #2382 — the approach overlay is a driving-tier feature; Basic
+      // (search-only) does not get it.
+      expect(basic, isNot(contains(Feature.approachOverlay)));
     });
 
     test('medium adds manualConsumption + showConsumptionTab to basic, no OBD2 stack', () {
@@ -56,6 +59,9 @@ void main() {
       expect(medium, contains(Feature.consumptionAnalytics));
       expect(medium, contains(Feature.gpsTripPath));
       expect(medium, isNot(contains(Feature.obd2Optional)));
+      // #2382 — the in-trip approach overlay is default-ON for Medium
+      // (needs no OBD2; the live detector geofences off GPS).
+      expect(medium, contains(Feature.approachOverlay));
       // Auto-record / gamification / loyalty stay Full-tier — they
       // assume a paired OBD2 dongle.
       expect(medium, isNot(contains(Feature.autoRecord)));
@@ -84,6 +90,8 @@ void main() {
       // #2025 — Full requires an OBD2 dongle to start a trip
       // (`obd2Optional` ON ⇒ adapter picker, no GPS-only fallback).
       expect(full, contains(Feature.obd2Optional));
+      // #2382 — the in-trip approach overlay is default-ON for Full too.
+      expect(full, contains(Feature.approachOverlay));
       // Full does NOT mean "every flag on" — `tflitePricePrediction`
       // stays off until the user opts in (off-band model artifact).
       expect(full, isNot(contains(Feature.tflitePricePrediction)));
