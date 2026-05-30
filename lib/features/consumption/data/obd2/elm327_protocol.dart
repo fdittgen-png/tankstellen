@@ -79,6 +79,19 @@ class Elm327Protocol {
   static const commandedEquivalenceRatioCommand =
       Elm327Commands.commandedEquivalenceRatioCommand;
   static const baroPressureCommand = Elm327Commands.baroPressureCommand;
+  static const shortTermFuelTrimBank2Command =
+      Elm327Commands.shortTermFuelTrimBank2Command;
+  static const longTermFuelTrimBank2Command =
+      Elm327Commands.longTermFuelTrimBank2Command;
+  static const absoluteLoadCommand = Elm327Commands.absoluteLoadCommand;
+  static const acceleratorPedalDCommand =
+      Elm327Commands.acceleratorPedalDCommand;
+  static const acceleratorPedalECommand =
+      Elm327Commands.acceleratorPedalECommand;
+  static const acceleratorPedalFCommand =
+      Elm327Commands.acceleratorPedalFCommand;
+  static const engineOilTempCommand = Elm327Commands.engineOilTempCommand;
+  static const ambientAirTempCommand = Elm327Commands.ambientAirTempCommand;
   static const fuelTypeCommand = Elm327Commands.fuelTypeCommand;
   static const vinCommand = Elm327Commands.vinCommand;
   static const mfgOdometerCatalog = Elm327Commands.mfgOdometerCatalog;
@@ -138,6 +151,30 @@ class Elm327Protocol {
 
   static double? parseLongTermFuelTrim(String raw) =>
       Elm327Parsers.parseLongTermFuelTrim(raw);
+
+  static double? parseShortTermFuelTrimBank2(String raw) =>
+      Elm327Parsers.parseShortTermFuelTrimBank2(raw);
+
+  static double? parseLongTermFuelTrimBank2(String raw) =>
+      Elm327Parsers.parseLongTermFuelTrimBank2(raw);
+
+  static double? parseAbsoluteLoad(String raw) =>
+      Elm327Parsers.parseAbsoluteLoad(raw);
+
+  static double? parseAcceleratorPedalD(String raw) =>
+      Elm327Parsers.parseAcceleratorPedalD(raw);
+
+  static double? parseAcceleratorPedalE(String raw) =>
+      Elm327Parsers.parseAcceleratorPedalE(raw);
+
+  static double? parseAcceleratorPedalF(String raw) =>
+      Elm327Parsers.parseAcceleratorPedalF(raw);
+
+  static double? parseEngineOilTempCelsius(String raw) =>
+      Elm327Parsers.parseEngineOilTempCelsius(raw);
+
+  static double? parseAmbientAirTempCelsius(String raw) =>
+      Elm327Parsers.parseAmbientAirTempCelsius(raw);
 
   static Set<int>? parseSupportedPidsBitmap(String raw, int groupBase) =>
       Elm327Parsers.parseSupportedPidsBitmap(raw, groupBase);

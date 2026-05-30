@@ -10,12 +10,14 @@ import '../domain/trip_recorder.dart';
 /// fuel-rate key (`'fe'`) joined the per-sample schema.
 ///
 /// Compact key names ('t','s','r','f','fe','th','el','ct','la','lo',
-/// 'al','ha','be','ag') keep per-trip JSON small — a 39-min trip × 1 Hz
-/// lands around 19 KB compressed at this density. The timestamp uses
-/// millisecondsSinceEpoch so the JSON parses fast and round-trips
-/// precisely. Every optional key is emitted only when its field is
-/// non-null, so trips written before each key landed deserialise with
-/// the field null.
+/// 'al','ha','be','ag', + #2459 'lm','bp','aL','pp','ot','am' and the
+/// diagnostic-capture raw inputs 'mf','mp','sf','lf') keep per-trip JSON
+/// small — a 39-min trip × 1 Hz lands around 19 KB compressed at this
+/// density. The timestamp uses millisecondsSinceEpoch so the JSON parses
+/// fast and round-trips precisely. Every optional key is emitted only
+/// when its field is non-null, so trips written before each key landed
+/// deserialise with the field null and a car that doesn't expose a PID
+/// (or a trip with the diagnostic-capture flag off) adds zero bytes.
 Map<String, dynamic> sampleToJson(TripSample s) => {
       't': s.timestamp.millisecondsSinceEpoch,
       's': s.speedKmh,
@@ -36,6 +38,21 @@ Map<String, dynamic> sampleToJson(TripSample s) => {
       if (s.hAccuracyM != null) 'ha': s.hAccuracyM,
       if (s.bearingDeg != null) 'be': s.bearingDeg,
       if (s.accelG != null) 'ag': s.accelG,
+      // #2459 — consumed-but-previously-unstored signals. Each guarded so
+      // a car without the PID adds zero bytes.
+      if (s.lambda != null) 'lm': s.lambda,
+      if (s.baroKpa != null) 'bp': s.baroKpa,
+      if (s.absLoadPercent != null) 'aL': s.absLoadPercent,
+      if (s.pedalPercent != null) 'pp': s.pedalPercent,
+      if (s.oilTempC != null) 'ot': s.oilTempC,
+      if (s.ambientTempC != null) 'am': s.ambientTempC,
+      // #2459 — diagnostic-capture raw mixture inputs. Present only when
+      // the per-trip 'diagnostic capture' flag was on AND the car exposed
+      // the PID; default-off trips and legacy trips carry none.
+      if (s.mafGramsPerSecond != null) 'mf': s.mafGramsPerSecond,
+      if (s.mapKpa != null) 'mp': s.mapKpa,
+      if (s.stft != null) 'sf': s.stft,
+      if (s.ltft != null) 'lf': s.ltft,
     };
 
 TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -57,4 +74,16 @@ TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
       hAccuracyM: (j['ha'] as num?)?.toDouble(),
       bearingDeg: (j['be'] as num?)?.toDouble(),
       accelG: (j['ag'] as num?)?.toDouble(),
+      // #2459 — missing key → null so legacy trips and cars without the
+      // PID deserialise cleanly.
+      lambda: (j['lm'] as num?)?.toDouble(),
+      baroKpa: (j['bp'] as num?)?.toDouble(),
+      absLoadPercent: (j['aL'] as num?)?.toDouble(),
+      pedalPercent: (j['pp'] as num?)?.toDouble(),
+      oilTempC: (j['ot'] as num?)?.toDouble(),
+      ambientTempC: (j['am'] as num?)?.toDouble(),
+      mafGramsPerSecond: (j['mf'] as num?)?.toDouble(),
+      mapKpa: (j['mp'] as num?)?.toDouble(),
+      stft: (j['sf'] as num?)?.toDouble(),
+      ltft: (j['lf'] as num?)?.toDouble(),
     );

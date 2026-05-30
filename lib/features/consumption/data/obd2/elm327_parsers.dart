@@ -229,8 +229,20 @@ class Elm327Parsers {
   static double? parseLongTermFuelTrim(String raw) =>
       _parseFuelTrim(raw, 0x07);
 
-  /// Shared fuel-trim decoder used by PIDs 06 / 07 (and 08 / 09 when
-  /// we add bank-2 support). Returns null on NO DATA.
+  /// Parse short-term fuel trim bank 2 from Mode 01 PID 08 response
+  /// (#2458). Identical encoding to bank-1 STFT; only V / boxer engines
+  /// expose a second bank. Returns null on NO DATA (inline engines).
+  static double? parseShortTermFuelTrimBank2(String raw) =>
+      _parseFuelTrim(raw, 0x08);
+
+  /// Parse long-term fuel trim bank 2 from Mode 01 PID 09 response
+  /// (#2458). Identical encoding to bank-1 LTFT; the slow per-bank
+  /// offset on dual-bank engines. Returns null on NO DATA.
+  static double? parseLongTermFuelTrimBank2(String raw) =>
+      _parseFuelTrim(raw, 0x09);
+
+  /// Shared fuel-trim decoder used by PIDs 06 / 07 / 08 / 09. Returns
+  /// null on NO DATA.
   static double? _parseFuelTrim(String raw, int expectedPid) {
     final bytes = _parseModeOneBody(raw, expectedPid, minBytes: 3);
     if (bytes == null) return null;
@@ -242,6 +254,51 @@ class Elm327Parsers {
     final bytes = _parseModeOneBody(raw, expectedPid, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2] * 100.0 / 255.0;
+  }
+
+  /// Parse accelerator-pedal position D from Mode 01 PID 49 response
+  /// (#2458). Formula: `% = A × 100 / 255`. The driver-intent signal —
+  /// distinct from absolute throttle (PID 11), which the ECU may damp
+  /// for traction / cruise. Response: "41 49 XX".
+  static double? parseAcceleratorPedalD(String raw) =>
+      _parse1BytePercent(raw, 0x49);
+
+  /// Parse accelerator-pedal position E from Mode 01 PID 4A response
+  /// (#2458). Same `A × 100 / 255` encoding. Response: "41 4A XX".
+  static double? parseAcceleratorPedalE(String raw) =>
+      _parse1BytePercent(raw, 0x4A);
+
+  /// Parse accelerator-pedal position F from Mode 01 PID 4B response
+  /// (#2458). Same `A × 100 / 255` encoding. Response: "41 4B XX".
+  static double? parseAcceleratorPedalF(String raw) =>
+      _parse1BytePercent(raw, 0x4B);
+
+  /// Parse absolute load value from Mode 01 PID 43 response (#2458).
+  /// Formula: `load% = (256·A + B) × 100 / 255`. Normalised against a
+  /// naturally-aspirated reference, so it **exceeds 100 %** on boosted
+  /// engines under positive manifold pressure (a clean high-load proxy).
+  /// Two-byte response: "41 43 XX YY".
+  static double? parseAbsoluteLoad(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x43, minBytes: 4);
+    if (bytes == null) return null;
+    return ((bytes[2] * 256) + bytes[3]) * 100.0 / 255.0;
+  }
+
+  /// Parse engine oil temperature from Mode 01 PID 5C response (#2459).
+  /// Formula: °C = A − 40 (single byte) — same encoding as coolant / IAT.
+  /// Response: "41 5C XX".
+  static double? parseEngineOilTempCelsius(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x5C, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2].toDouble() - 40.0;
+  }
+
+  /// Parse ambient air temperature from Mode 01 PID 46 response (#2459).
+  /// Formula: °C = A − 40 (single byte). Response: "41 46 XX".
+  static double? parseAmbientAirTempCelsius(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x46, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2].toDouble() - 40.0;
   }
 
   /// Parse a supported-PIDs bitmap response (#811).

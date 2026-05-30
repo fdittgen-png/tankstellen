@@ -389,6 +389,7 @@ class TripRecording extends _$TripRecording {
       oemFuel: _oemFuel,
       readActiveVehicle: _tryReadActiveVehicle,
       readOemPidsFlag: _readOemPidsFlag,
+      readDiagnosticCaptureFlag: _readDiagnosticCaptureFlag,
     );
     _pipeline = pipeline;
     await pipeline.start(service, automatic: automatic);
@@ -420,6 +421,23 @@ class TripRecording extends _$TripRecording {
       return ref
           .read(featureFlagsProvider.notifier)
           .isEnabled(Feature.experimentalOemPids);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: feature flags unavailable'}));
+      return false;
+    }
+  }
+
+  /// #2459 — read the per-trip 'diagnostic capture' flag from
+  /// `Feature.debugMode` (Developer mode). Not a user-facing consumption
+  /// setting: it's the dev/diagnostics gate, so the raw mixture inputs
+  /// are only persisted when a developer has explicitly enabled Developer
+  /// mode. Swallows provider-wiring errors the same way [_readOemPidsFlag]
+  /// does → safe default off.
+  bool _readDiagnosticCaptureFlag() {
+    try {
+      return ref
+          .read(featureFlagsProvider.notifier)
+          .isEnabled(Feature.debugMode);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: feature flags unavailable'}));
       return false;

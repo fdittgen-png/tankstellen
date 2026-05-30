@@ -62,7 +62,13 @@ void main() {
     // (PID 0x44, commanded λ), each with their dartdoc, so the
     // fuel-rate estimator can use the ECU's real mixture + ambient
     // air-density instead of the assumed-stoich AFR / sea-level pressure.
-    'lib/features/consumption/data/obd2/elm327_parsers.dart': 481,
+    // #2458/#2459 — re-grandfathered 481 → 538: nine new pure parsers,
+    // each with dartdoc — bank-2 trims (0x08/0x09), absolute load (0x43),
+    // accelerator-pedal D/E/F (0x49/0x4A/0x4B), engine-oil (0x5C) +
+    // ambient-air (0x46) temps. All trivial decoders reusing the existing
+    // `_parseFuelTrim` / `_parse1BytePercent` / `_parseModeOneBody`
+    // plumbing. Decomposition tracked separately by #2187/#2188.
+    'lib/features/consumption/data/obd2/elm327_parsers.dart': 538,
     // #2456 — re-grandfathered 471 → 524: the live integrator gained λ
     // (PID 0x44, 2 Hz) + baro (PID 0x33, 0.5 Hz) supportsPid-gated
     // subscriptions and threads both into the MAF + speed-density fuel
@@ -74,7 +80,14 @@ void main() {
     // is a one-line tier assignment, with #2458 tier slots commented in.
     // Net +9 is the helper + its dartdoc, not new branching. Decomposition
     // is tracked separately by #2187/#2188.
-    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 533,
+    // #2458/#2459 — re-grandfathered 533 → 652: filled the #2457 tier
+    // slots with nine supportsPid-gated subscriptions (pedal D/E/F →
+    // dynamics, abs-load → mixture, bank-2 trims → slow, oil + ambient →
+    // thermal) + their latches and latest-value getters that `_emit`
+    // persists onto each TripSample (#2459), + the bank-2 fold into
+    // `_applyTrim`. Each is a one-line `_sub` call carrying its own gate.
+    // Decomposition is tracked separately by #2187/#2188.
+    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 652,
     // #2379 — re-grandfathered 1457 → 1468: threaded the
     // `logFailureAsError` flag through `connect()` (param + doc + the
     // guarded `if` around the now-conditional connect-failed trace) so a
@@ -93,7 +106,12 @@ void main() {
     // `Obd2DebugSessionRecorder.recordHandshakeCommand` calls (all
     // `if(!enabled)`-gated, no-op in prod). Decomposition tracked by
     // #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1552,
+    // #2458 — re-grandfathered 1552 → 1599: bank-2 trim folded into
+    // `_applyFuelTrimCorrection` (supportsPid-gated PIDs 0x08/0x09) + the
+    // updated `applyFuelTrimCorrection` static forwarder + three new read
+    // helpers (bank-2 STFT/LTFT, absolute load 0x43). Decomposition tracked
+    // by #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1599,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb
@@ -101,7 +119,12 @@ void main() {
     // (matching the #2379/#2424 precedent in this same map). Net +6: the
     // explanatory rationale, not behaviour. Decomposition of this god-class
     // is tracked under #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1241,
+    // #2459 — re-grandfathered 1241 → 1288: the per-trip 'diagnostic
+    // capture' flag (field + dartdoc + slow-cadence interval/guard) and
+    // the `_emit` stamping of the six consumed-but-unstored signals
+    // (λ/baro/absLoad/pedal/oil/ambient) + the slow-cadence raw mixture
+    // inputs (MAF/MAP/STFT/LTFT). Decomposition tracked by #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1288,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
@@ -154,7 +177,11 @@ void main() {
     // call + the `_calibratePhysicsScale` resolve/persist helper; the EWMA
     // math itself lives in the standalone `PhysicsScaleCalibrator`).
     // Decomposition of this god-class is tracked under #2187/#2188/#2190.
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1162,
+    // #2459 — re-grandfathered 1162 → 1180: the `_readDiagnosticCaptureFlag`
+    // closure (mirrors `_readOemPidsFlag`: reads Feature.debugMode, swallows
+    // provider-wiring errors → safe off) + its injection into the pipeline.
+    // Decomposition tracked by #2187/#2188/#2190.
+    'lib/features/consumption/providers/trip_recording_provider.dart': 1180,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
     'lib/features/map/presentation/widgets/station_map_layers.dart': 544,
     // #2382 — +5 for Feature.approachOverlay's three per-feature switch

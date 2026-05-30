@@ -85,6 +85,15 @@ void main() {
     Elm327Protocol.engineFuelRateCommand, // 015E
     Elm327Protocol.commandedEquivalenceRatioCommand, // 0144
     Elm327Protocol.baroPressureCommand, // 0133
+    // #2458 / #2459 — newly-acquired optional PIDs.
+    Elm327Protocol.acceleratorPedalDCommand, // 0149
+    Elm327Protocol.acceleratorPedalECommand, // 014A
+    Elm327Protocol.acceleratorPedalFCommand, // 014B
+    Elm327Protocol.absoluteLoadCommand, // 0143
+    Elm327Protocol.shortTermFuelTrimBank2Command, // 0108
+    Elm327Protocol.longTermFuelTrimBank2Command, // 0109
+    Elm327Protocol.engineOilTempCommand, // 015C
+    Elm327Protocol.ambientAirTempCommand, // 0146
   };
 
   test(
@@ -112,7 +121,8 @@ void main() {
       'optional PID', () async {
     final all = <int>{
       0x0C, 0x0D, 0x11, 0x04, 0x0F, 0x05, 0x06, 0x07, 0x2F, // core
-      0x10, 0x0B, 0x5E, 0x44, 0x33, // optional
+      0x10, 0x0B, 0x5E, 0x44, 0x33, // optional (#2456 and earlier)
+      0x49, 0x4A, 0x4B, 0x43, 0x08, 0x09, 0x5C, 0x46, // #2458/#2459
     };
     final subscribed = await _subscribedCommands(all);
     expect(subscribed, containsAll(core));

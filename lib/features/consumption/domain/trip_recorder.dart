@@ -4,137 +4,14 @@
 import 'dart:math' as math;
 
 import 'harsh_event_detector.dart';
+import 'trip_sample.dart';
 import 'trip_summary.dart';
 
-// TripSummary lives in its own file (#1927 — keeps this file under the
-// 400-line guard) but is re-exported so importers of `trip_recorder.dart`
-// still see it as one unit.
+// TripSummary (#1927) and TripSample (#2459) live in their own files to
+// keep this one under the 400-line guard, but are re-exported so
+// importers of `trip_recorder.dart` still see them as one unit.
+export 'trip_sample.dart';
 export 'trip_summary.dart';
-
-/// One OBD2 sample tick — captured by the polling loop and fed into
-/// [TripRecorder] for metric accumulation.
-class TripSample {
-  final DateTime timestamp;
-  final double speedKmh;
-  final double rpm;
-  final double? fuelRateLPerHour;
-
-  /// GPS-physics **estimated** fuel rate in L/h (#2431). Populated ONLY
-  /// for OBD2/hybrid trips whose adapter+ECU supported none of the fuel
-  /// PIDs (PID 5E / MAF 0110 / speed-density MAP 010B), so
-  /// [fuelRateLPerHour] is null on every sample. It is the per-sample
-  /// distribution of the trip's GPS-physics L/100 km estimate over the
-  /// sample's speed (`L/100 km / 100 × speedKmh`), letting the
-  /// trip-detail fuel-rate chart render a clearly-marked *estimated*
-  /// series instead of "Keine Messwerte". Deliberately a SEPARATE field
-  /// from [fuelRateLPerHour] so a measured value and an estimate are
-  /// never confused — when a real fuel PID was seen this stays null and
-  /// the chart shows the measured series. Null for legacy trips, for
-  /// trips that DID get a real fuel signal, and at a standstill (no
-  /// per-distance figure is meaningful at v ≈ 0).
-  final double? estimatedFuelRateLPerHour;
-
-  /// Throttle position in percent (PID 0x11), if available. Cars
-  /// without PID 11 report null — the trip-detail throttle / RPM
-  /// histogram falls back to the RPM axis only in that case (#1261).
-  final double? throttlePercent;
-
-  /// Calculated engine load in percent (PID 0x04). Null when the car
-  /// doesn't surface the PID. Persisted so post-trip insights can
-  /// distinguish "uphill at 60 km/h" (high load) from "flat at 60 km/h"
-  /// (low load) instead of inferring from RPM alone (#1262).
-  final double? engineLoadPercent;
-
-  /// Engine coolant temperature in °C (PID 0x05). Null when the car
-  /// doesn't surface the PID. Persisted so the cold-start surcharge
-  /// heuristic (#1262 phase 2) can flag trips whose ECT never reached
-  /// operating temperature — those burn proportionally more fuel for
-  /// warm-up.
-  final double? coolantTempC;
-
-  /// GPS latitude in degrees (#1374 phase 1). Null when the
-  /// `Feature.gpsTripPath` flag is disabled (default), when no fix has
-  /// landed yet (cold-start indoors), or when the user revoked the
-  /// location permission. Persisted so a future map overlay (Phase 2)
-  /// and a per-segment heatmap (Phase 3) can render the recorded
-  /// trip's path. Legacy samples from trips recorded before this PR
-  /// deserialise with `latitude: null`.
-  final double? latitude;
-
-  /// GPS longitude in degrees (#1374 phase 1). Same null-semantics as
-  /// [latitude]; the two fields are always written and read together
-  /// — a half-set fix is meaningless on a map.
-  final double? longitude;
-
-  /// GPS altitude in metres (#1935 child A — epic #1935). Same
-  /// null-semantics as [latitude]/[longitude]: null when the
-  /// `Feature.gpsTripPath` flag is off, before the first fix, or when
-  /// the platform reports no altitude. Captured so the road-grade
-  /// calculator (#1941) can derive the trip's slope.
-  final double? altitudeM;
-
-  /// Reported horizontal accuracy of the GPS fix in metres (#2019).
-  /// Lets downstream filters reject jittery fixes from urban-canyon
-  /// readings before they feed the speed-derivative accel pipeline
-  /// (#2022) or the post-trip map polyline. Null with the same
-  /// semantics as [latitude] — no fix means no accuracy.
-  final double? hAccuracyM;
-
-  /// Bearing in degrees from true north (#2019). Populated when the
-  /// platform supplies it; null otherwise. The trip-detail map can
-  /// render directional arrowheads off this, and the gear-inference
-  /// heuristic (#2023) uses bearing-stability to gate "is this
-  /// straight-line cruise" decisions.
-  final double? bearingDeg;
-
-  /// Acceleration magnitude in g (#2019). Populated by the
-  /// speed-derivative low-pass pipeline (#2022) when no real
-  /// accelerometer feed is wired up; future hardware integrations may
-  /// overwrite this from raw sensor data. Null on legacy samples and
-  /// when the speed series is too short to differentiate.
-  final double? accelG;
-
-  const TripSample({
-    required this.timestamp,
-    required this.speedKmh,
-    required this.rpm,
-    this.fuelRateLPerHour,
-    this.estimatedFuelRateLPerHour,
-    this.throttlePercent,
-    this.engineLoadPercent,
-    this.coolantTempC,
-    this.latitude,
-    this.longitude,
-    this.altitudeM,
-    this.hAccuracyM,
-    this.bearingDeg,
-    this.accelG,
-  });
-
-  /// Return a copy with [estimatedFuelRateLPerHour] replaced (#2431).
-  /// The OBD2 GPS-estimate fallback uses it to stamp the per-sample
-  /// estimated fuel-rate series onto an already-captured sample without
-  /// disturbing its measured speed / RPM / GPS fields. Only the one
-  /// field is overridable because that is the sole post-capture mutation
-  /// the fallback performs.
-  TripSample copyWithEstimatedFuelRate(double? estimatedFuelRateLPerHour) =>
-      TripSample(
-        timestamp: timestamp,
-        speedKmh: speedKmh,
-        rpm: rpm,
-        fuelRateLPerHour: fuelRateLPerHour,
-        estimatedFuelRateLPerHour: estimatedFuelRateLPerHour,
-        throttlePercent: throttlePercent,
-        engineLoadPercent: engineLoadPercent,
-        coolantTempC: coolantTempC,
-        latitude: latitude,
-        longitude: longitude,
-        altitudeM: altitudeM,
-        hAccuracyM: hAccuracyM,
-        bearingDeg: bearingDeg,
-        accelG: accelG,
-      );
-}
 
 /// Pure-logic accumulator that turns a stream of OBD2 [TripSample]s
 /// into a [TripSummary]. The Bluetooth polling loop feeds samples in

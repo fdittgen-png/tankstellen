@@ -243,6 +243,58 @@ class Elm327Commands {
   /// assumed sea-level value. Response: "41 33 XX".
   static const baroPressureCommand = '0133\r';
 
+  /// Request short-term fuel trim, bank 2 (%). Mode 01, PID 08 (#2458).
+  /// Same formula as bank-1 STFT (`trim% = (A − 128) × 100 / 128`).
+  /// Only V-engines / boxer layouts run a second bank; on inline engines
+  /// the PID is absent and the fuel derivation stays on the bank-1
+  /// correction. Response: "41 08 XX".
+  static const shortTermFuelTrimBank2Command = '0108\r';
+
+  /// Request long-term fuel trim, bank 2 (%). Mode 01, PID 09 (#2458).
+  /// Same formula / bank-2 semantics as [shortTermFuelTrimBank2Command].
+  /// Captures the slow per-bank mixture offset on dual-bank engines.
+  /// Response: "41 09 XX".
+  static const longTermFuelTrimBank2Command = '0109\r';
+
+  /// Request absolute load value (%). Mode 01, PID 43 (#2458). Formula:
+  /// `load% = (256·A + B) × 100 / 255`. Unlike calculated engine load
+  /// (PID 04, capped at 100 %), absolute load is normalised against a
+  /// naturally-aspirated reference and so **exceeds 100 %** on boosted
+  /// engines under positive manifold pressure — a clean high-load proxy.
+  /// Response: "41 43 XX YY".
+  static const absoluteLoadCommand = '0143\r';
+
+  /// Request accelerator-pedal position D (%). Mode 01, PID 49 (#2458).
+  /// Formula: `% = A × 100 / 255`. One of three pedal channels the ECU
+  /// may expose (D/E/F, PIDs 49/4A/4B); the snapshot subscribes whichever
+  /// the car supports and takes the max as driver intent. Response:
+  /// "41 49 XX".
+  static const acceleratorPedalDCommand = '0149\r';
+
+  /// Request accelerator-pedal position E (%). Mode 01, PID 4A (#2458).
+  /// Same `A × 100 / 255` encoding as [acceleratorPedalDCommand].
+  /// Response: "41 4A XX".
+  static const acceleratorPedalECommand = '014A\r';
+
+  /// Request accelerator-pedal position F (%). Mode 01, PID 4B (#2458).
+  /// Same `A × 100 / 255` encoding as [acceleratorPedalDCommand].
+  /// Response: "41 4B XX".
+  static const acceleratorPedalFCommand = '014B\r';
+
+  /// Request engine oil temperature (°C). Mode 01, PID 5C (#2459).
+  /// Formula: °C = A − 40 (one-byte response, same encoding as coolant /
+  /// IAT). Persisted as an optional diagnostic context signal — slower
+  /// thermal mass than coolant, useful for warm-up modelling. Response:
+  /// "41 5C XX".
+  static const engineOilTempCommand = '015C\r';
+
+  /// Request ambient air temperature (°C). Mode 01, PID 46 (#2459).
+  /// Formula: °C = A − 40 (one-byte response). The true outside-air
+  /// temperature (vs IAT, which sits behind the intake and reads warm);
+  /// persisted as optional diagnostic context for air-density modelling.
+  /// Response: "41 46 XX".
+  static const ambientAirTempCommand = '0146\r';
+
   /// Request fuel type. Mode 01, PID 51. (#1399). Single-byte response
   /// per SAE-J1979 Table 6 — see [Elm327Parsers.parseFuelType] for the
   /// mapping. Used during the VIN-driven adapter-pair auto-population
