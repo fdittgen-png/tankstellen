@@ -55,6 +55,29 @@ class ScheduledPid {
 /// exceeds [tickRate] the next tick finds `_inFlight != null` and simply
 /// waits — the scheduler never queues commands behind a slow adapter.
 ///
+/// ## Transient-failure handling (#2379)
+///
+/// Per-PID transport failures (timeout, NO DATA, adapter dropped) are
+/// **expected and recoverable** — engine-off cars NO-DATA half their
+/// PIDs, and a slow clone times out intermittently. They are NOT error-
+/// logged one-per-PID-per-tick (which flooded a real user's error log
+/// with ~50 of 54 traces). Instead:
+///
+/// - Each subscription counts consecutive failures. After
+///   [_maxConsecutiveFailures] in a row the PID is **backed off**: its
+///   selection weight is recomputed at [_backoffHz] (≈ once per 30 s)
+///   instead of its configured hz, so it neither floods the adapter nor
+///   starves healthy PIDs. A single successful read resets the counter
+///   and restores full cadence. The `lastReadAt` anti-starvation stamp
+///   is kept on every attempt (success OR failure), so a backed-off PID
+///   still climbs weight and is retried — just rarely.
+/// - When the adapter looks broadly unresponsive ([_backoffThreshold]+
+///   PIDs backed off) a SINGLE rate-limited aggregated diagnostic is
+///   emitted, at most once per [_diagnosticWindow].
+///
+/// Recording is unaffected — a backed-off PID simply contributes fewer
+/// samples; the loop never stalls.
+///
 /// ## Phase 1 scope (#814)
 ///
 /// This class is the selection engine only. The follow-up phase wires it
@@ -66,6 +89,29 @@ class PidScheduler {
     this.tickRate = const Duration(milliseconds: 100),
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now;
+
+  /// Consecutive per-PID transport failures before the PID is backed off
+  /// to [_backoffHz]. Three covers a brief blip (one slow round-trip,
+  /// one NO-DATA) without flapping, while reacting within a few seconds
+  /// to a genuinely dead PID.
+  static const int _maxConsecutiveFailures = 3;
+
+  /// Effective refresh rate a backed-off PID is selected at — ≈ once per
+  /// 30 s. Low enough that a dead PID never crowds out healthy ones, high
+  /// enough that it resumes promptly the moment the engine starts / the
+  /// adapter recovers.
+  static const double _backoffHz = 1.0 / 30.0;
+
+  /// How many PIDs must be simultaneously backed off before the adapter
+  /// is considered "broadly unresponsive" and the aggregated diagnostic
+  /// is worth emitting. One dead PID (e.g. an unsupported optional PID)
+  /// is normal and silent; several at once signals a real problem.
+  static const int _backoffThreshold = 3;
+
+  /// Minimum gap between aggregated "adapter unresponsive" diagnostics.
+  /// Caps the diagnostic at ≤1 per this window no matter how many PIDs
+  /// time out per tick.
+  static const Duration _diagnosticWindow = Duration(seconds: 30);
 
   /// Sends one OBD-II command and returns the raw adapter response.
   /// Typically `Obd2Transport.sendCommand`.
@@ -86,6 +132,18 @@ class PidScheduler {
   bool _running = false;
   String? _inFlight;
   int _subscriptionCounter = 0;
+
+  /// When the last aggregated "adapter unresponsive" diagnostic was
+  /// emitted, used to rate-limit it to ≤1 per [_diagnosticWindow]. Null
+  /// until the first one fires.
+  DateTime? _lastDiagnosticAt;
+
+  /// Number of subscribed PIDs currently in the backed-off state
+  /// (consecutive failures ≥ [_maxConsecutiveFailures]). Exposed for
+  /// tests that assert backoff engaged / cleared.
+  @visibleForTesting
+  int get backedOffCount =>
+      _subs.values.where((s) => s.isBackedOff).length;
 
   /// Whether [start] has been called and [stop] has not yet run.
   bool get isRunning => _running;
@@ -169,7 +227,12 @@ class PidScheduler {
     if (last == null) return double.infinity;
     final elapsedMs = now.difference(last).inMicroseconds / 1000.0;
     if (elapsedMs <= 0) return 0.0;
-    return (elapsedMs / 1000.0) * sub.config.hz;
+    // A backed-off PID is selected at [_backoffHz] instead of its
+    // configured rate — far less often, so it neither floods the adapter
+    // nor starves healthy PIDs, while still being retried periodically so
+    // it resumes the instant it answers (#2379).
+    final hz = sub.isBackedOff ? _backoffHz : sub.config.hz;
+    return (elapsedMs / 1000.0) * hz;
   }
 
   /// Returns true if [candidateWeight]/[candidate] should replace
@@ -206,29 +269,61 @@ class PidScheduler {
     try {
       final response = await transport(command);
       sub.config.lastReadAt = _clock();
+      // A successful read clears any accumulated failure streak so the
+      // PID resumes its configured cadence immediately (#2379).
+      sub.consecutiveFailures = 0;
       // Check subscription still exists — user may have unsubscribed
       // while the adapter round-trip was in flight.
       if (_subs.containsKey(command)) {
         try {
           sub.onResult(response);
         } catch (e, st) {
-          // Callback errors must not stall the scheduler. Log and move on.
-          unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'PidScheduler: onResult for $command threw'}));
+          // Callback errors are a real HANDLER bug — keep them logged so
+          // they surface in triage. They live in OUR code, not the BLE
+          // link, so the layer is `other` ("not yet classified"), not
+          // `storage` (#2379).
+          unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+            'where': 'PidScheduler: onResult for $command threw',
+          }));
         }
       }
     } catch (e, st) {
-      // Transport failures (timeout, NO DATA, adapter dropped) must not
-      // deadlock the loop OR starve healthy PIDs. We stamp lastReadAt
-      // anyway so the failing PID stops winning every tick — otherwise
-      // two PIDs with identical hz and one failing forever would leave
-      // the healthy one starved by the FIFO tiebreaker. On the next
-      // round the failing PID still gets retried when its weight wins,
-      // just no more often than the cadence it was subscribed at.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'PidScheduler: transport for $command threw'}));
+      // Transport failures (timeout, NO DATA, adapter dropped) are
+      // EXPECTED and recoverable — an engine-off car NO-DATAs many PIDs,
+      // a slow clone times out intermittently. Logging one error trace
+      // per PID per tick flooded a real user's error log (#2379), so we
+      // do NOT error-log them here.
+      //
+      // We still stamp lastReadAt (anti-starvation: a forever-failing PID
+      // must stop winning every tick or it would starve a healthy PID
+      // tied on hz via the FIFO tiebreaker) and bump the failure streak.
+      // Past [_maxConsecutiveFailures] the PID backs off to [_backoffHz]
+      // (see [_weightFor]); a later success resets it.
       sub.config.lastReadAt = _clock();
+      sub.consecutiveFailures++;
+      _maybeEmitUnresponsiveDiagnostic(e, st);
     } finally {
       _inFlight = null;
     }
+  }
+
+  /// Emit AT MOST ONE aggregated "adapter unresponsive" diagnostic per
+  /// [_diagnosticWindow] when [_backoffThreshold]+ PIDs are backed off.
+  /// Replaces the old one-error-per-PID-per-tick flood with a single
+  /// rate-limited breadcrumb that still makes a broadly-dead adapter
+  /// visible in triage (#2379).
+  void _maybeEmitUnresponsiveDiagnostic(Object error, StackTrace stack) {
+    final downCount = backedOffCount;
+    if (downCount < _backoffThreshold) return;
+    final now = _clock();
+    final last = _lastDiagnosticAt;
+    if (last != null && now.difference(last) < _diagnosticWindow) return;
+    _lastDiagnosticAt = now;
+    unawaited(errorLogger.log(ErrorLayer.other, error, stack, context: {
+      'where': 'PidScheduler: OBD2 adapter unresponsive — '
+          '$downCount PIDs timing out',
+      'backedOffPids': downCount,
+    }));
   }
 }
 
@@ -244,4 +339,14 @@ class _Subscription {
 
   /// Monotonic subscription index used for FIFO tie-breaking.
   final int order;
+
+  /// Consecutive transport failures since the last successful read. Reset
+  /// to 0 on any success. Drives the [isBackedOff] state (#2379).
+  int consecutiveFailures = 0;
+
+  /// True once this PID has failed [PidScheduler._maxConsecutiveFailures]
+  /// times in a row — it is then selected at the slow backoff rate until
+  /// it next answers.
+  bool get isBackedOff =>
+      consecutiveFailures >= PidScheduler._maxConsecutiveFailures;
 }

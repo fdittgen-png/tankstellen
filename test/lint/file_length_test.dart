@@ -51,7 +51,12 @@ void main() {
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     'lib/features/consumption/data/obd2/elm327_parsers.dart': 457,
     'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 471,
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1457,
+    // #2379 — re-grandfathered 1457 → 1468: threaded the
+    // `logFailureAsError` flag through `connect()` (param + doc + the
+    // guarded `if` around the now-conditional connect-failed trace) so a
+    // recoverable connect attempt stops flooding the error log. Net +11;
+    // decomposition is tracked separately by #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1468,
     'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1235,
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
         496,

@@ -141,11 +141,17 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
       // is idempotent and a no-op when nothing is connected.
       try {
         await _device.disconnect();
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-          'where':
-              'FlutterBluePlusElmChannel: pre-connect dead-GATT teardown',
-        }));
+      } catch (e, _) {
+        // Best-effort pre-connect teardown of a stale GATT client. The
+        // connect below proceeds (and recovers) regardless — a failure
+        // here is RECOVERABLE and routine, never an error trace (#2379).
+        // Debug-only.
+        assert(() {
+          debugPrint(
+              'FlutterBluePlusElmChannel: pre-connect dead-GATT teardown '
+              'failed (proceeding): $e');
+          return true;
+        }());
       }
       // The explicit ~4 s timeout is LOAD-BEARING: FBP's
       // autoConnect:false connect can otherwise block ~35 s.
@@ -180,7 +186,10 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
         // (via `_failPending`) instead of sitting until the 5 s read
         // timeout, and log it so the drop is visible in release.
         if (!_incoming.isClosed) _incoming.addError(e, st);
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+        // OBD2/BLE GATT/ATT error, not local storage — `other` ("not yet
+        // classified") is the correct layer (#2379). Kept logged: this is
+        // a real link drop worth seeing in release triage.
+        unawaited(errorLogger.log(ErrorLayer.other, e, st,
             context: const {'where': 'FlutterBluePlusElmChannel notify error'}));
       },
     );
@@ -278,7 +287,8 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
     try {
       await _device.disconnect();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'FlutterBluePlusElmChannel: disconnect failed'}));
+      // OBD2/BLE layer, not local storage (#2379).
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FlutterBluePlusElmChannel: disconnect failed'}));
     }
     // #2295 — close the broadcast controller on dispose (symmetry with
     // ClassicElmChannel.close()) so it doesn't leak across a reconnect.
