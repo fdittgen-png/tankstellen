@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'obd2_comm_diagnostics.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Callback signature: "is the pinned adapter MAC currently
@@ -95,6 +96,21 @@ class AdapterReconnectScanner {
   /// uses the cheap passive wait instead of an active scan (#2261).
   bool _passiveMode = false;
 
+  /// #2466 — measures elapsed time from [start] to the successful
+  /// reconnect, fed into the gated comm-diagnostics time-to-reconnect
+  /// reservoir. Null until [start] (and only allocated when the collector
+  /// is armed, so production pays nothing).
+  Stopwatch? _sinceStart;
+
+  /// #2466 — whether the backoff has escalated past its initial value
+  /// during this drop episode. Drives the silent-vs-visible reconnect
+  /// classification: a reconnect that lands before the first escalation
+  /// (the fast `firstProbeDelay` probe / first attempt) is SILENT — it
+  /// healed inside the controller's grace window and the user never saw a
+  /// banner; one that lands after any escalation (or in passive mode) is
+  /// VISIBLE.
+  bool _backoffEscalated = false;
+
   AdapterReconnectScanner({
     required String pinnedMac,
     required AdapterInRangeProbe probe,
@@ -148,6 +164,12 @@ class AdapterReconnectScanner {
   Future<void> start() async {
     if (_scanning) return;
     _scanning = true;
+    // #2466 — start the time-to-reconnect clock (gated; only allocate the
+    // Stopwatch when the collector is armed). The episode begins now: the
+    // controller constructs + starts the scanner the moment a drop fires.
+    _backoffEscalated = false;
+    _sinceStart =
+        Obd2CommDiagnostics.instance.enabled ? (Stopwatch()..start()) : null;
     // #1991 — first probe fast (a transient drop recovers quickest with
     // a near-immediate retry); subsequent misses fall back to the
     // exponential backoff via `_scheduleNext`.
@@ -201,6 +223,7 @@ class AdapterReconnectScanner {
         // re-enter the scanner (e.g. start a new one on the next
         // drop) without clashing with a stale timer.
         await stop();
+        _noteReconnectDiagnostics();
         _onReconnect();
         return;
       }
@@ -220,6 +243,10 @@ class AdapterReconnectScanner {
     if (!_scanning) return; // stop() raced during the passive wait
     if (ok) {
       await stop();
+      // A passive-mode reconnect is by definition VISIBLE — it only
+      // happens past the active-scan miss ceiling, long after the
+      // silent-reconnect grace window closed.
+      _noteReconnectDiagnostics();
       _onReconnect();
       return;
     }
@@ -240,6 +267,7 @@ class AdapterReconnectScanner {
       // ceiling so the passive-wait re-arm is paced, and run the first
       // passive wait promptly.
       _passiveMode = true;
+      _backoffEscalated = true; // #2466 — past the ceiling ⇒ visible
       _currentBackoff = _maxBackoff;
       _timer?.cancel();
       _timer = Timer(_firstProbeDelay, _runCycle);
@@ -272,5 +300,30 @@ class AdapterReconnectScanner {
   void _doubleBackoff() {
     final next = _currentBackoff * 2;
     _currentBackoff = next > _maxBackoff ? _maxBackoff : next;
+    // #2466 — the episode has now lasted past at least one missed cycle,
+    // so a reconnect from here on is VISIBLE (it landed after the fast
+    // first probe failed and the backoff grew).
+    _backoffEscalated = true;
+  }
+
+  /// #2466 — record one successful reconnect into the gated comm-health
+  /// collector: a silent-vs-visible tally plus the time-to-reconnect
+  /// measured from [start]. A no-op unless `Feature.debugMode` armed the
+  /// collector (the Stopwatch is only allocated then). Called once, right
+  /// before [_onReconnect] fires, after the scanner has self-stopped.
+  void _noteReconnectDiagnostics() {
+    final diag = Obd2CommDiagnostics.instance;
+    if (!diag.enabled) return;
+    final elapsed = _sinceStart?.elapsedMilliseconds;
+    _sinceStart = null;
+    // Silent ⇒ recovered before the backoff ever escalated (the fast
+    // firstProbeDelay probe / first attempt healed it inside the grace
+    // window); visible ⇒ it took at least one backoff step or passive mode.
+    final silent = !_backoffEscalated;
+    diag.noteConnectionEvent(
+      silentReconnect: silent,
+      visibleReconnect: !silent,
+      timeToReconnectMs: elapsed,
+    );
   }
 }
