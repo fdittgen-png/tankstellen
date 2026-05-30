@@ -7302,11 +7302,17 @@ abstract class AppLocalizations {
   /// **'Test price alert'**
   String get developerToolsTestAlertTitle;
 
-  /// Notification body produced by the synthetic test-alert pipeline run (#2248).
+  /// Notification body produced by the test-alert pipeline run, naming the real station the synthetic alert fired against (#2248, #2408).
   ///
   /// In en, this message translates to:
-  /// **'Synthetic match: a station below your target was found nearby.'**
-  String get developerToolsTestAlertBody;
+  /// **'Synthetic match: {station} is below your target.'**
+  String developerToolsTestAlertBody(String station);
+
+  /// Snackbar shown when the test-alert action is tapped but there is no station in the current search results to fire against, so the notification would deep-link to a non-resolving station (#2408).
+  ///
+  /// In en, this message translates to:
+  /// **'Search for stations first, then run the test alert so the notification can open a real station.'**
+  String get developerToolsTestAlertNoStation;
 
   /// Group header above the feature-flag dump / clear-caches / copy-diagnostics actions in the Developer tools screen (#2248).
   ///

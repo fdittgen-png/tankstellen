@@ -4052,8 +4052,13 @@ class AppLocalizationsLv extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testa cenas brīdinājums';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Sintētiska atbilstība: tuvumā tika atrasta stacija zem jūsu mērķa.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Sintētiska atbilstība: tuvumā tika atrasta stacija zem jūsu mērķa.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';

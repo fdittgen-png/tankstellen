@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/country/country_config.dart';
 import '../../../core/country/country_provider.dart';
@@ -11,6 +13,16 @@ import '../../search/domain/entities/station.dart';
 import '../../search/providers/search_provider.dart';
 
 part 'station_detail_provider.g.dart';
+
+/// Upper bound on the fallback country-service fetch (#2408). A
+/// non-resolvable / stale deep-link id (e.g. the old synthetic
+/// `debug-test-station`, or a widget row whose station has since been
+/// retired) used to await a fetch that never completed, leaving
+/// `StationDetailScreen` stuck in `ShimmerStationDetail` forever. Bounding
+/// it makes the future throw a [TimeoutException], which the screen's
+/// EXISTING error/retry branch surfaces instead. The search-cache fast
+/// path below is untouched — it returns synchronously and never hits this.
+const Duration _fallbackFetchTimeout = Duration(seconds: 12);
 
 @riverpod
 Future<ServiceResult<StationDetail>> stationDetail(
@@ -59,11 +71,14 @@ Future<ServiceResult<StationDetail>> stationDetail(
   // working without standing up Hive.
   final originCountry = Countries.countryCodeForStationId(stationId);
   if (originCountry == null) {
-    return ref.watch(stationServiceProvider).getStationDetail(stationId);
+    return ref
+        .watch(stationServiceProvider)
+        .getStationDetail(stationId)
+        .timeout(_fallbackFetchTimeout);
   }
   final activeCountry = ref.watch(activeCountryProvider).code;
   final stationService = (originCountry == activeCountry)
       ? ref.watch(stationServiceProvider)
       : stationServiceForCountry(ref, originCountry);
-  return stationService.getStationDetail(stationId);
+  return stationService.getStationDetail(stationId).timeout(_fallbackFetchTimeout);
 }

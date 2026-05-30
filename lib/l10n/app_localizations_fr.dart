@@ -4069,8 +4069,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Alerte de prix de test';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Correspondance synthétique : une station sous votre cible a été trouvée à proximité.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Correspondance synthétique : une station sous votre cible a été trouvée à proximité.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';

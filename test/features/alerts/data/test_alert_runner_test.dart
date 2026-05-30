@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/notifications/notification_payload.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/features/alerts/data/test_alert_runner.dart';
+import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 
 /// Records every notification the runner emits and lets the test control
 /// whether the OS permission is granted. Stand-in for
@@ -108,6 +110,79 @@ void main() {
         {TestAlertRunner.notificationId},
         reason: 'a stable id means re-fires update the banner in place',
       );
+    });
+
+    // #2408 — when the UI passes a REAL station sample, the encoded payload
+    // must carry that station's id so tapping it deep-links to a station
+    // `stationDetailProvider` can resolve (instead of the non-resolving
+    // synthetic `debug-test-station` that left the detail screen stuck in
+    // the shimmer skeleton forever).
+    test('fires against the real station id when a station sample is passed',
+        () async {
+      final notifier = _FakeNotifier();
+      final runner = TestAlertRunner(notifier: notifier);
+      const sample = StationPriceSample(
+        stationId: 'de-12345',
+        name: 'Shell Hauptstraße',
+        lat: 52.5,
+        lng: 13.4,
+        fuelType: 'e10',
+        pricePerLiter: 1.789,
+      );
+
+      final count = await runner.run(
+        title: 'T',
+        body: 'B',
+        station: sample,
+        country: 'de',
+      );
+
+      expect(count, 1);
+      final payload =
+          NotificationPayload.tryDecode(notifier.priceAlerts.single.payload);
+      expect(payload, isNotNull);
+      expect(payload!.stationId, 'de-12345',
+          reason: 'the deep link must point at the real station id');
+      expect(payload.kind, NotificationPayload.kindRadius);
+      expect(payload.country, 'de');
+    });
+
+    test('matches a real station even when its price is well above 1.50',
+        () async {
+      // The old synthetic alert hard-coded a 1.50 threshold, which would
+      // never match a real petrol price near 1.80. The threshold now
+      // tracks the sample, so any real station matches.
+      final notifier = _FakeNotifier();
+      final runner = TestAlertRunner(notifier: notifier);
+      const sample = StationPriceSample(
+        stationId: 'fr-99',
+        name: 'Total',
+        lat: 48.8,
+        lng: 2.3,
+        fuelType: 'diesel',
+        pricePerLiter: 1.92,
+      );
+
+      final count = await runner.run(title: 'T', body: 'B', station: sample);
+
+      expect(count, 1);
+      final payload =
+          NotificationPayload.tryDecode(notifier.priceAlerts.single.payload);
+      expect(payload!.stationId, 'fr-99');
+    });
+
+    test('falls back to the synthetic sample when no station is passed',
+        () async {
+      final notifier = _FakeNotifier();
+      final runner = TestAlertRunner(notifier: notifier);
+
+      final count = await runner.run(title: 'T', body: 'B');
+
+      expect(count, 1);
+      final payload =
+          NotificationPayload.tryDecode(notifier.priceAlerts.single.payload);
+      expect(payload!.stationId, 'debug-test-station',
+          reason: 'last-resort synthetic path is preserved');
     });
   });
 }

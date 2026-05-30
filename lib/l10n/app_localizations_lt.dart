@@ -4049,8 +4049,13 @@ class AppLocalizationsLt extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Bandomasis kainos įspėjimas';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Sintetinis atitikmuo: netoliese rasta stotelė, mažesnė už jūsų tikslą.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Sintetinis atitikmuo: netoliese rasta stotelė, mažesnė už jūsų tikslą.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';

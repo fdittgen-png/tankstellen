@@ -4031,8 +4031,13 @@ class AppLocalizationsSl extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testno cenovno opozorilo';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Sintetično ujemanje: v bližini je bila najdena postaja pod vašim ciljem.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Sintetično ujemanje: v bližini je bila najdena postaja pod vašim ciljem.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';

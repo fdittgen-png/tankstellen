@@ -4063,8 +4063,13 @@ class AppLocalizationsEl extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Δοκιμαστική ειδοποίηση τιμής';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Συνθετική αντιστοίχιση: βρέθηκε κοντά ένας σταθμός κάτω από τον στόχο σας.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Συνθετική αντιστοίχιση: βρέθηκε κοντά ένας σταθμός κάτω από τον στόχο σας.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Διαγνωστικά';

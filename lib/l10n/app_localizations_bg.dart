@@ -4059,8 +4059,13 @@ class AppLocalizationsBg extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Тестов ценови сигнал';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Синтетично съвпадение: наблизо е намерена станция под вашата цел.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Синтетично съвпадение: наблизо е намерена станция под вашата цел.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Диагностика';

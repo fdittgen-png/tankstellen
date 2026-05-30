@@ -79,9 +79,19 @@
   "@developerToolsTestAlertTitle": {
     "description": "Notification title produced by the synthetic test-alert pipeline run (#2248)."
   },
-  "developerToolsTestAlertBody": "Synthetic match: a station below your target was found nearby.",
+  "developerToolsTestAlertBody": "Synthetic match: {station} is below your target.",
   "@developerToolsTestAlertBody": {
-    "description": "Notification body produced by the synthetic test-alert pipeline run (#2248)."
+    "description": "Notification body produced by the test-alert pipeline run, naming the real station the synthetic alert fired against (#2248, #2408).",
+    "placeholders": {
+      "station": {
+        "type": "String",
+        "example": "Shell Hauptstraße"
+      }
+    }
+  },
+  "developerToolsTestAlertNoStation": "Search for stations first, then run the test alert so the notification can open a real station.",
+  "@developerToolsTestAlertNoStation": {
+    "description": "Snackbar shown when the test-alert action is tapped but there is no station in the current search results to fire against, so the notification would deep-link to a non-resolving station (#2408)."
   },
   "developerToolsDiagnosticsGroupTitle": "Diagnostics",
   "@developerToolsDiagnosticsGroupTitle": {

@@ -4055,8 +4055,13 @@ class AppLocalizationsRo extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Alertă de preț de test';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Potrivire sintetică: a fost găsită în apropiere o stație sub ținta ta.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Potrivire sintetică: a fost găsită în apropiere o stație sub ținta ta.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnosticare';

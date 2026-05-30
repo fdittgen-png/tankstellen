@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
@@ -119,6 +122,79 @@ void main() {
       expect(serviceCalled, isTrue);
     });
   });
+
+  // #2408 — a non-resolvable / stale deep-link id used to await a country
+  // fetch that never completed, leaving StationDetailScreen stuck in the
+  // shimmer skeleton forever. The provider now bounds that fallback fetch
+  // so it throws (surfacing the screen's EXISTING error/retry branch).
+  group('stationDetailProvider fallback timeout (#2408)', () {
+    test('surfaces an error when the fallback fetch never resolves', () {
+      fakeAsync((async) {
+        final container = ProviderContainer(
+          overrides: [
+            stationServiceProvider.overrideWith(
+              (_) => _HangingStationService(),
+            ),
+            // No search-cache match → the provider takes the bounded
+            // fallback-fetch path for this unresolvable id.
+            searchStateProvider.overrideWith(() => _SeededSearchState(const [])),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        Object? caught;
+        var completed = false;
+        // Swallow the error here (assert on `caught`) so the rejected
+        // future does not surface as an unhandled async error inside the
+        // fake zone — re-throwing would fail the test even though the
+        // timeout behaviour is exactly what we want.
+        unawaited(
+          container
+              .read(stationDetailProvider('never-resolves').future)
+              .then((_) => completed = true)
+              .onError((Object e, _) {
+            caught = e;
+            return false;
+          }),
+        );
+
+        // Before the timeout elapses the future is still pending.
+        async.elapse(const Duration(seconds: 11));
+        expect(caught, isNull);
+        expect(completed, isFalse);
+
+        // Past the 12s bound the fallback fetch is abandoned and errors.
+        async.elapse(const Duration(seconds: 2));
+        expect(caught, isA<TimeoutException>(),
+            reason: 'a bounded fetch lets the screen show retry instead of '
+                'shimmering forever');
+      });
+    });
+  });
+}
+
+/// A station service whose detail fetch never completes — models a
+/// non-resolvable / stale deep-link id (the old `debug-test-station`, or a
+/// retired widget-row station).
+class _HangingStationService implements StationService {
+  @override
+  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
+      Completer<ServiceResult<StationDetail>>().future;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    dynamic cancelToken,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+          List<String> ids) =>
+      throw UnimplementedError();
 }
 
 // --- helpers ----------------------------------------------------------

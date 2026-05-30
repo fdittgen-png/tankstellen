@@ -4026,8 +4026,13 @@ class AppLocalizationsDa extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testprisadvarsel';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Syntetisk match: en station under dit mål blev fundet i nærheden.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Syntetisk match: en station under dit mål blev fundet i nærheden.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostik';
