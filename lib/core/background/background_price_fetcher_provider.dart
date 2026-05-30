@@ -5,17 +5,25 @@ import 'dart:io';
 
 import 'android_background_price_fetcher.dart';
 import 'background_price_fetcher.dart';
-import 'ios_background_price_fetcher_stub.dart';
+import 'ios_background_price_fetcher.dart';
+import 'noop_background_price_fetcher.dart';
 
 /// Creates the platform-appropriate [BackgroundPriceFetcher] implementation.
 ///
-/// - Android: [AndroidBackgroundPriceFetcher] (WorkManager-based)
-/// - iOS: [IosBackgroundPriceFetcherStub] (no-op placeholder)
-/// - Other platforms: [IosBackgroundPriceFetcherStub] (safe no-op fallback)
+/// This is the cross-platform seam (CLAUDE.md rule #2): the only place that
+/// branches on platform. Shared code (the coordinator, the callback) never
+/// inlines a `Platform.is*` check — it talks to [BackgroundPriceFetcher].
+///
+/// - Android: [AndroidBackgroundPriceFetcher] (WorkManager)
+/// - iOS: [IosBackgroundPriceFetcher] (workmanager iOS backend / BGAppRefresh)
+/// - Other platforms (desktop/web test hosts): [NoopBackgroundPriceFetcher]
 BackgroundPriceFetcher createBackgroundPriceFetcher() {
   if (Platform.isAndroid) {
     return AndroidBackgroundPriceFetcher();
   }
-  // iOS and other platforms get the stub for now.
-  return IosBackgroundPriceFetcherStub();
+  if (Platform.isIOS) {
+    return IosBackgroundPriceFetcher();
+  }
+  // Desktop / other test hosts: nothing to schedule.
+  return NoopBackgroundPriceFetcher();
 }

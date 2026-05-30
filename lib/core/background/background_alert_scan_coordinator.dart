@@ -116,8 +116,14 @@ class BackgroundAlertScanCoordinator {
   /// Acquires the Hive isolate lock, checks the cross-trigger cooldown,
   /// runs the full scan body, and stamps the dedup record on completion.
   /// Returns `true` when a scan actually ran, `false` when it was skipped
-  /// (lock contention or cooldown). Never throws — all failures are spooled
-  /// through [IsolateErrorSpool] for the foreground TraceRecorder.
+  /// (lock contention or cooldown).
+  ///
+  /// Every failure is caught and spooled through [IsolateErrorSpool] for the
+  /// foreground TraceRecorder; the call returns `false` rather than
+  /// propagating, so a flaky network or storage fault can't crash the OS-
+  /// spawned background isolate. The whole body is wrapped in
+  /// try/catch/finally so the lock is always released and the Hive boxes
+  /// always closed.
   ///
   /// [now] is injectable for tests; defaults to the wall clock.
   Future<bool> scan({

@@ -7,7 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/android_background_price_fetcher.dart';
 import 'package:tankstellen/core/background/background_price_fetcher.dart';
 import 'package:tankstellen/core/background/background_service.dart';
-import 'package:tankstellen/core/background/ios_background_price_fetcher_stub.dart';
+import 'package:tankstellen/core/background/ios_background_price_fetcher.dart';
+import 'package:tankstellen/core/background/noop_background_price_fetcher.dart';
 
 void main() {
   group('BackgroundPriceFetcher interface', () {
@@ -16,22 +17,58 @@ void main() {
       expect(fetcher, isA<BackgroundPriceFetcher>());
     });
 
-    test('IosBackgroundPriceFetcherStub implements BackgroundPriceFetcher', () {
-      final fetcher = IosBackgroundPriceFetcherStub();
+    test('IosBackgroundPriceFetcher implements BackgroundPriceFetcher', () {
+      final fetcher = IosBackgroundPriceFetcher();
+      expect(fetcher, isA<BackgroundPriceFetcher>());
+    });
+
+    test('NoopBackgroundPriceFetcher implements BackgroundPriceFetcher', () {
+      final fetcher = NoopBackgroundPriceFetcher();
       expect(fetcher, isA<BackgroundPriceFetcher>());
     });
   });
 
-  group('IosBackgroundPriceFetcherStub', () {
+  group('NoopBackgroundPriceFetcher', () {
     test('init completes without error', () async {
-      final fetcher = IosBackgroundPriceFetcherStub();
-      // Should complete without throwing
+      final fetcher = NoopBackgroundPriceFetcher();
       await expectLater(fetcher.init(), completes);
     });
 
     test('cancelAll completes without error', () async {
-      final fetcher = IosBackgroundPriceFetcherStub();
+      final fetcher = NoopBackgroundPriceFetcher();
       await expectLater(fetcher.cancelAll(), completes);
+    });
+  });
+
+  group('IosBackgroundPriceFetcher', () {
+    test('init / cancelAll exist and are callable', () {
+      final fetcher = IosBackgroundPriceFetcher();
+      expect(fetcher.init, isA<Function>());
+      expect(fetcher.cancelAll, isA<Function>());
+    });
+
+    test('registers the BGAppRefresh identifier matching Info.plist', () {
+      final source = File(
+        'lib/core/background/ios_background_price_fetcher.dart',
+      ).readAsStringSync();
+      expect(
+        source.contains('IosBackgroundTaskIds.appRefresh'),
+        isTrue,
+        reason: 'iOS fetcher must register the shared BGTask identifier',
+      );
+    });
+
+    test('the iOS BGTask identifier matches Info.plist', () {
+      final plist = File('ios/Runner/Info.plist').readAsStringSync();
+      expect(
+        plist.contains('de.tankstellen.tankstellen.background'),
+        isTrue,
+        reason: 'BGTaskSchedulerPermittedIdentifiers must list the task id',
+      );
+      expect(
+        IosBackgroundTaskIds.appRefresh,
+        'de.tankstellen.tankstellen.background',
+      );
     });
   });
 
@@ -191,9 +228,9 @@ void main() {
         reason: 'Factory must import Android implementation',
       );
       expect(
-        source.contains('ios_background_price_fetcher_stub.dart'),
+        source.contains('ios_background_price_fetcher.dart'),
         isTrue,
-        reason: 'Factory must import iOS stub',
+        reason: 'Factory must import iOS implementation',
       );
     });
 
