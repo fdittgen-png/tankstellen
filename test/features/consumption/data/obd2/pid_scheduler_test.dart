@@ -2,8 +2,31 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/pid_scheduler.dart';
 import '../../../../helpers/silence_error_logger.dart';
+
+/// Captures every `errorLogger.log` call routed through the foreground
+/// recorder seam, without standing up Hive / Riverpod (#2379). Mirrors
+/// the fake in `test/core/logging/error_logger_test.dart`.
+class _CaptureRecorder implements TraceRecorder {
+  final calls = <Object>[];
+
+  @override
+  Future<void> record(
+    Object error,
+    StackTrace stackTrace, {
+    ServiceChainSnapshot? serviceChainState,
+  }) async {
+    calls.add(error);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
+}
 
 /// Helper: build a scheduler wired to a deterministic clock. The returned
 /// `advance` function bumps the clock forward by [d] — use it instead of
@@ -376,6 +399,235 @@ void main() {
       expect(scheduler.pickNextCommand(now), '010C');
       scheduler.unsubscribe('010C');
       expect(scheduler.pickNextCommand(now), '010D');
+    });
+  });
+
+  // ── #2379 — transient-failure handling ──────────────────────────────
+  //
+  // These tests bind a capture recorder so they assert on what reached
+  // `errorLogger.log`. They run with a deterministic clock so backoff /
+  // rate-limit windows are advanced precisely rather than waited out.
+  group('PidScheduler — transient per-PID transport failures (#2379)', () {
+    late _CaptureRecorder recorder;
+
+    setUp(() {
+      errorLogger.resetForTest();
+      recorder = _CaptureRecorder();
+      errorLogger.testRecorderOverride = recorder;
+    });
+
+    tearDown(() {
+      // Re-install the file-wide spool silencer that setUpAll wired, so
+      // the selection-math group above keeps passing after these tests.
+      errorLogger.resetForTest();
+      errorLogger.spoolEnqueueOverride = ({
+        required String isolateTaskName,
+        required Object error,
+        StackTrace? stack,
+        Map<String, dynamic>? contextMap,
+        DateTime? timestamp,
+      }) async {};
+    });
+
+    /// Lets at least one real periodic tick fire (the scheduler's
+    /// `tickRate` is a real-wall-clock [Timer], even when the *weight*
+    /// clock is faked) and then drains the microtask queue so the
+    /// in-flight transport future + its catch/onResult settle before the
+    /// assertion runs.
+    Future<void> pump([Duration d = const Duration(milliseconds: 12)]) async {
+      await Future<void>.delayed(d);
+      await Future<void>.delayed(Duration.zero);
+    }
+
+    test(
+        'a single per-PID timeout logs NO error trace (no flood) but the '
+        'loop keeps advancing', () async {
+      // 010C times out every read; 010D is healthy. With one failure the
+      // PID is NOT yet backed off and — critically — nothing is logged.
+      final transport = _FakeTransport(throwOn: {'010C'});
+      final scheduler = PidScheduler(
+        transport: transport.call,
+        tickRate: const Duration(milliseconds: 20),
+      );
+      var goodReads = 0;
+      scheduler
+        ..subscribe('010C', ScheduledPid(hz: 5.0), (_) {})
+        ..subscribe('010D', ScheduledPid(hz: 5.0), (_) => goodReads++)
+        ..start();
+
+      // Just long enough for a couple of ticks — one or two 010C failures.
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      scheduler.stop();
+      await pump();
+
+      expect(transport.calls, contains('010C'),
+          reason: 'the failing PID was actually attempted');
+      expect(goodReads, greaterThanOrEqualTo(1),
+          reason: 'the healthy PID kept being polled');
+      // THE fix: a transient per-PID transport failure produces zero
+      // error traces (it used to log one per PID per tick).
+      expect(recorder.calls, isEmpty,
+          reason: 'transient per-PID failures must not be error-logged');
+    });
+
+    test(
+        'an onResult handler bug IS still logged — under ErrorLayer.other, '
+        'never storage', () async {
+      final transport = _FakeTransport();
+      final scheduler = PidScheduler(
+        transport: transport.call,
+        tickRate: const Duration(milliseconds: 20),
+      );
+      scheduler
+        ..subscribe('010C', ScheduledPid(hz: 5.0),
+            (_) => throw StateError('handler bug'))
+        ..start();
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      scheduler.stop();
+      await pump();
+
+      expect(recorder.calls, isNotEmpty,
+          reason: 'a real handler bug must stay visible in triage');
+      final logged = recorder.calls.whereType<ContextualError>().toList();
+      expect(logged, isNotEmpty);
+      expect(logged.every((e) => e.layer == ErrorLayer.other), isTrue,
+          reason: 'OBD2/BLE diagnostics must not carry the storage layer');
+      expect(logged.any((e) => e.inner is StateError), isTrue);
+    });
+
+    test(
+        'a PID backs off after N consecutive failures and resumes full '
+        'cadence on the next success', () async {
+      // `failing` gates the transport: while true the PID times out, when
+      // flipped false it answers. This makes the test robust to tick
+      // jitter — we assert the STATE transition, not an exact tick count.
+      var fakeNow = DateTime(2026, 1, 1, 12);
+      var failing = true;
+      Future<String> transport(String command) async {
+        if (failing) throw Exception('timeout');
+        return '41 0C 00>';
+      }
+
+      final scheduler = PidScheduler(
+        transport: transport,
+        tickRate: const Duration(milliseconds: 5),
+        clock: () => fakeNow,
+      );
+      var reads = 0;
+      scheduler.subscribe('010C', ScheduledPid(hz: 5.0), (_) => reads++);
+      scheduler.start();
+
+      // Pump until the PID has accumulated ≥ N consecutive failures and
+      // engaged backoff. (Advancing fakeNow keeps successive reads
+      // distinct so the single PID keeps winning selection.)
+      for (var i = 0; i < 6 && scheduler.backedOffCount == 0; i++) {
+        await pump();
+        fakeNow = fakeNow.add(const Duration(milliseconds: 250));
+      }
+      expect(scheduler.backedOffCount, 1,
+          reason: 'N consecutive failures must engage backoff');
+      expect(reads, 0, reason: 'nothing answered yet');
+
+      // Adapter recovers. While backed off the PID polls at ~1/30 Hz, so
+      // a sub-window gap would NOT select it — but a 31 s gap clears its
+      // backoff weight and it is retried, succeeds, and resets.
+      failing = false;
+      fakeNow = fakeNow.add(const Duration(seconds: 31));
+      await pump();
+      expect(reads, greaterThanOrEqualTo(1),
+          reason: 'a backed-off PID is still retried, just rarely');
+      expect(scheduler.backedOffCount, 0,
+          reason: 'a single success resets the failure streak → full cadence');
+
+      scheduler.stop();
+      await pump();
+      expect(recorder.calls, isEmpty,
+          reason: 'one dead PID (< threshold) never error-logs');
+    });
+
+    test(
+        'healthy PIDs are NOT starved while one PID is permanently dead',
+        () async {
+      // 010C always fails; 010D + 0111 are healthy. The dead PID must not
+      // crowd out the healthy ones once it is backed off.
+      final transport = _FakeTransport(throwOn: {'010C'});
+      final scheduler = PidScheduler(
+        transport: transport.call,
+        tickRate: const Duration(milliseconds: 10),
+      );
+      final reads = <String, int>{'010D': 0, '0111': 0};
+      scheduler
+        ..subscribe('010C', ScheduledPid(hz: 5.0), (_) {})
+        ..subscribe('010D', ScheduledPid(hz: 5.0),
+            (_) => reads['010D'] = reads['010D']! + 1)
+        ..subscribe('0111', ScheduledPid(hz: 5.0),
+            (_) => reads['0111'] = reads['0111']! + 1)
+        ..start();
+
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      scheduler.stop();
+      await pump();
+
+      for (final entry in reads.entries) {
+        expect(entry.value, greaterThanOrEqualTo(3),
+            reason: '${entry.key} starved by the dead 010C — backoff failed');
+      }
+    });
+
+    test(
+        'the aggregated "adapter unresponsive" diagnostic is rate-limited '
+        'to ≤1 per window', () async {
+      // Four PIDs all time out → past the backoff threshold. Over many
+      // ticks the aggregated diagnostic must fire AT MOST ONCE per window.
+      var fakeNow = DateTime(2026, 1, 1, 12);
+      Future<String> transport(String command) async {
+        throw Exception('timeout');
+      }
+
+      final scheduler = PidScheduler(
+        transport: transport,
+        tickRate: const Duration(milliseconds: 5),
+        clock: () => fakeNow,
+      );
+      for (final pid in ['010C', '010D', '0105', '0106']) {
+        scheduler.subscribe(pid, ScheduledPid(hz: 5.0), (_) {});
+      }
+      scheduler.start();
+
+      // Pump ~40 ticks across ~10 s of simulated time. All four PIDs back
+      // off; the diagnostic could fire on every one of dozens of failing
+      // ticks if it weren't rate-limited.
+      for (var i = 0; i < 40; i++) {
+        await pump();
+        fakeNow = fakeNow.add(const Duration(milliseconds: 250));
+      }
+      scheduler.stop();
+      await pump();
+
+      final diagnostics = recorder.calls
+          .whereType<ContextualError>()
+          .where((e) => e.toString().contains('adapter unresponsive'))
+          .toList();
+      expect(diagnostics, hasLength(1),
+          reason: 'within a single 30 s window only one diagnostic may fire');
+      expect(diagnostics.single.layer, ErrorLayer.other);
+
+      // Cross the 30 s window and pump again — a second diagnostic is now
+      // allowed (proving it is windowed, not one-shot).
+      fakeNow = fakeNow.add(const Duration(seconds: 31));
+      scheduler.start();
+      for (var i = 0; i < 4; i++) {
+        await pump();
+        fakeNow = fakeNow.add(const Duration(milliseconds: 250));
+      }
+      scheduler.stop();
+      await pump();
+      final after = recorder.calls
+          .whereType<ContextualError>()
+          .where((e) => e.toString().contains('adapter unresponsive'))
+          .toList();
+      expect(after.length, greaterThanOrEqualTo(2),
+          reason: 'a fresh window permits another diagnostic');
     });
   });
 }

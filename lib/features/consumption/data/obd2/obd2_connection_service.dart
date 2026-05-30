@@ -193,6 +193,7 @@ class Obd2ConnectionService {
     required Elm327Adapter adapter,
     required String mac,
     required String name,
+    bool logFailureAsError = true,
   }) async {
     // #2253/#2261 — build the session with the supported-PID + warm
     // negotiated-protocol caches wired in (see [buildObd2Session]).
@@ -211,9 +212,9 @@ class Obd2ConnectionService {
     // #2268 concern 3 — a no-op override suppresses the wake window for a
     // MAC observed never to need it; null ⇒ honour the adapter policy.
     final wakeOverride = await adapterWakeCache?.overrideFor(mac);
-    // #1330 — the per-adapter ELM327 adapter sets the init sequence/timing.
-    final ok =
-        await service.connect(adapter: adapter, wakePolicyOverride: wakeOverride);
+    // #1330 init. #2379 — recoverable attempts suppress the fail trace.
+    final ok = await service.connect(adapter: adapter,
+        wakePolicyOverride: wakeOverride, logFailureAsError: logFailureAsError);
     // #2268 concern 3 — persist the observed wake outcome (a no-op unless
     // the bounded window actually ran on this connect).
     await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
@@ -234,7 +235,8 @@ class Obd2ConnectionService {
     try {
       return await connect(_lastRanked.first);
     } on Obd2ConnectionError catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'Obd2ConnectionService.connectBest failed'}));
+      // #2379 — OBD2/BLE → `other`; still logged (final, rethrown).
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Obd2ConnectionService.connectBest failed'}));
       rethrow;
     }
   }
@@ -307,16 +309,12 @@ class Obd2ConnectionService {
         adapter: generic.adapter,
         mac: mac,
         name: generic.displayName,
+        logFailureAsError: false, // #2379 — recoverable (scan fallback)
       );
-    } on Object catch (e, st) {
-      // Direct attempt failed (connect timeout, GATT 133, init timeout,
-      // missing characteristic, …). Close the half-open channel and
-      // fall back to the scan path so behaviour is never worse than
-      // today's [connectByMac].
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'Obd2ConnectionService.connectByMacDirect — '
-            'falling back to scan',
-      }));
+    } on Object catch (_) {
+      // #2379 — a RECOVERABLE attempt (scan fallback below routinely
+      // succeeds): NOT an error trace. Inner connect already suppressed
+      // its trace; the outcome is owned by the orchestrator + breadcrumbs.
       await _teardownLastDirectChannel();
       if (!fallbackToScan) return null;
       return connectByMac(mac);
@@ -342,9 +340,11 @@ class Obd2ConnectionService {
         adapter: generic.adapter,
         mac: mac,
         name: generic.displayName,
+        logFailureAsError: false, // #2379 — recoverable (scanner re-arms)
       );
     } on Object catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      // #2379 — OBD2/BLE, not local storage.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
         'where': 'Obd2ConnectionService.connectByMacPassive failed',
       }));
       await _teardownLastDirectChannel();
@@ -359,7 +359,8 @@ class Obd2ConnectionService {
     try {
       await prior.close();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      // #2379 — OBD2/BLE, not local storage.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
         'where': 'Obd2ConnectionService: prior-direct-channel teardown',
       }));
     }

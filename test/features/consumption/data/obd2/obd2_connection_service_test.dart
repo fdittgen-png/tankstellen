@@ -6,6 +6,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_bluetooth_facade.dart';
@@ -401,6 +404,145 @@ void main() {
     });
   });
 
+  // ── #2379 — recovered-attempt connect logs must not flood ───────────
+  group('Obd2ConnectionService — connect-retry error-logging (#2379)', () {
+    late _CaptureRecorder recorder;
+
+    setUp(() {
+      errorLogger.resetForTest();
+      recorder = _CaptureRecorder();
+      errorLogger.testRecorderOverride = recorder;
+    });
+
+    tearDown(() {
+      // Restore the file-wide spool silencer that setUpAll installed.
+      errorLogger.resetForTest();
+      errorLogger.spoolEnqueueOverride = ({
+        required String isolateTaskName,
+        required Object error,
+        StackTrace? stack,
+        Map<String, dynamic>? contextMap,
+        DateTime? timestamp,
+      }) async {};
+    });
+
+    test(
+        'a direct attempt RECOVERED by the scan fallback emits NO '
+        '"falling back to scan" error trace (#2379)', () async {
+      // Direct channel.open() throws (connect timeout / GATT 133); the
+      // scan batch carries the same MAC so the fallback connectByMac
+      // succeeds. The direct attempt's own channel never reaches the
+      // ELM init, so the only thing this path used to log was the
+      // (now-suppressed) "falling back to scan" trace.
+      final fake = _FakeFacade(
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        channel: _FakeChannel(respondTo: _elmOkResponses()),
+        directChannel: _FakeChannel(
+          openError: StateError('connect timed out'),
+        ),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+
+      expect(ready, isNotNull, reason: 'scan fallback recovered the connect');
+      expect(fake.scanInvoked, isTrue);
+      // THE fix: the recovered first attempt is no longer an error trace.
+      // (The channel.open() throw is swallowed by Obd2Service.connect's
+      // transport.connect(), which on this code path logs nothing because
+      // open() — not init — failed, then connectByMacDirect's catch is now
+      // debug-only.) Net: a clean recovery with zero error traces.
+      expect(recorder.calls, isEmpty,
+          reason: 'a connect attempt recovered by the fallback flooded the '
+              'user error log — it must now be silent');
+      // Specifically: no "falling back to scan" trace survives.
+      expect(
+        recorder.calls
+            .whereType<ContextualError>()
+            .where((e) => e.toString().contains('falling back to scan')),
+        isEmpty,
+      );
+      await ready!.disconnect();
+    });
+
+    test(
+        'when BOTH direct AND scan fallback fail, connectByMacDirect emits '
+        'no "falling back to scan" trace (#2379)', () async {
+      // The recovered-attempt log is gone; the ultimate failure is owned
+      // upstream (RecordingStartCoordinator + AutoRecord breadcrumbs).
+      final fake = _FakeFacade(
+        batches: const [[]], // empty scan ⇒ connectByMac returns null
+        directChannel: _FakeChannel(
+          openError: StateError('connect timed out'),
+        ),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+      expect(ready, isNull);
+      expect(
+        recorder.calls
+            .whereType<ContextualError>()
+            .where((e) => e.toString().contains('falling back to scan')),
+        isEmpty,
+        reason: 'connectByMacDirect no longer logs its recovered/retried '
+            'attempt — the caller owns the final-failure trace',
+      );
+      // And nothing that does survive carries the storage layer.
+      expect(
+        recorder.calls
+            .whereType<ContextualError>()
+            .where((e) => e.layer == ErrorLayer.storage),
+        isEmpty,
+        reason: 'no OBD2/BLE error may carry the storage layer',
+      );
+    });
+
+    test(
+        'a genuinely unrecovered connect failure (connectBest) IS still '
+        'logged — under ErrorLayer.other, never storage (#2379)', () async {
+      // connectBest surfaces a real, unrecovered failure to its caller
+      // (it rethrows). That genuine failure stays logged — but tagged
+      // `other`, not `storage`.
+      final fake = _FakeFacade(
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'aa:bb',
+              deviceName: 'vLinker FD',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ],
+        // Silent channel ⇒ init never completes ⇒ Obd2AdapterUnresponsive.
+        channel: _FakeChannel(silent: true),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      // Populate _lastRanked so connectBest has a candidate to try.
+      await svc.scan(timeout: const Duration(milliseconds: 50)).toList();
+
+      await expectLater(svc.connectBest(), throwsA(isA<Obd2ConnectionError>()));
+      final logged = recorder.calls.whereType<ContextualError>().toList();
+      expect(logged, isNotEmpty,
+          reason: 'a genuinely unrecovered connect failure stays in triage');
+      expect(logged.every((e) => e.layer == ErrorLayer.other), isTrue,
+          reason: 'OBD2/BLE failures must not carry the storage layer');
+      expect(logged.any((e) => e.toString().contains('connectBest failed')),
+          isTrue);
+    });
+  });
+
   group('Obd2ConnectionService.connectByMacPassive (#2261 concern 2)', () {
     test(
         'opens an autoConnect channel, NO scan, NO bounded timeout, '
@@ -561,6 +703,25 @@ void main() {
 }
 
 // --- helpers ---------------------------------------------------------
+
+/// Captures every `errorLogger.log` routed through the foreground
+/// recorder seam without a Hive / Riverpod stack (#2379).
+class _CaptureRecorder implements TraceRecorder {
+  final calls = <Object>[];
+
+  @override
+  Future<void> record(
+    Object error,
+    StackTrace stackTrace, {
+    ServiceChainSnapshot? serviceChainState,
+  }) async {
+    calls.add(error);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
+}
 
 Obd2ConnectionService _build({
   required Obd2PermissionState permState,
