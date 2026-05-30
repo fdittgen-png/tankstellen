@@ -434,4 +434,38 @@ void main() {
       expect(service, isA<NotificationService>());
     });
   });
+
+  // #2249 — the background + widget isolates must obtain their Dio via the
+  // rate-limited factory, never by hand-rolling `Dio(BaseOptions(...))`. A raw
+  // Dio skips the RateLimitInterceptor (429/Retry-After) + conditional-GET
+  // interceptor, so the headless isolate could thunder at Tankerkönig. This is
+  // a source-scan guard rather than a runtime test because the Dios are built
+  // inside top-level isolate entrypoints that can't be exercised without a
+  // platform engine.
+  group('background isolate Dio construction (#2249)', () {
+    final source = File('lib/core/background/background_service.dart')
+        .readAsStringSync();
+
+    test('routes every Dio through DioFactory', () {
+      expect(
+        source.contains("import '../services/dio_factory.dart';"),
+        isTrue,
+        reason: 'background_service.dart must import DioFactory',
+      );
+      expect(
+        source.contains('DioFactory.create('),
+        isTrue,
+        reason: 'background isolate must build its Dio via DioFactory.create',
+      );
+    });
+
+    test('constructs no raw Dio(BaseOptions(...)) instances', () {
+      expect(
+        source.contains('Dio(BaseOptions('),
+        isFalse,
+        reason: 'raw Dio bypasses the rate-limit + conditional-GET '
+            'interceptors — use DioFactory.create instead',
+      );
+    });
+  });
 }

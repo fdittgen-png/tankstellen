@@ -3,7 +3,6 @@
 
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -25,6 +24,7 @@ import '../telemetry/storage/isolate_error_spool.dart';
 import '../notifications/local_notification_service.dart';
 import '../../features/station_services/germany/tankerkoenig_batch_price_fetcher.dart';
 import '../../features/station_services/germany/tankerkoenig_station_service.dart';
+import '../services/dio_factory.dart';
 import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
 import '../utils/json_extensions.dart';
@@ -267,13 +267,13 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       return;
     }
 
-    // 2. Fetch prices for all stations via the shared Tankerkoenig batch
-    //    fetcher. The fetcher handles chunking + parsing + retry — see
-    //    TankerkoenigBatchPriceFetcher.
-    final dio = Dio(BaseOptions(
+    // 2. Fetch prices via the shared Tankerkoenig batch fetcher (chunking +
+    //    parsing + retry). #2249 — DioFactory so the BG batch fetch inherits
+    //    the rate-limit + conditional-GET interceptors, not a raw request.
+    final dio = DioFactory.create(
       connectTimeout: BackgroundService.bgConnectTimeout,
       receiveTimeout: BackgroundService.bgReceiveTimeout,
-    ));
+    );
     final fetcher = TankerkoenigBatchPriceFetcher(
       dio: dio,
       batchSize: BackgroundService.tankerkoenigBatchSize,
@@ -664,12 +664,12 @@ Future<void> _runRadiusAlerts({
     return;
   }
 
-  final dio = Dio(BaseOptions(
+  // #2249 — rate-limited + conditional-GET Dio (radius-alert search).
+  final dio = DioFactory.create(
     baseUrl: 'https://creativecommons.tankerkoenig.de/json',
     connectTimeout: BackgroundService.bgConnectTimeout,
     receiveTimeout: BackgroundService.bgReceiveTimeout,
-    queryParameters: {'apikey': apiKey},
-  ));
+  )..options.queryParameters = {'apikey': apiKey};
   final service = TankerkoenigStationService(dio);
 
   final runner = RadiusAlertRunner(
@@ -758,12 +758,12 @@ Future<void> _refreshNearestWidgetFromSearch(HiveStorage storage) async {
     final apiKey = storage.getApiKey();
     final hasKey = apiKey != null && apiKey.isNotEmpty;
     if (hasKey) {
-      final dio = Dio(BaseOptions(
+      // #2249 — rate-limited + conditional-GET Dio (nearest-widget search).
+      final dio = DioFactory.create(
         baseUrl: 'https://creativecommons.tankerkoenig.de/json',
         connectTimeout: BackgroundService.bgConnectTimeout,
         receiveTimeout: BackgroundService.bgReceiveTimeout,
-        queryParameters: {'apikey': apiKey},
-      ));
+      )..options.queryParameters = {'apikey': apiKey};
       final service = TankerkoenigStationService(dio);
       await HomeWidgetService.updateNearestWidget(
         storage,
