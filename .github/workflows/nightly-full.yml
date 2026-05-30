@@ -9,8 +9,11 @@ name: Nightly Full Test Suite
 # except `network` because the live-API tests can't run reliably from
 # GitHub-hosted runners).
 #
-# Failure surfaces by reopening / commenting on the tracking issue
-# (#1591) so the user sees it without having to check Actions UI.
+# #2348 — failure no longer buries itself in a comment on the year-old
+# tracking issue #1591. Instead each failing night opens (or, on a
+# repeat failure the same UTC day, comments on) a labelled, triage-ready
+# bug — `nightly-full failed <UTC date>` under the `area/ci` filter —
+# and the next green nightly auto-closes any still-open one.
 
 on:
   schedule:
@@ -53,10 +56,48 @@ jobs:
       - run: dart run build_runner build --delete-conflicting-outputs
       - name: Run full test suite (selector bypassed)
         run: flutter test --coverage --exclude-tags=network
-      - name: Surface failure on tracking issue
+
+      # #2348 — open (or comment on) a dedicated, labelled triage issue
+      # per failing night. Dedups against an already-open issue with the
+      # same `nightly-full failed <date>` title so a re-run / repeat
+      # failure on the same day comments rather than spawning duplicates.
+      - name: Open / update nightly-failure issue
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue comment 1591 --body \
-            "Nightly full-suite run failed on $(date -u +%F): https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          set -euo pipefail
+          TITLE="nightly-full failed $(date -u +%F)"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXISTING=$(gh issue list --state open --search "in:title \"$TITLE\"" \
+            --json number,title \
+            --jq ".[] | select(.title == \"$TITLE\") | .number" | head -n1)
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" \
+              --body "Nightly full-suite failed again. Run: $RUN_URL"
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --label "type/bug,area/ci,P1-high" \
+              --body "Nightly full-suite run failed. Run: $RUN_URL"
+          fi
+
+      # #2348 — a green nightly auto-closes any still-open
+      # `nightly-full failed …` triage issue so a fixed regression
+      # does not linger on the board.
+      - name: Close open nightly-failure issues on green
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh issue list --state open --label area/ci \
+            --search 'in:title "nightly-full failed"' \
+            --json number,title \
+            --jq '.[] | select(.title | startswith("nightly-full failed")) | .number' \
+          | while read -r N; do
+              [ -n "$N" ] || continue
+              gh issue close "$N" \
+                --comment "Resolved by a green nightly-full run. Run: $RUN_URL"
+            done
