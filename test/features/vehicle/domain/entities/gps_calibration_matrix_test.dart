@@ -68,6 +68,17 @@ void main() {
       expect(c.accelEventCost,
           GpsCalibrationMatrix.accelEventCostMin);
     });
+
+    test('clamps physicsScale to its band (#2392)', () {
+      const tooHigh = GpsCalibrationMatrix(physicsScale: 5.0);
+      const tooLow = GpsCalibrationMatrix(physicsScale: 0.1);
+      const inBand = GpsCalibrationMatrix(physicsScale: 1.3);
+      expect(tooHigh.clamped().physicsScale,
+          GpsCalibrationMatrix.physicsScaleMax);
+      expect(
+          tooLow.clamped().physicsScale, GpsCalibrationMatrix.physicsScaleMin);
+      expect(inBand.clamped().physicsScale, 1.3);
+    });
   });
 
   group('GpsCalibrationMatrix.maturity', () {

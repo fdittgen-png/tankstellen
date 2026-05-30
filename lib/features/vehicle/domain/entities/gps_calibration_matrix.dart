@@ -45,6 +45,15 @@ abstract class GpsCalibrationMatrix with _$GpsCalibrationMatrix {
   static const double accelEventCostMin = 0.0;
   static const double accelEventCostMax = 3.0;
 
+  /// Sane band for [physicsScale] (#2392). The OBD2-ground-truth
+  /// calibrator clamps to this so a single mis-measured trip can't
+  /// wreck every future GPS-only live estimate — a scale outside
+  /// [0.5, 2.0] would mean the physics class-defaults are off by more
+  /// than 2× either way, which is a vehicle-param bug, not something
+  /// the live number should chase.
+  static const double physicsScaleMin = 0.5;
+  static const double physicsScaleMax = 2.0;
+
   /// Population-median seeds for cold-start when no WLTP is set.
   static const double defaultBaselineLPer100Km = 6.5;
   static const double defaultIdleCost = 1.2;
@@ -152,6 +161,7 @@ abstract class GpsCalibrationMatrix with _$GpsCalibrationMatrix {
             highSpeedPenalty.clamp(highSpeedPenaltyMin, highSpeedPenaltyMax),
         accelEventCost:
             accelEventCost.clamp(accelEventCostMin, accelEventCostMax),
+        physicsScale: physicsScale.clamp(physicsScaleMin, physicsScaleMax),
       );
 
   /// Whether the 7-coef expansion has been activated yet.

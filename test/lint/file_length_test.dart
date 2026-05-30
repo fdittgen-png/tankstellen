@@ -78,7 +78,12 @@ void main() {
     'lib/features/consumption/presentation/widgets/trip_path_map_card.dart':
         463,
     'lib/features/consumption/providers/consumption_providers.dart': 879,
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1125,
+    // #2392 — re-grandfathered 1125 → 1162: wired the OBD2-ground-truth
+    // physicsScale calibration into `_saveToHistory` (one fire-and-forget
+    // call + the `_calibratePhysicsScale` resolve/persist helper; the EWMA
+    // math itself lives in the standalone `PhysicsScaleCalibrator`).
+    // Decomposition of this god-class is tracked under #2187/#2188/#2190.
+    'lib/features/consumption/providers/trip_recording_provider.dart': 1162,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
     'lib/features/map/presentation/widgets/station_map_layers.dart': 544,
     'lib/features/profile/presentation/widgets/feature_management_section.dart':
