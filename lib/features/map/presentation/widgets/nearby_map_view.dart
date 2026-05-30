@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +14,6 @@ import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import 'station_map_layers.dart';
-import '../../../../core/logging/error_logger.dart';
 
 /// Displays a map of nearby stations from the current search results.
 ///
@@ -59,14 +56,6 @@ class NearbyMapView extends ConsumerStatefulWidget {
 }
 
 class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
-  /// The bounds the camera was last fitted to. Held in State so a redundant
-  /// rebuild (EV-toggle tap, app resume, unrelated provider change) does
-  /// not re-schedule an identical `fitCamera` (#2177). Set when we SCHEDULE
-  /// the post-frame fit — not inside the callback — so that if the fit
-  /// itself triggers a rebuild, the next build computes the same bounds,
-  /// sees they equal `_lastFitBounds`, and skips: no fit→rebuild→fit loop.
-  LatLngBounds? _lastFitBounds;
-
   @override
   Widget build(BuildContext context) {
     final searchState = widget.searchState;
@@ -126,37 +115,14 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
           );
         }
 
-        // Fit map viewport to the search radius when results change so the
-        // user immediately sees the entire searched area instead of having
-        // to zoom out manually.
-        //
-        // #2177 — guard the schedule against redundant per-build re-fits.
-        // `build` runs on every EV-toggle tap, app resume, and unrelated
-        // provider change; an unguarded post-frame `fitCamera` snapped the
-        // camera back to the search bounds each time (fighting the user's
-        // manual pan and, during the cold-start window, forcing a TileLayer
-        // reset). We only schedule when the fit target actually changed
-        // since the last fit. `_lastFitBounds` is set HERE (at schedule
-        // time, not in the callback) so a fit→rebuild→fit loop cannot form:
-        // the next build computes the same bounds, finds them equal, skips.
+        // #2399 — the viewport is framed by `StationMapLayers` itself:
+        // `MapOptions.initialCameraFit` positions the first paint during
+        // layout, and a single guarded `didUpdateWidget` re-fit handles a
+        // changed search centre. The old per-build post-frame `fitCamera`
+        // here raced the (now-deleted) cold-start reset window and is
+        // gone. `bounds` is still computed for the recenter button.
         final bounds =
             StationMapLayers.boundsForRadius(center, searchRadiusKm);
-        if (NearbyMapView.shouldFit(_lastFitBounds, bounds)) {
-          _lastFitBounds = bounds;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            try {
-              mapController.fitCamera(
-                CameraFit.bounds(
-                  bounds: bounds,
-                  padding: const EdgeInsets.all(32),
-                ),
-              );
-            } catch (e, st) {
-              unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Map fitCamera failed'}));
-            }
-          });
-        }
 
         return Stack(
           children: [

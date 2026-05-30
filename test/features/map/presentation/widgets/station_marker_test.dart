@@ -222,4 +222,124 @@ void main() {
       expect(expensiveMarker.width, kStationMarkerWidth);
     });
   });
+
+  group('StationMarkerBuilder fallback fuel display (#2400)', () {
+    // Tankerkönig returns only the queried fuel's price. A diesel-only
+    // station while E10 is selected used to render "--"; it must now fall
+    // back to the diesel price with a labelled fuel code.
+    const dieselOnlyStation = Station(
+      id: 'diesel-only',
+      name: 'Diesel Only',
+      brand: 'TOTAL',
+      street: 'Rue Diesel',
+      postCode: '75001',
+      place: 'Paris',
+      lat: 48.0,
+      lng: 2.0,
+      diesel: 1.699,
+      isOpen: true,
+    );
+
+    testWidgets(
+      'a diesel-only station on an E10 search shows the diesel price, '
+      'never "--"',
+      (tester) async {
+        final marker = StationMarkerBuilder.build(
+          tester.element(find.byType(Container).first),
+          dieselOnlyStation,
+          FuelType.e10,
+          1.50,
+          2.00,
+        );
+        // Fallback widens the marker so the fuel code + price both fit.
+        expect(marker.width, kStationMarkerWideWidth);
+
+        await pumpApp(
+          tester,
+          SizedBox(
+            width: marker.width,
+            height: marker.height,
+            child: (((marker.child as RepaintBoundary).child as Semantics)
+                    .child as GestureDetector)
+                .child,
+          ),
+        );
+
+        // The diesel price is shown (1.699 => "1,699"); never "--".
+        expect(find.text('1,699'), findsOneWidget);
+        expect(find.text('--'), findsNothing);
+        // The fallback fuel code is labelled so the price is unambiguous.
+        expect(find.text('Diesel'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'a truly price-less station still shows "--"',
+      (tester) async {
+        const emptyStation = Station(
+          id: 'empty',
+          name: 'Empty',
+          brand: 'TEST',
+          street: 'Nowhere',
+          postCode: '00000',
+          place: 'Void',
+          lat: 0.0,
+          lng: 0.0,
+          isOpen: true,
+        );
+        final marker = StationMarkerBuilder.build(
+          tester.element(find.byType(Container).first),
+          emptyStation,
+          FuelType.e10,
+          1.50,
+          2.00,
+        );
+        // No fallback fuel → no widening, no fuel label.
+        expect(marker.width, kStationMarkerWidth);
+
+        await pumpApp(
+          tester,
+          SizedBox(
+            width: marker.width,
+            height: marker.height,
+            child: (((marker.child as RepaintBoundary).child as Semantics)
+                    .child as GestureDetector)
+                .child,
+          ),
+        );
+
+        expect(find.text('--'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'no fallback label when the selected fuel has its own price',
+      (tester) async {
+        final marker = StationMarkerBuilder.build(
+          tester.element(find.byType(Container).first),
+          testStation, // has e10
+          FuelType.e10,
+          1.50,
+          2.00,
+        );
+        expect(marker.width, kStationMarkerWidth);
+
+        await pumpApp(
+          tester,
+          SizedBox(
+            width: marker.width,
+            height: marker.height,
+            child: (((marker.child as RepaintBoundary).child as Semantics)
+                    .child as GestureDetector)
+                .child,
+          ),
+        );
+
+        expect(find.text('1,799'), findsOneWidget);
+        // No fuel code when the selected fuel resolved directly.
+        expect(find.text('Diesel'), findsNothing);
+        expect(find.text('E10'), findsNothing);
+      },
+    );
+  });
 }

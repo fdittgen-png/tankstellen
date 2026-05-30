@@ -271,4 +271,67 @@ void main() {
       expect(station.fullLocation, equals('80331 München'));
     });
   });
+
+  group('bestDisplayPrice (#2400)', () {
+    test('returns the selected fuel price when present, labelled as it', () {
+      final s = _makeStation(e10: 1.599, diesel: 1.549);
+      final r = bestDisplayPrice(s, FuelType.e10);
+      expect(r, isNotNull);
+      expect(r!.price, 1.599);
+      expect(r.shownFuel, FuelType.e10);
+    });
+
+    test('falls back to the first available fuel when selected is null', () {
+      // Diesel-only station while E10 is selected — the recurring "--"
+      // case. Must resolve to the diesel price, labelled diesel.
+      final s = _makeStation(diesel: 1.699);
+      final r = bestDisplayPrice(s, FuelType.e10);
+      expect(r, isNotNull);
+      expect(r!.price, 1.699);
+      expect(r.shownFuel, FuelType.diesel);
+    });
+
+    test('fallback honours E10→E5→Diesel→…→CNG priority order', () {
+      // Selected = CNG (null); E5 + LPG present. E5 wins (earlier in the
+      // priority order than LPG).
+      final s = _makeStation(e5: 1.859, lpg: 0.799);
+      final r = bestDisplayPrice(s, FuelType.cng);
+      expect(r!.shownFuel, FuelType.e5);
+      expect(r.price, 1.859);
+    });
+
+    test('returns null only when the station has no usable price', () {
+      final s = _makeStation();
+      expect(bestDisplayPrice(s, FuelType.e10), isNull);
+    });
+  });
+
+  group('resolvedPriceRange (#2400)', () {
+    test('ranges over each station\'s resolved display price', () {
+      final stations = [
+        _makeStation(id: 'a', diesel: 1.50), // E10 null → diesel 1.50
+        _makeStation(id: 'b', e10: 1.70), // E10 present → 1.70
+        _makeStation(id: 'c', e5: 1.90), // E10 null → e5 1.90
+      ];
+      final (min, max) = resolvedPriceRange(stations, FuelType.e10);
+      expect(min, 1.50);
+      expect(max, 1.90);
+    });
+
+    test('returns (0, 0) when no station resolves to a price', () {
+      final stations = [_makeStation(id: 'x'), _makeStation(id: 'y')];
+      expect(resolvedPriceRange(stations, FuelType.e10), (0, 0));
+    });
+  });
+
+  group('shortFuelLabel (#2400)', () {
+    test('maps fuels to their language-neutral pump codes', () {
+      expect(shortFuelLabel(FuelType.e10), 'E10');
+      expect(shortFuelLabel(FuelType.e5), 'E5');
+      expect(shortFuelLabel(FuelType.diesel), 'Diesel');
+      expect(shortFuelLabel(FuelType.dieselPremium), 'Diesel+');
+      expect(shortFuelLabel(FuelType.lpg), 'GPL');
+      expect(shortFuelLabel(FuelType.cng), 'GNV');
+    });
+  });
 }

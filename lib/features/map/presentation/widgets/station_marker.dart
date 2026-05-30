@@ -17,6 +17,11 @@ import '../../../search/domain/entities/station.dart';
 const double kStationMarkerWidth = 50;
 const double kStationMarkerHeight = 24;
 
+/// Wider marker used when a fallback-fuel label is prepended (#2400) so
+/// the short fuel code (`E10`, `Diesel`, …) plus the price both fit
+/// without the [FittedBox] crushing the price too small to read.
+const double kStationMarkerWideWidth = 74;
+
 /// Maximum characters for the brand label before truncation (used in
 /// the tap-to-reveal tooltip).
 const _maxBrandLength = 14;
@@ -27,10 +32,18 @@ class StationMarkerBuilder {
 
   /// Build a compact [Marker] for a station, colored by relative price.
   ///
-  /// The marker shows only the price in bold inside a color-coded rounded
+  /// The marker shows the price in bold inside a color-coded rounded
   /// badge (green = cheap, orange = mid, red = expensive). Tapping opens
   /// the station detail page; long-press reveals the brand name as a
   /// tooltip.
+  ///
+  /// #2400 — the displayed price comes from [bestDisplayPrice]: the
+  /// selected [fuel] when present, otherwise the first available fallback
+  /// fuel. When the shown fuel differs from [fuel] (e.g. a diesel-only
+  /// station while the user has E10 selected), a small fuel-code dot +
+  /// label is prepended so the price is never silently mislabelled —
+  /// mirroring `AllPricesStationCard`. `'--'` now appears ONLY for a
+  /// station with no usable price for any fuel.
   ///
   /// When [pastel] is true, the marker uses muted/pastel colors for
   /// non-selected stations so that selected ones stand out.
@@ -42,22 +55,34 @@ class StationMarkerBuilder {
     double maxPrice, {
     bool pastel = false,
   }) {
-    final price = priceForFuelType(station, fuel);
+    final resolved = bestDisplayPrice(station, fuel);
+    final price = resolved?.price;
+    final isFallback = resolved != null && resolved.shownFuel != fuel;
     final baseColor = priceColor(price, minPrice, maxPrice);
     final color = pastel ? _toPastel(baseColor) : baseColor;
     final brand = truncateBrand(station.displayName, maxLength: _maxBrandLength);
+    final fallbackLabel =
+        isFallback ? shortFuelLabel(resolved.shownFuel) : '';
 
     // Accessibility (#566): TalkBack/VoiceOver read this as "Brand, price
     // EUR per litre, double-tap to view details" — otherwise the marker is
-    // an opaque gesture target with no announced role or content.
+    // an opaque gesture target with no announced role or content. When a
+    // fallback fuel is shown, the announced label names it so the price is
+    // never ambiguous.
     final priceLabel = price != null
-        ? PriceFormatter.formatPrice(price)
+        ? (isFallback
+            ? '$fallbackLabel ${PriceFormatter.formatPrice(price)}'
+            : PriceFormatter.formatPrice(price))
         : 'price unavailable';
     final semanticLabel = '$brand, $priceLabel';
 
+    final priceText = price != null
+        ? PriceFormatter.formatPriceCompact(price)
+        : '--'; // i18n-ignore: language-neutral no-price placeholder
+
     return Marker(
       point: LatLng(station.lat, station.lng),
-      width: kStationMarkerWidth,
+      width: isFallback ? kStationMarkerWideWidth : kStationMarkerWidth,
       height: kStationMarkerHeight,
       // #1772 — isolate each marker's raster so an animation or rebuild
       // on one marker (e.g. the selected-station pastel swap) does not
@@ -95,16 +120,43 @@ class StationMarkerBuilder {
             ),
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text(
-                price != null
-                    ? PriceFormatter.formatPriceCompact(price)
-                    : '--',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  height: 1.0,
-                  color: pastel ? Colors.black38 : Colors.black87,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Fallback fuel dot + code (mirrors AllPricesStationCard)
+                  // so a price for a fuel other than the selected one is
+                  // never shown unlabelled.
+                  if (isFallback) ...[
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: pastel ? Colors.black26 : Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      fallbackLabel,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                        height: 1.0,
+                        color: pastel ? Colors.black38 : Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(
+                    priceText,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      height: 1.0,
+                      color: pastel ? Colors.black38 : Colors.black87,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

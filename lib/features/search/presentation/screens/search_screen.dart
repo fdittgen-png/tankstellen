@@ -20,6 +20,7 @@ import '../../../map/presentation/widgets/inline_map.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
+import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
@@ -125,6 +126,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // #2401 — Tankerkönig returns ONLY the queried fuel's price, so
+    // switching the fuel chip leaves the other fuels null. Re-run the
+    // last search whenever the selected fuel changes so the data layer
+    // refetches for the new fuel. `repeatLastSearch` is a no-op before
+    // the first search (no last query) and while one is in flight, so
+    // this is safe to fire on every chip change. Combined with the
+    // `bestDisplayPrice` resolver (#2400) the map is never blank even
+    // before the re-search lands.
+    ref.listen<FuelType>(selectedFuelTypeProvider, (prev, next) {
+      if (prev != next) {
+        unawaited(
+          ref.read(searchStateProvider.notifier).repeatLastSearch(),
+        );
+      }
+    });
+
     final l10n = AppLocalizations.of(context);
     final isWide = isWideScreen(context);
     final isLandscape =
