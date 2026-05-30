@@ -70,6 +70,20 @@ abstract class GpsCalibrationMatrix with _$GpsCalibrationMatrix {
     /// [defaultAccelEventCost].
     @Default(0.5) double accelEventCost,
 
+    /// Single per-vehicle multiplier the GPS-only live physics
+    /// estimator applies to its instantaneous L/100 km output
+    /// (`gps_live_fuel_estimator.dart`, #2387 / Epic #2385). Refined
+    /// from OBD2 ground-truth trips (#2286) + fill-ups via the existing
+    /// [GpsMatrixReconciler] EWMA so the physics road-load model is
+    /// anchored to this vehicle's measured reality. 1.0 means "trust
+    /// the raw physics output"; values drift up/down as ground truth
+    /// accumulates. Independent of the lean post-trip matrix
+    /// coefficients above — those size the authoritative post-trip
+    /// average, this scales the per-tick live number. Defaults to 1.0
+    /// so legacy matrices (and the cold-start path) deserialize without
+    /// migration.
+    @Default(1.0) double physicsScale,
+
     // ─── Reserved 7-coef expansion slots — null in the lean model ───
     /// Brake event cost (proxy for missed regen / coasting
     /// opportunity). Null until the expand-on-demand trigger fires

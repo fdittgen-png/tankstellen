@@ -25,7 +25,19 @@ mixin _$GpsCalibrationMatrix {
 /// [defaultHighSpeedPenalty].
  double get highSpeedPenalty;/// L/100 km penalty per accel-event-per-km. Default matches
 /// [defaultAccelEventCost].
- double get accelEventCost;// ─── Reserved 7-coef expansion slots — null in the lean model ───
+ double get accelEventCost;/// Single per-vehicle multiplier the GPS-only live physics
+/// estimator applies to its instantaneous L/100 km output
+/// (`gps_live_fuel_estimator.dart`, #2387 / Epic #2385). Refined
+/// from OBD2 ground-truth trips (#2286) + fill-ups via the existing
+/// [GpsMatrixReconciler] EWMA so the physics road-load model is
+/// anchored to this vehicle's measured reality. 1.0 means "trust
+/// the raw physics output"; values drift up/down as ground truth
+/// accumulates. Independent of the lean post-trip matrix
+/// coefficients above — those size the authoritative post-trip
+/// average, this scales the per-tick live number. Defaults to 1.0
+/// so legacy matrices (and the cold-start path) deserialize without
+/// migration.
+ double get physicsScale;// ─── Reserved 7-coef expansion slots — null in the lean model ───
 /// Brake event cost (proxy for missed regen / coasting
 /// opportunity). Null until the expand-on-demand trigger fires
 /// (cold maturity + variance > threshold after 8 fill-ups).
@@ -52,16 +64,16 @@ $GpsCalibrationMatrixCopyWith<GpsCalibrationMatrix> get copyWith => _$GpsCalibra
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GpsCalibrationMatrix&&(identical(other.baseline, baseline) || other.baseline == baseline)&&(identical(other.idleCost, idleCost) || other.idleCost == idleCost)&&(identical(other.highSpeedPenalty, highSpeedPenalty) || other.highSpeedPenalty == highSpeedPenalty)&&(identical(other.accelEventCost, accelEventCost) || other.accelEventCost == accelEventCost)&&(identical(other.brakeEventCost, brakeEventCost) || other.brakeEventCost == brakeEventCost)&&(identical(other.gradeClimbCost, gradeClimbCost) || other.gradeClimbCost == gradeClimbCost)&&(identical(other.cornerLoadCost, cornerLoadCost) || other.cornerLoadCost == cornerLoadCost)&&(identical(other.fillUpReconciliationCount, fillUpReconciliationCount) || other.fillUpReconciliationCount == fillUpReconciliationCount)&&(identical(other.residualVariance, residualVariance) || other.residualVariance == residualVariance)&&(identical(other.lastReconciledAt, lastReconciledAt) || other.lastReconciledAt == lastReconciledAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GpsCalibrationMatrix&&(identical(other.baseline, baseline) || other.baseline == baseline)&&(identical(other.idleCost, idleCost) || other.idleCost == idleCost)&&(identical(other.highSpeedPenalty, highSpeedPenalty) || other.highSpeedPenalty == highSpeedPenalty)&&(identical(other.accelEventCost, accelEventCost) || other.accelEventCost == accelEventCost)&&(identical(other.physicsScale, physicsScale) || other.physicsScale == physicsScale)&&(identical(other.brakeEventCost, brakeEventCost) || other.brakeEventCost == brakeEventCost)&&(identical(other.gradeClimbCost, gradeClimbCost) || other.gradeClimbCost == gradeClimbCost)&&(identical(other.cornerLoadCost, cornerLoadCost) || other.cornerLoadCost == cornerLoadCost)&&(identical(other.fillUpReconciliationCount, fillUpReconciliationCount) || other.fillUpReconciliationCount == fillUpReconciliationCount)&&(identical(other.residualVariance, residualVariance) || other.residualVariance == residualVariance)&&(identical(other.lastReconciledAt, lastReconciledAt) || other.lastReconciledAt == lastReconciledAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,baseline,idleCost,highSpeedPenalty,accelEventCost,brakeEventCost,gradeClimbCost,cornerLoadCost,fillUpReconciliationCount,residualVariance,lastReconciledAt);
+int get hashCode => Object.hash(runtimeType,baseline,idleCost,highSpeedPenalty,accelEventCost,physicsScale,brakeEventCost,gradeClimbCost,cornerLoadCost,fillUpReconciliationCount,residualVariance,lastReconciledAt);
 
 @override
 String toString() {
-  return 'GpsCalibrationMatrix(baseline: $baseline, idleCost: $idleCost, highSpeedPenalty: $highSpeedPenalty, accelEventCost: $accelEventCost, brakeEventCost: $brakeEventCost, gradeClimbCost: $gradeClimbCost, cornerLoadCost: $cornerLoadCost, fillUpReconciliationCount: $fillUpReconciliationCount, residualVariance: $residualVariance, lastReconciledAt: $lastReconciledAt)';
+  return 'GpsCalibrationMatrix(baseline: $baseline, idleCost: $idleCost, highSpeedPenalty: $highSpeedPenalty, accelEventCost: $accelEventCost, physicsScale: $physicsScale, brakeEventCost: $brakeEventCost, gradeClimbCost: $gradeClimbCost, cornerLoadCost: $cornerLoadCost, fillUpReconciliationCount: $fillUpReconciliationCount, residualVariance: $residualVariance, lastReconciledAt: $lastReconciledAt)';
 }
 
 
@@ -72,7 +84,7 @@ abstract mixin class $GpsCalibrationMatrixCopyWith<$Res>  {
   factory $GpsCalibrationMatrixCopyWith(GpsCalibrationMatrix value, $Res Function(GpsCalibrationMatrix) _then) = _$GpsCalibrationMatrixCopyWithImpl;
 @useResult
 $Res call({
- double baseline, double idleCost, double highSpeedPenalty, double accelEventCost, double? brakeEventCost, double? gradeClimbCost, double? cornerLoadCost, int fillUpReconciliationCount, double residualVariance, DateTime? lastReconciledAt
+ double baseline, double idleCost, double highSpeedPenalty, double accelEventCost, double physicsScale, double? brakeEventCost, double? gradeClimbCost, double? cornerLoadCost, int fillUpReconciliationCount, double residualVariance, DateTime? lastReconciledAt
 });
 
 
@@ -89,12 +101,13 @@ class _$GpsCalibrationMatrixCopyWithImpl<$Res>
 
 /// Create a copy of GpsCalibrationMatrix
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? baseline = null,Object? idleCost = null,Object? highSpeedPenalty = null,Object? accelEventCost = null,Object? brakeEventCost = freezed,Object? gradeClimbCost = freezed,Object? cornerLoadCost = freezed,Object? fillUpReconciliationCount = null,Object? residualVariance = null,Object? lastReconciledAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? baseline = null,Object? idleCost = null,Object? highSpeedPenalty = null,Object? accelEventCost = null,Object? physicsScale = null,Object? brakeEventCost = freezed,Object? gradeClimbCost = freezed,Object? cornerLoadCost = freezed,Object? fillUpReconciliationCount = null,Object? residualVariance = null,Object? lastReconciledAt = freezed,}) {
   return _then(_self.copyWith(
 baseline: null == baseline ? _self.baseline : baseline // ignore: cast_nullable_to_non_nullable
 as double,idleCost: null == idleCost ? _self.idleCost : idleCost // ignore: cast_nullable_to_non_nullable
 as double,highSpeedPenalty: null == highSpeedPenalty ? _self.highSpeedPenalty : highSpeedPenalty // ignore: cast_nullable_to_non_nullable
 as double,accelEventCost: null == accelEventCost ? _self.accelEventCost : accelEventCost // ignore: cast_nullable_to_non_nullable
+as double,physicsScale: null == physicsScale ? _self.physicsScale : physicsScale // ignore: cast_nullable_to_non_nullable
 as double,brakeEventCost: freezed == brakeEventCost ? _self.brakeEventCost : brakeEventCost // ignore: cast_nullable_to_non_nullable
 as double?,gradeClimbCost: freezed == gradeClimbCost ? _self.gradeClimbCost : gradeClimbCost // ignore: cast_nullable_to_non_nullable
 as double?,cornerLoadCost: freezed == cornerLoadCost ? _self.cornerLoadCost : cornerLoadCost // ignore: cast_nullable_to_non_nullable
@@ -186,10 +199,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double baseline,  double idleCost,  double highSpeedPenalty,  double accelEventCost,  double? brakeEventCost,  double? gradeClimbCost,  double? cornerLoadCost,  int fillUpReconciliationCount,  double residualVariance,  DateTime? lastReconciledAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double baseline,  double idleCost,  double highSpeedPenalty,  double accelEventCost,  double physicsScale,  double? brakeEventCost,  double? gradeClimbCost,  double? cornerLoadCost,  int fillUpReconciliationCount,  double residualVariance,  DateTime? lastReconciledAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GpsCalibrationMatrix() when $default != null:
-return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accelEventCost,_that.brakeEventCost,_that.gradeClimbCost,_that.cornerLoadCost,_that.fillUpReconciliationCount,_that.residualVariance,_that.lastReconciledAt);case _:
+return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accelEventCost,_that.physicsScale,_that.brakeEventCost,_that.gradeClimbCost,_that.cornerLoadCost,_that.fillUpReconciliationCount,_that.residualVariance,_that.lastReconciledAt);case _:
   return orElse();
 
 }
@@ -207,10 +220,10 @@ return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accel
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double baseline,  double idleCost,  double highSpeedPenalty,  double accelEventCost,  double? brakeEventCost,  double? gradeClimbCost,  double? cornerLoadCost,  int fillUpReconciliationCount,  double residualVariance,  DateTime? lastReconciledAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double baseline,  double idleCost,  double highSpeedPenalty,  double accelEventCost,  double physicsScale,  double? brakeEventCost,  double? gradeClimbCost,  double? cornerLoadCost,  int fillUpReconciliationCount,  double residualVariance,  DateTime? lastReconciledAt)  $default,) {final _that = this;
 switch (_that) {
 case _GpsCalibrationMatrix():
-return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accelEventCost,_that.brakeEventCost,_that.gradeClimbCost,_that.cornerLoadCost,_that.fillUpReconciliationCount,_that.residualVariance,_that.lastReconciledAt);case _:
+return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accelEventCost,_that.physicsScale,_that.brakeEventCost,_that.gradeClimbCost,_that.cornerLoadCost,_that.fillUpReconciliationCount,_that.residualVariance,_that.lastReconciledAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -227,10 +240,10 @@ return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accel
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double baseline,  double idleCost,  double highSpeedPenalty,  double accelEventCost,  double? brakeEventCost,  double? gradeClimbCost,  double? cornerLoadCost,  int fillUpReconciliationCount,  double residualVariance,  DateTime? lastReconciledAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double baseline,  double idleCost,  double highSpeedPenalty,  double accelEventCost,  double physicsScale,  double? brakeEventCost,  double? gradeClimbCost,  double? cornerLoadCost,  int fillUpReconciliationCount,  double residualVariance,  DateTime? lastReconciledAt)?  $default,) {final _that = this;
 switch (_that) {
 case _GpsCalibrationMatrix() when $default != null:
-return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accelEventCost,_that.brakeEventCost,_that.gradeClimbCost,_that.cornerLoadCost,_that.fillUpReconciliationCount,_that.residualVariance,_that.lastReconciledAt);case _:
+return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accelEventCost,_that.physicsScale,_that.brakeEventCost,_that.gradeClimbCost,_that.cornerLoadCost,_that.fillUpReconciliationCount,_that.residualVariance,_that.lastReconciledAt);case _:
   return null;
 
 }
@@ -242,7 +255,7 @@ return $default(_that.baseline,_that.idleCost,_that.highSpeedPenalty,_that.accel
 @JsonSerializable()
 
 class _GpsCalibrationMatrix extends GpsCalibrationMatrix {
-  const _GpsCalibrationMatrix({this.baseline = 6.5, this.idleCost = 1.2, this.highSpeedPenalty = 2.0, this.accelEventCost = 0.5, this.brakeEventCost, this.gradeClimbCost, this.cornerLoadCost, this.fillUpReconciliationCount = 0, this.residualVariance = 0.0, this.lastReconciledAt}): super._();
+  const _GpsCalibrationMatrix({this.baseline = 6.5, this.idleCost = 1.2, this.highSpeedPenalty = 2.0, this.accelEventCost = 0.5, this.physicsScale = 1.0, this.brakeEventCost, this.gradeClimbCost, this.cornerLoadCost, this.fillUpReconciliationCount = 0, this.residualVariance = 0.0, this.lastReconciledAt}): super._();
   factory _GpsCalibrationMatrix.fromJson(Map<String, dynamic> json) => _$GpsCalibrationMatrixFromJson(json);
 
 /// Constant L/100 km term. Seeded from the vehicle's declared
@@ -259,6 +272,19 @@ class _GpsCalibrationMatrix extends GpsCalibrationMatrix {
 /// L/100 km penalty per accel-event-per-km. Default matches
 /// [defaultAccelEventCost].
 @override@JsonKey() final  double accelEventCost;
+/// Single per-vehicle multiplier the GPS-only live physics
+/// estimator applies to its instantaneous L/100 km output
+/// (`gps_live_fuel_estimator.dart`, #2387 / Epic #2385). Refined
+/// from OBD2 ground-truth trips (#2286) + fill-ups via the existing
+/// [GpsMatrixReconciler] EWMA so the physics road-load model is
+/// anchored to this vehicle's measured reality. 1.0 means "trust
+/// the raw physics output"; values drift up/down as ground truth
+/// accumulates. Independent of the lean post-trip matrix
+/// coefficients above — those size the authoritative post-trip
+/// average, this scales the per-tick live number. Defaults to 1.0
+/// so legacy matrices (and the cold-start path) deserialize without
+/// migration.
+@override@JsonKey() final  double physicsScale;
 // ─── Reserved 7-coef expansion slots — null in the lean model ───
 /// Brake event cost (proxy for missed regen / coasting
 /// opportunity). Null until the expand-on-demand trigger fires
@@ -293,16 +319,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GpsCalibrationMatrix&&(identical(other.baseline, baseline) || other.baseline == baseline)&&(identical(other.idleCost, idleCost) || other.idleCost == idleCost)&&(identical(other.highSpeedPenalty, highSpeedPenalty) || other.highSpeedPenalty == highSpeedPenalty)&&(identical(other.accelEventCost, accelEventCost) || other.accelEventCost == accelEventCost)&&(identical(other.brakeEventCost, brakeEventCost) || other.brakeEventCost == brakeEventCost)&&(identical(other.gradeClimbCost, gradeClimbCost) || other.gradeClimbCost == gradeClimbCost)&&(identical(other.cornerLoadCost, cornerLoadCost) || other.cornerLoadCost == cornerLoadCost)&&(identical(other.fillUpReconciliationCount, fillUpReconciliationCount) || other.fillUpReconciliationCount == fillUpReconciliationCount)&&(identical(other.residualVariance, residualVariance) || other.residualVariance == residualVariance)&&(identical(other.lastReconciledAt, lastReconciledAt) || other.lastReconciledAt == lastReconciledAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GpsCalibrationMatrix&&(identical(other.baseline, baseline) || other.baseline == baseline)&&(identical(other.idleCost, idleCost) || other.idleCost == idleCost)&&(identical(other.highSpeedPenalty, highSpeedPenalty) || other.highSpeedPenalty == highSpeedPenalty)&&(identical(other.accelEventCost, accelEventCost) || other.accelEventCost == accelEventCost)&&(identical(other.physicsScale, physicsScale) || other.physicsScale == physicsScale)&&(identical(other.brakeEventCost, brakeEventCost) || other.brakeEventCost == brakeEventCost)&&(identical(other.gradeClimbCost, gradeClimbCost) || other.gradeClimbCost == gradeClimbCost)&&(identical(other.cornerLoadCost, cornerLoadCost) || other.cornerLoadCost == cornerLoadCost)&&(identical(other.fillUpReconciliationCount, fillUpReconciliationCount) || other.fillUpReconciliationCount == fillUpReconciliationCount)&&(identical(other.residualVariance, residualVariance) || other.residualVariance == residualVariance)&&(identical(other.lastReconciledAt, lastReconciledAt) || other.lastReconciledAt == lastReconciledAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,baseline,idleCost,highSpeedPenalty,accelEventCost,brakeEventCost,gradeClimbCost,cornerLoadCost,fillUpReconciliationCount,residualVariance,lastReconciledAt);
+int get hashCode => Object.hash(runtimeType,baseline,idleCost,highSpeedPenalty,accelEventCost,physicsScale,brakeEventCost,gradeClimbCost,cornerLoadCost,fillUpReconciliationCount,residualVariance,lastReconciledAt);
 
 @override
 String toString() {
-  return 'GpsCalibrationMatrix(baseline: $baseline, idleCost: $idleCost, highSpeedPenalty: $highSpeedPenalty, accelEventCost: $accelEventCost, brakeEventCost: $brakeEventCost, gradeClimbCost: $gradeClimbCost, cornerLoadCost: $cornerLoadCost, fillUpReconciliationCount: $fillUpReconciliationCount, residualVariance: $residualVariance, lastReconciledAt: $lastReconciledAt)';
+  return 'GpsCalibrationMatrix(baseline: $baseline, idleCost: $idleCost, highSpeedPenalty: $highSpeedPenalty, accelEventCost: $accelEventCost, physicsScale: $physicsScale, brakeEventCost: $brakeEventCost, gradeClimbCost: $gradeClimbCost, cornerLoadCost: $cornerLoadCost, fillUpReconciliationCount: $fillUpReconciliationCount, residualVariance: $residualVariance, lastReconciledAt: $lastReconciledAt)';
 }
 
 
@@ -313,7 +339,7 @@ abstract mixin class _$GpsCalibrationMatrixCopyWith<$Res> implements $GpsCalibra
   factory _$GpsCalibrationMatrixCopyWith(_GpsCalibrationMatrix value, $Res Function(_GpsCalibrationMatrix) _then) = __$GpsCalibrationMatrixCopyWithImpl;
 @override @useResult
 $Res call({
- double baseline, double idleCost, double highSpeedPenalty, double accelEventCost, double? brakeEventCost, double? gradeClimbCost, double? cornerLoadCost, int fillUpReconciliationCount, double residualVariance, DateTime? lastReconciledAt
+ double baseline, double idleCost, double highSpeedPenalty, double accelEventCost, double physicsScale, double? brakeEventCost, double? gradeClimbCost, double? cornerLoadCost, int fillUpReconciliationCount, double residualVariance, DateTime? lastReconciledAt
 });
 
 
@@ -330,12 +356,13 @@ class __$GpsCalibrationMatrixCopyWithImpl<$Res>
 
 /// Create a copy of GpsCalibrationMatrix
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? baseline = null,Object? idleCost = null,Object? highSpeedPenalty = null,Object? accelEventCost = null,Object? brakeEventCost = freezed,Object? gradeClimbCost = freezed,Object? cornerLoadCost = freezed,Object? fillUpReconciliationCount = null,Object? residualVariance = null,Object? lastReconciledAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? baseline = null,Object? idleCost = null,Object? highSpeedPenalty = null,Object? accelEventCost = null,Object? physicsScale = null,Object? brakeEventCost = freezed,Object? gradeClimbCost = freezed,Object? cornerLoadCost = freezed,Object? fillUpReconciliationCount = null,Object? residualVariance = null,Object? lastReconciledAt = freezed,}) {
   return _then(_GpsCalibrationMatrix(
 baseline: null == baseline ? _self.baseline : baseline // ignore: cast_nullable_to_non_nullable
 as double,idleCost: null == idleCost ? _self.idleCost : idleCost // ignore: cast_nullable_to_non_nullable
 as double,highSpeedPenalty: null == highSpeedPenalty ? _self.highSpeedPenalty : highSpeedPenalty // ignore: cast_nullable_to_non_nullable
 as double,accelEventCost: null == accelEventCost ? _self.accelEventCost : accelEventCost // ignore: cast_nullable_to_non_nullable
+as double,physicsScale: null == physicsScale ? _self.physicsScale : physicsScale // ignore: cast_nullable_to_non_nullable
 as double,brakeEventCost: freezed == brakeEventCost ? _self.brakeEventCost : brakeEventCost // ignore: cast_nullable_to_non_nullable
 as double?,gradeClimbCost: freezed == gradeClimbCost ? _self.gradeClimbCost : gradeClimbCost // ignore: cast_nullable_to_non_nullable
 as double?,cornerLoadCost: freezed == cornerLoadCost ? _self.cornerLoadCost : cornerLoadCost // ignore: cast_nullable_to_non_nullable
