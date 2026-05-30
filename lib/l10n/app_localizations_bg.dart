@@ -4787,6 +4787,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Наредете дисплея в рамката и след това заснемете';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Какво сте заредили';
 
   @override

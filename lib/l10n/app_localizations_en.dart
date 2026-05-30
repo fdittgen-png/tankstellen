@@ -4719,6 +4719,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Line up the display inside the frame, then capture';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'What you filled';
 
   @override
@@ -11022,6 +11026,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get pumpCameraAlignHint =>
       '⟦Łîñé úƥ ŧĥé đîšƥłáý îñšîđé ŧĥé ƒřáɱé, ŧĥéñ çáƥŧúřé ··················⟧';
+
+  @override
+  String get pumpCameraRotateToLandscape =>
+      '⟦Ŧúřñ ýóúř ƥĥóñé šîđéŵáýš — ŧĥé ƥúɱƥ đîšƥłáý îš ŵîđé, šó ŧĥé ñúɱƀéřš çóɱé óúŧ łářǧéř áñđ úƥřîǧĥŧ ··································⟧';
 
   @override
   String get fillUpSectionWhatTitle => '⟦Ŵĥáŧ ýóú ƒîłłéđ ······⟧';

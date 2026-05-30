@@ -4784,6 +4784,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pumpCameraAlignHint => 'Alinea el surtidor en el marco y captura';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Qué repostaste';
 
   @override

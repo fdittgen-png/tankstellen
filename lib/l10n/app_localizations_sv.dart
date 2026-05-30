@@ -4742,6 +4742,10 @@ class AppLocalizationsSv extends AppLocalizations {
       'Rikta in displayen i ramen och ta sedan en bild';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Vad du tankade';
 
   @override

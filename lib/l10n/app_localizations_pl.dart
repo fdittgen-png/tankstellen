@@ -4765,6 +4765,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Ustaw wyświetlacz w ramce, a następnie zrób zdjęcie';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Co zatankowałeś';
 
   @override

@@ -6,23 +6,33 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/ocr/ocr_geometry.dart';
 
-/// Thin feedback strip shown beneath the alignment overlay (#2276).
+/// Thin feedback strip shown beneath the alignment overlay (#2276, #2477).
 ///
-/// Renders one of three states in priority order:
+/// Renders one of four states in priority order:
 ///
-///  1. **Glare warning** (amber) — the framed region is too bright /
+///  1. **Rotate-to-landscape** (red, highest priority, #2477) — the
+///     phone is held portrait. The wide pump display only fills the
+///     frame (large, upright digits) when the phone is sideways, so
+///     this message overrides every other state and the parent screen
+///     disables the shutter until the user rotates.
+///  2. **Glare warning** (amber) — the framed region is too bright /
 ///     washed out; the user is asked to re-angle.
-///  2. **Align hint** (semi-transparent dark pill) — steady-state
+///  3. **Align hint** (semi-transparent dark pill) — steady-state
 ///     instruction to line the display inside the frame.
-///  3. Nothing — once a capture is in progress the bar is hidden so
+///  4. Nothing — once a capture is in progress the bar is hidden so
 ///     the shutter button has the user's full attention.
 ///
 /// This widget is purely presentational — it emits no events.  The
-/// parent camera screen owns the live luminance sampling and passes
-/// [isOverGlared] down.
+/// parent camera screen owns the live luminance sampling + native
+/// orientation read and passes [isOverGlared] / [isPortrait] down.
 class PumpLiveFeedbackBar extends StatelessWidget {
   /// `true` when the sampled ROI is over-glared.
   final bool isOverGlared;
+
+  /// `true` when the device is held in portrait. Takes priority over
+  /// every other state: the bar shows the rotate-to-landscape prompt
+  /// and the parent screen disables the shutter (#2477).
+  final bool isPortrait;
 
   /// Whether a capture is currently in progress (hides the bar while
   /// the user waits for the shutter so the spinner is unobstructed).
@@ -31,6 +41,7 @@ class PumpLiveFeedbackBar extends StatelessWidget {
   const PumpLiveFeedbackBar({
     super.key,
     required this.isOverGlared,
+    this.isPortrait = false,
     this.isCapturing = false,
   });
 
@@ -38,22 +49,37 @@ class PumpLiveFeedbackBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isCapturing) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context);
-    final text = isOverGlared
-        ? (l10n?.pumpCameraGlareWarning ??
-            'Too much glare — tilt slightly to avoid reflections')
-        : (l10n?.pumpCameraAlignHint ??
-            'Line up the display inside the frame, then capture');
 
-    final bg = isOverGlared
-        ? Colors.amber.withValues(alpha: 0.88)
-        : Colors.black.withValues(alpha: 0.55);
-    final textColor = isOverGlared ? Colors.black87 : Colors.white;
-    final icon = isOverGlared ? Icons.wb_sunny_outlined : Icons.center_focus_weak;
+    final String text;
+    final Color bg;
+    final Color textColor;
+    final IconData icon;
+    if (isPortrait) {
+      // Highest priority — block capture until the phone is sideways.
+      text = l10n?.pumpCameraRotateToLandscape ??
+          'Turn your phone sideways — the pump display is wide, so the '
+              'numbers come out larger and upright';
+      bg = Colors.redAccent.withValues(alpha: 0.92);
+      textColor = Colors.white;
+      icon = Icons.screen_rotation_outlined;
+    } else if (isOverGlared) {
+      text = l10n?.pumpCameraGlareWarning ??
+          'Too much glare — tilt slightly to avoid reflections';
+      bg = Colors.amber.withValues(alpha: 0.88);
+      textColor = Colors.black87;
+      icon = Icons.wb_sunny_outlined;
+    } else {
+      text = l10n?.pumpCameraAlignHint ??
+          'Line up the display inside the frame, then capture';
+      bg = Colors.black.withValues(alpha: 0.55);
+      textColor = Colors.white;
+      icon = Icons.center_focus_weak;
+    }
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
       child: Container(
-        key: ValueKey(isOverGlared),
+        key: ValueKey('$isPortrait-$isOverGlared'),
         margin: const EdgeInsets.symmetric(horizontal: 24),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(

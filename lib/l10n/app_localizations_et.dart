@@ -4741,6 +4741,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Joondage ekraan raami sisse ja seejärel tehke foto';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mida täitsid';
 
   @override

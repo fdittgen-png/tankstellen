@@ -35,5 +35,6 @@
   "pumpCameraOrientationHorizontal": "Zu horizontaler Anzeige wechseln",
   "pumpCameraOrientationVertical": "Zu vertikaler Anzeige wechseln",
   "pumpCameraGlareWarning": "Zu viel Blendung — leicht neigen, um Reflexionen zu vermeiden",
-  "pumpCameraAlignHint": "Anzeige im Rahmen ausrichten, dann aufnehmen"
+  "pumpCameraAlignHint": "Anzeige im Rahmen ausrichten, dann aufnehmen",
+  "pumpCameraRotateToLandscape": "Drehe dein Telefon quer — die Zapfsäulenanzeige ist breit, so werden die Zahlen größer und stehen aufrecht"
 }

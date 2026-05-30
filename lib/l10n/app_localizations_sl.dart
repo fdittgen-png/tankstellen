@@ -4754,6 +4754,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Poravnajte zaslon v okvir in nato posnemite';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Kaj ste natočili';
 
   @override

@@ -4772,6 +4772,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Anzeige im Rahmen ausrichten, dann aufnehmen';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Drehe dein Telefon quer — die Zapfsäulenanzeige ist breit, so werden die Zahlen größer und stehen aufrecht';
+
+  @override
   String get fillUpSectionWhatTitle => 'Was du getankt hast';
 
   @override
