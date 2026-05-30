@@ -352,6 +352,47 @@ void main() {
       expect(updated.isOpen, isTrue);
     });
 
+    test('loadAndRefresh() merges the FULL widened fuel set (#2249)',
+        () async {
+      // Regression for the pre-#2249 drop: a fuel-rich-country refresh must
+      // carry LPG / CNG / E98 / diesel-premium / E85 into the station, not
+      // just e5/e10/diesel.
+      final station = testStationList[0];
+      await fakeStorage.setFavoriteIds([station.id]);
+      await fakeStorage.saveFavoriteStationData(station.id, station.toJson());
+
+      final mockService = MockStationService();
+      when(() => mockService.getPrices(any())).thenAnswer((_) async =>
+          ServiceResult(
+            data: {
+              station.id: const StationPrices(
+                e5: 1.811,
+                e10: 1.791,
+                e98: 1.951,
+                diesel: 1.691,
+                dieselPremium: 1.851,
+                e85: 0.991,
+                lpg: 0.951,
+                cng: 1.491,
+                status: 'open',
+              ),
+            },
+            source: ServiceSource.tankerkoenigApi,
+            fetchedAt: DateTime.now(),
+          ));
+
+      container = createContainer(mockService: mockService);
+      await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
+
+      final updated =
+          container.read(favoriteStationsProvider).value!.data.first;
+      expect(updated.e98, 1.951);
+      expect(updated.dieselPremium, 1.851);
+      expect(updated.e85, 0.991);
+      expect(updated.lpg, 0.951);
+      expect(updated.cng, 1.491);
+    });
+
     test('loadAndRefresh() persists updated prices back to storage',
         () async {
       final station = testStationList[0];
