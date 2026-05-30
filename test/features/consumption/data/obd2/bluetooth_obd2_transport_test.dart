@@ -194,6 +194,62 @@ void main() {
               'the 5 s read timeout');
     });
 
+    test(
+        '#2453 — a throwing write surfaces the error to ITS caller AND '
+        'leaves the transport recoverable (next command succeeds)', () async {
+      final channel = _ScriptedChannel();
+      final transport = BluetoothObd2Transport(channel);
+      await transport.connect();
+
+      // First command's write rejects mid-session (device-not-connected /
+      // GATT-write failure). Before #2453 this left `_pending` set, so the
+      // NEXT command tripped the concurrent-sendCommand guard forever.
+      final boom = Exception('GATT write failed: device not connected');
+      channel.scriptWriteThrows('010C\r', boom);
+      // The recovery command writes fine and gets a normal reply.
+      channel.scriptResponse('010D\r', '41 0D 3C >');
+
+      // 1) The failing command surfaces the write error to its caller.
+      await expectLater(
+        transport.sendCommand('010C\r'),
+        throwsA(same(boom)),
+        reason: 'the write error must reach the command that triggered it',
+      );
+
+      // 2) The NEXT command does NOT throw concurrent-sendCommand — the
+      //    transport recovered because `_pending` was cleared on the throw.
+      final reply = await transport.sendCommand('010D\r');
+      expect(reply, contains('41 0D 3C'),
+          reason: 'transport must recover: _pending was cleared on the '
+              'throwing write, so the next command proceeds normally');
+    });
+
+    test(
+        '#2453 — a read timeout still throws TimeoutException AND leaves the '
+        'transport recoverable for the next command', () async {
+      final channel = _ScriptedChannel();
+      // First command's reply never carries the '>' prompt, so it can only
+      // resolve via the read timeout. Use a short timeout to keep the test
+      // fast.
+      channel.scriptResponse('010C\r', '41 0C 1A F8 ');
+      channel.scriptResponse('010D\r', '41 0D 3C >');
+      final transport = BluetoothObd2Transport(
+        channel,
+        readTimeout: const Duration(milliseconds: 50),
+      );
+      await transport.connect();
+
+      await expectLater(
+        transport.sendCommand('010C\r'),
+        throwsA(isA<TimeoutException>()),
+      );
+
+      // The timeout cleared `_pending` (via the finally), so the next
+      // command is not blocked by the stale in-flight slot.
+      final reply = await transport.sendCommand('010D\r');
+      expect(reply, contains('41 0D 3C'));
+    });
+
     test('disconnect closes the channel and flips isConnected to false',
         () async {
       final channel = _ScriptedChannel();
@@ -218,6 +274,7 @@ void main() {
 
 class _ScriptedChannel implements ElmByteChannel {
   final Map<String, List<List<int>>> _chunksByCommand = {};
+  final Map<String, Object> _writeThrowsByCommand = {};
   final StreamController<List<int>> _controller =
       StreamController<List<int>>.broadcast();
   final List<List<int>> _writes = [];
@@ -230,6 +287,13 @@ class _ScriptedChannel implements ElmByteChannel {
   void scriptChunkedResponse(String command, List<String> chunks) {
     _chunksByCommand[command] =
         chunks.map((c) => c.codeUnits).toList();
+  }
+
+  /// #2453 — make `write()` THROW for a given command, simulating a
+  /// device-not-connected / GATT-write failure mid-session. The write is
+  /// still recorded (so order assertions see it) before it throws.
+  void scriptWriteThrows(String command, Object error) {
+    _writeThrowsByCommand[command] = error;
   }
 
   /// #2295 — simulate a forwarded notify-stream error (what the real BLE
@@ -257,6 +321,13 @@ class _ScriptedChannel implements ElmByteChannel {
   Future<void> write(List<int> bytes) async {
     _writes.add(bytes);
     final command = String.fromCharCodes(bytes);
+    final throwFor = _writeThrowsByCommand[command];
+    if (throwFor != null) {
+      // #2453 — the underlying BLE/GATT write rejected. The transport must
+      // surface this to the caller AND clear `_pending` so the next command
+      // isn't poisoned.
+      throw throwFor;
+    }
     final chunks = _chunksByCommand[command];
     if (chunks == null) {
       // Unknown command — send NO DATA> so the transport doesn't hang.
