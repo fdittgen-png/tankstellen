@@ -105,7 +105,13 @@ Future<void> runReceiptScan(
       service = ReceiptScanService();
       state.writeService(service);
     }
-    final outcome = await service.scanReceipt();
+    // #2273 — thread the active country/brand so the parser reads the
+    // receipt in the right currency (GBP/£/p, kr, $ …), mirroring how
+    // the pump path threads them into parsePumpDisplayImage.
+    final outcome = await service.scanReceipt(
+      country: state.activeCountry,
+      brand: state.stationBrand,
+    );
     if (outcome == null || !state.isMounted()) return;
     final result = outcome.parse;
 
