@@ -1,0 +1,113 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Epic checklist back-patch
+
+# #2341 — when a child issue is opened with a `Part of #<N>` /
+# `epic: #<N>` back-reference, rewrite the matching title-only task item
+# in the Epic's checklist to `- [ ] #<new> — <title>`, turning the Epic
+# body into a live merge-status dashboard (the #2167 gold standard)
+# without manual editing. No-op when there is no back-reference or no
+# fuzzily-matching title-only line.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  backpatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Back-patch parent Epic checklist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHILD_NUMBER: ${{ github.event.issue.number }}
+          CHILD_TITLE: ${{ github.event.issue.title }}
+          CHILD_BODY: ${{ github.event.issue.body }}
+        run: |
+          set -euo pipefail
+
+          # 1. Find the parent Epic number: `Part of #<N>` or `epic: #<N>`.
+          EPIC=$(printf '%s' "$CHILD_BODY" \
+            | grep -ioE '(part of|epic:?)[[:space:]]*#[0-9]+' \
+            | grep -oE '[0-9]+' | head -n1 || true)
+          if [ -z "${EPIC:-}" ]; then
+            echo "No 'Part of #' / 'epic: #' reference — nothing to back-patch."
+            exit 0
+          fi
+          echo "Parent Epic candidate: #$EPIC"
+
+          # 2. Fetch the Epic body.
+          gh issue view "$EPIC" --json body --jq .body > epic-body.md || {
+            echo "Could not read Epic #$EPIC — skipping."; exit 0; }
+
+          # 3. Fuzzy-match a title-only task item and rewrite it. The
+          #    rewrite happens in Python for robust matching; it writes
+          #    the new body to new-body.md and prints MATCHED=1 on a hit.
+          MATCHED=$(python3 - "$CHILD_NUMBER" <<'PY'
+          import os, re, sys, difflib
+
+          child_no = sys.argv[1]
+          child_title = os.environ["CHILD_TITLE"].strip()
+
+          with open("epic-body.md", encoding="utf-8") as fh:
+              lines = fh.readlines()
+
+          def normalize(s: str) -> str:
+              # Lower-case, strip a leading `type(scope):` conventional
+              # prefix and punctuation, collapse whitespace — so a task
+              # item phrased loosely still matches the filed title.
+              s = s.lower().strip()
+              s = re.sub(r"^[a-z]+(\([^)]*\))?:\s*", "", s)
+              s = re.sub(r"[^a-z0-9 ]+", " ", s)
+              return re.sub(r"\s+", " ", s).strip()
+
+          child_norm = normalize(child_title)
+
+          # A title-only task item: `- [ ] <title>` (any checkbox state)
+          # that does NOT already carry a `#NNNN` issue reference.
+          item_re = re.compile(r"^(\s*[-*]\s*\[[ xX]\]\s*)(.+?)\s*$")
+          ref_re = re.compile(r"#\d+")
+
+          best_i, best_ratio, best_title = -1, 0.0, ""
+          for i, line in enumerate(lines):
+              m = item_re.match(line)
+              if not m:
+                  continue
+              text = m.group(2)
+              if ref_re.search(text):
+                  continue  # already back-patched
+              ratio = difflib.SequenceMatcher(
+                  None, child_norm, normalize(text)).ratio()
+              if ratio > best_ratio:
+                  best_i, best_ratio, best_title = i, ratio, text.strip()
+
+          # Require a strong fuzzy match to avoid mis-patching the wrong
+          # line; 0.6 tolerates prefix/punctuation drift but rejects
+          # unrelated items.
+          if best_i < 0 or best_ratio < 0.6:
+              print("MATCHED=0")
+              sys.exit(0)
+
+          prefix = item_re.match(lines[best_i]).group(1)
+          lines[best_i] = f"{prefix}#{child_no} — {best_title}\n"
+          with open("new-body.md", "w", encoding="utf-8") as fh:
+              fh.writelines(lines)
+          print(f"MATCHED=1 ratio={best_ratio:.2f} line={best_i}",
+                file=sys.stderr)
+          print("MATCHED=1")
+          PY
+          )
+
+          if ! printf '%s' "$MATCHED" | grep -q 'MATCHED=1'; then
+            echo "No title-only Epic task item matched #$CHILD_NUMBER — no-op."
+            exit 0
+          fi
+
+          # 4. Commit the rewritten checklist back to the Epic.
+          gh issue edit "$EPIC" --body-file new-body.md
+          echo "Back-patched Epic #$EPIC with child #$CHILD_NUMBER."
