@@ -23,6 +23,7 @@ import '../../providers/trip_history_provider.dart';
 import '../widgets/charging_tab.dart';
 import '../widgets/fuel_tab.dart';
 import '../widgets/obd2_status_chip.dart';
+import '../widgets/fuel_confidence_app_bar_badge.dart';
 import '../widgets/trajets_tab.dart';
 import 'add_charging_log_screen.dart';
 import 'trajets_map_screen.dart';
@@ -169,9 +170,15 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   /// IconButton is inserted immediately before the download button so
   /// the user can reach the all-trips map without scrolling past the
   /// monthly-comparison card.
+  ///
+  /// When [showConfidence] is true (Fuel section only, #2383) the
+  /// [FuelConfidenceAppBarBadge] is prepended so the active vehicle's
+  /// consumption confidence tier is visible in the app-bar.
   List<Widget> _appBarActions(AppLocalizations? l,
-      {List<String>? tripIds}) =>
+      {List<String>? tripIds, bool showConfidence = false}) =>
       [
+        // #2383 — confidence indicator in the Fuel app-bar only.
+        if (showConfidence) const FuelConfidenceAppBarBadge(),
         // #797 phase 3 — title-bar chip announcing "OBD2 connected".
         const Obd2StatusChip(),
         // #2374 — map action visible only on the Trajets section.
@@ -294,7 +301,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
         title: l?.consumptionTabFuel ?? 'Fuel',
         leading: _vehiclesLeading(l),
         bodyPadding: EdgeInsets.zero,
-        actions: _appBarActions(l),
+        actions: _appBarActions(l, showConfidence: true),
         floatingActionButton: _addFillUpFab(context, l),
         body: fuelView,
       );
@@ -308,7 +315,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       title: l?.consumptionTabFuel ?? 'Fuel',
       leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
-      actions: _appBarActions(l),
+      actions: _appBarActions(l, showConfidence: true),
       floatingActionButton: isCharging
           ? _addChargingFab(context, l)
           : _addFillUpFab(context, l),

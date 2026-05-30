@@ -12,7 +12,6 @@ import '../../../../core/widgets/help_banner.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
-import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
@@ -50,7 +49,6 @@ class FuelTab extends ConsumerWidget {
       );
     }
     final showGamification = ref.watch(gamificationEnabledProvider);
-    final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final bottomInset = 96 + MediaQuery.of(context).viewPadding.bottom;
 
     final headerChildren = <Widget>[
@@ -64,12 +62,7 @@ class FuelTab extends ConsumerWidget {
       ),
       if (showGamification) const BadgeShelf(),
       const TankLevelCard(),
-      ConsumptionStatsCard(
-        stats: stats,
-        volumetricEfficiency: activeVehicle?.volumetricEfficiency,
-        volumetricEfficiencySamples:
-            activeVehicle?.volumetricEfficiencySamples,
-      ),
+      ConsumptionStatsCard(stats: stats),
     ];
 
     Widget buildFillUpRow(int index) {
