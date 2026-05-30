@@ -236,6 +236,41 @@ void main() {
     });
   });
 
+  // #2336 — fast l10n gate exists in ci.yml and is stubbed for docs PRs.
+  group('l10n-gate job (#2336)', () {
+    late String l10nJob;
+
+    setUpAll(() {
+      l10nJob = _jobBody(ciYaml, 'l10n-gate');
+      expect(l10nJob, isNotEmpty, reason: 'l10n-gate job must exist in ci.yml');
+    });
+
+    test('runs the ARB rebuild trio', () {
+      expect(l10nJob, contains('dart tool/build_arb.dart'));
+      expect(l10nJob, contains('dart tool/gen_pseudo_arb.dart'));
+      expect(l10nJob, contains('flutter gen-l10n'));
+    });
+
+    test('diffs lib/l10n and runs the l10n + lint buckets', () {
+      expect(l10nJob, contains('git diff --exit-code -- lib/l10n/'));
+      expect(l10nJob,
+          contains('flutter test test/l10n/ test/lint/ --exclude-tags=network'));
+    });
+
+    test('does NOT run Android or build_runner (kept fast)', () {
+      expect(l10nJob.contains('build_runner'), isFalse);
+      expect(l10nJob.contains('setup-java'), isFalse);
+      expect(l10nJob.contains('flutter build'), isFalse);
+    });
+
+    test('has a matching pass-through stub in ci-docs-stub.yml', () {
+      final stub = File('.github/workflows/ci-docs-stub.yml').readAsStringSync();
+      expect(_jobBody(stub, 'l10n-gate'), isNotEmpty,
+          reason: 'docs-only PRs need an l10n-gate stub — ci.yml is '
+              'path-ignored on them.');
+    });
+  });
+
   // #2347 — both nightlies must pin the same Flutter version as ci.yml,
   // so a floating stable-channel bump can't silently change the nightly
   // SDK and spam the tracking issues with spurious red.

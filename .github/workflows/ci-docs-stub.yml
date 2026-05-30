@@ -41,3 +41,11 @@ jobs:
     needs: [test]
     steps:
       - run: echo "docs-only change — coverage-merge skipped (stub passes for branch protection)"
+
+  # #2336 — `l10n-gate` is required. ci.yml is path-ignored on docs-only
+  # PRs so its real l10n-gate never runs; docs PRs never touch
+  # `lib/l10n/` anyway. Pass-through stub so the context resolves.
+  l10n-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — l10n-gate skipped (stub passes for branch protection)"

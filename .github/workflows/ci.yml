@@ -160,6 +160,52 @@ jobs:
             exit 1
           fi
 
+  # #2336 — fast, dedicated localization gate. Surfaces stale ARB
+  # fan-out and l10n/lint regressions in ~90s at push time instead of
+  # 7-8 min into the sharded test job (and, crucially, a check that
+  # actually exists on a DIRTY ARB PR — branch protection can require
+  # it, so a fan-out-conflict PR can no longer auto-merge unrun).
+  # NO Android, NO build_runner — pure ARB regen + diff + the
+  # l10n/lint test buckets. Steps:
+  #   1. Rebuild the canonical ARB from `_fragments/` + the pseudo
+  #      locale + Flutter's generated localizations.
+  #   2. `git diff --exit-code -- lib/l10n/` fails if any of step 1's
+  #      output differs from what was committed (someone edited a
+  #      fragment without rerunning the tooling).
+  #   3. Run the l10n + lint suites (network-tagged tests excluded;
+  #      they hit live APIs and live in other buckets).
+  l10n-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # #1936 — pin Flutter (see ci.yml analyze job). Coupled to the
+          # ci.yml pin; bump deliberately, not by drift.
+          flutter-version: "3.41.9"
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - name: Rebuild ARB + pseudo-locale + generated localizations
+        run: |
+          dart tool/build_arb.dart
+          dart tool/gen_pseudo_arb.dart
+          flutter gen-l10n
+      - name: Fail if committed ARB fan-out is stale
+        run: |
+          if ! git diff --exit-code -- lib/l10n/; then
+            echo "::error::Generated ARB / l10n output is stale. Run 'dart tool/build_arb.dart && dart tool/gen_pseudo_arb.dart && flutter gen-l10n' locally and commit the result." >&2
+            exit 1
+          fi
+      - name: Run l10n + lint test buckets
+        run: flutter test test/l10n/ test/lint/ --exclude-tags=network
+
   # #1581 — Test job sharded 4× across parallel runners. Each shard
   # runs `flutter test --total-shards=4 --shard-index=N` so every
   # test in the suite runs exactly once across the matrix. Wall clock
