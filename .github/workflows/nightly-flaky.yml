@@ -12,6 +12,13 @@ name: Nightly Flaky + Network Suite
 #   - `network` — live-API tests (Italy MIMIT, Argentina, etc).
 #   - `flaky`   — platform-plugin tests whose channel timing is
 #                 unreliable in headless runners (share_plus, etc).
+#
+# #2348 — failure now opens (or comments on, when one already exists for
+# the day) a labelled, triage-ready `nightly-flaky failed <UTC date>`
+# bug instead of a buried comment on #1584; the next green nightly
+# auto-closes it. A zero-match guard also fails the run loudly if the
+# tag selector matches no tests (the #2003 `flaky && network` bug ran
+# zero tests for an unknown window — silently green-by-empty).
 
 on:
   schedule:
@@ -64,11 +71,65 @@ jobs:
         # intent — per this workflow's own header comment — is OR: "we
         # cover everything the PR/master path excludes". Use the
         # explicit Boolean form so the selector matches both buckets.
-        run: flutter test --tags 'flaky || network'
-      - name: Surface failure on tracking issue
+        #
+        # #2348 — zero-match guard. `flutter test` exits 79 with "No
+        # tests ran" when the selector matches nothing (the #2003
+        # `flaky && network` regression hit exactly this and stayed
+        # silently green-by-empty). Capture the run, and if it exits 79
+        # / reports no matching tests, fail loudly with a distinct
+        # message so the failure path opens a triage issue rather than
+        # the run passing on an empty selector.
+        run: |
+          set -o pipefail
+          flutter test --tags 'flaky || network' 2>&1 | tee test-output.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -eq 79 ] || grep -qiE 'No tests (ran|match)' test-output.log; then
+            echo "::error::nightly-flaky tag selector 'flaky || network' matched ZERO tests — regression of the #2003 empty-selector bug." >&2
+            exit 1
+          fi
+          exit "$status"
+
+      # #2348 — open (or comment on) a dedicated, labelled triage issue
+      # per failing night. Dedups against an already-open issue with the
+      # same `nightly-flaky failed <date>` title so a re-run / repeat
+      # failure on the same day comments rather than spawning duplicates.
+      - name: Open / update nightly-failure issue
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue comment 1584 --body \
-            "Nightly flaky+network run failed on $(date -u +%F): https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          set -euo pipefail
+          TITLE="nightly-flaky failed $(date -u +%F)"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXISTING=$(gh issue list --state open --search "in:title \"$TITLE\"" \
+            --json number,title \
+            --jq ".[] | select(.title == \"$TITLE\") | .number" | head -n1)
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" \
+              --body "Nightly flaky+network suite failed again. Run: $RUN_URL"
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --label "type/bug,area/ci,P1-high" \
+              --body "Nightly flaky+network run failed. Run: $RUN_URL"
+          fi
+
+      # #2348 — a green nightly auto-closes any still-open
+      # `nightly-flaky failed …` triage issue so a fixed regression
+      # does not linger on the board.
+      - name: Close open nightly-failure issues on green
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh issue list --state open --label area/ci \
+            --search 'in:title "nightly-flaky failed"' \
+            --json number,title \
+            --jq '.[] | select(.title | startswith("nightly-flaky failed")) | .number' \
+          | while read -r N; do
+              [ -n "$N" ] || continue
+              gh issue close "$N" \
+                --comment "Resolved by a green nightly-flaky run. Run: $RUN_URL"
+            done
