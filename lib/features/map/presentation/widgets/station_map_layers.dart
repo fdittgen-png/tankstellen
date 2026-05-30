@@ -147,6 +147,25 @@ class _StationMapLayersState extends State<StationMapLayers> {
   late List<Marker> _markers;
   late (double, double) _priceRange;
 
+  /// True once FlutterMap has laid out and emitted `onMapReady`. The
+  /// guarded `didUpdateWidget` fit waits on this so a `fitCamera` call
+  /// never lands before the controller has a real viewport (#2399).
+  bool _mapReady = false;
+
+  /// The bounds the camera was last fitted to. Held so a redundant
+  /// rebuild (EV-toggle, app resume, unrelated provider change) does not
+  /// re-schedule an identical `fitCamera`. Set at SCHEDULE time so a
+  /// fit→rebuild→fit loop cannot form (the next build computes the same
+  /// bounds, finds them equal, skips) — relocated from `NearbyMapView`
+  /// in #2399. First paint is positioned by `MapOptions.initialCameraFit`,
+  /// so this only handles the stations-arrived / centre-moved transition.
+  LatLngBounds? _lastFitBounds;
+
+  /// Bounds of the search circle around the current centre — the camera
+  /// target for both `initialCameraFit` and the post-ready re-fit.
+  LatLngBounds get _fitBounds =>
+      StationMapLayers.boundsForRadius(widget.center, widget.searchRadiusKm);
+
   /// Recompute the memoised price range + marker list from the current
   /// widget inputs.
   void _recomputeMarkers() {
@@ -170,6 +189,10 @@ class _StationMapLayersState extends State<StationMapLayers> {
   void initState() {
     super.initState();
     _recomputeMarkers();
+    // First paint is positioned by `MapOptions.initialCameraFit`, so the
+    // initial fit is already accounted for; record it so the post-ready
+    // re-fit doesn't redundantly re-snap to the same bounds.
+    _lastFitBounds = _fitBounds;
   }
 
   @override
@@ -185,6 +208,35 @@ class _StationMapLayersState extends State<StationMapLayers> {
         !identical(oldWidget.selectedStationIds, widget.selectedStationIds)) {
       _recomputeMarkers();
     }
+
+    // #2399 — the SINGLE re-fit. When stations are present and the
+    // camera-anchoring centre changed VALUE (e.g. a new search landed
+    // after a cold open, or a ZIP search jumped to another city),
+    // schedule exactly ONE post-frame `fitCamera`. Guarded by:
+    //   - non-empty stations (nothing to frame otherwise),
+    //   - a value-distinct centre (`LatLng` has value `==`),
+    //   - bounds not already fitted (`LatLngBounds` value `==`),
+    //   - `mounted` + `_mapReady` inside the callback.
+    // `_lastFitBounds` is set HERE (at schedule time, not in the
+    // callback) so a fit→rebuild→fit loop cannot form. This replaces the
+    // per-build post-frame fit that used to live in `NearbyMapView` and
+    // land inside the cold-start reset window (deleted in #2398).
+    final centerChanged = widget.center != oldWidget.center;
+    if (widget.stations.isNotEmpty && centerChanged) {
+      final bounds = _fitBounds;
+      // `LatLngBounds` has value `==`, so this skips an identical re-fit.
+      // `NearbyMapView.shouldFit` is the same pure predicate, kept there
+      // for its unit test; inlined here to avoid an import cycle.
+      if (_lastFitBounds != bounds) {
+        _lastFitBounds = bounds;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || !_mapReady) return;
+          widget.mapController.fitCamera(
+            CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(32)),
+          );
+        });
+      }
+    }
   }
 
   @override
@@ -198,6 +250,25 @@ class _StationMapLayersState extends State<StationMapLayers> {
           options: MapOptions(
             initialCenter: widget.center,
             initialZoom: widget.zoom,
+            // #2399 — frame the search circle during the FIRST layout
+            // pass, not via a post-frame `fitCamera`. The old post-frame
+            // fit raced the (now-deleted) cold-start reset window and
+            // could land on a degenerate viewport. Positioning the
+            // camera as part of layout means the very first tile fetch
+            // already targets the right viewport — no reset needed.
+            initialCameraFit: CameraFit.bounds(
+              bounds:
+                  StationMapLayers.boundsForRadius(
+                      widget.center, widget.searchRadiusKm),
+              padding: const EdgeInsets.all(32),
+            ),
+            // #2399 — keep the FlutterMap (and its loaded tiles) alive
+            // when offstage in an IndexedStack so a tab flip back to the
+            // map doesn't tear down + cold-rebuild the tile pipeline.
+            keepAlive: true,
+            onMapReady: () {
+              if (mounted) _mapReady = true;
+            },
             // #1457 — clamp the camera to the tile-layer's max zoom (19)
             // so a programmatic `move(camera.zoom + 1)` past 19 doesn't
             // leave the user staring at a grey viewport (tiles only

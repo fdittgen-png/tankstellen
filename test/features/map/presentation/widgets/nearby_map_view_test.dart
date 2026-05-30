@@ -50,7 +50,7 @@ void main() {
     });
   });
 
-  group('NearbyMapView fitCamera scheduling (#2177)', () {
+  group('Camera lifecycle: initialCameraFit + single re-fit (#2399)', () {
     late Directory tempDir;
 
     setUp(() async {
@@ -122,7 +122,8 @@ void main() {
         );
 
     testWidgets(
-      'fits once on first data and does NOT re-fit on a same-bounds rebuild',
+      'first paint is framed by initialCameraFit + keepAlive; a same-bounds '
+      'rebuild does NOT re-fit',
       (tester) async {
         final controller = _CountingMapController();
         addTearDown(controller.dispose);
@@ -137,27 +138,36 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(controller.fitCount, 1,
-            reason: 'the first data fit must fire exactly once');
+        // #2399 — first paint is positioned by `MapOptions.initialCameraFit`
+        // applied during the first layout pass (flutter_map routes that one
+        // application through the controller, hence the baseline of 1). The
+        // OLD per-build post-frame `fitCamera` in NearbyMapView — which
+        // raced the cold-start reset window — is gone.
+        final flutterMap =
+            tester.widget<FlutterMap>(find.byType(FlutterMap));
+        expect(flutterMap.options.initialCameraFit, isNotNull,
+            reason: 'first paint must be framed via initialCameraFit');
+        expect(flutterMap.options.keepAlive, isTrue,
+            reason: 'keepAlive must be set so a tab flip keeps the tiles');
+        final baseline = controller.fitCount;
+        expect(baseline, lessThanOrEqualTo(1),
+            reason: 'at most the single initialCameraFit application');
 
-        // Force a genuine rebuild that recomputes the SAME fit target: a
-        // brand-new ServiceResult object holding the same Paris station, so
-        // the `searchState` reference changes (a real rebuild + recompute)
-        // but the resulting bounds are value-equal. This mirrors the
-        // redundant rebuilds in production (EV-toggle tap, app resume,
-        // unrelated provider change). The guard must skip the re-fit.
+        // A genuine rebuild recomputing the SAME bounds (new ServiceResult
+        // object, same Paris station) must NOT add a re-fit — `LatLngBounds`
+        // value `==` makes the guard skip it.
         final state =
             tester.state<_RebuildableState>(find.byType(_Rebuildable));
         state.show(resultFor(parisStations));
         await tester.pumpAndSettle();
 
-        expect(controller.fitCount, 1,
+        expect(controller.fitCount, baseline,
             reason: 'an unchanged fit target must NOT re-fit the camera');
       },
     );
 
     testWidgets(
-      'fits again when the search bounds genuinely change',
+      'exactly one re-fit per distinct search bounds (no fit loop)',
       (tester) async {
         final controller = _CountingMapController();
         addTearDown(controller.dispose);
@@ -172,16 +182,30 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(controller.fitCount, 1, reason: 'first fit on initial data');
+        // Baseline = the single initialCameraFit application on first paint.
+        final baseline = controller.fitCount;
 
-        // Swap to a different search area (Lyon) — new bounds, must re-fit.
+        // Swap to a different search area (Lyon): the centre changes value,
+        // so `StationMapLayers.didUpdateWidget` schedules exactly ONE fit.
         final state =
             tester.state<_RebuildableState>(find.byType(_Rebuildable));
         state.show(resultFor(lyonStations));
         await tester.pumpAndSettle();
 
-        expect(controller.fitCount, 2,
-            reason: 'a genuinely changed fit target must fit again');
+        expect(controller.fitCount, baseline + 1,
+            reason: 'a genuinely changed centre fits exactly once');
+
+        // Settle does not loop: a fit→rebuild→fit cycle would keep
+        // incrementing. `_lastFitBounds` is set at schedule time, so the
+        // post-fit rebuild recomputes the same bounds and skips.
+        await tester.pump(const Duration(milliseconds: 32));
+        expect(controller.fitCount, baseline + 1, reason: 'no fit loop');
+
+        // Back to Paris: a third distinct bounds → one more fit.
+        state.show(resultFor(parisStations));
+        await tester.pumpAndSettle();
+        expect(controller.fitCount, baseline + 2,
+            reason: 'each distinct bounds fits exactly once');
       },
     );
   });
