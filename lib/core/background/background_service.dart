@@ -62,6 +62,15 @@ class BackgroundService {
   /// reschedule did not fire. Must match `BootReceiver.BOOT_REREGISTER_TASK`.
   static const bootReregisterTask = 'bootReregister';
 
+  /// One-off task name enqueued by the Android home-widget provider whenever
+  /// the OS refreshes the widget (#2412). While the widget is on the home
+  /// screen its periodic OS refreshes are extra, opportunistic wake
+  /// opportunities — complementary to the WorkManager periodic tasks, NOT a
+  /// reliability guarantee. The coordinator's cross-trigger cooldown keeps
+  /// this from double-fetching alongside a concurrent periodic task. Must
+  /// match `FuelPriceWidgetProvider.WIDGET_SCAN_TASK`.
+  static const widgetRefreshScanTask = 'widgetRefreshScan';
+
   /// Standard refresh interval when on battery (not low).
   /// Android may delay based on Doze mode; 1h is the minimum WorkManager honors reliably.
   static const refreshInterval = Duration(hours: 1);
@@ -217,6 +226,8 @@ BackgroundScanTrigger? _triggerForTask(String task) {
       return BackgroundScanTrigger.workManagerPeriodic;
     case BackgroundService.priceRefreshChargingTask:
       return BackgroundScanTrigger.workManagerCharging;
+    case BackgroundService.widgetRefreshScanTask:
+      return BackgroundScanTrigger.androidWidget;
     case Workmanager.iOSBackgroundTask:
     case IosBackgroundTaskIds.appRefresh:
       return BackgroundScanTrigger.iosBackgroundRefresh;

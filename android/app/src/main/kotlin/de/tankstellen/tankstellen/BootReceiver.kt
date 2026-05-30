@@ -7,14 +7,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.work.Constraints
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import dev.fluttercommunity.workmanager.BackgroundWorker
-import dev.fluttercommunity.workmanager.SharedPreferenceHelper
 
 /**
  * Re-arms the on-device background price scan after a device reboot (#2413).
@@ -49,34 +41,15 @@ class BootReceiver : BroadcastReceiver() {
             return
         }
 
-        // Only re-arm if WorkManager was previously initialized from Dart
-        // (callback handle persisted). Otherwise there is no schedule to
-        // restore and re-arming would poll without user consent.
-        val callbackHandle = SharedPreferenceHelper.getCallbackHandle(context)
-        if (callbackHandle == -1L) {
-            Log.d(TAG, "boot: no persisted WorkManager callback — nothing to re-arm")
-            return
-        }
-
-        val input = Data.Builder()
-            .putString(BackgroundWorker.DART_TASK_KEY, BOOT_REREGISTER_TASK)
-            .build()
-
-        val request = OneTimeWorkRequest.Builder(BackgroundWorker::class.java)
-            .setInputData(input)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build(),
-            )
-            .build()
-
-        WorkManager.getInstance(context).enqueueUniqueWork(
-            BOOT_REREGISTER_UNIQUE_NAME,
-            ExistingWorkPolicy.REPLACE,
-            request,
+        // Re-arm only when WorkManager was previously initialized from Dart;
+        // the shared enqueuer guards on the persisted callback handle so a
+        // fresh install with no alerts re-arms nothing.
+        Log.d(TAG, "boot: re-arming background-scan registration")
+        BackgroundScanEnqueuer.enqueue(
+            context,
+            dartTask = BOOT_REREGISTER_TASK,
+            uniqueName = BOOT_REREGISTER_UNIQUE_NAME,
         )
-        Log.d(TAG, "boot: enqueued background-scan re-registration")
     }
 
     companion object {

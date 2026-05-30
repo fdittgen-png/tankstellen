@@ -562,4 +562,39 @@ void main() {
       );
     });
   });
+
+  // #2412 — Android home-widget refresh feeds the on-device scan.
+  group('widget-refresh scan trigger (#2412)', () {
+    test('widgetRefreshScanTask constant matches the native provider', () {
+      expect(BackgroundService.widgetRefreshScanTask, 'widgetRefreshScan');
+      final kt = File(
+        'android/app/src/main/kotlin/de/tankstellen/tankstellen/'
+        'FuelPriceWidgetProvider.kt',
+      ).readAsStringSync();
+      expect(
+        kt.contains('"widgetRefreshScan"'),
+        isTrue,
+        reason: 'widget provider must enqueue the widgetRefreshScan task',
+      );
+      expect(
+        kt.contains('BackgroundScanEnqueuer.enqueue'),
+        isTrue,
+        reason: 'onUpdate must enqueue a scan via the shared enqueuer',
+      );
+    });
+
+    test('the widget task maps to the androidWidget trigger', () {
+      // Exercises the private _triggerForTask switch indirectly via the
+      // source — the function is file-private, so a source-scan guards the
+      // mapping the same way the boot test guards its branch.
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+      expect(
+        source.contains('BackgroundScanTrigger.androidWidget'),
+        isTrue,
+        reason: 'the widget task must route to the androidWidget trigger',
+      );
+    });
+  });
 }

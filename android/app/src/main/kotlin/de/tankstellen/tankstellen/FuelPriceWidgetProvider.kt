@@ -24,6 +24,17 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
         for (appWidgetId in appWidgetIds) {
             renderAndCommit(context, appWidgetManager, appWidgetId)
         }
+        // #2412 — the OS refreshes the widget periodically (updatePeriodMillis)
+        // while it is on the home screen. Treat each refresh as an extra,
+        // opportunistic wake for the on-device price scan — complementary to
+        // the WorkManager periodic tasks, NOT a reliability guarantee. The
+        // coordinator's cross-trigger cooldown (#2415) dedups this against a
+        // concurrent periodic scan, so it is a cheap no-op when one just ran.
+        BackgroundScanEnqueuer.enqueue(
+            context,
+            dartTask = WIDGET_SCAN_TASK,
+            uniqueName = WIDGET_SCAN_UNIQUE_NAME,
+        )
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -66,5 +77,15 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
             providerClass = FuelPriceWidgetProvider::class.java,
         )
         appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
+
+    companion object {
+        /**
+         * Dart task name enqueued on every widget refresh (#2412). Must match
+         * `BackgroundService.widgetRefreshScanTask`.
+         */
+        const val WIDGET_SCAN_TASK = "widgetRefreshScan"
+
+        private const val WIDGET_SCAN_UNIQUE_NAME = "widgetRefreshScan"
     }
 }
