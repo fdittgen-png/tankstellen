@@ -320,6 +320,55 @@ void main() {
     });
   });
 
+  // #2342 — Parses TARGET_CHECKS from scripts/configure_branch_protection.sh
+  // and asserts incident-critical checks are present. Removal surfaces in CI
+  // before a broken PR can auto-merge. Incidents: #2360, #2361.
+  group('required-check-set completeness (#2342, incidents #2360 #2361)', () {
+    late List<String> targetChecks;
+
+    setUpAll(() {
+      final file = File('scripts/configure_branch_protection.sh');
+      expect(file.existsSync(), isTrue,
+          reason: 'Branch-protection script must exist');
+      final script = file.readAsStringSync();
+      expect(script.length, greaterThan(200));
+      expect(script, contains('TARGET_CHECKS=('));
+      final start = script.indexOf('TARGET_CHECKS=(') + 'TARGET_CHECKS=('.length;
+      final end = script.indexOf('\n)', start);
+      expect(end, greaterThan(start),
+          reason: 'TARGET_CHECKS must be closed with a bare )');
+      targetChecks = RegExp(r'"([^"]+)"')
+          .allMatches(script.substring(start, end))
+          .map((m) => m.group(1)!)
+          .toList();
+      expect(targetChecks, isNotEmpty);
+    });
+
+    // Incident #2360: codegen-drift was non-required → PR #2322 merged RED.
+    test('includes codegen-drift (incident #2360)', () {
+      expect(targetChecks, contains('codegen-drift'),
+          reason: 'see #2360 — stale *.g.dart poisoned master when non-required');
+    });
+
+    // Incident #2361: l10n-gate absent → ARB conflict recurred every wave.
+    test('includes l10n-gate (incident #2361)', () {
+      expect(targetChecks, contains('l10n-gate'),
+          reason: 'see #2361 — broken ARB fan-out blocked rebases when absent');
+    });
+
+    test('includes core quality gates', () {
+      for (final check in ['analyze', 'build-android', 'integration']) {
+        expect(targetChecks, contains(check));
+      }
+    });
+
+    test('includes all 4 test shards', () {
+      for (var i = 0; i < 4; i++) {
+        expect(targetChecks, contains('test ($i)'));
+      }
+    });
+  });
+
   // #2347 — both nightlies must pin the same Flutter version as ci.yml,
   // so a floating stable-channel bump can't silently change the nightly
   // SDK and spam the tracking issues with spurious red.
