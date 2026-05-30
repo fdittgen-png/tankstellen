@@ -5711,6 +5711,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Ei tallennettuja näytteitä';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Jaa';
 
   @override

@@ -5720,6 +5720,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Ni zabeleženih vzorcev';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Deli';
 
   @override

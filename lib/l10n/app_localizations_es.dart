@@ -5759,6 +5759,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trajetDetailChartEmpty => 'No se han registrado muestras';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Compartir';
 
   @override

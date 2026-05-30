@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 
+// #2431 — the CustomPainter + its point model live in a part file so this
+// widget file stays under the 400-line guard after the estimated-series
+// fallback + badge landed. They stay library-private (`_`-prefixed) — the
+// part shares this file's library scope.
+part 'trip_detail_line_painter.dart';
+
 /// One sample of the trip recording profile (#890).
 ///
 /// Mirrors the fields of `TripSample` in the domain layer but lives in
@@ -36,6 +42,14 @@ class TripDetailSample {
   /// fuel-rate chart renders its empty caption when every sample is
   /// null.
   final double? fuelRateLPerHour;
+
+  /// GPS-physics **estimated** fuel rate in L/h (#2431). Populated only
+  /// for OBD2/hybrid trips whose adapter+ECU supported no fuel PID, so
+  /// [fuelRateLPerHour] is null on every sample. When the measured series
+  /// is all-null but this one isn't, [TripDetailFuelRateChart] renders
+  /// THIS series with a "geschätzt" (estimated) badge instead of the
+  /// empty caption. Null for measured trips and at a standstill.
+  final double? estimatedFuelRateLPerHour;
 
   /// Throttle position % (PID 0x11). Null when the car's PID cache
   /// flagged 0x11 as unsupported, or when persisted by a build before
@@ -74,6 +88,7 @@ class TripDetailSample {
     required this.speedKmh,
     this.rpm,
     this.fuelRateLPerHour,
+    this.estimatedFuelRateLPerHour,
     this.throttlePercent,
     this.engineLoadPercent,
     this.coolantTempC,
@@ -112,10 +127,14 @@ class TripDetailSpeedChart extends StatelessWidget {
 
 /// Fuel-rate-over-time line chart on the Trip detail screen (#890).
 ///
-/// Renders the empty-state caption when every sample's
-/// `fuelRateLPerHour` is null — cars without PID 5E and without MAF
-/// will hit that path; the screen still shows the section header so
-/// the user understands the chart exists.
+/// Plots the MEASURED `fuelRateLPerHour` series. When every measured
+/// sample is null (cars without PID 5E and without MAF) but the
+/// GPS-physics fallback stamped an `estimatedFuelRateLPerHour` series
+/// (#2431), it falls back to plotting the ESTIMATED series with a
+/// "geschätzt" badge instead of the empty caption — so a Peugeot +
+/// generic ELM327 trip shows its consumption shape, clearly marked as an
+/// estimate rather than presented as a measurement. Only when BOTH
+/// series are all-null does it render the empty caption.
 class TripDetailFuelRateChart extends StatelessWidget {
   final List<TripDetailSample> samples;
   final Color? color;
@@ -128,12 +147,19 @@ class TripDetailFuelRateChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasMeasured =
+        samples.any((s) => s.fuelRateLPerHour != null);
+    final hasEstimate =
+        !hasMeasured && samples.any((s) => s.estimatedFuelRateLPerHour != null);
     return _TripDetailLineChart(
       samples: samples,
       color: color,
-      valueOf: (s) => s.fuelRateLPerHour,
+      valueOf: hasEstimate
+          ? (s) => s.estimatedFuelRateLPerHour
+          : (s) => s.fuelRateLPerHour,
       unit: 'L/h',
       emptyWhenAllNull: true,
+      estimated: hasEstimate,
     );
   }
 }
@@ -209,12 +235,18 @@ class _TripDetailLineChart extends StatelessWidget {
   final String unit;
   final bool emptyWhenAllNull;
 
+  /// #2431 — when true the plotted series is a GPS-physics ESTIMATE, not
+  /// a measurement: a "~ geschätzt" badge is overlaid so the user is
+  /// never misled into reading it as measured data.
+  final bool estimated;
+
   const _TripDetailLineChart({
     required this.samples,
     required this.color,
     required this.valueOf,
     required this.unit,
     required this.emptyWhenAllNull,
+    this.estimated = false,
   });
 
   @override
@@ -247,7 +279,7 @@ class _TripDetailLineChart extends StatelessWidget {
       );
     }
     points.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    return SizedBox(
+    final chart = SizedBox(
       height: 160,
       child: CustomPaint(
         painter: _LineChartPainter(
@@ -259,124 +291,31 @@ class _TripDetailLineChart extends StatelessWidget {
         size: Size.infinite,
       ),
     );
-  }
-}
-
-class _ChartPoint {
-  final DateTime timestamp;
-  final double value;
-
-  const _ChartPoint(this.timestamp, this.value);
-}
-
-class _LineChartPainter extends CustomPainter {
-  final List<_ChartPoint> points;
-  final Color color;
-  final Color labelColor;
-  final String unit;
-
-  _LineChartPainter({
-    required this.points,
-    required this.color,
-    required this.labelColor,
-    required this.unit,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (points.isEmpty) return;
-
-    const leftInset = 8.0;
-    const rightInset = 8.0;
-    const topInset = 18.0;
-    const bottomInset = 22.0;
-
-    final chartWidth = size.width - leftInset - rightInset;
-    final chartHeight = size.height - topInset - bottomInset;
-
-    final values = points.map((p) => p.value).toList(growable: false);
-    final minV = values.reduce(math.min);
-    final maxV = values.reduce(math.max);
-    final range = (maxV - minV).abs();
-    final padding = range > 0 ? range * 0.1 : 1.0;
-    final yMin = (minV - padding).clamp(-double.infinity, double.infinity);
-    final yMax = maxV + padding;
-    final ySpan = (yMax - yMin) == 0 ? 1.0 : (yMax - yMin);
-
-    final firstTs = points.first.timestamp.millisecondsSinceEpoch;
-    final lastTs = points.last.timestamp.millisecondsSinceEpoch;
-    final tSpan = (lastTs - firstTs) == 0 ? 1 : (lastTs - firstTs);
-
-    double xFor(DateTime t) {
-      final rel = (t.millisecondsSinceEpoch - firstTs) / tSpan;
-      return leftInset + rel * chartWidth;
-    }
-
-    double yFor(double v) =>
-        topInset + chartHeight - ((v - yMin) / ySpan) * chartHeight;
-
-    // Max / min labels at the corners — gives the user a quick read
-    // on the range without cluttering the plot with grid lines.
-    _drawText(
-      canvas,
-      '${maxV.toStringAsFixed(1)} $unit',
-      Offset(size.width - rightInset, 2),
-      anchorRight: true,
-      color: labelColor.withAlpha(160),
-      fontSize: 10,
+    if (!estimated) return chart;
+    // #2431 — overlay a clearly-marked estimate badge on the GPS-physics
+    // fallback series so it is never read as a measurement.
+    return Stack(
+      children: [
+        chart,
+        Positioned(
+          top: 0,
+          left: 8,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              '~ ${l?.trajetDetailChartEstimatedBadge ?? 'estimated'}',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSecondaryContainer,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
-    _drawText(
-      canvas,
-      minV.toStringAsFixed(1),
-      Offset(leftInset, size.height - bottomInset + 4),
-      color: labelColor.withAlpha(160),
-      fontSize: 10,
-    );
-
-    final linePaint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    final path = Path();
-    for (int i = 0; i < points.length; i++) {
-      final p = points[i];
-      final pt = Offset(xFor(p.timestamp), yFor(p.value));
-      if (i == 0) {
-        path.moveTo(pt.dx, pt.dy);
-      } else {
-        path.lineTo(pt.dx, pt.dy);
-      }
-    }
-    canvas.drawPath(path, linePaint);
   }
-
-  void _drawText(
-    Canvas canvas,
-    String text,
-    Offset offset, {
-    bool anchorRight = false,
-    bool anchorCenter = false,
-    required Color color,
-    double fontSize = 10,
-  }) {
-    final tp = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: TextStyle(color: color, fontSize: fontSize),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    var dx = offset.dx;
-    if (anchorRight) dx -= tp.width;
-    if (anchorCenter) dx -= tp.width / 2;
-    tp.paint(canvas, Offset(dx, offset.dy));
-  }
-
-  @override
-  bool shouldRepaint(_LineChartPainter oldDelegate) =>
-      oldDelegate.points != points ||
-      oldDelegate.color != color ||
-      oldDelegate.unit != unit;
 }
+

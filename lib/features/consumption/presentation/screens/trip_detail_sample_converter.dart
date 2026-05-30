@@ -13,6 +13,7 @@ TripDetailSample toDetailSample(TripSample s) => TripDetailSample(
       speedKmh: s.speedKmh,
       rpm: s.rpm,
       fuelRateLPerHour: s.fuelRateLPerHour,
+      estimatedFuelRateLPerHour: s.estimatedFuelRateLPerHour,
       throttlePercent: s.throttlePercent,
       engineLoadPercent: s.engineLoadPercent,
       coolantTempC: s.coolantTempC,

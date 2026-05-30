@@ -5743,6 +5743,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Keine Messwerte';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'geschätzt';
+
+  @override
   String get trajetDetailShareAction => 'Teilen';
 
   @override

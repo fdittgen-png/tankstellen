@@ -5710,6 +5710,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Inga prover inspelade';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Dela';
 
   @override

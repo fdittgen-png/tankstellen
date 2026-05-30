@@ -5755,6 +5755,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Nincsenek rögzített minták';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Megosztás';
 
   @override

@@ -5732,6 +5732,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Geen steekproeven geregistreerd';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Delen';
 
   @override

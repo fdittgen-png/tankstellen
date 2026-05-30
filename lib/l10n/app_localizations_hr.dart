@@ -5732,6 +5732,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Nema snimljenih uzoraka';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Dijeli';
 
   @override

@@ -5767,6 +5767,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Δεν καταγράφηκαν δείγματα';
 
   @override
+  String get trajetDetailChartEstimatedBadge => 'estimated';
+
+  @override
   String get trajetDetailShareAction => 'Κοινοποίηση';
 
   @override

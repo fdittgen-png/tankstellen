@@ -103,6 +103,48 @@ void main() {
       );
       expect(find.text('No samples recorded'), findsOneWidget);
     });
+
+    // #2431 — when the measured series is all-null but a GPS-physics
+    // estimate exists, the chart plots the estimate with a badge instead
+    // of the empty caption.
+    testWidgets(
+      'falls back to the ESTIMATED series + badge when measured is all-null',
+      (tester) async {
+        final estimated = [
+          for (var i = 0; i < 8; i++)
+            TripDetailSample(
+              timestamp:
+                  DateTime.utc(2026, 4, 22, 10).add(Duration(seconds: i)),
+              speedKmh: 60 + i.toDouble(),
+              estimatedFuelRateLPerHour: 4.5 + (i % 3),
+            ),
+        ];
+        await pumpApp(tester, TripDetailFuelRateChart(samples: estimated));
+        _expectCustomPaintPresent(tester, TripDetailFuelRateChart);
+        expect(find.text('No samples recorded'), findsNothing);
+        // The estimated badge ('~ estimated') is shown.
+        expect(find.textContaining('estimated'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'prefers the MEASURED series (no badge) when both are present',
+      (tester) async {
+        final both = [
+          for (var i = 0; i < 8; i++)
+            TripDetailSample(
+              timestamp:
+                  DateTime.utc(2026, 4, 22, 10).add(Duration(seconds: i)),
+              speedKmh: 60 + i.toDouble(),
+              fuelRateLPerHour: 5 + (i % 2),
+              estimatedFuelRateLPerHour: 4.5 + (i % 3),
+            ),
+        ];
+        await pumpApp(tester, TripDetailFuelRateChart(samples: both));
+        _expectCustomPaintPresent(tester, TripDetailFuelRateChart);
+        expect(find.textContaining('estimated'), findsNothing);
+      },
+    );
   });
 
   group('TripDetailRpmChart', () {
