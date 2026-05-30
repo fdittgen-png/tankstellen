@@ -5818,6 +5818,15 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tripPathLegendWasteful => 'Švaistymas (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Prisegimas palaiko ekraną įjungtą — naudoja daugiau baterijos';
 

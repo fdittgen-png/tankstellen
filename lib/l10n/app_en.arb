@@ -4743,6 +4743,18 @@
   "@tripPathLegendWasteful": {
     "description": "Legend entry for the red heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is at least 10."
   },
+  "tripRadarClosestStation": "Closest station",
+  "@tripRadarClosestStation": {
+    "description": "Title of the closest-station radar card at the top of the active trip-recording screen (#2380)."
+  },
+  "tripRadarScanning": "Scanning for nearby stations",
+  "@tripRadarScanning": {
+    "description": "Placeholder shown on the trip-recording radar card while the nearest-station lookup is in flight (#2380)."
+  },
+  "tripRadarNoStationNearby": "No station nearby",
+  "@tripRadarNoStationNearby": {
+    "description": "Placeholder shown on the trip-recording radar card when no fuel station is within range of the live GPS fix (#2380)."
+  },
   "tripRecordingPinTooltip": "Pinning keeps the screen on — uses more battery",
   "@tripRecordingPinTooltip": {
     "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."

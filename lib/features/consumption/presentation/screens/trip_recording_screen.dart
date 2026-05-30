@@ -31,6 +31,7 @@ import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
 import '../widgets/minimal_drive_summary.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
+import '../widgets/trip_radar_card.dart';
 import '../widgets/trip_start_progress.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -869,17 +870,16 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           : UnitFormatter.formatConsumption(liveAvg, isEv: false);
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // #2026 — minimal live-drive summary at the very top: one big
-        // instant L/100 km figure + three coaching symbols (shift up
-        // / shift down / ease pedal). Reads the same live state as
-        // the metric-card column below so a glance at the top tells
-        // the driver everything they need without scanning five
-        // cards. The card column underneath stays for the detail
-        // breakdown view.
-        const MinimalDriveSummary(),
+    // #2380 — the radar card + five metric cards + coaching card can
+    // exceed a short viewport, so the recording column scrolls rather
+    // than overflowing on small phones / large text scales.
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+        // #2380 — closest-station radar leads the column; coaching card
+        // moved to the bottom. See [TripRadarCard] for the data sources.
+        const TripRadarCard(),
         const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.route,
@@ -917,7 +917,12 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           label: l?.tripMetricElapsed ?? 'Elapsed',
           value: r == null ? '—' : _fmtElapsed(r.elapsed),
         ),
+        const SizedBox(height: 8),
+        // #2380 — instant L/100 km + coaching symbols; moved from the
+        // top to the bottom so the radar card leads the screen.
+        const MinimalDriveSummary(),
       ],
+      ),
     );
   }
 

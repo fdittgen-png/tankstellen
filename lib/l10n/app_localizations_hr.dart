@@ -5806,6 +5806,15 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripPathLegendWasteful => 'Rastrošno (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Prikačivanje drži ekran uključenim — troši više baterije';
 

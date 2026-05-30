@@ -10217,6 +10217,24 @@ abstract class AppLocalizations {
   /// **'Wasteful (≥ 10 L/100km)'**
   String get tripPathLegendWasteful;
 
+  /// Title of the closest-station radar card at the top of the active trip-recording screen (#2380).
+  ///
+  /// In en, this message translates to:
+  /// **'Closest station'**
+  String get tripRadarClosestStation;
+
+  /// Placeholder shown on the trip-recording radar card while the nearest-station lookup is in flight (#2380).
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning for nearby stations'**
+  String get tripRadarScanning;
+
+  /// Placeholder shown on the trip-recording radar card when no fuel station is within range of the live GPS fix (#2380).
+  ///
+  /// In en, this message translates to:
+  /// **'No station nearby'**
+  String get tripRadarNoStationNearby;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

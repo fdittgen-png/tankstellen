@@ -5838,6 +5838,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripPathLegendWasteful => 'Разточителен (≥ 10 л/100км)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Закачането задържа екрана включен — изразходва повече батерия';
 
