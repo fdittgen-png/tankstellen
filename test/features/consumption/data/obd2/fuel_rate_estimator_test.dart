@@ -223,11 +223,13 @@ void main() {
       }
     });
 
-    test('cng → CNG AFR + petrol-equivalent density (no liquid g/L)', () {
+    test('cng → petrol default (gaseous: no meaningful liquid g/L)', () {
+      // CNG has no liquid L/h, so it follows the documented
+      // "unknown → petrol, safer to under-count" rule (kept green by
+      // obd2_service_maf_fallback_test). kCngAfr stays exposed for a
+      // future native-units follow-up — see #2432.
       final r = resolveAfrDensity(profileWith('cng'));
-      expect(r.afr, closeTo(kCngAfr, 0.0001));
-      // Deliberately petrol-equivalent — see kCngAfr doc / #2432.
-      expect(r.densityGPerL, closeTo(kCngEquivalentDensityGPerL, 0.0001));
+      expect(r.afr, closeTo(kPetrolAfr, 0.0001));
       expect(r.densityGPerL, closeTo(kPetrolDensityGPerL, 0.0001));
     });
 

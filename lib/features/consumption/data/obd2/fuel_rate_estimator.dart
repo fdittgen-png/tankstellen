@@ -74,11 +74,11 @@ const double kLpgDensityGPerL = 535.0;
 /// [estimateFuelRateLPerHourFromMap] would emit a number whose unit
 /// isn't L/h at all. Rather than invent a fake density and silently
 /// mis-scale (the exact failure #2432 fixes for E85),
-/// [resolveAfrDensity] deliberately falls CNG back to the petrol
-/// density so the emitted figure stays a defined petrol-equivalent L/h
-/// rather than a unit-less artefact. The CNG AFR is exposed for
-/// completeness / future work that models CNG in its native kg/m³
-/// units. See #2432 for that follow-up.
+/// [resolveAfrDensity] treats CNG as the petrol default (matching the
+/// documented "unknown → petrol, safer to under-count" rule), so the
+/// emitted figure stays a defined petrol-equivalent L/h rather than a
+/// unit-less artefact. [kCngAfr] / [kCngEquivalentDensityGPerL] are
+/// exposed for a future native-units (kg/m³) follow-up. See #2432.
 const double kCngAfr = 17.2;
 
 /// Petrol-equivalent density used for CNG (#2432). CNG has no
@@ -171,12 +171,11 @@ const double _gasConstant = 287.0;
   if (key.contains('lpg') || key.contains('autogas')) {
     return (afr: kLpgAfr, densityGPerL: kLpgDensityGPerL);
   }
-  // CNG has no meaningful liquid g/L — fall back to a petrol-equivalent
-  // density rather than silently mis-scale. See [kCngAfr].
-  if (key.contains('cng')) {
-    return (afr: kCngAfr, densityGPerL: kCngEquivalentDensityGPerL);
-  }
-  // petrol / e10 / e5 / super / gasoline and any unknown value.
+  // CNG is gaseous (no meaningful liquid g/L) → petrol default, matching
+  // the documented "unknown → petrol, safer to under-count" rule
+  // (obd2_service_maf_fallback_test). [kCngAfr] is exposed for a future
+  // native-units (kg/m³) follow-up — see #2432.
+  // petrol / e10 / e5 / super / gasoline / cng / any unknown value.
   return (afr: kPetrolAfr, densityGPerL: kPetrolDensityGPerL);
 }
 
