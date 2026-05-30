@@ -56,19 +56,20 @@ void main() {
       expect(HiveStorage.initInIsolate, isA<Function>());
     });
 
-    test('background service does not open Hive boxes directly', () {
-      // Verify the background service delegates Hive initialization
-      // to HiveStorage.initInIsolate (with encryption) rather than
-      // opening boxes directly without a cipher.
+    test('scan coordinator does not open Hive boxes directly', () {
+      // #2415 — the scan body moved into BackgroundAlertScanCoordinator.
+      // It still must delegate Hive initialization to
+      // HiveStorage.initInIsolate (with encryption) rather than opening
+      // boxes directly without a cipher.
       final source = File(
-        'lib/core/background/background_service.dart',
+        'lib/core/background/background_alert_scan_coordinator.dart',
       ).readAsStringSync();
 
       // Should NOT contain direct Hive.openBox calls
       expect(
         source.contains('Hive.openBox'),
         isFalse,
-        reason: 'Background service must use HiveStorage.initInIsolate() '
+        reason: 'Coordinator must use HiveStorage.initInIsolate() '
             'instead of opening Hive boxes directly without encryption',
       );
 
@@ -76,20 +77,33 @@ void main() {
       expect(
         source.contains("import 'package:hive_flutter/hive_flutter.dart'"),
         isFalse,
-        reason: 'Background service should not import Hive directly',
+        reason: 'Coordinator should not import Hive directly',
       );
 
       // Should use initInIsolate
       expect(
         source.contains('initInIsolate'),
         isTrue,
-        reason: 'Background service must call HiveStorage.initInIsolate()',
+        reason: 'Coordinator must call HiveStorage.initInIsolate()',
       );
     });
 
-    test('background service contains no unsafe as-casts', () {
+    test('background service callback delegates to the scan coordinator', () {
+      // #2415 — the thin callback must hand off to the shared coordinator
+      // rather than re-implement the scan body.
       final source = File(
         'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+      expect(
+        source.contains('BackgroundAlertScanCoordinator'),
+        isTrue,
+        reason: 'callbackDispatcher must delegate into the coordinator',
+      );
+    });
+
+    test('scan coordinator contains no unsafe as-casts', () {
+      final source = File(
+        'lib/core/background/background_alert_scan_coordinator.dart',
       ).readAsStringSync();
 
       // Should NOT contain unsafe 'as Map<String, dynamic>' casts
@@ -120,13 +134,33 @@ void main() {
         reason: 'Background service should use getString() or '
             '?.toString() instead of unsafe "as String" casts',
       );
+    });
 
-      // Should import json_extensions for safe accessors
-      expect(
-        source.contains('json_extensions.dart'),
-        isTrue,
-        reason: 'Background service should import SafeJsonAccessors',
-      );
+    test('JSON-parsing scan files use safe accessors (json_extensions)', () {
+      // #2415 — the price/JSON parsing lives in the runners + history
+      // writer now; both must use the SafeJsonAccessors extension rather
+      // than hand-rolled casts.
+      for (final path in const [
+        'lib/core/background/background_scan_runners.dart',
+        'lib/core/background/background_price_history_writer.dart',
+      ]) {
+        final source = File(path).readAsStringSync();
+        expect(
+          source.contains('json_extensions.dart'),
+          isTrue,
+          reason: '$path should import SafeJsonAccessors',
+        );
+        expect(
+          source.contains('as num)'),
+          isFalse,
+          reason: '$path should use getDouble() not "as num" casts',
+        );
+        expect(
+          RegExp(r'as Map<String, dynamic>(?!\?)').hasMatch(source),
+          isFalse,
+          reason: '$path should use getMap() not unsafe Map casts',
+        );
+      }
     });
 
     test('background service registers two periodic tasks for adaptive scheduling', () {
@@ -355,16 +389,19 @@ void main() {
   });
 
   group('Hive isolate safety', () {
-    test('background service acquires lock before Hive access', () {
+    // #2415 — the scan body (lock + Hive init + close) moved into
+    // BackgroundAlertScanCoordinator. The serialisation invariants still
+    // hold; the assertions now read the coordinator source.
+    test('scan coordinator acquires lock before Hive access', () {
       final source = File(
-        'lib/core/background/background_service.dart',
+        'lib/core/background/background_alert_scan_coordinator.dart',
       ).readAsStringSync();
 
       // Must import hive_isolate_lock
       expect(
         source.contains('hive_isolate_lock.dart'),
         isTrue,
-        reason: 'Background service must import HiveIsolateLock',
+        reason: 'Coordinator must import HiveIsolateLock',
       );
 
       // Must acquire lock before initInIsolate
@@ -377,23 +414,23 @@ void main() {
       );
     });
 
-    test('background service closes Hive boxes in finally block', () {
+    test('scan coordinator closes Hive boxes in finally block', () {
       final source = File(
-        'lib/core/background/background_service.dart',
+        'lib/core/background/background_alert_scan_coordinator.dart',
       ).readAsStringSync();
 
       // Must call closeIsolateBoxes
       expect(
         source.contains('closeIsolateBoxes'),
         isTrue,
-        reason: 'Background service must close Hive boxes after use',
+        reason: 'Coordinator must close Hive boxes after use',
       );
 
       // Must release lock
       expect(
         source.contains('lock?.release()'),
         isTrue,
-        reason: 'Background service must release lock in finally block',
+        reason: 'Coordinator must release lock in finally block',
       );
 
       // closeIsolateBoxes and release must be in a finally block
@@ -406,16 +443,16 @@ void main() {
       );
     });
 
-    test('background service skips task when lock is unavailable', () {
+    test('scan coordinator skips scan when lock is unavailable', () {
       final source = File(
-        'lib/core/background/background_service.dart',
+        'lib/core/background/background_alert_scan_coordinator.dart',
       ).readAsStringSync();
 
       // Must check lock acquisition result and return early if failed
       expect(
         source.contains('if (!acquired)'),
         isTrue,
-        reason: 'Background service must check lock acquisition and skip if failed',
+        reason: 'Coordinator must check lock acquisition and skip if failed',
       );
     });
 
@@ -443,14 +480,18 @@ void main() {
   // inside top-level isolate entrypoints that can't be exercised without a
   // platform engine.
   group('background isolate Dio construction (#2249)', () {
-    final source = File('lib/core/background/background_service.dart')
-        .readAsStringSync();
+    // #2415 — the Dio construction moved into the coordinator with the
+    // scan body. The #2249 invariant (rate-limited factory, never raw Dio)
+    // still applies; the source-scan now reads the coordinator.
+    final source =
+        File('lib/core/background/background_alert_scan_coordinator.dart')
+            .readAsStringSync();
 
     test('routes every Dio through DioFactory', () {
       expect(
         source.contains("import '../services/dio_factory.dart';"),
         isTrue,
-        reason: 'background_service.dart must import DioFactory',
+        reason: 'coordinator must import DioFactory',
       );
       expect(
         source.contains('DioFactory.create('),

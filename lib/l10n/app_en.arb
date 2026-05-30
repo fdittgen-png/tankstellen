@@ -1172,7 +1172,7 @@
   "switchToAnonymousBody": "You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.",
   "switchAction": "Switch",
   "helpBannerCriteria": "Your profile defaults are pre-filled. Adjust criteria below to refine your search.",
-  "helpBannerAlerts": "Set a price threshold for a station. You'll be notified when prices drop below it. Checks run every 30 minutes.",
+  "helpBannerAlerts": "Set a price threshold for a station. You'll be notified when prices drop below it. Prices are checked periodically in the background — best effort, not in real time.",
   "helpBannerConsumption": "Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.",
   "helpBannerVehicles": "Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.",
   "syncNow": "Sync now",

@@ -41,7 +41,11 @@ void main() {
   // a comment). NEVER add new entries — use decomposition instead.
   const grandfatheredSnapshot = <String, int>{
     'lib/app/app_initializer.dart': 934,
-    'lib/core/background/background_service.dart': 782,
+    // #2415 — background_service.dart graduated: the scan body moved into
+    // BackgroundAlertScanCoordinator + BackgroundScanRunners +
+    // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
+    // lines (below the cap). Removed from the snapshot per the shrink
+    // ratchet; the extracted files are all new and under 400.
     'lib/core/country/country_config.dart': 723,
     // #2373 — re-grandfathered 868 → 887: one required `sourceUrl` field
     // added to every per-country FuelServicePolicy row (19 data lines) so

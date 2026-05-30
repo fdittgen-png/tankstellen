@@ -1094,7 +1094,7 @@
   "switchToAnonymousBody": "Sie werden von Ihrem E-Mail-Konto abgemeldet und mit einer neuen anonymen Sitzung fortfahren.\n\nIhre lokalen Daten (Favoriten, Alarme) bleiben auf diesem Gerät und werden mit dem neuen anonymen Konto synchronisiert.",
   "switchAction": "Wechseln",
   "helpBannerCriteria": "Ihre Profil-Standardwerte sind vorausgefüllt. Passen Sie die Kriterien unten an, um Ihre Suche zu verfeinern.",
-  "helpBannerAlerts": "Legen Sie einen Preisgrenzwert für eine Station fest. Sie werden benachrichtigt, wenn die Preise darunter fallen. Prüfungen laufen alle 30 Minuten.",
+  "helpBannerAlerts": "Legen Sie einen Preisgrenzwert für eine Station fest. Sie werden benachrichtigt, wenn die Preise darunter fallen. Die Preise werden periodisch im Hintergrund geprüft – nach bestem Bemühen, nicht in Echtzeit.",
   "helpBannerConsumption": "Erfassen Sie jede Tankfüllung, um Ihren tatsächlichen Verbrauch und CO₂-Fußabdruck zu verfolgen. Wischen Sie nach links, um einen Eintrag zu löschen.",
   "helpBannerVehicles": "Fügen Sie Ihre Fahrzeuge hinzu, damit Tankfüllungen und Kraftstoffvorgaben korrekt voreingestellt werden. Das erste Fahrzeug wird zum Standard.",
   "syncNow": "Jetzt synchronisieren",

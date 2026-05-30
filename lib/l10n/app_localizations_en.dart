@@ -2538,7 +2538,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpBannerAlerts =>
-      'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+      'Set a price threshold for a station. You\'ll be notified when prices drop below it. Prices are checked periodically in the background — best effort, not in real time.';
 
   @override
   String get helpBannerConsumption =>
@@ -8639,7 +8639,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get helpBannerAlerts =>
-      '⟦Šéŧ á ƥřîçé ŧĥřéšĥółđ ƒóř á šŧáŧîóñ. Ýóú\'łł ƀé ñóŧîƒîéđ ŵĥéñ ƥřîçéš đřóƥ ƀéłóŵ îŧ. Çĥéçķš řúñ éṽéřý 30 ɱîñúŧéš. ·······································⟧';
+      '⟦Šéŧ á ƥřîçé ŧĥřéšĥółđ ƒóř á šŧáŧîóñ. Ýóú\'łł ƀé ñóŧîƒîéđ ŵĥéñ ƥřîçéš đřóƥ ƀéłóŵ îŧ. Ƥřîçéš ářé çĥéçķéđ ƥéřîóđîçáłłý îñ ŧĥé ƀáçķǧřóúñđ — ƀéšŧ éƒƒóřŧ, ñóŧ îñ řéáł ŧîɱé. ···························································⟧';
 
   @override
   String get helpBannerConsumption =>
