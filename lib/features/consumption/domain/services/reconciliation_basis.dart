@@ -3,6 +3,7 @@
 
 import '../entities/fill_up.dart';
 import '../trip_summary.dart';
+import 'trip_consumed_liters.dart';
 
 /// The agreed comparison basis for the guided reconciliation workflow
 /// (Epic #2439, child #2440).
@@ -30,10 +31,11 @@ typedef ReconciliationBasis = ({
   /// excluded so Total L stays honest about what came out of the pump.
   double fuelTotalLiters,
 
-  /// Σ `trip.fuelLitersConsumed` (null → 0) **+** Σ correction-fill
-  /// litres **+** Σ virtual-trip litres. The trajets side of the
-  /// comparison: recorded burn plus every explicit stand-in for
-  /// unrecorded burn.
+  /// Σ canonical [tripConsumedLiters] (#2447 — measured litres, else the
+  /// GPS estimate, else 0) **+** Σ correction-fill litres **+** Σ
+  /// virtual-trip litres. The trajets side of the comparison: recorded
+  /// burn (counting GPS estimates for null-fuel trips) plus every
+  /// explicit stand-in for unrecorded burn.
   double trajetsTotalLiters,
 
   /// `fuelTotalLiters − trajetsTotalLiters`, signed. `0` once the window
@@ -80,7 +82,10 @@ ReconciliationBasis reconciliationBasis({
   var recordedConsumed = 0.0;
   var virtualTotal = 0.0;
   for (final trip in windowTrips) {
-    final liters = trip.fuelLitersConsumed ?? 0;
+    // #2447 — canonical trip litres: a null-fuel GPS/EV trip that still
+    // carries a GPS estimate contributes that estimate, not zero, so it
+    // no longer under-counts the trajets side against the pump.
+    final liters = tripConsumedLiters(trip);
     if (isVirtualTrip(trip)) {
       virtualTotal += liters;
     } else {

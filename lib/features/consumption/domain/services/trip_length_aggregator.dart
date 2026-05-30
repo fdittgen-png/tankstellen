@@ -27,17 +27,20 @@
 ///     `entry.vehicleId == vehicleId` (exact match) AND trips whose
 ///     `entry.vehicleId == null` (legacy data tagging) are included.
 ///     Mirrors the convention used by `trajets_tab.dart` line 110-112.
-///   * Trips with `summary.fuelLitersConsumed == null` are dropped
-///     from the bucket totals — silently treating null as 0 would
-///     skew the average. Without the litres figure we cannot honestly
-///     compute L/100 km. (`summary.distanceKm` is non-nullable on the
-///     model, so the only "missing field" gate is on litres.)
+///   * A trip's litres come from the canonical [tripConsumedLitersOrNull]
+///     (#2447): the measured `fuelLitersConsumed` if present, else the
+///     GPS-physics estimate recovered from `avgLPer100Km × distanceKm`.
+///     Only trips with NEITHER (honest "no data") are dropped from the
+///     bucket totals — silently treating them as 0 would skew the
+///     average. This is the same source of truth the monthly card and
+///     the reconciliation basis use, so the trajets surfaces agree.
 ///
 /// Pure function — no Riverpod, no I/O. Mirrors the style of
 /// `monthly_insights_aggregator.dart` in the same directory.
 library;
 
 import '../../data/trip_history_repository.dart';
+import 'trip_consumed_liters.dart';
 
 /// Upper edge of the SHORT bucket, in kilometres. Trips with
 /// `distanceKm < this` fall in [TripLengthBreakdown.short]. Re-exported
@@ -63,8 +66,9 @@ class TripLengthBucketStats {
   /// Zero when [tripCount] is zero.
   final double totalDistanceKm;
 
-  /// Sum of `summary.fuelLitersConsumed` across the bucket's
-  /// qualifying trips. Zero when [tripCount] is zero.
+  /// Sum of the canonical [tripConsumedLitersOrNull] (#2447 — measured
+  /// litres, else the GPS estimate) across the bucket's qualifying
+  /// trips. Zero when [tripCount] is zero.
   final double totalLitres;
 
   /// `(totalLitres / totalDistanceKm) × 100`. Null when [tripCount] is
@@ -133,9 +137,10 @@ class TripLengthBreakdown {
 /// `summary.vehicleId == null` (matching the Trajets tab convention).
 /// When null, every trip in [trips] is considered.
 ///
-/// Trips with `summary.fuelLitersConsumed == null` are skipped — the
-/// average is undefined without litres. (`summary.distanceKm` is
-/// non-nullable on the model.)
+/// A trip's litres come from the canonical [tripConsumedLitersOrNull]
+/// (#2447) — measured litres, else the GPS estimate. Only trips with
+/// neither (honest "no data") are skipped; the average is undefined
+/// without litres. (`summary.distanceKm` is non-nullable on the model.)
 TripLengthBreakdown aggregateByTripLength(
   Iterable<TripHistoryEntry> trips, {
   String? vehicleId,
@@ -152,7 +157,12 @@ TripLengthBreakdown aggregateByTripLength(
     }
 
     final distanceKm = entry.summary.distanceKm;
-    final litres = entry.summary.fuelLitersConsumed;
+    // #2447 — canonical trip litres: a null-fuel trip that still carries
+    // a GPS estimate (avgLPer100Km) now contributes that estimate instead
+    // of being dropped, so this surface agrees with the monthly card and
+    // the reconciliation basis. Trips with NEITHER litres NOR an estimate
+    // remain "no data" and are still skipped (honest, not zero-filled).
+    final litres = tripConsumedLitersOrNull(entry.summary);
     if (litres == null) continue;
     // distanceKm is non-nullable on TripSummary; a 0 km trip is rare
     // (synthetic test data) but folds cleanly into the SHORT bucket.

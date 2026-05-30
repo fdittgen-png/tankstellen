@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../../data/trip_history_repository.dart';
 import '../entities/fill_up.dart';
 import '../trip_recorder.dart';
+import 'trip_consumed_liters.dart';
 
 /// Outcome bucket for [Reconciler.reconcile] (#1361). Lets the caller
 /// distinguish "no correction needed because the gap was tiny" from
@@ -45,8 +46,9 @@ class ReconciliationResult {
   /// the closing plein).
   final double pumped;
 
-  /// Sum of `summary.fuelLitersConsumed` across every trip in the
-  /// window. Trips with `fuelLitersConsumed == null` contribute zero.
+  /// Sum of the canonical [tripConsumedLiters] across every trip in the
+  /// window (#2447 — measured litres, else the GPS estimate). Only trips
+  /// with neither a litres figure nor a GPS estimate contribute zero.
   final double consumed;
 
   /// `pumped - consumed`. Positive means the pump delivered more than
@@ -201,9 +203,13 @@ class Reconciler {
       );
     }
 
+    // #2447 — canonical trip litres: a null-fuel GPS/EV trip that carries
+    // a GPS estimate counts that estimate here too, so the detector's gap
+    // matches the reconciliation basis the dialog later asserts against
+    // (no estimate-vs-zero divergence between detection and display).
     final consumed = windowTrips.fold<double>(
       0,
-      (sum, t) => sum + (t.fuelLitersConsumed ?? 0),
+      (sum, t) => sum + tripConsumedLiters(t),
     );
     final gap = pumped - consumed;
 
