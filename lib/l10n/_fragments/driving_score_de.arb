@@ -7,5 +7,14 @@
   "drivingScorePenaltyHardAccel": "Starke Beschleunigung",
   "drivingScorePenaltyHardBrake": "Hartes Bremsen",
   "drivingScorePenaltyHighRpm": "Hohe Drehzahl",
-  "drivingScorePenaltyFullThrottle": "Vollgas"
+  "drivingScorePenaltyFullThrottle": "Vollgas",
+  "drivingScoreClassVeryGood": "Sehr gut",
+  "drivingScoreClassGood": "Gut",
+  "drivingScoreClassAverage": "Durchschnittlich",
+  "drivingScoreClassBad": "Verbesserungswürdig",
+  "drivingScorePenaltyLugging": "Untertouriges Fahren",
+  "drivingScorePenaltySmoothness": "Unruhiges Fahren",
+  "drivingScorePenaltyHighSpeed": "Hohe Geschwindigkeit",
+  "drivingScorePenaltyPedalVelocity": "Aggressives Gas",
+  "drivingScorePenaltyLambda": "Fettes Gemisch"
 }
