@@ -161,17 +161,27 @@ class BluetoothObd2Transport implements Obd2Transport {
     _buffer.clear();
     final completer = Completer<String>();
     _pending = completer;
-    await _channel.write(command.codeUnits);
-    return completer.future.timeout(
-      timeout,
-      onTimeout: () {
-        _pending = null;
-        throw TimeoutException(
-          'ELM327 did not respond within $timeout',
-          timeout,
-        );
-      },
-    );
+    // Clear `_pending` on EVERY exit — success, timeout *or* a throwing
+    // write (#2453). Before, if `_channel.write()` threw (device-not-
+    // connected / GATT timeout) with `_pending` still set, every later
+    // command tripped the concurrent-sendCommand guard and the transport
+    // stayed poisoned. The `identical` guard leaves a normally-completed
+    // command alone — `_onBytes` already nulled `_pending`, or a later
+    // command reassigned it — so finally only clears the slot it still owns.
+    try {
+      await _channel.write(command.codeUnits);
+      return await completer.future.timeout(
+        timeout,
+        onTimeout: () {
+          throw TimeoutException(
+            'ELM327 did not respond within $timeout',
+            timeout,
+          );
+        },
+      );
+    } finally {
+      if (identical(_pending, completer)) _pending = null;
+    }
   }
 
   void _onBytes(List<int> chunk) {
