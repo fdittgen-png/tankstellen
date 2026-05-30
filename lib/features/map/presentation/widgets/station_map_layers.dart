@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -9,8 +8,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/constants/app_constants.dart';
-import '../../data/retry_network_tile_provider.dart';
+import '../../data/sparkilo_tile_layer.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
@@ -32,54 +30,20 @@ const double _kMaxZoom = 19.0;
 /// Used by both [MapScreen] (full-screen) and [InlineMap] (split-screen)
 /// to eliminate ~130 lines of duplicated map layer code.
 ///
-/// ## Why this is stateful (#1234 follow-up to #1164)
+/// ## One tile path (#2394 / #2398)
 ///
-/// The earlier grey-tile fix (LayoutBuilder gate + tab-flip incarnation
-/// rebuild) covers the offstage IndexedStack viewport-capture race, but
-/// the screen still rendered grey on cold-start in some scenarios. The
-/// reason: [RetryNetworkTileProvider] was created inside `build()` and
-/// rebuilt on every parent state change. flutter_map's TileLayer
-/// preserves its [TileImage] objects across `didUpdateWidget`, but each
-/// existing TileImage holds a reference to the OLD provider's
-/// [http.Client]; meanwhile the *new* provider's client is what fresh
-/// tile fetches use. The leaked-client churn produced two pathologies:
-///   1. The very first tile fetches went through an http.Client that
-///      was about to be discarded, occasionally racing with the next
-///      build's replacement provider before completing.
-///   2. The default `BuiltInMapCachingProvider` instance — created
-///      lazily inside the image provider — was being asked to cache
-///      tiles whose request was abandoned, leaving holes that only got
-///      backfilled when a later rebuild happened to re-issue the same
-///      coordinates against a stable provider.
-/// Holding a single tile provider per [StationMapLayers] lifetime —
-/// created in `initState`, disposed in `dispose` — eliminates both
-/// pathologies. The KeyedSubtree+incarnation rebuild in [MapScreen]
-/// already destroys this state on tab-flip, so the provider lifetime
-/// is bounded by the visible-tab lifetime.
-///
-/// ## Cold-start tile reset window (#1316 phase 3)
-///
-/// The single `addPostFrameCallback` reset added in #1234 fires
-/// before two later events that also invalidate TileLayer's captured
-/// viewport:
-///   1. `NearbyMapView` schedules its own post-frame `fitCamera` call
-///      every build — that move arrives AFTER the initState reset, so
-///      TileLayer reloads against the bootstrap camera and never
-///      sees the settled camera the user actually wants tiles for.
-///   2. `FlutterMap` only emits `MapEventNonRotatedSizeChange` once
-///      its internal LayoutBuilder lays out — also AFTER the
-///      initState reset. If the bootstrap layout was small (the
-///      <100px LayoutBuilder gate in [MapScreen] only catches the
-///      worst placeholder layouts), TileLayer captured a tiny tile
-///      range that survives the size update.
-/// Both produced the "3 tile patches over a grey background"
-/// symptom the user reported. The fix subscribes to
-/// [MapController.mapEventStream] for [_coldStartResetWindow] (3 s)
-/// and re-emits on the reset stream every time a programmatic move,
-/// `fitCamera`, or `nonRotatedSizeChange` event arrives. After the
-/// window the subscription cancels itself so steady-state pans use
-/// TileLayer's normal load-on-event path (resetting on every pan
-/// would briefly blank the visible tiles).
+/// The basemap renders through the single hardened [SparkiloTileLayer].
+/// Prior to #2398 this widget ran a *parallel* inline `TileLayer` plus a
+/// 12-second cold-start "reset window" that fired `TileLayer.reset` on
+/// every camera/size event during cold-start. That storm evicted tiles
+/// before they painted on a slow first round-trip — the recurring
+/// grey-tile bug (#757 → #1234 → #1316 → #1991 → #2044 → #2096 →
+/// #2122 → #2177). The reset machinery is deleted: there is exactly one
+/// tile path, every surface shares `abortObsoleteRequests: true`
+/// (the upstream default inside [SparkiloTileLayer]), and there is no
+/// reset stream to mis-fire. See `tile_layer_consistency_test.dart`
+/// (allowlist is now the single `sparkilo_tile_layer.dart`) and
+/// `station_map_layers_no_reset_test.dart`.
 class StationMapLayers extends StatefulWidget {
   final MapController mapController;
   final List<Station> stations;
@@ -174,46 +138,6 @@ class StationMapLayers extends StatefulWidget {
 }
 
 class _StationMapLayersState extends State<StationMapLayers> {
-  /// Held in state so a single [http.Client] lives for the entire
-  /// visible lifetime of the map. Recreating the provider on every
-  /// build (the prior bug) churned http.Client instances and produced
-  /// the cold-start grey-tile regression (#1234).
-  late final RetryNetworkTileProvider _tileProvider;
-
-  /// Stream that, when emitted, makes [TileLayer] drop all current
-  /// tile images and re-fetch the visible range from scratch. We fire
-  /// it once after the first frame to cover the case where TileLayer's
-  /// initial `didChangeDependencies` ran against a degenerate camera
-  /// and never re-issued requests when the camera settled.
-  final StreamController<void> _resetController =
-      StreamController<void>.broadcast();
-
-  /// Subscription on [MapController.mapEventStream] used during the
-  /// cold-start window to force a tile-reset every time the map size
-  /// or camera moves programmatically. Cancelled after
-  /// [_coldStartResetWindow] so steady-state interactions are not
-  /// disturbed (#1316 phase 3 — see class doc).
-  StreamSubscription<MapEvent>? _coldStartEventSub;
-
-  /// Timer that closes the cold-start reset window. Cancelled in
-  /// [dispose] so a late firing cannot touch a disposed state.
-  Timer? _coldStartCloseTimer;
-
-  /// How long to keep firing tile-resets on programmatic
-  /// size/camera changes after init. Twelve seconds covers the worst
-  /// observed cold-start sequence (offstage IndexedStack pre-mount
-  /// → onstage promotion → LayoutBuilder gate clears → FlutterMap
-  /// internal LayoutBuilder lays out → `fitCamera` post-frame
-  /// callback fires → camera settles). Originally 3 s but the user's
-  /// 2026-05-24 report showed a slow-network cold open where the
-  /// first search result + `fitCamera` arrived ~5-8 s after mount
-  /// — past the old window — leaving the grey-tile bug uncovered
-  /// until they tapped Refresh. Twelve seconds gives a healthy
-  /// margin for GPS resolution + first network round-trip on cellular
-  /// while still bounded enough that the user's first deliberate
-  /// zoom (10+ s in) is unaffected.
-  static const Duration _coldStartResetWindow = Duration(seconds: 12);
-
   /// #1774 — the marker list and the price range are memoised here and
   /// recomputed only when `stations` / `selectedFuel` /
   /// `selectedStationIds` actually change. `MapScreen` watches four
@@ -243,6 +167,12 @@ class _StationMapLayersState extends State<StationMapLayers> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _recomputeMarkers();
+  }
+
+  @override
   void didUpdateWidget(StationMapLayers oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Riverpod hands back the same `stations` / `selectedStationIds`
@@ -255,91 +185,6 @@ class _StationMapLayersState extends State<StationMapLayers> {
         !identical(oldWidget.selectedStationIds, widget.selectedStationIds)) {
       _recomputeMarkers();
     }
-    // Tap-the-refresh-button cure (#2025 follow-up). When stations
-    // transition from empty → populated (the first successful search
-    // after a cold open) OR when the camera-anchoring centre changes,
-    // force a TileLayer reset. This catches the case where the user
-    // opens Carte before a search has landed: the initial map renders
-    // with a bootstrap camera and TileLayer captured a degenerate
-    // viewport, the 3-second cold-start window closed silently, and
-    // the user sees a grey background until they tap Refresh. The
-    // reset stream is broadcast + cheap (a no-op when tiles are
-    // already loaded for the visible range), so re-firing it on the
-    // search-results-arrived transition is the safest cure.
-    final wasEmpty = oldWidget.stations.isEmpty;
-    final centerChanged = widget.center != oldWidget.center;
-    if ((wasEmpty && widget.stations.isNotEmpty) || centerChanged) {
-      if (!_resetController.isClosed) {
-        _resetController.add(null);
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _tileProvider = RetryNetworkTileProvider(abortObsoleteRequests: false);
-    _recomputeMarkers();
-
-    // First-paint reset: kick TileLayer once so any tiles that fetched
-    // against the bootstrap camera are dropped + reissued against the
-    // settled MapController state. Cheap (no-op when tiles are already
-    // loaded for the visible range) and fixes the grey-on-first-open
-    // case where neither the LayoutBuilder gate nor the
-    // _mapIncarnation listener catches the offstage→onstage transition
-    // (#1234).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _resetController.isClosed) return;
-      _resetController.add(null);
-    });
-
-    // #1316 phase 3 — the single first-paint reset above fires before
-    // [NearbyMapView]'s post-frame `fitCamera` runs and before
-    // FlutterMap's own LayoutBuilder finishes propagating the real
-    // viewport size. Result: reset hits TileLayer with the bootstrap
-    // camera, TileLayer fetches a tiny tile set, then `fitCamera`
-    // moves the camera + the size-change event arrives — but
-    // TileLayer's reaction at that point only loads tiles INSIDE the
-    // already-captured (small) viewport, leaving most of the visible
-    // map grey (the "3 patches" symptom in the issue's screenshots).
-    //
-    // Fix: subscribe to the map event stream and re-fire the reset on
-    // every programmatic event that changes either the viewport size
-    // or the camera position during the [_coldStartResetWindow].
-    // After the window, unsubscribe — steady-state pans/zooms do not
-    // need a tile-pipeline reset (TileLayer's normal load-on-event
-    // path handles them just fine, and gratuitous resets would cause
-    // visible tile pop-in on every pan).
-    _coldStartEventSub =
-        widget.mapController.mapEventStream.listen(_onColdStartEvent);
-    _coldStartCloseTimer = Timer(_coldStartResetWindow, () {
-      _coldStartEventSub?.cancel();
-      _coldStartEventSub = null;
-    });
-  }
-
-  /// Fire a tile-reset on programmatic size/camera changes during the
-  /// cold-start window. Filters to events that actually invalidate the
-  /// captured viewport — pure user interaction (drag, scroll-wheel,
-  /// pinch) is ignored because if the user is interacting, the bug
-  /// did not reproduce on this open and we should not interrupt them.
-  void _onColdStartEvent(MapEvent event) {
-    if (!mounted || _resetController.isClosed) return;
-    final src = event.source;
-    final relevant = src == MapEventSource.nonRotatedSizeChange ||
-        src == MapEventSource.fitCamera ||
-        src == MapEventSource.mapController;
-    if (!relevant) return;
-    _resetController.add(null);
-  }
-
-  @override
-  void dispose() {
-    _coldStartCloseTimer?.cancel();
-    _coldStartEventSub?.cancel();
-    _resetController.close();
-    _tileProvider.dispose();
-    super.dispose();
   }
 
   @override
@@ -368,42 +213,13 @@ class _StationMapLayersState extends State<StationMapLayers> {
             ),
           ),
           children: [
-            TileLayer(
-              urlTemplate: AppConstants.osmTileUrl,
-              userAgentPackageName: AppConstants.osmUserAgent,
-              maxNativeZoom: 19,
-              maxZoom: 19,
-              // #757 — RetryNetworkTileProvider retries transient
-              // HTTP 429 / 5xx / connection errors with jittered
-              // backoff (200 ms, 800 ms). Combined with
-              // `evictErrorTileStrategy: notVisibleRespectMargin`
-              // below, a failed tile gets retried up to 3× and, if
-              // all attempts fail, is evicted as soon as it scrolls
-              // out of view so the next pan retries cleanly.
-              //
-              // #930 — flutter_map's default aborts in-flight tile
-              // fetches on pan. Our retry layer must not see those
-              // cancellations as errors. Hence explicit
-              // `abortObsoleteRequests: false` (in initState) plus
-              // cancellation-aware retry logic in the provider.
-              //
-              // #1234 — provider is held in state (initState/dispose),
-              // NOT rebuilt every frame. Recreating it churned
-              // http.Client instances and produced a cold-start
-              // grey-tile race the LayoutBuilder gate could not
-              // catch. The reset stream fires once after first paint
-              // to drop any tiles that captured a degenerate viewport.
-              tileProvider: _tileProvider,
-              reset: _resetController.stream,
-              evictErrorTileStrategy:
-                  EvictErrorTileStrategy.notVisibleRespectMargin,
-              errorTileCallback: (tile, error, stackTrace) {
-                debugPrint(
-                    'TileLayer error at (z:${tile.coordinates.z} '
-                    'x:${tile.coordinates.x} y:${tile.coordinates.y}): '
-                    '$error');
-              },
-            ),
+            // #2398 — the SINGLE hardened tile path. No inline TileLayer,
+            // no reset stream: the cold-start reset storm that evicted
+            // tiles before they painted is gone. `SparkiloTileLayer`
+            // owns its retry provider lifecycle and uses the upstream
+            // default `abortObsoleteRequests: true`, unified with every
+            // other map surface.
+            const SparkiloTileLayer(key: ValueKey('main-tiles')),
             // Route polyline (if in route search mode)
             if (widget.routePolyline != null &&
                 widget.routePolyline!.isNotEmpty)

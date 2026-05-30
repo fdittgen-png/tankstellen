@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:tankstellen/features/map/data/retry_network_tile_provider.dart';
+import 'package:tankstellen/features/map/data/sparkilo_tile_layer.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -132,15 +132,12 @@ void main() {
   // #757: the retry+evict tile provider makes the nudge unnecessary.
   // A failed tile now retries at the HTTP layer and, if still
   // unresolved, is evicted from the cache as soon as it scrolls out
-  // of the keep-buffer margin. The structural assertion that
-  // `MapOptions.onMapReady != null` no longer holds and should not
-  // be resurrected — re-adding the jiggle would cancel in-flight
-  // retries (the #709 regression that was itself rolled back).
+  // of the keep-buffer margin.
 
-  group('StationMapLayers tile provider stability (#1234)', () {
+  group('StationMapLayers single tile path (#2398)', () {
     testWidgets(
-      'TileLayer keeps the same RetryNetworkTileProvider instance across '
-      'parent rebuilds — does NOT re-instantiate on every build',
+      'renders the basemap through the hardened SparkiloTileLayer — no '
+      'parallel inline TileLayer, no reset stream',
       (tester) async {
         // Wide-enough viewport so the FlutterMap actually mounts.
         tester.view.physicalSize = const Size(900, 1600);
@@ -151,16 +148,57 @@ void main() {
         final mapController = MapController();
         addTearDown(mapController.dispose);
 
-        // Helper to drive a fresh build with a different external key
-        // (the kind of trivial rebuild that, before #1234, churned the
-        // tile provider on every parent setState).
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: StationMapLayers(
+                mapController: mapController,
+                stations: const [_seedStation],
+                center: const LatLng(52.5210, 13.4100),
+                zoom: 12,
+                searchRadiusKm: 10,
+                selectedFuel: FuelType.diesel,
+              ),
+            ),
+          ),
+        );
+
+        // Exactly one SparkiloTileLayer drives the basemap. Before
+        // #2398 the main map ran a parallel inline TileLayer with its
+        // own provider + a 12 s cold-start reset storm that evicted
+        // tiles before they painted (the recurring grey-tile bug). The
+        // unified path means there is one keyed tile widget and one
+        // reset behaviour shared with every other map surface.
+        expect(find.byType(SparkiloTileLayer), findsOneWidget);
+        final sparkilo =
+            tester.widget<SparkiloTileLayer>(find.byType(SparkiloTileLayer));
+        expect(sparkilo.key, const ValueKey('main-tiles'));
+        expect(
+          sparkilo.reset,
+          isNull,
+          reason:
+              'SparkiloTileLayer in the main map must NOT receive a reset '
+              'stream — the cold-start reset storm (#1316/#2025) that '
+              'evicted tiles before first paint was deleted in #2398.',
+        );
+      },
+    );
+
+    testWidgets(
+      'survives parent rebuilds without re-keying the tile widget '
+      '(provider lifetime is owned inside SparkiloTileLayer)',
+      (tester) async {
+        tester.view.physicalSize = const Size(900, 1600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final mapController = MapController();
+        addTearDown(mapController.dispose);
+
         Widget pumpAt(int rebuildToken) => MaterialApp(
               home: Scaffold(
                 body: KeyedSubtree(
-                  // ValueKey changes only the OUTER subtree wrapper —
-                  // it's a no-op on StationMapLayers' own State, which
-                  // is what we want. We only want the parent build()
-                  // to run again.
                   key: ValueKey('rebuild-$rebuildToken'),
                   child: StationMapLayers(
                     mapController: mapController,
@@ -175,204 +213,14 @@ void main() {
             );
 
         await tester.pumpWidget(pumpAt(0));
-
-        TileLayer findTileLayer() => tester.widget<TileLayer>(
-              find.byType(TileLayer),
-            );
-
-        final providerOnFirstBuild = findTileLayer().tileProvider;
-        expect(
-          providerOnFirstBuild,
-          isA<RetryNetworkTileProvider>(),
-          reason:
-              'StationMapLayers must wire RetryNetworkTileProvider into '
-              'the TileLayer (not the default NetworkTileProvider) — the '
-              '#757 retry policy depends on it.',
-        );
-
-        // Rebuild via a parent setState analogue. Same widget instance
-        // (same State), but the TileLayer widget is re-instantiated.
-        // The State must hand it the SAME tile provider instance.
-        await tester.pumpWidget(pumpAt(0));
         await tester.pumpWidget(pumpAt(0));
         await tester.pumpWidget(pumpAt(0));
 
-        final providerAfterRebuilds = findTileLayer().tileProvider;
-        expect(
-          identical(providerOnFirstBuild, providerAfterRebuilds),
-          isTrue,
-          reason:
-              'TileLayer.tileProvider must remain identical across '
-              'StationMapLayers parent rebuilds. Recreating the provider '
-              'every build (the prior bug, #1234) churned http.Client '
-              'instances and produced cold-start grey tiles. Holding it '
-              'in State (initState/dispose) is the fix.',
-        );
-      },
-    );
-
-    testWidgets(
-      'TileLayer.reset stream is wired so a settled-camera kick can drop '
-      'tiles fetched against a degenerate viewport',
-      (tester) async {
-        tester.view.physicalSize = const Size(900, 1600);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        final mapController = MapController();
-        addTearDown(mapController.dispose);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: StationMapLayers(
-                mapController: mapController,
-                stations: const [_seedStation],
-                center: const LatLng(52.5210, 13.4100),
-                zoom: 12,
-                searchRadiusKm: 10,
-                selectedFuel: FuelType.diesel,
-              ),
-            ),
-          ),
-        );
-
-        final layer = tester.widget<TileLayer>(find.byType(TileLayer));
-        expect(
-          layer.reset,
-          isNotNull,
-          reason:
-              'TileLayer.reset must be wired so the post-first-frame '
-              'kick can force a tile reload — covers the cold-start case '
-              'where TileLayer captured a degenerate viewport before the '
-              'MapController settled (#1234).',
-        );
-      },
-    );
-  });
-
-  group('StationMapLayers cold-start tile reset window (#1316 phase 3)', () {
-    testWidgets(
-      'reset stream re-fires on programmatic camera moves during the '
-      'cold-start window so TileLayer reloads after `fitCamera` settles',
-      (tester) async {
-        tester.view.physicalSize = const Size(900, 1600);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        final mapController = MapController();
-        addTearDown(mapController.dispose);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: StationMapLayers(
-                mapController: mapController,
-                stations: const [_seedStation],
-                center: const LatLng(52.5210, 13.4100),
-                zoom: 12,
-                searchRadiusKm: 10,
-                selectedFuel: FuelType.diesel,
-              ),
-            ),
-          ),
-        );
-
-        // The initState first-paint reset fired during pumpWidget's
-        // post-frame stage, so a listener attached now misses it
-        // (broadcast streams do not replay). That part is already
-        // covered by the existing "TileLayer.reset stream is wired"
-        // test above. Here we focus on the phase-3 invariant: a
-        // programmatic camera move during the cold-start window must
-        // produce at least one fresh reset.
-        final reset = tester.widget<TileLayer>(find.byType(TileLayer)).reset!;
-        final emissions = <void>[];
-        final sub = reset.listen(emissions.add);
-        addTearDown(sub.cancel);
-
-        // Simulate `NearbyMapView`s post-frame `fitCamera` arriving
-        // AFTER the initState reset already fired. Before #1316
-        // phase 3, this left TileLayer with whatever tile range it
-        // computed at the bootstrap camera — typically only a handful
-        // of tiles around the (possibly stale) initial centre. Now
-        // the cold-start subscriber must catch this event and
-        // re-emit reset so TileLayer reloads against the settled
-        // camera.
-        mapController.move(const LatLng(43.4500, 3.4900), 12);
-        await tester.pump(const Duration(milliseconds: 16));
-
-        expect(
-          emissions,
-          isNotEmpty,
-          reason:
-              '#1316 — programmatic camera moves during the cold-start '
-              'window must re-emit on the reset stream so TileLayer '
-              'recomputes its visible-tile set against the settled '
-              'camera. Previously the initState reset fired against the '
-              'bootstrap camera; if `fitCamera` (or any controller move) '
-              'arrived later, TileLayer kept the small tile set from '
-              'the bootstrap camera, leaving most of the map grey.',
-        );
-      },
-    );
-
-    testWidgets(
-      'after the cold-start window, programmatic moves no longer trigger '
-      'extra resets (steady-state pans must not pop tiles)',
-      (tester) async {
-        tester.view.physicalSize = const Size(900, 1600);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        final mapController = MapController();
-        addTearDown(mapController.dispose);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: StationMapLayers(
-                mapController: mapController,
-                stations: const [_seedStation],
-                center: const LatLng(52.5210, 13.4100),
-                zoom: 12,
-                searchRadiusKm: 10,
-                selectedFuel: FuelType.diesel,
-              ),
-            ),
-          ),
-        );
-
-        final reset = tester.widget<TileLayer>(find.byType(TileLayer)).reset!;
-        final emissions = <void>[];
-        final sub = reset.listen(emissions.add);
-        addTearDown(sub.cancel);
-
-        // Burn past the 12-second cold-start window (extended from
-        // 3 s in the #2025 follow-up to cover slow-network cold opens).
-        await tester.pump(const Duration(seconds: 13));
-        final baseline = emissions.length;
-
-        // Programmatic move AFTER the window — must not re-emit on
-        // the reset stream. TileLayer has its own load-on-event
-        // handling for steady-state pans; gratuitous resets pop the
-        // visible tiles back to their loading state.
-        mapController.move(const LatLng(43.4500, 3.4900), 12);
-        await tester.pump(const Duration(milliseconds: 16));
-
-        expect(
-          emissions.length,
-          baseline,
-          reason:
-              'After [_coldStartResetWindow] elapses, programmatic '
-              'camera moves must no longer fire the reset stream — '
-              'TileLayer\'s normal event-driven load path handles '
-              'steady-state pans and an extra reset would briefly '
-              'wipe the visible tiles. The cold-start subscription '
-              'must self-cancel.',
-        );
+        // The keyed SparkiloTileLayer is preserved across rebuilds, so
+        // its State (and the retry provider's http.Client) lives for
+        // the map's whole visible lifetime — the #1234 invariant now
+        // lives inside the wrapper rather than this widget.
+        expect(find.byType(SparkiloTileLayer), findsOneWidget);
       },
     );
   });

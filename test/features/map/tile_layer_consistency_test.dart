@@ -26,18 +26,17 @@ void main() {
   test(
     'every TileLayer in lib/ goes through SparkiloTileLayer or is allowlisted (#2096)',
     () {
-      // Allowlisted files — these own their own retry-provider
-      // lifecycle and the inline TileLayer is intentional.
+      // Allowlist — the SINGLE place a raw TileLayer is allowed
+      // (#2398). `station_map_layers.dart` was removed from the
+      // allowlist once its parallel inline TileLayer + cold-start
+      // reset machinery was deleted and it routed through
+      // SparkiloTileLayer. The parallel-TileLayer regression that
+      // caused the recurring grey-tile bug cannot recur: any new
+      // raw `TileLayer(` outside the wrapper fails this lint.
       const allowlist = <String>{
         // The hardened wrapper itself — the ONE place a raw
         // TileLayer is allowed.
         'lib/features/map/data/sparkilo_tile_layer.dart',
-        // The main map. Holds the provider in state + wires the
-        // cold-start event-stream reset. A future cleanup can fold
-        // this into SparkiloTileLayer with an optional cold-start
-        // hook; until then the inline setup is allowlisted with
-        // its existing rationale documented in the file.
-        'lib/features/map/presentation/widgets/station_map_layers.dart',
       };
 
       final offenders = <String>[];
