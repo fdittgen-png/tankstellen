@@ -17,12 +17,12 @@ void main() {
   Future<void> pumpInMap(WidgetTester tester, {required Locale locale}) async {
     await pumpApp(
       tester,
-      FlutterMap(
-        options: const MapOptions(
+      const FlutterMap(
+        options: MapOptions(
           initialCenter: LatLng(48.0, 2.0),
           initialZoom: 10,
         ),
-        children: const [OsmAttribution()],
+        children: [OsmAttribution()],
       ),
       locale: locale,
     );
