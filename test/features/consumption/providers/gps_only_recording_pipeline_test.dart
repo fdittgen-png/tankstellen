@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
+import 'package:tankstellen/features/consumption/domain/services/gps_fuel_estimator.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/gps_only_recording_pipeline.dart';
 import 'package:tankstellen/features/consumption/providers/recording_pipeline.dart';
@@ -67,6 +68,61 @@ void main() {
       // 10 m/s == 36 km/h.
       expect(live!.speedKmh, closeTo(36.0, 1e-9));
       expect(harness.host.state.phase, TripRecordingPhase.recording);
+    });
+
+    test('the very first fix carries a null GPS estimate (warm-up — no '
+        'previous speed for the accel finite-diff yet) (#2389)', () async {
+      final harness = _Harness();
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+
+      harness.geo.emit(_pos(43.4, 3.5, speedMps: 15.0, at: DateTime(2026, 5, 30, 8)));
+      await _pump();
+
+      expect(harness.host.state.live!.gpsEstimatedLPer100Km, isNull,
+          reason: 'no prior fix → estimator has no dt/accel basis yet');
+    });
+
+    test('a moving GPS-only trip carries a sane live GPS fuel estimate '
+        'within the estimator clamps (#2389)', () async {
+      final harness = _Harness();
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+
+      // A steady ~72 km/h cruise: feed several 1 s-apart fixes so the
+      // estimator's 3-sample accel low-pass warms up and emits an instant
+      // figure. (The 1st fix primes prevSpeed; the 2nd onward produce it.)
+      final t0 = DateTime(2026, 5, 30, 9);
+      for (var i = 0; i < 5; i++) {
+        harness.geo.emit(_pos(43.4 + i * 0.001, 3.5,
+            speedMps: 20.0, at: t0.add(Duration(seconds: i))));
+        await _pump();
+      }
+
+      final estimate = harness.host.state.live!.gpsEstimatedLPer100Km;
+      expect(estimate, isNotNull,
+          reason: 'a moving GPS-only trip must surface a live estimate');
+      // Clamped to the same plausibility band the post-trip estimator uses.
+      expect(estimate, greaterThanOrEqualTo(GpsFuelEstimator.minLPer100Km));
+      expect(estimate, lessThanOrEqualTo(GpsFuelEstimator.maxLPer100Km));
+    });
+
+    test('a stationary fix carries a null GPS estimate (no per-distance '
+        'figure at a standstill) (#2389)', () async {
+      final harness = _Harness();
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+
+      final t0 = DateTime(2026, 5, 30, 10);
+      // Two stopped fixes (0 m/s) — well below the estimator's move
+      // threshold, so the instant figure is undefined.
+      harness.geo.emit(_pos(43.4, 3.5, speedMps: 0.0, at: t0));
+      await _pump();
+      harness.geo.emit(_pos(43.4, 3.5,
+          speedMps: 0.0, at: t0.add(const Duration(seconds: 1))));
+      await _pump();
+
+      expect(harness.host.state.live!.gpsEstimatedLPer100Km, isNull);
     });
 
     test('a negative / NaN stale first speed fix is clamped to 0', () async {
