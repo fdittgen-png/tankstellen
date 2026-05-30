@@ -153,7 +153,7 @@ class BrokenMapDetector {
         // it never aborts the diesel probe (unlike the petrol path,
         // where baro is load-bearing).
         final dieselBaroRaw = await port.sendRaw(_baroCommand);
-        final dieselBaro = _parseBaroPressureKpa(dieselBaroRaw);
+        final dieselBaro = Elm327Parsers.parseBaroPressureKpa(dieselBaroRaw);
 
         // The "rev" step. #1621 phase 5 — when a prompt callback is
         // wired, ask the user to rev and key the re-read off the
@@ -194,7 +194,7 @@ class BrokenMapDetector {
       } else {
         // Petrol path: need baro to know the delta.
         final baroRaw = await port.sendRaw(_baroCommand);
-        final baro = _parseBaroPressureKpa(baroRaw);
+        final baro = Elm327Parsers.parseBaroPressureKpa(baroRaw);
         if (baro == null) return prior;
         observationScore = BrokenMapBeliefUpdater.vacuumMissingScore(
           baroKpa: baro,
@@ -308,26 +308,4 @@ class BrokenMapDetector {
       reason: reason,
     );
   }
-}
-
-/// Parse Mode 01 PID 0x33 (absolute barometric pressure) response.
-/// Single-byte payload, raw kPa (range 0-255). Returns null on NO DATA
-/// / malformed / wrong-PID echo. Inlined here because the existing
-/// [Elm327Parsers] catalog doesn't carry PID 0x33 (it isn't used
-/// elsewhere yet — this detector is the first consumer).
-double? _parseBaroPressureKpa(String raw) {
-  final clean = Elm327Parsers.cleanResponse(raw);
-  if (clean == null) return null;
-  // Tokens look like '41 33 XX' — split on whitespace, validate the
-  // mode-01 echo + PID, return the third byte.
-  final tokens = clean
-      .split(RegExp(r'\s+'))
-      .where((t) => t.isNotEmpty)
-      .toList();
-  if (tokens.length < 3) return null;
-  final mode = int.tryParse(tokens[0], radix: 16);
-  final pid = int.tryParse(tokens[1], radix: 16);
-  final value = int.tryParse(tokens[2], radix: 16);
-  if (mode != 0x41 || pid != 0x33 || value == null) return null;
-  return value.toDouble();
 }

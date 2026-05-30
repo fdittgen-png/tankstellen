@@ -227,6 +227,22 @@ class Elm327Commands {
   /// Request fuel tank level input (%). Mode 01, PID 2F. (#717)
   static const fuelTankLevelCommand = '012F\r';
 
+  /// Request commanded equivalence ratio / λ. Mode 01, PID 44 (#2456).
+  /// Formula: λ = (256·A + B) / 32768 (dimensionless). λ ≈ 1.0 at
+  /// stoichiometry; <1 is a lean cruise mixture, >1 is power-enrichment.
+  /// Replacing the assumed-stoich AFR with `stoichAFR × λ` is the biggest
+  /// fuel-estimate accuracy win on the no-MAF speed-density path (the
+  /// Peugeot). Response: "41 44 XX YY".
+  static const commandedEquivalenceRatioCommand = '0144\r';
+
+  /// Request absolute barometric pressure (kPa). Mode 01, PID 33 (#2456).
+  /// Single-byte raw value. Already read best-effort by
+  /// `broken_map_detector`; now promoted to a first-class parser so the
+  /// speed-density estimator can feed measured ambient pressure
+  /// (altitude / weather) into the ideal-gas air-mass term instead of an
+  /// assumed sea-level value. Response: "41 33 XX".
+  static const baroPressureCommand = '0133\r';
+
   /// Request fuel type. Mode 01, PID 51. (#1399). Single-byte response
   /// per SAE-J1979 Table 6 — see [Elm327Parsers.parseFuelType] for the
   /// mapping. Used during the VIN-driven adapter-pair auto-population

@@ -53,14 +53,30 @@ void main() {
     'lib/core/services/country_service_registry.dart': 887,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
-    'lib/features/consumption/data/obd2/elm327_parsers.dart': 457,
-    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 471,
+    // #2456 — re-grandfathered 457 → 481: two new pure parsers,
+    // `parseBaroPressureKpa` (PID 0x33) and `parseCommandedEquivalenceRatio`
+    // (PID 0x44, commanded λ), each with their dartdoc, so the
+    // fuel-rate estimator can use the ECU's real mixture + ambient
+    // air-density instead of the assumed-stoich AFR / sea-level pressure.
+    'lib/features/consumption/data/obd2/elm327_parsers.dart': 481,
+    // #2456 — re-grandfathered 471 → 524: the live integrator gained λ
+    // (PID 0x44, 2 Hz) + baro (PID 0x33, 0.5 Hz) supportsPid-gated
+    // subscriptions and threads both into the MAF + speed-density fuel
+    // derivation (effective AFR + air-density correction). Decomposition
+    // is tracked separately by #2187/#2188.
+    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 524,
     // #2379 — re-grandfathered 1457 → 1468: threaded the
     // `logFailureAsError` flag through `connect()` (param + doc + the
     // guarded `if` around the now-conditional connect-failed trace) so a
     // recoverable connect attempt stops flooding the error log. Net +11;
     // decomposition is tracked separately by #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1468,
+    // #2456 — re-grandfathered 1468 → 1505: two new read helpers
+    // (`readBaroPressureKpa` PID 0x33, `readCommandedEquivalenceRatio`
+    // PID 0x44) + their supportsPid-gated use in the MAF + speed-density
+    // steps of `readFuelRateLPerHour` + the new optional params on the
+    // `estimateFuelRateLPerHourFromMap` forwarder. Decomposition tracked
+    // by #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1505,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb
