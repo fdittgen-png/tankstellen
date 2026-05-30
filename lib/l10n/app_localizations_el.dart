@@ -4790,6 +4790,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Στοιχίστε την οθόνη εντός του πλαισίου και στη συνέχεια τραβήξτε φωτογραφία';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Τι ανεφοδιαστήκατε';
 
   @override

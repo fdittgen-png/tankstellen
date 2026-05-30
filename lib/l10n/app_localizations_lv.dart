@@ -4776,6 +4776,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Novietojiet displeju rāmītī un pēc tam fotografējiet';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Ko jūs uzpildījāt';
 
   @override

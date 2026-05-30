@@ -4770,6 +4770,10 @@ class AppLocalizationsSk extends AppLocalizations {
       'Zarovnajte displej do rámčeka a potom odfotografujte';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Čo ste natankovali';
 
   @override

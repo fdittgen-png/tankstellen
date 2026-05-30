@@ -4762,6 +4762,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Lijn het scherm uit in het kader en maak een foto';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Wat je getankt hebt';
 
   @override

@@ -5,19 +5,33 @@ import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../data/ocr/ocr_geometry.dart';
 import '../../data/ocr/pump_ocr_config.dart';
 import '../widgets/pump_alignment_overlay.dart';
+import '../widgets/pump_camera_message.dart';
 import '../widgets/pump_live_feedback_bar.dart';
+import '../widgets/pump_shutter_button.dart';
 import '../../../../core/logging/error_logger.dart';
 
-/// Full-screen in-app camera for capturing a pump display (#1868, #2276).
+/// Full-screen in-app camera for capturing a pump display (#1868, #2276,
+/// #2477).
 ///
 /// Shows a live [CameraPreview] overlaid by [PumpAlignmentOverlay]:
 /// an orientation-aware framing guide with per-field labelled slots so
 /// the user lines each number up in its named slot before capturing.
+///
+/// Pump displays are wide (the three numbers sit side by side), so a
+/// portrait shot lands the digits sideways and small — too small for the
+/// per-field masks to align. The screen therefore **forces landscape**
+/// (#2477): it pins [SystemChrome.setPreferredOrientations] to the two
+/// landscape orientations on entry, locks the capture orientation to
+/// [DeviceOrientation.landscapeRight] so the baked JPEG matches the held
+/// device, and restores the app's full orientation set on dispose. While
+/// the device is still portrait (mid-rotation) the live feedback bar
+/// shows the highest-priority rotate prompt and the shutter is disabled.
 ///
 /// The user can toggle H↔V orientation with the toolbar button; the
 /// overlay redraws and the ROI changes accordingly so OCR always crops
@@ -65,16 +79,35 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
   void initState() {
     super.initState();
     _orientation = widget.initialOrientation;
+    // #2477 — force landscape so the wide pump display fills the frame
+    // with large, upright digits. Restored in dispose + every early-return.
+    SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     WidgetsBinding.instance.addObserver(this);
     _setUpCamera();
   }
 
   @override
   void dispose() {
+    // Never leave the rest of the app landscape-locked (#2477).
+    _restoreOrientations();
     WidgetsBinding.instance.removeObserver(this);
     _stopStream();
     _controller?.dispose();
     super.dispose();
+  }
+
+  /// Restores the app's full orientation set after a forced-landscape
+  /// session. Safe to call more than once and from any teardown path.
+  void _restoreOrientations() {
+    SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
   }
 
   @override
@@ -115,6 +148,20 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
       final ctrl = CameraController(back, ResolutionPreset.max,
           enableAudio: false);
       await ctrl.initialize();
+      if (!mounted) {
+        // Widget gone mid-init — dispose() already restored orientation.
+        await ctrl.dispose();
+        return;
+      }
+      // #2477 — bake the JPEG in landscape so it matches the held device.
+      // Guarded: degrade gracefully if the platform doesn't support it.
+      try {
+        await ctrl.lockCaptureOrientation(DeviceOrientation.landscapeRight);
+      } on CameraException catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+          'where': 'PumpDisplayCameraScreen: lockCaptureOrientation'
+        }));
+      }
       if (!mounted) { await ctrl.dispose(); return; }
       setState(() { _controller = ctrl; _initializing = false; });
       _startFrameSampling(ctrl);
@@ -231,26 +278,45 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
 
   Widget _body(BuildContext context, AppLocalizations? l10n) {
     if (_permissionDenied) {
-      return _message(context,
-          icon: Icons.no_photography_outlined,
-          text: l10n?.pumpCameraPermissionDenied ??
-              'Camera access is needed to scan the pump display. '
-                  'Enable it in your device settings.');
+      return PumpCameraMessage(
+        icon: Icons.no_photography_outlined,
+        text: l10n?.pumpCameraPermissionDenied ??
+            'Camera access is needed to scan the pump display. '
+                'Enable it in your device settings.',
+      );
     }
     if (_failed) {
-      return _message(context,
-          icon: Icons.error_outline,
-          text: l10n?.pumpCameraError ??
-              "The camera couldn't start. Try again or enter the values "
-                  'by hand.',
-          onRetry: _setUpCamera,
-          retryLabel: l10n?.retry ?? 'Try again');
+      return PumpCameraMessage(
+        icon: Icons.error_outline,
+        text: l10n?.pumpCameraError ??
+            "The camera couldn't start. Try again or enter the values "
+                'by hand.',
+        onRetry: _setUpCamera,
+        retryLabel: l10n?.retry ?? 'Try again',
+      );
     }
     final ctrl = _controller;
     if (_initializing || ctrl == null) {
       return const Center(
           child: CircularProgressIndicator(color: Colors.white));
     }
+    // #2477 — the orientation lock asks for landscape, but the device can
+    // still be physically portrait mid-rotation. Gate the shutter on the
+    // live media orientation so a portrait shot can never be taken.
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        final isPortrait = orientation == Orientation.portrait;
+        return _preview(context, l10n, ctrl, isPortrait: isPortrait);
+      },
+    );
+  }
+
+  Widget _preview(
+    BuildContext context,
+    AppLocalizations? l10n,
+    CameraController ctrl, {
+    required bool isPortrait,
+  }) {
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -296,20 +362,22 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
           child: Center(
             child: PumpLiveFeedbackBar(
               isOverGlared: _isOverGlared,
+              isPortrait: isPortrait,
               isCapturing: _capturing,
             ),
           ),
         ),
-        // Shutter button.
+        // Shutter button — disabled while portrait so no sideways /
+        // small-digit shot can be taken (#2477).
         Positioned(
           left: 0,
           right: 0,
           bottom: 24,
           child: Center(
-            child: FilledButton.icon(
-              onPressed: _capturing ? null : _capture,
-              icon: const Icon(Icons.camera_alt),
-              label: Text(l10n?.pumpCameraCapture ?? 'Capture'),
+            child: PumpShutterButton(
+              isCapturing: _capturing,
+              isPortrait: isPortrait,
+              onCapture: _capture,
             ),
           ),
         ),
@@ -317,49 +385,6 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
     );
   }
 
-  Widget _message(
-    BuildContext context, {
-    required IconData icon,
-    required String text,
-    Future<void> Function()? onRetry,
-    String? retryLabel,
-  }) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: Colors.white70, size: 48),
-            const SizedBox(height: 16),
-            Text(text,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white)),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (onRetry != null) ...[
-                  OutlinedButton(
-                    onPressed: () => onRetry(),
-                    style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white),
-                    child: Text(retryLabel ?? 'Try again'),
-                  ),
-                  const SizedBox(width: 12),
-                ],
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                      AppLocalizations.of(context)?.cancel ?? 'Cancel'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 /// What [PumpDisplayCameraScreen] pops on a successful capture (#2275):

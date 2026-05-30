@@ -4781,6 +4781,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Igazítsa a kijelzőt a keretbe, majd készítse el a felvételt';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Mit tankolt';
 
   @override

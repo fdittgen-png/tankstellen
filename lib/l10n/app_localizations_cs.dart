@@ -4753,6 +4753,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zarovnejte displej do rámečku a poté vyfotografujte';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Co jste natankovali';
 
   @override

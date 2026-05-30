@@ -129,5 +129,9 @@
   "pumpCameraAlignHint": "Line up the display inside the frame, then capture",
   "@pumpCameraAlignHint": {
     "description": "Default hint shown in the live feedback bar on the guided alignment overlay (#2276)."
+  },
+  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
+  "@pumpCameraRotateToLandscape": {
+    "description": "Highest-priority feedback shown over the camera while the phone is held portrait; the shutter is disabled until the user rotates to landscape so the wide pump display fills the frame with large, upright digits (#2477)."
   }
 }

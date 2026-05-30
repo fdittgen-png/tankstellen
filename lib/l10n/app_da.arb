@@ -2407,5 +2407,10 @@
   "@reconcileResolveGapSemanticLabel": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
+  "@pumpCameraRotateToLandscape": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

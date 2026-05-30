@@ -4741,6 +4741,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Juster displayet i rammen og tag derefter billede';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Hvad du tankede';
 
   @override

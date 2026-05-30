@@ -4758,6 +4758,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get pumpCameraAlignHint => 'Poravnajte zaslon unutar okvira i snimite';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Što ste natočili';
 
   @override

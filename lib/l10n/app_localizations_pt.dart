@@ -4780,6 +4780,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Alinhe o visor dentro da moldura e capture';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'O que abasteceu';
 
   @override

@@ -4795,6 +4795,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Alignez l\'afficheur dans le cadre, puis capturez';
 
   @override
+  String get pumpCameraRotateToLandscape =>
+      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
   String get fillUpSectionWhatTitle => 'Votre plein';
 
   @override

@@ -8484,6 +8484,12 @@ abstract class AppLocalizations {
   /// **'Line up the display inside the frame, then capture'**
   String get pumpCameraAlignHint;
 
+  /// Highest-priority feedback shown over the camera while the phone is held portrait; the shutter is disabled until the user rotates to landscape so the wide pump display fills the frame with large, upright digits (#2477).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright'**
+  String get pumpCameraRotateToLandscape;
+
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///
   /// In en, this message translates to:
