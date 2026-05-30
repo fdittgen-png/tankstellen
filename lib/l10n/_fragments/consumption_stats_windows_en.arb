@@ -16,5 +16,14 @@
         "type": "int"
       }
     }
+  },
+  "statCorrectionLiters": "Corrections: +{liters} L",
+  "@statCorrectionLiters": {
+    "description": "Transparent line on the consumption stats card showing how many correction litres were added across closed windows, kept separate from the headline Total L which reflects only real pumped fuel (#2446).",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
   }
 }

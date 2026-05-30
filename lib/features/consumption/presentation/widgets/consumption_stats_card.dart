@@ -188,6 +188,22 @@ class ConsumptionStatsCard extends ConsumerWidget {
                 style: theme.textTheme.bodySmall,
               ),
             ],
+            // #2446 — corrections are surfaced transparently on their
+            // own line, never folded into the headline Total L. Shown
+            // only when at least one correction landed in a closed
+            // window so the line stays out of the way otherwise.
+            if (stats.correctionLitersTotal > 0) ...[
+              const SizedBox(height: 4),
+              Text(
+                l?.statCorrectionLiters(
+                      stats.correctionLitersTotal.toStringAsFixed(1),
+                    ) ??
+                    'Corrections: +${stats.correctionLitersTotal.toStringAsFixed(1)} L',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: DarkModeColors.warning(context),
+                ),
+              ),
+            ],
           ],
         ),
       ),
