@@ -4043,8 +4043,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testowy alert cenowy';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Dopasowanie syntetyczne: w pobliżu znaleziono stację poniżej Twojego celu.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Dopasowanie syntetyczne: w pobliżu znaleziono stację poniżej Twojego celu.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostyka';

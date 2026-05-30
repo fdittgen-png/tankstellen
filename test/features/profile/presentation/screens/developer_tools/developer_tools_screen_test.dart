@@ -2,16 +2,53 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/notifications/notification_providers.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
+import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/developer_tools/developer_tools_screen.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../../helpers/pump_app.dart';
+
+/// SearchState override that emits a fixed list of search results, so the
+/// dev-tools "Run test alert" action can resolve a REAL station to fire
+/// against (#2408). An empty list models "user has not searched yet".
+class _FakeSearchState extends SearchState {
+  _FakeSearchState(this.items);
+
+  final List<SearchResultItem> items;
+
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
+    return AsyncValue.data(ServiceResult(
+      data: items,
+      source: ServiceSource.cache,
+      fetchedAt: DateTime.now(),
+    ));
+  }
+}
+
+const _station = Station(
+  id: 'de-12345',
+  name: 'Shell Hauptstraße',
+  brand: 'Shell',
+  street: 'Hauptstraße 1',
+  postCode: '10115',
+  place: 'Berlin',
+  lat: 52.5,
+  lng: 13.4,
+  e10: 1.789,
+  diesel: 1.659,
+  isOpen: true,
+);
 
 /// TraceStorage that never touches Hive — the screen reads `count`
 /// during build.
@@ -68,6 +105,7 @@ void main() {
     List<Object> overrides({
       required bool debugOn,
       _FakeNotifier? notifier,
+      List<SearchResultItem> searchResults = const [],
     }) =>
         [
           enabledFeaturesProvider.overrideWithValue(
@@ -77,6 +115,9 @@ void main() {
           traceStorageProvider.overrideWithValue(_StubTraceStorage()),
           notificationServiceProvider
               .overrideWithValue(notifier ?? _FakeNotifier()),
+          searchStateProvider.overrideWith(
+            () => _FakeSearchState(searchResults),
+          ),
         ];
 
     testWidgets('renders the dev tools when debugMode is ON', (tester) async {
@@ -135,21 +176,48 @@ void main() {
       expect(notifier.fired, hasLength(1));
     });
 
-    testWidgets('Run test alert pipeline invokes the notification service',
+    testWidgets(
+        'Run test alert pipeline fires against the real search-result station',
         (tester) async {
       final notifier = _FakeNotifier();
       await pumpApp(
         tester,
         const DeveloperToolsScreen(),
-        overrides: overrides(debugOn: true, notifier: notifier),
+        overrides: overrides(
+          debugOn: true,
+          notifier: notifier,
+          searchResults: const [FuelStationResult(_station)],
+        ),
       );
 
       await tester.tap(find.byKey(const ValueKey('debug-run-test-alert')));
       await tester.pumpAndSettle();
 
       expect(notifier.fired, hasLength(1),
-          reason: 'the synthetic match must drive the real pipeline to '
-              'deliver exactly one notification');
+          reason: 'a real station resolved from search drives the pipeline '
+              'to deliver exactly one notification');
+      // #2408 — the body names the real station via the interpolated ARB.
+      expect(notifier.fired.single.body, contains('Shell'));
+    });
+
+    testWidgets(
+        'Run test alert with no search results shows search-first and fires '
+        'nothing (#2408)', (tester) async {
+      final notifier = _FakeNotifier();
+      await pumpApp(
+        tester,
+        const DeveloperToolsScreen(),
+        // No search results → no resolvable station id.
+        overrides: overrides(debugOn: true, notifier: notifier),
+      );
+
+      await tester.tap(find.byKey(const ValueKey('debug-run-test-alert')));
+      await tester.pumpAndSettle();
+
+      expect(notifier.fired, isEmpty,
+          reason: 'firing a non-resolving synthetic deep link is exactly the '
+              'stuck-shimmer bug — guide the user to search first instead');
+      expect(find.textContaining('Search for stations first'), findsOneWidget);
     });
 
     testWidgets('blocked notifications fire nothing on Fire test notification',

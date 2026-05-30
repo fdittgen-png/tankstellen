@@ -4022,8 +4022,13 @@ class AppLocalizationsEt extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testhinnahoiatus';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Sünteetiline vaste: läheduses leiti sinu sihist odavam jaam.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Sünteetiline vaste: läheduses leiti sinu sihist odavam jaam.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';

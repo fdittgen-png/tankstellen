@@ -4027,8 +4027,13 @@ class AppLocalizationsFi extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testihintahälytys';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostiikka';

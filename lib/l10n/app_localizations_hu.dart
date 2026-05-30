@@ -4056,8 +4056,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Tesztár-riasztás';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Szintetikus egyezés: a közelben találtunk egy a céljánál olcsóbb állomást.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Szintetikus egyezés: a közelben találtunk egy a céljánál olcsóbb állomást.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnosztika';

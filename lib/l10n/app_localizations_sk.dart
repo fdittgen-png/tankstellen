@@ -4049,8 +4049,13 @@ class AppLocalizationsSk extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testovacie cenové upozornenie';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Syntetická zhoda: v okolí sa našla stanica pod vaším cieľom.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Syntetická zhoda: v okolí sa našla stanica pod vaším cieľom.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostika';

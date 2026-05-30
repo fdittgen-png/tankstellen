@@ -4056,8 +4056,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Alerta de precio de prueba';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Coincidencia sintética: se encontró cerca una estación por debajo de tu objetivo.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Coincidencia sintética: se encontró cerca una estación por debajo de tu objetivo.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnósticos';

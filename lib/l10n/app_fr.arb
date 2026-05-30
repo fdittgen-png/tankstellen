@@ -2338,5 +2338,10 @@
   "@tripRadarNoStationNearby": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "developerToolsTestAlertNoStation": "Search for stations first, then run the test alert so the notification can open a real station.",
+  "@developerToolsTestAlertNoStation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

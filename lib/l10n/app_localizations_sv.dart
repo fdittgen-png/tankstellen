@@ -4028,8 +4028,13 @@ class AppLocalizationsSv extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testprisvarning';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Syntetisk träff: en station under ditt mål hittades i närheten.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Syntetisk träff: en station under ditt mål hittades i närheten.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostik';

@@ -4056,8 +4056,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Alerta de preço de teste';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Correspondência sintética: foi encontrada nas proximidades uma estação abaixo do seu objetivo.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Correspondência sintética: foi encontrada nas proximidades uma estação abaixo do seu objetivo.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnósticos';

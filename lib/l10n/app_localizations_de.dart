@@ -4051,8 +4051,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Test-Preisalarm';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Synthetischer Treffer: eine Tankstelle unter deinem Zielpreis wurde in der Nähe gefunden.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Synthetischer Treffer: $station liegt unter deinem Zielpreis.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Suche zuerst nach Tankstellen und führe dann den Test-Alarm aus, damit die Benachrichtigung eine echte Tankstelle öffnen kann.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnose';

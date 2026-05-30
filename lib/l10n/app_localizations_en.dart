@@ -4008,8 +4008,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Test price alert';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Synthetic match: a station below your target was found nearby.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Synthetic match: $station is below your target.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostics';
@@ -10161,8 +10166,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get developerToolsTestAlertTitle => '⟦Ŧéšŧ ƥřîçé áłéřŧ ······⟧';
 
   @override
-  String get developerToolsTestAlertBody =>
-      '⟦Šýñŧĥéŧîç ɱáŧçĥ: á šŧáŧîóñ ƀéłóŵ ýóúř ŧářǧéŧ ŵáš ƒóúñđ ñéářƀý. ·······················⟧';
+  String developerToolsTestAlertBody(String station) {
+    return '⟦Šýñŧĥéŧîç ɱáŧçĥ: $station îš ƀéłóŵ ýóúř ŧářǧéŧ. ··············⟧';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      '⟦Šéářçĥ ƒóř šŧáŧîóñš ƒîřšŧ, ŧĥéñ řúñ ŧĥé ŧéšŧ áłéřŧ šó ŧĥé ñóŧîƒîçáŧîóñ çáñ óƥéñ á řéáł šŧáŧîóñ. ···································⟧';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => '⟦Đîáǧñóšŧîçš ·····⟧';

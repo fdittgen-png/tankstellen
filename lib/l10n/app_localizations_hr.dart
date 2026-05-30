@@ -4036,8 +4036,13 @@ class AppLocalizationsHr extends AppLocalizations {
   String get developerToolsTestAlertTitle => 'Testno cjenovno upozorenje';
 
   @override
-  String get developerToolsTestAlertBody =>
-      'Sintetičko podudaranje: u blizini je pronađena postaja ispod vašeg cilja.';
+  String developerToolsTestAlertBody(String station) {
+    return 'Sintetičko podudaranje: u blizini je pronađena postaja ispod vašeg cilja.';
+  }
+
+  @override
+  String get developerToolsTestAlertNoStation =>
+      'Search for stations first, then run the test alert so the notification can open a real station.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Dijagnostika';

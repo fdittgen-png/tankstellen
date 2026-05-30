@@ -16,10 +16,16 @@ import '../../../../../core/widgets/page_scaffold.dart';
 import '../../../../../core/widgets/section_header.dart';
 import '../../../../../core/widgets/snackbar_helper.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/country/country_config.dart';
+import '../../../../../core/utils/station_extensions.dart';
 import '../../../../alerts/data/test_alert_runner.dart';
+import '../../../../alerts/domain/radius_alert_evaluator.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/build_channel.dart';
 import '../../../../feature_management/domain/feature.dart';
+import '../../../../search/domain/entities/search_result_item.dart';
+import '../../../../search/domain/entities/station.dart';
+import '../../../../search/providers/search_provider.dart';
 import '../../widgets/error_log_export_row.dart';
 import 'developer_diagnostics.dart';
 
@@ -192,13 +198,42 @@ class DeveloperToolsScreen extends ConsumerWidget {
 
   Future<void> _runTestAlert(BuildContext context, WidgetRef ref) async {
     final l = AppLocalizations.of(context);
+    // #2408 — fire against a REAL station from the current search results
+    // so the notification deep-links to a station that actually loads.
+    // Without a search result there is no resolvable id, so we refuse to
+    // fire a stuck synthetic deep-link and tell the user to search first.
+    final station = _firstSearchStation(ref);
+    if (station == null) {
+      SnackBarHelper.show(
+        context,
+        l?.developerToolsTestAlertNoStation ??
+            'Search for stations first, then run the test alert so the '
+                'notification can open a real station.',
+      );
+      return;
+    }
+    final sample = StationPriceSample.fromStation(station).firstOrNull;
+    if (sample == null) {
+      // The station reports no priced fuel — nothing the evaluator can
+      // match, so the same "search first" guidance applies.
+      SnackBarHelper.show(
+        context,
+        l?.developerToolsTestAlertNoStation ??
+            'Search for stations first, then run the test alert so the '
+                'notification can open a real station.',
+      );
+      return;
+    }
     final runner = TestAlertRunner(
       notifier: ref.read(notificationServiceProvider),
     );
     final count = await runner.run(
       title: l?.developerToolsTestAlertTitle ?? 'Test price alert',
-      body: l?.developerToolsTestAlertBody ??
-          'Synthetic match: a station below your target was found nearby.',
+      body: l?.developerToolsTestAlertBody(station.displayName) ??
+          'Synthetic match: ${station.displayName} is below your target.',
+      station: sample,
+      country: (Countries.countryCodeForStationId(station.id) ?? 'de')
+          .toLowerCase(),
     );
     if (!context.mounted) return;
     if (count == 0) {
@@ -244,6 +279,17 @@ class DeveloperToolsScreen extends ConsumerWidget {
           'Diagnostics copied to clipboard.',
     );
   }
+}
+
+/// #2408 — the first real fuel station in the current search results, or
+/// `null` when the user has not searched / the results hold no fuel
+/// station. The test alert fires against this so the notification
+/// deep-links to a station `stationDetailProvider` can actually resolve.
+Station? _firstSearchStation(WidgetRef ref) {
+  final searchState = ref.read(searchStateProvider);
+  if (!searchState.hasValue) return null;
+  final results = searchState.value?.data ?? const [];
+  return results.whereType<FuelStationResult>().firstOrNull?.station;
 }
 
 /// Read-only app version + build channel rows.
