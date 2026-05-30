@@ -42,6 +42,11 @@ void main() {
             tickRateHz: 3.8,
             backpressureSkips: 4,
             demotions: 1,
+            ticks: 380,
+            achievedReadsPerSecond: 7.2,
+            dynamicsEffectiveHz: 4.1,
+            backedOffCount: 2,
+            starved: false,
           ),
           framing: Obd2FramingStats(
             partialFrames: 2,
@@ -50,6 +55,19 @@ void main() {
             garbageReads: 1,
           ),
           fuelTierTicks: {'pid5E': 412, 'maf': 88},
+          fuelDowngrade:
+              Obd2FuelDowngradeStats(totalSamples: 500, suspiciousSamples: 25),
+          sessionActiveSeconds: 100,
+          discoveredSupported: {'010C': 'supported', '015E': 'unsupported'},
+          completeness: Obd2CompletenessStats(
+            overallPercent: 92.0,
+            perTierPercent: {'dynamics': 92.0, 'mixture': 88.0},
+            activeDutyCycle: 0.92,
+            emitGapDetected: false,
+          ),
+          expectedReads: 500,
+          achievedReads: 460,
+          completenessPercent: 92.0,
         );
 
     test('two structurally-equal sessions are == and share a hashCode', () {

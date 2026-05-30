@@ -5,7 +5,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import '../../../../core/logging/error_logger.dart';
+import 'obd2_comm_diagnostics.dart';
 import 'pid_bandwidth_governor.dart';
+import 'pid_scheduler_comm_diagnostics.dart';
 import 'scheduled_pid.dart';
 
 // Re-export the per-PID config vocabulary (#2457) so existing call sites
@@ -57,11 +59,12 @@ export 'scheduled_pid.dart';
 /// Its demotions + achieved tick-rate are exposed read-only via
 /// [governorState] for the comm-diagnostics overlay (#2468).
 ///
-/// ## Phase 1 scope (#814)
+/// ## Comm-diagnostics tee (#2468)
 ///
-/// This class is the selection engine only. The follow-up phase wires it
-/// into `trip_recording_controller.dart`, adds default-tier PID tables,
-/// and connects the per-command callbacks to `TripLiveReading` emissions.
+/// When developer mode is on, every tick tees the per-PID 5-way outcome +
+/// RTT and the scheduler/governor health into the gated collector via
+/// [PidSchedulerCommDiagnostics] — guarded by the cached `enabled` bool so
+/// production pays one branch-not-taken per tick (selection core unchanged).
 class PidScheduler {
   PidScheduler({
     required this.transport,
@@ -276,14 +279,23 @@ class PidScheduler {
 
   Future<void> _tick() async {
     if (!_running) return;
-    if (_inFlight != null) return; // Backpressure: skip, do not queue.
+    // Tee EVERY tick (fired or skipped) so back-pressure becomes a rate
+    // (#2468). Gated: a pure branch-not-taken in prod (debug-mode off).
+    final diag = Obd2CommDiagnostics.instance;
+    if (_inFlight != null) {
+      // Backpressure: skip, do not queue.
+      if (diag.enabled) PidSchedulerCommDiagnostics.noteTick(backpressureSkip: true);
+      return;
+    }
+    if (diag.enabled) PidSchedulerCommDiagnostics.noteTick();
     final now = _clock();
     final command = pickNextCommand(now);
     if (command == null) return;
     final sub = _subs[command];
     if (sub == null) return; // Subscription cancelled during selection.
 
-    _inFlight = command;
+    _inFlight = command; // `now` is the dispatch instant for the RTT below.
+    if (diag.enabled) PidSchedulerCommDiagnostics.noteDispatch(command, sub.config);
     try {
       final response = await transport(command);
       final completedAt = _clock();
@@ -292,37 +304,41 @@ class PidScheduler {
       // A successful read clears any accumulated failure streak so the
       // PID resumes its configured cadence immediately (#2379).
       sub.consecutiveFailures = 0;
+      if (diag.enabled) {
+        PidSchedulerCommDiagnostics.noteSuccess(command, response,
+            dispatchedAt: now, completedAt: completedAt);
+      }
       // Check subscription still exists — user may have unsubscribed
       // while the adapter round-trip was in flight.
       if (_subs.containsKey(command)) {
         try {
           sub.onResult(response);
         } catch (e, st) {
-          // Callback errors are a real HANDLER bug — keep them logged so
-          // they surface in triage. They live in OUR code, not the BLE
-          // link, so the layer is `other` ("not yet classified"), not
-          // `storage` (#2379).
+          // Callback errors are a real HANDLER bug in OUR code (not the BLE
+          // link) — keep them logged for triage, as layer `other` (#2379).
           unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
             'where': 'PidScheduler: onResult for $command threw',
           }));
         }
       }
     } catch (e, st) {
-      // Transport failures (timeout, NO DATA, adapter dropped) are
-      // EXPECTED and recoverable — an engine-off car NO-DATAs many PIDs,
-      // a slow clone times out intermittently. Logging one error trace
-      // per PID per tick flooded a real user's error log (#2379), so we
-      // do NOT error-log them here.
-      //
-      // We still stamp lastReadAt (anti-starvation: a forever-failing PID
-      // must stop winning every tick or it would starve a healthy PID
-      // tied on hz via the FIFO tiebreaker) and bump the failure streak.
-      // Past [_maxConsecutiveFailures] the PID backs off to [_backoffHz]
-      // (see [_weightFor]); a later success resets it.
+      // Transport failures (timeout, NO DATA, adapter dropped) are EXPECTED
+      // and recoverable — an engine-off car NO-DATAs many PIDs, a slow clone
+      // times out. NOT error-logged per-PID-per-tick (it flooded a real
+      // user's log, #2379). We still stamp lastReadAt (anti-starvation) and
+      // bump the failure streak; past [_maxConsecutiveFailures] the PID backs
+      // off to [_backoffHz] (see [_weightFor]); a later success resets it.
       final completedAt = _clock();
       sub.config.lastReadAt = completedAt;
       _governor.recordRead(command, completedAt);
       sub.consecutiveFailures++;
+      if (diag.enabled) {
+        PidSchedulerCommDiagnostics.noteFailure(command, e,
+            dispatchedAt: now,
+            completedAt: completedAt,
+            consecutiveFailures: sub.consecutiveFailures,
+            backedOff: sub.isBackedOff);
+      }
       _maybeEmitUnresponsiveDiagnostic(e, st);
     } finally {
       _inFlight = null;
@@ -330,14 +346,18 @@ class PidScheduler {
       // achieved-hz window only changes when a read lands), AFTER
       // `_inFlight` clears so a demotion takes effect on the next tick.
       _governor.evaluate();
+      // Tee the post-read governor/scheduler health snapshot (#2468).
+      if (diag.enabled) {
+        PidSchedulerCommDiagnostics.noteHealth(_governor.state,
+            tickRate: tickRate, backedOffCount: backedOffCount);
+      }
     }
   }
 
   /// Emit AT MOST ONE aggregated "adapter unresponsive" diagnostic per
-  /// [_diagnosticWindow] when [_backoffThreshold]+ PIDs are backed off.
-  /// Replaces the old one-error-per-PID-per-tick flood with a single
-  /// rate-limited breadcrumb that still makes a broadly-dead adapter
-  /// visible in triage (#2379).
+  /// [_diagnosticWindow] when [_backoffThreshold]+ PIDs are backed off —
+  /// a rate-limited replacement for the old one-error-per-PID-per-tick
+  /// flood that still makes a broadly-dead adapter visible in triage (#2379).
   void _maybeEmitUnresponsiveDiagnostic(Object error, StackTrace stack) {
     final downCount = backedOffCount;
     if (downCount < _backoffThreshold) return;

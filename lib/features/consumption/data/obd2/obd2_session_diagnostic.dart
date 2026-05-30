@@ -94,6 +94,27 @@ abstract class Obd2SessionDiagnostic with _$Obd2SessionDiagnostic {
     @JsonKey(name: 'ft')
     @Default(<String, int>{}) Map<String, int> fuelTierTicks,
 
+    /// Fuel-tier downgrade cause rolled up FREE from the breadcrumb
+    /// collector (#2469): `total` samples seen vs `suspicious` samples that
+    /// tripped a sanity flag (suspicious-low / 5E-vs-MAF divergent). A high
+    /// suspicious ratio alongside a [fuelTierTicks] skewed away from `pid5E`
+    /// is the downgrade-cause signature. Null/zero until Wave 2 rolls it up.
+    @JsonKey(name: 'fd')
+    @Default(Obd2FuelDowngradeStats()) Obd2FuelDowngradeStats fuelDowngrade,
+
+    /// How long the session was actively polling, in whole seconds — the
+    /// `activeSeconds` term of the completeness expected-reads formula.
+    /// 0 until Wave 2 stamps it.
+    @JsonKey(name: 'as') @Default(0) int sessionActiveSeconds,
+
+    /// Discovered-supported tri-state per polled command (#2469):
+    /// `'supported'` / `'unsupported'` / `'unknown'`. Sourced from the
+    /// resolver's discovered set ∩ target set; `'unknown'` for every command
+    /// when discovery never ran (probe-less clone / blind session). Empty
+    /// until Wave 2 records it.
+    @JsonKey(name: 'tri')
+    @Default(<String, String>{}) Map<String, String> discoveredSupported,
+
     // ---- Completeness (Wave 2 fills; null/zero for now) ---------------
     /// Σ(targetHz × activeSeconds) — the expected number of reads if the
     /// scheduler had hit every target. Null until Wave 2 computes it.
@@ -105,6 +126,12 @@ abstract class Obd2SessionDiagnostic with _$Obd2SessionDiagnostic {
     /// `achievedReads / expectedReads` as a 0–100 percentage. Null until
     /// Wave 2.
     @JsonKey(name: 'cp') double? completenessPercent,
+
+    /// Per-tier completeness rollup (overall + 5/2/0.5/0.1 Hz tiers +
+    /// active duty cycle + emit-index gaps). Empty default until Wave 2
+    /// computes it via `summariseObd2Completeness`.
+    @JsonKey(name: 'cm')
+    @Default(Obd2CompletenessStats()) Obd2CompletenessStats completeness,
   }) = _Obd2SessionDiagnostic;
 
   const Obd2SessionDiagnostic._();
@@ -165,10 +192,41 @@ abstract class Obd2PidStat with _$Obd2PidStat {
 
     /// 95th-percentile round-trip latency in ms.
     @JsonKey(name: 'p95') @Default(0) int latencyP95Ms,
+
+    /// Configured target refresh rate (Hz) the scheduler aims for this PID.
+    /// 0 when the dispatch tee didn't carry a target (e.g. a one-off raw
+    /// read outside the scheduler).
+    @JsonKey(name: 'th') @Default(0.0) double targetHz,
+
+    /// Achieved effective refresh rate (Hz) = `ok / sessionActiveSeconds`,
+    /// filled by `summariseObd2Completeness`. 0 until completeness runs.
+    @JsonKey(name: 'eh') @Default(0.0) double effectiveHz,
+
+    /// Cadence tier name (`'dynamics'`/`'mixture'`/`'slowCorrection'`/
+    /// `'thermalContext'`) carried by the dispatch tee. Null for un-tiered
+    /// raw reads.
+    @JsonKey(name: 'ti') String? tier,
+
+    /// Consecutive transport failures at the last result for this PID — the
+    /// scheduler's #2379 backoff streak. 0 when the last read succeeded.
+    @JsonKey(name: 'cf') @Default(0) int consecutiveFailures,
+
+    /// True when this PID was in the scheduler's backed-off state at the
+    /// last result (failed ≥ the backoff threshold in a row, polled at the
+    /// slow ≈1/30 s rate). Persisted so a mostly-NO-DATA PID is visible.
+    @JsonKey(name: 'bo') @Default(false) bool backedOff,
   }) = _Obd2PidStat;
+
+  const Obd2PidStat._();
 
   factory Obd2PidStat.fromJson(Map<String, dynamic> json) =>
       _$Obd2PidStatFromJson(json);
+
+  /// `effectiveHz / targetHz` as a 0–1 attainment ratio, or null when no
+  /// target was carried. >1 is possible if the scheduler over-polled (a
+  /// never-read PID wins immediately and re-fires).
+  double? get targetHzAttainment =>
+      targetHz <= 0 ? null : effectiveHz / targetHz;
 }
 
 /// Connection-lifecycle counters for the session.
@@ -209,7 +267,8 @@ abstract class Obd2ConnectionStats with _$Obd2ConnectionStats {
       _$Obd2ConnectionStatsFromJson(json);
 }
 
-/// Scheduler-health counters. Wave-2 fills these from the PID scheduler.
+/// Scheduler-health counters. Wave-2 (#2468) fills these from the PID
+/// scheduler + its bandwidth governor (`PidScheduler.governorState`).
 @freezed
 abstract class Obd2SchedulerStats with _$Obd2SchedulerStats {
   const factory Obd2SchedulerStats({
@@ -217,16 +276,97 @@ abstract class Obd2SchedulerStats with _$Obd2SchedulerStats {
     @JsonKey(name: 'tr') @Default(0.0) double tickRateHz,
 
     /// Ticks skipped because the previous read had not completed
-    /// (back-pressure).
+    /// (back-pressure) — the scheduler's `_inFlight != null` early return.
     @JsonKey(name: 'bp') @Default(0) int backpressureSkips,
 
-    /// Governor demotions — times the scheduler dropped to a lower
-    /// poll tier under sustained pressure.
+    /// Governor demotions currently in force — count of commands the
+    /// bandwidth governor has demoted to claw back budget for the dynamics
+    /// tier on a slow link.
     @JsonKey(name: 'dm') @Default(0) int demotions,
+
+    /// Total scheduler ticks observed (fired commands + backpressure
+    /// skips). The denominator that makes [backpressureSkips] a rate.
+    @JsonKey(name: 'tk') @Default(0) int ticks,
+
+    /// Achieved total reads/second across all PIDs over the governor's
+    /// rolling window (`GovernorState.achievedReadsPerSecond`).
+    @JsonKey(name: 'rps') @Default(0.0) double achievedReadsPerSecond,
+
+    /// Effective reads/s the slowest dynamics-tier PID is achieving — the
+    /// metric the governor floors. May be very large /
+    /// [double.infinity]-derived before two dynamics reads land; the tee
+    /// clamps the infinity sentinel to 0 so the JSON stays finite.
+    @JsonKey(name: 'dhz') @Default(0.0) double dynamicsEffectiveHz,
+
+    /// PIDs currently in the #2379 backed-off state (≥3 consecutive
+    /// failures) — the broadly-unresponsive-adapter indicator.
+    @JsonKey(name: 'bof') @Default(0) int backedOffCount,
+
+    /// Starvation indicator: true when the dynamics tier dropped below its
+    /// floor (`dynamicsEffectiveHz` measured and < the governor floor) —
+    /// RPM / speed are not keeping up despite the floor protection.
+    @JsonKey(name: 'st') @Default(false) bool starved,
   }) = _Obd2SchedulerStats;
 
   factory Obd2SchedulerStats.fromJson(Map<String, dynamic> json) =>
       _$Obd2SchedulerStatsFromJson(json);
+}
+
+/// Fuel-tier downgrade-cause rollup (#2469), lifted FREE from the
+/// `Obd2BreadcrumbCollector` running tally — no extra adapter I/O.
+@freezed
+abstract class Obd2FuelDowngradeStats with _$Obd2FuelDowngradeStats {
+  const factory Obd2FuelDowngradeStats({
+    /// Total fuel-rate samples seen this session.
+    @JsonKey(name: 't') @Default(0) int totalSamples,
+
+    /// Samples that tripped a sanity flag (suspicious-low / 5E-vs-MAF
+    /// divergent) — the numerator of the suspicion ratio.
+    @JsonKey(name: 's') @Default(0) int suspiciousSamples,
+  }) = _Obd2FuelDowngradeStats;
+
+  const Obd2FuelDowngradeStats._();
+
+  factory Obd2FuelDowngradeStats.fromJson(Map<String, dynamic> json) =>
+      _$Obd2FuelDowngradeStatsFromJson(json);
+
+  /// Suspicious fraction (0–1) of fuel-rate samples, or null when none
+  /// were seen.
+  double? get suspiciousRatio =>
+      totalSamples <= 0 ? null : suspiciousSamples / totalSamples;
+}
+
+/// Per-tier + overall session completeness (#2469): the OBD2 analogue of
+/// the GPS sampling card. Computed by `summariseObd2Completeness`.
+@freezed
+abstract class Obd2CompletenessStats with _$Obd2CompletenessStats {
+  const factory Obd2CompletenessStats({
+    /// Overall `Σ ok / Σ(targetHz × activeSeconds)` as a 0–100 percentage.
+    /// 0 when nothing was expected (no active seconds / no targets).
+    @JsonKey(name: 'o') @Default(0.0) double overallPercent,
+
+    /// Per-tier completeness percentage keyed by tier name
+    /// (`'dynamics'`/`'mixture'`/`'slowCorrection'`/`'thermalContext'`).
+    @JsonKey(name: 'pt')
+    @Default(<String, double>{}) Map<String, double> perTierPercent,
+
+    /// Fraction (0–1) of the session the scheduler was actively polling —
+    /// `min(1, totalAchievedReads / totalExpectedReads)`, clamped. A proxy
+    /// for "was the link delivering" vs idle/stalled.
+    @JsonKey(name: 'dc') @Default(0.0) double activeDutyCycle,
+
+    /// True when an emit-index gap was detected — a tier whose attainment
+    /// fell below [emitGapThreshold], i.e. the scheduler skipped a
+    /// meaningful share of that tier's expected reads.
+    @JsonKey(name: 'eg') @Default(false) bool emitGapDetected,
+  }) = _Obd2CompletenessStats;
+
+  factory Obd2CompletenessStats.fromJson(Map<String, dynamic> json) =>
+      _$Obd2CompletenessStatsFromJson(json);
+
+  /// A tier whose achieved/expected ratio falls below this is treated as a
+  /// detected emit-index gap.
+  static const double emitGapThreshold = 0.7;
 }
 
 /// Wire-framing counters — the symptoms of a sloppy clone's serial line.

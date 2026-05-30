@@ -164,4 +164,104 @@ void main() {
       expect(c.snapshot(), const Obd2SessionDiagnostic());
     });
   });
+
+  group('Obd2CommDiagnostics — scheduler health (#2468)', () {
+    test('backpressure / tick / governor counters accumulate', () {
+      final c = Obd2CommDiagnostics(enabled: true);
+      c.beginSession();
+      c.recordSchedulerHealth(tick: true);
+      c.recordSchedulerHealth(tick: true, backpressureSkip: true);
+      c.recordSchedulerHealth(tick: true, backpressureSkip: true);
+      c.recordSchedulerHealth(
+        tickRateHz: 10.0,
+        achievedReadsPerSecond: 8.5,
+        dynamicsEffectiveHz: 4.2,
+        demotions: 2,
+        backedOffCount: 3,
+        starved: true,
+      );
+      final s = c.snapshot().scheduler;
+      expect(s.ticks, 3);
+      expect(s.backpressureSkips, 2);
+      expect(s.tickRateHz, 10.0);
+      expect(s.achievedReadsPerSecond, 8.5);
+      expect(s.dynamicsEffectiveHz, 4.2);
+      expect(s.demotions, 2);
+      expect(s.backedOffCount, 3);
+      expect(s.starved, isTrue);
+    });
+
+    test('infinite dynamicsEffectiveHz clamps to 0 so JSON stays finite', () {
+      final c = Obd2CommDiagnostics(enabled: true);
+      c.beginSession();
+      c.recordSchedulerHealth(dynamicsEffectiveHz: double.infinity);
+      expect(c.snapshot().scheduler.dynamicsEffectiveHz, 0.0);
+    });
+  });
+
+  group('Obd2CommDiagnostics — per-PID table extras (#2468)', () {
+    test('dispatch carries targetHz + tier; result carries backoff state', () {
+      final c = Obd2CommDiagnostics(enabled: true);
+      c.beginSession();
+      c.noteDispatch('010C', targetHz: 5.0, tier: 'dynamics');
+      c.noteResult('010C', ResponseClass.timeout,
+          rttMs: 5000, consecutiveFailures: 3, backedOff: true);
+      final row = c.snapshot().pidStats['010C']!;
+      expect(row.targetHz, 5.0);
+      expect(row.tier, 'dynamics');
+      expect(row.consecutiveFailures, 3);
+      expect(row.backedOff, isTrue);
+      expect(row.timeout, 1);
+    });
+  });
+
+  group('Obd2CommDiagnostics — completeness + tri-state + fuel (#2469)', () {
+    test('snapshot runs the completeness summary over active seconds', () {
+      var fakeNow = DateTime(2026, 1, 1, 12);
+      final c = Obd2CommDiagnostics(enabled: true, clock: () => fakeNow);
+      c.beginSession();
+      c.noteDispatch('010C', targetHz: 5.0, tier: 'dynamics');
+      for (var i = 0; i < 50; i++) {
+        c.noteResult('010C', ResponseClass.ok, rttMs: 30);
+      }
+      fakeNow = fakeNow.add(const Duration(seconds: 10)); // 10 active s
+      final s = c.snapshot();
+      expect(s.sessionActiveSeconds, 10);
+      expect(s.expectedReads, 50); // 5 Hz × 10 s
+      expect(s.achievedReads, 50);
+      expect(s.completenessPercent, closeTo(100, 0.01));
+      expect(s.pidStats['010C']!.effectiveHz, closeTo(5.0, 0.01));
+    });
+
+    test('tri-state records supported/unsupported/unknown', () {
+      final c = Obd2CommDiagnostics(enabled: true);
+      c.beginSession();
+      c.recordSupportedTriState('010C', 'supported');
+      c.recordSupportedTriState('0166', 'unsupported');
+      c.recordSupportedTriState('015E', 'unknown');
+      final tri = c.snapshot().discoveredSupported;
+      expect(tri['010C'], 'supported');
+      expect(tri['0166'], 'unsupported');
+      expect(tri['015E'], 'unknown');
+    });
+
+    test('fuel-tier downgrade rollup + suspicious ratio', () {
+      final c = Obd2CommDiagnostics(enabled: true);
+      c.beginSession();
+      c.recordFuelDowngrade(totalSamples: 200, suspiciousSamples: 40);
+      final fd = c.snapshot().fuelDowngrade;
+      expect(fd.totalSamples, 200);
+      expect(fd.suspiciousSamples, 40);
+      expect(fd.suspiciousRatio, closeTo(0.2, 0.001));
+    });
+
+    test('disabled → scheduler/tri-state/fuel tees are all no-ops', () {
+      final c = Obd2CommDiagnostics(); // disabled
+      c.beginSession();
+      c.recordSchedulerHealth(tick: true, backpressureSkip: true);
+      c.recordSupportedTriState('010C', 'supported');
+      c.recordFuelDowngrade(totalSamples: 5, suspiciousSamples: 1);
+      expect(c.snapshot(), const Obd2SessionDiagnostic());
+    });
+  });
 }

@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import 'obd2_response_class.dart';
+import 'obd2_session_completeness.dart';
 import 'obd2_session_diagnostic.dart';
+
+/// The mutable live-session accumulator + bounded reservoir + the MAC
+/// redactor live in this part so the collector file stays under the
+/// 400-line cap (#2468/#2469 added the scheduler/completeness storage).
+part 'obd2_comm_diagnostics_internal.dart';
 
 /// Central, **gated** collector for OBD2 communication-health
 /// diagnostics (#2464, foundation of Epic #2463).
@@ -29,7 +35,12 @@ import 'obd2_session_diagnostic.dart';
 ///
 /// Single-isolate like the rest of the OBD2 stack, so no synchronisation.
 class Obd2CommDiagnostics {
-  Obd2CommDiagnostics({this.enabled = false});
+  Obd2CommDiagnostics({this.enabled = false, DateTime Function()? clock})
+      : _clock = clock ?? DateTime.now;
+
+  /// Injectable wall clock for deterministic [sessionActiveSeconds] in
+  /// tests. Production always uses [DateTime.now].
+  final DateTime Function() _clock;
 
   /// Process-wide collector the comm-path layers tee into (#2465).
   ///
@@ -70,7 +81,11 @@ class Obd2CommDiagnostics {
   void beginSession({String? linkKind, String? redactedMac}) {
     if (!enabled) return;
     if (_current != null) endSession();
-    _current = _LiveSession(linkKind: linkKind, redactedMac: redactedMac);
+    _current = _LiveSession(
+      linkKind: linkKind,
+      redactedMac: redactedMac,
+      startedAt: _clock(),
+    );
   }
 
   /// Stamp the adapter identity discovered during the handshake. No-op
@@ -117,18 +132,31 @@ class Obd2CommDiagnostics {
     );
   }
 
-  /// Note that a poll command [pid] was dispatched. No-op when disabled.
-  void noteDispatch(String pid) {
+  /// Note that a poll command [pid] was dispatched, optionally carrying the
+  /// scheduler's configured [targetHz] + cadence [tier] (#2468) so the
+  /// per-PID table can report target-Hz attainment per tier. No-op when
+  /// disabled.
+  void noteDispatch(String pid, {double? targetHz, String? tier}) {
     if (!enabled) return;
     final cur = _current;
     if (cur == null) return;
-    cur.pidRow(pid).polled++;
+    final row = cur.pidRow(pid);
+    row.polled++;
+    if (targetHz != null) row.targetHz = targetHz;
+    if (tier != null) row.tier = tier;
   }
 
-  /// Note the outcome [cls] of a poll for [pid], with optional
-  /// round-trip time [rttMs] folded into the latency reservoir. No-op
-  /// when disabled.
-  void noteResult(String pid, ResponseClass cls, {int? rttMs}) {
+  /// Note the outcome [cls] of a poll for [pid], with optional round-trip
+  /// time [rttMs] folded into the latency reservoir and the scheduler's
+  /// current [consecutiveFailures] streak + [backedOff] state (#2468,
+  /// #2379). No-op when disabled.
+  void noteResult(
+    String pid,
+    ResponseClass cls, {
+    int? rttMs,
+    int? consecutiveFailures,
+    bool? backedOff,
+  }) {
     if (!enabled) return;
     final cur = _current;
     if (cur == null) return;
@@ -147,6 +175,67 @@ class Obd2CommDiagnostics {
         row.error++;
     }
     if (rttMs != null) row.latency.add(rttMs);
+    if (consecutiveFailures != null) {
+      row.consecutiveFailures = consecutiveFailures;
+    }
+    if (backedOff != null) row.backedOff = backedOff;
+  }
+
+  /// Tee the scheduler's health snapshot (#2468): a back-pressure skip
+  /// (`backpressureSkip: true`) OR a once-per-tee governor/tick rollup. The
+  /// scheduler calls this with the cheap counters it already keeps plus its
+  /// `governorState`. No-op when disabled.
+  void recordSchedulerHealth({
+    bool backpressureSkip = false,
+    bool tick = false,
+    double? tickRateHz,
+    double? achievedReadsPerSecond,
+    double? dynamicsEffectiveHz,
+    int? demotions,
+    int? backedOffCount,
+    bool? starved,
+  }) {
+    if (!enabled) return;
+    final cur = _current;
+    if (cur == null) return;
+    if (backpressureSkip) cur.backpressureSkips++;
+    if (tick) cur.schedulerTicks++;
+    if (tickRateHz != null) cur.tickRateHz = tickRateHz;
+    if (achievedReadsPerSecond != null) {
+      cur.achievedReadsPerSecond = achievedReadsPerSecond;
+    }
+    if (dynamicsEffectiveHz != null) {
+      // Clamp the governor's infinity cold-start sentinel to 0 so the JSON
+      // stays finite + round-trippable.
+      cur.dynamicsEffectiveHz =
+          dynamicsEffectiveHz.isFinite ? dynamicsEffectiveHz : 0.0;
+    }
+    if (demotions != null) cur.demotions = demotions;
+    if (backedOffCount != null) cur.backedOffCount = backedOffCount;
+    if (starved != null) cur.starved = starved;
+  }
+
+  /// Record the discovered-supported tri-state for [pid] (#2469):
+  /// `'supported'` / `'unsupported'` / `'unknown'`. No-op when disabled.
+  void recordSupportedTriState(String pid, String triState) {
+    if (!enabled) return;
+    final cur = _current;
+    if (cur == null) return;
+    cur.discoveredSupported[pid] = triState;
+  }
+
+  /// Roll up the fuel-tier downgrade cause FREE from the breadcrumb
+  /// collector's running tally (#2469): [totalSamples] seen vs
+  /// [suspiciousSamples] that tripped a sanity flag. No-op when disabled.
+  void recordFuelDowngrade({
+    required int totalSamples,
+    required int suspiciousSamples,
+  }) {
+    if (!enabled) return;
+    final cur = _current;
+    if (cur == null) return;
+    cur.fuelTotalSamples = totalSamples;
+    cur.fuelSuspiciousSamples = suspiciousSamples;
   }
 
   /// Record a connection-lifecycle event. Exactly one of the optional
@@ -212,7 +301,7 @@ class Obd2CommDiagnostics {
   Obd2SessionDiagnostic snapshot() {
     final cur = _current;
     if (!enabled || cur == null) return const Obd2SessionDiagnostic();
-    return cur.toDiagnostic();
+    return _summarise(cur);
   }
 
   /// Finalise the live session into the capped ring. No-op when disabled
@@ -221,171 +310,21 @@ class Obd2CommDiagnostics {
     if (!enabled) return;
     final cur = _current;
     if (cur == null) return;
-    _finished.add(cur.toDiagnostic());
+    _finished.add(_summarise(cur));
     if (_finished.length > maxSessions) _finished.removeAt(0);
     _current = null;
+  }
+
+  /// Build the raw snapshot (stamping the elapsed active seconds) and run
+  /// the pure completeness summariser (#2469) over it.
+  Obd2SessionDiagnostic _summarise(_LiveSession cur) {
+    final activeSeconds = _clock().difference(cur.startedAt).inSeconds;
+    return summariseObd2Completeness(cur.toDiagnostic(activeSeconds));
   }
 
   /// Drop the live + finished sessions. Used by tests and on disable.
   void reset() {
     _current = null;
     _finished.clear();
-  }
-}
-
-/// Redact a raw adapter MAC for the diagnostics session (#2465).
-///
-/// MAC is a stable hardware identifier (PII). Everything before the
-/// final four characters is replaced with the middle-dot `·` so the
-/// length stays visible without leaking the address — the same form the
-/// XML/report exporters already use (`obd2_debug_session_xml.dart`,
-/// `obd2_diagnostic_report.dart`). A string of four characters or fewer
-/// is returned unchanged (there is nothing to hide); null passes through.
-String? redactObd2Mac(String? mac) {
-  if (mac == null) return null;
-  if (mac.length <= 4) return mac;
-  final visible = mac.substring(mac.length - 4);
-  return '${'·' * (mac.length - 4)}$visible';
-}
-
-/// Mutable live-session accumulator. Converted to the immutable
-/// [Obd2SessionDiagnostic] on [snapshot]/[endSession].
-class _LiveSession {
-  _LiveSession({this.linkKind, this.redactedMac});
-
-  final String? linkKind;
-  final String? redactedMac;
-
-  String? elmVersion;
-  String? protocolDigit;
-  int? mtu;
-  bool? warmStart;
-  String? capabilityTier;
-
-  final List<Obd2HandshakeLine> transcript = <Obd2HandshakeLine>[];
-  final Map<String, _PidAccumulator> _pids = <String, _PidAccumulator>{};
-
-  int connAttempts = 0;
-  int connSuccesses = 0;
-  final Map<String, int> connFailuresByReason = <String, int>{};
-  int connDrops = 0;
-  int silentReconnects = 0;
-  int visibleReconnects = 0;
-  final _LatencyReservoir timeToConnect = _LatencyReservoir();
-  final _LatencyReservoir timeToReconnect = _LatencyReservoir();
-
-  int partialFrames = 0;
-  int leftoverBytes = 0;
-  int strayPrompts = 0;
-  int garbageReads = 0;
-
-  final Map<String, int> fuelTierTicks = <String, int>{};
-
-  _PidAccumulator pidRow(String pid) =>
-      _pids.putIfAbsent(pid, _PidAccumulator.new);
-
-  Obd2SessionDiagnostic toDiagnostic() => Obd2SessionDiagnostic(
-        linkKind: linkKind,
-        redactedMac: redactedMac,
-        elmVersion: elmVersion,
-        protocolDigit: protocolDigit,
-        mtu: mtu,
-        warmStart: warmStart,
-        capabilityTier: capabilityTier,
-        initTranscript: List.unmodifiable(transcript),
-        pidStats: {
-          for (final entry in _pids.entries) entry.key: entry.value.toStat(),
-        },
-        connection: Obd2ConnectionStats(
-          attempts: connAttempts,
-          successes: connSuccesses,
-          failuresByReason: Map.unmodifiable(connFailuresByReason),
-          drops: connDrops,
-          silentReconnects: silentReconnects,
-          visibleReconnects: visibleReconnects,
-          timeToConnectP50Ms: timeToConnect.percentileOrNull(50),
-          timeToConnectP95Ms: timeToConnect.percentileOrNull(95),
-          timeToReconnectP50Ms: timeToReconnect.percentileOrNull(50),
-          timeToReconnectP95Ms: timeToReconnect.percentileOrNull(95),
-        ),
-        framing: Obd2FramingStats(
-          partialFrames: partialFrames,
-          leftoverBytes: leftoverBytes,
-          strayPrompts: strayPrompts,
-          garbageReads: garbageReads,
-        ),
-        fuelTierTicks: Map.unmodifiable(fuelTierTicks),
-      );
-}
-
-/// Mutable per-PID accumulator backing one [Obd2PidStat] row.
-class _PidAccumulator {
-  int polled = 0;
-  int ok = 0;
-  int noData = 0;
-  int timeout = 0;
-  int error = 0;
-  final _LatencyReservoir latency = _LatencyReservoir();
-
-  Obd2PidStat toStat() => Obd2PidStat(
-        polled: polled,
-        ok: ok,
-        noData: noData,
-        timeout: timeout,
-        error: error,
-        latencyP50Ms: latency.percentileOrNull(50) ?? 0,
-        latencyP95Ms: latency.percentileOrNull(95) ?? 0,
-      );
-}
-
-/// Bounded streaming latency reservoir. Retains at most [capacity]
-/// samples; once full, new samples evict via reservoir sampling so the
-/// retained set stays a uniform random sample of the whole stream — the
-/// percentile estimate stays representative without storing every read.
-class _LatencyReservoir {
-  /// Maximum retained samples — never grows beyond this. 128 samples is
-  /// ample for a stable p50/p95 estimate while keeping the per-PID
-  /// footprint tiny.
-  static const int capacity = 128;
-
-  final List<int> _samples = <int>[];
-  int _seen = 0;
-  // Deterministic LCG so percentiles are reproducible in tests (no
-  // dependency on dart:math Random's global seed).
-  int _rng = 0x2545F4914F6CDD1D;
-
-  /// Fold one sample into the reservoir.
-  void add(int value) {
-    _seen++;
-    if (_samples.length < capacity) {
-      _samples.add(value);
-      return;
-    }
-    // Reservoir sampling: replace a random slot with decreasing
-    // probability so the retained set stays uniform over the stream.
-    final j = _nextInt(_seen);
-    if (j < capacity) _samples[j] = value;
-  }
-
-  /// The [p]-th percentile (0–100) of the retained samples, or null when
-  /// empty. Nearest-rank on the sorted retained set.
-  int? percentileOrNull(int p) {
-    if (_samples.isEmpty) return null;
-    final sorted = [..._samples]..sort();
-    final clamped = p.clamp(0, 100);
-    // Nearest-rank: rank = ceil(p/100 * n), 1-based.
-    final rank = ((clamped / 100.0) * sorted.length).ceil();
-    final index = (rank <= 0 ? 1 : rank) - 1;
-    return sorted[index.clamp(0, sorted.length - 1)];
-  }
-
-  /// Deterministic xorshift-based bounded RNG in `[0, bound)`.
-  int _nextInt(int bound) {
-    var x = _rng;
-    x ^= (x << 13) & 0x7FFFFFFFFFFFFFFF;
-    x ^= x >> 7;
-    x ^= (x << 17) & 0x7FFFFFFFFFFFFFFF;
-    _rng = x & 0x7FFFFFFFFFFFFFFF;
-    return _rng % bound;
   }
 }
