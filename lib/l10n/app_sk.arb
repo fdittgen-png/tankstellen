@@ -2011,5 +2011,176 @@
   "countryInfoDataSource": "Údaje: {provider}",
   "countryInfoFuelTypes": "Druhy paliva: {fuelTypes}",
   "countryInfoDemoSource": "Demo",
-  "languageChipSemantic": "{selected, select, true{Jazyk {name}, vybraté} false{Jazyk {name}} other{Jazyk {name}}}"
+  "languageChipSemantic": "{selected, select, true{Jazyk {name}, vybraté} false{Jazyk {name}} other{Jazyk {name}}}",
+  "fillUpGuidanceTitle": "Best time to fill up",
+  "@fillUpGuidanceTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceGoodTimeNow": "The current price is among the cheapest of the last {days} days — a good time to fill up.",
+  "@fillUpGuidanceGoodTimeNow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "fillUpGuidanceWaitCheaper": "Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.",
+  "@fillUpGuidanceWaitCheaper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      },
+      "window": {
+        "type": "String",
+        "example": "Tuesday mornings"
+      }
+    }
+  },
+  "fillUpGuidanceFillSoon": "Prices are trending up — consider filling up soon.",
+  "@fillUpGuidanceFillSoon": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceNeutral": "Today's price is around the {days}-day average.",
+  "@fillUpGuidanceNeutral": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "fillUpGuidanceSaving": "Could save about {amount}/L by timing your fill-up.",
+  "@fillUpGuidanceSaving": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "0.05 €"
+      }
+    }
+  },
+  "fillUpGuidanceSampleNote": "{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}",
+  "@fillUpGuidanceSampleNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "24"
+      }
+    }
+  },
+  "fillUpGuidanceWindowDayAndPart": "{day} {part}",
+  "@fillUpGuidanceWindowDayAndPart": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Tuesday"
+      },
+      "part": {
+        "type": "String",
+        "example": "mornings"
+      }
+    }
+  },
+  "fillUpGuidanceWindowDayOnly": "on {day}",
+  "@fillUpGuidanceWindowDayOnly": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Tuesdays"
+      }
+    }
+  },
+  "fillUpGuidanceWindowPartOnly": "in the {part}",
+  "@fillUpGuidanceWindowPartOnly": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "part": {
+        "type": "String",
+        "example": "mornings"
+      }
+    }
+  },
+  "fillUpGuidanceWindowGeneric": "at other times",
+  "@fillUpGuidanceWindowGeneric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceWeekday1": "Mondays",
+  "@fillUpGuidanceWeekday1": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceWeekday2": "Tuesdays",
+  "@fillUpGuidanceWeekday2": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceWeekday3": "Wednesdays",
+  "@fillUpGuidanceWeekday3": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceWeekday4": "Thursdays",
+  "@fillUpGuidanceWeekday4": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceWeekday5": "Fridays",
+  "@fillUpGuidanceWeekday5": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceWeekday6": "Saturdays",
+  "@fillUpGuidanceWeekday6": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidanceWeekday7": "Sundays",
+  "@fillUpGuidanceWeekday7": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidancePartEarlyMorning": "early mornings",
+  "@fillUpGuidancePartEarlyMorning": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidancePartMorning": "mornings",
+  "@fillUpGuidancePartMorning": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidancePartAfternoon": "afternoons",
+  "@fillUpGuidancePartAfternoon": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidancePartEvening": "evenings",
+  "@fillUpGuidancePartEvening": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpGuidancePartNight": "nights",
+  "@fillUpGuidancePartNight": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  }
 }

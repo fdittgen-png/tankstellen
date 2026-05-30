@@ -4339,11 +4339,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enable OBD2 trip recording first';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+  String get featureLabel_tflitePricePrediction => 'Best time to fill up';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+      'On-device guidance on when to fill up, computed from your local price history — nothing leaves the device.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
@@ -4464,6 +4464,98 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedbackTokenFieldLabel => 'Personal Access Token';
+
+  @override
+  String get fillUpGuidanceTitle => 'Best time to fill up';
+
+  @override
+  String fillUpGuidanceGoodTimeNow(int days) {
+    return 'The current price is among the cheapest of the last $days days — a good time to fill up.';
+  }
+
+  @override
+  String fillUpGuidanceWaitCheaper(int days, String window) {
+    return 'Prices are near their $days-day high. They are usually cheaper $window — consider waiting.';
+  }
+
+  @override
+  String get fillUpGuidanceFillSoon =>
+      'Prices are trending up — consider filling up soon.';
+
+  @override
+  String fillUpGuidanceNeutral(int days) {
+    return 'Today\'s price is around the $days-day average.';
+  }
+
+  @override
+  String fillUpGuidanceSaving(String amount) {
+    return 'Could save about $amount/L by timing your fill-up.';
+  }
+
+  @override
+  String fillUpGuidanceSampleNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Based on $count price readings',
+      one: 'Based on 1 price reading',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayAndPart(String day, String part) {
+    return '$day $part';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayOnly(String day) {
+    return 'on $day';
+  }
+
+  @override
+  String fillUpGuidanceWindowPartOnly(String part) {
+    return 'in the $part';
+  }
+
+  @override
+  String get fillUpGuidanceWindowGeneric => 'at other times';
+
+  @override
+  String get fillUpGuidanceWeekday1 => 'Mondays';
+
+  @override
+  String get fillUpGuidanceWeekday2 => 'Tuesdays';
+
+  @override
+  String get fillUpGuidanceWeekday3 => 'Wednesdays';
+
+  @override
+  String get fillUpGuidanceWeekday4 => 'Thursdays';
+
+  @override
+  String get fillUpGuidanceWeekday5 => 'Fridays';
+
+  @override
+  String get fillUpGuidanceWeekday6 => 'Saturdays';
+
+  @override
+  String get fillUpGuidanceWeekday7 => 'Sundays';
+
+  @override
+  String get fillUpGuidancePartEarlyMorning => 'early mornings';
+
+  @override
+  String get fillUpGuidancePartMorning => 'mornings';
+
+  @override
+  String get fillUpGuidancePartAfternoon => 'afternoons';
+
+  @override
+  String get fillUpGuidancePartEvening => 'evenings';
+
+  @override
+  String get fillUpGuidancePartNight => 'nights';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
@@ -10407,11 +10499,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get featureLabel_tflitePricePrediction =>
-      '⟦ŦƑŁîŧé ƥřîçé ƥřéđîçŧîóñ ·········⟧';
+      '⟦Ɓéšŧ ŧîɱé ŧó ƒîłł úƥ ·······⟧';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      '⟦Óñ-đéṽîçé ƥřîçé ƒóřéçášŧ ɱóđéł — îñƒéřéñçé řúñš łóçáłłý; ƒéáŧúřéš áñđ ƥřéđîçŧîóñš ñéṽéř łéáṽé ŧĥé đéṽîçé. ·······································⟧';
+      '⟦Óñ-đéṽîçé ǧúîđáñçé óñ ŵĥéñ ŧó ƒîłł úƥ, çóɱƥúŧéđ ƒřóɱ ýóúř łóçáł ƥřîçé ĥîšŧóřý — ñóŧĥîñǧ łéáṽéš ŧĥé đéṽîçé. ······································⟧';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
@@ -10537,6 +10629,98 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get feedbackTokenFieldLabel => '⟦Ƥéřšóñáł Áççéšš Ŧóķéñ ·········⟧';
+
+  @override
+  String get fillUpGuidanceTitle => '⟦Ɓéšŧ ŧîɱé ŧó ƒîłł úƥ ·······⟧';
+
+  @override
+  String fillUpGuidanceGoodTimeNow(int days) {
+    return '⟦Ŧĥé çúřřéñŧ ƥřîçé îš áɱóñǧ ŧĥé çĥéáƥéšŧ óƒ ŧĥé łášŧ $days đáýš — á ǧóóđ ŧîɱé ŧó ƒîłł úƥ. ····························⟧';
+  }
+
+  @override
+  String fillUpGuidanceWaitCheaper(int days, String window) {
+    return '⟦Ƥřîçéš ářé ñéář ŧĥéîř $days-đáý ĥîǧĥ. Ŧĥéý ářé úšúáłłý çĥéáƥéř $window — çóñšîđéř ŵáîŧîñǧ. ···························⟧';
+  }
+
+  @override
+  String get fillUpGuidanceFillSoon =>
+      '⟦Ƥřîçéš ářé ŧřéñđîñǧ úƥ — çóñšîđéř ƒîłłîñǧ úƥ šóóñ. ··················⟧';
+
+  @override
+  String fillUpGuidanceNeutral(int days) {
+    return '⟦Ŧóđáý\'š ƥřîçé îš ářóúñđ ŧĥé $days-đáý áṽéřáǧé. ··············⟧';
+  }
+
+  @override
+  String fillUpGuidanceSaving(String amount) {
+    return '⟦Çóúłđ šáṽé áƀóúŧ $amount/Ł ƀý ŧîɱîñǧ ýóúř ƒîłł-úƥ. ···············⟧';
+  }
+
+  @override
+  String fillUpGuidanceSampleNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Based on $count price readings',
+      one: 'Based on 1 price reading',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayAndPart(String day, String part) {
+    return '⟦$day $part⟧';
+  }
+
+  @override
+  String fillUpGuidanceWindowDayOnly(String day) {
+    return '⟦óñ $day ·⟧';
+  }
+
+  @override
+  String fillUpGuidanceWindowPartOnly(String part) {
+    return '⟦îñ ŧĥé $part ··⟧';
+  }
+
+  @override
+  String get fillUpGuidanceWindowGeneric => '⟦áŧ óŧĥéř ŧîɱéš ·····⟧';
+
+  @override
+  String get fillUpGuidanceWeekday1 => '⟦Ṁóñđáýš ···⟧';
+
+  @override
+  String get fillUpGuidanceWeekday2 => '⟦Ŧúéšđáýš ····⟧';
+
+  @override
+  String get fillUpGuidanceWeekday3 => '⟦Ŵéđñéšđáýš ·····⟧';
+
+  @override
+  String get fillUpGuidanceWeekday4 => '⟦Ŧĥúřšđáýš ····⟧';
+
+  @override
+  String get fillUpGuidanceWeekday5 => '⟦Ƒřîđáýš ···⟧';
+
+  @override
+  String get fillUpGuidanceWeekday6 => '⟦Šáŧúřđáýš ····⟧';
+
+  @override
+  String get fillUpGuidanceWeekday7 => '⟦Šúñđáýš ···⟧';
+
+  @override
+  String get fillUpGuidancePartEarlyMorning => '⟦éářłý ɱóřñîñǧš ······⟧';
+
+  @override
+  String get fillUpGuidancePartMorning => '⟦ɱóřñîñǧš ····⟧';
+
+  @override
+  String get fillUpGuidancePartAfternoon => '⟦áƒŧéřñóóñš ·····⟧';
+
+  @override
+  String get fillUpGuidancePartEvening => '⟦éṽéñîñǧš ····⟧';
+
+  @override
+  String get fillUpGuidancePartNight => '⟦ñîǧĥŧš ···⟧';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel =>

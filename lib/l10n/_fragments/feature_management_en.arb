@@ -183,13 +183,13 @@
   "@featureBlockedEnable_showConsumptionTab": {
     "description": "Tooltip shown on the disabled consumption-tab toggle when its prerequisite (OBD2 trip recording) is off."
   },
-  "featureLabel_tflitePricePrediction": "TFLite price prediction",
+  "featureLabel_tflitePricePrediction": "Best time to fill up",
   "@featureLabel_tflitePricePrediction": {
-    "description": "Settings toggle label for the on-device TFLite price-prediction model (#1543)."
+    "description": "Settings toggle label for the on-device price-prediction guidance (#1543)."
   },
-  "featureDescription_tflitePricePrediction": "On-device price forecast model — inference runs locally; features and predictions never leave the device.",
+  "featureDescription_tflitePricePrediction": "On-device guidance on when to fill up, computed from your local price history — nothing leaves the device.",
   "@featureDescription_tflitePricePrediction": {
-    "description": "Settings toggle description for the on-device TFLite price-prediction model (#1543). Emphasises that no data leaves the device."
+    "description": "Settings toggle description for the on-device price-prediction guidance (#1543). Emphasises that the heuristic runs locally and no data leaves the device."
   },
   "featureBlockedEnable_tflitePricePrediction": "Enable price history first",
   "@featureBlockedEnable_tflitePricePrediction": {

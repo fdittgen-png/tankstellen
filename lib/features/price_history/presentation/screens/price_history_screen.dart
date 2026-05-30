@@ -9,6 +9,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../providers/price_history_provider.dart';
+import '../widgets/fill_up_guidance_card.dart';
 import '../widgets/price_chart.dart';
 import '../widgets/price_stats_card.dart';
 
@@ -99,6 +100,11 @@ class _FuelTypeSection extends ConsumerWidget {
             PriceChart(records: List.from(records), fuelType: fuelType),
             const SizedBox(height: 8),
             PriceStatsCard(stats: stats),
+            const SizedBox(height: 8),
+            // On-device "best time to fill up?" heuristic (#1543).
+            // Renders nothing when the feature gate is off or data is
+            // too thin — the provider returns null in both cases.
+            FillUpGuidanceCard(stationId: stationId, fuelType: fuelType),
           ],
         ),
       ),
