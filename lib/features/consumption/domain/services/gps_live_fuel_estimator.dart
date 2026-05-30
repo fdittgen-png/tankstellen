@@ -78,13 +78,43 @@ class GpsLiveFuelEstimator {
   static const double _moveThresholdMps = 0.5; // below this v is "stopped"
   static const int _accelWindow = 3; // moving-average low-pass length
 
-  // ─── Petrol / diesel fuel-energy + driveline params ───
+  // ─── Per-fuel volumetric energy density (LHV, MJ/L) + driveline params ───
+  //
+  // The energy→litres step `ṁ = P / (η · LHV · 1e6)` divides tractive
+  // energy by a *volumetric* lower heating value, so the LHV must match
+  // the fuel actually in the tank. Before #2431 this was a binary
+  // diesel-vs-petrol branch, which sent E85 (and LPG) down the petrol
+  // LHV (31.9 MJ/L): E85 packs ~25.6 MJ/L — ~20 % less energy per litre
+  // — so the same tractive work needs ~25 % MORE litres. Scaling an E85
+  // trip by the petrol LHV therefore under-counts its litres / Ø by
+  // ~20-25 %. This is the energy-path sibling of #2437's AFR/density fix
+  // (which corrected the OBD2 air-mass→litres path but not this physics
+  // energy→litres path).
+  //
+  // Sources (volumetric LHV at ~15 °C, commonly cited road-fuel figures):
+  //   * petrol  ≈ 31.9–32 MJ/L (kept at the legacy 31.9 so existing
+  //     petrol estimates don't shift),
+  //   * diesel  ≈ 35.8–36 MJ/L,
+  //   * E85     ≈ 25.6 MJ/L (≈85 % ethanol @ 21.2 MJ/L + 15 % petrol),
+  //   * LPG     ≈ 26 MJ/L (propane/butane autogas, liquid).
   static const double petrolLhvMjPerL = 31.9;
   static const double petrolEfficiency = 0.28;
   static const double petrolIdleLPerHour = 0.7;
   static const double dieselLhvMjPerL = 35.8;
   static const double dieselEfficiency = 0.34;
   static const double dieselIdleLPerHour = 0.5;
+
+  /// E85 volumetric LHV (#2431). ~85 % ethanol (≈21.2 MJ/L) + ~15 %
+  /// petrol → ≈25.6 MJ/L, ~20 % below petrol. Ethanol's higher knock
+  /// resistance also lets flex-fuel engines run a touch more efficiently,
+  /// but the dominant correction is the lower energy density, so the
+  /// efficiency stays at the petrol value and the LHV carries the fix.
+  static const double e85LhvMjPerL = 25.6;
+
+  /// LPG / autogas volumetric LHV (#2431). Liquid propane/butane mix
+  /// ≈26 MJ/L — also well below petrol. Same efficiency/idle as petrol
+  /// (spark-ignition engine); the LHV carries the correction.
+  static const double lpgLhvMjPerL = 26.0;
 
   // ─── Vehicle-class default table (mass / Cd / frontalArea / Crr) ───
   // Resolved by curb weight when a measured mass is available, else the
@@ -246,23 +276,49 @@ class GpsLiveFuelEstimator {
     return _suv;
   }
 
-  /// Map a [VehicleProfile.preferredFuelType] string to its fuel-energy
-  /// + driveline params. Diesel keys map to the diesel row; everything
-  /// else (incl. null) defaults to petrol.
+  /// Map a [VehicleProfile.preferredFuelType] free-text string to its
+  /// fuel-energy + driveline params (#2431). The match order mirrors
+  /// [resolveAfrDensity] in `fuel_rate_estimator.dart` (#2437) so the
+  /// physics energy→litres path and the OBD2 air-mass→litres path can
+  /// never disagree on which fuel a figure is scaled for:
+  ///
+  ///   * `diesel` (contains, so `"dieselPremium"` matches) → diesel LHV,
+  ///   * `e85` / `ethanol` → E85 LHV (the #2431 fix — was petrol before),
+  ///   * `lpg` / `autogas` → LPG LHV,
+  ///   * everything else (petrol / e10 / super / cng / null / unknown)
+  ///     → petrol defaults. CNG has no meaningful volumetric LHV (sold
+  ///     by mass), so it takes the petrol default — matching #2437's
+  ///     documented "unknown → petrol, safer to under-count" rule.
   static _FuelParams _resolveFuel(String? preferredFuelType) {
     final key = preferredFuelType?.toLowerCase().trim() ?? '';
-    final isDiesel = key.contains('diesel');
-    return isDiesel
-        ? const _FuelParams(
-            lhvMjPerL: dieselLhvMjPerL,
-            efficiency: dieselEfficiency,
-            idleLPerHour: dieselIdleLPerHour,
-          )
-        : const _FuelParams(
-            lhvMjPerL: petrolLhvMjPerL,
-            efficiency: petrolEfficiency,
-            idleLPerHour: petrolIdleLPerHour,
-          );
+    if (key.contains('diesel')) {
+      return const _FuelParams(
+        lhvMjPerL: dieselLhvMjPerL,
+        efficiency: dieselEfficiency,
+        idleLPerHour: dieselIdleLPerHour,
+      );
+    }
+    if (key.contains('e85') || key.contains('ethanol')) {
+      // E85: lower energy density carries the correction; spark-ignition
+      // efficiency + idle stay at the petrol values.
+      return const _FuelParams(
+        lhvMjPerL: e85LhvMjPerL,
+        efficiency: petrolEfficiency,
+        idleLPerHour: petrolIdleLPerHour,
+      );
+    }
+    if (key.contains('lpg') || key.contains('autogas')) {
+      return const _FuelParams(
+        lhvMjPerL: lpgLhvMjPerL,
+        efficiency: petrolEfficiency,
+        idleLPerHour: petrolIdleLPerHour,
+      );
+    }
+    return const _FuelParams(
+      lhvMjPerL: petrolLhvMjPerL,
+      efficiency: petrolEfficiency,
+      idleLPerHour: petrolIdleLPerHour,
+    );
   }
 }
 

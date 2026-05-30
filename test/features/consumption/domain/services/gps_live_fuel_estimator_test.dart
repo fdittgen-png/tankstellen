@@ -52,6 +52,55 @@ void main() {
       expect(diesel.instantLPer100Km, lessThan(petrol.instantLPer100Km!));
     });
 
+    test('an E85 profile burns MORE per km than petrol — lower LHV (#2431)',
+        () {
+      // #2431 — E85's volumetric LHV (25.6 MJ/L) is ~20 % below petrol
+      // (31.9 MJ/L) at the SAME efficiency, so the energy→litres step
+      // needs ~25 % more litres for the identical road load. Before the
+      // fix E85 fell into the petrol branch and read identical to petrol;
+      // now it must read higher.
+      const petrolCar = VehicleProfile(
+        id: 'p',
+        name: 'petrol',
+        curbWeightKg: 1500,
+        preferredFuelType: 'petrol',
+      );
+      const e85Car = VehicleProfile(
+        id: 'e',
+        name: 'flex',
+        curbWeightKg: 1500,
+        preferredFuelType: 'E85',
+      );
+      final petrol = _cruise(vehicle: petrolCar, speedMps: 25);
+      final e85 = _cruise(vehicle: e85Car, speedMps: 25);
+      expect(e85.instantLPer100Km, greaterThan(petrol.instantLPer100Km!));
+      // The instant figure scales as petrolLhv / e85Lhv at equal efficiency
+      // (tractive term dominates idle at cruise). Assert it lands within a
+      // tolerance of that expected ratio so the fix is the LHV, not noise.
+      const expectedRatio = GpsLiveFuelEstimator.petrolLhvMjPerL /
+          GpsLiveFuelEstimator.e85LhvMjPerL;
+      final actualRatio = e85.instantLPer100Km! / petrol.instantLPer100Km!;
+      expect(actualRatio, closeTo(expectedRatio, 0.1));
+    });
+
+    test('an "ethanol" fuel string also resolves to the E85 LHV (#2431)', () {
+      const petrolCar = VehicleProfile(
+        id: 'p',
+        name: 'petrol',
+        curbWeightKg: 1500,
+        preferredFuelType: 'petrol',
+      );
+      const ethanolCar = VehicleProfile(
+        id: 'e',
+        name: 'flex',
+        curbWeightKg: 1500,
+        preferredFuelType: 'ethanol blend',
+      );
+      final petrol = _cruise(vehicle: petrolCar, speedMps: 25);
+      final ethanol = _cruise(vehicle: ethanolCar, speedMps: 25);
+      expect(ethanol.instantLPer100Km, greaterThan(petrol.instantLPer100Km!));
+    });
+
     test('a heavier (SUV-class) vehicle burns more than a compact at cruise',
         () {
       const compact = VehicleProfile(
