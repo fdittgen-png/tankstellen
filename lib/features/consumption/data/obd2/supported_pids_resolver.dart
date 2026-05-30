@@ -206,4 +206,34 @@ class SupportedPidsResolver {
   /// Direct view of the supported-PID set for tests and diagnostics.
   /// Returns an unmodifiable empty set when discovery hasn't run.
   Set<int> get debugSupportedPids => Set.unmodifiable(_supportedPids ?? {});
+
+  /// Whether the supported-PID set has been resolved this session —
+  /// either discovered live or reloaded from the persistent cache during
+  /// [prime]. `false` means we're querying blind (a probe-less clone),
+  /// in which case [resolvedTargetSet] returns the full target set so the
+  /// unconditional core still rotates (#811 don't-reject-blind, #2457).
+  bool get isResolved => _supportedPids != null;
+
+  /// The live subscription set for [target] (#2457): the **discover-all ∩
+  /// target-set**. Given the polling layer's target PID table, return the
+  /// subset the car actually implements.
+  ///
+  ///   - Discovery has run → `target ∩ discovered`. A car supporting only
+  ///     {010C, 010D, 0104, 0111} resolves to exactly those of [target].
+  ///   - Discovery has NOT run (probe-less clone, blind session) → the
+  ///     full [target] unchanged. We don't know enough to drop any PID,
+  ///     so the unconditional core still rotates and unsupported PIDs
+  ///     self-evict via the scheduler's #2379 backoff.
+  ///
+  /// The discovered set itself is persisted once per adapter by [prime]
+  /// (keyed off adapterMac + make:model:year via the #2253 fallback key),
+  /// so this intersection costs no extra adapter I/O after the first scan.
+  /// Returned set is unmodifiable.
+  Set<int> resolvedTargetSet(Set<int> target) {
+    final discovered = _supportedPids;
+    if (discovered == null) return Set.unmodifiable(target);
+    return Set.unmodifiable(
+      target.where(discovered.contains).toSet(),
+    );
+  }
 }

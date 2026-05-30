@@ -5,44 +5,13 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import '../../../../core/logging/error_logger.dart';
+import 'pid_bandwidth_governor.dart';
+import 'scheduled_pid.dart';
 
-/// Priority tier used as a tiebreaker when two subscribed PIDs have an
-/// identical weight under the weighted round-robin selector.
-///
-/// The scheduler's primary selection metric is `(now − lastReadAt) × hz`,
-/// so priority only matters when two PIDs are _exactly_ tied — e.g. both
-/// subscribed on the same tick, or both have deterministic elapsed time.
-enum PidPriority { high, medium, low }
-
-/// Configuration for a single subscribed PID in the [PidScheduler].
-///
-/// The scheduler uses [hz] as the target refresh rate and computes each
-/// tick's winner from `(now − lastReadAt) × hz`. A higher [hz] drags the
-/// last-read timestamp toward "now" more aggressively, so fast-tier PIDs
-/// naturally win more ticks than slow-tier PIDs.
-///
-/// [priority] is consulted only to break weight ties — it is _not_ a
-/// hard override. A high-priority 0.1 Hz PID will still lose most ticks
-/// to a medium-priority 5 Hz PID because its weight grows 50× slower.
-class ScheduledPid {
-  ScheduledPid({
-    required this.hz,
-    this.priority = PidPriority.medium,
-  })  : assert(hz > 0, 'hz must be > 0'),
-        lastReadAt = null;
-
-  /// Target refresh rate in hertz (reads per second).
-  final double hz;
-
-  /// Tiebreaker when two PIDs have an identical weight this tick.
-  final PidPriority priority;
-
-  /// Timestamp of the most recent completed read, or `null` if the PID
-  /// has been subscribed but never read yet. A `null` here makes the PID
-  /// win the next tick unconditionally — a brand-new subscription should
-  /// get one initial read before the round-robin math kicks in.
-  DateTime? lastReadAt;
-}
+// Re-export the per-PID config vocabulary (#2457) so existing call sites
+// that import `pid_scheduler.dart` keep seeing PidPriority / PidTier /
+// ScheduledPid without a second import.
+export 'scheduled_pid.dart';
 
 /// Weighted round-robin scheduler for OBD-II PID polling.
 ///
@@ -77,6 +46,16 @@ class ScheduledPid {
 ///
 /// Recording is unaffected — a backed-off PID simply contributes fewer
 /// samples; the loop never stalls.
+///
+/// ## Bandwidth governor (#2457)
+///
+/// PIDs declare a [PidTier]. On a slow ELM327 clone the total reads/second
+/// the link sustains is the binding constraint, so the [PidBandwidthGovernor]
+/// demotes the most-expendable PID (deepest tier first) when the dynamics
+/// tier's effective hz drops below its floor, then restores it once headroom
+/// returns. The dynamics tier is never demoted, so RPM / speed never starve.
+/// Its demotions + achieved tick-rate are exposed read-only via
+/// [governorState] for the comm-diagnostics overlay (#2468).
 ///
 /// ## Phase 1 scope (#814)
 ///
@@ -138,6 +117,22 @@ class PidScheduler {
   /// until the first one fires.
   DateTime? _lastDiagnosticAt;
 
+  /// Bandwidth governor (#2457). Owns the achieved-reads windows + the
+  /// demotion policy that protects the dynamics tier on a slow link. The
+  /// scheduler feeds it read completions and queries its demotion set when
+  /// computing selection weight; it takes no transport / timer of its own.
+  late final PidBandwidthGovernor _governor =
+      PidBandwidthGovernor(clock: _clock);
+
+  /// Read-only snapshot of the bandwidth governor (#2457) for the
+  /// comm-diagnostics overlay (#2468): the achieved tick rate, the
+  /// dynamics tier's effective hz, and the currently-demoted commands.
+  GovernorState get governorState => _governor.state;
+
+  /// Commands currently demoted by the governor. Exposed for tests.
+  @visibleForTesting
+  Set<String> get demotedCommands => _governor.state.demotedCommands;
+
   /// Number of subscribed PIDs currently in the backed-off state
   /// (consecutive failures ≥ [_maxConsecutiveFailures]). Exposed for
   /// tests that assert backoff engaged / cleared.
@@ -164,15 +159,25 @@ class PidScheduler {
     void Function(String response) onResult,
   ) {
     _subs[command] = _Subscription(
+      command: command,
       config: config,
       onResult: onResult,
       order: _subscriptionCounter++,
     );
+    _governor.register(
+      command,
+      tier: config.tier,
+      priority: config.priority,
+      hz: config.hz,
+    );
   }
 
   /// Remove [command] from the rotation. A no-op if it isn't subscribed.
+  /// Also drops any governor demotion / read-window held against it so a
+  /// re-subscribe starts clean.
   void unsubscribe(String command) {
     _subs.remove(command);
+    _governor.unregister(command);
   }
 
   /// Start the periodic selection timer. Safe to call multiple times —
@@ -227,12 +232,25 @@ class PidScheduler {
     if (last == null) return double.infinity;
     final elapsedMs = now.difference(last).inMicroseconds / 1000.0;
     if (elapsedMs <= 0) return 0.0;
-    // A backed-off PID is selected at [_backoffHz] instead of its
-    // configured rate — far less often, so it neither floods the adapter
-    // nor starves healthy PIDs, while still being retried periodically so
-    // it resumes the instant it answers (#2379).
-    final hz = sub.isBackedOff ? _backoffHz : sub.config.hz;
-    return (elapsedMs / 1000.0) * hz;
+    return (elapsedMs / 1000.0) * _effectiveHz(sub);
+  }
+
+  /// The selection hz actually applied to [sub] this tick, after the two
+  /// dampers stack:
+  ///   - #2379 backoff: a PID that has failed [_maxConsecutiveFailures]
+  ///     times runs at [_backoffHz] (≈ 1/30 s) so a dead PID never crowds
+  ///     out healthy ones, yet is still retried periodically.
+  ///   - #2457 governor demotion: an expendable PID the governor has
+  ///     demoted runs at its configured hz × the governor's demotion
+  ///     factor, handing the freed budget to the dynamics tier on a slow
+  ///     link.
+  /// Backoff dominates (a dead PID stays at [_backoffHz] regardless).
+  double _effectiveHz(_Subscription sub) {
+    if (sub.isBackedOff) return _backoffHz;
+    final base = sub.config.hz;
+    return _governor.isDemoted(sub.command)
+        ? base * PidBandwidthGovernor.demotionFactor
+        : base;
   }
 
   /// Returns true if [candidateWeight]/[candidate] should replace
@@ -268,7 +286,9 @@ class PidScheduler {
     _inFlight = command;
     try {
       final response = await transport(command);
-      sub.config.lastReadAt = _clock();
+      final completedAt = _clock();
+      sub.config.lastReadAt = completedAt;
+      _governor.recordRead(command, completedAt);
       // A successful read clears any accumulated failure streak so the
       // PID resumes its configured cadence immediately (#2379).
       sub.consecutiveFailures = 0;
@@ -299,11 +319,17 @@ class PidScheduler {
       // tied on hz via the FIFO tiebreaker) and bump the failure streak.
       // Past [_maxConsecutiveFailures] the PID backs off to [_backoffHz]
       // (see [_weightFor]); a later success resets it.
-      sub.config.lastReadAt = _clock();
+      final completedAt = _clock();
+      sub.config.lastReadAt = completedAt;
+      _governor.recordRead(command, completedAt);
       sub.consecutiveFailures++;
       _maybeEmitUnresponsiveDiagnostic(e, st);
     } finally {
       _inFlight = null;
+      // Re-evaluate the bandwidth budget after every completed read (the
+      // achieved-hz window only changes when a read lands), AFTER
+      // `_inFlight` clears so a demotion takes effect on the next tick.
+      _governor.evaluate();
     }
   }
 
@@ -329,10 +355,15 @@ class PidScheduler {
 
 class _Subscription {
   _Subscription({
+    required this.command,
     required this.config,
     required this.onResult,
     required this.order,
   });
+
+  /// The OBD-II command this subscription polls (e.g. `'010C'`). Kept so
+  /// the governor can address demotions by command without a reverse map.
+  final String command;
 
   final ScheduledPid config;
   final void Function(String response) onResult;
