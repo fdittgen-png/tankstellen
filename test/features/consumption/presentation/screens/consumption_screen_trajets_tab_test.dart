@@ -317,4 +317,94 @@ void main() {
   // `showTrajets` flag) rather than by ConsumptionScreen. That gate is
   // covered by `test/app/shell/shell_destinations_test.dart` and
   // `test/app/shell_nav_vehicle_gating_test.dart`.
+
+  // #2374 — "View all on map" moved from a standalone full-width
+  // TextButton.icon row in TrajetsTab into the Trajets AppBar as an
+  // IconButton, placed immediately before the download (↓) action.
+  group('ConsumptionScreen Trajets — map AppBar action (#2374)', () {
+    const vehicle = VehicleProfile(
+      id: 'v1',
+      name: 'Test vehicle',
+      type: VehicleType.combustion,
+    );
+
+    testWidgets(
+        'map IconButton is present in the AppBar when trips exist',
+        (tester) async {
+      final trips = <TripHistoryEntry>[
+        _entry(
+          id: 'trip-1',
+          vehicleId: 'v1',
+          startedAt: DateTime.utc(2026, 4, 22, 9),
+          distanceKm: 10.0,
+        ),
+      ];
+
+      await _pumpScreen(
+        tester,
+        trips: trips,
+        activeVehicle: vehicle,
+        vehicles: [vehicle],
+      );
+
+      // The AppBar map IconButton carries the localized tooltip and
+      // the map_outlined icon.
+      expect(
+        find.byKey(const Key('trajets_view_all_on_map')),
+        findsOneWidget,
+      );
+      final btn = tester.widget<IconButton>(
+        find.byKey(const Key('trajets_view_all_on_map')),
+      );
+      expect(btn.tooltip, 'View all on map');
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('trajets_view_all_on_map')),
+          matching: find.byIcon(Icons.map_outlined),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        'map IconButton is present even with an empty trip list',
+        (tester) async {
+      await _pumpScreen(
+        tester,
+        activeVehicle: vehicle,
+        vehicles: [vehicle],
+      );
+
+      // The button is always present (empty tripIds list is valid for
+      // TrajetsMapScreen — it renders its own empty state).
+      expect(
+        find.byKey(const Key('trajets_view_all_on_map')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        'standalone TextButton.icon row is absent from the body',
+        (tester) async {
+      final trips = <TripHistoryEntry>[
+        _entry(
+          id: 'trip-2',
+          vehicleId: 'v1',
+          startedAt: DateTime.utc(2026, 4, 22, 9),
+          distanceKm: 5.0,
+        ),
+      ];
+      await _pumpScreen(
+        tester,
+        trips: trips,
+        activeVehicle: vehicle,
+        vehicles: [vehicle],
+      );
+
+      // Pre-#2374 there was a TextButton.icon with this key in the
+      // body scroll area; it must be gone now.
+      expect(find.byType(TextButton), findsNothing);
+    });
+
+  });
 }

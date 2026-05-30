@@ -25,6 +25,7 @@ import '../widgets/fuel_tab.dart';
 import '../widgets/obd2_status_chip.dart';
 import '../widgets/trajets_tab.dart';
 import 'add_charging_log_screen.dart';
+import 'trajets_map_screen.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Which slice of the consumption feature a [ConsumptionScreen] renders.
@@ -163,9 +164,28 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   /// AppBar actions shared by both sections (#1901): the OBD2 status
   /// chip, the backup export button, the gated Carbon dashboard entry
   /// point, and the Settings action.
-  List<Widget> _appBarActions(AppLocalizations? l) => [
+  ///
+  /// When [tripIds] is non-null (Trajets section only, #2374) a map
+  /// IconButton is inserted immediately before the download button so
+  /// the user can reach the all-trips map without scrolling past the
+  /// monthly-comparison card.
+  List<Widget> _appBarActions(AppLocalizations? l,
+      {List<String>? tripIds}) =>
+      [
         // #797 phase 3 — title-bar chip announcing "OBD2 connected".
         const Obd2StatusChip(),
+        // #2374 — map action visible only on the Trajets section.
+        if (tripIds != null)
+          IconButton(
+            key: const Key('trajets_view_all_on_map'),
+            tooltip: l?.trajetsViewAllOnMap ?? 'View all on map',
+            icon: const Icon(Icons.map_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => TrajetsMapScreen(tripIds: tripIds),
+              ),
+            ),
+          ),
         IconButton(
           key: const Key('export_backup'),
           tooltip: l?.exportBackupTooltip ?? 'Export backup',
@@ -230,14 +250,28 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   /// #1901 — the Trajets destination: OBD2 trip history. No FAB (the
   /// "Start recording" CTA lives in the tab header) and no in-screen
   /// tab bar.
+  ///
+  /// #2374 — computes the same vehicle-filtered trip IDs that [TrajetsTab]
+  /// renders, so the AppBar map action opens [TrajetsMapScreen] with exactly
+  /// the visible set of trips.
   Widget _buildTrajets(BuildContext context, AppLocalizations? l) {
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
+    final allTrips = ref.watch(tripHistoryListProvider);
+    // Mirror TrajetsTab's filter: when a vehicle is active, show only that
+    // vehicle's trips (plus untagged legacy trips); otherwise show all.
+    final vehicleId = activeVehicle?.id;
+    final tripIds = (vehicleId == null
+            ? allTrips
+            : allTrips.where(
+                (t) => t.vehicleId == null || t.vehicleId == vehicleId))
+        .map((t) => t.id)
+        .toList(growable: false);
     return PageScaffold(
       title: l?.trajetsTabLabel ?? 'Trips',
       leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
-      actions: _appBarActions(l),
-      body: TrajetsTab(vehicleId: activeVehicle?.id),
+      actions: _appBarActions(l, tripIds: tripIds),
+      body: TrajetsTab(vehicleId: vehicleId),
     );
   }
 
