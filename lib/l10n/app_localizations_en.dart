@@ -4761,6 +4761,123 @@ class AppLocalizationsEn extends AppLocalizations {
       'Easy on the throttle — coasting saves more';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navigate to $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Remove $name from favorites';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Show stations on map';
+
+  @override
+  String get searchResultsSemanticLabel => 'Search results';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Search criteria summary. Tap to edit.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'No favorites yet. Tap the star on a station to save it as a favorite.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Station is open',
+      'false': 'Station is closed',
+      'other': 'Station is closed',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Country $name, selected',
+      'false': 'Country $name',
+      'other': 'Country $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Language $name, selected',
+      'false': 'Language $name',
+      'other': 'Language $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Sort by $option, selected',
+      'false': 'Sort by $option',
+      'other': 'Sort by $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Fuel type $type, selected',
+      'false': 'Fuel type $type',
+      'other': 'Fuel type $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'EV charging station $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic => 'Privacy shield with fuel drop';
+
+  @override
+  String get globeIllustrationSemantic => 'Globe with fuel station markers';
+
+  @override
+  String get fuelPumpIllustrationSemantic => 'Fuel pump with price ticker';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, data source: $provider, $keyRequirement, fuel types: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'API key required';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Free, no key needed';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Data: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Fuel types: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Anon Key';
 
   @override
@@ -10727,6 +10844,126 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get hapticEcoCoachSnackBarMessage =>
       '⟦Éášý óñ ŧĥé ŧĥřóŧŧłé — çóášŧîñǧ šáṽéš ɱóřé ···············⟧';
+
+  @override
+  String semanticsNavigateTo(String name) {
+    return '⟦Ñáṽîǧáŧé ŧó $name ·····⟧';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return '⟦Řéɱóṽé $name ƒřóɱ ƒáṽóřîŧéš ·········⟧';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => '⟦Šĥóŵ šŧáŧîóñš óñ ɱáƥ ········⟧';
+
+  @override
+  String get searchResultsSemanticLabel => '⟦Šéářçĥ řéšúłŧš ······⟧';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      '⟦Šéářçĥ çřîŧéřîá šúɱɱářý. Ŧáƥ ŧó éđîŧ. ··············⟧';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      '⟦Ñó ƒáṽóřîŧéš ýéŧ. Ŧáƥ ŧĥé šŧář óñ á šŧáŧîóñ ŧó šáṽé îŧ áš á ƒáṽóřîŧé. ························⟧';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Station is open',
+      'false': 'Station is closed',
+      'other': 'Station is closed',
+    });
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Country $name, selected',
+      'false': 'Country $name',
+      'other': 'Country $name',
+    });
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Language $name, selected',
+      'false': 'Language $name',
+      'other': 'Language $name',
+    });
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Sort by $option, selected',
+      'false': 'Sort by $option',
+      'other': 'Sort by $option',
+    });
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Fuel type $type, selected',
+      'false': 'Fuel type $type',
+      'other': 'Fuel type $type',
+    });
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return '⟦ÉṼ çĥářǧîñǧ šŧáŧîóñ $name, $power ķŴ ·········⟧';
+  }
+
+  @override
+  String get shieldIllustrationSemantic =>
+      '⟦Ƥřîṽáçý šĥîéłđ ŵîŧĥ ƒúéł đřóƥ ···········⟧';
+
+  @override
+  String get globeIllustrationSemantic =>
+      '⟦Ǧłóƀé ŵîŧĥ ƒúéł šŧáŧîóñ ɱářķéřš ············⟧';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      '⟦Ƒúéł ƥúɱƥ ŵîŧĥ ƥřîçé ŧîçķéř ··········⟧';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '⟦$name, đáŧá šóúřçé: $provider, $keyRequirement, ƒúéł ŧýƥéš: $fuelTypes ·········⟧';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => '⟦ÁƤÎ ķéý řéɋúîřéđ ······⟧';
+
+  @override
+  String get countryInfoNoKeyNeeded => '⟦Ƒřéé, ñó ķéý ñééđéđ ·······⟧';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return '⟦Đáŧá: $provider ··⟧';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return '⟦Ƒúéł ŧýƥéš: $fuelTypes ····⟧';
+  }
+
+  @override
+  String get countryInfoDemoSource => '⟦Đéɱó ··⟧';
 
   @override
   String get anonKeyLabel => '⟦Áñóñ Ķéý ···⟧';

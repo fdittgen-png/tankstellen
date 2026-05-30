@@ -4825,6 +4825,123 @@ class AppLocalizationsHu extends AppLocalizations {
       'Kíméletes gáz — a gurulás több üzemanyagot takarít meg';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navigálás ide: $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return '$name eltávolítása a kedvencekből';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Állomások megjelenítése a térképen';
+
+  @override
+  String get searchResultsSemanticLabel => 'Keresési eredmények';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Keresési feltételek összegzése. Koppintson a szerkesztéshez.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Még nincsenek kedvencek. Koppintson egy állomás csillagára, hogy kedvencként mentse.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Az állomás nyitva van',
+      'false': 'Az állomás zárva van',
+      'other': 'Az állomás zárva van',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Ország: $name, kiválasztva',
+      'false': 'Ország: $name',
+      'other': 'Ország: $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Nyelv: $name, kiválasztva',
+      'false': 'Nyelv: $name',
+      'other': 'Nyelv: $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Rendezés: $option, kiválasztva',
+      'false': 'Rendezés: $option',
+      'other': 'Rendezés: $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Üzemanyag: $type, kiválasztva',
+      'false': 'Üzemanyag: $type',
+      'other': 'Üzemanyag: $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Töltőállomás: $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic => 'Adatvédelmi pajzs üzemanyagcseppel';
+
+  @override
+  String get globeIllustrationSemantic => 'Földgömb töltőállomás-jelölőkkel';
+
+  @override
+  String get fuelPumpIllustrationSemantic => 'Üzemanyagtöltő árkijelzővel';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, adatforrás: $provider, $keyRequirement, üzemanyagtípusok: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'API-kulcs szükséges';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Ingyenes, kulcs nélkül';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Adatok: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Üzemanyagtípusok: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demó';
+
+  @override
   String get anonKeyLabel => 'Anon kulcs';
 
   @override

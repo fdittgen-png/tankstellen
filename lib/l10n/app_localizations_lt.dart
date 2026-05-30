@@ -4815,6 +4815,124 @@ class AppLocalizationsLt extends AppLocalizations {
       'Atsargiau su akseleratoriumi — inercinė eiga taupo daugiau';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Nuvykti į $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Pašalinti $name iš parankinių';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Rodyti stoteles žemėlapyje';
+
+  @override
+  String get searchResultsSemanticLabel => 'Paieškos rezultatai';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Paieškos kriterijų santrauka. Bakstelėkite norėdami redaguoti.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Parankinių dar nėra. Bakstelėkite stotelės žvaigždutę, kad išsaugotumėte ją kaip parankinę.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Stotelė atidaryta',
+      'false': 'Stotelė uždaryta',
+      'other': 'Stotelė uždaryta',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Šalis $name, pasirinkta',
+      'false': 'Šalis $name',
+      'other': 'Šalis $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Kalba $name, pasirinkta',
+      'false': 'Kalba $name',
+      'other': 'Kalba $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Rūšiuoti pagal $option, pasirinkta',
+      'false': 'Rūšiuoti pagal $option',
+      'other': 'Rūšiuoti pagal $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Kuras $type, pasirinktas',
+      'false': 'Kuras $type',
+      'other': 'Kuras $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Įkrovimo stotelė $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic => 'Privatumo skydas su kuro lašu';
+
+  @override
+  String get globeIllustrationSemantic => 'Gaublys su degalinių žymekliais';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      'Degalų kolonėlė su kainų rodikliu';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, duomenų šaltinis: $provider, $keyRequirement, kuro tipai: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Reikalingas API raktas';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Nemokama, rakto nereikia';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Duomenys: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Kuro tipai: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Anoniminis raktas';
 
   @override

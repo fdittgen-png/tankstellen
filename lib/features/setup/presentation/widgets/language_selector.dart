@@ -36,8 +36,11 @@ class LanguageSelector extends StatelessWidget {
           children: AppLanguages.all.map((lang) {
             final isSelected = lang.code == selected.code;
             return Semantics(
-              label:
-                  'Language ${lang.nativeName}${isSelected ? ", selected" : ""}',
+              label: l10n?.languageChipSemantic(
+                    lang.nativeName,
+                    '$isSelected',
+                  ) ??
+                  'Language ${lang.nativeName}',
               child: ChoiceChip(
                 label: Text(lang.nativeName),
                 selected: isSelected,

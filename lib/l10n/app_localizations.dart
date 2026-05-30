@@ -8574,6 +8574,137 @@ abstract class AppLocalizations {
   /// **'Easy on the throttle — coasting saves more'**
   String get hapticEcoCoachSnackBarMessage;
 
+  /// No description provided for @semanticsNavigateTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate to {name}'**
+  String semanticsNavigateTo(String name);
+
+  /// No description provided for @semanticsRemoveFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from favorites'**
+  String semanticsRemoveFromFavorites(String name);
+
+  /// No description provided for @showOnMapSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show stations on map'**
+  String get showOnMapSemanticLabel;
+
+  /// No description provided for @searchResultsSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search results'**
+  String get searchResultsSemanticLabel;
+
+  /// No description provided for @searchCriteriaSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search criteria summary. Tap to edit.'**
+  String get searchCriteriaSemanticLabel;
+
+  /// No description provided for @noFavoritesSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet. Tap the star on a station to save it as a favorite.'**
+  String get noFavoritesSemanticLabel;
+
+  /// No description provided for @stationStatusSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{open, select, true{Station is open} false{Station is closed} other{Station is closed}}'**
+  String stationStatusSemantic(String open);
+
+  /// No description provided for @countryChipSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{selected, select, true{Country {name}, selected} false{Country {name}} other{Country {name}}}'**
+  String countryChipSemantic(String name, String selected);
+
+  /// No description provided for @languageChipSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{selected, select, true{Language {name}, selected} false{Language {name}} other{Language {name}}}'**
+  String languageChipSemantic(String name, String selected);
+
+  /// No description provided for @sortBySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{selected, select, true{Sort by {option}, selected} false{Sort by {option}} other{Sort by {option}}}'**
+  String sortBySemantic(String option, String selected);
+
+  /// No description provided for @fuelTypeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{selected, select, true{Fuel type {type}, selected} false{Fuel type {type}} other{Fuel type {type}}}'**
+  String fuelTypeSemantic(String type, String selected);
+
+  /// No description provided for @evChargingStationSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'EV charging station {name}, {power} kW'**
+  String evChargingStationSemantic(String name, int power);
+
+  /// No description provided for @shieldIllustrationSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy shield with fuel drop'**
+  String get shieldIllustrationSemantic;
+
+  /// No description provided for @globeIllustrationSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Globe with fuel station markers'**
+  String get globeIllustrationSemantic;
+
+  /// No description provided for @fuelPumpIllustrationSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel pump with price ticker'**
+  String get fuelPumpIllustrationSemantic;
+
+  /// No description provided for @countryInfoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, data source: {provider}, {keyRequirement}, fuel types: {fuelTypes}'**
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  );
+
+  /// No description provided for @countryInfoApiKeyRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'API key required'**
+  String get countryInfoApiKeyRequired;
+
+  /// No description provided for @countryInfoNoKeyNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Free, no key needed'**
+  String get countryInfoNoKeyNeeded;
+
+  /// No description provided for @countryInfoDataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Data: {provider}'**
+  String countryInfoDataSource(String provider);
+
+  /// No description provided for @countryInfoFuelTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel types: {fuelTypes}'**
+  String countryInfoFuelTypes(String fuelTypes);
+
+  /// No description provided for @countryInfoDemoSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo'**
+  String get countryInfoDemoSource;
+
   /// No description provided for @anonKeyLabel.
   ///
   /// In en, this message translates to:

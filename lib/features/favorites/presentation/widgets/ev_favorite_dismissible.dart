@@ -56,7 +56,7 @@ class EvFavoriteDismissible extends ConsumerWidget {
         return true;
       },
       background: Semantics(
-        label: 'Navigate to $label',
+        label: l10n?.semanticsNavigateTo(label) ?? 'Navigate to $label',
         child: Container(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.only(left: 24),
@@ -76,7 +76,8 @@ class EvFavoriteDismissible extends ConsumerWidget {
         ),
       ),
       secondaryBackground: Semantics(
-        label: 'Remove $label from favorites',
+        label: l10n?.semanticsRemoveFromFavorites(label) ??
+            'Remove $label from favorites',
         child: Container(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 24),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('LanguageSelector', () {
@@ -15,6 +16,9 @@ void main() {
     }) {
       return tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SingleChildScrollView(
               child: LanguageSelector(

@@ -4821,6 +4821,125 @@ class AppLocalizationsRo extends AppLocalizations {
       'Ușor cu acceleratorul — inerția economisește mai mult';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navighează către $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Elimină $name din favorite';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Afișează stațiile pe hartă';
+
+  @override
+  String get searchResultsSemanticLabel => 'Rezultatele căutării';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Rezumatul criteriilor de căutare. Atinge pentru a edita.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Încă nu există favorite. Atinge steaua unei stații pentru a o salva ca favorită.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Stația este deschisă',
+      'false': 'Stația este închisă',
+      'other': 'Stația este închisă',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Țară $name, selectat',
+      'false': 'Țară $name',
+      'other': 'Țară $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Limbă $name, selectat',
+      'false': 'Limbă $name',
+      'other': 'Limbă $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Sortează după $option, selectat',
+      'false': 'Sortează după $option',
+      'other': 'Sortează după $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Carburant $type, selectat',
+      'false': 'Carburant $type',
+      'other': 'Carburant $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Stație de încărcare $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic =>
+      'Scut de confidențialitate cu picătură de carburant';
+
+  @override
+  String get globeIllustrationSemantic => 'Glob cu marcaje pentru benzinării';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      'Pompă de carburant cu indicator de prețuri';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, sursă de date: $provider, $keyRequirement, tipuri de carburant: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Cheie API necesară';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Gratuit, fără cheie';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Date: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Tipuri de carburant: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Cheie anonimă';
 
   @override

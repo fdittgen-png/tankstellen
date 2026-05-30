@@ -4794,6 +4794,124 @@ class AppLocalizationsCs extends AppLocalizations {
   String get hapticEcoCoachSnackBarMessage => 'Mírnit plyn — výběh šetří více';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navigovat na $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Odebrat $name z oblíbených';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Zobrazit stanice na mapě';
+
+  @override
+  String get searchResultsSemanticLabel => 'Výsledky vyhledávání';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Souhrn kritérií vyhledávání. Klepnutím upravíte.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Zatím žádné oblíbené. Klepnutím na hvězdičku u stanice ji uložíte jako oblíbenou.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Stanice je otevřená',
+      'false': 'Stanice je zavřená',
+      'other': 'Stanice je zavřená',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Země $name, vybráno',
+      'false': 'Země $name',
+      'other': 'Země $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Jazyk $name, vybráno',
+      'false': 'Jazyk $name',
+      'other': 'Jazyk $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Seřadit podle $option, vybráno',
+      'false': 'Seřadit podle $option',
+      'other': 'Seřadit podle $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Palivo $type, vybráno',
+      'false': 'Palivo $type',
+      'other': 'Palivo $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Nabíjecí stanice $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic => 'Štít soukromí s kapkou paliva';
+
+  @override
+  String get globeIllustrationSemantic => 'Globus se značkami čerpacích stanic';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      'Čerpací stojan s cenovým tickerem';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, zdroj dat: $provider, $keyRequirement, druhy paliva: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Vyžadován klíč API';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Zdarma, bez klíče';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Data: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Druhy paliva: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Anonymní klíč';
 
   @override

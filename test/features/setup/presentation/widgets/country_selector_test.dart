@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/country_selector.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('CountrySelector', () {
@@ -15,6 +16,9 @@ void main() {
     }) {
       return tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SingleChildScrollView(
               child: CountrySelector(

@@ -4834,6 +4834,125 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ελαφρύτερο γκάζι — η αδράνεια εξοικονομεί περισσότερα';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Πλοήγηση προς $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Κατάργηση $name από τα αγαπημένα';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Εμφάνιση σταθμών στον χάρτη';
+
+  @override
+  String get searchResultsSemanticLabel => 'Αποτελέσματα αναζήτησης';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Σύνοψη κριτηρίων αναζήτησης. Πατήστε για επεξεργασία.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Δεν υπάρχουν ακόμη αγαπημένα. Πατήστε το αστέρι ενός σταθμού για να τον αποθηκεύσετε στα αγαπημένα.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Ο σταθμός είναι ανοιχτός',
+      'false': 'Ο σταθμός είναι κλειστός',
+      'other': 'Ο σταθμός είναι κλειστός',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Χώρα $name, επιλεγμένη',
+      'false': 'Χώρα $name',
+      'other': 'Χώρα $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Γλώσσα $name, επιλεγμένο',
+      'false': 'Γλώσσα $name',
+      'other': 'Γλώσσα $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Ταξινόμηση κατά $option, επιλεγμένο',
+      'false': 'Ταξινόμηση κατά $option',
+      'other': 'Ταξινόμηση κατά $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Καύσιμο $type, επιλεγμένο',
+      'false': 'Καύσιμο $type',
+      'other': 'Καύσιμο $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Σταθμός φόρτισης $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic =>
+      'Ασπίδα απορρήτου με σταγόνα καυσίμου';
+
+  @override
+  String get globeIllustrationSemantic =>
+      'Υδρόγειος με δείκτες πρατηρίων καυσίμων';
+
+  @override
+  String get fuelPumpIllustrationSemantic => 'Αντλία καυσίμου με δείκτη τιμών';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, πηγή δεδομένων: $provider, $keyRequirement, τύποι καυσίμου: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Απαιτείται κλειδί API';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Δωρεάν, χωρίς κλειδί';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Δεδομένα: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Τύποι καυσίμου: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Κλειδί Anon';
 
   @override

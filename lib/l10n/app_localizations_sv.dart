@@ -4784,6 +4784,124 @@ class AppLocalizationsSv extends AppLocalizations {
       'Varsamt med gasen – frihjul sparar mer';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navigera till $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Ta bort $name från favoriter';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Visa stationer på kartan';
+
+  @override
+  String get searchResultsSemanticLabel => 'Sökresultat';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Sammanfattning av sökkriterier. Tryck för att redigera.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Inga favoriter ännu. Tryck på stjärnan vid en station för att spara den som favorit.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Stationen är öppen',
+      'false': 'Stationen är stängd',
+      'other': 'Stationen är stängd',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Land $name, vald',
+      'false': 'Land $name',
+      'other': 'Land $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Språk $name, vald',
+      'false': 'Språk $name',
+      'other': 'Språk $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Sortera efter $option, vald',
+      'false': 'Sortera efter $option',
+      'other': 'Sortera efter $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Bränsle $type, vald',
+      'false': 'Bränsle $type',
+      'other': 'Bränsle $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Laddstation $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic => 'Integritetssköld med bränsledroppe';
+
+  @override
+  String get globeIllustrationSemantic =>
+      'Jordglob med markörer för bensinstationer';
+
+  @override
+  String get fuelPumpIllustrationSemantic => 'Bränslepump med prisindikator';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, datakälla: $provider, $keyRequirement, bränsletyper: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'API-nyckel krävs';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Gratis, ingen nyckel behövs';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Data: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Bränsletyper: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Anon-nyckel';
 
   @override

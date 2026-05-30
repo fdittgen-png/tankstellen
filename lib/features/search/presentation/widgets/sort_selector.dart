@@ -88,8 +88,9 @@ class _SortChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: 'Sort by $label${selected ? ", selected" : ""}',
+      label: l10n?.sortBySemantic(label, '$selected') ?? 'Sort by $label',
       child: ChoiceChip(
         avatar: Icon(icon, size: 16),
         label: Text(label),

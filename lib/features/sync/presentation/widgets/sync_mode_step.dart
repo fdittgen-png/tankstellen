@@ -27,6 +27,21 @@ class SyncModeStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+
+    final communityTitle =
+        l10n?.syncModeCommunityTitle ?? 'Sparkilo Community';
+    final communitySubtitle = l10n?.syncModeCommunitySubtitle ??
+        'Share favorites & ratings with all users';
+    final communityPrivacy = l10n?.syncPrivacyShared ?? 'Shared';
+    final privateTitle = l10n?.syncModePrivateTitle ?? 'Private Database';
+    final privateSubtitle = l10n?.syncModePrivateSubtitle ??
+        'Your own Supabase — full data control';
+    final privatePrivacy = l10n?.syncPrivacyPrivate ?? 'Private';
+    final groupTitle = l10n?.syncModeGroupTitle ?? 'Join a Group';
+    final groupSubtitle =
+        l10n?.syncModeGroupSubtitle ?? 'Family or friends shared database';
+    final groupPrivacy = l10n?.syncPrivacyGroup ?? 'Group';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -46,45 +61,39 @@ class SyncModeStep extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Semantics(
-          label:
-              'Sparkilo Community, shared. Share favorites and ratings with all users.',
+          label: '$communityTitle, $communityPrivacy. $communitySubtitle',
           button: true,
           child: SyncModeCard(
             icon: Icons.public,
-            title: l10n?.syncModeCommunityTitle ?? 'Sparkilo Community',
-            subtitle: l10n?.syncModeCommunitySubtitle ??
-                'Share favorites & ratings with all users',
-            privacyLabel: l10n?.syncPrivacyShared ?? 'Shared',
+            title: communityTitle,
+            subtitle: communitySubtitle,
+            privacyLabel: communityPrivacy,
             privacyColor: DarkModeColors.success(context),
             onTap: () => onSelectMode(SyncMode.community),
           ),
         ),
         const SizedBox(height: 10),
         Semantics(
-          label:
-              'Private Database, private. Your own Supabase, full data control.',
+          label: '$privateTitle, $privatePrivacy. $privateSubtitle',
           button: true,
           child: SyncModeCard(
             icon: Icons.lock_outline,
-            title: l10n?.syncModePrivateTitle ?? 'Private Database',
-            subtitle: l10n?.syncModePrivateSubtitle ??
-                'Your own Supabase — full data control',
-            privacyLabel: l10n?.syncPrivacyPrivate ?? 'Private',
+            title: privateTitle,
+            subtitle: privateSubtitle,
+            privacyLabel: privatePrivacy,
             privacyColor: Colors.blue,
             onTap: () => onSelectMode(SyncMode.private),
           ),
         ),
         const SizedBox(height: 10),
         Semantics(
-          label:
-              'Join a Group, group access. Family or friends shared database.',
+          label: '$groupTitle, $groupPrivacy. $groupSubtitle',
           button: true,
           child: SyncModeCard(
             icon: Icons.group_outlined,
-            title: l10n?.syncModeGroupTitle ?? 'Join a Group',
-            subtitle: l10n?.syncModeGroupSubtitle ??
-                'Family or friends shared database',
-            privacyLabel: l10n?.syncPrivacyGroup ?? 'Group',
+            title: groupTitle,
+            subtitle: groupSubtitle,
+            privacyLabel: groupPrivacy,
             privacyColor: DarkModeColors.warning(context),
             onTap: () => onSelectMode(SyncMode.joinExisting),
           ),

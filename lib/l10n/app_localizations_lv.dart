@@ -4818,6 +4818,126 @@ class AppLocalizationsLv extends AppLocalizations {
       'Uzmanīgi ar gāzi — skriešana ietaupa vairāk';
 
   @override
+  String semanticsNavigateTo(String name) {
+    return 'Navigēt uz $name';
+  }
+
+  @override
+  String semanticsRemoveFromFavorites(String name) {
+    return 'Noņemt $name no izlases';
+  }
+
+  @override
+  String get showOnMapSemanticLabel => 'Rādīt stacijas kartē';
+
+  @override
+  String get searchResultsSemanticLabel => 'Meklēšanas rezultāti';
+
+  @override
+  String get searchCriteriaSemanticLabel =>
+      'Meklēšanas kritēriju kopsavilkums. Pieskarieties, lai rediģētu.';
+
+  @override
+  String get noFavoritesSemanticLabel =>
+      'Vēl nav izlases. Pieskarieties stacijas zvaigznītei, lai saglabātu to izlasē.';
+
+  @override
+  String stationStatusSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Stacija ir atvērta',
+      'false': 'Stacija ir slēgta',
+      'other': 'Stacija ir slēgta',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String countryChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Valsts $name, atlasīta',
+      'false': 'Valsts $name',
+      'other': 'Valsts $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String languageChipSemantic(String name, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Valoda $name, atlasīts',
+      'false': 'Valoda $name',
+      'other': 'Valoda $name',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sortBySemantic(String option, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Kārtot pēc $option, atlasīts',
+      'false': 'Kārtot pēc $option',
+      'other': 'Kārtot pēc $option',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String fuelTypeSemantic(String type, String selected) {
+    String _temp0 = intl.Intl.selectLogic(selected, {
+      'true': 'Degviela $type, atlasīta',
+      'false': 'Degviela $type',
+      'other': 'Degviela $type',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String evChargingStationSemantic(String name, int power) {
+    return 'Uzlādes stacija $name, $power kW';
+  }
+
+  @override
+  String get shieldIllustrationSemantic =>
+      'Konfidencialitātes vairogs ar degvielas pilienu';
+
+  @override
+  String get globeIllustrationSemantic =>
+      'Globuss ar degvielas uzpildes staciju marķieriem';
+
+  @override
+  String get fuelPumpIllustrationSemantic =>
+      'Degvielas sūknis ar cenu rādītāju';
+
+  @override
+  String countryInfoSemantic(
+    String name,
+    String provider,
+    String keyRequirement,
+    String fuelTypes,
+  ) {
+    return '$name, datu avots: $provider, $keyRequirement, degvielas veidi: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoApiKeyRequired => 'Nepieciešama API atslēga';
+
+  @override
+  String get countryInfoNoKeyNeeded => 'Bez maksas, atslēga nav vajadzīga';
+
+  @override
+  String countryInfoDataSource(String provider) {
+    return 'Dati: $provider';
+  }
+
+  @override
+  String countryInfoFuelTypes(String fuelTypes) {
+    return 'Degvielas veidi: $fuelTypes';
+  }
+
+  @override
+  String get countryInfoDemoSource => 'Demo';
+
+  @override
   String get anonKeyLabel => 'Anon atslēga';
 
   @override
