@@ -61,7 +61,14 @@ void main() {
     // recoverable connect attempt stops flooding the error log. Net +11;
     // decomposition is tracked separately by #2187/#2188.
     'lib/features/consumption/data/obd2/obd2_service.dart': 1468,
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1235,
+    // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
+    // dropped its `errorLogger.log([storage], …)` (and the now-unused
+    // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb
+    // + an 8-line comment documenting WHY the transient is reclassified
+    // (matching the #2379/#2424 precedent in this same map). Net +6: the
+    // explanatory rationale, not behaviour. Decomposition of this god-class
+    // is tracked under #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1241,
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
         496,
     // #2380 — +5: closest-station radar card at the top of the

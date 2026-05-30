@@ -27,7 +27,6 @@ import 'trip_drop_detector.dart';
 import 'trip_live_reading.dart';
 import 'trip_sample_buffer.dart';
 import 'virtual_odometer.dart';
-import '../../../../core/logging/error_logger.dart';
 
 // Re-export the DTO + distance-source constants so existing callers
 // (providers, widget tests) that import this file keep working after
@@ -908,8 +907,15 @@ class TripRecordingController {
     try {
       final raw = await _service.sendCommand(Elm327Protocol.vinCommand);
       return Elm327Protocol.parseVin(raw);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripRecordingController VIN read failed'}));
+    } catch (_) {
+      // #2428 (follow-up to #2379/#2424) — the one-shot VIN (0902) read is
+      // best-effort: a flaky/slow ELM327 times it out, the legacy
+      // concurrent-sendCommand StateError can fire, or the device drops
+      // mid-probe — and old ECUs / clone adapters never answer 0902. All
+      // EXPECTED and recoverable: we return null and the trip records fine
+      // without a VIN, so a transient here must NOT pollute the user error
+      // log (it was mis-tagged `[storage]`). The null return IS the signal.
+      debugPrint('OBD2 VIN read failed — recording trip without a VIN');
       return null;
     }
   }
