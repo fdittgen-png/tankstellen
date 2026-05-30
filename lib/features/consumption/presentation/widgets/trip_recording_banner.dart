@@ -179,6 +179,18 @@ class TripRecordingBanner extends ConsumerWidget {
     if (distance != null) {
       parts.add('${distance.toStringAsFixed(1)} km');
     }
+    // #2393 — when the strip is showing the GPS estimate (no measured
+    // OBD2 value, estimate present) append the approximate-value
+    // disclaimer so screen-reader users hear it. The banner content
+    // sits under ExcludeSemantics, so the visible Tooltip can't surface
+    // here — this label is the a11y channel for it.
+    final live = state.live;
+    if (live != null &&
+        formatInstantConsumption(live) == null &&
+        live.gpsEstimatedLPer100Km != null) {
+      parts.add(l?.tripRecordingEstimatedInfo ??
+          'Estimated value (~) — modelled from GPS speed, not measured.');
+    }
     return parts.join(', ');
   }
 
@@ -240,12 +252,14 @@ class _Content extends StatelessWidget {
     // trip) leaves the slot silent as before.
     final gpsEstimate =
         (live != null && !paused) ? live.gpsEstimatedLPer100Km : null;
-    final instantConsumption = (live != null && !paused)
-        ? (formatInstantConsumption(live) ??
-            (gpsEstimate != null
-                ? '~${gpsEstimate.toStringAsFixed(1)} L/100'
-                : null))
-        : null;
+    final measured =
+        (live != null && !paused) ? formatInstantConsumption(live) : null;
+    // #2393 — true only when the value shown is the GPS estimate (no
+    // measured value, estimate present). Drives the approximate tooltip /
+    // accessibility disclaimer; the OBD2-measured value never carries it.
+    final isEstimate = measured == null && gpsEstimate != null;
+    final instantConsumption = measured ??
+        (isEstimate ? '~${gpsEstimate.toStringAsFixed(1)} L/100' : null);
     final coachingHintValue = (live != null && !paused)
         ? coachingHint(live, situation: state.situation, band: state.band)
         : null;
@@ -267,13 +281,33 @@ class _Content extends StatelessWidget {
           const SizedBox(width: 8),
         ],
         if (instantConsumption != null) ...[
-          Text(
-            instantConsumption,
-            style: TextStyle(
-              color: fg,
-              fontFeatures: const [FontFeature.tabularFigures()],
+          // #2393 — the GPS estimate carries a long-press tooltip
+          // explaining the `~` means a modelled (not measured) value;
+          // the OBD2-measured figure renders bare. The same disclaimer
+          // is folded into the banner's outer accessibility label
+          // (_semanticsLabel) since this content sits under
+          // ExcludeSemantics.
+          if (isEstimate)
+            Tooltip(
+              message: l?.tripRecordingEstimatedInfo ??
+                  'Estimated value (~) — modelled from GPS speed, '
+                      'not measured.',
+              child: Text(
+                instantConsumption,
+                style: TextStyle(
+                  color: fg,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            )
+          else
+            Text(
+              instantConsumption,
+              style: TextStyle(
+                color: fg,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
-          ),
           const SizedBox(width: 8),
         ],
         if (state.liveDeltaFraction != null && !paused) ...[

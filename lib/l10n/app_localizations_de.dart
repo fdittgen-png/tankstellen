@@ -5395,6 +5395,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle einen Nutzungsmodus, um fortzufahren.';
 
   @override
+  String get tripRecordingPipEstConsumptionCaption => 'gesch. L/100 km';
+
+  @override
+  String get tripRecordingEstimatedInfo =>
+      'Geschätzter Wert (~) — auf dieser Fahrt kein Kraftstoffsensor, daher wird der L/100-km-Wert aus GPS-Geschwindigkeit und der Kalibrierung deines Fahrzeugs modelliert. Er ist ein Näherungswert (typischerweise ±10–30 %, genauer mit zunehmender Kalibrierung), keine Messung.';
+
+  @override
   String get tripRecordingPipElapsedCaption => 'vergangen';
 
   @override

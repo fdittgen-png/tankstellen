@@ -80,12 +80,15 @@ class TripRecordingPipView extends StatelessWidget {
   ///
   /// 1. **OBD2 live fuel rate available** → huge L/100 km (or L/h on
   ///    idle). Secondary row: distance + elapsed.
-  /// 2. **GPS-only with a live estimate** (#2390) → huge **`~X.X`** with
-  ///    the same `L/100 km` caption the OBD2 branch uses. The leading
-  ///    `~` (a literal glyph, not translatable) marks it an estimate
-  ///    per ADR 0012. The figure comes from `gpsEstimatedLPer100Km`,
-  ///    non-null only on a moving GPS-only trajet once the estimator has
-  ///    warmed up. Secondary row: distance + elapsed.
+  /// 2. **GPS-only with a live estimate** (#2390) → huge **`~X.X`** under
+  ///    the dedicated localized **`est. L/100 km`** caption (#2393), which
+  ///    reads distinctly from the OBD2 branch's bare `L/100 km`. The
+  ///    leading `~` (a literal glyph, not translatable) marks it an
+  ///    estimate per ADR 0012, and the figure block carries an
+  ///    approximate-explanation tooltip + accessibility label (#2393).
+  ///    The figure comes from `gpsEstimatedLPer100Km`, non-null only on a
+  ///    moving GPS-only trajet once the estimator has warmed up.
+  ///    Secondary row: distance + elapsed.
   /// 3. **GPS-only, no estimate yet, distance ≥ 0.1 km** → huge
   ///    **distance**. The estimator is still warming up (or the matrix
   ///    isn't calibrated); distance is the most useful real-time number.
@@ -114,6 +117,10 @@ class TripRecordingPipView extends StatelessWidget {
     final String bigFigure;
     final String bigCaption;
     final List<String> secondaryRow;
+    // #2393 — true only on the GPS-estimate branch: drives the localized
+    // "est." caption + the approximate-explanation tooltip / semantics
+    // label. OBD2-measured branches stay false (the figure is real).
+    var isEstimate = false;
 
     if (raw != null) {
       // Branch 1 — OBD2 live consumption is the most informative.
@@ -124,10 +131,13 @@ class TripRecordingPipView extends StatelessWidget {
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
     } else if (gpsEstimate != null) {
-      // Branch 2 (#2390) — GPS-only live estimate: huge `~X.X` reusing
-      // the OBD2 path's `L/100 km` unit caption. `~` flags the estimate.
+      // Branch 2 (#2390) — GPS-only live estimate: huge `~X.X`. The
+      // caption is the dedicated localized "est. L/100 km" marker
+      // (#2393) so the value reads distinctly from the OBD2-measured
+      // "L/100 km"; the leading `~` carries the same meaning visually.
       bigFigure = '~${gpsEstimate.toStringAsFixed(1)}';
-      bigCaption = 'L/100 km';
+      bigCaption = l?.tripRecordingPipEstConsumptionCaption ?? 'est. L/100 km';
+      isEstimate = true;
       secondaryRow = [
         if (distance != null) '${distance.toStringAsFixed(1)} km',
         if (elapsed != null) _fmtElapsed(elapsed),
@@ -154,6 +164,49 @@ class TripRecordingPipView extends StatelessWidget {
       secondaryRow = const <String>[];
     }
 
+    // #2393 — on the GPS-estimate branch the figure + caption carry an
+    // approximate-explanation tooltip (long-press) and accessibility
+    // label; OBD2-measured branches render the bare figure (real value,
+    // no estimate disclaimer).
+    final estimateInfo = isEstimate
+        ? (l?.tripRecordingEstimatedInfo ??
+            'Estimated value (~) — modelled from GPS speed, not measured.')
+        : null;
+    Widget figureBlock = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            bigFigure,
+            style: TextStyle(
+              color: foregroundColor,
+              fontWeight: FontWeight.w800,
+              fontSize: 64,
+              height: 1.0,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          bigCaption,
+          style: TextStyle(
+            color: foregroundColor.withValues(alpha: 0.85),
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+    if (estimateInfo != null) {
+      figureBlock = Tooltip(
+        message: estimateInfo,
+        child: Semantics(label: estimateInfo, child: figureBlock),
+      );
+    }
+
     return Material(
       color: backgroundColor,
       child: SafeArea(
@@ -163,28 +216,7 @@ class TripRecordingPipView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  bigFigure,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 64,
-                    height: 1.0,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                bigCaption,
-                style: TextStyle(
-                  color: foregroundColor.withValues(alpha: 0.85),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
+              figureBlock,
               if (secondaryRow.isNotEmpty) ...[
                 const SizedBox(height: 6),
                 Row(

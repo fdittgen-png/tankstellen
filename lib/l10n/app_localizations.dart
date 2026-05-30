@@ -9467,6 +9467,18 @@ abstract class AppLocalizations {
   /// **'Pick a use mode to continue.'**
   String get onboardingPickUseMode;
 
+  /// #2393 — unit caption under the big GPS-estimated consumption figure on the PiP tile (the GPS-only branch added by #2390). Marks the value as an estimate ('est.') so it reads distinctly from the OBD2-measured 'L/100 km' caption — the leading '~' on the figure carries the same meaning visually. Short, fits a narrow PiP window.
+  ///
+  /// In en, this message translates to:
+  /// **'est. L/100 km'**
+  String get tripRecordingPipEstConsumptionCaption;
+
+  /// #2393 — long-press tooltip / accessibility label on the GPS-estimated consumption value shown on the trip-recording PiP tile and banner strip (#2390). Explains that the leading '~' means the figure is a GPS physics estimate, not a measured OBD2 value, and gives the expected accuracy band. Never shown on OBD2-measured trips.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle\'s calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.'**
+  String get tripRecordingEstimatedInfo;
+
   /// PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches.
   ///
   /// In en, this message translates to:

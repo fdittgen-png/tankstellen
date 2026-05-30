@@ -358,14 +358,18 @@ void main() {
         ));
 
     testWidgets(
-        'GPS-only trip with a live estimate → big "~X.X L/100 km", not '
-        'elapsed time', (tester) async {
+        'GPS-only trip with a live estimate → big "~X.X" + "est. L/100 km", '
+        'not elapsed time', (tester) async {
       // No OBD2 fuel rate, estimator has produced 6.4 L/100 km. The
-      // estimate becomes the hero with a leading "~" and the reused
-      // "L/100 km" unit caption — the elapsed time is demoted.
+      // estimate becomes the hero with a leading "~" and the dedicated
+      // localized "est. L/100 km" caption (#2393) — the elapsed time is
+      // demoted.
       await tester.pumpWidget(buildWith(fuelRate: null, gpsEstimate: 6.4));
       expect(find.text('~6.4'), findsOneWidget);
-      expect(find.text('L/100 km'), findsOneWidget);
+      // #2393 — the estimate caption is the dedicated marker, distinct
+      // from the OBD2 branch's bare "L/100 km".
+      expect(find.text('est. L/100 km'), findsOneWidget);
+      expect(find.text('L/100 km'), findsNothing);
       // The elapsed time is NOT the hero figure (it moves to the
       // secondary row instead of leading the tile).
       expect(find.text('7m 7s'), findsOneWidget); // secondary row
@@ -373,8 +377,20 @@ void main() {
       expect(find.text('1.2 km'), findsOneWidget);
     });
 
+    testWidgets('GPS-only estimate → approximate tooltip + a11y label (#2393)',
+        (tester) async {
+      await tester.pumpWidget(buildWith(fuelRate: null, gpsEstimate: 6.4));
+      // The figure block is wrapped in a Tooltip carrying the
+      // approximate-explanation message (long-press affordance).
+      final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
+      expect(tooltip.message, isNotNull);
+      expect(tooltip.message, contains('GPS'));
+      // The same explanation is exposed as a Semantics label for a11y.
+      expect(find.bySemanticsLabel(RegExp('GPS')), findsOneWidget);
+    });
+
     testWidgets('OBD2 trip → real measured consumption, estimate path NOT '
-        'taken (tilde-free)', (tester) async {
+        'taken (tilde-free, no est. caption, no tooltip)', (tester) async {
       // A real OBD2 fuel rate is present; even if an estimate were also
       // present, the measured value wins and stays tilde-free.
       await tester.pumpWidget(buildWith(fuelRate: 4.06, gpsEstimate: 6.4));
@@ -382,6 +398,10 @@ void main() {
       // Measured value: 4.06 L/h at 70 km/h → ~5.8 L/100 km, no "~".
       expect(find.text('5.8'), findsOneWidget);
       expect(find.textContaining('~'), findsNothing);
+      // #2393 — the measured value carries neither the est. caption nor
+      // the approximate tooltip (it is a real reading, not an estimate).
+      expect(find.text('est. L/100 km'), findsNothing);
+      expect(find.byType(Tooltip), findsNothing);
     });
 
     testWidgets(
