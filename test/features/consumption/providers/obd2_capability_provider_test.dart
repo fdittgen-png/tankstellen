@@ -16,17 +16,6 @@ void main() {
       expect(container.read(currentObd2CapabilityProvider), isNull);
     });
 
-    test('returns null while attempting — capability is unknown until '
-        'init reads ATI', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      container.read(obd2ConnectionStatusProvider.notifier).markAttempting(
-            adapterName: 'vLinker FS',
-            adapterMac: 'AA:BB',
-          );
-      expect(container.read(currentObd2CapabilityProvider), isNull);
-    });
-
     test(
         'returns the stamped capability once the producer flips to '
         'connected with a value', () {
@@ -34,11 +23,9 @@ void main() {
       addTearDown(container.dispose);
       final notifier =
           container.read(obd2ConnectionStatusProvider.notifier);
-      notifier.markAttempting(
+      notifier.markConnected(
         adapterName: 'OBDLink MX+',
         adapterMac: 'AA:BB',
-      );
-      notifier.markConnected(
         capability: Obd2AdapterCapability.passiveCanCapable,
       );
       expect(
@@ -59,28 +46,6 @@ void main() {
         adapterMac: 'AA:BB',
         // capability omitted — null on the snapshot.
       );
-      expect(container.read(currentObd2CapabilityProvider), isNull);
-    });
-
-    test('returns null after markUnreachable — failure drops the '
-        'capability so the UI doesn\'t show stale OEM-PID hints '
-        'after the adapter went out of range', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      final notifier =
-          container.read(obd2ConnectionStatusProvider.notifier);
-      notifier.markAttempting(
-        adapterName: 'OBDLink MX+',
-        adapterMac: 'AA:BB',
-      );
-      notifier.markConnected(
-        capability: Obd2AdapterCapability.passiveCanCapable,
-      );
-      expect(
-        container.read(currentObd2CapabilityProvider),
-        Obd2AdapterCapability.passiveCanCapable,
-      );
-      notifier.markUnreachable();
       expect(container.read(currentObd2CapabilityProvider), isNull);
     });
 

@@ -9,32 +9,14 @@ part of 'obd2_connection_state_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// App-wide owner of the OBD2 connection status (#784).
-///
-/// Phase-1 scope: state machine + API for callers (boot probe,
-/// manual disconnect, permission changes) to drive it. The actual
-/// boot-time Bluetooth scan + auto-connect isolate is deferred to
-/// the follow-up PR so this lands without coupling to the native
-/// plugin surface.
 
 @ProviderFor(Obd2ConnectionStatus)
 final obd2ConnectionStatusProvider = Obd2ConnectionStatusProvider._();
 
 /// App-wide owner of the OBD2 connection status (#784).
-///
-/// Phase-1 scope: state machine + API for callers (boot probe,
-/// manual disconnect, permission changes) to drive it. The actual
-/// boot-time Bluetooth scan + auto-connect isolate is deferred to
-/// the follow-up PR so this lands without coupling to the native
-/// plugin surface.
 final class Obd2ConnectionStatusProvider
     extends $NotifierProvider<Obd2ConnectionStatus, Obd2ConnectionSnapshot> {
   /// App-wide owner of the OBD2 connection status (#784).
-  ///
-  /// Phase-1 scope: state machine + API for callers (boot probe,
-  /// manual disconnect, permission changes) to drive it. The actual
-  /// boot-time Bluetooth scan + auto-connect isolate is deferred to
-  /// the follow-up PR so this lands without coupling to the native
-  /// plugin surface.
   Obd2ConnectionStatusProvider._()
     : super(
         from: null,
@@ -63,15 +45,9 @@ final class Obd2ConnectionStatusProvider
 }
 
 String _$obd2ConnectionStatusHash() =>
-    r'ab14da187622ea41fad1dbb4a80bd1bbe85e9082';
+    r'35b5d18c18098aaa886bcddafac954ff48a98ba5';
 
 /// App-wide owner of the OBD2 connection status (#784).
-///
-/// Phase-1 scope: state machine + API for callers (boot probe,
-/// manual disconnect, permission changes) to drive it. The actual
-/// boot-time Bluetooth scan + auto-connect isolate is deferred to
-/// the follow-up PR so this lands without coupling to the native
-/// plugin surface.
 
 abstract class _$Obd2ConnectionStatus
     extends $Notifier<Obd2ConnectionSnapshot> {

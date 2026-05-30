@@ -17,8 +17,7 @@ import '../../providers/obd2_connection_state_provider.dart';
 ///
 /// Colours:
 /// - green  = connected
-/// - amber  = attempting / retrying
-/// - red    = unreachable / permission denied
+/// - red    = permission denied
 /// - hidden = idle (no saved adapter)
 class Obd2StatusDot extends ConsumerWidget {
   const Obd2StatusDot({super.key});
@@ -61,16 +60,6 @@ class Obd2StatusDot extends ConsumerWidget {
         return (
           DarkModeColors.success(context),
           l?.obd2StatusConnected ?? 'OBD2 adapter: connected',
-        );
-      case Obd2ConnectionState.attempting:
-        return (
-          DarkModeColors.warning(context),
-          l?.obd2StatusAttempting ?? 'OBD2 adapter: connecting',
-        );
-      case Obd2ConnectionState.unreachable:
-        return (
-          DarkModeColors.error(context),
-          l?.obd2StatusUnreachable ?? 'OBD2 adapter: unreachable',
         );
       case Obd2ConnectionState.permissionDenied:
         return (
@@ -148,12 +137,6 @@ class Obd2StatusDot extends ConsumerWidget {
       case Obd2ConnectionState.connected:
         return l?.obd2StatusConnectedBody ??
             'Ready to record a trip.';
-      case Obd2ConnectionState.attempting:
-        return l?.obd2StatusAttemptingBody ??
-            'Connecting in the background…';
-      case Obd2ConnectionState.unreachable:
-        return l?.obd2StatusUnreachableBody ??
-            'Adapter out of range or already in use by another app.';
       case Obd2ConnectionState.permissionDenied:
         return l?.obd2StatusPermissionDeniedBody ??
             'Grant Bluetooth permission in system settings to reconnect automatically.';

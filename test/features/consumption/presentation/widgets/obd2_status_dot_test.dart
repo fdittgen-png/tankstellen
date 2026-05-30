@@ -80,8 +80,8 @@ void main() {
       expect(find.byKey(const Key('obd2StatusDotForget')), findsOneWidget);
     });
 
-    testWidgets('attempting state uses the amber semantics label '
-        'so colour-blind users hear the state, not just see it',
+    testWidgets('permissionDenied state renders the dot with an error '
+        'semantics label so TalkBack announces the action needed',
         (tester) async {
       await pumpApp(
         tester,
@@ -89,7 +89,7 @@ void main() {
         overrides: [
           obd2ConnectionStatusProvider.overrideWith(
             () => _FakeObd2Status(const Obd2ConnectionSnapshot(
-              state: Obd2ConnectionState.attempting,
+              state: Obd2ConnectionState.permissionDenied,
               adapterName: 'vLinker FS',
               adapterMac: 'AA:BB',
             )),
@@ -98,7 +98,7 @@ void main() {
       );
       final handle = tester.ensureSemantics();
       expect(
-        find.bySemanticsLabel('OBD2 adapter: connecting'),
+        find.bySemanticsLabel('OBD2 adapter: Bluetooth permission needed'),
         findsOneWidget,
       );
       handle.dispose();

@@ -100,27 +100,12 @@ void main() {
     });
 
     testWidgets('stays hidden when an adapter is paired but the '
-        'connection is attempting', (tester) async {
-      // An adapter IS paired — the transient disconnect is the
-      // Obd2StatusDot's job to surface, so the chip stays quiet.
+        'connection is in permissionDenied — Obd2StatusDot owns '
+        'that signal, the chip stays quiet', (tester) async {
       await _pumpChip(
         tester,
         snapshot: const Obd2ConnectionSnapshot(
-          state: Obd2ConnectionState.attempting,
-          adapterName: 'vLinker FS',
-        ),
-        pairedAdapterMac: 'AA:BB:CC',
-      );
-      expect(find.byKey(const Key('obd2StatusChip')), findsNothing);
-      expect(find.byKey(const Key('obd2PairChip')), findsNothing);
-    });
-
-    testWidgets('stays hidden when an adapter is paired but the '
-        'connection is unreachable', (tester) async {
-      await _pumpChip(
-        tester,
-        snapshot: const Obd2ConnectionSnapshot(
-          state: Obd2ConnectionState.unreachable,
+          state: Obd2ConnectionState.permissionDenied,
           adapterName: 'vLinker FS',
         ),
         pairedAdapterMac: 'AA:BB:CC',
