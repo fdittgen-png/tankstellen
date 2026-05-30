@@ -9711,6 +9711,18 @@ abstract class AppLocalizations {
   /// **'Delete virtual trip'**
   String get reconcileVirtualTrajetDelete;
 
+  /// Tappable banner on the consumption stats card when a reconciliation gap was deferred ('Decide later') and is still unresolved. Tapping re-opens the guided workflow for that gap (#2445). Replaces the old accusatory auto-correction-share hint. The litres figure is pre-formatted by the caller in the active locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Unresolved fuel/trip gap of {gap} L — tap to resolve'**
+  String reconcileResolveGapBanner(String gap);
+
+  /// Accessibility label for the tappable 'Resolve gap' banner on the consumption stats card (#2445).
+  ///
+  /// In en, this message translates to:
+  /// **'Resolve unresolved fuel and trip gap'**
+  String get reconcileResolveGapSemanticLabel;
+
   /// Trailing unit suffix on a fuel-pump price in the unified RefuelOptionCard (#1116 phase 3b). Renders below the numeric price (e.g. "1,799" + "/L" → "1,799 /L").
   ///
   /// In en, this message translates to:

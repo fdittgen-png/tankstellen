@@ -5521,6 +5521,15 @@ class AppLocalizationsSl extends AppLocalizations {
   String get reconcileVirtualTrajetDelete => 'Delete virtual trip';
 
   @override
+  String reconcileResolveGapBanner(String gap) {
+    return 'Unresolved fuel/trip gap of $gap L — tap to resolve';
+  }
+
+  @override
+  String get reconcileResolveGapSemanticLabel =>
+      'Resolve unresolved fuel and trip gap';
+
+  @override
   String get refuelUnitPerLiter => '/L';
 
   @override

@@ -1590,6 +1590,8 @@
   "reconcileVirtualTrajetEditTitle": "⟦Éđîŧ ṽîřŧúáł ŧřîƥ ·······⟧",
   "reconcileVirtualTrajetEditExplainer": "⟦Ŧĥîš ŧřîƥ ŵáš áđđéđ ŧó áççóúñŧ ƒóř ƒúéł ýóú úšéđ ŵĥîłé đřîṽîñǧ ŵîŧĥóúŧ řéçóřđîñǧ. Áđĵúšŧ ŧĥé đîšŧáñçé óř ƒúéł, óř đéłéŧé îŧ. ·············································⟧",
   "reconcileVirtualTrajetDelete": "⟦Đéłéŧé ṽîřŧúáł ŧřîƥ ········⟧",
+  "reconcileResolveGapBanner": "⟦Úñřéšółṽéđ ƒúéł/ŧřîƥ ǧáƥ óƒ {gap} Ł — ŧáƥ ŧó řéšółṽé ················⟧",
+  "reconcileResolveGapSemanticLabel": "⟦Řéšółṽé úñřéšółṽéđ ƒúéł áñđ ŧřîƥ ǧáƥ ··············⟧",
   "refuelUnitPerLiter": "⟦/Ł⟧",
   "refuelUnitPerKwh": "⟦/ķŴĥ ·⟧",
   "refuelUnitPerSession": "⟦/šéššîóñ ···⟧",

@@ -5543,6 +5543,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reconcileVirtualTrajetDelete => 'Virtuelle Fahrt löschen';
 
   @override
+  String reconcileResolveGapBanner(String gap) {
+    return 'Ungeklärte Kraftstoff-/Fahrten-Differenz von $gap L — zum Klären tippen';
+  }
+
+  @override
+  String get reconcileResolveGapSemanticLabel =>
+      'Ungeklärte Kraftstoff- und Fahrten-Differenz klären';
+
+  @override
   String get refuelUnitPerLiter => '/L';
 
   @override

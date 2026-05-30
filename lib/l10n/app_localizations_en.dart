@@ -5484,6 +5484,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reconcileVirtualTrajetDelete => 'Delete virtual trip';
 
   @override
+  String reconcileResolveGapBanner(String gap) {
+    return 'Unresolved fuel/trip gap of $gap L — tap to resolve';
+  }
+
+  @override
+  String get reconcileResolveGapSemanticLabel =>
+      'Resolve unresolved fuel and trip gap';
+
+  @override
   String get refuelUnitPerLiter => '/L';
 
   @override
@@ -11796,6 +11805,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get reconcileVirtualTrajetDelete => '⟦Đéłéŧé ṽîřŧúáł ŧřîƥ ········⟧';
+
+  @override
+  String reconcileResolveGapBanner(String gap) {
+    return '⟦Úñřéšółṽéđ ƒúéł/ŧřîƥ ǧáƥ óƒ $gap Ł — ŧáƥ ŧó řéšółṽé ················⟧';
+  }
+
+  @override
+  String get reconcileResolveGapSemanticLabel =>
+      '⟦Řéšółṽé úñřéšółṽéđ ƒúéł áñđ ŧřîƥ ǧáƥ ··············⟧';
 
   @override
   String get refuelUnitPerLiter => '⟦/Ł⟧';
