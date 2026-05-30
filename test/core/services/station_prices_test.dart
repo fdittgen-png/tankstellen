@@ -19,6 +19,32 @@ void main() {
       expect(p.status, 'open');
     });
 
+    test('carries the full FuelType-aligned set (#2249)', () {
+      // Before #2249 the model only held e5/e10/diesel, silently dropping
+      // LPG/CNG/E98/diesel-premium/E85 on a favorites/alerts refresh for
+      // fuel-rich countries. All eight priced fuels must now survive.
+      const p = StationPrices(
+        e5: 1.81,
+        e10: 1.79,
+        e98: 1.95,
+        diesel: 1.69,
+        dieselPremium: 1.85,
+        e85: 0.99,
+        lpg: 0.95,
+        cng: 1.49,
+        status: 'open',
+      );
+      expect(p.e5, closeTo(1.81, 0.0001));
+      expect(p.e10, closeTo(1.79, 0.0001));
+      expect(p.e98, closeTo(1.95, 0.0001));
+      expect(p.diesel, closeTo(1.69, 0.0001));
+      expect(p.dieselPremium, closeTo(1.85, 0.0001));
+      expect(p.e85, closeTo(0.99, 0.0001));
+      expect(p.lpg, closeTo(0.95, 0.0001));
+      expect(p.cng, closeTo(1.49, 0.0001));
+      expect(p.status, 'open');
+    });
+
     test('isOpen is true only for status == "open"', () {
       expect(
         const StationPrices(status: 'open').isOpen,
@@ -41,13 +67,23 @@ void main() {
       const p = StationPrices(
         e5: 1.859,
         e10: 1.799,
+        e98: 1.999,
         diesel: 1.659,
+        dieselPremium: 1.899,
+        e85: 0.989,
+        lpg: 0.949,
+        cng: 1.499,
         status: 'open',
       );
       expect(p.toJson(), {
         'e5': 1.859,
         'e10': 1.799,
+        'e98': 1.999,
         'diesel': 1.659,
+        'dieselPremium': 1.899,
+        'e85': 0.989,
+        'lpg': 0.949,
+        'cng': 1.499,
         'status': 'open',
       });
     });
@@ -57,7 +93,12 @@ void main() {
       final json = p.toJson();
       expect(json['e5'], 1.8);
       expect(json['e10'], isNull);
+      expect(json['e98'], isNull);
       expect(json['diesel'], isNull);
+      expect(json['dieselPremium'], isNull);
+      expect(json['e85'], isNull);
+      expect(json['lpg'], isNull);
+      expect(json['cng'], isNull);
       expect(json['status'], 'closed');
     });
   });
@@ -75,6 +116,30 @@ void main() {
       expect(p.e10, closeTo(1.799, 0.0001));
       expect(p.diesel, closeTo(1.659, 0.0001));
       expect(p.status, 'open');
+    });
+
+    test('full-set toJson→fromJson round-trip is lossless (#2249)', () {
+      const original = StationPrices(
+        e5: 1.811,
+        e10: 1.791,
+        e98: 1.951,
+        diesel: 1.691,
+        dieselPremium: 1.851,
+        e85: 0.991,
+        lpg: 0.951,
+        cng: 1.491,
+        status: 'open',
+      );
+      final restored = StationPrices.fromJson(original.toJson());
+      expect(restored.e5, closeTo(original.e5!, 0.0001));
+      expect(restored.e10, closeTo(original.e10!, 0.0001));
+      expect(restored.e98, closeTo(original.e98!, 0.0001));
+      expect(restored.diesel, closeTo(original.diesel!, 0.0001));
+      expect(restored.dieselPremium, closeTo(original.dieselPremium!, 0.0001));
+      expect(restored.e85, closeTo(original.e85!, 0.0001));
+      expect(restored.lpg, closeTo(original.lpg!, 0.0001));
+      expect(restored.cng, closeTo(original.cng!, 0.0001));
+      expect(restored.status, 'open');
     });
 
     test('null price values map to null on the model', () {

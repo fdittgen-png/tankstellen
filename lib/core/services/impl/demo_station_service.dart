@@ -139,7 +139,12 @@ class DemoStationService implements StationService {
       prices[id] = StationPrices(
         e5: cached?.e5 ?? 1.459,
         e10: cached?.e10 ?? 1.439,
+        e98: cached?.e98,
         diesel: cached?.diesel ?? 1.359,
+        dieselPremium: cached?.dieselPremium,
+        e85: cached?.e85,
+        lpg: cached?.lpg,
+        cng: cached?.cng,
         status: cached?.isOpen == true ? 'open' : 'closed',
       );
     }

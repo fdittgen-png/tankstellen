@@ -61,6 +61,40 @@ void main() {
         expect(result.data, isA<Map<String, StationPrices>>());
         expect(result.source, ServiceSource.prixCarburantsApi);
       });
+
+      test('surfaces the FULL widened fuel set incl. SP98/E85/GPLc (#2249)',
+          () async {
+        // Pre-#2249 getPrices only mapped sp95/e10/gazole, dropping SP98
+        // (e98), E85 and GPLc (lpg) that France's feed carries — so a
+        // favorites refresh in France lost those fuels.
+        final adapter = _TrackingMockAdapter();
+        adapter.addResponse({
+          'results': [
+            {
+              'id': '1234',
+              'sp95_prix': 1.879,
+              'e10_prix': 1.799,
+              'sp98_prix': 1.929,
+              'gazole_prix': 1.659,
+              'e85_prix': 0.899,
+              'gplc_prix': 0.999,
+            },
+          ],
+        });
+        final dio = Dio(BaseOptions());
+        dio.httpClientAdapter = adapter;
+        final svc = PrixCarburantsStationService(dio: dio);
+
+        final result = await svc.getPrices(['fr-1234']);
+        final p = result.data['fr-1234'];
+        expect(p, isNotNull);
+        expect(p!.e5, closeTo(1.879, 0.001));
+        expect(p.e10, closeTo(1.799, 0.001));
+        expect(p.e98, closeTo(1.929, 0.001));
+        expect(p.diesel, closeTo(1.659, 0.001));
+        expect(p.e85, closeTo(0.899, 0.001));
+        expect(p.lpg, closeTo(0.999, 0.001));
+      });
     });
 
     group('searchStations', () {

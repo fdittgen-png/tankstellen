@@ -273,7 +273,12 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         prices[originalId] = StationPrices(
           e5: _toDouble(r['sp95_prix']),
           e10: _toDouble(r['e10_prix']),
+          // #2249 — France's feed also carries SP98, E85 and GPLc; surface
+          // them so a favorites/alerts refresh keeps the full fuel set.
+          e98: _toDouble(r['sp98_prix']),
           diesel: _toDouble(r['gazole_prix']),
+          e85: _toDouble(r['e85_prix']),
+          lpg: _toDouble(r['gplc_prix']),
           status: 'open',
         );
       }

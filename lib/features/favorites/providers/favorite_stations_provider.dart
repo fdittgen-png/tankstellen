@@ -192,10 +192,17 @@ class FavoriteStations extends _$FavoriteStations {
         final updated = stations.map((s) {
           final fresh = freshPrices[s.id];
           if (fresh == null) return s;
+          // #2249 — merge the full fuel set so a refresh no longer drops
+          // LPG / CNG / E98 / diesel-premium / E85 for fuel-rich countries.
           return s.copyWith(
             e5: fresh.e5 ?? s.e5,
             e10: fresh.e10 ?? s.e10,
+            e98: fresh.e98 ?? s.e98,
             diesel: fresh.diesel ?? s.diesel,
+            dieselPremium: fresh.dieselPremium ?? s.dieselPremium,
+            e85: fresh.e85 ?? s.e85,
+            lpg: fresh.lpg ?? s.lpg,
+            cng: fresh.cng ?? s.cng,
             isOpen: fresh.isOpen,
           );
         }).toList();

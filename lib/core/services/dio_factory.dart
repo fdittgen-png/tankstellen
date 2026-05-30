@@ -4,6 +4,7 @@
 import 'package:dio/dio.dart';
 
 import '../constants/app_constants.dart';
+import 'conditional_get_interceptor.dart';
 import 'rate_limit_interceptor.dart';
 
 /// Centralized Dio instance creation with consistent defaults.
@@ -30,6 +31,7 @@ class DioFactory {
     Duration? rateLimit = defaultRateLimit,
     int rateLimitJitterBaseMs = 0,
     int rateLimitJitterRangeMs = 500,
+    bool conditionalGet = true,
   }) {
     final dio = Dio(BaseOptions(
       baseUrl: baseUrl ?? '',
@@ -44,6 +46,12 @@ class DioFactory {
         jitterBaseMs: rateLimitJitterBaseMs,
         jitterRangeMs: rateLimitJitterRangeMs,
       ));
+    }
+    if (conditionalGet) {
+      // #2249 — added after the rate limiter so the limiter's onRequest gate
+      // runs first; this interceptor's onResponse/onError (304 revalidation
+      // + offline stale-hit) then runs on the way back out.
+      dio.interceptors.add(ConditionalGetInterceptor());
     }
     dio.interceptors.addAll(interceptors);
     return dio;

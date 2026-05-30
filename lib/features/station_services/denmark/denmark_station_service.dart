@@ -97,14 +97,59 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
     }
   }
 
+  /// #2249 — short TTL applied to a *partial* multi-brand fetch so an
+  /// incomplete dataset (one brand feed down) is pinned only briefly and the
+  /// next search retries the missing source instead of holding the gap for
+  /// the full [_hardTtl].
+  static const Duration _partialTtl = Duration(minutes: 10);
+
+  /// Whether the most recent [_fetchAll] saw **every active brand source**
+  /// (OK + Shell) succeed. Q8 is excluded — it returns no coordinates today,
+  /// so its empty result is by-design, not a failure. Read by the
+  /// completeness gate in [_ensureDataLoaded].
+  bool _lastFetchComplete = true;
+
   Future<List<Station>> _fetchAll({CancelToken? cancelToken}) async {
-    // Fetch all 3 sources in parallel
+    // Fetch all sources in parallel. Each active brand reports success/failure
+    // so a single down feed downgrades completeness (→ short TTL) rather than
+    // silently caching a partial national dataset at the full TTL.
     final results = await Future.wait([
-      _fetchOk(cancelToken: cancelToken),
-      _fetchShell(cancelToken: cancelToken),
-      _fetchQ8(),
+      _fetchSource(() => _fetchOk(cancelToken: cancelToken)),
+      _fetchSource(() => _fetchShell(cancelToken: cancelToken)),
     ]);
-    return [...results[0], ...results[1], ...results[2]];
+    // Q8 has no coordinates — always empty, never counted toward completeness.
+    final q8 = await _fetchQ8();
+
+    // Every active source down → surface a network error. The persistent
+    // read-through catches it and serves the last good disk copy; the legacy
+    // in-memory path and searchStations' `on DioException` turn it into an
+    // ApiException instead of pinning an empty dataset.
+    if (results.every((r) => !r.ok)) {
+      throw DioException(
+        requestOptions: RequestOptions(path: 'dk-aggregate'),
+        type: DioExceptionType.connectionError,
+        error: 'DK: all brand feeds failed',
+      );
+    }
+    _lastFetchComplete = results.every((r) => r.ok);
+    return [
+      for (final r in results) ...r.stations,
+      ...q8,
+    ];
+  }
+
+  /// Run one brand fetcher, tagging whether it completed without a network
+  /// error. The brand fetchers themselves swallow [DioException] and return an
+  /// empty list, so we re-detect failure here by catching anything they
+  /// rethrow and, for the swallow path, treating a thrown error as a miss.
+  Future<({List<Station> stations, bool ok})> _fetchSource(
+    Future<List<Station>> Function() fetch,
+  ) async {
+    try {
+      return (stations: await fetch(), ok: true);
+    } on Object {
+      return (stations: const <Station>[], ok: false);
+    }
   }
 
   Future<void> _ensureDataLoaded({CancelToken? cancelToken}) {
@@ -119,13 +164,17 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
       );
     }
     // #2264 — disk read-through: survives cold start + offline.
-    return loadPersistentDataset<List<Station>>(
+    // #2249 — completeness gate: a partial fetch (a brand feed down) is cached
+    // under [_partialTtl] instead of [_hardTtl] so the gap is retried soon.
+    return loadPersistentDatasetGuarded<List<Station>>(
       cached: _cachedStations,
       softTtl: _softTtl,
       hardTtl: _hardTtl,
+      shortTtl: _partialTtl,
       persistent: persistent,
       fetch: () => _fetchAll(cancelToken: cancelToken),
       store: (value) => _cachedStations = value,
+      isComplete: (_) => _lastFetchComplete,
     );
   }
 
@@ -180,7 +229,10 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DK OK fetch failed'}));
-      return [];
+      // #2249 — rethrow so the completeness gate sees a *failed* source (vs a
+      // genuinely empty feed). [_fetchSource] catches it and downgrades the
+      // dataset to a short TTL; the legacy in-memory path is unaffected.
+      rethrow;
     }
   }
 
@@ -232,7 +284,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DK Shell fetch failed'}));
-      return [];
+      // #2249 — rethrow so the completeness gate downgrades to a short TTL.
+      rethrow;
     }
   }
 
