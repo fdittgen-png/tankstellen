@@ -24,6 +24,41 @@ void main() {
       expect(reading.fuelLitersSoFar, isNull);
       expect(reading.odometerStartKm, isNull);
       expect(reading.odometerNowKm, isNull);
+      // #2389 — the GPS-only live estimate defaults null so existing call
+      // sites (notably the OBD2 controller, which never sets it) compile
+      // unchanged and surface no estimate.
+      expect(reading.gpsEstimatedLPer100Km, isNull);
+    });
+
+    test('an OBD2-style reading keeps its real fuel value and leaves the '
+        'GPS estimate null — the estimate never clobbers ground truth '
+        '(#2389)', () {
+      // Mirrors what the OBD2 controller emits: a measured fuel-rate +
+      // litres-so-far, and no GPS estimate (the OBD2 path never sets it).
+      const reading = TripLiveReading(
+        distanceKmSoFar: 20.0,
+        elapsed: Duration(minutes: 15),
+        fuelRateLPerHour: 4.0,
+        fuelLitersSoFar: 1.0,
+      );
+      // The real measured average stays the source of truth.
+      expect(reading.liveAvgLPer100Km, closeTo(5.0, 1e-9));
+      expect(reading.fuelLitersSoFar, 1.0);
+      // The GPS estimate is absent on an OBD2 trip.
+      expect(reading.gpsEstimatedLPer100Km, isNull);
+    });
+
+    test('gpsEstimatedLPer100Km stores the value supplied by the GPS '
+        'pipeline (#2389)', () {
+      const reading = TripLiveReading(
+        distanceKmSoFar: 5.0,
+        elapsed: Duration(minutes: 3),
+        gpsEstimatedLPer100Km: 6.4,
+      );
+      expect(reading.gpsEstimatedLPer100Km, 6.4);
+      // It is independent of the measured fuel path, which stays null.
+      expect(reading.fuelLitersSoFar, isNull);
+      expect(reading.liveAvgLPer100Km, isNull);
     });
 
     test('coolantTempC stores the value supplied by the controller (#1262)',

@@ -49,6 +49,21 @@ class TripLiveReading {
   final double? odometerStartKm;
   final double? odometerNowKm;
 
+  /// Live GPS-only fuel estimate in L/100 km (Epic #2385 / #2389),
+  /// produced by the calibrated physics road-load `GpsLiveFuelEstimator`
+  /// on trajets that have **no** OBD2 fuel-rate signal. Non-null only on
+  /// GPS-only recordings, and only once the vehicle is actually moving
+  /// (the estimator returns null at a standstill and before its accel
+  /// low-pass has warmed up). Already clamped to the estimator's
+  /// plausibility band.
+  ///
+  /// On OBD2 trips this stays null — the real measured fuel-rate /
+  /// [fuelLitersSoFar] is the source of truth and is never overwritten by
+  /// the estimate. The PiP / banner display of this figure (with a
+  /// leading "~" and a confidence signal) is deferred to #2390 / #2391;
+  /// this field is purely the data source those issues will read.
+  final double? gpsEstimatedLPer100Km;
+
   const TripLiveReading({
     this.speedKmh,
     this.rpm,
@@ -63,6 +78,7 @@ class TripLiveReading {
     required this.elapsed,
     this.odometerStartKm,
     this.odometerNowKm,
+    this.gpsEstimatedLPer100Km,
   });
 
   /// Live L/100 km estimate — uses trip-so-far totals, so early
