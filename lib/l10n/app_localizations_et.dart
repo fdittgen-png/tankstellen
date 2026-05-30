@@ -3959,13 +3959,8 @@ class AppLocalizationsEt extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Sulge';
 
   @override
-  String dataSourceAttribution(String source, String license) {
-    return 'Allikas: $source ($license)';
-  }
-
-  @override
-  String dataSourceAttributionSemantic(String source, String license) {
-    return 'Kütusehindade andmed pärinevad allikast $source, litsentsitud litsentsi $license alusel.';
+  String dataSourceLinkSemantic(String source, String license) {
+    return 'Open the $source data source ($license) in your browser';
   }
 
   @override

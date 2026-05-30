@@ -75,6 +75,7 @@ const _bulkPolicy = FuelServicePolicy(
   searchResultTtl: Duration.zero,
   attribution: 'Test bulk',
   license: 'Test',
+  sourceUrl: 'https://example.test/bulk',
 );
 
 const _polledPolicy = FuelServicePolicy(
@@ -85,6 +86,7 @@ const _polledPolicy = FuelServicePolicy(
   searchResultTtl: Duration(minutes: 5),
   attribution: 'Test polled',
   license: 'Test',
+  sourceUrl: 'https://example.test/polled',
 );
 
 SearchParams _params() => const SearchParams(

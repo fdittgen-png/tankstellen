@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Deling tilbagekaldt.",
   "trajetsSharedSectionTitle": "Delt med mig",
   "trajetsSharedBadge": "Delt",
-  "dataSourceAttribution": "Kilde: {source} ({license})",
-  "dataSourceAttributionSemantic": "Brændstofprisdata leveret af {source}, licenseret under {license}.",
   "tripRecordingAutoPinTitle": "Fastgør altid, når optagelsen starter",
   "tripRecordingAutoPinSubtitle": "Fastgør formularen automatisk hver tur i stedet for at trykke hver gang. Bruger mere batteri.",
   "tripRecordingConnectingTitle": "Starter optagelse…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

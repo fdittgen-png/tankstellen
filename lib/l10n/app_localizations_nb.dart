@@ -3961,13 +3961,8 @@ class AppLocalizationsNb extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Lukk';
 
   @override
-  String dataSourceAttribution(String source, String license) {
-    return 'Kilde: $source ($license)';
-  }
-
-  @override
-  String dataSourceAttributionSemantic(String source, String license) {
-    return 'Drivstoffprisdata levert av $source, lisensiert under $license.';
+  String dataSourceLinkSemantic(String source, String license) {
+    return 'Open the $source data source ($license) in your browser';
   }
 
   @override

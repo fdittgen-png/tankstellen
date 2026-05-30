@@ -144,6 +144,7 @@ const _dePolicy = FuelServicePolicy(
   searchResultTtl: Duration(minutes: 5),
   attribution: 'Tankerkönig',
   license: 'CC BY 4.0',
+  sourceUrl: 'https://creativecommons.tankerkoenig.de/',
 );
 
 /// AT e-control — polled API; the Spritpreisrechner refreshes hourly, so a
@@ -156,6 +157,7 @@ const _atPolicy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 2),
   attribution: 'E-Control (Spritpreisrechner)',
   license: 'CC BY 3.0 AT',
+  sourceUrl: 'https://www.spritpreisrechner.at/',
 );
 
 /// MX CRE — polled-then-merged feed that updates several times daily; cache
@@ -168,6 +170,7 @@ const _mxPolicy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 4),
   attribution: 'Comisión Reguladora de Energía (CRE)',
   license: 'Libre Uso MX',
+  sourceUrl: 'https://datos.gob.mx/busca/dataset/ubicacion-de-gasolineras-y-precios-comerciales-de-gasolina-y-diesel',
 );
 
 /// PT DGEG — polled API; the portal publishes daily, so a 12 h search TTL and
@@ -180,6 +183,7 @@ const _ptPolicy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 12),
   attribution: 'DGEG (preçoscombustíveis)',
   license: 'Open data (DGEG)',
+  sourceUrl: 'https://precoscombustiveis.dgeg.gov.pt/',
 );
 
 /// UK CMA Fuel Finder — LEGACY polled fan-out across retailer feeds published
@@ -193,6 +197,7 @@ const _ukPolicyLegacy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 6),
   attribution: 'CMA Fuel Finder (retailer feeds)',
   license: 'Open Government Licence v3.0',
+  sourceUrl: 'https://www.gov.uk/guidance/access-fuel-price-data',
 );
 
 /// UK CMA Fuel Finder — BULK consolidated twice-daily file (#2277): one
@@ -207,6 +212,7 @@ const _ukPolicyBulk = FuelServicePolicy(
   searchResultTtl: Duration.zero,
   attribution: 'CMA Fuel Finder (consolidated)',
   license: 'Open Government Licence v3.0',
+  sourceUrl: 'https://www.gov.uk/guidance/access-fuel-price-data',
 );
 
 /// Staged-rollout selection (#2277): legacy by default, bulk when flagged.
@@ -223,6 +229,7 @@ const _luPolicy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 12),
   attribution: 'gouvernement.lu',
   license: 'CC0 1.0',
+  sourceUrl: 'https://data.public.lu/fr/datasets/prix-des-carburants/',
 );
 
 /// SI goriva.si — polled API; daily-ish updates.
@@ -234,6 +241,7 @@ const _siPolicy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 6),
   attribution: 'goriva.si / Ministrstvo za gospodarstvo',
   license: 'Open data (gov.si)',
+  sourceUrl: 'https://goriva.si/',
 );
 
 /// KR OPINET — polled API; near-real-time prices, 5-minute search TTL.
@@ -245,6 +253,7 @@ const _krPolicy = FuelServicePolicy(
   searchResultTtl: Duration(minutes: 30),
   attribution: 'OPINET (KNOC)',
   license: 'KOGL Type 1',
+  sourceUrl: 'https://www.opinet.co.kr/',
 );
 
 /// CL CNE Bencina en Línea — polled API; daily-ish updates.
@@ -256,6 +265,7 @@ const _clPolicy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 6),
   attribution: 'CNE (Comisión Nacional de Energía)',
   license: 'Datos Abiertos CL',
+  sourceUrl: 'https://www.cne.cl/',
 );
 
 /// GR Paratiritirio Timon — polled API (community FastAPI wrapper); prefecture
@@ -268,6 +278,7 @@ const _grPolicy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 6),
   attribution: 'Παρατηρητήριο Τιμών Υγρών Καυσίμων',
   license: 'Open data (data.gov.gr)',
+  sourceUrl: 'https://paratiritirio.mindev.gov.gr/',
 );
 
 /// RO Monitorul Prețurilor — polled API; 15-minute upstream updates.
@@ -279,6 +290,7 @@ const _roPolicy = FuelServicePolicy(
   searchResultTtl: Duration(minutes: 30),
   attribution: 'Consiliul Concurenței (Monitorul Prețurilor)',
   license: 'Open data (RO)',
+  sourceUrl: 'https://www.monitorulpreturilor.info/',
 );
 
 /// AU FuelCheck — stub (#804); throws on every search. Policy still recorded
@@ -291,6 +303,7 @@ const _auPolicy = FuelServicePolicy(
   searchResultTtl: Duration(minutes: 30),
   attribution: 'NSW Government FuelCheck',
   license: 'CC BY 4.0',
+  sourceUrl: 'https://www.fuelcheck.nsw.gov.au/',
 );
 
 /// ES MITECO — bulk national dataset (~12k stations) downloaded per province
@@ -303,6 +316,7 @@ const _esPolicy = FuelServicePolicy(
   searchResultTtl: Duration.zero,
   attribution: 'Geoportal Gasolineras (MITECO)',
   license: 'Open data (MITECO)',
+  sourceUrl: 'https://geoportalgasolineras.es/',
 );
 
 /// IT MIMIT (osservaprezzi) — bulk CSV dataset published daily at 08:00.
@@ -314,6 +328,7 @@ const _itPolicy = FuelServicePolicy(
   searchResultTtl: Duration.zero,
   attribution: 'MIMIT (osservaprezzi)',
   license: 'IODL 2.0',
+  sourceUrl: 'https://carburanti.mise.gov.it/ospzSearch/',
 );
 
 /// AR Secretaría de Energía — bulk CSV dataset (Resolución 314/2016); a few
@@ -326,6 +341,7 @@ const _arPolicy = FuelServicePolicy(
   searchResultTtl: Duration.zero,
   attribution: 'Secretaría de Energía (datos.energia.gob.ar)',
   license: 'Open data (AR)',
+  sourceUrl: 'https://datos.energia.gob.ar/dataset/precios-en-surtidor',
 );
 
 /// DK — bulk national aggregate across OK / Shell / Q8 feeds, filtered
@@ -338,6 +354,7 @@ const _dkPolicy = FuelServicePolicy(
   searchResultTtl: Duration.zero,
   attribution: 'OK / Shell / Q8 (DK)',
   license: 'Provider terms',
+  sourceUrl: 'https://www.ok.dk/privat/produkter/benzinkort/aktuelle-braendstofpriser',
 );
 
 /// FR Prix Carburants — LEGACY polled/OSM-enriched per-search query against
@@ -351,6 +368,7 @@ const _frPolicyLegacy = FuelServicePolicy(
   searchResultTtl: Duration(hours: 6),
   attribution: 'Prix Carburants (data.economie.gouv.fr)',
   license: 'Licence Ouverte 2.0',
+  sourceUrl: 'https://www.prix-carburants.gouv.fr/',
 );
 
 /// FR Prix Carburants — BULK *flux instantané* ZIP (#2277): one whole-country
@@ -365,6 +383,7 @@ const _frPolicyBulk = FuelServicePolicy(
   searchResultTtl: Duration.zero,
   attribution: 'Prix Carburants (flux instantané)',
   license: 'Licence Ouverte 2.0',
+  sourceUrl: 'https://www.prix-carburants.gouv.fr/',
 );
 
 /// Staged-rollout selection (#2277): legacy by default, bulk when flagged.

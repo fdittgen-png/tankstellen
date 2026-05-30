@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Deljenje preklicano.",
   "trajetsSharedSectionTitle": "Deljeno z mano",
   "trajetsSharedBadge": "Deljeno",
-  "dataSourceAttribution": "Vir: {source} ({license})",
-  "dataSourceAttributionSemantic": "Podatke o cenah goriva zagotavlja {source}, licencirano pod {license}.",
   "tripRecordingAutoPinTitle": "Ob začetku snemanja vedno pripni",
   "tripRecordingAutoPinSubtitle": "Obrazec samodejno pripni ob vsaki vožnji namesto dotika vsakič. Porabi več baterije.",
   "tripRecordingConnectingTitle": "Začenjanje snemanja…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

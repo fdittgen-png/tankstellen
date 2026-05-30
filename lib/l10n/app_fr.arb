@@ -2086,8 +2086,6 @@
   "tripShareRevoked": "Partage révoqué.",
   "trajetsSharedSectionTitle": "Partagé avec moi",
   "trajetsSharedBadge": "Partagé",
-  "dataSourceAttribution": "Source : {source} ({license})",
-  "dataSourceAttributionSemantic": "Données de prix des carburants fournies par {source}, sous licence {license}.",
   "tripRecordingAutoPinTitle": "Toujours épingler au démarrage de l'enregistrement",
   "tripRecordingAutoPinSubtitle": "Épingler le formulaire automatiquement à chaque trajet au lieu d'appuyer à chaque fois. Consomme plus de batterie.",
   "tripRecordingConnectingTitle": "Démarrage de l'enregistrement…",
@@ -2310,5 +2308,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

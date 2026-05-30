@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Jakaminen peruutettu.",
   "trajetsSharedSectionTitle": "Jaettu kanssani",
   "trajetsSharedBadge": "Jaettu",
-  "dataSourceAttribution": "Lähde: {source} ({license})",
-  "dataSourceAttributionSemantic": "Polttoaineiden hintatiedot tarjoaa {source}, lisensoitu lisenssillä {license}.",
   "tripRecordingAutoPinTitle": "Kiinnitä aina tallennuksen alkaessa",
   "tripRecordingAutoPinSubtitle": "Kiinnitä lomake automaattisesti joka ajolla sen sijaan, että napautat joka kerta. Kuluttaa enemmän akkua.",
   "tripRecordingConnectingTitle": "Aloitetaan tallennusta…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

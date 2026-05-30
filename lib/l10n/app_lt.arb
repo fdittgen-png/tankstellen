@@ -1958,8 +1958,6 @@
   "tripShareRevoked": "Bendrinimas atšauktas.",
   "trajetsSharedSectionTitle": "Bendrinama su manimi",
   "trajetsSharedBadge": "Bendrinama",
-  "dataSourceAttribution": "Šaltinis: {source} ({license})",
-  "dataSourceAttributionSemantic": "Degalų kainų duomenis teikia {source}, licencijuota pagal {license}.",
   "tripRecordingAutoPinTitle": "Visada prisegti pradedant įrašymą",
   "tripRecordingAutoPinSubtitle": "Automatiškai prisegti formą kiekvienos kelionės metu, užuot lietus kiekvieną kartą. Naudoja daugiau baterijos.",
   "tripRecordingConnectingTitle": "Pradedamas įrašymas…",
@@ -2182,5 +2180,20 @@
   "@fillUpGuidancePartNight": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "@dataSourceLinkSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Tankerkönig"
+      },
+      "license": {
+        "type": "String",
+        "example": "CC BY 4.0"
+      }
+    }
   }
 }

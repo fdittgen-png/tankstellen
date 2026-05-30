@@ -7194,17 +7194,11 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get crossBorderDismissTooltip;
 
-  /// Small non-intrusive line under the search results crediting the upstream fuel-price provider for the active country, satisfying the open-data licences that mandate visible attribution (CC BY / Licence Ouverte / OGL / IODL). 'Source:' is the localised label; {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy (#2270).
+  /// Accessibility label and tooltip for the tappable country-service header on the search screen, which opens the active country's upstream fuel-price data source in the browser (#2373). Relocates the open-data attribution from the old bottom footer into the link, so the provider name and licence stay available to screen-reader and long-press users (CC BY / Licence Ouverte / OGL / IODL all mandate visible attribution). {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy.
   ///
   /// In en, this message translates to:
-  /// **'Source: {source} ({license})'**
-  String dataSourceAttribution(String source, String license);
-
-  /// Screen-reader label for the data-source attribution line under the search results — spells out the abbreviated 'Source: … (…)' visual into a full sentence (#2270). {source} and {license} are data (provider + licence names) from the country's FuelServicePolicy.
-  ///
-  /// In en, this message translates to:
-  /// **'Fuel price data provided by {source}, licensed under {license}.'**
-  String dataSourceAttributionSemantic(String source, String license);
+  /// **'Open the {source} data source ({license}) in your browser'**
+  String dataSourceLinkSemantic(String source, String license);
 
   /// Title of the Settings section / screen hosting dev-only diagnostics, shown only when Developer / Debug mode is on (#2248).
   ///

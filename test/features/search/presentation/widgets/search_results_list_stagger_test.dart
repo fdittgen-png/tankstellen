@@ -8,6 +8,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/services/country_service_registry.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/staggered_fade_in.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
@@ -93,6 +94,41 @@ void main() {
         findsOneWidget,
       );
       expect(find.byType(StaggeredFadeIn), findsNWidgets(3));
+    });
+
+    // #2373 — the bottom data-source attribution footer was removed; the
+    // attribution is now relocated to the tappable country-service header
+    // at the top of the screen. The results list must no longer render the
+    // "Source: … (…)" credit line below the list.
+    testWidgets('no bottom data-source attribution footer in the list',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+      when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
+
+      await pumpApp(
+        tester,
+        SearchResultsList(
+          result: ServiceResult<List<SearchResultItem>>(
+            data: const [FuelStationResult(_s1)],
+            source: ServiceSource.cache,
+            fetchedAt: DateTime(2026, 4, 14),
+          ),
+          onRefresh: () {},
+        ),
+        overrides: test.overrides,
+      );
+
+      // The removed footer rendered the localised "Source: …" label and the
+      // provider attribution string for the active country — neither must
+      // appear anywhere in the results list any more.
+      expect(find.textContaining('Source:'), findsNothing);
+      expect(find.textContaining('Quelle:'), findsNothing);
+      final attribution =
+          CountryServiceRegistry.policyFor('DE')!.attribution;
+      expect(find.textContaining(attribution), findsNothing);
     });
   });
 }

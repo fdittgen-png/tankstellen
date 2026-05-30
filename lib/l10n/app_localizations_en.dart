@@ -3944,13 +3944,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Dismiss';
 
   @override
-  String dataSourceAttribution(String source, String license) {
-    return 'Source: $source ($license)';
-  }
-
-  @override
-  String dataSourceAttributionSemantic(String source, String license) {
-    return 'Fuel price data provided by $source, licensed under $license.';
+  String dataSourceLinkSemantic(String source, String license) {
+    return 'Open the $source data source ($license) in your browser';
   }
 
   @override
@@ -10087,13 +10082,8 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get crossBorderDismissTooltip => '⟦Đîšɱîšš ···⟧';
 
   @override
-  String dataSourceAttribution(String source, String license) {
-    return '⟦Šóúřçé: $source ($license) ···⟧';
-  }
-
-  @override
-  String dataSourceAttributionSemantic(String source, String license) {
-    return '⟦Ƒúéł ƥřîçé đáŧá ƥřóṽîđéđ ƀý $source, łîçéñšéđ úñđéř $license. ················⟧';
+  String dataSourceLinkSemantic(String source, String license) {
+    return '⟦Óƥéñ ŧĥé $source đáŧá šóúřçé ($license) îñ ýóúř ƀřóŵšéř ··············⟧';
   }
 
   @override

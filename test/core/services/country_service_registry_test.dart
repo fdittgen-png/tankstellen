@@ -78,6 +78,21 @@ void main() {
         }
       });
 
+      // #2373 — the country-service header links the upstream source via
+      // policy.sourceUrl, so every policy must carry a canonical https URL.
+      test('every policy has a canonical https sourceUrl', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          final url = entry.policy.sourceUrl;
+          expect(url, isNotEmpty, reason: '${entry.countryCode} sourceUrl');
+          final uri = Uri.tryParse(url);
+          expect(uri, isNotNull, reason: '${entry.countryCode} parseable');
+          expect(uri!.scheme, 'https',
+              reason: '${entry.countryCode} sourceUrl must be https');
+          expect(uri.host, isNotEmpty,
+              reason: '${entry.countryCode} sourceUrl host');
+        }
+      });
+
       test('every policy has a positive min-interval', () {
         for (final entry in CountryServiceRegistry.entries) {
           expect(entry.policy.minInterval, greaterThan(Duration.zero),
