@@ -3,6 +3,26 @@
 
 name: CI
 
+# Docs-only "stub" workflow. `ci.yml` carries `paths-ignore` for
+# `**/*.md`, `docs/**`, `LICENSE`, `.gitignore`, so on a docs-only PR
+# the real CI workflow never runs — which means none of its required
+# status-check contexts are ever reported, and branch protection would
+# pin the PR at `mergeStateStatus: BLOCKED` forever. This workflow is
+# the mirror image: it triggers ONLY on those same paths and re-emits
+# every required-check context as a trivial pass, so docs-only PRs
+# satisfy branch protection and keep auto-merge autonomy.
+#
+# CONTRACT (keep in lock-step with branch protection's
+# required_status_checks): every required context MUST have a job here
+# whose name matches the context string EXACTLY. Matrix jobs surface as
+# `name (value)` (e.g. `test (0)`), so the `test` matrix below covers
+# `test (0)..test (3)`. Required contexts as of #2336:
+#   analyze, test (0..3), codegen-drift, l10n-gate,
+#   build-android, integration, startup-budget.
+# `coverage-merge` is retained as a stub during the transition window
+# until it is removed from required_status_checks (it is harmless: an
+# extra passing context never blocks a merge).
+
 on:
   push:
     branches: [master]
@@ -41,3 +61,39 @@ jobs:
     needs: [test]
     steps:
       - run: echo "docs-only change — coverage-merge skipped (stub passes for branch protection)"
+
+  # #2333 — `codegen-drift` became a required check this session. Its
+  # context must resolve on docs-only PRs or every CHANGELOG / wiki /
+  # README PR sits BLOCKED forever. Pass-through stub.
+  codegen-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — codegen-drift skipped (stub passes for branch protection)"
+
+  # #2336 — `l10n-gate` is required. Docs PRs never touch `lib/l10n/`,
+  # so the real gate is a no-op for them; stub it so the context resolves.
+  l10n-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — l10n-gate skipped (stub passes for branch protection)"
+
+  # build-android / integration / startup-budget are becoming required
+  # this session. On a docs-only PR the real ci.yml is path-ignored and
+  # never runs, so — unlike a code-light PR where ci.yml's `changes`
+  # filter / job `if:` produces a `skipped` (passing) conclusion — these
+  # contexts would otherwise never be reported. Stub them here so the
+  # ONLY passing path on a docs-only PR is this workflow.
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — build-android skipped (stub passes for branch protection)"
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — integration skipped (stub passes for branch protection)"
+
+  startup-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — startup-budget skipped (stub passes for branch protection)"

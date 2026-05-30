@@ -5,6 +5,34 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+/// Returns the body of the named top-level job in [workflowYaml] — the
+/// lines from the `<jobName>:` header (indented exactly two spaces) up to
+/// but not including the next two-space-indented `<name>:` job header.
+///
+/// A deliberately simple line scanner rather than a YAML parser: it keeps
+/// the test dependency-free and the GitHub-Actions job grammar is regular
+/// enough (every top-level job is a key indented exactly two spaces) for a
+/// scan to be unambiguous.
+String _jobBody(String workflowYaml, String jobName) {
+  final lines = workflowYaml.split('\n');
+  final header = RegExp('^  $jobName:\\s*\$');
+  final anyJobHeader = RegExp(r'^  [A-Za-z0-9_-]+:\s*$');
+  final buffer = StringBuffer();
+  var inJob = false;
+  for (final line in lines) {
+    if (inJob) {
+      // A new two-space-indented `name:` line ends the current job.
+      if (anyJobHeader.hasMatch(line)) break;
+      buffer.writeln(line);
+      continue;
+    }
+    if (header.hasMatch(line)) {
+      inJob = true;
+    }
+  }
+  return buffer.toString();
+}
+
 /// Tests that verify the CI workflow file contains expected jobs and steps.
 void main() {
   late String ciYaml;
@@ -172,6 +200,150 @@ void main() {
 
     test('reports major version lag as informational', () {
       expect(outdatedScript, contains('Major version updates available'));
+    });
+  });
+
+  // #2334 — the codegen-drift job must NOT cache `.dart_tool`. Caching
+  // it keyed on pubspec.lock alone lets two PRs with the same lockfile
+  // share build_runner's incremental asset graph, so a stale `.g.dart`
+  // re-emits and the diff check passes against identically-stale
+  // committed files (the #2322 / #2245 poisoning vector).
+  group('codegen-drift stale-hash hardening (#2334)', () {
+    late String codegenJob;
+
+    setUpAll(() {
+      codegenJob = _jobBody(ciYaml, 'codegen-drift');
+      expect(codegenJob, isNotEmpty,
+          reason: 'codegen-drift job must exist in ci.yml');
+    });
+
+    test('codegen-drift job does NOT cache .dart_tool', () {
+      // Ignore comment lines — the rationale comment mentions `.dart_tool`
+      // in prose; what matters is no executable `path:` entry restores it.
+      final executable = codegenJob
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('#'))
+          .join('\n');
+      expect(executable.contains('.dart_tool'), isFalse,
+          reason: 'codegen-drift must start from a fresh .dart_tool so '
+              'build_runner regenerates honestly — see #2334.');
+    });
+
+    test('codegen-drift still caches ~/.pub-cache and regenerates', () {
+      expect(codegenJob, contains('~/.pub-cache'));
+      expect(codegenJob,
+          contains('dart run build_runner build --delete-conflicting-outputs'));
+    });
+  });
+
+  // #2336 — fast l10n gate exists in ci.yml and is stubbed for docs PRs.
+  group('l10n-gate job (#2336)', () {
+    late String l10nJob;
+
+    setUpAll(() {
+      l10nJob = _jobBody(ciYaml, 'l10n-gate');
+      expect(l10nJob, isNotEmpty, reason: 'l10n-gate job must exist in ci.yml');
+    });
+
+    test('runs the ARB rebuild trio', () {
+      expect(l10nJob, contains('dart tool/build_arb.dart'));
+      expect(l10nJob, contains('dart tool/gen_pseudo_arb.dart'));
+      expect(l10nJob, contains('flutter gen-l10n'));
+    });
+
+    test('diffs lib/l10n and runs the l10n + lint buckets', () {
+      expect(l10nJob, contains('git diff --exit-code -- lib/l10n/'));
+      expect(l10nJob,
+          contains('flutter test test/l10n/ test/lint/ --exclude-tags=network'));
+    });
+
+    test('does NOT run Android or build_runner (kept fast)', () {
+      expect(l10nJob.contains('build_runner'), isFalse);
+      expect(l10nJob.contains('setup-java'), isFalse);
+      expect(l10nJob.contains('flutter build'), isFalse);
+    });
+
+    test('has a matching pass-through stub in ci-docs-stub.yml', () {
+      final stub = File('.github/workflows/ci-docs-stub.yml').readAsStringSync();
+      expect(_jobBody(stub, 'l10n-gate'), isNotEmpty,
+          reason: 'docs-only PRs need an l10n-gate stub — ci.yml is '
+              'path-ignored on them.');
+    });
+  });
+
+  // #2333 / docs-PR safety — ci.yml is path-ignored on docs-only PRs, so
+  // the ONLY workflow that runs is ci-docs-stub.yml. Every context that
+  // is (or will be) a required status check must therefore have a stub
+  // job there whose name matches the context EXACTLY, or the docs PR
+  // sits BLOCKED forever.
+  group('ci-docs-stub covers every required check (#2333)', () {
+    late String stubYaml;
+
+    // The target required_status_checks set after the post-merge API
+    // change: build-android / integration / startup-budget / l10n-gate
+    // become required, the phantom coverage-merge is dropped. Matrix
+    // jobs (`test (0)..test (3)`) are covered by the `test` job header.
+    const requiredJobNames = <String>[
+      'analyze',
+      'test',
+      'codegen-drift',
+      'l10n-gate',
+      'build-android',
+      'integration',
+      'startup-budget',
+    ];
+
+    setUpAll(() {
+      final file = File('.github/workflows/ci-docs-stub.yml');
+      expect(file.existsSync(), isTrue,
+          reason: 'docs-stub workflow must exist');
+      stubYaml = file.readAsStringSync();
+    });
+
+    test('declares a stub job for every required check name', () {
+      for (final job in requiredJobNames) {
+        expect(_jobBody(stubYaml, job), isNotEmpty,
+            reason: 'ci-docs-stub.yml must declare a `$job:` stub job so '
+                'the `$job` required context resolves on docs-only PRs.');
+      }
+    });
+
+    test('the test stub keeps the 4-shard matrix so test (0..3) resolve',
+        () {
+      final testJob = _jobBody(stubYaml, 'test');
+      expect(testJob, contains('shard: [0, 1, 2, 3]'));
+    });
+
+    test('triggers only on docs paths (mirrors ci.yml paths-ignore)', () {
+      expect(stubYaml, contains("- '**/*.md'"));
+      expect(stubYaml, contains("- 'docs/**'"));
+    });
+  });
+
+  // #2347 — both nightlies must pin the same Flutter version as ci.yml,
+  // so a floating stable-channel bump can't silently change the nightly
+  // SDK and spam the tracking issues with spurious red.
+  group('nightly Flutter version pin (#2347)', () {
+    // Single source of truth: whatever ci.yml pins, the nightlies match.
+    late String pinnedVersion;
+
+    setUpAll(() {
+      final match =
+          RegExp(r'''flutter-version:\s*["']([\d.]+)["']''').firstMatch(ciYaml);
+      expect(match, isNotNull,
+          reason: 'ci.yml must pin a flutter-version');
+      pinnedVersion = match!.group(1)!;
+    });
+
+    test('nightly-full pins the same flutter-version as ci.yml', () {
+      final yaml = File('.github/workflows/nightly-full.yml').readAsStringSync();
+      expect(yaml, contains('flutter-version: "$pinnedVersion"'));
+    });
+
+    test('nightly-flaky pins the same flutter-version as ci.yml', () {
+      final yaml =
+          File('.github/workflows/nightly-flaky.yml').readAsStringSync();
+      expect(yaml, contains('flutter-version: "$pinnedVersion"'));
     });
   });
 }

@@ -33,6 +33,14 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # #2347 — pin Flutter in lock-step with ci.yml. A floating
+          # `channel: stable` picked up an SDK whose Gradle plugin
+          # hard-failed on the tflite_flutter JVM-target mismatch
+          # (#1936); an unpinned nightly repeats that risk every night
+          # stable bumps, producing spurious red that masks real
+          # regressions and spams #1591. Keep this value identical to
+          # the ci.yml pin; bump both together, never by drift.
+          flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
         with:
