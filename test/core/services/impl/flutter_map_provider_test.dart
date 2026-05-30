@@ -25,14 +25,18 @@ void main() {
       expect(provider.name, 'OpenStreetMap');
     });
 
-    test('tileConfig wires AppConstants OSM URL/userAgent/attribution', () {
+    test('tileConfig wires the effective (proxy) tile URL + UA + attribution',
+        () {
       final config = provider.tileConfig;
 
       expect(config, isA<TileLayerConfig>());
-      expect(config.urlTemplate, AppConstants.osmTileUrl);
+      // #2396 — defaults through the Supabase OSM caching proxy
+      // (`effectiveTileUrl`: proxy when set, OSM-direct fallback otherwise).
+      expect(config.urlTemplate, AppConstants.effectiveTileUrl);
+      expect(config.urlTemplate, AppConstants.tileProxyUrl);
       expect(
         config.urlTemplate,
-        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://klelxnkzrxlpzuddhpfg.supabase.co/functions/v1/tiles/{z}/{x}/{y}.png',
       );
       expect(config.userAgent, AppConstants.osmUserAgent);
       expect(config.userAgent, isNotNull);
@@ -216,7 +220,8 @@ void main() {
       expect(tileFinder, findsOneWidget);
 
       final tile = tester.widget<TileLayer>(tileFinder);
-      expect(tile.urlTemplate, AppConstants.osmTileUrl);
+      // #2396 — the provider now defaults through the proxy template.
+      expect(tile.urlTemplate, AppConstants.effectiveTileUrl);
       // flutter_map 8.x folds `userAgentPackageName` into the
       // tileProvider's User-Agent header at construction time.
       expect(

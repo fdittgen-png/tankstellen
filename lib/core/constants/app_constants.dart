@@ -81,15 +81,27 @@ class AppConstants {
   /// useful for upstream debugging. Not user-facing (an HTTP header).
   static const String osmUserAgent = appPackage;
 
-  /// Tile-proxy URL template (LAYER 2 / #2397). A Supabase `tiles` edge
-  /// function will fetch from OSM with a stable server-side UA and serve
-  /// tiles back with a 7-day `Cache-Control`, taking direct tile load off
-  /// OSM. NOT wired up yet: [SparkiloTileLayer] still defaults to
-  /// [osmTileUrl] (OSM-direct) until the proxy is deployed. When #2397
-  /// ships, #2396 flips SparkiloTileLayer's default to this constant and
-  /// pins the real deployed project subdomain. Not user-facing (a URL).
+  /// Tile-proxy URL template (LAYER 2 / #2397). The Supabase `tiles` edge
+  /// function (`supabase/functions/tiles`) fetches from OSM with the stable
+  /// server-side [tileProxyOsmUserAgent] and serves tiles back with a 7-day
+  /// `Cache-Control`, taking direct tile load off OSM. The subdomain is the
+  /// real project ref `klelxnkzrxlpzuddhpfg`; the `.png` suffix + `{z}/{x}/
+  /// {y}` shape match both [osmTileUrl] and the function's route.
+  ///
+  /// Wired up by #2396: [SparkiloTileLayer] / [effectiveTileUrl] default to
+  /// this. The function MUST be deployed before the app flip ships, or every
+  /// tile 404s — see `supabase/functions/tiles/README.md`. Set to empty to
+  /// fall back to OSM-direct (see [effectiveTileUrl]). Not user-facing (URL).
   static const String tileProxyUrl =
-      'https://tankstellen.supabase.co/functions/v1/tiles/{z}/{x}/{y}';
+      'https://klelxnkzrxlpzuddhpfg.supabase.co/functions/v1/tiles/{z}/{x}/{y}.png';
+
+  /// The tile-URL template the app should actually use: the [tileProxyUrl]
+  /// proxy when it is configured, else OSM-direct ([osmTileUrl]) as a clean
+  /// fallback so a build with the proxy cleared still renders a map instead
+  /// of grey (#2396). This is the single source the map surfaces resolve
+  /// through.
+  static String get effectiveTileUrl =>
+      tileProxyUrl.isEmpty ? osmTileUrl : tileProxyUrl;
 
   /// Stable OSM-facing User-Agent the [tileProxyUrl] edge function imports
   /// to identify itself to OSM (LAYER 2 / #2397). Carries a contact URL
