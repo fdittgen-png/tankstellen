@@ -58,6 +58,7 @@ class ClassicElmChannel implements ElmByteChannel {
     final bool ok;
     try {
       ok = await _plugin.connect(address: address, uuid: sppUuid);
+      // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
     } catch (e) {
       // A thrown platform error during the RFCOMM open (bonding,
       // permissions). Bin coarsely, then rethrow unchanged.

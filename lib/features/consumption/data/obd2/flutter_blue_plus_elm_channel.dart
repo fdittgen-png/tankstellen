@@ -141,6 +141,7 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
     if (diag.enabled) diag.noteConnectionEvent(attempt: true);
     try {
       await _connectAndDiscover();
+      // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
     } catch (e) {
       if (diag.enabled) {
         diag.noteConnectionEvent(
