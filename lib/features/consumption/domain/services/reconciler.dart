@@ -176,6 +176,13 @@ class Reconciler {
     final windowTrips = tripsForVehicle.where((t) {
       final when = t.startedAt;
       if (when == null) return false;
+      // #2444 — exclude synthetic reconciliation trajets from the
+      // window's recorded `consumed`. A virtual trip is the explicit
+      // stand-in for a PRIOR gap; re-running reconciliation on a later
+      // closing plein must NOT count it again (mirrors how correction
+      // fill-ups are excluded from `pumped` above), or the gap would
+      // be double-counted across windows.
+      if (t.isVirtual) return false;
       return inWindow(when);
     }).toList();
 

@@ -102,6 +102,28 @@ class TripSummary {
   /// counters.
   final List<HarshEvent> harshEvents;
 
+  /// Whether this is a SYNTHETIC reconciliation trajet injected by the
+  /// guided reconciliation workflow's Path B (#2444 / Epic #2439) — a
+  /// stand-in for unrecorded driving the user confirmed happened. It
+  /// carries [fuelLitersConsumed] = the reconciliation gap and a
+  /// user-supplied [distanceKm], and is rendered distinctly in the
+  /// Trajets list (like the orange correction fill-up).
+  ///
+  /// Treated specially everywhere that would otherwise double-count or
+  /// corrupt calibration:
+  /// - counts on the TRAJETS side of [reconciliationBasis] (it's an
+  ///   explicit stand-in for unrecorded burn), so the window reconciles;
+  /// - EXCLUDED from the η_v learner (it carries no real OBD2 samples,
+  ///   so rescaling η_v against it would be meaningless);
+  /// - EXCLUDED from the NEXT window's recorded `consumed` so a re-run
+  ///   doesn't double-count the gap (mirrors how correction fill-ups
+  ///   are excluded from `pumped`).
+  ///
+  /// Defaults `false` so every real trip — and every legacy trip
+  /// recorded before this field landed — deserialises as a normal,
+  /// fully-counted trajet.
+  final bool isVirtual;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -120,6 +142,7 @@ class TripSummary {
     this.volumetricEfficiencyUsed,
     this.kind = TripKind.gpsPlusObd2,
     this.harshEvents = const [],
+    this.isVirtual = false,
   });
 
   /// Returns a copy with the given fields replaced (#1858). Used by the
@@ -145,6 +168,7 @@ class TripSummary {
     double? volumetricEfficiencyUsed,
     TripKind? kind,
     List<HarshEvent>? harshEvents,
+    bool? isVirtual,
   }) =>
       TripSummary(
         distanceKm: distanceKm ?? this.distanceKm,
@@ -166,6 +190,7 @@ class TripSummary {
             volumetricEfficiencyUsed ?? this.volumetricEfficiencyUsed,
         kind: kind ?? this.kind,
         harshEvents: harshEvents ?? this.harshEvents,
+        isVirtual: isVirtual ?? this.isVirtual,
       );
 }
 

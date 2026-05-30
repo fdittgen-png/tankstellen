@@ -1089,4 +1089,67 @@ void main() {
               'not-recalculable rather than throwing');
     });
   });
+
+  group('TripSummary.isVirtual persistence (#2444)', () {
+    test('virtual trip round-trips and stores a compact "virt" flag',
+        () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 1, 12);
+      final virtual = TripSummary(
+        distanceKm: 100,
+        maxRpm: 0,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        fuelLitersConsumed: 7,
+        startedAt: start,
+        endedAt: start,
+        isVirtual: true,
+      );
+      await repo.save(TripHistoryEntry(
+        id: 'virtual_correction_x',
+        vehicleId: 'veh-1',
+        summary: virtual,
+      ));
+
+      final raw = box.get('virtual_correction_x')!;
+      final summaryJson = ((jsonDecode(raw) as Map)['summary'] as Map)
+          .cast<String, dynamic>();
+      expect(summaryJson['virt'], isTrue);
+
+      final loaded = repo.loadById('virtual_correction_x');
+      expect(loaded!.summary.isVirtual, isTrue);
+    });
+
+    test('real trip omits the "virt" key and reads isVirtual false',
+        () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 2, 12);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: 'veh-1',
+        summary: TripSummary(
+          distanceKm: 30,
+          maxRpm: 2800,
+          highRpmSeconds: 0,
+          idleSeconds: 0,
+          harshBrakes: 0,
+          harshAccelerations: 0,
+          startedAt: start,
+          endedAt: start.add(const Duration(minutes: 30)),
+          // isVirtual defaults false
+        ),
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final summaryJson = ((jsonDecode(raw) as Map)['summary'] as Map)
+          .cast<String, dynamic>();
+      expect(summaryJson.containsKey('virt'), isFalse,
+          reason: 'parsimony — real trips add zero bytes for this flag');
+
+      final loaded = repo.loadById(start.toIso8601String());
+      expect(loaded!.summary.isVirtual, isFalse);
+    });
+  });
 }
