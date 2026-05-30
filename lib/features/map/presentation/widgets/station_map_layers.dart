@@ -169,7 +169,11 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// Recompute the memoised price range + marker list from the current
   /// widget inputs.
   void _recomputeMarkers() {
-    _priceRange = priceRange(widget.stations, widget.selectedFuel);
+    // #2400 — colour by the RESOLVED display price (selected fuel, else
+    // fallback) so a fallback-priced marker is coloured by the value it
+    // actually shows rather than appearing grey because the selected
+    // fuel was null.
+    _priceRange = resolvedPriceRange(widget.stations, widget.selectedFuel);
     final ids = widget.selectedStationIds;
     final hasSelection = ids != null && ids.isNotEmpty;
     _markers = widget.stations.map((station) {

@@ -13,6 +13,47 @@ import 'station_extensions.dart';
 double? priceForFuelType(Station station, FuelType fuelType) =>
     station.priceFor(fuelType);
 
+/// Fallback fuel order for [bestDisplayPrice] when the selected fuel has
+/// no price. Most-common pump fuels first so the marker shows the most
+/// representative price for a typical driver: E10 → E5 → Diesel →
+/// Diesel Premium → E85 → LPG → CNG.
+const List<FuelType> _displayFallbackOrder = [
+  FuelType.e10,
+  FuelType.e5,
+  FuelType.diesel,
+  FuelType.dieselPremium,
+  FuelType.e85,
+  FuelType.lpg,
+  FuelType.cng,
+];
+
+/// The price to SHOW for [station] given the user's [selected] fuel, and
+/// which fuel produced it (#2400).
+///
+/// Tankerkönig returns only the queried fuel's price, so after a fuel-chip
+/// change the map markers would read `null` for the new fuel until a
+/// re-search lands — rendering "--" even though the station clearly has a
+/// price for another fuel. This resolver returns:
+///   - the [selected]-fuel price when it is non-null, else
+///   - the first non-null price in [_displayFallbackOrder],
+/// reporting the [shownFuel] that produced it so the caller can label a
+/// fallback. Returns `null` ONLY when the station has no usable price for
+/// any fuel — the sole legitimate "--" case.
+({double price, FuelType shownFuel})? bestDisplayPrice(
+  Station station,
+  FuelType selected,
+) {
+  final selectedPrice = station.priceFor(selected);
+  if (selectedPrice != null) {
+    return (price: selectedPrice, shownFuel: selected);
+  }
+  for (final fuel in _displayFallbackOrder) {
+    final p = station.priceFor(fuel);
+    if (p != null) return (price: p, shownFuel: fuel);
+  }
+  return null;
+}
+
 /// (min, max) price for [fuel] across [stations], for colour-gradient /
 /// price-tier classification. Returns `(0, 0)` when no station has a
 /// usable price.
@@ -32,6 +73,31 @@ double? priceForFuelType(Station station, FuelType fuelType) =>
   for (final s in stations) {
     final p = s.priceFor(fuel);
     if (p != null && (!requirePositive || p > 0)) {
+      if (p < minP) minP = p;
+      if (p > maxP) maxP = p;
+    }
+  }
+  if (minP == double.infinity) return (0, 0);
+  return (minP, maxP);
+}
+
+/// (min, max) over each station's RESOLVED display price for [selected]
+/// (see [bestDisplayPrice]) — i.e. the selected fuel where present, else
+/// the fallback. Returns `(0, 0)` when no station resolves to a price.
+///
+/// The map marker colours by relative price (#2400); colouring over the
+/// resolved prices keeps a fallback-priced marker's colour consistent
+/// with the value it actually shows, instead of grey because the
+/// selected fuel was null.
+(double, double) resolvedPriceRange(
+  Iterable<Station> stations,
+  FuelType selected,
+) {
+  double minP = double.infinity;
+  double maxP = 0;
+  for (final s in stations) {
+    final p = bestDisplayPrice(s, selected)?.price;
+    if (p != null) {
       if (p < minP) minP = p;
       if (p > maxP) maxP = p;
     }
