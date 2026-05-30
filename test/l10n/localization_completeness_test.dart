@@ -6,6 +6,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'french_required_prefixes.dart';
+
 void main() {
   group('Localization completeness', () {
     late Map<String, dynamic> referenceArb;
@@ -94,135 +96,27 @@ void main() {
       expect(germanMissing, isNull,
           reason: 'German (de) must have all keys from app_en.arb');
 
-      // #495 — French is the primary user locale; the wizard completion
-      // step was shipping in English because French lacked the
-      // `onboarding*` keys. French does not need to be fully complete
-      // yet (huge backlog), but every onboarding key MUST be present so
-      // the onboarding flow is fully localised for French users.
+      // French is the project's primary user locale (#495). A handful of
+      // core French-reachable surfaces must NOT fall back to English even
+      // though other locales may. Those surfaces are declared, one prefix
+      // per line, in `french_required_prefixes.dart` — adding a new
+      // French-reachable surface is a one-line data edit there, no test
+      // logic change. Each prefix's rationale (and originating incident) is
+      // documented alongside it in that file.
       final frenchMissing = missingReport['fr'] ?? const <String>[];
-      final frenchMissingOnboarding = frenchMissing
-          .where((k) => k.startsWith('onboarding'))
-          .toList()
-        ..sort();
-      expect(frenchMissingOnboarding, isEmpty,
-          reason: 'French (fr) must have every onboarding* key — the '
-              'wizard is the user\'s first impression of the app and '
-              'must not fall back to English for French users');
-
-      // #1218 — Edit vehicle was shipping mixed-locale on French because
-      // calibration / service-reminder / VIN / vehicle-edit keys lacked
-      // translations. Same rule as onboarding: these flows are core
-      // surfaces and must not fall back to English for French users.
-      final frenchMissingVehicleEdit = frenchMissing
+      final frenchMissingRequired = frenchMissing
           .where((k) =>
-              k.startsWith('vehicle') ||
-              k.startsWith('calibrationMode') ||
-              k.startsWith('veReset') ||
-              k.startsWith('serviceReminder') ||
-              k == 'addServiceReminder' ||
-              k.startsWith('vin'))
+              kFrenchRequiredPrefixes.any((prefix) => k.startsWith(prefix)))
           .toList()
         ..sort();
-      expect(frenchMissingVehicleEdit, isEmpty,
-          reason: 'French (fr) must have every vehicle-edit, calibration, '
-              'service-reminder and VIN key — the Edit vehicle screen '
-              'must not fall back to English for French users (#1218)');
-
-      // The Fuel Club Cards (loyalty) settings sub-screen shipped with
-      // only `en` + `de` ARB fragments, so French users saw an entirely
-      // English screen — including the menu tile that opens it. Same
-      // rule as onboarding / vehicle-edit: surfaces a French user can
-      // reach must not fall back to English.
-      final frenchMissingLoyalty = frenchMissing
-          .where((k) => k.startsWith('loyalty'))
-          .toList()
-        ..sort();
-      expect(frenchMissingLoyalty, isEmpty,
-          reason: 'French (fr) must have every loyalty* key — the '
-              'Fuel club cards screen and its add-card sheet must not '
-              'fall back to English for French users');
-
-      // #1373 phase 2 — the Feature management section in Settings is
-      // a French-reachable surface. Every per-feature label, description
-      // and blocked-transition tooltip must have a French translation
-      // so the section isn't a wall of English on French devices.
-      final frenchMissingFeatureMgmt = frenchMissing
-          .where((k) =>
-              k.startsWith('featureManagementSection') ||
-              k.startsWith('featureLabel_') ||
-              k.startsWith('featureDescription_') ||
-              k.startsWith('featureBlockedEnable_') ||
-              k.startsWith('featureBlockedDisable_'))
-          .toList()
-        ..sort();
-      expect(frenchMissingFeatureMgmt, isEmpty,
-          reason: 'French (fr) must have every featureManagement / '
-              'featureLabel_ / featureDescription_ / featureBlockedEnable_ / '
-              'featureBlockedDisable_ key — the Feature management section '
-              'in Settings must not fall back to English for French users '
-              '(#1373 phase 2)');
-
-      // #1374 phase 2 — the GPS trip-path overlay card on the trip
-      // detail screen is a French-reachable surface. Its title and
-      // subtitle must have French translations so the card isn't an
-      // English island in an otherwise French screen.
-      final frenchMissingTripPath = frenchMissing
-          .where((k) => k.startsWith('tripPath'))
-          .toList()
-        ..sort();
-      expect(frenchMissingTripPath, isEmpty,
-          reason: 'French (fr) must have every tripPath* key — the '
-              'GPS trip-path overlay on the trip detail screen must '
-              'not fall back to English for French users (#1374 '
-              'phase 2)');
-
-      // #1401 phase 6 — the adapter-capability card lives on the
-      // Edit-vehicle screen, which is a French-reachable surface
-      // (already enforced for `vehicle*` and `calibration*` keys).
-      // Same rule: every `obd2Capability*` key must be French so the
-      // tier label and OBDLink hint don't fall back to English.
-      final frenchMissingObd2Capability = frenchMissing
-          .where((k) => k.startsWith('obd2Capability'))
-          .toList()
-        ..sort();
-      expect(frenchMissingObd2Capability, isEmpty,
-          reason: 'French (fr) must have every obd2Capability* key — '
-              'the adapter-capability card on the Edit vehicle screen '
-              'must not fall back to English for French users (#1401 '
-              'phase 6)');
-
-      // #1401 phase 7b — the verified-by-adapter badge sits on every
-      // fill-up card and the variance dialog fires inside the Add
-      // fill-up flow, both reachable for French users. Every
-      // `fillUpReconciliation*` key must have a French translation
-      // so the chip label and confirmation prompt don't fall back to
-      // English on the Fuel tab.
-      final frenchMissingFillUpReconciliation = frenchMissing
-          .where((k) => k.startsWith('fillUpReconciliation'))
-          .toList()
-        ..sort();
-      expect(frenchMissingFillUpReconciliation, isEmpty,
-          reason: 'French (fr) must have every fillUpReconciliation* '
-              'key — the verified-by-adapter badge and variance prompt '
-              'on the fill-up flow must not fall back to English for '
-              'French users (#1401 phase 7b)');
-
-      // #1439 — the auto-record consent scope-clarification badge,
-      // help-icon explanation dialog and revoke hint live on the Edit
-      // vehicle screen. Every `autoRecordConsent*` key must have a
-      // French translation so the badge label, dialog title/body and
-      // tap-to-revoke hint don't fall back to English for French users
-      // (the original ambiguous label "Localisation en arrière-plan
-      // autorisée" was reported by a French-locale user).
-      final frenchMissingAutoRecordConsent = frenchMissing
-          .where((k) => k.startsWith('autoRecordConsent'))
-          .toList()
-        ..sort();
-      expect(frenchMissingAutoRecordConsent, isEmpty,
-          reason: 'French (fr) must have every autoRecordConsent* key — '
-              'the scope-clarification badge, help dialog and revoke '
-              'hint on the Edit vehicle screen must not fall back to '
-              'English for French users (#1439)');
+      expect(frenchMissingRequired, isEmpty,
+          reason: 'French (fr) must translate every key matching a '
+              'required surface prefix in french_required_prefixes.dart — '
+              'these core surfaces (onboarding, Edit vehicle, Feature '
+              'management, loyalty cards, trip-path, fill-up reconciliation, '
+              'auto-record consent, …) must not fall back to English for '
+              'French users. Add a prefix to french_required_prefixes.dart '
+              'when a new French-reachable surface ships.');
     });
 
     // #1699 — all 22 partial locales were brought to 100% coverage of
