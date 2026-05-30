@@ -88,7 +88,10 @@ class _RoutingScanService extends ReceiptScanService {
   int pumpCalls = 0;
 
   @override
-  Future<ReceiptScanOutcome?> scanReceipt() async {
+  Future<ReceiptScanOutcome?> scanReceipt({
+    String? country,
+    String? brand,
+  }) async {
     receiptCalls++;
     return null;
   }

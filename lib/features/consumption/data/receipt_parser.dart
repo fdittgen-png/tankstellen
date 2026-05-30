@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../search/domain/entities/fuel_type.dart';
+import 'ocr/pump_ocr_config.dart';
 import 'receipt_override_registry.dart';
 import 'receipt_parser/brand_detection.dart';
 import 'receipt_parser/brand_layouts.dart';
@@ -40,15 +41,25 @@ class ReceiptParser {
   /// can't force `null` where the brand layout found something. The
   /// reconciliation guard (`liters × pricePerLiter ≈ totalCost`) runs
   /// AFTER overrides so a bad regex combo falls back gracefully.
-  ReceiptParseResult parse(String text, {String? stationId}) {
+  ///
+  /// #2273 — when [profile] is supplied (the active country's
+  /// [OcrLocaleProfile], threaded from [PumpOcrConfig] by
+  /// [ReceiptScanService]) the currency-aware field extractors read
+  /// totals/prices in that country's currency (GBP/£/p, kr, $, …). With
+  /// no [profile] the parser defaults to EUR, unchanged from before.
+  ReceiptParseResult parse(
+    String text, {
+    String? stationId,
+    OcrLocaleProfile? profile,
+  }) {
     final lines = text.split('\n').map((l) => l.trim()).toList();
     final fullText = lines.join(' ');
 
     final brand = detectBrand(lines, fullText);
     final initial = switch (brand) {
-      'super_u' => parseSuperU(fullText, lines),
-      'carrefour' => parseCarrefour(fullText, lines),
-      _ => parseGeneric(fullText, lines),
+      'super_u' => parseSuperU(fullText, lines, profile: profile),
+      'carrefour' => parseCarrefour(fullText, lines, profile: profile),
+      _ => parseGeneric(fullText, lines, profile: profile),
     };
 
     final withOverrides = _applyOverrides(initial, text, stationId);

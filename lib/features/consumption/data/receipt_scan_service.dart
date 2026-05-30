@@ -97,7 +97,16 @@ class ReceiptScanService {
   /// from [ReceiptScanOutcome.imagePath] and delete when done (e.g.
   /// after the form is saved or after the user has shared a bad-scan
   /// report).
-  Future<ReceiptScanOutcome?> scanReceipt() async {
+  ///
+  /// #2273 — [country] (and, later, [brand]) thread the active region
+  /// into the parser, mirroring [scanPumpDisplay]. The country's
+  /// [OcrLocaleProfile] (from [PumpOcrConfig]) drives currency-aware
+  /// extraction so GBP/£/p, kr, $ receipts read correctly. With no
+  /// [country] the parser defaults to EUR, unchanged from before.
+  Future<ReceiptScanOutcome?> scanReceipt({
+    String? country,
+    String? brand,
+  }) async {
     final capture = await _capture();
     if (capture == null) return null;
     final text = await _recognise(capture);
@@ -105,8 +114,13 @@ class ReceiptScanService {
       await _tryDelete(capture);
       return null;
     }
+    OcrLocaleProfile? profile;
+    if (country != null) {
+      await _ocrConfig.load();
+      profile = _ocrConfig.profileFor(country);
+    }
     return ReceiptScanOutcome(
-      parse: _parser.parse(text),
+      parse: _parser.parse(text, profile: profile),
       ocrText: text,
       imagePath: capture,
     );

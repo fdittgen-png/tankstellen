@@ -82,10 +82,18 @@ class _StubReceiptParser extends ReceiptParser {
 
   final ReceiptParseResult result;
   String? lastTextParsed;
+  OcrLocaleProfile? lastProfile;
+  int parseCalls = 0;
 
   @override
-  ReceiptParseResult parse(String text, {String? stationId}) {
+  ReceiptParseResult parse(
+    String text, {
+    String? stationId,
+    OcrLocaleProfile? profile,
+  }) {
+    parseCalls++;
     lastTextParsed = text;
+    lastProfile = profile;
     return result;
   }
 }
@@ -211,6 +219,59 @@ void main() {
       expect(outcome, isNull,
           reason: 'Service must still return null cleanly even when the '
               'temp file delete fails.');
+
+      await capture.dir.delete(recursive: true);
+    });
+
+    test('threads the active country profile into the parser (#2273)',
+        () async {
+      // The receipt path must mirror the pump path: when a country is
+      // passed, the country's OcrLocaleProfile (GB → GBP here) is loaded
+      // from the OCR config and handed to the parser so currency-aware
+      // extraction runs.
+      const configJson = '''
+{
+  "version": 1,
+  "localeProfiles": [
+    {"country":"GB","currency":"GBP","decimalSeparator":".",
+     "priceMin":0.8,"priceMax":3.0,"volumeMax":200.0,"totalMax":500.0}
+  ],
+  "brands": []
+}''';
+      final service = ReceiptScanService(
+        picker: picker,
+        recognizer: recognizer,
+        parser: parser,
+        pumpParser: const _StubPumpDisplayParser(PumpDisplayParseResult()),
+        ocrConfig: PumpOcrConfig.fromJsonString(configJson),
+      );
+      final capture = await _createTempCapture();
+      picker.pathToReturn = capture.path;
+      recognizer.textToReturn = 'TOTAL 75.00';
+
+      final outcome = await service.scanReceipt(country: 'GB');
+
+      expect(outcome, isNotNull);
+      expect(parser.lastProfile, isNotNull,
+          reason: 'a known country must resolve to a profile.');
+      expect(parser.lastProfile!.currency, 'GBP');
+
+      await capture.dir.delete(recursive: true);
+    });
+
+    test('passes a null profile when no country is supplied (#2273)',
+        () async {
+      // Backwards compatibility: scanReceipt() with no country must keep
+      // the parser on its EUR default (null profile), unchanged.
+      final capture = await _createTempCapture();
+      picker.pathToReturn = capture.path;
+      recognizer.textToReturn = 'TOTAL 75.00';
+
+      await service.scanReceipt();
+
+      expect(parser.parseCalls, 1);
+      expect(parser.lastProfile, isNull,
+          reason: 'no country → no profile → EUR default, as before.');
 
       await capture.dir.delete(recursive: true);
     });

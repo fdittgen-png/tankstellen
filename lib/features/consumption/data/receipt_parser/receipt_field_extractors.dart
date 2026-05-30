@@ -4,6 +4,8 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../search/domain/entities/fuel_type.dart';
+import '../ocr/pump_ocr_config.dart';
+import 'receipt_currency_profile.dart';
 
 // Pure-function extractors shared by the generic matcher and the
 // per-brand layouts. Kept top-level + stateless so they can be unit-
@@ -125,32 +127,42 @@ double? extractLiters(String text) {
 /// Matches patterns like "TOTAL 58.42", "MONTANT 58,42 EUR",
 /// "TOT TTC 10.47", "MONTANT REEL : 10.69", "€ 58.42".
 ///
-/// The generic `€ [amount]` fallback is only used when no explicit label
-/// matches and the amount is NOT immediately followed by `/L` — otherwise
-/// we would pick up the unit price as the total.
-double? extractTotalCost(String text) {
+/// #2273 — the currency is config-driven: an optional [profile] (the
+/// active country's [OcrLocaleProfile], threaded from [PumpOcrConfig])
+/// selects the major-unit symbols to match (`£`/`GBP`, `kr`/`DKK`,
+/// `$`/`USD`, …). With no [profile] it defaults to EUR/€, so existing
+/// French/German receipts parse exactly as before.
+///
+/// The labelled-amount fallback is only used when no explicit label
+/// matches and the amount is NOT immediately followed by a per-litre
+/// `/L` suffix — otherwise we would pick up the unit price as the total.
+double? extractTotalCost(String text, {OcrLocaleProfile? profile}) {
+  final currency = ReceiptCurrencyProfile.fromLocale(profile);
+  final sym = currency.majorUnitPattern;
+
   final labelled = matchFirst(text, [
     // TOTAL / TOT TTC / MONTANT[ REEL / TTC] / TTC / German labels.
-    // Accept ":" or "=" between label and amount, optional €.
+    // Accept ":" or "=" between label and amount, optional currency sym.
     RegExp(
       r'(?:total|tot\s*ttc|montant(?:\s*(?:ttc|reel|r[eé]el))?|ttc|'
       r'betrag|summe|gesamt)'
-      r'\s*[:=]?\s*€?\s*(\d+[.,]\d+)',
+      '\\s*[:=]?\\s*(?:$sym)?\\s*(\\d+[.,]\\d+)',
       caseSensitive: false,
     ),
   ]);
   if (labelled != null) return labelled;
 
-  // Heuristic fallback: gather every standalone amount attached to
-  // €/EUR that isn't a price-per-liter (no "/L" suffix), then pick
-  // the LARGEST. Rationale: on a fuel receipt the unit price, tax,
-  // and net all live around the total, but the total is almost
-  // always the biggest number on the paper. Picking "first" grabs
-  // the price-per-liter on column-layout receipts like Super U,
-  // where OCR emits "€ 1.999/L ... € 10.47" — or even skips the
-  // "/L" suffix, so "first" becomes 1.999.
+  // Heuristic fallback: gather every standalone amount attached to the
+  // currency symbol that isn't a price-per-liter (no "/L" suffix), then
+  // pick the LARGEST. Rationale: on a fuel receipt the unit price, tax,
+  // and net all live around the total, but the total is almost always
+  // the biggest number on the paper. Picking "first" grabs the
+  // price-per-liter on column-layout receipts like Super U, where OCR
+  // emits "€ 1.999/L ... € 10.47" — or even skips the "/L" suffix.
   final currencyPattern = RegExp(
-    r'(?:€\s*(\d+[.,]\d+)|(\d+[.,]\d+)\s*(?:€|EUR))(\s*/\s*[lL])?',
+    '(?:(?:$sym)\\s*(\\d+[.,]\\d+)|(\\d+[.,]\\d+)\\s*(?:$sym))'
+    r'(\s*/\s*[lL])?',
+    caseSensitive: false,
   );
   double? best;
   for (final match in currencyPattern.allMatches(text)) {
@@ -159,15 +171,14 @@ double? extractTotalCost(String text) {
     if (raw == null) continue;
     final value = parseDecimal(raw);
     if (value == null || value <= 0) continue;
-    // Filter obvious non-totals: nobody's total is < 1 €, nobody's
-    // total is > 10 000 €.
+    // Filter obvious non-totals: nobody's total is < 1, nobody's total
+    // is > 10 000 (major units).
     if (value < 1 || value > 10000) continue;
-    // #801 — 3-decimal European amounts like `1,990 €` are fuel
-    // price-per-liter, never totals. Without this guard on the
-    // TotalEnergies receipt the parser grabbed `1,990 €` as the
-    // total and the user saw 1.99 € in the form instead of 9.95 €.
-    // Totals are always 2-decimal in EUR.
-    if (decimalDigitCount(raw) >= 3 && value < 5) continue;
+    // #801 — a 3-decimal amount below the price ceiling (e.g. `1,990 €`,
+    // `1.429 £`) is the fuel price-per-liter, never the total. Totals
+    // are always 2-decimal. Use the currency's own price band so this
+    // holds for GBP/kr/$ too, not just EUR.
+    if (decimalDigitCount(raw) >= 3 && value <= currency.priceMax) continue;
     if (best == null || value > best) best = value;
   }
   return best;
@@ -185,43 +196,80 @@ int decimalDigitCount(String raw) {
 
 /// Matches price-per-liter: "1.899 €/L", "€ 1,999/L", "PU: 1,899",
 /// "PRIX/L 1.899", "Prix unit. = 2,028 EUR", "Literpreis: 1.799".
-double? extractPricePerLiter(String text) {
+///
+/// #2273 — config-driven currency. An optional [profile] selects the
+/// major-unit symbols AND the subunit convention, so a UK pence-per-litre
+/// quote like `142.9p/L` or a US `c/L` cent quote is read and folded back
+/// into the major unit (£1.429/L, $…/L). With no [profile] it defaults to
+/// EUR/€, unchanged from before.
+double? extractPricePerLiter(String text, {OcrLocaleProfile? profile}) {
+  final currency = ReceiptCurrencyProfile.fromLocale(profile);
+  final sym = currency.majorUnitPattern;
+
+  // Subunit (pence/cents) per-litre takes priority — its explicit unit
+  // marker (`p/L`, `c/L`) is the strongest signal and unambiguous.
+  if (currency.hasMinorUnit) {
+    final minorPrice = _extractMinorUnitPrice(text, currency);
+    if (minorPrice != null) return minorPrice;
+  }
+
   final labelled = matchFirst(text, [
     // "1.899 €/L" or "1,899 EUR/L" — also "1.999 €/ℓ" (U+2113).
-    RegExp(r'(\d+[.,]\d{2,3})\s*(?:€|EUR)\s*/\s*[lLℓ]'),
-    // "€ 1.999/L" or "EUR 1,999/L" / "€ 1.999/ℓ" — currency before number.
-    RegExp(r'(?:€|EUR)\s*(\d+[.,]\d{2,3})\s*/\s*[lLℓ]'),
-    // Labels: PRIX/L, PU, Preis/L, Literpreis, Prix unit(.), Preis je Liter.
-    // Also accepts `ℓ` in place of `l` in the slash-L forms.
+    RegExp('(\\d+[.,]\\d{2,3})\\s*(?:$sym)\\s*/\\s*[lLℓ]', caseSensitive: false),
+    // "€ 1.999/L" / "£ 1.429/L" — currency symbol before the number.
+    RegExp('(?:$sym)\\s*(\\d+[.,]\\d{2,3})\\s*/\\s*[lLℓ]', caseSensitive: false),
+    // Labels: PRIX/L, PU, Preis/L, Literpreis, Prix unit(.), Preis je
+    // Liter, plus generic English "Unit price" / "Price/L". Also accepts
+    // `ℓ` in place of `l` in the slash-L forms.
     RegExp(
       r'(?:prix\s*/\s*[lℓ]|prix\s*unit\.?|pu|preis\s*/\s*[lℓ]|'
-      r'preis\s*je\s*liter|literpreis)'
-      r'\s*[:=]?\s*€?\s*(\d+[.,]\d{2,3})',
+      r'preis\s*je\s*liter|literpreis|unit\s*price|price\s*/\s*[lℓ])'
+      '\\s*[:=]?\\s*(?:$sym)?\\s*(\\d+[.,]\\d{2,3})',
       caseSensitive: false,
     ),
   ]);
   if (labelled != null) return labelled;
 
-  // #801 — TotalEnergies / independent French receipts often emit
-  // the unit price as a bare `1,990 €` (3-decimal digits, no `/L`
-  // suffix) on the line below a `QTY x FUELCODE` item line. Without
-  // this heuristic the amount was either missed entirely or grabbed
-  // as the total. 3 decimal digits + euro suffix + plausible
-  // fuel-price range (0.5-3.0 €/L) is a strong enough signal to
-  // accept without the explicit `/L` marker.
-  // Note on the lookbehind-free check: `\b` after `€` doesn't hold
-  // (both `€` and a trailing space are non-word chars in Dart
-  // regex, so no boundary sits between them). The negative
-  // lookahead for `/L` is the only disambiguator we need — any
-  // 3-decimal euro amount NOT followed by `/L` is the unit price.
-  final bareFuelPrice =
-      RegExp(r'(\d+[.,]\d{3})\s*(?:€|EUR)(?!\s*/\s*[lLℓ])');
+  // #801 — TotalEnergies / independent French receipts often emit the
+  // unit price as a bare `1,990 €` (3-decimal, no `/L` suffix) on the
+  // line below a `QTY x FUELCODE` item line. 3 decimals + currency
+  // symbol + a plausible per-litre range is a strong enough signal to
+  // accept without the explicit `/L` marker. The negative lookahead for
+  // `/L` keeps it from re-matching the labelled forms above. Range comes
+  // from the currency profile so this holds for GBP/kr/$ too.
+  final bareFuelPrice = RegExp(
+    '(\\d+[.,]\\d{3})\\s*(?:$sym)(?!\\s*/\\s*[lLℓ])',
+    caseSensitive: false,
+  );
   for (final match in bareFuelPrice.allMatches(text)) {
     final raw = match.group(1);
     if (raw == null) continue;
     final value = parseDecimal(raw);
     if (value == null) continue;
-    if (value >= 0.5 && value <= 3.0) return value;
+    if (currency.priceInRange(value)) return value;
+  }
+  return null;
+}
+
+/// Reads a per-litre price quoted in the currency's SUBUNIT (UK pence
+/// `142.9p/L`, US cents `c/L`) and folds it into the major unit by
+/// dividing by [ReceiptCurrencyProfile.minorUnitDivisor]. Returns the
+/// major-unit value (e.g. `142.9p/L` → `1.429`) when it falls in the
+/// currency's plausible per-litre band, else null (#2273).
+double? _extractMinorUnitPrice(String text, ReceiptCurrencyProfile currency) {
+  final minor = currency.minorUnitPattern;
+  // "142.9p/L", "142,9 p / L", "139.9 c/L" — subunit marker then /L.
+  final pattern = RegExp(
+    '(\\d+(?:[.,]\\d+)?)\\s*(?:$minor)\\s*/\\s*[lLℓ]',
+    caseSensitive: false,
+  );
+  for (final match in pattern.allMatches(text)) {
+    final raw = match.group(1);
+    if (raw == null) continue;
+    final subunit = parseDecimal(raw);
+    if (subunit == null || subunit <= 0) continue;
+    final major = subunit / currency.minorUnitDivisor;
+    if (currency.priceInRange(major)) return major;
   }
   return null;
 }
