@@ -127,7 +127,7 @@ file_size_limit = "50MiB"
 # start` provisions the same bucket locally.
 [storage.buckets.osm-tiles]
 public = false
-file_size_limit = "50KiB"
+file_size_limit = "256KiB"
 allowed_mime_types = ["image/png"]
 
 # Allow connections via S3 compatible clients

@@ -13,8 +13,11 @@
 --     and writes via the service_role key (service_role bypasses RLS).
 --   - No anon / authenticated policies are added, so RLS denies all
 --     client-side object access by default — exactly what we want.
---   - 50 KiB per-object cap: an OSM 256x256 PNG is ~5-20 KB; this bounds a
---     malformed upload without rejecting real tiles.
+--   - 256 KiB per-object cap: most OSM 256x256 PNGs are ~5-20 KB, but
+--     dense urban/coastal tiles routinely hit 55-100 KB (a 50 KiB cap
+--     silently rejected real tiles → every request was a cache MISS).
+--     256 KiB covers the largest raster tiles with headroom while still
+--     bounding a malformed upload.
 --
 -- RLS impact:
 --   [x] Adds a private Storage bucket. No public read; no client policies.
@@ -28,7 +31,7 @@ VALUES (
   'osm-tiles',
   'osm-tiles',
   false,
-  51200,                  -- 50 KiB per tile
+  262144,                 -- 256 KiB per tile (dense OSM tiles hit 55-100 KB)
   ARRAY['image/png']
 )
 ON CONFLICT (id) DO NOTHING;
