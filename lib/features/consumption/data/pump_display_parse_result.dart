@@ -40,6 +40,17 @@ class PumpDisplayParseResult {
   /// user-facing) — e.g. `consistent`, `price-out-of-range`.
   final String? validationReason;
 
+  /// Field names (`'totalCost'` / `'liters'` / `'pricePerLiter'`) whose
+  /// value was DERIVED from the other two via `total ≈ liters × €/L`
+  /// rather than read directly off the display (#2478).
+  ///
+  /// The label-anchored extractor recovers a dropped field — most often
+  /// the unit price (PRIX DU LITRE) washed out by glare — by computing it
+  /// from the two it did read. A derived value is arithmetically sound but
+  /// the UI may want to flag it so the user double-checks the recovered
+  /// number before saving. Empty when every present field was read.
+  final Set<String> derived;
+
   const PumpDisplayParseResult({
     this.liters,
     this.totalCost,
@@ -48,6 +59,7 @@ class PumpDisplayParseResult {
     this.confidence = 0,
     this.validated = false,
     this.validationReason,
+    this.derived = const {},
   });
 
   /// `true` when the parser extracted at least two of the three
