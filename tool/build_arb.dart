@@ -11,6 +11,11 @@
 // A short post-merge step rebuilds the canonical ARB files that Flutter's
 // gen-l10n consumes.
 //
+// After merging app_en / app_de this script also fans out to the 21 other
+// shipped locales via `tool/autofill_locales.dart`, machine-filling any
+// key they lack from English so the #1699 completeness gate can never be
+// tripped by an en+de-only fragment addition (#2335).
+//
 // Usage:
 //   dart run tool/build_arb.dart
 //   flutter gen-l10n   # consumes the merged files as before
@@ -32,15 +37,27 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'autofill_locales.dart' as autofill;
+
 const List<String> _locales = <String>['en', 'de'];
 const String _l10nDir = 'lib/l10n';
 const String _fragmentsDir = 'lib/l10n/_fragments';
 
 void main(List<String> args) {
+  // 1. Merge the human source-of-truth fragments into app_en / app_de.
   for (final locale in _locales) {
     _buildLocale(locale);
   }
   stdout.writeln('ARB fragments merged for locales: ${_locales.join(', ')}');
+
+  // 2. Fan out app_en into the 21 other shipped locales, machine-filling
+  //    any key they are missing (#2335). Skip with --no-autofill so a
+  //    caller can stage the en/de merge in isolation if they need to.
+  if (args.contains('--no-autofill')) {
+    stdout.writeln('autofill skipped (--no-autofill).');
+    return;
+  }
+  autofill.main(const <String>[]);
 }
 
 void _buildLocale(String locale) {
