@@ -22,6 +22,7 @@ import '../data/obd2/trip_recording_controller.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_start_stage.dart';
+import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_recording_pipeline.dart';
 import 'obd2_recording_pipeline.dart';
@@ -945,6 +946,11 @@ class TripRecording extends _$TripRecording {
         gpsSampleDiagnostics: gpsSampleDiagnostics,
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();
+      // #2392 — calibrate the vehicle's physicsScale from this trip's
+      // OBD2 ground truth (no-op for GPS-only / suspect / too-short
+      // trips). Fire-and-forget: a calibration failure must never derail
+      // the trip-save flow.
+      unawaited(_calibratePhysicsScale(summary, samples, vehicleId));
       // Phase 5 (#1004): bump the launcher-icon badge so the user sees
       // "something happened while I was driving" without opening the
       // app. The decrement fires when the user lands on the trip
@@ -984,6 +990,37 @@ class TripRecording extends _$TripRecording {
       }
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording._saveToHistory'}));
+    }
+  }
+
+  /// Refine the trip's vehicle physicsScale from OBD2 ground truth
+  /// (#2392). Delegates the gating + EWMA math to the pure
+  /// [PhysicsScaleCalibrator]; here we just resolve the vehicle, persist
+  /// the result, and refresh the list. No-op when nothing was learned
+  /// (the calibrator returns the matrix unchanged), so we only write +
+  /// invalidate when the scale actually moved.
+  Future<void> _calibratePhysicsScale(
+    TripSummary summary,
+    List<TripSample> samples,
+    String? vehicleId,
+  ) async {
+    if (vehicleId == null || samples.isEmpty) return;
+    try {
+      final repo = ref.read(vehicleProfileRepositoryProvider);
+      final vehicle = repo.getById(vehicleId);
+      if (vehicle == null) return;
+      final updated = PhysicsScaleCalibrator.calibrate(
+        vehicle: vehicle,
+        matrix: vehicle.gpsCalibration,
+        summary: summary,
+        samples: samples,
+      );
+      if (updated == vehicle.gpsCalibration) return;
+      await repo.save(vehicle.copyWith(gpsCalibration: updated));
+      ref.invalidate(vehicleProfileListProvider);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+          context: const {'where': 'TripRecording._calibratePhysicsScale'}));
     }
   }
 
