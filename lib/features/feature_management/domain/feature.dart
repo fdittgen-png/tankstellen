@@ -174,4 +174,15 @@ enum Feature {
   /// section because the flag stays off and the manifest declares it
   /// opt-in across every channel.
   debugMode,
+
+  /// In-trip approach overlay (#2382 / Epic #2065). When on and a trip
+  /// is recording, the live [ApproachDetector] geofences the driver
+  /// against nearby fuel stations and flips the PiP tile to the
+  /// fuel-type-coloured huge-price layout on radius entry. Gated so
+  /// the GPS subscription + periodic search-chain polls only run when
+  /// the user wants the overlay. Default-off in the manifest baseline,
+  /// flipped ON by the `AppProfile.medium` and `AppProfile.full`
+  /// presets. No prerequisite — the overlay degrades gracefully on
+  /// GPS-only trajets (no OBD2 required).
+  approachOverlay,
 }

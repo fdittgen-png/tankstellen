@@ -5,13 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tankstellen/core/services/approach_detector.dart';
+import 'package:tankstellen/core/theme/contrast_utils.dart';
+import 'package:tankstellen/core/theme/fuel_colors.dart';
+import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_banner.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_pip_view.dart';
 import 'package:tankstellen/features/consumption/providers/pip_mode_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -254,6 +262,107 @@ void main() {
       );
 
       expect(find.byKey(const Key('shell-child')), findsOneWidget);
+    });
+  });
+
+  // #2382 — in approach mode the PiP tile adopts the FUEL TYPE's colour
+  // (matching the hue the fuel wears elsewhere in the app) with a
+  // WCAG-contrasting foreground. Outside approach mode it keeps the
+  // driving-band palette.
+  group('TripRecordingBanner approach-overlay fuel-type colour (#2382)', () {
+    const station = Station(
+      id: 's-1',
+      name: 'Carrefour Pézenas',
+      brand: 'Carrefour',
+      street: '12 ROUTE DE BÉZIERS',
+      postCode: '34120',
+      place: 'Pézenas',
+      lat: 43.46,
+      lng: 3.42,
+      e85: 1.099,
+      isOpen: true,
+    );
+
+    TripRecordingPipView pipView(WidgetTester tester) =>
+        tester.widget<TripRecordingPipView>(
+          find.byType(TripRecordingPipView),
+        );
+
+    Future<void> pumpInApproach(
+      WidgetTester tester, {
+      required ApproachState approach,
+      required FuelType fuel,
+    }) {
+      return pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(distance: 4.0)),
+          ),
+          pipModeProvider.overrideWith(() => _FakePipMode(true)),
+          effectiveApproachStateProvider.overrideWithValue(approach),
+          effectiveFuelTypeProvider.overrideWithValue(fuel),
+        ],
+      );
+    }
+
+    testWidgets('ApproachInRadius → background is the fuel type colour',
+        (tester) async {
+      const fuel = FuelType.e85;
+      await pumpInApproach(
+        tester,
+        approach: const ApproachInRadius(
+          station: station,
+          distanceMeters: 350,
+        ),
+        fuel: fuel,
+      );
+
+      final view = pipView(tester);
+      expect(view.backgroundColor, FuelColors.forType(fuel),
+          reason: 'approach mode must paint the tile in the fuel hue');
+      // Foreground must clear WCAG AA-large against the fuel background.
+      expect(
+        ContrastUtils.meetsAALarge(view.foregroundColor, view.backgroundColor),
+        isTrue,
+        reason: 'the huge price figure must stay legible on the fuel hue',
+      );
+    });
+
+    testWidgets('a DIFFERENT fuel type yields its OWN colour', (tester) async {
+      const fuel = FuelType.diesel;
+      await pumpInApproach(
+        tester,
+        approach: const ApproachLeaving(lastStation: station),
+        fuel: fuel,
+      );
+      expect(pipView(tester).backgroundColor, FuelColors.forType(fuel));
+    });
+
+    testWidgets('outside approach mode the band palette wins — NOT the fuel '
+        'colour', (tester) async {
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [
+          tripRecordingProvider.overrideWith(
+            () => _FakeTripRecording(_activeState(
+              band: ConsumptionBand.eco,
+              distance: 4.0,
+            )),
+          ),
+          pipModeProvider.overrideWith(() => _FakePipMode(true)),
+          effectiveApproachStateProvider
+              .overrideWithValue(const ApproachIdle()),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.e85),
+        ],
+      );
+      expect(
+        pipView(tester).backgroundColor,
+        isNot(FuelColors.forType(FuelType.e85)),
+        reason: 'no approach → the driving-band palette must win',
+      );
     });
   });
 }

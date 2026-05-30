@@ -8,6 +8,7 @@ import 'package:tankstellen/core/notifications/notification_providers.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
+import 'package:tankstellen/features/approach/presentation/widgets/approach_test_panel.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
@@ -139,6 +140,27 @@ void main() {
           findsOneWidget);
       expect(find.byKey(const ValueKey('debug-copy-diagnostics')),
           findsOneWidget);
+    });
+
+    testWidgets('hosts the approach-overlay test panel (#2382 — moved here '
+        'from the Privacy Dashboard)', (tester) async {
+      await pumpApp(
+        tester,
+        const DeveloperToolsScreen(),
+        overrides: overrides(debugOn: true),
+      );
+
+      // The panel sits near the bottom of the scrollable dev-tools list,
+      // so scroll it into view before asserting it renders.
+      await tester.scrollUntilVisible(
+        find.byType(ApproachTestPanel),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.byType(ApproachTestPanel), findsOneWidget,
+          reason: 'the approach-overlay simulator is a dev test surface and '
+              'belongs in Developer tools, not the Privacy Dashboard');
     });
 
     testWidgets('renders nothing when debugMode is OFF (defensive guard)',

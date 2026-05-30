@@ -4444,6 +4444,13 @@ class AppLocalizationsDa extends AppLocalizations {
       'Viser en sektion med udviklerværktøjer i indstillingerne med diagnostik: eksport af fejllog, testnotifikationer, kørsel af testadvarselsforløb, oversigt over funktionsflag, rydning af cacher og kopiering af diagnostik.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';
 
   @override

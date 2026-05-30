@@ -4489,6 +4489,13 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εμφανίζει μια ενότητα Εργαλεία προγραμματιστή στις ρυθμίσεις με διαγνωστικά: εξαγωγή αρχείου σφαλμάτων, δοκιμαστικές γνωστοποιήσεις, εκτέλεση δοκιμαστικής ροής ειδοποιήσεων, καταγραφή σημαιών λειτουργιών, εκκαθάριση κρυφών μνημών και αντιγραφή διαγνωστικών.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';
 
   @override

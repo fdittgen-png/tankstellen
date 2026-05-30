@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/services/approach_detector.dart';
+import '../../../../core/theme/contrast_utils.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/fuel_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/effective_approach_state_provider.dart';
 import '../../../profile/providers/effective_fuel_type_provider.dart';
@@ -144,7 +146,15 @@ class TripRecordingBanner extends ConsumerWidget {
       // shell (and its nav bar) back into the tile in the meantime.
       return Material(color: Theme.of(context).colorScheme.surface);
     }
-    final palette = _bandColor(context, state.band, state.phase);
+    // #2382 — in approach mode (in-radius or the leaving grace) the tile
+    // adopts the FUEL TYPE's colour so it matches the same hue the fuel
+    // wears everywhere else in the app (price columns, map markers).
+    // Outside approach mode it keeps the driving-band palette.
+    final inApproach =
+        approachState is ApproachInRadius || approachState is ApproachLeaving;
+    final palette = inApproach
+        ? _approachPalette(fuelType)
+        : _bandColor(context, state.band, state.phase);
     return TripRecordingPipView(
       state: state,
       backgroundColor: palette.background,
@@ -152,6 +162,21 @@ class TripRecordingBanner extends ConsumerWidget {
       // #2163 — null outside any radius → PiP keeps the default layout.
       approachState: approachState,
       fuelType: fuelType,
+    );
+  }
+
+  /// Fuel-type-coloured palette for the approach overlay (#2382). The
+  /// background is [FuelColors.forType]; the foreground is whichever of
+  /// black / white wins the WCAG contrast against it, so the huge price
+  /// figure stays legible on every fuel hue (each tone is muted/dark, so
+  /// white wins in practice, but the check keeps the choice principled).
+  static _BannerPalette _approachPalette(FuelType fuelType) {
+    final background = FuelColors.forType(fuelType);
+    final onWhite = ContrastUtils.contrastRatio(Colors.white, background);
+    final onBlack = ContrastUtils.contrastRatio(Colors.black, background);
+    return _BannerPalette(
+      background: background,
+      foreground: onWhite >= onBlack ? Colors.white : Colors.black,
     );
   }
 

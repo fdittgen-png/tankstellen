@@ -278,5 +278,13 @@
   "featureDescription_debugMode": "Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.",
   "@featureDescription_debugMode": {
     "description": "Settings toggle description for Developer / Debug mode (#2248)."
+  },
+  "featureLabel_approachOverlay": "Approach overlay",
+  "@featureLabel_approachOverlay": {
+    "description": "Settings toggle label for the in-trip approach overlay (#2382). Default-on for the Medium and Full use-modes."
+  },
+  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "@featureDescription_approachOverlay": {
+    "description": "Settings toggle description for the in-trip approach overlay (#2382)."
   }
 }

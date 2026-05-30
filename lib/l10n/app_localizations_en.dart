@@ -4425,6 +4425,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override
@@ -10596,6 +10603,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureDescription_debugMode =>
       '⟦Šúřƒáçé á Đéṽéłóƥéř ŧóółš šéçŧîóñ îñ Šéŧŧîñǧš ŵîŧĥ đîáǧñóšŧîçš: éřřóř-łóǧ éẋƥóřŧ, ŧéšŧ ñóŧîƒîçáŧîóñš, á ŧéšŧ-áłéřŧ ƥîƥéłîñé řúñ, á ƒéáŧúřé-ƒłáǧ đúɱƥ, çłéář çáçĥéš, áñđ çóƥý đîáǧñóšŧîçš. ····································································⟧';
+
+  @override
+  String get featureLabel_approachOverlay => '⟦Áƥƥřóáçĥ óṽéřłáý ·······⟧';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      '⟦Đúřîñǧ á řéçóřđéđ ŧřîƥ, ƒłîƥ ŧĥé ƒłóáŧîñǧ ŧîłé ŧó ŧĥé ƒúéł ŧýƥé\'š çółóúř áñđ šĥóŵ ŧĥé ƥřîçé áš ýóú ñéář á ƒúéł šŧáŧîóñ. ··········································⟧';
 
   @override
   String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';

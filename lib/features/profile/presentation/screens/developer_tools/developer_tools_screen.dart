@@ -20,6 +20,7 @@ import '../../../../../core/country/country_config.dart';
 import '../../../../../core/utils/station_extensions.dart';
 import '../../../../alerts/data/test_alert_runner.dart';
 import '../../../../alerts/domain/radius_alert_evaluator.dart';
+import '../../../../approach/presentation/widgets/approach_test_panel.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/build_channel.dart';
 import '../../../../feature_management/domain/feature.dart';
@@ -150,6 +151,19 @@ class DeveloperToolsScreen extends ConsumerWidget {
               l?.developerToolsCopyDiagnostics ?? 'Copy diagnostics',
             ),
           ),
+          const SizedBox(height: 16),
+
+          // --- Approach overlay -----------------------------------------
+          // #2382 — the approach-overlay simulator. Moved here from the
+          // Privacy Dashboard: it is a test surface, not a privacy
+          // control, so it belongs with the rest of the dev diagnostics.
+          SectionHeader(
+            leadingIcon: Icons.local_gas_station_outlined,
+            title: l?.approachOverlaySection ?? 'Approach-station overlay',
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: 8),
+          const ApproachTestPanel(),
           const SizedBox(height: 16),
 
           // --- Build info -----------------------------------------------

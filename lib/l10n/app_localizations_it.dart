@@ -4471,6 +4471,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mostra una sezione Strumenti di sviluppo nelle impostazioni con diagnostica: esportazione del registro errori, notifiche di prova, esecuzione della pipeline di avviso di prova, dump dei flag delle funzionalità, svuotamento cache e copia della diagnostica.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Inviare la segnalazione su GitHub?';
 
   @override

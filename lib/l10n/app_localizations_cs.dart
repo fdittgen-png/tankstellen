@@ -4455,6 +4455,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zobrazí v nastavení sekci Nástroje pro vývojáře s diagnostikou: export protokolu chyb, testovací oznámení, spuštění testovacího procesu upozornění, výpis příznaků funkcí, vymazání mezipamětí a kopírování diagnostiky.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Odeslat hlášení na GitHub?';
 
   @override

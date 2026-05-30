@@ -4453,6 +4453,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'V nastavitvah prikaže razdelek Razvijalska orodja z diagnostiko: izvoz dnevnika napak, testna obvestila, zagon testnega cevovoda opozoril, izpis zastavic funkcij, čiščenje predpomnilnikov in kopiranje diagnostike.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati poročilo na GitHub?';
 
   @override

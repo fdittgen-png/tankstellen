@@ -399,5 +399,18 @@ class FeatureManifest {
           'diagnostics: error-log export, test notifications, a test-alert '
           'pipeline run, a feature-flag dump, clear caches, and diagnostics.',
     ),
+    // Default-off in the manifest baseline (#2382); the `AppProfile.medium`
+    // and `AppProfile.full` presets flip it ON so the in-trip approach
+    // overlay is opt-out for the active driving tiers. No prerequisite —
+    // the live detector only runs while a trip is recording and degrades
+    // gracefully on GPS-only trajets.
+    Feature.approachOverlay: FeatureManifestEntry.allChannels(
+      feature: Feature.approachOverlay,
+      defaultOn: false,
+      displayName: 'Approach overlay',
+      description:
+          'During a recorded trip, flip the floating tile to the fuel '
+              'type\'s colour and show the price as you near a fuel station.',
+    ),
   });
 }

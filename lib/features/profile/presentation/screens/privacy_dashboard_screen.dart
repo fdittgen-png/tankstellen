@@ -21,7 +21,6 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../approach/presentation/widgets/approach_test_panel.dart';
 import '../../providers/privacy_data_provider.dart';
 import '../widgets/config_verification_widget.dart';
 import '../widgets/privacy_dashboard/local_data_card.dart';
@@ -92,8 +91,6 @@ class _PrivacyDashboardScreenState
           LocalDataCard(snapshot: snapshot),
           const SizedBox(height: 16),
           SyncedDataCard(snapshot: snapshot),
-          const SizedBox(height: 16),
-          const ApproachTestPanel(), // #2163 — test surface
           const SizedBox(height: 24),
           PrivacyExportJsonButton(onPressed: _exportData),
           const SizedBox(height: 12),

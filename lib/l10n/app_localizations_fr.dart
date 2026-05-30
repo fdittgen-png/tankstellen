@@ -4496,6 +4496,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Affiche une section Outils de développement dans les réglages avec des diagnostics : export du journal d\'erreurs, notifications de test, exécution du pipeline d\'alerte de test, inspection des drapeaux de fonctionnalités, vidage des caches et copie des diagnostics.';
 
   @override
+  String get featureLabel_approachOverlay => 'Approach overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

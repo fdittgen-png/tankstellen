@@ -2215,5 +2215,15 @@
   "@developerToolsTestAlertNoStation": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "featureLabel_approachOverlay": "Approach overlay",
+  "@featureLabel_approachOverlay": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "@featureDescription_approachOverlay": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

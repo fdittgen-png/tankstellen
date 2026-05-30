@@ -11,6 +11,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/services/approach_detector.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 import '../../profile/data/models/user_profile.dart' as profile_model;
+import '../../profile/providers/approach_overlay_enabled_provider.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../../search/domain/entities/station.dart';
@@ -46,7 +47,13 @@ Stream<ApproachState> approachState(Ref ref) {
   final tripState = ref.watch(tripRecordingProvider);
   final profile = ref.watch(activeProfileProvider);
 
-  if (!tripState.isActive || profile == null) {
+  // #2382 — gate the live detector behind the approach-overlay feature
+  // flag (default-on for the Medium/Full use-modes). When off, the
+  // detector never starts: no GPS subscription, no corridor polls. The
+  // stream stays Idle so the PiP keeps its default L/100 km layout.
+  final overlayEnabled = ref.watch(approachOverlayEnabledProvider);
+
+  if (!overlayEnabled || !tripState.isActive || profile == null) {
     return Stream.value(const ApproachIdle());
   }
 

@@ -4474,6 +4474,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Blendet einen Entwicklerwerkzeuge-Bereich in den Einstellungen ein mit Diagnosefunktionen: Fehlerprotokoll-Export, Test-Benachrichtigungen, ein Test-Alarm-Durchlauf, ein Feature-Flag-Auszug, Caches leeren und Diagnose kopieren.';
 
   @override
+  String get featureLabel_approachOverlay => 'Annäherungs-Overlay';
+
+  @override
+  String get featureDescription_approachOverlay =>
+      'Während einer aufgezeichneten Fahrt wechselt die schwebende Kachel zur Farbe der Kraftstoffsorte und zeigt den Preis an, wenn Sie sich einer Tankstelle nähern.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override
