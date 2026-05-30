@@ -134,4 +134,69 @@ mixin CachedDatasetMixin {
       rethrow;
     }
   }
+
+  /// Completeness-gated variant of [loadPersistentDataset] (#2249).
+  ///
+  /// Multi-source datasets (e.g. DK's three brand feeds, fetched in parallel)
+  /// can come back **partial** when one source fails: the caller still gets a
+  /// usable-but-incomplete dataset rather than an exception. Pinning a partial
+  /// fetch under the full [hardTtl] would hide the missing source for hours.
+  ///
+  /// This variant runs [isComplete] on a freshly fetched dataset:
+  ///
+  ///  - **complete** → behaves exactly like [loadPersistentDataset]: store +
+  ///    persist with [hardTtl], mark fully fresh.
+  ///  - **partial** → persist under [shortTtl] (≪ hardTtl) and stamp the
+  ///    in-memory freshness clock so the dataset is treated as if it were
+  ///    already `(softTtl - shortTtl)` old. The data is served now, but the
+  ///    soft TTL elapses quickly so the very next search retries the missing
+  ///    source instead of pinning the gap.
+  ///
+  /// The read-through, dedup and offline-fallback semantics are identical to
+  /// [loadPersistentDataset] — only the post-fetch caching decision changes.
+  Future<T> loadPersistentDatasetGuarded<T>({
+    required T? cached,
+    required Duration softTtl,
+    required Duration hardTtl,
+    required Duration shortTtl,
+    required PersistentDataset<T> persistent,
+    required Future<T> Function() fetch,
+    required void Function(T value) store,
+    required bool Function(T value) isComplete,
+  }) async {
+    if (cached != null && isDatasetFresh(softTtl)) return cached;
+
+    if (cached == null || !isDatasetFresh(hardTtl)) {
+      final disk = persistent.read();
+      if (disk != null && disk.age <= hardTtl) {
+        store(disk.value);
+        markDatasetRefreshedAt(disk.age);
+        if (disk.age <= softTtl) return disk.value;
+      }
+    }
+
+    try {
+      final value = await _dedupedFetch<T>(fetch);
+      store(value);
+      if (isComplete(value)) {
+        markDatasetRefreshed();
+        await persistent.write(value, hardTtl: hardTtl);
+      } else {
+        // Partial — pin only briefly so the next search retries the gap.
+        // Stamp the clock so the soft TTL elapses after just [shortTtl].
+        final preAged = softTtl > shortTtl ? softTtl - shortTtl : Duration.zero;
+        markDatasetRefreshedAt(preAged);
+        await persistent.write(value, hardTtl: shortTtl);
+      }
+      return value;
+    } on Object {
+      final disk = persistent.read();
+      if (disk != null) {
+        store(disk.value);
+        markDatasetRefreshedAt(disk.age);
+        return disk.value;
+      }
+      rethrow;
+    }
+  }
 }

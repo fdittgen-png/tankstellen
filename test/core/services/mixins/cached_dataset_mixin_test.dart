@@ -237,6 +237,84 @@ void main() {
     });
   });
 
+  group('CachedDatasetMixin.loadPersistentDatasetGuarded (#2249)', () {
+    test('complete fetch persists at the FULL hard TTL + marks fully fresh',
+        () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+
+      final result = await cached.loadPersistentDatasetGuarded<List<int>>(
+        cached: null,
+        softTtl: const Duration(hours: 2),
+        hardTtl: const Duration(hours: 12),
+        shortTtl: const Duration(minutes: 10),
+        persistent: persistent,
+        fetch: () async => [1, 2, 3],
+        store: (_) {},
+        isComplete: (_) => true,
+      );
+
+      expect(result, [1, 2, 3]);
+      // Persisted at the hard TTL (the entry's own expiry).
+      expect(cache.get(PersistentDataset.datasetKey('XX', 'nums'))?.ttl,
+          const Duration(hours: 12));
+      // Marked fully fresh — still within the soft TTL.
+      expect(cached.isDatasetFresh(const Duration(hours: 2)), isTrue);
+    });
+
+    test('PARTIAL fetch persists at the SHORT TTL + pre-ages the clock',
+        () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+
+      final result = await cached.loadPersistentDatasetGuarded<List<int>>(
+        cached: null,
+        softTtl: const Duration(hours: 2),
+        hardTtl: const Duration(hours: 12),
+        shortTtl: const Duration(minutes: 10),
+        persistent: persistent,
+        fetch: () async => [1, 2], // one brand feed missing
+        store: (_) {},
+        isComplete: (_) => false,
+      );
+
+      expect(result, [1, 2]);
+      // Persisted under the SHORT TTL so the gap isn't pinned for 12 h.
+      expect(cache.get(PersistentDataset.datasetKey('XX', 'nums'))?.ttl,
+          const Duration(minutes: 10));
+      // In-memory clock pre-aged to (soft - short) = 1h50m. The dataset stays
+      // soft-fresh for only the remaining `shortTtl` (10 min), then the next
+      // search refetches the gap:
+      //  - against the full soft TTL it's only ~10 min from going stale...
+      expect(cached.isDatasetFresh(const Duration(hours: 2)), isTrue);
+      //  - ...but a window just under the pre-aged age already reads stale,
+      //    proving the clock was pushed back ~1h50m (a fresh stamp would not).
+      expect(cached.isDatasetFresh(const Duration(hours: 1)), isFalse);
+      // And it remains fresh against the hard TTL (served now, offline-ok).
+      expect(cached.isDatasetFresh(const Duration(hours: 12)), isTrue);
+    });
+
+    test('serves disk fallback when the whole fetch throws (offline)',
+        () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      await persistent.write([7], hardTtl: const Duration(hours: 12));
+
+      final result = await cached.loadPersistentDatasetGuarded<List<int>>(
+        cached: null,
+        softTtl: Duration.zero,
+        hardTtl: const Duration(hours: 12),
+        shortTtl: const Duration(minutes: 10),
+        persistent: persistent,
+        fetch: () async => throw Exception('all sources down'),
+        store: (_) {},
+        isComplete: (_) => true,
+      );
+
+      expect(result, [7], reason: 'a hard failure must serve the disk copy');
+    });
+  });
+
   group('concurrent-fetch guard (#2313)', () {
     test('loadDataset: two simultaneous cold calls issue ONE fetch', () async {
       var fetchCalls = 0;

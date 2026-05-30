@@ -1,15 +1,20 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/station_services/denmark/denmark_station_service.dart';
+import 'package:tankstellen/core/services/persistent_dataset.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../../helpers/silence_error_logger.dart';
 
 void main() {
+  silenceErrorLoggerSpool();
   late DenmarkStationService service;
 
   setUp(() {
@@ -547,6 +552,73 @@ void main() {
     });
   });
 
+  group('Denmark completeness gate (#2249)', () {
+    const okUrl = 'https://mobility-prices.ok.dk/api/v1/fuel-prices';
+    const shellUrl = 'https://shellpumpepriser.geoapp.me/v1/prices';
+    final datasetKey = PersistentDataset.datasetKey('DK', 'stations');
+
+    Map<String, dynamic> okBody() => {
+          'items': [
+            {
+              'facility_number': '1',
+              'coordinates': {'latitude': 55.6, 'longitude': 12.5},
+              'street': 'Main', 'house_number': '1', 'city': 'Copenhagen',
+              'postal_code': '1000',
+              'prices': [
+                {'product_name': 'Blyfri 95', 'price': 13.5},
+                {'product_name': 'Diesel', 'price': 12.9},
+              ],
+            },
+          ],
+        };
+    List<dynamic> shellBody() => [
+          {
+            'stationId': '9',
+            'brand': 'Shell',
+            'coordinates': {'latitude': '55.7', 'longitude': '12.6'},
+            'street': 'Side', 'houseNumber': '2', 'city': 'Aarhus',
+            'postalCode': '8000',
+            'prices': [
+              {'productName': '95', 'price': '13.6', 'lastUpdated': null},
+            ],
+          },
+        ];
+
+    test('a full fetch (both feeds up) persists at the HARD TTL', () async {
+      final cache = _MemCache();
+      final dio = Dio(BaseOptions())
+        ..httpClientAdapter = _DkRoutingAdapter({
+          okUrl: _DkOutcome.json(okBody()),
+          shellUrl: _DkOutcome.json(shellBody()),
+        });
+      final svc = DenmarkStationService(dio: dio, cache: cache);
+
+      await svc.searchStations(
+          const SearchParams(lat: 55.6, lng: 12.5, radiusKm: 50));
+
+      // Persisted under the 12-hour hard TTL.
+      expect(cache.get(datasetKey)?.ttl, const Duration(hours: 12));
+    });
+
+    test('a PARTIAL fetch (one feed down) persists at the SHORT TTL', () async {
+      final cache = _MemCache();
+      final dio = Dio(BaseOptions())
+        ..httpClientAdapter = _DkRoutingAdapter({
+          okUrl: _DkOutcome.json(okBody()),
+          shellUrl: _DkOutcome.fail(), // Shell feed down
+        });
+      final svc = DenmarkStationService(dio: dio, cache: cache);
+
+      final result = await svc.searchStations(
+          const SearchParams(lat: 55.6, lng: 12.5, radiusKm: 50));
+
+      // Still serves the OK stations…
+      expect(result.data, isNotEmpty);
+      // …but the incomplete dataset is pinned only briefly (10 min), not 12 h.
+      expect(cache.get(datasetKey)?.ttl, const Duration(minutes: 10));
+    });
+  });
+
   group('Denmark full station-building pipeline', () {
     late _TestableDenmarkParser parser;
 
@@ -813,4 +885,90 @@ class _TestableDenmarkParser {
       return null;
     }
   }
+}
+
+// ── Completeness-gate test doubles (#2249) ──────────────────────────────────
+
+/// In-memory [CacheStrategy] so the gate test can read back the TTL the
+/// dataset was persisted under.
+class _MemCache implements CacheStrategy {
+  final Map<String, CacheEntry> _store = {};
+
+  @override
+  Future<void> put(String key, Map<String, dynamic> data,
+      {required Duration ttl, required ServiceSource source}) async {
+    _store[key] = CacheEntry(
+        payload: data, storedAt: DateTime.now(), originalSource: source, ttl: ttl);
+  }
+
+  @override
+  CacheEntry? get(String key) => _store[key];
+
+  @override
+  CacheEntry? getFresh(String key) {
+    final e = _store[key];
+    if (e == null || e.isExpired) return null;
+    return e;
+  }
+}
+
+/// A scripted upstream outcome for one URL: a JSON body or a network failure.
+class _DkOutcome {
+  _DkOutcome._(this._build);
+  final ResponseBody Function(RequestOptions) _build;
+
+  static _DkOutcome json(dynamic body) =>
+      _DkOutcome._((o) => ResponseBody.fromString(
+            _encode(body),
+            200,
+            headers: {
+              'content-type': ['application/json'],
+            },
+          ));
+
+  static _DkOutcome fail() => _DkOutcome._((o) => throw DioException(
+        requestOptions: o,
+        type: DioExceptionType.connectionError,
+        error: 'simulated feed down',
+      ));
+
+  static String _encode(dynamic body) {
+    // Minimal JSON encoder for the fixed test fixtures (maps/lists/primitives).
+    if (body is Map) {
+      return '{${body.entries.map((e) => '"${e.key}":${_encode(e.value)}').join(',')}}';
+    }
+    if (body is List) {
+      return '[${body.map(_encode).join(',')}]';
+    }
+    if (body is String) return '"$body"';
+    if (body == null) return 'null';
+    return '$body';
+  }
+}
+
+/// Routes each request to the [_DkOutcome] registered for its URL, so the OK
+/// feed can succeed while the Shell feed fails in the same fetch.
+class _DkRoutingAdapter implements HttpClientAdapter {
+  _DkRoutingAdapter(this._routes);
+  final Map<String, _DkOutcome> _routes;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    final outcome = _routes[options.uri.toString()];
+    if (outcome == null) {
+      throw DioException(
+        requestOptions: options,
+        type: DioExceptionType.unknown,
+        error: 'no route for ${options.uri}',
+      );
+    }
+    return outcome._build(options);
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
