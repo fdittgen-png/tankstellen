@@ -170,6 +170,30 @@ class Elm327Parsers {
     return bytes[2].toDouble();
   }
 
+  /// Parse absolute barometric pressure from Mode 01 PID 33 response
+  /// (#2456). Formula: kPa = A (single byte, raw value). Response:
+  /// "41 33 XX". Sea level is ~101 kPa; pressure drops ~1 kPa per ~100 m
+  /// of altitude, so a 1500 m pass reads ~84 kPa. Feeds the speed-density
+  /// air-mass term so altitude / weather scale the air charge correctly.
+  static double? parseBaroPressureKpa(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x33, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2].toDouble();
+  }
+
+  /// Parse commanded equivalence ratio / λ from Mode 01 PID 44 response
+  /// (#2456). Formula: λ = (256·A + B) / 32768 (dimensionless). Response:
+  /// "41 44 XX YY". λ ≈ 1.0 at stoichiometry; <1 is a lean cruise
+  /// mixture (less fuel per unit air), >1 is power-enrichment (more
+  /// fuel). The effective AFR the engine is actually targeting is
+  /// `stoichAFR × λ`, which the fuel-rate estimator uses in place of the
+  /// assumed-stoich AFR when this PID is available.
+  static double? parseCommandedEquivalenceRatio(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x44, minBytes: 4);
+    if (bytes == null) return null;
+    return ((bytes[2] * 256) + bytes[3]) / 32768.0;
+  }
+
   /// Parse intake air temperature from Mode 01 PID 0F response (#800).
   /// Formula: °C = A − 40 (single byte). Response: "41 0F XX". Range
   /// −40 °C to 215 °C covers every drivable condition the sensor sees.

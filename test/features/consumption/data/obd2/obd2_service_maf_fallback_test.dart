@@ -234,5 +234,111 @@ void main() {
       // cng ≠ diesel → petrol constants → ~3.389 L/h.
       expect(rate, closeTo(3.389, 0.01));
     });
+
+    // ---- #2456: commanded-λ (0144) + baro (0133) ---------------------
+
+    test(
+        'MAF path with λ (0144) absent (NO DATA): rate is byte-for-byte '
+        'the pre-#2456 stoich result', () async {
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': mafLine,
+        '0144': 'NO DATA>', // λ unsupported / no data → fall back to stoich
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final rate = await service.readFuelRateLPerHour();
+      // Identical to the null-vehicle petrol MAF case: ~3.389 L/h.
+      expect(rate, closeTo(3.389, 0.01));
+    });
+
+    test(
+        'MAF path with λ = 1.2 (power-enrich) derives ~20 % more fuel '
+        'than the stoich result (#2456)', () async {
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': mafLine,
+        '0144': '41 44 99 9A>', // (0x999A)/32768 ≈ 1.2 λ
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final rate = await service.readFuelRateLPerHour();
+      // 3.389 × 1.2 ≈ 4.067 L/h (effective AFR = 14.7 / 1.2).
+      expect(rate, closeTo(4.067, 0.02));
+    });
+
+    test(
+        'MAF path with λ = 0.9 (lean cruise) derives less fuel than the '
+        'stoich result (#2456)', () async {
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': mafLine,
+        '0144': '41 44 73 33>', // (0x7333)/32768 ≈ 0.9 λ
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final rate = await service.readFuelRateLPerHour();
+      // 3.389 × 0.9 ≈ 3.050 L/h.
+      expect(rate, closeTo(3.050, 0.02));
+    });
+
+    test(
+        'speed-density path with low baro (altitude) derives less fuel '
+        'than the sea-level / no-baro result (#2456)', () async {
+      const sdResponses = {
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 28>', // MAP = 40 kPa
+        '010F': '41 0F 41>', // IAT = 25 °C
+        '010C': '41 0C 0C 80>', // RPM 800
+        '0144': 'NO DATA>', // λ absent → stoich
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      };
+      final seaLevel = await _connected({
+        ...sdResponses,
+        '0133': 'NO DATA>', // baro absent → sea-level assumption
+      });
+      final altitude = await _connected({
+        ...sdResponses,
+        '0133': '41 33 54>', // baro = 84 kPa (~1500 m)
+      });
+      final seaRate = await seaLevel.readFuelRateLPerHour();
+      final altRate = await altitude.readFuelRateLPerHour();
+      expect(seaRate, isNotNull);
+      expect(altRate, isNotNull);
+      expect(altRate!, lessThan(seaRate!));
+      // Air mass scales by baroFactor = 84 / 101.325 ≈ 0.829.
+      expect(altRate / seaRate, closeTo(84.0 / 101.325, 0.01));
+    });
+
+    test(
+        'speed-density path: λ + baro both absent reproduces the '
+        'pre-#2456 result exactly (#2456)', () async {
+      final withNoData = await _connected({
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 28>',
+        '010F': '41 0F 41>',
+        '010C': '41 0C 0C 80>',
+        '0133': 'NO DATA>',
+        '0144': 'NO DATA>',
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final baseline = await _connected({
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 28>',
+        '010F': '41 0F 41>',
+        '010C': '41 0C 0C 80>',
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final a = await withNoData.readFuelRateLPerHour();
+      final b = await baseline.readFuelRateLPerHour();
+      expect(a, isNotNull);
+      expect(a, closeTo(b!, 1e-9));
+    });
   });
 }

@@ -38,6 +38,7 @@ export 'fuel_rate_estimator.dart'
         kDefaultEngineDisplacementCc,
         kDefaultVolumetricEfficiency,
         resolveAfrDensity, // #2432 — fuel-type AFR/density lookup
+        effectiveAfrForLambda, // #2456 — commanded-λ effective AFR
         applyFuelTrimCorrection,
         estimateFuelRateLPerHourFromMap;
 
@@ -957,8 +958,14 @@ class Obd2Service implements Obd2RawCommandPort {
     if (isPidSupported(0x10)) {
       final maf = await readMafGramsPerSecond();
       if (maf != null) {
-        // Stoichiometric L/h = MAF × 3600 / (AFR × density).
-        final rate = maf * 3600.0 / (afr * fuelDensityGPerL);
+        // #2456 — when commanded λ (PID 0x44) is supported, divide by
+        // the ECU's effective AFR instead of the assumed stoich AFR.
+        // Unsupported / NO DATA → effectiveAfr == afr, unchanged.
+        final lambda =
+            isPidSupported(0x44) ? await readCommandedEquivalenceRatio() : null;
+        final effectiveAfr = estimator.effectiveAfrForLambda(afr, lambda);
+        // L/h = MAF × 3600 / (effectiveAFR × density).
+        final rate = maf * 3600.0 / (effectiveAfr * fuelDensityGPerL);
         final corrected = await _applyFuelTrimCorrection(rate);
         diagnostics.recordMaf(corrected: corrected, maf: maf);
         return corrected;
@@ -985,6 +992,13 @@ class Obd2Service implements Obd2RawCommandPort {
       );
       return null;
     }
+    // #2456 — refine with the measured baro (PID 0x33) air-density term
+    // and commanded λ (PID 0x44) effective AFR when the car exposes
+    // them. Both supportsPid-gated; absent → the estimator's null
+    // defaults reproduce the pre-#2456 result exactly.
+    final baroKpa = isPidSupported(0x33) ? await readBaroPressureKpa() : null;
+    final lambda =
+        isPidSupported(0x44) ? await readCommandedEquivalenceRatio() : null;
     final rate = estimator.estimateFuelRateLPerHourFromMap(
       mapKpa: mapKpa,
       iatCelsius: iatCelsius,
@@ -994,6 +1008,8 @@ class Obd2Service implements Obd2RawCommandPort {
       afr: afr,
       fuelDensityGPerL: fuelDensityGPerL,
       etaVCurve: etaVCurve,
+      baroKpa: baroKpa,
+      lambda: lambda,
     );
     if (rate == null) {
       diagnostics.recordNoBranch(
@@ -1078,6 +1094,8 @@ class Obd2Service implements Obd2RawCommandPort {
     double afr = estimator.kPetrolAfr,
     double fuelDensityGPerL = estimator.kPetrolDensityGPerL,
     List<EtaVCurvePoint> etaVCurve = const [],
+    double? baroKpa,
+    double? lambda,
   }) =>
       estimator.estimateFuelRateLPerHourFromMap(
         mapKpa: mapKpa,
@@ -1088,6 +1106,8 @@ class Obd2Service implements Obd2RawCommandPort {
         afr: afr,
         fuelDensityGPerL: fuelDensityGPerL,
         etaVCurve: etaVCurve,
+        baroKpa: baroKpa,
+        lambda: lambda,
       );
 
   /// Read mass air flow in g/s. (#717)
@@ -1109,6 +1129,24 @@ class Obd2Service implements Obd2RawCommandPort {
         Elm327Protocol.intakeAirTempCommand,
         Elm327Protocol.parseIntakeAirTempCelsius,
         label: 'intakeAirTemp',
+      );
+
+  /// Read absolute barometric pressure (kPa) via Mode 01 PID 0x33
+  /// (#2456). Feeds the speed-density air-density correction so altitude
+  /// / weather scale the air charge. Returns null when unsupported.
+  Future<double?> readBaroPressureKpa() => _readDouble(
+        Elm327Protocol.baroPressureCommand,
+        Elm327Protocol.parseBaroPressureKpa,
+        label: 'baroPressure',
+      );
+
+  /// Read commanded equivalence ratio / λ via Mode 01 PID 0x44 (#2456).
+  /// λ ≈ 1.0 at stoich; replaces the assumed stoich AFR in the MAF /
+  /// speed-density fuel math. Returns null when unsupported.
+  Future<double?> readCommandedEquivalenceRatio() => _readDouble(
+        Elm327Protocol.commandedEquivalenceRatioCommand,
+        Elm327Protocol.parseCommandedEquivalenceRatio,
+        label: 'commandedEquivalenceRatio',
       );
 
   /// Read short-term fuel trim bank 1 (%) (#813). Fast-feedback loop

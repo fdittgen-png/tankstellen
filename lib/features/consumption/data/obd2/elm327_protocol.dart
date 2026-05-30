@@ -76,6 +76,9 @@ class Elm327Protocol {
       Elm327Commands.shortTermFuelTrimCommand;
   static const longTermFuelTrimCommand = Elm327Commands.longTermFuelTrimCommand;
   static const fuelTankLevelCommand = Elm327Commands.fuelTankLevelCommand;
+  static const commandedEquivalenceRatioCommand =
+      Elm327Commands.commandedEquivalenceRatioCommand;
+  static const baroPressureCommand = Elm327Commands.baroPressureCommand;
   static const fuelTypeCommand = Elm327Commands.fuelTypeCommand;
   static const vinCommand = Elm327Commands.vinCommand;
   static const mfgOdometerCatalog = Elm327Commands.mfgOdometerCatalog;
@@ -114,6 +117,12 @@ class Elm327Protocol {
 
   static double? parseMafGramsPerSecond(String raw) =>
       Elm327Parsers.parseMafGramsPerSecond(raw);
+
+  static double? parseBaroPressureKpa(String raw) =>
+      Elm327Parsers.parseBaroPressureKpa(raw);
+
+  static double? parseCommandedEquivalenceRatio(String raw) =>
+      Elm327Parsers.parseCommandedEquivalenceRatio(raw);
 
   static double? parseManifoldPressureKpa(String raw) =>
       Elm327Parsers.parseManifoldPressureKpa(raw);

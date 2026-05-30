@@ -105,6 +105,49 @@ const double kDefaultVolumetricEfficiency = 0.85;
 /// ideal-gas-law air-mass step of [estimateFuelRateLPerHourFromMap].
 const double _gasConstant = 287.0;
 
+/// Reference sea-level barometric pressure (kPa) for the speed-density
+/// air-density correction (#2456). When PID 0x33 (absolute baro) is
+/// available, the air charge is scaled by `baroKpa / kSeaLevelBaroKpa`
+/// so altitude / weather correctly reduce (or raise) the air mass — and
+/// therefore the fuel — versus the implicit sea-level assumption the
+/// pre-#2456 formula carried. 101.325 kPa is the ISA standard.
+const double kSeaLevelBaroKpa = 101.325;
+
+/// Lower clamp for the commanded equivalence ratio λ (PID 0x44, #2456).
+/// Real mixtures never run leaner than ~0.5 in normal operation; a value
+/// below this is garbage (stuck sensor / parse noise) and is rejected so
+/// it can't blow up the effective-AFR denominator.
+const double kMinLambda = 0.5;
+
+/// Upper clamp for the commanded equivalence ratio λ (#2456). Power
+/// enrichment rarely exceeds ~1.3–1.4; 1.5 is a generous ceiling that
+/// still rejects obvious garbage.
+const double kMaxLambda = 1.5;
+
+/// Translate a stoichiometric AFR into the effective AFR the ECU is
+/// actually commanding, given the commanded equivalence ratio λ
+/// (PID 0x44, #2456).
+///
+/// Convention used here (matching the SAE PID 0x44 semantics the app
+/// targets): λ > 1 is power-enrichment — the engine is burning a richer
+/// mixture, i.e. *more* fuel per unit air, so the effective AFR is
+/// *lower*; λ < 1 is a lean cruise mixture (less fuel, higher AFR).
+/// Because the fuel-rate math divides the air mass by the AFR, an
+/// effective AFR of `stoichAfr / λ` makes the derived fuel scale up with
+/// λ (λ = 1.2 → ~20 % more fuel) and down for lean cruise — the
+/// accuracy win this PID buys on cars without a direct fuel-rate or MAF
+/// PID (the Peugeot speed-density path).
+///
+/// [lambda] is clamped to [kMinLambda] … [kMaxLambda] to reject garbage
+/// before it reaches the denominator. A null [lambda] returns
+/// [stoichAfr] unchanged so a car that doesn't expose PID 0x44 derives
+/// fuel exactly as it did before #2456.
+double effectiveAfrForLambda(double stoichAfr, double? lambda) {
+  if (lambda == null) return stoichAfr;
+  final clamped = lambda.clamp(kMinLambda, kMaxLambda);
+  return stoichAfr / clamped;
+}
+
 /// Single source of truth for the (AFR, density) pair the MAF /
 /// speed-density fuel-rate math divides by (#2432). Both
 /// [Obd2Service.readFuelRateLPerHour] and
@@ -237,6 +280,19 @@ double? interpolateEtaV(List<EtaVCurvePoint> curve, double rpm) {
 /// so existing callers are unaffected. [volumetricEfficiency] remains
 /// the fallback whenever the curve yields nothing.
 ///
+/// #2456 — two optional ECU signals refine the estimate when available
+/// and leave it byte-for-byte unchanged when absent:
+///   - [lambda] (commanded equivalence ratio, PID 0x44): the [afr] is
+///     replaced with [effectiveAfrForLambda]`(afr, lambda)`, so a richer
+///     commanded mixture (λ > 1) yields proportionally more fuel and a
+///     lean cruise (λ < 1) less. Null → the assumed stoich [afr].
+///   - [baroKpa] (absolute barometric pressure, PID 0x33): the air mass
+///     is scaled by `baroKpa / kSeaLevelBaroKpa` so altitude / weather
+///     correctly thin (or enrich) the charge versus the implicit
+///     sea-level assumption. Null → factor 1.0 (today's behaviour). The
+///     factor is clamped to a sane 0.6 … 1.1 band so a malformed baro
+///     reading can't invert or explode the result.
+///
 /// Returns null when any input is non-positive — the ideal gas law
 /// breaks down at 0 K / 0 pressure and callers should surface "no
 /// data" rather than a bogus number.
@@ -249,6 +305,8 @@ double? estimateFuelRateLPerHourFromMap({
   double afr = kPetrolAfr,
   double fuelDensityGPerL = kPetrolDensityGPerL,
   List<EtaVCurvePoint> etaVCurve = const [],
+  double? baroKpa,
+  double? lambda,
 }) {
   final iatKelvin = iatCelsius + 273.15;
   if (mapKpa <= 0 ||
@@ -267,6 +325,16 @@ double? estimateFuelRateLPerHourFromMap({
   final airMassKgPerS =
       (mapPa * displacementM3 * intakesPerSecond * etaV) /
           (_gasConstant * iatKelvin);
-  final airMassGPerS = airMassKgPerS * 1000.0;
-  return airMassGPerS * 3600.0 / (afr * fuelDensityGPerL);
+  // #2456 — ambient air-density correction. A measured baro below sea
+  // level (altitude) thins the charge, above raises it; clamped so a
+  // garbage reading can't invert or blow up the air mass. Null → 1.0,
+  // i.e. the pre-#2456 sea-level assumption, unchanged.
+  final baroFactor = baroKpa == null
+      ? 1.0
+      : (baroKpa / kSeaLevelBaroKpa).clamp(0.6, 1.1);
+  final airMassGPerS = airMassKgPerS * 1000.0 * baroFactor;
+  // #2456 — when λ (PID 0x44) is present, divide by the ECU's commanded
+  // effective AFR instead of the assumed stoich AFR. Null → [afr].
+  final effectiveAfr = effectiveAfrForLambda(afr, lambda);
+  return airMassGPerS * 3600.0 / (effectiveAfr * fuelDensityGPerL);
 }

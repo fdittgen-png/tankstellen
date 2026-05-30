@@ -335,6 +335,95 @@ void main() {
     });
   });
 
+  group('parseBaroPressureKpa (PID 33) — #2456', () {
+    test('41 33 65 -> 101 kPa (~sea level)', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('41 33 65'), 101.0);
+    });
+
+    test('41 33 54 -> 84 kPa (~1500 m altitude)', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('41 33 54'), 84.0);
+    });
+
+    test('41 33 00 -> 0 kPa', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('41 33 00'), 0.0);
+    });
+
+    test('41 33 FF -> 255 kPa', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('41 33 FF'), 255.0);
+    });
+
+    test('strips > prompt + whitespace', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('41 33 65\r\n>'), 101.0);
+    });
+
+    test('wrong PID returns null', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('41 0B 65'), isNull);
+    });
+
+    test('short response returns null', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('41 33'), isNull);
+    });
+
+    test('NO DATA returns null', () {
+      expect(Elm327Parsers.parseBaroPressureKpa('NO DATA'), isNull);
+    });
+  });
+
+  group('parseCommandedEquivalenceRatio (PID 44) — #2456', () {
+    test('41 44 80 00 -> ~1.0 λ (stoichiometric)', () {
+      // (0x80*256 + 0) / 32768 = 32768 / 32768 = 1.0.
+      expect(
+        Elm327Parsers.parseCommandedEquivalenceRatio('41 44 80 00'),
+        closeTo(1.0, 0.0001),
+      );
+    });
+
+    test('41 44 00 00 -> 0.0 λ (minimum)', () {
+      expect(
+        Elm327Parsers.parseCommandedEquivalenceRatio('41 44 00 00'),
+        closeTo(0.0, 0.0001),
+      );
+    });
+
+    test('41 44 FF FF -> ~2.0 λ (maximum)', () {
+      // (0xFFFF) / 32768 = 65535 / 32768 ≈ 1.99997.
+      expect(
+        Elm327Parsers.parseCommandedEquivalenceRatio('41 44 FF FF'),
+        closeTo(2.0, 0.001),
+      );
+    });
+
+    test('41 44 99 9A -> ~1.2 λ (power enrichment)', () {
+      // (0x999A) / 32768 = 39322 / 32768 ≈ 1.2000.
+      expect(
+        Elm327Parsers.parseCommandedEquivalenceRatio('41 44 99 9A'),
+        closeTo(1.2, 0.001),
+      );
+    });
+
+    test('strips > prompt + whitespace', () {
+      expect(
+        Elm327Parsers.parseCommandedEquivalenceRatio('41 44 80 00\r\n>'),
+        closeTo(1.0, 0.0001),
+      );
+    });
+
+    test('wrong PID returns null', () {
+      expect(
+        Elm327Parsers.parseCommandedEquivalenceRatio('41 10 80 00'),
+        isNull,
+      );
+    });
+
+    test('short response returns null', () {
+      expect(Elm327Parsers.parseCommandedEquivalenceRatio('41 44 80'), isNull);
+    });
+
+    test('NO DATA returns null', () {
+      expect(Elm327Parsers.parseCommandedEquivalenceRatio('NO DATA'), isNull);
+    });
+  });
+
   group('parseIntakeAirTempCelsius (PID 0F)', () {
     test('41 0F 28 -> 0 °C (40 - 40)', () {
       expect(

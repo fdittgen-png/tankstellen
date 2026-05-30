@@ -63,6 +63,15 @@ class LiveSampleSnapshot {
   double? _latestLtft;
   double? _latestDirectFuelRate;
 
+  // #2456 — commanded equivalence ratio λ (PID 0x44) and absolute
+  // barometric pressure (PID 0x33). Both refine the MAF / speed-density
+  // fuel derivation when the car exposes them and stay null (today's
+  // behaviour, bit-for-bit) on cars that don't. λ is sampled fast (it
+  // tracks the mixture under load); baro is sampled slowly (it only
+  // changes with altitude / weather).
+  double? _latestLambda;
+  double? _latestBaroKpa;
+
   // #1374 phase 1 — most recent GPS fix, pushed in by the provider
   // when the `Feature.gpsTripPath` flag is enabled. The controller
   // does NOT subscribe to Geolocator itself — that decision lives at
@@ -240,6 +249,22 @@ class LiveSampleSnapshot {
         if (v != null) _latestLtft = v;
       },
     );
+    // #2456 — commanded λ (PID 0x44). The mixture swings between lean
+    // cruise and power-enrich on the timescale of throttle inputs, so
+    // 2 Hz keeps the effective-AFR refinement current without stealing
+    // the high-priority RPM / speed / MAF / MAP budget. supportsPid-
+    // gated: a car that rejects 0x44 never subscribes and the
+    // derivation falls back to the assumed stoich AFR.
+    if (_service.supportsPid(0x44)) {
+      scheduler.subscribe(
+        Elm327Protocol.commandedEquivalenceRatioCommand,
+        ScheduledPid(hz: 2.0),
+        (r) {
+          final v = Elm327Protocol.parseCommandedEquivalenceRatio(r);
+          if (v != null) _latestLambda = v;
+        },
+      );
+    }
 
     // ---- 0.1 Hz tier (low priority) -------------------------------
     scheduler.subscribe(
@@ -250,6 +275,20 @@ class LiveSampleSnapshot {
         if (v != null) _latestFuelLevelPercent = v;
       },
     );
+    // #2456 — absolute baro (PID 0x33). Ambient pressure only changes
+    // with altitude / weather, so a slow 0.5 Hz read is ample and keeps
+    // it well clear of the dynamics budget. supportsPid-gated: absent →
+    // the speed-density air-mass keeps its sea-level assumption.
+    if (_service.supportsPid(0x33)) {
+      scheduler.subscribe(
+        Elm327Protocol.baroPressureCommand,
+        ScheduledPid(hz: 0.5, priority: PidPriority.low),
+        (r) {
+          final v = Elm327Protocol.parseBaroPressureKpa(r);
+          if (v != null) _latestBaroKpa = v;
+        },
+      );
+    }
   }
 
   /// #1858 — the branch [deriveFuelRateLPerHour] resolved on its most
@@ -359,17 +398,21 @@ class LiveSampleSnapshot {
       return direct;
     }
 
-    // Step 2: MAF-based. L/h = MAF × 3600 / (AFR × density).
+    // Step 2: MAF-based. L/h = MAF × 3600 / (effectiveAFR × density).
+    // #2456 — when commanded λ (PID 0x44) has landed, the assumed stoich
+    // AFR is replaced with the ECU's effective AFR (richer mixture →
+    // more fuel). Null λ → `effectiveAfr == afr`, i.e. unchanged.
     final maf = _latestMaf;
     if (maf != null) {
-      final raw = maf * 3600.0 / (afr * density);
+      final effectiveAfr = effectiveAfrForLambda(afr, _latestLambda);
+      final raw = maf * 3600.0 / (effectiveAfr * density);
       final corrected = _applyTrim(raw);
       collector?.record(
         branch: Obd2BranchTag.maf,
         fuelRateLPerHour: corrected,
         mafGramsPerSecond: maf,
         rpm: _latestRpm,
-        afr: afr,
+        afr: effectiveAfr,
         fuelDensityGPerL: density,
         engineDisplacementCc: displacement.toDouble(),
         volumetricEfficiency: ve,
@@ -396,6 +439,15 @@ class LiveSampleSnapshot {
       );
       return null;
     }
+    // #2456 — feed the measured baro (PID 0x33) + commanded λ (PID 0x44)
+    // into the speed-density math when available: baro scales the air
+    // charge for altitude / weather, λ replaces the assumed stoich AFR.
+    // Both null → byte-for-byte the pre-#2456 result. The effective AFR
+    // is recorded in the breadcrumb so diagnostics reflect the real
+    // denominator.
+    final lambda = _latestLambda;
+    final baroKpa = _latestBaroKpa;
+    final effectiveAfr = effectiveAfrForLambda(afr, lambda);
     final raw = Obd2Service.estimateFuelRateLPerHourFromMap(
       mapKpa: mapKpa,
       iatCelsius: iat,
@@ -404,6 +456,8 @@ class LiveSampleSnapshot {
       volumetricEfficiency: ve,
       afr: afr,
       fuelDensityGPerL: density,
+      baroKpa: baroKpa,
+      lambda: lambda,
     );
     if (raw == null) {
       collector?.record(
@@ -425,7 +479,7 @@ class LiveSampleSnapshot {
       mapKpa: mapKpa,
       iatCelsius: iat,
       rpm: rpm,
-      afr: afr,
+      afr: effectiveAfr,
       fuelDensityGPerL: density,
       engineDisplacementCc: displacement.toDouble(),
       volumetricEfficiency: ve,
