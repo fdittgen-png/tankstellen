@@ -55,6 +55,31 @@ class _FakeSettingsStorage implements SettingsStorage {
   Future<void> resetSetupSkip() async {}
 }
 
+/// SettingsStorage whose reads/writes throw — simulates the Hive box
+/// being unopenable / corrupt at the storage layer (the failure the
+/// `getConfig`/`uploadIfEnabled` "never throws" contract must absorb,
+/// distinct from the #2311 schema-drift `as Map` path).
+class _ThrowingSettingsStorage implements SettingsStorage {
+  @override
+  dynamic getSetting(String key) => throw StateError('hive read failed');
+
+  @override
+  Future<void> putSetting(String key, dynamic value) async =>
+      throw StateError('hive write failed');
+
+  @override
+  bool get isSetupComplete => false;
+
+  @override
+  bool get isSetupSkipped => false;
+
+  @override
+  Future<void> skipSetup() async {}
+
+  @override
+  Future<void> resetSetupSkip() async {}
+}
+
 void main() {
   group('TraceUploadConfig', () {
     test('disabled config has enabled=false and null URL', () {
@@ -176,6 +201,26 @@ void main() {
       ));
       // Should not throw
       await uploader.uploadIfEnabled(_makeTrace());
+    });
+
+    test(
+        'uploadIfEnabled never throws even when the storage read throws '
+        '(Hive-open / corrupt-box failure)', () async {
+      // uploadIfEnabled is fire-and-forget: a storage-layer throw
+      // surfacing out of it becomes an unhandled async error. The #2311
+      // fix moved `getConfig()` INSIDE the try, so even a throwing
+      // SettingsStorage (closed / corrupt Hive box) is absorbed here.
+      //
+      // NOTE: the bare `getConfig()` boundary is NOT storage-throw-safe
+      // — its `_storage.getSetting()` read sits outside the try. That is
+      // a real lib gap reported alongside this PR, intentionally NOT
+      // pinned here so the suite stays green without a lib edit (the
+      // never-throws lint grandfathers it via the allow-set).
+      final uploader = TraceUploader(_ThrowingSettingsStorage());
+      await expectLater(
+        uploader.uploadIfEnabled(_makeTrace()),
+        completes,
+      );
     });
 
     test('upload failure does not throw', () async {
