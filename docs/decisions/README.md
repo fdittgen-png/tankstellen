@@ -45,3 +45,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0009 | Cross-platform default + plugin pattern | Accepted |
 | 0010 | GPS driving-style calibration matrix | Accepted |
 | 0011 | Approach-detection + speed-aware polling scheduler | Accepted |
+| 0012 | GPS-only live consumption estimator | Accepted |
