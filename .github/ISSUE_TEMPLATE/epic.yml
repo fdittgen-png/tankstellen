@@ -1,0 +1,98 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Epic
+description: Multi-PR / multi-subsystem piece of work (needs breakdown + validation gate before children are filed)
+labels: ["type/epic"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Before you file
+        - Run `/epic-triage` in Claude Code first to confirm this qualifies as an Epic.
+        - Assign a **Milestone** (iteration) before saving — the board burn-down depends on it.
+        - File child issues only after the breakdown has been validated by the maintainer.
+
+  - type: dropdown
+    id: triage
+    attributes:
+      label: Triage classification
+      description: Pick the highest-signal category.
+      options:
+        - "P0 — Critical (blocks release / data loss)"
+        - "P1 — High (user-visible regression or key feature)"
+        - "P2 — Medium (improvement, polish)"
+        - "P3 — Low (nice-to-have, long-tail cleanup)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Primary area
+      description: Which subsystem does most of the work land in?
+      options:
+        - area/ui
+        - area/core
+        - area/api
+        - area/maps
+        - area/route
+        - area/alerts
+        - area/sync
+        - area/ev
+        - area/backend
+        - area/ci
+        - Cross-cutting (multiple areas)
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: |
+        One paragraph. What does this Epic deliver? What is explicitly out of scope?
+      placeholder: |
+        **In scope:** …
+        **Out of scope:** …
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation_gate
+    attributes:
+      label: Validation gate
+      description: How will we know the Epic is done? List observable acceptance criteria.
+      placeholder: |
+        - [ ] <criterion 1>
+        - [ ] <criterion 2>
+    validations:
+      required: true
+
+  - type: textarea
+    id: children_table
+    attributes:
+      label: Child-issue breakdown
+      description: |
+        Fill this in AFTER the maintainer has validated the breakdown.
+        Columns: Sev (P0-P3) | Title (conventional-commit) | Dim (area/x) | Effort (S/M/L) | ARB? (Y/N — needs ARB string changes)
+      value: |
+        | Sev | Title | Dim | Effort | ARB |
+        |-----|-------|-----|--------|-----|
+        | P2  | feat(…): … | area/… | S | N |
+    validations:
+      required: false
+
+  - type: textarea
+    id: sequencing
+    attributes:
+      label: Sequencing note
+      description: |
+        List any ordering constraints between child issues (decision-first, TDD, ARB-before-UI, etc.).
+        One PR in-flight at a time (see memory: serialize autonomous auto-merge PRs).
+      placeholder: |
+        1. #XXXX (decision / interface) — must merge first
+        2. #XXXX, #XXXX — can be bundled in one PR
+        3. #XXXX (cleanup) — last
+    validations:
+      required: false
