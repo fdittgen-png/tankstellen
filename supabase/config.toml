@@ -121,6 +121,15 @@ file_size_limit = "50MiB"
 # allowed_mime_types = ["image/png", "image/jpeg"]
 # objects_path = "./images"
 
+# OSM raster-tile cache for the `tiles` edge function (#2397). Private —
+# served only THROUGH the function via service_role, never to clients.
+# Mirrors the 20260530000001_osm_tiles_bucket.sql migration so `supabase
+# start` provisions the same bucket locally.
+[storage.buckets.osm-tiles]
+public = false
+file_size_limit = "50KiB"
+allowed_mime_types = ["image/png"]
+
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]
 enabled = true
