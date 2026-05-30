@@ -212,4 +212,65 @@ void main() {
       );
     });
   });
+
+  // ─── #2433 — precision rating left the Fuel app-bar ─────────────────
+  //
+  // #2383 had mounted the accuracy indicator + raw η_v chip in the
+  // Carburant app-bar. #2433 moves that rating into the
+  // Verbrauchsstatistik card, so the app-bar restores its plain "Fuel"
+  // title and carries NO precision chip — only the OBD2 chip, the
+  // download/export action, the gated Carbon entry and Settings.
+  group('ConsumptionScreen Fuel app-bar after #2433', () {
+    testWidgets('shows the plain Fuel title (no precision chip in the app-bar)',
+        (tester) async {
+      final fillUp = FillUp(
+        id: '1',
+        date: DateTime.utc(2026, 4, 15),
+        liters: 40,
+        totalCost: 60,
+        odometerKm: 10000,
+        fuelType: FuelType.e10,
+      );
+      await _pumpScreen(tester, fillUps: [fillUp]);
+
+      // The restored app-bar title (reuses consumptionTabFuel — #2433).
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.text('Fuel'),
+        ),
+        findsOneWidget,
+      );
+      // No precision chip surfaces anywhere in the app-bar.
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.textContaining('Accuracy:'),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.textContaining('η_v'),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('keeps the download/export action in the app-bar',
+        (tester) async {
+      final fillUp = FillUp(
+        id: '1',
+        date: DateTime.utc(2026, 4, 15),
+        liters: 40,
+        totalCost: 60,
+        odometerKm: 10000,
+        fuelType: FuelType.e10,
+      );
+      await _pumpScreen(tester, fillUps: [fillUp]);
+
+      expect(find.byKey(const Key('export_backup')), findsOneWidget);
+    });
+  });
 }

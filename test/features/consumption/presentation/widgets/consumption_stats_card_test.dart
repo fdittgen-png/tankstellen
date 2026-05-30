@@ -5,8 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/consumption_stats_card.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 
 import '../../../../helpers/pump_app.dart';
+
+/// #2262 — the raw η_v chip is gated on `Feature.debugMode`. This stub
+/// flips Developer mode ON so the chip renders; without it the manifest
+/// default (debugMode off) keeps the chip hidden.
+class _DebugModeOn extends FeatureFlags {
+  @override
+  Set<Feature> build() => {Feature.debugMode};
+}
+
+/// Overrides list that enables Developer mode for the calibration-chip
+/// tests below.
+final _debugOn = [featureFlagsProvider.overrideWith(() => _DebugModeOn())];
 
 /// Builds a [ConsumptionStats] with sensible defaults so each test only
 /// spells out the field it cares about. Mirrors the freezed factory at
@@ -373,35 +387,153 @@ void main() {
     },
   );
 
-  // ─── #2383 — confidence indicator + η_v chip moved to app-bar ───────
+  // ─── #2433 — precision rating back in the Verbrauchsstatistik card ───
   //
-  // Both the accuracy indicator (ConfidenceTierBadge) and the raw η_v
-  // chip (_CalibrationChip) have moved to FuelConfidenceAppBarBadge in
-  // the Carburant app-bar (#2383). The stats card body no longer renders
-  // either widget, regardless of calibration state or Feature.debugMode.
-  // The app-bar badge tests live in fuel_confidence_app_bar_badge_test.dart.
+  // #2383 moved the accuracy indicator (ConfidenceTierBadge) and the raw
+  // η_v chip (_CalibrationChip) to the Carburant app-bar. #2433 reverses
+  // that placement: both ride a subtitle row inside the stats card again,
+  // next to the figures they qualify. The raw η_v chip stays gated on
+  // Developer mode (#2262), so the chip tests below pump with `_debugOn`.
 
-  group('ConsumptionStatsCard — confidence/η_v absent from card body (#2383)',
-      () {
-    testWidgets('no Accuracy indicator in the card body', (tester) async {
-      await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
-      // ConfidenceTierBadge used to render "Accuracy: …" in the card;
-      // after #2383 it lives in the app-bar only.
-      expect(find.textContaining('Accuracy:'), findsNothing);
-    });
-
-    testWidgets('no raw η_v text in the card body (even without debug mode)',
+  group('ConsumptionStatsCard — calibration chip (#1397 / #2262)', () {
+    testWidgets('no chip when volumetricEfficiencySamples == null',
         (tester) async {
-      await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
-      // The _CalibrationChip used to render "η_v: …" in the card;
-      // after #2383 it lives in the app-bar under Feature.debugMode only.
-      expect(find.textContaining('η_v'), findsNothing);
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(stats: _stats()),
+        overrides: _debugOn,
+      );
+      expect(find.byType(Chip), findsNothing);
     });
 
-    testWidgets('no Wrap in the card body (chip row is removed)', (tester) async {
-      await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
-      // The chip Wrap was removed from the card body in #2383.
-      expect(find.byType(Wrap), findsNothing);
+    testWidgets(
+        'samples == 0 → "no plein-complet yet" pill (#2112, debug on)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.85,
+          volumetricEfficiencySamples: 0,
+        ),
+        overrides: _debugOn,
+      );
+      // #2112 — the calibration pill is no longer a Material `Chip`;
+      // it's a tonal Container so the η_v pill harmonises with the
+      // confidence-tier badge next to it. The label still contains
+      // the no-plein-complet substring.
+      expect(find.textContaining('no plein-complet'), findsOneWidget);
+    });
+
+    // #2112 — the "learning" vs "calibrated" parenthetical was
+    // dropped because the maturity colour is carried by the
+    // confidence-tier badge now riding next to it. The η_v pill
+    // shows the bare mean + sample count in both cases.
+    testWidgets(
+        '0 < samples < 3 → compact η_v pill with sample count (debug on)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+        overrides: _debugOn,
+      );
+      expect(find.textContaining('0.87'), findsOneWidget);
+      expect(find.textContaining('2 samples'), findsOneWidget);
+    });
+
+    testWidgets(
+        'samples >= 3 → compact η_v pill (no calibrated wording, debug on)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.91,
+          volumetricEfficiencySamples: 5,
+        ),
+        overrides: _debugOn,
+      );
+      expect(find.textContaining('0.91'), findsOneWidget);
+      expect(find.textContaining('5 samples'), findsOneWidget);
+      // #2112 — old shape removed; if the parenthetical comes back
+      // this fails and forces a deliberate decision.
+      expect(find.textContaining('calibrated'), findsNothing);
+      expect(find.textContaining('learning'), findsNothing);
+    });
+
+    testWidgets(
+        '#2112 — accuracy badge + η_v pill ride a single Wrap (debug on)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+        overrides: _debugOn,
+      );
+      final wraps = find.byType(Wrap).evaluate();
+      // ConsumptionStatsCard has no other Wrap today; this asserts
+      // the calibration pills group sits in exactly one Wrap so
+      // their layout stays harmonised.
+      expect(wraps.length, greaterThanOrEqualTo(1));
+    });
+  });
+
+  group('ConsumptionStatsCard — raw η_v chip Developer-mode gate (#2262)', () {
+    testWidgets(
+        'η_v chip is HIDDEN for normal users (debugMode off — default)',
+        (tester) async {
+      // No override → manifest default → debugMode off.
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+      );
+      // The raw η_v glyph + sample count must not surface.
+      expect(find.textContaining('η_v'), findsNothing);
+      expect(find.textContaining('2 samples'), findsNothing);
+      // …but the plain accuracy indicator (always-on) still renders.
+      expect(find.textContaining('Accuracy:'), findsOneWidget);
+    });
+
+    testWidgets('η_v chip is SHOWN when Developer mode is ON', (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+        overrides: _debugOn,
+      );
+      expect(find.textContaining('η_v'), findsOneWidget);
+      expect(find.textContaining('2 samples'), findsOneWidget);
+      // Accuracy indicator still rides alongside it.
+      expect(find.textContaining('Accuracy:'), findsOneWidget);
+    });
+
+    testWidgets(
+        'samples == 0 raw chip is HIDDEN for normal users (debugMode off)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.85,
+          volumetricEfficiencySamples: 0,
+        ),
+      );
+      expect(find.textContaining('no plein-complet'), findsNothing);
+      expect(find.textContaining('η_v'), findsNothing);
     });
   });
 }
