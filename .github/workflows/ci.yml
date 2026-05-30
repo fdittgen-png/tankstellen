@@ -132,11 +132,23 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
+      # #2334 — deliberately do NOT cache `.dart_tool` here (only
+      # `~/.pub-cache`). The cache key is `hashFiles('pubspec.lock')`,
+      # so two PRs with the same lockfile but different `@riverpod` /
+      # `@freezed` source share build_runner's cached asset graph under
+      # `.dart_tool/build`. An *incremental* `build_runner build` then
+      # sees "no input changed", re-emits the prior `.g.dart`, and the
+      # `git diff` check passes against identically-stale committed
+      # files — the exact stale-hash vector that poisoned master in
+      # #2322 / #2245 (and `feedback_codegen_drift_local_gate.md`).
+      # Starting from a fresh `.dart_tool` forces a full, honest
+      # regeneration every run. `--delete-conflicting-outputs` only
+      # resolves output collisions, not stale internal hashes, so it is
+      # not a substitute. Cost is ~+30s — well under the ~2.5 min budget.
       - uses: actions/cache@v5
         with:
           path: |
             ~/.pub-cache
-            .dart_tool
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
       - run: flutter pub get

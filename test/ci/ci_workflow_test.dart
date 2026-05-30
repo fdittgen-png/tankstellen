@@ -5,6 +5,34 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+/// Returns the body of the named top-level job in [workflowYaml] — the
+/// lines from the `<jobName>:` header (indented exactly two spaces) up to
+/// but not including the next two-space-indented `<name>:` job header.
+///
+/// A deliberately simple line scanner rather than a YAML parser: it keeps
+/// the test dependency-free and the GitHub-Actions job grammar is regular
+/// enough (every top-level job is a key indented exactly two spaces) for a
+/// scan to be unambiguous.
+String _jobBody(String workflowYaml, String jobName) {
+  final lines = workflowYaml.split('\n');
+  final header = RegExp('^  $jobName:\\s*\$');
+  final anyJobHeader = RegExp(r'^  [A-Za-z0-9_-]+:\s*$');
+  final buffer = StringBuffer();
+  var inJob = false;
+  for (final line in lines) {
+    if (inJob) {
+      // A new two-space-indented `name:` line ends the current job.
+      if (anyJobHeader.hasMatch(line)) break;
+      buffer.writeln(line);
+      continue;
+    }
+    if (header.hasMatch(line)) {
+      inJob = true;
+    }
+  }
+  return buffer.toString();
+}
+
 /// Tests that verify the CI workflow file contains expected jobs and steps.
 void main() {
   late String ciYaml;
@@ -172,6 +200,39 @@ void main() {
 
     test('reports major version lag as informational', () {
       expect(outdatedScript, contains('Major version updates available'));
+    });
+  });
+
+  // #2334 — the codegen-drift job must NOT cache `.dart_tool`. Caching
+  // it keyed on pubspec.lock alone lets two PRs with the same lockfile
+  // share build_runner's incremental asset graph, so a stale `.g.dart`
+  // re-emits and the diff check passes against identically-stale
+  // committed files (the #2322 / #2245 poisoning vector).
+  group('codegen-drift stale-hash hardening (#2334)', () {
+    late String codegenJob;
+
+    setUpAll(() {
+      codegenJob = _jobBody(ciYaml, 'codegen-drift');
+      expect(codegenJob, isNotEmpty,
+          reason: 'codegen-drift job must exist in ci.yml');
+    });
+
+    test('codegen-drift job does NOT cache .dart_tool', () {
+      // Ignore comment lines — the rationale comment mentions `.dart_tool`
+      // in prose; what matters is no executable `path:` entry restores it.
+      final executable = codegenJob
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('#'))
+          .join('\n');
+      expect(executable.contains('.dart_tool'), isFalse,
+          reason: 'codegen-drift must start from a fresh .dart_tool so '
+              'build_runner regenerates honestly — see #2334.');
+    });
+
+    test('codegen-drift still caches ~/.pub-cache and regenerates', () {
+      expect(codegenJob, contains('~/.pub-cache'));
+      expect(codegenJob,
+          contains('dart run build_runner build --delete-conflicting-outputs'));
     });
   });
 
