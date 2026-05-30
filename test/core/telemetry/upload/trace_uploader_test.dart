@@ -177,6 +177,20 @@ void main() {
       expect(config.enabled, isFalse);
     });
 
+    test('getConfig disables (no throw) when the storage read itself throws '
+        '(#2366 — corrupt/closed Hive box)', () {
+      // The bare getConfig() boundary must absorb a storage-layer throw,
+      // not just the #2311 schema-drift parse error. #2366 moved the
+      // `_storage.getSetting()` read INSIDE the try, so a closed/corrupt
+      // Hive box can no longer escape this documented "never throws"
+      // boundary.
+      final uploader = TraceUploader(_ThrowingSettingsStorage());
+      late TraceUploadConfig config;
+      expect(() => config = uploader.getConfig(), returnsNormally);
+      expect(config.enabled, isFalse,
+          reason: 'a throwing storage read must fall back to disabled');
+    });
+
     test('uploadIfEnabled never throws even with a non-map config (#2311)',
         () async {
       // The whole contract: a drifted config that would throw inside
@@ -207,15 +221,11 @@ void main() {
         'uploadIfEnabled never throws even when the storage read throws '
         '(Hive-open / corrupt-box failure)', () async {
       // uploadIfEnabled is fire-and-forget: a storage-layer throw
-      // surfacing out of it becomes an unhandled async error. The #2311
-      // fix moved `getConfig()` INSIDE the try, so even a throwing
-      // SettingsStorage (closed / corrupt Hive box) is absorbed here.
-      //
-      // NOTE: the bare `getConfig()` boundary is NOT storage-throw-safe
-      // — its `_storage.getSetting()` read sits outside the try. That is
-      // a real lib gap reported alongside this PR, intentionally NOT
-      // pinned here so the suite stays green without a lib edit (the
-      // never-throws lint grandfathers it via the allow-set).
+      // surfacing out of it becomes an unhandled async error. #2311 moved
+      // the getConfig() *call* inside uploadIfEnabled's try; #2366 then
+      // moved the `_storage.getSetting()` read inside getConfig()'s own
+      // try, so both boundaries now absorb a throwing SettingsStorage
+      // (closed / corrupt Hive box) — see the dedicated #2366 test above.
       final uploader = TraceUploader(_ThrowingSettingsStorage());
       await expectLater(
         uploader.uploadIfEnabled(_makeTrace()),
