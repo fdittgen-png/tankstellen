@@ -166,9 +166,8 @@ class Obd2ConnectionService {
     };
     // #1312 — stamp adapter identity onto the service so the trip
     // recorder can persist it on the saved [TripHistoryEntry] and the
-    // detail screen can name the device that produced the recording.
-    // The friendly name falls back to the registry's display label
-    // when the BLE advertisement was empty (matches the picker rule).
+    // detail screen can name the device. The friendly name falls back to
+    // the registry display label when the advertisement was empty.
     final name = candidate.candidate.deviceName.isEmpty
         ? candidate.profile.displayName
         : candidate.candidate.deviceName;
@@ -177,6 +176,7 @@ class Obd2ConnectionService {
       adapter: candidate.profile.adapter,
       mac: candidate.candidate.deviceId,
       name: name,
+      linkKind: obd2LinkKindOf(candidate.profile.transport),
     );
   }
 
@@ -187,12 +187,13 @@ class Obd2ConnectionService {
   /// service-side ELM327 init (`adapter.initSequence` via
   /// [Obd2Service.connect]), which the transport itself no longer runs
   /// (#2233). Surfaces [Obd2AdapterUnresponsive] when init fails (the
-  /// channel is closed before the error is rethrown).
+  /// channel is closed first).
   Future<Obd2Service> _openAndInit({
     required ElmByteChannel channel,
     required Elm327Adapter adapter,
     required String mac,
     required String name,
+    String linkKind = 'ble',
     bool logFailureAsError = true,
   }) async {
     // #2253/#2261 — build the session with the supported-PID + warm
@@ -208,6 +209,7 @@ class Obd2ConnectionService {
       model: vehicle?.model,
       year: vehicle?.year,
       vin: vehicle?.vin,
+      linkKind: linkKind, // #2465 — gated comm-diagnostics session label
     );
     // #2268 concern 3 — a no-op override suppresses the wake window for a
     // MAC observed never to need it; null ⇒ honour the adapter policy.
@@ -215,8 +217,7 @@ class Obd2ConnectionService {
     // #1330 init. #2379 — recoverable attempts suppress the fail trace.
     final ok = await service.connect(adapter: adapter,
         wakePolicyOverride: wakeOverride, logFailureAsError: logFailureAsError);
-    // #2268 concern 3 — persist the observed wake outcome (a no-op unless
-    // the bounded window actually ran on this connect).
+    // #2268 concern 3 — persist the observed wake outcome (no-op unless the bounded window ran).
     await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
     if (!ok) {
       await service.disconnect();

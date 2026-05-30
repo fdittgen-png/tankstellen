@@ -15,6 +15,7 @@ _Obd2SessionDiagnostic _$Obd2SessionDiagnosticFromJson(
   protocolDigit: json['pd'] as String?,
   mtu: (json['mtu'] as num?)?.toInt(),
   warmStart: json['ws'] as bool?,
+  capabilityTier: json['ct'] as String?,
   initTranscript:
       (json['tx'] as List<dynamic>?)
           ?.map((e) => Obd2HandshakeLine.fromJson(e as Map<String, dynamic>))
@@ -53,6 +54,7 @@ Map<String, dynamic> _$Obd2SessionDiagnosticToJson(
   'pd': instance.protocolDigit,
   'mtu': instance.mtu,
   'ws': instance.warmStart,
+  'ct': instance.capabilityTier,
   'tx': instance.initTranscript.map((e) => e.toJson()).toList(),
   'pid': instance.pidStats.map((k, e) => MapEntry(k, e.toJson())),
   'conn': instance.connection.toJson(),

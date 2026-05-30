@@ -3,12 +3,21 @@
 
 import 'package:hive/hive.dart';
 
+import 'adapter_registry.dart';
 import 'bluetooth_obd2_transport.dart';
 import 'elm_byte_channel.dart';
 import 'negotiated_protocol_cache.dart';
 import 'obd2_service.dart';
 import 'supported_pids_cache.dart';
 import '../../../../core/storage/hive_boxes.dart';
+
+/// Map a resolved [BluetoothTransport] to the comm-diagnostics link-kind
+/// tag (#2465 — `'ble'` / `'classic'`). Kept beside [buildObd2Session]
+/// so the link-kind label lives next to where it is stamped.
+String obd2LinkKindOf(BluetoothTransport transport) => switch (transport) {
+      BluetoothTransport.ble => 'ble',
+      BluetoothTransport.classic => 'classic',
+    };
 
 /// Opens the deferred OBD2 caches the live [Obd2ConnectionService] wires
 /// into every session. Each returns null when its Hive box isn't open
@@ -37,7 +46,9 @@ NegotiatedProtocolCache? openNegotiatedProtocolCache() {
 /// the scan and direct/passive connect paths in [Obd2ConnectionService]
 /// produce a byte-for-byte identical session. The vehicle [make]/[model]/
 /// [year]/[vin] refine the cache keys; null fields collapse to
-/// adapterMac-only keying.
+/// adapterMac-only keying. [linkKind] (#2465 — `'ble'` / `'classic'`)
+/// is stamped so the gated comm-diagnostics session can record the
+/// transport flavour without the data layer reaching into the registry.
 Obd2Service buildObd2Session({
   required ElmByteChannel channel,
   required String mac,
@@ -48,6 +59,7 @@ Obd2Service buildObd2Session({
   String? model,
   int? year,
   String? vin,
+  String? linkKind,
 }) {
   final service = Obd2Service(
     BluetoothObd2Transport(channel),
@@ -67,5 +79,6 @@ Obd2Service buildObd2Session({
   );
   service.adapterMac = mac;
   service.adapterName = name;
+  service.linkKind = linkKind;
   return service;
 }

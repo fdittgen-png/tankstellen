@@ -39,6 +39,7 @@ import '../features/consumption/data/obd2/paused_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/paused_trip_repository.dart';
 import '../features/consumption/data/trip_history_repository.dart';
 import '../features/consumption/providers/auto_record_orchestrator.dart';
+import '../features/consumption/providers/obd2_comm_diagnostics_gate_provider.dart';
 import '../features/consumption/providers/obd2_debug_logging_provider.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
 import '../features/consumption/providers/trip_ve_recompute_provider.dart';
@@ -245,6 +246,21 @@ class AppInitializer {
       } catch (e, st) {
         debugPrint(
             'AppInitializer: OBD2 debug-logging kick-off failed: $e\n$st');
+      }
+    });
+
+    // #2465 — arm the OBD2 comm-health diagnostics collector from
+    // Feature.debugMode. Reading the keep-alive gate provider runs its
+    // `build`, which mirrors the flag onto
+    // `Obd2CommDiagnostics.instance.enabled` and keeps it in sync as the
+    // user toggles Developer mode. A no-op in production (dev mode off).
+    _deferPostFirstFrame(() async {
+      try {
+        container.read(obd2CommDiagnosticsGateProvider);
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: OBD2 comm-diagnostics gate kick-off failed: '
+            '$e\n$st');
       }
     });
 

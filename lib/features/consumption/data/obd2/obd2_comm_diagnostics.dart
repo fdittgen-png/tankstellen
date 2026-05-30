@@ -31,6 +31,17 @@ import 'obd2_session_diagnostic.dart';
 class Obd2CommDiagnostics {
   Obd2CommDiagnostics({this.enabled = false});
 
+  /// Process-wide collector the comm-path layers tee into (#2465).
+  ///
+  /// Mirrors the static singleton shape of [Obd2DebugSessionRecorder] /
+  /// `AutoRecordTraceLog`: the OBD2 data layer is plumbing-free of
+  /// Riverpod, so the connect/init path teaches itself the live collector
+  /// through this single shared handle rather than threading an instance
+  /// through every constructor. The `Obd2CommDiagnosticsGate` provider
+  /// flips [instance.enabled] from `Feature.debugMode`; production
+  /// (debug-mode off) leaves it `false`, so every tee is a no-op.
+  static final Obd2CommDiagnostics instance = Obd2CommDiagnostics();
+
   /// Hard cap on the retained finished-session ring (#2463 design:
   /// "capped 5-session ring").
   static const int maxSessions = 5;
@@ -64,11 +75,17 @@ class Obd2CommDiagnostics {
 
   /// Stamp the adapter identity discovered during the handshake. No-op
   /// when disabled or before [beginSession].
+  ///
+  /// [capabilityTier] is the firmware-derived runtime tier name (e.g.
+  /// `'standardOnly'` / `'oemPidsCapable'` / `'passiveCanCapable'`).
+  /// Wave 2 will add the reconciled value once the lazy multi-frame probe
+  /// is instrumented; Wave 1 records the claimed tier (#2465).
   void recordAdapterIdentity({
     String? elmVersion,
     String? protocolDigit,
     int? mtu,
     bool? warmStart,
+    String? capabilityTier,
   }) {
     if (!enabled) return;
     final cur = _current;
@@ -77,6 +94,7 @@ class Obd2CommDiagnostics {
     cur.protocolDigit = protocolDigit ?? cur.protocolDigit;
     cur.mtu = mtu ?? cur.mtu;
     cur.warmStart = warmStart ?? cur.warmStart;
+    cur.capabilityTier = capabilityTier ?? cur.capabilityTier;
   }
 
   /// Append one redacted ELM init/handshake line. One-shot capped at
@@ -215,6 +233,21 @@ class Obd2CommDiagnostics {
   }
 }
 
+/// Redact a raw adapter MAC for the diagnostics session (#2465).
+///
+/// MAC is a stable hardware identifier (PII). Everything before the
+/// final four characters is replaced with the middle-dot `·` so the
+/// length stays visible without leaking the address — the same form the
+/// XML/report exporters already use (`obd2_debug_session_xml.dart`,
+/// `obd2_diagnostic_report.dart`). A string of four characters or fewer
+/// is returned unchanged (there is nothing to hide); null passes through.
+String? redactObd2Mac(String? mac) {
+  if (mac == null) return null;
+  if (mac.length <= 4) return mac;
+  final visible = mac.substring(mac.length - 4);
+  return '${'·' * (mac.length - 4)}$visible';
+}
+
 /// Mutable live-session accumulator. Converted to the immutable
 /// [Obd2SessionDiagnostic] on [snapshot]/[endSession].
 class _LiveSession {
@@ -227,6 +260,7 @@ class _LiveSession {
   String? protocolDigit;
   int? mtu;
   bool? warmStart;
+  String? capabilityTier;
 
   final List<Obd2HandshakeLine> transcript = <Obd2HandshakeLine>[];
   final Map<String, _PidAccumulator> _pids = <String, _PidAccumulator>{};
@@ -257,6 +291,7 @@ class _LiveSession {
         protocolDigit: protocolDigit,
         mtu: mtu,
         warmStart: warmStart,
+        capabilityTier: capabilityTier,
         initTranscript: List.unmodifiable(transcript),
         pidStats: {
           for (final entry in _pids.entries) entry.key: entry.value.toStat(),

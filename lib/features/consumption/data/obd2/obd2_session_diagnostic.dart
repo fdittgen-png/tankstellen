@@ -53,6 +53,13 @@ abstract class Obd2SessionDiagnostic with _$Obd2SessionDiagnostic {
     /// rather than running the full cold handshake. Null until known.
     @JsonKey(name: 'ws') bool? warmStart,
 
+    /// Firmware-derived runtime capability tier name (#2465) — one of
+    /// `'standardOnly'` / `'oemPidsCapable'` / `'passiveCanCapable'`.
+    /// Wave 1 records the firmware-CLAIMED tier; Wave 2 will record the
+    /// value reconciled by the lazy multi-frame probe. Null until the
+    /// handshake reads ATI.
+    @JsonKey(name: 'ct') String? capabilityTier,
+
     /// Redacted ELM init/handshake transcript, capped one-shot at
     /// [maxTranscriptLines] by the collector. Oldest-first.
     @JsonKey(name: 'tx')

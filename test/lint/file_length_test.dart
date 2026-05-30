@@ -40,7 +40,11 @@ void main() {
   // here when a legitimate re-grandfathering is needed (same PR, with
   // a comment). NEVER add new entries — use decomposition instead.
   const grandfatheredSnapshot = <String, int>{
-    'lib/app/app_initializer.dart': 934,
+    // #2465 — re-grandfathered 934 → 950: a post-first-frame warm-up block
+    // that reads `obd2CommDiagnosticsGateProvider` to arm the gated OBD2
+    // comm-health collector from `Feature.debugMode` (mirrors the adjacent
+    // #1925 `obd2DebugSessionLoggingProvider` kick-off).
+    'lib/app/app_initializer.dart': 950,
     // #2415 — background_service.dart graduated: the scan body moved into
     // BackgroundAlertScanCoordinator + BackgroundScanRunners +
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
@@ -82,7 +86,14 @@ void main() {
     // steps of `readFuelRateLPerHour` + the new optional params on the
     // `estimateFuelRateLPerHourFromMap` forwarder. Decomposition tracked
     // by #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1505,
+    // #2465 — re-grandfathered 1505 → 1552: the connect/init path now tees
+    // the gated comm-health diagnostics — a `linkKind` field, a
+    // `beginSession` + `recordAdapterIdentity` stamp, and the two
+    // `recordHandshakeLine` tees alongside the existing
+    // `Obd2DebugSessionRecorder.recordHandshakeCommand` calls (all
+    // `if(!enabled)`-gated, no-op in prod). Decomposition tracked by
+    // #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1552,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb
