@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'elm327_protocol.dart';
+import 'obd2_comm_diagnostics.dart';
 import 'supported_pids_cache.dart';
 
 /// Owns the #811 supported-PID concern, extracted from [Obd2Service]
@@ -236,4 +237,40 @@ class SupportedPidsResolver {
       target.where(discovered.contains).toSet(),
     );
   }
+
+  /// Discovered-supported tri-state for [pid] (#2469):
+  ///
+  ///   - discovery never ran (probe-less clone / blind session) →
+  ///     `'unknown'` — we can't assert support either way;
+  ///   - discovered set contains [pid] → `'supported'`;
+  ///   - discovered set is resolved but lacks [pid] → `'unsupported'`.
+  String supportedTriState(int pid) {
+    final discovered = _supportedPids;
+    if (discovered == null) return triStateUnknown;
+    return discovered.contains(pid) ? triStateSupported : triStateUnsupported;
+  }
+
+  /// Tee the discovered-supported tri-state for every [targetCommands] entry
+  /// (command string → its Mode-01 PID int) into the gated comm-diagnostics
+  /// collector (#2469). No-op when the collector is disabled — the
+  /// `if(!enabled)` guard is checked before iterating, so production pays a
+  /// single branch-not-taken. Keeps the resolver the single source of truth
+  /// for support classification without giving it a UI/diagnostics import in
+  /// the hot path.
+  void recordSupportedTriStateInto(Map<String, int> targetCommands) {
+    final diag = Obd2CommDiagnostics.instance;
+    if (!diag.enabled) return;
+    for (final entry in targetCommands.entries) {
+      diag.recordSupportedTriState(entry.key, supportedTriState(entry.value));
+    }
+  }
 }
+
+/// Tri-state tag — discovery never ran, so support is indeterminate.
+const String triStateUnknown = 'unknown';
+
+/// Tri-state tag — the discovered set includes the PID.
+const String triStateSupported = 'supported';
+
+/// Tri-state tag — the discovered set is resolved but lacks the PID.
+const String triStateUnsupported = 'unsupported';

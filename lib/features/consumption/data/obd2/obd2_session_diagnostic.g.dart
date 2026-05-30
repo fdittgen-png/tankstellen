@@ -40,9 +40,21 @@ _Obd2SessionDiagnostic _$Obd2SessionDiagnosticFromJson(
         (k, e) => MapEntry(k, (e as num).toInt()),
       ) ??
       const <String, int>{},
+  fuelDowngrade: json['fd'] == null
+      ? const Obd2FuelDowngradeStats()
+      : Obd2FuelDowngradeStats.fromJson(json['fd'] as Map<String, dynamic>),
+  sessionActiveSeconds: (json['as'] as num?)?.toInt() ?? 0,
+  discoveredSupported:
+      (json['tri'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ) ??
+      const <String, String>{},
   expectedReads: (json['er'] as num?)?.toInt(),
   achievedReads: (json['ar'] as num?)?.toInt(),
   completenessPercent: (json['cp'] as num?)?.toDouble(),
+  completeness: json['cm'] == null
+      ? const Obd2CompletenessStats()
+      : Obd2CompletenessStats.fromJson(json['cm'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$Obd2SessionDiagnosticToJson(
@@ -61,9 +73,13 @@ Map<String, dynamic> _$Obd2SessionDiagnosticToJson(
   'sch': instance.scheduler.toJson(),
   'frm': instance.framing.toJson(),
   'ft': instance.fuelTierTicks,
+  'fd': instance.fuelDowngrade.toJson(),
+  'as': instance.sessionActiveSeconds,
+  'tri': instance.discoveredSupported,
   'er': instance.expectedReads,
   'ar': instance.achievedReads,
   'cp': instance.completenessPercent,
+  'cm': instance.completeness.toJson(),
 };
 
 _Obd2HandshakeLine _$Obd2HandshakeLineFromJson(Map<String, dynamic> json) =>
@@ -88,6 +104,11 @@ _Obd2PidStat _$Obd2PidStatFromJson(Map<String, dynamic> json) => _Obd2PidStat(
   error: (json['er'] as num?)?.toInt() ?? 0,
   latencyP50Ms: (json['p50'] as num?)?.toInt() ?? 0,
   latencyP95Ms: (json['p95'] as num?)?.toInt() ?? 0,
+  targetHz: (json['th'] as num?)?.toDouble() ?? 0.0,
+  effectiveHz: (json['eh'] as num?)?.toDouble() ?? 0.0,
+  tier: json['ti'] as String?,
+  consecutiveFailures: (json['cf'] as num?)?.toInt() ?? 0,
+  backedOff: json['bo'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$Obd2PidStatToJson(_Obd2PidStat instance) =>
@@ -99,6 +120,11 @@ Map<String, dynamic> _$Obd2PidStatToJson(_Obd2PidStat instance) =>
       'er': instance.error,
       'p50': instance.latencyP50Ms,
       'p95': instance.latencyP95Ms,
+      'th': instance.targetHz,
+      'eh': instance.effectiveHz,
+      'ti': instance.tier,
+      'cf': instance.consecutiveFailures,
+      'bo': instance.backedOff,
     };
 
 _Obd2ConnectionStats _$Obd2ConnectionStatsFromJson(Map<String, dynamic> json) =>
@@ -139,6 +165,11 @@ _Obd2SchedulerStats _$Obd2SchedulerStatsFromJson(Map<String, dynamic> json) =>
       tickRateHz: (json['tr'] as num?)?.toDouble() ?? 0.0,
       backpressureSkips: (json['bp'] as num?)?.toInt() ?? 0,
       demotions: (json['dm'] as num?)?.toInt() ?? 0,
+      ticks: (json['tk'] as num?)?.toInt() ?? 0,
+      achievedReadsPerSecond: (json['rps'] as num?)?.toDouble() ?? 0.0,
+      dynamicsEffectiveHz: (json['dhz'] as num?)?.toDouble() ?? 0.0,
+      backedOffCount: (json['bof'] as num?)?.toInt() ?? 0,
+      starved: json['st'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$Obd2SchedulerStatsToJson(_Obd2SchedulerStats instance) =>
@@ -146,7 +177,48 @@ Map<String, dynamic> _$Obd2SchedulerStatsToJson(_Obd2SchedulerStats instance) =>
       'tr': instance.tickRateHz,
       'bp': instance.backpressureSkips,
       'dm': instance.demotions,
+      'tk': instance.ticks,
+      'rps': instance.achievedReadsPerSecond,
+      'dhz': instance.dynamicsEffectiveHz,
+      'bof': instance.backedOffCount,
+      'st': instance.starved,
     };
+
+_Obd2FuelDowngradeStats _$Obd2FuelDowngradeStatsFromJson(
+  Map<String, dynamic> json,
+) => _Obd2FuelDowngradeStats(
+  totalSamples: (json['t'] as num?)?.toInt() ?? 0,
+  suspiciousSamples: (json['s'] as num?)?.toInt() ?? 0,
+);
+
+Map<String, dynamic> _$Obd2FuelDowngradeStatsToJson(
+  _Obd2FuelDowngradeStats instance,
+) => <String, dynamic>{
+  't': instance.totalSamples,
+  's': instance.suspiciousSamples,
+};
+
+_Obd2CompletenessStats _$Obd2CompletenessStatsFromJson(
+  Map<String, dynamic> json,
+) => _Obd2CompletenessStats(
+  overallPercent: (json['o'] as num?)?.toDouble() ?? 0.0,
+  perTierPercent:
+      (json['pt'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, (e as num).toDouble()),
+      ) ??
+      const <String, double>{},
+  activeDutyCycle: (json['dc'] as num?)?.toDouble() ?? 0.0,
+  emitGapDetected: json['eg'] as bool? ?? false,
+);
+
+Map<String, dynamic> _$Obd2CompletenessStatsToJson(
+  _Obd2CompletenessStats instance,
+) => <String, dynamic>{
+  'o': instance.overallPercent,
+  'pt': instance.perTierPercent,
+  'dc': instance.activeDutyCycle,
+  'eg': instance.emitGapDetected,
+};
 
 _Obd2FramingStats _$Obd2FramingStatsFromJson(Map<String, dynamic> json) =>
     _Obd2FramingStats(

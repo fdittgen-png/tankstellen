@@ -49,13 +49,29 @@ mixin _$Obd2SessionDiagnostic {
 /// prompts / garbage reads).
 @JsonKey(name: 'frm') Obd2FramingStats get framing;/// Per-tick fuel-resolution-tier distribution: branch tag → tick
 /// count (e.g. `{'pid5E': 412, 'maf': 88, 'speedDensity': 3}`).
-@JsonKey(name: 'ft') Map<String, int> get fuelTierTicks;// ---- Completeness (Wave 2 fills; null/zero for now) ---------------
+@JsonKey(name: 'ft') Map<String, int> get fuelTierTicks;/// Fuel-tier downgrade cause rolled up FREE from the breadcrumb
+/// collector (#2469): `total` samples seen vs `suspicious` samples that
+/// tripped a sanity flag (suspicious-low / 5E-vs-MAF divergent). A high
+/// suspicious ratio alongside a [fuelTierTicks] skewed away from `pid5E`
+/// is the downgrade-cause signature. Null/zero until Wave 2 rolls it up.
+@JsonKey(name: 'fd') Obd2FuelDowngradeStats get fuelDowngrade;/// How long the session was actively polling, in whole seconds — the
+/// `activeSeconds` term of the completeness expected-reads formula.
+/// 0 until Wave 2 stamps it.
+@JsonKey(name: 'as') int get sessionActiveSeconds;/// Discovered-supported tri-state per polled command (#2469):
+/// `'supported'` / `'unsupported'` / `'unknown'`. Sourced from the
+/// resolver's discovered set ∩ target set; `'unknown'` for every command
+/// when discovery never ran (probe-less clone / blind session). Empty
+/// until Wave 2 records it.
+@JsonKey(name: 'tri') Map<String, String> get discoveredSupported;// ---- Completeness (Wave 2 fills; null/zero for now) ---------------
 /// Σ(targetHz × activeSeconds) — the expected number of reads if the
 /// scheduler had hit every target. Null until Wave 2 computes it.
 @JsonKey(name: 'er') int? get expectedReads;/// Reads actually achieved this session. Null until Wave 2.
 @JsonKey(name: 'ar') int? get achievedReads;/// `achievedReads / expectedReads` as a 0–100 percentage. Null until
 /// Wave 2.
-@JsonKey(name: 'cp') double? get completenessPercent;
+@JsonKey(name: 'cp') double? get completenessPercent;/// Per-tier completeness rollup (overall + 5/2/0.5/0.1 Hz tiers +
+/// active duty cycle + emit-index gaps). Empty default until Wave 2
+/// computes it via `summariseObd2Completeness`.
+@JsonKey(name: 'cm') Obd2CompletenessStats get completeness;
 /// Create a copy of Obd2SessionDiagnostic
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -68,16 +84,16 @@ $Obd2SessionDiagnosticCopyWith<Obd2SessionDiagnostic> get copyWith => _$Obd2Sess
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SessionDiagnostic&&(identical(other.linkKind, linkKind) || other.linkKind == linkKind)&&(identical(other.redactedMac, redactedMac) || other.redactedMac == redactedMac)&&(identical(other.elmVersion, elmVersion) || other.elmVersion == elmVersion)&&(identical(other.protocolDigit, protocolDigit) || other.protocolDigit == protocolDigit)&&(identical(other.mtu, mtu) || other.mtu == mtu)&&(identical(other.warmStart, warmStart) || other.warmStart == warmStart)&&(identical(other.capabilityTier, capabilityTier) || other.capabilityTier == capabilityTier)&&const DeepCollectionEquality().equals(other.initTranscript, initTranscript)&&const DeepCollectionEquality().equals(other.pidStats, pidStats)&&(identical(other.connection, connection) || other.connection == connection)&&(identical(other.scheduler, scheduler) || other.scheduler == scheduler)&&(identical(other.framing, framing) || other.framing == framing)&&const DeepCollectionEquality().equals(other.fuelTierTicks, fuelTierTicks)&&(identical(other.expectedReads, expectedReads) || other.expectedReads == expectedReads)&&(identical(other.achievedReads, achievedReads) || other.achievedReads == achievedReads)&&(identical(other.completenessPercent, completenessPercent) || other.completenessPercent == completenessPercent));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SessionDiagnostic&&(identical(other.linkKind, linkKind) || other.linkKind == linkKind)&&(identical(other.redactedMac, redactedMac) || other.redactedMac == redactedMac)&&(identical(other.elmVersion, elmVersion) || other.elmVersion == elmVersion)&&(identical(other.protocolDigit, protocolDigit) || other.protocolDigit == protocolDigit)&&(identical(other.mtu, mtu) || other.mtu == mtu)&&(identical(other.warmStart, warmStart) || other.warmStart == warmStart)&&(identical(other.capabilityTier, capabilityTier) || other.capabilityTier == capabilityTier)&&const DeepCollectionEquality().equals(other.initTranscript, initTranscript)&&const DeepCollectionEquality().equals(other.pidStats, pidStats)&&(identical(other.connection, connection) || other.connection == connection)&&(identical(other.scheduler, scheduler) || other.scheduler == scheduler)&&(identical(other.framing, framing) || other.framing == framing)&&const DeepCollectionEquality().equals(other.fuelTierTicks, fuelTierTicks)&&(identical(other.fuelDowngrade, fuelDowngrade) || other.fuelDowngrade == fuelDowngrade)&&(identical(other.sessionActiveSeconds, sessionActiveSeconds) || other.sessionActiveSeconds == sessionActiveSeconds)&&const DeepCollectionEquality().equals(other.discoveredSupported, discoveredSupported)&&(identical(other.expectedReads, expectedReads) || other.expectedReads == expectedReads)&&(identical(other.achievedReads, achievedReads) || other.achievedReads == achievedReads)&&(identical(other.completenessPercent, completenessPercent) || other.completenessPercent == completenessPercent)&&(identical(other.completeness, completeness) || other.completeness == completeness));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,linkKind,redactedMac,elmVersion,protocolDigit,mtu,warmStart,capabilityTier,const DeepCollectionEquality().hash(initTranscript),const DeepCollectionEquality().hash(pidStats),connection,scheduler,framing,const DeepCollectionEquality().hash(fuelTierTicks),expectedReads,achievedReads,completenessPercent);
+int get hashCode => Object.hashAll([runtimeType,linkKind,redactedMac,elmVersion,protocolDigit,mtu,warmStart,capabilityTier,const DeepCollectionEquality().hash(initTranscript),const DeepCollectionEquality().hash(pidStats),connection,scheduler,framing,const DeepCollectionEquality().hash(fuelTierTicks),fuelDowngrade,sessionActiveSeconds,const DeepCollectionEquality().hash(discoveredSupported),expectedReads,achievedReads,completenessPercent,completeness]);
 
 @override
 String toString() {
-  return 'Obd2SessionDiagnostic(linkKind: $linkKind, redactedMac: $redactedMac, elmVersion: $elmVersion, protocolDigit: $protocolDigit, mtu: $mtu, warmStart: $warmStart, capabilityTier: $capabilityTier, initTranscript: $initTranscript, pidStats: $pidStats, connection: $connection, scheduler: $scheduler, framing: $framing, fuelTierTicks: $fuelTierTicks, expectedReads: $expectedReads, achievedReads: $achievedReads, completenessPercent: $completenessPercent)';
+  return 'Obd2SessionDiagnostic(linkKind: $linkKind, redactedMac: $redactedMac, elmVersion: $elmVersion, protocolDigit: $protocolDigit, mtu: $mtu, warmStart: $warmStart, capabilityTier: $capabilityTier, initTranscript: $initTranscript, pidStats: $pidStats, connection: $connection, scheduler: $scheduler, framing: $framing, fuelTierTicks: $fuelTierTicks, fuelDowngrade: $fuelDowngrade, sessionActiveSeconds: $sessionActiveSeconds, discoveredSupported: $discoveredSupported, expectedReads: $expectedReads, achievedReads: $achievedReads, completenessPercent: $completenessPercent, completeness: $completeness)';
 }
 
 
@@ -88,11 +104,11 @@ abstract mixin class $Obd2SessionDiagnosticCopyWith<$Res>  {
   factory $Obd2SessionDiagnosticCopyWith(Obd2SessionDiagnostic value, $Res Function(Obd2SessionDiagnostic) _then) = _$Obd2SessionDiagnosticCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'lk') String? linkKind,@JsonKey(name: 'mac') String? redactedMac,@JsonKey(name: 'ev') String? elmVersion,@JsonKey(name: 'pd') String? protocolDigit,@JsonKey(name: 'mtu') int? mtu,@JsonKey(name: 'ws') bool? warmStart,@JsonKey(name: 'ct') String? capabilityTier,@JsonKey(name: 'tx') List<Obd2HandshakeLine> initTranscript,@JsonKey(name: 'pid') Map<String, Obd2PidStat> pidStats,@JsonKey(name: 'conn') Obd2ConnectionStats connection,@JsonKey(name: 'sch') Obd2SchedulerStats scheduler,@JsonKey(name: 'frm') Obd2FramingStats framing,@JsonKey(name: 'ft') Map<String, int> fuelTierTicks,@JsonKey(name: 'er') int? expectedReads,@JsonKey(name: 'ar') int? achievedReads,@JsonKey(name: 'cp') double? completenessPercent
+@JsonKey(name: 'lk') String? linkKind,@JsonKey(name: 'mac') String? redactedMac,@JsonKey(name: 'ev') String? elmVersion,@JsonKey(name: 'pd') String? protocolDigit,@JsonKey(name: 'mtu') int? mtu,@JsonKey(name: 'ws') bool? warmStart,@JsonKey(name: 'ct') String? capabilityTier,@JsonKey(name: 'tx') List<Obd2HandshakeLine> initTranscript,@JsonKey(name: 'pid') Map<String, Obd2PidStat> pidStats,@JsonKey(name: 'conn') Obd2ConnectionStats connection,@JsonKey(name: 'sch') Obd2SchedulerStats scheduler,@JsonKey(name: 'frm') Obd2FramingStats framing,@JsonKey(name: 'ft') Map<String, int> fuelTierTicks,@JsonKey(name: 'fd') Obd2FuelDowngradeStats fuelDowngrade,@JsonKey(name: 'as') int sessionActiveSeconds,@JsonKey(name: 'tri') Map<String, String> discoveredSupported,@JsonKey(name: 'er') int? expectedReads,@JsonKey(name: 'ar') int? achievedReads,@JsonKey(name: 'cp') double? completenessPercent,@JsonKey(name: 'cm') Obd2CompletenessStats completeness
 });
 
 
-$Obd2ConnectionStatsCopyWith<$Res> get connection;$Obd2SchedulerStatsCopyWith<$Res> get scheduler;$Obd2FramingStatsCopyWith<$Res> get framing;
+$Obd2ConnectionStatsCopyWith<$Res> get connection;$Obd2SchedulerStatsCopyWith<$Res> get scheduler;$Obd2FramingStatsCopyWith<$Res> get framing;$Obd2FuelDowngradeStatsCopyWith<$Res> get fuelDowngrade;$Obd2CompletenessStatsCopyWith<$Res> get completeness;
 
 }
 /// @nodoc
@@ -105,7 +121,7 @@ class _$Obd2SessionDiagnosticCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SessionDiagnostic
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? linkKind = freezed,Object? redactedMac = freezed,Object? elmVersion = freezed,Object? protocolDigit = freezed,Object? mtu = freezed,Object? warmStart = freezed,Object? capabilityTier = freezed,Object? initTranscript = null,Object? pidStats = null,Object? connection = null,Object? scheduler = null,Object? framing = null,Object? fuelTierTicks = null,Object? expectedReads = freezed,Object? achievedReads = freezed,Object? completenessPercent = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? linkKind = freezed,Object? redactedMac = freezed,Object? elmVersion = freezed,Object? protocolDigit = freezed,Object? mtu = freezed,Object? warmStart = freezed,Object? capabilityTier = freezed,Object? initTranscript = null,Object? pidStats = null,Object? connection = null,Object? scheduler = null,Object? framing = null,Object? fuelTierTicks = null,Object? fuelDowngrade = null,Object? sessionActiveSeconds = null,Object? discoveredSupported = null,Object? expectedReads = freezed,Object? achievedReads = freezed,Object? completenessPercent = freezed,Object? completeness = null,}) {
   return _then(_self.copyWith(
 linkKind: freezed == linkKind ? _self.linkKind : linkKind // ignore: cast_nullable_to_non_nullable
 as String?,redactedMac: freezed == redactedMac ? _self.redactedMac : redactedMac // ignore: cast_nullable_to_non_nullable
@@ -120,10 +136,14 @@ as Map<String, Obd2PidStat>,connection: null == connection ? _self.connection : 
 as Obd2ConnectionStats,scheduler: null == scheduler ? _self.scheduler : scheduler // ignore: cast_nullable_to_non_nullable
 as Obd2SchedulerStats,framing: null == framing ? _self.framing : framing // ignore: cast_nullable_to_non_nullable
 as Obd2FramingStats,fuelTierTicks: null == fuelTierTicks ? _self.fuelTierTicks : fuelTierTicks // ignore: cast_nullable_to_non_nullable
-as Map<String, int>,expectedReads: freezed == expectedReads ? _self.expectedReads : expectedReads // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,fuelDowngrade: null == fuelDowngrade ? _self.fuelDowngrade : fuelDowngrade // ignore: cast_nullable_to_non_nullable
+as Obd2FuelDowngradeStats,sessionActiveSeconds: null == sessionActiveSeconds ? _self.sessionActiveSeconds : sessionActiveSeconds // ignore: cast_nullable_to_non_nullable
+as int,discoveredSupported: null == discoveredSupported ? _self.discoveredSupported : discoveredSupported // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,expectedReads: freezed == expectedReads ? _self.expectedReads : expectedReads // ignore: cast_nullable_to_non_nullable
 as int?,achievedReads: freezed == achievedReads ? _self.achievedReads : achievedReads // ignore: cast_nullable_to_non_nullable
 as int?,completenessPercent: freezed == completenessPercent ? _self.completenessPercent : completenessPercent // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,completeness: null == completeness ? _self.completeness : completeness // ignore: cast_nullable_to_non_nullable
+as Obd2CompletenessStats,
   ));
 }
 /// Create a copy of Obd2SessionDiagnostic
@@ -152,6 +172,24 @@ $Obd2FramingStatsCopyWith<$Res> get framing {
   
   return $Obd2FramingStatsCopyWith<$Res>(_self.framing, (value) {
     return _then(_self.copyWith(framing: value));
+  });
+}/// Create a copy of Obd2SessionDiagnostic
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$Obd2FuelDowngradeStatsCopyWith<$Res> get fuelDowngrade {
+  
+  return $Obd2FuelDowngradeStatsCopyWith<$Res>(_self.fuelDowngrade, (value) {
+    return _then(_self.copyWith(fuelDowngrade: value));
+  });
+}/// Create a copy of Obd2SessionDiagnostic
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$Obd2CompletenessStatsCopyWith<$Res> get completeness {
+  
+  return $Obd2CompletenessStatsCopyWith<$Res>(_self.completeness, (value) {
+    return _then(_self.copyWith(completeness: value));
   });
 }
 }
@@ -235,10 +273,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'lk')  String? linkKind, @JsonKey(name: 'mac')  String? redactedMac, @JsonKey(name: 'ev')  String? elmVersion, @JsonKey(name: 'pd')  String? protocolDigit, @JsonKey(name: 'mtu')  int? mtu, @JsonKey(name: 'ws')  bool? warmStart, @JsonKey(name: 'ct')  String? capabilityTier, @JsonKey(name: 'tx')  List<Obd2HandshakeLine> initTranscript, @JsonKey(name: 'pid')  Map<String, Obd2PidStat> pidStats, @JsonKey(name: 'conn')  Obd2ConnectionStats connection, @JsonKey(name: 'sch')  Obd2SchedulerStats scheduler, @JsonKey(name: 'frm')  Obd2FramingStats framing, @JsonKey(name: 'ft')  Map<String, int> fuelTierTicks, @JsonKey(name: 'er')  int? expectedReads, @JsonKey(name: 'ar')  int? achievedReads, @JsonKey(name: 'cp')  double? completenessPercent)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'lk')  String? linkKind, @JsonKey(name: 'mac')  String? redactedMac, @JsonKey(name: 'ev')  String? elmVersion, @JsonKey(name: 'pd')  String? protocolDigit, @JsonKey(name: 'mtu')  int? mtu, @JsonKey(name: 'ws')  bool? warmStart, @JsonKey(name: 'ct')  String? capabilityTier, @JsonKey(name: 'tx')  List<Obd2HandshakeLine> initTranscript, @JsonKey(name: 'pid')  Map<String, Obd2PidStat> pidStats, @JsonKey(name: 'conn')  Obd2ConnectionStats connection, @JsonKey(name: 'sch')  Obd2SchedulerStats scheduler, @JsonKey(name: 'frm')  Obd2FramingStats framing, @JsonKey(name: 'ft')  Map<String, int> fuelTierTicks, @JsonKey(name: 'fd')  Obd2FuelDowngradeStats fuelDowngrade, @JsonKey(name: 'as')  int sessionActiveSeconds, @JsonKey(name: 'tri')  Map<String, String> discoveredSupported, @JsonKey(name: 'er')  int? expectedReads, @JsonKey(name: 'ar')  int? achievedReads, @JsonKey(name: 'cp')  double? completenessPercent, @JsonKey(name: 'cm')  Obd2CompletenessStats completeness)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Obd2SessionDiagnostic() when $default != null:
-return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocolDigit,_that.mtu,_that.warmStart,_that.capabilityTier,_that.initTranscript,_that.pidStats,_that.connection,_that.scheduler,_that.framing,_that.fuelTierTicks,_that.expectedReads,_that.achievedReads,_that.completenessPercent);case _:
+return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocolDigit,_that.mtu,_that.warmStart,_that.capabilityTier,_that.initTranscript,_that.pidStats,_that.connection,_that.scheduler,_that.framing,_that.fuelTierTicks,_that.fuelDowngrade,_that.sessionActiveSeconds,_that.discoveredSupported,_that.expectedReads,_that.achievedReads,_that.completenessPercent,_that.completeness);case _:
   return orElse();
 
 }
@@ -256,10 +294,10 @@ return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocol
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'lk')  String? linkKind, @JsonKey(name: 'mac')  String? redactedMac, @JsonKey(name: 'ev')  String? elmVersion, @JsonKey(name: 'pd')  String? protocolDigit, @JsonKey(name: 'mtu')  int? mtu, @JsonKey(name: 'ws')  bool? warmStart, @JsonKey(name: 'ct')  String? capabilityTier, @JsonKey(name: 'tx')  List<Obd2HandshakeLine> initTranscript, @JsonKey(name: 'pid')  Map<String, Obd2PidStat> pidStats, @JsonKey(name: 'conn')  Obd2ConnectionStats connection, @JsonKey(name: 'sch')  Obd2SchedulerStats scheduler, @JsonKey(name: 'frm')  Obd2FramingStats framing, @JsonKey(name: 'ft')  Map<String, int> fuelTierTicks, @JsonKey(name: 'er')  int? expectedReads, @JsonKey(name: 'ar')  int? achievedReads, @JsonKey(name: 'cp')  double? completenessPercent)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'lk')  String? linkKind, @JsonKey(name: 'mac')  String? redactedMac, @JsonKey(name: 'ev')  String? elmVersion, @JsonKey(name: 'pd')  String? protocolDigit, @JsonKey(name: 'mtu')  int? mtu, @JsonKey(name: 'ws')  bool? warmStart, @JsonKey(name: 'ct')  String? capabilityTier, @JsonKey(name: 'tx')  List<Obd2HandshakeLine> initTranscript, @JsonKey(name: 'pid')  Map<String, Obd2PidStat> pidStats, @JsonKey(name: 'conn')  Obd2ConnectionStats connection, @JsonKey(name: 'sch')  Obd2SchedulerStats scheduler, @JsonKey(name: 'frm')  Obd2FramingStats framing, @JsonKey(name: 'ft')  Map<String, int> fuelTierTicks, @JsonKey(name: 'fd')  Obd2FuelDowngradeStats fuelDowngrade, @JsonKey(name: 'as')  int sessionActiveSeconds, @JsonKey(name: 'tri')  Map<String, String> discoveredSupported, @JsonKey(name: 'er')  int? expectedReads, @JsonKey(name: 'ar')  int? achievedReads, @JsonKey(name: 'cp')  double? completenessPercent, @JsonKey(name: 'cm')  Obd2CompletenessStats completeness)  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SessionDiagnostic():
-return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocolDigit,_that.mtu,_that.warmStart,_that.capabilityTier,_that.initTranscript,_that.pidStats,_that.connection,_that.scheduler,_that.framing,_that.fuelTierTicks,_that.expectedReads,_that.achievedReads,_that.completenessPercent);case _:
+return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocolDigit,_that.mtu,_that.warmStart,_that.capabilityTier,_that.initTranscript,_that.pidStats,_that.connection,_that.scheduler,_that.framing,_that.fuelTierTicks,_that.fuelDowngrade,_that.sessionActiveSeconds,_that.discoveredSupported,_that.expectedReads,_that.achievedReads,_that.completenessPercent,_that.completeness);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -276,10 +314,10 @@ return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocol
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'lk')  String? linkKind, @JsonKey(name: 'mac')  String? redactedMac, @JsonKey(name: 'ev')  String? elmVersion, @JsonKey(name: 'pd')  String? protocolDigit, @JsonKey(name: 'mtu')  int? mtu, @JsonKey(name: 'ws')  bool? warmStart, @JsonKey(name: 'ct')  String? capabilityTier, @JsonKey(name: 'tx')  List<Obd2HandshakeLine> initTranscript, @JsonKey(name: 'pid')  Map<String, Obd2PidStat> pidStats, @JsonKey(name: 'conn')  Obd2ConnectionStats connection, @JsonKey(name: 'sch')  Obd2SchedulerStats scheduler, @JsonKey(name: 'frm')  Obd2FramingStats framing, @JsonKey(name: 'ft')  Map<String, int> fuelTierTicks, @JsonKey(name: 'er')  int? expectedReads, @JsonKey(name: 'ar')  int? achievedReads, @JsonKey(name: 'cp')  double? completenessPercent)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'lk')  String? linkKind, @JsonKey(name: 'mac')  String? redactedMac, @JsonKey(name: 'ev')  String? elmVersion, @JsonKey(name: 'pd')  String? protocolDigit, @JsonKey(name: 'mtu')  int? mtu, @JsonKey(name: 'ws')  bool? warmStart, @JsonKey(name: 'ct')  String? capabilityTier, @JsonKey(name: 'tx')  List<Obd2HandshakeLine> initTranscript, @JsonKey(name: 'pid')  Map<String, Obd2PidStat> pidStats, @JsonKey(name: 'conn')  Obd2ConnectionStats connection, @JsonKey(name: 'sch')  Obd2SchedulerStats scheduler, @JsonKey(name: 'frm')  Obd2FramingStats framing, @JsonKey(name: 'ft')  Map<String, int> fuelTierTicks, @JsonKey(name: 'fd')  Obd2FuelDowngradeStats fuelDowngrade, @JsonKey(name: 'as')  int sessionActiveSeconds, @JsonKey(name: 'tri')  Map<String, String> discoveredSupported, @JsonKey(name: 'er')  int? expectedReads, @JsonKey(name: 'ar')  int? achievedReads, @JsonKey(name: 'cp')  double? completenessPercent, @JsonKey(name: 'cm')  Obd2CompletenessStats completeness)?  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SessionDiagnostic() when $default != null:
-return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocolDigit,_that.mtu,_that.warmStart,_that.capabilityTier,_that.initTranscript,_that.pidStats,_that.connection,_that.scheduler,_that.framing,_that.fuelTierTicks,_that.expectedReads,_that.achievedReads,_that.completenessPercent);case _:
+return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocolDigit,_that.mtu,_that.warmStart,_that.capabilityTier,_that.initTranscript,_that.pidStats,_that.connection,_that.scheduler,_that.framing,_that.fuelTierTicks,_that.fuelDowngrade,_that.sessionActiveSeconds,_that.discoveredSupported,_that.expectedReads,_that.achievedReads,_that.completenessPercent,_that.completeness);case _:
   return null;
 
 }
@@ -291,7 +329,7 @@ return $default(_that.linkKind,_that.redactedMac,_that.elmVersion,_that.protocol
 @JsonSerializable()
 
 class _Obd2SessionDiagnostic extends Obd2SessionDiagnostic {
-  const _Obd2SessionDiagnostic({@JsonKey(name: 'lk') this.linkKind, @JsonKey(name: 'mac') this.redactedMac, @JsonKey(name: 'ev') this.elmVersion, @JsonKey(name: 'pd') this.protocolDigit, @JsonKey(name: 'mtu') this.mtu, @JsonKey(name: 'ws') this.warmStart, @JsonKey(name: 'ct') this.capabilityTier, @JsonKey(name: 'tx') final  List<Obd2HandshakeLine> initTranscript = const <Obd2HandshakeLine>[], @JsonKey(name: 'pid') final  Map<String, Obd2PidStat> pidStats = const <String, Obd2PidStat>{}, @JsonKey(name: 'conn') this.connection = const Obd2ConnectionStats(), @JsonKey(name: 'sch') this.scheduler = const Obd2SchedulerStats(), @JsonKey(name: 'frm') this.framing = const Obd2FramingStats(), @JsonKey(name: 'ft') final  Map<String, int> fuelTierTicks = const <String, int>{}, @JsonKey(name: 'er') this.expectedReads, @JsonKey(name: 'ar') this.achievedReads, @JsonKey(name: 'cp') this.completenessPercent}): _initTranscript = initTranscript,_pidStats = pidStats,_fuelTierTicks = fuelTierTicks,super._();
+  const _Obd2SessionDiagnostic({@JsonKey(name: 'lk') this.linkKind, @JsonKey(name: 'mac') this.redactedMac, @JsonKey(name: 'ev') this.elmVersion, @JsonKey(name: 'pd') this.protocolDigit, @JsonKey(name: 'mtu') this.mtu, @JsonKey(name: 'ws') this.warmStart, @JsonKey(name: 'ct') this.capabilityTier, @JsonKey(name: 'tx') final  List<Obd2HandshakeLine> initTranscript = const <Obd2HandshakeLine>[], @JsonKey(name: 'pid') final  Map<String, Obd2PidStat> pidStats = const <String, Obd2PidStat>{}, @JsonKey(name: 'conn') this.connection = const Obd2ConnectionStats(), @JsonKey(name: 'sch') this.scheduler = const Obd2SchedulerStats(), @JsonKey(name: 'frm') this.framing = const Obd2FramingStats(), @JsonKey(name: 'ft') final  Map<String, int> fuelTierTicks = const <String, int>{}, @JsonKey(name: 'fd') this.fuelDowngrade = const Obd2FuelDowngradeStats(), @JsonKey(name: 'as') this.sessionActiveSeconds = 0, @JsonKey(name: 'tri') final  Map<String, String> discoveredSupported = const <String, String>{}, @JsonKey(name: 'er') this.expectedReads, @JsonKey(name: 'ar') this.achievedReads, @JsonKey(name: 'cp') this.completenessPercent, @JsonKey(name: 'cm') this.completeness = const Obd2CompletenessStats()}): _initTranscript = initTranscript,_pidStats = pidStats,_fuelTierTicks = fuelTierTicks,_discoveredSupported = discoveredSupported,super._();
   factory _Obd2SessionDiagnostic.fromJson(Map<String, dynamic> json) => _$Obd2SessionDiagnosticFromJson(json);
 
 /// Transport flavour that carried this session: `'ble'`, `'classic'`,
@@ -366,6 +404,33 @@ class _Obd2SessionDiagnostic extends Obd2SessionDiagnostic {
   return EqualUnmodifiableMapView(_fuelTierTicks);
 }
 
+/// Fuel-tier downgrade cause rolled up FREE from the breadcrumb
+/// collector (#2469): `total` samples seen vs `suspicious` samples that
+/// tripped a sanity flag (suspicious-low / 5E-vs-MAF divergent). A high
+/// suspicious ratio alongside a [fuelTierTicks] skewed away from `pid5E`
+/// is the downgrade-cause signature. Null/zero until Wave 2 rolls it up.
+@override@JsonKey(name: 'fd') final  Obd2FuelDowngradeStats fuelDowngrade;
+/// How long the session was actively polling, in whole seconds — the
+/// `activeSeconds` term of the completeness expected-reads formula.
+/// 0 until Wave 2 stamps it.
+@override@JsonKey(name: 'as') final  int sessionActiveSeconds;
+/// Discovered-supported tri-state per polled command (#2469):
+/// `'supported'` / `'unsupported'` / `'unknown'`. Sourced from the
+/// resolver's discovered set ∩ target set; `'unknown'` for every command
+/// when discovery never ran (probe-less clone / blind session). Empty
+/// until Wave 2 records it.
+ final  Map<String, String> _discoveredSupported;
+/// Discovered-supported tri-state per polled command (#2469):
+/// `'supported'` / `'unsupported'` / `'unknown'`. Sourced from the
+/// resolver's discovered set ∩ target set; `'unknown'` for every command
+/// when discovery never ran (probe-less clone / blind session). Empty
+/// until Wave 2 records it.
+@override@JsonKey(name: 'tri') Map<String, String> get discoveredSupported {
+  if (_discoveredSupported is EqualUnmodifiableMapView) return _discoveredSupported;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_discoveredSupported);
+}
+
 // ---- Completeness (Wave 2 fills; null/zero for now) ---------------
 /// Σ(targetHz × activeSeconds) — the expected number of reads if the
 /// scheduler had hit every target. Null until Wave 2 computes it.
@@ -375,6 +440,10 @@ class _Obd2SessionDiagnostic extends Obd2SessionDiagnostic {
 /// `achievedReads / expectedReads` as a 0–100 percentage. Null until
 /// Wave 2.
 @override@JsonKey(name: 'cp') final  double? completenessPercent;
+/// Per-tier completeness rollup (overall + 5/2/0.5/0.1 Hz tiers +
+/// active duty cycle + emit-index gaps). Empty default until Wave 2
+/// computes it via `summariseObd2Completeness`.
+@override@JsonKey(name: 'cm') final  Obd2CompletenessStats completeness;
 
 /// Create a copy of Obd2SessionDiagnostic
 /// with the given fields replaced by the non-null parameter values.
@@ -389,16 +458,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SessionDiagnostic&&(identical(other.linkKind, linkKind) || other.linkKind == linkKind)&&(identical(other.redactedMac, redactedMac) || other.redactedMac == redactedMac)&&(identical(other.elmVersion, elmVersion) || other.elmVersion == elmVersion)&&(identical(other.protocolDigit, protocolDigit) || other.protocolDigit == protocolDigit)&&(identical(other.mtu, mtu) || other.mtu == mtu)&&(identical(other.warmStart, warmStart) || other.warmStart == warmStart)&&(identical(other.capabilityTier, capabilityTier) || other.capabilityTier == capabilityTier)&&const DeepCollectionEquality().equals(other._initTranscript, _initTranscript)&&const DeepCollectionEquality().equals(other._pidStats, _pidStats)&&(identical(other.connection, connection) || other.connection == connection)&&(identical(other.scheduler, scheduler) || other.scheduler == scheduler)&&(identical(other.framing, framing) || other.framing == framing)&&const DeepCollectionEquality().equals(other._fuelTierTicks, _fuelTierTicks)&&(identical(other.expectedReads, expectedReads) || other.expectedReads == expectedReads)&&(identical(other.achievedReads, achievedReads) || other.achievedReads == achievedReads)&&(identical(other.completenessPercent, completenessPercent) || other.completenessPercent == completenessPercent));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SessionDiagnostic&&(identical(other.linkKind, linkKind) || other.linkKind == linkKind)&&(identical(other.redactedMac, redactedMac) || other.redactedMac == redactedMac)&&(identical(other.elmVersion, elmVersion) || other.elmVersion == elmVersion)&&(identical(other.protocolDigit, protocolDigit) || other.protocolDigit == protocolDigit)&&(identical(other.mtu, mtu) || other.mtu == mtu)&&(identical(other.warmStart, warmStart) || other.warmStart == warmStart)&&(identical(other.capabilityTier, capabilityTier) || other.capabilityTier == capabilityTier)&&const DeepCollectionEquality().equals(other._initTranscript, _initTranscript)&&const DeepCollectionEquality().equals(other._pidStats, _pidStats)&&(identical(other.connection, connection) || other.connection == connection)&&(identical(other.scheduler, scheduler) || other.scheduler == scheduler)&&(identical(other.framing, framing) || other.framing == framing)&&const DeepCollectionEquality().equals(other._fuelTierTicks, _fuelTierTicks)&&(identical(other.fuelDowngrade, fuelDowngrade) || other.fuelDowngrade == fuelDowngrade)&&(identical(other.sessionActiveSeconds, sessionActiveSeconds) || other.sessionActiveSeconds == sessionActiveSeconds)&&const DeepCollectionEquality().equals(other._discoveredSupported, _discoveredSupported)&&(identical(other.expectedReads, expectedReads) || other.expectedReads == expectedReads)&&(identical(other.achievedReads, achievedReads) || other.achievedReads == achievedReads)&&(identical(other.completenessPercent, completenessPercent) || other.completenessPercent == completenessPercent)&&(identical(other.completeness, completeness) || other.completeness == completeness));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,linkKind,redactedMac,elmVersion,protocolDigit,mtu,warmStart,capabilityTier,const DeepCollectionEquality().hash(_initTranscript),const DeepCollectionEquality().hash(_pidStats),connection,scheduler,framing,const DeepCollectionEquality().hash(_fuelTierTicks),expectedReads,achievedReads,completenessPercent);
+int get hashCode => Object.hashAll([runtimeType,linkKind,redactedMac,elmVersion,protocolDigit,mtu,warmStart,capabilityTier,const DeepCollectionEquality().hash(_initTranscript),const DeepCollectionEquality().hash(_pidStats),connection,scheduler,framing,const DeepCollectionEquality().hash(_fuelTierTicks),fuelDowngrade,sessionActiveSeconds,const DeepCollectionEquality().hash(_discoveredSupported),expectedReads,achievedReads,completenessPercent,completeness]);
 
 @override
 String toString() {
-  return 'Obd2SessionDiagnostic(linkKind: $linkKind, redactedMac: $redactedMac, elmVersion: $elmVersion, protocolDigit: $protocolDigit, mtu: $mtu, warmStart: $warmStart, capabilityTier: $capabilityTier, initTranscript: $initTranscript, pidStats: $pidStats, connection: $connection, scheduler: $scheduler, framing: $framing, fuelTierTicks: $fuelTierTicks, expectedReads: $expectedReads, achievedReads: $achievedReads, completenessPercent: $completenessPercent)';
+  return 'Obd2SessionDiagnostic(linkKind: $linkKind, redactedMac: $redactedMac, elmVersion: $elmVersion, protocolDigit: $protocolDigit, mtu: $mtu, warmStart: $warmStart, capabilityTier: $capabilityTier, initTranscript: $initTranscript, pidStats: $pidStats, connection: $connection, scheduler: $scheduler, framing: $framing, fuelTierTicks: $fuelTierTicks, fuelDowngrade: $fuelDowngrade, sessionActiveSeconds: $sessionActiveSeconds, discoveredSupported: $discoveredSupported, expectedReads: $expectedReads, achievedReads: $achievedReads, completenessPercent: $completenessPercent, completeness: $completeness)';
 }
 
 
@@ -409,11 +478,11 @@ abstract mixin class _$Obd2SessionDiagnosticCopyWith<$Res> implements $Obd2Sessi
   factory _$Obd2SessionDiagnosticCopyWith(_Obd2SessionDiagnostic value, $Res Function(_Obd2SessionDiagnostic) _then) = __$Obd2SessionDiagnosticCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'lk') String? linkKind,@JsonKey(name: 'mac') String? redactedMac,@JsonKey(name: 'ev') String? elmVersion,@JsonKey(name: 'pd') String? protocolDigit,@JsonKey(name: 'mtu') int? mtu,@JsonKey(name: 'ws') bool? warmStart,@JsonKey(name: 'ct') String? capabilityTier,@JsonKey(name: 'tx') List<Obd2HandshakeLine> initTranscript,@JsonKey(name: 'pid') Map<String, Obd2PidStat> pidStats,@JsonKey(name: 'conn') Obd2ConnectionStats connection,@JsonKey(name: 'sch') Obd2SchedulerStats scheduler,@JsonKey(name: 'frm') Obd2FramingStats framing,@JsonKey(name: 'ft') Map<String, int> fuelTierTicks,@JsonKey(name: 'er') int? expectedReads,@JsonKey(name: 'ar') int? achievedReads,@JsonKey(name: 'cp') double? completenessPercent
+@JsonKey(name: 'lk') String? linkKind,@JsonKey(name: 'mac') String? redactedMac,@JsonKey(name: 'ev') String? elmVersion,@JsonKey(name: 'pd') String? protocolDigit,@JsonKey(name: 'mtu') int? mtu,@JsonKey(name: 'ws') bool? warmStart,@JsonKey(name: 'ct') String? capabilityTier,@JsonKey(name: 'tx') List<Obd2HandshakeLine> initTranscript,@JsonKey(name: 'pid') Map<String, Obd2PidStat> pidStats,@JsonKey(name: 'conn') Obd2ConnectionStats connection,@JsonKey(name: 'sch') Obd2SchedulerStats scheduler,@JsonKey(name: 'frm') Obd2FramingStats framing,@JsonKey(name: 'ft') Map<String, int> fuelTierTicks,@JsonKey(name: 'fd') Obd2FuelDowngradeStats fuelDowngrade,@JsonKey(name: 'as') int sessionActiveSeconds,@JsonKey(name: 'tri') Map<String, String> discoveredSupported,@JsonKey(name: 'er') int? expectedReads,@JsonKey(name: 'ar') int? achievedReads,@JsonKey(name: 'cp') double? completenessPercent,@JsonKey(name: 'cm') Obd2CompletenessStats completeness
 });
 
 
-@override $Obd2ConnectionStatsCopyWith<$Res> get connection;@override $Obd2SchedulerStatsCopyWith<$Res> get scheduler;@override $Obd2FramingStatsCopyWith<$Res> get framing;
+@override $Obd2ConnectionStatsCopyWith<$Res> get connection;@override $Obd2SchedulerStatsCopyWith<$Res> get scheduler;@override $Obd2FramingStatsCopyWith<$Res> get framing;@override $Obd2FuelDowngradeStatsCopyWith<$Res> get fuelDowngrade;@override $Obd2CompletenessStatsCopyWith<$Res> get completeness;
 
 }
 /// @nodoc
@@ -426,7 +495,7 @@ class __$Obd2SessionDiagnosticCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SessionDiagnostic
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? linkKind = freezed,Object? redactedMac = freezed,Object? elmVersion = freezed,Object? protocolDigit = freezed,Object? mtu = freezed,Object? warmStart = freezed,Object? capabilityTier = freezed,Object? initTranscript = null,Object? pidStats = null,Object? connection = null,Object? scheduler = null,Object? framing = null,Object? fuelTierTicks = null,Object? expectedReads = freezed,Object? achievedReads = freezed,Object? completenessPercent = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? linkKind = freezed,Object? redactedMac = freezed,Object? elmVersion = freezed,Object? protocolDigit = freezed,Object? mtu = freezed,Object? warmStart = freezed,Object? capabilityTier = freezed,Object? initTranscript = null,Object? pidStats = null,Object? connection = null,Object? scheduler = null,Object? framing = null,Object? fuelTierTicks = null,Object? fuelDowngrade = null,Object? sessionActiveSeconds = null,Object? discoveredSupported = null,Object? expectedReads = freezed,Object? achievedReads = freezed,Object? completenessPercent = freezed,Object? completeness = null,}) {
   return _then(_Obd2SessionDiagnostic(
 linkKind: freezed == linkKind ? _self.linkKind : linkKind // ignore: cast_nullable_to_non_nullable
 as String?,redactedMac: freezed == redactedMac ? _self.redactedMac : redactedMac // ignore: cast_nullable_to_non_nullable
@@ -441,10 +510,14 @@ as Map<String, Obd2PidStat>,connection: null == connection ? _self.connection : 
 as Obd2ConnectionStats,scheduler: null == scheduler ? _self.scheduler : scheduler // ignore: cast_nullable_to_non_nullable
 as Obd2SchedulerStats,framing: null == framing ? _self.framing : framing // ignore: cast_nullable_to_non_nullable
 as Obd2FramingStats,fuelTierTicks: null == fuelTierTicks ? _self._fuelTierTicks : fuelTierTicks // ignore: cast_nullable_to_non_nullable
-as Map<String, int>,expectedReads: freezed == expectedReads ? _self.expectedReads : expectedReads // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,fuelDowngrade: null == fuelDowngrade ? _self.fuelDowngrade : fuelDowngrade // ignore: cast_nullable_to_non_nullable
+as Obd2FuelDowngradeStats,sessionActiveSeconds: null == sessionActiveSeconds ? _self.sessionActiveSeconds : sessionActiveSeconds // ignore: cast_nullable_to_non_nullable
+as int,discoveredSupported: null == discoveredSupported ? _self._discoveredSupported : discoveredSupported // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,expectedReads: freezed == expectedReads ? _self.expectedReads : expectedReads // ignore: cast_nullable_to_non_nullable
 as int?,achievedReads: freezed == achievedReads ? _self.achievedReads : achievedReads // ignore: cast_nullable_to_non_nullable
 as int?,completenessPercent: freezed == completenessPercent ? _self.completenessPercent : completenessPercent // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,completeness: null == completeness ? _self.completeness : completeness // ignore: cast_nullable_to_non_nullable
+as Obd2CompletenessStats,
   ));
 }
 
@@ -474,6 +547,24 @@ $Obd2FramingStatsCopyWith<$Res> get framing {
   
   return $Obd2FramingStatsCopyWith<$Res>(_self.framing, (value) {
     return _then(_self.copyWith(framing: value));
+  });
+}/// Create a copy of Obd2SessionDiagnostic
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$Obd2FuelDowngradeStatsCopyWith<$Res> get fuelDowngrade {
+  
+  return $Obd2FuelDowngradeStatsCopyWith<$Res>(_self.fuelDowngrade, (value) {
+    return _then(_self.copyWith(fuelDowngrade: value));
+  });
+}/// Create a copy of Obd2SessionDiagnostic
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$Obd2CompletenessStatsCopyWith<$Res> get completeness {
+  
+  return $Obd2CompletenessStatsCopyWith<$Res>(_self.completeness, (value) {
+    return _then(_self.copyWith(completeness: value));
   });
 }
 }
@@ -767,7 +858,20 @@ mixin _$Obd2PidStat {
 /// unrecognized/garbage rolled up).
 @JsonKey(name: 'er') int get error;/// Median (p50) round-trip latency in ms across this PID's reads.
 @JsonKey(name: 'p50') int get latencyP50Ms;/// 95th-percentile round-trip latency in ms.
-@JsonKey(name: 'p95') int get latencyP95Ms;
+@JsonKey(name: 'p95') int get latencyP95Ms;/// Configured target refresh rate (Hz) the scheduler aims for this PID.
+/// 0 when the dispatch tee didn't carry a target (e.g. a one-off raw
+/// read outside the scheduler).
+@JsonKey(name: 'th') double get targetHz;/// Achieved effective refresh rate (Hz) = `ok / sessionActiveSeconds`,
+/// filled by `summariseObd2Completeness`. 0 until completeness runs.
+@JsonKey(name: 'eh') double get effectiveHz;/// Cadence tier name (`'dynamics'`/`'mixture'`/`'slowCorrection'`/
+/// `'thermalContext'`) carried by the dispatch tee. Null for un-tiered
+/// raw reads.
+@JsonKey(name: 'ti') String? get tier;/// Consecutive transport failures at the last result for this PID — the
+/// scheduler's #2379 backoff streak. 0 when the last read succeeded.
+@JsonKey(name: 'cf') int get consecutiveFailures;/// True when this PID was in the scheduler's backed-off state at the
+/// last result (failed ≥ the backoff threshold in a row, polled at the
+/// slow ≈1/30 s rate). Persisted so a mostly-NO-DATA PID is visible.
+@JsonKey(name: 'bo') bool get backedOff;
 /// Create a copy of Obd2PidStat
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -780,16 +884,16 @@ $Obd2PidStatCopyWith<Obd2PidStat> get copyWith => _$Obd2PidStatCopyWithImpl<Obd2
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2PidStat&&(identical(other.polled, polled) || other.polled == polled)&&(identical(other.ok, ok) || other.ok == ok)&&(identical(other.noData, noData) || other.noData == noData)&&(identical(other.timeout, timeout) || other.timeout == timeout)&&(identical(other.error, error) || other.error == error)&&(identical(other.latencyP50Ms, latencyP50Ms) || other.latencyP50Ms == latencyP50Ms)&&(identical(other.latencyP95Ms, latencyP95Ms) || other.latencyP95Ms == latencyP95Ms));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2PidStat&&(identical(other.polled, polled) || other.polled == polled)&&(identical(other.ok, ok) || other.ok == ok)&&(identical(other.noData, noData) || other.noData == noData)&&(identical(other.timeout, timeout) || other.timeout == timeout)&&(identical(other.error, error) || other.error == error)&&(identical(other.latencyP50Ms, latencyP50Ms) || other.latencyP50Ms == latencyP50Ms)&&(identical(other.latencyP95Ms, latencyP95Ms) || other.latencyP95Ms == latencyP95Ms)&&(identical(other.targetHz, targetHz) || other.targetHz == targetHz)&&(identical(other.effectiveHz, effectiveHz) || other.effectiveHz == effectiveHz)&&(identical(other.tier, tier) || other.tier == tier)&&(identical(other.consecutiveFailures, consecutiveFailures) || other.consecutiveFailures == consecutiveFailures)&&(identical(other.backedOff, backedOff) || other.backedOff == backedOff));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,polled,ok,noData,timeout,error,latencyP50Ms,latencyP95Ms);
+int get hashCode => Object.hash(runtimeType,polled,ok,noData,timeout,error,latencyP50Ms,latencyP95Ms,targetHz,effectiveHz,tier,consecutiveFailures,backedOff);
 
 @override
 String toString() {
-  return 'Obd2PidStat(polled: $polled, ok: $ok, noData: $noData, timeout: $timeout, error: $error, latencyP50Ms: $latencyP50Ms, latencyP95Ms: $latencyP95Ms)';
+  return 'Obd2PidStat(polled: $polled, ok: $ok, noData: $noData, timeout: $timeout, error: $error, latencyP50Ms: $latencyP50Ms, latencyP95Ms: $latencyP95Ms, targetHz: $targetHz, effectiveHz: $effectiveHz, tier: $tier, consecutiveFailures: $consecutiveFailures, backedOff: $backedOff)';
 }
 
 
@@ -800,7 +904,7 @@ abstract mixin class $Obd2PidStatCopyWith<$Res>  {
   factory $Obd2PidStatCopyWith(Obd2PidStat value, $Res Function(Obd2PidStat) _then) = _$Obd2PidStatCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'p') int polled,@JsonKey(name: 'ok') int ok,@JsonKey(name: 'nd') int noData,@JsonKey(name: 'to') int timeout,@JsonKey(name: 'er') int error,@JsonKey(name: 'p50') int latencyP50Ms,@JsonKey(name: 'p95') int latencyP95Ms
+@JsonKey(name: 'p') int polled,@JsonKey(name: 'ok') int ok,@JsonKey(name: 'nd') int noData,@JsonKey(name: 'to') int timeout,@JsonKey(name: 'er') int error,@JsonKey(name: 'p50') int latencyP50Ms,@JsonKey(name: 'p95') int latencyP95Ms,@JsonKey(name: 'th') double targetHz,@JsonKey(name: 'eh') double effectiveHz,@JsonKey(name: 'ti') String? tier,@JsonKey(name: 'cf') int consecutiveFailures,@JsonKey(name: 'bo') bool backedOff
 });
 
 
@@ -817,7 +921,7 @@ class _$Obd2PidStatCopyWithImpl<$Res>
 
 /// Create a copy of Obd2PidStat
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? polled = null,Object? ok = null,Object? noData = null,Object? timeout = null,Object? error = null,Object? latencyP50Ms = null,Object? latencyP95Ms = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? polled = null,Object? ok = null,Object? noData = null,Object? timeout = null,Object? error = null,Object? latencyP50Ms = null,Object? latencyP95Ms = null,Object? targetHz = null,Object? effectiveHz = null,Object? tier = freezed,Object? consecutiveFailures = null,Object? backedOff = null,}) {
   return _then(_self.copyWith(
 polled: null == polled ? _self.polled : polled // ignore: cast_nullable_to_non_nullable
 as int,ok: null == ok ? _self.ok : ok // ignore: cast_nullable_to_non_nullable
@@ -826,7 +930,12 @@ as int,timeout: null == timeout ? _self.timeout : timeout // ignore: cast_nullab
 as int,error: null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as int,latencyP50Ms: null == latencyP50Ms ? _self.latencyP50Ms : latencyP50Ms // ignore: cast_nullable_to_non_nullable
 as int,latencyP95Ms: null == latencyP95Ms ? _self.latencyP95Ms : latencyP95Ms // ignore: cast_nullable_to_non_nullable
-as int,
+as int,targetHz: null == targetHz ? _self.targetHz : targetHz // ignore: cast_nullable_to_non_nullable
+as double,effectiveHz: null == effectiveHz ? _self.effectiveHz : effectiveHz // ignore: cast_nullable_to_non_nullable
+as double,tier: freezed == tier ? _self.tier : tier // ignore: cast_nullable_to_non_nullable
+as String?,consecutiveFailures: null == consecutiveFailures ? _self.consecutiveFailures : consecutiveFailures // ignore: cast_nullable_to_non_nullable
+as int,backedOff: null == backedOff ? _self.backedOff : backedOff // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -911,10 +1020,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'p')  int polled, @JsonKey(name: 'ok')  int ok, @JsonKey(name: 'nd')  int noData, @JsonKey(name: 'to')  int timeout, @JsonKey(name: 'er')  int error, @JsonKey(name: 'p50')  int latencyP50Ms, @JsonKey(name: 'p95')  int latencyP95Ms)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'p')  int polled, @JsonKey(name: 'ok')  int ok, @JsonKey(name: 'nd')  int noData, @JsonKey(name: 'to')  int timeout, @JsonKey(name: 'er')  int error, @JsonKey(name: 'p50')  int latencyP50Ms, @JsonKey(name: 'p95')  int latencyP95Ms, @JsonKey(name: 'th')  double targetHz, @JsonKey(name: 'eh')  double effectiveHz, @JsonKey(name: 'ti')  String? tier, @JsonKey(name: 'cf')  int consecutiveFailures, @JsonKey(name: 'bo')  bool backedOff)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Obd2PidStat() when $default != null:
-return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_that.latencyP50Ms,_that.latencyP95Ms);case _:
+return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_that.latencyP50Ms,_that.latencyP95Ms,_that.targetHz,_that.effectiveHz,_that.tier,_that.consecutiveFailures,_that.backedOff);case _:
   return orElse();
 
 }
@@ -932,10 +1041,10 @@ return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'p')  int polled, @JsonKey(name: 'ok')  int ok, @JsonKey(name: 'nd')  int noData, @JsonKey(name: 'to')  int timeout, @JsonKey(name: 'er')  int error, @JsonKey(name: 'p50')  int latencyP50Ms, @JsonKey(name: 'p95')  int latencyP95Ms)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'p')  int polled, @JsonKey(name: 'ok')  int ok, @JsonKey(name: 'nd')  int noData, @JsonKey(name: 'to')  int timeout, @JsonKey(name: 'er')  int error, @JsonKey(name: 'p50')  int latencyP50Ms, @JsonKey(name: 'p95')  int latencyP95Ms, @JsonKey(name: 'th')  double targetHz, @JsonKey(name: 'eh')  double effectiveHz, @JsonKey(name: 'ti')  String? tier, @JsonKey(name: 'cf')  int consecutiveFailures, @JsonKey(name: 'bo')  bool backedOff)  $default,) {final _that = this;
 switch (_that) {
 case _Obd2PidStat():
-return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_that.latencyP50Ms,_that.latencyP95Ms);case _:
+return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_that.latencyP50Ms,_that.latencyP95Ms,_that.targetHz,_that.effectiveHz,_that.tier,_that.consecutiveFailures,_that.backedOff);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -952,10 +1061,10 @@ return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'p')  int polled, @JsonKey(name: 'ok')  int ok, @JsonKey(name: 'nd')  int noData, @JsonKey(name: 'to')  int timeout, @JsonKey(name: 'er')  int error, @JsonKey(name: 'p50')  int latencyP50Ms, @JsonKey(name: 'p95')  int latencyP95Ms)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'p')  int polled, @JsonKey(name: 'ok')  int ok, @JsonKey(name: 'nd')  int noData, @JsonKey(name: 'to')  int timeout, @JsonKey(name: 'er')  int error, @JsonKey(name: 'p50')  int latencyP50Ms, @JsonKey(name: 'p95')  int latencyP95Ms, @JsonKey(name: 'th')  double targetHz, @JsonKey(name: 'eh')  double effectiveHz, @JsonKey(name: 'ti')  String? tier, @JsonKey(name: 'cf')  int consecutiveFailures, @JsonKey(name: 'bo')  bool backedOff)?  $default,) {final _that = this;
 switch (_that) {
 case _Obd2PidStat() when $default != null:
-return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_that.latencyP50Ms,_that.latencyP95Ms);case _:
+return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_that.latencyP50Ms,_that.latencyP95Ms,_that.targetHz,_that.effectiveHz,_that.tier,_that.consecutiveFailures,_that.backedOff);case _:
   return null;
 
 }
@@ -966,8 +1075,8 @@ return $default(_that.polled,_that.ok,_that.noData,_that.timeout,_that.error,_th
 /// @nodoc
 @JsonSerializable()
 
-class _Obd2PidStat implements Obd2PidStat {
-  const _Obd2PidStat({@JsonKey(name: 'p') this.polled = 0, @JsonKey(name: 'ok') this.ok = 0, @JsonKey(name: 'nd') this.noData = 0, @JsonKey(name: 'to') this.timeout = 0, @JsonKey(name: 'er') this.error = 0, @JsonKey(name: 'p50') this.latencyP50Ms = 0, @JsonKey(name: 'p95') this.latencyP95Ms = 0});
+class _Obd2PidStat extends Obd2PidStat {
+  const _Obd2PidStat({@JsonKey(name: 'p') this.polled = 0, @JsonKey(name: 'ok') this.ok = 0, @JsonKey(name: 'nd') this.noData = 0, @JsonKey(name: 'to') this.timeout = 0, @JsonKey(name: 'er') this.error = 0, @JsonKey(name: 'p50') this.latencyP50Ms = 0, @JsonKey(name: 'p95') this.latencyP95Ms = 0, @JsonKey(name: 'th') this.targetHz = 0.0, @JsonKey(name: 'eh') this.effectiveHz = 0.0, @JsonKey(name: 'ti') this.tier, @JsonKey(name: 'cf') this.consecutiveFailures = 0, @JsonKey(name: 'bo') this.backedOff = false}): super._();
   factory _Obd2PidStat.fromJson(Map<String, dynamic> json) => _$Obd2PidStatFromJson(json);
 
 /// How many times this PID was dispatched.
@@ -985,6 +1094,24 @@ class _Obd2PidStat implements Obd2PidStat {
 @override@JsonKey(name: 'p50') final  int latencyP50Ms;
 /// 95th-percentile round-trip latency in ms.
 @override@JsonKey(name: 'p95') final  int latencyP95Ms;
+/// Configured target refresh rate (Hz) the scheduler aims for this PID.
+/// 0 when the dispatch tee didn't carry a target (e.g. a one-off raw
+/// read outside the scheduler).
+@override@JsonKey(name: 'th') final  double targetHz;
+/// Achieved effective refresh rate (Hz) = `ok / sessionActiveSeconds`,
+/// filled by `summariseObd2Completeness`. 0 until completeness runs.
+@override@JsonKey(name: 'eh') final  double effectiveHz;
+/// Cadence tier name (`'dynamics'`/`'mixture'`/`'slowCorrection'`/
+/// `'thermalContext'`) carried by the dispatch tee. Null for un-tiered
+/// raw reads.
+@override@JsonKey(name: 'ti') final  String? tier;
+/// Consecutive transport failures at the last result for this PID — the
+/// scheduler's #2379 backoff streak. 0 when the last read succeeded.
+@override@JsonKey(name: 'cf') final  int consecutiveFailures;
+/// True when this PID was in the scheduler's backed-off state at the
+/// last result (failed ≥ the backoff threshold in a row, polled at the
+/// slow ≈1/30 s rate). Persisted so a mostly-NO-DATA PID is visible.
+@override@JsonKey(name: 'bo') final  bool backedOff;
 
 /// Create a copy of Obd2PidStat
 /// with the given fields replaced by the non-null parameter values.
@@ -999,16 +1126,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2PidStat&&(identical(other.polled, polled) || other.polled == polled)&&(identical(other.ok, ok) || other.ok == ok)&&(identical(other.noData, noData) || other.noData == noData)&&(identical(other.timeout, timeout) || other.timeout == timeout)&&(identical(other.error, error) || other.error == error)&&(identical(other.latencyP50Ms, latencyP50Ms) || other.latencyP50Ms == latencyP50Ms)&&(identical(other.latencyP95Ms, latencyP95Ms) || other.latencyP95Ms == latencyP95Ms));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2PidStat&&(identical(other.polled, polled) || other.polled == polled)&&(identical(other.ok, ok) || other.ok == ok)&&(identical(other.noData, noData) || other.noData == noData)&&(identical(other.timeout, timeout) || other.timeout == timeout)&&(identical(other.error, error) || other.error == error)&&(identical(other.latencyP50Ms, latencyP50Ms) || other.latencyP50Ms == latencyP50Ms)&&(identical(other.latencyP95Ms, latencyP95Ms) || other.latencyP95Ms == latencyP95Ms)&&(identical(other.targetHz, targetHz) || other.targetHz == targetHz)&&(identical(other.effectiveHz, effectiveHz) || other.effectiveHz == effectiveHz)&&(identical(other.tier, tier) || other.tier == tier)&&(identical(other.consecutiveFailures, consecutiveFailures) || other.consecutiveFailures == consecutiveFailures)&&(identical(other.backedOff, backedOff) || other.backedOff == backedOff));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,polled,ok,noData,timeout,error,latencyP50Ms,latencyP95Ms);
+int get hashCode => Object.hash(runtimeType,polled,ok,noData,timeout,error,latencyP50Ms,latencyP95Ms,targetHz,effectiveHz,tier,consecutiveFailures,backedOff);
 
 @override
 String toString() {
-  return 'Obd2PidStat(polled: $polled, ok: $ok, noData: $noData, timeout: $timeout, error: $error, latencyP50Ms: $latencyP50Ms, latencyP95Ms: $latencyP95Ms)';
+  return 'Obd2PidStat(polled: $polled, ok: $ok, noData: $noData, timeout: $timeout, error: $error, latencyP50Ms: $latencyP50Ms, latencyP95Ms: $latencyP95Ms, targetHz: $targetHz, effectiveHz: $effectiveHz, tier: $tier, consecutiveFailures: $consecutiveFailures, backedOff: $backedOff)';
 }
 
 
@@ -1019,7 +1146,7 @@ abstract mixin class _$Obd2PidStatCopyWith<$Res> implements $Obd2PidStatCopyWith
   factory _$Obd2PidStatCopyWith(_Obd2PidStat value, $Res Function(_Obd2PidStat) _then) = __$Obd2PidStatCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'p') int polled,@JsonKey(name: 'ok') int ok,@JsonKey(name: 'nd') int noData,@JsonKey(name: 'to') int timeout,@JsonKey(name: 'er') int error,@JsonKey(name: 'p50') int latencyP50Ms,@JsonKey(name: 'p95') int latencyP95Ms
+@JsonKey(name: 'p') int polled,@JsonKey(name: 'ok') int ok,@JsonKey(name: 'nd') int noData,@JsonKey(name: 'to') int timeout,@JsonKey(name: 'er') int error,@JsonKey(name: 'p50') int latencyP50Ms,@JsonKey(name: 'p95') int latencyP95Ms,@JsonKey(name: 'th') double targetHz,@JsonKey(name: 'eh') double effectiveHz,@JsonKey(name: 'ti') String? tier,@JsonKey(name: 'cf') int consecutiveFailures,@JsonKey(name: 'bo') bool backedOff
 });
 
 
@@ -1036,7 +1163,7 @@ class __$Obd2PidStatCopyWithImpl<$Res>
 
 /// Create a copy of Obd2PidStat
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? polled = null,Object? ok = null,Object? noData = null,Object? timeout = null,Object? error = null,Object? latencyP50Ms = null,Object? latencyP95Ms = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? polled = null,Object? ok = null,Object? noData = null,Object? timeout = null,Object? error = null,Object? latencyP50Ms = null,Object? latencyP95Ms = null,Object? targetHz = null,Object? effectiveHz = null,Object? tier = freezed,Object? consecutiveFailures = null,Object? backedOff = null,}) {
   return _then(_Obd2PidStat(
 polled: null == polled ? _self.polled : polled // ignore: cast_nullable_to_non_nullable
 as int,ok: null == ok ? _self.ok : ok // ignore: cast_nullable_to_non_nullable
@@ -1045,7 +1172,12 @@ as int,timeout: null == timeout ? _self.timeout : timeout // ignore: cast_nullab
 as int,error: null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as int,latencyP50Ms: null == latencyP50Ms ? _self.latencyP50Ms : latencyP50Ms // ignore: cast_nullable_to_non_nullable
 as int,latencyP95Ms: null == latencyP95Ms ? _self.latencyP95Ms : latencyP95Ms // ignore: cast_nullable_to_non_nullable
-as int,
+as int,targetHz: null == targetHz ? _self.targetHz : targetHz // ignore: cast_nullable_to_non_nullable
+as double,effectiveHz: null == effectiveHz ? _self.effectiveHz : effectiveHz // ignore: cast_nullable_to_non_nullable
+as double,tier: freezed == tier ? _self.tier : tier // ignore: cast_nullable_to_non_nullable
+as String?,consecutiveFailures: null == consecutiveFailures ? _self.consecutiveFailures : consecutiveFailures // ignore: cast_nullable_to_non_nullable
+as int,backedOff: null == backedOff ? _self.backedOff : backedOff // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -1377,10 +1509,24 @@ mixin _$Obd2SchedulerStats {
 
 /// Achieved tick-rate (Hz), the effective poll loop frequency.
 @JsonKey(name: 'tr') double get tickRateHz;/// Ticks skipped because the previous read had not completed
-/// (back-pressure).
-@JsonKey(name: 'bp') int get backpressureSkips;/// Governor demotions — times the scheduler dropped to a lower
-/// poll tier under sustained pressure.
-@JsonKey(name: 'dm') int get demotions;
+/// (back-pressure) — the scheduler's `_inFlight != null` early return.
+@JsonKey(name: 'bp') int get backpressureSkips;/// Governor demotions currently in force — count of commands the
+/// bandwidth governor has demoted to claw back budget for the dynamics
+/// tier on a slow link.
+@JsonKey(name: 'dm') int get demotions;/// Total scheduler ticks observed (fired commands + backpressure
+/// skips). The denominator that makes [backpressureSkips] a rate.
+@JsonKey(name: 'tk') int get ticks;/// Achieved total reads/second across all PIDs over the governor's
+/// rolling window (`GovernorState.achievedReadsPerSecond`).
+@JsonKey(name: 'rps') double get achievedReadsPerSecond;/// Effective reads/s the slowest dynamics-tier PID is achieving — the
+/// metric the governor floors. May be very large /
+/// [double.infinity]-derived before two dynamics reads land; the tee
+/// clamps the infinity sentinel to 0 so the JSON stays finite.
+@JsonKey(name: 'dhz') double get dynamicsEffectiveHz;/// PIDs currently in the #2379 backed-off state (≥3 consecutive
+/// failures) — the broadly-unresponsive-adapter indicator.
+@JsonKey(name: 'bof') int get backedOffCount;/// Starvation indicator: true when the dynamics tier dropped below its
+/// floor (`dynamicsEffectiveHz` measured and < the governor floor) —
+/// RPM / speed are not keeping up despite the floor protection.
+@JsonKey(name: 'st') bool get starved;
 /// Create a copy of Obd2SchedulerStats
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1393,16 +1539,16 @@ $Obd2SchedulerStatsCopyWith<Obd2SchedulerStats> get copyWith => _$Obd2SchedulerS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SchedulerStats&&(identical(other.tickRateHz, tickRateHz) || other.tickRateHz == tickRateHz)&&(identical(other.backpressureSkips, backpressureSkips) || other.backpressureSkips == backpressureSkips)&&(identical(other.demotions, demotions) || other.demotions == demotions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SchedulerStats&&(identical(other.tickRateHz, tickRateHz) || other.tickRateHz == tickRateHz)&&(identical(other.backpressureSkips, backpressureSkips) || other.backpressureSkips == backpressureSkips)&&(identical(other.demotions, demotions) || other.demotions == demotions)&&(identical(other.ticks, ticks) || other.ticks == ticks)&&(identical(other.achievedReadsPerSecond, achievedReadsPerSecond) || other.achievedReadsPerSecond == achievedReadsPerSecond)&&(identical(other.dynamicsEffectiveHz, dynamicsEffectiveHz) || other.dynamicsEffectiveHz == dynamicsEffectiveHz)&&(identical(other.backedOffCount, backedOffCount) || other.backedOffCount == backedOffCount)&&(identical(other.starved, starved) || other.starved == starved));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tickRateHz,backpressureSkips,demotions);
+int get hashCode => Object.hash(runtimeType,tickRateHz,backpressureSkips,demotions,ticks,achievedReadsPerSecond,dynamicsEffectiveHz,backedOffCount,starved);
 
 @override
 String toString() {
-  return 'Obd2SchedulerStats(tickRateHz: $tickRateHz, backpressureSkips: $backpressureSkips, demotions: $demotions)';
+  return 'Obd2SchedulerStats(tickRateHz: $tickRateHz, backpressureSkips: $backpressureSkips, demotions: $demotions, ticks: $ticks, achievedReadsPerSecond: $achievedReadsPerSecond, dynamicsEffectiveHz: $dynamicsEffectiveHz, backedOffCount: $backedOffCount, starved: $starved)';
 }
 
 
@@ -1413,7 +1559,7 @@ abstract mixin class $Obd2SchedulerStatsCopyWith<$Res>  {
   factory $Obd2SchedulerStatsCopyWith(Obd2SchedulerStats value, $Res Function(Obd2SchedulerStats) _then) = _$Obd2SchedulerStatsCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'tr') double tickRateHz,@JsonKey(name: 'bp') int backpressureSkips,@JsonKey(name: 'dm') int demotions
+@JsonKey(name: 'tr') double tickRateHz,@JsonKey(name: 'bp') int backpressureSkips,@JsonKey(name: 'dm') int demotions,@JsonKey(name: 'tk') int ticks,@JsonKey(name: 'rps') double achievedReadsPerSecond,@JsonKey(name: 'dhz') double dynamicsEffectiveHz,@JsonKey(name: 'bof') int backedOffCount,@JsonKey(name: 'st') bool starved
 });
 
 
@@ -1430,12 +1576,17 @@ class _$Obd2SchedulerStatsCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SchedulerStats
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? tickRateHz = null,Object? backpressureSkips = null,Object? demotions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? tickRateHz = null,Object? backpressureSkips = null,Object? demotions = null,Object? ticks = null,Object? achievedReadsPerSecond = null,Object? dynamicsEffectiveHz = null,Object? backedOffCount = null,Object? starved = null,}) {
   return _then(_self.copyWith(
 tickRateHz: null == tickRateHz ? _self.tickRateHz : tickRateHz // ignore: cast_nullable_to_non_nullable
 as double,backpressureSkips: null == backpressureSkips ? _self.backpressureSkips : backpressureSkips // ignore: cast_nullable_to_non_nullable
 as int,demotions: null == demotions ? _self.demotions : demotions // ignore: cast_nullable_to_non_nullable
-as int,
+as int,ticks: null == ticks ? _self.ticks : ticks // ignore: cast_nullable_to_non_nullable
+as int,achievedReadsPerSecond: null == achievedReadsPerSecond ? _self.achievedReadsPerSecond : achievedReadsPerSecond // ignore: cast_nullable_to_non_nullable
+as double,dynamicsEffectiveHz: null == dynamicsEffectiveHz ? _self.dynamicsEffectiveHz : dynamicsEffectiveHz // ignore: cast_nullable_to_non_nullable
+as double,backedOffCount: null == backedOffCount ? _self.backedOffCount : backedOffCount // ignore: cast_nullable_to_non_nullable
+as int,starved: null == starved ? _self.starved : starved // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -1520,10 +1671,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'tr')  double tickRateHz, @JsonKey(name: 'bp')  int backpressureSkips, @JsonKey(name: 'dm')  int demotions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'tr')  double tickRateHz, @JsonKey(name: 'bp')  int backpressureSkips, @JsonKey(name: 'dm')  int demotions, @JsonKey(name: 'tk')  int ticks, @JsonKey(name: 'rps')  double achievedReadsPerSecond, @JsonKey(name: 'dhz')  double dynamicsEffectiveHz, @JsonKey(name: 'bof')  int backedOffCount, @JsonKey(name: 'st')  bool starved)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Obd2SchedulerStats() when $default != null:
-return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions);case _:
+return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions,_that.ticks,_that.achievedReadsPerSecond,_that.dynamicsEffectiveHz,_that.backedOffCount,_that.starved);case _:
   return orElse();
 
 }
@@ -1541,10 +1692,10 @@ return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'tr')  double tickRateHz, @JsonKey(name: 'bp')  int backpressureSkips, @JsonKey(name: 'dm')  int demotions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'tr')  double tickRateHz, @JsonKey(name: 'bp')  int backpressureSkips, @JsonKey(name: 'dm')  int demotions, @JsonKey(name: 'tk')  int ticks, @JsonKey(name: 'rps')  double achievedReadsPerSecond, @JsonKey(name: 'dhz')  double dynamicsEffectiveHz, @JsonKey(name: 'bof')  int backedOffCount, @JsonKey(name: 'st')  bool starved)  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SchedulerStats():
-return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions);case _:
+return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions,_that.ticks,_that.achievedReadsPerSecond,_that.dynamicsEffectiveHz,_that.backedOffCount,_that.starved);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1561,10 +1712,10 @@ return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'tr')  double tickRateHz, @JsonKey(name: 'bp')  int backpressureSkips, @JsonKey(name: 'dm')  int demotions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'tr')  double tickRateHz, @JsonKey(name: 'bp')  int backpressureSkips, @JsonKey(name: 'dm')  int demotions, @JsonKey(name: 'tk')  int ticks, @JsonKey(name: 'rps')  double achievedReadsPerSecond, @JsonKey(name: 'dhz')  double dynamicsEffectiveHz, @JsonKey(name: 'bof')  int backedOffCount, @JsonKey(name: 'st')  bool starved)?  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SchedulerStats() when $default != null:
-return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions);case _:
+return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions,_that.ticks,_that.achievedReadsPerSecond,_that.dynamicsEffectiveHz,_that.backedOffCount,_that.starved);case _:
   return null;
 
 }
@@ -1576,17 +1727,36 @@ return $default(_that.tickRateHz,_that.backpressureSkips,_that.demotions);case _
 @JsonSerializable()
 
 class _Obd2SchedulerStats implements Obd2SchedulerStats {
-  const _Obd2SchedulerStats({@JsonKey(name: 'tr') this.tickRateHz = 0.0, @JsonKey(name: 'bp') this.backpressureSkips = 0, @JsonKey(name: 'dm') this.demotions = 0});
+  const _Obd2SchedulerStats({@JsonKey(name: 'tr') this.tickRateHz = 0.0, @JsonKey(name: 'bp') this.backpressureSkips = 0, @JsonKey(name: 'dm') this.demotions = 0, @JsonKey(name: 'tk') this.ticks = 0, @JsonKey(name: 'rps') this.achievedReadsPerSecond = 0.0, @JsonKey(name: 'dhz') this.dynamicsEffectiveHz = 0.0, @JsonKey(name: 'bof') this.backedOffCount = 0, @JsonKey(name: 'st') this.starved = false});
   factory _Obd2SchedulerStats.fromJson(Map<String, dynamic> json) => _$Obd2SchedulerStatsFromJson(json);
 
 /// Achieved tick-rate (Hz), the effective poll loop frequency.
 @override@JsonKey(name: 'tr') final  double tickRateHz;
 /// Ticks skipped because the previous read had not completed
-/// (back-pressure).
+/// (back-pressure) — the scheduler's `_inFlight != null` early return.
 @override@JsonKey(name: 'bp') final  int backpressureSkips;
-/// Governor demotions — times the scheduler dropped to a lower
-/// poll tier under sustained pressure.
+/// Governor demotions currently in force — count of commands the
+/// bandwidth governor has demoted to claw back budget for the dynamics
+/// tier on a slow link.
 @override@JsonKey(name: 'dm') final  int demotions;
+/// Total scheduler ticks observed (fired commands + backpressure
+/// skips). The denominator that makes [backpressureSkips] a rate.
+@override@JsonKey(name: 'tk') final  int ticks;
+/// Achieved total reads/second across all PIDs over the governor's
+/// rolling window (`GovernorState.achievedReadsPerSecond`).
+@override@JsonKey(name: 'rps') final  double achievedReadsPerSecond;
+/// Effective reads/s the slowest dynamics-tier PID is achieving — the
+/// metric the governor floors. May be very large /
+/// [double.infinity]-derived before two dynamics reads land; the tee
+/// clamps the infinity sentinel to 0 so the JSON stays finite.
+@override@JsonKey(name: 'dhz') final  double dynamicsEffectiveHz;
+/// PIDs currently in the #2379 backed-off state (≥3 consecutive
+/// failures) — the broadly-unresponsive-adapter indicator.
+@override@JsonKey(name: 'bof') final  int backedOffCount;
+/// Starvation indicator: true when the dynamics tier dropped below its
+/// floor (`dynamicsEffectiveHz` measured and < the governor floor) —
+/// RPM / speed are not keeping up despite the floor protection.
+@override@JsonKey(name: 'st') final  bool starved;
 
 /// Create a copy of Obd2SchedulerStats
 /// with the given fields replaced by the non-null parameter values.
@@ -1601,16 +1771,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SchedulerStats&&(identical(other.tickRateHz, tickRateHz) || other.tickRateHz == tickRateHz)&&(identical(other.backpressureSkips, backpressureSkips) || other.backpressureSkips == backpressureSkips)&&(identical(other.demotions, demotions) || other.demotions == demotions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SchedulerStats&&(identical(other.tickRateHz, tickRateHz) || other.tickRateHz == tickRateHz)&&(identical(other.backpressureSkips, backpressureSkips) || other.backpressureSkips == backpressureSkips)&&(identical(other.demotions, demotions) || other.demotions == demotions)&&(identical(other.ticks, ticks) || other.ticks == ticks)&&(identical(other.achievedReadsPerSecond, achievedReadsPerSecond) || other.achievedReadsPerSecond == achievedReadsPerSecond)&&(identical(other.dynamicsEffectiveHz, dynamicsEffectiveHz) || other.dynamicsEffectiveHz == dynamicsEffectiveHz)&&(identical(other.backedOffCount, backedOffCount) || other.backedOffCount == backedOffCount)&&(identical(other.starved, starved) || other.starved == starved));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tickRateHz,backpressureSkips,demotions);
+int get hashCode => Object.hash(runtimeType,tickRateHz,backpressureSkips,demotions,ticks,achievedReadsPerSecond,dynamicsEffectiveHz,backedOffCount,starved);
 
 @override
 String toString() {
-  return 'Obd2SchedulerStats(tickRateHz: $tickRateHz, backpressureSkips: $backpressureSkips, demotions: $demotions)';
+  return 'Obd2SchedulerStats(tickRateHz: $tickRateHz, backpressureSkips: $backpressureSkips, demotions: $demotions, ticks: $ticks, achievedReadsPerSecond: $achievedReadsPerSecond, dynamicsEffectiveHz: $dynamicsEffectiveHz, backedOffCount: $backedOffCount, starved: $starved)';
 }
 
 
@@ -1621,7 +1791,7 @@ abstract mixin class _$Obd2SchedulerStatsCopyWith<$Res> implements $Obd2Schedule
   factory _$Obd2SchedulerStatsCopyWith(_Obd2SchedulerStats value, $Res Function(_Obd2SchedulerStats) _then) = __$Obd2SchedulerStatsCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'tr') double tickRateHz,@JsonKey(name: 'bp') int backpressureSkips,@JsonKey(name: 'dm') int demotions
+@JsonKey(name: 'tr') double tickRateHz,@JsonKey(name: 'bp') int backpressureSkips,@JsonKey(name: 'dm') int demotions,@JsonKey(name: 'tk') int ticks,@JsonKey(name: 'rps') double achievedReadsPerSecond,@JsonKey(name: 'dhz') double dynamicsEffectiveHz,@JsonKey(name: 'bof') int backedOffCount,@JsonKey(name: 'st') bool starved
 });
 
 
@@ -1638,12 +1808,589 @@ class __$Obd2SchedulerStatsCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SchedulerStats
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? tickRateHz = null,Object? backpressureSkips = null,Object? demotions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tickRateHz = null,Object? backpressureSkips = null,Object? demotions = null,Object? ticks = null,Object? achievedReadsPerSecond = null,Object? dynamicsEffectiveHz = null,Object? backedOffCount = null,Object? starved = null,}) {
   return _then(_Obd2SchedulerStats(
 tickRateHz: null == tickRateHz ? _self.tickRateHz : tickRateHz // ignore: cast_nullable_to_non_nullable
 as double,backpressureSkips: null == backpressureSkips ? _self.backpressureSkips : backpressureSkips // ignore: cast_nullable_to_non_nullable
 as int,demotions: null == demotions ? _self.demotions : demotions // ignore: cast_nullable_to_non_nullable
+as int,ticks: null == ticks ? _self.ticks : ticks // ignore: cast_nullable_to_non_nullable
+as int,achievedReadsPerSecond: null == achievedReadsPerSecond ? _self.achievedReadsPerSecond : achievedReadsPerSecond // ignore: cast_nullable_to_non_nullable
+as double,dynamicsEffectiveHz: null == dynamicsEffectiveHz ? _self.dynamicsEffectiveHz : dynamicsEffectiveHz // ignore: cast_nullable_to_non_nullable
+as double,backedOffCount: null == backedOffCount ? _self.backedOffCount : backedOffCount // ignore: cast_nullable_to_non_nullable
+as int,starved: null == starved ? _self.starved : starved // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$Obd2FuelDowngradeStats {
+
+/// Total fuel-rate samples seen this session.
+@JsonKey(name: 't') int get totalSamples;/// Samples that tripped a sanity flag (suspicious-low / 5E-vs-MAF
+/// divergent) — the numerator of the suspicion ratio.
+@JsonKey(name: 's') int get suspiciousSamples;
+/// Create a copy of Obd2FuelDowngradeStats
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Obd2FuelDowngradeStatsCopyWith<Obd2FuelDowngradeStats> get copyWith => _$Obd2FuelDowngradeStatsCopyWithImpl<Obd2FuelDowngradeStats>(this as Obd2FuelDowngradeStats, _$identity);
+
+  /// Serializes this Obd2FuelDowngradeStats to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2FuelDowngradeStats&&(identical(other.totalSamples, totalSamples) || other.totalSamples == totalSamples)&&(identical(other.suspiciousSamples, suspiciousSamples) || other.suspiciousSamples == suspiciousSamples));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,totalSamples,suspiciousSamples);
+
+@override
+String toString() {
+  return 'Obd2FuelDowngradeStats(totalSamples: $totalSamples, suspiciousSamples: $suspiciousSamples)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Obd2FuelDowngradeStatsCopyWith<$Res>  {
+  factory $Obd2FuelDowngradeStatsCopyWith(Obd2FuelDowngradeStats value, $Res Function(Obd2FuelDowngradeStats) _then) = _$Obd2FuelDowngradeStatsCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: 't') int totalSamples,@JsonKey(name: 's') int suspiciousSamples
+});
+
+
+
+
+}
+/// @nodoc
+class _$Obd2FuelDowngradeStatsCopyWithImpl<$Res>
+    implements $Obd2FuelDowngradeStatsCopyWith<$Res> {
+  _$Obd2FuelDowngradeStatsCopyWithImpl(this._self, this._then);
+
+  final Obd2FuelDowngradeStats _self;
+  final $Res Function(Obd2FuelDowngradeStats) _then;
+
+/// Create a copy of Obd2FuelDowngradeStats
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? totalSamples = null,Object? suspiciousSamples = null,}) {
+  return _then(_self.copyWith(
+totalSamples: null == totalSamples ? _self.totalSamples : totalSamples // ignore: cast_nullable_to_non_nullable
+as int,suspiciousSamples: null == suspiciousSamples ? _self.suspiciousSamples : suspiciousSamples // ignore: cast_nullable_to_non_nullable
 as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [Obd2FuelDowngradeStats].
+extension Obd2FuelDowngradeStatsPatterns on Obd2FuelDowngradeStats {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _Obd2FuelDowngradeStats value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _Obd2FuelDowngradeStats() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _Obd2FuelDowngradeStats value)  $default,){
+final _that = this;
+switch (_that) {
+case _Obd2FuelDowngradeStats():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _Obd2FuelDowngradeStats value)?  $default,){
+final _that = this;
+switch (_that) {
+case _Obd2FuelDowngradeStats() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 't')  int totalSamples, @JsonKey(name: 's')  int suspiciousSamples)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _Obd2FuelDowngradeStats() when $default != null:
+return $default(_that.totalSamples,_that.suspiciousSamples);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 't')  int totalSamples, @JsonKey(name: 's')  int suspiciousSamples)  $default,) {final _that = this;
+switch (_that) {
+case _Obd2FuelDowngradeStats():
+return $default(_that.totalSamples,_that.suspiciousSamples);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 't')  int totalSamples, @JsonKey(name: 's')  int suspiciousSamples)?  $default,) {final _that = this;
+switch (_that) {
+case _Obd2FuelDowngradeStats() when $default != null:
+return $default(_that.totalSamples,_that.suspiciousSamples);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _Obd2FuelDowngradeStats extends Obd2FuelDowngradeStats {
+  const _Obd2FuelDowngradeStats({@JsonKey(name: 't') this.totalSamples = 0, @JsonKey(name: 's') this.suspiciousSamples = 0}): super._();
+  factory _Obd2FuelDowngradeStats.fromJson(Map<String, dynamic> json) => _$Obd2FuelDowngradeStatsFromJson(json);
+
+/// Total fuel-rate samples seen this session.
+@override@JsonKey(name: 't') final  int totalSamples;
+/// Samples that tripped a sanity flag (suspicious-low / 5E-vs-MAF
+/// divergent) — the numerator of the suspicion ratio.
+@override@JsonKey(name: 's') final  int suspiciousSamples;
+
+/// Create a copy of Obd2FuelDowngradeStats
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$Obd2FuelDowngradeStatsCopyWith<_Obd2FuelDowngradeStats> get copyWith => __$Obd2FuelDowngradeStatsCopyWithImpl<_Obd2FuelDowngradeStats>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$Obd2FuelDowngradeStatsToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2FuelDowngradeStats&&(identical(other.totalSamples, totalSamples) || other.totalSamples == totalSamples)&&(identical(other.suspiciousSamples, suspiciousSamples) || other.suspiciousSamples == suspiciousSamples));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,totalSamples,suspiciousSamples);
+
+@override
+String toString() {
+  return 'Obd2FuelDowngradeStats(totalSamples: $totalSamples, suspiciousSamples: $suspiciousSamples)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$Obd2FuelDowngradeStatsCopyWith<$Res> implements $Obd2FuelDowngradeStatsCopyWith<$Res> {
+  factory _$Obd2FuelDowngradeStatsCopyWith(_Obd2FuelDowngradeStats value, $Res Function(_Obd2FuelDowngradeStats) _then) = __$Obd2FuelDowngradeStatsCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: 't') int totalSamples,@JsonKey(name: 's') int suspiciousSamples
+});
+
+
+
+
+}
+/// @nodoc
+class __$Obd2FuelDowngradeStatsCopyWithImpl<$Res>
+    implements _$Obd2FuelDowngradeStatsCopyWith<$Res> {
+  __$Obd2FuelDowngradeStatsCopyWithImpl(this._self, this._then);
+
+  final _Obd2FuelDowngradeStats _self;
+  final $Res Function(_Obd2FuelDowngradeStats) _then;
+
+/// Create a copy of Obd2FuelDowngradeStats
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? totalSamples = null,Object? suspiciousSamples = null,}) {
+  return _then(_Obd2FuelDowngradeStats(
+totalSamples: null == totalSamples ? _self.totalSamples : totalSamples // ignore: cast_nullable_to_non_nullable
+as int,suspiciousSamples: null == suspiciousSamples ? _self.suspiciousSamples : suspiciousSamples // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$Obd2CompletenessStats {
+
+/// Overall `Σ ok / Σ(targetHz × activeSeconds)` as a 0–100 percentage.
+/// 0 when nothing was expected (no active seconds / no targets).
+@JsonKey(name: 'o') double get overallPercent;/// Per-tier completeness percentage keyed by tier name
+/// (`'dynamics'`/`'mixture'`/`'slowCorrection'`/`'thermalContext'`).
+@JsonKey(name: 'pt') Map<String, double> get perTierPercent;/// Fraction (0–1) of the session the scheduler was actively polling —
+/// `min(1, totalAchievedReads / totalExpectedReads)`, clamped. A proxy
+/// for "was the link delivering" vs idle/stalled.
+@JsonKey(name: 'dc') double get activeDutyCycle;/// True when an emit-index gap was detected — a tier whose attainment
+/// fell below [emitGapThreshold], i.e. the scheduler skipped a
+/// meaningful share of that tier's expected reads.
+@JsonKey(name: 'eg') bool get emitGapDetected;
+/// Create a copy of Obd2CompletenessStats
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Obd2CompletenessStatsCopyWith<Obd2CompletenessStats> get copyWith => _$Obd2CompletenessStatsCopyWithImpl<Obd2CompletenessStats>(this as Obd2CompletenessStats, _$identity);
+
+  /// Serializes this Obd2CompletenessStats to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2CompletenessStats&&(identical(other.overallPercent, overallPercent) || other.overallPercent == overallPercent)&&const DeepCollectionEquality().equals(other.perTierPercent, perTierPercent)&&(identical(other.activeDutyCycle, activeDutyCycle) || other.activeDutyCycle == activeDutyCycle)&&(identical(other.emitGapDetected, emitGapDetected) || other.emitGapDetected == emitGapDetected));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,overallPercent,const DeepCollectionEquality().hash(perTierPercent),activeDutyCycle,emitGapDetected);
+
+@override
+String toString() {
+  return 'Obd2CompletenessStats(overallPercent: $overallPercent, perTierPercent: $perTierPercent, activeDutyCycle: $activeDutyCycle, emitGapDetected: $emitGapDetected)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Obd2CompletenessStatsCopyWith<$Res>  {
+  factory $Obd2CompletenessStatsCopyWith(Obd2CompletenessStats value, $Res Function(Obd2CompletenessStats) _then) = _$Obd2CompletenessStatsCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: 'o') double overallPercent,@JsonKey(name: 'pt') Map<String, double> perTierPercent,@JsonKey(name: 'dc') double activeDutyCycle,@JsonKey(name: 'eg') bool emitGapDetected
+});
+
+
+
+
+}
+/// @nodoc
+class _$Obd2CompletenessStatsCopyWithImpl<$Res>
+    implements $Obd2CompletenessStatsCopyWith<$Res> {
+  _$Obd2CompletenessStatsCopyWithImpl(this._self, this._then);
+
+  final Obd2CompletenessStats _self;
+  final $Res Function(Obd2CompletenessStats) _then;
+
+/// Create a copy of Obd2CompletenessStats
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? overallPercent = null,Object? perTierPercent = null,Object? activeDutyCycle = null,Object? emitGapDetected = null,}) {
+  return _then(_self.copyWith(
+overallPercent: null == overallPercent ? _self.overallPercent : overallPercent // ignore: cast_nullable_to_non_nullable
+as double,perTierPercent: null == perTierPercent ? _self.perTierPercent : perTierPercent // ignore: cast_nullable_to_non_nullable
+as Map<String, double>,activeDutyCycle: null == activeDutyCycle ? _self.activeDutyCycle : activeDutyCycle // ignore: cast_nullable_to_non_nullable
+as double,emitGapDetected: null == emitGapDetected ? _self.emitGapDetected : emitGapDetected // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [Obd2CompletenessStats].
+extension Obd2CompletenessStatsPatterns on Obd2CompletenessStats {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _Obd2CompletenessStats value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _Obd2CompletenessStats() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _Obd2CompletenessStats value)  $default,){
+final _that = this;
+switch (_that) {
+case _Obd2CompletenessStats():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _Obd2CompletenessStats value)?  $default,){
+final _that = this;
+switch (_that) {
+case _Obd2CompletenessStats() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'o')  double overallPercent, @JsonKey(name: 'pt')  Map<String, double> perTierPercent, @JsonKey(name: 'dc')  double activeDutyCycle, @JsonKey(name: 'eg')  bool emitGapDetected)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _Obd2CompletenessStats() when $default != null:
+return $default(_that.overallPercent,_that.perTierPercent,_that.activeDutyCycle,_that.emitGapDetected);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'o')  double overallPercent, @JsonKey(name: 'pt')  Map<String, double> perTierPercent, @JsonKey(name: 'dc')  double activeDutyCycle, @JsonKey(name: 'eg')  bool emitGapDetected)  $default,) {final _that = this;
+switch (_that) {
+case _Obd2CompletenessStats():
+return $default(_that.overallPercent,_that.perTierPercent,_that.activeDutyCycle,_that.emitGapDetected);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'o')  double overallPercent, @JsonKey(name: 'pt')  Map<String, double> perTierPercent, @JsonKey(name: 'dc')  double activeDutyCycle, @JsonKey(name: 'eg')  bool emitGapDetected)?  $default,) {final _that = this;
+switch (_that) {
+case _Obd2CompletenessStats() when $default != null:
+return $default(_that.overallPercent,_that.perTierPercent,_that.activeDutyCycle,_that.emitGapDetected);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _Obd2CompletenessStats implements Obd2CompletenessStats {
+  const _Obd2CompletenessStats({@JsonKey(name: 'o') this.overallPercent = 0.0, @JsonKey(name: 'pt') final  Map<String, double> perTierPercent = const <String, double>{}, @JsonKey(name: 'dc') this.activeDutyCycle = 0.0, @JsonKey(name: 'eg') this.emitGapDetected = false}): _perTierPercent = perTierPercent;
+  factory _Obd2CompletenessStats.fromJson(Map<String, dynamic> json) => _$Obd2CompletenessStatsFromJson(json);
+
+/// Overall `Σ ok / Σ(targetHz × activeSeconds)` as a 0–100 percentage.
+/// 0 when nothing was expected (no active seconds / no targets).
+@override@JsonKey(name: 'o') final  double overallPercent;
+/// Per-tier completeness percentage keyed by tier name
+/// (`'dynamics'`/`'mixture'`/`'slowCorrection'`/`'thermalContext'`).
+ final  Map<String, double> _perTierPercent;
+/// Per-tier completeness percentage keyed by tier name
+/// (`'dynamics'`/`'mixture'`/`'slowCorrection'`/`'thermalContext'`).
+@override@JsonKey(name: 'pt') Map<String, double> get perTierPercent {
+  if (_perTierPercent is EqualUnmodifiableMapView) return _perTierPercent;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_perTierPercent);
+}
+
+/// Fraction (0–1) of the session the scheduler was actively polling —
+/// `min(1, totalAchievedReads / totalExpectedReads)`, clamped. A proxy
+/// for "was the link delivering" vs idle/stalled.
+@override@JsonKey(name: 'dc') final  double activeDutyCycle;
+/// True when an emit-index gap was detected — a tier whose attainment
+/// fell below [emitGapThreshold], i.e. the scheduler skipped a
+/// meaningful share of that tier's expected reads.
+@override@JsonKey(name: 'eg') final  bool emitGapDetected;
+
+/// Create a copy of Obd2CompletenessStats
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$Obd2CompletenessStatsCopyWith<_Obd2CompletenessStats> get copyWith => __$Obd2CompletenessStatsCopyWithImpl<_Obd2CompletenessStats>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$Obd2CompletenessStatsToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2CompletenessStats&&(identical(other.overallPercent, overallPercent) || other.overallPercent == overallPercent)&&const DeepCollectionEquality().equals(other._perTierPercent, _perTierPercent)&&(identical(other.activeDutyCycle, activeDutyCycle) || other.activeDutyCycle == activeDutyCycle)&&(identical(other.emitGapDetected, emitGapDetected) || other.emitGapDetected == emitGapDetected));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,overallPercent,const DeepCollectionEquality().hash(_perTierPercent),activeDutyCycle,emitGapDetected);
+
+@override
+String toString() {
+  return 'Obd2CompletenessStats(overallPercent: $overallPercent, perTierPercent: $perTierPercent, activeDutyCycle: $activeDutyCycle, emitGapDetected: $emitGapDetected)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$Obd2CompletenessStatsCopyWith<$Res> implements $Obd2CompletenessStatsCopyWith<$Res> {
+  factory _$Obd2CompletenessStatsCopyWith(_Obd2CompletenessStats value, $Res Function(_Obd2CompletenessStats) _then) = __$Obd2CompletenessStatsCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: 'o') double overallPercent,@JsonKey(name: 'pt') Map<String, double> perTierPercent,@JsonKey(name: 'dc') double activeDutyCycle,@JsonKey(name: 'eg') bool emitGapDetected
+});
+
+
+
+
+}
+/// @nodoc
+class __$Obd2CompletenessStatsCopyWithImpl<$Res>
+    implements _$Obd2CompletenessStatsCopyWith<$Res> {
+  __$Obd2CompletenessStatsCopyWithImpl(this._self, this._then);
+
+  final _Obd2CompletenessStats _self;
+  final $Res Function(_Obd2CompletenessStats) _then;
+
+/// Create a copy of Obd2CompletenessStats
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? overallPercent = null,Object? perTierPercent = null,Object? activeDutyCycle = null,Object? emitGapDetected = null,}) {
+  return _then(_Obd2CompletenessStats(
+overallPercent: null == overallPercent ? _self.overallPercent : overallPercent // ignore: cast_nullable_to_non_nullable
+as double,perTierPercent: null == perTierPercent ? _self._perTierPercent : perTierPercent // ignore: cast_nullable_to_non_nullable
+as Map<String, double>,activeDutyCycle: null == activeDutyCycle ? _self.activeDutyCycle : activeDutyCycle // ignore: cast_nullable_to_non_nullable
+as double,emitGapDetected: null == emitGapDetected ? _self.emitGapDetected : emitGapDetected // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
