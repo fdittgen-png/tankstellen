@@ -274,8 +274,16 @@ jobs:
   # the full suite as a paranoia net. Master pushes + the weekly cron
   # ignore the selector entirely.
   test:
-    needs: [green-gate]  # #2417 — skip when the build-relevant tree already passed
-    if: ${{ needs.green-gate.outputs.cached != 'true' }}
+    # #2417 — a MATRIX job must NOT be skipped at job level: a skipped
+    # matrix never expands, so the required `test (0..3)` contexts are
+    # never reported and branch protection blocks the PR forever (auto-
+    # merge can never fire). So the job always runs (the four contexts
+    # always exist) and each heavy STEP below is gated on the green-gate
+    # cache — on a hit every step skips and each shard reports `success`
+    # in seconds (just the checkout). Single-context leaf jobs
+    # (build-android, integration, …) keep the cheaper job-level skip,
+    # whose `skipped` conclusion branch protection counts as a pass.
+    needs: [green-gate]
     runs-on: ubuntu-latest
     strategy:
       # Don't cancel sibling shards when one fails — we want every
@@ -290,6 +298,7 @@ jobs:
           # Shallow clone (default) has no master tip locally.
           fetch-depth: 0
       - uses: subosito/flutter-action@v2
+        if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           channel: stable
           # #1936 — pin Flutter. A floating `channel: stable` picked up
@@ -300,6 +309,7 @@ jobs:
           flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
+        if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           path: |
             ~/.pub-cache
@@ -309,11 +319,13 @@ jobs:
       # #1585 — Cache compiled artefacts. Same-branch reruns and rebase
       # rounds reuse the compiled Dart output keyed on the source state.
       - uses: actions/cache@v5
+        if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           path: build/
           key: ${{ runner.os }}-build-${{ hashFiles('pubspec.lock', 'lib/**/*.dart') }}
           restore-keys: ${{ runner.os }}-build-
-      - run: flutter pub get
+      - if: ${{ needs.green-gate.outputs.cached != 'true' }}
+        run: flutter pub get
       # #1730 — no `build_runner build` here. Committed generated files
       # are trusted; the `codegen-drift` job gates their freshness.
       # #1594 — Compute the affected-test list once per shard. Fast
@@ -321,7 +333,7 @@ jobs:
       # parallelised. Empty output triggers a full-suite fallback in
       # the run step.
       - name: Compute affected tests (PR only)
-        if: github.event_name == 'pull_request'
+        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
         run: |
           # `dart run` emits `Running build hooks...` progress text to stdout
           # (with `\r` overwrites). Naively redirecting `> affected_tests.txt`
@@ -347,7 +359,7 @@ jobs:
       # (share_plus) that intermittently fail and cannot block PRs.
       # The nightly-flaky workflow re-runs both buckets.
       - name: Run test shard ${{ matrix.shard }} of 4 (PR — affected only, no coverage)
-        if: github.event_name == 'pull_request'
+        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
         shell: bash
         run: |
           if [ -s affected_tests.txt ]; then
