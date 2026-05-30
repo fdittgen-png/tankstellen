@@ -150,52 +150,185 @@ void main() {
     });
   });
 
-  group('isDieselProfile — #800', () {
-    test('null profile → false (safe default is petrol)', () {
-      expect(isDieselProfile(null), isFalse);
-    });
-
-    test('empty preferredFuelType → false', () {
-      const vehicle = VehicleProfile(id: 'x', name: 'Test');
-      expect(isDieselProfile(vehicle), isFalse);
-    });
-
-    test('preferredFuelType "diesel" → true', () {
-      const vehicle = VehicleProfile(
-        id: 'x',
-        name: 'Test',
-        preferredFuelType: 'diesel',
-      );
-      expect(isDieselProfile(vehicle), isTrue);
-    });
-
-    test('preferredFuelType with diesel variant (dieselPremium) → true', () {
-      const vehicle = VehicleProfile(
-        id: 'x',
-        name: 'Test',
-        preferredFuelType: 'dieselPremium',
-      );
-      expect(isDieselProfile(vehicle), isTrue);
-    });
-
-    test('petrol-class fuel types → false', () {
-      for (final fuel in ['e5', 'e10', 'super', 'petrol', 'Gasoline']) {
-        final vehicle = VehicleProfile(
+  group('resolveAfrDensity — #2432', () {
+    VehicleProfile profileWith(String? fuel) => VehicleProfile(
           id: 'x',
           name: 'Test',
           preferredFuelType: fuel,
         );
-        expect(isDieselProfile(vehicle), isFalse, reason: 'for $fuel');
+
+    test('null profile → petrol default (safe default)', () {
+      final r = resolveAfrDensity(null);
+      expect(r.afr, closeTo(kPetrolAfr, 0.0001));
+      expect(r.densityGPerL, closeTo(kPetrolDensityGPerL, 0.0001));
+    });
+
+    test('empty preferredFuelType → petrol default', () {
+      final r = resolveAfrDensity(profileWith(null));
+      expect(r.afr, closeTo(kPetrolAfr, 0.0001));
+      expect(r.densityGPerL, closeTo(kPetrolDensityGPerL, 0.0001));
+    });
+
+    test('unrecognised fuel key → petrol default', () {
+      final r = resolveAfrDensity(profileWith('hydrogen'));
+      expect(r.afr, closeTo(kPetrolAfr, 0.0001));
+      expect(r.densityGPerL, closeTo(kPetrolDensityGPerL, 0.0001));
+    });
+
+    test('petrol-class keys → petrol constants', () {
+      for (final fuel in ['petrol', 'e10', 'e5', 'super', 'Gasoline']) {
+        final r = resolveAfrDensity(profileWith(fuel));
+        expect(r.afr, closeTo(kPetrolAfr, 0.0001), reason: 'AFR for $fuel');
+        expect(
+          r.densityGPerL,
+          closeTo(kPetrolDensityGPerL, 0.0001),
+          reason: 'density for $fuel',
+        );
       }
     });
 
-    test('whitespace + mixed case normalisation', () {
+    test('diesel + dieselPremium → diesel constants', () {
+      for (final fuel in ['diesel', 'dieselPremium', '  DIESEL  ']) {
+        final r = resolveAfrDensity(profileWith(fuel));
+        expect(r.afr, closeTo(kDieselAfr, 0.0001), reason: 'AFR for $fuel');
+        expect(
+          r.densityGPerL,
+          closeTo(kDieselDensityGPerL, 0.0001),
+          reason: 'density for $fuel',
+        );
+      }
+    });
+
+    test('e85 + ethanol keys → E85 constants', () {
+      for (final fuel in ['e85', 'E85', 'ethanol']) {
+        final r = resolveAfrDensity(profileWith(fuel));
+        expect(r.afr, closeTo(kE85Afr, 0.0001), reason: 'AFR for $fuel');
+        expect(
+          r.densityGPerL,
+          closeTo(kE85DensityGPerL, 0.0001),
+          reason: 'density for $fuel',
+        );
+      }
+    });
+
+    test('lpg + autogas keys → LPG constants', () {
+      for (final fuel in ['lpg', 'LPG', 'autogas']) {
+        final r = resolveAfrDensity(profileWith(fuel));
+        expect(r.afr, closeTo(kLpgAfr, 0.0001), reason: 'AFR for $fuel');
+        expect(
+          r.densityGPerL,
+          closeTo(kLpgDensityGPerL, 0.0001),
+          reason: 'density for $fuel',
+        );
+      }
+    });
+
+    test('cng → CNG AFR + petrol-equivalent density (no liquid g/L)', () {
+      final r = resolveAfrDensity(profileWith('cng'));
+      expect(r.afr, closeTo(kCngAfr, 0.0001));
+      // Deliberately petrol-equivalent — see kCngAfr doc / #2432.
+      expect(r.densityGPerL, closeTo(kCngEquivalentDensityGPerL, 0.0001));
+      expect(r.densityGPerL, closeTo(kPetrolDensityGPerL, 0.0001));
+    });
+
+    test('manual AFR override wins over the fuel-type mapping', () {
       const vehicle = VehicleProfile(
         id: 'x',
         name: 'Test',
-        preferredFuelType: '  DIESEL  ',
+        preferredFuelType: 'diesel',
+        manualAfrOverride: 12.3,
       );
-      expect(isDieselProfile(vehicle), isTrue);
+      final r = resolveAfrDensity(vehicle);
+      expect(r.afr, closeTo(12.3, 0.0001));
+      // density falls through to the diesel mapping (no override set).
+      expect(r.densityGPerL, closeTo(kDieselDensityGPerL, 0.0001));
+    });
+
+    test('manual density override wins over the fuel-type mapping', () {
+      const vehicle = VehicleProfile(
+        id: 'x',
+        name: 'Test',
+        preferredFuelType: 'e85',
+        manualFuelDensityGPerLOverride: 799.0,
+      );
+      final r = resolveAfrDensity(vehicle);
+      // AFR falls through to the E85 mapping (no override set).
+      expect(r.afr, closeTo(kE85Afr, 0.0001));
+      expect(r.densityGPerL, closeTo(799.0, 0.0001));
+    });
+
+    test('both overrides win regardless of fuel key', () {
+      const vehicle = VehicleProfile(
+        id: 'x',
+        name: 'Test',
+        preferredFuelType: 'petrol',
+        manualAfrOverride: 11.0,
+        manualFuelDensityGPerLOverride: 700.0,
+      );
+      final r = resolveAfrDensity(vehicle);
+      expect(r.afr, closeTo(11.0, 0.0001));
+      expect(r.densityGPerL, closeTo(700.0, 0.0001));
+    });
+
+    test('fallbackFuelType maps when there is no profile', () {
+      final r = resolveAfrDensity(null, fallbackFuelType: 'diesel');
+      expect(r.afr, closeTo(kDieselAfr, 0.0001));
+      expect(r.densityGPerL, closeTo(kDieselDensityGPerL, 0.0001));
+    });
+
+    test('profile preferredFuelType beats fallbackFuelType', () {
+      final r = resolveAfrDensity(
+        profileWith('e85'),
+        fallbackFuelType: 'diesel',
+      );
+      expect(r.afr, closeTo(kE85Afr, 0.0001));
+      expect(r.densityGPerL, closeTo(kE85DensityGPerL, 0.0001));
+    });
+  });
+
+  group('E85 under-count fix — #2432', () {
+    test('E85 profile yields ~30 %+ higher L/h than the old petrol '
+        'default for the same MAF operating point', () {
+      const mapKpa = 80.0;
+      const iat = 25.0;
+      const rpm = 2000.0;
+      const displacementCc = 1600;
+      const ve = 0.85;
+
+      // New behaviour: an E85 profile resolves to E85 AFR/density.
+      final e85 = resolveAfrDensity(
+        const VehicleProfile(id: 'x', name: 'E85', preferredFuelType: 'e85'),
+      );
+      final e85Rate = estimateFuelRateLPerHourFromMap(
+        mapKpa: mapKpa,
+        iatCelsius: iat,
+        rpm: rpm,
+        engineDisplacementCc: displacementCc,
+        volumetricEfficiency: ve,
+        afr: e85.afr,
+        fuelDensityGPerL: e85.densityGPerL,
+      )!;
+
+      // Old behaviour: the binary branch sent E85 down the petrol path.
+      final petrolRate = estimateFuelRateLPerHourFromMap(
+        mapKpa: mapKpa,
+        iatCelsius: iat,
+        rpm: rpm,
+        engineDisplacementCc: displacementCc,
+        volumetricEfficiency: ve,
+        afr: kPetrolAfr,
+        fuelDensityGPerL: kPetrolDensityGPerL,
+      )!;
+
+      // (14.7×740)/(9.8×785) = 10878/7693 ≈ 1.414 → ~41 % higher.
+      expect(e85Rate / petrolRate, greaterThan(1.30));
+      expect(
+        e85Rate / petrolRate,
+        closeTo(
+          (kPetrolAfr * kPetrolDensityGPerL) / (kE85Afr * kE85DensityGPerL),
+          0.001,
+        ),
+      );
     });
   });
 
@@ -214,6 +347,21 @@ void main() {
 
     test('diesel density 832 g/L (EN 590 reference)', () {
       expect(kDieselDensityGPerL, closeTo(832.0, 0.0001));
+    });
+
+    test('E85 AFR ~9.8 + density 785 g/L (#2432)', () {
+      expect(kE85Afr, closeTo(9.8, 0.0001));
+      expect(kE85DensityGPerL, closeTo(785.0, 0.0001));
+    });
+
+    test('LPG AFR ~15.6 + density 535 g/L (#2432)', () {
+      expect(kLpgAfr, closeTo(15.6, 0.0001));
+      expect(kLpgDensityGPerL, closeTo(535.0, 0.0001));
+    });
+
+    test('CNG AFR ~17.2 + petrol-equivalent density (#2432)', () {
+      expect(kCngAfr, closeTo(17.2, 0.0001));
+      expect(kCngEquivalentDensityGPerL, closeTo(kPetrolDensityGPerL, 0.0001));
     });
 
     test('default displacement 1000 cc (Peugeot 107 class)', () {

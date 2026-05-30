@@ -37,7 +37,7 @@ export 'fuel_rate_estimator.dart'
         kDieselDensityGPerL,
         kDefaultEngineDisplacementCc,
         kDefaultVolumetricEfficiency,
-        isDieselProfile,
+        resolveAfrDensity, // #2432 — fuel-type AFR/density lookup
         applyFuelTrimCorrection,
         estimateFuelRateLPerHourFromMap;
 
@@ -910,15 +910,14 @@ class Obd2Service implements Obd2RawCommandPort {
         (manualVe == null && profileVe == null && referenceVehicle != null)
             ? etaVCurveFor(referenceVehicle)
             : const <EtaVCurvePoint>[];
-    final isDiesel = vehicle != null
-        ? estimator.isDieselProfile(vehicle)
-        : referenceVehicle?.fuelType.toLowerCase() == 'diesel';
-    final afr = vehicle?.manualAfrOverride ??
-        (isDiesel ? estimator.kDieselAfr : estimator.kPetrolAfr);
-    final fuelDensityGPerL = vehicle?.manualFuelDensityGPerLOverride ??
-        (isDiesel
-            ? estimator.kDieselDensityGPerL
-            : estimator.kPetrolDensityGPerL);
+    // #2432 — single fuel-type lookup (manual overrides win, else the
+    // free-text fuel key → AFR/density, else petrol default). When there
+    // is no profile the reference-catalog fuel string is the fallback
+    // key, so that path also gets E85/LPG/CNG coverage, not just diesel.
+    final afrDensity = estimator.resolveAfrDensity(vehicle,
+        fallbackFuelType: vehicle == null ? referenceVehicle?.fuelType : null);
+    final afr = afrDensity.afr;
+    final fuelDensityGPerL = afrDensity.densityGPerL;
     // #1395 / #2191 — the diagnostic side-channel (breadcrumb trace +
     // the suspicious-low / 5E-vs-MAF sanity bounds) lives in this
     // collaborator so the fallback chain below reads clean: compute

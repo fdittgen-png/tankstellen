@@ -275,26 +275,25 @@ class LiveSampleSnapshot {
   /// (e.g. first 200 ms of a trip before MAP/IAT both land).
   ///
   /// AFR + density are chosen from the active vehicle's preferred
-  /// fuel type (#800). Diesel profiles get AFR 14.5 / density 832 g/L;
-  /// anything else (including null / unknown) stays on the petrol
-  /// defaults the pre-#800 path used.
+  /// fuel type via [resolveAfrDensity] (#800, #2432): diesel → 14.5 /
+  /// 832 g/L, E85 → 9.8 / 785 g/L, LPG → 15.6 / 535 g/L, CNG → 17.2 /
+  /// petrol-equivalent density, and null / unknown stays on the petrol
+  /// defaults the pre-#800 path used. Manual AFR / density overrides
+  /// win over the mapping.
   double? deriveFuelRateLPerHour() {
     // #1858 — provenance defaults; each branch below overrides them.
     _lastFuelRateBranch = Obd2BranchTag.none;
     _lastFuelRateVe = null;
-    final preferredFuel =
-        _vehicle?.preferredFuelType?.trim().toLowerCase() ?? '';
-    final isDiesel = preferredFuel.contains('diesel');
-    // #1397 — manual overrides take precedence over the inferred /
-    // catalog-resolved values. Mirrors the resolution chain in
+    // #1397 / #2432 — single fuel-type lookup: manual AFR/density
+    // overrides win, else the free-text fuel key maps to its
+    // AFR/density (petrol/diesel/E85/LPG/CNG), else the petrol default.
+    // Mirrors the resolution chain in
     // [Obd2Service.readFuelRateLPerHour] so the live integrator and the
-    // pull-mode estimator agree on every scalar.
-    final afr = _vehicle?.manualAfrOverride ??
-        (isDiesel ? Obd2Service.dieselAfr : Obd2Service.petrolAfr);
-    final density = _vehicle?.manualFuelDensityGPerLOverride ??
-        (isDiesel
-            ? Obd2Service.dieselDensityGPerL
-            : Obd2Service.petrolDensityGPerL);
+    // pull-mode estimator agree on every scalar. `resolveAfrDensity` is
+    // re-exported from `obd2_service.dart`.
+    final afrDensity = resolveAfrDensity(_vehicle);
+    final afr = afrDensity.afr;
+    final density = afrDensity.densityGPerL;
     final displacement = _vehicle?.manualEngineDisplacementCcOverride
             ?.round() ??
         _vehicle?.engineDisplacementCc ??
