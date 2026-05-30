@@ -25,24 +25,27 @@ const FlexSchemeColor _forestGreen = FlexSchemeColor(
 class AppTheme {
   AppTheme._();
 
-  /// Default light theme (#1757, retuned #1887) — calm forest green.
+  /// Default light theme (#1757, retuned #1887, de-greyed #2375) — clean
+  /// forest-green accent on a near-white surface.
   ///
-  /// #1887 — the previous tuning still read as a generic bright-day
-  /// light theme with a stark dark-green accent. The surface
-  /// green-tint is raised well up (`blendLevel` 14 → 26) so every
-  /// surface — scaffold, cards, chrome — is a deliberate soft
-  /// sage-green-tinted off-white. That carries the brand identity
-  /// across the whole app *and* narrows the jarring gap between the
-  /// forest-green filled surfaces and their background, so the accent
-  /// reads as part of a green family rather than a high-contrast
-  /// stamp on white. The forest-green accent itself is unchanged.
+  /// #2375 — #1887 had raised `blendLevel` 14 → 26 to make every surface a
+  /// "soft sage-green-tinted off-white". In practice, blending the *dark,
+  /// semi-desaturated* brand green `#2E7D32` into white at level 26 reads as
+  /// muddy **grey-green** — on the scaffold and on every `surfaceContainer`
+  /// card — not soft green. Repeated user feedback called the background
+  /// "grey". So the surface blend is cut back hard (`blendLevel` 26 → 8,
+  /// `blendOnLevel` 18 → 10): surfaces are now a clean, light off-white with
+  /// only a faint green hint, while the forest-green *accent* (buttons,
+  /// chrome, icons) is unchanged and now reads crisply against the clean
+  /// background instead of being muddied into it. The deliberately
+  /// green-forward look lives in [eco]; [light] is the clean default.
   static ThemeData light() {
     return FlexThemeData.light(
       colors: _forestGreen,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-      blendLevel: 26,
+      blendLevel: 8,
       subThemesData: const FlexSubThemesData(
-        blendOnLevel: 18,
+        blendOnLevel: 10,
         blendOnColors: false,
         useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
