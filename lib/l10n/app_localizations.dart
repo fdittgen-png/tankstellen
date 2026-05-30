@@ -4769,7 +4769,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpBannerAlerts.
   ///
   /// In en, this message translates to:
-  /// **'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.'**
+  /// **'Set a price threshold for a station. You\'ll be notified when prices drop below it. Prices are checked periodically in the background — best effort, not in real time.'**
   String get helpBannerAlerts;
 
   /// No description provided for @helpBannerConsumption.

@@ -175,6 +175,13 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("androidx.car.app:app:1.4.0")
+    // #2412 / #2413 — BootReceiver + the widget-refresh trigger enqueue a
+    // WorkManager one-off directly (androidx.work.*). The workmanager plugin
+    // pulls work-runtime in as `implementation`, which Gradle does not expose
+    // transitively, so the app module declares it explicitly. Version pinned
+    // to the plugin's (workmanager_android 0.9.0 → work-runtime 2.10.2) to
+    // avoid a resolved-version split.
+    implementation("androidx.work:work-runtime-ktx:2.10.2")
 }
 
 flutter {

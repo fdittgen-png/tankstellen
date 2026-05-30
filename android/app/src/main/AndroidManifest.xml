@@ -72,6 +72,15 @@
         tools:node="remove"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <!-- #2413 — Tier-1 background scan hardening. WorkManager persists its
+         periodic tasks, but re-establishing the schedule after a reboot
+         requires the boot broadcast. RECEIVE_BOOT_COMPLETED is a normal
+         (install-time) permission — no runtime prompt, no Play sensitive-
+         permissions declaration. It only re-arms the price-alert poll the
+         user already consented to (a poll exists only while an alert is
+         active); it does not enable any new data collection. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <application
         android:label="Sparkilo"
         android:name="${applicationName}"
@@ -156,6 +165,26 @@
             android:name="androidx.car.app.minCarApiLevel"
             android:value="1" />
         -->
+
+        <!-- #2413 — re-arm the on-device background price scan after a
+             reboot. WorkManager persists periodic work and androidx
+             reschedules it on boot, but this receiver re-registers the
+             tasks from scratch (via a one-off WorkManager task whose Dart
+             handler calls BackgroundService.init) so the schedule survives
+             even when WorkManager's own boot reschedule does not fire. It
+             only acts when a WorkManager callback handle is already
+             persisted — i.e. the user previously had an active alert. -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

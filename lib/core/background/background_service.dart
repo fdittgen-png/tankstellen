@@ -6,36 +6,16 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../../features/alerts/data/price_snapshot_store.dart';
-import '../../features/alerts/data/radius_alert_dedup.dart';
-import '../../features/alerts/data/radius_alert_runner.dart';
-import '../../features/alerts/data/radius_alert_store.dart';
-import '../../features/alerts/data/repositories/alert_repository.dart';
-import '../../features/alerts/data/velocity_alert_cooldown.dart';
-import '../../features/alerts/data/velocity_alert_runner.dart';
-import '../../features/alerts/domain/radius_alert_evaluator.dart';
-import '../../features/alerts/domain/velocity_alert_detector.dart';
-import '../../features/search/data/models/search_params.dart';
-import '../../features/price_history/data/models/price_record.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
-import '../../features/widget/data/home_widget_service.dart';
-import '../constants/field_names.dart';
-import '../telemetry/storage/isolate_error_spool.dart';
-import '../notifications/local_notification_service.dart';
-import '../../features/station_services/germany/tankerkoenig_batch_price_fetcher.dart';
-import '../../features/station_services/germany/tankerkoenig_station_service.dart';
-import '../services/dio_factory.dart';
-import '../storage/hive_storage.dart';
-import '../storage/storage_keys.dart';
-import '../utils/json_extensions.dart';
-import 'background_price_fetcher_provider.dart';
-import 'background_retry.dart';
-import 'daily_collection.dart';
-import 'hive_isolate_lock.dart';
-import 'notification_templates.dart';
 import '../../core/logging/error_logger.dart';
+import '../../features/alerts/data/radius_alert_store.dart';
+import '../storage/hive_storage.dart';
+import 'background_alert_scan_coordinator.dart';
+import 'background_price_fetcher_provider.dart';
+import 'background_price_history_writer.dart';
+import 'notification_templates.dart';
 
-/// Constants and callback logic for background price refresh tasks.
+/// Background price-refresh scheduling + the WorkManager / iOS BGTask
+/// callback entry point.
 ///
 /// ## Why a separate isolate?
 /// WorkManager runs tasks in a separate Dart isolate (a lightweight thread).
@@ -46,20 +26,26 @@ import '../../core/logging/error_logger.dart';
 /// - Must use Dio directly instead of service providers
 ///
 /// ## What runs in background:
-/// 1. Fetch latest prices for all favorite + alert stations (Tankerkoenig API)
-/// 2. Record price history to Hive (dedup: skip if last record < 60 min ago)
-/// 3. Update cached station data with fresh prices
-/// 4. Evaluate alert thresholds and fire local push notifications
+/// The actual scan (price fetch, history dedup, alert evaluation, widget
+/// refresh) lives in [BackgroundAlertScanCoordinator] (#2415) so every
+/// trigger — the WorkManager periodic tasks here, the Android home-widget
+/// refresh (#2412), and the iOS BGAppRefreshTask (#2414) — runs the same
+/// code and shares one cross-trigger dedup/cooldown gate. This callback is
+/// deliberately thin: it just maps the task name to a
+/// [BackgroundScanTrigger] and delegates.
 ///
 /// ## Frequency: Adaptive based on battery/charger state
 /// - **Charging**: every 30 minutes (more frequent updates while plugged in)
 /// - **On battery (not low)**: every 1 hour (standard interval)
 /// - **Low battery**: tasks are skipped by WorkManager constraints
 ///
+/// Background scanning is **best-effort, never real-time** — Android delays
+/// periodic work under Doze and iOS schedules BGAppRefresh opportunistically.
+///
 /// ## Platform abstraction
 /// Task scheduling is handled by [BackgroundPriceFetcher] implementations:
 /// - Android: [AndroidBackgroundPriceFetcher] (WorkManager)
-/// - iOS: [IosBackgroundPriceFetcherStub] (no-op placeholder)
+/// - iOS: [IosBackgroundPriceFetcher] (workmanager iOS backend / BGTask)
 ///
 /// Use [createBackgroundPriceFetcher] to get the correct implementation,
 /// then call `init()` to register periodic tasks.
@@ -70,6 +56,21 @@ class BackgroundService {
   /// Task name for the charging-only periodic price refresh.
   static const priceRefreshChargingTask = 'priceRefreshCharging';
 
+  /// One-off task name enqueued by the Android [BootReceiver] after a
+  /// reboot (#2413). Handling it re-registers the periodic tasks so the
+  /// schedule survives a device restart even if WorkManager's own boot
+  /// reschedule did not fire. Must match `BootReceiver.BOOT_REREGISTER_TASK`.
+  static const bootReregisterTask = 'bootReregister';
+
+  /// One-off task name enqueued by the Android home-widget provider whenever
+  /// the OS refreshes the widget (#2412). While the widget is on the home
+  /// screen its periodic OS refreshes are extra, opportunistic wake
+  /// opportunities — complementary to the WorkManager periodic tasks, NOT a
+  /// reliability guarantee. The coordinator's cross-trigger cooldown keeps
+  /// this from double-fetching alongside a concurrent periodic task. Must
+  /// match `FuelPriceWidgetProvider.WIDGET_SCAN_TASK`.
+  static const widgetRefreshScanTask = 'widgetRefreshScan';
+
   /// Standard refresh interval when on battery (not low).
   /// Android may delay based on Doze mode; 1h is the minimum WorkManager honors reliably.
   static const refreshInterval = Duration(hours: 1);
@@ -78,30 +79,35 @@ class BackgroundService {
   /// Plugged-in users get fresher prices without battery impact.
   static const chargingRefreshInterval = Duration(minutes: 30);
 
+  // Retry / dedup / batch constants live on BackgroundAlertScanCoordinator
+  // (#2415) so every trigger shares one tuning surface. Kept here as thin
+  // forwarders for backwards-compatible call sites + existing tests.
+
   /// Max IDs accepted per Tankerkoenig batch prices request.
-  static const tankerkoenigBatchSize = 10;
+  static const tankerkoenigBatchSize =
+      BackgroundAlertScanCoordinator.tankerkoenigBatchSize;
 
-  /// Skip writing a new price-history record if the last one is more recent than this.
-  /// Avoids duplicate points when the BG task runs faster than prices actually change.
-  static const priceHistoryDedupWindow = Duration(minutes: 60);
+  /// Skip writing a new price-history record if the last one is more recent.
+  static const priceHistoryDedupWindow =
+      BackgroundPriceHistoryWriter.dedupWindow;
 
-  /// Keep this much price-history per station, older points are trimmed.
-  static const priceHistoryRetention = Duration(days: 30);
+  /// Keep this much price-history per station; older points are trimmed.
+  static const priceHistoryRetention = BackgroundPriceHistoryWriter.retention;
 
-  /// Do not re-fire the same alert within this window, prevents notification spam.
-  static const alertRetriggerCooldown = Duration(hours: 4);
+  /// Do not re-fire the same per-station alert within this window.
+  static const alertRetriggerCooldown =
+      BackgroundAlertScanCoordinator.priceAlertRetriggerCooldown;
 
-  /// Connect timeout for Tankerkoenig prices batch requests in the BG isolate.
-  static const bgConnectTimeout = Duration(seconds: 10);
+  /// Connect / receive timeouts for the BG-isolate Dio client.
+  static const bgConnectTimeout =
+      BackgroundAlertScanCoordinator.bgConnectTimeout;
+  static const bgReceiveTimeout =
+      BackgroundAlertScanCoordinator.bgReceiveTimeout;
 
-  /// Receive timeout for Tankerkoenig prices batch requests in the BG isolate.
-  static const bgReceiveTimeout = Duration(seconds: 15);
-
-  /// Max retry attempts for transient network failures in the background task.
-  static const maxRetryAttempts = 3;
-
-  /// Base delay for exponential backoff between retries.
-  static const retryBaseDelay = Duration(seconds: 2);
+  /// Max retry attempts + base backoff for transient network failures.
+  static const maxRetryAttempts =
+      BackgroundAlertScanCoordinator.maxRetryAttempts;
+  static const retryBaseDelay = BackgroundAlertScanCoordinator.retryBaseDelay;
 
   /// Initialize background price refresh using the platform-appropriate
   /// implementation.
@@ -181,605 +187,63 @@ class BackgroundService {
   }
 }
 
+/// Top-level WorkManager / iOS BGTask entry point (must be a top-level
+/// function annotated `vm:entry-point` so the background isolate can find
+/// it). Maps the task name onto a [BackgroundScanTrigger] and delegates to
+/// the shared [BackgroundAlertScanCoordinator] — see #2415.
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    if (task == BackgroundService.priceRefreshTask ||
-        task == BackgroundService.priceRefreshChargingTask) {
-      debugPrint('BackgroundService: running task "$task"');
-      await _refreshPricesAndCheckAlerts();
+    // #2413 — boot re-arm: re-register the periodic tasks rather than scan.
+    // The BootReceiver enqueues this one-off after a reboot.
+    if (task == BackgroundService.bootReregisterTask) {
+      debugPrint('BackgroundService: re-registering periodic tasks after boot');
+      await BackgroundService.init();
+      return true;
     }
+
+    final trigger = _triggerForTask(task);
+    if (trigger == null) {
+      debugPrint('BackgroundService: ignoring unknown task "$task"');
+      return true;
+    }
+    debugPrint('BackgroundService: running task "$task" (${trigger.tag})');
+    await BackgroundAlertScanCoordinator().scan(trigger: trigger);
     return true;
   });
 }
 
-/// Background task: fetch latest prices for favorites, record history,
-/// evaluate alerts, and fire notifications.
+/// Resolve the [BackgroundScanTrigger] for a WorkManager / iOS task name.
 ///
-/// Uses [HiveIsolateLock] to prevent concurrent Hive access with the main
-/// isolate, and closes all Hive boxes when done to release file handles.
-Future<void> _refreshPricesAndCheckAlerts() async {
-  HiveIsolateLock? lock;
-  try {
-    // Acquire file-based lock to prevent concurrent Hive access
-    lock = await HiveIsolateLock.create();
-    final acquired = await lock.acquire();
-    if (!acquired) {
-      debugPrint('BackgroundService: could not acquire Hive lock, skipping task');
-      return;
-    }
-
-    // Initialize Hive in isolate with proper encryption
-    await HiveStorage.initInIsolate();
-
-    final storage = HiveStorage();
-
-    // Load API key
-    await HiveStorage.loadApiKey();
-    final apiKey = storage.getApiKey();
-
-    // #2306 — load the localized notification templates the main isolate
-    // stashed at reconcile() time. If absent (e.g. a task that outran the
-    // first reconcile, or a storage hiccup) resolve live from the
-    // persisted active language code so we still localize, never English.
-    final notificationTemplates = BackgroundNotificationTemplates.tryDecode(
-          storage.getSetting(BackgroundNotificationTemplates.storageKey)
-              as String?,
-        ) ??
-        BackgroundNotificationTemplates.resolveForLanguage(
-          storage.getSetting('active_language_code') as String?,
-        );
-
-    // 1. Build the station-id set to fetch. Favorites + active-alert
-    //    stations are always refreshed; #2212 — every previously-viewed
-    //    ("collected") station is also gathered ONCE PER DAY so its price
-    //    history keeps growing even if it isn't a favorite.
-    final now = DateTime.now();
-    final favoriteIds = storage.getFavoriteIds();
-    final repo = AlertRepository(storage);
-    final alerts = repo.getAlerts();
-    final alertStationIds = alerts
-        .where((a) => a.isActive)
-        .map((a) => a.stationId)
-        .toSet();
-    bool collectedToday(String id) {
-      final recs = storage.getPriceRecords(id);
-      if (recs.isEmpty) return false;
-      final last =
-          DateTime.tryParse(recs.last['recordedAt']?.toString() ?? '');
-      return last != null && isSameDay(last, now);
-    }
-
-    final allStationIds = stationsToCollect(
-      favorites: favoriteIds,
-      alerts: alertStationIds.toList(),
-      viewed: storage.getPriceHistoryKeys(),
-      collectedToday: collectedToday,
-    );
-    debugPrint('BackgroundService: ${favoriteIds.length} favorites, '
-        '${alertStationIds.length} alert stations, '
-        '${allStationIds.length} total (incl. once-a-day viewed)');
-
-    if (allStationIds.isEmpty) {
-      // #609 — users without favorites still need a populated nearest
-      // widget. Run the real-search builder before bailing.
-      await _refreshNearestWidgetFromSearch(storage);
-      return;
-    }
-
-    // 2. Fetch prices via the shared Tankerkoenig batch fetcher (chunking +
-    //    parsing + retry). #2249 — DioFactory so the BG batch fetch inherits
-    //    the rate-limit + conditional-GET interceptors, not a raw request.
-    final dio = DioFactory.create(
-      connectTimeout: BackgroundService.bgConnectTimeout,
-      receiveTimeout: BackgroundService.bgReceiveTimeout,
-    );
-    final fetcher = TankerkoenigBatchPriceFetcher(
-      dio: dio,
-      batchSize: BackgroundService.tankerkoenigBatchSize,
-      retryConfig: const BackgroundRetryConfig(
-        maxAttempts: BackgroundService.maxRetryAttempts,
-        baseDelay: BackgroundService.retryBaseDelay,
-      ),
-    );
-    final prices = await fetcher.fetchBatch(
-      ids: allStationIds,
-      apiKey: apiKey,
-    );
-    debugPrint('BackgroundService: fetched prices for ${prices.length} stations');
-
-    // 3. Record price history for each station
-    if (prices.isNotEmpty) {
-      for (final entry in prices.entries) {
-        final stationId = entry.key;
-        final p = entry.value;
-        if (p[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
-
-        final record = PriceRecord(
-          stationId: stationId,
-          recordedAt: now,
-          e5: p.getDouble(TankerkoenigFields.e5),
-          e10: p.getDouble(TankerkoenigFields.e10),
-          diesel: p.getDouble(TankerkoenigFields.diesel),
-        );
-
-        // Deduplicate: only save if last record is older than dedup window
-        final existing = storage.getPriceRecords(stationId);
-        final lastRecordedAt = existing.isNotEmpty
-            ? DateTime.tryParse(existing.last['recordedAt']?.toString() ?? '')
-            : null;
-        final shouldSave = existing.isEmpty ||
-            lastRecordedAt == null ||
-            now.difference(lastRecordedAt) >
-                BackgroundService.priceHistoryDedupWindow;
-        if (shouldSave) {
-          final records = [
-            ...existing,
-            record.toJson(),
-          ];
-          // Trim to retention window
-          final cutoff = now.subtract(BackgroundService.priceHistoryRetention);
-          final trimmed = records.where((r) {
-            final ts = DateTime.tryParse(r['recordedAt']?.toString() ?? '');
-            return ts != null && ts.isAfter(cutoff);
-          }).toList();
-          await storage.savePriceRecords(stationId, trimmed.cast<Map<String, dynamic>>());
-        }
-      }
-      debugPrint('BackgroundService: price history recorded');
-
-      // 4. Update cached station data with fresh prices
-      for (final entry in prices.entries) {
-        final stationId = entry.key;
-        final p = entry.value;
-        if (p[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
-
-        final cached = storage.getCachedData('station:$stationId');
-        final cachedData = cached?.getMap('data');
-        if (cachedData != null) {
-          final stationData = Map<String, dynamic>.from(cachedData);
-          final e5 = p.getDouble(TankerkoenigFields.e5);
-          final e10 = p.getDouble(TankerkoenigFields.e10);
-          final diesel = p.getDouble(TankerkoenigFields.diesel);
-          if (e5 != null) stationData[TankerkoenigFields.e5] = e5;
-          if (e10 != null) stationData[TankerkoenigFields.e10] = e10;
-          if (diesel != null) stationData[TankerkoenigFields.diesel] = diesel;
-          stationData[TankerkoenigFields.isOpen] = p[TankerkoenigFields.status] == TankerkoenigFields.statusOpen;
-          await storage.cacheData('station:$stationId', stationData);
-        }
-      }
-    }
-
-    // 5. Evaluate alerts (prices may be empty if all retries failed)
-    final activeAlerts = alerts.where((a) => a.isActive).toList();
-
-    if (activeAlerts.isNotEmpty && prices.isNotEmpty) {
-      final notifier = LocalNotificationService();
-      await notifier.initialize();
-      int notificationCount = 0;
-
-      for (final alert in activeAlerts) {
-        final stationPrices = prices[alert.stationId];
-        if (stationPrices == null || stationPrices[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
-
-        // #2246 — the switch intentionally stays at e5/e10/diesel: those
-        // are the ONLY fuels Tankerkönig's prices feed exposes (the German
-        // MTS-K mandate). e98/dieselPremium/e85/lpg/cng are not in the
-        // upstream feed, so there is nothing to evaluate — extending the
-        // switch would only pretend. The create dialog is now gated to the
-        // same three fuels (mirrors the radius #2211 fix), so new alerts
-        // can never land on the `default` branch; legacy alerts on dead
-        // fuels fall through to `continue` and are skipped, same as before.
-        double? currentPrice;
-        switch (alert.fuelType) {
-          case FuelTypeE5():
-            currentPrice = stationPrices.getDouble(TankerkoenigFields.e5);
-          case FuelTypeE10():
-            currentPrice = stationPrices.getDouble(TankerkoenigFields.e10);
-          case FuelTypeDiesel():
-            currentPrice = stationPrices.getDouble(TankerkoenigFields.diesel);
-          default:
-            continue;
-        }
-
-        if (currentPrice != null && currentPrice <= alert.targetPrice) {
-          // Honor re-trigger cooldown
-          if (alert.lastTriggeredAt != null &&
-              now.difference(alert.lastTriggeredAt!) <
-                  BackgroundService.alertRetriggerCooldown) {
-            debugPrint(
-              'BackgroundService: alert ${alert.stationId} '
-              '(${alert.fuelType.displayName}) tripped at '
-              '${currentPrice.toStringAsFixed(3)}, but cooldown is '
-              'still active (lastTriggeredAt=${alert.lastTriggeredAt}) '
-              '— skipping notification',
-            );
-            continue;
-          }
-
-          await notifier.showPriceAlert(
-            id: alert.stationId.hashCode,
-            title: notificationTemplates.renderPriceAlertTitle(
-              station: alert.stationName,
-              fuelType: alert.fuelType.displayName,
-            ),
-            body: notificationTemplates.renderPriceAlertBody(
-              price: currentPrice.toStringAsFixed(3),
-              target: alert.targetPrice.toStringAsFixed(3),
-            ),
-          );
-          notificationCount++;
-
-          // Update last triggered
-          await repo.saveAlert(alert.copyWith(lastTriggeredAt: now));
-        }
-      }
-      debugPrint('BackgroundService: $notificationCount alerts triggered');
-    } else {
-      // Be explicit about WHICH precondition failed: no alerts (user
-      // hasn't created any), prices empty (refresh chain-exhausted),
-      // or both. Most common branch users ask about: "why didn't I
-      // get an alert?"
-      final reason = activeAlerts.isEmpty
-          ? (prices.isEmpty
-              ? 'no active alerts AND no prices fetched'
-              : 'no active alerts')
-          : 'no prices fetched (refresh failed?)';
-      debugPrint(
-        'BackgroundService: alert loop skipped — $reason '
-        '(activeAlerts=${activeAlerts.length}, prices=${prices.length})',
-      );
-    }
-
-    // 5b. #579 — Velocity detector: rapid drops across multiple nearby
-    //     stations. Runs even when no per-station alert exists so the
-    //     user gets notified about a wider price slide. Snapshots are
-    //     pruned by the store itself; cooldown is per fuel type.
-    if (prices.isNotEmpty) {
-      try {
-        final notifier = LocalNotificationService();
-        await notifier.initialize();
-        await _runVelocityDetector(
-          storage: storage,
-          prices: prices,
-          now: now,
-          notifier: notifier,
-          templates: notificationTemplates,
-        );
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: velocity detector failed'}));
-        // #1105 — spool the failure so the foreground TraceRecorder can
-        // surface it through the same pipeline as foreground errors.
-        await IsolateErrorSpool.enqueue(
-          isolateTaskName: 'velocity_detector',
-          error: e,
-          stack: st,
-          contextMap: <String, dynamic>{
-            'priceCount': prices.length,
-          },
-        );
-      }
-    }
-
-    // 5c. #578 phase 3 — Radius alerts: iterate every enabled
-    //     RadiusAlert, query stations within its radius, and fire a
-    //     notification when any station is at or below the
-    //     threshold. Dedup remembers (alert, station) → (price, ts)
-    //     so we don't re-notify on every 1 h cycle while the station
-    //     stays cheap.
-    try {
-      final notifier = LocalNotificationService();
-      await notifier.initialize();
-      await _runRadiusAlerts(
-        storage: storage,
-        now: now,
-        notifier: notifier,
-        apiKey: apiKey,
-        templates: notificationTemplates,
-      );
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: radius alert runner failed'}));
-      // #1105 — spool the failure so the foreground TraceRecorder can
-      // surface radius-alert outages through the same pipeline as
-      // foreground errors.
-      await IsolateErrorSpool.enqueue(
-        isolateTaskName: 'radius_alerts',
-        error: e,
-        stack: st,
-      );
-    }
-
-    // 6. Update home screen widgets with latest favorite prices.
-    //    Pass profile + settings storage so the widget can resolve the
-    //    active profile's preferred fuel type and last-known GPS.
-    await HomeWidgetService.updateWidget(
-      storage,
-      profileStorage: storage,
-      settingsStorage: storage,
-    );
-    // #609 — nearest widget now queries a real search against the active
-    // country's API (when supported in the BG isolate) instead of just
-    // sorting favorites by distance. Shared helper so the early-return
-    // path above also runs it.
-    await _refreshNearestWidgetFromSearch(storage);
-  } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: task failed'}));
-    // #1105 — top-level isolate failure: spool through the ring buffer
-    // so the foreground TraceRecorder can replay it. This catches any
-    // exception not handled by the inner runners (Hive open failures,
-    // batch fetcher exhaustion, unexpected runtime errors).
-    await IsolateErrorSpool.enqueue(
-      isolateTaskName: 'price_refresh',
-      error: e,
-      stack: st,
-    );
-  } finally {
-    // Always close Hive boxes and release lock, even on failure.
-    // This prevents file handle leaks and stale locks.
-    try {
-      await HiveStorage.closeIsolateBoxes();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: failed to close Hive boxes'}));
-    }
-    lock?.release();
+/// On iOS the workmanager backend reports background-fetch wakeups as
+/// [Workmanager.iOSBackgroundTask]; the BGAppRefreshTask registered in
+/// `AppDelegate.swift` reports its own identifier. Both funnel into the
+/// iOS trigger. Returns null for task names we don't recognise so the
+/// dispatcher can no-op instead of scanning on a stray callback.
+BackgroundScanTrigger? _triggerForTask(String task) {
+  switch (task) {
+    case BackgroundService.priceRefreshTask:
+      return BackgroundScanTrigger.workManagerPeriodic;
+    case BackgroundService.priceRefreshChargingTask:
+      return BackgroundScanTrigger.workManagerCharging;
+    case BackgroundService.widgetRefreshScanTask:
+      return BackgroundScanTrigger.androidWidget;
+    case Workmanager.iOSBackgroundTask:
+    case IosBackgroundTaskIds.appRefresh:
+      return BackgroundScanTrigger.iosBackgroundRefresh;
+    default:
+      return null;
   }
 }
 
-/// #579 — orchestrate the velocity detector from the BG isolate.
-///
-/// Builds per-station [VelocityStationObservation]s by joining the
-/// freshly fetched prices with the `station:<id>` cache (for
-/// coordinates), then hands off to [VelocityAlertRunner] which owns
-/// snapshot recording, detection, cooldown, and notification firing.
-///
-/// Extracted so a future test can drive the same code path with a
-/// fake notifier + seeded snapshots.
-Future<void> _runVelocityDetector({
-  required HiveStorage storage,
-  required Map<String, Map<String, dynamic>> prices,
-  required DateTime now,
-  required LocalNotificationService notifier,
-  required BackgroundNotificationTemplates templates,
-}) async {
-  final runner = VelocityAlertRunner(
-    snapshotStore: PriceSnapshotStore(),
-    cooldown: VelocityAlertCooldown(),
-    notifier: notifier,
-    copyBuilder: (event) => _buildVelocityCopy(event, templates),
-  );
-  final config = await runner.loadConfig();
-  final fuelKey = _tankerkoenigKeyFor(config.fuelType);
-  if (fuelKey == null) {
-    debugPrint('BackgroundService: velocity skipped — ${config.fuelType.apiValue} not in Tankerkoenig response');
-    return;
-  }
+/// iOS BGTaskScheduler identifiers. Must match the values registered in
+/// `ios/Runner/AppDelegate.swift` and listed under
+/// `BGTaskSchedulerPermittedIdentifiers` in `ios/Runner/Info.plist` — all
+/// three break together (#2414).
+class IosBackgroundTaskIds {
+  IosBackgroundTaskIds._();
 
-  final observations = <VelocityStationObservation>[];
-  for (final entry in prices.entries) {
-    final stationId = entry.key;
-    final p = entry.value;
-    if (p[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) {
-      continue;
-    }
-    final price = p.getDouble(fuelKey);
-    if (price == null) continue;
-    final cached = storage.getCachedData('station:$stationId');
-    final data = cached?.getMap('data');
-    final lat = data?.getDouble('lat');
-    final lng = data?.getDouble('lng');
-    if (lat == null || lng == null) continue;
-    observations.add(VelocityStationObservation(
-      stationId: stationId,
-      price: price,
-      lat: lat,
-      lng: lng,
-    ));
-  }
-  if (observations.isEmpty) {
-    debugPrint('BackgroundService: velocity detector has no usable observations');
-    return;
-  }
-
-  final userLat = storage.getSetting(StorageKeys.userPositionLat) as num?;
-  final userLng = storage.getSetting(StorageKeys.userPositionLng) as num?;
-
-  final event = await runner.run(
-    observations: observations,
-    now: now,
-    userLat: userLat?.toDouble(),
-    userLng: userLng?.toDouble(),
-  );
-  if (event != null) {
-    debugPrint(
-        'BackgroundService: velocity alert ${event.fuelType.apiValue}, '
-        'count=${event.stationCount}, max=${event.maxDropCents.toStringAsFixed(1)}ct');
-  }
-}
-
-/// Map [FuelType] → Tankerkoenig JSON key. The BG isolate only
-/// fetches E5/E10/diesel today (see [_refreshPricesAndCheckAlerts])
-/// so other fuels return `null` and skip velocity detection until
-/// we broaden the batch fetcher.
-String? _tankerkoenigKeyFor(FuelType fuelType) {
-  return switch (fuelType) {
-    FuelTypeE5() => TankerkoenigFields.e5,
-    FuelTypeE10() => TankerkoenigFields.e10,
-    FuelTypeDiesel() => TankerkoenigFields.diesel,
-    _ => null,
-  };
-}
-
-/// Build notification copy for a velocity event. #2306 — the copy now
-/// comes from the localized [BackgroundNotificationTemplates] the main
-/// isolate resolved for the active in-app language, replacing the old
-/// `Platform.localeName` de/en branch (which used the device locale, not
-/// the user's chosen language, and only ever offered two languages).
-VelocityAlertCopy _buildVelocityCopy(
-  VelocityAlertEvent event,
-  BackgroundNotificationTemplates templates,
-) {
-  final fuelLabel = event.fuelType.displayName.toUpperCase();
-  return VelocityAlertCopy(
-    title: templates.renderVelocityTitle(fuelLabel: fuelLabel),
-    body: templates.renderVelocityBody(
-      count: event.stationCount,
-      cents: event.maxDropCents.round(),
-    ),
-  );
-}
-
-/// #578 phase 3 — orchestrate radius-alert evaluation from the BG
-/// isolate.
-///
-/// Builds a per-alert sample list by searching the country's
-/// StationService for stations within the alert's radius, then hands
-/// off to [RadiusAlertRunner] which owns evaluator + dedup +
-/// notification firing.
-///
-/// Today the BG isolate only has a working [TankerkoenigStationService]
-/// (matches the per-station alert + velocity detector scope). Alerts
-/// centred on non-DE coordinates are skipped with a log line rather
-/// than dropped silently, so the user can tell why nothing arrived.
-/// Expanding BG coverage to every country API is tracked separately.
-Future<void> _runRadiusAlerts({
-  required HiveStorage storage,
-  required DateTime now,
-  required LocalNotificationService notifier,
-  required String? apiKey,
-  required BackgroundNotificationTemplates templates,
-}) async {
-  final store = RadiusAlertStore();
-  final alerts = await store.list();
-  final active = alerts.where((a) => a.enabled).toList();
-  if (active.isEmpty) {
-    debugPrint('BackgroundService: no active radius alerts');
-    return;
-  }
-
-  // Without a Tankerkoenig key the only useful source is the shared
-  // cache; skip rather than pretend we can search.
-  if (apiKey == null || apiKey.isEmpty) {
-    debugPrint(
-        'BackgroundService: radius alerts skipped — no Tankerkoenig API key');
-    return;
-  }
-
-  // #2249 — rate-limited + conditional-GET Dio (radius-alert search).
-  final dio = DioFactory.create(
-    baseUrl: 'https://creativecommons.tankerkoenig.de/json',
-    connectTimeout: BackgroundService.bgConnectTimeout,
-    receiveTimeout: BackgroundService.bgReceiveTimeout,
-  )..options.queryParameters = {'apikey': apiKey};
-  final service = TankerkoenigStationService(dio);
-
-  final runner = RadiusAlertRunner(
-    store: store,
-    dedup: RadiusAlertDedup(),
-    notifier: notifier,
-    copyBuilder: (event) => _buildRadiusAlertCopy(event, templates),
-  );
-
-  final fired = await runner.run(
-    now: now,
-    samplesFor: (alert) async {
-      try {
-        final result = await service.searchStations(
-          SearchParams(
-            lat: alert.centerLat,
-            lng: alert.centerLng,
-            radiusKm: alert.radiusKm,
-          ),
-        );
-        final samples = <StationPriceSample>[];
-        for (final station in result.data) {
-          samples.addAll(StationPriceSample.fromStation(station));
-        }
-        return samples;
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'BackgroundService: radius alert samples for ${alert.id} failed'}));
-        return const <StationPriceSample>[];
-      }
-    },
-  );
-  debugPrint('BackgroundService: ${fired.length} radius alerts fired');
-}
-
-/// Build notification copy for a radius alert (#1012 phase 2 grouped
-/// fire). #2306 — copy now comes from the localized
-/// [BackgroundNotificationTemplates] resolved in the main isolate for the
-/// active in-app language, replacing the old `Platform.localeName` de/en
-/// branch.
-///
-/// Title summarises the alert as `<label>: N stations ≤ €X`. Body renders
-/// one line per top-N matching station (cheapest first) and appends
-/// `+ X more` when matches got truncated.
-RadiusAlertCopy _buildRadiusAlertCopy(
-  RadiusAlertGroupedEvent event,
-  BackgroundNotificationTemplates templates,
-) {
-  final threshold = event.alert.threshold.toStringAsFixed(3);
-  final label = event.alert.label;
-  final currency = templates.currencySymbol;
-  // Total visible matches *plus* the truncated tail — the title number
-  // should reflect everything the user could see if they tapped in.
-  final total = event.matches.length + event.truncatedMoreCount;
-  final lines = event.matches
-      // #2211 — show the station name, not the raw id. The per-line
-      // "name price currency" mask is language-neutral.
-      .map((m) => '${m.name} ${m.pricePerLiter.toStringAsFixed(3)} $currency')
-      .toList();
-  if (event.truncatedMoreCount > 0) {
-    lines.add(
-        templates.renderRadiusMore(count: event.truncatedMoreCount));
-  }
-  return RadiusAlertCopy(
-    title: templates.renderRadiusTitle(
-      label: label,
-      count: total,
-      threshold: threshold,
-    ),
-    body: lines.join('\n'),
-  );
-}
-
-/// Run the new nearest-widget builder from the background isolate.
-///
-/// Instantiates a minimal [TankerkoenigStationService] because that's the
-/// only API for which we can assemble a working Dio here without pulling
-/// in the full Riverpod graph. Countries without a DE-style key-based API
-/// fall back to the legacy favorites-distance widget path by passing
-/// `stationService: null` to [HomeWidgetService.updateNearestWidget].
-///
-/// The key gate mirrors the existing background price refresh — which
-/// is also Tankerkoenig-only in the BG isolate today. Expanding this to
-/// other countries is tracked separately.
-Future<void> _refreshNearestWidgetFromSearch(HiveStorage storage) async {
-  try {
-    final apiKey = storage.getApiKey();
-    final hasKey = apiKey != null && apiKey.isNotEmpty;
-    if (hasKey) {
-      // #2249 — rate-limited + conditional-GET Dio (nearest-widget search).
-      final dio = DioFactory.create(
-        baseUrl: 'https://creativecommons.tankerkoenig.de/json',
-        connectTimeout: BackgroundService.bgConnectTimeout,
-        receiveTimeout: BackgroundService.bgReceiveTimeout,
-      )..options.queryParameters = {'apikey': apiKey};
-      final service = TankerkoenigStationService(dio);
-      await HomeWidgetService.updateNearestWidget(
-        storage,
-        storage,
-        profileStorage: storage,
-        stationService: service,
-      );
-    } else {
-      // No API key → degrade to legacy favorites-distance path.
-      await HomeWidgetService.updateNearestWidget(
-        storage,
-        storage,
-        profileStorage: storage,
-      );
-    }
-  } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BackgroundService: nearest widget refresh failed'}));
-  }
+  /// BGAppRefreshTask identifier for the periodic price scan.
+  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
+  static const String appRefresh = 'de.tankstellen.tankstellen.background';
 }

@@ -2562,7 +2562,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get helpBannerAlerts =>
-      'Legen Sie einen Preisgrenzwert für eine Station fest. Sie werden benachrichtigt, wenn die Preise darunter fallen. Prüfungen laufen alle 30 Minuten.';
+      'Legen Sie einen Preisgrenzwert für eine Station fest. Sie werden benachrichtigt, wenn die Preise darunter fallen. Die Preise werden periodisch im Hintergrund geprüft – nach bestem Bemühen, nicht in Echtzeit.';
 
   @override
   String get helpBannerConsumption =>

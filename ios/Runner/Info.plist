@@ -100,6 +100,13 @@
 		<string>bluetooth-central</string>
 		<string>location</string>
 	</array>
+	<!-- #2414 — Tier-1 on-device background price scan. This identifier is the
+	     BGAppRefreshTask the workmanager iOS backend schedules; it must match
+	     the value registered in AppDelegate.swift
+	     (WorkmanagerPlugin.registerPeriodicTask) and the Dart-side
+	     IosBackgroundTaskIds.appRefresh. The `fetch` UIBackgroundMode above
+	     gates BGAppRefresh. iOS runs it opportunistically, OS-budgeted —
+	     best-effort, never real-time. -->
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>de.tankstellen.tankstellen.background</string>
