@@ -250,4 +250,92 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  // #2461 — the new driving-signal charts. Each renders when its signal
+  // is present and falls back to the shared empty caption when all-null.
+  group('TripDetailThrottleChart (#2461)', () {
+    List<TripDetailSample> withPedal(int n) => [
+          for (var i = 0; i < n; i++)
+            TripDetailSample(
+              timestamp:
+                  DateTime.utc(2026, 4, 22, 10).add(Duration(seconds: i)),
+              speedKmh: 40,
+              pedalPercent: 20 + i.toDouble(),
+            ),
+        ];
+
+    List<TripDetailSample> withThrottleOnly(int n) => [
+          for (var i = 0; i < n; i++)
+            TripDetailSample(
+              timestamp:
+                  DateTime.utc(2026, 4, 22, 10).add(Duration(seconds: i)),
+              speedKmh: 40,
+              throttlePercent: 30 + i.toDouble(),
+            ),
+        ];
+
+    testWidgets('renders CustomPaint when pedal samples exist',
+        (tester) async {
+      await pumpApp(tester, TripDetailThrottleChart(samples: withPedal(8)));
+      _expectCustomPaintPresent(tester, TripDetailThrottleChart);
+      expect(find.text('No samples recorded'), findsNothing);
+    });
+
+    testWidgets('falls back to throttle % when pedal is absent',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripDetailThrottleChart(samples: withThrottleOnly(8)),
+      );
+      _expectCustomPaintPresent(tester, TripDetailThrottleChart);
+    });
+
+    testWidgets('renders empty caption when pedal AND throttle are all-null',
+        (tester) async {
+      await pumpApp(tester, TripDetailThrottleChart(samples: _withSpeedOnly(5)));
+      expect(find.text('No samples recorded'), findsOneWidget);
+    });
+  });
+
+  group('TripDetailCoolantChart / Altitude / Lambda (#2461)', () {
+    List<TripDetailSample> withSignals(int n) => [
+          for (var i = 0; i < n; i++)
+            TripDetailSample(
+              timestamp:
+                  DateTime.utc(2026, 4, 22, 10).add(Duration(seconds: i)),
+              speedKmh: 40,
+              coolantTempC: 60 + i.toDouble(),
+              altitudeM: 100 + i.toDouble(),
+              lambda: 0.95 + i * 0.001,
+            ),
+        ];
+
+    testWidgets('coolant chart renders when coolant samples exist',
+        (tester) async {
+      await pumpApp(tester, TripDetailCoolantChart(samples: withSignals(8)));
+      _expectCustomPaintPresent(tester, TripDetailCoolantChart);
+    });
+
+    testWidgets('altitude chart renders when altitude samples exist',
+        (tester) async {
+      await pumpApp(tester, TripDetailAltitudeChart(samples: withSignals(8)));
+      _expectCustomPaintPresent(tester, TripDetailAltitudeChart);
+    });
+
+    testWidgets('lambda chart renders when lambda samples exist',
+        (tester) async {
+      await pumpApp(tester, TripDetailLambdaChart(samples: withSignals(8)));
+      _expectCustomPaintPresent(tester, TripDetailLambdaChart);
+    });
+
+    testWidgets('each optional chart is empty when its signal is all-null',
+        (tester) async {
+      await pumpApp(tester, TripDetailCoolantChart(samples: _withSpeedOnly(5)));
+      expect(find.text('No samples recorded'), findsOneWidget);
+      await pumpApp(tester, TripDetailAltitudeChart(samples: _withSpeedOnly(5)));
+      expect(find.text('No samples recorded'), findsOneWidget);
+      await pumpApp(tester, TripDetailLambdaChart(samples: _withSpeedOnly(5)));
+      expect(find.text('No samples recorded'), findsOneWidget);
+    });
+  });
 }

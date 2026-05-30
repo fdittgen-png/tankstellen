@@ -4134,6 +4134,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'No harsh acceleration or braking this trip — steady inputs like these keep consumption low.';
 
   @override
+  String insightFullThrottle(String pctTime, String liters) {
+    return 'Full throttle ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceFullThrottle =>
+      'Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.';
+
+  @override
+  String insightLambdaEnrichment(String pctTime, String liters) {
+    return 'Rich mixture under load ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceLambdaEnrichment =>
+      'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.';
+
+  @override
   String get drivingScoreCardTitle => 'Driving score';
 
   @override
@@ -4162,6 +4180,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get drivingScorePenaltyFullThrottle => 'Full throttle';
+
+  @override
+  String get drivingScoreClassVeryGood => 'Very good';
+
+  @override
+  String get drivingScoreClassGood => 'Good';
+
+  @override
+  String get drivingScoreClassAverage => 'Average';
+
+  @override
+  String get drivingScoreClassBad => 'Needs work';
+
+  @override
+  String get drivingScorePenaltyLugging => 'Lugging';
+
+  @override
+  String get drivingScorePenaltySmoothness => 'Jerky driving';
+
+  @override
+  String get drivingScorePenaltyHighSpeed => 'High speed';
+
+  @override
+  String get drivingScorePenaltyPedalVelocity => 'Aggressive pedal';
+
+  @override
+  String get drivingScorePenaltyLambda => 'Rich mixture';
 
   @override
   String get ecoRouteOption => 'Eco';
@@ -5768,6 +5813,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trajetDetailChartEngineLoad => 'Engine load (%)';
+
+  @override
+  String get trajetDetailChartThrottle => 'Throttle / pedal (%)';
+
+  @override
+  String get trajetDetailChartCoolant => 'Coolant (°C)';
+
+  @override
+  String get trajetDetailChartAltitude => 'Altitude (m)';
+
+  @override
+  String get trajetDetailChartLambda => 'Commanded λ';
 
   @override
   String get trajetDetailChartsSection => 'Charts';
@@ -10421,6 +10478,24 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ñó ĥářšĥ áççéłéřáŧîóñ óř ƀřáķîñǧ ŧĥîš ŧřîƥ — šŧéáđý îñƥúŧš łîķé ŧĥéšé ķééƥ çóñšúɱƥŧîóñ łóŵ. ··································⟧';
 
   @override
+  String insightFullThrottle(String pctTime, String liters) {
+    return '⟦Ƒúłł ŧĥřóŧŧłé ($pctTime% óƒ ŧřîƥ): ŵášŧéđ $liters Ł ···········⟧';
+  }
+
+  @override
+  String get lessonAdviceFullThrottle =>
+      '⟦Éášé óñŧó ŧĥé ƥéđáł — á ǧéñŧłéř 70 % óƒ ŧĥé ŧĥřóŧŧłé ǧéŧš ýóú úƥ ŧó šƥééđ óñ ƒář łéšš ƒúéł. ······························⟧';
+
+  @override
+  String insightLambdaEnrichment(String pctTime, String liters) {
+    return '⟦Řîçĥ ɱîẋŧúřé úñđéř łóáđ ($pctTime% óƒ ŧřîƥ): ŵášŧéđ $liters Ł ···············⟧';
+  }
+
+  @override
+  String get lessonAdviceLambdaEnrichment =>
+      '⟦Ĥéáṽý, šúšŧáîñéđ łóáđ ɱáķéš ŧĥé éñǧîñé řúñ řîçĥ — šĥóřŧ-šĥîƒŧ áñđ ƀáçķ óƒƒ óñ łóñǧ çłîɱƀš ŧó ķééƥ ŧĥé ɱîẋŧúřé łéáñ. ·········································⟧';
+
+  @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';
 
   @override
@@ -10449,6 +10524,33 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get drivingScorePenaltyFullThrottle => '⟦Ƒúłł ŧĥřóŧŧłé ·····⟧';
+
+  @override
+  String get drivingScoreClassVeryGood => '⟦Ṽéřý ǧóóđ ····⟧';
+
+  @override
+  String get drivingScoreClassGood => '⟦Ǧóóđ ··⟧';
+
+  @override
+  String get drivingScoreClassAverage => '⟦Áṽéřáǧé ···⟧';
+
+  @override
+  String get drivingScoreClassBad => '⟦Ñééđš ŵóřķ ····⟧';
+
+  @override
+  String get drivingScorePenaltyLugging => '⟦Łúǧǧîñǧ ···⟧';
+
+  @override
+  String get drivingScorePenaltySmoothness => '⟦Ĵéřķý đřîṽîñǧ ·····⟧';
+
+  @override
+  String get drivingScorePenaltyHighSpeed => '⟦Ĥîǧĥ šƥééđ ····⟧';
+
+  @override
+  String get drivingScorePenaltyPedalVelocity => '⟦Áǧǧřéššîṽé ƥéđáł ·······⟧';
+
+  @override
+  String get drivingScorePenaltyLambda => '⟦Řîçĥ ɱîẋŧúřé ·····⟧';
 
   @override
   String get ecoRouteOption => '⟦Éçó ·⟧';
@@ -12101,6 +12203,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetDetailChartEngineLoad => '⟦Éñǧîñé łóáđ (%) ·····⟧';
+
+  @override
+  String get trajetDetailChartThrottle => '⟦Ŧĥřóŧŧłé / ƥéđáł (%) ······⟧';
+
+  @override
+  String get trajetDetailChartCoolant => '⟦Çóółáñŧ (°Ç) ····⟧';
+
+  @override
+  String get trajetDetailChartAltitude => '⟦Áłŧîŧúđé (ɱ) ····⟧';
+
+  @override
+  String get trajetDetailChartLambda => '⟦Çóɱɱáñđéđ λ ····⟧';
 
   @override
   String get trajetDetailChartsSection => '⟦Çĥářŧš ···⟧';

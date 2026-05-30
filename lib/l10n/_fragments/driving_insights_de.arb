@@ -15,5 +15,9 @@
   "insightHighSpeedBandNoFuel": "Anhaltend hohe Geschwindigkeit ({pctTime}% der Fahrt)",
   "lessonAdviceHighSpeedBand": "Über 110 km/h Gas wegnehmen – der Luftwiderstand steigt stark, schon etwas langsamer spart viel Sprit.",
   "lessonSmoothDrivingTitle": "Vorausschauend gefahren – gut gemacht!",
-  "lessonAdviceSmoothDriving": "Diese Fahrt ohne starkes Beschleunigen oder Bremsen – gleichmäßiges Fahren hält den Verbrauch niedrig."
+  "lessonAdviceSmoothDriving": "Diese Fahrt ohne starkes Beschleunigen oder Bremsen – gleichmäßiges Fahren hält den Verbrauch niedrig.",
+  "insightFullThrottle": "Vollgas ({pctTime}% der Fahrt): {liters} L verschwendet",
+  "lessonAdviceFullThrottle": "Sanfter Gas geben – mit etwa 70 % Pedalweg kommst du mit deutlich weniger Sprit auf Tempo.",
+  "insightLambdaEnrichment": "Fettes Gemisch unter Last ({pctTime}% der Fahrt): {liters} L verschwendet",
+  "lessonAdviceLambdaEnrichment": "Hohe Dauerlast lässt den Motor anfetten – früher hochschalten und an langen Steigungen Gas wegnehmen, damit das Gemisch mager bleibt."
 }

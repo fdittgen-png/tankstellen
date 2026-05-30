@@ -19,4 +19,9 @@ TripDetailSample toDetailSample(TripSample s) => TripDetailSample(
       coolantTempC: s.coolantTempC,
       latitude: s.latitude,
       longitude: s.longitude,
+      // #2461 — carry pedal / λ / altitude through so the charts and the
+      // canonical driving-style score (#2460) see the persisted signals.
+      pedalPercent: s.pedalPercent,
+      lambda: s.lambda,
+      altitudeM: s.altitudeM,
     );

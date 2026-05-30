@@ -9,10 +9,12 @@ import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/trip_recorder.dart';
 import '../driving_insights_analyzer.dart';
 import '../driving_score_calculator.dart';
+import 'rules/full_throttle_rule.dart';
 import 'rules/hard_accel_rule.dart';
 import 'rules/high_rpm_rule.dart';
 import 'rules/high_speed_band_rule.dart';
 import 'rules/idling_rule.dart';
+import 'rules/lambda_enrichment_rule.dart';
 import 'rules/low_gear_rule.dart';
 import 'rules/smooth_driving_rule.dart';
 
@@ -49,6 +51,8 @@ class DrivingLessonRegistry {
   ///   * [HardAccelRule]     — hard-acceleration events (#2251);
   ///   * [IdlingRule]        — engine-on-stationary waste (#2251);
   ///   * [HighSpeedBandRule] — drag-dominated high-speed penalty (#2287);
+  ///   * [FullThrottleRule]   — time at full throttle / pedal (#2461);
+  ///   * [LambdaEnrichmentRule] — rich-mixture (λ < 1) fuel waste (#2461);
   ///   * [SmoothDrivingRule] — positive reinforcement (#2287).
   ///
   /// Declaration order is the tie-break for equal-impact lessons (see
@@ -61,6 +65,8 @@ class DrivingLessonRegistry {
         HardAccelRule(),
         IdlingRule(),
         HighSpeedBandRule(),
+        FullThrottleRule(),
+        LambdaEnrichmentRule(),
         SmoothDrivingRule(),
       ]);
 

@@ -4163,6 +4163,24 @@ class AppLocalizationsHr extends AppLocalizations {
       'Nema naglog ubrzavanja ni kočenja na ovoj vožnji – ravnomjerna vožnja drži potrošnju niskom.';
 
   @override
+  String insightFullThrottle(String pctTime, String liters) {
+    return 'Full throttle ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceFullThrottle =>
+      'Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.';
+
+  @override
+  String insightLambdaEnrichment(String pctTime, String liters) {
+    return 'Rich mixture under load ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceLambdaEnrichment =>
+      'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.';
+
+  @override
   String get drivingScoreCardTitle => 'Ocjena vožnje';
 
   @override
@@ -4191,6 +4209,33 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get drivingScorePenaltyFullThrottle => 'Puni gas';
+
+  @override
+  String get drivingScoreClassVeryGood => 'Very good';
+
+  @override
+  String get drivingScoreClassGood => 'Good';
+
+  @override
+  String get drivingScoreClassAverage => 'Average';
+
+  @override
+  String get drivingScoreClassBad => 'Needs work';
+
+  @override
+  String get drivingScorePenaltyLugging => 'Lugging';
+
+  @override
+  String get drivingScorePenaltySmoothness => 'Jerky driving';
+
+  @override
+  String get drivingScorePenaltyHighSpeed => 'High speed';
+
+  @override
+  String get drivingScorePenaltyPedalVelocity => 'Aggressive pedal';
+
+  @override
+  String get drivingScorePenaltyLambda => 'Rich mixture';
 
   @override
   String get ecoRouteOption => 'Eko';
@@ -5817,6 +5862,18 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get trajetDetailChartEngineLoad => 'Opterećenje motora (%)';
+
+  @override
+  String get trajetDetailChartThrottle => 'Throttle / pedal (%)';
+
+  @override
+  String get trajetDetailChartCoolant => 'Coolant (°C)';
+
+  @override
+  String get trajetDetailChartAltitude => 'Altitude (m)';
+
+  @override
+  String get trajetDetailChartLambda => 'Commanded λ';
 
   @override
   String get trajetDetailChartsSection => 'Grafikoni';

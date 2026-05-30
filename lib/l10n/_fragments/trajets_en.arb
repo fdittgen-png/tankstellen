@@ -125,6 +125,22 @@
   "@trajetDetailChartEngineLoad": {
     "description": "Section title above the engine-load-over-time chart on the Trip detail screen (#1262 phase 3). Hidden when no sample carries an engineLoadPercent value (cars without OBD2 PID 0x04)."
   },
+  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "@trajetDetailChartThrottle": {
+    "description": "Section title above the throttle/pedal-position-over-time chart on the Trip detail screen (#2461). Plots accelerator-pedal % (PID 0x49-0x4B) when present, else throttle % (PID 0x11). Hidden when no sample carries either value."
+  },
+  "trajetDetailChartCoolant": "Coolant (°C)",
+  "@trajetDetailChartCoolant": {
+    "description": "Section title above the coolant-temperature-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries a coolantTempC value (cars without OBD2 PID 0x05)."
+  },
+  "trajetDetailChartAltitude": "Altitude (m)",
+  "@trajetDetailChartAltitude": {
+    "description": "Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix)."
+  },
+  "trajetDetailChartLambda": "Commanded λ",
+  "@trajetDetailChartLambda": {
+    "description": "Section title above the commanded-lambda-over-time chart on the Trip detail screen (#2461). Lambda is the commanded equivalence ratio (PID 0x44); values below 1 mean an enriched mixture. The Greek letter lambda is a universal automotive symbol — kept untranslated. Hidden when no sample carries a lambda value."
+  },
   "trajetDetailChartsSection": "Charts",
   "@trajetDetailChartsSection": {
     "description": "Header of the collapsible section that groups all per-trip telemetry charts on the Trip detail screen (#1895). Collapsed by default — the trip summary and insight cards stay visible above it."
