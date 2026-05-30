@@ -68,6 +68,13 @@ class SupabaseSyncRepository implements SyncRepository {
       AlertsSync.merge(localAlerts);
 
   // ── Price History ──
+  //
+  // #2249 — cache↔Supabase split: local Hive history is the source of truth
+  // for what the user has seen; Supabase `price_snapshots` is a server-
+  // backfilled supplement that only covers DE today. [PriceHistorySync.fetch]
+  // gates non-DE stations to an empty list (no wasted round-trip), and
+  // [PriceHistorySync.mergeRemoteIntoLocal] de-duplicates the two histories by
+  // (stationId, recordedAt) for callers that union them.
 
   @override
   Future<List<Map<String, dynamic>>> fetchPriceHistory(String stationId,
