@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../ocr/pump_ocr_config.dart';
 import 'brand_detection.dart';
 import 'receipt_field_extractors.dart';
 import 'receipt_parse_result.dart';
@@ -9,19 +10,29 @@ import 'receipt_parse_result.dart';
 // compose the pure extractors from `receipt_field_extractors.dart`
 // into a `ReceiptParseResult`. Split out of `ReceiptParser` so each
 // layout is independently readable + unit-testable.
+//
+// #2273 — each layout takes an optional [profile] (the active country's
+// [OcrLocaleProfile]) and threads it into the currency-aware extractors
+// so GBP/£/p, kr, $ receipts read correctly. Super U / Carrefour are
+// French/EUR brands, so the profile only changes the generic fallbacks
+// on those; `parseGeneric` is where non-EUR receipts actually land.
 
 /// Super U / Système U layout. Labels observed on real receipts:
 ///   Volume   5.24 L
 ///   Prix     € 1.999/L
 ///   TOT TTC  € 10.47
-ReceiptParseResult parseSuperU(String text, List<String> lines) {
+ReceiptParseResult parseSuperU(
+  String text,
+  List<String> lines, {
+  OcrLocaleProfile? profile,
+}) {
   return ReceiptParseResult(
     liters: extractLiters(text),
     totalCost: matchFirst(text, [
       RegExp(r'tot\s*ttc\s*:?\s*€?\s*(\d+[.,]\d+)', caseSensitive: false),
       RegExp(r'total\s*ttc\s*:?\s*€?\s*(\d+[.,]\d+)', caseSensitive: false),
-    ]) ?? extractTotalCost(text),
-    pricePerLiter: extractPricePerLiter(text),
+    ]) ?? extractTotalCost(text, profile: profile),
+    pricePerLiter: extractPricePerLiter(text, profile: profile),
     date: extractDate(text),
     stationName: extractStationName(lines),
     fuelType: extractFuelType(text),
@@ -35,7 +46,11 @@ ReceiptParseResult parseSuperU(String text, List<String> lines) {
 ///   Quantite    = 5.27 L
 ///   Prix unit.  = 2,028 EUR
 ///   MONTANT REEL : 10.69 EUR
-ReceiptParseResult parseCarrefour(String text, List<String> lines) {
+ReceiptParseResult parseCarrefour(
+  String text,
+  List<String> lines, {
+  OcrLocaleProfile? profile,
+}) {
   return ReceiptParseResult(
     liters: matchFirst(text, [
       RegExp(r'quantit[eé]\s*[:=]\s*(\d+[.,]\d+)', caseSensitive: false),
@@ -43,11 +58,11 @@ ReceiptParseResult parseCarrefour(String text, List<String> lines) {
     totalCost: matchFirst(text, [
       RegExp(r'montant\s*(?:reel|r[eé]el|ttc)?\s*[:=]?\s*€?\s*(\d+[.,]\d+)',
           caseSensitive: false),
-    ]) ?? extractTotalCost(text),
+    ]) ?? extractTotalCost(text, profile: profile),
     pricePerLiter: matchFirst(text, [
       RegExp(r'prix\s*unit\.?\s*[:=]?\s*€?\s*(\d+[.,]\d{2,3})',
           caseSensitive: false),
-    ]) ?? extractPricePerLiter(text),
+    ]) ?? extractPricePerLiter(text, profile: profile),
     date: extractDate(text),
     stationName: extractStationName(lines),
     fuelType: extractFuelType(text),
@@ -55,12 +70,18 @@ ReceiptParseResult parseCarrefour(String text, List<String> lines) {
   );
 }
 
-/// Generic fallback — everything that isn't a known retailer.
-ReceiptParseResult parseGeneric(String text, List<String> lines) {
+/// Generic fallback — everything that isn't a known retailer. This is
+/// where non-EUR receipts (GB/£/p, kr, $) land, so the currency-aware
+/// extractors take the threaded [profile] (#2273).
+ReceiptParseResult parseGeneric(
+  String text,
+  List<String> lines, {
+  OcrLocaleProfile? profile,
+}) {
   return ReceiptParseResult(
     liters: extractLiters(text),
-    totalCost: extractTotalCost(text),
-    pricePerLiter: extractPricePerLiter(text),
+    totalCost: extractTotalCost(text, profile: profile),
+    pricePerLiter: extractPricePerLiter(text, profile: profile),
     date: extractDate(text),
     stationName: extractStationName(lines),
     fuelType: extractFuelType(text),

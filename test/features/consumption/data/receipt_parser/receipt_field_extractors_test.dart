@@ -2,8 +2,39 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/ocr/pump_ocr_config.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser/receipt_field_extractors.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+
+/// Per-country [OcrLocaleProfile]s for the currency-aware extraction
+/// tests (#2273). Mirror the bands shipped in `assets/ocr_config`.
+const _gb = OcrLocaleProfile(
+  country: 'GB',
+  currency: 'GBP',
+  decimalSeparator: '.',
+  priceMin: 0.8,
+  priceMax: 3.0,
+  volumeMax: 200,
+  totalMax: 500,
+);
+const _dk = OcrLocaleProfile(
+  country: 'DK',
+  currency: 'DKK',
+  decimalSeparator: ',',
+  priceMin: 5,
+  priceMax: 40,
+  volumeMax: 200,
+  totalMax: 2000,
+);
+const _us = OcrLocaleProfile(
+  country: 'US',
+  currency: 'USD',
+  decimalSeparator: '.',
+  priceMin: 0.5,
+  priceMax: 4.0,
+  volumeMax: 200,
+  totalMax: 500,
+);
 
 void main() {
   group('extractFuelType', () {
@@ -557,6 +588,142 @@ void main() {
 
     test('returns null for empty string', () {
       expect(extractPricePerLiter(''), isNull);
+    });
+  });
+
+  // -------------------------------------------------------------------
+  // #2273 — config-driven, multi-currency extraction. The threaded
+  // OcrLocaleProfile selects the currency symbols + subunit convention.
+  // EUR (no profile) keeps working; GBP/£/p, kr, $ now read correctly,
+  // and minor-unit (pence/cents) per-litre folds back to the major unit.
+  // -------------------------------------------------------------------
+  group('extractTotalCost — multi-currency (#2273)', () {
+    test('GBP "£ 58.42" total', () {
+      expect(extractTotalCost('£ 58.42', profile: _gb), closeTo(58.42, 0.001));
+    });
+
+    test('GBP "TOTAL £45.10", suffix "45.10 GBP" both read', () {
+      expect(
+          extractTotalCost('TOTAL £45.10', profile: _gb), closeTo(45.10, 0.001));
+      expect(
+          extractTotalCost('45.10 GBP', profile: _gb), closeTo(45.10, 0.001));
+    });
+
+    test('GBP fallback skips the pence-per-litre unit price', () {
+      // A UK receipt: "142.9 p/L" unit price + "£72.43" total. The total
+      // must win; the per-litre figure (different unit) is not a total.
+      const text = 'UNLEADED 142.9p/L\nTOTAL £72.43';
+      expect(extractTotalCost(text, profile: _gb), closeTo(72.43, 0.001));
+    });
+
+    test('GBP fallback treats a bare 3-decimal £ amount as the unit price',
+        () {
+      // "1.429 £" (3-decimal, within the GBP price band) is the £/L unit
+      // price, not the total → skipped; "20.00 £" is the total.
+      const text = '1.429 £\n20.00 £';
+      expect(extractTotalCost(text, profile: _gb), closeTo(20.00, 0.001));
+    });
+
+    test('DKK "kr" total "TOTAL 612,50 kr"', () {
+      expect(
+          extractTotalCost('TOTAL 612,50 kr', profile: _dk), closeTo(612.5, 0.1));
+    });
+
+    test('DKK suffix "DKK 612,50"', () {
+      expect(
+          extractTotalCost('612,50 DKK', profile: _dk), closeTo(612.5, 0.1));
+    });
+
+    test('USD "\$ 58.42" total', () {
+      expect(extractTotalCost(r'$ 58.42', profile: _us), closeTo(58.42, 0.001));
+    });
+
+    test('EUR default still works when no profile is threaded', () {
+      expect(extractTotalCost('TOTAL 58.42'), closeTo(58.42, 0.001));
+      expect(extractTotalCost('€ 10.47'), closeTo(10.47, 0.001));
+    });
+
+    test('GBP profile does not accidentally read a € amount', () {
+      // With a GBP profile the € symbol is not a recognised currency, so
+      // the bare fallback must not pick "€ 99.99" as a £ total.
+      expect(extractTotalCost('€ 99.99', profile: _gb), isNull);
+    });
+  });
+
+  group('extractPricePerLiter — multi-currency (#2273)', () {
+    test('GBP pence-per-litre "142.9p/L" → £1.429/L', () {
+      expect(
+        extractPricePerLiter('142.9p/L', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP pence-per-litre with spaces "142,9 p / L"', () {
+      expect(
+        extractPricePerLiter('142,9 p / L', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP major-unit "£1.429/L"', () {
+      expect(
+        extractPricePerLiter('£1.429/L', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP "Unit price £1.429" English label', () {
+      expect(
+        extractPricePerLiter('Unit price £1.429', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP pence price out of band is rejected', () {
+      // 50p/L → £0.50/L, below the GBP priceMin 0.8 → null.
+      expect(extractPricePerLiter('50.0p/L', profile: _gb), isNull);
+    });
+
+    test('DKK kroner-per-litre "13,49 kr/L"', () {
+      expect(
+        extractPricePerLiter('13,49 kr/L', profile: _dk),
+        closeTo(13.49, 0.005),
+      );
+    });
+
+    test('DKK bare 3-decimal in band "13,490 kr"', () {
+      expect(
+        extractPricePerLiter('13,490 kr', profile: _dk),
+        closeTo(13.49, 0.005),
+      );
+    });
+
+    test('USD cents-per-litre "139.9c/L" → \$1.399/L', () {
+      expect(
+        extractPricePerLiter('139.9c/L', profile: _us),
+        closeTo(1.399, 0.0005),
+      );
+    });
+
+    test('USD major-unit "\$1.399/L"', () {
+      expect(
+        extractPricePerLiter(r'$1.399/L', profile: _us),
+        closeTo(1.399, 0.0005),
+      );
+    });
+
+    test('EUR default still works when no profile is threaded', () {
+      expect(extractPricePerLiter('1.899 €/L'), closeTo(1.899, 0.001));
+      expect(extractPricePerLiter('1,990 €'), closeTo(1.990, 0.001));
+    });
+
+    test('end-to-end €/L-equivalent: 142.9 p/L equals 1.429 £/L', () {
+      // The pence read and the equivalent major-unit read must agree.
+      final pence = extractPricePerLiter('142.9p/L', profile: _gb);
+      final pounds = extractPricePerLiter('£1.429/L', profile: _gb);
+      expect(pence, isNotNull);
+      expect(pounds, isNotNull);
+      expect(pence, closeTo(pounds!, 0.0005));
     });
   });
 
