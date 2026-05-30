@@ -136,6 +136,20 @@ void main() {
           findsOneWidget);
       expect(find.byKey(const ValueKey('debug-feature-flag-dump')),
           findsOneWidget);
+      // #2471 — the OBD2 communication-health row joins the Diagnostics
+      // section. Its arrival pushes the rows below it off the first fold,
+      // so scroll each remaining target into view before asserting.
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('debug-obd2-health')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const ValueKey('debug-obd2-health')), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('debug-copy-diagnostics')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.byKey(const ValueKey('debug-clear-caches')),
           findsOneWidget);
       expect(find.byKey(const ValueKey('debug-copy-diagnostics')),
