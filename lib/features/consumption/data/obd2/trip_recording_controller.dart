@@ -167,6 +167,24 @@ class TripRecordingController {
   /// the app was killed before the disconnect-save timer fired.
   final bool _automatic;
 
+  /// Per-trip 'diagnostic capture' flag (#2459 — default off; an
+  /// internal/dev flag, not a user setting, wired from
+  /// `Feature.debugMode`). When ON, `_emit` ALSO stamps the raw mixture
+  /// inputs (MAF / MAP / STFT / LTFT) onto each persisted [TripSample]
+  /// at a SLOW cadence (every [_diagnosticCaptureInterval], carried
+  /// forward in between) so a trip's fuel rate can be re-derived
+  /// post-hoc. Default OFF ⇒ those four keys are never written ⇒ zero
+  /// storage growth for the overwhelming majority of trips.
+  final bool _diagnosticCapture;
+
+  /// Minimum wall-clock spacing between diagnostic-capture raw-input
+  /// stamps (#2459). The fuel-derivation signals drift slowly, so a
+  /// ~1 Hz sample is ample for post-hoc re-derivation and keeps the
+  /// extra payload roughly 1/4 the per-tick emit cadence. Timestamp of
+  /// the last stamp is tracked in [_lastDiagnosticCaptureAt].
+  static const Duration _diagnosticCaptureInterval = Duration(seconds: 1);
+  DateTime? _lastDiagnosticCaptureAt;
+
   /// Optional override — tests inject a hand-built scheduler (usually
   /// with a tiny [PidScheduler.tickRate] + a fake transport) to
   /// exercise the scheduler ↔ controller wiring without touching the
@@ -313,12 +331,14 @@ class TripRecordingController {
     Duration schedulerTickRate = const Duration(milliseconds: 100),
     String? pinnedAdapterMac,
     bool automatic = false,
+    bool diagnosticCapture = false,
     AdapterReconnectScanner? Function(
       String pinnedMac,
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
     Obd2BreadcrumbRecorder? breadcrumbCollector,
   })  : _service = service,
+        _diagnosticCapture = diagnosticCapture,
         _recorder = recorder ??
             TripRecorder(
                 maxIntegrationGapSeconds: _integrationGapCapSeconds),
@@ -956,6 +976,16 @@ class TripRecordingController {
     final throttlePercent = snap.latestThrottlePercent;
     final engineLoadPercent = snap.latestEngineLoadPercent;
     final coolantTempC = snap.latestCoolantTempC;
+    // #2459 — should this tick ALSO carry the diagnostic-capture raw
+    // mixture inputs? Only when the per-trip flag is on AND we're past
+    // the slow-cadence interval since the last stamp; otherwise the four
+    // raw keys stay null (carried-forward = simply not re-written) so the
+    // payload doesn't balloon at the 4 Hz emit rate.
+    final captureRaw = _diagnosticCapture &&
+        (_lastDiagnosticCaptureAt == null ||
+            nowTs.difference(_lastDiagnosticCaptureAt!) >=
+                _diagnosticCaptureInterval);
+    if (captureRaw) _lastDiagnosticCaptureAt = nowTs;
     // The recorder integrates fuel rate and Δt itself, so we only
     // hand it one TripSample per emit — not per PID callback. At a
     // 250 ms emit cadence that's 4 Hz into the recorder, matching
@@ -978,6 +1008,23 @@ class TripRecordingController {
         latitude: snap.latestLatitude,
         longitude: snap.latestLongitude,
         altitudeM: snap.latestAltitudeM,
+        // #2459 — the consumed-but-previously-unstored signals, stamped
+        // from the snapshot latest-value getters exactly like throttle.
+        // Each stays null on cars that don't expose the PID, so the
+        // compact-key serialization writes zero bytes for them.
+        lambda: snap.latestLambda,
+        baroKpa: snap.latestBaroKpa,
+        absLoadPercent: snap.latestAbsLoadPercent,
+        pedalPercent: snap.latestPedalPercent,
+        oilTempC: snap.latestOilTempC,
+        ambientTempC: snap.latestAmbientTempC,
+        // #2459 — diagnostic-capture raw mixture inputs, only on the
+        // slow-cadence ticks while the flag is on (else null = not
+        // written). Each is independently null-safe per PID support.
+        mafGramsPerSecond: captureRaw ? snap.latestMaf : null,
+        mapKpa: captureRaw ? snap.latestMapKpa : null,
+        stft: captureRaw ? snap.latestStft : null,
+        ltft: captureRaw ? snap.latestLtft : null,
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;

@@ -209,6 +209,7 @@ final _pipelineProvider =
     oemFuel: TripOemFuelLevelController(),
     readActiveVehicle: () => null,
     readOemPidsFlag: () => false,
+    readDiagnosticCaptureFlag: () => false,
   ),
 );
 

@@ -35,17 +35,16 @@ import 'trip_recording_state.dart';
 /// owned [Obd2Service], the [TripRecordingController] + its live /
 /// stateChanges subscriptions, the adapter-identity snapshot (#1312), the
 /// one-shot capability-probe latch (#2261), and the auto-reconnect scanner
-/// factory (#797 / #2245). The four focused collaborators are *injected*
-/// from the notifier so they outlive a single recording and the test
-/// counters accumulate exactly as the inline fields did.
+/// factory (#797 / #2245). The focused collaborators are *injected* from
+/// the notifier so they outlive a single recording and the test counters
+/// accumulate exactly as the inline fields did.
 ///
 /// Deliberately NOT owned: the Riverpod `state`, the last-trip identity
-/// fields, the shared `_saveToHistory` write, and the #1303 active-trip WAL
-/// snapshot (+ its #1347 cold-start recovery) stay on the notifier and are
-/// reached through the [Obd2RecordingPipelineHost] — the WAL survives the
-/// recording loop being torn down (recovery runs with no pipeline at all),
-/// so it belongs to the notifier. Behaviour-preserving: the seed / flush
-/// cadence is driven through the same host hooks the inline path used.
+/// fields, `_saveToHistory`, and the #1303 active-trip WAL (+ #1347
+/// cold-start recovery) stay on the notifier, reached through the
+/// [Obd2RecordingPipelineHost] — the WAL survives the recording loop being
+/// torn down (recovery runs with no pipeline at all), so it belongs to the
+/// notifier. The seed / flush cadence is driven through the same host hooks.
 class Obd2RecordingPipeline implements RecordingPipeline {
   Obd2RecordingPipeline({
     required Ref ref,
@@ -56,6 +55,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     required TripOemFuelLevelController oemFuel,
     required VehicleProfile? Function() readActiveVehicle,
     required bool Function() readOemPidsFlag,
+    required bool Function() readDiagnosticCaptureFlag,
   })  : _ref = ref,
         _host = host,
         _haptics = haptics,
@@ -63,7 +63,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         _baselines = baselines,
         _oemFuel = oemFuel,
         _readActiveVehicle = readActiveVehicle,
-        _readOemPidsFlag = readOemPidsFlag;
+        _readOemPidsFlag = readOemPidsFlag,
+        _readDiagnosticCaptureFlag = readDiagnosticCaptureFlag;
 
   final Ref _ref;
   final Obd2RecordingPipelineHost _host;
@@ -73,6 +74,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   final TripOemFuelLevelController _oemFuel;
   final VehicleProfile? Function() _readActiveVehicle;
   final bool Function() _readOemPidsFlag;
+  // #2459 — per-trip diagnostic-capture flag (Feature.debugMode).
+  final bool Function() _readDiagnosticCaptureFlag;
 
   Obd2Service? _service;
   TripRecordingController? _controller;
@@ -126,23 +129,18 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // controller can tag any pause-on-drop snapshot (#797 phase 1).
     final activeVehicle = _readActiveVehicle();
     final eagerVehicleId = _readActiveVehicle()?.id;
-    // #797 phase 3 — pass the pinned MAC + a factory for the auto-reconnect
-    // scanner. Null MAC (unpaired vehicle) skips the scanner entirely and
-    // leaves the grace-window path as the sole recovery mechanism.
+    // #797 phase 3 — pinned MAC + auto-reconnect scanner factory. Null MAC
+    // (unpaired) skips the scanner; the grace window is the sole recovery.
     final pinnedMac = activeVehicle?.obd2AdapterMac;
-    // #1395 — wire the diagnostic breadcrumb sink for this trip. Both
-    // the controller and the underlying [Obd2Service] push through the
-    // SAME notifier (kept keepAlive across recordings) so the user can
-    // inspect the trace from the overlay after the recording screen pops.
+    // #1395 — wire the diagnostic breadcrumb sink for this trip; both the
+    // controller and the [Obd2Service] push through the SAME keepAlive
+    // notifier so the trace survives the recording screen popping.
     final breadcrumbs = _ref.read(obd2BreadcrumbsProvider.notifier);
-    // Clear any leftover breadcrumbs from a prior trip — fresh
-    // suspicion-rate denominator for THIS recording.
-    breadcrumbs.clear();
+    breadcrumbs.clear(); // fresh suspicion-rate denominator for THIS trip
     service.breadcrumbCollector = breadcrumbs;
     // #1422 phase 1 — match the active vehicle to the bundled catalog so
-    // the controller can fall through to the engine-tech-derived η_v
-    // default instead of the legacy 0.85 literal until VeLearner
-    // converges. Null on no-vehicle / no-catalog / no-match.
+    // the controller can use the engine-tech-derived η_v default instead
+    // of the legacy 0.85 literal until VeLearner converges. Null on no-match.
     final matchedReference = _tryMatchReferenceVehicle(activeVehicle);
     final ctl = TripRecordingController(
       service: service,
@@ -151,6 +149,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       vehicleId: eagerVehicleId,
       pinnedAdapterMac: pinnedMac,
       automatic: automatic,
+      // #2459 — diagnostic capture (Feature.debugMode); default off.
+      diagnosticCapture: _readDiagnosticCaptureFlag(),
       reconnectScannerFactory: _buildReconnectScannerFactory(),
       breadcrumbCollector: breadcrumbs,
     );
