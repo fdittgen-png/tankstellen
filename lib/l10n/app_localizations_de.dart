@@ -4901,6 +4901,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get tripAvgGpsEstimateTooltip =>
+      'GPS-Schätzung (~) — auf dieser Fahrt kein Kraftstoffsensor. Der Wert wird aus Geschwindigkeit und der Kalibrierung deines Fahrzeugs modelliert; die Genauigkeit steigt mit zunehmender Reife der Matrix.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Fahrweise';
 
   @override

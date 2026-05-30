@@ -2353,5 +2353,10 @@
   "@featureDescription_approachOverlay": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "tripAvgGpsEstimateTooltip": "Estimation GPS (~) — aucun capteur de carburant sur ce trajet. La valeur est modélisée à partir de la vitesse et de l'étalonnage de votre véhicule ; la précision s'améliore à mesure que la matrice mûrit.",
+  "@tripAvgGpsEstimateTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

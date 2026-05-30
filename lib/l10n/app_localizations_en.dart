@@ -4846,6 +4846,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tripAvgGpsEstimateTooltip =>
+      'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Driving';
 
   @override
@@ -11037,6 +11041,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String gpsMatrixMaturityConvergedTooltip(int count) {
     return '⟦ǦƤŠ ɱáŧřîẋ ĥáš çóñṽéřǧéđ ($count ƒîłł-úƥš). Éšŧîɱáŧéš ářé ŵîŧĥîñ ~2 % óƒ řéáł-ŵóřłđ ƀúřñ. ···························⟧';
   }
+
+  @override
+  String get tripAvgGpsEstimateTooltip =>
+      '⟦ǦƤŠ éšŧîɱáŧé (~) — ñó ƒúéł šéñšóř óñ ŧĥîš ŧřîƥ. Ŧĥé ƒîǧúřé îš ɱóđéłłéđ ƒřóɱ šƥééđ áñđ ýóúř ṽéĥîçłé\'š çáłîƀřáŧîóñ; áççúřáçý îɱƥřóṽéš áš ŧĥé ɱáŧřîẋ ɱáŧúřéš. ······················································⟧';
 
   @override
   String get hapticEcoCoachSectionTitle => '⟦Đřîṽîñǧ ···⟧';

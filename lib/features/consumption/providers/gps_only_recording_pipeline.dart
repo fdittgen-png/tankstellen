@@ -176,6 +176,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // null at a standstill / before warm-up, which is exactly what the
     // live reading should carry then.
     double? gpsEstimate;
+    double? gpsEstimateAvg;
+    double? gpsEstimateLiters;
     final est = _liveEstimator;
     final prevSpeed = _prevSpeedMps;
     final prevAt = _prevSampleAt;
@@ -186,6 +188,13 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
         prevSpeedMps: prevSpeed,
         dtSeconds: dt,
       );
+      // #2391 — the recording-screen Avg + Fuel-used cards read the
+      // smoother running figures (not the per-tick instant): the
+      // running-average L/100 km and the running litres integral. Both
+      // come straight off the same estimator state, so no extra fold.
+      gpsEstimateAvg = est.runningAvgLPer100Km;
+      final liters = est.litersSoFar;
+      gpsEstimateLiters = liters > 0 ? liters : null;
     }
     _prevSpeedMps = speedMps;
     _prevSampleAt = sample.timestamp;
@@ -207,6 +216,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
         distanceKmSoFar: summary.distanceKm,
         elapsed: DateTime.now().difference(startedAt),
         gpsEstimatedLPer100Km: gpsEstimate,
+        gpsEstimatedAvgLPer100Km: gpsEstimateAvg,
+        gpsEstimatedFuelLitersSoFar: gpsEstimateLiters,
       ),
       gpsCoachingHint: coaching,
       clearGpsCoachingHint: coaching == null,

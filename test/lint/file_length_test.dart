@@ -67,10 +67,15 @@ void main() {
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
-    // of overflowing on short viewports. Decomposition tracked under
-    // the existing god-class follow-ups (#2187/#2188/#2190).
+    // of overflowing on short viewports.
+    // #2391 — re-grandfathered 1069 → 1074: GPS-only Avg card now shows
+    // the measured-vs-estimate (`~`) decision via the extracted
+    // `TripAvgConsumptionCard` widget (the substantial logic moved off
+    // the screen), and the Fuel-used card gained a GPS-estimate fallback
+    // branch. Decomposition tracked under the existing god-class
+    // follow-ups (#2187/#2188/#2190).
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1069,
+        1074,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':

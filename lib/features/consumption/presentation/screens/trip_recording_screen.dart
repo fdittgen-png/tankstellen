@@ -31,6 +31,7 @@ import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
 import '../widgets/minimal_drive_summary.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
+import '../widgets/trip_avg_consumption_card.dart';
 import '../widgets/trip_radar_card.dart';
 import '../widgets/trip_start_progress.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -860,15 +861,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final band = belief == null
         ? BrokenMapBand.silent
         : brokenMapBandFor(belief.pointEstimate);
-    final liveAvg = r?.liveAvgLPer100Km;
-    final String avgValue;
-    if (band == BrokenMapBand.hardDisable) {
-      avgValue = _receiptDerivedLPer100Km(ref) ?? '—';
-    } else {
-      avgValue = liveAvg == null
-          ? '—'
-          : UnitFormatter.formatConsumption(liveAvg, isEv: false);
-    }
+    // #2391 — the Avg card owns the measured-vs-GPS-estimate decision
+    // (`~` prefix + maturity badge for GPS-only) itself; the screen only
+    // resolves the broken-MAP hard-disable override (receipt-derived
+    // per-vehicle average) and hands it through.
+    final brokenMapOverride = band == BrokenMapBand.hardDisable
+        ? (_receiptDerivedLPer100Km(ref) ?? '—')
+        : null;
 
     // #2380 — the radar card + five metric cards + coaching card can
     // exceed a short viewport, so the recording column scrolls rather
@@ -900,15 +899,21 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         _MetricCard(
           icon: Icons.local_gas_station,
           label: l?.tripMetricFuelUsed ?? 'Fuel used',
-          value: r?.fuelLitersSoFar == null
-              ? '—'
-              : '${r!.fuelLitersSoFar!.toStringAsFixed(2)} L',
+          // #2391 — measured litres, else the GPS estimator's running
+          // integral with `~` (GPS-only trips no longer show `—` all
+          // drive), else `—`.
+          value: r?.fuelLitersSoFar != null
+              ? '${r!.fuelLitersSoFar!.toStringAsFixed(2)} L'
+              : r?.gpsEstimatedFuelLitersSoFar != null
+                  ? '~${r!.gpsEstimatedFuelLitersSoFar!.toStringAsFixed(2)} L'
+                  : '—',
         ),
         const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.eco,
-          label: l?.tripMetricAvgConsumption ?? 'Avg',
-          value: avgValue,
+        // #2391 — Avg card: measured (OBD2, no `~`) vs GPS-only estimate
+        // (`~X.X L/100 km` + calibration-maturity badge + info tooltip).
+        TripAvgConsumptionCard(
+          live: r,
+          brokenMapOverride: brokenMapOverride,
         ),
         const BrokenMapDisclaimerChip(),
         const SizedBox(height: 8),
