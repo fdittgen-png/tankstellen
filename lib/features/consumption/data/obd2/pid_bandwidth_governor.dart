@@ -41,7 +41,7 @@ class GovernorState {
 /// grows with staleness, low-tier PIDs would otherwise nibble ticks away
 /// from RPM / speed. This governor measures the achieved per-PID hz over a
 /// rolling window and, when the [PidTier.dynamics] tier drops below
-/// [_dynamicsFloorHz], **demotes** the most-expendable PID (deepest tier
+/// [dynamicsFloorHz], **demotes** the most-expendable PID (deepest tier
 /// first) by halving its target hz — freeing budget for the dynamics
 /// tier — then **restores** it once the tier clears [_dynamicsRestoreHz]
 /// with headroom (hysteresis prevents flapping). The dynamics tier is
@@ -60,7 +60,11 @@ class PidBandwidthGovernor {
   /// the slowest dynamics PID drops below this the governor demotes one
   /// expendable PID. 3 Hz keeps RPM / speed responsive for harsh-accel
   /// detection while leaving slack below the 5 Hz target for jitter.
-  static const double _dynamicsFloorHz = 3.0;
+  ///
+  /// Exposed (read-only) so the comm-diagnostics scheduler tee (#2468) can
+  /// flag a starvation event when the MEASURED dynamics rate falls below
+  /// the same floor the governor defends.
+  static const double dynamicsFloorHz = 3.0;
 
   /// Hysteresis ceiling: an expendable PID is only *restored* once the
   /// dynamics tier comfortably clears the floor, so the governor doesn't
@@ -141,7 +145,7 @@ class PidBandwidthGovernor {
   }
 
   /// Core governor step, run after each completed read. On a slow link
-  /// where the dynamics tier has dropped below [_dynamicsFloorHz], demote
+  /// where the dynamics tier has dropped below [dynamicsFloorHz], demote
   /// the single most-expendable PID (deepest tier first). When the tier
   /// has recovered above [_dynamicsRestoreHz] with headroom, restore the
   /// least-expendable demoted PID. At most one move per [_governorCooldown]
@@ -157,7 +161,7 @@ class PidBandwidthGovernor {
     // No measurable dynamics rate yet (cold start) → nothing to protect.
     if (dynamicsHz == double.infinity) return;
 
-    if (dynamicsHz < _dynamicsFloorHz) {
+    if (dynamicsHz < dynamicsFloorHz) {
       final victim = _nextDemotionCandidate();
       if (victim != null) {
         _demoted.add(victim);
