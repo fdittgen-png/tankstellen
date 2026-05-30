@@ -10,11 +10,22 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
+import 'ocr/image_orientation.dart';
 import 'ocr/ocr_image_preprocessor.dart';
+import 'ocr/pump_display_orchestrator.dart';
 import 'ocr/pump_ocr_config.dart';
+import 'ocr/pump_validation_gate.dart';
+import 'ocr/recognized_text_adapter.dart';
+import 'ocr/recognized_text_block.dart';
 import 'pump_display_parser.dart';
 import 'receipt_parser.dart';
 import '../../../core/logging/error_logger.dart';
+
+// Re-export the image-orientation helpers (#1711/#2275) so existing
+// callers / tests that import them from this file keep resolving after
+// they moved to `ocr/image_orientation.dart` for the #2478 split.
+export 'ocr/image_orientation.dart'
+    show bakeImageOrientation, preprocessPumpDisplayForOcr;
 
 /// Outcome of a single receipt capture: parsed fields plus the source
 /// OCR text and the path to the captured JPEG on disk. The caller is
@@ -74,6 +85,7 @@ class ReceiptScanService {
   final TextRecognizer _recognizer;
   final ReceiptParser _parser;
   final PumpDisplayParser _pumpParser;
+  final PumpValidationGate _pumpGate;
   final PumpOcrConfig _ocrConfig;
   final OcrImagePreprocessor _preprocessor;
 
@@ -82,12 +94,14 @@ class ReceiptScanService {
     TextRecognizer? recognizer,
     ReceiptParser? parser,
     PumpDisplayParser? pumpParser,
+    PumpValidationGate? pumpGate,
     PumpOcrConfig? ocrConfig,
     OcrImagePreprocessor? preprocessor,
   })  : _picker = picker ?? ImagePicker(),
         _recognizer = recognizer ?? TextRecognizer(),
         _parser = parser ?? const ReceiptParser(),
         _pumpParser = pumpParser ?? const PumpDisplayParser(),
+        _pumpGate = pumpGate ?? const PumpValidationGate(),
         _ocrConfig = ocrConfig ?? PumpOcrConfig(),
         _preprocessor = preprocessor ?? const OcrImagePreprocessor();
 
@@ -178,12 +192,13 @@ class ReceiptScanService {
     }
     // Crop to the reticle ROI FIRST, then run the 7-segment
     // preprocessing pass (adaptive Sauvola binarization, replacing the
-    // glare-amplifying #1860 global contrast). ML Kit still reads the
-    // printed PRIX/VOLUME/PRIX-DU-LITRE labels off the cleaned crop; the
-    // result is parsed against the active country's config profile so
-    // the validation gate can range-check + cross-check it.
-    final text = await _recognise(path, enhanceContrast: true, roi: roi);
-    if (text == null) {
+    // glare-amplifying #1860 global contrast). ML Kit reads the printed
+    // PRIX/VOLUME/PRIX-DU-LITRE labels off the cleaned crop; we keep its
+    // block geometry (#2478) — not just the flat string — so the
+    // label-anchored extractor can tell which number sits under which
+    // label and recover the dropped unit price.
+    final recognised = await _recognisePump(path, roi: roi);
+    if (recognised == null) {
       await _tryDelete(path);
       return null;
     }
@@ -193,8 +208,16 @@ class ReceiptScanService {
       profile = _ocrConfig.profileFor(country);
     }
     return PumpDisplayScanOutcome(
-      parse: _pumpParser.parse(text, profile: profile),
-      ocrText: text,
+      // #2478 — PRIMARY label-anchored read (recovers the dropped PRIX DU
+      // LITRE unit price), flat-string parser fallback, then the gate.
+      parse: orchestratePumpDisplayParse(
+        blocks: recognised.blocks,
+        text: recognised.text,
+        profile: profile,
+        parser: _pumpParser,
+        gate: _pumpGate,
+      ),
+      ocrText: recognised.text,
       imagePath: path,
     );
   }
@@ -247,20 +270,49 @@ class ReceiptScanService {
     bool enhanceContrast = false,
     OcrNormalizedRect? roi,
   }) async {
+    final text = (await _recogniseRaw(path, enhanceContrast: enhanceContrast, roi: roi))?.text;
+    if (text != null) debugPrint('OCR text (${text.length} chars):\n$text');
+    return text;
+  }
+
+  /// Runs ML Kit on the pump-display crop and returns BOTH the flat text
+  /// and the per-line block geometry (#2478).
+  ///
+  /// The pump path needs the boxes — discarding them (the old behaviour)
+  /// is exactly why the unit price could not be anchored to its label.
+  /// Same EXIF-upright + #2275 Sauvola preprocessing as [_recognise]; the
+  /// flat text is retained for the legacy fallback parser. Returns null
+  /// when OCR recognises nothing.
+  Future<({String text, List<RecognizedTextBlock> blocks})?> _recognisePump(
+    String path, {
+    OcrNormalizedRect? roi,
+  }) async {
+    final recognized = await _recogniseRaw(path, enhanceContrast: true, roi: roi);
+    if (recognized == null) return null;
+    final blocks = mapRecognizedText(recognized);
+    debugPrint('Pump OCR: ${recognized.text.length} chars, ${blocks.length} blocks');
+    return (text: recognized.text, blocks: blocks);
+  }
+
+  /// Core ML Kit pass shared by [_recognise] and [_recognisePump]: writes
+  /// the EXIF-upright (optionally Sauvola-preprocessed) temp copy, runs
+  /// the recognizer, and returns the raw [RecognizedText] so each caller
+  /// can keep just the flat text or the full block geometry. Returns null
+  /// on any decode/recognize error (logged).
+  Future<RecognizedText?> _recogniseRaw(
+    String path, {
+    bool enhanceContrast = false,
+    OcrNormalizedRect? roi,
+  }) async {
     String? uprightTemp;
     try {
-      uprightTemp = await _writeUprightCopy(
-        path,
-        enhanceContrast: enhanceContrast,
-        roi: roi,
-      );
+      uprightTemp =
+          await _writeUprightCopy(path, enhanceContrast: enhanceContrast, roi: roi);
       final inputImage = InputImage.fromFilePath(uprightTemp ?? path);
-      final recognized = await _recognizer.processImage(inputImage);
-      final text = recognized.text;
-      debugPrint('OCR text (${text.length} chars):\n$text');
-      return text;
+      return await _recognizer.processImage(inputImage);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'OCR scan failed'}));
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: const {'where': 'OCR scan failed'}));
       return null;
     } finally {
       if (uprightTemp != null) await _tryDelete(uprightTemp);
@@ -311,76 +363,5 @@ class ReceiptScanService {
 
   void dispose() {
     _recognizer.close();
-  }
-}
-
-/// Re-encodes [jpegBytes] with any EXIF orientation baked into the
-/// pixel data (#1711).
-///
-/// A camera capture stores the raw sensor orientation plus an EXIF tag
-/// describing how to rotate it for display. ML Kit's
-/// `InputImage.fromFilePath` does not reliably apply that tag, so a
-/// sideways capture reaches the recognizer rotated and OCR fails. This
-/// applies the rotation to the pixels and clears the tag, so the
-/// recognizer always sees an upright image.
-///
-/// Returns the upright JPEG bytes, or `null` when the input cannot be
-/// decoded as a JPEG — the caller then OCRs the original unchanged.
-Uint8List? bakeImageOrientation(Uint8List jpegBytes) {
-  try {
-    final decoded = img.decodeJpg(jpegBytes);
-    if (decoded == null) return null;
-    final upright = img.bakeOrientation(decoded);
-    return img.encodeJpg(upright, quality: 90);
-  } catch (e, st) {
-    // A malformed / non-JPEG file is not fatal — OCR the original.
-    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'bakeImageOrientation: decode failed'}));
-    return null;
-  }
-}
-
-/// Re-encodes a pump-display capture for OCR (#2275, replacing #1860).
-///
-/// The #1860 pass did `grayscale → normalize → contrast(140)` over the
-/// **whole frame** — a *global* operation that AMPLIFIES specular glare
-/// (a bright reflection drags the whole histogram and crushes the
-/// digits beside it) and never used the reticle the user framed. This
-/// rebuild:
-///
-///   1. **bakes EXIF orientation** (phone-hold correction);
-///   2. **crops to the reticle [roi]** FIRST so all downstream work is
-///      on the readout, not the metrology stickers / card reader;
-///   3. **grayscale** — colour is noise on a monochrome LCD;
-///   4. **denoise** — a light blur before thresholding;
-///   5. **Sauvola adaptive (local) binarization** — each pixel is
-///      thresholded against its own neighbourhood, so a reflection on
-///      one corner no longer blows out the digits elsewhere;
-///   6. **morphological close** — bridges the gaps adaptive
-///      thresholding leaves between a glyph's strokes.
-///
-/// Scoped to the pump-display path only — [scanReceipt]'s prose-receipt
-/// OCR keeps the plain [bakeImageOrientation] path. Returns the
-/// processed JPEG bytes, or `null` when the input cannot be decoded.
-Uint8List? preprocessPumpDisplayForOcr(
-  Uint8List jpegBytes, {
-  OcrNormalizedRect? roi,
-  OcrImagePreprocessor preprocessor = const OcrImagePreprocessor(),
-}) {
-  try {
-    final decoded = img.decodeJpg(jpegBytes);
-    if (decoded == null) return null;
-    final upright = img.bakeOrientation(decoded);
-    final cropped = roi != null
-        ? preprocessor.cropToRoi(upright, roi)
-        : upright;
-    final gray = preprocessor.toGrayscale(cropped);
-    final denoised = preprocessor.denoise(gray);
-    final binary = preprocessor.sauvolaBinarize(denoised);
-    final closed = preprocessor.morphologicalClose(binary);
-    return img.encodeJpg(closed, quality: 90);
-  } catch (e, st) {
-    // A malformed / non-JPEG file is not fatal — OCR the original.
-    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'preprocessPumpDisplayForOcr: decode failed'}));
-    return null;
   }
 }
