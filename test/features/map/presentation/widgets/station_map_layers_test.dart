@@ -224,6 +224,107 @@ void main() {
       },
     );
   });
+
+  group('StationMapLayers.orderedByPriceForPainting (#2434)', () {
+    // The (cluster) layer paints in source-list order — a marker LATER
+    // in the list paints ON TOP of earlier ones. The helper must order
+    // stations so the cheapest (green) marker ends up LAST (top) and a
+    // price-less marker ends up FIRST (bottom, beneath every real price).
+    Station station(String id, {double? diesel, double? e10}) => Station(
+          id: id,
+          name: id,
+          brand: 'Brand $id',
+          street: 'Street',
+          houseNumber: '1',
+          postCode: '10178',
+          place: 'Berlin',
+          lat: 52.0,
+          lng: 13.0,
+          dist: 1.0,
+          diesel: diesel,
+          e10: e10,
+          isOpen: true,
+        );
+
+    test('orders cheapest LAST (painted on top), most expensive FIRST', () {
+      final cheap = station('cheap', diesel: 1.50);
+      final mid = station('mid', diesel: 1.70);
+      final expensive = station('expensive', diesel: 1.90);
+
+      // Feed them in an arbitrary order.
+      final ordered = StationMapLayers.orderedByPriceForPainting(
+        [mid, expensive, cheap],
+        FuelType.diesel,
+      );
+
+      // Bottom → top of the paint stack: expensive, mid, cheap.
+      expect(
+        ordered.map((s) => s.id).toList(),
+        ['expensive', 'mid', 'cheap'],
+        reason: 'cheapest must be LAST so it paints on top of the rest',
+      );
+    });
+
+    test('price-less stations sink to the BOTTOM (front of the list)', () {
+      final cheap = station('cheap', diesel: 1.50);
+      final expensive = station('expensive', diesel: 1.90);
+      final noPrice = station('noprice'); // no diesel, no fallback fuel
+
+      final ordered = StationMapLayers.orderedByPriceForPainting(
+        [cheap, noPrice, expensive],
+        FuelType.diesel,
+      );
+
+      // The null-price marker is first (very bottom) so it can never
+      // cover a real green one; cheapest is still last (top).
+      expect(ordered.first.id, 'noprice',
+          reason: 'price-less marker must sit beneath every priced one');
+      expect(ordered.last.id, 'cheap',
+          reason: 'cheapest priced marker must still paint on top');
+    });
+
+    test(
+        'orders by the RESOLVED display price (fallback fuel), matching '
+        'the marker colour', () {
+      // User has DIESEL selected. `fallback` has no diesel but a cheap
+      // E10 — its marker is coloured by that fallback price (#2400), so
+      // the z-order must use the same resolved price, not the (null)
+      // selected-fuel price.
+      final dieselExpensive = station('diesel-expensive', diesel: 1.95);
+      final fallbackCheap = station('fallback-cheap', e10: 1.40);
+
+      final ordered = StationMapLayers.orderedByPriceForPainting(
+        [dieselExpensive, fallbackCheap],
+        FuelType.diesel,
+      );
+
+      // The resolved-cheap fallback station paints on top of the
+      // diesel-expensive one, agreeing with their green/red colours.
+      expect(ordered.last.id, 'fallback-cheap');
+      expect(ordered.first.id, 'diesel-expensive');
+    });
+
+    test('is a pure function — does not mutate the input list', () {
+      final input = [
+        station('a', diesel: 1.90),
+        station('b', diesel: 1.50),
+      ];
+      final before = input.map((s) => s.id).toList();
+      StationMapLayers.orderedByPriceForPainting(input, FuelType.diesel);
+      expect(input.map((s) => s.id).toList(), before,
+          reason: 'helper must return a new list, leaving the input intact');
+    });
+
+    test('is stable for equal prices (preserves relative order)', () {
+      final first = station('first', diesel: 1.70);
+      final second = station('second', diesel: 1.70);
+      final ordered = StationMapLayers.orderedByPriceForPainting(
+        [first, second],
+        FuelType.diesel,
+      );
+      expect(ordered.map((s) => s.id).toList(), ['first', 'second']);
+    });
+  });
 }
 
 const _seedStation = Station(

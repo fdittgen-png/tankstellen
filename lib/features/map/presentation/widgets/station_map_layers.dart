@@ -3,6 +3,7 @@
 
 import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
@@ -135,6 +136,41 @@ class StationMapLayers extends StatefulWidget {
     return LatLng(sumLat / stations.length, sumLng / stations.length);
   }
 
+  /// Order [stations] so that, when their markers are handed to the
+  /// (cluster) layer, the CHEAPEST (green/günstig) marker is painted ON
+  /// TOP of any more-expensive (orange/red) markers it overlaps (#2434).
+  ///
+  /// flutter_map / flutter_map_marker_cluster paint markers in the order
+  /// of the source list — a marker LATER in the list is painted on top of
+  /// earlier ones. For individually-overlapping (un-clustered) price
+  /// bubbles at the reported zoom, this list order governs the overlap,
+  /// because the cluster layer recurses its nodes in insertion order and
+  /// `MarkerLayer` paints in list order. So the rule is:
+  ///   - sort by the RESOLVED display price (see [bestDisplayPrice]) —
+  ///     the SAME price the marker is COLOURED by (#2400) — DESCENDING:
+  ///     most expensive first (painted at the bottom), cheapest last
+  ///     (painted on top), so colour and stacking always agree;
+  ///   - markers with NO comparable price ([bestDisplayPrice] null → the
+  ///     grey "--" bubble) sort to the very FRONT (the bottom of the
+  ///     stack) so a price-less marker can never cover a real green one.
+  ///
+  /// Returns a NEW list; the input is not mutated. A stable sort keeps the
+  /// relative order of equal-priced stations.
+  static List<Station> orderedByPriceForPainting(
+    List<Station> stations,
+    FuelType selectedFuel,
+  ) {
+    // A null resolved price is treated as the most-expensive bucket
+    // (+infinity) so, under a descending sort, it lands first → painted
+    // at the very bottom, beneath every priced marker.
+    double sortKey(Station s) =>
+        bestDisplayPrice(s, selectedFuel)?.price ?? double.infinity;
+    final ordered = List<Station>.of(stations);
+    // Descending: highest price first (bottom), lowest last (top).
+    mergeSort<Station>(ordered,
+        compare: (a, b) => sortKey(b).compareTo(sortKey(a)));
+    return ordered;
+  }
 }
 
 class _StationMapLayersState extends State<StationMapLayers> {
@@ -176,7 +212,16 @@ class _StationMapLayersState extends State<StationMapLayers> {
     _priceRange = resolvedPriceRange(widget.stations, widget.selectedFuel);
     final ids = widget.selectedStationIds;
     final hasSelection = ids != null && ids.isNotEmpty;
-    _markers = widget.stations.map((station) {
+    // #2434 — order so the cheapest (green) marker paints ON TOP of the
+    // more-expensive ones it overlaps. The (cluster) layer paints in
+    // source-list order (later = on top), so we sort price-descending:
+    // expensive at the bottom, cheapest last/on top, price-less markers
+    // beneath everything. Same resolved price the marker is coloured by.
+    final ordered = StationMapLayers.orderedByPriceForPainting(
+      widget.stations,
+      widget.selectedFuel,
+    );
+    _markers = ordered.map((station) {
       final isPastel = hasSelection && !ids.contains(station.id);
       return StationMarkerBuilder.build(
         context,
