@@ -64,7 +64,13 @@ void main() {
     // subscriptions and threads both into the MAF + speed-density fuel
     // derivation (effective AFR + air-density correction). Decomposition
     // is tracked separately by #2187/#2188.
-    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 524,
+    // #2457 — re-grandfathered 524 → 533: subscribeAllTiers re-expressed
+    // as four cadence tiers (PidTier) + the centralised `_sub` helper that
+    // carries the discover-all ∩ target-set gate (optionalPid) so each PID
+    // is a one-line tier assignment, with #2458 tier slots commented in.
+    // Net +9 is the helper + its dartdoc, not new branching. Decomposition
+    // is tracked separately by #2187/#2188.
+    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 533,
     // #2379 — re-grandfathered 1457 → 1468: threaded the
     // `logFailureAsError` flag through `connect()` (param + doc + the
     // guarded `if` around the now-conditional connect-failed trace) so a

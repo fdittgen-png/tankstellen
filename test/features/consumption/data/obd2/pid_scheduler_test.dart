@@ -630,4 +630,125 @@ void main() {
           reason: 'a fresh window permits another diagnostic');
     });
   });
+
+  // ── #2457 — 4-tier cadence + bandwidth governor ─────────────────────
+  group('PidScheduler — cadence tiers + weight (#2457)', () {
+    test('the RR weight scales with the configured hz across all four tiers',
+        () {
+      // One PID per tier, all read the same 1 s ago → weight = elapsed ×
+      // hz, so the order is purely the hz ranking. This proves the four
+      // tiers ride the same weighted-RR and a deeper tier never out-
+      // competes a shallower one in steady state.
+      final setup = _schedulerWithClock(transport: _FakeTransport().call);
+      final scheduler = setup.scheduler;
+      final base = DateTime(2026, 1, 1, 12);
+      final readAt = base.subtract(const Duration(seconds: 1));
+      scheduler.subscribe(
+          '010C',
+          ScheduledPid(hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics)
+            ..lastReadAt = readAt,
+          (_) {});
+      scheduler.subscribe(
+          '0144',
+          ScheduledPid(hz: 2.0, tier: PidTier.mixture)..lastReadAt = readAt,
+          (_) {});
+      scheduler.subscribe(
+          '0106',
+          ScheduledPid(hz: 0.5, tier: PidTier.slowCorrection)
+            ..lastReadAt = readAt,
+          (_) {});
+      scheduler.subscribe(
+          '012F',
+          ScheduledPid(hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext)
+            ..lastReadAt = readAt,
+          (_) {});
+
+      // Dynamics (5 Hz) has the largest weight → wins.
+      expect(scheduler.pickNextCommand(base), '010C');
+    });
+
+    test('a tier default does not gate selection — only weight does', () {
+      // A high-priority thermal PID (deep tier) still loses to a medium
+      // dynamics PID, proving the tier is metadata, not a hard override.
+      final setup = _schedulerWithClock(transport: _FakeTransport().call);
+      final scheduler = setup.scheduler;
+      final base = DateTime(2026, 1, 1, 12);
+      final readAt = base.subtract(const Duration(seconds: 1));
+      scheduler.subscribe(
+          '0105',
+          ScheduledPid(hz: 0.1, priority: PidPriority.high, tier: PidTier.thermalContext)
+            ..lastReadAt = readAt,
+          (_) {});
+      scheduler.subscribe(
+          '010C',
+          ScheduledPid(hz: 5.0, tier: PidTier.dynamics)..lastReadAt = readAt,
+          (_) {});
+      expect(scheduler.pickNextCommand(base), '010C');
+    });
+  });
+
+  group('PidScheduler — bandwidth governor end-to-end (#2457)', () {
+    test(
+        'a slow link demotes the lowest tier while RPM / speed keep their '
+        'effective-hz, restored once headroom returns', () async {
+      // Per-read transport delay is the slow-link knob. `slow` (200 ms per
+      // read) means even the two 5 Hz dynamics PIDs can only share ~5
+      // reads/s total — ~2.5 Hz each, below the 3 Hz floor — so the
+      // governor must demote an expendable PID. Flipping to fast (0 ms)
+      // gives ample headroom and the demotion is unwound.
+      var slow = true;
+      Future<String> transport(String command) async {
+        if (slow) await Future<void>.delayed(const Duration(milliseconds: 200));
+        final pid = command.substring(2, 4);
+        return '41 $pid 00>';
+      }
+
+      final scheduler = PidScheduler(
+        transport: transport,
+        tickRate: const Duration(milliseconds: 5),
+      );
+      final reads = <String, int>{'010C': 0, '010D': 0, '012F': 0, '0105': 0};
+      scheduler
+        ..subscribe('010C',
+            ScheduledPid(hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics),
+            (_) => reads['010C'] = reads['010C']! + 1)
+        ..subscribe('010D',
+            ScheduledPid(hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics),
+            (_) => reads['010D'] = reads['010D']! + 1)
+        ..subscribe('0105',
+            ScheduledPid(hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext),
+            (_) => reads['0105'] = reads['0105']! + 1)
+        ..subscribe('012F',
+            ScheduledPid(hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext),
+            (_) => reads['012F'] = reads['012F']! + 1)
+        ..start();
+
+      // Run the slow link long enough for the governor's 4 s window +
+      // 2 s cooldown to fire at least once.
+      await Future<void>.delayed(const Duration(seconds: 8));
+      // A thermal-tier PID is demoted to protect the dynamics tier; the
+      // dynamics PIDs are never demoted.
+      expect(scheduler.demotedCommands, isNotEmpty,
+          reason: 'the slow link should have demoted an expendable PID');
+      expect(scheduler.demotedCommands.any((c) => c == '012F' || c == '0105'),
+          isTrue,
+          reason: 'only thermal-tier PIDs are demoted on a slow link');
+      expect(scheduler.demotedCommands, isNot(contains('010C')));
+      expect(scheduler.demotedCommands, isNot(contains('010D')));
+
+      // Dynamics PIDs still got the lion's share of the budget.
+      final dynamicsReads = reads['010C']! + reads['010D']!;
+      final thermalReads = reads['0105']! + reads['012F']!;
+      expect(dynamicsReads, greaterThan(thermalReads),
+          reason: 'RPM / speed must out-poll the demoted thermal tier');
+
+      // Link recovers → the governor restores the demoted PID.
+      slow = false;
+      await Future<void>.delayed(const Duration(seconds: 8));
+      scheduler.stop();
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      expect(scheduler.demotedCommands, isEmpty,
+          reason: 'headroom returned → demotions are unwound');
+    });
+  });
 }

@@ -124,171 +124,180 @@ class LiveSampleSnapshot {
     _latestOemFuelLevelLitres = litres;
   }
 
-  /// Wire every priority tier's PID subscriptions onto [scheduler].
-  /// Each callback writes the latest parsed value into this snapshot;
-  /// high-priority callbacks additionally feed the silent-failure
-  /// observer, and the vehicle-speed callback feeds the virtual
-  /// odometer.
+  /// Wire the four cadence tiers' PID subscriptions onto [scheduler]
+  /// (#2457). Each callback writes the latest parsed value into this
+  /// snapshot; dynamics-tier callbacks also feed the silent-failure
+  /// observer, and the vehicle-speed callback feeds the virtual odometer.
+  ///
+  /// **Cadence tiers** (re-expressing the previous 3-tier layout on the
+  /// same weighted round-robin; the governor demotes deepest tiers first,
+  /// never [PidTier.dynamics], so RPM / speed never starve):
+  ///   - [PidTier.dynamics] ~5 Hz — RPM 010C, speed 010D, throttle 0111,
+  ///     + the fuel-rate driver (015E → MAF 0110 → MAP 010B speed-density).
+  ///   - [PidTier.mixture] ~2 Hz — λ 0144, engine load 0104.
+  ///   - [PidTier.slowCorrection] ~0.5 Hz — STFT 0106, LTFT 0107, IAT
+  ///     010F, baro 0133.
+  ///   - [PidTier.thermalContext] ~0.1 Hz — coolant 0105, fuel tank 012F.
+  /// (#2458 adds pedal to dynamics, abs-load/bank-2 to mixture, and
+  /// oil/ambient/voltage to thermal — slots are commented inline below.)
+  ///
+  /// **Discover-all ∩ target-set:** the live set is this target table ∩
+  /// the #811-discovered supported set. The unconditional core (RPM,
+  /// speed, throttle, load, IAT, coolant, STFT, LTFT, tank) carries no
+  /// gate — `isPidSupported` is don't-reject-blind so a probe-less clone
+  /// still rotates it. Optional PIDs (MAF, MAP, 015E, λ, baro) pass an
+  /// `optionalPid` gate, so a car supporting only {010C,010D,0104,0111}
+  /// subscribes exactly those plus the core. Adding a PID is a one-line
+  /// [_sub] call — the gate, tier, hz and priority travel together.
   void subscribeAllTiers(PidScheduler scheduler) {
-    // ---- 5 Hz tier (high priority) --------------------------------
-    // RPM and speed are consumed directly by TripSample → TripRecorder
-    // for distance/idle/harsh-accel accumulation, so they need the
-    // highest refresh we can squeeze out of the adapter.
-    scheduler.subscribe(
-      Elm327Protocol.engineRpmCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseEngineRpm(r);
-        if (v != null) _latestRpm = v;
-        _onHighPriorityParse(v);
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.vehicleSpeedCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseVehicleSpeed(r);
-        if (v != null) {
-          _latestSpeedKmh = v.toDouble();
-          _onSpeedSample(v.toDouble());
-        }
-        _onHighPriorityParse(v);
-      },
-    );
-    // MAF and MAP are the two alternate air-mass inputs to the fuel-
-    // rate derivation. Cheap cars (Peugeot 107) only have MAP+IAT;
-    // modern cars expose MAF. We subscribe both and let the snapshot-
-    // based derivation pick whichever landed most recently.
-    if (_service.supportsPid(0x10)) {
-      scheduler.subscribe(
-        Elm327Protocol.mafCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseMafGramsPerSecond(r);
-          if (v != null) _latestMaf = v;
-          _onHighPriorityParse(v);
-        },
-      );
-    }
-    if (_service.supportsPid(0x0B)) {
-      scheduler.subscribe(
-        Elm327Protocol.intakeManifoldPressureCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseManifoldPressureKpa(r);
-          if (v != null) _latestMapKpa = v;
-          _onHighPriorityParse(v);
-        },
-      );
-    }
-    scheduler.subscribe(
-      Elm327Protocol.throttlePositionCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseThrottlePercent(r);
-        if (v != null) _latestThrottlePercent = v;
-        _onHighPriorityParse(v);
-      },
-    );
-    // PID 5E is only present on ~2014+ ECUs. Skip when #811 discovery
-    // already proved the car rejects it, to save the 200 ms round-
-    // trip of a guaranteed NO DATA.
-    if (_service.supportsPid(0x5E)) {
-      scheduler.subscribe(
-        Elm327Protocol.engineFuelRateCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseFuelRateLPerHour(r);
-          if (v != null) _latestDirectFuelRate = v;
-          _onHighPriorityParse(v);
-        },
-      );
-    }
+    // ---- DYNAMICS tier (~5 Hz, high priority) ----------------------
+    // RPM and speed feed TripSample → TripRecorder for distance / idle /
+    // harsh-accel accumulation, so they need the highest refresh we can
+    // squeeze out of the adapter — and the governor's floor guards them.
+    _sub(scheduler, Elm327Protocol.engineRpmCommand,
+        hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics, (r) {
+      final v = Elm327Protocol.parseEngineRpm(r);
+      if (v != null) _latestRpm = v;
+      _onHighPriorityParse(v);
+    });
+    _sub(scheduler, Elm327Protocol.vehicleSpeedCommand,
+        hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics, (r) {
+      final v = Elm327Protocol.parseVehicleSpeed(r);
+      if (v != null) {
+        _latestSpeedKmh = v.toDouble();
+        _onSpeedSample(v.toDouble());
+      }
+      _onHighPriorityParse(v);
+    });
+    _sub(scheduler, Elm327Protocol.throttlePositionCommand,
+        hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics, (r) {
+      final v = Elm327Protocol.parseThrottlePercent(r);
+      if (v != null) _latestThrottlePercent = v;
+      _onHighPriorityParse(v);
+    });
+    // #2458 slot: accelerator-pedal (0149/014A/014B) — driver intent, 5 Hz.
+    //
+    // The fuel-rate driver: subscribe whichever the car exposes (015E
+    // direct → MAF → MAP speed-density) and let the snapshot derivation
+    // pick the richest branch that landed. All three optionalPid-gated.
+    _sub(scheduler, Elm327Protocol.engineFuelRateCommand,
+        hz: 5.0,
+        priority: PidPriority.high,
+        tier: PidTier.dynamics,
+        optionalPid: 0x5E, (r) {
+      final v = Elm327Protocol.parseFuelRateLPerHour(r);
+      if (v != null) _latestDirectFuelRate = v;
+      _onHighPriorityParse(v);
+    });
+    _sub(scheduler, Elm327Protocol.mafCommand,
+        hz: 5.0,
+        priority: PidPriority.high,
+        tier: PidTier.dynamics,
+        optionalPid: 0x10, (r) {
+      final v = Elm327Protocol.parseMafGramsPerSecond(r);
+      if (v != null) _latestMaf = v;
+      _onHighPriorityParse(v);
+    });
+    _sub(scheduler, Elm327Protocol.intakeManifoldPressureCommand,
+        hz: 5.0,
+        priority: PidPriority.high,
+        tier: PidTier.dynamics,
+        optionalPid: 0x0B, (r) {
+      final v = Elm327Protocol.parseManifoldPressureKpa(r);
+      if (v != null) _latestMapKpa = v;
+      _onHighPriorityParse(v);
+    });
 
-    // ---- 1 Hz tier (medium priority) ------------------------------
-    scheduler.subscribe(
-      Elm327Protocol.engineLoadCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseEngineLoad(r);
-        if (v != null) _latestEngineLoadPercent = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.intakeAirTempCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseIntakeAirTempCelsius(r);
-        if (v != null) _latestIatCelsius = v;
-      },
-    );
-    // Coolant temp drifts slowly — 1 Hz is more than enough resolution
-    // for the cold-start surcharge heuristic (#1262 phase 2) to detect
-    // whether the trip ever crossed operating temperature.
-    scheduler.subscribe(
-      Elm327Protocol.coolantTempCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseCoolantTempCelsius(r);
-        if (v != null) _latestCoolantTempC = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.shortTermFuelTrimCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseShortTermFuelTrim(r);
-        if (v != null) _latestStft = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.longTermFuelTrimCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseLongTermFuelTrim(r);
-        if (v != null) _latestLtft = v;
-      },
-    );
-    // #2456 — commanded λ (PID 0x44). The mixture swings between lean
-    // cruise and power-enrich on the timescale of throttle inputs, so
-    // 2 Hz keeps the effective-AFR refinement current without stealing
-    // the high-priority RPM / speed / MAF / MAP budget. supportsPid-
-    // gated: a car that rejects 0x44 never subscribes and the
-    // derivation falls back to the assumed stoich AFR.
-    if (_service.supportsPid(0x44)) {
-      scheduler.subscribe(
-        Elm327Protocol.commandedEquivalenceRatioCommand,
-        ScheduledPid(hz: 2.0),
-        (r) {
-          final v = Elm327Protocol.parseCommandedEquivalenceRatio(r);
-          if (v != null) _latestLambda = v;
-        },
-      );
-    }
+    // ---- MIXTURE tier (~2 Hz, medium priority) ---------------------
+    // The mixture swings on the timescale of throttle inputs, so 2 Hz
+    // keeps the effective-AFR refinement current without stealing the
+    // dynamics budget. #2456 — commanded λ (0x44), optionalPid-gated:
+    // absent → the derivation falls back to the assumed stoich AFR.
+    _sub(scheduler, Elm327Protocol.commandedEquivalenceRatioCommand,
+        hz: 2.0, tier: PidTier.mixture, optionalPid: 0x44, (r) {
+      final v = Elm327Protocol.parseCommandedEquivalenceRatio(r);
+      if (v != null) _latestLambda = v;
+    });
+    _sub(scheduler, Elm327Protocol.engineLoadCommand,
+        hz: 2.0, tier: PidTier.mixture, (r) {
+      final v = Elm327Protocol.parseEngineLoad(r);
+      if (v != null) _latestEngineLoadPercent = v;
+    });
+    // #2458 slot: absolute load (0143), bank-2 fuel trims (0108/0109).
 
-    // ---- 0.1 Hz tier (low priority) -------------------------------
-    scheduler.subscribe(
-      Elm327Protocol.fuelTankLevelCommand,
-      ScheduledPid(hz: 0.1, priority: PidPriority.low),
-      (r) {
-        final v = Elm327Protocol.parseFuelLevelPercent(r);
-        if (v != null) _latestFuelLevelPercent = v;
-      },
-    );
-    // #2456 — absolute baro (PID 0x33). Ambient pressure only changes
-    // with altitude / weather, so a slow 0.5 Hz read is ample and keeps
-    // it well clear of the dynamics budget. supportsPid-gated: absent →
+    // ---- SLOW-CORRECTION tier (~0.5 Hz, medium priority) -----------
+    // Fuel trims + IAT drift slowly; the corrections only matter at the
+    // half-Hz scale of the fuel-rate integration.
+    _sub(scheduler, Elm327Protocol.shortTermFuelTrimCommand,
+        hz: 0.5, tier: PidTier.slowCorrection, (r) {
+      final v = Elm327Protocol.parseShortTermFuelTrim(r);
+      if (v != null) _latestStft = v;
+    });
+    _sub(scheduler, Elm327Protocol.longTermFuelTrimCommand,
+        hz: 0.5, tier: PidTier.slowCorrection, (r) {
+      final v = Elm327Protocol.parseLongTermFuelTrim(r);
+      if (v != null) _latestLtft = v;
+    });
+    _sub(scheduler, Elm327Protocol.intakeAirTempCommand,
+        hz: 0.5, tier: PidTier.slowCorrection, (r) {
+      final v = Elm327Protocol.parseIntakeAirTempCelsius(r);
+      if (v != null) _latestIatCelsius = v;
+    });
+    // #2456 — absolute baro (0x33). Ambient pressure changes only with
+    // altitude / weather, so 0.5 Hz is ample. optionalPid-gated: absent →
     // the speed-density air-mass keeps its sea-level assumption.
-    if (_service.supportsPid(0x33)) {
-      scheduler.subscribe(
-        Elm327Protocol.baroPressureCommand,
-        ScheduledPid(hz: 0.5, priority: PidPriority.low),
+    _sub(scheduler, Elm327Protocol.baroPressureCommand,
+        hz: 0.5, tier: PidTier.slowCorrection, optionalPid: 0x33, (r) {
+      final v = Elm327Protocol.parseBaroPressureKpa(r);
+      if (v != null) _latestBaroKpa = v;
+    });
+
+    // ---- THERMAL/CONTEXT tier (~0.1 Hz, low priority) --------------
+    // These change over minutes; first to be demoted under bandwidth
+    // pressure. 0.1 Hz coolant is ample for the cold-start surcharge
+    // heuristic (#1262 phase 2) to tell if the trip reached temperature.
+    _sub(scheduler, Elm327Protocol.coolantTempCommand,
+        hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext,
         (r) {
-          final v = Elm327Protocol.parseBaroPressureKpa(r);
-          if (v != null) _latestBaroKpa = v;
-        },
-      );
-    }
+      final v = Elm327Protocol.parseCoolantTempCelsius(r);
+      if (v != null) _latestCoolantTempC = v;
+    });
+    _sub(scheduler, Elm327Protocol.fuelTankLevelCommand,
+        hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext,
+        (r) {
+      final v = Elm327Protocol.parseFuelLevelPercent(r);
+      if (v != null) _latestFuelLevelPercent = v;
+    });
+    // #2458 slot: oil temp (015C), ambient air (0146), control-module
+    // voltage (0142) — all thermal/context, all 0.1 Hz.
+  }
+
+  /// Register one tier subscription on [scheduler] (#2457). Centralises
+  /// the discover-all ∩ target-set gate so each PID above is a single
+  /// line carrying its [hz], [tier], [priority] and optional [optionalPid]
+  /// gate together.
+  ///
+  /// When [optionalPid] is null the command is part of the unconditional
+  /// core and is always subscribed (relying on `isPidSupported`'s
+  /// don't-reject-blind semantics + the #2379 backoff to self-evict if
+  /// the car NO-DATAs it). When [optionalPid] is set, the command is only
+  /// subscribed if `_service.supportsPid(optionalPid)` — i.e. the target
+  /// PID intersected the car's discovered-supported set.
+  void _sub(
+    PidScheduler scheduler,
+    String command,
+    void Function(String response) onResult, {
+    required double hz,
+    required PidTier tier,
+    PidPriority priority = PidPriority.medium,
+    int? optionalPid,
+  }) {
+    if (optionalPid != null && !_service.supportsPid(optionalPid)) return;
+    scheduler.subscribe(
+      command,
+      ScheduledPid(hz: hz, priority: priority, tier: tier),
+      onResult,
+    );
   }
 
   /// #1858 — the branch [deriveFuelRateLPerHour] resolved on its most
