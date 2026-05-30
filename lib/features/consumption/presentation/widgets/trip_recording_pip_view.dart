@@ -25,11 +25,12 @@ import '../../providers/trip_recording_provider.dart';
 /// └──────────────────────┘
 /// ```
 ///
-/// When the trip carries no OBD2 fuel-rate samples (GPS-only trajet,
-/// or before the OBD2 stream produces the first reading), the figure
-/// renders as `~` followed by a placeholder. The `~` prefix flags the
-/// number as an estimate when the GPS-matrix estimator (#F of Epic
-/// #2055) lands — until then the placeholder is a literal dash.
+/// On a GPS-only trajet (no OBD2 fuel-rate samples) the big figure is
+/// the live physics estimate rendered as `~X.X L/100 km` once the
+/// estimator has warmed up (#2390 / Epic #2385) — the leading `~` flags
+/// it an estimate per ADR 0012. Before the estimate lands (warm-up /
+/// uncalibrated) the tile gracefully falls back to distance, then
+/// elapsed time, so no information-free placeholder is ever shown.
 ///
 /// The widget is paint-only — it does not own the recording state.
 /// The caller passes in the live [TripRecordingState] and a band
@@ -75,20 +76,27 @@ class TripRecordingPipView extends StatelessWidget {
 
   /// Default PiP layout (no approach radius hit) — picks the **most
   /// informative** metric for the big slot based on what the trajet
-  /// has produced so far (#2094). Three branches in priority order:
+  /// has produced so far (#2094 + #2390). Four branches, priority order:
   ///
   /// 1. **OBD2 live fuel rate available** → huge L/100 km (or L/h on
   ///    idle). Secondary row: distance + elapsed.
-  /// 2. **GPS-only, distance ≥ 0.1 km** → huge **distance**. The
-  ///    GPS-matrix L/100 km estimate is post-trip only (#2080), so
-  ///    nothing live to render in that slot; distance is the most
-  ///    useful real-time number. Secondary row: elapsed.
-  /// 3. **Pre-roll (distance ≈ 0)** → huge **elapsed time**. The user
+  /// 2. **GPS-only with a live estimate** (#2390) → huge **`~X.X`** with
+  ///    the same `L/100 km` caption the OBD2 branch uses. The leading
+  ///    `~` (a literal glyph, not translatable) marks it an estimate
+  ///    per ADR 0012. The figure comes from `gpsEstimatedLPer100Km`,
+  ///    non-null only on a moving GPS-only trajet once the estimator has
+  ///    warmed up. Secondary row: distance + elapsed.
+  /// 3. **GPS-only, no estimate yet, distance ≥ 0.1 km** → huge
+  ///    **distance**. The estimator is still warming up (or the matrix
+  ///    isn't calibrated); distance is the most useful real-time number.
+  ///    Secondary row: elapsed.
+  /// 4. **Pre-roll (distance ≈ 0)** → huge **elapsed time**. The user
   ///    sees the session is recording while the GPS warms up.
   ///    Secondary row: empty.
   ///
   /// The big `~` placeholder that wasted the tile pre-#2094 is gone —
-  /// no branch renders an information-free symbol huge.
+  /// no branch renders an information-free symbol huge; the `~` here
+  /// always precedes a real estimate.
   Widget _buildDefaultLayout(BuildContext context) {
     final l = AppLocalizations.of(context);
     final live = state.live;
@@ -98,6 +106,10 @@ class TripRecordingPipView extends StatelessWidget {
 
     // Resolve OBD2-derived live L/100 km (or L/h at idle).
     final raw = (live != null && !paused) ? formatInstantConsumption(live) : null;
+    // #2390 — GPS-only live estimate (null on OBD2 trips + during the
+    // estimator's warm-up). The OBD2 `raw` figure always wins over it.
+    final gpsEstimate =
+        (live != null && !paused) ? live.gpsEstimatedLPer100Km : null;
 
     final String bigFigure;
     final String bigCaption;
@@ -111,8 +123,18 @@ class TripRecordingPipView extends StatelessWidget {
         if (distance != null) '${distance.toStringAsFixed(1)} km',
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
+    } else if (gpsEstimate != null) {
+      // Branch 2 (#2390) — GPS-only live estimate: huge `~X.X` reusing
+      // the OBD2 path's `L/100 km` unit caption. `~` flags the estimate.
+      bigFigure = '~${gpsEstimate.toStringAsFixed(1)}';
+      bigCaption = 'L/100 km';
+      secondaryRow = [
+        if (distance != null) '${distance.toStringAsFixed(1)} km',
+        if (elapsed != null) _fmtElapsed(elapsed),
+      ];
     } else if (distance != null && distance >= 0.1) {
-      // Branch 2 — GPS-only mid-trajet: distance is the live signal.
+      // Branch 3 — GPS-only mid-trajet, no estimate yet: distance is the
+      // live signal (graceful fallback while the estimator warms up).
       bigFigure = distance.toStringAsFixed(1);
       bigCaption = 'km';
       secondaryRow = [

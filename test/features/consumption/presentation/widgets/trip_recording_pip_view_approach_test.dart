@@ -32,12 +32,17 @@ TripRecordingState _activeState({
   Duration elapsed = const Duration(minutes: 8, seconds: 32),
   // Default fuel rate keeps tests on the OBD2 branch (#2094 Branch 1)
   // where the L/100 km marker is rendered — that's the canonical
-  // "default layout" for the legacy tests. Branch-2 (GPS-only) and
-  // Branch-3 (pre-roll) get their own dedicated tests further down.
+  // "default layout" for the legacy tests. The GPS-estimate branch
+  // (#2390), GPS-distance branch and pre-roll branch get their own
+  // dedicated tests further down.
   double? fuelRateLPerHour = 4.06,
+  // #2390 — GPS-only live physics estimate (L/100 km). Null on OBD2
+  // trips + during the estimator's warm-up.
+  double? gpsEstimatedLPer100Km,
+  TripRecordingPhase phase = TripRecordingPhase.recording,
 }) =>
     TripRecordingState(
-      phase: TripRecordingPhase.recording,
+      phase: phase,
       situation: DrivingSituation.highwayCruise,
       band: ConsumptionBand.normal,
       live: TripLiveReading(
@@ -45,6 +50,7 @@ TripRecordingState _activeState({
         distanceKmSoFar: distance,
         elapsed: elapsed,
         fuelRateLPerHour: fuelRateLPerHour,
+        gpsEstimatedLPer100Km: gpsEstimatedLPer100Km,
       ),
     );
 
@@ -330,6 +336,97 @@ void main() {
       expect(find.textContaining('4.0'), findsOneWidget);
       expect(find.text('elapsed'), findsNothing);
       expect(find.text('~'), findsNothing);
+    });
+  });
+
+  group('TripRecordingPipView (#2390) — GPS-only live estimate', () {
+    Widget buildWith({
+      double? fuelRate,
+      double? gpsEstimate,
+      double distance = 1.2,
+      Duration elapsed = const Duration(minutes: 7, seconds: 7),
+    }) =>
+        _wrap(TripRecordingPipView(
+          state: _activeState(
+            distance: distance,
+            elapsed: elapsed,
+            fuelRateLPerHour: fuelRate,
+            gpsEstimatedLPer100Km: gpsEstimate,
+          ),
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ));
+
+    testWidgets(
+        'GPS-only trip with a live estimate → big "~X.X L/100 km", not '
+        'elapsed time', (tester) async {
+      // No OBD2 fuel rate, estimator has produced 6.4 L/100 km. The
+      // estimate becomes the hero with a leading "~" and the reused
+      // "L/100 km" unit caption — the elapsed time is demoted.
+      await tester.pumpWidget(buildWith(fuelRate: null, gpsEstimate: 6.4));
+      expect(find.text('~6.4'), findsOneWidget);
+      expect(find.text('L/100 km'), findsOneWidget);
+      // The elapsed time is NOT the hero figure (it moves to the
+      // secondary row instead of leading the tile).
+      expect(find.text('7m 7s'), findsOneWidget); // secondary row
+      // Distance also stays in the secondary row.
+      expect(find.text('1.2 km'), findsOneWidget);
+    });
+
+    testWidgets('OBD2 trip → real measured consumption, estimate path NOT '
+        'taken (tilde-free)', (tester) async {
+      // A real OBD2 fuel rate is present; even if an estimate were also
+      // present, the measured value wins and stays tilde-free.
+      await tester.pumpWidget(buildWith(fuelRate: 4.06, gpsEstimate: 6.4));
+      expect(find.text('L/100 km'), findsOneWidget);
+      // Measured value: 4.06 L/h at 70 km/h → ~5.8 L/100 km, no "~".
+      expect(find.text('5.8'), findsOneWidget);
+      expect(find.textContaining('~'), findsNothing);
+    });
+
+    testWidgets(
+        'GPS-only warm-up (null estimate) → falls back to distance/elapsed, '
+        'no "~" or blank', (tester) async {
+      // Estimator hasn't warmed up yet: estimate is null. With distance
+      // ≥ 0.1 km the tile gracefully shows distance (no "~", no blank).
+      await tester.pumpWidget(
+          buildWith(fuelRate: null, gpsEstimate: null, distance: 1.2));
+      expect(find.text('1.2'), findsOneWidget);
+      expect(find.text('km'), findsOneWidget);
+      expect(find.text('L/100 km'), findsNothing);
+      expect(find.textContaining('~'), findsNothing);
+    });
+
+    testWidgets(
+        'GPS-only pre-roll (null estimate, distance ≈ 0) → falls back to '
+        'elapsed, no "~"', (tester) async {
+      await tester.pumpWidget(buildWith(
+        fuelRate: null,
+        gpsEstimate: null,
+        distance: 0.0,
+        elapsed: const Duration(minutes: 7, seconds: 7),
+      ));
+      expect(find.text('7m 7s'), findsOneWidget);
+      expect(find.text('elapsed'), findsOneWidget);
+      expect(find.text('L/100 km'), findsNothing);
+      expect(find.textContaining('~'), findsNothing);
+    });
+
+    testWidgets('paused GPS-only trip suppresses the estimate', (tester) async {
+      // Paused → the estimate must not show (a stale reading would
+      // mislead); the tile shows distance instead.
+      await tester.pumpWidget(_wrap(TripRecordingPipView(
+        state: _activeState(
+          distance: 1.2,
+          fuelRateLPerHour: null,
+          gpsEstimatedLPer100Km: 6.4,
+          phase: TripRecordingPhase.paused,
+        ),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+      )));
+      expect(find.textContaining('~'), findsNothing);
+      expect(find.text('L/100 km'), findsNothing);
     });
   });
 }
