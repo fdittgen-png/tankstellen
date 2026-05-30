@@ -5,74 +5,193 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/theme/fuel_colors.dart';
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/price_record.dart';
+import 'price_chart_axes.dart';
 
 /// A simple line chart that renders price history using [CustomPainter].
 ///
 /// No external chart library required. Draws a line from oldest (left)
-/// to newest (right) with dashed min/max reference lines.
-class PriceChart extends StatelessWidget {
+/// to newest (right) with dashed min/max reference lines, a price (€)
+/// Y-axis scale, date X-axis labels, and a tap/long-press tooltip that
+/// reveals the price + date of the nearest data point (#2384).
+class PriceChart extends StatefulWidget {
   final List<PriceRecord> records;
   final FuelType fuelType;
 
   const PriceChart({super.key, required this.records, required this.fuelType});
 
   @override
+  State<PriceChart> createState() => _PriceChartState();
+
+  /// Builds the ordered, oldest→newest list of plottable points for
+  /// [records] / [fuelType]. Exposed for testing the axis/label maths.
+  @visibleForTesting
+  static List<ChartPoint> pointsFor(
+    List<PriceRecord> records,
+    FuelType fuelType,
+  ) {
+    final reversed = records.reversed.toList();
+    final points = <ChartPoint>[];
+    for (int i = 0; i < reversed.length; i++) {
+      final price = priceForFuelType(reversed[i], fuelType);
+      if (price != null) {
+        points.add(ChartPoint(
+          index: i,
+          price: price,
+          date: reversed[i].recordedAt,
+        ));
+      }
+    }
+    return points;
+  }
+}
+
+class _PriceChartState extends State<PriceChart> {
+  /// Data-point index of the currently highlighted point (tap/long-press),
+  /// or null when nothing is selected.
+  int? _selected;
+
+  static const double _chartHeight = 132;
+
+  @override
+  void didUpdateWidget(PriceChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.records != widget.records ||
+        oldWidget.fuelType != widget.fuelType) {
+      _selected = null;
+    }
+  }
+
+  void _handlePointer(Offset localPos, Size size, List<ChartPoint> points) {
+    if (points.length < 2) return;
+    final nearest = PriceChartAxes.nearestPointIndex(localPos, size, points);
+    if (nearest != _selected) {
+      setState(() => _selected = nearest);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (records.isEmpty) {
+    if (widget.records.isEmpty) {
       final l = AppLocalizations.of(context);
       return SizedBox(
-        height: 120,
+        height: _chartHeight,
         child: Center(child: Text(l?.noPriceHistory ?? 'No price history yet')),
       );
     }
+
+    final theme = Theme.of(context);
+    final color = FuelColors.forType(widget.fuelType);
+    final points = PriceChart.pointsFor(widget.records, widget.fuelType);
+    final locale = Localizations.localeOf(context).toString();
+    final dateFormat = DateFormat.Md(locale);
+
+    final selected =
+        (_selected != null && _selected! < points.length) ? _selected : null;
+
     return SizedBox(
-      height: 120,
-      child: CustomPaint(
-        painter: _PriceChartPainter(
-          records: records,
-          fuelType: fuelType,
-          color: FuelColors.forType(fuelType),
+      height: _chartHeight,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = Size(constraints.maxWidth, constraints.maxHeight);
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: (d) => _handlePointer(d.localPosition, size, points),
+            onLongPressStart: (d) =>
+                _handlePointer(d.localPosition, size, points),
+            onLongPressMoveUpdate: (d) =>
+                _handlePointer(d.localPosition, size, points),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _PriceChartPainter(
+                      points: points,
+                      color: color,
+                      axisColor: theme.colorScheme.onSurfaceVariant,
+                      dateFormat: dateFormat,
+                      selectedIndex: selected,
+                    ),
+                  ),
+                ),
+                if (selected != null)
+                  _PriceTooltip(
+                    point: points[selected],
+                    dateFormat: dateFormat,
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// A small callout showing the selected point's price + date, e.g.
+/// "2,069 € · 23.05". Rendered as a real widget so it is legible at any
+/// scale and testable via `find.textContaining`.
+class _PriceTooltip extends StatelessWidget {
+  final ChartPoint point;
+  final DateFormat dateFormat;
+
+  const _PriceTooltip({required this.point, required this.dateFormat});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final label =
+        '${PriceFormatter.formatPrice(point.price)} · ${dateFormat.format(point.date)}';
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.inverseSurface,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onInverseSurface,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
-        size: Size.infinite,
       ),
     );
   }
 }
 
 class _PriceChartPainter extends CustomPainter {
-  final List<PriceRecord> records;
-  final FuelType fuelType;
+  final List<ChartPoint> points;
   final Color color;
+  final Color axisColor;
+  final DateFormat dateFormat;
+  final int? selectedIndex;
 
   _PriceChartPainter({
-    required this.records,
-    required this.fuelType,
+    required this.points,
     required this.color,
+    required this.axisColor,
+    required this.dateFormat,
+    required this.selectedIndex,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Extract prices for the given fuel type, paired with their index
-    // Records are newest-first from the repository, so we reverse for
-    // left = oldest, right = newest.
-    final reversed = records.reversed.toList();
-    final dataPoints = <_DataPoint>[];
-
-    for (int i = 0; i < reversed.length; i++) {
-      final price = _priceForFuelType(reversed[i], fuelType);
-      if (price != null) {
-        dataPoints.add(_DataPoint(index: i, price: price));
-      }
-    }
-
-    if (dataPoints.isEmpty) return;
-    if (dataPoints.length == 1) {
-      // Single point: draw a dot in the center
+    if (points.isEmpty) return;
+    if (points.length == 1) {
       final dotPaint = Paint()
         ..color = color
         ..style = PaintingStyle.fill;
@@ -84,58 +203,37 @@ class _PriceChartPainter extends CustomPainter {
       return;
     }
 
-    // Determine Y axis bounds with a small padding
-    final prices = dataPoints.map((d) => d.price).toList();
-    final minPrice = prices.reduce(math.min);
-    final maxPrice = prices.reduce(math.max);
+    final layout = PriceChartAxes.layout(size, points);
 
-    // Add 5% padding top and bottom, handle case where min == max
-    final range = maxPrice - minPrice;
-    final padding = range > 0 ? range * 0.1 : 0.01;
-    final yMin = minPrice - padding;
-    final yMax = maxPrice + padding;
-
-    // Chart area with insets for labels
-    const leftInset = 8.0;
-    const rightInset = 8.0;
-    const topInset = 8.0;
-    const bottomInset = 8.0;
-
-    final chartWidth = size.width - leftInset - rightInset;
-    final chartHeight = size.height - topInset - bottomInset;
-
-    double xForIndex(int idx) {
-      if (dataPoints.length == 1) return leftInset + chartWidth / 2;
-      final first = dataPoints.first.index;
-      final last = dataPoints.last.index;
-      final totalSpan = last - first;
-      if (totalSpan == 0) return leftInset + chartWidth / 2;
-      return leftInset + ((idx - first) / totalSpan) * chartWidth;
+    // Y-axis price gridlines (min / mid / max) with €-labels.
+    for (final tick in layout.priceTicks) {
+      final y = layout.yForPrice(tick);
+      _drawLabel(
+        canvas,
+        PriceFormatter.formatPrice(tick),
+        Offset(0, y),
+        anchorMiddle: true,
+      );
     }
 
-    double yForPrice(double price) {
-      return topInset + chartHeight - ((price - yMin) / (yMax - yMin)) * chartHeight;
-    }
-
-    // Draw dashed horizontal lines for min and max
+    // Dashed horizontal guides for the observed min and max prices.
+    final guidePaint = Paint()
+      ..color = color.withAlpha(60)
+      ..strokeWidth = 1;
     _drawDashedLine(
       canvas,
-      Offset(leftInset, yForPrice(minPrice)),
-      Offset(size.width - rightInset, yForPrice(minPrice)),
-      Paint()
-        ..color = color.withAlpha(60)
-        ..strokeWidth = 1,
+      Offset(layout.left, layout.yForPrice(layout.minPrice)),
+      Offset(layout.right, layout.yForPrice(layout.minPrice)),
+      guidePaint,
     );
     _drawDashedLine(
       canvas,
-      Offset(leftInset, yForPrice(maxPrice)),
-      Offset(size.width - rightInset, yForPrice(maxPrice)),
-      Paint()
-        ..color = color.withAlpha(60)
-        ..strokeWidth = 1,
+      Offset(layout.left, layout.yForPrice(layout.maxPrice)),
+      Offset(layout.right, layout.yForPrice(layout.maxPrice)),
+      guidePaint,
     );
 
-    // Draw the price line
+    // The price line.
     final linePaint = Paint()
       ..color = color
       ..strokeWidth = 2.0
@@ -144,43 +242,100 @@ class _PriceChartPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
-    path.moveTo(
-      xForIndex(dataPoints.first.index),
-      yForPrice(dataPoints.first.price),
-    );
-    for (int i = 1; i < dataPoints.length; i++) {
+    path.moveTo(layout.xForIndex(points.first.index),
+        layout.yForPrice(points.first.price));
+    for (int i = 1; i < points.length; i++) {
       path.lineTo(
-        xForIndex(dataPoints[i].index),
-        yForPrice(dataPoints[i].price),
-      );
+          layout.xForIndex(points[i].index), layout.yForPrice(points[i].price));
     }
     canvas.drawPath(path, linePaint);
 
-    // Draw gradient fill under the line
-    final fillPath = Path.from(path);
-    fillPath.lineTo(xForIndex(dataPoints.last.index), size.height - bottomInset);
-    fillPath.lineTo(xForIndex(dataPoints.first.index), size.height - bottomInset);
-    fillPath.close();
-
+    // Gradient fill under the line.
+    final fillPath = Path.from(path)
+      ..lineTo(layout.xForIndex(points.last.index), layout.bottom)
+      ..lineTo(layout.xForIndex(points.first.index), layout.bottom)
+      ..close();
     final fillPaint = Paint()
       ..shader = ui.Gradient.linear(
-        const Offset(0, topInset),
-        Offset(0, size.height - bottomInset),
+        Offset(0, layout.top),
+        Offset(0, layout.bottom),
         [color.withAlpha(40), color.withAlpha(5)],
       );
     canvas.drawPath(fillPath, fillPaint);
 
-    // Draw dots at each data point
+    // Data-point dots.
     final dotPaint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
-    for (final dp in dataPoints) {
+    for (final p in points) {
       canvas.drawCircle(
-        Offset(xForIndex(dp.index), yForPrice(dp.price)),
+        Offset(layout.xForIndex(p.index), layout.yForPrice(p.price)),
         3,
         dotPaint,
       );
     }
+
+    // Highlight the selected point with a ring.
+    if (selectedIndex != null && selectedIndex! < points.length) {
+      final sel = points[selectedIndex!];
+      final center =
+          Offset(layout.xForIndex(sel.index), layout.yForPrice(sel.price));
+      canvas.drawCircle(center, 5, dotPaint);
+      canvas.drawCircle(
+        center,
+        7,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
+    }
+
+    // X-axis date labels (first + last, plus middle ticks if they fit).
+    for (final tick in layout.dateTicks) {
+      final p = points[tick];
+      _drawLabel(
+        canvas,
+        dateFormat.format(p.date),
+        Offset(layout.xForIndex(p.index), size.height),
+        centerHorizontally: true,
+        clampX: size.width,
+      );
+    }
+  }
+
+  void _drawLabel(
+    Canvas canvas,
+    String text,
+    Offset anchor, {
+    bool anchorMiddle = false,
+    bool centerHorizontally = false,
+    double? clampX,
+  }) {
+    final tp = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(color: axisColor, fontSize: 9),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )..layout();
+
+    double dx = anchor.dx;
+    if (centerHorizontally) {
+      dx = anchor.dx - tp.width / 2;
+    }
+    if (clampX != null) {
+      dx = dx.clamp(0.0, math.max(0.0, clampX - tp.width));
+    }
+
+    double dy = anchor.dy;
+    if (anchorMiddle) {
+      dy = anchor.dy - tp.height / 2;
+    } else {
+      // Bottom-axis labels: sit just below the chart baseline.
+      dy = anchor.dy - tp.height;
+    }
+    tp.paint(canvas, Offset(dx, dy));
   }
 
   void _drawDashedLine(Canvas canvas, Offset start, Offset end, Paint paint) {
@@ -189,6 +344,7 @@ class _PriceChartPainter extends CustomPainter {
     final dx = end.dx - start.dx;
     final dy = end.dy - start.dy;
     final totalLength = math.sqrt(dx * dx + dy * dy);
+    if (totalLength == 0) return;
     final unitDx = dx / totalLength;
     final unitDy = dy / totalLength;
 
@@ -204,31 +360,28 @@ class _PriceChartPainter extends CustomPainter {
     }
   }
 
-  double? _priceForFuelType(PriceRecord record, FuelType fuelType) {
-    return switch (fuelType) {
-      FuelTypeE5() => record.e5,
-      FuelTypeE10() => record.e10,
-      FuelTypeE98() => record.e98,
-      FuelTypeDiesel() => record.diesel,
-      FuelTypeDieselPremium() => record.dieselPremium,
-      FuelTypeE85() => record.e85,
-      FuelTypeLpg() => record.lpg,
-      FuelTypeCng() => record.cng,
-      FuelTypeHydrogen() || FuelTypeElectric() || FuelTypeAll() => null,
-    };
-  }
-
   @override
   bool shouldRepaint(_PriceChartPainter oldDelegate) {
-    return oldDelegate.records != records ||
-        oldDelegate.fuelType != fuelType ||
-        oldDelegate.color != color;
+    return oldDelegate.points != points ||
+        oldDelegate.color != color ||
+        oldDelegate.axisColor != axisColor ||
+        oldDelegate.selectedIndex != selectedIndex;
   }
 }
 
-class _DataPoint {
-  final int index;
-  final double price;
-
-  const _DataPoint({required this.index, required this.price});
+/// Resolve the price for [fuelType] from a [PriceRecord]. Exposed for
+/// the chart point builder and its tests.
+@visibleForTesting
+double? priceForFuelType(PriceRecord record, FuelType fuelType) {
+  return switch (fuelType) {
+    FuelTypeE5() => record.e5,
+    FuelTypeE10() => record.e10,
+    FuelTypeE98() => record.e98,
+    FuelTypeDiesel() => record.diesel,
+    FuelTypeDieselPremium() => record.dieselPremium,
+    FuelTypeE85() => record.e85,
+    FuelTypeLpg() => record.lpg,
+    FuelTypeCng() => record.cng,
+    FuelTypeHydrogen() || FuelTypeElectric() || FuelTypeAll() => null,
+  };
 }
