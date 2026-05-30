@@ -8,6 +8,10 @@
 Thank you for your interest in contributing to Tankstellen, the free fuel price
 comparison app for Europe and beyond.
 
+> **Read first:** the four non-negotiable [agent HARD RULES](AGENT_RULES.md)
+> (no hard-coded strings, issue-first, clean-codegen-before-push, 23-locale ARB
+> fan-out) plus the local pre-push hook install pointer.
+
 ## Development Setup
 
 1. **Flutter SDK** 3.41.5+ installed and on your PATH

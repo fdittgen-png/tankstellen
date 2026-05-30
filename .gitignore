@@ -90,6 +90,9 @@ docs/*
 # not inside docs/decisions/ which is reserved for ADRs).
 !docs/test-audit-*.md
 !docs/test-always-run-bucket-*.md
+# Version-controlled mirror of the agent HARD RULES (#2355) — CLAUDE.md stays
+# gitignored (#296), so the rules live here to reach a fresh clone.
+!docs/AGENT_RULES.md
 docs/guides/*
 !docs/guides/NETWORK_TESTS.md
 !docs/guides/NEW_COUNTRY.md
