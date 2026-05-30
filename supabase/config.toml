@@ -380,6 +380,14 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# #2397 — the `tiles` OSM proxy is a PUBLIC basemap endpoint: flutter_map
+# tile requests carry no Supabase JWT, so JWT verification must be off or
+# every tile would 401. Safe to expose: the function only ever proxies
+# read-only OSM raster tiles (z/x/y bounds-validated, no DB/PII access),
+# and the cache bucket stays private (service_role-only).
+[functions.tiles]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
