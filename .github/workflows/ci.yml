@@ -37,6 +37,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # #2417 — green-tree skip. The heavy leaf jobs (test ×4, build-android,
+  # integration, startup-budget, codegen-drift, l10n-gate) are a pure
+  # function of the build-relevant source tree. `record-green` (below)
+  # saves a first-party `actions/cache` marker keyed on a hash of that
+  # exact tree after a full real pass; `green-gate` probes that marker on
+  # the next PR run with `lookup-only`. On a HIT (identical tree already
+  # proved green — e.g. a rebase, a base-branch retarget, or an
+  # empty-commit re-fire) every gated leaf job is skipped via its `if:`.
+  #
+  # Why this is safe for `gh pr merge --auto`: a job skipped via a
+  # job-level `if:` reports a `skipped` check conclusion, and branch
+  # protection (strict=false) counts `skipped` as a satisfied required
+  # context — the same load-bearing fact the `changes` paths-gate below
+  # already relies on. So the PR stays mergeable with no heavy work.
+  #
+  # Fail-safe by construction: only `pull_request` events probe (master
+  # push / tag / weekly schedule leave `cache-hit` empty ⇒ `cached !=
+  # 'true'` ⇒ everything runs and master is never skipped). A cache miss
+  # or eviction is likewise empty ⇒ full run. The marker key MUST stay
+  # byte-identical between `green-gate` and `record-green` (same
+  # hashFiles glob set) or a save can never be probed back as a hit.
+  green-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      cached: ${{ steps.probe.outputs.cache-hit }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: probe
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: .green-marker
+          key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
+          lookup-only: true
+
   # #1810 / #1813 — paths gate. Detects, for a PR, which downstream
   # jobs can be skipped because the PR can't affect them:
   #   - `deps`  → `pubspec.*` changed → run the dependency-audit jobs.
@@ -119,6 +154,8 @@ jobs:
   # invisible: every other job regenerated over the top of the stale
   # files, so CI went green and the drift rotted in the repo.
   codegen-drift:
+    needs: [green-gate]  # #2417 — skip when the build-relevant tree already passed
+    if: ${{ needs.green-gate.outputs.cached != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -175,6 +212,8 @@ jobs:
   #   3. Run the l10n + lint suites (network-tagged tests excluded;
   #      they hit live APIs and live in other buckets).
   l10n-gate:
+    needs: [green-gate]  # #2417 — skip when the build-relevant tree already passed
+    if: ${{ needs.green-gate.outputs.cached != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -235,6 +274,16 @@ jobs:
   # the full suite as a paranoia net. Master pushes + the weekly cron
   # ignore the selector entirely.
   test:
+    # #2417 — a MATRIX job must NOT be skipped at job level: a skipped
+    # matrix never expands, so the required `test (0..3)` contexts are
+    # never reported and branch protection blocks the PR forever (auto-
+    # merge can never fire). So the job always runs (the four contexts
+    # always exist) and each heavy STEP below is gated on the green-gate
+    # cache — on a hit every step skips and each shard reports `success`
+    # in seconds (just the checkout). Single-context leaf jobs
+    # (build-android, integration, …) keep the cheaper job-level skip,
+    # whose `skipped` conclusion branch protection counts as a pass.
+    needs: [green-gate]
     runs-on: ubuntu-latest
     strategy:
       # Don't cancel sibling shards when one fails — we want every
@@ -249,6 +298,7 @@ jobs:
           # Shallow clone (default) has no master tip locally.
           fetch-depth: 0
       - uses: subosito/flutter-action@v2
+        if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           channel: stable
           # #1936 — pin Flutter. A floating `channel: stable` picked up
@@ -259,6 +309,7 @@ jobs:
           flutter-version: "3.41.9"
           cache: true
       - uses: actions/cache@v5
+        if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           path: |
             ~/.pub-cache
@@ -268,11 +319,13 @@ jobs:
       # #1585 — Cache compiled artefacts. Same-branch reruns and rebase
       # rounds reuse the compiled Dart output keyed on the source state.
       - uses: actions/cache@v5
+        if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           path: build/
           key: ${{ runner.os }}-build-${{ hashFiles('pubspec.lock', 'lib/**/*.dart') }}
           restore-keys: ${{ runner.os }}-build-
-      - run: flutter pub get
+      - if: ${{ needs.green-gate.outputs.cached != 'true' }}
+        run: flutter pub get
       # #1730 — no `build_runner build` here. Committed generated files
       # are trusted; the `codegen-drift` job gates their freshness.
       # #1594 — Compute the affected-test list once per shard. Fast
@@ -280,7 +333,7 @@ jobs:
       # parallelised. Empty output triggers a full-suite fallback in
       # the run step.
       - name: Compute affected tests (PR only)
-        if: github.event_name == 'pull_request'
+        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
         run: |
           # `dart run` emits `Running build hooks...` progress text to stdout
           # (with `\r` overwrites). Naively redirecting `> affected_tests.txt`
@@ -306,7 +359,7 @@ jobs:
       # (share_plus) that intermittently fail and cannot block PRs.
       # The nightly-flaky workflow re-runs both buckets.
       - name: Run test shard ${{ matrix.shard }} of 4 (PR — affected only, no coverage)
-        if: github.event_name == 'pull_request'
+        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
         shell: bash
         run: |
           if [ -s affected_tests.txt ]; then
@@ -394,7 +447,8 @@ jobs:
   # still enforce it. Cheap: runs only the test/core/perf/ subset.
   startup-budget:
     runs-on: ubuntu-latest
-    needs: [analyze]
+    needs: [analyze, green-gate]  # #2417 — green-gate skips when the tree already passed
+    if: ${{ needs.green-gate.outputs.cached != 'true' }}
     steps:
       - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
@@ -430,7 +484,8 @@ jobs:
   # the integration suite a named CI signal; it is cheap (three small
   # files) and `needs: [analyze]` so it fails fast on broken analysis.
   integration:
-    needs: [analyze]
+    needs: [analyze, green-gate]  # #2417 — green-gate skips when the tree already passed
+    if: ${{ needs.green-gate.outputs.cached != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -549,8 +604,10 @@ jobs:
     # #1813 — `changes` added so a test-only / workflow / docs PR skips
     # the build entirely (a skipped job counts as a passing required
     # check, so `gh pr merge --auto` is unaffected).
-    needs: [analyze, changes]
-    if: ${{ needs.changes.outputs.code == 'true' || github.event_name != 'pull_request' }}
+    # #2417 — `green-gate` added so an already-passed identical tree
+    # skips the build too.
+    needs: [analyze, changes, green-gate]
+    if: ${{ needs.green-gate.outputs.cached != 'true' && (needs.changes.outputs.code == 'true' || github.event_name != 'pull_request') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
@@ -699,3 +756,32 @@ jobs:
           files: |
             android-apk/app-*.apk
             android-aab/app-play-release.aab
+
+  # #2417 — saves the green-tree marker after a real full PR pass so the
+  # NEXT run on an identical tree can skip the heavy leaf jobs (see the
+  # `green-gate` header above). Runs only on `pull_request`, only when
+  # this run was itself a full pass (`cached != 'true'` — we never
+  # re-save on a HIT), and only after the gated jobs reported success.
+  #
+  # `!cancelled()` is REQUIRED: a legitimately-skipped `build-android`
+  # (test-only PR where `changes.code == 'false'`) reports `skipped`, and
+  # without `!cancelled()` that would skip-propagate to this job and
+  # prevent the marker being saved for an otherwise fully-green tree. The
+  # `build-android.result != 'failure' && != 'cancelled'` pair therefore
+  # accepts both `success` and `skipped` while still refusing a real
+  # failure. This job is a NEW non-required check — do NOT add it to
+  # branch protection.
+  #
+  # The hashFiles glob set below MUST stay byte-identical to `green-gate`
+  # (same cache key) — keep the two lists in sync.
+  record-green:
+    runs-on: ubuntu-latest
+    needs: [green-gate, analyze, codegen-drift, l10n-gate, test, integration, startup-budget, build-android]
+    if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' && needs.analyze.result == 'success' && needs.codegen-drift.result == 'success' && needs.l10n-gate.result == 'success' && needs.test.result == 'success' && needs.integration.result == 'success' && needs.startup-budget.result == 'success' && needs.build-android.result != 'failure' && needs.build-android.result != 'cancelled' }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: mkdir -p .green-marker && echo "$GITHUB_SHA" > .green-marker/sha
+      - uses: actions/cache/save@v4
+        with:
+          path: .green-marker
+          key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
