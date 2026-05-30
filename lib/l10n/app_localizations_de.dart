@@ -5817,6 +5817,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripPathLegendWasteful => 'Verschwenderisch (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Nächste Tankstelle';
+
+  @override
+  String get tripRadarScanning => 'Suche nach Tankstellen in der Nähe';
+
+  @override
+  String get tripRadarNoStationNearby => 'Keine Tankstelle in der Nähe';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 

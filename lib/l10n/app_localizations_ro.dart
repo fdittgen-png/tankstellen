@@ -5828,6 +5828,15 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tripPathLegendWasteful => 'Risipitor (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fixarea menține ecranul aprins — consumă mai multă baterie';
 

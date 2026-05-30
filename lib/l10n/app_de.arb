@@ -2457,6 +2457,18 @@
   "tripPathLegendEfficient": "Effizient (< 6 L/100km)",
   "tripPathLegendBorderline": "Grenzwertig (6–10 L/100km)",
   "tripPathLegendWasteful": "Verschwenderisch (≥ 10 L/100km)",
+  "tripRadarClosestStation": "Nächste Tankstelle",
+  "@tripRadarClosestStation": {
+    "description": "Title of the closest-station radar card at the top of the active trip-recording screen (#2380)."
+  },
+  "tripRadarScanning": "Suche nach Tankstellen in der Nähe",
+  "@tripRadarScanning": {
+    "description": "Placeholder shown on the trip-recording radar card while the nearest-station lookup is in flight (#2380)."
+  },
+  "tripRadarNoStationNearby": "Keine Tankstelle in der Nähe",
+  "@tripRadarNoStationNearby": {
+    "description": "Placeholder shown on the trip-recording radar card when no fuel station is within range of the live GPS fix (#2380)."
+  },
   "tripRecordingPinTooltip": "Anpinnen hält den Bildschirm an — verbraucht mehr Akku",
   "@tripRecordingPinTooltip": {
     "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."

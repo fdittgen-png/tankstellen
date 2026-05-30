@@ -5784,6 +5784,15 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tripPathLegendWasteful => 'Spildt (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fastgørelse holder skærmen tændt — bruger mere batteri';
 

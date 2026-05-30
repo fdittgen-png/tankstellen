@@ -5806,6 +5806,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tripPathLegendWasteful => 'Verspillend (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Vastpinnen houdt het scherm aan — verbruikt meer batterij';
 

@@ -2323,5 +2323,20 @@
         "example": "CC BY 4.0"
       }
     }
+  },
+  "tripRadarClosestStation": "Closest station",
+  "@tripRadarClosestStation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripRadarScanning": "Scanning for nearby stations",
+  "@tripRadarScanning": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripRadarNoStationNearby": "No station nearby",
+  "@tripRadarNoStationNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

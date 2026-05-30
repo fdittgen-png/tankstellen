@@ -5756,6 +5756,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 
@@ -11947,6 +11956,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripPathLegendWasteful => '⟦Ŵášŧéƒúł (≥ 10 Ł/100ķɱ) ·····⟧';
+
+  @override
+  String get tripRadarClosestStation => '⟦Çłóšéšŧ šŧáŧîóñ ······⟧';
+
+  @override
+  String get tripRadarScanning => '⟦Šçáññîñǧ ƒóř ñéářƀý šŧáŧîóñš ···········⟧';
+
+  @override
+  String get tripRadarNoStationNearby => '⟦Ñó šŧáŧîóñ ñéářƀý ·······⟧';
 
   @override
   String get tripRecordingPinTooltip =>

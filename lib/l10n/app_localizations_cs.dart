@@ -5793,6 +5793,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripPathLegendWasteful => 'Neúsporná (≥ 10 L/100km)';
 
   @override
+  String get tripRadarClosestStation => 'Closest station';
+
+  @override
+  String get tripRadarScanning => 'Scanning for nearby stations';
+
+  @override
+  String get tripRadarNoStationNearby => 'No station nearby';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Připnutí udržuje obrazovku zapnutou — spotřebuje více baterie';
 
