@@ -566,10 +566,13 @@ void main() {
   group('FlutterMapProvider — buildAttribution', () {
     const provider = FlutterMapProvider();
 
-    testWidgets('returns a RichAttributionWidget mentioning OSM contributors',
-        (WidgetTester tester) async {
+    testWidgets(
+        'returns a RichAttributionWidget crediting OSM (#2402 — localized '
+        'wrapper, brand kept literal)', (WidgetTester tester) async {
       final widget = provider.buildAttribution();
 
+      // No `AppLocalizations` in the tree, so the helper takes its English
+      // fallback composition — which still carries the © and the brand.
       await tester.pumpWidget(
         MaterialApp(
           home: FlutterMap(
@@ -589,7 +592,10 @@ void main() {
       expect(attribution.attributions, hasLength(1));
       final source =
           attribution.attributions.single as TextSourceAttribution;
-      expect(source.text, 'OpenStreetMap contributors');
+      // Brand stays literal; wrapper composes "© OpenStreetMap contributors".
+      expect(source.text, contains('OpenStreetMap'));
+      expect(source.text, startsWith('©'));
+      expect(source.text, '© OpenStreetMap contributors');
     });
   });
 }

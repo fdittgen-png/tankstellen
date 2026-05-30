@@ -3993,6 +3993,11 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String mapAttributionOsm(String brand) {
+    return '© $brand contributors';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Izstrādātāja rīki';
 
   @override

@@ -3997,6 +3997,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String mapAttributionOsm(String brand) {
+    return '© $brand contributors';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Fejlesztői eszközök';
 
   @override

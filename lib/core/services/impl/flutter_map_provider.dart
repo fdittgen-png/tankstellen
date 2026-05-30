@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../features/map/data/sparkilo_tile_layer.dart';
 import '../../constants/app_constants.dart';
+import '../../widgets/osm_attribution.dart';
 import '../map_provider.dart';
 
 /// Default [MapProvider] implementation backed by flutter_map + OSM tiles.
@@ -128,13 +129,8 @@ class FlutterMapProvider implements MapProvider {
   }
 
   @override
-  Widget buildAttribution() {
-    return const RichAttributionWidget(
-      attributions: [
-        TextSourceAttribution('OpenStreetMap contributors'),
-      ],
-    );
-  }
+  // Localized OSM credit (#2402) — resolves the ARB wrapper at build time.
+  Widget buildAttribution() => const OsmAttribution();
 
   @override
   dynamic createController() => MapController();

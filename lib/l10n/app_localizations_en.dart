@@ -3949,6 +3949,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String mapAttributionOsm(String brand) {
+    return '© $brand contributors';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Developer tools';
 
   @override
@@ -10116,6 +10121,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String dataSourceLinkSemantic(String source, String license) {
     return '⟦Óƥéñ ŧĥé $source đáŧá šóúřçé ($license) îñ ýóúř ƀřóŵšéř ··············⟧';
+  }
+
+  @override
+  String mapAttributionOsm(String brand) {
+    return '⟦© $brand çóñŧřîƀúŧóřš ·····⟧';
   }
 
   @override

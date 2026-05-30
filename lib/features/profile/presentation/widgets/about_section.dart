@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class AboutSection extends StatelessWidget {
@@ -131,9 +132,9 @@ class AboutSection extends StatelessWidget {
               mode: LaunchMode.externalApplication,
             ),
           ),
-          const ListTile(
-            leading: Icon(Icons.map),
-            title: Text(AppConstants.osmAttribution),
+          ListTile(
+            leading: const Icon(Icons.map),
+            title: Text(osmAttributionText(context)),
           ),
         ],
       ),

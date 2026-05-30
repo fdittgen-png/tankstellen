@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/utils/price_utils.dart';
+import '../../../../core/widgets/osm_attribution.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
@@ -141,11 +142,7 @@ class _DrivingMapViewState extends State<DrivingMapView> {
         // wrapper.
         const SparkiloTileLayer(),
         MarkerLayer(markers: _markers),
-        const RichAttributionWidget(
-          attributions: [
-            TextSourceAttribution('OpenStreetMap contributors'),
-          ],
-        ),
+        const OsmAttribution(),
       ],
     );
   }

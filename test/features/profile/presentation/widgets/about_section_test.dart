@@ -94,6 +94,19 @@ void main() {
           reason: 'attribution row should carry the open-in-new affordance');
     });
 
+    testWidgets(
+        'OSM map-data row renders the localized attribution with the brand '
+        'kept literal (#2402)', (tester) async {
+      await pumpApp(
+        tester,
+        const SingleChildScrollView(child: AboutSection()),
+      );
+
+      // English wrapper from the `mapAttributionOsm` ARB key; the
+      // OpenStreetMap brand survives verbatim.
+      expect(find.text('© OpenStreetMap contributors'), findsOneWidget);
+    });
+
     test('CreativeCommons URL constant is HTTPS and points at the CC BY page',
         () {
       expect(AppConstants.tankerkoenigCreativeCommonsUrl,
