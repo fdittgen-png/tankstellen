@@ -7200,6 +7200,12 @@ abstract class AppLocalizations {
   /// **'Open the {source} data source ({license}) in your browser'**
   String dataSourceLinkSemantic(String source, String license);
 
+  /// Map-tile attribution shown on every OpenStreetMap-tiled map (the flutter_map RichAttributionWidget on the station/driving/trip/radius-picker maps and the about screen's data-source list). OSM's tile-usage policy mandates the visible '© OpenStreetMap contributors' credit. Only the surrounding structural wording ('© … contributors') is translatable; {brand} is the proper-noun 'OpenStreetMap', passed verbatim from the call site (kept literal there under an i18n-ignore brand exemption) so it can never be mistranslated. Keep the leading © and the {brand} token in every translation (#2402).
+  ///
+  /// In en, this message translates to:
+  /// **'© {brand} contributors'**
+  String mapAttributionOsm(String brand);
+
   /// Title of the Settings section / screen hosting dev-only diagnostics, shown only when Developer / Debug mode is on (#2248).
   ///
   /// In en, this message translates to:

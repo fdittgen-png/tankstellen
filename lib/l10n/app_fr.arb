@@ -2368,5 +2368,15 @@
   "@tripRecordingEstimatedInfo": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "mapAttributionOsm": "© les contributeurs {brand}",
+  "@mapAttributionOsm": {
+    "description": "Map-tile attribution shown on every OpenStreetMap-tiled map (#2402). Hand-translated French. {brand} is the verbatim proper noun 'OpenStreetMap'.",
+    "placeholders": {
+      "brand": {
+        "type": "String",
+        "example": "OpenStreetMap"
+      }
+    }
   }
 }

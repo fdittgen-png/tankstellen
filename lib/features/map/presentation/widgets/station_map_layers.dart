@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../data/sparkilo_tile_layer.dart';
 import '../../../../core/utils/price_utils.dart';
+import '../../../../core/widgets/osm_attribution.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import 'price_legend.dart';
@@ -373,12 +374,8 @@ class _StationMapLayersState extends State<StationMapLayers> {
             }),
             // Extra layers (e.g. EV overlay)
             ...widget.extraLayers,
-            // Attribution
-            const RichAttributionWidget(
-              attributions: [
-                TextSourceAttribution('OpenStreetMap contributors'),
-              ],
-            ),
+            // Attribution — localized OSM credit (#2402).
+            const OsmAttribution(),
           ],
         ),
         // Zoom controls

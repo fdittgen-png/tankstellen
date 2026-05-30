@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -181,15 +182,11 @@ class _RadiusAlertMapPickerState extends ConsumerState<RadiusAlertMapPicker> {
                 flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
             ),
-            children: [
+            children: const [
               // #2096 — was a raw TileLayer; routed through the
               // hardened wrapper for retry + cancellation resilience.
-              const SparkiloTileLayer(),
-              const RichAttributionWidget(
-                attributions: [
-                  TextSourceAttribution('OpenStreetMap contributors'),
-                ],
-              ),
+              SparkiloTileLayer(),
+              OsmAttribution(),
             ],
           ),
           // Fixed crosshair marking the picked location. Sits on top

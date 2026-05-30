@@ -2240,5 +2240,16 @@
   "@tripRecordingEstimatedInfo": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "mapAttributionOsm": "© {brand} contributors",
+  "@mapAttributionOsm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "brand": {
+        "type": "String",
+        "example": "OpenStreetMap"
+      }
+    }
   }
 }

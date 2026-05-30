@@ -12,5 +12,15 @@
         "example": "CC BY 4.0"
       }
     }
+  },
+  "mapAttributionOsm": "© {brand} contributors",
+  "@mapAttributionOsm": {
+    "description": "Map-tile attribution shown on every OpenStreetMap-tiled map (the flutter_map RichAttributionWidget on the station/driving/trip/radius-picker maps and the about screen's data-source list). OSM's tile-usage policy mandates the visible '© OpenStreetMap contributors' credit. Only the surrounding structural wording ('© … contributors') is translatable; {brand} is the proper-noun 'OpenStreetMap', passed verbatim from the call site (kept literal there under an i18n-ignore brand exemption) so it can never be mistranslated. Keep the leading © and the {brand} token in every translation (#2402).",
+    "placeholders": {
+      "brand": {
+        "type": "String",
+        "example": "OpenStreetMap"
+      }
+    }
   }
 }

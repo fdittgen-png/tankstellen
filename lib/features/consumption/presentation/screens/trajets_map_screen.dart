@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../core/sharing/public_file_exporter.dart';
+import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -252,11 +253,7 @@ class _MapState extends State<_Map> {
               ),
           ],
         ),
-        const RichAttributionWidget(
-          attributions: [
-            TextSourceAttribution('OpenStreetMap contributors'),
-          ],
-        ),
+        const OsmAttribution(),
       ],
     );
   }

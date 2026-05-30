@@ -3984,6 +3984,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String mapAttributionOsm(String brand) {
+    return '© $brand contributors';
+  }
+
+  @override
   String get developerToolsSectionTitle => 'Ontwikkelaarstools';
 
   @override
