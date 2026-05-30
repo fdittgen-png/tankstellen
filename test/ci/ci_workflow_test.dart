@@ -271,6 +271,55 @@ void main() {
     });
   });
 
+  // #2333 / docs-PR safety — ci.yml is path-ignored on docs-only PRs, so
+  // the ONLY workflow that runs is ci-docs-stub.yml. Every context that
+  // is (or will be) a required status check must therefore have a stub
+  // job there whose name matches the context EXACTLY, or the docs PR
+  // sits BLOCKED forever.
+  group('ci-docs-stub covers every required check (#2333)', () {
+    late String stubYaml;
+
+    // The target required_status_checks set after the post-merge API
+    // change: build-android / integration / startup-budget / l10n-gate
+    // become required, the phantom coverage-merge is dropped. Matrix
+    // jobs (`test (0)..test (3)`) are covered by the `test` job header.
+    const requiredJobNames = <String>[
+      'analyze',
+      'test',
+      'codegen-drift',
+      'l10n-gate',
+      'build-android',
+      'integration',
+      'startup-budget',
+    ];
+
+    setUpAll(() {
+      final file = File('.github/workflows/ci-docs-stub.yml');
+      expect(file.existsSync(), isTrue,
+          reason: 'docs-stub workflow must exist');
+      stubYaml = file.readAsStringSync();
+    });
+
+    test('declares a stub job for every required check name', () {
+      for (final job in requiredJobNames) {
+        expect(_jobBody(stubYaml, job), isNotEmpty,
+            reason: 'ci-docs-stub.yml must declare a `$job:` stub job so '
+                'the `$job` required context resolves on docs-only PRs.');
+      }
+    });
+
+    test('the test stub keeps the 4-shard matrix so test (0..3) resolve',
+        () {
+      final testJob = _jobBody(stubYaml, 'test');
+      expect(testJob, contains('shard: [0, 1, 2, 3]'));
+    });
+
+    test('triggers only on docs paths (mirrors ci.yml paths-ignore)', () {
+      expect(stubYaml, contains("- '**/*.md'"));
+      expect(stubYaml, contains("- 'docs/**'"));
+    });
+  });
+
   // #2347 — both nightlies must pin the same Flutter version as ci.yml,
   // so a floating stable-channel bump can't silently change the nightly
   // SDK and spam the tracking issues with spurious red.
