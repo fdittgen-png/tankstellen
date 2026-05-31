@@ -156,4 +156,156 @@ void main() {
     expect(s.isStopAndGoContext, isFalse);
     expect(s.recentAccelMps2(), 0);
   });
+
+  // --- #2515 PR2 fuel-mass correction --------------------------------
+  TripLiveReading precisionReading({
+    double? lambda,
+    double? stft,
+    double? ltft,
+    double? mapKpa,
+    double? coolant,
+    double? oil,
+  }) =>
+      TripLiveReading(
+        lambda: lambda,
+        stft: stft,
+        ltft: ltft,
+        mapKpa: mapKpa,
+        coolantTempC: coolant,
+        oilTempC: oil,
+        distanceKmSoFar: 0,
+        elapsed: Duration.zero,
+      );
+
+  group('fuel-mass correction factor (#2515)', () {
+    test('a sample with no precision PIDs is identity (no regression)', () {
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(precisionReading()),
+        1.0,
+      );
+    });
+
+    test('enrichment (λ=0.9) yields a factor < 1.0', () {
+      final f = BaselineRollingState.fuelMassCorrectionFactor(
+          precisionReading(lambda: 0.9));
+      expect(f, lessThan(1.0));
+      expect(f, closeTo(0.9, 1e-9));
+    });
+
+    test('lean cruise (λ=1.1) yields a factor > 1.0', () {
+      final f = BaselineRollingState.fuelMassCorrectionFactor(
+          precisionReading(lambda: 1.1));
+      expect(f, greaterThan(1.0));
+      expect(f, closeTo(1.1, 1e-9));
+    });
+
+    test('an implausible λ outside [0.5, 1.5] degrades to identity', () {
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(
+            precisionReading(lambda: 2.0)),
+        1.0,
+      );
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(
+            precisionReading(lambda: 0.3)),
+        1.0,
+      );
+    });
+
+    test('positive fuel trims raise the factor above 1.0', () {
+      final f = BaselineRollingState.fuelMassCorrectionFactor(
+          precisionReading(stft: 6, ltft: 4));
+      expect(f, closeTo(1.10, 1e-9));
+    });
+
+    test('negative fuel trims lower the factor below 1.0', () {
+      final f = BaselineRollingState.fuelMassCorrectionFactor(
+          precisionReading(stft: -5, ltft: -5));
+      expect(f, closeTo(0.90, 1e-9));
+    });
+
+    test('extreme trims are clamped to [0.7, 1.3]', () {
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(
+            precisionReading(stft: 20, ltft: 20)),
+        closeTo(1.3, 1e-9),
+      );
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(
+            precisionReading(stft: -20, ltft: -20)),
+        closeTo(0.7, 1e-9),
+      );
+    });
+
+    test('MAP density scales the factor and clamps to [0.6, 1.2]', () {
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(
+            precisionReading(mapKpa: 80)),
+        closeTo(0.8, 1e-9),
+      );
+      // Sea-level MAP ~100 → ~1.0 (identity for density).
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(
+            precisionReading(mapKpa: 100)),
+        closeTo(1.0, 1e-9),
+      );
+      expect(
+        BaselineRollingState.fuelMassCorrectionFactor(
+            precisionReading(mapKpa: 200)),
+        closeTo(1.2, 1e-9),
+      );
+    });
+
+    test('the three terms multiply together', () {
+      final f = BaselineRollingState.fuelMassCorrectionFactor(
+          precisionReading(lambda: 0.9, stft: 5, ltft: 0, mapKpa: 90));
+      expect(f, closeTo(0.9 * 1.05 * 0.9, 1e-9));
+    });
+  });
+
+  group('warm-up gate (#2515)', () {
+    test('cold coolant (45 °C) is warming up', () {
+      expect(
+        BaselineRollingState.isWarmUp(precisionReading(coolant: 45)),
+        isTrue,
+      );
+    });
+
+    test('warm coolant (90 °C) is not warming up', () {
+      expect(
+        BaselineRollingState.isWarmUp(precisionReading(coolant: 90)),
+        isFalse,
+      );
+    });
+
+    test('coolant exactly at the 70 °C ceiling is not warming up', () {
+      expect(
+        BaselineRollingState.isWarmUp(precisionReading(coolant: 70)),
+        isFalse,
+      );
+    });
+
+    test('oil temp is the fallback only when coolant is null', () {
+      expect(
+        BaselineRollingState.isWarmUp(precisionReading(oil: 40)),
+        isTrue,
+      );
+      expect(
+        BaselineRollingState.isWarmUp(precisionReading(oil: 55)),
+        isFalse,
+      );
+      // Coolant present wins over oil even when oil looks cold.
+      expect(
+        BaselineRollingState.isWarmUp(precisionReading(coolant: 90, oil: 30)),
+        isFalse,
+      );
+    });
+
+    test('no temperature reported is not a warm-up (no evidence)', () {
+      expect(
+        BaselineRollingState.isWarmUp(precisionReading()),
+        isFalse,
+      );
+    });
+  });
 }
