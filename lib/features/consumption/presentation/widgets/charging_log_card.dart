@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_log.dart';
 
@@ -30,9 +31,13 @@ class ChargingLogCard extends StatelessWidget {
         ? log.stationName!
         : (l?.chargingStationName ?? 'Station');
     final kwhStr = log.kWh.toStringAsFixed(1);
-    final costStr = log.costEur.toStringAsFixed(2);
+    // #2491 — a charging-session cost is a TOTAL: route it through
+    // formatTotal (locale-aware 2 dp + the active currency symbol)
+    // instead of a hand-rolled toStringAsFixed(2) with a hardcoded
+    // " € " glyph that was wrong in every non-euro country.
+    final costStr = PriceFormatter.formatTotal(log.costEur);
     final subtitle =
-        '$dateStr  •  $kwhStr kWh  •  $costStr €  •  ${log.chargeTimeMin} min';
+        '$dateStr  •  $kwhStr kWh  •  $costStr  •  ${log.chargeTimeMin} min';
 
     return Semantics(
       container: true,

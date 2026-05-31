@@ -467,12 +467,14 @@ void main() {
       );
 
       expect(find.text('Fuel cost'), findsOneWidget);
-      // PriceFormatter.formatPrice with FR locale prints the value
-      // with three decimals and a non-breaking space + €.
+      // #2491 — a trip cost is a TOTAL, so the card now uses
+      // formatTotal (2 dp + € suffix): 0.4455 → "0,45 €" in FR, not
+      // the old per-litre 3-decimal "0,446 €" (the bug this fixes).
       expect(
-        find.text(PriceFormatter.formatPrice(0.4455)),
+        find.text(PriceFormatter.formatTotal(0.4455)),
         findsOneWidget,
       );
+      expect(find.text('0,45 €'), findsOneWidget);
     });
 
     testWidgets('hides the cost row when the provider returns null',

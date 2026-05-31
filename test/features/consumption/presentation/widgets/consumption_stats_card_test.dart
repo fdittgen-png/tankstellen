@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/entities/pending_reconciliation.dart';
@@ -86,6 +87,12 @@ ConsumptionStats _stats({
 }
 
 void main() {
+  // #2491 — the avg-cost/km tile now formats via
+  // PriceFormatter.formatPerKm and the total-spent tile via
+  // formatTotal, both locale-aware. Pin GB so the figures keep their
+  // dot-decimal shape and the total carries a deterministic £ symbol.
+  setUp(() => PriceFormatter.setCountry('GB'));
+
   group('ConsumptionStatsCard — title', () {
     testWidgets('renders the localized "Consumption stats" title',
         (tester) async {
@@ -179,8 +186,9 @@ void main() {
         ConsumptionStatsCard(stats: _stats(totalSpent: 123.456)),
       );
 
-      // 123.456 → "123.46" via toStringAsFixed(2)
-      expect(find.text('123.46'), findsOneWidget);
+      // #2491 — 123.456 → "123.46 £" via PriceFormatter.formatTotal
+      // (2 dp + currency symbol, GB locale dot separator).
+      expect(find.text('123.46 £'), findsOneWidget);
     });
 
     testWidgets('renders the localized total-spent label', (tester) async {
@@ -253,9 +261,9 @@ void main() {
       );
 
       expect(find.text('6.40'), findsOneWidget); // avg L/100km
-      expect(find.text('0.105'), findsOneWidget); // avg cost/km
+      expect(find.text('0.105'), findsOneWidget); // avg cost/km (formatPerKm)
       expect(find.text('120.0'), findsOneWidget); // total liters
-      expect(find.text('198.40'), findsOneWidget); // total spent
+      expect(find.text('198.40 £'), findsOneWidget); // total spent (formatTotal)
       expect(find.text('Fill-ups: 3'), findsOneWidget);
       expect(find.text('—'), findsNothing); // no nullable fallbacks fired
     });

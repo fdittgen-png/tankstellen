@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
@@ -164,8 +165,9 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   child: _StatTile(
                     icon: Icons.euro,
                     label: l?.statAvgCostPerKm ?? 'Avg /km',
+                    // #2491 — locale-aware 3 dp via formatPerKm.
                     value: avgCostKm != null
-                        ? avgCostKm.toStringAsFixed(3)
+                        ? PriceFormatter.formatPerKm(avgCostKm)
                         : '—',
                   ),
                 ),
@@ -185,7 +187,8 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   child: _StatTile(
                     icon: Icons.payments_outlined,
                     label: l?.statTotalSpent ?? 'Total spent',
-                    value: stats.totalSpent.toStringAsFixed(2),
+                    // #2491 — locale-aware 2 dp + currency symbol.
+                    value: PriceFormatter.formatTotal(stats.totalSpent),
                   ),
                 ),
               ],
@@ -201,6 +204,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
             // own line, never folded into the headline Total L. Shown
             // only when at least one correction landed in a closed
             // window so the line stays out of the way otherwise.
+            // #2491 — neutral onSurfaceVariant, not warning (#2487).
             if (stats.correctionLitersTotal > 0) ...[
               const SizedBox(height: 4),
               Text(
@@ -209,7 +213,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
                     ) ??
                     'Corrections: +${stats.correctionLitersTotal.toStringAsFixed(1)} L',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: DarkModeColors.warning(context),
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
