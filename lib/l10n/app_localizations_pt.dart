@@ -2454,6 +2454,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sectionLocation => 'Localização';
 
   @override
+  String get sectionSetupDataSources => 'Setup & data sources';
+
+  @override
+  String get sectionFeaturesUsage => 'Features & usage';
+
+  @override
+  String get sectionAccountSync => 'Account & sync';
+
+  @override
+  String get sectionAppearanceWidgets => 'Appearance & widgets';
+
+  @override
+  String get sectionPrivacyData => 'Privacy & data';
+
+  @override
+  String get sectionAdvancedDeveloper => 'Advanced & developer';
+
+  @override
   String get tooltipBack => 'Voltar';
 
   @override

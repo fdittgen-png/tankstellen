@@ -2431,6 +2431,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionLocation => 'Location';
 
   @override
+  String get sectionSetupDataSources => 'Setup & data sources';
+
+  @override
+  String get sectionFeaturesUsage => 'Features & usage';
+
+  @override
+  String get sectionAccountSync => 'Account & sync';
+
+  @override
+  String get sectionAppearanceWidgets => 'Appearance & widgets';
+
+  @override
+  String get sectionPrivacyData => 'Privacy & data';
+
+  @override
+  String get sectionAdvancedDeveloper => 'Advanced & developer';
+
+  @override
   String get tooltipBack => 'Back';
 
   @override
@@ -8869,6 +8887,24 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get sectionLocation => '⟦Łóçáŧîóñ ····⟧';
+
+  @override
+  String get sectionSetupDataSources => '⟦Šéŧúƥ & đáŧá šóúřçéš ·······⟧';
+
+  @override
+  String get sectionFeaturesUsage => '⟦Ƒéáŧúřéš & úšáǧé ······⟧';
+
+  @override
+  String get sectionAccountSync => '⟦Áççóúñŧ & šýñç ·····⟧';
+
+  @override
+  String get sectionAppearanceWidgets => '⟦Áƥƥéářáñçé & ŵîđǧéŧš ········⟧';
+
+  @override
+  String get sectionPrivacyData => '⟦Ƥřîṽáçý & đáŧá ·····⟧';
+
+  @override
+  String get sectionAdvancedDeveloper => '⟦Áđṽáñçéđ & đéṽéłóƥéř ········⟧';
 
   @override
   String get tooltipBack => '⟦Ɓáçķ ··⟧';

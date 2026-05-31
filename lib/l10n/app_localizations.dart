@@ -4568,6 +4568,42 @@ abstract class AppLocalizations {
   /// **'Location'**
   String get sectionLocation;
 
+  /// Settings group header (#2521) over the API Key + Location entries — the first-run configuration the app needs to find prices.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup & data sources'**
+  String get sectionSetupDataSources;
+
+  /// Settings group header (#2521) over Feature management + Consumption — the toggles that decide which surfaces appear and how they're used.
+  ///
+  /// In en, this message translates to:
+  /// **'Features & usage'**
+  String get sectionFeaturesUsage;
+
+  /// Settings group header (#2521) over the TankSync cloud-sync entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & sync'**
+  String get sectionAccountSync;
+
+  /// Settings group header (#2521) over the Theme chooser + Home-screen widget help entries.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance & widgets'**
+  String get sectionAppearanceWidgets;
+
+  /// Settings group header (#2521) over Privacy consent + Privacy Dashboard + Storage & cache — one data-control concern.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & data'**
+  String get sectionPrivacyData;
+
+  /// Settings group header (#2521) over the bad-scan PAT entry + Developer tools — power-user controls hidden by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced & developer'**
+  String get sectionAdvancedDeveloper;
+
   /// No description provided for @tooltipBack.
   ///
   /// In en, this message translates to:

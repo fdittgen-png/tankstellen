@@ -83,6 +83,66 @@ void main() {
       expect(find.text('Location'), findsOneWidget);
     });
 
+    testWidgets(
+        '#2521: renders the always-visible group headers in '
+        'frequently-used-first order', (tester) async {
+      // The #2521 information-architecture refactor groups the flat
+      // Settings list under labelled SectionHeader rows. For a default
+      // (no gated feature) profile the always-visible groups are
+      // Profiles → Setup & data sources → Features & usage →
+      // Appearance & widgets → Privacy & data → About. The gated
+      // groups (Account & sync, Advanced & developer) are absent here
+      // because their only children are feature-gated off by default.
+      //
+      // A tall surface forces the lazy ListView to materialise every
+      // header so we can assert their relative vertical order in one
+      // pass (mirrors the #1545 pattern in the gating test).
+      await tester.binding.setSurfaceSize(const Size(1200, 4000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: overrides,
+      );
+
+      // Ordered list of the headers that must always render, top-down.
+      const orderedHeaders = <String>[
+        'Profile',
+        'Setup & data sources',
+        'Features & usage',
+        'Appearance & widgets',
+        'Privacy & data',
+        'About',
+      ];
+
+      double headerTop(String label) {
+        final finder = find.text(label, skipOffstage: false);
+        expect(finder, findsOneWidget,
+            reason: '#2521: group header "$label" must render');
+        return tester.getTopLeft(finder).dy;
+      }
+
+      var previousTop = double.negativeInfinity;
+      for (final label in orderedHeaders) {
+        final top = headerTop(label);
+        expect(top, greaterThan(previousTop),
+            reason: '#2521: "$label" must sit below the previous group '
+                'header in the frequently-used-first order');
+        previousTop = top;
+      }
+
+      // The two gated group headers must NOT render for a default
+      // profile (TankSync + PAT + debug all off) — a gated-empty group
+      // never shows a lone heading.
+      expect(find.text('Account & sync', skipOffstage: false), findsNothing,
+          reason: '#2521: Account & sync header must not render when '
+              'TankSync is off');
+      expect(
+          find.text('Advanced & developer', skipOffstage: false), findsNothing,
+          reason: '#2521: Advanced & developer header must not render '
+              'when neither the PAT nor debug-mode feature is enabled');
+    });
+
     testWidgets('does not render Data Transparency section', (tester) async {
       await pumpApp(
         tester,

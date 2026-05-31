@@ -28,8 +28,22 @@ import '../widgets/use_mode_section.dart';
 
 /// Settings / profile screen that composes extracted section widgets.
 ///
-/// Each major section is either always visible (Profile, Location, About)
-/// or wrapped in a [_FoldableSection] for progressive disclosure.
+/// #2521 — entries are grouped under labelled [SectionHeader] rows,
+/// ordered frequently-used-first and gate-before-gated:
+///
+///   1. Profiles            5. Appearance & widgets
+///   2. Setup & data        6. Privacy & data
+///   3. Features & usage     7. Advanced & developer
+///   4. Account & sync       8. About
+///
+/// This is a pure information-architecture / ordering change: every
+/// section widget stays self-contained and owns its own Riverpod
+/// providers, so there is no persistence, behaviour or feature-flag
+/// change. A group header is emitted only when at least one of its
+/// children is visible, so a gated-empty group never renders a lone
+/// heading. Always-visible sections (Profile, About) keep their
+/// original [SectionHeader]; the ~6 new group headers reuse the same
+/// forest-green primary-tinted [SectionHeader] shape.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -54,6 +68,8 @@ class ProfileScreen extends ConsumerWidget {
     // (manual fill-ups, no OBD2) can still configure their vehicle
     // and reach the Consumption surface.
     final consumptionOn = isConsumptionTabReachable(manifest, enabledFlags);
+    final patOn = enabledFlags.contains(Feature.developerPatToken);
+    final debugOn = enabledFlags.contains(Feature.debugMode);
 
     return PageScaffold(
       title: l?.settings ?? 'Settings',
@@ -66,12 +82,11 @@ class ProfileScreen extends ConsumerWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         children: [
+          // ── 1. Profiles — primary user-data section, kept first.
           // Use mode (#1517 / #1519) used to sit at the top of the
           // Settings screen; it now lives INSIDE the Consumption
           // _FoldableSection below so the use-mode chooser is grouped
           // with the consumption-tier-dependent toggles it gates.
-
-          // Profiles — primary user-data section.
           SectionHeader(
             leadingIcon: Icons.person,
             title: l?.sectionProfile ?? 'Profile',
@@ -81,6 +96,21 @@ class ProfileScreen extends ConsumerWidget {
           const ProfileListSection(),
           const SizedBox(height: 16),
 
+          // ── 2. Setup & data sources — what a fresh install must
+          // configure first. API Key gates fuel search working at all
+          // (#2521 promotes it from #5); Location follows.
+          _groupHeader(
+            icon: Icons.tune,
+            title: l?.sectionSetupDataSources ?? 'Setup & data sources',
+          ),
+          const SizedBox(height: 4),
+          // API Key — closed by default (unchanged).
+          _FoldableSection(
+            icon: Icons.key,
+            title: l?.apiKeySetup ?? 'API Key',
+            child: const ApiKeySection(),
+          ),
+          const SizedBox(height: 8),
           // #534 — Location wrapped in _FoldableSection, closed by
           // default. The user rarely changes location preferences
           // after the initial setup.
@@ -89,126 +119,25 @@ class ProfileScreen extends ConsumerWidget {
             title: l?.sectionLocation ?? 'Location',
             child: const LocationSectionWidget(),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
 
-          // #534 — TankSync closed by default (was initiallyExpanded: true).
-          // #1447 phase 3 — hidden entirely when Feature.tankSync is
-          // effectively disabled. Stored TankSync config (account,
-          // mode, etc.) is preserved; re-enabling the feature surfaces
-          // the section with the prior configuration intact.
-          if (tankSyncOn) ...[
-            _FoldableSection(
-              icon: Icons.cloud_outlined,
-              title: 'TankSync', // i18n-ignore: brand name
-              // #1696 — a localized descriptive subtitle so the
-              // brand-named section isn't an unexplained label.
-              subtitle: l?.tankSyncSectionSubtitle ??
-                  'Cloud sync across your devices',
-              child: const TankSyncSection(),
-            ),
-            const SizedBox(height: 8),
-          ],
-
-          // #952 phase 3 + #2116-6 — bad-scan reporter PAT entry,
-          // gated behind `Feature.developerPatToken` (default off).
-          // 99 % of users never paste a token; the SharePlus fallback
-          // covers them. Power users opt in via Feature management.
-          if (enabledFlags.contains(Feature.developerPatToken)) ...[
-            _FoldableSection(
-              icon: Icons.bug_report_outlined,
-              title:
-                  l?.feedbackTokenSectionTitle ?? 'Bad-scan feedback (GitHub)',
-              child: const FeedbackTokenSection(),
-            ),
-            const SizedBox(height: 8),
-          ],
-
-          // API Key — closed by default (unchanged).
-          _FoldableSection(
-            icon: Icons.key,
-            title: l?.apiKeySetup ?? 'API Key',
-            child: const ApiKeySection(),
-          ),
-          const SizedBox(height: 8),
-
+          // ── 3. Features & usage — Feature management is the gate that
+          // decides whether Consumption/Loyalty/Vehicles appear, so
+          // #2521 lifts it ABOVE the things it gates (cause-before-
+          // effect), reversing the prior bottom placement.
+          //
           // #896 — Consumption log menu tile removed. The consumption
           // screen is already a top-level destination on the bottom
           // navigation bar, so a duplicate menu entry here was
           // redundant. Route `/consumption` remains registered in
           // `lib/app/router.dart` for direct navigation (station
           // detail CTA, deep links).
-
-          // Theme — light / dark / follow system (#752, #897).
-          // #897 — restyled as a `SettingsMenuTile` that navigates to
-          // the dedicated `/theme-settings` screen so the Theme entry
-          // matches the Privacy Dashboard and Storage card pattern
-          // instead of opening a modal bottom sheet inline.
-          SettingsMenuTile(
-            icon: Icons.palette_outlined,
-            title: l?.themeCardTitle ?? 'Theme',
-            subtitle: _themeSubtitle(ref, l),
-            onTap: () => context.push('/theme-settings'),
+          _groupHeader(
+            icon: Icons.dashboard_customize_outlined,
+            title: l?.sectionFeaturesUsage ?? 'Features & usage',
           ),
-          const SizedBox(height: 8),
-
-          // #1572 — Conso foldable contains every parameter that
-          // pairs with a Conso functionality: Mes véhicules, optional
-          // Trips (OBD2) sub-section, and the Driving toggles
-          // (eco-coach, gamification, fuel-club). DrivingSettingsSection
-          // itself owns the sub-section layout. The top-level
-          // *Mes véhicules* tile added in #1568 was reverted here in
-          // favour of the in-foldable sub-section header.
-          if (consumptionOn) ...[
-            _FoldableSection(
-              icon: Icons.local_gas_station_outlined,
-              title: l?.navConsumption ?? 'Consumption',
-              child: const DrivingSettingsSection(),
-            ),
-            const SizedBox(height: 8),
-          ],
-
-          // #1806 — home-screen widget help. The Android widget's
-          // per-widget config is OS-mediated (long-press → Reconfigure)
-          // and can't be launched from the app, so this section is the
-          // in-app discoverable surface for it.
-          _FoldableSection(
-            icon: Icons.widgets_outlined,
-            title: l?.widgetHelpSectionTitle ?? 'Home-screen widget',
-            child: const WidgetHelpSection(),
-          ),
-          const SizedBox(height: 8),
-
-          // Storage & Cache
-          _FoldableSection(
-            icon: Icons.storage,
-            title: l?.storageAndCache ?? 'Storage & cache',
-            child: const StorageSection(),
-          ),
-          const SizedBox(height: 8),
-
-          // Privacy & Consent
-          _FoldableSection(
-            icon: Icons.privacy_tip_outlined,
-            title: l?.gdprTitle ?? 'Privacy',
-            child: const ConsentSettingsSection(),
-          ),
-          const SizedBox(height: 8),
-
-          // Privacy Dashboard
-          SettingsMenuTile(
-            icon: Icons.privacy_tip,
-            title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
-            subtitle: l?.privacyDashboardSubtitle ??
-                'View, export, or delete your data',
-            onTap: () => context.push('/privacy-dashboard'),
-          ),
-          const SizedBox(height: 8),
-
-          // #1373 phase 2 — central feature-management toggles. Placed
-          // near the bottom (above About, below Privacy) because most
-          // users will never visit it; advanced controls don't belong
-          // at the top of a settings screen.
-          //
+          const SizedBox(height: 4),
+          // #1373 phase 2 — central feature-management toggles.
           // The Use-mode chooser (Basic / Medium / Full / Custom) sits
           // at the TOP of this section because picking a preset
           // overwrites every toggle below it — users discover the
@@ -225,25 +154,148 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          // #1572 — Conso foldable contains every parameter that
+          // pairs with a Conso functionality: Mes véhicules, optional
+          // Trips (OBD2) sub-section, and the Driving toggles
+          // (eco-coach, gamification, fuel-club). DrivingSettingsSection
+          // itself owns the sub-section layout. The Consumption→
+          // My-vehicles link is kept here.
+          if (consumptionOn) ...[
+            _FoldableSection(
+              icon: Icons.local_gas_station_outlined,
+              title: l?.navConsumption ?? 'Consumption',
+              child: const DrivingSettingsSection(),
+            ),
+            const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 8),
 
-          // #2248 — Developer / Debug tools. Only renders when the user
-          // has flipped `Feature.debugMode` on (from the Feature
-          // management section directly above). Production users never
-          // see it. Placed right below Feature management so a developer
-          // who just enabled the mode discovers the entry immediately.
-          if (enabledFlags.contains(Feature.debugMode)) ...[
-            SettingsMenuTile(
-              icon: Icons.developer_mode,
-              title: l?.developerToolsSectionTitle ?? 'Developer tools',
-              subtitle: l?.developerToolsMenuSubtitle ??
-                  'Error log, test alerts, diagnostics',
-              onTap: () => context.push('/developer-tools'),
+          // ── 4. Account & sync — TankSync (gated). The header only
+          // renders alongside its single child.
+          // #534 — TankSync closed by default (was initiallyExpanded: true).
+          // #1447 phase 3 — hidden entirely when Feature.tankSync is
+          // effectively disabled. Stored TankSync config (account,
+          // mode, etc.) is preserved; re-enabling the feature surfaces
+          // the section with the prior configuration intact.
+          if (tankSyncOn) ...[
+            _groupHeader(
+              icon: Icons.cloud_outlined,
+              title: l?.sectionAccountSync ?? 'Account & sync',
+            ),
+            const SizedBox(height: 4),
+            _FoldableSection(
+              icon: Icons.cloud_outlined,
+              title: 'TankSync', // i18n-ignore: brand name
+              // #1696 — a localized descriptive subtitle so the
+              // brand-named section isn't an unexplained label.
+              subtitle: l?.tankSyncSectionSubtitle ??
+                  'Cloud sync across your devices',
+              child: const TankSyncSection(),
             ),
             const SizedBox(height: 16),
           ],
 
-          // #534 — About moved to the very end, below Privacy.
+          // ── 5. Appearance & widgets — Theme + Home-screen widget.
+          _groupHeader(
+            icon: Icons.palette_outlined,
+            title: l?.sectionAppearanceWidgets ?? 'Appearance & widgets',
+          ),
+          const SizedBox(height: 4),
+          // Theme — light / dark / follow system (#752, #897).
+          // #897 — restyled as a `SettingsMenuTile` that navigates to
+          // the dedicated `/theme-settings` screen so the Theme entry
+          // matches the Privacy Dashboard and Storage card pattern
+          // instead of opening a modal bottom sheet inline.
+          SettingsMenuTile(
+            icon: Icons.palette_outlined,
+            title: l?.themeCardTitle ?? 'Theme',
+            subtitle: _themeSubtitle(ref, l),
+            onTap: () => context.push('/theme-settings'),
+          ),
+          const SizedBox(height: 8),
+          // #1806 — home-screen widget help. The Android widget's
+          // per-widget config is OS-mediated (long-press → Reconfigure)
+          // and can't be launched from the app, so this section is the
+          // in-app discoverable surface for it.
+          _FoldableSection(
+            icon: Icons.widgets_outlined,
+            title: l?.widgetHelpSectionTitle ?? 'Home-screen widget',
+            child: const WidgetHelpSection(),
+          ),
+          const SizedBox(height: 16),
+
+          // ── 6. Privacy & data — #2521 reunites the one data concern
+          // that #519 had split apart: consent, the Privacy Dashboard
+          // and Storage & cache.
+          _groupHeader(
+            icon: Icons.privacy_tip_outlined,
+            title: l?.sectionPrivacyData ?? 'Privacy & data',
+          ),
+          const SizedBox(height: 4),
+          // Privacy & Consent
+          _FoldableSection(
+            icon: Icons.privacy_tip_outlined,
+            title: l?.gdprTitle ?? 'Privacy',
+            child: const ConsentSettingsSection(),
+          ),
+          const SizedBox(height: 8),
+          // Privacy Dashboard
+          SettingsMenuTile(
+            icon: Icons.privacy_tip,
+            title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
+            subtitle: l?.privacyDashboardSubtitle ??
+                'View, export, or delete your data',
+            onTap: () => context.push('/privacy-dashboard'),
+          ),
+          const SizedBox(height: 8),
+          // Storage & Cache
+          _FoldableSection(
+            icon: Icons.storage,
+            title: l?.storageAndCache ?? 'Storage & cache',
+            child: const StorageSection(),
+          ),
+          const SizedBox(height: 16),
+
+          // ── 7. Advanced & developer — power-user controls hidden by
+          // default. The header is conditionalised on its children so a
+          // production user (no PAT, no debug) never sees a lone heading.
+          if (patOn || debugOn) ...[
+            _groupHeader(
+              icon: Icons.developer_mode,
+              title: l?.sectionAdvancedDeveloper ?? 'Advanced & developer',
+            ),
+            const SizedBox(height: 4),
+            // #952 phase 3 + #2116-6 — bad-scan reporter PAT entry,
+            // gated behind `Feature.developerPatToken` (default off).
+            // 99 % of users never paste a token; the SharePlus fallback
+            // covers them. Power users opt in via Feature management.
+            if (patOn) ...[
+              _FoldableSection(
+                icon: Icons.bug_report_outlined,
+                title: l?.feedbackTokenSectionTitle ??
+                    'Bad-scan feedback (GitHub)',
+                child: const FeedbackTokenSection(),
+              ),
+              const SizedBox(height: 8),
+            ],
+            // #2248 — Developer / Debug tools. Only renders when the
+            // user has flipped `Feature.debugMode` on (from the Feature
+            // management section above). Production users never see it.
+            if (debugOn) ...[
+              SettingsMenuTile(
+                icon: Icons.developer_mode,
+                title: l?.developerToolsSectionTitle ?? 'Developer tools',
+                subtitle: l?.developerToolsMenuSubtitle ??
+                    'Error log, test alerts, diagnostics',
+                onTap: () => context.push('/developer-tools'),
+              ),
+              const SizedBox(height: 8),
+            ],
+            const SizedBox(height: 8),
+          ],
+
+          // ── 8. About — kept last (#534).
           SectionHeader(
             leadingIcon: Icons.info_outline,
             title: l?.about ?? 'About',
@@ -257,6 +309,20 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 }
+
+/// Builds a #2521 settings group heading. Thin wrapper over
+/// [SectionHeader] that pins the forest-green primary-tinted leading
+/// icon + zero outer padding shared by the new group rows, so the
+/// `build` method reads as a flat list of groups.
+SectionHeader _groupHeader({
+  required IconData icon,
+  required String title,
+}) =>
+    SectionHeader(
+      leadingIcon: icon,
+      title: title,
+      padding: EdgeInsets.zero,
+    );
 
 // ---------------------------------------------------------------------------
 // Shared layout helpers (kept private to this file)

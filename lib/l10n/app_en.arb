@@ -1136,6 +1136,30 @@
   },
   "sectionProfile": "Profile",
   "sectionLocation": "Location",
+  "sectionSetupDataSources": "Setup & data sources",
+  "@sectionSetupDataSources": {
+    "description": "Settings group header (#2521) over the API Key + Location entries — the first-run configuration the app needs to find prices."
+  },
+  "sectionFeaturesUsage": "Features & usage",
+  "@sectionFeaturesUsage": {
+    "description": "Settings group header (#2521) over Feature management + Consumption — the toggles that decide which surfaces appear and how they're used."
+  },
+  "sectionAccountSync": "Account & sync",
+  "@sectionAccountSync": {
+    "description": "Settings group header (#2521) over the TankSync cloud-sync entry."
+  },
+  "sectionAppearanceWidgets": "Appearance & widgets",
+  "@sectionAppearanceWidgets": {
+    "description": "Settings group header (#2521) over the Theme chooser + Home-screen widget help entries."
+  },
+  "sectionPrivacyData": "Privacy & data",
+  "@sectionPrivacyData": {
+    "description": "Settings group header (#2521) over Privacy consent + Privacy Dashboard + Storage & cache — one data-control concern."
+  },
+  "sectionAdvancedDeveloper": "Advanced & developer",
+  "@sectionAdvancedDeveloper": {
+    "description": "Settings group header (#2521) over the bad-scan PAT entry + Developer tools — power-user controls hidden by default."
+  },
   "tooltipBack": "Back",
   "tooltipClose": "Close",
   "tooltipShare": "Share",
