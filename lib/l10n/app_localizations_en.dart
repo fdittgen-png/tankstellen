@@ -2196,6 +2196,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get situationClimbing => 'Climbing / loaded';
 
   @override
+  String get situationColdStart => 'Cold start';
+
+  @override
+  String get situationSustainedLoad => 'Sustained load / towing';
+
+  @override
+  String get situationPartialDecel => 'Coasting';
+
+  @override
   String get situationHardAccel => 'Hard accel';
 
   @override
@@ -8826,6 +8835,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get situationClimbing => '⟦Çłîɱƀîñǧ / łóáđéđ ······⟧';
+
+  @override
+  String get situationColdStart => '⟦Çółđ šŧářŧ ····⟧';
+
+  @override
+  String get situationSustainedLoad => '⟦Šúšŧáîñéđ łóáđ / ŧóŵîñǧ ·········⟧';
+
+  @override
+  String get situationPartialDecel => '⟦Çóášŧîñǧ ····⟧';
 
   @override
   String get situationHardAccel => '⟦Ĥářđ áççéł ····⟧';

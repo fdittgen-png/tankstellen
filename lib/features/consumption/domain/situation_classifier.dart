@@ -33,6 +33,23 @@ enum DrivingSituation {
   climbingOrLoaded,
   hardAccel,
   fuelCutCoast,
+
+  // --- #2515 (epic #2512) new persistent calibration buckets ------
+  // Consumption-layer mirror of the vehicle-layer `Situation` additions
+  // (cold-start / sustained-load / partial-throttle decel). Persistence
+  // is keyed by `.name`, so appending mid-enum would be ordinal-safe; we
+  // append at the end regardless. All three are PERSISTENT (a stable
+  // learned mean), not transient.
+  /// Engine below operating temperature — open-loop warm-up enrichment.
+  coldStartWarmup,
+
+  /// High load held steady on a flat road (towing / fully loaded),
+  /// distinct from a hill climb.
+  sustainedLoadOrTowing,
+
+  /// Gentle engine-braking / coast where injectors still fire — between
+  /// [deceleration] and [fuelCutCoast].
+  partialThrottleDecel,
 }
 
 /// One point of driving data the classifier ingests. Values come from
@@ -47,6 +64,16 @@ class DrivingSample {
   final double? engineLoadPercent;
   final double? fuelRateLPerHour;
 
+  /// Engine coolant temperature in °C (PID 0x05), #2515. Null when the
+  /// car doesn't surface it. Used by [SituationClassifier] to detect a
+  /// cold-start warm-up so the rule-mode path gets the new buckets too.
+  final double? coolantTempC;
+
+  /// Road grade as a percentage when a confident GPS-altitude estimate
+  /// exists, else 0 (#2515). Lets the rule path separate a flat
+  /// sustained load (towing) from a hill climb.
+  final double gradePct;
+
   const DrivingSample({
     required this.timestamp,
     required this.speedKmh,
@@ -54,6 +81,8 @@ class DrivingSample {
     this.throttlePercent,
     this.engineLoadPercent,
     this.fuelRateLPerHour,
+    this.coolantTempC,
+    this.gradePct = 0,
   });
 }
 
@@ -161,6 +190,17 @@ class SituationClassifier {
     final avgThrottle = _avg((e) => e.throttlePercent);
     final speedRange = _range((e) => e.speedKmh);
 
+    // Cold-start / warm-up (#2515): the engine is below operating
+    // temperature, running open-loop rich. Highest-priority steady
+    // state — a warm-up sample must not be classified as anything else,
+    // mirroring the fuzzy path's cold-start override. Coolant below
+    // 70 °C (PID 0x05) is the gate; cars that never report it fall
+    // through to the legacy logic.
+    final coolant = s.coolantTempC;
+    if (coolant != null && coolant < 70) {
+      return DrivingSituation.coldStartWarmup;
+    }
+
     // Idle: basically stationary with the engine running. Short
     // window of ≥5 s so a momentary stop at a light doesn't count.
     if (avgSpeed <= 2 &&
@@ -184,14 +224,38 @@ class SituationClassifier {
       return DrivingSituation.deceleration;
     }
 
+    // Partial-throttle decel (#2515): a gentler lift-off than the
+    // `< -1 m/s²` deceleration above — the injectors still fire. Sits in
+    // the band `[-1, -0.1)` between full deceleration and a steady
+    // cruise. Disjoint accel band so it can't double-count with
+    // deceleration.
+    if (accel != null && accel >= -1 && accel < -0.1 && avgThrottle < 10) {
+      return DrivingSituation.partialThrottleDecel;
+    }
+
     // Climbing or heavily loaded: engine working hard (high load)
-    // while speed is roughly constant. Stands in for the pure
+    // while speed is roughly constant. #2515 — only when a grade is
+    // actually present; on the flat the same high-load signature is a
+    // sustained tow (handled next), not a climb. Stands in for the pure
     // climb-detection we'd do with GPS altitude.
     if (engineLoad != null &&
         engineLoad > 70 &&
         speedRange < 2 &&
-        avgSpeed > 20) {
+        avgSpeed > 20 &&
+        s.gradePct >= 2) {
       return DrivingSituation.climbingOrLoaded;
+    }
+
+    // Sustained load / towing (#2515): the same high-load, steady-speed
+    // signature as a climb but on a FLAT road (grade < 2 %) — a fully
+    // loaded car or a trailer holding the engine at high load without a
+    // hill.
+    if (engineLoad != null &&
+        engineLoad > 70 &&
+        speedRange < 2 &&
+        avgSpeed > 20 &&
+        s.gradePct < 2) {
+      return DrivingSituation.sustainedLoadOrTowing;
     }
 
     // Highway cruise: high, stable speed.

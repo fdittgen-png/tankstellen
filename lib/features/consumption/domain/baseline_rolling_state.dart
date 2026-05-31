@@ -15,6 +15,56 @@ class _SpeedPoint {
   const _SpeedPoint(this.at, this.speedKmh);
 }
 
+/// Altitude band a learned baseline is stratified under (#2515, epic
+/// #2512). Air density falls with altitude, so the same driving
+/// situation burns differently at sea level vs in the mountains;
+/// keying each Welford bucket by `'${situation.name}#$id'` keeps the
+/// bands from averaging together.
+///
+/// The [id] strings are the stable on-disk suffix — they must never
+/// change (they're baked into Hive keys). [BaselineStore] composes the
+/// key; legacy bare keys (pre-#2515) are read back as [seaLevel].
+enum BaselineAltitudeStratum {
+  /// ≤ 500 m — also the fallback for legacy data and for trips with no
+  /// confident altitude / baro fix.
+  seaLevel('alt0'),
+
+  /// 500–1000 m.
+  low('alt500'),
+
+  /// 1000–1500 m.
+  mid('alt1000'),
+
+  /// > 1500 m.
+  high('alt1500p');
+
+  const BaselineAltitudeStratum(this.id);
+
+  /// Stable on-disk suffix appended after `#` in the composite key.
+  final String id;
+
+  /// Pick the stratum for an altitude in metres. Null → [seaLevel] (the
+  /// safe sea-level default while no confident fix exists).
+  static BaselineAltitudeStratum forAltitudeM(double? altitudeM) {
+    if (altitudeM == null) return seaLevel;
+    if (altitudeM <= 500) return seaLevel;
+    if (altitudeM <= 1000) return low;
+    if (altitudeM <= 1500) return mid;
+    return high;
+  }
+
+  /// Derive altitude from barometric pressure (kPa) via the barometric
+  /// formula, then map to a stratum — the fallback when GPS altitude is
+  /// unavailable but the car reports PID 0x33. `44330·(1−(p/101.325)^
+  /// (1/5.255))`. Null baro → [seaLevel].
+  static BaselineAltitudeStratum forBaroKpa(double? baroKpa) {
+    if (baroKpa == null || baroKpa <= 0) return seaLevel;
+    final altitudeM =
+        44330.0 * (1 - math.pow(baroKpa / 101.325, 1 / 5.255));
+    return forAltitudeM(altitudeM);
+  }
+}
+
 /// Per-trip rolling state the fuzzy calibration path needs but the pure
 /// [FuzzyClassifier] can't own (#2513, epic #2512).
 ///
@@ -48,6 +98,10 @@ class BaselineRollingState {
   final Queue<_SpeedPoint> _speedWindow = Queue<_SpeedPoint>();
   final RoadGradeCalculator _gradeCalc = RoadGradeCalculator();
 
+  /// Latest barometric pressure (PID 0x33) seen this trip, latched for
+  /// the altitude-stratum fallback when GPS altitude is unavailable.
+  double? _latestBaroKpa;
+
   /// Fold one reading in: push its speed into the 30-s window (trimmed
   /// to [window] using [now]) and its distance + altitude into the
   /// grade calculator. A null altitude is a no-op for the grade (a run
@@ -66,13 +120,31 @@ class BaselineRollingState {
       cumulativeDistanceKm: r.distanceKmSoFar,
       altitudeM: r.altitudeM,
     );
+    if (r.baroKpa != null) _latestBaroKpa = r.baroKpa;
   }
 
   /// Drop all accumulated state — call at the start/end of each trip.
   void reset() {
     _speedWindow.clear();
     _gradeCalc.reset();
+    _latestBaroKpa = null;
   }
+
+  /// The altitude stratum (#2515) the current sample's baseline should
+  /// be bucketed under. Prefers the smoothed GPS altitude from the
+  /// grade calculator; falls back to the barometric estimate when no
+  /// GPS fix has landed; defaults to sea level until either is
+  /// confident — so a trip never starts writing into a wrong band.
+  BaselineAltitudeStratum get altitudeStratum {
+    final gpsAltitude = _gradeCalc.latestSmoothedAltitudeM;
+    if (gpsAltitude != null) {
+      return BaselineAltitudeStratum.forAltitudeM(gpsAltitude);
+    }
+    return BaselineAltitudeStratum.forBaroKpa(_latestBaroKpa);
+  }
+
+  /// The stable on-disk suffix for the current [altitudeStratum].
+  String get altitudeStratumId => altitudeStratum.id;
 
   /// True when the rolling window looks like stop-and-go: either
   /// repeated start/stop crossings (≥2, mirroring [SituationClassifier]

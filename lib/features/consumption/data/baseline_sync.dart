@@ -8,17 +8,26 @@
 /// {
 ///   "version": 1,
 ///   "perSituation": {
-///     "highwayCruise": {"n": 123, "mean": 6.5, "m2": 2.3},
-///     "urbanCruise":   {"n": 45,  "mean": 8.2, "m2": 4.1}
+///     "highwayCruise#alt0": {"n": 123, "mean": 6.5, "m2": 2.3},
+///     "urbanCruise#alt500": {"n": 45,  "mean": 8.2, "m2": 4.1}
 ///   }
 /// }
 /// ```
 ///
-/// Merge rule: for each situation, pick the accumulator with the
-/// higher `n`. A device that drove more of that situation knows
-/// more — merging the raw Welford moments across devices would be
-/// numerically fine but requires shared samples, which we don't
-/// have. "Prefer more experience" is a safe, intuitive fallback.
+/// Merge rule: for each key, pick the accumulator with the higher `n`.
+/// A device that drove more of that situation knows more — merging the
+/// raw Welford moments across devices would be numerically fine but
+/// requires shared samples, which we don't have. "Prefer more
+/// experience" is a safe, intuitive fallback.
+///
+/// #2515 — keys are now altitude-stratified
+/// (`'${situation.name}#$stratumId'`, e.g. `highwayCruise#alt0`). The
+/// merge treats the key as **opaque**: each (situation, altitude-band)
+/// cell merges independently by higher-n, and legacy bare keys
+/// (pre-#2515, e.g. `highwayCruise`) merge as their own cell — both are
+/// correct because the band is part of the cell identity.
+/// [totalSampleCount] sums `n` across every key regardless of suffix,
+/// so the `total_samples` column stays correct.
 library;
 
 import 'dart:convert';

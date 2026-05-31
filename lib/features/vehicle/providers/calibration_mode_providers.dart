@@ -34,6 +34,27 @@ class CalibrationSample {
   /// into multiple buckets weighted by membership.
   final double observedValue;
 
+  // --- #2515 (epic #2512) signals the three new buckets need --------
+  /// Engine / absolute load %, feeding the sustained-load + climbing
+  /// load ramps. 0 when neither load PID is available.
+  final double loadPct;
+
+  /// Engine coolant temperature in °C (PID 0x05) — gates the cold-start
+  /// bucket. Null when the car doesn't surface it.
+  final double? coolantTempC;
+
+  /// Engine oil temperature in °C (PID 0x5C) — the cold-start fallback
+  /// when [coolantTempC] is null.
+  final double? oilTempC;
+
+  /// Ambient air temperature in °C (PID 0x46) — plumbed for PR 2's
+  /// precision folding; not consumed by [classify] yet.
+  final double? ambientTempC;
+
+  /// Accelerator-pedal position % (PIDs 0x49–0x4B) — driver intent,
+  /// plumbed for PR 2; not consumed by [classify] yet.
+  final double? pedalPct;
+
   const CalibrationSample({
     required this.speedKmh,
     required this.accelMps2,
@@ -42,6 +63,11 @@ class CalibrationSample {
     required this.rpm,
     required this.observedValue,
     this.isStopAndGoContext = false,
+    this.loadPct = 0,
+    this.coolantTempC,
+    this.oilTempC,
+    this.ambientTempC,
+    this.pedalPct,
   });
 }
 
@@ -106,6 +132,13 @@ List<SituationVote> calibrationVotes(
         throttlePct: sample.throttlePct,
         rpm: sample.rpm,
         isStopAndGoContext: sample.isStopAndGoContext,
+        // #2515 — feed the load + precision signals so the new buckets
+        // (cold-start / sustained-load / partial-decel) can fire.
+        loadPct: sample.loadPct,
+        coolantTempC: sample.coolantTempC,
+        oilTempC: sample.oilTempC,
+        ambientTempC: sample.ambientTempC,
+        pedalPct: sample.pedalPct,
       );
 
   return [
@@ -151,16 +184,46 @@ class CalibrationReplayQueue extends _$CalibrationReplayQueue {
 /// original baseline work — idle < 2 km/h, stop-and-go flagged by
 /// the caller, highway ≥ 80 km/h, climbing > 3 % grade under load,
 /// decel when coasting off the pedal, fuel-cut when injectors close.
+///
+/// #2515 adds the three new buckets in priority order:
+///  * **coldStart** is checked FIRST — a cold engine running rich must
+///    win over everything else (mirrors the fuzzy path's high-priority
+///    override) so warm-up samples never pollute a steady-state mean.
+///  * **partialDecel** sits between [Situation.decel] and the
+///    speed-based modes: the gentle-coast accel band `[-0.5, -0.1)` is
+///    disjoint from decel's `< -0.5`, so the two never collide.
+///  * **sustainedLoad** is checked right after the climbing-grade test
+///    — same high-load signature but on the flat (grade < 2 %).
 Situation _ruleWinner(CalibrationSample s) {
+  // #2515 — cold-start override: coolant (or oil when coolant is null)
+  // below operating temperature beats every other classification.
+  final temp = s.coolantTempC ?? s.oilTempC;
+  final coldThreshold = s.coolantTempC != null ? 70 : 60;
+  if (temp != null && temp < coldThreshold) {
+    return Situation.coldStart;
+  }
   if (s.throttlePct < 5 && s.rpm > 1500 && s.speedKmh > 20) {
     return Situation.fuelCut;
   }
   if (s.accelMps2 < -0.5 && s.throttlePct < 5) {
     return Situation.decel;
   }
+  // #2515 — partial-throttle / gentle coast: lighter lift-off than
+  // decel, injectors still firing. Disjoint accel band from decel.
+  if (s.accelMps2 >= -0.5 &&
+      s.accelMps2 < -0.1 &&
+      s.throttlePct < 5 &&
+      s.speedKmh > 15) {
+    return Situation.partialDecel;
+  }
   if (s.speedKmh <= 2) return Situation.idle;
   if (s.isStopAndGoContext) return Situation.stopAndGo;
   if (s.gradePct >= 3) return Situation.climbing;
+  // #2515 — sustained load / towing on the flat: the same high-load,
+  // moving signature as a climb but with no grade.
+  if (s.gradePct < 2 && s.speedKmh > 20 && s.loadPct >= 60) {
+    return Situation.sustainedLoad;
+  }
   if (s.speedKmh >= 80) return Situation.highway;
   return Situation.urban;
 }

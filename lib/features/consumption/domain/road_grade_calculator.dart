@@ -63,6 +63,14 @@ class RoadGradeCalculator {
   final List<_GradePoint> _points = <_GradePoint>[];
   double? _smoothedAltitudeM;
 
+  /// The most recent smoothed GPS altitude in metres, or null before
+  /// the first fix (#2515). Used by [BaselineRollingState] to pick the
+  /// altitude stratum a sample's baseline is bucketed under — the
+  /// smoothed value damps the ±10–30 m per-fix GPS noise the same way
+  /// the grade does. Null until a fix lands → the recorder defaults to
+  /// the sea-level stratum.
+  double? get latestSmoothedAltitudeM => _smoothedAltitudeM;
+
   /// Feed one sample. [cumulativeDistanceKm] is the trip's total
   /// distance so far (monotonically non-decreasing); [altitudeM] is the
   /// GPS altitude in metres, or null when no fix is available — a null

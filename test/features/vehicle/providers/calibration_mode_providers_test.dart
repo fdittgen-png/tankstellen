@@ -26,6 +26,10 @@ class _FakeFuzzyClassifier extends FuzzyClassifier {
     required double rpm,
     bool isStopAndGoContext = false,
     double loadPct = 0,
+    double? coolantTempC,
+    double? oilTempC,
+    double? ambientTempC,
+    double? pedalPct,
   }) =>
       result;
 }
@@ -176,6 +180,70 @@ void main() {
       );
       expect(votes, hasLength(1));
       expect(votes.single.situation, Situation.urban);
+    });
+
+    test('#2515 coldStart: cold coolant beats everything (highest priority)',
+        () async {
+      await setupRuleProfile();
+      final votes = container.read(
+        calibrationVotesProvider(
+          vehicleId: 'v1',
+          sample: const CalibrationSample(
+            speedKmh: 50, // would otherwise be urban
+            accelMps2: 0,
+            gradePct: 0,
+            throttlePct: 25,
+            rpm: 2000,
+            observedValue: 9.0,
+            coolantTempC: 45, // engine still warming up
+          ),
+        ),
+      );
+      expect(votes, hasLength(1));
+      expect(votes.single.situation, Situation.coldStart);
+    });
+
+    test('#2515 sustainedLoad: flat high load (grade < 2 %) → '
+        'Situation.sustainedLoad', () async {
+      await setupRuleProfile();
+      final votes = container.read(
+        calibrationVotesProvider(
+          vehicleId: 'v1',
+          sample: const CalibrationSample(
+            speedKmh: 60,
+            accelMps2: 0,
+            gradePct: 0, // flat — not a climb
+            throttlePct: 55,
+            rpm: 2400,
+            observedValue: 8.5,
+            loadPct: 80,
+            coolantTempC: 90, // warm, so cold-start doesn't fire
+          ),
+        ),
+      );
+      expect(votes, hasLength(1));
+      expect(votes.single.situation, Situation.sustainedLoad);
+    });
+
+    test('#2515 partialDecel: gentle coast band [-0.5, -0.1) → '
+        'Situation.partialDecel', () async {
+      await setupRuleProfile();
+      final votes = container.read(
+        calibrationVotesProvider(
+          vehicleId: 'v1',
+          sample: const CalibrationSample(
+            speedKmh: 40,
+            accelMps2: -0.3, // gentler than decel's < -0.5
+            gradePct: 0,
+            throttlePct: 2,
+            rpm: 1300, // below fuel-cut gate
+            observedValue: 2.5,
+            coolantTempC: 90,
+          ),
+        ),
+      );
+      expect(votes, hasLength(1));
+      expect(votes.single.situation, Situation.partialDecel);
     });
 
     test('decel: accel < -0.5 m/s² with throttle off → Situation.decel '

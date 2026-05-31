@@ -60,6 +60,28 @@ void main() {
     var distanceKm = 0.0;
     var elapsedS = 0;
 
+    // --- #2515 Cold warm-up FIRST: steady ~25 km/h, coolant rising
+    // 42 → 66 °C (below the 70 °C operating-temp gate the whole time)
+    // so every sample classifies as cold-start. ---
+    var coolant = 42.0;
+    for (var i = 0; i < 12; i++) {
+      const speed = 25.0;
+      distanceKm += speed / 3600.0;
+      elapsedS += 1;
+      coolant += 2.0; // 42 → 66 °C across the segment, all < 70
+      readings.add(TripLiveReading(
+        speedKmh: speed,
+        rpm: 1600,
+        fuelRateLPerHour: 5.0, // richer open-loop warm-up burn
+        throttlePercent: 22,
+        engineLoadPercent: 35,
+        absLoadPercent: 33,
+        coolantTempC: coolant,
+        distanceKmSoFar: distanceKm,
+        elapsed: Duration(seconds: elapsedS),
+      ));
+    }
+
     // --- Stop-and-go: oscillate 0 ↔ 30 km/h, several crossings ---
     const stopGoPattern = [
       30.0, 30.0, 0.0, 0.0, 30.0, 30.0, 0.0, 0.0, //
@@ -72,10 +94,12 @@ void main() {
         speedKmh: speed,
         rpm: speed > 1 ? 1500 : 800,
         fuelRateLPerHour: speed > 1 ? 4.0 : 0.8,
-        // Low throttle/load in the urban stop-and-go crawl.
+        // Low throttle/load in the urban stop-and-go crawl. Warm engine
+        // (coolant ≥ 70) so these classify as stop-and-go, not cold.
         throttlePercent: speed > 1 ? 18 : 2,
         engineLoadPercent: speed > 1 ? 25 : 12,
         absLoadPercent: speed > 1 ? 22 : 10,
+        coolantTempC: 88,
         distanceKmSoFar: distanceKm,
         elapsed: Duration(seconds: elapsedS),
       ));
@@ -98,10 +122,64 @@ void main() {
         throttlePercent: 60,
         engineLoadPercent: 85,
         absLoadPercent: 88,
+        coolantTempC: 90,
         altitudeM: altitude,
         distanceKmSoFar: distanceKm,
         elapsed: Duration(seconds: elapsedS),
       ));
+    }
+
+    // --- #2515 Flat sustained load / towing: steady 60 km/h on a FLAT
+    // road, high engine + abs load. The car keeps a GPS fix (the real
+    // towing scenario) but at a CONSTANT altitude, so the road-grade
+    // calculator converges to ~0 % — distinguishing a flat tow from the
+    // climb above. The rule path keys off load>70 + tight speed range +
+    // grade<2; the fuzzy load ramp fills sustainedLoad (NOT climbing,
+    // since grade < 2). Long enough (40 s) for the grade calculator to
+    // wash out the climb's altitude trend AND the rule classifier's
+    // 10-s window + 3-s debounce to settle. ---
+    final flatAltitude = altitude; // hold the climb's final altitude flat
+    for (var i = 0; i < 40; i++) {
+      const speed = 60.0;
+      distanceKm += speed / 3600.0;
+      elapsedS += 1;
+      readings.add(TripLiveReading(
+        speedKmh: speed,
+        rpm: 2400,
+        fuelRateLPerHour: 8.5,
+        throttlePercent: 55,
+        engineLoadPercent: 82,
+        absLoadPercent: 84,
+        coolantTempC: 90,
+        // Constant altitude ⇒ the smoothed grade converges to 0 % over
+        // the window: a flat tow, not a hill.
+        altitudeM: flatAltitude,
+        distanceKmSoFar: distanceKm,
+        elapsed: Duration(seconds: elapsedS),
+      ));
+    }
+
+    // --- #2515 Gentle coast: speed declining ~1.2 km/h/s (≈ -0.33 m/s²,
+    // inside the partial-decel band [-0.5, -0.1) for fuzzy and [-1, -0.1)
+    // for the rule path), throttle closed, moving > 15 km/h. Starts near
+    // the flat-load 60 km/h to avoid a big jump-in transient, and runs
+    // long enough for the rule debounce + window to settle. ---
+    var coastSpeed = 58.0;
+    for (var i = 0; i < 16; i++) {
+      distanceKm += coastSpeed / 3600.0;
+      elapsedS += 1;
+      readings.add(TripLiveReading(
+        speedKmh: coastSpeed,
+        rpm: 1300, // below the 1500 fuel-cut gate → injectors still fire
+        fuelRateLPerHour: 2.5,
+        throttlePercent: 2, // off the pedal
+        engineLoadPercent: 18,
+        absLoadPercent: 16,
+        coolantTempC: 90,
+        distanceKmSoFar: distanceKm,
+        elapsed: Duration(seconds: elapsedS),
+      ));
+      coastSpeed -= 1.2;
     }
 
     return readings;
@@ -172,6 +250,23 @@ void main() {
           reason: 'the climb segment must record at least one '
               'climbingOrLoaded sample in ${mode.name} mode — it sat at '
               '0/30 forever before #2513');
+    });
+
+    test('the three #2515 buckets each accumulate samples in '
+        '${mode.name} mode', () async {
+      final counts = await runTripIn(mode);
+
+      expect(counts[DrivingSituation.coldStartWarmup]!, greaterThan(0),
+          reason: 'the cold warm-up segment (coolant < 70 °C) must record '
+              'a coldStartWarmup sample in ${mode.name} mode (#2515)');
+      expect(counts[DrivingSituation.sustainedLoadOrTowing]!, greaterThan(0),
+          reason: 'the flat high-load segment (grade 0, load > 80) must '
+              'record a sustainedLoadOrTowing sample in ${mode.name} mode '
+              '(#2515)');
+      expect(counts[DrivingSituation.partialThrottleDecel]!, greaterThan(0),
+          reason: 'the gentle-coast segment (accel in the [-0.5, -0.1) '
+              'band) must record a partialThrottleDecel sample in '
+              '${mode.name} mode (#2515)');
     });
   }
 }

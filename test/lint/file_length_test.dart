@@ -151,7 +151,14 @@ void main() {
     // loop polled the DEAD old transport forever → silent data loss + a
     // timeout/StateError flood. Pure recovery wiring; decomposition of this
     // god-class is tracked by #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1471,
+    // #2515 — re-grandfathered 1471 → 1484: the live reading now carries
+    // the eight precision signals the calibration path consumes
+    // (oil/ambient temp + λ/baro/MAP/STFT/LTFT/pedal), each stamped from
+    // an existing snapshot latest-getter in `_emit` (+a shared dartdoc
+    // comment). Pure field-plumbing onto the existing TripLiveReading
+    // build; decomposition of this god-class is tracked by
+    // #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1484,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted

@@ -2211,6 +2211,15 @@ class AppLocalizationsPl extends AppLocalizations {
   String get situationClimbing => 'Podjazd / obciążenie';
 
   @override
+  String get situationColdStart => 'Cold start';
+
+  @override
+  String get situationSustainedLoad => 'Sustained load / towing';
+
+  @override
+  String get situationPartialDecel => 'Coasting';
+
+  @override
   String get situationHardAccel => 'Gwałtowne przyspieszenie';
 
   @override

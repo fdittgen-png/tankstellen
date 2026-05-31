@@ -26,6 +26,10 @@ void main() {
         DrivingSituation.highwayCruise,
         DrivingSituation.deceleration,
         DrivingSituation.climbingOrLoaded,
+        // #2515 — the three new persistent buckets.
+        DrivingSituation.coldStartWarmup,
+        DrivingSituation.sustainedLoadOrTowing,
+        DrivingSituation.partialThrottleDecel,
       ];
       for (final s in drivingSituations) {
         final petrol =

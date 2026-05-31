@@ -161,7 +161,7 @@ final class CalibrationVotesProvider
   }
 }
 
-String _$calibrationVotesHash() => r'2721bd36a6872ebd72c703fa0fc184a1e8377a7b';
+String _$calibrationVotesHash() => r'fa1396df210c240e2179a0bb24d6e73726d626a5';
 
 /// Turn [sample] into a list of Welford votes according to the
 /// vehicle's current calibration mode.

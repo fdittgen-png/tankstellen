@@ -4130,6 +4130,24 @@ abstract class AppLocalizations {
   /// **'Climbing / loaded'**
   String get situationClimbing;
 
+  /// No description provided for @situationColdStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold start'**
+  String get situationColdStart;
+
+  /// No description provided for @situationSustainedLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Sustained load / towing'**
+  String get situationSustainedLoad;
+
+  /// No description provided for @situationPartialDecel.
+  ///
+  /// In en, this message translates to:
+  /// **'Coasting'**
+  String get situationPartialDecel;
+
   /// No description provided for @situationHardAccel.
   ///
   /// In en, this message translates to:

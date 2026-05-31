@@ -2220,6 +2220,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get situationClimbing => 'Steigung / beladen';
 
   @override
+  String get situationColdStart => 'Kaltstart';
+
+  @override
+  String get situationSustainedLoad => 'Dauerlast / Anhänger';
+
+  @override
+  String get situationPartialDecel => 'Ausrollen';
+
+  @override
   String get situationHardAccel => 'Harte Beschl.';
 
   @override

@@ -2206,6 +2206,15 @@ class AppLocalizationsSl extends AppLocalizations {
   String get situationClimbing => 'Vzpenjanje / obremenitev';
 
   @override
+  String get situationColdStart => 'Cold start';
+
+  @override
+  String get situationSustainedLoad => 'Sustained load / towing';
+
+  @override
+  String get situationPartialDecel => 'Coasting';
+
+  @override
   String get situationHardAccel => 'Močno pospeševanje';
 
   @override
