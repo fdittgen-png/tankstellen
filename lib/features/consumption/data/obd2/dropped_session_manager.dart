@@ -129,13 +129,11 @@ class DroppedSessionManager {
   /// `debugReconnectScanner` test hook.
   AdapterReconnectScanner? get reconnectScanner => _reconnectScanner;
 
-  /// React to a detected connection drop (#797 / #1904). A
-  /// `transportError` drop first enters the invisible reconnect window
-  /// (scheduler stopped, scanner probing, host still reporting
-  /// `recording`); only if [_silentReconnectWindow] elapses with no
-  /// reconnect does it escalate to the visible state. A `silentFailure`
-  /// drop escalates straight to visible — reconnecting the Bluetooth
-  /// link cannot revive a dead ECU.
+  /// React to a detected connection drop (#797 / #1904). A `transportError`
+  /// drop first enters the invisible reconnect window (scheduler stopped,
+  /// scanner probing, host still `recording`); only if [_silentReconnectWindow]
+  /// elapses with no reconnect does it escalate to visible. A `silentFailure`
+  /// drop escalates straight to visible — a reconnect cannot revive a dead ECU.
   void handleDrop({
     TripDropReason reason = TripDropReason.transportError,
   }) {
@@ -148,6 +146,9 @@ class DroppedSessionManager {
       detail: reason.name,
     );
     _host.stopScheduler();
+    // #2524 — tear down the now-dead service so its channel closes + any
+    // stranded `_pending` fails (else it later trips the concurrent guard).
+    _host.disconnectDroppedService();
     _host.clearDropDetectorErrorWindow();
     _persistPausedSnapshot();
     if (reason == TripDropReason.transportError &&
@@ -272,9 +273,9 @@ class DroppedSessionManager {
     }
   }
 
-  /// Persist the in-progress trip snapshot to the paused-trips box on
-  /// drop (#797 phase 1). Fire-and-forget; Hive errors are logged by
-  /// the repo and must not throw back into the scheduler callback.
+  /// Persist the in-progress trip snapshot to the paused-trips box on drop
+  /// (#797 phase 1). Fire-and-forget; Hive errors are logged by the repo and
+  /// must not throw back into the scheduler callback.
   void _persistPausedSnapshot() {
     final repo = _resolvePausedRepo();
     final id = _host.sessionId;
@@ -296,9 +297,9 @@ class DroppedSessionManager {
     repo.save(entry);
   }
 
-  /// Delete this session's row from the paused-trips box — the session
-  /// is live again, so leaving the partial behind would let a later
-  /// pause stomp the in-memory state. Best-effort.
+  /// Delete this session's row from the paused-trips box — the session is
+  /// live again, so leaving the partial behind would let a later pause stomp
+  /// the in-memory state. Best-effort.
   void clearPausedTripRow() {
     final id = _host.sessionId;
     if (id == null) return;
@@ -373,17 +374,17 @@ class DroppedSessionManager {
   }
 
   /// Cancel the grace timer + clear the drop reason — called by the
-  /// controller's resume() before it clears the paused row and re-arms
-  /// the detector. Scanner teardown stays the caller's job.
+  /// controller's resume() before it clears the paused row and re-arms the
+  /// detector. Scanner teardown stays the caller's job.
   void cancelGrace() {
     _graceTimer?.cancel();
     _graceTimer = null;
     _dropReason = null;
   }
 
-  /// Tear down every pending timer + the silent-reconnect flag — called
-  /// by the controller's stop(). Scanner teardown is awaited separately
-  /// by stop() via [stopReconnectScanner].
+  /// Tear down every pending timer + the silent-reconnect flag — called by
+  /// the controller's stop(). Scanner teardown is awaited separately by
+  /// stop() via [stopReconnectScanner].
   void cancelAllTimers() {
     _graceTimer?.cancel();
     _graceTimer = null;
@@ -394,8 +395,7 @@ class DroppedSessionManager {
 
   /// Test seam: synchronously drive the grace-window finalisation path
   /// without waiting for the real timer. Plain (not `@visibleForTesting`)
-  /// because the controller's own test-only `debugExpireGraceWindow`
-  /// hook delegates here — mirroring `TripDistanceResolver`'s seam style.
+  /// because the controller's `debugExpireGraceWindow` hook delegates here.
   Future<void> expireGraceWindowNow() async {
     _graceTimer?.cancel();
     await _onGraceWindowElapsed();

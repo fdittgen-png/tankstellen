@@ -575,10 +575,15 @@ void main() {
     });
 
     test(
-        'the aggregated "adapter unresponsive" diagnostic is rate-limited '
-        'to ≤1 per window', () async {
-      // Four PIDs all time out → past the backoff threshold. Over many
-      // ticks the aggregated diagnostic must fire AT MOST ONCE per window.
+        'the aggregated "adapter unresponsive" diagnostic logs at most ONE '
+        'ERROR per unresponsive EPISODE — not per tick, not per window (#2524)',
+        () async {
+      // #2524 — reclassification: a known-unresponsive adapter must NOT
+      // spool a per-tick ERROR. At most one real ERROR is logged on the
+      // TRANSITION into the unresponsive state; while it persists, the
+      // aggregate is a debugPrint breadcrumb only. The errorlog_9 field
+      // report showed 39× TimeoutException + 6× StateError flooding the
+      // user error log from this single site after an in-trip reconnect.
       var fakeNow = DateTime(2026, 1, 1, 12);
       Future<String> transport(String command) async {
         throw Exception('timeout');
@@ -595,8 +600,8 @@ void main() {
       scheduler.start();
 
       // Pump ~40 ticks across ~10 s of simulated time. All four PIDs back
-      // off; the diagnostic could fire on every one of dozens of failing
-      // ticks if it weren't rate-limited.
+      // off and STAY backed off (one continuous episode). The old per-tick
+      // flood would log dozens of ERROR traces here.
       for (var i = 0; i < 40; i++) {
         await pump();
         fakeNow = fakeNow.add(const Duration(milliseconds: 250));
@@ -609,25 +614,93 @@ void main() {
           .where((e) => e.toString().contains('adapter unresponsive'))
           .toList();
       expect(diagnostics, hasLength(1),
-          reason: 'within a single 30 s window only one diagnostic may fire');
+          reason: 'one continuous unresponsive episode logs exactly one '
+              'ERROR — on the transition in, never per-tick');
       expect(diagnostics.single.layer, ErrorLayer.other);
 
-      // Cross the 30 s window and pump again — a second diagnostic is now
-      // allowed (proving it is windowed, not one-shot).
+      // Cross the 30 s window WITHOUT recovering. Because the episode never
+      // closed (the adapter stayed dead), NO second ERROR may fire — the
+      // gate is now the episode transition, not the wall-clock window.
       fakeNow = fakeNow.add(const Duration(seconds: 31));
       scheduler.start();
-      for (var i = 0; i < 4; i++) {
+      for (var i = 0; i < 8; i++) {
         await pump();
         fakeNow = fakeNow.add(const Duration(milliseconds: 250));
       }
       scheduler.stop();
       await pump();
-      final after = recorder.calls
+      final stillSameEpisode = recorder.calls
           .whereType<ContextualError>()
           .where((e) => e.toString().contains('adapter unresponsive'))
           .toList();
-      expect(after.length, greaterThanOrEqualTo(2),
-          reason: 'a fresh window permits another diagnostic');
+      expect(stillSameEpisode, hasLength(1),
+          reason: 'a still-open episode never re-logs, even across the '
+              'diagnostic window — no per-tick flood (#2524)');
+    });
+
+    test(
+        'a NEW unresponsive episode (after recovery) logs a fresh ERROR '
+        '(#2524)', () async {
+      // The episode latch closes when enough PIDs recover; a genuinely new
+      // outage afterwards is still surfaced exactly once.
+      var fakeNow = DateTime(2026, 1, 1, 12);
+      var failing = true;
+      Future<String> transport(String command) async {
+        if (failing) throw Exception('timeout');
+        return '41 ${command.substring(2, 4)} 00>';
+      }
+
+      final scheduler = PidScheduler(
+        transport: transport,
+        tickRate: const Duration(milliseconds: 5),
+        clock: () => fakeNow,
+      );
+      for (final pid in ['010C', '010D', '0105', '0106']) {
+        scheduler.subscribe(pid, ScheduledPid(hz: 5.0), (_) {});
+      }
+      scheduler.start();
+
+      // Episode 1 — all PIDs dead → one ERROR.
+      for (var i = 0; i < 30; i++) {
+        await pump();
+        fakeNow = fakeNow.add(const Duration(milliseconds: 250));
+      }
+      final afterEpisode1 = recorder.calls
+          .whereType<ContextualError>()
+          .where((e) => e.toString().contains('adapter unresponsive'))
+          .length;
+      expect(afterEpisode1, 1, reason: 'episode 1 logs exactly one ERROR');
+
+      // Recover — every PID answers, so backedOffCount drops below the
+      // threshold and the episode latch closes. Pump generously so the
+      // round-robin reaches every PID at least once.
+      failing = false;
+      for (var i = 0; i < 80; i++) {
+        await pump();
+        fakeNow = fakeNow.add(const Duration(milliseconds: 250));
+      }
+      expect(scheduler.backedOffCount, lessThan(3),
+          reason: 'a stretch of successes must drop the backed-off count '
+              'below the threshold so the unresponsive episode latch closes');
+
+      // Episode 2 — the adapter dies again well past the 30 s window. A
+      // genuinely new outage must surface a second ERROR.
+      failing = true;
+      fakeNow = fakeNow.add(const Duration(seconds: 31));
+      for (var i = 0; i < 30; i++) {
+        await pump();
+        fakeNow = fakeNow.add(const Duration(milliseconds: 250));
+      }
+      scheduler.stop();
+      await pump();
+
+      final total = recorder.calls
+          .whereType<ContextualError>()
+          .where((e) => e.toString().contains('adapter unresponsive'))
+          .length;
+      expect(total, 2,
+          reason: 'a fresh unresponsive episode after recovery logs a '
+              'second ERROR — one per episode, not per tick (#2524)');
     });
   });
 

@@ -142,7 +142,16 @@ void main() {
     // the baseline recorder so the fuzzy path can fill the climbing/loaded
     // bucket from a real road grade and/or load ramp (#2513). Pure wiring;
     // decomposition of this god-class is tracked by #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1412,
+    // #2524 — re-grandfathered → 1471: the in-trip reconnect now swaps the
+    // controller's live service (`_service` made mutable + the new
+    // `replaceService` method that points the recording loop at the
+    // reconnected transport AND tears down the dead one) plus the
+    // `_DroppedSessionHostAdapter.disconnectDroppedService` hook that fails
+    // the dead transport's stranded `_pending` on a drop. Before this the
+    // loop polled the DEAD old transport forever → silent data loss + a
+    // timeout/StateError flood. Pure recovery wiring; decomposition of this
+    // god-class is tracked by #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1471,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted

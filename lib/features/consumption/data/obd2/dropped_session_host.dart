@@ -21,6 +21,15 @@ abstract class DroppedSessionHost {
   /// so no further transport chatter happens while we recover.
   void stopScheduler();
 
+  /// Tear down the CURRENT (now-dead) OBD2 service the instant a drop is
+  /// detected (#2524). Closes its transport channel and fails any command
+  /// stranded in the transport's `_pending` via `_failPending`, so the
+  /// abandoned half-dead instance can't later trip the
+  /// concurrent-sendCommand guard. Best-effort + fire-and-forget — the
+  /// link is already gone, so a disconnect error here is expected and must
+  /// not derail the recovery state machine.
+  void disconnectDroppedService();
+
   /// Resume the PID polling loop after a silent reconnect inside the
   /// #1904 window. Production gates this on "not paused / not stopped"
   /// itself; the manager just asks.

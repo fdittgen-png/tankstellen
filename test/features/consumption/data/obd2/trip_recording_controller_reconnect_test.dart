@@ -1,12 +1,17 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_reconnect_scanner.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/data/obd2/paused_trip_repository.dart';
@@ -504,7 +509,247 @@ void main() {
         await ctl.stop();
       });
     });
+
+    // ── #2524 — reconnect must swap the controller onto the LIVE service ──
+    //
+    // The existing #797/#1904 tests above reuse ONE healthy fake transport,
+    // so they never exercise the swap: a real in-trip reconnect builds a
+    // BRAND-NEW Obd2Service + transport. Without `replaceService` the
+    // recording loop keeps polling the DEAD old transport forever — every
+    // poll times out, a stranded `_pending` trips the concurrent-sendCommand
+    // guard, both flood the error log, and the rest of the drive records
+    // nothing.
+    group('reconnect builds a NEW transport — controller swap (#2524)', () {
+      // Capture errorLogger.log calls so we can assert NO concurrent-
+      // sendCommand StateError reaches the spool.
+      late _CaptureRecorder recorder;
+      setUp(() {
+        recorder = _CaptureRecorder();
+        errorLogger.resetForTest();
+        errorLogger.testRecorderOverride = recorder;
+      });
+      tearDown(errorLogger.resetForTest);
+
+      test(
+          'after replaceService the recording loop polls the LIVE transport '
+          '(samples flow), the OLD service is disconnected + its stranded '
+          'pending failed, and no concurrent StateError is error-logged',
+          () async {
+        // The OLD service: a half-dead transport. It answers the init /
+        // odometer / VIN reads (so trip-start completes), NO-DATAs other
+        // PIDs, but strands `010C` in _pending — the #2524 leak the swap
+        // must fail cleanly on disconnect.
+        final oldTransport =
+            _DeadTransport(initResponses(), strandCommand: '010C');
+        await oldTransport.connect();
+        // Strand a pending command on the dead transport (never resolves
+        // until disconnect fails it).
+        final stranded = oldTransport.sendCommand('010C');
+        var strandedFailed = false;
+        unawaited(stranded.then(
+          (_) {},
+          onError: (_) => strandedFailed = true,
+        ));
+
+        // The NEW, healthy transport built by the (simulated) reconnect.
+        final liveTransport = _LiveTransport({
+          ...initResponses(),
+          '010D': '41 0D 32>', // 50 km/h
+          '010C': '41 0C 0E A6>', // ~937 rpm
+        });
+        await liveTransport.connect();
+        final liveService = Obd2Service(liveTransport);
+
+        VoidCallback? capturedOnReconnect;
+        final ctl = TripRecordingController(
+          service: Obd2Service(oldTransport),
+          pollInterval: const Duration(milliseconds: 40),
+          schedulerTickRate: const Duration(milliseconds: 10),
+          vehicleId: 'car-2524',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          pinnedAdapterMac: 'AA:BB',
+          // A scanner whose onReconnect we fire manually; on fire it stands
+          // in for ReconnectConnector.onConnected → ctl.replaceService.
+          reconnectScannerFactory: (mac, onReconnect) {
+            capturedOnReconnect = onReconnect;
+            return _ObservableScanner(
+              pinnedMac: mac,
+              onReconnect: onReconnect,
+              onStart: () {},
+              onStop: () {},
+            );
+          },
+        );
+
+        await ctl.start();
+        // Drop → enters the silent reconnect window. handleDrop tears down
+        // the OLD service (#2524), which fails its stranded _pending.
+        ctl.debugTriggerDrop();
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        expect(strandedFailed, isTrue,
+            reason: 'the drop must disconnect the dead service so its '
+                'stranded _pending is failed cleanly, not left hanging');
+        expect(oldTransport.disconnectCount, greaterThanOrEqualTo(1),
+            reason: 'the OLD service must be disconnected on drop');
+
+        // Simulate the reconnect landing a NEW live service: this is what
+        // ReconnectConnector.onConnected → Obd2RecordingPipeline does.
+        ctl.replaceService(liveService);
+        capturedOnReconnect!.call();
+        expect(ctl.currentState, TripRecordingControllerState.recording,
+            reason: 'a silent reconnect keeps the state at recording');
+
+        // Collect live readings from the NEW transport. Before the fix the
+        // loop kept polling the dead old transport and nothing flowed.
+        final readings = <TripLiveReading>[];
+        final sub = ctl.live.listen(readings.add);
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+
+        expect(readings.any((r) => r.speedKmh == 50), isTrue,
+            reason: '#2524 — after replaceService the scheduler must poll '
+                'the LIVE transport: the 50 km/h sample only exists there');
+        expect(liveTransport.pidPollCount, greaterThan(0),
+            reason: 'the live transport must actually receive PID polls');
+
+        // No concurrent-sendCommand StateError reached the error logger.
+        final stateErrors = recorder.calls.where((e) {
+          final s = e.toString().toLowerCase();
+          return e is StateError && s.contains('concurrent');
+        });
+        expect(stateErrors, isEmpty,
+            reason: 'the concurrent-sendCommand guard must never reach the '
+                'error logger as a raw StateError (#2524)');
+
+        await sub.cancel();
+        await ctl.stop();
+      });
+
+      test(
+          'replaceService is idempotent — passing the current service is a '
+          'no-op and does not disconnect it', () async {
+        final transport = _LiveTransport(initResponses());
+        await transport.connect();
+        final service = Obd2Service(transport);
+        final ctl = TripRecordingController(
+          service: service,
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-2524-idem',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+        );
+        await ctl.start();
+
+        ctl.replaceService(service); // same instance
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        expect(transport.disconnectCount, 0,
+            reason: 'replaceService(currentService) must be a no-op');
+
+        await ctl.stop();
+      });
+    });
   });
+}
+
+/// Captures every `errorLogger.log` call routed through the foreground
+/// recorder seam (#2524 assertion (c)). Mirrors the fake in
+/// `pid_scheduler_test.dart`.
+class _CaptureRecorder implements TraceRecorder {
+  final calls = <Object>[];
+
+  @override
+  Future<void> record(
+    Object error,
+    StackTrace stackTrace, {
+    ServiceChainSnapshot? serviceChainState,
+  }) async {
+    calls.add(error);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
+}
+
+/// The OLD transport after a drop: its channel is dead but `_connected`
+/// stays true. It answers scripted commands (so trip-start's odometer /
+/// VIN reads complete) and NO-DATAs everything else, EXCEPT the single
+/// [strandCommand], which never resolves — modelling a command stranded
+/// in the half-dead instance's `_pending` until [disconnect] fails it (the
+/// #2524 leak the controller must tear down on reconnect).
+class _DeadTransport implements Obd2Transport {
+  _DeadTransport(this._responses, {this.strandCommand});
+
+  final Map<String, String> _responses;
+  final String? strandCommand;
+  bool _connected = false;
+  int disconnectCount = 0;
+  final List<Completer<String>> _stranded = <Completer<String>>[];
+
+  @override
+  Future<void> connect() async => _connected = true;
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<String> sendCommand(String command) {
+    if (!_connected) {
+      return Future.error(StateError('Not connected'));
+    }
+    final cmd = command.trim();
+    if (strandCommand != null && cmd == strandCommand) {
+      // Never resolves — stranded in _pending until disconnect fails it.
+      final c = Completer<String>();
+      _stranded.add(c);
+      return c.future;
+    }
+    return Future<String>.value(_responses[cmd] ?? 'NO DATA>');
+  }
+
+  @override
+  Future<void> disconnect() async {
+    _connected = false;
+    disconnectCount++;
+    for (final c in _stranded) {
+      if (!c.isCompleted) {
+        c.completeError(const Obd2DisconnectedException('link torn down'));
+      }
+    }
+    _stranded.clear();
+  }
+}
+
+/// The NEW, healthy transport built by a real reconnect: answers PIDs from
+/// a scripted map and counts live-PID polls so the test can prove the
+/// scheduler is hitting THIS transport after the swap (#2524).
+class _LiveTransport implements Obd2Transport {
+  _LiveTransport(this._responses);
+
+  final Map<String, String> _responses;
+  bool _connected = false;
+  int disconnectCount = 0;
+  int pidPollCount = 0;
+
+  @override
+  Future<void> connect() async => _connected = true;
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<String> sendCommand(String command) async {
+    if (!_connected) throw StateError('Not connected');
+    final cmd = command.trim();
+    if (cmd == '010D' || cmd == '010C') pidPollCount++;
+    return _responses[cmd] ?? 'NO DATA>';
+  }
+
+  @override
+  Future<void> disconnect() async {
+    _connected = false;
+    disconnectCount++;
+  }
 }
 
 /// Test-local transport whose [sendCommand] throws for the first

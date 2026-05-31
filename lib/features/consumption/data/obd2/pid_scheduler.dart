@@ -9,6 +9,7 @@ import 'obd2_comm_diagnostics.dart';
 import 'pid_bandwidth_governor.dart';
 import 'pid_scheduler_comm_diagnostics.dart';
 import 'scheduled_pid.dart';
+import 'unresponsive_adapter_diagnostic.dart';
 
 // Re-export the per-PID config vocabulary (#2457) so existing call sites
 // that import `pid_scheduler.dart` keep seeing PidPriority / PidTier /
@@ -115,10 +116,16 @@ class PidScheduler {
   String? _inFlight;
   int _subscriptionCounter = 0;
 
-  /// When the last aggregated "adapter unresponsive" diagnostic was
-  /// emitted, used to rate-limit it to ≤1 per [_diagnosticWindow]. Null
-  /// until the first one fires.
-  DateTime? _lastDiagnosticAt;
+  /// #2524 — owns the "adapter broadly unresponsive" log-once-per-episode
+  /// decision (extracted so the selection core stays under the 400-line
+  /// cap). Logs ≤1 ERROR per episode transition; per-tick it is a
+  /// `debugPrint` breadcrumb, never an `errorLogger.log` flood (#2424/#2428).
+  late final UnresponsiveAdapterDiagnostic _unresponsiveDiagnostic =
+      UnresponsiveAdapterDiagnostic(
+    backoffThreshold: _backoffThreshold,
+    window: _diagnosticWindow,
+    clock: _clock,
+  );
 
   /// Bandwidth governor (#2457). Owns the achieved-reads windows + the
   /// demotion policy that protects the dynamics tier on a slow link. The
@@ -354,22 +361,11 @@ class PidScheduler {
     }
   }
 
-  /// Emit AT MOST ONE aggregated "adapter unresponsive" diagnostic per
-  /// [_diagnosticWindow] when [_backoffThreshold]+ PIDs are backed off —
-  /// a rate-limited replacement for the old one-error-per-PID-per-tick
-  /// flood that still makes a broadly-dead adapter visible in triage (#2379).
+  /// Surface a broadly-unresponsive adapter WITHOUT flooding the error log
+  /// (#2379 / #2524). Delegates the log-once-per-episode decision to
+  /// [UnresponsiveAdapterDiagnostic]; see that class for the contract.
   void _maybeEmitUnresponsiveDiagnostic(Object error, StackTrace stack) {
-    final downCount = backedOffCount;
-    if (downCount < _backoffThreshold) return;
-    final now = _clock();
-    final last = _lastDiagnosticAt;
-    if (last != null && now.difference(last) < _diagnosticWindow) return;
-    _lastDiagnosticAt = now;
-    unawaited(errorLogger.log(ErrorLayer.other, error, stack, context: {
-      'where': 'PidScheduler: OBD2 adapter unresponsive — '
-          '$downCount PIDs timing out',
-      'backedOffPids': downCount,
-    }));
+    _unresponsiveDiagnostic.onFailure(backedOffCount, error, stack);
   }
 }
 

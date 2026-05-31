@@ -35,16 +35,14 @@ import 'trip_recording_state.dart';
 /// owned [Obd2Service], the [TripRecordingController] + its live /
 /// stateChanges subscriptions, the adapter-identity snapshot (#1312), the
 /// one-shot capability-probe latch (#2261), and the auto-reconnect scanner
-/// factory (#797 / #2245). The focused collaborators are *injected* from
-/// the notifier so they outlive a single recording and the test counters
-/// accumulate exactly as the inline fields did.
+/// factory (#797 / #2245). Focused collaborators are *injected* from the
+/// notifier so they outlive a single recording.
 ///
 /// Deliberately NOT owned: the Riverpod `state`, the last-trip identity
 /// fields, `_saveToHistory`, and the #1303 active-trip WAL (+ #1347
-/// cold-start recovery) stay on the notifier, reached through the
-/// [Obd2RecordingPipelineHost] — the WAL survives the recording loop being
-/// torn down (recovery runs with no pipeline at all), so it belongs to the
-/// notifier. The seed / flush cadence is driven through the same host hooks.
+/// cold-start recovery) stay on the notifier via [Obd2RecordingPipelineHost]
+/// — the WAL survives the recording loop being torn down (recovery runs with
+/// no pipeline at all). The seed / flush cadence uses the same host hooks.
 class Obd2RecordingPipeline implements RecordingPipeline {
   Obd2RecordingPipeline({
     required Ref ref,
@@ -143,13 +141,11 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // of the legacy 0.85 literal until VeLearner converges. Null on no-match.
     final matchedReference = tryMatchReferenceVehicle(_ref, activeVehicle);
     // #2506 — build the SHARED GPS-physics live-estimate + coaching folder
-    // from the active vehicle + its calibration matrix (mirrors the
-    // GPS-only pipeline). Folded per no-fuel-PID tick inside the controller
-    // so the OBD2 live screen carries `~ estimated` consumption + GPS
-    // coaching instead of dashing the whole drive on a car that exposes no
-    // fuel-rate PID — live now mirrors the proven post-trip
-    // `Obd2GpsEstimateFallback`. A null vehicle / matrix falls back to the
-    // population-default class + cold-start scale.
+    // (mirrors the GPS-only pipeline). Folded per no-fuel-PID tick inside the
+    // controller so the OBD2 live screen carries `~ estimated` consumption +
+    // GPS coaching instead of dashing a no-fuel-PID car's whole drive — live
+    // mirrors the post-trip `Obd2GpsEstimateFallback`. Null vehicle / matrix
+    // → population-default class + cold-start scale.
     final gpsEstimateFolder = GpsLiveEstimateFolder.forVehicle(
       activeVehicle,
       activeVehicle?.gpsCalibration,
@@ -200,11 +196,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       final classified = _baselines.recordAndClassify(reading);
       _haptics.fireForBandTransition(_host.state.band, classified.band);
       // #2506 — surface the GPS coaching hint the controller computed on a
-      // no-fuel-PID tick. `MinimalDriveSummary` already swaps to the GPS
-      // coaching triplet when `reading.fuelRateLPerHour == null` and reads
-      // `state.gpsCoachingHint`, so publishing it here lights the chips on
-      // the OBD2 live screen exactly as it does for GPS-only trips. Null
-      // (a measured fuel rate is present, or no hint applies) clears it.
+      // no-fuel-PID tick. `MinimalDriveSummary` swaps to the GPS coaching
+      // triplet when `reading.fuelRateLPerHour == null` and reads
+      // `state.gpsCoachingHint`, so publishing it here lights the chips on the
+      // OBD2 live screen too. Null (measured fuel present / no hint) clears it.
       final gpsHint = ctl.latestGpsCoachingHint;
       _host.state = _host.state.copyWith(
         phase: _phaseFor(ctl),
@@ -239,8 +234,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       unawaited(_host.flushActiveSnapshot(force: true));
     });
     // #2274 concern 2 — going live clears any connecting stage so the
-    // recording screen swaps the inline progress card for the live
-    // metrics on the same frame.
+    // recording screen swaps the progress card for live metrics that frame.
     _host.state = _host.state.copyWith(
       phase: TripRecordingPhase.recording,
       clearConnectStage: true,
@@ -281,8 +275,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // Snapshot the captured-samples buffer BEFORE stop() tears down the
     // controller — else the trip-detail charts render empty (#1040).
     final capturedSamples = List<TripSample>.unmodifiable(ctl.capturedSamples);
-    // #1458 phase 2 — snapshot the GPS cadence diagnostics BEFORE teardown,
-    // same reason. Always captured (empty when GPS off).
+    // #1458 phase 2 — snapshot GPS cadence diagnostics BEFORE teardown (same
+    // reason); always captured (empty when GPS off).
     final capturedGpsDiagnostics = List<GpsSampleDiagnostic>.unmodifiable(
       ctl.capturedGpsSampleDiagnostics,
     );
@@ -297,7 +291,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
     // #2509 — GPS-fix count BEFORE teardown: lets the guard keep a real
-    // GPS-tracked drive whose OBD2 link was dead apart from a stationary stop.
+    // dead-OBD2 GPS-tracked drive apart from a stationary stop.
     final gpsFixCount = ctl.gpsFixCount;
     await _liveSub?.cancel();
     _liveSub = null;
@@ -385,9 +379,15 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // scanner's repeated connect cycles. The connect callback prefers a
       // DIRECT GATT connect (works for clones that stop advertising in
       // standby) and only falls back to an RSSI-gated scan (#2245).
+      // #2524 — swap the pipeline's pointer (so stop() tears down the LIVE
+      // svc) AND the controller's via `replaceService` (so the loop polls the
+      // reconnected transport, not the closed one). See `replaceService`.
       final connector = ReconnectConnector(
         connection: connection,
-        onConnected: (svc) => _service = svc,
+        onConnected: (svc) {
+          _service = svc;
+          _controller?.replaceService(svc);
+        },
       );
       return AdapterReconnectScanner(
         pinnedMac: pinnedMac,
