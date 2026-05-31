@@ -7,10 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/current_shell_branch_provider.dart';
-import '../../../../app/responsive_search_layout.dart';
 import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
-import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/presentation/widgets/ev_filter_chips.dart';
@@ -18,10 +16,7 @@ import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../search/providers/search_provider.dart';
-import '../../../search/providers/selected_station_provider.dart';
-import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
 import '../widgets/nearby_map_view.dart';
-import '../widgets/price_legend.dart';
 import '../widgets/route_map_view.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -156,16 +151,6 @@ class _MapScreenState extends ConsumerState<MapScreen>
         ref.watch(currentShellBranchProvider) == _mapBranchIndex;
     final showEv = ref.watch(evShowOnMapProvider);
 
-    // #2532 — on a wide screen a marker tap selects the station into the
-    // side panel rather than pushing the full route; on compact the marker
-    // keeps its default `/station/:id` push (passing null leaves the
-    // StationMarkerBuilder default untouched). The detail then renders in a
-    // sibling pane beside the still-full-bleed map (see body below).
-    final isWide = screenSizeOf(context) != ScreenSize.compact;
-    final void Function(String)? onStationTap = isWide
-        ? (id) => ref.read(selectedStationProvider.notifier).select(id)
-        : null;
-
     final Widget body;
     if (!isVisibleBranch) {
       // Offstage: render nothing heavy. When the branch becomes visible
@@ -182,42 +167,14 @@ class _MapScreenState extends ConsumerState<MapScreen>
               routeResult: routeState.value!,
               selectedFuel: selectedFuel,
               mapController: _mapController,
-              onStationTap: onStationTap,
             )
           : NearbyMapView(
               searchState: searchState,
               selectedFuel: selectedFuel,
               searchRadiusKm: searchRadius,
               mapController: _mapController,
-              onStationTap: onStationTap,
             );
     }
-
-    // The master pane — the EV filter chips + the (gated) map body, wrapped
-    // in the #1959 share boundary so the Share action still renders ONLY the
-    // map to a PNG (the detail pane is a sibling, outside the boundary).
-    final Widget mapPane = RepaintBoundary(
-      key: _shareBoundaryKey,
-      child: Column(
-        children: [
-          if (isVisibleBranch && showEv) const EvFilterChips(),
-          Expanded(child: body),
-        ],
-      ),
-    );
-
-    // #2532 — on wide, the selected station (if any) shows its inline detail
-    // in the side pane; otherwise the pane is the empty-state legend. On
-    // compact `ResponsiveMasterDetail` hides the detail entirely, so the map
-    // stays byte-for-byte full-bleed and the marker tap pushes the route.
-    final selectedStationId = ref.watch(selectedStationProvider);
-    final Widget detailPane = selectedStationId != null
-        ? StationDetailInline(
-            stationId: selectedStationId,
-            onClose: () =>
-                ref.read(selectedStationProvider.notifier).clear(),
-          )
-        : const _MapDetailPlaceholder();
 
     return PageScaffold(
       title: l10n?.map ?? 'Map',
@@ -240,40 +197,15 @@ class _MapScreenState extends ConsumerState<MapScreen>
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
-      body: ResponsiveMasterDetail(
-        master: mapPane,
-        detail: detailPane,
+      body: RepaintBoundary(
+        key: _shareBoundaryKey,
+        child: Column(
+          children: [
+            if (isVisibleBranch && showEv) const EvFilterChips(),
+            Expanded(child: body),
+          ],
+        ),
       ),
-    );
-  }
-}
-
-/// Empty-state side pane shown on a wide map screen when no station is
-/// selected (#2532). A simple hint plus the [PriceLegend] so the colour
-/// ramp is explained even before the user has tapped a marker. Uses only
-/// existing ARB keys — no new strings.
-class _MapDetailPlaceholder extends StatelessWidget {
-  const _MapDetailPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: EmptyState(
-            icon: Icons.touch_app_outlined,
-            title: l10n?.startSearch ??
-                'Search for stations to see them on the map',
-            iconSize: 64,
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.only(bottom: 16),
-          child: PriceLegend(),
-        ),
-      ],
     );
   }
 }

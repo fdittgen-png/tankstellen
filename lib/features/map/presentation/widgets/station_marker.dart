@@ -55,13 +55,6 @@ class StationMarkerBuilder {
   /// When [compact] is true, the marker renders as a small coloured dot
   /// (no price text) — used for lower-ranked stations so a bounded result
   /// set stays fully visible without the full bubbles overlapping (#2510).
-  ///
-  /// [onStationTap] overrides the default tap behaviour (#2532). When null
-  /// the marker pushes the full `/station/:id` detail route (the compact
-  /// phone behaviour, unchanged). On a wide screen the map screen supplies a
-  /// callback that instead selects the station into the side panel via
-  /// `selectedStationProvider` — no route change, the detail renders in the
-  /// detail pane beside the still-full-bleed map.
   static Marker build(
     BuildContext context,
     Station station,
@@ -70,7 +63,6 @@ class StationMarkerBuilder {
     double maxPrice, {
     bool pastel = false,
     bool compact = false,
-    void Function(String stationId)? onStationTap,
   }) {
     // #2510 — strict selected-fuel price, exactly like the list card. No
     // fallback to another fuel: a station lacking the selected fuel shows
@@ -107,9 +99,7 @@ class StationMarkerBuilder {
           label: semanticLabel,
           button: true,
           child: GestureDetector(
-            onTap: () => onStationTap != null
-                ? onStationTap(station.id)
-                : GoRouter.of(context).push('/station/${station.id}'),
+            onTap: () => GoRouter.of(context).push('/station/${station.id}'),
             child: Tooltip(
               message: brand,
               waitDuration: const Duration(milliseconds: 300),
