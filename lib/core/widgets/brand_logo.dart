@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../theme/app_radius.dart';
 import '../utils/brand_logo_mapper.dart';
 
 /// Displays a brand logo for a fuel station, with automatic fallback
@@ -51,7 +52,7 @@ class BrandLogo extends StatelessWidget {
     // resolution wasted memory on every card (#1761).
     final cachePx = (size * MediaQuery.devicePixelRatioOf(context)).round();
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppRadius.md,
       child: CachedNetworkImage(
         imageUrl: url,
         width: size,
@@ -74,7 +75,7 @@ class BrandLogo extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.md,
       ),
     );
   }
@@ -85,7 +86,7 @@ class BrandLogo extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.md,
       ),
       child: Icon(
         Icons.local_gas_station,

@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_radius.dart';
+
 /// Grouped-form visual component used by the restyled Add-Fill-up and
 /// Edit-vehicle forms (#751 phase 2).
 ///
@@ -58,7 +60,7 @@ class FormSectionCard extends StatelessWidget {
       elevation: 0,
       color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.xl,
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -202,7 +204,7 @@ class _IconTile extends StatelessWidget {
       height: 44,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.lg,
       ),
       child: Icon(icon, size: 28, color: color),
     );

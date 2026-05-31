@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../theme/app_radius.dart';
+
 class ShimmerStationCard extends StatelessWidget {
   const ShimmerStationCard({super.key});
 
@@ -21,7 +23,7 @@ class ShimmerStationCard extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8))),
+                    borderRadius: AppRadius.md)),
             const SizedBox(width: 12),
             Expanded(
                 child: Column(

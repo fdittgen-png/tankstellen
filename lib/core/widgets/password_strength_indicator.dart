@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../theme/app_radius.dart';
 import '../theme/dark_mode_colors.dart';
 import '../utils/password_validator.dart';
 
@@ -49,7 +50,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: AppRadius.sm,
                 child: LinearProgressIndicator(
                   value: score,
                   backgroundColor: theme.colorScheme.surfaceContainerHighest,
