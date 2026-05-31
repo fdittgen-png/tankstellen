@@ -6184,6 +6184,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Spouštění nahrávání…';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Zatím žádné cesty';
 
   @override
@@ -6437,6 +6446,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Spouštění nahrávání…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

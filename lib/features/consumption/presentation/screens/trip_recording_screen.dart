@@ -33,6 +33,7 @@ import '../widgets/minimal_drive_summary.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
 import '../widgets/trip_avg_consumption_card.dart';
 import '../widgets/trip_radar_card.dart';
+import '../widgets/trip_save_progress.dart';
 import '../widgets/trip_start_progress.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -705,13 +706,17 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
 
     final title = stopped != null
         ? (l?.tripSummaryTitle ?? 'Trip summary')
-        : state.isConnecting
-            // #2274 concern 2 — the connecting view is up while the
-            // link warms; title it accordingly rather than "Recording".
-            ? (l?.tripRecordingConnectingTitle ?? 'Starting recording…')
-            : state.phase == TripRecordingPhase.paused
-                ? (l?.tripBannerPaused ?? 'Trip paused')
-                : (l?.tripRecordingTitle ?? 'Recording trip');
+        // #2548 — the staged save view's title, the stop-side bookend to
+        // the #2274 connecting title.
+        : state.isSaving
+            ? (l?.tripRecordingSavingTitle ?? 'Saving trip…')
+            : state.isConnecting
+                // #2274 concern 2 — the connecting view is up while the link
+                // warms; title it accordingly rather than "Recording".
+                ? (l?.tripRecordingConnectingTitle ?? 'Starting recording…')
+                : state.phase == TripRecordingPhase.paused
+                    ? (l?.tripBannerPaused ?? 'Trip paused')
+                    : (l?.tripRecordingTitle ?? 'Recording trip');
 
     // After stop: show the summary. Until then: live view.
     // #1395 — wrap the title in a GestureDetector so the hidden
@@ -849,6 +854,18 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     AppLocalizations? l,
     TripRecordingState state,
   ) {
+    // #2548 — staged save-progress: while `stop()` runs, the screen stays
+    // mounted in the transient `saving` phase showing the inline
+    // TripSaveProgress card (the "wrapping up" bookend to the start
+    // "warming up") until `_stopped` flips it to the summary.
+    if (state.isSaving) {
+      return Center(
+        child: TripSaveProgress(
+          stage: state.saveStage ?? TripSaveStage.finalizingSummary,
+        ),
+      );
+    }
+
     // #2274 concern 2 — start-now-connect-later: the screen is pushed
     // immediately in the connecting phase while the BLE connect + prime
     // run underneath. Render the inline progress card (the same one the

@@ -183,8 +183,13 @@ void main() {
     // returned a stationary discard (`StoppedTripResult.discardedNoMovement`),
     // so a Stop tap that saves nothing is never silent data loss. Pure UI
     // wiring; decomposition tracked under #2187/#2188/#2190.
+    // #2548 — re-grandfathered 1088 → 1105: `_buildRecording` now renders the
+    // inline `TripSaveProgress` card during the transient `saving` phase (the
+    // stop-side bookend to the connecting view) plus a saving AppBar-title
+    // variant — staged save feedback. Pure UI wiring; decomposition still
+    // tracked under #2187/#2188/#2190.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1088,
+        1105,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
@@ -229,7 +234,11 @@ void main() {
     // closure (mirrors `_readOemPidsFlag`: reads Feature.debugMode, swallows
     // provider-wiring errors → safe off) + its injection into the pipeline.
     // Decomposition tracked by #2187/#2188/#2190.
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1217,
+    // #2548 — re-grandfathered 1217 → 1235: the `setSaveStage` notifier method
+    // + its `_RecordingPipelineHostAdapter` override + the TripSaveStage
+    // re-export — the staged save-progress wiring mirroring `setConnectStage`.
+    // Decomposition still tracked by #2187/#2188/#2190.
+    'lib/features/consumption/providers/trip_recording_provider.dart': 1235,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
     // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
     // hides results behind count-clusters. Adds the `rankForEmphasis`

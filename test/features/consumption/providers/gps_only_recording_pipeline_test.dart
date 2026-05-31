@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
+import 'package:tankstellen/features/consumption/domain/entities/trip_save_stage.dart';
 import 'package:tankstellen/features/consumption/domain/services/gps_fuel_estimator.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/gps_only_recording_pipeline.dart';
@@ -194,6 +195,12 @@ void main() {
       expect(result.odometerLatestKm, isNull);
       // State reset to idle after teardown.
       expect(harness.host.state.phase, TripRecordingPhase.idle);
+      // #2548 — the GPS-only stop drives the two save stages (no cloud
+      // sync beat — the GPS path never uploads inline), in order.
+      expect(harness.host.saveStages, [
+        TripSaveStage.finalizingSummary,
+        TripSaveStage.savingToHistory,
+      ]);
     });
 
     test('appendObd2Sample mid-trip flips the finalised kind to '
@@ -341,8 +348,17 @@ class _FakeHost implements RecordingPipelineHost {
 
   final List<_Saved> saved = [];
 
+  /// #2548 — the ordered save stages the pipeline drove through this host.
+  final List<TripSaveStage> saveStages = [];
+
   @override
   String? readActiveVehicleId() => activeVehicleId;
+
+  @override
+  void setSaveStage(TripSaveStage stage) {
+    saveStages.add(stage);
+    state = state.copyWith(phase: TripRecordingPhase.saving, saveStage: stage);
+  }
 
   @override
   Future<TripPersistOutcome> saveToHistory(

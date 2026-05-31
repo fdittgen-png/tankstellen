@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/driving_coaching.dart' show DrivingCoachingHint;
+import '../domain/entities/trip_save_stage.dart';
 import '../domain/entities/trip_start_stage.dart';
 import '../domain/situation_classifier.dart';
 import 'trip_recording_phase.dart';
@@ -44,6 +45,13 @@ class TripRecordingState {
   /// every other phase.
   final TripStartStage? connectStage;
 
+  /// #2548 — which beat of the stop→save sequence the teardown is on,
+  /// surfaced while [phase] is [TripRecordingPhase.saving] so the
+  /// recording screen renders the inline [TripSaveProgress] in place of
+  /// the frozen live metrics. The symmetric stop-side bookend to
+  /// [connectStage]. Null in every other phase.
+  final TripSaveStage? saveStage;
+
   const TripRecordingState({
     this.phase = TripRecordingPhase.idle,
     this.live,
@@ -53,6 +61,7 @@ class TripRecordingState {
     this.dropReason,
     this.gpsCoachingHint,
     this.connectStage,
+    this.saveStage,
   });
 
   TripRecordingState copyWith({
@@ -68,6 +77,8 @@ class TripRecordingState {
     bool clearGpsCoachingHint = false,
     TripStartStage? connectStage,
     bool clearConnectStage = false,
+    TripSaveStage? saveStage,
+    bool clearSaveStage = false,
   }) =>
       TripRecordingState(
         phase: phase ?? this.phase,
@@ -86,6 +97,9 @@ class TripRecordingState {
         connectStage: clearConnectStage
             ? null
             : (connectStage ?? this.connectStage),
+        saveStage: clearSaveStage
+            ? null
+            : (saveStage ?? this.saveStage),
       );
 
   bool get isActive =>
@@ -97,4 +111,11 @@ class TripRecordingState {
   /// reaching the adapter and priming the recorder, before the first
   /// live sample lands. Distinct from [isActive] (no trip exists yet).
   bool get isConnecting => phase == TripRecordingPhase.connecting;
+
+  /// #2548 — true while a stopped trip is being finalised, written to
+  /// history, and (when enabled) handed to the cloud upload, before
+  /// `stop()` returns and the screen flips to the summary. Distinct
+  /// from [isActive] — the trip has left the live loop, so the
+  /// recording banner must NOT resurface mid-save.
+  bool get isSaving => phase == TripRecordingPhase.saving;
 }

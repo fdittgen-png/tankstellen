@@ -6229,6 +6229,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Стартиране на запис...';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Все още няма пътувания';
 
   @override
@@ -6480,6 +6489,9 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Стартиране на записа…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

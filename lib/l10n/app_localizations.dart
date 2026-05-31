@@ -10845,6 +10845,24 @@ abstract class AppLocalizations {
   /// **'Starting recording…'**
   String get tripStartProgressStartingRecording;
 
+  /// Status label on the inline save-progress card shown on the trip-recording screen after the user taps Stop, while the trip summary is being finalised — odometer refresh / summary build (#2548). The stop-side bookend to the start-progress labels. Indeterminate, never a percentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Finalizing summary…'**
+  String get tripSaveProgressFinalizingSummary;
+
+  /// Status label on the inline save-progress card shown on the trip-recording screen after the user taps Stop, while the finished trip is being written to the local history log (#2548). Indeterminate, never a percentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to history…'**
+  String get tripSaveProgressSavingToHistory;
+
+  /// Status label on the inline save-progress card shown on the trip-recording screen after the user taps Stop, while the saved trip is handed to the cloud sync upload (#2548). Worded 'in background' on purpose: the upload is fire-and-forget (unawaited), so this beat never blocks the resolve to the summary, and it is only shown when cloud sync is enabled. Indeterminate, never a percentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing in background…'**
+  String get tripSaveProgressSyncingToCloud;
+
   /// Empty-state title on the Trips tab when no trips have been recorded (#889).
   ///
   /// In en, this message translates to:
@@ -11294,6 +11312,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Starting recording…'**
   String get tripRecordingConnectingTitle;
+
+  /// AppBar title shown on the trip-recording screen after the user taps Stop, while the trip is finalised, written to history, and (when enabled) handed to the cloud upload, before the screen flips to the summary (#2548). The stop-side bookend to tripRecordingConnectingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving trip…'**
+  String get tripRecordingSavingTitle;
 
   /// SnackBar shown after the user stops a recording that covered no distance and captured no usable signal — a genuine false-start / stationary stop (#2509). Tells the user nothing was saved because the car never moved. Never shown when the trip was actually saved.
   ///

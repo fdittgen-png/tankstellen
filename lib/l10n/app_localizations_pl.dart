@@ -6201,6 +6201,15 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Uruchamianie nagrywania…';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Brak tras';
 
   @override
@@ -6455,6 +6464,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Rozpoczynanie nagrywania…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

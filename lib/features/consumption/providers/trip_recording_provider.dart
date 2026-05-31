@@ -21,6 +21,7 @@ import '../data/obd2/obd2_service.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/entities/trip_save_stage.dart';
 import '../domain/entities/trip_start_stage.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
@@ -57,6 +58,9 @@ export 'recording_pipeline.dart' show StoppedTripResult;
 // state; re-export it so callers that drive the start flow through this
 // provider resolve the stage type without a second import.
 export '../domain/entities/trip_start_stage.dart' show TripStartStage;
+// #2548 — the saving phase carries a TripSaveStage; re-export it so
+// callers resolve the type without a second import.
+export '../domain/entities/trip_save_stage.dart' show TripSaveStage;
 
 part 'trip_recording_provider.g.dart';
 
@@ -329,6 +333,15 @@ class TripRecording extends _$TripRecording {
   void setConnectStage(TripStartStage stage) {
     if (state.phase != TripRecordingPhase.connecting) return;
     state = state.copyWith(connectStage: stage);
+  }
+
+  /// #2548 — enter / advance the transient (non-active)
+  /// [TripRecordingPhase.saving] phase shown while a stopped trip is
+  /// wrapped up. The stop-side mirror of [setConnectStage]: each
+  /// pipeline's `stop()` calls it before its major teardown beats. The
+  /// final state write at the end of `stop()` is unchanged.
+  void setSaveStage(TripSaveStage stage) {
+    state = state.copyWith(phase: TripRecordingPhase.saving, saveStage: stage);
   }
 
   /// #2274 concern 2 — abandon a connecting session (connect failed, or
@@ -1186,6 +1199,11 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
         adapterFirmware: adapterFirmware,
         gpsFixCount: gpsFixCount,
       );
+
+  // #2548 — staged save-progress: the pipeline drives the `saving` phase
+  // + stage through the notifier (mirrors the start `setConnectStage`).
+  @override
+  void setSaveStage(TripSaveStage stage) => _n.setSaveStage(stage);
 
   // #2227 — WAL snapshot hooks driven by the OBD2 pipeline. The
   // GPS-only pipeline does not use these (its [RecordingPipelineHost]

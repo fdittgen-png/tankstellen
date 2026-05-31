@@ -6231,6 +6231,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Έναρξη καταγραφής…';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Δεν υπάρχουν ταξίδια ακόμα';
 
   @override
@@ -6485,6 +6494,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Έναρξη εγγραφής…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

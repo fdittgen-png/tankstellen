@@ -6212,6 +6212,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aufzeichnung wird gestartet…';
 
   @override
+  String get tripSaveProgressFinalizingSummary =>
+      'Zusammenfassung wird erstellt…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Wird im Verlauf gespeichert…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud =>
+      'Wird im Hintergrund synchronisiert…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Noch keine Fahrten';
 
   @override
@@ -6464,6 +6475,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Aufnahme wird gestartet …';
+
+  @override
+  String get tripRecordingSavingTitle => 'Fahrt wird gespeichert…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

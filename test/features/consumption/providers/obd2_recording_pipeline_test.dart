@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
+import 'package:tankstellen/features/consumption/domain/entities/trip_save_stage.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/obd2_recording_pipeline.dart';
 import 'package:tankstellen/features/consumption/providers/recording_pipeline.dart';
@@ -121,6 +122,13 @@ void main() {
           reason: 'a moving trip integrates a non-zero distance');
       expect(h.service.isConnected, isFalse,
           reason: 'stop must disconnect the owned service');
+      // #2548 — the stop drives the staged save-progress: finalize then
+      // save-to-history. The syncing beat is gated on cloud sync, which
+      // is off in this anonymous test container, so it is skipped.
+      expect(h.host.saveStages, [
+        TripSaveStage.finalizingSummary,
+        TripSaveStage.savingToHistory,
+      ]);
     });
 
     test('stop() on an unstarted pipeline returns an empty result and '
@@ -229,8 +237,17 @@ class _FakeWalHost implements Obd2RecordingPipelineHost {
   int clearCount = 0;
   final List<_Saved> saved = [];
 
+  /// #2548 — the ordered save stages the pipeline drove through this host.
+  final List<TripSaveStage> saveStages = [];
+
   @override
   String? readActiveVehicleId() => null;
+
+  @override
+  void setSaveStage(TripSaveStage stage) {
+    saveStages.add(stage);
+    state = state.copyWith(phase: TripRecordingPhase.saving, saveStage: stage);
+  }
 
   @override
   void seedActiveSnapshot() => seedCount++;

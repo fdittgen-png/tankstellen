@@ -6147,6 +6147,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Starting recording…';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'No trips yet';
 
   @override
@@ -6398,6 +6407,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Starting recording…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>
@@ -12952,6 +12964,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Šŧářŧîñǧ řéçóřđîñǧ… ········⟧';
 
   @override
+  String get tripSaveProgressFinalizingSummary =>
+      '⟦Ƒîñáłîžîñǧ šúɱɱářý… ········⟧';
+
+  @override
+  String get tripSaveProgressSavingToHistory => '⟦Šáṽîñǧ ŧó ĥîšŧóřý… ·······⟧';
+
+  @override
+  String get tripSaveProgressSyncingToCloud =>
+      '⟦Šýñçîñǧ îñ ƀáçķǧřóúñđ… ·········⟧';
+
+  @override
   String get trajetsEmptyStateTitle => '⟦Ñó ŧřîƥš ýéŧ ·····⟧';
 
   @override
@@ -13208,6 +13231,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripRecordingConnectingTitle => '⟦Šŧářŧîñǧ řéçóřđîñǧ… ········⟧';
+
+  @override
+  String get tripRecordingSavingTitle => '⟦Šáṽîñǧ ŧřîƥ… ·····⟧';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

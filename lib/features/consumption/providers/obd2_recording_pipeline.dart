@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../data/obd2/adapter_reconnect_scanner.dart';
 import '../data/obd2/obd2_connection_service.dart';
@@ -15,10 +16,12 @@ import '../data/obd2/obd2_session_context_block.dart';
 import '../data/obd2/reconnect_connector.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/entities/trip_save_stage.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/services/obd2_gps_estimate_fallback.dart';
 import '../domain/trip_recorder.dart';
 import 'obd2_breadcrumb_provider.dart';
+import 'obd2_controller_phase_mapper.dart';
 import 'recording_pipeline.dart';
 import 'reference_vehicle_match.dart';
 import 'trip_baseline_recorder.dart';
@@ -112,40 +115,37 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   /// + `state.isActive` short-circuit stay on the notifier.
   Future<void> start(Obd2Service service, {bool automatic = false}) async {
     _service = service;
-    // #2261 concern 6 — re-arm the deferred capability probe for this
-    // recording; the first live sample kicks it.
+    // #2261 concern 6 — re-arm the deferred capability probe (first sample).
     _capabilityReconcileKicked = false;
-    // #1312 — snapshot adapter identity NOW: the service is disconnected
-    // during `stop` before the entry is saved, so it can't be read off
-    // the live service at save time. Null → the detail card hides the row.
+    // #1312 — snapshot adapter identity NOW: the service is disconnected in
+    // `stop` before the entry is saved, so it can't be read off the live
+    // service then. Null → the detail card hides the row.
     _adapterMac = service.adapterMac;
     _adapterName = service.adapterName;
     _adapterFirmware = service.adapterFirmware;
-    // #812 phase 3 — snapshot the active vehicle so the controller can
-    // hand it to `readFuelRateLPerHour`; a null vehicle / fields fall back
-    // to the service defaults. Vehicle id resolved up-front so the
-    // controller can tag any pause-on-drop snapshot (#797 phase 1).
+    // #812 phase 3 — snapshot the active vehicle for `readFuelRateLPerHour`
+    // (null vehicle / fields fall back to service defaults). Vehicle id
+    // resolved up-front to tag any pause-on-drop snapshot (#797 phase 1).
     final activeVehicle = _readActiveVehicle();
     final eagerVehicleId = _readActiveVehicle()?.id;
     // #797 phase 3 — pinned MAC + auto-reconnect scanner factory. Null MAC
     // (unpaired) skips the scanner; the grace window is the sole recovery.
     final pinnedMac = activeVehicle?.obd2AdapterMac;
-    // #1395 — wire the diagnostic breadcrumb sink for this trip; both the
-    // controller and the [Obd2Service] push through the SAME keepAlive
-    // notifier so the trace survives the recording screen popping.
+    // #1395 — wire the diagnostic breadcrumb sink for this trip; controller
+    // and [Obd2Service] push through the SAME keepAlive notifier so the
+    // trace survives the recording screen popping.
     final breadcrumbs = _ref.read(obd2BreadcrumbsProvider.notifier);
     breadcrumbs.clear(); // fresh suspicion-rate denominator for THIS trip
     service.breadcrumbCollector = breadcrumbs;
-    // #1422 phase 1 — match the active vehicle to the bundled catalog so
-    // the controller can use the engine-tech-derived η_v default instead
-    // of the legacy 0.85 literal until VeLearner converges. Null on no-match.
+    // #1422 phase 1 — match the active vehicle to the bundled catalog so the
+    // controller uses the engine-tech-derived η_v default instead of the
+    // legacy 0.85 literal until VeLearner converges. Null on no-match.
     final matchedReference = tryMatchReferenceVehicle(_ref, activeVehicle);
-    // #2506 — build the SHARED GPS-physics live-estimate + coaching folder
-    // (mirrors the GPS-only pipeline). Folded per no-fuel-PID tick inside the
-    // controller so the OBD2 live screen carries `~ estimated` consumption +
-    // GPS coaching instead of dashing a no-fuel-PID car's whole drive — live
-    // mirrors the post-trip `Obd2GpsEstimateFallback`. Null vehicle / matrix
-    // → population-default class + cold-start scale.
+    // #2506 — SHARED GPS-physics live-estimate + coaching folder (mirrors
+    // the GPS-only pipeline). Folded per no-fuel-PID tick in the controller
+    // so the OBD2 live screen carries `~ estimated` consumption + GPS
+    // coaching, mirroring the post-trip `Obd2GpsEstimateFallback`. Null
+    // vehicle / matrix → population-default class + cold-start scale.
     final gpsEstimateFolder = GpsLiveEstimateFolder.forVehicle(
       activeVehicle,
       activeVehicle?.gpsCalibration,
@@ -170,11 +170,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     await _baselines.load();
 
     await ctl.start();
-    // #1374 / #1981 — GPS trip-path sampling, default-on. Fire-and-forget
-    // — the permission round-trip must not block trip-start.
+    // #1374 / #1981 — GPS trip-path sampling, default-on; fire-and-forget so
+    // the permission round-trip never blocks trip-start.
     unawaited(_gps.start(ctl));
-    // #1615 — opt-in experimental OEM-PID exact-fuel-level poll. A no-op
-    // when the flag is off or the adapter is not OEM-PID-capable.
+    // #1615 — opt-in OEM-PID exact-fuel-level poll; no-op when off.
     _oemFuel.start(
       enabled: _readOemPidsFlag(),
       vin: ctl.vin,
@@ -182,8 +181,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       port: service,
       onLitres: ctl.updateOemFuelLevelLitres,
     );
-    // #1303 — seed the active-trip WAL snapshot now that the controller
-    // knows its session id + odometer reads (stays on the notifier).
+    // #1303 — seed the active-trip WAL snapshot now the controller knows
+    // its session id + odometer reads (stays on the notifier).
     _host.seedActiveSnapshot();
     _liveSub = ctl.live.listen((reading) {
       // #2261 concern 6 — run the deferred `0902` capability probe lazily
@@ -198,11 +197,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // #2506 — surface the GPS coaching hint the controller computed on a
       // no-fuel-PID tick. `MinimalDriveSummary` swaps to the GPS coaching
       // triplet when `reading.fuelRateLPerHour == null` and reads
-      // `state.gpsCoachingHint`, so publishing it here lights the chips on the
-      // OBD2 live screen too. Null (measured fuel present / no hint) clears it.
+      // `state.gpsCoachingHint`. Null (measured fuel / no hint) clears it.
       final gpsHint = ctl.latestGpsCoachingHint;
       _host.state = _host.state.copyWith(
-        phase: _phaseFor(ctl),
+        phase: phaseForController(ctl),
         live: reading,
         situation: classified.situation,
         band: classified.band,
@@ -216,7 +214,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #797 phase 1 — listen to explicit state changes so the UI surfaces
     // "pausedDueToDrop" even when no TripLiveReading lands.
     _stateSub = ctl.stateChanges.listen((_) {
-      final newPhase = _phaseFor(ctl);
+      final newPhase = phaseForController(ctl);
       // #1330 phase 3 — surface the controller's drop reason. Cleared
       // when leaving the drop state.
       if (newPhase == TripRecordingPhase.pausedDueToDrop) {
@@ -265,6 +263,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
+    // #2548 — staged save-progress: flip into the transient (non-active)
+    // `saving` phase so the screen shows the inline TripSaveProgress card
+    // instead of a frozen swap. Finalising (odometer + summary) is beat 1.
+    _host.setSaveStage(TripSaveStage.finalizingSummary);
     try {
       await ctl.refreshOdometer();
     } catch (e, st) {
@@ -302,7 +304,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #1615 — tear down the OEM-PID fuel-level poll. Best-effort.
     await _oemFuel.stop();
     _controller = null;
-    // #726 — persist every trip (incl. discarded); fill-up is separate.
+    // #2548 beat 2 / #726 — write to history (every trip, incl. discarded).
+    _host.setSaveStage(TripSaveStage.savingToHistory);
     final outcome = await _host.saveToHistory(
       summary,
       samples: filled.samples,
@@ -314,6 +317,20 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       adapterFirmware: _adapterFirmware,
       gpsFixCount: gpsFixCount,
     );
+    // #2548 — third beat, shown ONLY when cloud sync is on (the upload
+    // saveToHistory kicked off is fire-and-forget, so it is worded
+    // "Syncing in background…" and never blocks the resolve; sync-off
+    // resolves straight to the outcome). The gate read must never derail
+    // the save flow.
+    try {
+      if (_ref.read(tripsSyncEnabledProvider)) {
+        _host.setSaveStage(TripSaveStage.syncingToCloud);
+      }
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'Obd2RecordingPipeline.stop: sync-gate read'
+      }));
+    }
     // #769 / #780 — flush learned baselines + sync before release.
     await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once persisted.
@@ -338,23 +355,6 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // #2509 — surface "no movement detected" only on a stationary discard.
       discardedNoMovement: outcome.isStationaryDiscard,
     );
-  }
-
-  /// Map the controller's enum onto the provider's phase. Mirrors the
-  /// notifier's former `_phaseFor`.
-  TripRecordingPhase _phaseFor(TripRecordingController ctl) {
-    switch (ctl.currentState) {
-      case TripRecordingControllerState.idle:
-        return TripRecordingPhase.idle;
-      case TripRecordingControllerState.recording:
-        return TripRecordingPhase.recording;
-      case TripRecordingControllerState.paused:
-        return TripRecordingPhase.paused;
-      case TripRecordingControllerState.pausedDueToDrop:
-        return TripRecordingPhase.pausedDueToDrop;
-      case TripRecordingControllerState.stopped:
-        return TripRecordingPhase.finished;
-    }
   }
 
   /// Build the reconnect-scanner factory handed to [TripRecordingController]

@@ -6210,6 +6210,15 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Pradedamas įrašymas…';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Dar nėra kelionių';
 
   @override
@@ -6460,6 +6469,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Pradedamas įrašymas…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

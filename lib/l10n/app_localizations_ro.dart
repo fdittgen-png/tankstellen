@@ -6218,6 +6218,15 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Se pornește înregistrarea…';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Nicio călătorie încă';
 
   @override
@@ -6473,6 +6482,9 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Se pornește înregistrarea…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

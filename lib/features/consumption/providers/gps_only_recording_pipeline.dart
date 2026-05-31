@@ -12,6 +12,7 @@ import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/trip_live_reading.dart';
+import '../domain/entities/trip_save_stage.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
@@ -193,6 +194,12 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       return const StoppedTripResult.empty();
     }
     final samples = List<TripSample>.unmodifiable(_samples);
+    // #2548 — staged save-progress: flip into the transient `saving` phase
+    // so the recording screen shows the inline TripSaveProgress card
+    // while the dongle-less trip is wrapped up. Building the summary
+    // (+ #2080 GPS-fuel imputation) is the first beat. The GPS-only path
+    // never uploads inline, so it has no `syncingToCloud` beat.
+    _host.setSaveStage(TripSaveStage.finalizingSummary);
     // #2025 — derive `kind` from the actual sample stream rather than
     // hardcoding `gpsOnly`. If [appendObd2Sample] (or any future
     // mid-trip path) injected OBD2 samples into the buffer, the
@@ -226,6 +233,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
         }
       }
     }
+    // #2548 — second beat: writing the finished trip to Hive history.
+    _host.setSaveStage(TripSaveStage.savingToHistory);
     // #2509 — each GPS fix feeds one sample through the recorder, so the
     // GPS-fix count equals the captured-sample count here. Threaded so the
     // guard treats a genuinely-stationary GPS-only stop consistently and
