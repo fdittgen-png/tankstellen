@@ -14,11 +14,18 @@ import 'section_header.dart';
 ///
 /// Visual contract (see `docs/design/DESIGN_SYSTEM.md` §"SectionCard"):
 ///
-///   * `elevation: 0` — separation from the scaffold is handled by the
-///     `surfaceContainerLow` tint, not a shadow.
-///   * `color: colorScheme.surfaceContainerLow`.
-///   * Corner radius is inherited from the global theme
-///     (`AppRadius.lg` / 12 px via `FlexColorScheme.subThemesData`).
+///   * Elevation follows the theme's `cardTheme.elevation` (#2488):
+///     light = 0 (tint-only), eco/dark = 1 dp. A hairline
+///     `surfaceContainerHighest` outline guarantees a card↔scaffold delta
+///     on every theme — most importantly on dark, where a 1 dp shadow is
+///     faint, and on light, where there is no shadow at all.
+///   * `color: colorScheme.surfaceContainerLow` — in the de-inverted eco
+///     ramp (#2488) the scaffold is the lightest (near-white) base surface
+///     and the card carries the gentle green container tint, the canonical
+///     Material direction (same as light/dark) rather than the old inverted
+///     deep-green scaffold.
+///   * Corner radius is 12 px (`AppRadius.lg`), matching the global theme
+///     (`FlexColorScheme.subThemesData.cardRadius`).
 ///   * Default inner padding = `Spacing.cardPadding`.
 ///   * Default outer margin = `EdgeInsets.zero` so the host `ListView`
 ///     / `Column` owns card-to-card spacing.
@@ -68,13 +75,21 @@ class SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    // #2488 — honour the theme's card elevation (eco/dark = 1 dp,
+    // light = 0). On dark a 1 dp shadow is faint, and on light there is
+    // no shadow at all, so a hairline `surfaceContainerHighest` outline
+    // guarantees a card↔scaffold delta on every theme. The 12 px radius
+    // is inherited from FlexColorScheme's global `cardRadius`.
     return Card(
       margin: margin,
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
-      // `shape` intentionally omitted — FlexColorScheme applies the
-      // canonical `AppRadius.lg` (12 px) card radius globally.
+      elevation: theme.cardTheme.elevation ?? 0,
+      color: scheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: scheme.surfaceContainerHighest),
+      ),
       child: Padding(
         padding: padding,
         child: Column(

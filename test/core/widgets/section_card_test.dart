@@ -17,7 +17,12 @@ void main() {
       );
     }
 
-    testWidgets('wraps the child in a Card with elevation 0', (tester) async {
+    testWidgets('wraps the child in a Card honouring the theme elevation',
+        (tester) async {
+      // #2488 — SectionCard no longer hard-pins elevation 0; it reads
+      // `theme.cardTheme.elevation` (light = 0, eco/dark = 1). With no
+      // explicit cardTheme on this bare MaterialApp the elevation resolves
+      // to 0, so the tint-only base contract still holds.
       await pump(
         tester,
         const SectionCard(child: Text('Body content')),
@@ -25,6 +30,41 @@ void main() {
       expect(find.text('Body content'), findsOneWidget);
       final card = tester.widget<Card>(find.byType(Card));
       expect(card.elevation, 0);
+    });
+
+    testWidgets('eco/dark card elevation flows through from the theme',
+        (tester) async {
+      // #2488 — when the ambient theme sets a 1 dp card elevation (as eco
+      // and dark do) SectionCard honours it rather than forcing 0.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(cardTheme: const CardThemeData(elevation: 1)),
+          home: const Scaffold(body: SectionCard(child: Text('Body'))),
+        ),
+      );
+      final card = tester.widget<Card>(find.byType(Card));
+      expect(card.elevation, 1);
+    });
+
+    testWidgets('draws a hairline surfaceContainerHighest outline (#2488)',
+        (tester) async {
+      // The outline guarantees a card↔scaffold delta on every theme —
+      // most importantly on dark, where a 1 dp shadow is too faint to read.
+      late ColorScheme scheme;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              scheme = Theme.of(context).colorScheme;
+              return const Scaffold(body: SectionCard(child: Text('Body')));
+            },
+          ),
+        ),
+      );
+      final card = tester.widget<Card>(find.byType(Card));
+      final shape = card.shape as RoundedRectangleBorder;
+      expect(shape.side.color, scheme.surfaceContainerHighest);
+      expect(shape.side.width, greaterThan(0));
     });
 
     testWidgets('uses surfaceContainerLow as background', (tester) async {
