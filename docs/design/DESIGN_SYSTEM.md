@@ -32,38 +32,94 @@ pick a title size or a card elevation by hand.
 
 ## Brand palette
 
-Pulled from the existing Material theme (`lib/app/theme.dart`, which
-uses `FlexScheme.bahamaBlue` from `flex_color_scheme`). These hex
-values are what the placeholder assets and the shipped UI already use;
-the table below names each `ColorScheme` slot by the role it plays in
-the app, not by its Material spec name.
+The app ships a **calm forest-green** identity (#1757), not the old
+`bahamaBlue`. The seed scheme is `_forestGreen` in `lib/app/theme.dart`
+— a hand-tuned `FlexSchemeColor` whose `primary` is the literal
+`#2E7D32` green pulled from the app icon. Three `FlexColorScheme`
+builders share that one seed: `AppTheme.light()`, `AppTheme.dark()`
+and `AppTheme.eco()` (see "Per-theme surface ramp" below). The
+muted, semi-desaturated green sits calmly next to content; the surface
+*tints* are derived per-theme by `FlexColorScheme` from a `blendLevel`,
+so the exact `surface*` hexes are computed, not literals.
 
-| Role | Hex (light) | Hex (dark) | `ColorScheme` slot | Where it shows up |
-| --- | --- | --- | --- | --- |
-| Brand primary | `#4059AD` | `#8FB2F5` | `primary` | App bar tint, primary buttons, brand logo fill |
-| On-primary | `#FFFFFF` | `#0E2A5A` | `onPrimary` | Text / icons on primary surfaces |
-| Secondary | `#6B8AEE` | `#B7C8F0` | `secondary` | Chips, secondary accents |
-| Surface | `#F6F8FF` | `#11131B` | `surface` | Scaffold background |
-| Surface container low | `#ECEFF8` | `#181A23` | `surfaceContainerLow` | `SectionCard` background |
-| Surface container | `#E6E9F3` | `#1E212B` | `surfaceContainer` | Elevated sheet / modal background |
-| On-surface | `#1B1D24` | `#E3E5ED` | `onSurface` | Body text |
-| On-surface variant | `—` | `—` | `onSurfaceVariant` | Muted / secondary text |
-| Outline | `—` | `—` | `outline` | Hairlines, disabled-text hint |
-| Error | `#BA1A1A` | `#FFB4AB` | `error` | Destructive actions, validation |
+The seed inputs (`_forestGreen`, identical across all three themes):
 
-Success and warning semantic colors are not part of the `ColorScheme`
-directly — they live in `lib/core/theme/dark_mode_colors.dart`, keyed
-to brightness:
+| Slot | Hex | Where it shows up |
+| --- | --- | --- |
+| `primary` | `#2E7D32` | App-bar tint (light), primary buttons, brand fill, selected-pill outline, station accent stripe (fuel) |
+| `primaryContainer` | `#B4D6B6` | Selected-pill fill, eco app-bar (tonal), `PageScaffold` banner |
+| `secondary` | `#4E6B52` | Secondary accents |
+| `secondaryContainer` | `#D6E4D7` | Light/dark app-bar tint (`appBarColor`), storage "price-history" segment |
+| `tertiary` | `#3C6E63` | Correction accents (neutral, see semantic table), storage segment |
+| `tertiaryContainer` | `#CFE3DC` | Storage "alerts" segment |
+| `error` | `#B3261E` | `ColorScheme.error` — destructive chrome, validation |
+
+The brightness-adapting `surface*` / `onSurface*` / `outline` slots are
+**not** literals — `FlexColorScheme` derives them per-theme from
+`blendLevel`. Read them at runtime via `Theme.of(context).colorScheme`;
+never hardcode a surface hex. Roles to know:
+
+| `ColorScheme` slot | Role in the app |
+| --- | --- |
+| `surface` | Scaffold background — the **lightest** base surface in all three themes (see ramp invariant) |
+| `surfaceContainerLow` | `SectionCard` background — one tonal step up from the scaffold |
+| `surfaceContainerHighest` | `SectionCard` hairline outline, `AppPill` default fill |
+| `onSurface` | Body text |
+| `onSurfaceVariant` | Muted / secondary text, unselected-pill foreground, neutral correction text |
+| `outline` | Hairlines, disabled-text hint |
+
+Success / warning / error **semantic** colours are not raw
+`ColorScheme` slots — they live in `lib/core/theme/dark_mode_colors.dart`,
+keyed to brightness and **widened for colourblind safety (#2492)**:
 
 | Role | Light | Dark | Source |
 | --- | --- | --- | --- |
 | Success | `#388E3C` | `#66BB6A` | `DarkModeColors.success(context)` |
-| Warning | `#E65100` | `#FFA726` | `DarkModeColors.warning(context)` |
-| Error (semantic) | `#D32F2F` | `#EF5350` | `DarkModeColors.error(context)` |
+| Warning | `#C77800` (dark gold) | `#F9A825` (amber) | `DarkModeColors.warning(context)` |
+| Error (semantic) | `#C62828` | `#EF5350` | `DarkModeColors.error(context)` |
 
-All dark-mode variants target at least 4.5:1 contrast against the
-standard Material 3 dark surface. Do not hardcode `Colors.green`,
-`Colors.red`, or `Colors.grey` — always call the helper.
+The warning hue moved off the old deep-orange `#E65100` into the
+amber/gold family so it no longer sits next to the error red; the error
+red deepened to `#C62828` on light for the same separation. Both target
+≥ 4.5:1 (or ≥ 3:1 large) against their surface. Do not hardcode
+`Colors.green` / `Colors.red` / `Colors.grey` — always call the helper.
+
+---
+
+## Per-theme surface ramp
+
+All three themes are built from the **same** `_forestGreen` seed; what
+differs is the surface *ramp* — how green and how light each tonal step
+is. The hard invariant, restored in **#2488**:
+
+> **The scaffold must always be a LOWER (lighter) surface than
+> `SectionCard`.** The scaffold is the lightest base surface; the green
+> tint and any elevation live in the cards *on* it — the canonical
+> Material direction. A card must never sit on a surface darker/greener
+> than itself.
+
+| Theme | `surfaceMode` | `blendLevel` | `cardElevation` | AppBar | Ramp reads |
+| --- | --- | --- | --- | --- | --- |
+| `light()` | `levelSurfacesLowScaffold` | `8` | `0` (tint-only) | surface-tinted (`secondaryContainer`) | Near-white scaffold, faint-green cards; separation is the tonal step + `SectionCard` hairline outline |
+| `dark()` | `levelSurfacesLowScaffold` | `22` | `1` dp | surface-tinted | Charcoal-green scaffold, lifted cards; a 1 dp shadow is faint on dark, so the `surfaceContainerHighest` hairline outline carries the delta |
+| `eco()` | `levelSurfacesLowScaffold` | `20` | `1` dp | **tonal** (`primaryContainer`) | Clearly greener than `light` (per the #2244 "recognisably green" mandate) but **no longer inverted** |
+
+**#2488 — what changed in eco.** The #2244 redesign had used
+`FlexSurfaceMode.highScaffoldLevelSurface` with `blendLevel: 40`, which
+made the *scaffold more green than the cards on it* (scaffold ≈ `#9dc29f`,
+cards ≈ `#d8e5d9`) — the ramp ran backwards. Green content (cheap-price
+text, status dots, icons) lost contrast on the over-green page, and
+`SectionCard`'s tint-only separation left cards with no delta. Eco now
+uses `levelSurfacesLowScaffold` (same family as light/dark) at half the
+blend (40 → 20), plus a 1 dp `cardElevation` and the `SectionCard`
+hairline outline, so the ramp runs the correct direction in every theme.
+The eco AppBar is now filled with **`primaryContainer`** (tonal) rather
+than full `primary`, harmonising the chrome with the `PageScaffold`
+banner while still reading "eco" at a glance.
+
+The floating-SnackBar geometry (`behavior: floating`, `radius: 12`,
+`elevation: 6`) is shared across all three via the
+`AppTheme._floatingSnackBars` overlay — see "Component notes".
 
 ---
 
@@ -101,40 +157,64 @@ pick the nearest existing token.
 
 ## Radius scale
 
-Canonical tokens in `lib/core/theme/app_radius.dart`. Reuse these —
-do not write `BorderRadius.circular(12)` inline.
+Canonical tokens **ship** in `lib/core/theme/app_radius.dart` (#2489).
+Reuse them — do not write `BorderRadius.circular(12)` inline. Each token
+exists in two forms: a raw `double` (`radius*`, for slots that want a
+number) and a `BorderRadius.circular(...)` getter (`AppRadius.sm/md/lg/
+xl/xxl`, for `borderRadius:` / `shape:` slots).
 
-| Token | Pixels | Use for |
-| --- | --- | --- |
-| `AppRadius.sm` / `radiusSm` | `4` | Tight corners: small chips, dense inputs |
-| `AppRadius.md` / `radiusMd` | `8` | Default filled card (Material 3 filled-card rule) |
-| `AppRadius.lg` / `radiusLg` | `12` | Elevated card / sheet rounding — **matches the theme's `cardRadius: 12.0`**. Canonical `SectionCard` radius. |
-| `AppRadius.xl` / `radiusXl` | `16` | Dialog + bottom-sheet corner |
-| `AppRadius.xxl` / `radiusXxl` | `24` | Hero surfaces (onboarding tiles, splash) |
+| Getter | `double` | Pixels | Use for |
+| --- | --- | --- | --- |
+| `AppRadius.sm` | `radiusSm` | `4` | Tight corners: small chips, dense inputs, `AppPill` |
+| `AppRadius.md` | `radiusMd` | `8` | Default filled card (Material 3 filled-card rule) |
+| `AppRadius.lg` | `radiusLg` | `12` | Elevated card / sheet rounding — canonical card radius (`SectionCard`, `StationCardShell`) |
+| `AppRadius.xl` | `radiusXl` | `16` | Dialog + bottom-sheet corner; `SelectablePill`; the shared `chipRadius` (#2494) |
+| `AppRadius.xxl` | `radiusXxl` | `24` | Hero surfaces (onboarding tiles, splash) |
 
 **Canonical card radius: `AppRadius.lg` (12).** This matches what
 `flex_color_scheme` already applies to every `Card` via
-`subThemesData.cardRadius: 12.0` — so `SectionCard` does not need to
-override a shape. Do not raise the radius above 16 for cards; reserve
-`xxl` for hero / onboarding surfaces only.
+`subThemesData.cardRadius: 12.0` — so a plain `SectionCard` inherits it.
+Do not raise the radius above 16 for cards; reserve `xxl` for hero /
+onboarding surfaces only.
+
+**Lint:** `test/lint/no_inline_border_radius_test.dart` scans all of
+`lib/` for `Radius.circular(` (catching both `BorderRadius.circular(` and
+a bare `Radius.circular(`) outside the token file. It carries a
+**decrease-only baseline** (currently `126`) of pre-existing inline radii,
+mirroring HARD RULE #1's pattern — the target is `0`. Never raise it;
+drop it as call sites migrate to the `AppRadius.*` tokens.
 
 ---
 
 ## Elevation scale
 
-Three levels, nothing else. Anything higher must be justified in the
-PR body.
+Card separation is **theme-driven, not a fixed `0`** (#2488). A
+`SectionCard` reads its elevation from `theme.cardTheme.elevation`, and
+every theme *also* draws a hairline `surfaceContainerHighest` outline so
+there is a real card↔scaffold delta even where the shadow is absent or
+faint:
+
+| Theme | Card elevation | What carries the separation |
+| --- | --- | --- |
+| `light()` | `0` | Tonal step (near-white scaffold vs `surfaceContainerLow` card) + the hairline outline — no shadow |
+| `dark()` | `1` dp | A 1 dp shadow is faint on a dark surface, so the hairline outline does the work |
+| `eco()` | `1` dp | The de-inverted tonal step + 1 dp shadow + hairline outline |
+
+Floating surfaces still use higher levels:
 
 | Level | Use for |
 | --- | --- |
-| `0` | Flat: `SectionCard`, every card inside a scrollable screen, `SettingsMenuTile`. We rely on a `surfaceContainerLow` tint, not a shadow, to separate cards from scaffold. |
-| `1` | Raised: `AppBar` surface-tinted elevation on scroll (handled by Material 3), sticky headers that overlap content. |
-| `3` | Modal / menu: `BottomSheet`, `PopupMenu`, `Dialog`, `DropdownMenu`. Anything that floats above the current screen. |
+| `1` | Raised: `AppBar` surface-tinted elevation on scroll (Material 3), `SectionCard` on dark/eco, sticky headers that overlap content. |
+| `2` | `StationCardShell` on light (the four station cards lift off the list; dark uses `1`). |
+| `3`+ | Modal / menu: `BottomSheet`, `PopupMenu`, `Dialog`, `DropdownMenu`. Anything that floats above the current screen. The floating `SnackBar` uses `6`. |
 
-**Rule:** `SectionCard` ships with `elevation: 0` + a tinted
-background. Shadows at elevation 2 or above are reserved for modal
-contexts. If a card "needs" a shadow to be visible, the surrounding
-background is wrong — fix that instead.
+**Rule (revised by #2488):** card↔scaffold separation no longer relies
+on a tint *alone*. The earlier "tint, not a shadow" rule assumed the old
+eco high-scaffold mode where the ramp was inverted; with the ramp
+de-inverted, the canonical separation is **tonal step + hairline outline**
+(every theme) plus a 1 dp shadow on dark/eco. If a card "needs" more lift
+than that to be visible, the surrounding background is wrong — fix the
+ramp, not the shadow.
 
 ---
 
@@ -166,44 +246,91 @@ widgets in `lib/core/widgets/` and the theme files in
 
 ## Semantic colors
 
-Beyond the palette, three color layers carry app-specific meaning.
+Beyond the palette, several colour layers carry app-specific meaning.
+The #2487 disambiguation gives **one distinct meaning per colour** — the
+single `warning`-orange token used to carry 6+ unrelated roles (staleness,
+corrections, borderline efficiency, storage dots, EV-in-use). Each role
+below maps to exactly one source.
 
-### Status semantics
+### Named semantic-role table
 
-Use `DarkModeColors` (see palette table) — never `Colors.green` /
-`Colors.red` / `Colors.grey` directly. The helper switches on
-`Theme.of(context).brightness` so dark-mode contrast stays ≥ 4.5:1.
-Chip backgrounds: `DarkModeColors.successSurface(context)` /
-`errorSurface` / `warningSurface`.
+| Role | Colour source | When to use it |
+| --- | --- | --- |
+| **Warning** (attention / stale only) | `DarkModeColors.warning(context)` — gold/amber | Freshness/stale badges, genuine "needs attention". **Not** corrections, **not** storage. |
+| **Error** (expensive / failure) | `DarkModeColors.error(context)` — deep red; `ColorScheme.error` for destructive chrome | Closed/expensive indicators, validation failure, Delete-all. |
+| **Success** (open / cheap) | `DarkModeColors.success(context)` — green | Open/cheap indicators, positive status dots. |
+| **Corrections** (informational, **neutral — NOT warning**) | `colorScheme.tertiary` (the `_CorrectionRow` accent) or `onSurfaceVariant` (the "Corrections: +X L" line) | A reconciliation correction is informational, not an alert — #2491 moved it **off** the warning-orange onto neutral tones. |
+| **Storage categories** (neutral categorical) | `surfaceContainerHighest` / `secondaryContainer` / `tertiaryContainer` / `outlineVariant` / `tertiary` | Storage-bar segments + legend dots. Benign data must not read as data-loss — #2490 moved Cache off `error` and the dots off warning-orange; error-red is reserved for Delete-all. |
+| **Efficiency bands** | `DarkModeColors` success/warning/error by band | Eco-score / driving-style bands. Borderline efficiency uses `warning`; it does **not** borrow the correction or storage tones. |
+| **Map-overlay chrome** | `DarkModeColors.mapOverlay / mapOverlayIcon / mapOverlayShadow` | The floating-control surface (legend, zoom buttons) — tuned for both brightness modes. Do not reinvent. |
+
+Chip backgrounds for the status trio:
+`DarkModeColors.successSurface(context)` / `errorSurface` /
+`warningSurface`. Never call `Colors.green` / `Colors.red` /
+`Colors.grey` / `Colors.amber` directly — the helper switches on
+`Theme.of(context).brightness` so dark-mode contrast holds.
+
+### Price-band ramp (the ONE cheap→expensive system)
+
+`lib/core/theme/price_band_colors.dart` is the **single canonical**
+cheap→expensive ramp (#2492). Before it, the map markers used
+`[green, yellow, orange, red]` while the legend used a 3-stop
+success/warning/error gradient with no yellow — two divergent systems.
+Both the markers (`station_marker.dart`) and the legend
+(`price_legend.dart`) now consume `PriceBandColors.ramp`, so the legend
+always describes exactly what the markers paint.
+
+| Stop | Constant | Hex | Meaning |
+| --- | --- | --- | --- |
+| 0 | `PriceBandColors.cheap` | `#43A047` | Cheap (bottom third) — green = good |
+| 1 | `PriceBandColors.belowAverage` | `#F9A825` | Lower-middle pivot (saturated amber) |
+| 2 | `PriceBandColors.aboveAverage` | `#F57C00` | Upper-middle pivot (orange) |
+| 3 | `PriceBandColors.expensive` | `#C62828` | Expensive (top third) — red = costly |
+
+`PriceBandColors.ramp` is the 4-stop list (breakpoints at 1/3 and 2/3).
+The legend's three tiers are `cheapTier` / `averageTier` (the midpoint
+`lerp` of the two middle stops) / `expensiveTier`. The bright amber is
+intentional here — these are *fill* colours behind dark marker text and
+standalone legend swatches; the *semantic* `warning` text token darkens
+the same hue for AA contrast as text.
 
 ### Fuel-type semantics
 
-`lib/core/theme/fuel_colors.dart` exposes one color per
-`FuelType` — reuse for chart legends, fuel badges, map pins. Summary:
+`lib/core/theme/fuel_colors.dart` exposes one **muted, deep** colour per
+`FuelType` (#1757) — desaturated well below the old electric Material-500
+hues so the palette sits calmly next to the forest-green theme, while
+each fuel keeps a distinguishable hue and stays dark enough to read as
+bold price text on a light card (WCAG AA-large).
 
-| `FuelType` | Color | Role |
+| `FuelType` | Hex | Tone |
 | --- | --- | --- |
-| `FuelTypeE5` | `#4CAF50` green | Regular-E5 petrol |
-| `FuelTypeE10` | `#2196F3` blue | E10 petrol |
-| `FuelTypeE98` | `#9C27B0` purple | Premium E98 |
-| `FuelTypeDiesel` | `#FF9800` orange | Diesel |
-| `FuelTypeDieselPremium` | `#FF5722` deep orange | Premium diesel |
-| `FuelTypeE85` | `#8BC34A` light green | E85 |
-| `FuelTypeLpg` | `#00BCD4` cyan | LPG |
-| `FuelTypeCng` | `#607D8B` blue-grey | CNG |
-| `FuelTypeHydrogen` | `#03A9F4` light blue | Hydrogen |
-| `FuelTypeElectric` | `#009688` teal | EV charging |
-| `FuelTypeAll` | `#757575` grey | "Any fuel" filter marker |
+| `FuelTypeE5` | `#4F7C44` | Muted green |
+| `FuelTypeE10` | `#3B6FA0` | Muted slate-blue |
+| `FuelTypeE98` | `#7B4E86` | Muted plum |
+| `FuelTypeDiesel` | `#BE7C1E` | Muted ochre |
+| `FuelTypeDieselPremium` | `#B5573B` | Muted terracotta |
+| `FuelTypeE85` | `#73904A` | Muted olive |
+| `FuelTypeLpg` | `#3C8794` | Muted teal-cyan |
+| `FuelTypeCng` | `#5C7079` | Muted blue-grey |
+| `FuelTypeHydrogen` | `#4589AC` | Muted sky-blue |
+| `FuelTypeElectric` | `#3B8079` | Muted teal (price hue) |
+| `FuelTypeAll` | `#6F6F6F` | Neutral grey ("any fuel" marker) |
 
-`FuelColors.forType(type)` returns the base color;
+`FuelColors.forType(type)` returns the base colour;
 `FuelColors.forTypeLight(type)` returns it at 15% alpha for chip
-backgrounds / map cluster fills.
+backgrounds / map cluster fills. `FuelColors.stripeColor(context, type)`
+is the `StationCardShell` left-stripe variant — identical to `forType`
+for a concrete fuel, but resolves the all-fuels case to the theme
+**primary** (forest green) instead of the near-invisible neutral grey.
 
-### Map overlay semantics
-
-`DarkModeColors.mapOverlay / mapOverlayIcon / mapOverlayShadow`
-provide the floating-control surface. Do not reinvent — the map
-shadows are tuned for both brightness modes.
+**EV accent — `FuelColors.evAccent = #4FC3F7`** (crystal-blue, #2143 /
+#2493). This is the **single source** for the EV-surface accent: the kW
+headline, the EV card's left stripe and the connector-chip tints all
+reference it. It is deliberately distinct from the muted-teal
+`FuelTypeElectric` *price* hue (`#3B8079`) and replaces the three
+divergent values that used to live in `ev_favorite_card.dart` (`#4FC3F7`),
+`ev_station_card.dart` (teal `#009688`) and `ev_connector_chips.dart`
+(`#2196F3`).
 
 ---
 
@@ -388,28 +515,36 @@ form structure.
 - `margin: EdgeInsets` — defaults to `EdgeInsets.zero` so the
   screen's `ListView` / `Column` controls stacking.
 
-**Visual contract:**
+**Visual contract (as shipped, #2488):** elevation follows the theme
+(`theme.cardTheme.elevation` — light `0`, dark/eco `1` dp) and the card
+draws an explicit hairline `surfaceContainerHighest` outline so the
+card↔scaffold delta holds on every theme (most importantly on light,
+where there is no shadow, and on dark, where a 1 dp shadow is faint):
 
 ```dart
 return Card(
   margin: margin,
   clipBehavior: Clip.antiAlias,
-  elevation: 0,
-  color: theme.colorScheme.surfaceContainerLow,
-  // `shape` omitted — theme applies AppRadius.lg globally.
+  elevation: theme.cardTheme.elevation ?? 0,
+  color: scheme.surfaceContainerLow,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12), // AppRadius.lg
+    side: BorderSide(color: scheme.surfaceContainerHighest), // hairline
+  ),
   child: Padding(
     padding: padding,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (title != null)
+        if (title != null) ...[
           SectionHeader(
             title: title!,
             subtitle: subtitle,
             leadingIcon: leadingIcon,
             padding: EdgeInsets.zero,
           ),
-        if (title != null) const SizedBox(height: Spacing.md),
+          const SizedBox(height: Spacing.md),
+        ],
         child,
       ],
     ),
@@ -418,10 +553,11 @@ return Card(
 ```
 
 **Use for:** every grouped content block on a screen.
-**Do NOT use for:** a card whose shape is specifically bespoke
-(e.g. `StationCard` with its price pill overlay, `BrandLogo` tile in
-the map legend). Bespoke cards stay raw but must document the reason
-in a file-header comment — the lint scan will carry an allow-list
+**Do NOT use for:** a card whose shape is specifically bespoke. The four
+station cards now share `StationCardShell` (see "Component notes"), not
+`SectionCard`; `BrandLogo` tiles in the map legend stay raw. Bespoke
+cards must document the reason in a file-header comment — the lint scan
+(`test/lint/no_raw_card_in_features_test.dart`) carries an allow-list
 keyed to file path, not a blanket exemption.
 
 **Example after migration:** `FormSectionCard` in the Add-Fill-up
@@ -546,6 +682,65 @@ already-shown content, it does not switch views).
 `FavoritesScreen` wrap their view bodies in a `DefaultTabController`
 and feed `TabSwitcher(tabs: [...], ...)` into the scaffold body's
 header slot.
+
+---
+
+## Component notes (theme-level, #2487 Wave 2/3)
+
+Beyond the five canonical scaffolding widgets, the theme layer now owns
+a few shared component contracts so screens stop re-inventing them.
+
+### Floating SnackBar
+
+There is no docked SnackBar anywhere. `AppTheme._floatingSnackBars`
+overlays `SnackBarBehavior.floating` on the `snackBarTheme` of all three
+themes (FlexColorScheme sets radius/elevation via `subThemesData`
+— `snackBarRadius: 12`, `snackBarElevation: 6` — but never the behavior),
+so every SnackBar floats **clear of the bottom nav bar** instead of
+clipping against it on full-screen routes (the "Delete radius alert?"
+clip, #2488). Just call `ScaffoldMessenger.showSnackBar` — the geometry
+is automatic.
+
+### Chips, `SelectablePill`, `AppPill`
+
+One pill family, one corner radius. The theme sets
+`chipRadius: AppRadius.radiusXl` (16) on every Material `Chip` (#2494) so
+chips match the two bespoke pill widgets:
+
+- **`SelectablePill`** (`lib/core/widgets/selectable_pill.dart`) — a
+  compact **toggleable** icon+label pill for binary/segmented mode
+  selection (search "All / Best stops", route-map "All / Best"). Selected
+  → `primaryContainer` fill + `primary` outline + bold label + `primary`
+  icon; unselected → transparent with a faint `outline` border. Corner
+  `AppRadius.xl`. Collapses the old `ModeChip` (r20) + `RouteViewModeChip`
+  (r16) into one shape.
+- **`AppPill`** (`lib/core/widgets/app_pill.dart`) — a small **static**
+  (non-toggleable) labelled badge for connector / amenity / count pills.
+  No selection, no tap. Defaults to the neutral
+  `surfaceContainerHighest` / `onSurfaceVariant` pair (overridable for
+  semantic pills); corner `AppRadius.sm` (the dense-chip token). Reach for
+  `SelectablePill` when the pill toggles a mode; `AppPill` when it is a
+  passive label.
+
+### `StationCardShell`
+
+`lib/core/widgets/station_card_shell.dart` is the **one** card frame for
+all four station cards (`StationCard`, `EvFavoriteCard`, `EVStationCard`,
+`AllPricesStationCard`), which previously hand-copied a drifting frame
+(#2493). The shell owns: margin `symmetric(horizontal: 8, vertical: 6)`,
+`Clip.antiAlias`, elevation `2` on light / `1` on dark, radius
+`AppRadius.lg` (12), an `InkWell` tap target, and an optional left accent
+**stripe**.
+
+**The stripe colour is the only axis** distinguishing fuel vs EV cards —
+the frame is identical:
+
+- **Fuel** cards stripe with `FuelColors.stripeColor(context, type)` —
+  the muted forest-green-family fuel hue (all-fuels → theme `primary`).
+- **EV** cards stripe with `FuelColors.evAccent` (`#4FC3F7` crystal-blue).
+- The all-prices card passes `stripeColor: null` (its colour lives in the
+  per-fuel badges instead); the cheapest-fuel card bumps `stripeWidth`
+  to `6` to emphasise the winner.
 
 ---
 
