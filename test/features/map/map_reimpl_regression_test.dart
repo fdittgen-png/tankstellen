@@ -99,20 +99,53 @@ void main() {
     });
   });
 
-  group('NEVER-BLANK MARKER — a price-bearing station never shows "--" '
-      '(#2400)', () {
-    // A result set where each station has at least one non-null price, but
-    // NONE of them carries the selected fuel (E10) — the exact
-    // fuel-chip-divergence scenario. Every marker must show a real price.
-    final mismatchedSet = <Station>[
-      _station(id: 's-diesel', diesel: 1.699),
-      _station(id: 's-e5', e5: 1.859),
-      _station(id: 's-lpg', lpg: 0.799),
-      _station(id: 's-cng', cng: 1.199),
-    ];
+  group('SELECTED-FUEL MARKER — the marker matches the list, no fallback '
+      '(#2510)', () {
+    // #2510 reverses the #2400 fallback chain: the marker shows STRICTLY
+    // the selected fuel's price (exactly like the search LIST card). A
+    // station that lacks the selected fuel renders "--" — it must NOT be
+    // re-labelled with another fuel's price (the bug where an E85 search
+    // map read "E10 2,099" while the list showed the E85 price).
 
-    testWidgets('no marker in a price-bearing set renders "--" on a '
-        'mismatched fuel', (tester) async {
+    testWidgets(
+        'a marker shows the selected fuel price when the station carries it',
+        (tester) async {
+      // E85 selected; station has E85 (cheap) plus an E10 default. The
+      // marker must show the E85 price, never the E10 default.
+      final station = _station(id: 's-e85', e10: 2.099, e85: 0.799);
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        station,
+        FuelType.e85,
+        0.5,
+        2.5,
+      );
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
+        ),
+      );
+      expect(find.text('0,799'), findsOneWidget);
+      expect(find.text('2,099'), findsNothing,
+          reason: 'the E10 default must never replace the selected E85 price');
+    });
+
+    testWidgets(
+        'a station lacking the selected fuel renders "--", NOT a fallback '
+        'price', (tester) async {
+      // Each station has a non-null price for SOME other fuel but NOT the
+      // selected E10 — the list shows a dash here, so the map must too.
+      final mismatchedSet = <Station>[
+        _station(id: 's-diesel', diesel: 1.699),
+        _station(id: 's-e5', e5: 1.859),
+        _station(id: 's-lpg', lpg: 0.799),
+        _station(id: 's-cng', cng: 1.199),
+      ];
       for (final station in mismatchedSet) {
         final marker = StationMarkerBuilder.build(
           tester.element(find.byType(Container).first),
@@ -131,9 +164,10 @@ void main() {
                 .child,
           ),
         );
-        expect(find.text('--'), findsNothing,
+        expect(find.text('--'), findsOneWidget,
             reason:
-                '${station.id} has a fallback price and must not render "--"');
+                '${station.id} has no E10 price → "--", matching the list, '
+                'no fallback');
       }
     });
 
@@ -156,7 +190,7 @@ void main() {
         ),
       );
       expect(find.text('--'), findsOneWidget,
-          reason: 'the true-empty case is the only legitimate "--"');
+          reason: 'a station with no usable price renders "--"');
     });
   });
 }
@@ -165,6 +199,7 @@ Station _station({
   required String id,
   double? e5,
   double? e10,
+  double? e85,
   double? diesel,
   double? lpg,
   double? cng,
@@ -180,6 +215,7 @@ Station _station({
       lng: 13.0,
       e5: e5,
       e10: e10,
+      e85: e85,
       diesel: diesel,
       lpg: lpg,
       cng: cng,
