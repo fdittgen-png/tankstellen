@@ -535,9 +535,9 @@ class TripRecordingController {
     unawaited(() async {
       try {
         await old.disconnect();
-      } catch (e) {
+      } catch (e, st) {
         debugPrint('TripRecordingController.replaceService: '
-            'old service disconnect failed (already dead) — $e');
+            'old service disconnect failed (already dead) — $e\n$st');
       }
     }());
   }
@@ -1401,9 +1401,9 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
     unawaited(() async {
       try {
         await svc.disconnect();
-      } catch (e) {
+      } catch (e, st) {
         debugPrint('TripRecordingController: dropped-service disconnect '
-            'failed (already dead) — $e');
+            'failed (already dead) — $e\n$st');
       }
     }());
   }
