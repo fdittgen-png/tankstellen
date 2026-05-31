@@ -143,7 +143,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     });
 
     final l10n = AppLocalizations.of(context);
-    final isWide = isWideScreen(context);
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -163,28 +162,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
-      body: isWide
-          ? _buildWideLayout(context)
-          : _buildSearchContent(context),
+      // #2530 — the shared master/detail scaffold owns the breakpoint +
+      // foldable-hinge + 1:1/2:3 ratios. Compact (< 600dp) renders
+      // `_buildSearchContent` full-width, byte-for-byte unchanged. On wide
+      // screens the detail pane is the selected-station inline view,
+      // falling back to the inline map when nothing is selected. Search
+      // thereby picks up the consistent 2:3 expanded ratio (it was a flat
+      // 1:1 before this consolidation).
+      body: _buildWideLayout(context),
     );
   }
 
   Widget _buildWideLayout(BuildContext context) {
     final selectedId = ref.watch(selectedStationProvider);
 
-    return Row(
-      children: [
-        Expanded(child: _buildSearchContent(context)),
-        const VerticalDivider(width: 1),
-        Expanded(
-          child: selectedId != null
-              ? StationDetailInline(
-                  stationId: selectedId,
-                  onClose: () => ref.read(selectedStationProvider.notifier).clear(),
-                )
-              : const InlineMap(),
-        ),
-      ],
+    return ResponsiveMasterDetail(
+      master: _buildSearchContent(context),
+      detail: selectedId != null
+          ? StationDetailInline(
+              stationId: selectedId,
+              onClose: () =>
+                  ref.read(selectedStationProvider.notifier).clear(),
+            )
+          : null,
+      detailPlaceholder: const InlineMap(),
     );
   }
 

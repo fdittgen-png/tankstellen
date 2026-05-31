@@ -873,6 +873,62 @@ void main() {
           reason: 'CTA is disabled while a start is connecting');
     });
   });
+
+  // #2530 — the wide-screen split now goes through the shared
+  // ResponsiveMasterDetail scaffold. Structural pane-count assertions.
+  group('TrajetsTab — #2530 responsive panes', () {
+    final trips = [
+      _entry(
+        id: 'trip-r',
+        vehicleId: 'v1',
+        startedAt: DateTime(2026, 4, 22, 9),
+        distanceKm: 12.0,
+      ),
+    ];
+
+    testWidgets('compact width renders a single pane (no VerticalDivider)',
+        (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: trips,
+        vehicles: [combustionVehicle],
+        activeVehicle: combustionVehicle,
+      );
+
+      expect(find.byType(VerticalDivider), findsNothing);
+      expect(find.byKey(const Key('trajets_list')), findsOneWidget);
+    });
+
+    testWidgets('expanded width renders two panes with the 2:3 ratio',
+        (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: trips,
+        vehicles: [combustionVehicle],
+        activeVehicle: combustionVehicle,
+      );
+
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      // Master flex 2 (insights), detail flex 3 (trajets list).
+      final flexes = tester
+          .widgetList<Expanded>(find.byType(Expanded))
+          .map((e) => e.flex)
+          .toList();
+      expect(flexes, containsAllInOrder(<int>[2, 3]));
+    });
+  });
 }
 
 /// A trip stuck in the transient connecting phase (#2274 concern 2) so

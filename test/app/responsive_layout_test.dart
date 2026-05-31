@@ -286,6 +286,175 @@ void main() {
     });
   });
 
+  group('ResponsiveMasterDetail', () {
+    // The two flex panes of the wrapper's Row are the only `Expanded`s in
+    // these trees, in master-then-detail order.
+    List<int> paneFlex(WidgetTester tester) => tester
+        .widgetList<Expanded>(find.byType(Expanded))
+        .map((e) => e.flex)
+        .toList();
+
+    testWidgets('shows only master on compact (one pane)', (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveMasterDetail(
+              master: Text('Master'),
+              detail: Text('Detail'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Master'), findsOneWidget);
+      expect(find.text('Detail'), findsNothing);
+      expect(find.byType(VerticalDivider), findsNothing);
+    });
+
+    testWidgets('shows two panes (1:1) on medium', (tester) async {
+      tester.view.physicalSize = const Size(768, 1024);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveMasterDetail(
+              master: Text('Master'),
+              detail: Text('Detail'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Master'), findsOneWidget);
+      expect(find.text('Detail'), findsOneWidget);
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      expect(paneFlex(tester), [1, 1]);
+    });
+
+    testWidgets('shows two panes with the 2:3 ratio on expanded',
+        (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveMasterDetail(
+              master: Text('Master'),
+              detail: Text('Detail'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Master'), findsOneWidget);
+      expect(find.text('Detail'), findsOneWidget);
+      // Master flex 2, detail flex 3 — the shared expanded ratio.
+      expect(paneFlex(tester), [2, 3]);
+    });
+
+    testWidgets('falls back to detailPlaceholder when detail is null',
+        (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveMasterDetail(
+              master: Text('Master'),
+              detailPlaceholder: Text('Placeholder'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Master'), findsOneWidget);
+      expect(find.text('Placeholder'), findsOneWidget);
+    });
+
+    testWidgets('detail takes precedence over detailPlaceholder',
+        (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveMasterDetail(
+              master: Text('Master'),
+              detail: Text('Detail'),
+              detailPlaceholder: Text('Placeholder'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Detail'), findsOneWidget);
+      expect(find.text('Placeholder'), findsNothing);
+    });
+
+    testWidgets('master full-width when both detail and placeholder are null',
+        (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveMasterDetail(master: Text('Master')),
+          ),
+        ),
+      );
+
+      expect(find.text('Master'), findsOneWidget);
+      expect(find.byType(VerticalDivider), findsNothing);
+    });
+
+    testWidgets('forceSplit shows two panes (1:1) even on compact',
+        (tester) async {
+      // The Favorites "landscape OR ≥600dp" trigger relies on forceSplit to
+      // keep the side-by-side layout on a sub-600 landscape phone.
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveMasterDetail(
+              forceSplit: true,
+              master: Text('Master'),
+              detail: Text('Detail'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Master'), findsOneWidget);
+      expect(find.text('Detail'), findsOneWidget);
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      expect(paneFlex(tester), [1, 1]);
+    });
+  });
+
   group('displayHingeOf', () {
     testWidgets('returns null when no display features', (tester) async {
       late Rect? result;

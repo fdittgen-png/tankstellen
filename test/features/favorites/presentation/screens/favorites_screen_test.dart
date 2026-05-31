@@ -166,6 +166,33 @@ void main() {
       expect(find.byType(VerticalDivider), findsOneWidget);
     });
 
+    testWidgets(
+        '#2530 expanded width picks up the shared 2:3 master/detail ratio',
+        (tester) async {
+      final test = standardTestOverrides(favoriteIds: []);
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      stubAlerts(test.mockStorage);
+
+      await pumpApp(
+        tester,
+        const MediaQuery(
+          // Expanded width (≥840dp): tablet landscape / desktop.
+          data: MediaQueryData(size: Size(1024, 768)),
+          child: FavoritesScreen(),
+        ),
+        overrides: test.overrides,
+      );
+
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      // FavoritesTab (master) flex 2, AlertsTab (detail) flex 3.
+      final flexes = tester
+          .widgetList<Expanded>(find.byType(Expanded))
+          .map((e) => e.flex)
+          .toList();
+      expect(flexes, containsAllInOrder(<int>[2, 3]));
+    });
+
     testWidgets('renders station cards when favorites have data',
         (tester) async {
       final test = standardTestOverrides(

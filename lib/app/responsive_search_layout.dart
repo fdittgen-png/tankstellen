@@ -67,10 +67,19 @@ class ResponsiveLayoutWrapper extends StatelessWidget {
   /// If null, [compactBody] is shown full-width regardless of screen size.
   final Widget? detailBody;
 
+  /// When true, the side-by-side split is forced even on a compact-width
+  /// screen, using the medium (1:1) ratio. Lets a caller with its own
+  /// wider-trigger (e.g. Favorites' "landscape OR ≥600dp") keep splitting
+  /// on a sub-600 landscape phone while the breakpoint + ratio logic still
+  /// lives here. When false (the default), compact screens show only
+  /// [compactBody].
+  final bool forceSplit;
+
   const ResponsiveLayoutWrapper({
     super.key,
     required this.compactBody,
     this.detailBody,
+    this.forceSplit = false,
   });
 
   @override
@@ -78,7 +87,7 @@ class ResponsiveLayoutWrapper extends StatelessWidget {
     if (detailBody == null) return compactBody;
 
     final size = screenSizeOf(context);
-    if (size == ScreenSize.compact) return compactBody;
+    if (size == ScreenSize.compact && !forceSplit) return compactBody;
 
     // Check for foldable hinge
     final hinge = displayHingeOf(context);
@@ -90,7 +99,7 @@ class ResponsiveLayoutWrapper extends StatelessWidget {
       );
     }
 
-    // Medium: equal split; Expanded: 2:3 ratio
+    // Expanded: 2:3 ratio; medium (and a forced compact split): equal 1:1.
     final leadingFlex = size == ScreenSize.expanded ? 2 : 1;
     final trailingFlex = size == ScreenSize.expanded ? 3 : 1;
 
@@ -145,6 +154,56 @@ class ResponsiveSearchLayout extends StatelessWidget {
     return ResponsiveLayoutWrapper(
       compactBody: searchPanel,
       detailBody: mapPanel,
+    );
+  }
+}
+
+/// Shared master/detail scaffold for the app's two-pane wide layouts.
+///
+/// Delegates to [ResponsiveLayoutWrapper] so the breakpoint, the
+/// foldable-hinge split and the 1:1 (medium) / 2:3 (expanded) ratios all
+/// live in ONE place. Replaces the per-screen hand-rolled `isWideScreen`
+/// checks + literal flex `Row`s in Search / Favorites / Fuel / Trajets.
+///
+/// - On compact screens (< 600dp), shows only [master] full-width — the
+///   detail pane is hidden (unless [forceSplit] is set).
+/// - On medium / expanded screens, shows [master] beside the detail pane
+///   ([detail] when non-null, else [detailPlaceholder]). When both detail
+///   and placeholder are null, [master] stays full-width on every size.
+///
+/// Selection / navigation logic stays with the caller — this widget only
+/// owns the layout container.
+class ResponsiveMasterDetail extends StatelessWidget {
+  /// The primary pane, shown on every screen size.
+  final Widget master;
+
+  /// The active detail pane (e.g. a selected station). Takes precedence
+  /// over [detailPlaceholder] on wide screens.
+  final Widget? detail;
+
+  /// Fallback detail pane shown on wide screens when [detail] is null
+  /// (e.g. an inline map or an empty-selection hint).
+  final Widget? detailPlaceholder;
+
+  /// Forwarded to [ResponsiveLayoutWrapper.forceSplit] — forces the
+  /// side-by-side split even on a compact-width screen (medium 1:1 ratio).
+  /// Used by Favorites to honour its "landscape OR ≥600dp" trigger.
+  final bool forceSplit;
+
+  const ResponsiveMasterDetail({
+    super.key,
+    required this.master,
+    this.detail,
+    this.detailPlaceholder,
+    this.forceSplit = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveLayoutWrapper(
+      compactBody: master,
+      detailBody: detail ?? detailPlaceholder,
+      forceSplit: forceSplit,
     );
   }
 }
