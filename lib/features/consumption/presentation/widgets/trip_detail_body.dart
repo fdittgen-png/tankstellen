@@ -22,6 +22,7 @@ import 'driving_score_card.dart';
 import 'gps_diagnostics_card.dart';
 import 'obd2_diagnostics_trip_card.dart';
 import 'throttle_rpm_histogram_card.dart';
+import 'trip_chart_section.dart';
 import 'trip_detail_charts.dart';
 import 'trip_path_map_card.dart';
 import 'trip_summary_card.dart';
@@ -171,6 +172,18 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // summary regardless of per-sample availability.
     final hasRpmSamples = widget.samples.any((s) => s.rpm != null);
 
+    // Fuel-rate section (#2490) follows the same gating rule as RPM /
+    // engine-load: when neither the MEASURED `fuelRateLPerHour` nor the
+    // GPS-physics ESTIMATED series (#2431) has a single non-null sample,
+    // [TripDetailFuelRateChart] would render its 140 px "Keine
+    // Messwerte" empty card. Gate the section here so it disappears
+    // entirely instead — mirroring the chart's own self-suppression
+    // predicate so the section and the chart agree.
+    final hasFuelRateSamples = widget.samples.any(
+      (s) =>
+          s.fuelRateLPerHour != null || s.estimatedFuelRateLPerHour != null,
+    );
+
     // Engine-load section (#1262 phase 3) follows the same gating
     // rule as RPM: cars without PID 0x04 emit null on every sample
     // (legacy trips persisted before #1262 phase 1 also do), and we
@@ -292,43 +305,44 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             collapsedShape: const Border(),
             childrenPadding: const EdgeInsets.only(bottom: 4),
             children: [
-              _ChartSection(
+              TripChartSection(
                 title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
                 chart: TripDetailSpeedChart(samples: widget.samples),
               ),
-              _ChartSection(
-                title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
-                chart: TripDetailFuelRateChart(samples: widget.samples),
-              ),
+              if (hasFuelRateSamples)
+                TripChartSection(
+                  title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
+                  chart: TripDetailFuelRateChart(samples: widget.samples),
+                ),
               if (hasRpmSamples)
-                _ChartSection(
+                TripChartSection(
                   title: l?.trajetDetailChartRpm ?? 'RPM',
                   chart: TripDetailRpmChart(samples: widget.samples),
                 ),
               if (hasEngineLoadSamples)
-                _ChartSection(
+                TripChartSection(
                   title: l?.trajetDetailChartEngineLoad ?? 'Engine load (%)',
                   chart: TripDetailEngineLoadChart(samples: widget.samples),
                 ),
               // #2461 — driving-signal charts, each gated on its own
               // if-any-non-null signal (mirrors RPM / engine-load).
               if (hasThrottleSamples)
-                _ChartSection(
+                TripChartSection(
                   title: l?.trajetDetailChartThrottle ?? 'Throttle / pedal (%)',
                   chart: TripDetailThrottleChart(samples: widget.samples),
                 ),
               if (hasCoolantSamples)
-                _ChartSection(
+                TripChartSection(
                   title: l?.trajetDetailChartCoolant ?? 'Coolant (°C)',
                   chart: TripDetailCoolantChart(samples: widget.samples),
                 ),
               if (hasAltitudeSamples)
-                _ChartSection(
+                TripChartSection(
                   title: l?.trajetDetailChartAltitude ?? 'Altitude (m)',
                   chart: TripDetailAltitudeChart(samples: widget.samples),
                 ),
               if (hasLambdaSamples)
-                _ChartSection(
+                TripChartSection(
                   title: l?.trajetDetailChartLambda ?? 'Commanded λ',
                   chart: TripDetailLambdaChart(samples: widget.samples),
                 ),
@@ -378,26 +392,3 @@ TripSample _toTripSample(TripDetailSample s) => TripSample(
       pedalPercent: s.pedalPercent,
       lambda: s.lambda,
     );
-
-class _ChartSection extends StatelessWidget {
-  final String title;
-  final Widget chart;
-
-  const _ChartSection({required this.title, required this.chart});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: theme.textTheme.titleSmall),
-          const SizedBox(height: 4),
-          chart,
-        ],
-      ),
-    );
-  }
-}

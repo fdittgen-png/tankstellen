@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/map/data/sparkilo_tile_layer.dart';
@@ -323,6 +324,86 @@ void main() {
         FuelType.diesel,
       );
       expect(ordered.map((s) => s.id).toList(), ['first', 'second']);
+    });
+  });
+
+  // #2490 — markers were only routed through the cluster layer when
+  // `stations.length > 20`, so a small radius search (e.g. 10 stations)
+  // dropped to a raw [MarkerLayer] and rendered overlapping price bubbles.
+  // Every non-empty set now goes through [MarkerClusterLayerWidget] so
+  // overlapping markers collapse into a tappable cluster.
+  group('StationMapLayers marker clustering (#2490)', () {
+    List<Station> nStations(int n) => List.generate(
+          n,
+          (i) => Station(
+            id: 'st-$i',
+            name: 'Station $i',
+            brand: 'Brand',
+            street: 'Street',
+            houseNumber: '$i',
+            postCode: '10178',
+            place: 'Berlin',
+            // Cluster them tightly around the centre so overlap is realistic.
+            lat: 52.5210 + i * 0.0005,
+            lng: 13.4100 + i * 0.0005,
+            dist: 0.8,
+            diesel: 1.50 + i * 0.01,
+            isOpen: true,
+          ),
+        );
+
+    Future<void> pumpWith(
+      WidgetTester tester,
+      List<Station> stations,
+    ) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final mapController = MapController();
+      addTearDown(mapController.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StationMapLayers(
+              mapController: mapController,
+              stations: stations,
+              center: const LatLng(52.5210, 13.4100),
+              zoom: 12,
+              searchRadiusKm: 10,
+              selectedFuel: FuelType.diesel,
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('routes a SMALL (10-station) set through the cluster layer',
+        (tester) async {
+      await pumpWith(tester, nStations(10));
+      expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
+    });
+
+    testWidgets('routes a SINGLE station through the cluster layer',
+        (tester) async {
+      await pumpWith(tester, const [_seedStation]);
+      expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
+    });
+
+    testWidgets('routes a LARGE (40-station) set through the cluster layer',
+        (tester) async {
+      await pumpWith(tester, nStations(40));
+      expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
+    });
+
+    testWidgets('renders no cluster layer for an empty station set',
+        (tester) async {
+      // Empty markers list → the cluster widget is skipped entirely so it
+      // never lays out an empty quadtree.
+      await pumpWith(tester, const []);
+      expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
   });
 }

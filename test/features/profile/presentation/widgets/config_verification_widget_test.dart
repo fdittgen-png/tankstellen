@@ -39,10 +39,27 @@ class _ConnectedSync extends SyncState {
       );
 }
 
+/// Connected sync with a long Supabase URL — the exact shape that, before
+/// #2490, wrapped the "Database" label onto two lines and clipped the host
+/// in the inline `_ConfigRow` layout.
+class _ConnectedSyncLongUrl extends SyncState {
+  @override
+  SyncConfig build() => const SyncConfig(
+        enabled: true,
+        mode: SyncMode.community,
+        userId: 'user-abc',
+        userEmail: 'test@example.com',
+        supabaseUrl:
+            'https://abcdefghijklmnopqrstuvwx.supabase.co/rest/v1/realtime',
+        supabaseAnonKey: 'anon-key',
+      );
+}
+
 List<Object> _buildOverrides({
   UserProfile? profile,
   bool hasApiKey = false,
   bool syncEnabled = false,
+  bool longUrl = false,
 }) {
   // #521 — hasApiKey() is true in production whenever ANY key is configured.
   // FakeHiveStorage models that via `hasBundledDefaultKey` (true by default)
@@ -55,11 +72,15 @@ List<Object> _buildOverrides({
   // configured; mirror the legacy mock value so any UI that surfaces the
   // first 8 chars stays stable.
 
+  SyncState syncState() {
+    if (!syncEnabled) return _DisabledSync();
+    return longUrl ? _ConnectedSyncLongUrl() : _ConnectedSync();
+  }
+
   return [
     storageRepositoryProvider.overrideWithValue(fake),
     activeProfileProvider.overrideWith(() => _FixedActiveProfile(profile)),
-    syncStateProvider
-        .overrideWith(() => syncEnabled ? _ConnectedSync() : _DisabledSync()),
+    syncStateProvider.overrideWith(syncState),
   ];
 }
 
@@ -175,6 +196,54 @@ void main() {
         locale: const Locale('fr'),
       );
       expect(find.text('Connectée'), findsOneWidget);
+    });
+
+    testWidgets(
+        '#2490: a long Supabase URL does not overflow — Database label and '
+        'URL both render with the value stacked under the label',
+        (tester) async {
+      // Before #2490 the inline `_ConfigRow` (Expanded label + unconstrained
+      // value) wrapped "Database" onto two lines and clipped the host. The
+      // value is now stacked under the label, so a long URL lays out
+      // without throwing a RenderFlex overflow.
+      await pumpApp(
+        tester,
+        const ConfigVerificationWidget(),
+        overrides: _buildOverrides(
+          profile: _sampleProfile(),
+          syncEnabled: true,
+          longUrl: true,
+        ),
+      );
+
+      // pumpApp would surface any RenderFlex overflow as a test failure;
+      // reaching here means the row laid out cleanly. The label and the
+      // (single-line) URL value are both present.
+      expect(find.text('Database'), findsOneWidget);
+      expect(
+        find.text(
+            'https://abcdefghijklmnopqrstuvwx.supabase.co/rest/v1/realtime'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        '#2490: a short value still renders inline next to its label',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const ConfigVerificationWidget(),
+        overrides: _buildOverrides(
+          profile: _sampleProfile(),
+          syncEnabled: true,
+        ),
+        locale: const Locale('en'),
+      );
+
+      // The short URL still renders; the inline path now uses Flexible +
+      // ellipsis but a short value is unaffected.
+      expect(find.text('Database'), findsOneWidget);
+      expect(find.text('https://example.supabase.co'), findsOneWidget);
     });
 
     testWidgets('no English label leaks under a FR locale', (tester) async {

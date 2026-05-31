@@ -70,6 +70,21 @@ TripDetailSample _sampleWithEngineLoad(int sec, double speed, double load) =>
       engineLoadPercent: load,
     );
 
+TripDetailSample _sampleWithFuelRate(int sec, double speed, double fuelRate) =>
+    TripDetailSample(
+      timestamp: DateTime.utc(2026, 4, 22, 10, 0, sec),
+      speedKmh: speed,
+      fuelRateLPerHour: fuelRate,
+    );
+
+TripDetailSample _sampleWithEstimatedFuelRate(
+        int sec, double speed, double estimate) =>
+    TripDetailSample(
+      timestamp: DateTime.utc(2026, 4, 22, 10, 0, sec),
+      speedKmh: speed,
+      estimatedFuelRateLPerHour: estimate,
+    );
+
 /// Default overrides for [TripDetailBody] tests. Now that the body
 /// reads [gamificationEnabledProvider] (#1194), every test must seed a
 /// value so the underlying active-profile chain isn't traversed (those
@@ -119,7 +134,9 @@ void main() {
         TripDetailBody(
           entry: _entry(),
           vehicle: _vehicle,
-          samples: const [],
+          // #2490 — the fuel-rate section is now gated on having at least
+          // one measured/estimated fuel-rate sample, so seed one.
+          samples: [_sampleWithFuelRate(0, 30, 4.2)],
           isEv: false,
         ),
       );
@@ -138,7 +155,7 @@ void main() {
         TripDetailBody(
           entry: _entry(),
           vehicle: _vehicle,
-          samples: const [],
+          samples: [_sampleWithFuelRate(0, 30, 4.2)],
           isEv: false,
         ),
       );
@@ -179,7 +196,9 @@ void main() {
         TripDetailBody(
           entry: _entry(),
           vehicle: _vehicle,
-          samples: const [],
+          // #2490 — seed a fuel-rate sample so the (now-gated) fuel-rate
+          // section is present to reveal.
+          samples: [_sampleWithFuelRate(0, 30, 4.2)],
           isEv: false,
         ),
       );
@@ -322,6 +341,98 @@ void main() {
     });
   });
 
+  // #2490 — the fuel-rate section used to render UNGATED, so a trip with
+  // no measured/estimated fuel-rate data (a GPS-only or no-fuel-PID trip)
+  // showed an empty 140-px "Keine Messwerte" card. It now follows the same
+  // gating rule as RPM / engine-load: hidden entirely when no sample
+  // carries a measured OR estimated fuel rate.
+  group('TripDetailBody — fuel-rate section visibility', () {
+    testWidgets('mounts the fuel-rate chart when a measured sample exists',
+        (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: [
+            _sampleNoRpm(0, 30),
+            _sampleWithFuelRate(1, 35, 4.2),
+            _sampleNoRpm(2, 40),
+          ],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(TripDetailFuelRateChart, skipOffstage: false),
+          findsOneWidget);
+      expect(find.text('Fuel rate (L/h)', skipOffstage: false),
+          findsOneWidget);
+    });
+
+    testWidgets(
+        'mounts the fuel-rate chart when only an ESTIMATED sample exists',
+        (tester) async {
+      // GPS-physics estimate (#2431) with no measured PID — the section
+      // still renders because the chart plots the estimated series.
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: [
+            _sampleNoRpm(0, 30),
+            _sampleWithEstimatedFuelRate(1, 35, 3.1),
+          ],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(TripDetailFuelRateChart, skipOffstage: false),
+          findsOneWidget);
+      expect(find.text('Fuel rate (L/h)', skipOffstage: false),
+          findsOneWidget);
+    });
+
+    testWidgets(
+        'hides the fuel-rate chart when no sample carries a measured or '
+        'estimated fuel rate', (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: [
+            _sampleNoRpm(0, 30),
+            _sampleWithRpm(1, 35, 1800.0),
+            _sampleNoRpm(2, 40),
+          ],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(TripDetailFuelRateChart, skipOffstage: false),
+          findsNothing);
+      expect(find.text('Fuel rate (L/h)', skipOffstage: false), findsNothing);
+    });
+
+    testWidgets('hides the fuel-rate chart when samples is empty',
+        (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(TripDetailFuelRateChart, skipOffstage: false),
+          findsNothing);
+      expect(find.text('Fuel rate (L/h)', skipOffstage: false), findsNothing);
+    });
+  });
+
   group('TripDetailBody — section ordering', () {
     testWidgets(
         'renders summary, speed, fuel rate, then RPM in that vertical order',
@@ -331,9 +442,22 @@ void main() {
         TripDetailBody(
           entry: _entry(),
           vehicle: _vehicle,
+          // #2490 — include a fuel-rate sample so the (now-gated)
+          // fuel-rate section renders and the ordering check below
+          // (speed < fuel < rpm) has all three sections present.
           samples: [
-            _sampleWithRpm(0, 30, 1500.0),
-            _sampleWithRpm(1, 35, 1700.0),
+            TripDetailSample(
+              timestamp: DateTime.utc(2026, 4, 22, 10, 0, 0),
+              speedKmh: 30,
+              rpm: 1500.0,
+              fuelRateLPerHour: 4.0,
+            ),
+            TripDetailSample(
+              timestamp: DateTime.utc(2026, 4, 22, 10, 0, 1),
+              speedKmh: 35,
+              rpm: 1700.0,
+              fuelRateLPerHour: 4.5,
+            ),
           ],
           isEv: false,
         ),
@@ -366,15 +490,17 @@ void main() {
   group('TripDetailBody — EV mode', () {
     testWidgets('still mounts speed and fuel-rate sections when isEv is true',
         (tester) async {
-      // The body itself doesn't gate sections on isEv — it only forwards
-      // the flag to the summary card. This guards against a future change
-      // accidentally hiding charts on EV trips.
+      // The body doesn't gate the speed/fuel-rate charts on isEv — it
+      // only forwards the flag to the summary card. This guards against a
+      // future change accidentally hiding those charts on EV trips. #2490
+      // — the fuel-rate section is gated on fuel-rate data presence (not
+      // on isEv), so seed a fuel-rate sample.
       await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
           vehicle: _vehicle,
-          samples: const [],
+          samples: [_sampleWithFuelRate(0, 30, 3.5)],
           isEv: true,
         ),
       );

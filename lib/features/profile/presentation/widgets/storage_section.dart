@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/cache/cache_manager.dart';
 import '../../../../core/storage/storage_providers.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'storage_bar.dart';
@@ -56,13 +55,18 @@ class StorageSection extends ConsumerWidget {
                   // i18n-ignore: "Cache" is a brand-neutral technical term.
                   'Cache (${storageMgmt.cacheEntryCount} ${l?.entries ?? "entries"})',
                   stats.cache,
-                  theme.colorScheme.error.withValues(alpha: 0.7),
+                  // #2490 — cache is benign data, not data-loss. It maps to
+                  // a NEUTRAL categorical tone rather than error-red (which
+                  // dominated ~96% of the bar and read as an alarm). Error
+                  // red is reserved for the Delete-all action below.
+                  theme.colorScheme.surfaceContainerHighest,
                 ),
                 StorageSegment(
                   '${l?.priceHistory ?? "Price History"} '
                   '(${storageMgmt.priceHistoryEntryCount})',
                   stats.priceHistory,
-                  DarkModeColors.warning(context).withValues(alpha: 0.7),
+                  // #2490 — neutral categorical tone, not warning-orange.
+                  theme.colorScheme.secondaryContainer,
                 ),
               ],
               totalBytes: stats.total,
@@ -96,7 +100,9 @@ class StorageSection extends ConsumerWidget {
               detail:
                   '${storageMgmt.cacheEntryCount} ${l?.cachedResponses ?? 'cached'}',
               bytes: stats.cache,
-              color: theme.colorScheme.error.withValues(alpha: 0.7),
+              // #2490 — neutral categorical tone (matches the bar segment),
+              // not error-red; cache is benign data, not data-loss.
+              color: theme.colorScheme.surfaceContainerHighest,
             ),
             StorageDetailRow(
               label: l?.priceHistory ?? 'Price History',
@@ -104,14 +110,16 @@ class StorageSection extends ConsumerWidget {
                       storageMgmt.priceHistoryEntryCount) ??
                   '${storageMgmt.priceHistoryEntryCount} stations tracked',
               bytes: stats.priceHistory,
-              color: DarkModeColors.warning(context).withValues(alpha: 0.7),
+              // #2490 — neutral categorical tone, not warning-orange.
+              color: theme.colorScheme.secondaryContainer,
             ),
             StorageDetailRow(
               label: l?.priceAlerts ?? 'Alerts',
               detail: l?.alertsConfiguredCount(storageMgmt.alertCount) ??
                   '${storageMgmt.alertCount} configured',
               bytes: stats.alerts,
-              color: DarkModeColors.warning(context).withValues(alpha: 0.7),
+              // #2490 — neutral categorical tone, not warning-orange.
+              color: theme.colorScheme.tertiaryContainer,
             ),
             StorageDetailRow(
               label: l?.ignoredStationsLabel ?? 'Ignored',
@@ -119,7 +127,8 @@ class StorageSection extends ConsumerWidget {
                       storageMgmt.getIgnoredIds().length) ??
                   '${storageMgmt.getIgnoredIds().length} stations hidden',
               bytes: storageMgmt.getIgnoredIds().length * 64,
-              color: Colors.grey,
+              // #2490 — theme outline token instead of a hard-coded grey.
+              color: theme.colorScheme.outlineVariant,
             ),
             StorageDetailRow(
               label: l?.ratingsLabel ?? 'Ratings',
@@ -127,7 +136,8 @@ class StorageSection extends ConsumerWidget {
                       storageMgmt.getRatings().length) ??
                   '${storageMgmt.getRatings().length} stations rated',
               bytes: storageMgmt.getRatings().length * 64,
-              color: Colors.amber,
+              // #2490 — neutral categorical tone instead of hard-coded amber.
+              color: theme.colorScheme.tertiary,
             ),
             const Divider(height: 32),
             Row(
