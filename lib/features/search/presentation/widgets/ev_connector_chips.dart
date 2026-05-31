@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/fuel_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Compact wrap of colored "pills" identifying the connector types on
@@ -32,8 +33,14 @@ class EvConnectorChips extends StatelessWidget {
   /// Maps a connector type label to a brand-recognisable color. Returns
   /// neutral grey for unknown types so the pill still renders without
   /// breaking the layout.
+  ///
+  /// #2493 — the generic CCS chip now uses the canonical
+  /// [FuelColors.evAccent] crystal-blue instead of the ad-hoc Material
+  /// blue (`#2196F3`) it used to hard-code, so the EV accent is one token
+  /// across every surface. Type 2 / CHAdeMO / Tesla keep their deliberate
+  /// per-connector brand hues (green / orange / pink).
   static Color colorFor(String type) {
-    if (type.contains('CCS')) return const Color(0xFF2196F3); // Blue
+    if (type.contains('CCS')) return FuelColors.evAccent; // Crystal-blue
     if (type.contains('Type 2')) return const Color(0xFF4CAF50); // Green
     if (type.contains('CHAdeMO')) return const Color(0xFFFF9800); // Orange
     if (type.contains('Tesla')) return const Color(0xFFE91E63); // Pink
@@ -47,7 +54,7 @@ class EvConnectorChips extends StatelessWidget {
     final semanticLabel = visible.isEmpty
         ? (l10n?.evConnectorsNone ?? 'No connector information')
         : '${l10n?.evConnectorsLabel ?? "Available connectors"}: '
-            '${visible.join(", ")}';
+              '${visible.join(", ")}';
 
     return Semantics(
       container: true,

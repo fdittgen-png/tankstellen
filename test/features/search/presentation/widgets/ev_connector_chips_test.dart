@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_connector_chips.dart';
 
 void main() {
@@ -43,23 +44,33 @@ void main() {
       expect(find.text('Tesla'), findsNothing);
     });
 
-    testWidgets('returns brand colors from EvConnectorChips.colorFor',
-        (tester) async {
-      expect(EvConnectorChips.colorFor('CCS'), const Color(0xFF2196F3));
+    testWidgets('returns brand colors from EvConnectorChips.colorFor', (
+      tester,
+    ) async {
+      // #2493 — the generic CCS chip uses the canonical EV accent token
+      // instead of an ad-hoc Material blue; the deliberate per-connector
+      // brand hues (Type 2 / CHAdeMO / Tesla) are unchanged.
+      expect(EvConnectorChips.colorFor('CCS'), FuelColors.evAccent);
       expect(EvConnectorChips.colorFor('Type 2'), const Color(0xFF4CAF50));
       expect(EvConnectorChips.colorFor('CHAdeMO'), const Color(0xFFFF9800));
-      expect(EvConnectorChips.colorFor('Tesla Supercharger'),
-          const Color(0xFFE91E63));
+      expect(
+        EvConnectorChips.colorFor('Tesla Supercharger'),
+        const Color(0xFFE91E63),
+      );
     });
 
-    testWidgets('falls back to neutral grey for unknown connector types',
-        (tester) async {
-      expect(EvConnectorChips.colorFor('Mystery Plug'),
-          const Color(0xFF757575));
+    testWidgets('falls back to neutral grey for unknown connector types', (
+      tester,
+    ) async {
+      expect(
+        EvConnectorChips.colorFor('Mystery Plug'),
+        const Color(0xFF757575),
+      );
     });
 
-    testWidgets('renders nothing visible when the connector list is empty',
-        (tester) async {
+    testWidgets('renders nothing visible when the connector list is empty', (
+      tester,
+    ) async {
       await pumpChips(tester, connectors: const []);
       // The Wrap still exists, but no Container chips inside it.
       expect(
@@ -72,27 +83,26 @@ void main() {
     });
 
     testWidgets(
-        'exposes a group Semantics label listing connectors (#566 a11y)',
-        (tester) async {
-      await pumpChips(tester, connectors: const ['CCS', 'Type 2']);
-      final handle = tester.ensureSemantics();
+      'exposes a group Semantics label listing connectors (#566 a11y)',
+      (tester) async {
+        await pumpChips(tester, connectors: const ['CCS', 'Type 2']);
+        final handle = tester.ensureSemantics();
 
-      // Parent Semantics announces the whole group — no chip-by-chip spam.
-      expect(
-        find.bySemanticsLabel('Available connectors: CCS, Type 2'),
-        findsOneWidget,
-      );
-      handle.dispose();
-    });
+        // Parent Semantics announces the whole group — no chip-by-chip spam.
+        expect(
+          find.bySemanticsLabel('Available connectors: CCS, Type 2'),
+          findsOneWidget,
+        );
+        handle.dispose();
+      },
+    );
 
-    testWidgets('empty list still exposes "no information" Semantics label',
-        (tester) async {
+    testWidgets('empty list still exposes "no information" Semantics label', (
+      tester,
+    ) async {
       await pumpChips(tester, connectors: const []);
       final handle = tester.ensureSemantics();
-      expect(
-        find.bySemanticsLabel('No connector information'),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel('No connector information'), findsOneWidget);
       handle.dispose();
     });
   });

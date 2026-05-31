@@ -7,6 +7,7 @@ import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
+import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
@@ -21,10 +22,7 @@ void main() {
     testWidgets('renders station brand name', (tester) async {
       await pumpApp(
         tester,
-        const StationCard(
-          station: testStation,
-          selectedFuelType: FuelType.e10,
-        ),
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
       );
 
       expect(find.text('STAR'), findsOneWidget);
@@ -33,10 +31,7 @@ void main() {
     testWidgets('renders station address', (tester) async {
       await pumpApp(
         tester,
-        const StationCard(
-          station: testStation,
-          selectedFuelType: FuelType.e10,
-        ),
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
       );
 
       // Address + postcode combined on one line when brand is shown
@@ -67,10 +62,7 @@ void main() {
     testWidgets('renders distance in km', (tester) async {
       await pumpApp(
         tester,
-        const StationCard(
-          station: testStation,
-          selectedFuelType: FuelType.e10,
-        ),
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
       );
 
       // testStation.dist = 1.5 → "1,5 km"
@@ -79,13 +71,18 @@ void main() {
 
     testWidgets('shows open indicator when isOpen=true', (tester) async {
       late Color expectedColor;
-      await pumpApp(tester, Builder(builder: (context) {
-        expectedColor = DarkModeColors.success(context);
-        return const StationCard(
-          station: testStation, // isOpen: true
-          selectedFuelType: FuelType.e10,
-        );
-      }));
+      await pumpApp(
+        tester,
+        Builder(
+          builder: (context) {
+            expectedColor = DarkModeColors.success(context);
+            return const StationCard(
+              station: testStation, // isOpen: true
+              selectedFuelType: FuelType.e10,
+            );
+          },
+        ),
+      );
 
       // The open indicator is a circle with success color
       final containers = find.byWidgetPredicate((widget) {
@@ -100,16 +97,22 @@ void main() {
     });
 
     testWidgets('shows closed indicator when isOpen=false', (tester) async {
-      final closedStation = testStationList[2]; // station-expensive, isOpen: false
+      final closedStation =
+          testStationList[2]; // station-expensive, isOpen: false
 
       late Color expectedColor;
-      await pumpApp(tester, Builder(builder: (context) {
-        expectedColor = DarkModeColors.error(context);
-        return StationCard(
-          station: closedStation,
-          selectedFuelType: FuelType.e10,
-        );
-      }));
+      await pumpApp(
+        tester,
+        Builder(
+          builder: (context) {
+            expectedColor = DarkModeColors.error(context);
+            return StationCard(
+              station: closedStation,
+              selectedFuelType: FuelType.e10,
+            );
+          },
+        ),
+      );
 
       // The closed indicator is a circle with error color
       final containers = find.byWidgetPredicate((widget) {
@@ -158,8 +161,9 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('shows arrow_downward icon when priceTier is cheap',
-        (tester) async {
+    testWidgets('shows arrow_downward icon when priceTier is cheap', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const StationCard(
@@ -172,8 +176,7 @@ void main() {
       expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
     });
 
-    testWidgets('shows remove icon when priceTier is average',
-        (tester) async {
+    testWidgets('shows remove icon when priceTier is average', (tester) async {
       await pumpApp(
         tester,
         const StationCard(
@@ -187,8 +190,9 @@ void main() {
       expect(find.byIcon(Icons.remove), findsOneWidget);
     });
 
-    testWidgets('shows arrow_upward icon when priceTier is expensive',
-        (tester) async {
+    testWidgets('shows arrow_upward icon when priceTier is expensive', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const StationCard(
@@ -201,22 +205,21 @@ void main() {
       expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
     });
 
-    testWidgets('does not show tier icon when priceTier is null',
-        (tester) async {
+    testWidgets('does not show tier icon when priceTier is null', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
-        const StationCard(
-          station: testStation,
-          selectedFuelType: FuelType.e10,
-        ),
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
       );
 
       expect(find.byIcon(Icons.arrow_downward), findsNothing);
       expect(find.byIcon(Icons.arrow_upward), findsNothing);
     });
 
-    testWidgets('does not show tier icon when priceTier is unknown',
-        (tester) async {
+    testWidgets('does not show tier icon when priceTier is unknown', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const StationCard(
@@ -242,30 +245,35 @@ void main() {
       );
 
       // 3 filled stars + 2 empty stars = 5 star icons total
-      final filledStars = find.byWidgetPredicate((widget) =>
-          widget is Icon && widget.icon == Icons.star && widget.size == 12);
-      final emptyStars = find.byWidgetPredicate((widget) =>
-          widget is Icon &&
-          widget.icon == Icons.star_border &&
-          widget.size == 12);
+      final filledStars = find.byWidgetPredicate(
+        (widget) =>
+            widget is Icon && widget.icon == Icons.star && widget.size == 12,
+      );
+      final emptyStars = find.byWidgetPredicate(
+        (widget) =>
+            widget is Icon &&
+            widget.icon == Icons.star_border &&
+            widget.size == 12,
+      );
       expect(filledStars, findsNWidgets(3));
       expect(emptyStars, findsNWidgets(2));
     });
 
-    testWidgets('does not show rating stars when rating is null',
-        (tester) async {
+    testWidgets('does not show rating stars when rating is null', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
-        const StationCard(
-          station: testStation,
-          selectedFuelType: FuelType.e10,
-        ),
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
       );
 
       // No 12px star icons should appear (the favorite star is 22px)
       final ratingStars = find.byWidgetPredicate(
-          (widget) => widget is Icon && widget.size == 12 &&
-              (widget.icon == Icons.star || widget.icon == Icons.star_border));
+        (widget) =>
+            widget is Icon &&
+            widget.size == 12 &&
+            (widget.icon == Icons.star || widget.icon == Icons.star_border),
+      );
       expect(ratingStars, findsNothing);
     });
 
@@ -279,8 +287,10 @@ void main() {
         ),
       );
 
-      final filledStars = find.byWidgetPredicate((widget) =>
-          widget is Icon && widget.icon == Icons.star && widget.size == 12);
+      final filledStars = find.byWidgetPredicate(
+        (widget) =>
+            widget is Icon && widget.icon == Icons.star && widget.size == 12,
+      );
       expect(filledStars, findsNWidgets(5));
     });
 
@@ -297,10 +307,12 @@ void main() {
       // Both the price RichText and the favorite IconButton should be
       // inside the same Row (the right-side price+fav row).
       // Verify both are rendered and the favorite icon is 22px (compact).
-      final favIcon = find.byWidgetPredicate((widget) =>
-          widget is Icon &&
-          widget.icon == Icons.star &&
-          widget.color == Colors.amber);
+      final favIcon = find.byWidgetPredicate(
+        (widget) =>
+            widget is Icon &&
+            widget.icon == Icons.star &&
+            widget.color == Colors.amber,
+      );
       expect(favIcon, findsOneWidget);
 
       // The favorite IconButton should be compact (32x32 SizedBox)
@@ -313,8 +325,9 @@ void main() {
       expect(sizedBox, findsOneWidget);
     });
 
-    testWidgets('renders amenity chips on single horizontal line',
-        (tester) async {
+    testWidgets('renders amenity chips on single horizontal line', (
+      tester,
+    ) async {
       const stationWithAmenities = Station(
         id: 'amenity-test',
         name: 'Test Station',
@@ -347,8 +360,9 @@ void main() {
       expect(find.byType(AmenityChips), findsOneWidget);
     });
 
-    testWidgets('calls onFavoriteTap when favorite button tapped',
-        (tester) async {
+    testWidgets('calls onFavoriteTap when favorite button tapped', (
+      tester,
+    ) async {
       var favTapped = false;
 
       await pumpApp(
@@ -367,8 +381,9 @@ void main() {
     });
 
     group('profile fuel highlight in all-fuels view', () {
-      testWidgets('shows all three price rows when FuelType.all selected',
-          (tester) async {
+      testWidgets('shows all three price rows when FuelType.all selected', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -383,36 +398,37 @@ void main() {
       });
 
       testWidgets(
-          'profile fuel row has larger dot when profileFuelType matches',
-          (tester) async {
-        await pumpApp(
-          tester,
-          const StationCard(
-            station: testStation,
-            selectedFuelType: FuelType.all,
-            profileFuelType: FuelType.e10,
-          ),
-        );
+        'profile fuel row has larger dot when profileFuelType matches',
+        (tester) async {
+          await pumpApp(
+            tester,
+            const StationCard(
+              station: testStation,
+              selectedFuelType: FuelType.all,
+              profileFuelType: FuelType.e10,
+            ),
+          );
 
-        // The E10 row should have a larger dot (8px) while others have 6px
-        final containers = find.byWidgetPredicate((widget) {
-          if (widget is Container && widget.decoration is BoxDecoration) {
-            final decoration = widget.decoration as BoxDecoration;
-            final constraints = widget.constraints;
-            return decoration.shape == BoxShape.circle &&
-                constraints != null &&
-                constraints.maxWidth == 8.0 &&
-                constraints.maxHeight == 8.0;
-          }
-          return false;
-        });
-        // One 8px dot for the highlighted E10 row
-        expect(containers, findsOneWidget);
-      });
+          // The E10 row should have a larger dot (8px) while others have 6px
+          final containers = find.byWidgetPredicate((widget) {
+            if (widget is Container && widget.decoration is BoxDecoration) {
+              final decoration = widget.decoration as BoxDecoration;
+              final constraints = widget.constraints;
+              return decoration.shape == BoxShape.circle &&
+                  constraints != null &&
+                  constraints.maxWidth == 8.0 &&
+                  constraints.maxHeight == 8.0;
+            }
+            return false;
+          });
+          // One 8px dot for the highlighted E10 row
+          expect(containers, findsOneWidget);
+        },
+      );
 
-      testWidgets(
-          'profile fuel row label uses fuel-type color',
-          (tester) async {
+      testWidgets('profile fuel row label uses fuel-type color', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -431,9 +447,9 @@ void main() {
         expect(textWidget.style?.color, dieselColor);
       });
 
-      testWidgets(
-          'non-profile fuel rows do not use fuel-type label color',
-          (tester) async {
+      testWidgets('non-profile fuel rows do not use fuel-type label color', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -452,9 +468,7 @@ void main() {
         expect(e5Text.style?.color, isNot(equals(e5FuelColor)));
       });
 
-      testWidgets(
-          'no highlight when profileFuelType is null',
-          (tester) async {
+      testWidgets('no highlight when profileFuelType is null', (tester) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -478,9 +492,9 @@ void main() {
         expect(largeDots, findsNothing);
       });
 
-      testWidgets(
-          'no price rows when single fuel type selected (not all)',
-          (tester) async {
+      testWidgets('no price rows when single fuel type selected (not all)', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -515,43 +529,51 @@ void main() {
       });
 
       testWidgets(
-          'uk- prefix renders £ even when the active profile is France',
-          (tester) async {
-        PriceFormatter.setCountry('FR');
+        'uk- prefix renders £ even when the active profile is France',
+        (tester) async {
+          PriceFormatter.setCountry('FR');
 
-        const ukStation = Station(
-          id: 'uk-BP1',
-          name: 'BP Victoria',
-          brand: 'BP',
-          street: '1 Victoria St',
-          postCode: 'SW1E 6DE',
-          place: 'London',
-          lat: 51.4975,
-          lng: -0.1357,
-          dist: 1.5,
-          e5: 1.559,
-          e10: 1.459,
-          diesel: 1.529,
-          isOpen: true,
-        );
+          const ukStation = Station(
+            id: 'uk-BP1',
+            name: 'BP Victoria',
+            brand: 'BP',
+            street: '1 Victoria St',
+            postCode: 'SW1E 6DE',
+            place: 'London',
+            lat: 51.4975,
+            lng: -0.1357,
+            dist: 1.5,
+            e5: 1.559,
+            e10: 1.459,
+            diesel: 1.529,
+            isOpen: true,
+          );
 
-        await pumpApp(
-          tester,
-          const StationCard(
-            station: ukStation,
-            selectedFuelType: FuelType.e5,
-          ),
-        );
+          await pumpApp(
+            tester,
+            const StationCard(
+              station: ukStation,
+              selectedFuelType: FuelType.e5,
+            ),
+          );
 
-        final rendered = priceRichText(tester);
-        expect(rendered, contains('£'),
-            reason: 'UK station must render its price in pounds');
-        expect(rendered, isNot(contains('€')),
-            reason: 'UK station must not use the profile € symbol');
-      });
+          final rendered = priceRichText(tester);
+          expect(
+            rendered,
+            contains('£'),
+            reason: 'UK station must render its price in pounds',
+          );
+          expect(
+            rendered,
+            isNot(contains('€')),
+            reason: 'UK station must not use the profile € symbol',
+          );
+        },
+      );
 
-      testWidgets(
-          'pt- prefix keeps € and matches the active FR profile', (tester) async {
+      testWidgets('pt- prefix keeps € and matches the active FR profile', (
+        tester,
+      ) async {
         PriceFormatter.setCountry('FR');
 
         const ptStation = Station(
@@ -571,43 +593,48 @@ void main() {
 
         await pumpApp(
           tester,
-          const StationCard(
-            station: ptStation,
-            selectedFuelType: FuelType.e5,
-          ),
+          const StationCard(station: ptStation, selectedFuelType: FuelType.e5),
         );
 
         expect(priceRichText(tester), contains('€'));
       });
 
       testWidgets(
-          'unprefixed Tankerkoenig UUID with German coordinates resolves '
-          'to € via bbox fallback (#516)', (tester) async {
-        // Under #516 the bounding-box fallback kicks in when the id
-        // carries no country prefix. testStation has a UUID + Berlin
-        // coords, so it must render with € regardless of the active
-        // profile — previously (#514) it would have fallen through
-        // to the profile currency.
-        PriceFormatter.setCountry('GB');
+        'unprefixed Tankerkoenig UUID with German coordinates resolves '
+        'to € via bbox fallback (#516)',
+        (tester) async {
+          // Under #516 the bounding-box fallback kicks in when the id
+          // carries no country prefix. testStation has a UUID + Berlin
+          // coords, so it must render with € regardless of the active
+          // profile — previously (#514) it would have fallen through
+          // to the profile currency.
+          PriceFormatter.setCountry('GB');
 
-        await pumpApp(
-          tester,
-          const StationCard(
-            station: testStation,
-            selectedFuelType: FuelType.e5,
-          ),
-        );
+          await pumpApp(
+            tester,
+            const StationCard(
+              station: testStation,
+              selectedFuelType: FuelType.e5,
+            ),
+          );
 
-        final rendered = priceRichText(tester);
-        expect(rendered, contains('€'),
-            reason: 'Berlin coordinates must resolve to DE → € even '
-                'under a GB profile (bbox fallback)');
-        expect(rendered, isNot(contains('£')),
-            reason: 'a German station must not borrow the profile £');
-      });
+          final rendered = priceRichText(tester);
+          expect(
+            rendered,
+            contains('€'),
+            reason:
+                'Berlin coordinates must resolve to DE → € even '
+                'under a GB profile (bbox fallback)',
+          );
+          expect(
+            rendered,
+            isNot(contains('£')),
+            reason: 'a German station must not borrow the profile £',
+          );
+        },
+      );
 
-      testWidgets(
-          '#516: bare-numeric FR Prix-Carburants id at Paris coords '
+      testWidgets('#516: bare-numeric FR Prix-Carburants id at Paris coords '
           'renders € under a GB profile', (tester) async {
         // The exact scenario from the bug report screenshot: the
         // active profile is UK, a favorite French station has a raw
@@ -635,59 +662,64 @@ void main() {
 
         await pumpApp(
           tester,
-          const StationCard(
-            station: frStation,
-            selectedFuelType: FuelType.e10,
-          ),
+          const StationCard(station: frStation, selectedFuelType: FuelType.e10),
         );
 
         final rendered = priceRichText(tester);
-        expect(rendered, contains('€'),
-            reason: 'French coordinates must resolve to FR → € even '
-                'with a bare numeric id and a GB profile');
-        expect(rendered, isNot(contains('£')),
-            reason: 'French station must not inherit the profile £');
+        expect(
+          rendered,
+          contains('€'),
+          reason:
+              'French coordinates must resolve to FR → € even '
+              'with a bare numeric id and a GB profile',
+        );
+        expect(
+          rendered,
+          isNot(contains('£')),
+          reason: 'French station must not inherit the profile £',
+        );
       });
 
       testWidgets(
-          '#516: uk- prefixed station under a FR profile still renders £',
-          (tester) async {
-        // Mirror of the scenario above — the other direction, to prove
-        // the prefix path still works after #516 changes the resolver.
-        PriceFormatter.setCountry('FR');
+        '#516: uk- prefixed station under a FR profile still renders £',
+        (tester) async {
+          // Mirror of the scenario above — the other direction, to prove
+          // the prefix path still works after #516 changes the resolver.
+          PriceFormatter.setCountry('FR');
 
-        const ukStation = Station(
-          id: 'uk-MFG-Streatham',
-          name: 'MFG Streatham Leigham',
-          brand: 'ESSO',
-          street: '928.3 km',
-          postCode: 'SW16',
-          place: 'London',
-          lat: 51.42,
-          lng: -0.13,
-          dist: 928.3,
-          e5: 1.759,
-          e10: 1.579,
-          diesel: 1.939,
-          isOpen: true,
-        );
+          const ukStation = Station(
+            id: 'uk-MFG-Streatham',
+            name: 'MFG Streatham Leigham',
+            brand: 'ESSO',
+            street: '928.3 km',
+            postCode: 'SW16',
+            place: 'London',
+            lat: 51.42,
+            lng: -0.13,
+            dist: 928.3,
+            e5: 1.759,
+            e10: 1.579,
+            diesel: 1.939,
+            isOpen: true,
+          );
 
-        await pumpApp(
-          tester,
-          const StationCard(
-            station: ukStation,
-            selectedFuelType: FuelType.e10,
-          ),
-        );
+          await pumpApp(
+            tester,
+            const StationCard(
+              station: ukStation,
+              selectedFuelType: FuelType.e10,
+            ),
+          );
 
-        final rendered = priceRichText(tester);
-        expect(rendered, contains('£'));
-        expect(rendered, isNot(contains('€')));
-      });
+          final rendered = priceRichText(tester);
+          expect(rendered, contains('£'));
+          expect(rendered, isNot(contains('€')));
+        },
+      );
 
-      testWidgets(
-          'mx- prefix renders the peso symbol under a FR profile',
-          (tester) async {
+      testWidgets('mx- prefix renders the peso symbol under a FR profile', (
+        tester,
+      ) async {
         PriceFormatter.setCountry('FR');
 
         const mxStation = Station(
@@ -708,25 +740,23 @@ void main() {
 
         await pumpApp(
           tester,
-          const StationCard(
-            station: mxStation,
-            selectedFuelType: FuelType.e5,
-          ),
+          const StationCard(station: mxStation, selectedFuelType: FuelType.e5),
         );
 
         final rendered = priceRichText(tester);
-        expect(rendered, contains('\$'),
-            reason: 'MX station must render the peso \$ symbol');
+        expect(
+          rendered,
+          contains('\$'),
+          reason: 'MX station must render the peso \$ symbol',
+        );
         expect(rendered, isNot(contains('€')));
       });
     });
 
     group('micro-animations (#595 — reverted by #2161)', () {
-      testWidgets(
-          '#2161 brand/name title is NOT a Hero anymore — the detail '
+      testWidgets('#2161 brand/name title is NOT a Hero anymore — the detail '
           'screen dropped the matching destination, so the card no '
-          'longer needs to animate into it',
-          (tester) async {
+          'longer needs to animate into it', (tester) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -740,12 +770,16 @@ void main() {
           final widget = element.widget as Hero;
           return widget.tag.toString().startsWith('station-name-');
         });
-        expect(matching, isEmpty,
-            reason: 'StationCard title Hero source must be gone (#2161)');
+        expect(
+          matching,
+          isEmpty,
+          reason: 'StationCard title Hero source must be gone (#2161)',
+        );
       });
 
-      testWidgets('favorite star is rendered via AnimatedFavoriteStar',
-          (tester) async {
+      testWidgets('favorite star is rendered via AnimatedFavoriteStar', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -766,8 +800,9 @@ void main() {
         );
       });
 
-      testWidgets('price display is wrapped in AnimatedPriceText',
-          (tester) async {
+      testWidgets('price display is wrapped in AnimatedPriceText', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -786,9 +821,9 @@ void main() {
     });
 
     group('loyalty discount (#1120)', () {
-      testWidgets(
-          'matching brand renders an effective price + badge',
-          (tester) async {
+      testWidgets('matching brand renders an effective price + badge', (
+        tester,
+      ) async {
         // testStation.brand == 'STAR' which is in BrandRegistry as
         // an alias of Orlen. Use a Total station instead.
         const totalStation = Station(
@@ -820,17 +855,24 @@ void main() {
           final richText = element.widget as RichText;
           return richText.text.toPlainText().contains('1,74');
         });
-        expect(hasEffective, isTrue,
-            reason: 'effective price (raw - discount) must be the headline');
+        expect(
+          hasEffective,
+          isTrue,
+          reason: 'effective price (raw - discount) must be the headline',
+        );
 
         // Raw price stays accessible — appears struck through in the badge.
         final hasRaw = find.textContaining('1,799');
-        expect(hasRaw, findsOneWidget,
-            reason: 'raw price must remain visible to the user');
+        expect(
+          hasRaw,
+          findsOneWidget,
+          reason: 'raw price must remain visible to the user',
+        );
       });
 
-      testWidgets('non-matching brand leaves the price unchanged',
-          (tester) async {
+      testWidgets('non-matching brand leaves the price unchanged', (
+        tester,
+      ) async {
         // testStation brand "STAR" canonicalises to Orlen — no
         // Total card applies. Headline price must stay 1,79⁹.
         await pumpApp(
@@ -861,83 +903,88 @@ void main() {
       });
 
       testWidgets(
-          'empty discount map leaves matching-brand stations unchanged',
-          (tester) async {
-        const totalStation = Station(
-          id: 'fr-totalenergies-2',
-          name: 'TotalEnergies Béziers',
-          brand: 'Total',
-          street: 'Boulevard Pasteur',
-          postCode: '34500',
-          place: 'Béziers',
-          lat: 43.34,
-          lng: 3.21,
-          dist: 1.0,
-          e10: 1.799,
-          isOpen: true,
-        );
+        'empty discount map leaves matching-brand stations unchanged',
+        (tester) async {
+          const totalStation = Station(
+            id: 'fr-totalenergies-2',
+            name: 'TotalEnergies Béziers',
+            brand: 'Total',
+            street: 'Boulevard Pasteur',
+            postCode: '34500',
+            place: 'Béziers',
+            lat: 43.34,
+            lng: 3.21,
+            dist: 1.0,
+            e10: 1.799,
+            isOpen: true,
+          );
 
-        await pumpApp(
-          tester,
-          const StationCard(
-            station: totalStation,
-            selectedFuelType: FuelType.e10,
-            activeDiscountsByBrand: {},
-          ),
-        );
+          await pumpApp(
+            tester,
+            const StationCard(
+              station: totalStation,
+              selectedFuelType: FuelType.e10,
+              activeDiscountsByBrand: {},
+            ),
+          );
 
-        // Strike-through text is what the badge renders. Empty map
-        // → no badge → no strike-through.
-        final hasStrike = find.byWidgetPredicate((w) {
-          if (w is Text && w.style?.decoration == TextDecoration.lineThrough) {
-            return true;
-          }
-          return false;
-        });
-        expect(hasStrike, findsNothing);
-      });
+          // Strike-through text is what the badge renders. Empty map
+          // → no badge → no strike-through.
+          final hasStrike = find.byWidgetPredicate((w) {
+            if (w is Text &&
+                w.style?.decoration == TextDecoration.lineThrough) {
+              return true;
+            }
+            return false;
+          });
+          expect(hasStrike, findsNothing);
+        },
+      );
 
       testWidgets(
-          'zero discount is rejected (defensive — never floor below raw)',
-          (tester) async {
-        const totalStation = Station(
-          id: 'fr-totalenergies-3',
-          name: 'TotalEnergies Sète',
-          brand: 'TotalEnergies',
-          street: 'Quai',
-          postCode: '34200',
-          place: 'Sète',
-          lat: 43.40,
-          lng: 3.69,
-          dist: 1.0,
-          e10: 1.799,
-          isOpen: true,
-        );
+        'zero discount is rejected (defensive — never floor below raw)',
+        (tester) async {
+          const totalStation = Station(
+            id: 'fr-totalenergies-3',
+            name: 'TotalEnergies Sète',
+            brand: 'TotalEnergies',
+            street: 'Quai',
+            postCode: '34200',
+            place: 'Sète',
+            lat: 43.40,
+            lng: 3.69,
+            dist: 1.0,
+            e10: 1.799,
+            isOpen: true,
+          );
 
-        await pumpApp(
-          tester,
-          const StationCard(
-            station: totalStation,
-            selectedFuelType: FuelType.e10,
-            activeDiscountsByBrand: {'TotalEnergies': 0},
-          ),
-        );
+          await pumpApp(
+            tester,
+            const StationCard(
+              station: totalStation,
+              selectedFuelType: FuelType.e10,
+              activeDiscountsByBrand: {'TotalEnergies': 0},
+            ),
+          );
 
-        // Strike-through text would only appear if a real discount
-        // applied. 0 → no badge → no strike-through.
-        final hasStrike = find.byWidgetPredicate((w) {
-          if (w is Text && w.style?.decoration == TextDecoration.lineThrough) {
-            return true;
-          }
-          return false;
-        });
-        expect(hasStrike, findsNothing);
-      });
+          // Strike-through text would only appear if a real discount
+          // applied. 0 → no badge → no strike-through.
+          final hasStrike = find.byWidgetPredicate((w) {
+            if (w is Text &&
+                w.style?.decoration == TextDecoration.lineThrough) {
+              return true;
+            }
+            return false;
+          });
+          expect(hasStrike, findsNothing);
+        },
+      );
     });
 
     group('card polish (#592)', () {
-      testWidgets('card has 6dp vertical margin (breathing room)',
-          (tester) async {
+      testWidgets('card has 6dp vertical margin (breathing room)', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -996,48 +1043,132 @@ void main() {
 
         final card = tester.widget<Card>(find.byType(Card).first);
         final shape = card.shape as RoundedRectangleBorder;
-        expect(
-          shape.borderRadius,
-          BorderRadius.circular(12),
-        );
+        expect(shape.borderRadius, BorderRadius.circular(12));
       });
     });
 
     testWidgets(
-        '#2061 — the "Independent" sentinel does not leak into the title',
-        (tester) async {
-      // The French Prix Carburants parser tags brandless stations with
-      // `BrandRegistry.independentLabel` (== "Independent"). Before
-      // #2061 the search card rendered that sentinel as the title;
-      // after, it falls back to the street address (matching the
-      // detail screen).
-      const independentStation = Station(
-        id: 'indep-2061',
-        name: '',
-        brand: 'Independent',
-        street: '26 AVENUE DE VERDUN',
-        postCode: '34120',
-        place: 'Pézenas',
-        lat: 43.46,
-        lng: 3.42,
-        e10: 1.999,
-        isOpen: true,
-      );
+      '#2061 — the "Independent" sentinel does not leak into the title',
+      (tester) async {
+        // The French Prix Carburants parser tags brandless stations with
+        // `BrandRegistry.independentLabel` (== "Independent"). Before
+        // #2061 the search card rendered that sentinel as the title;
+        // after, it falls back to the street address (matching the
+        // detail screen).
+        const independentStation = Station(
+          id: 'indep-2061',
+          name: '',
+          brand: 'Independent',
+          street: '26 AVENUE DE VERDUN',
+          postCode: '34120',
+          place: 'Pézenas',
+          lat: 43.46,
+          lng: 3.42,
+          e10: 1.999,
+          isOpen: true,
+        );
 
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: independentStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        expect(
+          find.text('Independent'),
+          findsNothing,
+          reason:
+              'The Independent sentinel is an internal classification, '
+              'not a brand to render.',
+        );
+        expect(
+          find.text('26 AVENUE DE VERDUN'),
+          findsOneWidget,
+          reason: 'Brandless station falls back to the street as title.',
+        );
+      },
+    );
+  });
+
+  group('StationCardShell composition (#2493)', () {
+    testWidgets('StationCard is built from the shared StationCardShell', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
+      );
+      expect(find.byType(StationCardShell), findsOneWidget);
+    });
+
+    testWidgets(
+      'the all-fuels stripe is a VISIBLE colour, not the invisible grey',
+      (tester) async {
+        late Color primary;
+        await pumpApp(
+          tester,
+          Builder(
+            builder: (context) {
+              primary = Theme.of(context).colorScheme.primary;
+              return const StationCard(
+                station: testStation,
+                selectedFuelType: FuelType.all,
+              );
+            },
+          ),
+        );
+
+        final shell = tester.widget<StationCardShell>(
+          find.byType(StationCardShell),
+        );
+        // #2493 — the all-fuels stripe must be the forest-green primary,
+        // never the near-invisible neutral grey `#6F6F6F` returned by
+        // FuelColors.forType(FuelType.all).
+        expect(shell.stripeColor, primary);
+        expect(shell.stripeColor, isNot(const Color(0xFF6F6F6F)));
+      },
+    );
+
+    testWidgets('a single concrete fuel uses its fuel stripe colour', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const StationCard(
-          station: independentStation,
-          selectedFuelType: FuelType.e10,
+          station: testStation,
+          selectedFuelType: FuelType.diesel,
         ),
       );
+      final shell = tester.widget<StationCardShell>(
+        find.byType(StationCardShell),
+      );
+      expect(shell.stripeColor, FuelColors.forType(FuelType.diesel));
+    });
 
-      expect(find.text('Independent'), findsNothing,
-          reason:
-              'The Independent sentinel is an internal classification, '
-              'not a brand to render.');
-      expect(find.text('26 AVENUE DE VERDUN'), findsOneWidget,
-          reason: 'Brandless station falls back to the street as title.');
+    testWidgets('the cheapest card widens the stripe and uses success', (
+      tester,
+    ) async {
+      late Color success;
+      await pumpApp(
+        tester,
+        Builder(
+          builder: (context) {
+            success = DarkModeColors.success(context);
+            return const StationCard(
+              station: testStation,
+              selectedFuelType: FuelType.e10,
+              isCheapest: true,
+            );
+          },
+        ),
+      );
+      final shell = tester.widget<StationCardShell>(
+        find.byType(StationCardShell),
+      );
+      expect(shell.stripeColor, success);
+      expect(shell.stripeWidth, 6);
     });
   });
 }
