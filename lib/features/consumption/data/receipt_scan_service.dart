@@ -20,6 +20,7 @@ import 'ocr/recognized_text_adapter.dart';
 import 'ocr/recognized_text_block.dart';
 import 'pump_display_parser.dart';
 import 'receipt_parser.dart';
+import 'receipt_scan_outcomes.dart';
 import '../../../core/logging/error_logger.dart';
 
 // Re-export the image-orientation helpers (#1711/#2275) so existing
@@ -28,49 +29,11 @@ import '../../../core/logging/error_logger.dart';
 export 'ocr/image_orientation.dart'
     show bakeImageOrientation, preprocessPumpDisplayForOcr;
 
-/// Outcome of a single receipt capture: parsed fields plus the source
-/// OCR text and the path to the captured JPEG on disk. The caller is
-/// responsible for deleting [imagePath] once it no longer needs it — we
-/// keep the file around so the "report bad scan" flow (#713) can share
-/// the photo alongside the user's corrected values.
-class ReceiptScanOutcome {
-  final ReceiptParseResult parse;
-  final String ocrText;
-  final String imagePath;
-
-  const ReceiptScanOutcome({
-    required this.parse,
-    required this.ocrText,
-    required this.imagePath,
-  });
-}
-
-/// Outcome of a single pump-display capture: parsed fields plus the
-/// source OCR text and the path to the captured JPEG on disk. Mirrors
-/// [ReceiptScanOutcome] so the bad-scan reporting flow (#953) can ship
-/// the photo and OCR text alongside the user's corrected values when a
-/// pump-display read fails.
-///
-/// The caller is responsible for deleting [imagePath] once it no longer
-/// needs it (form saved, user dismissed the failure flow, or report
-/// submitted).
-class PumpDisplayScanOutcome {
-  final PumpDisplayParseResult parse;
-  final String ocrText;
-  final String imagePath;
-
-  /// `true` when the captured ROI was rejected for excessive glare
-  /// (#2275) — the caller shows a "re-angle" prompt instead of the
-  /// generic failure sheet.
-  final bool glareRejected;
-
-  const PumpDisplayScanOutcome({
-    required this.parse,
-    required this.ocrText,
-    required this.imagePath,
-    this.glareRejected = false,
-  });
-}
+// Re-export the scan-outcome value types so existing importers that read
+// `ReceiptScanOutcome` / `PumpDisplayScanOutcome` from this file keep
+// resolving after they moved to `receipt_scan_outcomes.dart` (#2518).
+export 'receipt_scan_outcomes.dart'
+    show ReceiptScanOutcome, PumpDisplayScanOutcome;
 
 /// Service that captures a photo and runs on-device OCR.
 ///
@@ -126,9 +89,32 @@ class ReceiptScanService {
     trace?.input(country: country, brand: brand);
     final capture = await _capture();
     if (capture == null) return null;
-    final text = await _recognise(capture, trace: trace);
+    return parseReceiptImage(
+      capture,
+      country: country,
+      brand: brand,
+      trace: trace,
+    );
+  }
+
+  /// Runs OCR + parsing on an already-captured receipt photo at [path].
+  ///
+  /// The capture-owning analogue of [parsePumpDisplayImage]: the in-app
+  /// OCR tester (#2518) and any future caller that already holds the
+  /// image hand the path here instead of reopening the camera. The photo
+  /// is NOT deleted on success (same #713 bad-scan-report policy); it is
+  /// deleted only when OCR recognises no text. Returns null when OCR
+  /// recognises nothing.
+  Future<ReceiptScanOutcome?> parseReceiptImage(
+    String path, {
+    String? country,
+    String? brand,
+    OcrTraceRecorder? trace,
+  }) async {
+    trace?.input(country: country, brand: brand);
+    final text = await _recognise(path, trace: trace);
     if (text == null) {
-      await _tryDelete(capture);
+      await _tryDelete(path);
       return null;
     }
     OcrLocaleProfile? profile;
@@ -139,7 +125,7 @@ class ReceiptScanService {
     return ReceiptScanOutcome(
       parse: _parser.parse(text, profile: profile, trace: trace),
       ocrText: text,
-      imagePath: capture,
+      imagePath: path,
     );
   }
 

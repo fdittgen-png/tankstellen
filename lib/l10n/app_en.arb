@@ -4523,6 +4523,174 @@
       }
     }
   },
+  "ocrTesterTitle": "OCR tester",
+  "@ocrTesterTitle": {
+    "description": "Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode."
+  },
+  "ocrTesterNavLabel": "OCR tester",
+  "@ocrTesterNavLabel": {
+    "description": "Label of the Developer-tools button that opens the OCR tester screen (#2518)."
+  },
+  "ocrTesterExplain": "Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.",
+  "@ocrTesterExplain": {
+    "description": "One-line explanation under the OCR tester title clarifying it is a gated developer tool (#2518)."
+  },
+  "ocrTesterModePump": "Pump",
+  "@ocrTesterModePump": {
+    "description": "Segmented-button label for the pump-display OCR mode on the OCR tester (#2518)."
+  },
+  "ocrTesterModeReceipt": "Receipt",
+  "@ocrTesterModeReceipt": {
+    "description": "Segmented-button label for the paper-receipt OCR mode on the OCR tester (#2518)."
+  },
+  "ocrTesterCapture": "Capture",
+  "@ocrTesterCapture": {
+    "description": "Button that opens the camera to capture a fresh image to run through the OCR pipeline (#2518)."
+  },
+  "ocrTesterPickImage": "Pick image",
+  "@ocrTesterPickImage": {
+    "description": "Button that picks an existing image from the gallery to re-run a fixture through the OCR pipeline (#2518)."
+  },
+  "ocrTesterRun": "Run",
+  "@ocrTesterRun": {
+    "description": "Button that runs the chosen OCR pipeline on the selected image (#2518)."
+  },
+  "ocrTesterCountry": "Country",
+  "@ocrTesterCountry": {
+    "description": "Label of the optional country dropdown that threads the locale profile into the OCR pipeline on the tester (#2518)."
+  },
+  "ocrTesterCountryNone": "Default (no profile)",
+  "@ocrTesterCountryNone": {
+    "description": "Dropdown entry on the OCR tester for running with no country locale profile, i.e. the default EUR behaviour (#2518)."
+  },
+  "ocrTesterNoImage": "Pick or capture an image, then Run.",
+  "@ocrTesterNoImage": {
+    "description": "Empty-state hint shown on the OCR tester before any image has been selected (#2518)."
+  },
+  "ocrTesterRunning": "Running OCR…",
+  "@ocrTesterRunning": {
+    "description": "Progress label shown while the OCR pipeline runs on the selected image in the tester (#2518)."
+  },
+  "ocrTesterNoResult": "OCR produced no readable result.",
+  "@ocrTesterNoResult": {
+    "description": "Shown on the OCR tester when the pipeline returned no result (e.g. the user cancelled the camera or OCR read nothing) (#2518)."
+  },
+  "ocrTesterOverlaySection": "Block overlay",
+  "@ocrTesterOverlaySection": {
+    "description": "Section header above the ML Kit block overlay (the image with classified boxes) on the OCR tester (#2518)."
+  },
+  "ocrTesterStepsSection": "Pipeline steps",
+  "@ocrTesterStepsSection": {
+    "description": "Section header above the per-stage steps panel on the OCR tester (#2518)."
+  },
+  "ocrTesterLegendLabel": "Label",
+  "@ocrTesterLegendLabel": {
+    "description": "Legend chip for blocks classified as printed labels (blue) on the OCR tester block overlay (#2518)."
+  },
+  "ocrTesterLegendNumeric": "Numeric",
+  "@ocrTesterLegendNumeric": {
+    "description": "Legend chip for blocks classified as numeric values (green) on the OCR tester block overlay (#2518)."
+  },
+  "ocrTesterLegendNoise": "Noise",
+  "@ocrTesterLegendNoise": {
+    "description": "Legend chip for blocks classified as noise (grey) on the OCR tester block overlay (#2518)."
+  },
+  "ocrTesterLegendDerived": "Derived",
+  "@ocrTesterLegendDerived": {
+    "description": "Legend chip for a field the cross-check derived rather than read (dashed amber) on the OCR tester block overlay (#2518)."
+  },
+  "ocrTesterStageGlare": "Capture / glare",
+  "@ocrTesterStageGlare": {
+    "description": "Steps-panel stage name for the glare-fraction preprocessing reject decision on the OCR tester (#2518)."
+  },
+  "ocrTesterStageMlkit": "ML Kit",
+  "@ocrTesterStageMlkit": {
+    "description": "Steps-panel stage name for ML Kit text recognition (flat text + block geometry) on the OCR tester (#2518)."
+  },
+  "ocrTesterStageClassify": "Classify",
+  "@ocrTesterStageClassify": {
+    "description": "Steps-panel stage name for per-block label / numeric / noise classification on the OCR tester (#2518)."
+  },
+  "ocrTesterStageAssemble": "Assemble",
+  "@ocrTesterStageAssemble": {
+    "description": "Steps-panel stage name for split-label assembly on the OCR tester (#2518)."
+  },
+  "ocrTesterStageAnchor": "Anchor",
+  "@ocrTesterStageAnchor": {
+    "description": "Steps-panel stage name for label-to-numeric anchoring on the OCR tester (#2518)."
+  },
+  "ocrTesterStageFallback": "Fallback",
+  "@ocrTesterStageFallback": {
+    "description": "Steps-panel stage name for the magnitude fallback for unbound fields on the OCR tester (#2518)."
+  },
+  "ocrTesterStageCrossCheck": "Cross-check",
+  "@ocrTesterStageCrossCheck": {
+    "description": "Steps-panel stage name for the total / volume / unit-price cross-check derivation on the OCR tester (#2518)."
+  },
+  "ocrTesterStageConfidence": "Confidence",
+  "@ocrTesterStageConfidence": {
+    "description": "Steps-panel stage name for the per-component confidence scoring on the OCR tester (#2518)."
+  },
+  "ocrTesterStageGate": "Gate",
+  "@ocrTesterStageGate": {
+    "description": "Steps-panel stage name for the per-country validation gate on the OCR tester (#2518)."
+  },
+  "ocrTesterStageBrand": "Brand",
+  "@ocrTesterStageBrand": {
+    "description": "Steps-panel stage name for receipt brand detection on the OCR tester (#2518)."
+  },
+  "ocrTesterStageOverrides": "Overrides",
+  "@ocrTesterStageOverrides": {
+    "description": "Steps-panel stage name for receipt per-station override dispatch on the OCR tester (#2518)."
+  },
+  "ocrTesterStageReconcile": "Reconcile",
+  "@ocrTesterStageReconcile": {
+    "description": "Steps-panel stage name for receipt cross-field reconcile on the OCR tester (#2518)."
+  },
+  "ocrTesterStageResult": "Result",
+  "@ocrTesterStageResult": {
+    "description": "Steps-panel stage name for the final read on the OCR tester (#2518)."
+  },
+  "ocrTesterChipRead": "READ",
+  "@ocrTesterChipRead": {
+    "description": "Chip flagging a value that was read directly off the display / receipt on the OCR tester (#2518)."
+  },
+  "ocrTesterChipDerived": "DERIVED",
+  "@ocrTesterChipDerived": {
+    "description": "Chip flagging a value the cross-check computed rather than read, on the OCR tester (#2518)."
+  },
+  "ocrTesterGateAccepted": "Accepted",
+  "@ocrTesterGateAccepted": {
+    "description": "Steps-panel label shown when the validation gate accepted the read on the OCR tester (#2518)."
+  },
+  "ocrTesterGateRejected": "Rejected",
+  "@ocrTesterGateRejected": {
+    "description": "Steps-panel label shown when the validation gate rejected the read on the OCR tester (#2518)."
+  },
+  "ocrTesterFallbackBanner": "A field was recovered via magnitude fallback — verify it.",
+  "@ocrTesterFallbackBanner": {
+    "description": "Banner shown in the steps panel when the magnitude-fallback stage bound a field, prompting the developer to double-check it (#2518)."
+  },
+  "ocrTesterStageNoData": "Stage did not run.",
+  "@ocrTesterStageNoData": {
+    "description": "Placeholder shown inside a steps-panel tile for a stage the pipeline never reached (#2518)."
+  },
+  "ocrTesterCopyJson": "Copy as JSON",
+  "@ocrTesterCopyJson": {
+    "description": "Button that copies the full OCR trace package as JSON to the clipboard on the tester (#2518)."
+  },
+  "ocrTesterExportPackage": "Export package",
+  "@ocrTesterExportPackage": {
+    "description": "Button that exports the OCR trace (image + JSON) to the Downloads folder / share sheet on the tester (#2518)."
+  },
+  "ocrTesterCopied": "OCR trace copied to clipboard.",
+  "@ocrTesterCopied": {
+    "description": "Snackbar confirming the OCR trace JSON was copied to the clipboard (#2518)."
+  },
+  "ocrTesterExported": "OCR package saved to your Downloads folder.",
+  "@ocrTesterExported": {
+    "description": "Snackbar confirming the OCR trace package (image + JSON) was saved to Downloads (#2518)."
+  },
   "onboardingObd2StepTitle": "Connect your OBD2 adapter",
   "@onboardingObd2StepTitle": {
     "description": "Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile."

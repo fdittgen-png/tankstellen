@@ -7,12 +7,13 @@ import 'package:tankstellen/app/routes/profile_routes.dart';
 
 void main() {
   group('profileRoutes', () {
-    test('returns exactly 10 routes', () {
+    test('returns exactly 11 routes', () {
       // Guards against accidental insert/delete — the Profile shell
       // branch pushes onto these sub-screens. #2248 added the three
       // Developer-tools routes (/developer-tools[/error-log|/flags]);
-      // #2471 added the gated /developer-tools/obd2-health screen.
-      expect(profileRoutes.length, 10);
+      // #2471 added the gated /developer-tools/obd2-health screen;
+      // #2518 added the gated /developer-tools/ocr-tester screen.
+      expect(profileRoutes.length, 11);
     });
 
     test('route 0 path is "/vehicles"', () {
@@ -66,6 +67,11 @@ void main() {
     test('route 9 path is "/developer-tools/obd2-health" (#2471)', () {
       final route = profileRoutes[9] as GoRoute;
       expect(route.path, '/developer-tools/obd2-health');
+    });
+
+    test('route 10 path is "/developer-tools/ocr-tester" (#2518)', () {
+      final route = profileRoutes[10] as GoRoute;
+      expect(route.path, '/developer-tools/ocr-tester');
     });
 
     test('every entry is a GoRoute', () {
