@@ -2056,6 +2056,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'OBD2 adapter';
 
   @override
@@ -8507,6 +8518,19 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get vehicleBaselineResetConfirmBody =>
       '⟦Ŧĥîš ŵîƥéš éṽéřý łéářñéđ šáɱƥłé ƒóř ŧĥîš ṽéĥîçłé. Ýóú\'łł đřîƒŧ ƀáçķ ŧó ŧĥé çółđ-šŧářŧ đéƒáúłŧš úñŧîł ñéŵ ŧřîƥš řéƒîłł ŧĥé ƥřóƒîłé. ················································⟧';
+
+  @override
+  String get vehicleBaselineShowDetails =>
+      '⟦Šĥóŵ ƥéř-šîŧúáŧîóñ ƀřéáķđóŵñ ···········⟧';
+
+  @override
+  String get vehicleBaselineHideDetails =>
+      '⟦Ĥîđé ƥéř-šîŧúáŧîóñ ƀřéáķđóŵñ ···········⟧';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return '⟦Ñóŧ đéŧéçŧéđ ýéŧ: $situations. Ŧĥéšé đřîṽîñǧ šîŧúáŧîóñš šŧîłł řéáđ 0 šáɱƥłéš, šó ŧĥé ƀášéłîñé îš îñçóɱƥłéŧé. ···································⟧';
+  }
 
   @override
   String get vehicleAdapterSectionTitle => '⟦ÓƁĐ2 áđáƥŧéř ·····⟧';

@@ -3872,6 +3872,24 @@ abstract class AppLocalizations {
   /// **'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.'**
   String get vehicleBaselineResetConfirmBody;
 
+  /// TextButton label that reveals the per-driving-situation calibration rows on the vehicle-edit baseline section (#2514, was English-only inline).
+  ///
+  /// In en, this message translates to:
+  /// **'Show per-situation breakdown'**
+  String get vehicleBaselineShowDetails;
+
+  /// TextButton label that collapses the per-driving-situation calibration rows back to the single aggregate bar (#2514).
+  ///
+  /// In en, this message translates to:
+  /// **'Hide per-situation breakdown'**
+  String get vehicleBaselineHideDetails;
+
+  /// Warning chip on the baseline-calibration section naming the driving situations that have never accumulated a sample (e.g. Stop & go, Climbing / loaded), so the user understands calibration is incomplete even when the aggregate bar looks high (#2514).
+  ///
+  /// In en, this message translates to:
+  /// **'Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.'**
+  String vehicleBaselineMissingWarning(String situations);
+
   /// No description provided for @vehicleAdapterSectionTitle.
   ///
   /// In en, this message translates to:

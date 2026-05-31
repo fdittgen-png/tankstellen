@@ -21,6 +21,13 @@ import '../../providers/vehicle_baseline_summary_provider.dart';
 /// per-driving-situation breakdown (the original 6-row view). Saves
 /// ~360 dp on the vehicle-edit screen for users who only care
 /// whether their baseline is "ready" or not.
+///
+/// #2514 — the aggregate bar tracks *coverage* (Σ min(count, target))
+/// rather than raw sample volume, so an over-filled bucket (urban
+/// 224k) can no longer drive it to 100% while Stop & go / Climbing
+/// sit at 0/30. When any persisted situation has zero samples a
+/// warning chip names the missing buckets and the per-situation
+/// breakdown auto-expands.
 class VehicleBaselineSection extends ConsumerStatefulWidget {
   final String vehicleId;
 
@@ -50,7 +57,11 @@ class VehicleBaselineSection extends ConsumerStatefulWidget {
 
 class _VehicleBaselineSectionState
     extends ConsumerState<VehicleBaselineSection> {
-  late bool _showDetails = widget.expandDetailsByDefault;
+  /// `null` means "follow the auto policy" (expand when buckets are
+  /// empty, #2514, or when the test seam forces it). Once the user taps
+  /// the toggle we latch their explicit choice here and stop deriving
+  /// it from coverage.
+  bool? _showDetailsOverride;
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +80,39 @@ class _VehicleBaselineSectionState
       DrivingSituation.climbingOrLoaded,
     ];
 
+    final target = widget.fullConfidenceSamples;
     final totalSamples =
         situations.fold<int>(0, (acc, s) => acc + (counts[s] ?? 0));
-    final maxTotal = situations.length * widget.fullConfidenceSamples;
+    final maxTotal = situations.length * target;
+
+    // #2514 — drive the aggregate bar off *coverage*, not raw volume.
+    // Σ min(count, target) caps each bucket at its target, so a single
+    // over-filled situation (urban 224k) can no longer mask two empty
+    // ones: the bar can NEVER read 100% while any persisted bucket is
+    // still 0/target.
+    final coveredSamples = situations.fold<int>(
+      0,
+      (acc, s) => acc + (counts[s] ?? 0).clamp(0, target),
+    );
+    final coverageValue = maxTotal == 0 ? 0.0 : coveredSamples / maxTotal;
+
+    // Persisted situations that have not accumulated a single sample yet
+    // (e.g. Stop & go and Climbing on the Fuzzy path, #2512). When any
+    // exist — and the baseline isn't simply empty — we surface a warning
+    // chip and force the per-situation breakdown open so the user sees
+    // exactly which buckets are stuck at 0/target.
+    final missingSituations = totalSamples == 0
+        ? const <DrivingSituation>[]
+        : [
+            for (final s in situations)
+              if ((counts[s] ?? 0) == 0) s,
+          ];
+    final hasMissing = missingSituations.isNotEmpty;
+
+    // Auto-expand when buckets are empty (or the test seam asks for it);
+    // otherwise honour the user's explicit toggle, defaulting collapsed.
+    final showDetails =
+        _showDetailsOverride ?? (widget.expandDetailsByDefault || hasMissing);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -107,33 +148,52 @@ class _VehicleBaselineSectionState
             // situation breakdown only when the user taps Show
             // details. Saves 5 of the 6 rows (~300 dp) on the
             // common path.
+            //
+            // #2514 — the bar tracks COVERAGE (Σ min(count, target)),
+            // not raw volume, so it can never sit at 100% while a
+            // bucket is empty.
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
-                value: maxTotal == 0 ? 0 : totalSamples / maxTotal,
+                key: const Key('vehicleBaselineAggregateBar'),
+                value: coverageValue,
                 minHeight: 8,
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              '$totalSamples / $maxTotal samples',
+              '$coveredSamples / $maxTotal samples',
               style: theme.textTheme.labelSmall,
               textAlign: TextAlign.right,
             ),
+            // #2514 — surface the empty buckets the over-filled
+            // aggregate used to hide, so the user knows a driving
+            // situation has never been detected yet.
+            if (hasMissing) ...[
+              const SizedBox(height: 8),
+              _MissingSituationsWarning(
+                situations: missingSituations
+                    .map((s) => _label(s, l))
+                    .toList(growable: false),
+              ),
+            ],
             const SizedBox(height: 8),
             Align(
               alignment: AlignmentDirectional.centerStart,
               child: TextButton.icon(
                 key: const Key('vehicleBaselineDetailsToggle'),
                 onPressed: () =>
-                    setState(() => _showDetails = !_showDetails),
+                    setState(() => _showDetailsOverride = !showDetails),
                 icon: Icon(
-                  _showDetails ? Icons.expand_less : Icons.expand_more,
+                  showDetails ? Icons.expand_less : Icons.expand_more,
                   size: 18,
                 ),
                 label: Text(
-                  // English-only inline; ARB pass to follow.
-                  _showDetails ? 'Hide per-situation breakdown' : 'Show per-situation breakdown',
+                  showDetails
+                      ? (l?.vehicleBaselineHideDetails ??
+                          'Hide per-situation breakdown')
+                      : (l?.vehicleBaselineShowDetails ??
+                          'Show per-situation breakdown'),
                 ),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -143,7 +203,7 @@ class _VehicleBaselineSectionState
                 ),
               ),
             ),
-            if (_showDetails) ...[
+            if (showDetails) ...[
               const SizedBox(height: 4),
               for (final s in situations)
                 _BaselineRow(
@@ -271,6 +331,54 @@ class _BaselineRow extends StatelessWidget {
               '$count/$fullConfidenceSamples',
               style: theme.textTheme.bodySmall,
               textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// #2514 — amber warning chip listing the driving situations that have
+/// never been detected (0 samples). It exists because the coverage bar
+/// alone tells the user calibration is incomplete but not *which*
+/// buckets are stuck; naming them (e.g. "Stop & go", "Climbing /
+/// loaded") points at the root cause tracked by Epic #2512.
+class _MissingSituationsWarning extends StatelessWidget {
+  final List<String> situations;
+
+  const _MissingSituationsWarning({required this.situations});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    // Comma-join is locale-neutral punctuation, not prose.
+    final joined = situations.join(', '); // i18n-ignore: list separator
+    return Container(
+      key: const Key('vehicleBaselineMissingWarning'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.warning_amber_rounded,
+            size: 18,
+            color: scheme.onErrorContainer,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l?.vehicleBaselineMissingWarning(joined) ??
+                  'Not detected yet: $joined. These driving situations '
+                      'still read 0 samples, so the baseline is incomplete.',
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: scheme.onErrorContainer),
             ),
           ),
         ],

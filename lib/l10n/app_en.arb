@@ -986,6 +986,24 @@
   "vehicleBaselineReset": "Reset driving-situation baseline",
   "vehicleBaselineResetConfirmTitle": "Reset driving-situation baseline?",
   "vehicleBaselineResetConfirmBody": "This wipes every learned sample for this vehicle. You'll drift back to the cold-start defaults until new trips refill the profile.",
+  "vehicleBaselineShowDetails": "Show per-situation breakdown",
+  "@vehicleBaselineShowDetails": {
+    "description": "TextButton label that reveals the per-driving-situation calibration rows on the vehicle-edit baseline section (#2514, was English-only inline)."
+  },
+  "vehicleBaselineHideDetails": "Hide per-situation breakdown",
+  "@vehicleBaselineHideDetails": {
+    "description": "TextButton label that collapses the per-driving-situation calibration rows back to the single aggregate bar (#2514)."
+  },
+  "vehicleBaselineMissingWarning": "Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.",
+  "@vehicleBaselineMissingWarning": {
+    "description": "Warning chip on the baseline-calibration section naming the driving situations that have never accumulated a sample (e.g. Stop & go, Climbing / loaded), so the user understands calibration is incomplete even when the aggregate bar looks high (#2514).",
+    "placeholders": {
+      "situations": {
+        "type": "String",
+        "example": "Stop & go, Climbing / loaded"
+      }
+    }
+  },
   "vehicleAdapterSectionTitle": "OBD2 adapter",
   "vehicleAdapterEmpty": "No adapter paired. Pair one so the app can reconnect automatically next time.",
   "vehicleAdapterUnnamed": "Unknown adapter",

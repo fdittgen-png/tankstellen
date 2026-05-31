@@ -2826,5 +2826,26 @@
   "@sectionAdvancedDeveloper": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "vehicleBaselineShowDetails": "Show per-situation breakdown",
+  "@vehicleBaselineShowDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleBaselineHideDetails": "Hide per-situation breakdown",
+  "@vehicleBaselineHideDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleBaselineMissingWarning": "Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.",
+  "@vehicleBaselineMissingWarning": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "situations": {
+        "type": "String",
+        "example": "Stop & go, Climbing / loaded"
+      }
+    }
   }
 }

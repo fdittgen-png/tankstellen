@@ -2069,6 +2069,17 @@ class AppLocalizationsCs extends AppLocalizations {
       'Tímto se vymažou všechny naučené vzorky pro toto vozidlo. Vrátíte se k výchozím hodnotám studeného startu, dokud nové cesty znovu nenaplní profil.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'Adaptér OBD2';
 
   @override

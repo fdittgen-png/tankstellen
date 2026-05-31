@@ -2074,6 +2074,17 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit wist alle geleerde steekproeven voor dit voertuig. Je valt terug op de standaardwaarden bij koude start totdat nieuwe ritten het profiel aanvullen.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'OBD2-adapter';
 
   @override
