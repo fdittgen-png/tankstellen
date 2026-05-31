@@ -429,6 +429,7 @@ void main() {
 /// be asserted end-to-end.
 class _FakeHost implements DroppedSessionHost {
   int stopSchedulerCalls = 0;
+  int disconnectDroppedServiceCalls = 0;
   int startSchedulerCalls = 0;
   int resetDropDetectorCalls = 0;
   int clearErrorWindowCalls = 0;
@@ -465,6 +466,9 @@ class _FakeHost implements DroppedSessionHost {
 
   @override
   void stopScheduler() => stopSchedulerCalls++;
+
+  @override
+  void disconnectDroppedService() => disconnectDroppedServiceCalls++;
 
   @override
   void startScheduler() => startSchedulerCalls++;

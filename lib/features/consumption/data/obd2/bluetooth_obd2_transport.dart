@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
+import 'obd2_connection_errors.dart';
 import 'obd2_read_timeout.dart';
 import 'obd2_transport.dart';
 
@@ -57,6 +58,16 @@ class BluetoothObd2Transport implements Obd2Transport {
   Future<void> connect() async {
     if (_connected) return;
     _firstCommandPending = true;
+    // #2524 — reset any state a previous link left behind so a reused or
+    // half-dead instance can't carry stale pending into the fresh link. A
+    // dropped session that never ran `disconnect()` can leave `_pending`
+    // pointing at a never-completing completer and `_buffer` holding a
+    // partial response; either one would poison the first command on the
+    // new channel (the concurrent-sendCommand guard, or a corrupt parse).
+    // Fail (not just drop) any stranded pending so a caller awaiting it
+    // unblocks instead of hanging forever.
+    _failPending(StateError('Transport reconnecting'));
+    _buffer.clear();
     await _channel.open();
     _subscription = _channel.incoming.listen(
       _onBytes,
@@ -142,10 +153,17 @@ class BluetoothObd2Transport implements Obd2Transport {
     // One in-flight command at a time — the ELM327 is half-duplex.
     // [sendCommand] serialises every caller onto `_queueTail`, so this
     // guard is now a defensive invariant: tripping it means a code path
-    // reached `_sendRaw` while another command was unfinished.
+    // reached `_sendRaw` while another command was unfinished — in
+    // practice a stranded `_pending` left behind by a half-dead link.
+    // #2524 — fail with a RECOVERABLE [Obd2DisconnectedException] (which
+    // the drop detector's `_isTypedDisconnect` already treats as a drop)
+    // instead of a raw `StateError`. The raw StateError surfaced as an
+    // ERROR trace in the user log; routing it through the drop path means
+    // the recording loop recovers (reconnect / pause-with-grace) and no
+    // error trace is logged.
     if (_pending != null) {
-      throw StateError(
-        'BluetoothObd2Transport: concurrent sendCommand is not allowed',
+      throw const Obd2DisconnectedException(
+        'BluetoothObd2Transport: concurrent sendCommand — link is recovering',
       );
     }
     // #2261 concern 5 — right-size the read timeout per command class

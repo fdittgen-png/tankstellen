@@ -250,6 +250,47 @@ void main() {
       expect(reply, contains('41 0D 3C'));
     });
 
+    test(
+        '#2524 — a reconnect cycle leaves NO stranded _pending: a command '
+        'in flight when the link drops is failed, and the next command on '
+        'the reconnected instance succeeds', () async {
+      final channel = _ScriptedChannel();
+      // A reply that NEVER carries the prompt — the command can only resolve
+      // via a forwarded link error, leaving _pending set until then.
+      channel.scriptResponse('010C\r', '41 0C 1A F8 ');
+      channel.scriptResponse('010D\r', '41 0D 3C >');
+      final transport = BluetoothObd2Transport(
+        channel,
+        readTimeout: const Duration(seconds: 5),
+      );
+      await transport.connect();
+
+      // Fire a command and, mid-flight, drop the link via a forwarded
+      // channel error (the half-dead-reconnect trigger). The pending
+      // command must FAIL — never hang — so a caller awaiting it unblocks.
+      final pending = transport.sendCommand('010C\r');
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      channel.injectError(Exception('GATT link dropped mid-command'));
+      await expectLater(pending, throwsA(isA<Exception>()),
+          reason: 'a stranded _pending must be failed cleanly on a link '
+              'drop, not left to time out / hang (#2524)');
+
+      // Reconnect the SAME instance. connect() resets _pending + _buffer so
+      // no stale state survives into the fresh link.
+      await transport.disconnect();
+      await transport.connect();
+      expect(transport.isConnected, isTrue);
+
+      // The next command does NOT trip the concurrent-sendCommand guard
+      // (which would now surface as Obd2DisconnectedException) and parses
+      // a clean reply — proving _pending was null + _buffer empty on the
+      // reconnected link.
+      final reply = await transport.sendCommand('010D\r');
+      expect(reply.trim(), '41 0D 3C',
+          reason: 'the reconnected instance starts with _pending == null + '
+              'an empty buffer, so the next command succeeds (#2524)');
+    });
+
     test('disconnect closes the channel and flips isConnected to false',
         () async {
       final channel = _ScriptedChannel();

@@ -133,7 +133,17 @@ enum TripRecordingControllerState {
 /// Phase 1 exposes the state machine without wiring a UI banner —
 /// phase 2 brings the auto-reconnect scanner + snackbar UX.
 class TripRecordingController {
-  final Obd2Service _service;
+  /// The OBD2 service the recording loop reads through. NOT `final`
+  /// (#2524): an in-trip auto-reconnect builds a brand-new
+  /// [Obd2Service] + transport, and [replaceService] swaps this pointer
+  /// so [_runTransport] / [refreshOdometer] start polling the LIVE link
+  /// instead of the dead old one. Before #2524 this was bound once at
+  /// construction and never reassigned — the pipeline's `onConnected`
+  /// swapped only its OWN pointer, so the scheduler kept dereferencing
+  /// the original (closed) transport, every poll timed out at 2.5 s, a
+  /// stranded `_pending` tripped the concurrent-sendCommand guard, and
+  /// the rest of the drive recorded nothing.
+  Obd2Service _service;
   final TripRecorder _recorder;
   final Duration _pollInterval;
   final DateTime Function() _now;
@@ -493,6 +503,43 @@ class TripRecordingController {
     _paused = false;
     _scheduler?.start();
     _emitState();
+  }
+
+  /// Swap the recording loop onto a freshly-reconnected [Obd2Service]
+  /// (#2524).
+  ///
+  /// An in-trip auto-reconnect ([ReconnectConnector]) builds a BRAND-NEW
+  /// service + transport for the recovered link. [_runTransport] and
+  /// [refreshOdometer] dereference [_service] at call time, so until this
+  /// runs the scheduler keeps polling the DEAD old transport — every read
+  /// times out and the rest of the drive records nothing. Pointing
+  /// [_service] at the live service fixes that for every subsequent poll.
+  ///
+  /// The OLD service is torn down ([Obd2Service.disconnect]) so its
+  /// channel closes and any command stranded in its transport's `_pending`
+  /// is failed cleanly via the transport's `_failPending` — otherwise the
+  /// abandoned half-dead instance leaks its subscription and a stranded
+  /// pending could later trip the concurrent-sendCommand guard. A no-op
+  /// when [service] is already the current one (idempotent / defensive).
+  /// Best-effort: a disconnect failure on the already-dead old link must
+  /// never derail the just-recovered recording, so it is swallowed to a
+  /// breadcrumb.
+  void replaceService(Obd2Service service) {
+    final old = _service;
+    if (identical(old, service)) return;
+    _service = service;
+    // Tear down the abandoned link off the hot path. `disconnect()` is
+    // idempotent and never throws for the typed-closed states, but guard
+    // anyway — the old transport is already dead, so any error here is
+    // expected and must not reach the user error log.
+    unawaited(() async {
+      try {
+        await old.disconnect();
+      } catch (e) {
+        debugPrint('TripRecordingController.replaceService: '
+            'old service disconnect failed (already dead) — $e');
+      }
+    }());
   }
 
   /// Push the most recent GPS fix into the per-tick snapshot
@@ -1345,6 +1392,21 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
 
   @override
   void stopScheduler() => _c._scheduler?.stop();
+
+  @override
+  void disconnectDroppedService() {
+    // #2524 — fail the dead transport's stranded `_pending` + close its
+    // channel off the hot path. Best-effort; the link is already gone.
+    final svc = _c._service;
+    unawaited(() async {
+      try {
+        await svc.disconnect();
+      } catch (e) {
+        debugPrint('TripRecordingController: dropped-service disconnect '
+            'failed (already dead) — $e');
+      }
+    }());
+  }
 
   @override
   void startScheduler() => _c._scheduler?.start();

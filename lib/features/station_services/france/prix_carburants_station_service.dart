@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/services/impl/osm_brand_enricher.dart';
@@ -135,6 +136,14 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       }, cancelToken: cancelToken);
       return parser.extractPrixCarburantsResults(response.data);
     } on DioException catch (e, st) {
+      // #2524 — an OFFLINE failure (no network) is expected and already
+      // handled (returns []), so it must NOT pollute the user error spool.
+      // Drop it to a debugPrint; only a real API error (4xx/5xx, malformed
+      // response) is worth an ERROR trace.
+      if (_isOffline(e)) {
+        debugPrint('Prix-Carburants ZIP fetch skipped — offline ($e)');
+        return [];
+      }
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants ZIP fetch failed'}));
       return [];
     }
@@ -157,9 +166,35 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       }, cancelToken: cancelToken);
       return parser.extractPrixCarburantsResults(response.data);
     } on DioException catch (e, st) {
+      // #2524 — see [_queryByPostalCode]: an offline failure is expected and
+      // swallowed (returns []); only a real API error gets an ERROR trace.
+      if (_isOffline(e)) {
+        debugPrint('Prix-Carburants geo fetch skipped — offline ($e)');
+        return [];
+      }
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants geo fetch failed'}));
       return [];
     }
+  }
+
+  /// Whether [e] is an offline / no-network failure rather than a real
+  /// API error (#2524). A "Failed host lookup" / SocketException surfaces
+  /// either as [DioExceptionType.connectionError] or, on some platforms,
+  /// as a [DioExceptionType.unknown] wrapping the raw SocketException — both
+  /// mean "the device has no working connection", which is expected and
+  /// already handled by returning an empty list, so it must not pollute the
+  /// error spool.
+  static bool _isOffline(DioException e) {
+    if (e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.connectionTimeout) {
+      return true;
+    }
+    if (e.type == DioExceptionType.unknown) {
+      // i18n-ignore: matching a platform exception class name, not UI text.
+      return e.error?.runtimeType.toString().contains('SocketException') ??
+          false;
+    }
+    return false;
   }
 
   /// Merge two raw API result lists, deduplicating by station id.
