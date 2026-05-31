@@ -7,9 +7,6 @@ import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
-import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
-import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
-import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../data/obd2/adapter_reconnect_scanner.dart';
 import '../data/obd2/obd2_connection_service.dart';
@@ -18,10 +15,12 @@ import '../data/obd2/obd2_session_context_block.dart';
 import '../data/obd2/reconnect_connector.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/services/obd2_gps_estimate_fallback.dart';
 import '../domain/trip_recorder.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'recording_pipeline.dart';
+import 'reference_vehicle_match.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
 import 'trip_haptic_controller.dart';
@@ -142,7 +141,19 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #1422 phase 1 — match the active vehicle to the bundled catalog so
     // the controller can use the engine-tech-derived η_v default instead
     // of the legacy 0.85 literal until VeLearner converges. Null on no-match.
-    final matchedReference = _tryMatchReferenceVehicle(activeVehicle);
+    final matchedReference = tryMatchReferenceVehicle(_ref, activeVehicle);
+    // #2506 — build the SHARED GPS-physics live-estimate + coaching folder
+    // from the active vehicle + its calibration matrix (mirrors the
+    // GPS-only pipeline). Folded per no-fuel-PID tick inside the controller
+    // so the OBD2 live screen carries `~ estimated` consumption + GPS
+    // coaching instead of dashing the whole drive on a car that exposes no
+    // fuel-rate PID — live now mirrors the proven post-trip
+    // `Obd2GpsEstimateFallback`. A null vehicle / matrix falls back to the
+    // population-default class + cold-start scale.
+    final gpsEstimateFolder = GpsLiveEstimateFolder.forVehicle(
+      activeVehicle,
+      activeVehicle?.gpsCalibration,
+    );
     final ctl = TripRecordingController(
       service: service,
       vehicle: activeVehicle,
@@ -154,6 +165,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       diagnosticCapture: _readDiagnosticCaptureFlag(),
       reconnectScannerFactory: _buildReconnectScannerFactory(),
       breadcrumbCollector: breadcrumbs,
+      gpsEstimateFolder: gpsEstimateFolder,
     );
     _controller = ctl;
 
@@ -187,12 +199,21 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       }
       final classified = _baselines.recordAndClassify(reading);
       _haptics.fireForBandTransition(_host.state.band, classified.band);
+      // #2506 — surface the GPS coaching hint the controller computed on a
+      // no-fuel-PID tick. `MinimalDriveSummary` already swaps to the GPS
+      // coaching triplet when `reading.fuelRateLPerHour == null` and reads
+      // `state.gpsCoachingHint`, so publishing it here lights the chips on
+      // the OBD2 live screen exactly as it does for GPS-only trips. Null
+      // (a measured fuel rate is present, or no hint applies) clears it.
+      final gpsHint = ctl.latestGpsCoachingHint;
       _host.state = _host.state.copyWith(
         phase: _phaseFor(ctl),
         live: reading,
         situation: classified.situation,
         band: classified.band,
         liveDeltaFraction: classified.delta,
+        gpsCoachingHint: gpsHint,
+        clearGpsCoachingHint: gpsHint == null,
       );
       // #1303 — debounced write-through (cheap when the gate rejects).
       _host.maybeFlushActiveSnapshot();
@@ -338,27 +359,6 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         return TripRecordingPhase.pausedDueToDrop;
       case TripRecordingControllerState.stopped:
         return TripRecordingPhase.finished;
-    }
-  }
-
-  /// Resolve the catalog row for [profile] (#1422 phase 1). Null when the
-  /// catalog hasn't loaded, the profile is null, or no tier hits.
-  /// Swallows provider-wiring errors so widget tests don't have to
-  /// override the catalog graph just to start a recording.
-  ReferenceVehicle? _tryMatchReferenceVehicle(VehicleProfile? profile) {
-    if (profile == null) return null;
-    try {
-      final catalog = _ref.read(referenceVehicleCatalogProvider).value;
-      if (catalog == null || catalog.isEmpty) return null;
-      return VehicleProfileCatalogMatcher.bestMatch(
-        profile: profile,
-        catalog: catalog,
-      );
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
-        'where': 'Obd2RecordingPipeline: reference catalog unavailable'
-      }));
-      return null;
     }
   }
 
