@@ -13,6 +13,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
 import '../../../search/domain/entities/search_result_item.dart';
+import '../../../search/providers/search_screen_ui_provider.dart';
 import 'station_map_layers.dart';
 
 /// Displays a map of nearby stations from the current search results.
@@ -86,6 +87,9 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
         }
 
         final showEv = ref.watch(evShowOnMapProvider);
+        // #2510 — the active list sort drives which stations the map
+        // emphasizes (full price bubble) vs renders as compact dots.
+        final sortMode = ref.watch(selectedSortModeProvider);
         final userPos = ref.read(userPositionProvider);
         // Center the viewport on the SEARCHED area, not the user's GPS.
         // Otherwise a ZIP/city search from a distant location (e.g. user
@@ -136,6 +140,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
                     zoom: zoom,
                     searchRadiusKm: searchRadiusKm,
                     selectedFuel: selectedFuel,
+                    sortMode: sortMode,
                     showRecenterButton: true,
                     onRecenter: () => mapController.fitCamera(
                       CameraFit.bounds(

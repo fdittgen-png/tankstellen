@@ -193,7 +193,14 @@ void main() {
     // Decomposition tracked by #2187/#2188/#2190.
     'lib/features/consumption/providers/trip_recording_provider.dart': 1180,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 544,
+    // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
+    // hides results behind count-clusters. Adds the `rankForEmphasis`
+    // helper + two `@visibleForTesting` constants (emphasisCount,
+    // clusterThreshold) and the de-clustering branch (a bounded set renders
+    // a plain MarkerLayer with the top-ranked stations emphasized; only a
+    // huge/zoomed-far set falls back to clustering). Net +18 is the helper,
+    // the constants and their dartdoc. Decomposition tracked by #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 562,
     // #2382 — +5 for Feature.approachOverlay's three per-feature switch
     // cases (label / description / blocked-enable). Intrinsic per-feature
     // growth in this switch-based section; full decomposition is its own

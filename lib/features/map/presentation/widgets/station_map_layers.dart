@@ -14,6 +14,7 @@ import '../../../../core/utils/price_utils.dart';
 import '../../../../core/widgets/osm_attribution.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
+import '../../../search/presentation/widgets/sort_selector.dart';
 import 'price_legend.dart';
 import 'station_marker.dart';
 
@@ -53,6 +54,17 @@ class StationMapLayers extends StatefulWidget {
   final double zoom;
   final double searchRadiusKm;
   final FuelType selectedFuel;
+
+  /// The active list sort (#2510). Governs which stations are EMPHASIZED
+  /// on the map: the top-ranked few keep their full price bubble while
+  /// the rest render as compact price-band dots so a bounded result set
+  /// stays fully visible without the bubbles overlapping. `price` /
+  /// `priceDistance` emphasize the cheapest; everything else (distance,
+  /// 24h, rating, name) emphasizes the closest. Defaults to
+  /// [SortMode.price] — the savings-first emphasis — for callers (route,
+  /// driving, inline) that don't surface a sort selector.
+  final SortMode sortMode;
+
   final bool showRecenterButton;
   final VoidCallback? onRecenter;
   final List<LatLng>? routePolyline;
@@ -74,6 +86,7 @@ class StationMapLayers extends StatefulWidget {
     required this.zoom,
     required this.searchRadiusKm,
     required this.selectedFuel,
+    this.sortMode = SortMode.price,
     this.showRecenterButton = false,
     this.onRecenter,
     this.routePolyline,
@@ -138,22 +151,20 @@ class StationMapLayers extends StatefulWidget {
   }
 
   /// Order [stations] so that, when their markers are handed to the
-  /// (cluster) layer, the CHEAPEST (green/günstig) marker is painted ON
+  /// marker layer, the CHEAPEST (green/günstig) marker is painted ON
   /// TOP of any more-expensive (orange/red) markers it overlaps (#2434).
   ///
-  /// flutter_map / flutter_map_marker_cluster paint markers in the order
-  /// of the source list — a marker LATER in the list is painted on top of
-  /// earlier ones. For individually-overlapping (un-clustered) price
-  /// bubbles at the reported zoom, this list order governs the overlap,
-  /// because the cluster layer recurses its nodes in insertion order and
-  /// `MarkerLayer` paints in list order. So the rule is:
-  ///   - sort by the RESOLVED display price (see [bestDisplayPrice]) —
-  ///     the SAME price the marker is COLOURED by (#2400) — DESCENDING:
-  ///     most expensive first (painted at the bottom), cheapest last
-  ///     (painted on top), so colour and stacking always agree;
-  ///   - markers with NO comparable price ([bestDisplayPrice] null → the
-  ///     grey "--" bubble) sort to the very FRONT (the bottom of the
-  ///     stack) so a price-less marker can never cover a real green one.
+  /// flutter_map paints markers in the order of the source list — a marker
+  /// LATER in the list is painted on top of earlier ones. So the rule is:
+  ///   - sort by the SELECTED-fuel price (`station.priceFor(selectedFuel)`)
+  ///     — the SAME price the marker is COLOURED by and the SAME strict
+  ///     resolution the search list uses (#2510, reverting the #2400
+  ///     fallback chain) — DESCENDING: most expensive first (painted at
+  ///     the bottom), cheapest last (painted on top), so colour and
+  ///     stacking always agree;
+  ///   - markers with NO selected-fuel price (the grey "--" bubble) sort
+  ///     to the very FRONT (the bottom of the stack) so a price-less
+  ///     marker can never cover a real green one.
   ///
   /// Returns a NEW list; the input is not mutated. A stable sort keeps the
   /// relative order of equal-priced stations.
@@ -161,16 +172,62 @@ class StationMapLayers extends StatefulWidget {
     List<Station> stations,
     FuelType selectedFuel,
   ) {
-    // A null resolved price is treated as the most-expensive bucket
+    // A null selected-fuel price is treated as the most-expensive bucket
     // (+infinity) so, under a descending sort, it lands first → painted
     // at the very bottom, beneath every priced marker.
     double sortKey(Station s) =>
-        bestDisplayPrice(s, selectedFuel)?.price ?? double.infinity;
+        priceForFuelType(s, selectedFuel) ?? double.infinity;
     final ordered = List<Station>.of(stations);
     // Descending: highest price first (bottom), lowest last (top).
     mergeSort<Station>(ordered,
         compare: (a, b) => sortKey(b).compareTo(sortKey(a)));
     return ordered;
+  }
+
+  /// How many top-ranked stations keep their full price label; the rest
+  /// render as compact price-band dots (#2510). Small enough that the
+  /// emphasized bubbles stay legible at the search zoom, large enough to
+  /// surface the handful of stations a driver actually compares.
+  @visibleForTesting
+  static const int emphasisCount = 4;
+
+  /// At or above this many stations the map falls back to count-clustering
+  /// (#2510). A bounded nearby search (the 10-station / 10 km case) stays
+  /// well under this, so every result renders as its own marker; only a
+  /// genuinely huge / zoomed-far set collapses into tappable clusters
+  /// rather than painting hundreds of overlapping dots.
+  @visibleForTesting
+  static const int clusterThreshold = 80;
+
+  /// Rank [stations] for marker EMPHASIS per the active [sortMode] (#2510):
+  /// the cheapest stations first for a price-oriented sort, the closest
+  /// first otherwise. The first [StationMapLayers.emphasisCount] entries
+  /// get the full price bubble; the rest become compact dots. Stations
+  /// without a comparable value sort last so they never steal emphasis
+  /// from a station that has a real price/distance.
+  ///
+  /// Returns a NEW list; the input is not mutated. Stable for ties.
+  static List<Station> rankForEmphasis(
+    List<Station> stations,
+    FuelType selectedFuel,
+    SortMode sortMode,
+  ) {
+    final ranked = List<Station>.of(stations);
+    final byPrice =
+        sortMode == SortMode.price || sortMode == SortMode.priceDistance;
+    int compare(Station a, Station b) {
+      if (byPrice) {
+        // Cheapest first; price-less stations sort last (sentinel handled
+        // inside compareByPrice).
+        return compareByPrice(a, b, selectedFuel);
+      }
+      // Closest first for distance / 24h / rating / name sorts — distance
+      // is the universally available, savings-relevant tie-breaker.
+      return a.dist.compareTo(b.dist);
+    }
+
+    mergeSort<Station>(ranked, compare: compare);
+    return ranked;
   }
 }
 
@@ -206,18 +263,30 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// Recompute the memoised price range + marker list from the current
   /// widget inputs.
   void _recomputeMarkers() {
-    // #2400 — colour by the RESOLVED display price (selected fuel, else
-    // fallback) so a fallback-priced marker is coloured by the value it
-    // actually shows rather than appearing grey because the selected
-    // fuel was null.
-    _priceRange = resolvedPriceRange(widget.stations, widget.selectedFuel);
+    // #2510 — colour by the SELECTED-fuel price (the same strict
+    // resolution the list uses), not a fallback chain. A station without
+    // the selected fuel paints grey ("--") instead of being re-coloured
+    // by E10's price.
+    _priceRange = priceRange(widget.stations, widget.selectedFuel);
     final ids = widget.selectedStationIds;
     final hasSelection = ids != null && ids.isNotEmpty;
+
+    // #2510 — emphasis: the top-ranked stations per the active sort
+    // (cheapest for a price sort, closest otherwise) keep the full price
+    // bubble; the rest render as compact price-band dots so a bounded
+    // result set stays fully visible without the bubbles overlapping into
+    // an illegible pile. The set is small, so a Set lookup is cheap.
+    final emphasized = StationMapLayers.rankForEmphasis(
+      widget.stations,
+      widget.selectedFuel,
+      widget.sortMode,
+    ).take(StationMapLayers.emphasisCount).map((s) => s.id).toSet();
+
     // #2434 — order so the cheapest (green) marker paints ON TOP of the
-    // more-expensive ones it overlaps. The (cluster) layer paints in
+    // more-expensive ones it overlaps. The marker layer paints in
     // source-list order (later = on top), so we sort price-descending:
     // expensive at the bottom, cheapest last/on top, price-less markers
-    // beneath everything. Same resolved price the marker is coloured by.
+    // beneath everything. Same price the marker is coloured by.
     final ordered = StationMapLayers.orderedByPriceForPainting(
       widget.stations,
       widget.selectedFuel,
@@ -231,6 +300,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
         _priceRange.$1,
         _priceRange.$2,
         pastel: isPastel,
+        compact: !emphasized.contains(station.id),
       );
     }).toList();
   }
@@ -255,6 +325,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
     final stationsChanged = !identical(oldWidget.stations, widget.stations);
     if (stationsChanged ||
         oldWidget.selectedFuel != widget.selectedFuel ||
+        oldWidget.sortMode != widget.sortMode ||
         !identical(oldWidget.selectedStationIds, widget.selectedStationIds)) {
       _recomputeMarkers();
     }
@@ -391,37 +462,46 @@ class _StationMapLayersState extends State<StationMapLayers> {
                 ),
               ],
             ),
-            // Station markers — ALWAYS routed through the cluster layer.
-            // #1774 — `_markers` is memoised; this builder just places the
-            // pre-built list. #2490 — the prior `stations.length > 20` gate
-            // dropped to a raw [MarkerLayer] for small result sets, so a
-            // 10-station radius search rendered overlapping price bubbles
-            // that obscured each other. Routing every set through
-            // [MarkerClusterLayerWidget] means overlapping markers always
-            // collapse into a tappable cluster (spiderfy / zoom-to-bounds
-            // on tap, both the layer's defaults), and a single far-apart
-            // station still renders as its own bubble. A tighter
-            // `maxClusterRadius` (was 80) keeps nearby-but-distinct
-            // stations from over-merging at the search zoom.
+            // Station markers. #1774 — `_markers` is memoised; this
+            // builder just places the pre-built list.
+            //
+            // #2510 — a BOUNDED nearby-search result set renders every
+            // station as its OWN marker (a plain [MarkerLayer]), so a
+            // 10-station / 10 km search shows all ten — never hidden behind
+            // count bubbles. De-overlap is by emphasis, not aggregation:
+            // the top-ranked stations (cheapest / closest per the active
+            // sort) keep the full price label, the rest are compact dots
+            // (see `_recomputeMarkers`). This reverses the #2490
+            // over-correction that routed EVERY set through
+            // [MarkerClusterLayerWidget] and so collapsed a small radius
+            // search into "4"/"2"/"3" count clusters.
+            //
+            // Clustering is kept ONLY as a fallback for a genuinely huge /
+            // zoomed-far set ([StationMapLayers.clusterThreshold]+), where
+            // painting hundreds of overlapping dots would itself be
+            // illegible; the bounded nearby case never reaches it.
             if (_markers.isNotEmpty)
-              MarkerClusterLayerWidget(
-                options: MarkerClusterLayerOptions(
-                  maxClusterRadius: 50,
-                  markers: _markers,
-                  builder: (context, clusterMarkers) => Container(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${clusterMarkers.length}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+              if (widget.stations.length >= StationMapLayers.clusterThreshold)
+                MarkerClusterLayerWidget(
+                  options: MarkerClusterLayerOptions(
+                    maxClusterRadius: 50,
+                    markers: _markers,
+                    builder: (context, clusterMarkers) => Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${clusterMarkers.length}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
+                )
+              else
+                MarkerLayer(markers: _markers),
             // Extra layers (e.g. EV overlay)
             ...widget.extraLayers,
             // Attribution — localized OSM credit (#2402).
