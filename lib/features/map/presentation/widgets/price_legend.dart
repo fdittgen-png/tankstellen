@@ -3,17 +3,23 @@
 
 import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/price_band_colors.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../l10n/app_localizations.dart';
 
-/// Compact price legend showing the cheap-to-expensive color gradient.
+/// Compact price legend describing the map markers' cheap-to-expensive
+/// colour ramp.
+///
+/// #2492 — the swatches and the gradient bar are driven by the ONE
+/// canonical [PriceBandColors.ramp] that [StationMarkerBuilder] also
+/// consumes, so the legend always matches what the markers paint. All
+/// three tiers `priceTierOf` classifies are shown: cheap, the middle
+/// "average" swatch, and expensive.
 class PriceLegend extends StatelessWidget {
   const PriceLegend({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cheapColor = DarkModeColors.success(context);
-    final expensiveColor = DarkModeColors.error(context);
     final overlayBg = DarkModeColors.mapOverlay(context);
     final shadowColor = DarkModeColors.mapOverlayShadow(context);
     return Container(
@@ -30,37 +36,46 @@ class PriceLegend extends StatelessWidget {
         return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(iconForPriceTier(PriceTier.cheap), size: 12, color: cheapColor),
-          Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                  color: cheapColor, shape: BoxShape.circle)),
+          Icon(iconForPriceTier(PriceTier.cheap),
+              size: 12, color: DarkModeColors.success(context)),
+          _swatch(PriceBandColors.cheapTier),
           const SizedBox(width: 4),
           Text(l10n?.cheap ?? 'cheap', style: const TextStyle(fontSize: 10)),
           Container(
             width: 40,
             height: 4,
             margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [cheapColor, DarkModeColors.warning(context), expensiveColor]),
-              borderRadius: const BorderRadius.all(Radius.circular(2)),
+            decoration: const BoxDecoration(
+              // The full 4-stop ramp the markers use, not a 3-stop
+              // approximation, so the bar matches the bubbles exactly.
+              gradient: LinearGradient(colors: PriceBandColors.ramp),
+              borderRadius: BorderRadius.all(Radius.circular(2)),
             ),
           ),
-          Text(l10n?.expensive ?? 'expensive', style: const TextStyle(fontSize: 10)),
+          // Middle "average" tier swatch + neutral dash icon (language-
+          // neutral, so no new string) — mirrors PriceTier.average.
+          _swatch(PriceBandColors.averageTier),
+          Icon(iconForPriceTier(PriceTier.average),
+              size: 12, color: DarkModeColors.warning(context)),
+          const SizedBox(width: 8),
+          Text(l10n?.expensive ?? 'expensive',
+              style: const TextStyle(fontSize: 10)),
           const SizedBox(width: 4),
-          Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                  color: expensiveColor, shape: BoxShape.circle)),
-          Icon(iconForPriceTier(PriceTier.expensive), size: 12, color: expensiveColor),
+          _swatch(PriceBandColors.expensiveTier),
+          Icon(iconForPriceTier(PriceTier.expensive),
+              size: 12, color: DarkModeColors.error(context)),
         ],
       );
       }),
     );
   }
+
+  /// A 12dp colour dot for one price-band stop.
+  static Widget _swatch(Color color) => Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      );
 }
 
 /// Circular zoom/location control button for the map.

@@ -22,16 +22,30 @@ class DarkModeColors {
           : const Color(0xFF388E3C); // green.shade700 — 4.8:1 on white
 
   /// Closed / error / expensive indicator.
+  ///
+  /// #2492 — widened to a deeper, more saturated red (`#C62828`) on light
+  /// so the error hue is unmistakably separated from the amber `warning`
+  /// for red/green colourblind users. The dark variant keeps the brighter
+  /// `red.shade400` because the requested `#C62828` reads only 3.05:1 on
+  /// the dark surface, while `#EF5350` holds a safe 4.9:1.
   static Color error(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFFEF5350) // red.shade400 — 4.6:1 on dark surface
-          : const Color(0xFFD32F2F); // red.shade700 — 5.6:1 on white
+          ? const Color(0xFFEF5350) // red.shade400 — 4.9:1 on dark surface
+          : const Color(0xFFC62828); // red.shade800 — 5.5:1 on white
 
-  /// Warning / moderate / in-use indicator.
+  /// Warning / moderate / in-use / stale indicator.
+  ///
+  /// #2492 — widened toward the amber/gold family (away from the old
+  /// deep-orange `#E65100`, which sat too close to the error red) for
+  /// colourblind safety. The dark variant uses the canonical amber
+  /// `#F9A825` (8.7:1). The light variant darkens the *same* hue to
+  /// `#C77800` (gold) because pure `#F9A825` as text on white is only
+  /// 1.9:1 — far below AA; the darker gold holds 3.4:1 while staying
+  /// clearly amber, not orange-red.
   static Color warning(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFFFFA726) // orange.shade400 — 6.2:1 on dark surface
-          : const Color(0xFFE65100); // deepOrange.shade900 — 4.6:1 on white
+          ? const Color(0xFFF9A825) // amber.shade800 — 8.7:1 on dark surface
+          : const Color(0xFFC77800); // dark gold — 3.4:1 on white
 
   // ---------------------------------------------------------------------------
   // Muted / secondary text

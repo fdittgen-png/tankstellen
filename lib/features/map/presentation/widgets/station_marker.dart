@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../../core/theme/price_band_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_gradient.dart';
 import '../../../../core/utils/price_utils.dart';
@@ -167,15 +168,14 @@ class StationMarkerBuilder {
     );
   }
 
-  /// Green (cheapest) -> Yellow -> Orange -> Red (most expensive).
-  /// #2196 \u2014 thin wrapper over the shared [priceGradientColor]; kept
-  /// public because tests assert its boundary colours directly.
-  static const _priceStops = [
-    Colors.green,
-    Colors.yellow,
-    Colors.orange,
-    Colors.red,
-  ];
+  /// Green (cheapest) -> Amber -> Orange -> Red (most expensive).
+  /// #2196 \u2014 thin wrapper over the shared [priceGradientColor].
+  /// #2492 \u2014 the stops now come from the ONE canonical
+  /// [PriceBandColors.ramp], shared with [PriceLegend] so the legend
+  /// describes exactly what the markers paint. The old pure
+  /// `Colors.yellow` (`#FFEB00`) was near-invisible on the white-bordered
+  /// bubbles; it is replaced by the ramp's saturated amber.
+  static const _priceStops = PriceBandColors.ramp;
 
   static Color priceColor(double? price, double minPrice, double maxPrice) =>
       priceGradientColor(
@@ -184,7 +184,7 @@ class StationMarkerBuilder {
         maxPrice,
         stops: _priceStops,
         nullColor: Colors.grey,
-        flatColor: Colors.green,
+        flatColor: PriceBandColors.cheap,
       );
 
   /// Convert a vivid color to a pastel/muted variant.

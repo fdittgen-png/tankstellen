@@ -9,9 +9,12 @@ import '../service_result.dart';
 /// Compact badge showing data age and source with color-coded freshness.
 ///
 /// Displays an icon + label like "2 min ago" (fresh) or "Stale — 30 min ago"
-/// (stale). Color transitions from green (< 5 min) through amber (5-15 min)
-/// to red (stale / > 15 min), giving users an at-a-glance sense of data
-/// quality without reading the full [ServiceStatusBanner].
+/// (stale). Color transitions from green (< 5 min) to amber as the data
+/// ages (5-15 min) and stays in the amber/warning family once stale or
+/// > 15 min — staleness is an *attention* state, not an error, so it never
+/// escalates to the error red (which carries "expensive / failed"). This
+/// matches the badge's `warning_amber_rounded` icon (#2492) and gives users
+/// an at-a-glance sense of data quality without the full [ServiceStatusBanner].
 class FreshnessBadge extends StatelessWidget {
   final ServiceResult result;
 
@@ -68,10 +71,13 @@ class FreshnessBadge extends StatelessWidget {
   static _BadgeStyle _styleForAge(
       BuildContext context, Duration age, bool isStale) {
     if (isStale || age.inMinutes > 15) {
+      // #2492 — very-stale stays amber (warning family), NOT error red.
+      // Staleness is an attention state matching the warning_amber_rounded
+      // icon; the error red is reserved for "expensive / failed".
       return _BadgeStyle(
         icon: Icons.warning_amber_rounded,
-        backgroundColor: DarkModeColors.error(context),
-        foregroundColor: DarkModeColors.error(context),
+        backgroundColor: DarkModeColors.warning(context),
+        foregroundColor: DarkModeColors.warning(context),
       );
     }
     if (age.inMinutes >= 5) {
