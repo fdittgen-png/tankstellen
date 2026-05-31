@@ -3285,6 +3285,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get alertsRadiusDeleteConfirm => 'Eliminare l\'avviso di raggio?';
 
   @override
+  String radiusAlertDeleted(String name) {
+    return 'Radius alert \"$name\" deleted';
+  }
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 connesso: $adapterName';
   }

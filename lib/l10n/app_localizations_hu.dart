@@ -3293,6 +3293,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get alertsRadiusDeleteConfirm => 'Törli a sugárkörös riasztást?';
 
   @override
+  String radiusAlertDeleted(String name) {
+    return 'Radius alert \"$name\" deleted';
+  }
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 csatlakoztatva: $adapterName';
   }

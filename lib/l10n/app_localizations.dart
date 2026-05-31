@@ -6075,6 +6075,12 @@ abstract class AppLocalizations {
   /// **'Delete radius alert?'**
   String get alertsRadiusDeleteConfirm;
 
+  /// Past-tense snackbar shown after a radius alert is deleted, paired with an Undo action that re-inserts it (#2494).
+  ///
+  /// In en, this message translates to:
+  /// **'Radius alert \"{name}\" deleted'**
+  String radiusAlertDeleted(String name);
+
   /// Tooltip on the title-bar OBD2 status chip (#797 phase 3) shown only when the pinned adapter is currently connected.
   ///
   /// In en, this message translates to:

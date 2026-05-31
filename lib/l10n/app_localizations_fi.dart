@@ -3272,6 +3272,11 @@ class AppLocalizationsFi extends AppLocalizations {
   String get alertsRadiusDeleteConfirm => 'Poistetaanko säde-hälytys?';
 
   @override
+  String radiusAlertDeleted(String name) {
+    return 'Radius alert \"$name\" deleted';
+  }
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 yhdistetty: $adapterName';
   }
