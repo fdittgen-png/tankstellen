@@ -6174,6 +6174,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Startar inspelning…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Dela med ett annat konto';
 
   @override

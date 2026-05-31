@@ -279,17 +279,15 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       }));
     }
     // Snapshot the captured-samples buffer BEFORE stop() tears down the
-    // controller — without this the trip-detail charts render the
-    // "No samples recorded" empty state on every saved trip (#1040).
+    // controller — else the trip-detail charts render empty (#1040).
     final capturedSamples = List<TripSample>.unmodifiable(ctl.capturedSamples);
-    // #1458 phase 2 — snapshot the GPS cadence diagnostics buffer BEFORE
-    // teardown, same reason. Always captured (empty when GPS off).
+    // #1458 phase 2 — snapshot the GPS cadence diagnostics BEFORE teardown,
+    // same reason. Always captured (empty when GPS off).
     final capturedGpsDiagnostics = List<GpsSampleDiagnostic>.unmodifiable(
       ctl.capturedGpsSampleDiagnostics,
     );
     // #2431 — back-fill consumption from the GPS-physics estimate when the
-    // adapter+ECU supported no fuel PID (all-null → blank fuel branch);
-    // a no-op when any real fuel signal was seen (see fillWhenNoFuelPid).
+    // adapter+ECU supported no fuel PID; a no-op when real fuel was seen.
     final filled = Obd2GpsEstimateFallback.fillWhenNoFuelPid(
       summary: await ctl.stop(),
       samples: capturedSamples,
@@ -298,6 +296,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     final summary = filled.summary;
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
+    // #2509 — GPS-fix count BEFORE teardown: lets the guard keep a real
+    // GPS-tracked drive whose OBD2 link was dead apart from a stationary stop.
+    final gpsFixCount = ctl.gpsFixCount;
     await _liveSub?.cancel();
     _liveSub = null;
     await _stateSub?.cancel();
@@ -307,9 +308,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #1615 — tear down the OEM-PID fuel-level poll. Best-effort.
     await _oemFuel.stop();
     _controller = null;
-    // #726 — persist every trip (incl. discarded) to history; the fill-up
-    // flow is a *separate* decision. Best-effort.
-    await _host.saveToHistory(
+    // #726 — persist every trip (incl. discarded); fill-up is separate.
+    final outcome = await _host.saveToHistory(
       summary,
       samples: filled.samples,
       gpsSampleDiagnostics: capturedGpsDiagnostics,
@@ -318,9 +318,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       adapterMac: _adapterMac,
       adapterName: _adapterName,
       adapterFirmware: _adapterFirmware,
+      gpsFixCount: gpsFixCount,
     );
-    // #769 / #780 — flush learned baselines + fold in the server copy
-    // before releasing the service. Best-effort.
+    // #769 / #780 — flush learned baselines + sync before release.
     await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once persisted.
     _adapterMac = null;
@@ -334,14 +334,15 @@ class Obd2RecordingPipeline implements RecordingPipeline {
           context: obd2DisconnectTraceContext()));
     }
     _service = null;
-    // #1303 — the trip is finalised in history; clear the WAL snapshot
-    // so recovery doesn't resurrect a stopped trip on next launch.
+    // #1303 — trip finalised; clear the WAL so recovery doesn't resurrect it.
     await _host.clearActiveSnapshot();
     _host.state = _host.state.copyWith(phase: TripRecordingPhase.finished);
     return StoppedTripResult(
       summary: summary,
       odometerStartKm: odometerStartKm,
       odometerLatestKm: odometerLatestKm,
+      // #2509 — surface "no movement detected" only on a stationary discard.
+      discardedNoMovement: outcome.isStationaryDiscard,
     );
   }
 

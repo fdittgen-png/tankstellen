@@ -344,6 +344,20 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       );
       if (!mounted) return;
     }
+    // #2509 — surface a "no movement detected" notice when the trip was
+    // discarded as genuinely stationary (no distance, no usable signal),
+    // so a Stop tap that saves nothing is never silent data loss. NEVER
+    // shown when the trip was actually saved (`discardedNoMovement` is
+    // false then) — the user lands on the normal summary view instead.
+    if (result.discardedNoMovement) {
+      final l = AppLocalizations.of(context);
+      ScaffoldMessenger.maybeOf(context)
+        ?..hideCurrentSnackBar()
+        ..showSnackBar(SnackBarHelper.infoSnackBar(
+          l?.tripRecordingDiscardedNoMovement ??
+              'Recording discarded — no movement detected',
+        ));
+    }
     setState(() {
       _stopped = result;
       _stopping = false;

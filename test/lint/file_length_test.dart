@@ -134,13 +134,15 @@ void main() {
     // `updateGpsFix(speedKmh:)` latch, the `_emit` effective-speed/distance
     // fallback, and the no-fuel-PID overlay call. Decomposition of this
     // god-class is tracked by #2187/#2188/#2190.
-    // #2513 — re-grandfathered 1360 → 1367: the live `TripLiveReading`
-    // now carries the wider-range absolute load (PID 0x43) + the latest
-    // GPS altitude through to the baseline recorder, so its fuzzy path
-    // can fill the climbing/loaded bucket from a real road grade and/or
-    // a load ramp (the two fields + their rationale comment). Pure
-    // wiring; decomposition tracked by #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1367,
+    // #2509 + #2513 — re-grandfathered 1360 → 1412 (merge of both): the GPS
+    // start-time fallback (the `_gpsStartedAt`/`_gpsEndedAt` latch in
+    // `updateGpsFix`, the `_finaliseSummary` start/end back-fill, and the
+    // `gpsFixCount` getter the persist guard reads, #2509) PLUS the
+    // wider-range absolute load (PID 0x43) + latest GPS altitude wired to
+    // the baseline recorder so the fuzzy path can fill the climbing/loaded
+    // bucket from a real road grade and/or load ramp (#2513). Pure wiring;
+    // decomposition of this god-class is tracked by #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1412,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
@@ -160,8 +162,13 @@ void main() {
     // the screen), and the Fuel-used card gained a GPS-estimate fallback
     // branch. Decomposition tracked under the existing god-class
     // follow-ups (#2187/#2188/#2190).
+    // #2509 — re-grandfathered 1074 → 1088: the `_onStop` handler now
+    // surfaces a localized "no movement detected" SnackBar when the stop
+    // returned a stationary discard (`StoppedTripResult.discardedNoMovement`),
+    // so a Stop tap that saves nothing is never silent data loss. Pure UI
+    // wiring; decomposition tracked under #2187/#2188/#2190.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1074,
+        1088,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
@@ -188,6 +195,15 @@ void main() {
     // Lives on `FillUpList` because it reads + mutates the pending-gap
     // provider in the same save path. Decomposition tracked #2187/#2188.
     'lib/features/consumption/providers/consumption_providers.dart': 975,
+    // #2509 — re-grandfathered 1180 → 1217: the persist guard in
+    // `_saveToHistory` was tightened from the buggy disjunction
+    // (`startedAt == null || distance < 0.01`, which silently discarded a
+    // real GPS-tracked drive with a dead OBD2 link) to the conjunction
+    // #1923 intended, `_saveToHistory` now returns a `TripPersistOutcome`,
+    // and a genuine stationary discard logs a structured `errorLogger`
+    // entry (no more silent discard). The `_RecordingPipelineHostAdapter`
+    // forwards the new `gpsFixCount` param + return type. Pure wiring +
+    // rationale; decomposition of this god-class is tracked #2187/#2188/#2190.
     // #2392 — re-grandfathered 1125 → 1162: wired the OBD2-ground-truth
     // physicsScale calibration into `_saveToHistory` (one fire-and-forget
     // call + the `_calibratePhysicsScale` resolve/persist helper; the EWMA
@@ -197,9 +213,16 @@ void main() {
     // closure (mirrors `_readOemPidsFlag`: reads Feature.debugMode, swallows
     // provider-wiring errors → safe off) + its injection into the pipeline.
     // Decomposition tracked by #2187/#2188/#2190.
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1180,
+    'lib/features/consumption/providers/trip_recording_provider.dart': 1217,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 544,
+    // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
+    // hides results behind count-clusters. Adds the `rankForEmphasis`
+    // helper + two `@visibleForTesting` constants (emphasisCount,
+    // clusterThreshold) and the de-clustering branch (a bounded set renders
+    // a plain MarkerLayer with the top-ranked stations emphasized; only a
+    // huge/zoomed-far set falls back to clustering). Net +18 is the helper,
+    // the constants and their dartdoc. Decomposition tracked by #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 562,
     // #2382 — +5 for Feature.approachOverlay's three per-feature switch
     // cases (label / description / blocked-enable). Intrinsic per-feature
     // growth in this switch-based section; full decomposition is its own

@@ -6210,6 +6210,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Aufnahme wird gestartet …';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Aufnahme verworfen — keine Bewegung erkannt';
+
+  @override
   String get tripShareAction => 'Mit anderem Konto teilen';
 
   @override

@@ -6221,6 +6221,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Felvétel indítása…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Megosztás másik fiókkal';
 
   @override

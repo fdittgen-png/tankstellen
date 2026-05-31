@@ -6198,6 +6198,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Pokretanje snimanja…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Podijeli s drugim računom';
 
   @override

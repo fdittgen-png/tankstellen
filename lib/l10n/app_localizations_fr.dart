@@ -6244,6 +6244,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Démarrage de l\'enregistrement…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Partager avec un autre compte';
 
   @override

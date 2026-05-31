@@ -6175,6 +6175,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Aloitetaan tallennusta…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Jaa toiselle tilille';
 
   @override

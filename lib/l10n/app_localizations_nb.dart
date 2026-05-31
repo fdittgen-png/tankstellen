@@ -6173,6 +6173,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Starter opptak…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Del med en annen konto';
 
   @override

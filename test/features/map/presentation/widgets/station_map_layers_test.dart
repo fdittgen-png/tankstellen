@@ -8,8 +8,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/map/data/sparkilo_tile_layer.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
 
 void main() {
   group('StationMapLayers.zoomForRadius', () {
@@ -285,24 +287,24 @@ void main() {
     });
 
     test(
-        'orders by the RESOLVED display price (fallback fuel), matching '
-        'the marker colour', () {
-      // User has DIESEL selected. `fallback` has no diesel but a cheap
-      // E10 — its marker is coloured by that fallback price (#2400), so
-      // the z-order must use the same resolved price, not the (null)
-      // selected-fuel price.
-      final dieselExpensive = station('diesel-expensive', diesel: 1.95);
-      final fallbackCheap = station('fallback-cheap', e10: 1.40);
+        'orders by the STRICT selected-fuel price, matching the marker '
+        'colour (#2510)', () {
+      // User has DIESEL selected. `e10Only` has NO diesel price — under
+      // #2510 the marker shows "--" (no E10 fallback), so its z-order key
+      // is the null/price-less bucket: it sinks to the BOTTOM, beneath the
+      // real diesel marker. This reverts the #2400 fallback-price ordering.
+      final dieselPriced = station('diesel-priced', diesel: 1.95);
+      final e10Only = station('e10-only', e10: 1.40);
 
       final ordered = StationMapLayers.orderedByPriceForPainting(
-        [dieselExpensive, fallbackCheap],
+        [dieselPriced, e10Only],
         FuelType.diesel,
       );
 
-      // The resolved-cheap fallback station paints on top of the
-      // diesel-expensive one, agreeing with their green/red colours.
-      expect(ordered.last.id, 'fallback-cheap');
-      expect(ordered.first.id, 'diesel-expensive');
+      // The price-less (for diesel) station sits at the bottom; the real
+      // diesel marker paints on top of it.
+      expect(ordered.first.id, 'e10-only');
+      expect(ordered.last.id, 'diesel-priced');
     });
 
     test('is a pure function — does not mutate the input list', () {
@@ -327,12 +329,13 @@ void main() {
     });
   });
 
-  // #2490 — markers were only routed through the cluster layer when
-  // `stations.length > 20`, so a small radius search (e.g. 10 stations)
-  // dropped to a raw [MarkerLayer] and rendered overlapping price bubbles.
-  // Every non-empty set now goes through [MarkerClusterLayerWidget] so
-  // overlapping markers collapse into a tappable cluster.
-  group('StationMapLayers marker clustering (#2490)', () {
+  // #2510 — #2490 over-corrected: routing EVERY set through the cluster
+  // layer collapsed a bounded nearby search (10 stations / 10 km) into
+  // "4"/"2"/"3" count bubbles + one stray marker, HIDING the results. The
+  // bounded set must now render every station as its OWN marker (a plain
+  // [MarkerLayer]); clustering is kept only as a fallback for a genuinely
+  // huge / zoomed-far set (>= [StationMapLayers.clusterThreshold]).
+  group('StationMapLayers de-clustering (#2510)', () {
     List<Station> nStations(int n) => List.generate(
           n,
           (i) => Station(
@@ -346,7 +349,7 @@ void main() {
             // Cluster them tightly around the centre so overlap is realistic.
             lat: 52.5210 + i * 0.0005,
             lng: 13.4100 + i * 0.0005,
-            dist: 0.8,
+            dist: 0.8 + i * 0.1,
             diesel: 1.50 + i * 0.01,
             isOpen: true,
           ),
@@ -354,8 +357,9 @@ void main() {
 
     Future<void> pumpWith(
       WidgetTester tester,
-      List<Station> stations,
-    ) async {
+      List<Station> stations, {
+      SortMode sortMode = SortMode.price,
+    }) async {
       tester.view.physicalSize = const Size(900, 1600);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -374,34 +378,80 @@ void main() {
               zoom: 12,
               searchRadiusKm: 10,
               selectedFuel: FuelType.diesel,
+              sortMode: sortMode,
             ),
           ),
         ),
       );
     }
 
-    testWidgets('routes a SMALL (10-station) set through the cluster layer',
-        (tester) async {
-      await pumpWith(tester, nStations(10));
-      expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
-    });
+    testWidgets(
+      'a 10-station nearby set renders individual markers, NOT a count '
+      'cluster',
+      (tester) async {
+        await pumpWith(tester, nStations(10));
+        // No count-cluster layer — every result stays visible.
+        expect(find.byType(MarkerClusterLayerWidget), findsNothing);
+        // A plain MarkerLayer carries every station marker. (The centre
+        // marker is its own MarkerLayer, so there are two.)
+        expect(find.byType(MarkerLayer), findsWidgets);
+      },
+    );
 
-    testWidgets('routes a SINGLE station through the cluster layer',
+    testWidgets(
+      'every one of the 10 stations renders its own marker',
+      (tester) async {
+        await pumpWith(tester, nStations(10));
+        // Collect the markers from the station MarkerLayer(s) — exclude the
+        // single-marker centre layer.
+        final stationMarkers = tester
+            .widgetList<MarkerLayer>(find.byType(MarkerLayer))
+            .expand((l) => l.markers)
+            .where((m) => m.width != 20) // 20 == the centre dot
+            .toList();
+        // All 10 stations are present as individual markers, none hidden.
+        expect(stationMarkers.length, 10);
+      },
+    );
+
+    testWidgets(
+      'the cheapest stations are EMPHASIZED with the full price bubble '
+      'under a price sort',
+      (tester) async {
+        await pumpWith(tester, nStations(10), sortMode: SortMode.price);
+        // emphasisCount stations keep the full price bubble (width ==
+        // kStationMarkerWidth); the rest become compact dots (kStationDotSize).
+        final stationMarkers = tester
+            .widgetList<MarkerLayer>(find.byType(MarkerLayer))
+            .expand((l) => l.markers)
+            .where((m) => m.width != 20)
+            .toList();
+        final fullBubbles =
+            stationMarkers.where((m) => m.width == kStationMarkerWidth).length;
+        final dots =
+            stationMarkers.where((m) => m.width == kStationDotSize).length;
+        expect(fullBubbles, StationMapLayers.emphasisCount);
+        expect(dots, 10 - StationMapLayers.emphasisCount);
+      },
+    );
+
+    testWidgets('a SINGLE station renders as its own marker (no cluster)',
         (tester) async {
       await pumpWith(tester, const [_seedStation]);
-      expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
+      expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
 
-    testWidgets('routes a LARGE (40-station) set through the cluster layer',
-        (tester) async {
-      await pumpWith(tester, nStations(40));
-      expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
-    });
+    testWidgets(
+      'a genuinely huge set (>= clusterThreshold) still falls back to '
+      'clustering',
+      (tester) async {
+        await pumpWith(tester, nStations(StationMapLayers.clusterThreshold));
+        expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
+      },
+    );
 
-    testWidgets('renders no cluster layer for an empty station set',
+    testWidgets('renders no marker/cluster layer for an empty station set',
         (tester) async {
-      // Empty markers list → the cluster widget is skipped entirely so it
-      // never lays out an empty quadtree.
       await pumpWith(tester, const []);
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });

@@ -6222,6 +6222,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Se pornește înregistrarea…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Partajează cu alt cont';
 
   @override

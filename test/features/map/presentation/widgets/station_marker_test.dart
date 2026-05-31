@@ -273,36 +273,42 @@ void main() {
     });
   });
 
-  group('StationMarkerBuilder fallback fuel display (#2400)', () {
-    // Tankerkönig returns only the queried fuel's price. A diesel-only
-    // station while E10 is selected used to render "--"; it must now fall
-    // back to the diesel price with a labelled fuel code.
-    const dieselOnlyStation = Station(
-      id: 'diesel-only',
-      name: 'Diesel Only',
-      brand: 'TOTAL',
-      street: 'Rue Diesel',
-      postCode: '75001',
-      place: 'Paris',
-      lat: 48.0,
-      lng: 2.0,
-      diesel: 1.699,
+  group('StationMarkerBuilder selected-fuel price (#2510)', () {
+    // #2510 — the marker shows STRICTLY the selected fuel's price, exactly
+    // like the search LIST (`StationCard`). It must NOT fall back to E10 /
+    // another fuel: that #2400 fallback chain made the map read "E10
+    // 2,099" on an E85 search while the list showed the E85 price. A
+    // station lacking the selected fuel renders "--", never a re-labelled
+    // other-fuel price.
+
+    // A station that sells multiple fuels, including a cheap E85 — the
+    // real-world Intermarché / Pézenas case from the bug report.
+    const multiFuelStation = Station(
+      id: 'multi-fuel',
+      name: 'Intermarché',
+      brand: 'Intermarché',
+      street: 'Av. de Pézenas',
+      postCode: '34120',
+      place: 'Pézenas',
+      lat: 43.46,
+      lng: 3.42,
+      e10: 2.099,
+      diesel: 1.899,
+      e85: 0.799,
       isOpen: true,
     );
 
     testWidgets(
-      'a diesel-only station on an E10 search shows the diesel price, '
-      'never "--"',
+      'with E85 selected, a multi-fuel station shows the E85 price, '
+      'NOT the E10 default',
       (tester) async {
         final marker = StationMarkerBuilder.build(
           tester.element(find.byType(Container).first),
-          dieselOnlyStation,
-          FuelType.e10,
-          1.50,
-          2.00,
+          multiFuelStation,
+          FuelType.e85,
+          0.50,
+          2.50,
         );
-        // Fallback widens the marker so the fuel code + price both fit.
-        expect(marker.width, kStationMarkerWideWidth);
 
         await pumpApp(
           tester,
@@ -315,37 +321,39 @@ void main() {
           ),
         );
 
-        // The diesel price is shown (1.699 => "1,699"); never "--".
-        expect(find.text('1,699'), findsOneWidget);
-        expect(find.text('--'), findsNothing);
-        // The fallback fuel code is labelled so the price is unambiguous.
-        expect(find.text('Diesel'), findsOneWidget);
+        // The E85 price (0.799 => "0,799") is shown — matching the list.
+        expect(find.text('0,799'), findsOneWidget);
+        // The E10 default (2.099) must NOT appear, and there is no fuel
+        // code prefix — the selected fuel resolved directly.
+        expect(find.text('2,099'), findsNothing);
+        expect(find.text('E10'), findsNothing);
       },
     );
 
     testWidgets(
-      'a truly price-less station still shows "--"',
+      'a station lacking the selected fuel shows "--", NOT an E10 fallback',
       (tester) async {
-        const emptyStation = Station(
-          id: 'empty',
-          name: 'Empty',
-          brand: 'TEST',
-          street: 'Nowhere',
-          postCode: '00000',
-          place: 'Void',
-          lat: 0.0,
-          lng: 0.0,
+        // Diesel-only station while E85 is selected. The list would show a
+        // dash for E85 here; the marker must match — no fallback to diesel.
+        const dieselOnlyStation = Station(
+          id: 'diesel-only',
+          name: 'Diesel Only',
+          brand: 'TOTAL',
+          street: 'Rue Diesel',
+          postCode: '75001',
+          place: 'Paris',
+          lat: 48.0,
+          lng: 2.0,
+          diesel: 1.699,
           isOpen: true,
         );
         final marker = StationMarkerBuilder.build(
           tester.element(find.byType(Container).first),
-          emptyStation,
-          FuelType.e10,
-          1.50,
-          2.00,
+          dieselOnlyStation,
+          FuelType.e85,
+          0.50,
+          2.50,
         );
-        // No fallback fuel → no widening, no fuel label.
-        expect(marker.width, kStationMarkerWidth);
 
         await pumpApp(
           tester,
@@ -358,38 +366,69 @@ void main() {
           ),
         );
 
+        // Graceful dash — never the diesel price, never a fuel code.
         expect(find.text('--'), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'no fallback label when the selected fuel has its own price',
-      (tester) async {
-        final marker = StationMarkerBuilder.build(
-          tester.element(find.byType(Container).first),
-          testStation, // has e10
-          FuelType.e10,
-          1.50,
-          2.00,
-        );
-        expect(marker.width, kStationMarkerWidth);
-
-        await pumpApp(
-          tester,
-          SizedBox(
-            width: marker.width,
-            height: marker.height,
-            child: (((marker.child as RepaintBoundary).child as Semantics)
-                    .child as GestureDetector)
-                .child,
-          ),
-        );
-
-        expect(find.text('1,799'), findsOneWidget);
-        // No fuel code when the selected fuel resolved directly.
+        expect(find.text('1,699'), findsNothing);
         expect(find.text('Diesel'), findsNothing);
-        expect(find.text('E10'), findsNothing);
       },
     );
+  });
+
+  group('StationMarkerBuilder compact dot (#2510)', () {
+    testWidgets('a compact marker is a small price-less dot', (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation, // has e10 = 1.799
+        FuelType.e10,
+        1.50,
+        2.00,
+        compact: true,
+      );
+      // The dot is markedly smaller than the full price bubble.
+      expect(marker.width, kStationDotSize);
+      expect(marker.height, kStationDotSize);
+      expect(marker.width, lessThan(kStationMarkerWidth));
+
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
+        ),
+      );
+
+      // No price label is painted on a compact dot — it is a pure colour
+      // swatch, so the bounded result set stays uncluttered.
+      expect(find.text('1,799'), findsNothing);
+    });
+
+    testWidgets('a compact marker still announces its price for a11y',
+        (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation,
+        FuelType.e10,
+        1.50,
+        2.00,
+        compact: true,
+      );
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: marker.child,
+        ),
+      );
+
+      final handle = tester.ensureSemantics();
+      // Even a de-emphasized dot stays a labelled button so a screen-
+      // reader user can find it (#566).
+      expect(find.bySemanticsLabel(RegExp(r'STAR.*1[.,]7')), findsOneWidget);
+      handle.dispose();
+    });
   });
 }

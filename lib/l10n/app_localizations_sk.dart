@@ -6205,6 +6205,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Spúšťa sa nahrávanie…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Zdieľať s iným účtom';
 
   @override

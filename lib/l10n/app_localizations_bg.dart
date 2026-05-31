@@ -6229,6 +6229,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Стартиране на записа…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Споделяне с друг акаунт';
 
   @override

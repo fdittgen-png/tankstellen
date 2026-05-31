@@ -245,7 +245,7 @@ class _FakeWalHost implements Obd2RecordingPipelineHost {
   Future<void> clearActiveSnapshot() async => clearCount++;
 
   @override
-  Future<void> saveToHistory(
+  Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
     bool automatic = false,
     List<TripSample> samples = const [],
@@ -254,16 +254,24 @@ class _FakeWalHost implements Obd2RecordingPipelineHost {
     String? adapterMac,
     String? adapterName,
     String? adapterFirmware,
+    int gpsFixCount = 0,
   }) async {
-    // Mirror the notifier's stub-discard guard (#1923) so the test asserts
-    // the same persistence behaviour the real host applies.
-    if (summary.startedAt == null || summary.distanceKm < 0.01) return;
+    // Mirror the notifier's tightened stub-discard guard (#1923 / #2509) so
+    // the test asserts the same persistence behaviour the real host
+    // applies: discard ONLY when there was no movement AND no usable
+    // signal (no start time, or no samples and no GPS fixes).
+    final hasNoSignal = summary.startedAt == null ||
+        (samples.isEmpty && gpsFixCount == 0);
+    if (summary.distanceKm < 0.01 && hasNoSignal) {
+      return TripPersistOutcome.discardedNoMovement;
+    }
     saved.add(_Saved(
       summary: summary,
       samples: samples,
       adapterMac: adapterMac,
       vehicleId: vehicleId,
     ));
+    return TripPersistOutcome.saved;
   }
 }
 

@@ -6213,6 +6213,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Notiek ieraksta sākšana…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Kopīgot ar citu kontu';
 
   @override

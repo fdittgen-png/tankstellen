@@ -8,6 +8,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../../search/providers/search_provider.dart';
+import '../../../search/providers/search_screen_ui_provider.dart';
 import 'station_map_layers.dart';
 
 /// A reusable map widget that displays station markers from current search results.
@@ -39,6 +40,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
     final searchState = ref.watch(searchStateProvider);
     final selectedFuel = ref.watch(selectedFuelTypeProvider);
     final searchRadius = ref.watch(searchRadiusProvider);
+    final sortMode = ref.watch(selectedSortModeProvider);
 
     return searchState.when(
       data: (result) {
@@ -65,6 +67,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
           zoom: zoom,
           searchRadiusKm: searchRadius,
           selectedFuel: selectedFuel,
+          sortMode: sortMode,
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
