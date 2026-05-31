@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/services/approach_detector.dart';
+import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -150,39 +151,54 @@ class _RadarCard extends StatelessWidget {
             '${distanceMeters!.toStringAsFixed(0)} m',
     ];
 
+    // Tap → hand the station's coords to the SSoT navigation util, which
+    // launches the OS's default driving/itinéraire app (geo: URI, Google-
+    // Maps web fallback) — #2545. Reuses the existing `navigate` ARB key
+    // for the tooltip/semantics affordance (no new key → no 23-locale
+    // fan-out).
+    final navigateLabel = l?.navigate ?? 'Navigate';
+
     return Card(
       margin: EdgeInsets.zero,
-      child: ListTile(
-        leading: Icon(
-          live ? Icons.my_location : Icons.local_gas_station,
-          size: 28,
-          color: live ? theme.colorScheme.primary : null,
-        ),
-        // Overline carries the localised card title; the prominent line
-        // is the (data, not ARB) station name + the fuel/distance row.
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title, style: theme.textTheme.bodySmall),
-            Text(
-              name.isNotEmpty ? name : title,
-              style: theme.textTheme.titleSmall,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+      child: Tooltip(
+        message: navigateLabel,
+        child: ListTile(
+          onTap: () => NavigationUtils.openInMaps(
+            station.lat,
+            station.lng,
+            label: station.displayName,
+          ),
+          leading: Icon(
+            live ? Icons.my_location : Icons.local_gas_station,
+            size: 28,
+            color: live ? theme.colorScheme.primary : null,
+          ),
+          // Overline carries the localised card title; the prominent line
+          // is the (data, not ARB) station name + the fuel/distance row.
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(title, style: theme.textTheme.bodySmall),
+              Text(
+                name.isNotEmpty ? name : title,
+                style: theme.textTheme.titleSmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+          subtitle: Text(
+            subtitleParts.join(' · '),
+            style: theme.textTheme.bodySmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Text(
+            priceText,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
-          ],
-        ),
-        subtitle: Text(
-          subtitleParts.join(' · '),
-          style: theme.textTheme.bodySmall,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Text(
-          priceText,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontFeatures: const [FontFeature.tabularFigures()],
           ),
         ),
       ),
