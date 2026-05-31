@@ -31,12 +31,14 @@ class LiveSampleSnapshot {
     Obd2BreadcrumbRecorder? breadcrumbCollector,
     required void Function(Object? parsedValue) onHighPriorityParse,
     required void Function(double speedKmh) onSpeedSample,
+    DateTime Function()? clock,
   })  : _service = service,
         _vehicle = vehicle,
         _referenceVehicle = referenceVehicle,
         _breadcrumbCollector = breadcrumbCollector,
         _onHighPriorityParse = onHighPriorityParse,
-        _onSpeedSample = onSpeedSample;
+        _onSpeedSample = onSpeedSample,
+        _clock = clock ?? DateTime.now;
 
   final Obd2Service _service;
   final VehicleProfile? _vehicle;
@@ -44,6 +46,7 @@ class LiveSampleSnapshot {
   final Obd2BreadcrumbRecorder? _breadcrumbCollector;
   final void Function(Object? parsedValue) _onHighPriorityParse;
   final void Function(double speedKmh) _onSpeedSample;
+  final DateTime Function() _clock; // #2505 — IAT-staleness clock (test seam).
 
   // Latest parsed values, keyed by PID command. Written by scheduler
   // callbacks, read by the controller's `_emit` when assembling a
@@ -55,6 +58,9 @@ class LiveSampleSnapshot {
   double? _latestMaf;
   double? _latestMapKpa;
   double? _latestIatCelsius;
+  // #2505 — when [_latestIatCelsius] last landed. Lets the speed-density
+  // branch reuse a slightly-stale IAT (see [_freshIatCelsius]).
+  DateTime? _latestIatAt;
   double? _latestThrottlePercent;
   double? _latestEngineLoadPercent;
   double? _latestCoolantTempC;
@@ -98,12 +104,11 @@ class LiveSampleSnapshot {
   double? _latestOilTempC;
   double? _latestAmbientTempC;
 
-  // #1374 phase 1 — most recent GPS fix, pushed in by the provider
-  // when the `Feature.gpsTripPath` flag is enabled. The controller
-  // does NOT subscribe to Geolocator itself — that decision lives at
-  // the provider layer. When the flag is off both fields stay null
-  // and every persisted sample carries `latitude: null,
-  // longitude: null` (matching pre-#1374 behaviour bit-for-bit).
+  // #1374 phase 1 — most recent GPS fix, pushed in by the provider when
+  // the `Feature.gpsTripPath` flag is enabled (the controller never
+  // subscribes to Geolocator itself — that lives at the provider layer).
+  // Flag off → both stay null and every sample carries lat/lon null
+  // (matching pre-#1374 behaviour bit-for-bit).
   double? _latestLatitude;
   double? _latestLongitude;
 
@@ -113,12 +118,10 @@ class LiveSampleSnapshot {
 
   // #1615 — most recent exact-litre OEM-PID fuel reading, pushed in by
   // the provider layer (`TripOemFuelLevelController`) when the
-  // `experimentalOemPids` flag is on and an OEM-capable adapter
-  // resolved a manufacturer table. The OEM read is a multi-command
-  // async sequence that does NOT fit the per-PID scheduler, so this
-  // class never issues it itself — it only holds the latch. When the
-  // flag is off (or no OEM read ever lands) this stays null and `_emit`
-  // produces a reading identical to pre-#1615 behaviour.
+  // `experimentalOemPids` flag is on and an OEM-capable adapter resolved
+  // a manufacturer table. The multi-command OEM read does NOT fit the
+  // per-PID scheduler, so this class only holds the latch; flag off (or
+  // no read) → null and `_emit` matches pre-#1615 behaviour.
   double? _latestOemFuelLevelLitres;
 
   double? get latestSpeedKmh => _latestSpeedKmh;
@@ -180,26 +183,20 @@ class LiveSampleSnapshot {
   /// snapshot; dynamics-tier callbacks also feed the silent-failure
   /// observer, and the vehicle-speed callback feeds the virtual odometer.
   ///
-  /// **Cadence tiers** (re-expressing the previous 3-tier layout on the
-  /// same weighted round-robin; the governor demotes deepest tiers first,
-  /// never [PidTier.dynamics], so RPM / speed never starve):
-  ///   - [PidTier.dynamics] ~5 Hz — RPM 010C, speed 010D, throttle 0111,
-  ///     + the fuel-rate driver (015E → MAF 0110 → MAP 010B speed-density).
-  ///   - [PidTier.mixture] ~2 Hz — λ 0144, engine load 0104.
-  ///   - [PidTier.slowCorrection] ~0.5 Hz — STFT 0106, LTFT 0107, IAT
-  ///     010F, baro 0133.
-  ///   - [PidTier.thermalContext] ~0.1 Hz — coolant 0105, fuel tank 012F.
-  /// (#2458 adds pedal to dynamics, abs-load/bank-2 to mixture, and
-  /// oil/ambient/voltage to thermal — slots are commented inline below.)
+  /// **Cadence tiers** (weighted round-robin; the governor demotes deepest
+  /// tiers first, never [PidTier.dynamics], so RPM / speed never starve):
+  /// dynamics ~5 Hz (RPM 010C, speed 010D, throttle 0111 + the 015E → MAF
+  /// 0110 → MAP 010B fuel-rate driver), mixture ~2 Hz (λ 0144, load 0104),
+  /// slowCorrection ~0.5 Hz (STFT 0106, LTFT 0107, IAT 010F, baro 0133),
+  /// thermalContext ~0.1 Hz (coolant 0105, tank 012F). #2458 adds pedal,
+  /// abs-load/bank-2, and oil/ambient to those tiers (slots inline below).
   ///
   /// **Discover-all ∩ target-set:** the live set is this target table ∩
-  /// the #811-discovered supported set. The unconditional core (RPM,
-  /// speed, throttle, load, IAT, coolant, STFT, LTFT, tank) carries no
+  /// the #811-discovered supported set. The unconditional core carries no
   /// gate — `isPidSupported` is don't-reject-blind so a probe-less clone
-  /// still rotates it. Optional PIDs (MAF, MAP, 015E, λ, baro) pass an
-  /// `optionalPid` gate, so a car supporting only {010C,010D,0104,0111}
-  /// subscribes exactly those plus the core. Adding a PID is a one-line
-  /// [_sub] call — the gate, tier, hz and priority travel together.
+  /// still rotates it; optional PIDs pass an `optionalPid` gate, so a car
+  /// with only {010C,010D,0104,0111} subscribes exactly those plus core.
+  /// Adding a PID is a one-line [_sub] call (gate, tier, hz, priority).
   void subscribeAllTiers(PidScheduler scheduler) {
     // ---- DYNAMICS tier (~5 Hz, high priority) ----------------------
     // RPM and speed feed TripSample → TripRecorder for distance / idle /
@@ -340,7 +337,10 @@ class LiveSampleSnapshot {
     _sub(scheduler, Elm327Protocol.intakeAirTempCommand,
         hz: 0.5, tier: PidTier.slowCorrection, (r) {
       final v = Elm327Protocol.parseIntakeAirTempCelsius(r);
-      if (v != null) _latestIatCelsius = v;
+      if (v != null) {
+        _latestIatCelsius = v;
+        _latestIatAt = _clock(); // #2505 — latch for the staleness window.
+      }
     });
     // #2456 — absolute baro (0x33). Ambient pressure changes only with
     // altitude / weather, so 0.5 Hz is ample. optionalPid-gated: absent →
@@ -382,17 +382,12 @@ class LiveSampleSnapshot {
     }, optionalPid: 0x46);
   }
 
-  /// Register one tier subscription on [scheduler] (#2457). Centralises
-  /// the discover-all ∩ target-set gate so each PID above is a single
-  /// line carrying its [hz], [tier], [priority] and optional [optionalPid]
-  /// gate together.
-  ///
-  /// When [optionalPid] is null the command is part of the unconditional
-  /// core and is always subscribed (relying on `isPidSupported`'s
-  /// don't-reject-blind semantics + the #2379 backoff to self-evict if
-  /// the car NO-DATAs it). When [optionalPid] is set, the command is only
-  /// subscribed if `_service.supportsPid(optionalPid)` — i.e. the target
-  /// PID intersected the car's discovered-supported set.
+  /// Register one tier subscription on [scheduler] (#2457): each PID is a
+  /// single line carrying its [hz], [tier], [priority] and optional
+  /// [optionalPid] gate. Null [optionalPid] → unconditional core, always
+  /// subscribed (`isPidSupported` don't-reject-blind + the #2379 backoff
+  /// self-evicts on NO DATA); set → subscribed only if
+  /// `_service.supportsPid(optionalPid)` (intersected the discovered set).
   void _sub(
     PidScheduler scheduler,
     String command,
@@ -432,20 +427,16 @@ class LiveSampleSnapshot {
   /// reads. Returns null when not enough inputs have arrived yet
   /// (e.g. first 200 ms of a trip before MAP/IAT both land).
   ///
-  /// AFR + density are chosen from the active vehicle's preferred
-  /// fuel type via [resolveAfrDensity] (#800, #2432): diesel → 14.5 /
-  /// 832 g/L, E85 → 9.8 / 785 g/L, LPG → 15.6 / 535 g/L, CNG → 17.2 /
-  /// petrol-equivalent density, and null / unknown stays on the petrol
-  /// defaults the pre-#800 path used. Manual AFR / density overrides
-  /// win over the mapping.
+  /// AFR + density come from the active vehicle's preferred fuel type via
+  /// [resolveAfrDensity] (#800, #2432): diesel 14.5 / 832, E85 9.8 / 785,
+  /// LPG 15.6 / 535, CNG 17.2 / petrol-equiv; null / unknown stays on the
+  /// pre-#800 petrol defaults. Manual AFR / density overrides win.
   double? deriveFuelRateLPerHour() {
     // #1858 — provenance defaults; each branch below overrides them.
     _lastFuelRateBranch = Obd2BranchTag.none;
     _lastFuelRateVe = null;
-    // #1397 / #2432 — single fuel-type lookup: manual AFR/density
-    // overrides win, else the free-text fuel key maps to its
-    // AFR/density (petrol/diesel/E85/LPG/CNG), else the petrol default.
-    // Mirrors the resolution chain in
+    // #1397 / #2432 — single fuel-type lookup (manual override → fuel-key
+    // AFR/density → petrol default), mirroring
     // [Obd2Service.readFuelRateLPerHour] so the live integrator and the
     // pull-mode estimator agree on every scalar. `resolveAfrDensity` is
     // re-exported from `obd2_service.dart`.
@@ -458,10 +449,8 @@ class LiveSampleSnapshot {
         1000;
     // #1422 phase 1 — same precedence as Obd2Service.readFuelRateLPerHour:
     // manual override → stored profile (when learned or non-default) →
-    // engine-tech helper on the reference catalog row → hard 0.85
-    // fallback. The two paths must agree so the live integrator and
-    // the pull-mode estimator produce identical numbers for the same
-    // tick.
+    // engine-tech helper on the reference catalog row → hard 0.85 fallback.
+    // Both paths must agree so live + pull-mode produce identical numbers.
     final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
         _resolveControllerProfileVe() ??
         (_referenceVehicle != null
@@ -542,20 +531,23 @@ class LiveSampleSnapshot {
 
     // Step 3: speed-density from MAP+IAT+RPM. Feeds the pre-#810
     // estimator with the active vehicle's displacement + VE (#812).
+    // #2505 — MAP + RPM must be same-tick current, but IAT is reused up
+    // to [_iatStaleness] old (the #2457 governor reads it slowly).
     final mapKpa = _latestMapKpa;
-    final iat = _latestIatCelsius;
+    final iat = _freshIatCelsius();
     final rpm = _latestRpm;
+    void recordNone() => collector?.record(
+          branch: Obd2BranchTag.none,
+          mapKpa: mapKpa,
+          iatCelsius: iat,
+          rpm: rpm,
+          afr: afr,
+          fuelDensityGPerL: density,
+          engineDisplacementCc: displacement.toDouble(),
+          volumetricEfficiency: ve,
+        );
     if (mapKpa == null || iat == null || rpm == null) {
-      collector?.record(
-        branch: Obd2BranchTag.none,
-        mapKpa: mapKpa,
-        iatCelsius: iat,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
+      recordNone();
       return null;
     }
     // #2456 — feed the measured baro (PID 0x33) + commanded λ (PID 0x44)
@@ -579,16 +571,7 @@ class LiveSampleSnapshot {
       lambda: lambda,
     );
     if (raw == null) {
-      collector?.record(
-        branch: Obd2BranchTag.none,
-        mapKpa: mapKpa,
-        iatCelsius: iat,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
+      recordNone();
       return null;
     }
     final corrected = _applyTrim(raw);
@@ -651,5 +634,21 @@ class LiveSampleSnapshot {
       stftBank2: _latestStftBank2,
       ltftBank2: _latestLtftBank2,
     );
+  }
+
+  /// How long a latched IAT (#2505) stays usable for speed-density fuel.
+  /// The #2457 governor reads IAT (0x0F) on the demotable ~0.5 Hz tier, so
+  /// it is rarely fresh on the tick MAP + RPM land; intake-air temperature
+  /// drifts on a minutes scale, so a few-seconds-old value is physically
+  /// fine. 12 s spans a few throttled IAT periods yet rejects a dead link.
+  static const Duration _iatStaleness = Duration(seconds: 12);
+
+  /// The last-known IAT (°C) if it landed within [_iatStaleness], else
+  /// null (#2505) — keeps speed-density fuel flowing between sparse reads.
+  double? _freshIatCelsius() {
+    final iat = _latestIatCelsius;
+    final at = _latestIatAt;
+    if (iat == null || at == null) return null;
+    return _clock().difference(at) > _iatStaleness ? null : iat;
   }
 }
