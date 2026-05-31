@@ -2396,6 +2396,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get evStatusOutOfOrder => 'Ude af drift';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Kun åbne';
 
   @override

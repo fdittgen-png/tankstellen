@@ -1040,6 +1040,7 @@
   "evStatusAvailable": "Verfügbar",
   "evStatusOccupied": "Belegt",
   "evStatusOutOfOrder": "Außer Betrieb",
+  "evStatusPartial": "Teilweise verfügbar",
   "openOnlyFilter": "Nur geöffnete",
   "saveAsDefaults": "Als Standard speichern",
   "criteriaSavedToProfile": "Als Standard gespeichert",

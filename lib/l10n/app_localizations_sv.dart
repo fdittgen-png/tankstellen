@@ -2397,6 +2397,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get evStatusOutOfOrder => 'Ur funktion';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Endast öppna';
 
   @override

@@ -2405,6 +2405,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get evStatusOutOfOrder => 'Buiten gebruik';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Alleen geopend';
 
   @override

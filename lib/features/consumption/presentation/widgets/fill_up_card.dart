@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -69,8 +68,10 @@ class FillUpCard extends StatelessWidget {
     // records logged before this change will re-format on the fly when
     // the user changes country — acceptable as a transitional step.
     final distance = UnitFormatter.formatDistance(fillUp.odometerKm);
-    final costStr =
-        '${fillUp.totalCost.toStringAsFixed(2)} ${PriceFormatter.currency}';
+    // #2491 — a fill-up cost is a TOTAL: route it through formatTotal
+    // (locale-aware 2 dp + currency symbol) instead of a hand-rolled
+    // toStringAsFixed(2) that hardcodes the dot separator.
+    final costStr = PriceFormatter.formatTotal(fillUp.totalCost);
     final ppl = UnitFormatter.formatPricePerUnit(fillUp.pricePerLiter);
     // #1401 phase 7b — only render the verified-by-adapter chip when
     // both fuel-level captures are present. Either missing → no chip.
@@ -179,10 +180,15 @@ class FillUpCard extends StatelessWidget {
   String _pad(int n) => n.toString().padLeft(2, '0');
 }
 
-/// #1902 — the slim amber row a correction [FillUp] collapses to. It
-/// carries only the auto-correction label and the adjusted volume on a
-/// single line: the date, cost, fuel type and odometer of a system
-/// adjustment are noise next to the real fill-ups it sits between.
+/// #1902 — the slim row a correction [FillUp] collapses to. It carries
+/// only the auto-correction label and the adjusted volume on a single
+/// line: the date, cost, fuel type and odometer of a system adjustment
+/// are noise next to the real fill-ups it sits between.
+///
+/// #2491 — the accent moved OFF the shared `warning`-orange token onto
+/// the theme's neutral `tertiary`. A correction is informational, not a
+/// warning; the orange token carried 6+ unrelated meanings (#2487) and
+/// shouting "attention" at a routine auto-adjustment was misleading.
 class _CorrectionRow extends StatelessWidget {
   final String volume;
   final VoidCallback? onTap;
@@ -193,7 +199,7 @@ class _CorrectionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
-    final correctionColor = DarkModeColors.warning(context);
+    final correctionColor = theme.colorScheme.tertiary;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 2, 16, 2),

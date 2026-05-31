@@ -4484,6 +4484,12 @@ abstract class AppLocalizations {
   /// **'Out of order'**
   String get evStatusOutOfOrder;
 
+  /// No description provided for @evStatusPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly available'**
+  String get evStatusPartial;
+
   /// No description provided for @openOnlyFilter.
   ///
   /// In en, this message translates to:

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
+import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
@@ -14,73 +15,55 @@ import '../../../../fixtures/stations.dart';
 void main() {
   group('AllPricesStationCard', () {
     testWidgets('renders station brand name', (tester) async {
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: testStation),
-      );
+      await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
       expect(find.text('STAR'), findsOneWidget);
     });
 
     testWidgets('renders address line when brand is present', (tester) async {
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: testStation),
-      );
+      await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
       expect(find.textContaining('Hauptstr.'), findsOneWidget);
       expect(find.textContaining('10115'), findsOneWidget);
     });
 
     testWidgets('renders distance', (tester) async {
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: testStation),
-      );
+      await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
       expect(find.textContaining('1,5 km'), findsOneWidget);
     });
 
     testWidgets('shows open status badge when station is open', (tester) async {
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: testStation),
-      );
+      await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
       expect(find.text('Open'), findsOneWidget);
     });
 
-    testWidgets('shows closed status badge when station is closed',
-        (tester) async {
+    testWidgets('shows closed status badge when station is closed', (
+      tester,
+    ) async {
       final closedStation = testStationList[2]; // isOpen: false
 
-      await pumpApp(
-        tester,
-        AllPricesStationCard(station: closedStation),
-      );
+      await pumpApp(tester, AllPricesStationCard(station: closedStation));
 
       expect(find.text('Closed'), findsOneWidget);
     });
 
-    testWidgets('renders fuel price badges for available fuels',
-        (tester) async {
+    testWidgets('renders fuel price badges for available fuels', (
+      tester,
+    ) async {
       // testStation has e5, e10, diesel
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: testStation),
-      );
+      await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
       expect(find.text('E5'), findsOneWidget);
       expect(find.text('E10'), findsOneWidget);
       expect(find.text('Diesel'), findsOneWidget);
     });
 
-    testWidgets('does not render badges for unavailable fuels without price',
-        (tester) async {
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: testStation),
-      );
+    testWidgets('does not render badges for unavailable fuels without price', (
+      tester,
+    ) async {
+      await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
       // testStation has no e98, e85, lpg, cng prices and they are not in
       // unavailableFuels, so badges should not appear
@@ -90,8 +73,9 @@ void main() {
       expect(find.text('GNV'), findsNothing);
     });
 
-    testWidgets('shows out-of-stock badge for unavailable fuels',
-        (tester) async {
+    testWidgets('shows out-of-stock badge for unavailable fuels', (
+      tester,
+    ) async {
       const stationWithUnavailable = Station(
         id: 'test-unavail',
         name: 'Test Station',
@@ -119,10 +103,7 @@ void main() {
     testWidgets('renders favorite star when isFavorite=true', (tester) async {
       await pumpApp(
         tester,
-        const AllPricesStationCard(
-          station: testStation,
-          isFavorite: true,
-        ),
+        const AllPricesStationCard(station: testStation, isFavorite: true),
       );
 
       expect(find.byIcon(Icons.star), findsOneWidget);
@@ -133,10 +114,7 @@ void main() {
     testWidgets('renders unfilled star when isFavorite=false', (tester) async {
       await pumpApp(
         tester,
-        const AllPricesStationCard(
-          station: testStation,
-          isFavorite: false,
-        ),
+        const AllPricesStationCard(station: testStation, isFavorite: false),
       );
 
       expect(find.byIcon(Icons.star_border), findsOneWidget);
@@ -147,10 +125,7 @@ void main() {
 
       await pumpApp(
         tester,
-        AllPricesStationCard(
-          station: testStation,
-          onTap: () => tapped = true,
-        ),
+        AllPricesStationCard(station: testStation, onTap: () => tapped = true),
       );
 
       await tester.tap(find.byType(AllPricesStationCard));
@@ -190,7 +165,9 @@ void main() {
     });
 
     group('champion (cheapest) chip styling (#572)', () {
-      testWidgets('champion chip has filled fuel-type background', (tester) async {
+      testWidgets('champion chip has filled fuel-type background', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const AllPricesStationCard(
@@ -218,8 +195,12 @@ void main() {
 
         final container = tester.widget<Container>(badgeContainer);
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, dieselColor,
-            reason: 'Champion chip must use filled fuel-type color, not light alpha.');
+        expect(
+          decoration.color,
+          dieselColor,
+          reason:
+              'Champion chip must use filled fuel-type color, not light alpha.',
+        );
       });
 
       testWidgets('champion chip text is white for contrast', (tester) async {
@@ -237,54 +218,56 @@ void main() {
       });
 
       testWidgets('non-champion chip does not use white text', (tester) async {
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(station: testStation),
-        );
+        await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
         // Without cheapestFlags, no chip is a champion; label uses the
         // fuel-type color on a light tinted background (not white-on-solid).
         final labelWidget = tester.widget<Text>(find.text('Diesel'));
-        expect(labelWidget.style?.color, isNot(Colors.white),
-            reason: 'Non-champion chip must not use white text.');
+        expect(
+          labelWidget.style?.color,
+          isNot(Colors.white),
+          reason: 'Non-champion chip must not use white text.',
+        );
       });
 
-      testWidgets('unavailable fuel never becomes champion (cheapestFlag ignored)',
-          (tester) async {
-        const stationWithUnavailable = Station(
-          id: 'u1',
-          name: 'u',
-          brand: 'TOT',
-          street: 's',
-          postCode: '1',
-          place: 'p',
-          lat: 0,
-          lng: 0,
-          e5: 1.5,
-          isOpen: true,
-          unavailableFuels: ['diesel'],
-        );
+      testWidgets(
+        'unavailable fuel never becomes champion (cheapestFlag ignored)',
+        (tester) async {
+          const stationWithUnavailable = Station(
+            id: 'u1',
+            name: 'u',
+            brand: 'TOT',
+            street: 's',
+            postCode: '1',
+            place: 'p',
+            lat: 0,
+            lng: 0,
+            e5: 1.5,
+            isOpen: true,
+            unavailableFuels: ['diesel'],
+          );
 
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(
-            station: stationWithUnavailable,
-            cheapestFlags: {FuelType.diesel: true},
-          ),
-        );
+          await pumpApp(
+            tester,
+            const AllPricesStationCard(
+              station: stationWithUnavailable,
+              cheapestFlags: {FuelType.diesel: true},
+            ),
+          );
 
-        final diesel = tester.widget<Text>(find.text('Diesel'));
-        expect(diesel.style?.color, isNot(Colors.white),
-            reason: 'Out-of-stock fuel must not render as champion.');
-      });
+          final diesel = tester.widget<Text>(find.text('Diesel'));
+          expect(
+            diesel.style?.color,
+            isNot(Colors.white),
+            reason: 'Out-of-stock fuel must not render as champion.',
+          );
+        },
+      );
     });
 
     group('distance prominence (#572)', () {
       testWidgets('distance uses bold bodyMedium style', (tester) async {
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(station: testStation),
-        );
+        await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
         final distanceText = tester.widget<Text>(find.textContaining('km'));
         expect(distanceText.style?.fontWeight, FontWeight.bold);
@@ -310,10 +293,7 @@ void main() {
         isOpen: true,
       );
 
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: fullStation),
-      );
+      await pumpApp(tester, const AllPricesStationCard(station: fullStation));
 
       expect(find.text('E5'), findsOneWidget);
       expect(find.text('E10'), findsOneWidget);
@@ -346,38 +326,45 @@ void main() {
     });
 
     testWidgets(
-        '#2061 — the "Independent" sentinel does not leak into the title',
-        (tester) async {
-      // The French Prix Carburants parser tags brandless stations with
-      // `BrandRegistry.independentLabel` (== "Independent"). Before
-      // #2061 the search card rendered that sentinel as the title;
-      // after, it falls back to the street address (matching the
-      // detail screen).
-      const independentStation = Station(
-        id: 'indep-2061',
-        name: '',
-        brand: 'Independent',
-        street: '26 AVENUE DE VERDUN',
-        postCode: '34120',
-        place: 'Pézenas',
-        lat: 43.46,
-        lng: 3.42,
-        e10: 1.999,
-        isOpen: true,
-      );
+      '#2061 — the "Independent" sentinel does not leak into the title',
+      (tester) async {
+        // The French Prix Carburants parser tags brandless stations with
+        // `BrandRegistry.independentLabel` (== "Independent"). Before
+        // #2061 the search card rendered that sentinel as the title;
+        // after, it falls back to the street address (matching the
+        // detail screen).
+        const independentStation = Station(
+          id: 'indep-2061',
+          name: '',
+          brand: 'Independent',
+          street: '26 AVENUE DE VERDUN',
+          postCode: '34120',
+          place: 'Pézenas',
+          lat: 43.46,
+          lng: 3.42,
+          e10: 1.999,
+          isOpen: true,
+        );
 
-      await pumpApp(
-        tester,
-        const AllPricesStationCard(station: independentStation),
-      );
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(station: independentStation),
+        );
 
-      expect(find.text('Independent'), findsNothing,
+        expect(
+          find.text('Independent'),
+          findsNothing,
           reason:
               'The Independent sentinel is an internal classification, '
-              'not a brand to render.');
-      expect(find.text('26 AVENUE DE VERDUN'), findsOneWidget,
-          reason: 'Brandless station falls back to the street as title.');
-    });
+              'not a brand to render.',
+        );
+        expect(
+          find.text('26 AVENUE DE VERDUN'),
+          findsOneWidget,
+          reason: 'Brandless station falls back to the street as title.',
+        );
+      },
+    );
 
     group('profile fuel highlight', () {
       testWidgets('profile fuel badge has larger dot', (tester) async {
@@ -404,8 +391,9 @@ void main() {
         expect(largeDots, findsOneWidget);
       });
 
-      testWidgets('profile fuel badge price uses fuel-type color',
-          (tester) async {
+      testWidgets('profile fuel badge price uses fuel-type color', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const AllPricesStationCard(
@@ -426,8 +414,9 @@ void main() {
         expect(labelWidget.style?.color, dieselColor);
       });
 
-      testWidgets('non-profile fuel badges remain at default size',
-          (tester) async {
+      testWidgets('non-profile fuel badges remain at default size', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const AllPricesStationCard(
@@ -445,12 +434,8 @@ void main() {
         expect(e5Text.style?.fontSize, 10.0);
       });
 
-      testWidgets('no highlight when profileFuelType is null',
-          (tester) async {
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(station: testStation),
-        );
+      testWidgets('no highlight when profileFuelType is null', (tester) async {
+        await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
         // All dots should be 6px (default size)
         final largeDots = find.byWidgetPredicate((widget) {
@@ -466,9 +451,7 @@ void main() {
         expect(largeDots, findsNothing);
       });
 
-      testWidgets(
-          'profile fuel badge has thicker border',
-          (tester) async {
+      testWidgets('profile fuel badge has thicker border', (tester) async {
         await pumpApp(
           tester,
           const AllPricesStationCard(
@@ -483,8 +466,7 @@ void main() {
             final decoration = widget.decoration as BoxDecoration;
             if (decoration.border is Border) {
               final border = decoration.border as Border;
-              return border.top.width == 1.5 &&
-                  decoration.borderRadius != null;
+              return border.top.width == 1.5 && decoration.borderRadius != null;
             }
           }
           return false;
@@ -494,48 +476,46 @@ void main() {
       });
 
       testWidgets(
-          'unavailable fuel is not highlighted even when it matches profile',
-          (tester) async {
-        const stationWithUnavailable = Station(
-          id: 'test-unavail',
-          name: 'Test Station',
-          brand: 'TEST',
-          street: 'Test Str.',
-          postCode: '12345',
-          place: 'Berlin',
-          lat: 52.52,
-          lng: 13.40,
-          e5: 1.859,
-          diesel: 1.659,
-          isOpen: true,
-          unavailableFuels: ['e10'],
-        );
+        'unavailable fuel is not highlighted even when it matches profile',
+        (tester) async {
+          const stationWithUnavailable = Station(
+            id: 'test-unavail',
+            name: 'Test Station',
+            brand: 'TEST',
+            street: 'Test Str.',
+            postCode: '12345',
+            place: 'Berlin',
+            lat: 52.52,
+            lng: 13.40,
+            e5: 1.859,
+            diesel: 1.659,
+            isOpen: true,
+            unavailableFuels: ['e10'],
+          );
 
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(
-            station: stationWithUnavailable,
-            profileFuelType: FuelType.e10,
-          ),
-        );
+          await pumpApp(
+            tester,
+            const AllPricesStationCard(
+              station: stationWithUnavailable,
+              profileFuelType: FuelType.e10,
+            ),
+          );
 
-        // E10 badge should exist but show "Out of stock", not highlighted
-        expect(find.text('Out of stock'), findsOneWidget);
+          // E10 badge should exist but show "Out of stock", not highlighted
+          expect(find.text('Out of stock'), findsOneWidget);
 
-        // The E10 label should NOT have bold weight (unavailable overrides highlight)
-        final e10Label = find.text('E10');
-        expect(e10Label, findsOneWidget);
-        final e10Text = tester.widget<Text>(e10Label);
-        expect(e10Text.style?.fontWeight, FontWeight.w600);
-      });
+          // The E10 label should NOT have bold weight (unavailable overrides highlight)
+          final e10Label = find.text('E10');
+          expect(e10Label, findsOneWidget);
+          final e10Text = tester.widget<Text>(e10Label);
+          expect(e10Text.style?.fontWeight, FontWeight.w600);
+        },
+      );
     });
 
     group('card polish (#592)', () {
       testWidgets('card has 6dp vertical margin', (tester) async {
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(station: testStation),
-        );
+        await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
         final card = tester.widget<Card>(find.byType(Card).first);
         expect(
@@ -545,22 +525,30 @@ void main() {
       });
 
       testWidgets('card uses elevation 2 in light mode', (tester) async {
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(station: testStation),
-        );
+        await pumpApp(tester, const AllPricesStationCard(station: testStation));
         final card = tester.widget<Card>(find.byType(Card).first);
         expect(card.elevation, 2.0);
       });
 
       testWidgets('card has 12dp rounded corners', (tester) async {
-        await pumpApp(
-          tester,
-          const AllPricesStationCard(station: testStation),
-        );
+        await pumpApp(tester, const AllPricesStationCard(station: testStation));
         final card = tester.widget<Card>(find.byType(Card).first);
         final shape = card.shape as RoundedRectangleBorder;
         expect(shape.borderRadius, BorderRadius.circular(12));
+      });
+    });
+
+    group('StationCardShell composition (#2493)', () {
+      testWidgets('built from the shared shell with no accent stripe', (
+        tester,
+      ) async {
+        await pumpApp(tester, const AllPricesStationCard(station: testStation));
+        final shell = tester.widget<StationCardShell>(
+          find.byType(StationCardShell),
+        );
+        // #2493 — the all-prices card carries its colour in the per-fuel
+        // badges, so the shared shell draws no left stripe.
+        expect(shell.stripeColor, isNull);
       });
     });
   });

@@ -2396,6 +2396,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get evStatusOutOfOrder => 'Izvan pogona';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Samo otvorene';
 
   @override

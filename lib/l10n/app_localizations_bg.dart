@@ -2413,6 +2413,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get evStatusOutOfOrder => 'Извън строя';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Само отворени';
 
   @override
