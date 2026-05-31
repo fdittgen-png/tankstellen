@@ -137,30 +137,24 @@ class TrajetsTab extends ConsumerWidget {
     // + maintenance suggestions, right = trajets list. Narrow screens
     // fall back to a single column with the same vertical order.
     // #2374 — the "View all on map" action moved to the AppBar.
+    // #2530 — routed through the shared ResponsiveMasterDetail scaffold so
+    // the breakpoint + foldable-hinge + 1:1 (medium) / 2:3 (expanded)
+    // ratios live in ONE place. (`isWideScreen` == screenSizeOf != compact,
+    // so the wide branch only ever hits the medium/expanded wrapper paths.)
     if (isWideScreen(context)) {
-      return Row(
-        children: [
-          // 2:3 flex on landscape so the trajets list (the dense
-          // data) gets more room than the mostly-static insights
-          // panel. Prior 1:1 split wasted half the screen on the
-          // sparse left side per the 2026-05-24 screenshots.
-          Expanded(
-            flex: 2,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 4, bottom: bottomInset),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  MonthlyInsightsCard(summary: monthlySummary),
-                  const MaintenanceSuggestionList(),
-                  const SharedTripsSection(),
-                ],
-              ),
-            ),
+      return ResponsiveMasterDetail(
+        master: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 4, bottom: bottomInset),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MonthlyInsightsCard(summary: monthlySummary),
+              const MaintenanceSuggestionList(),
+              const SharedTripsSection(),
+            ],
           ),
-          const VerticalDivider(width: 1),
-          Expanded(flex: 3, child: trajetsList),
-        ],
+        ),
+        detail: trajetsList,
       );
     }
     return Column(

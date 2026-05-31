@@ -128,6 +128,48 @@ void main() {
           'Tapping a correction card must open the bottom-sheet editor.',
     );
   });
+
+  // #2530 — the wide-screen split now goes through the shared
+  // ResponsiveMasterDetail scaffold. Structural pane-count assertions.
+  group('#2530 responsive panes', () {
+    testWidgets('compact width renders a single pane (no VerticalDivider)',
+        (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: fillUps, stats: stats, l: null),
+        overrides: overrides(gamification: false),
+      );
+
+      expect(find.byType(VerticalDivider), findsNothing);
+    });
+
+    testWidgets('expanded width renders two panes with the 2:3 ratio',
+        (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: fillUps, stats: stats, l: null),
+        overrides: overrides(gamification: false),
+      );
+
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      // Master flex 2 (stats header), detail flex 3 (fill-up list).
+      final flexes = tester
+          .widgetList<Expanded>(find.byType(Expanded))
+          .map((e) => e.flex)
+          .toList();
+      expect(flexes, containsAllInOrder(<int>[2, 3]));
+    });
+  });
 }
 
 /// Returns null for the active vehicle so [TankLevelCard] short-circuits

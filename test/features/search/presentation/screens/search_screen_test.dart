@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/features/map/presentation/widgets/inline_map.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_screen.dart';
@@ -248,6 +249,51 @@ void main() {
             'Expected results area to be at least 50% of screen height, got '
             '${resultsBox.height}/$screenHeight',
       );
+    });
+
+    // #2530 — Search now goes through the shared ResponsiveMasterDetail
+    // scaffold. Structural pane-count assertions at the breakpoints.
+    testWidgets('compact width renders a single pane (no VerticalDivider)',
+        (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [...test.overrides, userPositionNullOverride()],
+      );
+
+      expect(find.byType(VerticalDivider), findsNothing);
+      expect(find.bySemanticsLabel('Search results'), findsOneWidget);
+    });
+
+    testWidgets('wide width renders two panes (VerticalDivider + InlineMap)',
+        (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [...test.overrides, userPositionNullOverride()],
+      );
+
+      // The split scaffold renders the search pane beside the inline map,
+      // separated by the shared VerticalDivider.
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      expect(find.byType(InlineMap), findsOneWidget);
+      expect(find.bySemanticsLabel('Search results'), findsOneWidget);
     });
   });
 }

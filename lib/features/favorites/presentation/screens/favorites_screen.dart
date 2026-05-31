@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/responsive_search_layout.dart';
 import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/sync/sync_provider.dart';
@@ -119,18 +120,18 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     final isLandscape = media.orientation == Orientation.landscape;
     final isWide = media.size.width >= 600;
     if (isLandscape || isWide) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: RepaintBoundary(
-              key: _shareBoundaryKey,
-              child: const FavoritesTab(),
-            ),
-          ),
-          const VerticalDivider(width: 1, thickness: 1),
-          const Expanded(child: AlertsTab()),
-        ],
+      // #2530 — the side-by-side panes go through the shared
+      // ResponsiveMasterDetail scaffold so the foldable-hinge + 1:1/2:3
+      // ratios live in ONE place. Favorites keeps its own broader trigger
+      // (landscape OR ≥600dp) via `forceSplit`, so it still splits on a
+      // sub-600 landscape phone the same way it did before.
+      return ResponsiveMasterDetail(
+        forceSplit: true,
+        master: RepaintBoundary(
+          key: _shareBoundaryKey,
+          child: const FavoritesTab(),
+        ),
+        detail: const AlertsTab(),
       );
     }
     return Column(

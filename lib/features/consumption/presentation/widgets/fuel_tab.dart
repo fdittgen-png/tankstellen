@@ -103,35 +103,25 @@ class FuelTab extends ConsumerWidget {
     }
 
     // #2018 — landscape / tablet split: left = tank level + stats
-    // header, right = fill-ups list. Mirrors the search-results
-    // wide-screen pattern via `isWideScreen(context)` (≥ 600dp).
+    // header, right = fill-ups list. #2530 — routed through the shared
+    // ResponsiveMasterDetail scaffold so the breakpoint + foldable-hinge +
+    // 1:1 (medium) / 2:3 (expanded) ratios live in ONE place. (`isWideScreen`
+    // == screenSizeOf != compact, so the wide branch only ever hits the
+    // medium/expanded paths of the wrapper.)
     if (isWideScreen(context)) {
-      // 2:3 flex on landscape so the Pleins list (the dense data the
-      // user scrolls) gets more width than the mostly-static stats
-      // header. Prior 1:1 split wasted half the screen on the sparse
-      // left column per the 2026-05-24 screenshots.
-      return Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: headerChildren,
-              ),
-            ),
+      return ResponsiveMasterDetail(
+        master: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: headerChildren,
           ),
-          const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
-              itemCount: fillUps.length,
-              itemBuilder: (context, index) => buildFillUpRow(index),
-            ),
-          ),
-        ],
+        ),
+        detail: ListView.builder(
+          padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
+          itemCount: fillUps.length,
+          itemBuilder: (context, index) => buildFillUpRow(index),
+        ),
       );
     }
 
