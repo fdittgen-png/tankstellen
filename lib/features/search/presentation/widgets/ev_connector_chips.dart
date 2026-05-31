@@ -39,18 +39,34 @@ class EvConnectorChips extends StatelessWidget {
   /// blue (`#2196F3`) it used to hard-code, so the EV accent is one token
   /// across every surface. Type 2 / CHAdeMO / Tesla keep their deliberate
   /// per-connector brand hues (green / orange / pink).
-  static Color colorFor(String type) {
-    if (type.contains('CCS')) return FuelColors.evAccent; // Crystal-blue
-    if (type.contains('Type 2')) return const Color(0xFF4CAF50); // Green
-    if (type.contains('CHAdeMO')) return const Color(0xFFFF9800); // Orange
-    if (type.contains('Tesla')) return const Color(0xFFE91E63); // Pink
-    return const Color(0xFF757575); // Grey
+  ///
+  /// #2526 — [brightness] makes the hue dark-safe. The light identity hues
+  /// (e.g. Tesla pink `#E91E63` read only ~3.9:1 as text on the dark
+  /// surface) are lightened on dark to a same-family variant that clears
+  /// AA, preserving per-connector identity. Callers that omit [brightness]
+  /// keep the canonical light identity hue (the value the chip-colour API
+  /// and its tests document).
+  static Color colorFor(String type, {Brightness brightness = Brightness.light}) {
+    final dark = brightness == Brightness.dark;
+    if (type.contains('CCS')) return FuelColors.evAccent; // Crystal-blue (already light)
+    if (type.contains('Type 2')) {
+      return dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50); // Green
+    }
+    if (type.contains('CHAdeMO')) {
+      return dark ? const Color(0xFFFFB74D) : const Color(0xFFFF9800); // Orange
+    }
+    if (type.contains('Tesla')) {
+      return dark ? const Color(0xFFF06292) : const Color(0xFFE91E63); // Pink
+    }
+    return dark ? const Color(0xFFBDBDBD) : const Color(0xFF757575); // Grey
   }
 
   @override
   Widget build(BuildContext context) {
     final visible = connectors.take(maxConnectors).toList();
     final l10n = AppLocalizations.of(context);
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
     final semanticLabel = visible.isEmpty
         ? (l10n?.evConnectorsNone ?? 'No connector information')
         : '${l10n?.evConnectorsLabel ?? "Available connectors"}: '
@@ -64,12 +80,19 @@ class EvConnectorChips extends StatelessWidget {
           spacing: 4,
           runSpacing: 2,
           children: visible.map((type) {
-            final color = colorFor(type);
+            final color = colorFor(type, brightness: brightness);
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
+                // #2526 — raise the fill alpha on dark and add a hairline
+                // outline so the pill actually reads against the dark card
+                // (the 15%-alpha fill was near-invisible on a dark surface).
+                color: color.withValues(alpha: isDark ? 0.22 : 0.15),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: color.withValues(alpha: isDark ? 0.6 : 0.3),
+                  width: 1,
+                ),
               ),
               child: Text(
                 type,

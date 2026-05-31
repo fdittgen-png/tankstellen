@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_gradient.dart';
 import '../../../../core/utils/price_tier.dart';
@@ -23,15 +24,23 @@ class DrivingMarkerBuilder {
   DrivingMarkerBuilder._();
 
   /// Build a large [Marker] for driving mode, colored by relative price.
+  ///
+  /// #2526 — pass [context] so the null-price fallback resolves to the
+  /// theme's [DarkModeColors.hintText] (`outline`) instead of the
+  /// hardcoded `Colors.grey.shade400`, keeping the "no price" badge legible
+  /// in dark. The bright price palette is intentionally
+  /// brightness-independent: these badges float over map tiles (not the app
+  /// surface) and carry their own white outline + dark `black87` text.
   static Marker build(
     Station station,
     FuelType fuel,
     double minPrice,
     double maxPrice, {
     required VoidCallback onTap,
+    BuildContext? context,
   }) {
     final price = station.priceFor(fuel);
-    final color = _priceColor(price, minPrice, maxPrice);
+    final color = _priceColor(price, minPrice, maxPrice, context);
     final brand = truncateBrand(station.displayName, maxLength: _maxBrandLength);
     final tier = priceTierOf(price, minPrice, maxPrice);
 
@@ -108,13 +117,22 @@ class DrivingMarkerBuilder {
     Color(0xFFF44336),
   ];
 
-  static Color _priceColor(double? price, double minPrice, double maxPrice) =>
+  static Color _priceColor(
+    double? price,
+    double minPrice,
+    double maxPrice, [
+    BuildContext? context,
+  ]) =>
       priceGradientColor(
         price,
         minPrice,
         maxPrice,
         stops: _drivingStops,
-        nullColor: Colors.grey.shade400,
+        // #2526 — theme-resolved hint colour when a context is available,
+        // falling back to the legacy neutral grey otherwise.
+        nullColor: context != null
+            ? DarkModeColors.hintText(context)
+            : Colors.grey.shade400,
         flatColor: const Color(0xFF4CAF50),
       );
 }

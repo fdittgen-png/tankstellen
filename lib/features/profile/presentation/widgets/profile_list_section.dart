@@ -25,9 +25,18 @@ class ProfileListSection extends ConsumerWidget {
       children: [
         ...profiles.map((profile) {
           final isActive = profile.id == activeProfile?.id;
+          final cs = theme.colorScheme;
           return Card(
-            color: isActive ? theme.colorScheme.primaryContainer : null,
+            color: isActive ? cs.primaryContainer : null,
             child: ListTile(
+              // #2526 — the active card fills with `primaryContainer`, which in
+              // dark is a pale green (`#C9E1CA`). Letting the title/subtitle and
+              // leading icon default to `onSurface`/`onSurfaceVariant`
+              // (near-white) collapsed the card to ~1.1:1. Pin the on-colour to
+              // `onPrimaryContainer` (11:1) while active; inactive keeps the
+              // theme default.
+              textColor: isActive ? cs.onPrimaryContainer : null,
+              iconColor: isActive ? cs.onPrimaryContainer : null,
               leading: Icon(
                 isActive ? Icons.person : Icons.person_outline,
               ),

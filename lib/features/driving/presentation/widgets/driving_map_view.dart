@@ -67,8 +67,11 @@ class _DrivingMapViewState extends State<DrivingMapView> {
   List<Marker> _markers = const [];
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // #2526 — recompute here (not initState) so the markers can read the
+    // theme via `context` (the null-price badge resolves a theme hint
+    // colour) and re-run if the brightness changes mid-session.
     _recompute();
   }
 
@@ -97,6 +100,9 @@ class _DrivingMapViewState extends State<DrivingMapView> {
             widget.selectedFuel,
             range.$1,
             range.$2,
+            // #2526 — thread context so the null-price badge picks the
+            // theme hint colour instead of a hardcoded grey.
+            context: context,
             // Read the callbacks off `widget` at tap time so a memoised
             // marker still dispatches to the current handlers.
             onTap: () {

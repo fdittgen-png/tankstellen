@@ -48,6 +48,22 @@ class DarkModeColors {
           : const Color(0xFFC77800); // dark gold — 3.4:1 on white
 
   // ---------------------------------------------------------------------------
+  // Brand
+  // ---------------------------------------------------------------------------
+
+  /// Adaptive brand green (#2526).
+  ///
+  /// The brand identity green is the icon's `#2E7D32`. On a light surface it
+  /// clears AA comfortably, but as text/iconography on a dark surface it
+  /// collapses to ~3.4:1 (fails AA). On dark we substitute the scheme's
+  /// lighter `primary` (`#69A16B`), which clears AA (~5.8:1) on the dark card
+  /// surface while staying recognisably the same forest-green brand hue.
+  static Color brandGreen(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? Theme.of(context).colorScheme.primary // #69A16B on dark
+          : const Color(0xFF2E7D32); // icon brand green on light
+
+  // ---------------------------------------------------------------------------
   // Muted / secondary text
   // ---------------------------------------------------------------------------
 
