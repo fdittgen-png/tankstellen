@@ -5311,6 +5311,10 @@
   "@tripRecordingConnectingTitle": {
     "description": "AppBar title shown on the trip-recording screen while the BLE adapter connect + odometer prime run, before the first live sample lands (#2274 start-now-connect-later). The screen is pushed immediately in this transient connecting state."
   },
+  "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
+  "@tripRecordingDiscardedNoMovement": {
+    "description": "SnackBar shown after the user stops a recording that covered no distance and captured no usable signal — a genuine false-start / stationary stop (#2509). Tells the user nothing was saved because the car never moved. Never shown when the trip was actually saved."
+  },
   "tripShareAction": "Share with another account",
   "@tripShareAction": {
     "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."

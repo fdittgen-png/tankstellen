@@ -105,7 +105,15 @@ abstract class RecordingPipelineHost {
   /// the OBD2 pipeline stamp the saved entry with the dongle identity it
   /// snapshotted at start (#1312) and the baseline-store vehicle id; the
   /// GPS-only path leaves them null and the detail card hides the rows.
-  Future<void> saveToHistory(
+  ///
+  /// [gpsFixCount] (#2509) is the number of GPS fixes the trip captured.
+  /// The guard uses it to keep a genuinely-stationary trip discarded
+  /// (#1923 — no distance AND no signal) while persisting a real
+  /// GPS-tracked drive whose OBD2 link was dead (distance ≥ 0.01, or a
+  /// `startedAt` recovered from a GPS fix). Returns the [TripPersistOutcome]
+  /// so the caller can surface a "no movement detected" notice on a
+  /// genuine discard (and never on a save).
+  Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
     bool automatic,
     List<TripSample> samples,
@@ -114,7 +122,28 @@ abstract class RecordingPipelineHost {
     String? adapterMac,
     String? adapterName,
     String? adapterFirmware,
+    int gpsFixCount,
   });
+}
+
+/// Outcome of a [RecordingPipelineHost.saveToHistory] call (#2509).
+///
+/// Replaces the old fire-and-forget silent return: a trip that the
+/// empty-trip guard drops now reports *why* so the stop UI can tell a
+/// genuinely-stationary discard (surface "no movement detected") apart
+/// from a normal save (say nothing). `saved` carries no reason.
+enum TripPersistOutcome {
+  /// The trip was written to the rolling history log.
+  saved,
+
+  /// The trip was discarded because it covered no distance and carried no
+  /// usable signal (no start time, no samples, no GPS fixes) — a genuine
+  /// false-start / stationary stop (#1923). The stop UI surfaces a
+  /// "recording discarded — no movement detected" notice.
+  discardedNoMovement;
+
+  /// True only for [discardedNoMovement] — the single case the UI surfaces.
+  bool get isStationaryDiscard => this == TripPersistOutcome.discardedNoMovement;
 }
 
 /// The wider host an [Obd2RecordingPipeline] needs (#2227): the base
@@ -158,10 +187,19 @@ class StoppedTripResult {
   final double? odometerStartKm;
   final double? odometerLatestKm;
 
+  /// #2509 — true when the trip was discarded as genuinely stationary (no
+  /// distance, no usable signal). The recording screen surfaces a
+  /// localized "no movement detected" notice in this case so a Stop tap
+  /// that saves nothing is never silent. False for a saved trip and for
+  /// the empty / no-pipeline fallbacks (those reach the summary view, not
+  /// the recording surface that reads this).
+  final bool discardedNoMovement;
+
   const StoppedTripResult({
     required this.summary,
     required this.odometerStartKm,
     required this.odometerLatestKm,
+    this.discardedNoMovement = false,
   });
 
   const StoppedTripResult.empty()
@@ -174,7 +212,8 @@ class StoppedTripResult {
           harshAccelerations: 0,
         ),
         odometerStartKm = null,
-        odometerLatestKm = null;
+        odometerLatestKm = null,
+        discardedNoMovement = false;
 
   /// End-of-trip km, derived: latest odometer read if we have one,
   /// otherwise start + integrated distance. Null when neither

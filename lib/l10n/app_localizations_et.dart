@@ -6168,6 +6168,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Salvestuse alustamine…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Jaga teise kontoga';
 
   @override

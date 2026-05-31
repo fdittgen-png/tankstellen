@@ -6209,6 +6209,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Pradedamas įrašymas…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Bendrinti su kita paskyra';
 
   @override

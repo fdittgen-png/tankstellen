@@ -195,4 +195,12 @@ class TripDistanceResolver {
   /// straight through.
   List<VirtualOdometerSample> get debugSpeedSamples =>
       List.unmodifiable(_speedSamples);
+
+  /// Count of GPS fixes buffered so far (#2509). Used by the controller +
+  /// persist guard to tell a genuinely-stationary trip (no movement, no
+  /// signal) apart from a real GPS-tracked drive whose OBD2 link was dead
+  /// — the latter has fixes here even when no speed/RPM sample ever
+  /// reached the recorder. Not the distance: a parked car can scatter a
+  /// handful of fixes, so callers pair this with [distanceKm].
+  int get gpsFixCount => _gpsTrack.length;
 }

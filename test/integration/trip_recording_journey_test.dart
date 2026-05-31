@@ -174,12 +174,89 @@ void main() {
       final notifier = container.read(tripRecordingProvider.notifier);
       await notifier.start(service);
       // No samples injected — stop immediately.
-      await notifier.stop();
+      final result = await notifier.stop();
 
       final repo = container.read(tripHistoryRepositoryProvider);
       expect(repo, isNotNull);
       expect(repo!.loadAll(), isEmpty,
           reason: 'an empty trip must not pollute the rolling history log');
+      // #2509 — a genuinely stationary stop (no distance, no signal) is a
+      // no-movement discard, surfaced to the UI rather than saved.
+      expect(result.discardedNoMovement, isTrue,
+          reason: 'the empty stop must report a stationary discard so the '
+              'recording screen can surface a "no movement" notice');
+    },
+  );
+
+  test(
+    // #2509 — the silent-data-loss regression: a real GPS-tracked drive
+    // whose OBD2 link was dead the whole session (no speed/RPM sample
+    // ever reached the recorder, so `startedAt` stayed null) was
+    // discarded by the disjunction guard. It must now persist.
+    'a GPS-tracked OBD2 trip with ZERO speed/RPM samples but a moving GPS '
+    'track persists and appears in history (#2509)',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final service = Obd2Service(FakeObd2Transport(_elmOk()));
+      await service.connect();
+
+      final notifier = container.read(tripRecordingProvider.notifier);
+      await notifier.start(service);
+
+      final ctl = notifier.debugController;
+      expect(ctl, isNotNull,
+          reason: 'provider must own a controller while recording');
+
+      // Feed a moving GPS track through the SAME production seam the GPS
+      // stream controller uses — `updateGpsFix` buffers the fix into the
+      // distance resolver AND (the #2509 fix) latches the first-fix
+      // timestamp as the start-time fallback. Crucially we inject NO
+      // speed/RPM samples: a dead dongle, so `recorder.onSample` — the
+      // sole setter of the recorder's `startedAt` — never fires.
+      //
+      // ~20 fixes stepping latitude by 0.0005° (~55 m each) clear the
+      // resolver's `kMinGpsFixesForDistanceSource` (10) and 50 m floor,
+      // integrating to ~1 km of real road distance.
+      const baseLat = 48.1000;
+      const baseLon = 11.5000;
+      for (var i = 0; i < 20; i++) {
+        ctl!.updateGpsFix(
+          latitude: baseLat + i * 0.0005,
+          longitude: baseLon,
+        );
+      }
+
+      final result = await notifier.stop();
+      expect(
+        container.read(tripRecordingProvider).phase,
+        TripRecordingPhase.finished,
+      );
+
+      // The drive WAS saved — not a silent discard.
+      expect(result.discardedNoMovement, isFalse,
+          reason: 'a GPS-tracked drive must not be reported as a stationary '
+              'discard');
+
+      final repo = container.read(tripHistoryRepositoryProvider);
+      expect(repo, isNotNull);
+      final history = repo!.loadAll();
+      expect(history, hasLength(1),
+          reason: 'a real GPS-tracked drive with a dead OBD2 link must '
+              'persist — not be discarded by the empty-trip guard (#2509)');
+
+      final entry = history.single;
+      // Distance came from the haversine-summed GPS track…
+      expect(entry.summary.distanceKm, greaterThanOrEqualTo(0.01),
+          reason: 'the GPS track must integrate into a real distance');
+      expect(entry.summary.distanceSource, 'gps',
+          reason: 'no odometer PID + no speed samples → GPS is the source');
+      // …and the start time was back-filled from the first GPS fix even
+      // though no OBD2 sample ever set it.
+      expect(entry.summary.startedAt, isNotNull,
+          reason: 'startedAt must be recovered from the first GPS fix when '
+              'the OBD2 link delivered no speed/RPM sample');
     },
   );
 }

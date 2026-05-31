@@ -6147,6 +6147,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Starting recording…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Share with another account';
 
   @override
@@ -12692,6 +12696,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripRecordingConnectingTitle => '⟦Šŧářŧîñǧ řéçóřđîñǧ… ········⟧';
+
+  @override
+  String get tripRecordingDiscardedNoMovement =>
+      '⟦Řéçóřđîñǧ đîšçářđéđ — ñó ɱóṽéɱéñŧ đéŧéçŧéđ ················⟧';
 
   @override
   String get tripShareAction => '⟦Šĥářé ŵîŧĥ áñóŧĥéř áççóúñŧ ··········⟧';

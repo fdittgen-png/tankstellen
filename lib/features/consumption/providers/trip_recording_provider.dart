@@ -921,7 +921,11 @@ class TripRecording extends _$TripRecording {
   /// Shared by both pipelines through the [RecordingPipelineHost]: the
   /// OBD2 pipeline passes the baseline vehicle id + the adapter identity
   /// it snapshotted at start (#1312); the GPS-only path leaves them null.
-  Future<void> _saveToHistory(
+  ///
+  /// Returns the [TripPersistOutcome] so the caller can surface a
+  /// "no movement detected" notice on a genuine stationary discard and
+  /// stay silent on a save (#2509).
+  Future<TripPersistOutcome> _saveToHistory(
     TripSummary summary, {
     bool automatic = false,
     List<TripSample> samples = const [],
@@ -930,20 +934,47 @@ class TripRecording extends _$TripRecording {
     String? adapterMac,
     String? adapterName,
     String? adapterFirmware,
+    int gpsFixCount = 0,
   }) async {
-    // Skip stub trips so they never clutter history (#1923). A trip is
-    // a stub when the recorder never received a sample (`startedAt`
-    // null — service disconnected immediately) OR it covered no
-    // distance (a false-start: Stop tapped, or the adapter dropped,
-    // before the car moved). The pre-#1923 guard required *both* —
-    // `distanceKm < 0.01 && startedAt == null` — so a 20-second 0 km
-    // false-start that did capture a few idle samples still landed in
-    // history. A real trip always has both a `startedAt` and a
-    // non-zero distance, so this never discards a genuine drive.
-    if (summary.startedAt == null || summary.distanceKm < 0.01) return;
+    // Skip stub trips so they never clutter history (#1923) — but ONLY
+    // when there was genuinely no movement and no usable signal.
+    //
+    // #2509 — the pre-fix guard `startedAt == null || distanceKm < 0.01`
+    // was a *disjunction*, so a real GPS-tracked drive whose OBD2 link was
+    // dead the whole session was silently discarded: no speed/RPM sample
+    // ever reached the recorder, so its `startedAt` stayed null even
+    // though GPS fixes integrated into a real resolver distance. The
+    // controller now back-fills `startedAt` from the first GPS fix
+    // ([_finaliseSummary]); here we tighten the guard to the conjunction
+    // #1923 actually intends — discard only when there is no meaningful
+    // signal at all: zero distance AND (no start time OR no samples and no
+    // GPS fixes). A trip with distance ≥ 0.01 km always persists, even
+    // when its `startedAt` came from GPS rather than an OBD2 sample.
+    final hasNoSignal = summary.startedAt == null ||
+        (samples.isEmpty && gpsFixCount == 0);
+    if (summary.distanceKm < 0.01 && hasNoSignal) {
+      // No silent discard (#2509): record WHY so a regression of the
+      // silent-data-loss bug surfaces in the error log, and let the caller
+      // surface a "no movement detected" notice to the user.
+      unawaited(errorLogger.log(
+        ErrorLayer.providers,
+        StateError('trip discarded — no movement detected'),
+        StackTrace.current,
+        context: {
+          'where': 'TripRecording._saveToHistory discard',
+          'reason': 'no-movement',
+          'distanceKm': summary.distanceKm.toStringAsFixed(4),
+          'distanceSource': summary.distanceSource,
+          'sampleCount': samples.length.toString(),
+          'gpsFixCount': gpsFixCount.toString(),
+          'hadStartedAt': (summary.startedAt != null).toString(),
+        },
+      ));
+      return TripPersistOutcome.discardedNoMovement;
+    }
     try {
       final repo = ref.read(tripHistoryRepositoryProvider);
-      if (repo == null) return;
+      if (repo == null) return TripPersistOutcome.saved;
       final id = summary.startedAt?.toIso8601String() ??
           DateTime.now().toIso8601String();
       await repo.save(TripHistoryEntry(
@@ -1009,6 +1040,10 @@ class TripRecording extends _$TripRecording {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording._saveToHistory'}));
     }
+    // #2509 — the trip reached the history write (or a best-effort
+    // sub-step failed and was logged above); either way it was not a
+    // stationary discard, so the stop UI shows no "no movement" notice.
+    return TripPersistOutcome.saved;
   }
 
   /// Refine the trip's vehicle physicsScale from OBD2 ground truth
@@ -1129,7 +1164,7 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   String? readActiveVehicleId() => _n._tryReadActiveVehicle()?.id;
 
   @override
-  Future<void> saveToHistory(
+  Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
     bool automatic = false,
     List<TripSample> samples = const [],
@@ -1138,6 +1173,7 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
     String? adapterMac,
     String? adapterName,
     String? adapterFirmware,
+    int gpsFixCount = 0,
   }) =>
       _n._saveToHistory(
         summary,
@@ -1148,6 +1184,7 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
         adapterMac: adapterMac,
         adapterName: adapterName,
         adapterFirmware: adapterFirmware,
+        gpsFixCount: gpsFixCount,
       );
 
   // #2227 — WAL snapshot hooks driven by the OBD2 pipeline. The
