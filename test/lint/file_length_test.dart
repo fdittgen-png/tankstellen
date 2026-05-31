@@ -231,7 +231,13 @@ void main() {
     // a plain MarkerLayer with the top-ranked stations emphasized; only a
     // huge/zoomed-far set falls back to clustering). Net +18 is the helper,
     // the constants and their dartdoc. Decomposition tracked by #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 562,
+    // #2532 — re-grandfathered 562 → 574: the optional `onStationTap` field
+    // (so a wide-screen marker tap selects into the side panel instead of
+    // pushing the route) + its dartdoc, its constructor param, its pass-down
+    // in `_recomputeMarkers`, and the `didUpdateWidget` identity guard that
+    // rebuilds markers on a changed callback. Decomposition tracked by
+    // #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 574,
     // #2382 — +5 for Feature.approachOverlay's three per-feature switch
     // cases (label / description / blocked-enable). Intrinsic per-feature
     // growth in this switch-based section; full decomposition is its own

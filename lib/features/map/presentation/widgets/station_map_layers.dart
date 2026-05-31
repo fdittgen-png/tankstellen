@@ -78,6 +78,13 @@ class StationMapLayers extends StatefulWidget {
   /// EV charging station overlay.
   final List<Widget> extraLayers;
 
+  /// Overrides what a station marker tap does (#2532). When null the marker
+  /// pushes the full `/station/:id` route (the compact phone behaviour,
+  /// unchanged). On a wide screen [MapScreen] supplies a callback that
+  /// selects the station into the side-panel detail via
+  /// `selectedStationProvider` instead of navigating away.
+  final void Function(String stationId)? onStationTap;
+
   const StationMapLayers({
     super.key,
     required this.mapController,
@@ -93,6 +100,7 @@ class StationMapLayers extends StatefulWidget {
     this.showSearchRadius = true,
     this.selectedStationIds,
     this.extraLayers = const [],
+    this.onStationTap,
   });
 
   @override
@@ -301,6 +309,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
         _priceRange.$2,
         pastel: isPastel,
         compact: !emphasized.contains(station.id),
+        onStationTap: widget.onStationTap,
       );
     }).toList();
   }
@@ -326,7 +335,10 @@ class _StationMapLayersState extends State<StationMapLayers> {
     if (stationsChanged ||
         oldWidget.selectedFuel != widget.selectedFuel ||
         oldWidget.sortMode != widget.sortMode ||
-        !identical(oldWidget.selectedStationIds, widget.selectedStationIds)) {
+        !identical(oldWidget.selectedStationIds, widget.selectedStationIds) ||
+        // #2532 — the tap handler is baked into each marker, so a changed
+        // callback identity (e.g. compact→wide swap) must rebuild them.
+        !identical(oldWidget.onStationTap, widget.onStationTap)) {
       _recomputeMarkers();
     }
 

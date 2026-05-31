@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -161,78 +162,155 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
           onPressed: _navigateToStation,
         ),
       ],
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom + 24),
-        children: [
-          EVStationHeaderCard(station: station, evColor: evColor),
-          const SizedBox(height: 8),
-          EVAddressCard(station: station),
-          const SizedBox(height: 8),
-          EVConnectorsCard(station: station, evColor: evColor),
-          const SizedBox(height: 8),
-          EVPricingCard(station: station, evColor: evColor),
-          const SizedBox(height: 8),
-          EVLastUpdatedCard(station: station),
-          const SizedBox(height: 8),
-
-          // Rating
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n?.yourRating ?? 'Your rating',
-                      style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  Consumer(builder: (context, ref, _) {
-                    final rating = ref.watch(stationRatingProvider(station.id));
-                    return Row(
-                      children: [
-                        StarRating(
-                          rating: rating,
-                          onRatingChanged: (stars) {
-                            ref.read(stationRatingsProvider.notifier).rate(station.id, stars);
-                          },
-                        ),
-                        if (rating != null) ...[
-                          const SizedBox(width: 12),
-                          Text('$rating/5', style: theme.textTheme.bodyMedium),
-                        ],
-                      ],
-                    );
-                  }),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Log-charging button — primary wheel-lens action (#582 phase 3).
-          FilledButton.icon(
-            key: const Key('ev_log_charging_button'),
-            onPressed: _logCharging,
-            icon: const Icon(Icons.ev_station),
-            label: Text(l10n?.chargingLogButtonLabel ?? 'Log charging'),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(48),
-              backgroundColor: evColor,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Navigate button
-          FilledButton.icon(
-            onPressed: _navigateToStation,
-            icon: const Icon(Icons.navigation),
-            label: Text(l10n?.evNavigateToStation ?? 'Navigate to station'),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(48),
-              backgroundColor: evColor.withValues(alpha: 0.85),
-            ),
-          ),
-        ],
-      ),
+      // #2532 — on medium / expanded screens the single column just stretches
+      // the portrait layout, wasting the width. The two-pane Row puts the
+      // header + address on the LEFT and the connectors / pricing / rating /
+      // actions on the RIGHT, each pane self-scrolling. Compact is unchanged.
+      body: screenSizeOf(context) != ScreenSize.compact
+          ? _wideBody(context, theme, l10n, station, evColor)
+          : _compactBody(context, theme, l10n, station, evColor),
     );
+  }
+
+  /// The portrait single-column body — byte-for-byte the pre-#2532 layout.
+  Widget _compactBody(
+    BuildContext context,
+    ThemeData theme,
+    AppLocalizations? l10n,
+    ChargingStation station,
+    Color evColor,
+  ) {
+    return ListView(
+      padding: EdgeInsets.fromLTRB(
+          16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom + 24),
+      children: [
+        ..._headerSections(station, evColor),
+        const SizedBox(height: 8),
+        ..._detailSections(context, theme, l10n, station, evColor),
+      ],
+    );
+  }
+
+  /// The medium / expanded two-pane body (#2532). LEFT (flex 2) = the header
+  /// + address cards; RIGHT (flex 3) = connectors, pricing, last-updated,
+  /// rating and the log / navigate actions. The SAME section widgets are
+  /// reused — only the container changes (mirrors the #2531 fuel pattern).
+  Widget _wideBody(
+    BuildContext context,
+    ThemeData theme,
+    AppLocalizations? l10n,
+    ChargingStation station,
+    Color evColor,
+  ) {
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 2,
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding),
+            children: _headerSections(station, evColor),
+          ),
+        ),
+        const VerticalDivider(width: 1),
+        Expanded(
+          flex: 3,
+          child: ListView(
+            padding:
+                EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding + 24),
+            children: _detailSections(context, theme, l10n, station, evColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// LEFT-pane sections — the station header + address. Shared by both
+  /// layouts.
+  List<Widget> _headerSections(ChargingStation station, Color evColor) {
+    return [
+      EVStationHeaderCard(station: station, evColor: evColor),
+      const SizedBox(height: 8),
+      EVAddressCard(station: station),
+    ];
+  }
+
+  /// RIGHT-pane sections — connectors, pricing, last-updated, the rating
+  /// card and the log / navigate action buttons. Shared by both layouts.
+  List<Widget> _detailSections(
+    BuildContext context,
+    ThemeData theme,
+    AppLocalizations? l10n,
+    ChargingStation station,
+    Color evColor,
+  ) {
+    return [
+      EVConnectorsCard(station: station, evColor: evColor),
+      const SizedBox(height: 8),
+      EVPricingCard(station: station, evColor: evColor),
+      const SizedBox(height: 8),
+      EVLastUpdatedCard(station: station),
+      const SizedBox(height: 8),
+
+      // Rating
+      Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n?.yourRating ?? 'Your rating',
+                  style: theme.textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Consumer(builder: (context, ref, _) {
+                final rating = ref.watch(stationRatingProvider(station.id));
+                return Row(
+                  children: [
+                    StarRating(
+                      rating: rating,
+                      onRatingChanged: (stars) {
+                        ref
+                            .read(stationRatingsProvider.notifier)
+                            .rate(station.id, stars);
+                      },
+                    ),
+                    if (rating != null) ...[
+                      const SizedBox(width: 12),
+                      Text('$rating/5', style: theme.textTheme.bodyMedium),
+                    ],
+                  ],
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 8),
+
+      // Log-charging button — primary wheel-lens action (#582 phase 3).
+      FilledButton.icon(
+        key: const Key('ev_log_charging_button'),
+        onPressed: _logCharging,
+        icon: const Icon(Icons.ev_station),
+        label: Text(l10n?.chargingLogButtonLabel ?? 'Log charging'),
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(48),
+          backgroundColor: evColor,
+        ),
+      ),
+      const SizedBox(height: 8),
+
+      // Navigate button
+      FilledButton.icon(
+        onPressed: _navigateToStation,
+        icon: const Icon(Icons.navigation),
+        label: Text(l10n?.evNavigateToStation ?? 'Navigate to station'),
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(48),
+          backgroundColor: evColor.withValues(alpha: 0.85),
+        ),
+      ),
+    ];
   }
 }
