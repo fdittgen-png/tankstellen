@@ -3230,5 +3230,25 @@
   "@calculatorResultPlaceholder": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "tripSaveProgressFinalizingSummary": "Finalizing summary…",
+  "@tripSaveProgressFinalizingSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripSaveProgressSavingToHistory": "Saving to history…",
+  "@tripSaveProgressSavingToHistory": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripSaveProgressSyncingToCloud": "Syncing in background…",
+  "@tripSaveProgressSyncingToCloud": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripRecordingSavingTitle": "Saving trip…",
+  "@tripRecordingSavingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -2774,6 +2774,9 @@
   "tripStartProgressConnectingAdapter": "Verbinde mit OBD2-Adapter…",
   "tripStartProgressReadingVehicleData": "Fahrzeugdaten werden gelesen…",
   "tripStartProgressStartingRecording": "Aufzeichnung wird gestartet…",
+  "tripSaveProgressFinalizingSummary": "Zusammenfassung wird erstellt…",
+  "tripSaveProgressSavingToHistory": "Wird im Verlauf gespeichert…",
+  "tripSaveProgressSyncingToCloud": "Wird im Hintergrund synchronisiert…",
   "trajetsEmptyStateTitle": "Noch keine Fahrten",
   "trajetsEmptyStateBody": "Tippe auf „Aufzeichnung starten“, um deine Fahrten zu protokollieren.",
   "trajetsRowDistance": "{km} km",
@@ -2867,6 +2870,7 @@
   "tripRecordingAutoPinTitle": "Beim Aufnahmestart immer anpinnen",
   "tripRecordingAutoPinSubtitle": "Das Formular bei jeder Fahrt automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.",
   "tripRecordingConnectingTitle": "Aufnahme wird gestartet …",
+  "tripRecordingSavingTitle": "Fahrt wird gespeichert…",
   "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt",
   "tripShareAction": "Mit anderem Konto teilen",
   "@tripShareAction": {

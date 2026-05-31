@@ -6219,6 +6219,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Rögzítés indítása…';
 
   @override
+  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+
+  @override
+  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+
+  @override
+  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Még nincs út';
 
   @override
@@ -6472,6 +6481,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tripRecordingConnectingTitle => 'Felvétel indítása…';
+
+  @override
+  String get tripRecordingSavingTitle => 'Saving trip…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>

@@ -21,5 +21,6 @@
   "tripRecordingAutoPinTitle": "Beim Aufnahmestart immer anpinnen",
   "tripRecordingAutoPinSubtitle": "Das Formular bei jeder Fahrt automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.",
   "tripRecordingConnectingTitle": "Aufnahme wird gestartet …",
+  "tripRecordingSavingTitle": "Fahrt wird gespeichert…",
   "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt"
 }

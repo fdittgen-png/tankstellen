@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/entities/trip_save_stage.dart';
 import '../domain/trip_recorder.dart';
 import 'trip_recording_state.dart';
 
@@ -124,6 +125,16 @@ abstract class RecordingPipelineHost {
     String? adapterFirmware,
     int gpsFixCount,
   });
+
+  /// #2548 — flip the notifier into the transient
+  /// [TripRecordingPhase.saving] phase and advance the inline
+  /// [TripSaveProgress] card to [stage]. The stop-side mirror of the
+  /// start path's `setConnectStage`: each pipeline's `stop()` calls this
+  /// before its major teardown steps (finalise → history write → cloud
+  /// sync) so the ~300-700 ms save shows staged feedback instead of a
+  /// frozen swap to the summary. The phase is deliberately non-active,
+  /// so the recording banner does not resurface mid-save.
+  void setSaveStage(TripSaveStage stage);
 }
 
 /// Outcome of a [RecordingPipelineHost.saveToHistory] call (#2509).

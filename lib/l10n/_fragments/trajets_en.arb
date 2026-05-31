@@ -23,6 +23,18 @@
   "@tripStartProgressStartingRecording": {
     "description": "Status label shown on the Trips tab in the final moment before pushing to the live recording screen."
   },
+  "tripSaveProgressFinalizingSummary": "Finalizing summary…",
+  "@tripSaveProgressFinalizingSummary": {
+    "description": "Status label on the inline save-progress card shown on the trip-recording screen after the user taps Stop, while the trip summary is being finalised — odometer refresh / summary build (#2548). The stop-side bookend to the start-progress labels. Indeterminate, never a percentage."
+  },
+  "tripSaveProgressSavingToHistory": "Saving to history…",
+  "@tripSaveProgressSavingToHistory": {
+    "description": "Status label on the inline save-progress card shown on the trip-recording screen after the user taps Stop, while the finished trip is being written to the local history log (#2548). Indeterminate, never a percentage."
+  },
+  "tripSaveProgressSyncingToCloud": "Syncing in background…",
+  "@tripSaveProgressSyncingToCloud": {
+    "description": "Status label on the inline save-progress card shown on the trip-recording screen after the user taps Stop, while the saved trip is handed to the cloud sync upload (#2548). Worded 'in background' on purpose: the upload is fire-and-forget (unawaited), so this beat never blocks the resolve to the summary, and it is only shown when cloud sync is enabled. Indeterminate, never a percentage."
+  },
   "trajetsEmptyStateTitle": "No trips yet",
   "@trajetsEmptyStateTitle": {
     "description": "Empty-state title on the Trips tab when no trips have been recorded (#889)."
