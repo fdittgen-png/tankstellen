@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "kind": "pump",
+  "capturedAt": "2026-05-31T09:00:00.000Z",
+  "input": {
+    "country": "FR",
+    "profile": {
+      "country": "FR",
+      "currency": "EUR",
+      "decimalSeparator": ",",
+      "priceMin": 0.5,
+      "priceMax": 4.0,
+      "volumeMax": 200.0,
+      "totalMax": 500.0
+    }
+  },
+  "mlkit": {
+    "flatText": "PRIX 18,59 VOLUME 23,30 PRIX DU LITRE 0,798 Note du service de la Métrologie TOKHEIM Vmin = 5L",
+    "blocks": [
+      { "text": "PRIX", "box": [40, 100, 130, 130] },
+      { "text": "18,59", "box": [40, 140, 200, 185] },
+      { "text": "VOLUME", "box": [40, 220, 170, 250] },
+      { "text": "23,30", "box": [40, 260, 200, 305] },
+      { "text": "PRIX DU LITRE", "box": [40, 340, 230, 370] },
+      { "text": "0,798", "box": [40, 380, 180, 420] },
+      { "text": "Note du service de la Métrologie", "box": [400, 20, 720, 50] },
+      { "text": "Seules les indications de prix", "box": [400, 55, 760, 80] },
+      { "text": "TOKHEIM", "box": [300, 600, 460, 660] },
+      { "text": "Vmin = 5L", "box": [700, 20, 820, 55] },
+      { "text": "3", "box": [720, 600, 760, 660] }
+    ]
+  },
+  "classification": [
+    { "text": "PRIX", "kind": "label", "field": "total", "weight": 4 },
+    { "text": "18,59", "kind": "numeric", "value": 18.59, "decimals": 2 },
+    { "text": "VOLUME", "kind": "label", "field": "volume", "weight": 12 },
+    { "text": "23,30", "kind": "numeric", "value": 23.3, "decimals": 2 },
+    { "text": "PRIX DU LITRE", "kind": "label", "field": "pricePerLitre", "weight": 30 },
+    { "text": "0,798", "kind": "numeric", "value": 0.798, "decimals": 3 }
+  ],
+  "anchors": [
+    {
+      "labelField": "pricePerLitre",
+      "labelText": "PRIX DU LITRE",
+      "numericValue": 0.798,
+      "sqDistance": 2500,
+      "chosen": true
+    },
+    {
+      "labelField": "total",
+      "labelText": "PRIX",
+      "numericValue": 18.59,
+      "sqDistance": 1600,
+      "chosen": true
+    },
+    {
+      "labelField": "volume",
+      "labelText": "VOLUME",
+      "numericValue": 23.3,
+      "sqDistance": 1600,
+      "chosen": true
+    }
+  ],
+  "crossCheck": {
+    "total": 18.59,
+    "volume": 23.3,
+    "price": 0.798,
+    "derivedPath": "none"
+  },
+  "confidence": {
+    "hasTotal": true,
+    "hasVolume": true,
+    "hasPrice": true,
+    "isConsistent": true,
+    "total": 1.0
+  },
+  "gate": {
+    "checks": [
+      { "name": "totalRange", "passed": true },
+      { "name": "volumeRange", "passed": true },
+      { "name": "priceRange", "passed": true },
+      { "name": "identity", "passed": true }
+    ],
+    "reason": "consistent",
+    "accepted": true,
+    "identityDelta": 0.003
+  },
+  "result": {
+    "totalCost": 18.59,
+    "liters": 23.3,
+    "pricePerLiter": 0.798,
+    "derived": [],
+    "confidence": 1.0,
+    "validated": true,
+    "validationReason": "consistent"
+  },
+  "expected": {
+    "totalCost": 18.59,
+    "liters": 23.3,
+    "pricePerLiter": 0.798,
+    "derived": []
+  },
+  "image": {
+    "fileName": "fr_tokheim_18_59eur_23_30l.jpg",
+    "base64": ""
+  }
+}

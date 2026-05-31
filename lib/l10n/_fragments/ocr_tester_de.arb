@@ -40,5 +40,7 @@
   "ocrTesterCopyJson": "Als JSON kopieren",
   "ocrTesterExportPackage": "Paket exportieren",
   "ocrTesterCopied": "OCR-Trace in die Zwischenablage kopiert.",
-  "ocrTesterExported": "OCR-Paket im Downloads-Ordner gespeichert."
+  "ocrTesterExported": "OCR-Paket im Downloads-Ordner gespeichert.",
+  "ocrTesterSaveFixture": "Als Fixture speichern",
+  "ocrTesterFixtureSaved": "Fixture im Downloads-Ordner gespeichert. Nach test/fixtures verschieben und tool/promote_ocr_fixture.dart ausführen."
 }

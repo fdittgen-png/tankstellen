@@ -101,6 +101,111 @@ class OcrTesterExport {
     return ok;
   }
 
+  /// Saves [package] as a regression FIXTURE (#2519): a slugged source
+  /// image (`<slug>.jpg`) plus a `<slug>.ocrpkg.json` whose `expected`
+  /// block is filled from the final read (hand-correctable after export).
+  /// Both land in the device Downloads folder; the maintainer then moves
+  /// the pair under `test/fixtures/pump_displays/` and runs
+  /// `tool/promote_ocr_fixture.dart` to generate the pure-Dart replay test.
+  ///
+  /// Returns the slug used (for the snackbar / a test assertion), or null
+  /// when there was no image to anchor the fixture on.
+  static Future<String?> saveAsFixture(OcrTracePackage package) async {
+    final image = package.image;
+    if (image == null) return null;
+    final slug = fixtureSlug(package);
+
+    // Fold the final read into `expected` so the generated test asserts
+    // it; the maintainer hand-corrects the JSON if the read was wrong.
+    final withExpected = _withExpectedFromResult(package, image, slug);
+    final json = formatOcrTracePackageJson(withExpected);
+
+    try {
+      await PublicFileExporter.saveBytesToDownloads(
+        bytes: base64Decode(image.base64),
+        fileName: '$slug.jpg',
+        mimeType: 'image/jpeg',
+      );
+    } on Object catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OcrTesterExport.saveAsFixture: image write',
+      }));
+    }
+    try {
+      await PublicFileExporter.saveTextToDownloads(
+        text: json,
+        fileName: '$slug.ocrpkg.json',
+        mimeType: 'application/json',
+      );
+    } on Object catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'OcrTesterExport.saveAsFixture: json write',
+      }));
+    }
+    return slug;
+  }
+
+  /// Builds the fixture slug from the country + read values, mirroring the
+  /// committed `fr_tokheim_18_59eur_23_30l` naming so a maintainer can drop
+  /// the pair straight into `test/fixtures/pump_displays/`.
+  static String fixtureSlug(OcrTracePackage package) {
+    final parts = <String>[package.kind.name];
+    final country = package.input.country;
+    if (country != null && country.isNotEmpty) {
+      parts.add(country.toLowerCase());
+    }
+    final r = package.result;
+    if (r?.totalCost != null) parts.add('${_money(r!.totalCost!)}eur');
+    if (r?.liters != null) parts.add('${_money(r!.liters!)}l');
+    if (parts.length == 1) {
+      // No read to describe — fall back to a timestamp so two captures of
+      // an unreadable display don't collide.
+      parts.add(package.capturedAt.millisecondsSinceEpoch.toString());
+    }
+    return parts.join('_');
+  }
+
+  /// Formats a money/volume double into a slug fragment: `18.59` → `18_59`.
+  static String _money(double v) =>
+      v.toStringAsFixed(2).replaceAll('.', '_');
+
+  /// Returns a copy of [package] with `expected` seeded from `result` (when
+  /// not already set) and the image filename pinned to `<slug>.jpg` so the
+  /// generator's sibling-image lookup finds the committed source.
+  static OcrTracePackage _withExpectedFromResult(
+    OcrTracePackage package,
+    OcrTraceImage image,
+    String slug,
+  ) {
+    final r = package.result;
+    final expected = package.expected ??
+        (r == null
+            ? null
+            : OcrTraceExpected(
+                totalCost: r.totalCost,
+                liters: r.liters,
+                pricePerLiter: r.pricePerLiter,
+              ));
+    return OcrTracePackage(
+      kind: package.kind,
+      capturedAt: package.capturedAt,
+      input: package.input,
+      preprocess: package.preprocess,
+      mlkit: package.mlkit,
+      classification: package.classification,
+      assembledLabels: package.assembledLabels,
+      anchors: package.anchors,
+      magnitudeFallback: package.magnitudeFallback,
+      crossCheck: package.crossCheck,
+      confidence: package.confidence,
+      gate: package.gate,
+      receipt: package.receipt,
+      result: package.result,
+      expected: expected,
+      image: OcrTraceImage(fileName: '$slug.jpg', base64: image.base64),
+    );
+  }
+
   /// Routes the JSON to the widget-test share seam only (production has no
   /// sink installed → no-op). The real Downloads write happens once in the
   /// caller, mirroring the #2236 single-write contract.

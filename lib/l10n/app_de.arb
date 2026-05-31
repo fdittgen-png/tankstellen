@@ -2612,6 +2612,8 @@
   "ocrTesterExportPackage": "Paket exportieren",
   "ocrTesterCopied": "OCR-Trace in die Zwischenablage kopiert.",
   "ocrTesterExported": "OCR-Paket im Downloads-Ordner gespeichert.",
+  "ocrTesterSaveFixture": "Als Fixture speichern",
+  "ocrTesterFixtureSaved": "Fixture im Downloads-Ordner gespeichert. Nach test/fixtures verschieben und tool/promote_ocr_fixture.dart ausführen.",
   "onboardingObd2StepTitle": "OBD2-Adapter verbinden",
   "onboardingObd2StepBody": "Stecke deinen OBD2-Adapter in den Anschluss des Fahrzeugs und schalte die Zündung ein. Wir lesen die VIN aus und füllen die Motordaten automatisch.",
   "onboardingObd2ConnectButton": "Adapter verbinden",

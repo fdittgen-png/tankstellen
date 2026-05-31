@@ -3115,5 +3115,15 @@
   "@obd2HealthCopyInitTranscript": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "ocrTesterSaveFixture": "Save as fixture",
+  "@ocrTesterSaveFixture": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "@ocrTesterFixtureSaved": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

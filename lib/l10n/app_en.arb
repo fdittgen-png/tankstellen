@@ -4743,6 +4743,14 @@
   "@ocrTesterExported": {
     "description": "Snackbar confirming the OCR trace package (image + JSON) was saved to Downloads (#2518)."
   },
+  "ocrTesterSaveFixture": "Save as fixture",
+  "@ocrTesterSaveFixture": {
+    "description": "Button that saves the current OCR trace as a regression fixture — the source image plus a .ocrpkg.json with expected values — into the device Downloads folder, ready to commit and run through the fixture-promotion generator (#2519)."
+  },
+  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "@ocrTesterFixtureSaved": {
+    "description": "Snackbar confirming the OCR regression fixture (source image + .ocrpkg.json) was saved to Downloads, with a hint on the next step (#2519)."
+  },
   "onboardingObd2StepTitle": "Connect your OBD2 adapter",
   "@onboardingObd2StepTitle": {
     "description": "Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile."
