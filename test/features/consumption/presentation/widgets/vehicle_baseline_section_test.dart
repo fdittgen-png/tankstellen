@@ -18,14 +18,37 @@ const _vehicleId = 'car-a';
 /// the per-situation row view (#779) keep their assertions valid
 /// after the #1529 collapse-by-default change. Default-collapsed
 /// behaviour gets its own dedicated test below.
-Widget _host({int fullConfidenceSamples = 30}) => SizedBox(
-      width: 600,
-      child: VehicleBaselineSection(
+Widget _host({int fullConfidenceSamples = 30}) => _scroll(
+      VehicleBaselineSection(
         vehicleId: _vehicleId,
         fullConfidenceSamples: fullConfidenceSamples,
         expandDetailsByDefault: true,
       ),
     );
+
+/// Wrap the section in a width-bounded, vertically-scrollable host so
+/// the now-9-row expanded breakdown (#2515) doesn't overflow the 800×600
+/// test surface and trip a RenderFlex layout assertion. Finders + taps
+/// still resolve against the element tree regardless of viewport.
+Widget _scroll(Widget child) => SizedBox(
+      width: 600,
+      child: SingleChildScrollView(child: child),
+    );
+
+/// The nine persistent driving situations the section renders (#779 +
+/// the three #2515 buckets), all pinned to [count]. Saves repeating the
+/// full map in the "fully calibrated" tests.
+Map<DrivingSituation, int> _allAt(int count) => {
+      DrivingSituation.idle: count,
+      DrivingSituation.stopAndGo: count,
+      DrivingSituation.urbanCruise: count,
+      DrivingSituation.highwayCruise: count,
+      DrivingSituation.deceleration: count,
+      DrivingSituation.climbingOrLoaded: count,
+      DrivingSituation.coldStartWarmup: count,
+      DrivingSituation.sustainedLoadOrTowing: count,
+      DrivingSituation.partialThrottleDecel: count,
+    };
 
 /// Build the override that pins the baseline summary to a specific
 /// per-situation count map. Saves repeating `.overrideWithValue(...)`
@@ -45,8 +68,8 @@ void main() {
         overrides: [_summaryOverride(const {})],
       );
 
-      // All 6 persisted situations render at 0/30.
-      expect(find.text('0/30'), findsNWidgets(6));
+      // All 9 persisted situations render at 0/30 (#2515 added 3).
+      expect(find.text('0/30'), findsNWidgets(9));
 
       // Empty-state copy mentions OBD2 trips.
       expect(find.textContaining('OBD2 trip'), findsOneWidget);
@@ -83,8 +106,8 @@ void main() {
             find.byType(LinearProgressIndicator),
           )
           .toList();
-      // 6 per-situation bars + 1 aggregate bar (#1529).
-      expect(bars.length, 7);
+      // 9 per-situation bars + 1 aggregate bar (#1529 / #2515).
+      expect(bars.length, 10);
       // One of the per-situation bars must be at 0.5 — exact ordering
       // is the widget's concern, not the test's.
       expect(
@@ -92,10 +115,10 @@ void main() {
         1,
         reason: 'urbanCruise row should render at 50% progress',
       );
-      // The other 5 per-situation bars are at 0; the aggregate bar
-      // sits at 15 / (6 × 30) ≈ 0.083 — neither 0 nor 0.5 — so it
+      // The other 8 per-situation bars are at 0; the aggregate bar
+      // sits at 15 / (9 × 30) ≈ 0.056 — neither 0 nor 0.5 — so it
       // doesn't disturb either count.
-      expect(bars.where((b) => (b.value ?? -1) == 0.0).length, 5);
+      expect(bars.where((b) => (b.value ?? -1) == 0.0).length, 8);
     });
 
     testWidgets(
@@ -156,7 +179,7 @@ void main() {
     });
 
     testWidgets(
-        'all 6 persisted situations render — transients (hardAccel, '
+        'all 9 persisted situations render — transients (hardAccel, '
         'fuelCutCoast) must NOT appear because they never accumulate '
         'samples and would mislead the user about calibration scope',
         (tester) async {
@@ -166,26 +189,29 @@ void main() {
         overrides: [_summaryOverride(const {})],
       );
 
-      // Six persisted-situation labels.
+      // Nine persisted-situation labels (#779 six + #2515 three).
       expect(find.text('Idle'), findsOneWidget);
       expect(find.text('Stop & go'), findsOneWidget);
       expect(find.text('Urban'), findsOneWidget);
       expect(find.text('Highway'), findsOneWidget);
       expect(find.text('Decelerating'), findsOneWidget);
       expect(find.text('Climbing / loaded'), findsOneWidget);
+      expect(find.text('Cold start'), findsOneWidget);
+      expect(find.text('Sustained load / towing'), findsOneWidget);
+      expect(find.text('Coasting'), findsOneWidget);
 
       // Transient enum names should never leak into the UI.
       expect(find.text('hardAccel'), findsNothing);
       expect(find.text('fuelCutCoast'), findsNothing);
 
-      // 6 per-situation bars + 1 aggregate progress bar (#1529).
-      expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
+      // 9 per-situation bars + 1 aggregate progress bar (#1529 / #2515).
+      expect(find.byType(LinearProgressIndicator), findsNWidgets(10));
     });
 
     testWidgets(
       '#1529 — per-situation rows are HIDDEN by default; show-details '
       'toggle reveals them and bumps the bar count from 1 (aggregate) '
-      'to 7',
+      'to 10',
       (tester) async {
         // No `expandDetailsByDefault` override — this is the production
         // default the user sees on the vehicle-edit screen. Every bucket
@@ -193,20 +219,8 @@ void main() {
         // fire; this isolates the pure collapse-by-default behaviour.
         await pumpApp(
           tester,
-          const SizedBox(
-            width: 600,
-            child: VehicleBaselineSection(vehicleId: _vehicleId),
-          ),
-          overrides: [
-            _summaryOverride(const {
-              DrivingSituation.idle: 30,
-              DrivingSituation.stopAndGo: 30,
-              DrivingSituation.urbanCruise: 30,
-              DrivingSituation.highwayCruise: 30,
-              DrivingSituation.deceleration: 30,
-              DrivingSituation.climbingOrLoaded: 30,
-            }),
-          ],
+          _scroll(const VehicleBaselineSection(vehicleId: _vehicleId)),
+          overrides: [_summaryOverride(_allAt(30))],
         );
         // Only the aggregate progress bar in the collapsed view.
         expect(find.byType(LinearProgressIndicator), findsOneWidget);
@@ -223,8 +237,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // 1 aggregate + 6 per-situation = 7 bars; labels visible.
-        expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
+        // 1 aggregate + 9 per-situation = 10 bars; labels visible (#2515).
+        expect(find.byType(LinearProgressIndicator), findsNWidgets(10));
         expect(find.text('Idle'), findsOneWidget);
       },
     );
@@ -250,6 +264,10 @@ void main() {
       final btn = tester.widget<TextButton>(reset);
       expect(btn.onPressed, isNotNull);
 
+      // #2515 — the breakdown is now 9 rows; scroll the reset button
+      // (at the bottom) into view before tapping it.
+      await tester.ensureVisible(reset);
+      await tester.pumpAndSettle();
       await tester.tap(reset);
       await tester.pumpAndSettle();
 
@@ -281,6 +299,9 @@ void main() {
         ],
       );
 
+      await tester.ensureVisible(
+          find.byKey(const Key('resetBaselinesButton')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('resetBaselinesButton')));
       await tester.pumpAndSettle();
 
@@ -315,6 +336,9 @@ void main() {
         ],
       );
 
+      await tester.ensureVisible(
+          find.byKey(const Key('resetBaselinesButton')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('resetBaselinesButton')));
       await tester.pumpAndSettle();
 
@@ -391,19 +415,16 @@ void main() {
       await pumpApp(
         tester,
         // Production default (collapsed) so we exercise the real path.
-        const SizedBox(
-          width: 600,
-          child: VehicleBaselineSection(vehicleId: _vehicleId),
-        ),
+        _scroll(const VehicleBaselineSection(vehicleId: _vehicleId)),
         overrides: [
           _summaryOverride(const {
             // Mirrors the field report: urban massively over-filled,
-            // a couple of buckets healthy, two stuck at 0.
+            // a couple of buckets healthy, the rest stuck at 0.
             DrivingSituation.idle: 30,
             DrivingSituation.urbanCruise: 224000,
             DrivingSituation.highwayCruise: 30,
             DrivingSituation.deceleration: 30,
-            // stopAndGo + climbingOrLoaded absent → 0/30.
+            // stopAndGo + climbingOrLoaded + the 3 #2515 buckets → 0/30.
           }),
         ],
       );
@@ -411,11 +432,12 @@ void main() {
       final bar = tester.widget<LinearProgressIndicator>(
         find.byKey(const Key('vehicleBaselineAggregateBar')),
       );
-      // Coverage = (30 + 30 + 30 + 30 + 0 + 0) capped / (6 × 30)
-      //          = 120 / 180 ≈ 0.667 — NEVER 1.0 while a bucket is 0.
+      // Coverage = (30 + 30 + 30 + 30, the 5 empty buckets contribute 0)
+      //          capped / (9 × 30) = 120 / 270 ≈ 0.444 — NEVER 1.0 while
+      //          a bucket is 0.
       expect(bar.value, isNotNull);
       expect(bar.value!, lessThan(1.0));
-      expect(bar.value!, closeTo(120 / 180, 0.0001));
+      expect(bar.value!, closeTo(120 / 270, 0.0001));
     });
 
     testWidgets(
@@ -425,10 +447,7 @@ void main() {
       await pumpApp(
         tester,
         // Collapsed by default; #2514 must force it open.
-        const SizedBox(
-          width: 600,
-          child: VehicleBaselineSection(vehicleId: _vehicleId),
-        ),
+        _scroll(const VehicleBaselineSection(vehicleId: _vehicleId)),
         overrides: [
           _summaryOverride(const {
             DrivingSituation.idle: 30,
@@ -439,9 +458,9 @@ void main() {
         ],
       );
 
-      // Auto-expanded: 1 aggregate + 6 per-situation bars are visible
-      // even though we never tapped the toggle.
-      expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
+      // Auto-expanded: 1 aggregate + 9 per-situation bars are visible
+      // even though we never tapped the toggle (#2515).
+      expect(find.byType(LinearProgressIndicator), findsNWidgets(10));
       expect(find.text('Idle'), findsOneWidget);
 
       // Warning chip present and names BOTH empty buckets.
@@ -464,20 +483,8 @@ void main() {
         'chip appears — the genuinely-calibrated state', (tester) async {
       await pumpApp(
         tester,
-        const SizedBox(
-          width: 600,
-          child: VehicleBaselineSection(vehicleId: _vehicleId),
-        ),
-        overrides: [
-          _summaryOverride(const {
-            DrivingSituation.idle: 30,
-            DrivingSituation.stopAndGo: 30,
-            DrivingSituation.urbanCruise: 30,
-            DrivingSituation.highwayCruise: 30,
-            DrivingSituation.deceleration: 30,
-            DrivingSituation.climbingOrLoaded: 30,
-          }),
-        ],
+        _scroll(const VehicleBaselineSection(vehicleId: _vehicleId)),
+        overrides: [_summaryOverride(_allAt(30))],
       );
 
       final bar = tester.widget<LinearProgressIndicator>(
@@ -499,10 +506,7 @@ void main() {
         'partially-learned vehicles only', (tester) async {
       await pumpApp(
         tester,
-        const SizedBox(
-          width: 600,
-          child: VehicleBaselineSection(vehicleId: _vehicleId),
-        ),
+        _scroll(const VehicleBaselineSection(vehicleId: _vehicleId)),
         overrides: [_summaryOverride(const {})],
       );
 
@@ -520,10 +524,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        const SizedBox(
-          width: 600,
-          child: VehicleBaselineSection(vehicleId: _vehicleId),
-        ),
+        _scroll(const VehicleBaselineSection(vehicleId: _vehicleId)),
         overrides: [
           _summaryOverride(const {
             DrivingSituation.idle: 30,
@@ -532,8 +533,8 @@ void main() {
         ],
       );
 
-      // Auto-expanded by the empty buckets.
-      expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
+      // Auto-expanded by the empty buckets (#2515: 1 aggregate + 9 rows).
+      expect(find.byType(LinearProgressIndicator), findsNWidgets(10));
 
       // Tapping the toggle collapses it back to the aggregate only.
       await tester.tap(

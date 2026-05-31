@@ -2216,6 +2216,15 @@ class AppLocalizationsLv extends AppLocalizations {
   String get situationClimbing => 'Kāpšana / noslogots';
 
   @override
+  String get situationColdStart => 'Cold start';
+
+  @override
+  String get situationSustainedLoad => 'Sustained load / towing';
+
+  @override
+  String get situationPartialDecel => 'Coasting';
+
+  @override
   String get situationHardAccel => 'Straujš paātrinājums';
 
   @override

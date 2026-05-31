@@ -1201,6 +1201,19 @@ class TripRecordingController {
       altitudeM: snap.latestAltitudeM,
       throttlePercent: throttlePercent,
       coolantTempC: coolantTempC,
+      // #2515 — surface the precision signals the snapshot already
+      // latches (oil/ambient temp gate the cold-start bucket now; λ /
+      // baro / MAP / fuel-trim / pedal feed PR 2's mixture-precision
+      // folding + altitude stratification). All null on cars without
+      // the PID, so the calibration path degrades gracefully.
+      oilTempC: snap.latestOilTempC,
+      ambientTempC: snap.latestAmbientTempC,
+      lambda: snap.latestLambda,
+      baroKpa: snap.latestBaroKpa,
+      mapKpa: snap.latestMapKpa,
+      stft: snap.latestStft,
+      ltft: snap.latestLtft,
+      pedalPercent: snap.latestPedalPercent,
       distanceKmSoFar: effectiveDistanceKm,
       fuelLitersSoFar: _fuelRateSeen ? _fuelLitersSoFar : null,
       elapsed: nowTs.difference(_startedAt ?? nowTs),

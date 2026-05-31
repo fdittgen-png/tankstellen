@@ -194,29 +194,41 @@ class TripRecordingBanner extends ConsumerWidget {
     return parts.join(', ');
   }
 
-  String _situationLabel(DrivingSituation s, AppLocalizations? l) {
-    switch (s) {
-      case DrivingSituation.idle:
-        return l?.situationIdle ?? 'Idle';
-      case DrivingSituation.stopAndGo:
-        return l?.situationStopAndGo ?? 'Stop & go';
-      case DrivingSituation.urbanCruise:
-        return l?.situationUrban ?? 'Urban';
-      case DrivingSituation.highwayCruise:
-        return l?.situationHighway ?? 'Highway';
-      case DrivingSituation.deceleration:
-        return l?.situationDecel ?? 'Decelerating';
-      case DrivingSituation.climbingOrLoaded:
-        return l?.situationClimbing ?? 'Climbing / loaded';
-      case DrivingSituation.hardAccel:
-        return l?.situationHardAccel ?? 'Hard accel';
-      case DrivingSituation.fuelCutCoast:
-        return l?.situationFuelCut ?? 'Fuel cut — coast';
-    }
-  }
-
+  String _situationLabel(DrivingSituation s, AppLocalizations? l) =>
+      situationDisplayLabel(s, l);
 }
 
+/// Localized label for a [DrivingSituation], shared by the banner's
+/// accessibility label and its visible content strip (#2515 — extracted
+/// from the two byte-identical switches so the new buckets only need to
+/// be mapped once).
+String situationDisplayLabel(DrivingSituation s, AppLocalizations? l) {
+  switch (s) {
+    case DrivingSituation.idle:
+      return l?.situationIdle ?? 'Idle';
+    case DrivingSituation.stopAndGo:
+      return l?.situationStopAndGo ?? 'Stop & go';
+    case DrivingSituation.urbanCruise:
+      return l?.situationUrban ?? 'Urban';
+    case DrivingSituation.highwayCruise:
+      return l?.situationHighway ?? 'Highway';
+    case DrivingSituation.deceleration:
+      return l?.situationDecel ?? 'Decelerating';
+    case DrivingSituation.climbingOrLoaded:
+      return l?.situationClimbing ?? 'Climbing / loaded';
+    // #2515 — the three new persistent buckets.
+    case DrivingSituation.coldStartWarmup:
+      return l?.situationColdStart ?? 'Cold start';
+    case DrivingSituation.sustainedLoadOrTowing:
+      return l?.situationSustainedLoad ?? 'Sustained load / towing';
+    case DrivingSituation.partialThrottleDecel:
+      return l?.situationPartialDecel ?? 'Coasting';
+    case DrivingSituation.hardAccel:
+      return l?.situationHardAccel ?? 'Hard accel';
+    case DrivingSituation.fuelCutCoast:
+      return l?.situationFuelCut ?? 'Fuel cut — coast';
+  }
+}
 
 class _Content extends StatelessWidget {
   final TripRecordingState state;
@@ -234,7 +246,9 @@ class _Content extends StatelessWidget {
 
     final fg = palette.foreground;
     final situationLabel =
-        paused ? (l?.tripBannerPaused ?? 'Paused') : _label(state.situation, l);
+        paused
+            ? (l?.tripBannerPaused ?? 'Paused')
+            : situationDisplayLabel(state.situation, l);
     final bandIcon = paused
         ? Icons.pause_circle_filled
         : _iconFor(state.situation, state.band);
@@ -346,31 +360,13 @@ class _Content extends StatelessWidget {
     );
   }
 
-  String _label(DrivingSituation s, AppLocalizations? l) {
-    switch (s) {
-      case DrivingSituation.idle:
-        return l?.situationIdle ?? 'Idle';
-      case DrivingSituation.stopAndGo:
-        return l?.situationStopAndGo ?? 'Stop & go';
-      case DrivingSituation.urbanCruise:
-        return l?.situationUrban ?? 'Urban';
-      case DrivingSituation.highwayCruise:
-        return l?.situationHighway ?? 'Highway';
-      case DrivingSituation.deceleration:
-        return l?.situationDecel ?? 'Decelerating';
-      case DrivingSituation.climbingOrLoaded:
-        return l?.situationClimbing ?? 'Climbing / loaded';
-      case DrivingSituation.hardAccel:
-        return l?.situationHardAccel ?? 'Hard accel';
-      case DrivingSituation.fuelCutCoast:
-        return l?.situationFuelCut ?? 'Fuel cut — coast';
-    }
-  }
-
   IconData _iconFor(DrivingSituation s, ConsumptionBand b) {
     if (s == DrivingSituation.hardAccel) return Icons.local_fire_department;
     if (s == DrivingSituation.fuelCutCoast) return Icons.eco;
     if (s == DrivingSituation.idle) return Icons.hourglass_bottom;
+    // #2515 — a cold engine running rich gets the warm-up icon; the
+    // other two new buckets fall through to the band-driven icon below.
+    if (s == DrivingSituation.coldStartWarmup) return Icons.ac_unit;
     switch (b) {
       case ConsumptionBand.eco:
         return Icons.eco;

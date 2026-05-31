@@ -70,7 +70,9 @@ class _VehicleBaselineSectionState
         ref.watch(vehicleBaselineSummaryProvider(widget.vehicleId));
     final theme = Theme.of(context);
 
-    // Persisted situations only — transients never accumulate.
+    // Persisted situations only — transients never accumulate. The
+    // three #2515 buckets (cold-start / sustained-load / partial-decel)
+    // are persistent, so they join the breakdown + the coverage bar.
     const situations = [
       DrivingSituation.idle,
       DrivingSituation.stopAndGo,
@@ -78,6 +80,9 @@ class _VehicleBaselineSectionState
       DrivingSituation.highwayCruise,
       DrivingSituation.deceleration,
       DrivingSituation.climbingOrLoaded,
+      DrivingSituation.coldStartWarmup,
+      DrivingSituation.sustainedLoadOrTowing,
+      DrivingSituation.partialThrottleDecel,
     ];
 
     final target = widget.fullConfidenceSamples;
@@ -286,6 +291,13 @@ class _VehicleBaselineSectionState
         return l?.situationDecel ?? 'Decelerating';
       case DrivingSituation.climbingOrLoaded:
         return l?.situationClimbing ?? 'Climbing / loaded';
+      // #2515 — the three new persistent buckets.
+      case DrivingSituation.coldStartWarmup:
+        return l?.situationColdStart ?? 'Cold start';
+      case DrivingSituation.sustainedLoadOrTowing:
+        return l?.situationSustainedLoad ?? 'Sustained load / towing';
+      case DrivingSituation.partialThrottleDecel:
+        return l?.situationPartialDecel ?? 'Coasting';
       // Transients are filtered out at the call site.
       case DrivingSituation.hardAccel:
       case DrivingSituation.fuelCutCoast:

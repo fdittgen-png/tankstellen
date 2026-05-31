@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+import '../domain/baseline_rolling_state.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
 import 'welford.dart';
@@ -88,12 +89,14 @@ class BaselineStore {
     required String vehicleId,
     required DrivingSituation situation,
     required double value,
+    String? stratumId,
   }) =>
       recordWeighted(
         vehicleId: vehicleId,
         situation: situation,
         value: value,
         weight: 1.0,
+        stratumId: stratumId,
       );
 
   /// Feed one sample at [weight] into the (vehicle, situation)
@@ -112,6 +115,7 @@ class BaselineStore {
     required DrivingSituation situation,
     required double value,
     required double weight,
+    String? stratumId,
   }) {
     if (weight <= 0) return;
     if (situation == DrivingSituation.hardAccel ||
@@ -119,8 +123,14 @@ class BaselineStore {
       return;
     }
     final byVehicle = _cache.putIfAbsent(vehicleId, () => {});
-    final acc =
-        byVehicle.putIfAbsent(situation.name, () => WelfordAccumulator());
+    // #2515 — writes always go to the altitude-stratified composite key
+    // `'${situation.name}#$stratumId'`. A null stratum (callers that
+    // don't know the altitude — rule-mode tests, legacy paths) writes to
+    // the sea-level band, so a sample is never lost.
+    final acc = byVehicle.putIfAbsent(
+      _compositeKey(situation, stratumId),
+      () => WelfordAccumulator(),
+    );
     acc.updateWeighted(value, weight);
   }
 
@@ -141,9 +151,16 @@ class BaselineStore {
     required String vehicleId,
     required DrivingSituation situation,
     required ConsumptionFuelFamily fuelFamily,
+    String? stratumId,
   }) {
     final coldStart = coldStartBaseline(fuelFamily, situation);
-    final acc = _cache[vehicleId]?[situation.name];
+    // #2515 — prefer the altitude-stratified band for this sample; fall
+    // back to the legacy bare key (pre-#2515 data, written without a
+    // stratum) when the composite cell hasn't accumulated yet, so
+    // existing users keep their learned baseline.
+    final byVehicle = _cache[vehicleId];
+    final acc = byVehicle?[_compositeKey(situation, stratumId)] ??
+        byVehicle?[situation.name];
     if (acc == null || acc.effectiveSampleCount <= 0) return coldStart;
     final weight =
         (acc.effectiveSampleCount / fullConfidenceSamples).clamp(0.0, 1.0);
@@ -157,11 +174,35 @@ class BaselineStore {
   /// fuzzy path can over-state confidence. The blend math in [lookup]
   /// uses the effective-N formula and is the correct number to drive
   /// behaviour off; this getter is for the UI counter only.
+  ///
+  /// #2515 — with no [stratumId] this sums every altitude band for the
+  /// situation (plus any legacy bare-key cell), so the calibration
+  /// coverage UI counts a situation as "learned" once its samples reach
+  /// the target across all altitudes combined. Pass a [stratumId] to
+  /// read a single band.
   int sampleCount({
     required String vehicleId,
     required DrivingSituation situation,
-  }) =>
-      _cache[vehicleId]?[situation.name]?.n ?? 0;
+    String? stratumId,
+  }) {
+    final byVehicle = _cache[vehicleId];
+    if (byVehicle == null) return 0;
+    if (stratumId != null) {
+      return byVehicle[_compositeKey(situation, stratumId)]?.n ?? 0;
+    }
+    var total = 0;
+    final prefix = '${situation.name}#';
+    byVehicle.forEach((key, acc) {
+      if (key == situation.name || key.startsWith(prefix)) total += acc.n;
+    });
+    return total;
+  }
+
+  /// Compose the on-disk key for a (situation, altitude-stratum) cell.
+  /// A null [stratumId] uses the sea-level band so a sample is never
+  /// lost when the altitude is unknown.
+  String _compositeKey(DrivingSituation situation, String? stratumId) =>
+      '${situation.name}#${stratumId ?? BaselineAltitudeStratum.seaLevel.id}';
 
   /// Persist the vehicle's accumulators to disk. Called at trip end;
   /// never mid-trip to keep 1 Hz polling off the I/O path.

@@ -60,6 +60,26 @@ SituationBaseline coldStartBaseline(
       return family == ConsumptionFuelFamily.gasoline
           ? const SituationBaseline(10.0, BaselineUnit.lPer100Km)
           : const SituationBaseline(7.5, BaselineUnit.lPer100Km);
+    // #2515 — cold-start / warm-up. Open-loop enrichment burns
+    // noticeably richer than warm idle; in L/h because the car is
+    // typically idling / crawling cold (avoids the L/100 km blow-up at
+    // near-zero speed).
+    case DrivingSituation.coldStartWarmup:
+      return family == ConsumptionFuelFamily.gasoline
+          ? const SituationBaseline(1.4, BaselineUnit.lPerHour)
+          : const SituationBaseline(1.1, BaselineUnit.lPerHour);
+    // #2515 — sustained load / towing on the flat. Same envelope as a
+    // climb (engine held at high load), so it shares climbing's number.
+    case DrivingSituation.sustainedLoadOrTowing:
+      return family == ConsumptionFuelFamily.gasoline
+          ? const SituationBaseline(10.0, BaselineUnit.lPer100Km)
+          : const SituationBaseline(7.5, BaselineUnit.lPer100Km);
+    // #2515 — partial-throttle / gentle coast. Injectors still fire but
+    // the load is light — close to the deceleration envelope.
+    case DrivingSituation.partialThrottleDecel:
+      return family == ConsumptionFuelFamily.gasoline
+          ? const SituationBaseline(3.0, BaselineUnit.lPer100Km)
+          : const SituationBaseline(2.2, BaselineUnit.lPer100Km);
     // Transients don't have a meaningful "baseline" — they just
     // trigger a badge. Return a zero value with the distance unit
     // so callers don't have to special-case; the UI skips the

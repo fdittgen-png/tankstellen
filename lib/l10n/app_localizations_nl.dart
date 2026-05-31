@@ -2214,6 +2214,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get situationClimbing => 'Klimmen / zwaar beladen';
 
   @override
+  String get situationColdStart => 'Cold start';
+
+  @override
+  String get situationSustainedLoad => 'Sustained load / towing';
+
+  @override
+  String get situationPartialDecel => 'Coasting';
+
+  @override
   String get situationHardAccel => 'Hard optrekken';
 
   @override

@@ -8,7 +8,9 @@ void main() {
   const classifier = FuzzyClassifier();
 
   // Convenience: baseline neutral sample. Individual tests override
-  // just the fields they care about.
+  // just the fields they care about. The #2515 precision signals default
+  // to null/0 so the steady-state tests below behave exactly as before
+  // (no coolant ⇒ coldStart stays 0 ⇒ no override fires).
   Map<Situation, double> classify({
     double speed = 0,
     double accel = 0,
@@ -16,6 +18,11 @@ void main() {
     double throttle = 10,
     double rpm = 800,
     bool stopAndGo = false,
+    double load = 0,
+    double? coolantTempC,
+    double? oilTempC,
+    double? ambientTempC,
+    double? pedalPct,
   }) =>
       classifier.classify(
         speedKmh: speed,
@@ -24,6 +31,11 @@ void main() {
         throttlePct: throttle,
         rpm: rpm,
         isStopAndGoContext: stopAndGo,
+        loadPct: load,
+        coolantTempC: coolantTempC,
+        oilTempC: oilTempC,
+        ambientTempC: ambientTempC,
+        pedalPct: pedalPct,
       );
 
   double sumOf(Map<Situation, double> m) =>
@@ -157,12 +169,81 @@ void main() {
       expect(sumOf(m), closeTo(1.0, 1e-6));
     });
 
-    test('returns entries for all seven situations', () {
+    test('returns an entry for every Situation value', () {
       final m = classify(speed: 30);
       expect(m.length, Situation.values.length);
       for (final s in Situation.values) {
         expect(m.containsKey(s), isTrue, reason: 'missing $s');
       }
+    });
+  });
+
+  group('FuzzyClassifier #2515 new buckets', () {
+    test('coldStart fires from a cold coolant and zeros steady-state', () {
+      // 30 km/h would normally be urban, but a 35 °C coolant means the
+      // engine is warming up → coldStart is the HIGH-PRIORITY override
+      // and the urban/steady buckets are zeroed.
+      final m = classify(speed: 30, coolantTempC: 35);
+      expect(m[Situation.coldStart]!, closeTo(1.0, 1e-3));
+      expect(m[Situation.urban]!, 0);
+      expect(m[Situation.idle]!, 0);
+      expect(sumOf(m), closeTo(1.0, 1e-6));
+    });
+
+    test('coldStart ramps to 0 at 70 °C coolant (warm engine)', () {
+      final m = classify(speed: 30, coolantTempC: 75);
+      expect(m[Situation.coldStart]!, 0);
+      // Warm again ⇒ urban wins, no override.
+      expect(m[Situation.urban]!, greaterThan(0));
+    });
+
+    test('coldStart falls back to oil temp when coolant is null', () {
+      final m = classify(speed: 30, oilTempC: 25);
+      expect(m[Situation.coldStart]!, greaterThan(0));
+    });
+
+    test('no temperature signal ⇒ coldStart stays 0', () {
+      final m = classify(speed: 30);
+      expect(m[Situation.coldStart]!, 0);
+    });
+
+    test('sustainedLoad fires on a flat high-load cruise (no grade)', () {
+      // grade 0, moving, 80 % load → sustainedLoad, NOT climbing.
+      final m = classify(speed: 60, grade: 0, load: 80);
+      expect(m[Situation.sustainedLoad]!, greaterThan(0));
+      expect(m[Situation.climbing]!, 0,
+          reason: 'a flat load must not register as a climb (#2515 split)');
+    });
+
+    test('a graded high load feeds climbing, not sustainedLoad', () {
+      // grade 5 % with 80 % load → the load ramp reinforces climbing and
+      // sustainedLoad stays 0 (its gate requires grade < 2 %).
+      final m = classify(speed: 60, grade: 5, load: 80);
+      expect(m[Situation.climbing]!, greaterThan(0));
+      expect(m[Situation.sustainedLoad]!, 0);
+    });
+
+    test('partialDecel fires in the gentle-coast accel band', () {
+      // accel -0.3 ∈ [-0.5, -0.1), throttle closed, moving → partialDecel
+      // and NOT decel (decel needs accel < -0.5).
+      final m = classify(speed: 40, accel: -0.3, throttle: 2);
+      expect(m[Situation.partialDecel]!, greaterThan(0));
+      expect(m[Situation.decel]!, 0);
+    });
+
+    test('a harder lift-off is decel, not partialDecel (disjoint bands)', () {
+      final m = classify(speed: 40, accel: -1.0, throttle: 2, rpm: 1000);
+      expect(m[Situation.decel]!, greaterThan(0));
+      expect(m[Situation.partialDecel]!, 0);
+    });
+
+    test('fuel-cut zeros BOTH decel and partialDecel', () {
+      // speed>20, rpm>1500, throttle<5 fires fuelCut; the gentle accel
+      // band would otherwise fire partialDecel.
+      final m = classify(speed: 60, accel: -0.3, throttle: 0, rpm: 2000);
+      expect(m[Situation.fuelCut]!, greaterThan(0));
+      expect(m[Situation.partialDecel]!, 0);
+      expect(m[Situation.decel]!, 0);
     });
   });
 }

@@ -47,21 +47,27 @@ Map<DrivingSituation, int> vehicleBaselineSummary(Ref ref, String vehicleId) {
   final perSituation = decoded['perSituation'];
   if (perSituation is! Map) return const {};
 
+  // #2515 — keys are now altitude-stratified (`'${situation.name}#$id'`),
+  // so sum every band per situation for the #2514 coverage bar. Legacy
+  // bare keys (`situation.name`, pre-#2515) fold in too — they're the
+  // sea-level band by definition.
+  final byName = <String, int>{};
+  perSituation.forEach((key, acc) {
+    if (key is! String || acc is! Map) return;
+    final name = key.split('#').first;
+    final n = acc['n'];
+    final count = n is int ? n : (n is num ? n.toInt() : 0);
+    byName[name] = (byName[name] ?? 0) + count;
+  });
+
   final result = <DrivingSituation, int>{};
   for (final s in DrivingSituation.values) {
     if (s == DrivingSituation.hardAccel ||
         s == DrivingSituation.fuelCutCoast) {
       continue;
     }
-    final acc = perSituation[s.name];
-    if (acc is Map) {
-      final n = acc['n'];
-      if (n is int) {
-        result[s] = n;
-      } else if (n is num) {
-        result[s] = n.toInt();
-      }
-    }
+    final total = byName[s.name];
+    if (total != null) result[s] = total;
   }
   return result;
 }

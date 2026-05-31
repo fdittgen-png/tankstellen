@@ -59,6 +59,42 @@ class TripLiveReading {
   /// phase 2) can read it post-trip — engines that never reach
   /// operating temperature burn proportionally more fuel for warm-up.
   final double? coolantTempC;
+
+  // --- #2515 precision signals (epic #2512) -------------------------
+  // Already captured per-tick by the live-sample snapshot (#2455/#2458/
+  // #2459); plumbed onto the live reading here so the calibration path
+  // can read them directly. The cold-start bucket consumes [oilTempC]
+  // / [ambientTempC] now; the rest (λ, baro, MAP, STFT/LTFT, pedal) are
+  // wired here so PR 2's precision folding has them without another
+  // controller change. All null on cars that don't surface the PID.
+  /// Engine oil temperature in °C (PID 0x5C) — the cold-start fallback
+  /// when coolant ([coolantTempC]) is unavailable.
+  final double? oilTempC;
+
+  /// Ambient air temperature in °C (PID 0x46).
+  final double? ambientTempC;
+
+  /// Commanded equivalence ratio / λ (PID 0x44) — true mixture, folded
+  /// into per-bucket fuel-mass precision in PR 2.
+  final double? lambda;
+
+  /// Barometric pressure in kPa (PID 0x33) — air-density correction +
+  /// altitude cross-check (baro → altitude fallback for stratification).
+  final double? baroKpa;
+
+  /// Intake manifold absolute pressure in kPa (PID 0x0B).
+  final double? mapKpa;
+
+  /// Short-term fuel trim, % (PID 0x06).
+  final double? stft;
+
+  /// Long-term fuel trim, % (PID 0x07).
+  final double? ltft;
+
+  /// Accelerator-pedal position, 0–100 % (PIDs 0x49–0x4B) — driver
+  /// intent, distinct from the mechanical throttle plate ([throttlePercent]).
+  final double? pedalPercent;
+
   final double distanceKmSoFar;
   final double? fuelLitersSoFar;
   final Duration elapsed;
@@ -110,6 +146,14 @@ class TripLiveReading {
     this.altitudeM,
     this.throttlePercent,
     this.coolantTempC,
+    this.oilTempC,
+    this.ambientTempC,
+    this.lambda,
+    this.baroKpa,
+    this.mapKpa,
+    this.stft,
+    this.ltft,
+    this.pedalPercent,
     required this.distanceKmSoFar,
     this.fuelLitersSoFar,
     required this.elapsed,
@@ -141,6 +185,14 @@ class TripLiveReading {
     double? altitudeM,
     double? throttlePercent,
     double? coolantTempC,
+    double? oilTempC,
+    double? ambientTempC,
+    double? lambda,
+    double? baroKpa,
+    double? mapKpa,
+    double? stft,
+    double? ltft,
+    double? pedalPercent,
     double? distanceKmSoFar,
     double? fuelLitersSoFar,
     Duration? elapsed,
@@ -161,6 +213,14 @@ class TripLiveReading {
       altitudeM: altitudeM ?? this.altitudeM,
       throttlePercent: throttlePercent ?? this.throttlePercent,
       coolantTempC: coolantTempC ?? this.coolantTempC,
+      oilTempC: oilTempC ?? this.oilTempC,
+      ambientTempC: ambientTempC ?? this.ambientTempC,
+      lambda: lambda ?? this.lambda,
+      baroKpa: baroKpa ?? this.baroKpa,
+      mapKpa: mapKpa ?? this.mapKpa,
+      stft: stft ?? this.stft,
+      ltft: ltft ?? this.ltft,
+      pedalPercent: pedalPercent ?? this.pedalPercent,
       distanceKmSoFar: distanceKmSoFar ?? this.distanceKmSoFar,
       fuelLitersSoFar: fuelLitersSoFar ?? this.fuelLitersSoFar,
       elapsed: elapsed ?? this.elapsed,

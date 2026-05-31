@@ -3125,5 +3125,20 @@
   "@ocrTesterFixtureSaved": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "situationColdStart": "Cold start",
+  "@situationColdStart": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "situationSustainedLoad": "Sustained load / towing",
+  "@situationSustainedLoad": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "situationPartialDecel": "Coasting",
+  "@situationPartialDecel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

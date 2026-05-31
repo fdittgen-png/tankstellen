@@ -2204,6 +2204,15 @@ class AppLocalizationsNb extends AppLocalizations {
   String get situationClimbing => 'Stigning / last';
 
   @override
+  String get situationColdStart => 'Cold start';
+
+  @override
+  String get situationSustainedLoad => 'Sustained load / towing';
+
+  @override
+  String get situationPartialDecel => 'Coasting';
+
+  @override
   String get situationHardAccel => 'Hard akselerasjon';
 
   @override

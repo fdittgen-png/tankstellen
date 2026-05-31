@@ -157,6 +157,8 @@ class TripBaselineRecorder {
       vehicleId: vid,
       situation: situation,
       value: live,
+      // #2515 — stratify the learned mean by altitude band.
+      stratumId: _rolling.altitudeStratumId,
     );
   }
 
@@ -194,6 +196,13 @@ class TripBaselineRecorder {
       rpm: r.rpm ?? 0,
       isStopAndGoContext: _rolling.isStopAndGoContext,
       loadPct: BaselineRollingState.loadSignal(r),
+      // #2515 — feed the precision signals so the cold-start /
+      // partial-decel buckets can fire. coldStart gates on coolant (or
+      // oil when coolant is null); pedal/ambient are plumbed for PR 2.
+      coolantTempC: r.coolantTempC,
+      oilTempC: r.oilTempC,
+      ambientTempC: r.ambientTempC,
+      pedalPct: r.pedalPercent,
     );
     for (final entry in memberships.entries) {
       if (entry.value <= 0) continue;
@@ -204,6 +213,8 @@ class TripBaselineRecorder {
         situation: ds,
         value: live,
         weight: entry.value,
+        // #2515 — stratify the learned mean by altitude band.
+        stratumId: _rolling.altitudeStratumId,
       );
     }
   }
@@ -227,6 +238,14 @@ class TripBaselineRecorder {
         return DrivingSituation.deceleration;
       case Situation.fuelCut:
         return null;
+      // #2515 — the three new buckets map 1:1 onto their consumption-
+      // layer mirrors. All three are persistent (not transient).
+      case Situation.coldStart:
+        return DrivingSituation.coldStartWarmup;
+      case Situation.sustainedLoad:
+        return DrivingSituation.sustainedLoadOrTowing;
+      case Situation.partialDecel:
+        return DrivingSituation.partialThrottleDecel;
     }
   }
 
@@ -240,6 +259,10 @@ class TripBaselineRecorder {
       vehicleId: vid,
       situation: situation,
       fuelFamily: _fuelFamily,
+      // #2515 — read the band matching the car's current altitude, with
+      // the store falling back to the legacy bare key when the band is
+      // still empty.
+      stratumId: _rolling.altitudeStratumId,
     );
   }
 
@@ -258,6 +281,11 @@ class TripBaselineRecorder {
       throttlePercent: r.throttlePercent ?? r.engineLoadPercent,
       engineLoadPercent: r.engineLoadPercent,
       fuelRateLPerHour: r.fuelRateLPerHour,
+      // #2515 — coolant lets the rule path detect a cold-start warm-up;
+      // the confident grade lets it separate a flat sustained load
+      // (towing) from a hill climb.
+      coolantTempC: r.coolantTempC,
+      gradePct: _rolling.confidentGradePct,
     ));
   }
 
