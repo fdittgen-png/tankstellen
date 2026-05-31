@@ -37,6 +37,19 @@ int pumpFieldWeight(PumpField field) {
   }
 }
 
+/// Maps a [PumpField] to the [PumpDisplayParseResult.derived] field-name
+/// key (`'totalCost'` / `'liters'` / `'pricePerLiter'`).
+String pumpFieldName(PumpField field) {
+  switch (field) {
+    case PumpField.total:
+      return 'totalCost';
+    case PumpField.volume:
+      return 'liters';
+    case PumpField.pricePerLitre:
+      return 'pricePerLiter';
+  }
+}
+
 /// Multi-locale pump labels. The unit-price labels carry the heaviest
 /// weight so a block reading "PRIX DU LITRE" is never mis-claimed as the
 /// bare-PRIX total — the exact collision that dropped the unit price.

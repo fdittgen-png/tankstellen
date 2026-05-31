@@ -11,6 +11,7 @@ import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/data/ocr/ocr_geometry.dart';
+import 'package:tankstellen/features/consumption/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/pump_display_camera_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/bad_scan_report_sheet.dart';
@@ -90,6 +91,7 @@ class _FakeFailingScanService extends ReceiptScanService {
     String? country,
     String? brand,
     OcrNormalizedRect? roi,
+    OcrTraceRecorder? trace,
   }) async {
     return const PumpDisplayScanOutcome(
       // confidence == 0 + only one usable field → !hasUsableData → opens

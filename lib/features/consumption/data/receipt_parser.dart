@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../search/domain/entities/fuel_type.dart';
+import 'ocr/ocr_trace_recorder.dart';
 import 'ocr/pump_ocr_config.dart';
 import 'receipt_override_registry.dart';
 import 'receipt_parser/brand_detection.dart';
@@ -51,19 +52,43 @@ class ReceiptParser {
     String text, {
     String? stationId,
     OcrLocaleProfile? profile,
+    OcrTraceRecorder? trace,
   }) {
     final lines = text.split('\n').map((l) => l.trim()).toList();
     final fullText = lines.join(' ');
 
     final brand = detectBrand(lines, fullText);
+    final layout = switch (brand) {
+      'super_u' => 'super_u',
+      'carrefour' => 'carrefour',
+      _ => 'generic',
+    };
+    trace?.brand(brand, layout);
     final initial = switch (brand) {
       'super_u' => parseSuperU(fullText, lines, profile: profile),
       'carrefour' => parseCarrefour(fullText, lines, profile: profile),
       _ => parseGeneric(fullText, lines, profile: profile),
     };
 
-    final withOverrides = _applyOverrides(initial, text, stationId);
-    return reconcile(withOverrides);
+    final withOverrides = _applyOverrides(initial, text, stationId, trace);
+    final reconciled = reconcile(withOverrides);
+    trace?.reconcile(
+      read: withOverrides.totalCost,
+      derived: reconciled.totalCost,
+      predictedTotal: (withOverrides.liters != null &&
+              withOverrides.pricePerLiter != null)
+          ? withOverrides.liters! * withOverrides.pricePerLiter!
+          : null,
+      delta: (withOverrides.totalCost != null && reconciled.totalCost != null)
+          ? (reconciled.totalCost! - withOverrides.totalCost!).abs()
+          : null,
+    );
+    trace?.result(
+      totalCost: reconciled.totalCost,
+      liters: reconciled.liters,
+      pricePerLiter: reconciled.pricePerLiter,
+    );
+    return reconciled;
   }
 
   /// Apply per-station overrides on top of the brand-layout result. Any
@@ -73,8 +98,9 @@ class ReceiptParser {
   ReceiptParseResult _applyOverrides(
     ReceiptParseResult result,
     String text,
-    String? stationId,
-  ) {
+    String? stationId, [
+    OcrTraceRecorder? trace,
+  ]) {
     if (stationId == null) return result;
     final registry = _overrideRegistry;
     if (registry == null) return result;
@@ -89,13 +115,23 @@ class ReceiptParser {
     FuelType? fuelType = result.fuelType;
 
     final overrideLiters = _overrideDecimal(spec.liters, text);
-    if (overrideLiters != null) liters = overrideLiters;
+    if (overrideLiters != null) {
+      liters = overrideLiters;
+      _traceOverride(trace, 'liters', spec.liters, text, overrideLiters);
+    }
 
     final overrideTotal = _overrideDecimal(spec.totalCost, text);
-    if (overrideTotal != null) totalCost = overrideTotal;
+    if (overrideTotal != null) {
+      totalCost = overrideTotal;
+      _traceOverride(trace, 'totalCost', spec.totalCost, text, overrideTotal);
+    }
 
     final overridePpl = _overrideDecimal(spec.pricePerLiter, text);
-    if (overridePpl != null) pricePerLiter = overridePpl;
+    if (overridePpl != null) {
+      pricePerLiter = overridePpl;
+      _traceOverride(
+          trace, 'pricePerLiter', spec.pricePerLiter, text, overridePpl);
+    }
 
     final overrideDateRaw = spec.date?.extract(text);
     if (overrideDateRaw != null) {
@@ -134,5 +170,23 @@ class ReceiptParser {
     final raw = field.extract(text);
     if (raw == null) return null;
     return parseDecimal(raw);
+  }
+
+  /// Records one fired override field on [trace] (no-op when null) —
+  /// trace-only, never on the production parse path (#2517).
+  void _traceOverride(
+    OcrTraceRecorder? trace,
+    String field,
+    OverrideFieldSpec? spec,
+    String text,
+    double value,
+  ) {
+    if (trace == null || spec == null) return;
+    trace.overrideField(
+      field: field,
+      pattern: spec.pattern,
+      match: spec.extract(text) ?? '',
+      value: value,
+    );
   }
 }
