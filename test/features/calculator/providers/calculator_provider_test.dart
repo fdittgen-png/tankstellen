@@ -70,13 +70,48 @@ void main() {
 
       notifier.setDistance(200);
       notifier.setPrice(1.80);
+      notifier.setRoundTrip(true);
+      notifier.setTripsPerMonth(20);
       notifier.reset();
 
       final state = container.read(calculatorProvider);
       expect(state.distanceKm, 0);
       expect(state.consumptionPer100Km, 7.0);
       expect(state.pricePerLiter, 0);
+      expect(state.roundTrip, false);
+      expect(state.tripsPerMonth, isNull);
       expect(state.hasInput, false);
+    });
+
+    test('setRoundTrip flips the flag without touching distance', () {
+      final notifier = container.read(calculatorProvider.notifier);
+      notifier.setDistance(150);
+      notifier.setRoundTrip(true);
+
+      final state = container.read(calculatorProvider);
+      expect(state.roundTrip, true);
+      expect(state.distanceKm, 150);
+    });
+
+    test('setTripsPerMonth stores positive, clears on null/zero', () {
+      final notifier = container.read(calculatorProvider.notifier);
+
+      notifier.setTripsPerMonth(12);
+      expect(container.read(calculatorProvider).tripsPerMonth, 12);
+
+      notifier.setTripsPerMonth(0);
+      expect(container.read(calculatorProvider).tripsPerMonth, isNull);
+
+      notifier.setTripsPerMonth(8);
+      notifier.setTripsPerMonth(null);
+      expect(container.read(calculatorProvider).tripsPerMonth, isNull);
+    });
+
+    test('copyWith leaves tripsPerMonth untouched when not passed', () {
+      const state = CalculatorState(tripsPerMonth: 15);
+      final next = state.copyWith(distanceKm: 50);
+      expect(next.tripsPerMonth, 15);
+      expect(next.distanceKm, 50);
     });
   });
 }

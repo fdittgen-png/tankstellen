@@ -3,15 +3,20 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/calculator_provider.dart';
 
-/// Card showing the trip cost result for the calculator.
+/// Result hero for the calculator — leads with the answer (#2543).
 ///
-/// Reads from [CalculatorState] directly so the parent screen doesn't need to
-/// pipe individual numbers through the widget tree.
+/// A [SectionCard] titled "Trip Cost" with a big primary-colour total
+/// and a 3–4-up breakdown of compact tiles. Before all three inputs are
+/// entered ([CalculatorState.hasInput] false) it renders the **same**
+/// card with `--` placeholders and a one-line helper, so the screen
+/// never shows an empty void waiting on input.
 class CalculatorResultCard extends StatelessWidget {
   final CalculatorState state;
 
@@ -21,82 +26,123 @@ class CalculatorResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final calc = state.calculation;
+    final filled = state.hasInput;
+    final roundTrip = state.roundTrip;
 
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Icon(
-              Icons.calculate_outlined,
-              size: 40,
+    // The hero total honours the round-trip flag; `--` until ready.
+    final totalText = filled
+        ? PriceFormatter.formatTotal(calc.effectiveCost(roundTrip: roundTrip))
+        : _placeholder;
+
+    final tiles = <Widget>[
+      _BreakdownTile(
+        label: l10n?.fuelNeeded ?? 'Fuel needed',
+        value: filled
+            ? UnitFormatter.formatVolume(
+                calc.effectiveLiters(roundTrip: roundTrip))
+            : _placeholder,
+      ),
+      _BreakdownTile(
+        label: l10n?.costPerDistance ?? 'Cost per km',
+        value: filled
+            ? '${PriceFormatter.formatPerKm(calc.costPerKm)} $_perKmSuffix'
+            : _placeholder,
+      ),
+    ];
+
+    if (roundTrip) {
+      tiles.add(_BreakdownTile(
+        label: l10n?.roundTripTotal ?? 'Round trip',
+        value: filled
+            ? PriceFormatter.formatTotal(calc.roundTripCost)
+            : _placeholder,
+      ));
+    }
+
+    final monthly = calc.monthlyCost(
+      roundTrip: roundTrip,
+      tripsPerMonth: state.tripsPerMonth,
+    );
+    if (state.tripsPerMonth != null && state.tripsPerMonth! > 0) {
+      tiles.add(_BreakdownTile(
+        label: l10n?.costPerMonth ?? 'Cost per month',
+        value: filled ? PriceFormatter.formatTotal(monthly) : _placeholder,
+      ));
+    }
+
+    return SectionCard(
+      title: l10n?.tripCost ?? 'Trip Cost',
+      leadingIcon: Icons.calculate_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            totalText,
+            style: theme.textTheme.displaySmall?.copyWith(
               color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 16),
+          ),
+          if (!filled) ...[
+            const SizedBox(height: Spacing.sm),
             Text(
-              l10n?.tripCost ?? 'Trip Cost',
-              style: theme.textTheme.titleMedium,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _ResultItem(
-                  label: l10n?.fuelNeeded ?? 'Fuel needed',
-                  value: UnitFormatter.formatVolume(
-                      state.calculation.totalLiters),
-                ),
-                _ResultItem(
-                  // Trip totals are shown at cent precision, not the
-                  // 3-decimal fuel-price precision, so we don't route
-                  // through formatPrice here — only the currency
-                  // symbol is localised.
-                  label: l10n?.totalCost ?? 'Total cost',
-                  value:
-                      '${state.calculation.totalCost.toStringAsFixed(2)} ${PriceFormatter.currency}',
-                  highlight: true,
-                ),
-              ],
+              l10n?.calculatorResultPlaceholder ??
+                  'Fill in distance, consumption and price to see your '
+                      'trip cost',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
-        ),
+          const SizedBox(height: Spacing.xl),
+          Wrap(
+            alignment: WrapAlignment.spaceEvenly,
+            spacing: Spacing.xl,
+            runSpacing: Spacing.md,
+            children: tiles,
+          ),
+        ],
       ),
     );
   }
+
+  /// Cost-per-distance unit mask, e.g. `€/km` or `£/mi`. Currency from
+  /// [PriceFormatter], distance unit from the active country config so
+  /// it never hard-codes km. Language-neutral format mask.
+  static String get _perKmSuffix {
+    final unit = PriceFormatter.activeConfig.distanceUnit;
+    return '${PriceFormatter.currency}/$unit';
+  }
+
+  static const String _placeholder = '--';
 }
 
-class _ResultItem extends StatelessWidget {
+class _BreakdownTile extends StatelessWidget {
   final String label;
   final String value;
-  final bool highlight;
 
-  const _ResultItem({
-    required this.label,
-    required this.value,
-    this.highlight = false,
-  });
+  const _BreakdownTile({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
+        Text(
+          value,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: Spacing.xs),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: highlight
-              ? theme.textTheme.headlineSmall?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                )
-              : theme.textTheme.titleLarge,
         ),
       ],
     );

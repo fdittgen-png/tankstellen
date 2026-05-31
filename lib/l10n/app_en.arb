@@ -451,6 +451,42 @@
   "fuelNeeded": "Fuel needed",
   "totalCost": "Total cost",
   "enterCalcValues": "Enter distance, consumption, and price to calculate trip cost",
+  "calculatorDistanceLabel": "Distance ({unit})",
+  "@calculatorDistanceLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorConsumptionLabel": "Consumption ({unit})",
+  "@calculatorConsumptionLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorPriceLabel": "Fuel price ({unit})",
+  "@calculatorPriceLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorUseMine": "Use",
+  "calculatorApplied": "Applied",
+  "tripDetails": "Trip details",
+  "calculatorRoundTrip": "Round trip",
+  "roundTripTotal": "Round trip",
+  "costPerDistance": "Cost per km",
+  "costPerMonth": "Cost per month",
+  "calculatorEstimateMonthly": "Estimate monthly cost",
+  "calculatorTripsPerMonth": "Trips per month",
+  "calculatorTripsPerMonthHint": "e.g. 20",
+  "calculatorReset": "Reset",
+  "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
   "priceHistory": "Price History",
   "ignoredStationsLabel": "Ignored",
   "ratingsLabel": "Ratings",

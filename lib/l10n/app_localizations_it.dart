@@ -986,6 +986,58 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inserisci distanza, consumo e prezzo per calcolare il costo del viaggio';
 
   @override
+  String calculatorDistanceLabel(String unit) {
+    return 'Distance ($unit)';
+  }
+
+  @override
+  String calculatorConsumptionLabel(String unit) {
+    return 'Consumption ($unit)';
+  }
+
+  @override
+  String calculatorPriceLabel(String unit) {
+    return 'Fuel price ($unit)';
+  }
+
+  @override
+  String get calculatorUseMine => 'Use';
+
+  @override
+  String get calculatorApplied => 'Applied';
+
+  @override
+  String get tripDetails => 'Trip details';
+
+  @override
+  String get calculatorRoundTrip => 'Round trip';
+
+  @override
+  String get roundTripTotal => 'Round trip';
+
+  @override
+  String get costPerDistance => 'Cost per km';
+
+  @override
+  String get costPerMonth => 'Cost per month';
+
+  @override
+  String get calculatorEstimateMonthly => 'Estimate monthly cost';
+
+  @override
+  String get calculatorTripsPerMonth => 'Trips per month';
+
+  @override
+  String get calculatorTripsPerMonthHint => 'e.g. 20';
+
+  @override
+  String get calculatorReset => 'Reset';
+
+  @override
+  String get calculatorResultPlaceholder =>
+      'Fill in distance, consumption and price to see your trip cost';
+
+  @override
   String get priceHistory => 'Storico prezzi';
 
   @override

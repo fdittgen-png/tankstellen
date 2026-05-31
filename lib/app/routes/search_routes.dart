@@ -22,6 +22,13 @@ List<RouteBase> get searchRoutes => [
       ),
       GoRoute(
         path: '/calculator',
-        builder: (context, state) => const CalculatorScreen(),
+        builder: (context, state) {
+          // #2543 — the search-results launch passes the price the
+          // user was looking at as `extra` so the calculator opens
+          // pre-filled. A cold open (no arg) leaves it null.
+          final extra = state.extra;
+          final initialPrice = extra is double ? extra : null;
+          return CalculatorScreen(initialPrice: initialPrice);
+        },
       ),
     ];

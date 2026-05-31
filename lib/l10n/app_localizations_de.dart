@@ -985,6 +985,58 @@ class AppLocalizationsDe extends AppLocalizations {
       'Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu berechnen';
 
   @override
+  String calculatorDistanceLabel(String unit) {
+    return 'Entfernung ($unit)';
+  }
+
+  @override
+  String calculatorConsumptionLabel(String unit) {
+    return 'Verbrauch ($unit)';
+  }
+
+  @override
+  String calculatorPriceLabel(String unit) {
+    return 'Kraftstoffpreis ($unit)';
+  }
+
+  @override
+  String get calculatorUseMine => 'Übernehmen';
+
+  @override
+  String get calculatorApplied => 'Übernommen';
+
+  @override
+  String get tripDetails => 'Fahrtdetails';
+
+  @override
+  String get calculatorRoundTrip => 'Hin- und Rückfahrt';
+
+  @override
+  String get roundTripTotal => 'Hin- und Rückfahrt';
+
+  @override
+  String get costPerDistance => 'Kosten pro km';
+
+  @override
+  String get costPerMonth => 'Kosten pro Monat';
+
+  @override
+  String get calculatorEstimateMonthly => 'Monatliche Kosten schätzen';
+
+  @override
+  String get calculatorTripsPerMonth => 'Fahrten pro Monat';
+
+  @override
+  String get calculatorTripsPerMonthHint => 'z. B. 20';
+
+  @override
+  String get calculatorReset => 'Zurücksetzen';
+
+  @override
+  String get calculatorResultPlaceholder =>
+      'Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu sehen';
+
+  @override
   String get priceHistory => 'Preisverlauf';
 
   @override

@@ -976,6 +976,58 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter distance, consumption, and price to calculate trip cost';
 
   @override
+  String calculatorDistanceLabel(String unit) {
+    return 'Distance ($unit)';
+  }
+
+  @override
+  String calculatorConsumptionLabel(String unit) {
+    return 'Consumption ($unit)';
+  }
+
+  @override
+  String calculatorPriceLabel(String unit) {
+    return 'Fuel price ($unit)';
+  }
+
+  @override
+  String get calculatorUseMine => 'Use';
+
+  @override
+  String get calculatorApplied => 'Applied';
+
+  @override
+  String get tripDetails => 'Trip details';
+
+  @override
+  String get calculatorRoundTrip => 'Round trip';
+
+  @override
+  String get roundTripTotal => 'Round trip';
+
+  @override
+  String get costPerDistance => 'Cost per km';
+
+  @override
+  String get costPerMonth => 'Cost per month';
+
+  @override
+  String get calculatorEstimateMonthly => 'Estimate monthly cost';
+
+  @override
+  String get calculatorTripsPerMonth => 'Trips per month';
+
+  @override
+  String get calculatorTripsPerMonthHint => 'e.g. 20';
+
+  @override
+  String get calculatorReset => 'Reset';
+
+  @override
+  String get calculatorResultPlaceholder =>
+      'Fill in distance, consumption and price to see your trip cost';
+
+  @override
   String get priceHistory => 'Price History';
 
   @override
@@ -7587,6 +7639,58 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get enterCalcValues =>
       '⟦Éñŧéř đîšŧáñçé, çóñšúɱƥŧîóñ, áñđ ƥřîçé ŧó çáłçúłáŧé ŧřîƥ çóšŧ ·······················⟧';
+
+  @override
+  String calculatorDistanceLabel(String unit) {
+    return '⟦Đîšŧáñçé ($unit) ····⟧';
+  }
+
+  @override
+  String calculatorConsumptionLabel(String unit) {
+    return '⟦Çóñšúɱƥŧîóñ ($unit) ·····⟧';
+  }
+
+  @override
+  String calculatorPriceLabel(String unit) {
+    return '⟦Ƒúéł ƥřîçé ($unit) ····⟧';
+  }
+
+  @override
+  String get calculatorUseMine => '⟦Úšé ·⟧';
+
+  @override
+  String get calculatorApplied => '⟦Áƥƥłîéđ ···⟧';
+
+  @override
+  String get tripDetails => '⟦Ŧřîƥ đéŧáîłš ·····⟧';
+
+  @override
+  String get calculatorRoundTrip => '⟦Řóúñđ ŧřîƥ ····⟧';
+
+  @override
+  String get roundTripTotal => '⟦Řóúñđ ŧřîƥ ····⟧';
+
+  @override
+  String get costPerDistance => '⟦Çóšŧ ƥéř ķɱ ····⟧';
+
+  @override
+  String get costPerMonth => '⟦Çóšŧ ƥéř ɱóñŧĥ ·····⟧';
+
+  @override
+  String get calculatorEstimateMonthly => '⟦Éšŧîɱáŧé ɱóñŧĥłý çóšŧ ·········⟧';
+
+  @override
+  String get calculatorTripsPerMonth => '⟦Ŧřîƥš ƥéř ɱóñŧĥ ······⟧';
+
+  @override
+  String get calculatorTripsPerMonthHint => '⟦é.ǧ. 20 ·⟧';
+
+  @override
+  String get calculatorReset => '⟦Řéšéŧ ··⟧';
+
+  @override
+  String get calculatorResultPlaceholder =>
+      '⟦Ƒîłł îñ đîšŧáñçé, çóñšúɱƥŧîóñ áñđ ƥřîçé ŧó šéé ýóúř ŧřîƥ çóšŧ ·······················⟧';
 
   @override
   String get priceHistory => '⟦Ƥřîçé Ĥîšŧóřý ·····⟧';
