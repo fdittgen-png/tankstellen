@@ -124,7 +124,17 @@ void main() {
     // the `_emit` stamping of the six consumed-but-unstored signals
     // (λ/baro/absLoad/pedal/oil/ambient) + the slow-cadence raw mixture
     // inputs (MAF/MAP/STFT/LTFT). Decomposition tracked by #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1288,
+    // #2506 — re-grandfathered 1288 → 1360: the live GPS-physics estimate +
+    // coaching + GPS speed/distance fallback for no-fuel-PID cars. The
+    // SUBSTANTIVE new logic (the per-fix fold, the coaching window, and the
+    // reading-overlay) was extracted to the new pure-Dart
+    // `gps_live_estimate_folder.dart` (shared with the GPS-only pipeline so
+    // they can't diverge); only the controller-local WIRING remains here —
+    // the injected folder field + GPS-speed latch + coaching getter, the
+    // `updateGpsFix(speedKmh:)` latch, the `_emit` effective-speed/distance
+    // fallback, and the no-fuel-PID overlay call. Decomposition of this
+    // god-class is tracked by #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1360,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted

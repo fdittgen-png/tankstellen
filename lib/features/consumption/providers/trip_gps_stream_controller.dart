@@ -91,6 +91,11 @@ class TripGpsStreamController {
             longitude: pos.longitude,
             // #1935 child A — altitude feeds the road-grade calculator.
             altitudeM: pos.altitude,
+            // #2506 — forward GPS ground-speed (m/s → km/h) so the live
+            // read-out has a speed source when the OBD2 speed PID (0x0D) is
+            // momentarily absent. The controller latches it as a fallback;
+            // the OBD2 speed always wins when present.
+            speedKmh: pos.speed * 3.6,
           );
           // #1458 phase 2 — record one cadence-diagnostic per fix so the
           // user can see, post-trip, whether the OS kept delivering

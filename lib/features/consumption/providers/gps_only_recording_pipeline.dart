@@ -12,11 +12,9 @@ import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/trip_live_reading.dart';
-import '../domain/driving_coaching.dart'
-    show gpsCoachingHint, recentSamplesWithin;
 import '../domain/gps_driving_features.dart';
 import '../domain/services/gps_fuel_estimator.dart';
-import '../domain/services/gps_live_fuel_estimator.dart';
+import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/trip_recorder.dart';
 import 'recording_pipeline.dart';
 import 'trip_recording_phase.dart';
@@ -79,18 +77,13 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   final List<TripSample> _samples = [];
   DateTime? _startedAt;
 
-  /// #2389 — calibrated physics road-load estimator that turns the same
-  /// GPS speed stream into a live L/100 km figure for the PiP/banner
-  /// (display wired later in #2390/#2391). Resolved once at [start] from
-  /// the active vehicle + its calibration matrix; null when no vehicle
-  /// graph is wired (the estimate field then simply stays null).
-  GpsLiveFuelEstimator? _liveEstimator;
-
-  /// Previous fix's ground speed (m/s) + timestamp — the finite-diff
-  /// basis the estimator needs for acceleration. Null before the first
-  /// fix lands.
-  double? _prevSpeedMps;
-  DateTime? _prevSampleAt;
+  /// #2389 / #2506 — shared GPS-physics live-estimate + coaching folder.
+  /// Turns the same GPS speed stream into a live L/100 km figure (instant
+  /// + running-average + litres) and the GPS coaching hint, folding both
+  /// the OBD2 [TripRecordingController] and this pipeline through one
+  /// implementation so they can't diverge (#2506). Resolved once at [start]
+  /// from the active vehicle + its calibration matrix; null between trips.
+  GpsLiveEstimateFolder? _estimateFolder;
 
   /// Open the Geolocator stream, prime the recorder, and seed the
   /// recording state. Returns true once the stream is opened.
@@ -104,18 +97,16 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     _recorder = TripRecorder(maxIntegrationGapSeconds: 30);
     _samples.clear();
     _startedAt = DateTime.now();
-    _prevSpeedMps = null;
-    _prevSampleAt = null;
     _host.lastTripStartedAt = DateTime.now();
     _host.lastTripVehicleId = _host.readActiveVehicleId();
-    // #2389 — build the live physics estimator from the active vehicle +
-    // its calibration matrix (physicsScale #2388). A null vehicle / matrix
-    // falls back to the population-default class + cold-start scale, so the
-    // estimate still flows on a fresh install — it just isn't yet
-    // OBD2-anchored.
+    // #2389 / #2506 — build the shared live physics estimate + coaching
+    // folder from the active vehicle + its calibration matrix (physicsScale
+    // #2388). A null vehicle / matrix falls back to the population-default
+    // class + cold-start scale, so the estimate still flows on a fresh
+    // install — it just isn't yet OBD2-anchored.
     final vehicle = _tryReadActiveVehicle();
     final matrix = vehicle?.gpsCalibration;
-    _liveEstimator = GpsLiveFuelEstimator.forVehicle(vehicle, matrix);
+    _estimateFolder = GpsLiveEstimateFolder.forVehicle(vehicle, matrix);
     // Subscribe to the position stream at high accuracy — the
     // post-trip map polyline + confidence-tier UX both want ~10 m
     // precision. Permission failure is non-fatal: the stream errors
@@ -168,56 +159,24 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     _samples.add(sample);
     recorder.onSample(sample);
     final summary = recorder.buildSummary();
-    // #2389 — fold this fix into the live physics estimator. The estimator
-    // does its own 3-sample accel low-pass + warm-up, so we just hand it
-    // the finite-diff inputs (current speed, previous speed, dt). Grade is
-    // left off (gradeConfident: false) — raw GPS altitude is too noisy to
-    // feed the inertial/grade term without smoothing (deferred). Returns
+    // #2389 / #2506 — fold this fix into the SHARED estimate + coaching
+    // folder (also used by the OBD2 live path). The folder does its own
+    // 3-sample accel low-pass + warm-up and a bounded coaching window, so
+    // we just hand it the GPS-stamped sample. The estimate figures return
     // null at a standstill / before warm-up, which is exactly what the
-    // live reading should carry then.
-    double? gpsEstimate;
-    double? gpsEstimateAvg;
-    double? gpsEstimateLiters;
-    final est = _liveEstimator;
-    final prevSpeed = _prevSpeedMps;
-    final prevAt = _prevSampleAt;
-    if (est != null && prevSpeed != null && prevAt != null) {
-      final dt = sample.timestamp.difference(prevAt).inMilliseconds / 1000.0;
-      gpsEstimate = est.onSample(
-        speedMps: speedMps,
-        prevSpeedMps: prevSpeed,
-        dtSeconds: dt,
-      );
-      // #2391 — the recording-screen Avg + Fuel-used cards read the
-      // smoother running figures (not the per-tick instant): the
-      // running-average L/100 km and the running litres integral. Both
-      // come straight off the same estimator state, so no extra fold.
-      gpsEstimateAvg = est.runningAvgLPer100Km;
-      final liters = est.litersSoFar;
-      gpsEstimateLiters = liters > 0 ? liters : null;
-    }
-    _prevSpeedMps = speedMps;
-    _prevSampleAt = sample.timestamp;
-    // #2058/#2174 — GPS coaching hint from the most recent 5 s of
-    // samples on every emit. recentSamplesWithin scans only a bounded
-    // tail so the per-emit cost is O(window), not O(trajet) — the old
-    // `.where` over the whole buffer grew linearly with trip length
-    // (despite a comment claiming O(window)).
-    final recent = recentSamplesWithin(
-      _samples,
-      const Duration(seconds: 5),
-      sample.timestamp,
-    );
-    final coaching = gpsCoachingHint(recent);
+    // live reading should carry then; the #2391 Avg + Fuel-used cards read
+    // the smoother running figures it carries.
+    final estimate = _estimateFolder?.fold(sample) ?? GpsLiveEstimate.none;
+    final coaching = estimate.coachingHint;
     _host.state = _host.state.copyWith(
       phase: TripRecordingPhase.recording,
       live: TripLiveReading(
         speedKmh: sample.speedKmh,
         distanceKmSoFar: summary.distanceKm,
         elapsed: DateTime.now().difference(startedAt),
-        gpsEstimatedLPer100Km: gpsEstimate,
-        gpsEstimatedAvgLPer100Km: gpsEstimateAvg,
-        gpsEstimatedFuelLitersSoFar: gpsEstimateLiters,
+        gpsEstimatedLPer100Km: estimate.instantLPer100Km,
+        gpsEstimatedAvgLPer100Km: estimate.avgLPer100Km,
+        gpsEstimatedFuelLitersSoFar: estimate.fuelLitersSoFar,
       ),
       gpsCoachingHint: coaching,
       clearGpsCoachingHint: coaching == null,
@@ -275,9 +234,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     _recorder = null;
     _samples.clear();
     _startedAt = null;
-    _liveEstimator = null;
-    _prevSpeedMps = null;
-    _prevSampleAt = null;
+    _estimateFolder = null;
     _host.state = const TripRecordingState();
     return StoppedTripResult(
       summary: summary,

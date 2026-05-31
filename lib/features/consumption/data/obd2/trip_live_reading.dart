@@ -102,6 +102,57 @@ class TripLiveReading {
     this.gpsEstimatedFuelLitersSoFar,
   });
 
+  /// Overlay one or more fields onto a copy of this reading (#2506).
+  ///
+  /// Convention: a null argument **keeps** the existing value. The OBD2
+  /// live path uses this to fold the GPS-physics estimate
+  /// (`gpsEstimatedLPer100Km/Avg/FuelLitersSoFar`) and the GPS-track
+  /// speed/distance fallback onto the freshly-built measured reading when
+  /// no fuel-rate PID is measurable, without re-listing every measured
+  /// field. Because every overlay site only ever passes non-null values
+  /// it actually wants to set, the keep-on-null contract is unambiguous
+  /// here.
+  TripLiveReading copyWith({
+    double? speedKmh,
+    double? rpm,
+    double? fuelRateLPerHour,
+    double? fuelLevelPercent,
+    double? fuelLevelLitres,
+    double? engineLoadPercent,
+    double? throttlePercent,
+    double? coolantTempC,
+    double? distanceKmSoFar,
+    double? fuelLitersSoFar,
+    Duration? elapsed,
+    double? odometerStartKm,
+    double? odometerNowKm,
+    double? gpsEstimatedLPer100Km,
+    double? gpsEstimatedAvgLPer100Km,
+    double? gpsEstimatedFuelLitersSoFar,
+  }) {
+    return TripLiveReading(
+      speedKmh: speedKmh ?? this.speedKmh,
+      rpm: rpm ?? this.rpm,
+      fuelRateLPerHour: fuelRateLPerHour ?? this.fuelRateLPerHour,
+      fuelLevelPercent: fuelLevelPercent ?? this.fuelLevelPercent,
+      fuelLevelLitres: fuelLevelLitres ?? this.fuelLevelLitres,
+      engineLoadPercent: engineLoadPercent ?? this.engineLoadPercent,
+      throttlePercent: throttlePercent ?? this.throttlePercent,
+      coolantTempC: coolantTempC ?? this.coolantTempC,
+      distanceKmSoFar: distanceKmSoFar ?? this.distanceKmSoFar,
+      fuelLitersSoFar: fuelLitersSoFar ?? this.fuelLitersSoFar,
+      elapsed: elapsed ?? this.elapsed,
+      odometerStartKm: odometerStartKm ?? this.odometerStartKm,
+      odometerNowKm: odometerNowKm ?? this.odometerNowKm,
+      gpsEstimatedLPer100Km:
+          gpsEstimatedLPer100Km ?? this.gpsEstimatedLPer100Km,
+      gpsEstimatedAvgLPer100Km:
+          gpsEstimatedAvgLPer100Km ?? this.gpsEstimatedAvgLPer100Km,
+      gpsEstimatedFuelLitersSoFar:
+          gpsEstimatedFuelLitersSoFar ?? this.gpsEstimatedFuelLitersSoFar,
+    );
+  }
+
   /// Live L/100 km estimate — uses trip-so-far totals, so early
   /// samples are noisy and converge as the trip progresses. Returns
   /// null when the car doesn't surface a fuel-rate PID.

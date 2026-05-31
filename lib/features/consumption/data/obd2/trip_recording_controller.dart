@@ -7,8 +7,10 @@ import 'package:flutter/foundation.dart';
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../domain/driving_coaching.dart' show DrivingCoachingHint;
 import '../../domain/entities/gps_sample_diagnostic.dart';
 import '../../domain/services/gear_inference.dart';
+import '../../domain/services/gps_live_estimate_folder.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
@@ -274,6 +276,23 @@ class TripRecordingController {
   /// capture the resolved [_now] clock.
   late final TripDistanceResolver _distance;
 
+  /// #2506 — shared GPS-physics estimate + coaching folder, injected by
+  /// `Obd2RecordingPipeline` so the OBD2 live path mirrors the GPS-only
+  /// pipeline through ONE implementation (the anti-divergence seam). Null
+  /// in harnesses that don't wire it → the live estimate fields stay null.
+  final GpsLiveEstimateFolder? _gpsEstimateFolder;
+
+  /// #2506 — latest GPS ground-speed (km/h) latched via [updateGpsFix];
+  /// the live speed-read-out fallback when the OBD2 speed PID (0x0D) is
+  /// momentarily absent. OBD2 speed always wins when present.
+  double? _latestGpsSpeedKmh;
+
+  /// #2506 — latest GPS coaching hint from the shared folder on a
+  /// no-fuel-PID tick. `Obd2RecordingPipeline` publishes it onto
+  /// `state.gpsCoachingHint`, which `MinimalDriveSummary` already renders.
+  DrivingCoachingHint? get latestGpsCoachingHint => _latestGpsCoachingHint;
+  DrivingCoachingHint? _latestGpsCoachingHint;
+
   /// Owns the #1040 captured-sample buffer and the #1458 GPS
   /// cadence-diagnostics buffer — both per-trip ring buffers
   /// extracted into a focused collaborator (#1679).
@@ -337,8 +356,10 @@ class TripRecordingController {
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
     Obd2BreadcrumbRecorder? breadcrumbCollector,
+    GpsLiveEstimateFolder? gpsEstimateFolder,
   })  : _service = service,
         _diagnosticCapture = diagnosticCapture,
+        _gpsEstimateFolder = gpsEstimateFolder,
         _recorder = recorder ??
             TripRecorder(
                 maxIntegrationGapSeconds: _integrationGapCapSeconds),
@@ -476,12 +497,25 @@ class TripRecordingController {
   /// only lives at the provider seam, which keeps unit-testing the
   /// controller cheap (no Geolocator mocks required) and lets the
   /// flag-off path skip the plugin entirely.
-  void updateGpsFix({double? latitude, double? longitude, double? altitudeM}) {
+  void updateGpsFix({
+    double? latitude,
+    double? longitude,
+    double? altitudeM,
+    double? speedKmh,
+  }) {
     _liveSampleSnapshot.updateGpsFix(
       latitude: latitude,
       longitude: longitude,
       altitudeM: altitudeM,
     );
+    // #2506 — latch the GPS ground-speed for the live speed fallback. A
+    // null / non-finite / negative speed (cold GPS warm-up) is ignored so
+    // the latch never regresses to a bogus value. Stored on the controller
+    // (not the off-limits live snapshot) so the OBD2 speed PID 0x0D, when
+    // present, always wins in [_emit]; this only fills the gap.
+    if (speedKmh != null && speedKmh.isFinite && speedKmh >= 0) {
+      _latestGpsSpeedKmh = speedKmh;
+    }
     // #1979 — buffer every real fix for the GPS-distance source. A
     // null-coord call only clears the per-tick latch; it is not a fix.
     if (latitude != null && longitude != null) {
@@ -1045,8 +1079,21 @@ class TripRecordingController {
       _fuelRateSeen = true;
       _fuelLitersSoFar = summary.fuelLitersConsumed ?? _fuelLitersSoFar;
     }
-    final reading = TripLiveReading(
-      speedKmh: speedKmh,
+    // #2506 — live Speed/Distance GPS fallback. The OBD2 speed PID (0x0D)
+    // always wins when present; when it's momentarily absent (the no-fuel-
+    // PID Peugeot in the field report drops it intermittently) the latched
+    // GPS ground-speed fills the read-out instead of dashing to "—". For
+    // distance, prefer the resolver's three-tier pick (GPS track > virtual
+    // integral) when it has advanced past the recorder's integrated number
+    // — matching what `_finaliseSummary` already does at stop, so live and
+    // persisted agree.
+    final effectiveSpeedKmh = speedKmh ?? _latestGpsSpeedKmh;
+    final resolverDistanceKm = currentDistanceKm;
+    final effectiveDistanceKm = resolverDistanceKm > summary.distanceKm
+        ? resolverDistanceKm
+        : summary.distanceKm;
+    var reading = TripLiveReading(
+      speedKmh: effectiveSpeedKmh,
       rpm: rpm,
       fuelRateLPerHour: fuelRate,
       fuelLevelPercent: snap.latestFuelLevelPercent,
@@ -1058,12 +1105,37 @@ class TripRecordingController {
       engineLoadPercent: engineLoadPercent,
       throttlePercent: throttlePercent,
       coolantTempC: coolantTempC,
-      distanceKmSoFar: summary.distanceKm,
+      distanceKmSoFar: effectiveDistanceKm,
       fuelLitersSoFar: _fuelRateSeen ? _fuelLitersSoFar : null,
       elapsed: nowTs.difference(_startedAt ?? nowTs),
       odometerStartKm: _odometerStartKm,
       odometerNowKm: _odometerLatestKm,
     );
+    // #2506 — when NO fuel-rate PID is measurable (every tick null), fold
+    // the GPS-physics estimate + coaching into the live reading so the
+    // recording screen mirrors the proven post-trip
+    // `Obd2GpsEstimateFallback` instead of dashing the whole drive. The
+    // shared [GpsLiveEstimateFolder] is the same implementation the
+    // GPS-only pipeline uses, so the two paths can't diverge. The fold is
+    // driven by the EFFECTIVE speed (GPS latch when OBD2 0x0D is absent),
+    // so the physics still runs on a car that exposes neither a fuel PID
+    // nor a reliable speed PID. Skipped once any real fuel rate is seen —
+    // measured data is never overwritten; a stale GPS coaching hint is then
+    // cleared so `MinimalDriveSummary` swaps back to the OBD2 triplet.
+    final folder = _gpsEstimateFolder;
+    if (fuelRate == null && !_fuelRateSeen && folder != null) {
+      final overlaid = folder.overlay(
+        base: reading,
+        now: nowTs,
+        effectiveSpeedKmh: effectiveSpeedKmh ?? 0,
+        rpm: rpm,
+        altitudeM: snap.latestAltitudeM,
+      );
+      reading = overlaid.reading;
+      _latestGpsCoachingHint = overlaid.coachingHint;
+    } else if (_fuelRateSeen) {
+      _latestGpsCoachingHint = null;
+    }
     _liveController.add(reading);
   }
 
