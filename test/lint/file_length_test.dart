@@ -134,13 +134,15 @@ void main() {
     // `updateGpsFix(speedKmh:)` latch, the `_emit` effective-speed/distance
     // fallback, and the no-fuel-PID overlay call. Decomposition of this
     // god-class is tracked by #2187/#2188/#2190.
-    // #2509 — re-grandfathered 1360 → 1402: the GPS start-time fallback that
-    // stops a real GPS-tracked drive with a dead OBD2 link from being
-    // silently discarded — the `_gpsStartedAt`/`_gpsEndedAt` latch (set in
-    // `updateGpsFix`), the `_finaliseSummary` start/end back-fill, and the
-    // `gpsFixCount` getter the persist guard reads. Pure wiring + rationale;
+    // #2509 + #2513 — re-grandfathered 1360 → 1412 (merge of both): the GPS
+    // start-time fallback (the `_gpsStartedAt`/`_gpsEndedAt` latch in
+    // `updateGpsFix`, the `_finaliseSummary` start/end back-fill, and the
+    // `gpsFixCount` getter the persist guard reads, #2509) PLUS the
+    // wider-range absolute load (PID 0x43) + latest GPS altitude wired to
+    // the baseline recorder so the fuzzy path can fill the climbing/loaded
+    // bucket from a real road grade and/or load ramp (#2513). Pure wiring;
     // decomposition of this god-class is tracked by #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1402,
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1412,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
