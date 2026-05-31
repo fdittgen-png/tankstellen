@@ -5,6 +5,19 @@ import 'package:flutter/material.dart';
 
 import '../theme/spacing.dart';
 
+/// Bottom padding a scrollable body must reserve so its last row clears a
+/// floating [FloatingActionButton] hosted by [PageScaffold.floatingActionButton]
+/// (#2494).
+///
+/// Both the Carburant fill-up list and the Trajets trip list float their
+/// "add" / "start recording" FAB over the list via the Scaffold FAB slot.
+/// The Scaffold already lifts a floating FAB clear of the system bottom
+/// inset, so callers must **not** add `MediaQuery.viewPadding.bottom` on
+/// top of this — doing so double-counts the safe-area gap (the old
+/// hand-rolled Trajets Stack bug). Use it as the list's
+/// `EdgeInsets.only(bottom: kFabScrollClearance)`.
+const double kFabScrollClearance = 96;
+
 /// Canonical outer chrome for every top-level screen — `Scaffold` +
 /// `AppBar` + optional primary-tinted banner below the app bar + body.
 ///

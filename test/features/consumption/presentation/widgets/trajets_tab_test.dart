@@ -13,6 +13,7 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/trajets_record_fab.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trajets_tab.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
@@ -236,7 +237,14 @@ Future<void> _pumpTab(
     routes: [
       GoRoute(
         path: '/trajets',
-        builder: (_, _) => Scaffold(body: TrajetsTab(vehicleId: vehicleId)),
+        // #2494 — the record FAB now floats in the Scaffold FAB slot (as it
+        // does in production via PageScaffold) rather than inside the tab
+        // body. Hosting it here keeps the existing CTA assertions valid
+        // while exercising the unified FAB-over-list path.
+        builder: (_, _) => Scaffold(
+          body: TrajetsTab(vehicleId: vehicleId),
+          floatingActionButton: const TrajetsRecordFab(),
+        ),
       ),
       GoRoute(
         path: '/trip/:id',
