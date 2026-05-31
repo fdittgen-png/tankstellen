@@ -2452,6 +2452,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get sectionLocation => 'Helyszín';
 
   @override
+  String get sectionSetupDataSources => 'Setup & data sources';
+
+  @override
+  String get sectionFeaturesUsage => 'Features & usage';
+
+  @override
+  String get sectionAccountSync => 'Account & sync';
+
+  @override
+  String get sectionAppearanceWidgets => 'Appearance & widgets';
+
+  @override
+  String get sectionPrivacyData => 'Privacy & data';
+
+  @override
+  String get sectionAdvancedDeveloper => 'Advanced & developer';
+
+  @override
   String get tooltipBack => 'Vissza';
 
   @override

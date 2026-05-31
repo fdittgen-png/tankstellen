@@ -2454,6 +2454,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sectionLocation => 'Standort';
 
   @override
+  String get sectionSetupDataSources => 'Einrichtung & Datenquellen';
+
+  @override
+  String get sectionFeaturesUsage => 'Funktionen & Nutzung';
+
+  @override
+  String get sectionAccountSync => 'Konto & Synchronisierung';
+
+  @override
+  String get sectionAppearanceWidgets => 'Darstellung & Widgets';
+
+  @override
+  String get sectionPrivacyData => 'Datenschutz & Daten';
+
+  @override
+  String get sectionAdvancedDeveloper => 'Erweitert & Entwickler';
+
+  @override
   String get tooltipBack => 'Zurück';
 
   @override

@@ -2796,5 +2796,35 @@
   "@tripRecordingDiscardedNoMovement": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "sectionSetupDataSources": "Setup & data sources",
+  "@sectionSetupDataSources": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sectionFeaturesUsage": "Features & usage",
+  "@sectionFeaturesUsage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sectionAccountSync": "Account & sync",
+  "@sectionAccountSync": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sectionAppearanceWidgets": "Appearance & widgets",
+  "@sectionAppearanceWidgets": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sectionPrivacyData": "Privacy & data",
+  "@sectionPrivacyData": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sectionAdvancedDeveloper": "Advanced & developer",
+  "@sectionAdvancedDeveloper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

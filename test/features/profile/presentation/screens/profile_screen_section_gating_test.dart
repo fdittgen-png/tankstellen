@@ -145,6 +145,13 @@ void main() {
 
         expect(find.text('TankSync', skipOffstage: false), findsOneWidget);
         expect(find.text('Consumption', skipOffstage: false), findsOneWidget);
+        // #2521 — TankSync is the only child of the "Account & sync"
+        // group, so enabling it must also surface that group header.
+        expect(
+          find.text('Account & sync', skipOffstage: false),
+          findsOneWidget,
+          reason: '#2521: enabling TankSync must surface its group header',
+        );
       },
     );
 
@@ -211,6 +218,15 @@ void main() {
           findsOneWidget,
           reason: 'enabling debugMode must surface the Developer tools '
               'entry in Settings (#2248).',
+        );
+        // #2521 — the Developer tools tile lives under the "Advanced &
+        // developer" group, whose header is conditionalised on having a
+        // visible child. Enabling debugMode must surface that header.
+        expect(
+          find.text('Advanced & developer', skipOffstage: false),
+          findsOneWidget,
+          reason: '#2521: enabling debugMode must surface the Advanced & '
+              'developer group header',
         );
       },
     );
