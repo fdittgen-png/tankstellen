@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'ocr/image_orientation.dart';
 import 'ocr/ocr_image_preprocessor.dart';
+import 'ocr/ocr_trace_recorder.dart';
 import 'ocr/pump_display_orchestrator.dart';
 import 'ocr/pump_ocr_config.dart';
 import 'ocr/pump_validation_gate.dart';
@@ -120,10 +121,12 @@ class ReceiptScanService {
   Future<ReceiptScanOutcome?> scanReceipt({
     String? country,
     String? brand,
+    OcrTraceRecorder? trace,
   }) async {
+    trace?.input(country: country, brand: brand);
     final capture = await _capture();
     if (capture == null) return null;
-    final text = await _recognise(capture);
+    final text = await _recognise(capture, trace: trace);
     if (text == null) {
       await _tryDelete(capture);
       return null;
@@ -134,7 +137,7 @@ class ReceiptScanService {
       profile = _ocrConfig.profileFor(country);
     }
     return ReceiptScanOutcome(
-      parse: _parser.parse(text, profile: profile),
+      parse: _parser.parse(text, profile: profile, trace: trace),
       ocrText: text,
       imagePath: capture,
     );
@@ -154,6 +157,7 @@ class ReceiptScanService {
     String? country,
     String? brand,
     OcrNormalizedRect? roi,
+    OcrTraceRecorder? trace,
   }) async {
     final capture = await _capture();
     if (capture == null) return null;
@@ -162,6 +166,7 @@ class ReceiptScanService {
       country: country,
       brand: brand,
       roi: roi,
+      trace: trace,
     );
   }
 
@@ -179,10 +184,24 @@ class ReceiptScanService {
     String? country,
     String? brand,
     OcrNormalizedRect? roi,
+    OcrTraceRecorder? trace,
   }) async {
+    // Resolve the profile up front (independent of the image) so the
+    // trace's input section is complete even on a glare-rejected frame.
+    OcrLocaleProfile? profile;
+    if (country != null) {
+      await _ocrConfig.load();
+      profile = _ocrConfig.profileFor(country);
+    }
+    trace?.input(
+      country: country,
+      brand: brand,
+      roi: roi == null ? null : [roi.left, roi.top, roi.width, roi.height],
+      profile: profile?.toTraceJson(),
+    );
     // #2275 — auto-reject an over-glared frame BEFORE OCR so the caller
     // can prompt a re-angle rather than show a generic failure.
-    if (await _isOverGlared(path, roi)) {
+    if (await _isOverGlared(path, roi, trace: trace)) {
       return PumpDisplayScanOutcome(
         parse: const PumpDisplayParseResult(),
         ocrText: '',
@@ -202,11 +221,7 @@ class ReceiptScanService {
       await _tryDelete(path);
       return null;
     }
-    OcrLocaleProfile? profile;
-    if (country != null) {
-      await _ocrConfig.load();
-      profile = _ocrConfig.profileFor(country);
-    }
+    trace?.blocks(recognised.text, recognised.blocks);
     return PumpDisplayScanOutcome(
       // #2478 — PRIMARY label-anchored read (recovers the dropped PRIX DU
       // LITRE unit price), flat-string parser fallback, then the gate.
@@ -216,6 +231,7 @@ class ReceiptScanService {
         profile: profile,
         parser: _pumpParser,
         gate: _pumpGate,
+        trace: trace,
       ),
       ocrText: recognised.text,
       imagePath: path,
@@ -225,7 +241,11 @@ class ReceiptScanService {
   /// Decodes [path], crops to [roi], and returns `true` when the ROI is
   /// over-glared per [GlarePolicy.standard]. Best-effort: a decode error
   /// returns `false` so a quirky image still reaches OCR (#2275).
-  Future<bool> _isOverGlared(String path, OcrNormalizedRect? roi) async {
+  Future<bool> _isOverGlared(
+    String path,
+    OcrNormalizedRect? roi, {
+    OcrTraceRecorder? trace,
+  }) async {
     try {
       final bytes = await File(path).readAsBytes();
       final decoded = img.decodeJpg(bytes);
@@ -233,8 +253,12 @@ class ReceiptScanService {
       final upright = img.bakeOrientation(decoded);
       final region =
           roi != null ? _preprocessor.cropToRoi(upright, roi) : upright;
-      return _preprocessor.glareFraction(region) >
-          GlarePolicy.standard.rejectAbove;
+      final fraction = _preprocessor.glareFraction(region);
+      final threshold = GlarePolicy.standard.rejectAbove;
+      final rejected = fraction > threshold;
+      trace?.glare(
+          fraction: fraction, threshold: threshold, rejected: rejected);
+      return rejected;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: const {'where': 'pump glare check failed'}));
@@ -269,9 +293,17 @@ class ReceiptScanService {
     String path, {
     bool enhanceContrast = false,
     OcrNormalizedRect? roi,
+    OcrTraceRecorder? trace,
   }) async {
-    final text = (await _recogniseRaw(path, enhanceContrast: enhanceContrast, roi: roi))?.text;
+    final recognized =
+        await _recogniseRaw(path, enhanceContrast: enhanceContrast, roi: roi);
+    final text = recognized?.text;
     if (text != null) debugPrint('OCR text (${text.length} chars):\n$text');
+    // #2517 — TRACE ONLY: recover the ML Kit geometry the receipt path
+    // discards (production still reads only the flat [text]).
+    if (trace != null && recognized != null) {
+      trace.blocks(recognized.text, mapRecognizedText(recognized));
+    }
     return text;
   }
 

@@ -78,6 +78,18 @@ class OcrLocaleProfile {
   /// `true` when [total] is a plausible total charge.
   bool totalInRange(double total) => total > 0 && total <= totalMax;
 
+  /// Serialises this profile for the OCR trace package's `input` section
+  /// (#2517) — trace-only, never on the production read path.
+  Map<String, dynamic> toTraceJson() => {
+        'country': country,
+        'currency': currency,
+        'decimalSeparator': decimalSeparator,
+        'priceMin': priceMin,
+        'priceMax': priceMax,
+        'volumeMax': volumeMax,
+        'totalMax': totalMax,
+      };
+
   static OcrLocaleProfile? fromJson(Object? raw) {
     if (raw is! Map) return null;
     final country = raw['country'];

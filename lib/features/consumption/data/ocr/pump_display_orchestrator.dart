@@ -3,6 +3,7 @@
 
 import '../pump_display_parser.dart';
 import 'label_anchored_extractor.dart';
+import 'ocr_trace_recorder.dart';
 import 'pump_ocr_config.dart';
 import 'pump_validation_gate.dart';
 import 'recognized_text_block.dart';
@@ -28,20 +29,48 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
   OcrLocaleProfile? profile,
   PumpDisplayParser parser = const PumpDisplayParser(),
   PumpValidationGate gate = const PumpValidationGate(),
+  OcrTraceRecorder? trace,
 }) {
-  final anchored = extractByLabelAnchor(blocks, profile: profile);
+  final anchored = extractByLabelAnchor(blocks, profile: profile, trace: trace);
   if (anchored.boundCount < 2) {
     // Geometry too sparse to anchor — defer to the flat-string parser,
     // which keeps the legacy German / receipt-style behaviour.
-    return parser.parse(text, profile: profile);
+    final fallback = parser.parse(text, profile: profile);
+    trace?.result(
+      totalCost: fallback.totalCost,
+      liters: fallback.liters,
+      pricePerLiter: fallback.pricePerLiter,
+      derived: fallback.derived,
+      confidence: fallback.confidence,
+      validated: fallback.validated,
+      validationReason: 'flat-string-fallback',
+    );
+    return fallback;
   }
   final confidence = _confidenceFor(anchored);
+  trace?.confidence(
+    hasTotal: anchored.totalCost != null,
+    hasVolume: anchored.liters != null,
+    hasPrice: anchored.pricePerLiter != null,
+    isConsistent: anchored.isConsistent,
+    total: confidence,
+  );
   final result = gate.evaluate(
     total: anchored.totalCost,
     volume: anchored.liters,
     pricePerLitre: anchored.pricePerLiter,
     confidence: confidence,
     profile: profile,
+    trace: trace,
+  );
+  trace?.result(
+    totalCost: anchored.totalCost,
+    liters: anchored.liters,
+    pricePerLiter: anchored.pricePerLiter,
+    derived: anchored.derived.map(pumpFieldName).toSet(),
+    confidence: confidence,
+    validated: profile != null && result.accepted,
+    validationReason: result.reason,
   );
   return PumpDisplayParseResult(
     totalCost: anchored.totalCost,
@@ -61,17 +90,4 @@ double _confidenceFor(LabelAnchoredResult r) {
   if (r.pricePerLiter != null) score += 0.3;
   if (r.isConsistent) score += 0.1;
   return score.clamp(0.0, 1.0);
-}
-
-/// Maps a [PumpField] to the [PumpDisplayParseResult.derived] field-name
-/// key (`'totalCost'` / `'liters'` / `'pricePerLiter'`).
-String pumpFieldName(PumpField field) {
-  switch (field) {
-    case PumpField.total:
-      return 'totalCost';
-    case PumpField.volume:
-      return 'liters';
-    case PumpField.pricePerLitre:
-      return 'pricePerLiter';
-  }
 }

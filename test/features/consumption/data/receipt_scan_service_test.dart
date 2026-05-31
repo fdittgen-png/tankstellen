@@ -9,6 +9,7 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:tankstellen/features/consumption/data/ocr/ocr_geometry.dart';
+import 'package:tankstellen/features/consumption/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/ocr/pump_ocr_config.dart';
 import 'package:tankstellen/features/consumption/data/pump_display_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
@@ -90,6 +91,7 @@ class _StubReceiptParser extends ReceiptParser {
     String text, {
     String? stationId,
     OcrLocaleProfile? profile,
+    OcrTraceRecorder? trace,
   }) {
     parseCalls++;
     lastTextParsed = text;

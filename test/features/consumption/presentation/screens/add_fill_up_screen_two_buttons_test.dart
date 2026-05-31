@@ -10,6 +10,7 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/ocr/ocr_geometry.dart';
+import 'package:tankstellen/features/consumption/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/pump_display_camera_screen.dart';
@@ -91,6 +92,7 @@ class _RoutingScanService extends ReceiptScanService {
   Future<ReceiptScanOutcome?> scanReceipt({
     String? country,
     String? brand,
+    OcrTraceRecorder? trace,
   }) async {
     receiptCalls++;
     return null;
@@ -102,6 +104,7 @@ class _RoutingScanService extends ReceiptScanService {
     String? country,
     String? brand,
     OcrNormalizedRect? roi,
+    OcrTraceRecorder? trace,
   }) async {
     pumpCalls++;
     return null;

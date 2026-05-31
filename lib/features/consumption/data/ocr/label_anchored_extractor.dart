@@ -5,10 +5,12 @@ import 'package:meta/meta.dart';
 
 import '../_pump_display_helpers.dart';
 import '_pump_label_table.dart';
+import 'label_anchored_trace.dart';
+import 'ocr_trace_recorder.dart';
 import 'pump_ocr_config.dart';
 import 'recognized_text_block.dart';
 
-export '_pump_label_table.dart' show PumpField;
+export '_pump_label_table.dart' show PumpField, pumpFieldName;
 
 /// A block already classified as a printed label (with its field).
 @immutable
@@ -88,6 +90,7 @@ class LabelAnchoredResult {
 LabelAnchoredResult extractByLabelAnchor(
   List<RecognizedTextBlock> blocks, {
   OcrLocaleProfile? profile,
+  OcrTraceRecorder? trace,
 }) {
   if (blocks.isEmpty) return LabelAnchoredResult.empty;
 
@@ -105,8 +108,17 @@ LabelAnchoredResult extractByLabelAnchor(
     if (field != null) {
       labels.add(_LabelHit(block, field));
       rawLabelBlocks.add(block);
+      continue;
     }
     // Everything else (metrology prose, card-reader plate) is noise.
+  }
+  // Trace-only re-walk (guarded → read path pays nothing when null).
+  if (trace != null) {
+    for (final b in blocks) {
+      final n = _asNumeric(b);
+      recordClassification(
+          trace, b.text, n?.value, n?.decimals, classifyPumpLabel(b.text));
+    }
   }
 
   // Assemble multi-block labels: "PRIX DU" + "LITRE" recombine into the
@@ -115,6 +127,11 @@ LabelAnchoredResult extractByLabelAnchor(
     labels.removeWhere(
         (l) => l.block == hit.firstSource || l.block == hit.secondSource);
     labels.add(_LabelHit(hit.block, hit.field));
+    trace?.assembled(
+        first: hit.firstSource.text,
+        second: hit.secondSource.text,
+        combined: hit.block.text,
+        field: pumpFieldName(hit.field));
   }
 
   final bound = <PumpField, double>{};
@@ -126,19 +143,21 @@ LabelAnchoredResult extractByLabelAnchor(
       (a, b) => pumpFieldWeight(b.field).compareTo(pumpFieldWeight(a.field)));
   for (final label in labels) {
     if (bound.containsKey(label.field)) continue;
-    final value = _anchorNumeric(label.block, numerics, consumed);
+    final value = _anchorNumeric(label.block, numerics, consumed,
+        field: label.field, trace: trace);
     if (value != null) {
       bound[label.field] = value.value;
       consumed.add(value);
     }
   }
 
-  _magnitudeFallback(bound, numerics, consumed, profile);
+  _magnitudeFallback(bound, numerics, consumed, profile, trace);
 
   return _crossCheck(
     total: bound[PumpField.total],
     volume: bound[PumpField.volume],
     price: bound[PumpField.pricePerLitre],
+    trace: trace,
   );
 }
 
@@ -240,8 +259,10 @@ bool _areAdjacent(OcrBox a, OcrBox b) {
 _NumericHit? _anchorNumeric(
   RecognizedTextBlock label,
   List<_NumericHit> numerics,
-  Set<_NumericHit> consumed,
-) {
+  Set<_NumericHit> consumed, {
+  PumpField? field,
+  OcrTraceRecorder? trace,
+}) {
   _NumericHit? best;
   var bestScore = double.infinity;
   for (final n in numerics) {
@@ -254,6 +275,17 @@ _NumericHit? _anchorNumeric(
       best = n;
     }
   }
+  if (trace != null && field != null) {
+    recordAnchorCandidates(trace, field, label.text, label.box.cx, label.box.cy, [
+      for (final n in numerics)
+        if (!consumed.contains(n))
+          AnchorCandidate(
+              value: n.value,
+              cx: n.block.box.cx,
+              cy: n.block.box.cy,
+              chosen: identical(n, best)),
+    ]);
+  }
   return best;
 }
 
@@ -265,11 +297,15 @@ void _magnitudeFallback(
   List<_NumericHit> numerics,
   Set<_NumericHit> consumed,
   OcrLocaleProfile? profile,
+  OcrTraceRecorder? trace,
 ) {
   final leftover = numerics.where((n) => !consumed.contains(n)).toList();
   if (leftover.isEmpty) return;
   final priceMin = profile?.priceMin ?? 0.5;
   final priceMax = profile?.priceMax ?? 5.0;
+  // Pre-fallback snapshot so the trace reports only fallback's own picks.
+  final before = Map<PumpField, double>.from(bound);
+  var reason = '';
 
   if (!bound.containsKey(PumpField.pricePerLitre)) {
     final priceLike = leftover
@@ -300,6 +336,7 @@ void _magnitudeFallback(
       // so a bare magnitude sort would mislabel them.
       final asAsc = (a * price - b).abs(); // volume=a (smaller), total=b
       final asDesc = (b * price - a).abs(); // volume=b (larger), total=a
+      reason = 'price-anchored: best (volume×price≈total) ordering';
       if (asDesc < asAsc) {
         bound[PumpField.volume] = b;
         bound[PumpField.total] = a;
@@ -312,12 +349,17 @@ void _magnitudeFallback(
       // whenever €/L > 1, the common case).
       bound[PumpField.volume] = a;
       bound[PumpField.total] = b;
+      reason = 'no price anchor: volume<total';
     }
   } else if (!bound.containsKey(PumpField.volume) && twoDec.isNotEmpty) {
     bound[PumpField.volume] = twoDec.first.value;
+    reason = 'lone 2-dec leftover → volume';
   } else if (!bound.containsKey(PumpField.total) && twoDec.isNotEmpty) {
     bound[PumpField.total] = twoDec.last.value;
+    reason = 'lone 2-dec leftover → total';
   }
+
+  recordFallback(trace, before, bound, priceMin, priceMax, reason);
 }
 
 /// Cross-checks `total ≈ volume × €/L`, deriving the missing third when
@@ -326,7 +368,9 @@ LabelAnchoredResult _crossCheck({
   double? total,
   double? volume,
   double? price,
+  OcrTraceRecorder? trace,
 }) {
+  final readTotal = total, readVolume = volume, readPrice = price;
   final derived = <PumpField>{};
   final present = [total, volume, price].where((v) => v != null).length;
 
@@ -345,6 +389,9 @@ LabelAnchoredResult _crossCheck({
       derived.add(PumpField.pricePerLitre);
     }
   }
+
+  recordCrossCheck(trace, readTotal, readVolume, readPrice, derived,
+      total: total, volume: volume, price: price);
 
   return LabelAnchoredResult(
     totalCost: total,
