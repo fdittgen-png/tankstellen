@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -18,6 +19,7 @@ import '../widgets/station_info_section.dart';
 import '../widgets/station_prices_section.dart';
 import '../widgets/station_rating_section.dart';
 import '../widgets/station_status_row.dart';
+import 'station_detail_wide_layout.dart';
 
 /// Detail screen for a single fuel station.
 ///
@@ -84,10 +86,19 @@ class _StationDetailPlain extends StatelessWidget {
   }
 }
 
-/// Loaded state — `CustomScrollView` + `SliverAppBar(pinned: true,
-/// expandedHeight: 196)`. Status row and brand header live inside the
-/// `flexibleSpace.background`, so they fade out as the bar collapses
-/// to its compact form on scroll past the prices card.
+/// Loaded state — adaptive on screen size (#2531, Epic #2525).
+///
+/// On **compact** (< 600dp / portrait phone) this is the original
+/// `CustomScrollView` + `SliverAppBar(pinned: true, expandedHeight: 196)`:
+/// status row and brand header live inside the `flexibleSpace.background`,
+/// so they fade out as the bar collapses to its compact form on scroll past
+/// the prices card. This path is byte-for-byte unchanged.
+///
+/// On **medium / expanded** (≥ 600dp / landscape / tablet) it delegates to
+/// [StationDetailWideLayout] — a normal (non-expanding) `PageScaffold`
+/// AppBar over a two-pane `Row` (status + brand header | prices + info +
+/// rating + history), each pane self-scrolling. Same section widgets, no
+/// route change (deep-link safe).
 class _StationDetailLoaded extends StatelessWidget {
   final String stationId;
   final StationDetail detail;
@@ -101,6 +112,16 @@ class _StationDetailLoaded extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Wide screens get the two-column layout; compact keeps the sliver
+    // header below, unchanged.
+    if (screenSizeOf(context) != ScreenSize.compact) {
+      return StationDetailWideLayout(
+        stationId: stationId,
+        detail: detail,
+        serviceResult: serviceResult,
+      );
+    }
+
     final l10n = AppLocalizations.of(context);
     final station = detail.station;
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
