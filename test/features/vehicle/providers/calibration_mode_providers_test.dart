@@ -25,6 +25,7 @@ class _FakeFuzzyClassifier extends FuzzyClassifier {
     required double throttlePct,
     required double rpm,
     bool isStopAndGoContext = false,
+    double loadPct = 0,
   }) =>
       result;
 }

@@ -1103,6 +1103,13 @@ class TripRecordingController {
       // OEM-capable.
       fuelLevelLitres: snap.latestOemFuelLevelLitres,
       engineLoadPercent: engineLoadPercent,
+      // #2513 — carry the wider-range absolute load + latest GPS
+      // altitude through to the baseline recorder so its fuzzy path can
+      // fill the climbing/loaded bucket from a real road grade and/or a
+      // load ramp. Both stay null on cars / trips that don't surface
+      // them, and the recorder degrades gracefully.
+      absLoadPercent: snap.latestAbsLoadPercent,
+      altitudeM: snap.latestAltitudeM,
       throttlePercent: throttlePercent,
       coolantTempC: coolantTempC,
       distanceKmSoFar: effectiveDistanceKm,

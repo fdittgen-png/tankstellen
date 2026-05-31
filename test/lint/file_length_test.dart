@@ -134,7 +134,13 @@ void main() {
     // `updateGpsFix(speedKmh:)` latch, the `_emit` effective-speed/distance
     // fallback, and the no-fuel-PID overlay call. Decomposition of this
     // god-class is tracked by #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1360,
+    // #2513 — re-grandfathered 1360 → 1367: the live `TripLiveReading`
+    // now carries the wider-range absolute load (PID 0x43) + the latest
+    // GPS altitude through to the baseline recorder, so its fuzzy path
+    // can fill the climbing/loaded bucket from a real road grade and/or
+    // a load ramp (the two fields + their rationale comment). Pure
+    // wiring; decomposition tracked by #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1367,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted

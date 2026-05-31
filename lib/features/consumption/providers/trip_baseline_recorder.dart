@@ -15,6 +15,7 @@ import '../../vehicle/providers/calibration_mode_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
 import '../data/obd2/trip_live_reading.dart';
+import '../domain/baseline_rolling_state.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
 import '../../../core/logging/error_logger.dart';
@@ -29,14 +30,26 @@ import '../../../core/logging/error_logger.dart';
 /// gets `(situation, band, delta)` back to stamp onto its state. The
 /// collaborator reads its Riverpod dependencies through [_ref].
 class TripBaselineRecorder {
-  TripBaselineRecorder(this._ref);
+  /// [now] is an injectable clock — production passes the default
+  /// `DateTime.now`; tests inject a virtual clock so the rolling
+  /// stop-and-go window and the rule-path [SituationClassifier]'s
+  /// debounce advance deterministically without real time passing
+  /// (#2513).
+  TripBaselineRecorder(this._ref, {DateTime Function()? now})
+      : _now = now ?? DateTime.now;
 
   final Ref _ref;
+  final DateTime Function() _now;
 
   SituationClassifier? _classifier;
   BaselineStore? _store;
   String? _vehicleId;
   ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
+
+  /// #2513 — per-trip rolling window (30-s speed variance + finite-diff
+  /// accel) and GPS-altitude road-grade estimate the fuzzy path needs.
+  /// The [FuzzyClassifier] is pure, so this windowed state lives here.
+  final BaselineRollingState _rolling = BaselineRollingState();
 
   /// Vehicle id the current recording's baselines are scoped to.
   /// Surfaced so the notifier can tag the active-trip snapshot and
@@ -49,6 +62,10 @@ class TripBaselineRecorder {
   /// vehicle is unavailable.
   Future<void> load() async {
     _classifier = SituationClassifier();
+    // #2513 — start each trip with a clean stop-and-go window + grade
+    // estimate so the previous trip's tail can't leak into the first
+    // few samples.
+    _rolling.reset();
     try {
       final vehicle = _ref.read(activeVehicleProfileProvider);
       _vehicleId = vehicle?.id;
@@ -72,6 +89,11 @@ class TripBaselineRecorder {
   /// delta-fraction the notifier stamps onto its state.
   ({DrivingSituation situation, ConsumptionBand band, double? delta})
       recordAndClassify(TripLiveReading reading) {
+    // #2513 — fold this reading into the rolling stop-and-go window and
+    // the road-grade estimate BEFORE classifying, so the fuzzy path
+    // sees the up-to-date context (variance flag, finite-diff accel,
+    // confident grade) for this very sample.
+    _rolling.add(reading, _now());
     final situation = _classifyFrom(reading);
     _recordToStore(reading, situation);
     final band = _classifyBandFrom(reading, situation);
@@ -98,6 +120,8 @@ class TripBaselineRecorder {
     _store = null;
     _vehicleId = null;
     _classifier = null;
+    // #2513 — drop the rolling stop-and-go window + grade state.
+    _rolling.reset();
   }
 
   /// Map a [FuelType] apiValue onto a [ConsumptionFuelFamily] for
@@ -139,12 +163,22 @@ class TripBaselineRecorder {
   /// Fuzzy path: split [live] across all non-transient buckets the
   /// classifier flags as members, weighted by membership.
   ///
-  /// `accel` and `grade` aren't on the OBD2 live stream, so we pass
-  /// 0 — the classifier degrades gracefully (decel and climbing zero
-  /// out, which is the same conservative result the rule path
-  /// produces when those signals are missing). [Situation.fuelCut]
-  /// maps onto a transient and is filtered by [BaselineStore]; we
-  /// drop it pre-call so the bridge stays explicit.
+  /// #2513 — every input the classifier needs is now derived from the
+  /// recorder's rolling state instead of the previous `0` literals that
+  /// left `stopAndGo` and `climbing` permanently empty:
+  ///
+  ///  * `isStopAndGoContext` from the 30-s speed-variance window;
+  ///  * `grade` from the GPS-altitude [RoadGradeCalculator], but only
+  ///    when it's confident (else 0 → the load ramp carries climbing);
+  ///  * `loadPct` from absolute / engine load, so a loaded-flat drive
+  ///    still fills climbing on cars without GPS altitude;
+  ///  * `throttlePct` from the real PID 0x11 throttle (engine-load
+  ///    proxy only as a fallback);
+  ///  * `accel` from a finite difference over the speed window so the
+  ///    decel membership can fire.
+  ///
+  /// [Situation.fuelCut] maps onto a transient and is filtered by
+  /// [BaselineStore]; we drop it pre-call so the bridge stays explicit.
   void _recordFuzzy(
     BaselineStore store,
     String vehicleId,
@@ -154,10 +188,12 @@ class TripBaselineRecorder {
     final classifier = _ref.read(fuzzyClassifierProvider);
     final memberships = classifier.classify(
       speedKmh: r.speedKmh ?? 0,
-      accel: 0,
-      grade: 0,
-      throttlePct: r.engineLoadPercent ?? 0,
+      accel: _rolling.recentAccelMps2(),
+      grade: _rolling.confidentGradePct,
+      throttlePct: BaselineRollingState.throttleSignal(r) ?? 0,
       rpm: r.rpm ?? 0,
+      isStopAndGoContext: _rolling.isStopAndGoContext,
+      loadPct: BaselineRollingState.loadSignal(r),
     );
     for (final entry in memberships.entries) {
       if (entry.value <= 0) continue;
@@ -211,10 +247,15 @@ class TripBaselineRecorder {
     final cls = _classifier;
     if (cls == null) return DrivingSituation.idle;
     return cls.onSample(DrivingSample(
-      timestamp: DateTime.now(),
+      timestamp: _now(),
       speedKmh: r.speedKmh ?? 0,
       rpm: r.rpm ?? 0,
-      throttlePercent: r.engineLoadPercent, // close-enough proxy
+      // #2513 — feed the real PID 0x11 throttle into the throttle slot;
+      // the calculated engine load only stands in when throttle is
+      // unavailable. Previously engine load was mis-fed into BOTH slots,
+      // which over-read the closed-pedal state and corrupted the
+      // idle / decel / urban gating.
+      throttlePercent: r.throttlePercent ?? r.engineLoadPercent,
       engineLoadPercent: r.engineLoadPercent,
       fuelRateLPerHour: r.fuelRateLPerHour,
     ));

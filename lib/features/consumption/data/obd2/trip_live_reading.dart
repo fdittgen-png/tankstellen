@@ -30,6 +30,22 @@ class TripLiveReading {
 
   final double? engineLoadPercent;
 
+  /// Absolute engine load, 0–100 % (PID 0x43). A wider-range companion
+  /// to [engineLoadPercent] (PID 0x04) — it isn't clamped at 100 % the
+  /// way calculated load is, so it reads the genuine "working hard"
+  /// signal on a climb or under tow. Fed into the fuzzy classifier's
+  /// load ramp (#2513) so the climbing/loaded baseline fills even on
+  /// cars / trips without a confident GPS-altitude grade. Null when the
+  /// adapter doesn't surface PID 0x43.
+  final double? absLoadPercent;
+
+  /// Most recent GPS altitude in metres (#1935 / #2513), latched from
+  /// the trip's GPS fix when the `gpsTripPath` flag is on. Feeds the
+  /// recorder-owned `RoadGradeCalculator` so the fuzzy classifier can
+  /// learn a real road-grade-driven climbing baseline. Null when no GPS
+  /// fix is available (flag off, indoors, before the first fix).
+  final double? altitudeM;
+
   /// Absolute throttle position, 0–100 %. Subscribed to the 5 Hz tier
   /// of the PidScheduler (#814) so the eco-feedback UI and the
   /// future coasting-detection logic have a direct signal instead of
@@ -90,6 +106,8 @@ class TripLiveReading {
     this.fuelLevelPercent,
     this.fuelLevelLitres,
     this.engineLoadPercent,
+    this.absLoadPercent,
+    this.altitudeM,
     this.throttlePercent,
     this.coolantTempC,
     required this.distanceKmSoFar,
@@ -119,6 +137,8 @@ class TripLiveReading {
     double? fuelLevelPercent,
     double? fuelLevelLitres,
     double? engineLoadPercent,
+    double? absLoadPercent,
+    double? altitudeM,
     double? throttlePercent,
     double? coolantTempC,
     double? distanceKmSoFar,
@@ -137,6 +157,8 @@ class TripLiveReading {
       fuelLevelPercent: fuelLevelPercent ?? this.fuelLevelPercent,
       fuelLevelLitres: fuelLevelLitres ?? this.fuelLevelLitres,
       engineLoadPercent: engineLoadPercent ?? this.engineLoadPercent,
+      absLoadPercent: absLoadPercent ?? this.absLoadPercent,
+      altitudeM: altitudeM ?? this.altitudeM,
       throttlePercent: throttlePercent ?? this.throttlePercent,
       coolantTempC: coolantTempC ?? this.coolantTempC,
       distanceKmSoFar: distanceKmSoFar ?? this.distanceKmSoFar,

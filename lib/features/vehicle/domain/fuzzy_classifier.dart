@@ -40,7 +40,12 @@ enum Situation {
 /// * stopAndGo — urban-shaped, gated by the caller-owned
 ///   [isStopAndGoContext] flag (30-second speed-variance window).
 /// * highway — trapezoid 70-90-130-200 km/h.
-/// * climbing — linear ramp over 0–8 % grade.
+/// * climbing — `max` of two ramps so the bucket fills whether or not
+///   the car has a confident GPS-altitude grade (#2513): a linear ramp
+///   over 0–8 % road grade, **or** a load ramp over 45 %→70 % engine /
+///   absolute load (a heavily-loaded car working hard on the flat is
+///   the same baseline as a climb). Either signal alone reaches 1.0,
+///   so "climbing/loaded" never depends on a single optional input.
 /// * decel — 1.0 when `accel < -0.5 m/s²` AND throttle < 5 %.
 /// * fuelCut — 1.0 when throttle < 5 % AND rpm > 1500 AND
 ///   speed > 20 km/h. When fuelCut fires it zeros-out decel.
@@ -64,6 +69,7 @@ class FuzzyClassifier {
     required double throttlePct,
     required double rpm,
     bool isStopAndGoContext = false,
+    double loadPct = 0,
   }) {
     final raw = <Situation, double>{
       Situation.idle: _idleMembership(speedKmh),
@@ -72,7 +78,7 @@ class FuzzyClassifier {
           ? _urbanMembership(speedKmh)
           : 0.0,
       Situation.highway: _highwayMembership(speedKmh),
-      Situation.climbing: _climbingMembership(grade),
+      Situation.climbing: _climbingMembership(grade, loadPct),
       Situation.decel: _decelMembership(accel, throttlePct),
       Situation.fuelCut: _fuelCutMembership(throttlePct, rpm, speedKmh),
     };
@@ -120,11 +126,38 @@ class FuzzyClassifier {
   double _highwayMembership(double speed) =>
       _trapezoid(speed, 70, 90, 130, 200);
 
+  /// Climbing / heavily-loaded membership (#2513). Either of two
+  /// independent signals can fill this bucket, and we take their `max`
+  /// so it never hinges on a single optional input:
+  ///
+  ///  * **grade ramp** — linear in road grade: 0 % → 0, 8 % → 1. Only
+  ///    non-zero once the [RoadGradeCalculator] reports a *confident*
+  ///    grade from smoothed GPS altitude; cars without GPS altitude
+  ///    pass `grade: 0` and this term stays 0.
+  ///  * **load ramp** — linear in engine / absolute load: 45 % → 0,
+  ///    70 % → 1. A car towing or fully loaded on flat road sits at a
+  ///    sustained high load with no grade, so the load signal is what
+  ///    fills the bucket then (and on every car that lacks a confident
+  ///    GPS-altitude grade).
+  ///
+  /// Both saturate at 1.0.
+  double _climbingMembership(double grade, double loadPct) =>
+      math.max(_gradeRamp(grade), _loadRamp(loadPct));
+
   /// Linear ramp in road grade: 0 % → 0, 8 % → 1, saturates at 1.
-  double _climbingMembership(double grade) {
+  double _gradeRamp(double grade) {
     if (grade <= 0) return 0;
     if (grade >= 8) return 1;
     return grade / 8;
+  }
+
+  /// Linear ramp in engine / absolute load: 45 % → 0, 70 % → 1,
+  /// saturates at 1. Below 45 % the engine is loafing — not a climb /
+  /// load situation.
+  double _loadRamp(double loadPct) {
+    if (loadPct <= 45) return 0;
+    if (loadPct >= 70) return 1;
+    return (loadPct - 45) / (70 - 45);
   }
 
   /// Hard threshold: 1.0 when the driver is decelerating AND off the
