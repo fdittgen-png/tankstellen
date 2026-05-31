@@ -2918,5 +2918,10 @@
         "type": "String"
       }
     }
+  },
+  "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
+  "@tripRecordingDiscardedNoMovement": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

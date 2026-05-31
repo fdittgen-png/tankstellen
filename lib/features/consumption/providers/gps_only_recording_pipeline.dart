@@ -226,10 +226,15 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
         }
       }
     }
-    await _host.saveToHistory(
+    // #2509 — each GPS fix feeds one sample through the recorder, so the
+    // GPS-fix count equals the captured-sample count here. Threaded so the
+    // guard treats a genuinely-stationary GPS-only stop consistently and
+    // the outcome can surface the "no movement" notice.
+    final outcome = await _host.saveToHistory(
       summary,
       samples: samples,
       automatic: automatic,
+      gpsFixCount: samples.length,
     );
     _recorder = null;
     _samples.clear();
@@ -240,6 +245,9 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       summary: summary,
       odometerStartKm: null,
       odometerLatestKm: null,
+      // #2509 — surface a "no movement detected" notice when the
+      // dongle-less trip was discarded as genuinely stationary.
+      discardedNoMovement: outcome.isStationaryDiscard,
     );
   }
 

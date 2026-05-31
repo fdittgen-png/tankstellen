@@ -20,5 +20,6 @@
   "tripRecordingMinimiseTooltip": "Als schwebende Kachel minimieren",
   "tripRecordingAutoPinTitle": "Beim Aufnahmestart immer anpinnen",
   "tripRecordingAutoPinSubtitle": "Das Formular bei jeder Fahrt automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.",
-  "tripRecordingConnectingTitle": "Aufnahme wird gestartet …"
+  "tripRecordingConnectingTitle": "Aufnahme wird gestartet …",
+  "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt"
 }

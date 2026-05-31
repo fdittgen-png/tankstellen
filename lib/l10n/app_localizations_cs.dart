@@ -6186,6 +6186,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Spouštění nahrávání…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Sdílet s jiným účtem';
 
   @override

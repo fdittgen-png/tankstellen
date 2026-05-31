@@ -345,7 +345,7 @@ class _FakeHost implements RecordingPipelineHost {
   String? readActiveVehicleId() => activeVehicleId;
 
   @override
-  Future<void> saveToHistory(
+  Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
     bool automatic = false,
     List<TripSample> samples = const [],
@@ -354,6 +354,7 @@ class _FakeHost implements RecordingPipelineHost {
     String? adapterMac,
     String? adapterName,
     String? adapterFirmware,
+    int gpsFixCount = 0,
   }) async {
     saved.add(_Saved(
       summary: summary,
@@ -361,6 +362,9 @@ class _FakeHost implements RecordingPipelineHost {
       samples: samples,
       gpsSampleDiagnostics: gpsSampleDiagnostics,
     ));
+    // #2509 — this fake records every save unconditionally; report
+    // `saved` so the pipeline's `discardedNoMovement` stays false.
+    return TripPersistOutcome.saved;
   }
 }
 

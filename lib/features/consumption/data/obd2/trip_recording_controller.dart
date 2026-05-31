@@ -238,6 +238,19 @@ class TripRecordingController {
   Timer? _emitTimer;
   DateTime? _startedAt;
   DateTime? _lastSampleAt;
+
+  // #2509 — timestamps of the FIRST and LATEST valid GPS fixes that
+  // arrived while the OBD2 link delivered no speed/RPM (so
+  // `_recorder.onSample` — the sole setter of the recorder's
+  // `startedAt` / `endedAt` — never fired). A dead dongle leaves
+  // `_recorder.buildSummary().startedAt`/`endedAt` null even on a real
+  // GPS-tracked drive; [_finaliseSummary] falls back to these so the trip
+  // carries a start/end time and clears the persist guard instead of
+  // being silently discarded. Both stay null on a healthy OBD2 trip (the
+  // recorder owns the timestamps then) and on a trip that never saw a GPS
+  // fix.
+  DateTime? _gpsStartedAt;
+  DateTime? _gpsEndedAt;
   double? _odometerStartKm;
   double? _odometerLatestKm;
   double _fuelLitersSoFar = 0;
@@ -520,6 +533,18 @@ class TripRecordingController {
     // null-coord call only clears the per-tick latch; it is not a fix.
     if (latitude != null && longitude != null) {
       _distance.addGpsFix(latitude, longitude);
+      // #2509 — latch the first GPS-fix timestamp as a start-time
+      // fallback. On a dead OBD2 link no speed/RPM sample ever reaches
+      // the recorder, so `_recorder` never stamps `startedAt`; without
+      // this the finalised summary's `startedAt` is null and the
+      // persist guard discards a real GPS-tracked drive. Only the FIRST
+      // fix wins so the start time is the start of the drive, not the
+      // latest fix. A healthy OBD2 trip ignores this value (the recorder
+      // owns `startedAt`); it is consulted only as a fallback in
+      // [_finaliseSummary].
+      final fixAt = _now();
+      _gpsStartedAt ??= fixAt;
+      _gpsEndedAt = fixAt;
     }
   }
 
@@ -711,6 +736,16 @@ class TripRecordingController {
         (!_sawNonVeDerivedFuel && _veDerivedFuelRateSum > 0)
             ? _veWeightedFuelSum / _veDerivedFuelRateSum
             : null;
+    // #2509 — GPS start/end fallback. When the OBD2 link was dead the
+    // recorder never saw a sample, so `base.startedAt` / `base.endedAt`
+    // are null even though GPS fixes were buffered into the distance
+    // resolver and produced a real distance. Without a `startedAt` the
+    // persist guard discards the whole drive (silent data loss). Fall
+    // back to the first/last GPS-fix timestamp captured in [updateGpsFix]
+    // ONLY when the recorder did not supply its own — a healthy OBD2 trip
+    // keeps the recorder's authoritative timestamps untouched.
+    final startedAt = base.startedAt ?? _gpsStartedAt;
+    final endedAt = base.endedAt ?? _gpsEndedAt;
     return TripSummary(
       distanceKm: distanceKm,
       maxRpm: base.maxRpm,
@@ -720,8 +755,8 @@ class TripRecordingController {
       harshAccelerations: base.harshAccelerations,
       avgLPer100Km: avg,
       fuelLitersConsumed: base.fuelLitersConsumed,
-      startedAt: base.startedAt,
-      endedAt: base.endedAt,
+      startedAt: startedAt,
+      endedAt: endedAt,
       distanceSource: source,
       secondsBelowOptimalGear: _computeGearCoachingMetric(),
       fuelRateSuspect: fuelRateSuspect,
@@ -831,6 +866,13 @@ class TripRecordingController {
         odometerStartKm: _odometerStartKm,
         odometerLatestKm: _odometerLatestKm,
       );
+
+  /// Number of GPS fixes buffered for the distance resolver this trip
+  /// (#2509). Surfaced so the save path can distinguish a genuinely
+  /// stationary trip (no movement AND no fixes → discard, #1923) from a
+  /// real GPS-tracked drive whose OBD2 link was dead (fixes present →
+  /// persist). Delegates to [TripDistanceResolver.gpsFixCount].
+  int get gpsFixCount => _distance.gpsFixCount;
 
   /// Append a speed sample to the virtual-odometer buffer, dropping
   /// the oldest entry when the cap is hit. Called from the 5 Hz

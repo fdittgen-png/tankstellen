@@ -6234,6 +6234,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Έναρξη εγγραφής…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Κοινοποίηση σε άλλον λογαριασμό';
 
   @override

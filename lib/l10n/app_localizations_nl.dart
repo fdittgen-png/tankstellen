@@ -6199,6 +6199,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Opname starten…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Delen met een ander account';
 
   @override

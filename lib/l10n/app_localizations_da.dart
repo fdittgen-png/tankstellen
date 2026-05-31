@@ -6176,6 +6176,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Starter optagelse…';
 
   @override
+  String get tripRecordingDiscardedNoMovement =>
+      'Recording discarded — no movement detected';
+
+  @override
   String get tripShareAction => 'Del med en anden konto';
 
   @override

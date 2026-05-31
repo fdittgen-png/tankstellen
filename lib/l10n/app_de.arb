@@ -2737,6 +2737,7 @@
   "tripRecordingAutoPinTitle": "Beim Aufnahmestart immer anpinnen",
   "tripRecordingAutoPinSubtitle": "Das Formular bei jeder Fahrt automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.",
   "tripRecordingConnectingTitle": "Aufnahme wird gestartet …",
+  "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt",
   "tripShareAction": "Mit anderem Konto teilen",
   "@tripShareAction": {
     "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."

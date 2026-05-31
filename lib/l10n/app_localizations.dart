@@ -10827,6 +10827,12 @@ abstract class AppLocalizations {
   /// **'Starting recording…'**
   String get tripRecordingConnectingTitle;
 
+  /// SnackBar shown after the user stops a recording that covered no distance and captured no usable signal — a genuine false-start / stationary stop (#2509). Tells the user nothing was saved because the car never moved. Never shown when the trip was actually saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording discarded — no movement detected'**
+  String get tripRecordingDiscardedNoMovement;
+
   /// Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account.
   ///
   /// In en, this message translates to:
