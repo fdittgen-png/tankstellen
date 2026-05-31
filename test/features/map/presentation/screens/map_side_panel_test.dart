@@ -6,24 +6,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/current_shell_branch_provider.dart';
-import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/app/responsive_search_layout.dart';
 import 'package:tankstellen/features/map/presentation/screens/map_screen.dart';
 import 'package:tankstellen/features/map/presentation/widgets/nearby_map_view.dart';
-import 'package:tankstellen/features/map/presentation/widgets/price_legend.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/selected_station_provider.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_detail_inline.dart';
-import 'package:tankstellen/features/station_detail/providers/station_detail_provider.dart';
 
-import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// Branch index of the Carte tab in the bottom-nav `IndexedStack`.
 const int _mapBranchIndex = 1;
 
-/// A [SelectedStation] notifier pre-seeded with a selection so the wide map
-/// renders the side-panel detail without a tap gesture in the test.
+/// A [SelectedStation] notifier pre-seeded with a selection. Used to prove
+/// that — after the #2547 revert — a selected station no longer surfaces a
+/// side-panel detail on the map (a marker tap pushes `/station/:id` instead).
 class _SelectedStation extends SelectedStation {
   final String? _initial;
   _SelectedStation(this._initial);
@@ -58,21 +55,6 @@ void main() {
 
     final test = standardTestOverrides();
     when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-    // The inline detail mounts a PriceHistorySection + rating section that
-    // read price records / ratings off storage — stub them so the detail
-    // pane builds without a provider-error throw.
-    when(() => test.mockStorage.getPriceRecords(any())).thenReturn([]);
-    when(() => test.mockStorage.getPriceHistoryKeys()).thenReturn([]);
-    when(() => test.mockStorage.savePriceRecords(any(), any()))
-        .thenAnswer((_) async {});
-    when(() => test.mockStorage.getRatings()).thenReturn({});
-    when(() => test.mockStorage.getRating(any())).thenReturn(null);
-
-    final detailResult = ServiceResult(
-      data: const StationDetail(station: testStation),
-      source: ServiceSource.cache,
-      fetchedAt: DateTime(2026, 3, 27, 10),
-    );
 
     await pumpApp(
       tester,
@@ -81,54 +63,56 @@ void main() {
         ...test.overrides,
         userPositionNullOverride(),
         selectedStationProvider.overrideWith(() => _SelectedStation(selected)),
-        stationDetailProvider(stationId).overrideWith((_) async => detailResult),
       ],
     );
     await _goBranch(tester, _mapBranchIndex);
   }
 
-  group('MapScreen side-panel detail (#2532)', () {
+  group('MapScreen full horizontal width (#2547 — reverts the #2532 split)',
+      () {
     testWidgets(
-      'wide (900x600) with a selected station renders the inline detail '
-      'pane beside the map (a VerticalDivider splits the two panes)',
+      'wide (900x600): the map is full-bleed — no master/detail split, '
+      'no detail pane, the map fills the whole content width',
       (tester) async {
+        await pumpMap(tester, size: const Size(900, 600), selected: null);
+
+        // The map body is the full body.
+        expect(find.byType(NearbyMapView), findsOneWidget);
+        // No side-panel split: the #2532 ResponsiveMasterDetail wrapper +
+        // its VerticalDivider are gone, so the map owns the full width.
+        expect(find.byType(ResponsiveMasterDetail), findsNothing);
+        expect(find.byType(VerticalDivider), findsNothing);
+        // No detail pane either.
+        expect(find.byType(StationDetailInline), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'wide (900x600): a selected station does NOT open a side-panel — the '
+      'marker tap no longer feeds selectedStationProvider into a detail pane',
+      (tester) async {
+        // Pre-seed a selection as if a marker had been tapped. Pre-#2532 (and
+        // post-revert) behaviour is a `/station/:id` push, never a side-panel,
+        // so even a non-null selection must not surface an inline detail.
         await pumpMap(tester, size: const Size(900, 600), selected: stationId);
 
-        // The detail pane is the inline station detail.
-        expect(find.byType(StationDetailInline), findsOneWidget);
-        // The two-pane split is identified by the master/detail divider.
-        expect(find.byType(VerticalDivider), findsOneWidget);
-        // The map (master pane) is still built full-bleed beside it.
+        expect(find.byType(StationDetailInline), findsNothing);
+        expect(find.byType(VerticalDivider), findsNothing);
+        expect(find.byType(ResponsiveMasterDetail), findsNothing);
+        // The map still owns the full content area.
         expect(find.byType(NearbyMapView), findsOneWidget);
       },
     );
 
     testWidgets(
-      'wide (900x600) with NO selection renders the empty-state legend '
-      'placeholder, not a detail pane',
-      (tester) async {
-        await pumpMap(tester, size: const Size(900, 600), selected: null);
-
-        // No station selected → the placeholder, not the inline detail.
-        expect(find.byType(StationDetailInline), findsNothing);
-        // The empty-state placeholder carries the price legend.
-        expect(find.byType(PriceLegend), findsWidgets);
-        // The split container is still present on a wide screen.
-        expect(find.byType(VerticalDivider), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'compact (400x800) stays full-bleed — no detail pane, no divider, '
-      'even when a station is selected',
+      'compact (400x800): unchanged — full-bleed map, no detail pane, '
+      'no divider, even with a selected station',
       (tester) async {
         await pumpMap(tester, size: const Size(400, 800), selected: stationId);
 
-        // On compact the map is full-bleed: ResponsiveMasterDetail hides the
-        // detail entirely, so neither the inline detail nor the master/detail
-        // divider is mounted. The marker tap keeps its `/station/:id` push.
         expect(find.byType(StationDetailInline), findsNothing);
         expect(find.byType(VerticalDivider), findsNothing);
+        expect(find.byType(ResponsiveMasterDetail), findsNothing);
         expect(find.byType(NearbyMapView), findsOneWidget);
       },
     );

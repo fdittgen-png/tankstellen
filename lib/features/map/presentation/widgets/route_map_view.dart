@@ -32,18 +32,11 @@ class RouteMapView extends ConsumerStatefulWidget {
   final dynamic selectedFuel;
   final MapController mapController;
 
-  /// Overrides the station-marker tap (#2532). When null markers push the
-  /// full `/station/:id` route (compact phone behaviour); on a wide screen
-  /// [MapScreen] supplies a callback that selects the station into the
-  /// side-panel detail instead.
-  final void Function(String stationId)? onStationTap;
-
   const RouteMapView({
     super.key,
     required this.routeResult,
     required this.selectedFuel,
     required this.mapController,
-    this.onStationTap,
   });
 
   @override
@@ -116,7 +109,6 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             showSearchRadius: false,
             selectedStationIds:
                 _selectedStationIds.isNotEmpty ? _selectedStationIds : null,
-            onStationTap: widget.onStationTap,
           ),
         ),
         if (_viewMode == RouteViewMode.bestStops && displayStations.isNotEmpty)

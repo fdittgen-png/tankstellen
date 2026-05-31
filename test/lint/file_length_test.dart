@@ -244,7 +244,11 @@ void main() {
     // in `_recomputeMarkers`, and the `didUpdateWidget` identity guard that
     // rebuilds markers on a changed callback. Decomposition tracked by
     // #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 574,
+    // #2547 — tightened 574 → 562: the #2547 revert removed that
+    // `onStationTap` field (the map now takes the full horizontal width on
+    // wide/landscape — no side panel), so the marker tap is back to its
+    // pre-#2532 `/station/:id` push and the field + its plumbing are gone.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 562,
     // #2382 — +5 for Feature.approachOverlay's three per-feature switch
     // cases (label / description / blocked-enable). Intrinsic per-feature
     // growth in this switch-based section; full decomposition is its own
