@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../storage/storage_providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/logging/error_logger.dart';
+import '../theme/app_radius.dart';
 
 /// A one-time dismissible help banner for contextual onboarding.
 ///
@@ -82,7 +83,7 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.lg,
       ),
       child: Row(
         children: [
