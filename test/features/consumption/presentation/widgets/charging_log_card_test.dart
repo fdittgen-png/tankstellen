@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/charging_log_card.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 
@@ -36,6 +37,12 @@ ChargingLog _log({
 }
 
 void main() {
+  // #2491 — the cost glyph now comes from PriceFormatter.formatTotal,
+  // which formats in the active country's locale. Pin GB so the cost
+  // keeps the dot-decimal "7.85" shape the subtitle assertions use
+  // (and a deterministic £ symbol regardless of test ordering).
+  setUp(() => PriceFormatter.setCountry('GB'));
+
   group('ChargingLogCard — base structure', () {
     testWidgets('renders a Card and ListTile', (tester) async {
       await pumpApp(tester, ChargingLogCard(log: _log()));
@@ -120,7 +127,7 @@ void main() {
         ),
       );
       expect(
-        find.text('2026-04-25  •  22.5 kWh  •  7.85 €  •  35 min'),
+        find.text('2026-04-25  •  22.5 kWh  •  7.85 £  •  35 min'),
         findsOneWidget,
       );
     });
@@ -138,9 +145,10 @@ void main() {
           ),
         ),
       );
-      // 22.47 → 22.5 via toStringAsFixed(1); 7.8 → 7.80 via toStringAsFixed(2).
+      // 22.47 → 22.5 via toStringAsFixed(1); 7.8 → "7.80 £" via
+      // PriceFormatter.formatTotal (2 dp, GB locale dot separator).
       expect(
-        find.text('2026-04-25  •  22.5 kWh  •  7.80 €  •  12 min'),
+        find.text('2026-04-25  •  22.5 kWh  •  7.80 £  •  12 min'),
         findsOneWidget,
       );
     });
@@ -172,7 +180,7 @@ void main() {
         ),
       );
       const expectedLabel =
-          'Ionity Castelnau, 2026-04-25  •  22.5 kWh  •  7.85 €  •  35 min';
+          'Ionity Castelnau, 2026-04-25  •  22.5 kWh  •  7.85 £  •  35 min';
       expect(
         find.bySemanticsLabel(expectedLabel),
         findsOneWidget,

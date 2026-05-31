@@ -114,6 +114,111 @@ void main() {
       });
     });
 
+    // #2491 — formatTotal is the TOTAL-currency formatter (2 dp, or 0
+    // dp for a zero-decimal currency) — distinct from the per-litre
+    // formatPrice (3 dp). The regression it fixes: a 1.05 € trip total
+    // rendered "1,047 €" because it was routed through formatPrice.
+    group('formatTotal (#2491)', () {
+      test('rounds to 2 decimals — a 1.047 input is "1,05 €", not '
+          '"1,047" (the bug)', () {
+        PriceFormatter.setCountry('DE');
+        final formatted = PriceFormatter.formatTotal(1.047);
+        expect(formatted, '1,05 €');
+        // The per-litre 3-decimal artefact must be gone.
+        expect(formatted, isNot(contains('047')));
+      });
+
+      test('German locale: comma separator + 2 dp + € suffix', () {
+        PriceFormatter.setCountry('DE');
+        expect(PriceFormatter.formatTotal(12.5), '12,50 €');
+        // Thousands grouping uses the German dot.
+        expect(PriceFormatter.formatTotal(1234.5), '1.234,50 €');
+      });
+
+      test('French locale: comma decimal separator + 2 dp', () {
+        PriceFormatter.setCountry('FR');
+        final formatted = PriceFormatter.formatTotal(1.05);
+        expect(formatted, contains(','));
+        expect(formatted, isNot(contains('.')));
+        expect(formatted, contains('€'));
+      });
+
+      test('UK locale: dot decimal separator + £ suffix', () {
+        PriceFormatter.setCountry('GB');
+        final formatted = PriceFormatter.formatTotal(1.05);
+        expect(formatted, '1.05 £');
+        expect(formatted, isNot(contains(',')));
+      });
+
+      test('exactly two decimals are always shown (no trailing trim)', () {
+        PriceFormatter.setCountry('GB');
+        expect(PriceFormatter.formatTotal(7.8), '7.80 £');
+        PriceFormatter.setCountry('FR');
+        expect(PriceFormatter.formatTotal(7.8), '7,80 €');
+      });
+
+      test('KRW is a zero-decimal currency — whole number, ₩ suffix', () {
+        PriceFormatter.setCountry('KR');
+        // 1050.0 → no minor unit → "1,050 ₩" (grouping comma, but no
+        // fractional part at all).
+        expect(PriceFormatter.formatTotal(1050), '1,050 ₩');
+        // A sub-unit input rounds to a whole number — no decimals.
+        expect(PriceFormatter.formatTotal(1.047), '1 ₩');
+        expect(PriceFormatter.formatTotal(1.6), '2 ₩');
+      });
+
+      test('CLP is also zero-decimal (Chilean peso)', () {
+        PriceFormatter.setCountry('CL');
+        // 1234.5 rounds to a whole number of pesos (es_CL groups with a
+        // dot, so "1.235 $") — no fractional minor unit is shown.
+        expect(PriceFormatter.formatTotal(1234.5), '1.235 \$');
+        expect(PriceFormatter.formatTotal(99.4), '99 \$');
+      });
+
+      test('no doubled space between number and symbol (#2491 trim)', () {
+        PriceFormatter.setCountry('FR');
+        expect(PriceFormatter.formatTotal(1.05), isNot(contains('  ')));
+      });
+
+      test('null amount returns --', () {
+        PriceFormatter.setCountry('FR');
+        expect(PriceFormatter.formatTotal(null), '--');
+      });
+
+      test('zero is a real total (not a sentinel) → "0,00 €"', () {
+        PriceFormatter.setCountry('FR');
+        // Unlike formatPrice, a total of 0 is meaningful (e.g. a
+        // free charge / a 0-cost correction) so it formats, not "--".
+        expect(PriceFormatter.formatTotal(0), '0,00 €');
+      });
+
+      test('honours currencyOverride for cross-country rows', () {
+        PriceFormatter.setCountry('FR');
+        final formatted =
+            PriceFormatter.formatTotal(1.05, currencyOverride: '£');
+        expect(formatted, contains('£'));
+        expect(formatted, isNot(contains('€')));
+      });
+    });
+
+    group('formatPerKm (#2491)', () {
+      test('3 decimals, locale-aware, no currency symbol', () {
+        PriceFormatter.setCountry('FR');
+        expect(PriceFormatter.formatPerKm(0.105), '0,105');
+        PriceFormatter.setCountry('GB');
+        expect(PriceFormatter.formatPerKm(0.105), '0.105');
+      });
+
+      test('rounds to 3 decimals', () {
+        PriceFormatter.setCountry('GB');
+        expect(PriceFormatter.formatPerKm(0.12345), '0.123');
+      });
+
+      test('null returns --', () {
+        expect(PriceFormatter.formatPerKm(null), '--');
+      });
+    });
+
     group('setCountry', () {
       test('case insensitive', () {
         PriceFormatter.setCountry('gb');

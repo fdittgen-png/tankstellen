@@ -133,7 +133,10 @@ class TripSummaryCard extends ConsumerWidget {
             if (fuelCost != null)
               _SummaryRow(
                 label: l?.trajetDetailFieldFuelCost ?? 'Fuel cost',
-                value: PriceFormatter.formatPrice(fuelCost),
+                // #2491 — a trip cost is a TOTAL, not a per-litre price:
+                // route it through formatTotal (2 dp + currency symbol)
+                // so a 1.05 € trip reads "1,05 €", not "1,047 €".
+                value: PriceFormatter.formatTotal(fuelCost),
               ),
             _SummaryRow(
               label: l?.trajetDetailFieldAvgSpeed ?? 'Avg speed',

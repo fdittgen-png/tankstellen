@@ -145,14 +145,21 @@ void main() {
       );
 
       // #1902 — the correction collapses to a slim row with a 2 px
-      // orange rule (down from the old 4 px full border).
+      // rule (down from the old 4 px full border).
+      // #2491 — that rule moved OFF the warning-orange token onto the
+      // theme's neutral tertiary: a correction is informational, not a
+      // warning, so it must NOT borrow the attention colour.
       final card = tester.widget<Card>(find.byType(Card));
       final shape = card.shape;
       expect(shape, isA<RoundedRectangleBorder>());
       final border = (shape! as RoundedRectangleBorder).side;
+      final ctx = tester.element(find.byType(Card));
+      expect(border.color, Theme.of(ctx).colorScheme.tertiary);
       expect(
         border.color,
-        DarkModeColors.warning(tester.element(find.byType(Card))),
+        isNot(DarkModeColors.warning(ctx)),
+        reason: '#2491 — the correction accent must not use the '
+            'overloaded warning-orange token',
       );
       expect(border.width, 2);
       // The slim correction row is not a full ListTile.
@@ -220,10 +227,13 @@ void main() {
 
     await pumpApp(tester, const ConsumptionStatsCard(stats: stats));
 
-    expect(find.text('8.00'), findsOneWidget); // avg L/100km
-    expect(find.text('0.120'), findsOneWidget); // avg cost/km
-    expect(find.text('120.0'), findsOneWidget); // total liters
-    expect(find.text('180.00'), findsOneWidget); // total spent
+    // This file runs with the FR default formatter locale (see the
+    // "50,0 L" / "1,600 €/L" assertions above), so #2491's locale-aware
+    // formatTotal/formatPerKm print comma decimals + the € symbol.
+    expect(find.text('8.00'), findsOneWidget); // avg L/100km (toStringAsFixed)
+    expect(find.text('0,120'), findsOneWidget); // avg cost/km (formatPerKm, FR)
+    expect(find.text('120.0'), findsOneWidget); // total liters (toStringAsFixed)
+    expect(find.text('180,00 €'), findsOneWidget); // total spent (formatTotal)
     expect(find.textContaining('3'), findsWidgets); // fill up count
   });
 
