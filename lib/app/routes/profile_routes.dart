@@ -9,6 +9,7 @@ import '../../features/profile/presentation/screens/developer_tools/developer_to
 import '../../features/profile/presentation/screens/developer_tools/error_log_viewer_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/feature_flag_dump_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/obd2_health_screen.dart';
+import '../../features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart';
 import '../../features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import '../../features/profile/presentation/screens/theme_settings_screen.dart';
 import '../../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
@@ -75,5 +76,12 @@ List<RouteBase> get profileRoutes => [
       GoRoute(
         path: '/developer-tools/obd2-health',
         builder: (context, state) => const Obd2HealthScreen(),
+      ),
+      // #2518 — in-app OCR tester (Epic #2516 Child 2): runs the pump /
+      // receipt pipeline on a chosen image and shows the block overlay +
+      // step trace. Self-guards on `Feature.debugMode` like its siblings.
+      GoRoute(
+        path: '/developer-tools/ocr-tester',
+        builder: (context, state) => const PumpOcrTesterScreen(),
       ),
     ];

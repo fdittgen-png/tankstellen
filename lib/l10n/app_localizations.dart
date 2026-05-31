@@ -9773,6 +9773,258 @@ abstract class AppLocalizations {
   /// **'Couldn\'t reach \'{adapterName}\' — pick another adapter'**
   String obd2PickerPinnedFallback(String adapterName);
 
+  /// Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode.
+  ///
+  /// In en, this message translates to:
+  /// **'OCR tester'**
+  String get ocrTesterTitle;
+
+  /// Label of the Developer-tools button that opens the OCR tester screen (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'OCR tester'**
+  String get ocrTesterNavLabel;
+
+  /// One-line explanation under the OCR tester title clarifying it is a gated developer tool (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.'**
+  String get ocrTesterExplain;
+
+  /// Segmented-button label for the pump-display OCR mode on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Pump'**
+  String get ocrTesterModePump;
+
+  /// Segmented-button label for the paper-receipt OCR mode on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get ocrTesterModeReceipt;
+
+  /// Button that opens the camera to capture a fresh image to run through the OCR pipeline (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Capture'**
+  String get ocrTesterCapture;
+
+  /// Button that picks an existing image from the gallery to re-run a fixture through the OCR pipeline (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick image'**
+  String get ocrTesterPickImage;
+
+  /// Button that runs the chosen OCR pipeline on the selected image (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Run'**
+  String get ocrTesterRun;
+
+  /// Label of the optional country dropdown that threads the locale profile into the OCR pipeline on the tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get ocrTesterCountry;
+
+  /// Dropdown entry on the OCR tester for running with no country locale profile, i.e. the default EUR behaviour (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Default (no profile)'**
+  String get ocrTesterCountryNone;
+
+  /// Empty-state hint shown on the OCR tester before any image has been selected (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick or capture an image, then Run.'**
+  String get ocrTesterNoImage;
+
+  /// Progress label shown while the OCR pipeline runs on the selected image in the tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Running OCR…'**
+  String get ocrTesterRunning;
+
+  /// Shown on the OCR tester when the pipeline returned no result (e.g. the user cancelled the camera or OCR read nothing) (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'OCR produced no readable result.'**
+  String get ocrTesterNoResult;
+
+  /// Section header above the ML Kit block overlay (the image with classified boxes) on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Block overlay'**
+  String get ocrTesterOverlaySection;
+
+  /// Section header above the per-stage steps panel on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Pipeline steps'**
+  String get ocrTesterStepsSection;
+
+  /// Legend chip for blocks classified as printed labels (blue) on the OCR tester block overlay (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get ocrTesterLegendLabel;
+
+  /// Legend chip for blocks classified as numeric values (green) on the OCR tester block overlay (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Numeric'**
+  String get ocrTesterLegendNumeric;
+
+  /// Legend chip for blocks classified as noise (grey) on the OCR tester block overlay (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Noise'**
+  String get ocrTesterLegendNoise;
+
+  /// Legend chip for a field the cross-check derived rather than read (dashed amber) on the OCR tester block overlay (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Derived'**
+  String get ocrTesterLegendDerived;
+
+  /// Steps-panel stage name for the glare-fraction preprocessing reject decision on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Capture / glare'**
+  String get ocrTesterStageGlare;
+
+  /// Steps-panel stage name for ML Kit text recognition (flat text + block geometry) on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'ML Kit'**
+  String get ocrTesterStageMlkit;
+
+  /// Steps-panel stage name for per-block label / numeric / noise classification on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Classify'**
+  String get ocrTesterStageClassify;
+
+  /// Steps-panel stage name for split-label assembly on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Assemble'**
+  String get ocrTesterStageAssemble;
+
+  /// Steps-panel stage name for label-to-numeric anchoring on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Anchor'**
+  String get ocrTesterStageAnchor;
+
+  /// Steps-panel stage name for the magnitude fallback for unbound fields on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Fallback'**
+  String get ocrTesterStageFallback;
+
+  /// Steps-panel stage name for the total / volume / unit-price cross-check derivation on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Cross-check'**
+  String get ocrTesterStageCrossCheck;
+
+  /// Steps-panel stage name for the per-component confidence scoring on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Confidence'**
+  String get ocrTesterStageConfidence;
+
+  /// Steps-panel stage name for the per-country validation gate on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Gate'**
+  String get ocrTesterStageGate;
+
+  /// Steps-panel stage name for receipt brand detection on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get ocrTesterStageBrand;
+
+  /// Steps-panel stage name for receipt per-station override dispatch on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Overrides'**
+  String get ocrTesterStageOverrides;
+
+  /// Steps-panel stage name for receipt cross-field reconcile on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Reconcile'**
+  String get ocrTesterStageReconcile;
+
+  /// Steps-panel stage name for the final read on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get ocrTesterStageResult;
+
+  /// Chip flagging a value that was read directly off the display / receipt on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'READ'**
+  String get ocrTesterChipRead;
+
+  /// Chip flagging a value the cross-check computed rather than read, on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'DERIVED'**
+  String get ocrTesterChipDerived;
+
+  /// Steps-panel label shown when the validation gate accepted the read on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get ocrTesterGateAccepted;
+
+  /// Steps-panel label shown when the validation gate rejected the read on the OCR tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get ocrTesterGateRejected;
+
+  /// Banner shown in the steps panel when the magnitude-fallback stage bound a field, prompting the developer to double-check it (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'A field was recovered via magnitude fallback — verify it.'**
+  String get ocrTesterFallbackBanner;
+
+  /// Placeholder shown inside a steps-panel tile for a stage the pipeline never reached (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Stage did not run.'**
+  String get ocrTesterStageNoData;
+
+  /// Button that copies the full OCR trace package as JSON to the clipboard on the tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Copy as JSON'**
+  String get ocrTesterCopyJson;
+
+  /// Button that exports the OCR trace (image + JSON) to the Downloads folder / share sheet on the tester (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'Export package'**
+  String get ocrTesterExportPackage;
+
+  /// Snackbar confirming the OCR trace JSON was copied to the clipboard (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'OCR trace copied to clipboard.'**
+  String get ocrTesterCopied;
+
+  /// Snackbar confirming the OCR trace package (image + JSON) was saved to Downloads (#2518).
+  ///
+  /// In en, this message translates to:
+  /// **'OCR package saved to your Downloads folder.'**
+  String get ocrTesterExported;
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:

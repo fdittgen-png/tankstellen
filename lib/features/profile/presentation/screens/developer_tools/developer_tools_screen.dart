@@ -146,6 +146,14 @@ class DeveloperToolsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
+          // #2518 — in-app OCR tester (Epic #2516 Child 2).
+          OutlinedButton.icon(
+            key: const ValueKey('debug-ocr-tester'),
+            onPressed: () => context.push('/developer-tools/ocr-tester'),
+            icon: const Icon(Icons.document_scanner_outlined),
+            label: Text(l?.ocrTesterNavLabel ?? 'OCR tester'),
+          ),
+          const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const ValueKey('debug-clear-caches'),
             onPressed: () => _clearCaches(context, ref),

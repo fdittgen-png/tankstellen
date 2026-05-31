@@ -5608,6 +5608,134 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get ocrTesterTitle => 'OCR tester';
+
+  @override
+  String get ocrTesterNavLabel => 'OCR tester';
+
+  @override
+  String get ocrTesterExplain =>
+      'Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.';
+
+  @override
+  String get ocrTesterModePump => 'Pump';
+
+  @override
+  String get ocrTesterModeReceipt => 'Receipt';
+
+  @override
+  String get ocrTesterCapture => 'Capture';
+
+  @override
+  String get ocrTesterPickImage => 'Pick image';
+
+  @override
+  String get ocrTesterRun => 'Run';
+
+  @override
+  String get ocrTesterCountry => 'Country';
+
+  @override
+  String get ocrTesterCountryNone => 'Default (no profile)';
+
+  @override
+  String get ocrTesterNoImage => 'Pick or capture an image, then Run.';
+
+  @override
+  String get ocrTesterRunning => 'Running OCR…';
+
+  @override
+  String get ocrTesterNoResult => 'OCR produced no readable result.';
+
+  @override
+  String get ocrTesterOverlaySection => 'Block overlay';
+
+  @override
+  String get ocrTesterStepsSection => 'Pipeline steps';
+
+  @override
+  String get ocrTesterLegendLabel => 'Label';
+
+  @override
+  String get ocrTesterLegendNumeric => 'Numeric';
+
+  @override
+  String get ocrTesterLegendNoise => 'Noise';
+
+  @override
+  String get ocrTesterLegendDerived => 'Derived';
+
+  @override
+  String get ocrTesterStageGlare => 'Capture / glare';
+
+  @override
+  String get ocrTesterStageMlkit => 'ML Kit';
+
+  @override
+  String get ocrTesterStageClassify => 'Classify';
+
+  @override
+  String get ocrTesterStageAssemble => 'Assemble';
+
+  @override
+  String get ocrTesterStageAnchor => 'Anchor';
+
+  @override
+  String get ocrTesterStageFallback => 'Fallback';
+
+  @override
+  String get ocrTesterStageCrossCheck => 'Cross-check';
+
+  @override
+  String get ocrTesterStageConfidence => 'Confidence';
+
+  @override
+  String get ocrTesterStageGate => 'Gate';
+
+  @override
+  String get ocrTesterStageBrand => 'Brand';
+
+  @override
+  String get ocrTesterStageOverrides => 'Overrides';
+
+  @override
+  String get ocrTesterStageReconcile => 'Reconcile';
+
+  @override
+  String get ocrTesterStageResult => 'Result';
+
+  @override
+  String get ocrTesterChipRead => 'READ';
+
+  @override
+  String get ocrTesterChipDerived => 'DERIVED';
+
+  @override
+  String get ocrTesterGateAccepted => 'Accepted';
+
+  @override
+  String get ocrTesterGateRejected => 'Rejected';
+
+  @override
+  String get ocrTesterFallbackBanner =>
+      'A field was recovered via magnitude fallback — verify it.';
+
+  @override
+  String get ocrTesterStageNoData => 'Stage did not run.';
+
+  @override
+  String get ocrTesterCopyJson => 'Copy as JSON';
+
+  @override
+  String get ocrTesterExportPackage => 'Export package';
+
+  @override
+  String get ocrTesterCopied => 'OCR trace copied to clipboard.';
+
+  @override
+  String get ocrTesterExported => 'OCR package saved to your Downloads folder.';
+
+  @override
   String get onboardingObd2StepTitle => 'Connetti il tuo adattatore OBD2';
 
   @override

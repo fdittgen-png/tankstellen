@@ -2974,5 +2974,215 @@
         "example": "Stop & go, Climbing / loaded"
       }
     }
+  },
+  "ocrTesterTitle": "OCR tester",
+  "@ocrTesterTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterNavLabel": "OCR tester",
+  "@ocrTesterNavLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterExplain": "Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.",
+  "@ocrTesterExplain": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterModePump": "Pump",
+  "@ocrTesterModePump": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterModeReceipt": "Receipt",
+  "@ocrTesterModeReceipt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterCapture": "Capture",
+  "@ocrTesterCapture": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterPickImage": "Pick image",
+  "@ocrTesterPickImage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterRun": "Run",
+  "@ocrTesterRun": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterCountry": "Country",
+  "@ocrTesterCountry": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterCountryNone": "Default (no profile)",
+  "@ocrTesterCountryNone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterNoImage": "Pick or capture an image, then Run.",
+  "@ocrTesterNoImage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterRunning": "Running OCR…",
+  "@ocrTesterRunning": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterNoResult": "OCR produced no readable result.",
+  "@ocrTesterNoResult": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterOverlaySection": "Block overlay",
+  "@ocrTesterOverlaySection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStepsSection": "Pipeline steps",
+  "@ocrTesterStepsSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterLegendLabel": "Label",
+  "@ocrTesterLegendLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterLegendNumeric": "Numeric",
+  "@ocrTesterLegendNumeric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterLegendNoise": "Noise",
+  "@ocrTesterLegendNoise": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterLegendDerived": "Derived",
+  "@ocrTesterLegendDerived": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageGlare": "Capture / glare",
+  "@ocrTesterStageGlare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageMlkit": "ML Kit",
+  "@ocrTesterStageMlkit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageClassify": "Classify",
+  "@ocrTesterStageClassify": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageAssemble": "Assemble",
+  "@ocrTesterStageAssemble": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageAnchor": "Anchor",
+  "@ocrTesterStageAnchor": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageFallback": "Fallback",
+  "@ocrTesterStageFallback": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageCrossCheck": "Cross-check",
+  "@ocrTesterStageCrossCheck": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageConfidence": "Confidence",
+  "@ocrTesterStageConfidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageGate": "Gate",
+  "@ocrTesterStageGate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageBrand": "Brand",
+  "@ocrTesterStageBrand": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageOverrides": "Overrides",
+  "@ocrTesterStageOverrides": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageReconcile": "Reconcile",
+  "@ocrTesterStageReconcile": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageResult": "Result",
+  "@ocrTesterStageResult": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterChipRead": "READ",
+  "@ocrTesterChipRead": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterChipDerived": "DERIVED",
+  "@ocrTesterChipDerived": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterGateAccepted": "Accepted",
+  "@ocrTesterGateAccepted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterGateRejected": "Rejected",
+  "@ocrTesterGateRejected": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterFallbackBanner": "A field was recovered via magnitude fallback — verify it.",
+  "@ocrTesterFallbackBanner": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterStageNoData": "Stage did not run.",
+  "@ocrTesterStageNoData": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterCopyJson": "Copy as JSON",
+  "@ocrTesterCopyJson": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterExportPackage": "Export package",
+  "@ocrTesterExportPackage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterCopied": "OCR trace copied to clipboard.",
+  "@ocrTesterCopied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "ocrTesterExported": "OCR package saved to your Downloads folder.",
+  "@ocrTesterExported": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
