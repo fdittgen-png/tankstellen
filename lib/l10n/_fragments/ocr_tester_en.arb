@@ -166,5 +166,13 @@
   "ocrTesterExported": "OCR package saved to your Downloads folder.",
   "@ocrTesterExported": {
     "description": "Snackbar confirming the OCR trace package (image + JSON) was saved to Downloads (#2518)."
+  },
+  "ocrTesterSaveFixture": "Save as fixture",
+  "@ocrTesterSaveFixture": {
+    "description": "Button that saves the current OCR trace as a regression fixture — the source image plus a .ocrpkg.json with expected values — into the device Downloads folder, ready to commit and run through the fixture-promotion generator (#2519)."
+  },
+  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "@ocrTesterFixtureSaved": {
+    "description": "Snackbar confirming the OCR regression fixture (source image + .ocrpkg.json) was saved to Downloads, with a hint on the next step (#2519)."
   }
 }

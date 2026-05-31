@@ -5774,6 +5774,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get ocrTesterExported => 'OCR package saved to your Downloads folder.';
 
   @override
+  String get ocrTesterSaveFixture => 'Save as fixture';
+
+  @override
+  String get ocrTesterFixtureSaved =>
+      'Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.';
+
+  @override
   String get onboardingObd2StepTitle => 'Ligue o seu adaptador OBD2';
 
   @override

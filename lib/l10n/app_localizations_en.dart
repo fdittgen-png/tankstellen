@@ -5704,6 +5704,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ocrTesterExported => 'OCR package saved to your Downloads folder.';
 
   @override
+  String get ocrTesterSaveFixture => 'Save as fixture';
+
+  @override
+  String get ocrTesterFixtureSaved =>
+      'Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.';
+
+  @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
 
   @override
@@ -12429,6 +12436,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get ocrTesterExported =>
       '⟦ÓÇŘ ƥáçķáǧé šáṽéđ ŧó ýóúř Đóŵñłóáđš ƒółđéř. ················⟧';
+
+  @override
+  String get ocrTesterSaveFixture => '⟦Šáṽé áš ƒîẋŧúřé ······⟧';
+
+  @override
+  String get ocrTesterFixtureSaved =>
+      '⟦Ƒîẋŧúřé šáṽéđ ŧó ýóúř Đóŵñłóáđš ƒółđéř. Ṁóṽé îŧ úñđéř ŧéšŧ/ƒîẋŧúřéš áñđ řúñ ŧóół/ƥřóɱóŧé_óçř_ƒîẋŧúřé.đářŧ. ·······································⟧';
 
   @override
   String get onboardingObd2StepTitle => '⟦Çóññéçŧ ýóúř ÓƁĐ2 áđáƥŧéř ·········⟧';

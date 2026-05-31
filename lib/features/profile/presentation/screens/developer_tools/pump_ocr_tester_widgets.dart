@@ -322,4 +322,16 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       l?.ocrTesterExported ?? 'OCR package saved to your Downloads folder.',
     );
   }
+
+  Future<void> _saveAsFixture(OcrTracePackage package) async {
+    await OcrTesterExport.saveAsFixture(package);
+    if (!mounted) return;
+    final l = AppLocalizations.of(context);
+    SnackBarHelper.showSuccess(
+      context,
+      l?.ocrTesterFixtureSaved ??
+          'Fixture saved to your Downloads folder. Move it under '
+              'test/fixtures and run tool/promote_ocr_fixture.dart.',
+    );
+  }
 }

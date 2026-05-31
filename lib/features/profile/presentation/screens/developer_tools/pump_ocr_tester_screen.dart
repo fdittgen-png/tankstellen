@@ -254,6 +254,8 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
       OcrTraceStepsPanel(package: package),
       const SizedBox(height: 16),
       _exportRow(l, package),
+      const SizedBox(height: 8),
+      _saveFixtureButton(l, package),
     ];
   }
 
@@ -278,6 +280,24 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  /// "Save as fixture" turns the current trace into a committable
+  /// regression fixture (#2519): the source image + a `.ocrpkg.json` with
+  /// `expected` seeded from the read. Only pump-mode reads with a captured
+  /// image can promote (the replay harness drives the pump path).
+  Widget _saveFixtureButton(AppLocalizations? l, OcrTracePackage package) {
+    final promotable =
+        package.kind == OcrTraceKind.pump && package.image != null;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        key: const Key('ocr_tester_save_fixture'),
+        onPressed: promotable ? () => _saveAsFixture(package) : null,
+        icon: const Icon(Icons.bookmark_add_outlined),
+        label: Text(l?.ocrTesterSaveFixture ?? 'Save as fixture'),
+      ),
     );
   }
 }

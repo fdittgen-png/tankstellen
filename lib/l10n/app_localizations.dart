@@ -10067,6 +10067,18 @@ abstract class AppLocalizations {
   /// **'OCR package saved to your Downloads folder.'**
   String get ocrTesterExported;
 
+  /// Button that saves the current OCR trace as a regression fixture — the source image plus a .ocrpkg.json with expected values — into the device Downloads folder, ready to commit and run through the fixture-promotion generator (#2519).
+  ///
+  /// In en, this message translates to:
+  /// **'Save as fixture'**
+  String get ocrTesterSaveFixture;
+
+  /// Snackbar confirming the OCR regression fixture (source image + .ocrpkg.json) was saved to Downloads, with a hint on the next step (#2519).
+  ///
+  /// In en, this message translates to:
+  /// **'Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.'**
+  String get ocrTesterFixtureSaved;
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:

@@ -5763,6 +5763,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ocrTesterExported => 'OCR-Paket im Downloads-Ordner gespeichert.';
 
   @override
+  String get ocrTesterSaveFixture => 'Als Fixture speichern';
+
+  @override
+  String get ocrTesterFixtureSaved =>
+      'Fixture im Downloads-Ordner gespeichert. Nach test/fixtures verschieben und tool/promote_ocr_fixture.dart ausführen.';
+
+  @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
 
   @override
