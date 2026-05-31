@@ -200,6 +200,93 @@ class BaselineRollingState {
   static double loadSignal(TripLiveReading r) =>
       r.absLoadPercent ?? r.engineLoadPercent ?? 0;
 
+  /// Coolant temperature below which the cold-start operating-temp gate
+  /// considers the engine still warming up (PID 0x05). Matches the warm
+  /// shoulder of the fuzzy [FuzzyClassifier] cold-start ramp.
+  static const double warmUpCoolantCeilingC = 70;
+
+  /// Oil-temperature fallback ceiling when coolant is unavailable
+  /// (PID 0x5C). Lower than the coolant ceiling because oil lags
+  /// coolant and reaches operating temperature a little cooler.
+  static const double warmUpOilCeilingC = 50;
+
+  /// True while the engine is below operating temperature (#2515): the
+  /// belt-and-braces warm-up gate the recorder uses to *guarantee* a
+  /// cold sample only feeds the cold-start bucket, independent of the
+  /// fuzzy classifier's own cold-start override. Prefers coolant
+  /// (< [warmUpCoolantCeilingC]); falls back to oil
+  /// (< [warmUpOilCeilingC]) when coolant is null; false when neither
+  /// temperature is reported (no evidence of a cold start).
+  static bool isWarmUp(TripLiveReading r) {
+    final coolant = r.coolantTempC;
+    if (coolant != null) return coolant < warmUpCoolantCeilingC;
+    final oil = r.oilTempC;
+    if (oil != null) return oil < warmUpOilCeilingC;
+    return false;
+  }
+
+  /// Stoichiometry-normalising fuel-mass correction (#2515).
+  ///
+  /// Two samples taken at different commanded mixtures (open-loop
+  /// enrichment, fuel-trim corrections, or different air density) inject
+  /// different fuel masses for the *same* underlying demand, so a raw
+  /// fuel-rate baseline blends regimes that aren't comparable. This pure
+  /// factor renormalises each sample's value back to the stoichiometric,
+  /// sea-level-density demand BEFORE it feeds the Welford accumulator, so
+  /// a bucket learns the true per-situation demand instead of an average
+  /// of mixtures.
+  ///
+  /// `factor = λterm × trimterm × densityterm`. Each term degrades to
+  /// **1.0** when its PID is null, so a car that surfaces none of these
+  /// signals sees exactly today's behaviour — no regression:
+  ///
+  ///  * **λ-term** ([TripLiveReading.lambda], PID 0x44 commanded
+  ///    equivalence ratio φ = AFR/AFR_stoich): `λ` when `λ ∈ [0.5, 1.5]`,
+  ///    else 1.0. Enrichment (`λ < 1`) injects extra fuel for the same
+  ///    air charge, so scaling the measured rate *down* by λ divides that
+  ///    extra fuel back out and leaves the stoichiometric demand; a lean
+  ///    cruise (`λ > 1`) scales the other way. (An enriched λ=0.9 sample
+  ///    therefore yields a sub-1.0 factor → a lower learned mean than the
+  ///    raw rate, which is the precision win.)
+  ///  * **trim-term** ([TripLiveReading.stft] PID 0x06 +
+  ///    [TripLiveReading.ltft] PID 0x07, each −20..+20 %):
+  ///    `(1 + (stft + ltft) / 100)`, clamped to `[0.7, 1.3]` so a
+  ///    glitchy trim reading can't dominate.
+  ///  * **density-term** ([TripLiveReading.mapKpa], PID 0x0B intake
+  ///    manifold absolute pressure as an air-density proxy):
+  ///    `clamp(mapKpa / 100, 0.6, 1.2)`.
+  static double fuelMassCorrectionFactor(TripLiveReading r) {
+    return _lambdaTerm(r.lambda) *
+        _trimTerm(r.stft, r.ltft) *
+        _densityTerm(r.mapKpa);
+  }
+
+  /// λ-term: scale the measured rate by λ so commanded enrichment
+  /// (λ < 1, extra fuel) is divided back out and the baseline reflects
+  /// stoichiometric demand. Identity outside the plausible `[0.5, 1.5]`
+  /// band (or when PID 0x44 is absent).
+  static double _lambdaTerm(double? lambda) {
+    if (lambda == null) return 1;
+    if (lambda < 0.5 || lambda > 1.5) return 1;
+    return lambda;
+  }
+
+  /// trim-term: combined short+long fuel trim as a multiplicative
+  /// correction, clamped so a transient spike can't swing the mean.
+  /// Identity when both trims are absent.
+  static double _trimTerm(double? stft, double? ltft) {
+    if (stft == null && ltft == null) return 1;
+    final combined = (stft ?? 0) + (ltft ?? 0);
+    return (1 + combined / 100).clamp(0.7, 1.3);
+  }
+
+  /// density-term: intake-manifold pressure as an air-density proxy,
+  /// clamped to a sane band. Identity when PID 0x0B is absent.
+  static double _densityTerm(double? mapKpa) {
+    if (mapKpa == null) return 1;
+    return (mapKpa / 100).clamp(0.6, 1.2);
+  }
+
   /// Count moving (>5 km/h) → stopped (≤1 km/h) transitions in the
   /// window. Mirrors [SituationClassifier]'s private heuristic so the
   /// two paths agree on what "stop-and-go" means.

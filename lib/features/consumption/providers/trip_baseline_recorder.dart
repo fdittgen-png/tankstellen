@@ -179,6 +179,17 @@ class TripBaselineRecorder {
   ///  * `accel` from a finite difference over the speed window so the
   ///    decel membership can fire.
   ///
+  /// #2515 (PR 2) — two precision-folding steps wrap the record loop:
+  /// (1) the per-sample [live] value is renormalised by
+  /// [BaselineRollingState.fuelMassCorrectionFactor] (λ / fuel-trim /
+  /// MAP-density) before it feeds the Welford accumulator, so a bucket
+  /// learns the stoichiometric demand instead of an average of commanded
+  /// mixtures — the factor degrades to 1.0 per missing PID, so no-PID
+  /// cars are unchanged; (2) a belt-and-braces warm-up gate: while
+  /// [BaselineRollingState.isWarmUp] holds, only the cold-start bucket
+  /// may record, so warm-up never bleeds into a steady mean even if the
+  /// classifier's own cold-start override ever regresses.
+  ///
   /// [Situation.fuelCut] maps onto a transient and is filtered by
   /// [BaselineStore]; we drop it pre-call so the bridge stays explicit.
   void _recordFuzzy(
@@ -204,14 +215,24 @@ class TripBaselineRecorder {
       ambientTempC: r.ambientTempC,
       pedalPct: r.pedalPercent,
     );
+    // #2515 PR2 — stoichiometry-normalise the sample's value so two
+    // samples at different commanded mixtures yield comparable
+    // baselines. Identity (× 1.0) on cars lacking the λ/trim/MAP PIDs.
+    final corrected = live * BaselineRollingState.fuelMassCorrectionFactor(r);
+    // #2515 PR2 — belt-and-braces warm-up gate: while the engine is
+    // below operating temperature, only the cold-start bucket may
+    // record. Robust even if the classifier's own cold-start override
+    // ever regresses.
+    final warmUp = BaselineRollingState.isWarmUp(r);
     for (final entry in memberships.entries) {
       if (entry.value <= 0) continue;
       final ds = _bridgeFuzzySituation(entry.key);
       if (ds == null) continue;
+      if (warmUp && ds != DrivingSituation.coldStartWarmup) continue;
       store.recordWeighted(
         vehicleId: vehicleId,
         situation: ds,
-        value: live,
+        value: corrected,
         weight: entry.value,
         // #2515 — stratify the learned mean by altitude band.
         stratumId: _rolling.altitudeStratumId,
