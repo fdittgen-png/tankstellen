@@ -2077,6 +2077,19 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dadurch werden alle gelernten Werte für dieses Fahrzeug verworfen. Bis neue Fahrten die Daten wieder aufbauen, werden die Kaltstart-Standardwerte verwendet.';
 
   @override
+  String get vehicleBaselineShowDetails =>
+      'Aufschlüsselung nach Fahrsituation anzeigen';
+
+  @override
+  String get vehicleBaselineHideDetails =>
+      'Aufschlüsselung nach Fahrsituation ausblenden';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Noch nicht erkannt: $situations. Diese Fahrsituationen zeigen weiterhin 0 Messwerte, daher ist die Kalibrierung unvollständig.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'OBD2-Adapter';
 
   @override

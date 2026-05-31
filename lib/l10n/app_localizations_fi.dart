@@ -2064,6 +2064,17 @@ class AppLocalizationsFi extends AppLocalizations {
       'Tämä poistaa kaikki opitut näytteet tälle ajoneuvolle. Palataan kylmäkäynnistyksen oletusarvoihin, kunnes uudet matkat täyttävät profiilin uudelleen.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'OBD2-sovitin';
 
   @override

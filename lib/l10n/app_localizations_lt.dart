@@ -2071,6 +2071,17 @@ class AppLocalizationsLt extends AppLocalizations {
       'Tai ištrina visus išmokytus šios transporto priemonės pavyzdžius. Grįšite prie šaltojo paleidimo numatytųjų reikšmių, kol naujos kelionės vėl užpildys profilį.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'OBD2 adapteris';
 
   @override

@@ -2066,6 +2066,17 @@ class AppLocalizationsSl extends AppLocalizations {
       'To izbriše vse naučene vzorce za to vozilo. Vrnil se boste na privzete vrednosti hladnega zagona, dokler nove vožnje ne napolnijo profila.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'Adapter OBD2';
 
   @override

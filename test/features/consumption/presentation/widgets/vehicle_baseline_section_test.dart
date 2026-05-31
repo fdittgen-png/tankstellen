@@ -188,7 +188,9 @@ void main() {
       'to 7',
       (tester) async {
         // No `expandDetailsByDefault` override — this is the production
-        // default the user sees on the vehicle-edit screen.
+        // default the user sees on the vehicle-edit screen. Every bucket
+        // is at the cap so #2514's empty-bucket auto-expand does NOT
+        // fire; this isolates the pure collapse-by-default behaviour.
         await pumpApp(
           tester,
           const SizedBox(
@@ -196,13 +198,25 @@ void main() {
             child: VehicleBaselineSection(vehicleId: _vehicleId),
           ),
           overrides: [
-            _summaryOverride(const {DrivingSituation.idle: 4}),
+            _summaryOverride(const {
+              DrivingSituation.idle: 30,
+              DrivingSituation.stopAndGo: 30,
+              DrivingSituation.urbanCruise: 30,
+              DrivingSituation.highwayCruise: 30,
+              DrivingSituation.deceleration: 30,
+              DrivingSituation.climbingOrLoaded: 30,
+            }),
           ],
         );
         // Only the aggregate progress bar in the collapsed view.
         expect(find.byType(LinearProgressIndicator), findsOneWidget);
         // Per-situation labels invisible until expand.
         expect(find.text('Idle'), findsNothing);
+        // No warning chip when every bucket is covered (#2514).
+        expect(
+          find.byKey(const Key('vehicleBaselineMissingWarning')),
+          findsNothing,
+        );
 
         await tester.tap(
           find.byKey(const Key('vehicleBaselineDetailsToggle')),
@@ -359,6 +373,175 @@ void main() {
         find.text('Reset driving-situation baseline'),
         findsOneWidget,
       );
+    });
+  });
+
+  group('VehicleBaselineSection coverage bar + empty-bucket warning (#2514)',
+      () {
+    // The bug: urban over-filled to 224k drove the aggregate bar to
+    // ~100% green while Stop & go and Climbing sat at 0/30. The fix
+    // makes the bar track coverage (Σ min(count, target)), surfaces a
+    // warning chip naming the empty buckets, and auto-expands the
+    // per-situation breakdown.
+
+    testWidgets(
+        'over-filled bucket + two empty buckets: the aggregate bar reads '
+        'WELL below 100% (coverage, not raw volume) instead of the old '
+        'pegged-green misleading state', (tester) async {
+      await pumpApp(
+        tester,
+        // Production default (collapsed) so we exercise the real path.
+        const SizedBox(
+          width: 600,
+          child: VehicleBaselineSection(vehicleId: _vehicleId),
+        ),
+        overrides: [
+          _summaryOverride(const {
+            // Mirrors the field report: urban massively over-filled,
+            // a couple of buckets healthy, two stuck at 0.
+            DrivingSituation.idle: 30,
+            DrivingSituation.urbanCruise: 224000,
+            DrivingSituation.highwayCruise: 30,
+            DrivingSituation.deceleration: 30,
+            // stopAndGo + climbingOrLoaded absent → 0/30.
+          }),
+        ],
+      );
+
+      final bar = tester.widget<LinearProgressIndicator>(
+        find.byKey(const Key('vehicleBaselineAggregateBar')),
+      );
+      // Coverage = (30 + 30 + 30 + 30 + 0 + 0) capped / (6 × 30)
+      //          = 120 / 180 ≈ 0.667 — NEVER 1.0 while a bucket is 0.
+      expect(bar.value, isNotNull);
+      expect(bar.value!, lessThan(1.0));
+      expect(bar.value!, closeTo(120 / 180, 0.0001));
+    });
+
+    testWidgets(
+        'two empty buckets auto-expand the breakdown and surface a '
+        'warning chip naming them — the diagnostic the user needs',
+        (tester) async {
+      await pumpApp(
+        tester,
+        // Collapsed by default; #2514 must force it open.
+        const SizedBox(
+          width: 600,
+          child: VehicleBaselineSection(vehicleId: _vehicleId),
+        ),
+        overrides: [
+          _summaryOverride(const {
+            DrivingSituation.idle: 30,
+            DrivingSituation.urbanCruise: 224000,
+            DrivingSituation.highwayCruise: 30,
+            DrivingSituation.deceleration: 30,
+          }),
+        ],
+      );
+
+      // Auto-expanded: 1 aggregate + 6 per-situation bars are visible
+      // even though we never tapped the toggle.
+      expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
+      expect(find.text('Idle'), findsOneWidget);
+
+      // Warning chip present and names BOTH empty buckets.
+      expect(
+        find.byKey(const Key('vehicleBaselineMissingWarning')),
+        findsOneWidget,
+      );
+      final warning = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(const Key('vehicleBaselineMissingWarning')),
+          matching: find.byType(Text),
+        ),
+      );
+      expect(warning.data, contains('Stop & go'));
+      expect(warning.data, contains('Climbing / loaded'));
+    });
+
+    testWidgets(
+        'every bucket at target: the bar is FULL (1.0) and no warning '
+        'chip appears — the genuinely-calibrated state', (tester) async {
+      await pumpApp(
+        tester,
+        const SizedBox(
+          width: 600,
+          child: VehicleBaselineSection(vehicleId: _vehicleId),
+        ),
+        overrides: [
+          _summaryOverride(const {
+            DrivingSituation.idle: 30,
+            DrivingSituation.stopAndGo: 30,
+            DrivingSituation.urbanCruise: 30,
+            DrivingSituation.highwayCruise: 30,
+            DrivingSituation.deceleration: 30,
+            DrivingSituation.climbingOrLoaded: 30,
+          }),
+        ],
+      );
+
+      final bar = tester.widget<LinearProgressIndicator>(
+        find.byKey(const Key('vehicleBaselineAggregateBar')),
+      );
+      expect(bar.value, 1.0);
+
+      // No empty buckets → no warning, and the breakdown stays collapsed.
+      expect(
+        find.byKey(const Key('vehicleBaselineMissingWarning')),
+        findsNothing,
+      );
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets(
+        'empty baseline (zero samples everywhere) shows NO warning chip — '
+        'the empty-state copy already explains why; the warning is for '
+        'partially-learned vehicles only', (tester) async {
+      await pumpApp(
+        tester,
+        const SizedBox(
+          width: 600,
+          child: VehicleBaselineSection(vehicleId: _vehicleId),
+        ),
+        overrides: [_summaryOverride(const {})],
+      );
+
+      expect(
+        find.byKey(const Key('vehicleBaselineMissingWarning')),
+        findsNothing,
+      );
+      // Empty-state copy is shown instead.
+      expect(find.textContaining('OBD2 trip'), findsOneWidget);
+    });
+
+    testWidgets(
+        'user can still collapse the auto-expanded breakdown — the toggle '
+        'latches the explicit choice over the empty-bucket auto policy',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const SizedBox(
+          width: 600,
+          child: VehicleBaselineSection(vehicleId: _vehicleId),
+        ),
+        overrides: [
+          _summaryOverride(const {
+            DrivingSituation.idle: 30,
+            DrivingSituation.urbanCruise: 30,
+          }),
+        ],
+      );
+
+      // Auto-expanded by the empty buckets.
+      expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
+
+      // Tapping the toggle collapses it back to the aggregate only.
+      await tester.tap(
+        find.byKey(const Key('vehicleBaselineDetailsToggle')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
     });
   });
 }

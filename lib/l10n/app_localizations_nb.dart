@@ -2064,6 +2064,17 @@ class AppLocalizationsNb extends AppLocalizations {
       'Dette sletter alle innlærte prøver for dette kjøretøyet. Du vil falle tilbake til standardinnstillingene for kaldstart inntil nye turer fyller profilen igjen.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'OBD2-adapter';
 
   @override

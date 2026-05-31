@@ -2076,6 +2076,17 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez törli az ehhez a járműhöz tanult összes mintát. A profil újbóli feltöltéséig visszatér az alap értékekhez.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'OBD2-adapter';
 
   @override

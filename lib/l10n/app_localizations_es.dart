@@ -2075,6 +2075,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esto borra todas las muestras aprendidas de este vehículo. Volverás a los valores predeterminados de arranque en frío hasta que nuevos viajes vuelvan a llenar el perfil.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'Adaptador OBD2';
 
   @override

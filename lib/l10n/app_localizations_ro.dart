@@ -2074,6 +2074,17 @@ class AppLocalizationsRo extends AppLocalizations {
       'Aceasta șterge toate eșantioanele învățate pentru acest vehicul. Veți reveni la valorile implicite de pornire la rece până când noile călătorii vor reumple profilul.';
 
   @override
+  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+
+  @override
+  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+
+  @override
+  String vehicleBaselineMissingWarning(String situations) {
+    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+  }
+
+  @override
   String get vehicleAdapterSectionTitle => 'Adaptor OBD2';
 
   @override
