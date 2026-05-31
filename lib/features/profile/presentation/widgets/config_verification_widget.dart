@@ -114,6 +114,10 @@ class ConfigVerificationWidget extends ConsumerWidget {
                 label: l?.configDatabase ?? 'Database',
                 value: syncConfig.supabaseUrl ?? '\u2014',
                 status: _Status.ok,
+                // A Supabase URL is long enough to wrap "Database" onto two
+                // lines and clip the host in the inline layout, so stack the
+                // value under the label rather than crowding it on the right.
+                stacked: true,
               ),
             ],
 
@@ -201,11 +205,18 @@ class _ConfigRow extends StatelessWidget {
   final String value;
   final _Status status;
 
+  /// When true the value is rendered on its own line BELOW the label
+  /// instead of inline on the right. Used for long values (e.g. a
+  /// Supabase URL) that would otherwise wrap the label to two lines and
+  /// clip in the inline layout (#2490).
+  final bool stacked;
+
   const _ConfigRow({
     required this.icon,
     required this.label,
     required this.value,
     this.status = _Status.neutral,
+    this.stacked = false,
   });
 
   @override
@@ -216,6 +227,41 @@ class _ConfigRow extends StatelessWidget {
       _Status.warning => DarkModeColors.warning(context),
       _Status.neutral => theme.colorScheme.onSurfaceVariant,
     };
+    final valueStyle = theme.textTheme.bodySmall?.copyWith(
+      fontWeight: FontWeight.w600,
+      color: statusColor,
+    );
+
+    if (stacked) {
+      // Label-over-value: a long value (URL) gets the full row width on
+      // its own line and ellipsises rather than wrapping the label.
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 14, color: statusColor),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(label, style: theme.textTheme.bodySmall),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 22, top: 2),
+              child: Text(
+                value,
+                style: valueStyle,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -224,11 +270,15 @@ class _ConfigRow extends StatelessWidget {
           Icon(icon, size: 14, color: statusColor),
           const SizedBox(width: 8),
           Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
-          Text(
-            value,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: statusColor,
+          const SizedBox(width: 8),
+          // Constrain the value so a long one ellipsises instead of
+          // pushing the label into a two-line clip (#2490).
+          Flexible(
+            child: Text(
+              value,
+              style: valueStyle,
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

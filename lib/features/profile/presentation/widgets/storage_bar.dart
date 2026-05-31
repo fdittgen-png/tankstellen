@@ -1,8 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
+
+/// Minimum flex weight a non-zero [StorageBar] segment is given so a
+/// small-but-real category stays visible next to a dominant one (#2490).
+/// 1000 is the full-bar weight, so ~3% is the floor a tiny slice renders
+/// at — enough to be a perceptible band, not a dominant lie.
+const int _kMinSegmentFlex = 30;
 
 /// Format byte count to human-readable string.
 String formatBytes(int bytes) {
@@ -59,22 +67,29 @@ class StorageBar extends StatelessWidget {
           child: SizedBox(
             height: 24,
             child: Row(
-              children: segments.map((seg) {
-                final fraction = seg.bytes / totalBytes;
-                if (fraction < 0.01) return const SizedBox.shrink();
-                return Expanded(
-                  flex: (fraction * 1000).round(),
-                  child: Container(color: seg.color),
-                );
-              }).toList(),
+              children: [
+                for (final seg in segments)
+                  // #2490 — any segment with measurable bytes gets at least
+                  // a [_kMinSegmentFlex] sliver of the bar so a small-but-
+                  // real category (e.g. a couple of favourites next to a
+                  // huge cache) never collapses to an invisible hairline.
+                  // Truly empty (0-byte) categories are still dropped.
+                  if (seg.bytes > 0)
+                    Expanded(
+                      flex: math.max(
+                        _kMinSegmentFlex,
+                        (seg.bytes / totalBytes * 1000).round(),
+                      ),
+                      child: Container(color: seg.color),
+                    ),
+              ],
             ),
           ),
         ),
         // #2116 — legend ties each bar segment to its detail row's dot,
         // so the colours stop being arbitrary "what's the orange one
-        // again?" guesses. Only segments with a measurable share
-        // (≥ 1 % of total) make it into the legend — the same
-        // threshold the bar uses to render its slice.
+        // again?" guesses. #2490 — the legend now lists every segment the
+        // bar renders (any non-zero category), so legend and bar agree.
         const SizedBox(height: 6),
         Wrap(
           key: const Key('storage_bar_legend'),
@@ -82,7 +97,7 @@ class StorageBar extends StatelessWidget {
           runSpacing: 4,
           children: [
             for (final seg in segments)
-              if (totalBytes > 0 && seg.bytes / totalBytes >= 0.01)
+              if (seg.bytes > 0)
                 _LegendSwatch(label: seg.label, color: seg.color),
           ],
         ),

@@ -65,14 +65,19 @@ void main() {
     });
 
     testWidgets(
-        'legend omits segments whose share is below 1% of total (#2116)',
+        'legend lists every non-zero segment, even a tiny one (#2490)',
         (tester) async {
+      // #2490 — a small-but-real category (0.1 % here) must still appear
+      // in both the bar and the legend; only truly empty categories drop.
+      // Before #2490 the bar collapsed sub-1% slices to an invisible
+      // hairline and the legend dropped them, so a couple of favourites
+      // next to a huge cache silently vanished.
       await pumpApp(
         tester,
         StorageBar(
           segments: const [
             StorageSegment('Big', 9990, Colors.green),
-            StorageSegment('Tiny', 10, Colors.purple), // 0.1 % → hidden
+            StorageSegment('Tiny', 10, Colors.purple), // 0.1 % → still shown
           ],
           totalBytes: 10000,
           theme: testTheme,
@@ -81,7 +86,66 @@ void main() {
 
       expect(find.byKey(const Key('storage_bar_legend')), findsOneWidget);
       expect(find.text('Big'), findsOneWidget);
-      expect(find.text('Tiny'), findsNothing);
+      expect(find.text('Tiny'), findsOneWidget);
+    });
+
+    testWidgets('legend omits zero-byte segments (#2490)', (tester) async {
+      await pumpApp(
+        tester,
+        StorageBar(
+          segments: const [
+            StorageSegment('HasData', 2000, Colors.green),
+            StorageSegment('Empty', 0, Colors.purple),
+          ],
+          totalBytes: 2000,
+          theme: testTheme,
+        ),
+      );
+
+      expect(find.byKey(const Key('storage_bar_legend')), findsOneWidget);
+      expect(find.text('HasData'), findsOneWidget);
+      expect(find.text('Empty'), findsNothing);
+    });
+
+    testWidgets(
+        'a tiny non-zero segment renders a visible sliver, not a hairline '
+        '(#2490)', (tester) async {
+      // The min-flex floor means a sub-1% segment is laid out wider than
+      // its raw byte share. We assert it gets non-trivial width relative
+      // to the dominant segment.
+      tester.view.physicalSize = const Size(1000, 200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        StorageBar(
+          segments: const [
+            StorageSegment('Big', 9990, Colors.green),
+            StorageSegment('Tiny', 10, Colors.purple),
+          ],
+          totalBytes: 10000,
+          theme: testTheme,
+        ),
+      );
+
+      final greenSize = tester.getSize(
+        find.byWidgetPredicate(
+          (w) => w is Container && w.color == Colors.green,
+        ),
+      );
+      final purpleSize = tester.getSize(
+        find.byWidgetPredicate(
+          (w) => w is Container && w.color == Colors.purple,
+        ),
+      );
+      // The tiny slice's raw share is 0.1 % of the bar, but the floor
+      // gives it ~30/1020 ≈ 2.9 %, so it must be perceptibly wide.
+      expect(purpleSize.width, greaterThan(10.0),
+          reason: 'tiny segment must render a visible sliver');
+      expect(greenSize.width, greaterThan(purpleSize.width),
+          reason: 'the dominant segment is still the widest');
     });
   });
 

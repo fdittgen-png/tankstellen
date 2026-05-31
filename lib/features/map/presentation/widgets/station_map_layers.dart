@@ -391,32 +391,37 @@ class _StationMapLayersState extends State<StationMapLayers> {
                 ),
               ],
             ),
-            // Station markers with clustering. #1774 — `_markers` is
-            // memoised; this builder just places the pre-built list.
-            Builder(builder: (ctx) {
-              final markers = _markers;
-              if (widget.stations.length > 20) {
-                return MarkerClusterLayerWidget(
-                  options: MarkerClusterLayerOptions(
-                    maxClusterRadius: 80,
-                    markers: markers,
-                    builder: (context, clusterMarkers) => Container(
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${clusterMarkers.length}',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
+            // Station markers — ALWAYS routed through the cluster layer.
+            // #1774 — `_markers` is memoised; this builder just places the
+            // pre-built list. #2490 — the prior `stations.length > 20` gate
+            // dropped to a raw [MarkerLayer] for small result sets, so a
+            // 10-station radius search rendered overlapping price bubbles
+            // that obscured each other. Routing every set through
+            // [MarkerClusterLayerWidget] means overlapping markers always
+            // collapse into a tappable cluster (spiderfy / zoom-to-bounds
+            // on tap, both the layer's defaults), and a single far-apart
+            // station still renders as its own bubble. A tighter
+            // `maxClusterRadius` (was 80) keeps nearby-but-distinct
+            // stations from over-merging at the search zoom.
+            if (_markers.isNotEmpty)
+              MarkerClusterLayerWidget(
+                options: MarkerClusterLayerOptions(
+                  maxClusterRadius: 50,
+                  markers: _markers,
+                  builder: (context, clusterMarkers) => Container(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${clusterMarkers.length}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
-                );
-              }
-              return MarkerLayer(markers: markers);
-            }),
+                ),
+              ),
             // Extra layers (e.g. EV overlay)
             ...widget.extraLayers,
             // Attribution — localized OSM credit (#2402).
