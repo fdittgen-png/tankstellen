@@ -31,12 +31,19 @@ class NearbyMapView extends ConsumerStatefulWidget {
   final double searchRadiusKm;
   final MapController mapController;
 
+  /// Overrides the station-marker tap (#2532). When null markers push the
+  /// full `/station/:id` route (compact phone behaviour); on a wide screen
+  /// [MapScreen] supplies a callback that selects the station into the
+  /// side-panel detail instead.
+  final void Function(String stationId)? onStationTap;
+
   const NearbyMapView({
     super.key,
     required this.searchState,
     required this.selectedFuel,
     required this.searchRadiusKm,
     required this.mapController,
+    this.onStationTap,
   });
 
   @override
@@ -149,6 +156,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
                       ),
                     ),
                     extraLayers: extraLayers,
+                    onStationTap: widget.onStationTap,
                   ),
                 ),
                 _buildInfoBar(context, l10n, stations, result),
