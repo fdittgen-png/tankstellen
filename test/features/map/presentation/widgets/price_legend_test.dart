@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
+import 'package:tankstellen/core/theme/price_band_colors.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/map/presentation/widgets/price_legend.dart';
 
@@ -18,10 +19,10 @@ void main() {
       expect(find.text('expensive'), findsOneWidget);
     });
 
-    testWidgets('renders circle for cheap end with success color', (tester) async {
+    testWidgets('renders a swatch for every price tier (#2492)',
+        (tester) async {
       await pumpApp(tester, const PriceLegend());
 
-      // The cheap circle uses DarkModeColors.success which is theme-aware
       final containers = find.byWidgetPredicate((widget) {
         if (widget is Container && widget.decoration is BoxDecoration) {
           final decoration = widget.decoration as BoxDecoration;
@@ -30,8 +31,30 @@ void main() {
         }
         return false;
       });
-      // Two circles: cheap and expensive
-      expect(containers, findsNWidgets(2));
+      // Three swatches: cheap, the middle "average", and expensive —
+      // mirroring the three tiers priceTierOf classifies.
+      expect(containers, findsNWidgets(3));
+    });
+
+    testWidgets('swatch colours come from the canonical ramp (#2492)',
+        (tester) async {
+      await pumpApp(tester, const PriceLegend());
+
+      final colors = tester
+          .widgetList<Container>(find.byWidgetPredicate((widget) {
+            if (widget is Container && widget.decoration is BoxDecoration) {
+              final d = widget.decoration as BoxDecoration;
+              return d.shape == BoxShape.circle && d.color != null;
+            }
+            return false;
+          }))
+          .map((c) => (c.decoration as BoxDecoration).color)
+          .toList();
+
+      // The legend describes exactly what the markers paint.
+      expect(colors, contains(PriceBandColors.cheapTier));
+      expect(colors, contains(PriceBandColors.averageTier));
+      expect(colors, contains(PriceBandColors.expensiveTier));
     });
 
     testWidgets('renders gradient bar between labels', (tester) async {
@@ -92,7 +115,7 @@ void main() {
       expect(expensiveIcon.color, expectedColor);
     });
 
-    testWidgets('gradient has three stops (cheap, warning, expensive)',
+    testWidgets('gradient bar is the canonical 4-stop ramp (#2492)',
         (tester) async {
       await pumpApp(tester, const PriceLegend());
 
@@ -101,12 +124,21 @@ void main() {
           final decoration = widget.decoration as BoxDecoration;
           if (decoration.gradient is LinearGradient) {
             final gradient = decoration.gradient as LinearGradient;
-            return gradient.colors.length == 3;
+            // The legend draws the exact same 4-stop ramp the markers use.
+            return gradient.colors.length == 4 &&
+                gradient.colors == PriceBandColors.ramp;
           }
         }
         return false;
       });
       expect(gradientContainer, findsOneWidget);
+    });
+
+    testWidgets('renders the neutral "average" tier icon (#2492)',
+        (tester) async {
+      await pumpApp(tester, const PriceLegend());
+
+      expect(find.byIcon(iconForPriceTier(PriceTier.average)), findsOneWidget);
     });
   });
 

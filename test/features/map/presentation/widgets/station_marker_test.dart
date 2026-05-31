@@ -3,12 +3,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/price_band_colors.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 import '../../../../fixtures/stations.dart';
 import '../../../../helpers/pump_app.dart';
+
+/// Asserts two colours match within a sub-1/255 epsilon. `Color.lerp` at
+/// t == 1.0 returns the end stop but can introduce a tiny float drift in
+/// the linear channels, so exact `==` is too strict for ramp endpoints.
+void expectSameColor(Color actual, Color expected) {
+  expect(actual.a, closeTo(expected.a, 0.002));
+  expect(actual.r, closeTo(expected.r, 0.002));
+  expect(actual.g, closeTo(expected.g, 0.002));
+  expect(actual.b, closeTo(expected.b, 0.002));
+}
 
 void main() {
   group('StationMarkerBuilder.priceColor', () {
@@ -27,15 +38,54 @@ void main() {
       expect(color, Colors.grey);
     });
 
-    test('returns green when min equals max', () {
+    test('returns the canonical cheap band when min equals max', () {
+      // #2492 — degenerate range falls back to the shared ramp's cheap
+      // stop, not a bare Colors.green.
       final color = StationMarkerBuilder.priceColor(1.70, 1.70, 1.70);
-      expect(color, Colors.green);
+      expect(color, PriceBandColors.cheap);
     });
 
     test('returns mid-range color for middle price', () {
       final color = StationMarkerBuilder.priceColor(1.70, 1.50, 1.90);
-      expect(color, isNot(Colors.green));
-      expect(color, isNot(Colors.red));
+      expect(color, isNot(PriceBandColors.cheap));
+      expect(color, isNot(PriceBandColors.expensive));
+    });
+
+    test('cheapest price resolves to the ramp cheap stop', () {
+      // t == 0 -> exactly stops[0].
+      expect(
+        StationMarkerBuilder.priceColor(1.50, 1.50, 1.90),
+        PriceBandColors.cheap,
+      );
+    });
+
+    test('most expensive price resolves to the ramp expensive stop', () {
+      // t == 1 -> stops[3] (Color.lerp may drift by a sub-1/255 epsilon).
+      expectSameColor(
+        StationMarkerBuilder.priceColor(1.90, 1.50, 1.90),
+        PriceBandColors.expensive,
+      );
+    });
+  });
+
+  group('canonical price-band ramp (#2492)', () {
+    test('the ramp has exactly 4 stops', () {
+      expect(PriceBandColors.ramp.length, 4);
+    });
+
+    test('the marker gradient consumes the ONE canonical ramp', () {
+      // priceColor must produce the ramp's own boundary colours, proving
+      // the marker and the legend draw from the same source.
+      expect(StationMarkerBuilder.priceColor(0, 0, 1), PriceBandColors.cheap);
+      expectSameColor(
+          StationMarkerBuilder.priceColor(1, 0, 1), PriceBandColors.expensive);
+    });
+
+    test('the middle stop is amber, not pure yellow', () {
+      // #FFEB00 (Colors.yellow) was near-invisible on white-bordered
+      // bubbles; the ramp uses a saturated amber instead.
+      expect(PriceBandColors.belowAverage, const Color(0xFFF9A825));
+      expect(PriceBandColors.belowAverage, isNot(Colors.yellow));
     });
   });
 
