@@ -2405,6 +2405,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get evStatusOutOfOrder => 'Neveikia';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Tik atidarytos';
 
   @override

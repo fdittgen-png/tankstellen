@@ -1105,6 +1105,7 @@
   "evStatusAvailable": "Available",
   "evStatusOccupied": "Occupied",
   "evStatusOutOfOrder": "Out of order",
+  "evStatusPartial": "Partly available",
   "openOnlyFilter": "Open only",
   "saveAsDefaults": "Save as my defaults",
   "criteriaSavedToProfile": "Saved as defaults",

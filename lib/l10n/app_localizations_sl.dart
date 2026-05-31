@@ -2397,6 +2397,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get evStatusOutOfOrder => 'Izven obratovanja';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Samo odprte';
 
   @override

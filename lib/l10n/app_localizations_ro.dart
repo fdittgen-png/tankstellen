@@ -2407,6 +2407,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get evStatusOutOfOrder => 'Defect';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Numai deschise';
 
   @override

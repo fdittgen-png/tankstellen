@@ -2407,6 +2407,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get evStatusOutOfOrder => 'Meghibásodott';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Csak nyitva';
 
   @override

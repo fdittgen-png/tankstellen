@@ -2409,6 +2409,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get evStatusOutOfOrder => 'Nedarbojas';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Tikai atvērtās';
 
   @override

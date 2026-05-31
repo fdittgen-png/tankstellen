@@ -2401,6 +2401,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get evStatusOutOfOrder => 'Mimo provoz';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Pouze otevřené';
 
   @override

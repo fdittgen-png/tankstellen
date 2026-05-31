@@ -11,10 +11,22 @@ part 'charging_station.freezed.dart';
 part 'charging_station.g.dart';
 
 /// Real-time status of an individual [EvConnector].
+///
+/// Canonical, locale-independent status scale (#2493). Every upstream
+/// provider's free-form, often-English status string is normalised into
+/// one of these enum values at the data layer ([fromLabel]); the UI then
+/// switches colour/icon on the enum and localises only the display label,
+/// so the operational scale survives in all 23 locales instead of silently
+/// disappearing wherever the upstream string isn't English.
 enum ConnectorStatus {
   available('available'),
   occupied('occupied'),
   outOfOrder('out_of_order'),
+
+  /// Some, but not all, connectors/points at this position are usable
+  /// (OpenChargeMap "Partly Operational"). Distinct from [available] /
+  /// [outOfOrder] so the UI can warn rather than show all-clear.
+  partial('partial'),
   unknown('unknown');
 
   final String key;
@@ -30,23 +42,33 @@ enum ConnectorStatus {
 
   /// Best-effort heuristic mapping from the human-readable labels that
   /// OpenChargeMap returns ("Currently Available", "In Use", "Not
-  /// Operational", …) into the canonical [ConnectorStatus]. Used by the
-  /// legacy-format [EvConnector.fromJson] path so data persisted before
-  /// the #560 consolidation still rehydrates correctly.
+  /// Operational", "Partly Operational", …) into the canonical
+  /// [ConnectorStatus]. The single source of truth for status
+  /// normalisation (#2493) — both the live [EvConnector] construction in
+  /// the charging service and the legacy-format [EvConnector.fromJson]
+  /// path route through here, so the UI never has to string-match again.
   static ConnectorStatus fromLabel(String? label) {
     if (label == null) return ConnectorStatus.unknown;
     final lower = label.toLowerCase();
-    if (lower.contains('available') || lower == 'operational') {
-      return ConnectorStatus.available;
-    }
-    if (lower.contains('in use') || lower.contains('occupied')) {
-      return ConnectorStatus.occupied;
+    // Order matters. "Partly Operational" must precede the plain
+    // "operational"/"available" branch, and the negative "unavailable"
+    // branch must precede the positive "available" one — otherwise the
+    // substring "available" inside "unavailable" misreads a dead connector
+    // ("Temporarily Unavailable") as free (#2493).
+    if (lower.contains('partly') || lower.contains('partial')) {
+      return ConnectorStatus.partial;
     }
     if (lower.contains('not operational') ||
         lower.contains('out of order') ||
         lower.contains('unavailable') ||
         lower.contains('removed')) {
       return ConnectorStatus.outOfOrder;
+    }
+    if (lower.contains('available') || lower == 'operational') {
+      return ConnectorStatus.available;
+    }
+    if (lower.contains('in use') || lower.contains('occupied')) {
+      return ConnectorStatus.occupied;
     }
     return ConnectorStatus.unknown;
   }
@@ -116,8 +138,7 @@ Map<String, dynamic> _normalizeChargingStationJson(Map<String, dynamic> json) {
   if (!normalized.containsKey('latitude') && normalized.containsKey('lat')) {
     normalized['latitude'] = normalized['lat'];
   }
-  if (!normalized.containsKey('longitude') &&
-      normalized.containsKey('lng')) {
+  if (!normalized.containsKey('longitude') && normalized.containsKey('lng')) {
     normalized['longitude'] = normalized['lng'];
   }
   return normalized;
@@ -223,15 +244,13 @@ abstract class ChargingStation with _$ChargingStation {
       _$ChargingStationFromJson(_normalizeChargingStationJson(json));
 
   /// Whether any connector is currently reported as `available`.
-  bool get hasAvailableConnector => connectors
-      .any((c) => c.status == ConnectorStatus.available);
+  bool get hasAvailableConnector =>
+      connectors.any((c) => c.status == ConnectorStatus.available);
 
   /// Highest advertised max power across all connectors.
   double get maxPowerKw => connectors.isEmpty
       ? 0
-      : connectors
-          .map((c) => c.maxPowerKw)
-          .reduce((a, b) => a > b ? a : b);
+      : connectors.map((c) => c.maxPowerKw).reduce((a, b) => a > b ? a : b);
 
   /// Legacy alias matching the pre-#560 search-side `lat` getter. Keeps
   /// the rename from `lat`/`lng` to `latitude`/`longitude` a soft

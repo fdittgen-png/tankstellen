@@ -22,31 +22,31 @@ import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dar
 void main() {
   group('ChargingStation entity', () {
     ChargingStation sample() => ChargingStation(
-          id: 'station-1',
-          name: 'Ionity Strasbourg',
-          operator: 'Ionity',
-          latitude: 48.5734,
-          longitude: 7.7521,
-          address: '67000 Strasbourg, France',
-          connectors: const [
-            EvConnector(
-              id: 'c1',
-              type: ConnectorType.ccs,
-              maxPowerKw: 350,
-              status: ConnectorStatus.available,
-              tariffId: 'tariff-1',
-            ),
-            EvConnector(
-              id: 'c2',
-              type: ConnectorType.type2,
-              maxPowerKw: 22,
-              status: ConnectorStatus.occupied,
-            ),
-          ],
-          amenities: const ['restroom', 'cafe'],
-          openingHours: const OpeningHours(twentyFourSeven: true),
-          lastUpdate: DateTime.utc(2026, 4, 8, 10, 0),
-        );
+      id: 'station-1',
+      name: 'Ionity Strasbourg',
+      operator: 'Ionity',
+      latitude: 48.5734,
+      longitude: 7.7521,
+      address: '67000 Strasbourg, France',
+      connectors: const [
+        EvConnector(
+          id: 'c1',
+          type: ConnectorType.ccs,
+          maxPowerKw: 350,
+          status: ConnectorStatus.available,
+          tariffId: 'tariff-1',
+        ),
+        EvConnector(
+          id: 'c2',
+          type: ConnectorType.type2,
+          maxPowerKw: 22,
+          status: ConnectorStatus.occupied,
+        ),
+      ],
+      amenities: const ['restroom', 'cafe'],
+      openingHours: const OpeningHours(twentyFourSeven: true),
+      lastUpdate: DateTime.utc(2026, 4, 8, 10, 0),
+    );
 
     test('JSON round-trip preserves every field', () {
       final original = sample();
@@ -82,16 +82,8 @@ void main() {
     test('openingHours with regular hours round-trips', () {
       const hours = OpeningHours(
         regularHours: [
-          RegularHours(
-            weekday: 1,
-            periodBegin: '06:00',
-            periodEnd: '22:00',
-          ),
-          RegularHours(
-            weekday: 7,
-            periodBegin: '08:00',
-            periodEnd: '20:00',
-          ),
+          RegularHours(weekday: 1, periodBegin: '06:00', periodEnd: '22:00'),
+          RegularHours(weekday: 7, periodBegin: '08:00', periodEnd: '20:00'),
         ],
       );
       final restored = OpeningHours.fromJson(hours.toJson());
@@ -176,10 +168,16 @@ void main() {
       final json = station.toJson();
       expect(json.containsKey('latitude'), isTrue);
       expect(json.containsKey('longitude'), isTrue);
-      expect(json.containsKey('lat'), isFalse,
-          reason: 'toJson must not emit the legacy lat key');
-      expect(json.containsKey('lng'), isFalse,
-          reason: 'toJson must not emit the legacy lng key');
+      expect(
+        json.containsKey('lat'),
+        isFalse,
+        reason: 'toJson must not emit the legacy lat key',
+      );
+      expect(
+        json.containsKey('lng'),
+        isFalse,
+        reason: 'toJson must not emit the legacy lng key',
+      );
       expect(json['latitude'], 48.85);
       expect(json['longitude'], 2.35);
     });
@@ -197,8 +195,7 @@ void main() {
       expect(restored, original);
     });
 
-    test(
-        'legacy-shape JSON (lat/lng) round-trips back to canonical output '
+    test('legacy-shape JSON (lat/lng) round-trips back to canonical output '
         'via fromJson -> toJson', () {
       final legacyJson = {
         'id': 'ocm-1',
@@ -216,70 +213,72 @@ void main() {
       expect(roundTripped.containsKey('lng'), isFalse);
     });
 
-    test('fromJson accepts full search-side payload with all ported fields',
-        () {
-      // Payload shape the pre-#560 EVChargingService emitted. Every
-      // field on the entity must rehydrate correctly from it.
-      final json = {
-        'id': 'ocm-456',
-        'name': 'Super Charger',
-        'operator': 'Ionity',
-        'lat': 48.8,
-        'lng': 2.3,
-        'dist': 5.2,
-        'address': 'Rue de Paris',
-        'postCode': '75001',
-        'place': 'Paris',
-        'connectors': [
-          {
-            'type': 'CCS Type 2',
-            'powerKW': 350.0,
-            'quantity': 4,
-            'currentType': 'DC',
-            'status': 'Currently Available',
-          },
-          {
-            'type': 'Type 2',
-            'powerKW': 22.0,
-            'quantity': 2,
-            'currentType': 'AC',
-          },
-        ],
-        'totalPoints': 6,
-        'isOperational': true,
-        'usageCost': '0.39 EUR/kWh',
-        'updatedAt': '27/03/2026',
-        'countryCode': 'FR',
-      };
+    test(
+      'fromJson accepts full search-side payload with all ported fields',
+      () {
+        // Payload shape the pre-#560 EVChargingService emitted. Every
+        // field on the entity must rehydrate correctly from it.
+        final json = {
+          'id': 'ocm-456',
+          'name': 'Super Charger',
+          'operator': 'Ionity',
+          'lat': 48.8,
+          'lng': 2.3,
+          'dist': 5.2,
+          'address': 'Rue de Paris',
+          'postCode': '75001',
+          'place': 'Paris',
+          'connectors': [
+            {
+              'type': 'CCS Type 2',
+              'powerKW': 350.0,
+              'quantity': 4,
+              'currentType': 'DC',
+              'status': 'Currently Available',
+            },
+            {
+              'type': 'Type 2',
+              'powerKW': 22.0,
+              'quantity': 2,
+              'currentType': 'AC',
+            },
+          ],
+          'totalPoints': 6,
+          'isOperational': true,
+          'usageCost': '0.39 EUR/kWh',
+          'updatedAt': '27/03/2026',
+          'countryCode': 'FR',
+        };
 
-      final station = ChargingStation.fromJson(json);
+        final station = ChargingStation.fromJson(json);
 
-      expect(station.id, 'ocm-456');
-      expect(station.name, 'Super Charger');
-      expect(station.operator, 'Ionity');
-      expect(station.latitude, 48.8);
-      expect(station.longitude, 2.3);
-      expect(station.dist, 5.2);
-      expect(station.address, 'Rue de Paris');
-      expect(station.postCode, '75001');
-      expect(station.place, 'Paris');
-      expect(station.connectors.length, 2);
-      expect(station.totalPoints, 6);
-      expect(station.isOperational, true);
-      expect(station.usageCost, '0.39 EUR/kWh');
-      expect(station.updatedAt, '27/03/2026');
-      expect(station.countryCode, 'FR');
+        expect(station.id, 'ocm-456');
+        expect(station.name, 'Super Charger');
+        expect(station.operator, 'Ionity');
+        expect(station.latitude, 48.8);
+        expect(station.longitude, 2.3);
+        expect(station.dist, 5.2);
+        expect(station.address, 'Rue de Paris');
+        expect(station.postCode, '75001');
+        expect(station.place, 'Paris');
+        expect(station.connectors.length, 2);
+        expect(station.totalPoints, 6);
+        expect(station.isOperational, true);
+        expect(station.usageCost, '0.39 EUR/kWh');
+        expect(station.updatedAt, '27/03/2026');
+        expect(station.countryCode, 'FR');
 
-      // Connector normalisation: free-form "CCS Type 2" -> enum + rawType
-      expect(station.connectors.first.type, ConnectorType.ccs);
-      expect(station.connectors.first.rawType, 'CCS Type 2');
-      expect(station.connectors.first.maxPowerKw, 350);
-      expect(station.connectors.first.powerKW, 350);
-      expect(station.connectors.first.currentType, 'DC');
-      expect(station.connectors.first.quantity, 4);
-      expect(station.connectors.first.status, ConnectorStatus.available);
-      expect(station.connectors.first.statusLabel, 'Currently Available');
-    });
+        // Connector normalisation: free-form "CCS Type 2" -> enum + rawType
+        expect(station.connectors.first.type, ConnectorType.ccs);
+        expect(station.connectors.first.rawType, 'CCS Type 2');
+        expect(station.connectors.first.maxPowerKw, 350);
+        expect(station.connectors.first.powerKW, 350);
+        expect(station.connectors.first.currentType, 'DC');
+        expect(station.connectors.first.quantity, 4);
+        expect(station.connectors.first.status, ConnectorStatus.available);
+        expect(station.connectors.first.statusLabel, 'Currently Available');
+      },
+    );
   });
 
   group('EvConnector.fromJson accepts both shapes', () {
@@ -298,25 +297,27 @@ void main() {
       expect(c.statusLabel, isNull);
     });
 
-    test('legacy search shape: powerKW + free-form type + free-form status',
-        () {
-      final json = {
-        'type': 'CHAdeMO',
-        'powerKW': 50.0,
-        'quantity': 2,
-        'currentType': 'DC',
-        'status': 'In Use',
-      };
-      final c = EvConnector.fromJson(json);
-      expect(c.type, ConnectorType.chademo);
-      expect(c.rawType, 'CHAdeMO');
-      expect(c.maxPowerKw, 50);
-      expect(c.powerKW, 50, reason: 'powerKW getter aliases maxPowerKw');
-      expect(c.quantity, 2);
-      expect(c.currentType, 'DC');
-      expect(c.status, ConnectorStatus.occupied);
-      expect(c.statusLabel, 'In Use');
-    });
+    test(
+      'legacy search shape: powerKW + free-form type + free-form status',
+      () {
+        final json = {
+          'type': 'CHAdeMO',
+          'powerKW': 50.0,
+          'quantity': 2,
+          'currentType': 'DC',
+          'status': 'In Use',
+        };
+        final c = EvConnector.fromJson(json);
+        expect(c.type, ConnectorType.chademo);
+        expect(c.rawType, 'CHAdeMO');
+        expect(c.maxPowerKw, 50);
+        expect(c.powerKW, 50, reason: 'powerKW getter aliases maxPowerKw');
+        expect(c.quantity, 2);
+        expect(c.currentType, 'DC');
+        expect(c.status, ConnectorStatus.occupied);
+        expect(c.statusLabel, 'In Use');
+      },
+    );
 
     test('legacy status "Not Operational" maps to outOfOrder', () {
       final c = EvConnector.fromJson({
@@ -326,6 +327,38 @@ void main() {
       });
       expect(c.status, ConnectorStatus.outOfOrder);
       expect(c.statusLabel, 'Not Operational');
+    });
+
+    test('#2493 — "Partly Operational" maps to the new partial status', () {
+      final c = EvConnector.fromJson({
+        'type': 'CCS',
+        'powerKW': 150.0,
+        'status': 'Partly Operational',
+      });
+      expect(c.status, ConnectorStatus.partial);
+      expect(c.statusLabel, 'Partly Operational');
+    });
+
+    test('#2493 — ConnectorStatus.fromLabel normalises the OCM scale', () {
+      // "partly/partial" wins over the bare "available" branch.
+      expect(
+        ConnectorStatus.fromLabel('Partly Operational'),
+        ConnectorStatus.partial,
+      );
+      expect(
+        ConnectorStatus.fromLabel('Currently Available'),
+        ConnectorStatus.available,
+      );
+      expect(
+        ConnectorStatus.fromLabel('Operational'),
+        ConnectorStatus.available,
+      );
+      expect(ConnectorStatus.fromLabel('In Use'), ConnectorStatus.occupied);
+      expect(
+        ConnectorStatus.fromLabel('Temporarily Unavailable'),
+        ConnectorStatus.outOfOrder,
+      );
+      expect(ConnectorStatus.fromLabel(null), ConnectorStatus.unknown);
     });
 
     test('connector without tariffId round-trips', () {

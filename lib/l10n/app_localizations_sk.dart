@@ -2406,6 +2406,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get evStatusOutOfOrder => 'Mimo prevádzky';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Iba otvorené';
 
   @override

@@ -3,8 +3,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../ev/domain/entities/charging_station.dart';
+import '../../../ev/presentation/widgets/connector_status_style.dart';
+import 'ev_connector_chips.dart';
 
 /// A single connector row showing type, power, current type, quantity, and status.
 class EVConnectorTile extends StatelessWidget {
@@ -12,14 +13,26 @@ class EVConnectorTile extends StatelessWidget {
   const EVConnectorTile({super.key, required this.connector});
 
   String get _typeLabel => connector.rawType ?? connector.type.label;
-  String? get _statusLabel => connector.statusLabel;
+
+  /// Surface a status chip whenever the upstream told us anything — either
+  /// a free-form label string OR a normalised status that isn't
+  /// [ConnectorStatus.unknown]. The chip's colour, icon and text then all
+  /// derive from the canonical enum (#2493), so the operational scale shows
+  /// localised in every locale instead of only when the API string was
+  /// English.
+  bool get _hasStatus =>
+      connector.statusLabel != null ||
+      connector.status != ConnectorStatus.unknown;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final label = _typeLabel;
-    final status = _statusLabel;
-    final connColor = _connectorColor(label);
+    // #2493 — connector-family tints are a deliberate per-connector colour
+    // scheme (CCS/Type 2/CHAdeMO/Tesla); reuse the single map shared with
+    // the connector chips rather than re-declaring it here.
+    final connColor = EvConnectorChips.colorFor(label);
+    final status = connector.status;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -32,66 +45,71 @@ class EVConnectorTile extends StatelessWidget {
             ),
             child: Text(
               label,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: connColor),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: connColor,
+              ),
             ),
           ),
           const SizedBox(width: 12),
-          Text('${connector.maxPowerKw.round()} kW', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            '${connector.maxPowerKw.round()} kW',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(width: 8),
           if (connector.currentType != null)
-            Text(connector.currentType!, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            Text(
+              connector.currentType!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           const Spacer(),
           if (connector.quantity > 0)
-            Text('x${connector.quantity}', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          if (status != null) ...[
+            Text(
+              'x${connector.quantity}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          if (_hasStatus) ...[
             const SizedBox(width: 8),
-            Builder(builder: (context) {
-              final statusCol = _statusColor(context, status);
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: statusCol.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(_statusIcon(status), size: 12, color: statusCol),
-                    const SizedBox(width: 3),
-                    Text(status, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: statusCol)),
-                  ],
-                ),
-              );
-            }),
+            Builder(
+              builder: (context) {
+                final statusCol = status.color(context);
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusCol.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(status.icon, size: 12, color: statusCol),
+                      const SizedBox(width: 3),
+                      Text(
+                        status.label(context),
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: statusCol,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         ],
       ),
     );
-  }
-
-  Color _statusColor(BuildContext context, String? status) {
-    if (status == null) return Theme.of(context).colorScheme.outline;
-    if (status.contains('Available') || status == 'Operational') return DarkModeColors.success(context);
-    if (status == 'In Use') return DarkModeColors.warning(context);
-    if (status.contains('Unavailable') || status == 'Not Operational') return DarkModeColors.error(context);
-    if (status == 'Partly Operational') return DarkModeColors.warning(context);
-    return Theme.of(context).colorScheme.outline;
-  }
-
-  IconData _statusIcon(String? status) {
-    if (status == null) return Icons.help_outline;
-    if (status.contains('Available') || status == 'Operational') return Icons.check_circle;
-    if (status == 'In Use') return Icons.access_time;
-    if (status.contains('Unavailable') || status == 'Not Operational') return Icons.cancel;
-    if (status == 'Partly Operational') return Icons.warning;
-    return Icons.help_outline;
-  }
-
-  Color _connectorColor(String type) {
-    if (type.contains('CCS')) return const Color(0xFF2196F3);
-    if (type.contains('Type 2')) return const Color(0xFF4CAF50);
-    if (type.contains('CHAdeMO')) return const Color(0xFFFF9800);
-    if (type.contains('Tesla')) return const Color(0xFFE91E63);
-    return const Color(0xFF757575);
   }
 }
