@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../theme/dark_mode_colors.dart';
 
 /// Interactive 5-star rating widget.
 class StarRating extends StatelessWidget {
@@ -46,7 +47,13 @@ class StarRating extends StatelessWidget {
               child: Center(
                 child: Icon(
                   isFilled ? Icons.star : Icons.star_border,
-                  color: isFilled ? Colors.amber : Colors.grey.shade400,
+                  // #2526 — the amber/gold `warning` token clears AA on
+                  // both surfaces (3.4:1 light, 8.7:1 dark) where plain
+                  // `Colors.amber` was only ~1.6:1 on a light card; the
+                  // empty star uses the theme hint colour.
+                  color: isFilled
+                      ? DarkModeColors.warning(context)
+                      : DarkModeColors.hintText(context),
                   size: starSize,
                 ),
               ),

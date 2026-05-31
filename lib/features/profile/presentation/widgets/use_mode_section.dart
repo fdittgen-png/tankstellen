@@ -153,20 +153,27 @@ class _PresetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const brandGreen = Color(0xFF2E7D32);
+    final cs = theme.colorScheme;
+    // #2526 — the active on-colour is now `onPrimaryContainer` (the
+    // scheme's guaranteed-legible pairing for a `primaryContainer`
+    // fill), replacing the hardcoded light brand-green `#2E7D32` that
+    // collapsed to ~1.16:1 on a dark surface.
+    final activeOn = cs.onPrimaryContainer;
     // #2116 — replaced the 2-px green outline + checkmark badge of
     // the selected state with a Material 3-style subtle tonal
-    // background (primaryContainer at low alpha) + raised elevation.
-    // The brand-green text + leading icon already carry the
-    // selected-state signal; the outline was visually competing with
-    // the label.
+    // background + raised elevation. The on-container text + leading
+    // icon carry the selected-state signal; the outline was visually
+    // competing with the label.
+    // #2526 — the fill was `primaryContainer.withValues(alpha: 0.4)`,
+    // which in dark resolves to a mid-tone grey-green on which neither
+    // the near-black `onPrimaryContainer` (2.7:1) nor brand green reads.
+    // The *solid* `primaryContainer` keeps the M3 tonal look while
+    // making `onPrimaryContainer` clear AA (11:1) in every theme.
     return Card(
       key: Key('useModeCard_${profile.name}'),
       elevation: isActive ? 1 : 0,
       margin: EdgeInsets.zero,
-      color: isActive
-          ? theme.colorScheme.primaryContainer.withValues(alpha: 0.4)
-          : null,
+      color: isActive ? cs.primaryContainer : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: BorderSide(color: theme.dividerColor, width: 1),
@@ -182,9 +189,7 @@ class _PresetCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 32,
-                color: isActive
-                    ? brandGreen
-                    : theme.colorScheme.onSurfaceVariant,
+                color: isActive ? activeOn : cs.onSurfaceVariant,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -197,16 +202,14 @@ class _PresetCard extends StatelessWidget {
                           title,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: isActive
-                                ? brandGreen
-                                : theme.colorScheme.onSurface,
+                            color: isActive ? activeOn : cs.onSurface,
                           ),
                         ),
                         if (isActive) ...[
                           const SizedBox(width: 6),
-                          const Icon(
+                          Icon(
                             Icons.check_circle,
-                            color: brandGreen,
+                            color: activeOn,
                             size: 16,
                           ),
                         ],
@@ -216,7 +219,10 @@ class _PresetCard extends StatelessWidget {
                     Text(
                       description,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                        // #2526 — on the solid `primaryContainer` active fill,
+                        // `onSurfaceVariant` (light grey in dark) vanishes;
+                        // pin to `onPrimaryContainer` while active.
+                        color: isActive ? activeOn : cs.onSurfaceVariant,
                       ),
                     ),
                   ],

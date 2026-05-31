@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../theme/dark_mode_colors.dart';
+
 /// Wraps an arbitrary price widget (usually the card/detail RichText) in a
 /// one-shot "price changed" animation: subtle scale 1.0 → 1.15 → 1.0 over
 /// 500 ms and a brief green (drop) or red (increase) tint overlay.
@@ -25,11 +27,16 @@ class AnimatedPriceText extends StatefulWidget {
   /// `Text` price span so we don't duplicate formatting logic here.
   final Widget child;
 
-  /// Color flashed when price *drops* (new < old). Defaults to green.
-  final Color dropColor;
+  /// Color flashed when price *drops* (new < old). When null (#2526) it
+  /// resolves at build time to [DarkModeColors.success] so the flash is a
+  /// dark-mode-legible green (the old const `#2E7D32` green-800 read only
+  /// 3.59:1 on the dark surface).
+  final Color? dropColor;
 
-  /// Color flashed when price *increases* (new > old). Defaults to red.
-  final Color increaseColor;
+  /// Color flashed when price *increases* (new > old). When null (#2526) it
+  /// resolves at build time to [DarkModeColors.error] (the old const
+  /// `#C62828` red-800 read only 3.28:1 on the dark surface).
+  final Color? increaseColor;
 
   /// Animation duration. Default 500 ms per #595 spec.
   final Duration duration;
@@ -38,8 +45,8 @@ class AnimatedPriceText extends StatefulWidget {
     super.key,
     required this.price,
     required this.child,
-    this.dropColor = const Color(0xFF2E7D32), // Material green 800
-    this.increaseColor = const Color(0xFFC62828), // Material red 800
+    this.dropColor, // #2526 — null → DarkModeColors.success(context)
+    this.increaseColor, // #2526 — null → DarkModeColors.error(context)
     this.duration = const Duration(milliseconds: 500),
   });
 
@@ -51,7 +58,13 @@ class _AnimatedPriceTextState extends State<AnimatedPriceText>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
-  Color? _flashColor;
+
+  /// Whether a flash is currently armed, and its direction. The actual
+  /// colour is resolved in [build] (#2526) so it can read the live theme
+  /// brightness via [DarkModeColors] — `didUpdateWidget` has no usable
+  /// context for a scheme lookup. `null` means no flash is active; `true`
+  /// = price drop, `false` = price increase.
+  bool? _flashIsDrop;
 
   @override
   void initState() {
@@ -82,7 +95,7 @@ class _AnimatedPriceTextState extends State<AnimatedPriceText>
     if (oldPrice == null || newPrice == null) return;
     if (oldPrice == newPrice) return;
     setState(() {
-      _flashColor = newPrice < oldPrice ? widget.dropColor : widget.increaseColor;
+      _flashIsDrop = newPrice < oldPrice;
     });
     _controller
       ..reset()
@@ -97,6 +110,14 @@ class _AnimatedPriceTextState extends State<AnimatedPriceText>
 
   @override
   Widget build(BuildContext context) {
+    // #2526 — resolve the flash colour here so it tracks the live theme.
+    // An explicit [widget.dropColor] / [widget.increaseColor] wins; when
+    // null we fall back to the dark-mode-legible semantic colours.
+    final Color? tint = switch (_flashIsDrop) {
+      true => widget.dropColor ?? DarkModeColors.success(context),
+      false => widget.increaseColor ?? DarkModeColors.error(context),
+      null => null,
+    };
     // Animate a Transform.scale (subtle bounce) wrapping the child, plus
     // an overlay Container whose opacity fades the flash color from
     // ~0.25 at t=0 down to 0 at t=1. Kept simple so the scroll path
@@ -104,7 +125,6 @@ class _AnimatedPriceTextState extends State<AnimatedPriceText>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        final tint = _flashColor;
         final t = _controller.value;
         // 0.25 → 0 linear fade. Peak low enough that text stays legible
         // when dark-mode palettes push the flash toward neon.

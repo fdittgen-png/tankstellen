@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/app_profile_provider.dart';
 import '../../../feature_management/domain/app_profile.dart';
@@ -43,7 +44,10 @@ class ProfileChoiceStep extends ConsumerWidget {
             'Sparkilo', // i18n-ignore: brand wordmark / proper noun
             style: theme.textTheme.headlineLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2E7D32),
+              // #2526 — the wordmark was the light brand green `#2E7D32`
+              // (3.4:1 on the dark surface). Brightness-select so dark uses
+              // the lighter brand `primary` (#69A16B) and clears AA.
+              color: DarkModeColors.brandGreen(context),
             ),
             textAlign: TextAlign.center,
           ),
@@ -136,7 +140,10 @@ class _ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const brandGreen = Color(0xFF2E7D32);
+    // #2526 — adaptive brand green: dark substitutes the scheme's lighter
+    // `primary` (#69A16B) so the active border/icon/title/check clear AA on
+    // the dark Card surface; light keeps the icon brand green `#2E7D32`.
+    final brandGreen = DarkModeColors.brandGreen(context);
     final borderColor = isActive ? brandGreen : theme.dividerColor;
     return Card(
       key: Key('profileCard_${profile.name}'),
@@ -178,7 +185,7 @@ class _ProfileCard extends StatelessWidget {
                         ),
                         if (isActive) ...[
                           const SizedBox(width: 8),
-                          const Icon(
+                          Icon(
                             Icons.check_circle,
                             color: brandGreen,
                             size: 20,
