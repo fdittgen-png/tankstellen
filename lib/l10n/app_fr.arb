@@ -3267,5 +3267,95 @@
   "@situationPartialDecel": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "calculatorDistanceLabel": "Distance ({unit})",
+  "@calculatorDistanceLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorConsumptionLabel": "Consumption ({unit})",
+  "@calculatorConsumptionLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorPriceLabel": "Fuel price ({unit})",
+  "@calculatorPriceLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorUseMine": "Use",
+  "@calculatorUseMine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calculatorApplied": "Applied",
+  "@calculatorApplied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripDetails": "Trip details",
+  "@tripDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calculatorRoundTrip": "Round trip",
+  "@calculatorRoundTrip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "roundTripTotal": "Round trip",
+  "@roundTripTotal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "costPerDistance": "Cost per km",
+  "@costPerDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "costPerMonth": "Cost per month",
+  "@costPerMonth": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calculatorEstimateMonthly": "Estimate monthly cost",
+  "@calculatorEstimateMonthly": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calculatorTripsPerMonth": "Trips per month",
+  "@calculatorTripsPerMonth": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calculatorTripsPerMonthHint": "e.g. 20",
+  "@calculatorTripsPerMonthHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calculatorReset": "Reset",
+  "@calculatorReset": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
+  "@calculatorResultPlaceholder": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

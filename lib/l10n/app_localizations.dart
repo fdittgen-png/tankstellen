@@ -1941,6 +1941,96 @@ abstract class AppLocalizations {
   /// **'Enter distance, consumption, and price to calculate trip cost'**
   String get enterCalcValues;
 
+  /// No description provided for @calculatorDistanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance ({unit})'**
+  String calculatorDistanceLabel(String unit);
+
+  /// No description provided for @calculatorConsumptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption ({unit})'**
+  String calculatorConsumptionLabel(String unit);
+
+  /// No description provided for @calculatorPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel price ({unit})'**
+  String calculatorPriceLabel(String unit);
+
+  /// No description provided for @calculatorUseMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Use'**
+  String get calculatorUseMine;
+
+  /// No description provided for @calculatorApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied'**
+  String get calculatorApplied;
+
+  /// No description provided for @tripDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip details'**
+  String get tripDetails;
+
+  /// No description provided for @calculatorRoundTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Round trip'**
+  String get calculatorRoundTrip;
+
+  /// No description provided for @roundTripTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Round trip'**
+  String get roundTripTotal;
+
+  /// No description provided for @costPerDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per km'**
+  String get costPerDistance;
+
+  /// No description provided for @costPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per month'**
+  String get costPerMonth;
+
+  /// No description provided for @calculatorEstimateMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate monthly cost'**
+  String get calculatorEstimateMonthly;
+
+  /// No description provided for @calculatorTripsPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips per month'**
+  String get calculatorTripsPerMonth;
+
+  /// No description provided for @calculatorTripsPerMonthHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 20'**
+  String get calculatorTripsPerMonthHint;
+
+  /// No description provided for @calculatorReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get calculatorReset;
+
+  /// No description provided for @calculatorResultPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in distance, consumption and price to see your trip cost'**
+  String get calculatorResultPlaceholder;
+
   /// No description provided for @priceHistory.
   ///
   /// In en, this message translates to:

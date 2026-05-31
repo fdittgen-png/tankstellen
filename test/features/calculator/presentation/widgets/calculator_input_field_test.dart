@@ -59,5 +59,40 @@ void main() {
       await tester.enterText(find.byType(TextField), 'abc');
       expect(parsed, 0);
     });
+
+    testWidgets('renders an optional trailing action when provided',
+        (tester) async {
+      await pumpApp(
+        tester,
+        CalculatorInputField(
+          controller: TextEditingController(),
+          labelText: 'Distance (km)',
+          hintText: 'e.g. 150',
+          icon: Icons.straighten,
+          onParsed: (_) {},
+          action: const Text('use mine'),
+        ),
+      );
+
+      expect(find.text('use mine'), findsOneWidget);
+      // The field itself is still present.
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('omits the action area when action is null', (tester) async {
+      await pumpApp(
+        tester,
+        CalculatorInputField(
+          controller: TextEditingController(),
+          labelText: 'Distance (km)',
+          hintText: 'e.g. 150',
+          icon: Icons.straighten,
+          onParsed: (_) {},
+        ),
+      );
+
+      // With no action the widget is a bare TextField (no wrapping Column).
+      expect(find.byType(Column), findsNothing);
+    });
   });
 }

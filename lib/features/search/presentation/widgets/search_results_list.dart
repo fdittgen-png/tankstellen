@@ -148,7 +148,21 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                   label: l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator',
                   button: true,
                   child: InkWell(
-                    onTap: () => context.go('/calculator'),
+                    // #2543 — carry the cheapest visible price for the
+                    // selected fuel into the calculator so it opens
+                    // pre-filled. Null when no station has a price.
+                    onTap: () {
+                      final fuel = ref.read(selectedFuelTypeProvider);
+                      final (minP, _) = priceRange(
+                        _fuelStationsFrom(result.data),
+                        fuel,
+                        requirePositive: true,
+                      );
+                      context.go(
+                        '/calculator',
+                        extra: minP > 0 ? minP : null,
+                      );
+                    },
                     borderRadius: BorderRadius.circular(12),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

@@ -432,6 +432,42 @@
   "fuelNeeded": "Benötigter Kraftstoff",
   "totalCost": "Gesamtkosten",
   "enterCalcValues": "Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu berechnen",
+  "calculatorDistanceLabel": "Entfernung ({unit})",
+  "@calculatorDistanceLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorConsumptionLabel": "Verbrauch ({unit})",
+  "@calculatorConsumptionLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorPriceLabel": "Kraftstoffpreis ({unit})",
+  "@calculatorPriceLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatorUseMine": "Übernehmen",
+  "calculatorApplied": "Übernommen",
+  "tripDetails": "Fahrtdetails",
+  "calculatorRoundTrip": "Hin- und Rückfahrt",
+  "roundTripTotal": "Hin- und Rückfahrt",
+  "costPerDistance": "Kosten pro km",
+  "costPerMonth": "Kosten pro Monat",
+  "calculatorEstimateMonthly": "Monatliche Kosten schätzen",
+  "calculatorTripsPerMonth": "Fahrten pro Monat",
+  "calculatorTripsPerMonthHint": "z. B. 20",
+  "calculatorReset": "Zurücksetzen",
+  "calculatorResultPlaceholder": "Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu sehen",
   "priceHistory": "Preisverlauf",
   "ignoredStationsLabel": "Ignoriert",
   "ratingsLabel": "Bewertungen",

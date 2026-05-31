@@ -105,4 +105,76 @@ void main() {
       expect(b.totalCost, closeTo(2 * a.totalCost, 1e-9));
     });
   });
+
+  group('TripCalculation.costPerKm', () {
+    test('is totalCost / distance for a normal trip', () {
+      const calc = TripCalculation(
+        distanceKm: 200,
+        consumptionPer100Km: 6,
+        pricePerLiter: 1.5,
+      );
+      // 200 * 6 / 100 = 12 L; 12 * 1.5 = 18 €; / 200 km = 0.09 €/km.
+      expect(calc.costPerKm, closeTo(0.09, 1e-9));
+    });
+
+    test('guards a zero distance — returns 0, not NaN/Infinity', () {
+      const calc = TripCalculation(
+        distanceKm: 0,
+        consumptionPer100Km: 7,
+        pricePerLiter: 1.9,
+      );
+      expect(calc.costPerKm, 0);
+      expect(calc.costPerKm.isFinite, isTrue);
+    });
+  });
+
+  group('TripCalculation round-trip', () {
+    const calc = TripCalculation(
+      distanceKm: 100,
+      consumptionPer100Km: 7,
+      pricePerLiter: 2,
+    );
+
+    test('roundTripCost doubles the one-way total', () {
+      expect(calc.roundTripCost, closeTo(2 * calc.totalCost, 1e-9));
+      expect(calc.roundTripLiters, closeTo(2 * calc.totalLiters, 1e-9));
+    });
+
+    test('effectiveCost honours the round-trip flag', () {
+      expect(calc.effectiveCost(roundTrip: false), calc.totalCost);
+      expect(calc.effectiveCost(roundTrip: true), calc.roundTripCost);
+    });
+
+    test('does not mutate the input distance', () {
+      // The one-way distance the caller passed in is untouched.
+      expect(calc.distanceKm, 100);
+    });
+  });
+
+  group('TripCalculation.monthlyCost', () {
+    const calc = TripCalculation(
+      distanceKm: 100,
+      consumptionPer100Km: 7,
+      pricePerLiter: 2,
+    );
+
+    test('multiplies the effective cost by trips/month', () {
+      // one-way 14 €, ×20 = 280 €.
+      expect(
+        calc.monthlyCost(roundTrip: false, tripsPerMonth: 20),
+        closeTo(280, 1e-9),
+      );
+      // round-trip 28 €, ×20 = 560 €.
+      expect(
+        calc.monthlyCost(roundTrip: true, tripsPerMonth: 20),
+        closeTo(560, 1e-9),
+      );
+    });
+
+    test('returns 0 when trips/month is null or non-positive', () {
+      expect(calc.monthlyCost(roundTrip: false, tripsPerMonth: null), 0);
+      expect(calc.monthlyCost(roundTrip: false, tripsPerMonth: 0), 0);
+      expect(calc.monthlyCost(roundTrip: false, tripsPerMonth: -3), 0);
+    });
+  });
 }
