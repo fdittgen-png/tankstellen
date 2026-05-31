@@ -64,12 +64,21 @@ class StationStatusRow extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                ExcludeSemantics(
-                  child: Text(
-                    _buildStatusText(station, serviceResult, l10n),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.w600,
+                // Flexible + ellipsis so the status text yields instead of
+                // overflowing the row when the available width is narrow —
+                // e.g. the flex:2 left pane of the #2531 two-column wide
+                // layout, where the row competes with the trailing stars.
+                // Harmless in the full-width compact sliver header (the text
+                // never reaches the cap there).
+                Flexible(
+                  child: ExcludeSemantics(
+                    child: Text(
+                      _buildStatusText(station, serviceResult, l10n),
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
