@@ -81,13 +81,12 @@ void main() {
 
     violations.sort();
 
-    // Baseline as of 2026-05-30 (#2489): the inline-radius count *after*
-    // migrating `lib/core/widgets/**` to `AppRadius` (8 calls across 5
-    // files: brand_logo, password_strength_indicator, help_banner,
-    // form_section_card, shimmer_placeholder). Only ever decreases; the
-    // target is 0. The remaining 129 live under `lib/features/**` and are
-    // owned by the Epic #2487 cards/chips children — migrate them down,
-    // never raise this number.
+    // Baseline as of 2026-05-30 (#2494): dropped 129 → 126 by collapsing
+    // the two mode pills into `SelectablePill` (AppRadius.xl) and migrating
+    // `amenity_chips.dart` onto the new `AppPill` (AppRadius.sm) — four
+    // inline radii removed. Only ever decreases; the target is 0. The
+    // remainder live under `lib/features/**` and are owned by the Epic
+    // #2487 cards/chips children — migrate them down, never raise this.
     const baseline = _baseline;
 
     expect(
@@ -109,4 +108,4 @@ const _radiusTokenFile = 'lib/core/theme/app_radius.dart';
 
 /// Inline-radius count outside the token file. Driven toward **0** by the
 /// Epic #2487 cards/chips children. Never raise it.
-const _baseline = 129;
+const _baseline = 126;

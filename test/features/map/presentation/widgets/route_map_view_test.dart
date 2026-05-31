@@ -12,7 +12,7 @@ import 'package:tankstellen/features/itinerary/providers/itinerary_provider.dart
 import 'package:tankstellen/features/map/presentation/widgets/route_best_stops_list.dart';
 import 'package:tankstellen/features/map/presentation/widgets/route_info_bar.dart';
 import 'package:tankstellen/features/map/presentation/widgets/route_map_view.dart';
-import 'package:tankstellen/features/map/presentation/widgets/route_view_mode_chip.dart';
+import 'package:tankstellen/core/widgets/selectable_pill.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -103,7 +103,7 @@ void main() {
         expect(find.text('Search'), findsOneWidget);
         // Map-specific widgets MUST NOT render in the empty branch.
         expect(find.byType(RouteInfoBar), findsNothing);
-        expect(find.byType(RouteViewModeChip), findsNothing);
+        expect(find.byType(SelectablePill), findsNothing);
       },
     );
 
@@ -126,7 +126,7 @@ void main() {
 
         expect(find.byType(EmptyState), findsNothing);
         expect(find.byType(RouteInfoBar), findsOneWidget);
-        expect(find.byType(RouteViewModeChip), findsNWidgets(2));
+        expect(find.byType(SelectablePill), findsNWidgets(2));
       },
     );
   });
@@ -150,7 +150,7 @@ void main() {
 
         // All-stations chip is selected; best-stops chip is not.
         final chips = tester
-            .widgetList<RouteViewModeChip>(find.byType(RouteViewModeChip))
+            .widgetList<SelectablePill>(find.byType(SelectablePill))
             .toList();
         expect(chips, hasLength(2));
         expect(chips[0].selected, isTrue,
@@ -194,7 +194,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final chips = tester
-            .widgetList<RouteViewModeChip>(find.byType(RouteViewModeChip))
+            .widgetList<SelectablePill>(find.byType(SelectablePill))
             .toList();
         expect(chips[0].selected, isFalse);
         expect(chips[1].selected, isTrue);

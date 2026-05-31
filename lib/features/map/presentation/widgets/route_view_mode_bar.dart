@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/selectable_pill.dart';
 import '../../../../l10n/app_localizations.dart';
-import 'route_view_mode_chip.dart';
 
 /// Top bar for the route map: hosts the "All stations" / "Best stops" mode
 /// chips plus the selection-count + open-in-maps shortcut on the trailing
@@ -41,14 +41,14 @@ class RouteViewModeBar extends StatelessWidget {
       color: theme.colorScheme.surfaceContainerHighest,
       child: Row(
         children: [
-          RouteViewModeChip(
+          SelectablePill(
             label: l10n?.allStations ?? 'All stations',
             icon: Icons.local_gas_station,
             selected: allStationsSelected,
             onTap: onTapAllStations,
           ),
           const SizedBox(width: 8),
-          RouteViewModeChip(
+          SelectablePill(
             label: l10n?.bestStops ?? 'Best stops',
             icon: Icons.star,
             selected: bestStopsSelected,
