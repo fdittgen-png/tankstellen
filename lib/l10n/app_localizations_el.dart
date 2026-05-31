@@ -2412,6 +2412,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get evStatusOutOfOrder => 'Εκτός λειτουργίας';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Μόνο ανοιχτοί';
 
   @override

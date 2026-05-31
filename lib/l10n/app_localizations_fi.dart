@@ -2395,6 +2395,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get evStatusOutOfOrder => 'Epäkunnossa';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Vain avoinna';
 
   @override

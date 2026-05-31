@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -14,6 +13,7 @@ import '../../../search/providers/station_rating_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
 import '../../domain/entities/charging_station.dart';
+import '../widgets/connector_status_style.dart';
 
 /// Detail view for a single [ChargingStation] with favorite toggle.
 ///
@@ -105,9 +105,7 @@ class EvStationDetailScreen extends ConsumerWidget {
               ),
             ),
             icon: const Icon(Icons.ev_station),
-            label: Text(
-              l10n?.chargingLogButtonLabel ?? 'Log charging',
-            ),
+            label: Text(l10n?.chargingLogButtonLabel ?? 'Log charging'),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
             ),
@@ -171,35 +169,14 @@ class _ConnectorTile extends StatelessWidget {
     }
   }
 
-  static (String, Color) _statusBadge(
-    BuildContext context,
-    ConnectorStatus status,
-  ) {
-    final l10n = AppLocalizations.of(context);
-    switch (status) {
-      case ConnectorStatus.available:
-        return (
-          l10n?.evStatusAvailable ?? 'Available',
-          DarkModeColors.success(context)
-        );
-      case ConnectorStatus.occupied:
-        return (
-          l10n?.evStatusOccupied ?? 'Occupied',
-          DarkModeColors.warning(context)
-        );
-      case ConnectorStatus.outOfOrder:
-        return (
-          l10n?.evStatusOutOfOrder ?? 'Out of order',
-          DarkModeColors.error(context)
-        );
-      case ConnectorStatus.unknown:
-        return (l10n?.evStatusUnknown ?? 'Unknown', Colors.grey);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final (statusLabel, color) = _statusBadge(context, connector.status);
+    // #2493 — colour + label both resolve off the canonical enum via the
+    // shared [ConnectorStatusStyle], so this screen and the search-side
+    // `EVConnectorTile` can never disagree on what "available" looks like.
+    final status = connector.status;
+    final statusLabel = status.label(context);
+    final color = status.color(context);
     return Card(
       child: ListTile(
         leading: const Icon(Icons.power),
@@ -238,8 +215,9 @@ class _RatingRow extends ConsumerWidget {
         ...List.generate(5, (i) {
           final starIndex = i + 1;
           return GestureDetector(
-            onTap: () =>
-                ref.read(stationRatingsProvider.notifier).rate(stationId, starIndex),
+            onTap: () => ref
+                .read(stationRatingsProvider.notifier)
+                .rate(stationId, starIndex),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Icon(

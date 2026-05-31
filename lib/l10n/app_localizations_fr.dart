@@ -2414,6 +2414,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get evStatusOutOfOrder => 'Hors service';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Ouvertes uniquement';
 
   @override

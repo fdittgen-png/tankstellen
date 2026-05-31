@@ -2391,6 +2391,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get evStatusOutOfOrder => 'Rikkes';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Ainult avatud';
 
   @override

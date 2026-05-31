@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_station.dart';
 
@@ -14,18 +16,11 @@ import '../../../ev/domain/entities/charging_station.dart';
 /// the typed [EvConnector] instead of the previous free-form search
 /// side [Connector].
 ///
-/// #2229 — shares the fuel `StationCard`'s frame (margins, elevation,
-/// shape, leading status dot, title/operator/distance block, right
-/// detail column) so both favorite cards have one silhouette; the only
-/// visual difference is the left accent stripe — [crystalBlue] here vs
-/// the grey `FuelType.all` stripe on fuel cards.
+/// #2229 — shares the fuel `StationCard`'s frame (now the common
+/// [StationCardShell], #2493) so both favorite cards have one silhouette;
+/// the only visual difference is the left accent stripe — the canonical
+/// [FuelColors.evAccent] crystal-blue here vs the fuel stripe elsewhere.
 class EvFavoriteCard extends StatelessWidget {
-  /// Crystal-blue accent (#2143) — cool, glassy, distinct from the
-  /// muted-teal `FuelTypeElectric` (#3B8079). Used for both the kW
-  /// headline and (since #2229) the left accent stripe that marks the
-  /// card as EV, without borrowing the fuel palette.
-  static const Color crystalBlue = Color(0xFF4FC3F7);
-
   final ChargingStation station;
   final VoidCallback? onTap;
   final VoidCallback? onFavoriteTap;
@@ -69,80 +64,67 @@ class EvFavoriteCard extends StatelessWidget {
     return Semantics(
       label: semanticLabel,
       button: true,
-      child: Card(
-        // #2229 — same frame as the fuel `StationCard` so both favorite
-        // cards share one silhouette; the only difference is the left
-        // accent stripe colour (blue here vs grey for FuelType.all fuel
-        // cards).
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        clipBehavior: Clip.antiAlias,
-        elevation: theme.brightness == Brightness.dark ? 1 : 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            decoration: const BoxDecoration(
-              border: Border(
-                left: BorderSide(color: crystalBlue, width: 4),
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _EvStatusDot(available: available),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
+      // #2229 / #2493 — same frame as the fuel `StationCard` via the shared
+      // [StationCardShell]; the only difference is the left accent stripe
+      // colour (the canonical EV [FuelColors.evAccent] here vs the fuel
+      // stripe elsewhere).
+      child: StationCardShell(
+        onTap: onTap,
+        stripeColor: FuelColors.evAccent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _EvStatusDot(available: available),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      station.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (operatorName.isNotEmpty) ...[
+                      const SizedBox(height: 2),
                       Text(
-                        station.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+                        operatorName,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (operatorName.isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          operatorName,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                      if (station.dist > 0) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          PriceFormatter.formatDistance(station.dist),
-                          style: theme.textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
                     ],
-                  ),
+                    if (station.dist > 0) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        PriceFormatter.formatDistance(station.dist),
+                        style: theme.textTheme.bodySmall,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(width: 8),
-                _EvDetailColumn(
-                  maxPowerKw: maxPower,
-                  available: available,
-                  total: total,
-                  connectorTypes: connectorTypes,
-                  availableLabel: availableLabel,
-                  onFavoriteTap: onFavoriteTap,
-                  removeFavoriteTooltip:
-                      l10n?.removeFavorite ?? 'Remove from favorites',
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              _EvDetailColumn(
+                maxPowerKw: maxPower,
+                available: available,
+                total: total,
+                connectorTypes: connectorTypes,
+                availableLabel: availableLabel,
+                onFavoriteTap: onFavoriteTap,
+                removeFavoriteTooltip:
+                    l10n?.removeFavorite ?? 'Remove from favorites',
+              ),
+            ],
           ),
         ),
       ),
@@ -206,17 +188,13 @@ class _EvDetailColumn extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.bolt,
-              size: 16,
-              color: EvFavoriteCard.crystalBlue,
-            ),
+            const Icon(Icons.bolt, size: 16, color: FuelColors.evAccent),
             const SizedBox(width: 2),
             Text(
               '${maxPowerKw.round()} kW',
               style: theme.textTheme.titleLarge!.copyWith(
                 fontWeight: FontWeight.bold,
-                color: EvFavoriteCard.crystalBlue,
+                color: FuelColors.evAccent,
               ),
             ),
             const SizedBox(width: 4),

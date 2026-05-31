@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/fuel_colors.dart';
+import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_station_card.dart';
@@ -24,19 +26,21 @@ void main() {
     place: 'Berlin',
     connectors: [
       EvConnector(
-          id: 'c1',
-          type: ConnectorType.ccs,
-          rawType: 'CCS Type 2',
-          maxPowerKw: 350,
-          quantity: 4,
-          currentType: 'DC'),
+        id: 'c1',
+        type: ConnectorType.ccs,
+        rawType: 'CCS Type 2',
+        maxPowerKw: 350,
+        quantity: 4,
+        currentType: 'DC',
+      ),
       EvConnector(
-          id: 'c2',
-          type: ConnectorType.type2,
-          rawType: 'Type 2',
-          maxPowerKw: 22,
-          quantity: 2,
-          currentType: 'AC'),
+        id: 'c2',
+        type: ConnectorType.type2,
+        rawType: 'Type 2',
+        maxPowerKw: 22,
+        quantity: 2,
+        currentType: 'AC',
+      ),
     ],
     totalPoints: 6,
     isOperational: true,
@@ -115,10 +119,7 @@ void main() {
 
     testWidgets('shows station name when operator is empty', (tester) async {
       final noOperator = testStation.copyWith(operator: '');
-      await pumpApp(
-        tester,
-        EVStationCard(result: EVStationResult(noOperator)),
-      );
+      await pumpApp(tester, EVStationCard(result: EVStationResult(noOperator)));
 
       expect(find.text('Test Charger'), findsOneWidget);
     });
@@ -143,8 +144,9 @@ void main() {
         expect(find.byIcon(Icons.star_border), findsNothing);
       });
 
-      testWidgets('outlined star when not favourited; tap fires the callback',
-          (tester) async {
+      testWidgets('outlined star when not favourited; tap fires the callback', (
+        tester,
+      ) async {
         var tapped = 0;
         await pumpApp(
           tester,
@@ -171,6 +173,23 @@ void main() {
         );
         expect(find.byIcon(Icons.star), findsOneWidget);
         expect(find.byIcon(Icons.star_border), findsNothing);
+      });
+    });
+
+    group('StationCardShell composition (#2493)', () {
+      testWidgets('built from the shared shell with the evAccent stripe', (
+        tester,
+      ) async {
+        await pumpApp(
+          tester,
+          const EVStationCard(result: EVStationResult(testStation)),
+        );
+        final shell = tester.widget<StationCardShell>(
+          find.byType(StationCardShell),
+        );
+        // #2493 — single canonical EV accent (no teal `#009688` /
+        // `FuelType.electric` stripe divergence).
+        expect(shell.stripeColor, FuelColors.evAccent);
       });
     });
   });

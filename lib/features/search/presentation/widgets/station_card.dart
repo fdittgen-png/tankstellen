@@ -10,6 +10,7 @@ import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/animated_price_text.dart';
+import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
 import '../../domain/entities/brand_registry.dart';
@@ -74,8 +75,7 @@ class StationCard extends StatelessWidget {
   /// helper excludes the legacy `'Station'` sentinel + the
   /// `BrandRegistry.independentLabel` (`'Independent'` from #482).
   /// `'Autoroute'` is a synthetic motorway tag, kept excluded here.
-  bool get _hasBrand =>
-      hasRealBrand(station) && station.brand != 'Autoroute';
+  bool get _hasBrand => hasRealBrand(station) && station.brand != 'Autoroute';
 
   double? get _displayPrice => station.priceFor(selectedFuelType);
 
@@ -106,10 +106,10 @@ class StationCard extends StatelessWidget {
   /// Returns `null` when neither path resolves — the caller falls
   /// back to the globally-set active profile currency.
   String? get _stationCurrency => Countries.countryForStation(
-        id: station.id,
-        lat: station.lat,
-        lng: station.lng,
-      )?.currencySymbol;
+    id: station.id,
+    lat: station.lat,
+    lng: station.lng,
+  )?.currencySymbol;
 
   @override
   Widget build(BuildContext context) {
@@ -128,61 +128,46 @@ class StationCard extends StatelessWidget {
         '$formattedPrice, $semanticStatus';
 
     final fuelColor = FuelColors.forType(selectedFuelType);
+    // #2493 — the stripe (unlike the price-text tint) uses the visible
+    // all-fuels colour so a `FuelType.all` card no longer shows the near-
+    // invisible neutral grey. Cheapest still wins with the success stripe.
+    final stripeColor = isCheapest
+        ? DarkModeColors.success(context)
+        : FuelColors.stripeColor(context, selectedFuelType);
 
     return Semantics(
       label: semanticLabel,
       button: true,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        clipBehavior: Clip.antiAlias,
-        elevation:
-            Theme.of(context).brightness == Brightness.dark ? 1 : 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: isCheapest
-                      ? DarkModeColors.success(context)
-                      : fuelColor,
-                  width: isCheapest ? 6 : 4,
-                ),
+      child: StationCardShell(
+        onTap: onTap,
+        stripeColor: stripeColor,
+        stripeWidth: isCheapest ? 6 : 4,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _StatusColumn(station: station),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _StationDetails(station: station, hasBrand: _hasBrand),
               ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _StatusColumn(station: station),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StationDetails(
-                    station: station,
-                    hasBrand: _hasBrand,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _StationPriceColumn(
-                  station: station,
-                  selectedFuelType: selectedFuelType,
-                  price: price,
-                  currencyOverride: currencyOverride,
-                  fuelColor: fuelColor,
-                  isFavorite: isFavorite,
-                  isCheapest: isCheapest,
-                  priceTier: priceTier,
-                  rating: rating,
-                  profileFuelType: profileFuelType,
-                  loyaltyDiscount: _loyaltyDiscount,
-                  onFavoriteTap: onFavoriteTap,
-                ),
-              ],
-            ),
+              const SizedBox(width: 8),
+              _StationPriceColumn(
+                station: station,
+                selectedFuelType: selectedFuelType,
+                price: price,
+                currencyOverride: currencyOverride,
+                fuelColor: fuelColor,
+                isFavorite: isFavorite,
+                isCheapest: isCheapest,
+                priceTier: priceTier,
+                rating: rating,
+                profileFuelType: profileFuelType,
+                loyaltyDiscount: _loyaltyDiscount,
+                onFavoriteTap: onFavoriteTap,
+              ),
+            ],
           ),
         ),
       ),

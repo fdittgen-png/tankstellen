@@ -2395,6 +2395,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get evStatusOutOfOrder => 'Ute av drift';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Kun åpne';
 
   @override

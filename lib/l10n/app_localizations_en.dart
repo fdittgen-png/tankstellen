@@ -2387,6 +2387,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get evStatusOutOfOrder => 'Out of order';
 
   @override
+  String get evStatusPartial => 'Partly available';
+
+  @override
   String get openOnlyFilter => 'Open only';
 
   @override
@@ -8812,6 +8815,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get evStatusOutOfOrder => '⟦Óúŧ óƒ óřđéř ·····⟧';
+
+  @override
+  String get evStatusPartial => '⟦Ƥářŧłý áṽáîłáƀłé ·······⟧';
 
   @override
   String get openOnlyFilter => '⟦Óƥéñ óñłý ····⟧';
