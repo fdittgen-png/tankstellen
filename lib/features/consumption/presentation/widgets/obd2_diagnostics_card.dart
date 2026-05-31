@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/obd2_diagnostics_summary.dart';
 import '../../data/obd2/obd2_session_diagnostic.dart';
+import 'obd2_init_transcript_section.dart';
 
 /// Read-only inspector card for one OBD2 communication-health session
 /// (#2470, TAIL of Epic #2463) — the dev-tools analogue of
@@ -101,6 +102,11 @@ class Obd2DiagnosticsCard extends StatelessWidget {
           _completenessSection(context, l, theme, summary),
           _supportSection(context, l, theme, summary),
           if (summary.fuelTotal > 0) _fuelSection(context, l, theme, summary),
+          if (session.initTranscript.isNotEmpty)
+            Obd2InitTranscriptSection(
+              session: session,
+              supportedCount: summary.supportedCount,
+            ),
           const SizedBox(height: 12),
           Text(
             l?.obd2DiagnosticsExplain ??

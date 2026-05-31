@@ -4482,6 +4482,58 @@
       }
     }
   },
+  "obd2DiagnosticsInitSection": "Dongle init transcript",
+  "@obd2DiagnosticsInitSection": {
+    "description": "Section header above the ELM327 dongle initialization-handshake transcript (the timed ATZ/ATE0/… command→response lines) on the OBD2 diagnostics card (#2511, Epic #2463)."
+  },
+  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
+  "@obd2DiagnosticsInitHeader": {
+    "description": "Summary header above the init-transcript lines on the OBD2 diagnostics card (#2511). protocol is the auto-detected OBD protocol digit; start is the localised warm/cold word; firmware is the ELM banner version; tier is the firmware capability-tier name; pids is the count of discovered-supported PIDs. All pre-formatted (an em-dash is supplied for any unknown field).",
+    "placeholders": {
+      "protocol": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "firmware": {
+        "type": "String"
+      },
+      "tier": {
+        "type": "String"
+      },
+      "pids": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
+  "@obd2DiagnosticsInitLine": {
+    "description": "One init-handshake transcript line on the OBD2 diagnostics card (#2511): the AT/OBD command sent, an arrow, the redacted reply, and the round-trip latency in milliseconds. cmd and response are raw adapter data (AT commands / hex replies) shown verbatim.",
+    "placeholders": {
+      "cmd": {
+        "type": "String"
+      },
+      "response": {
+        "type": "String"
+      },
+      "latency": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsInitWarm": "warm",
+  "@obd2DiagnosticsInitWarm": {
+    "description": "Word for a warm (already-initialised, fast-path) adapter start in the init-transcript header on the OBD2 diagnostics card (#2511)."
+  },
+  "obd2DiagnosticsInitCold": "cold",
+  "@obd2DiagnosticsInitCold": {
+    "description": "Word for a cold (full-handshake) adapter start in the init-transcript header on the OBD2 diagnostics card (#2511)."
+  },
+  "obd2HealthCopyInitTranscript": "Copy init transcript only",
+  "@obd2HealthCopyInitTranscript": {
+    "description": "Label for the action on the dev-tools OBD2 communication-health screen (#2511) that copies only the dongle-init handshake (adapter identity + init transcript + supported PIDs) to the clipboard as JSON, without the full per-PID/session payload."
+  },
   "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
   "@obd2DiagnosticsEmpty": {
     "description": "Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet."

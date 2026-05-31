@@ -28,6 +28,11 @@ void main() {
       warmStart: false,
       capabilityTier: 'standardOnly',
       sessionActiveSeconds: 100,
+      initTranscript: [
+        Obd2HandshakeLine(cmd: 'ATZ', response: 'ELM327 v1.5', latencyMs: 120),
+        Obd2HandshakeLine(cmd: 'ATE0', response: 'OK', latencyMs: 18),
+        Obd2HandshakeLine(cmd: '0100', response: 'BE3FA813', latencyMs: 64),
+      ],
       pidStats: {
         // Healthy dynamics PID: 1 Hz target, fully achieved.
         '010C': Obd2PidStat(
@@ -161,9 +166,17 @@ void main() {
       await tester.tap(find.byKey(const Key('obd2_diagnostics_tile')));
       await tester.pumpAndSettle();
 
-      // Adapter identity (redacted MAC + firmware + protocol + MTU).
+      // Adapter identity (redacted MAC + firmware + protocol + MTU). The
+      // firmware string also appears in the init-transcript section, so
+      // scope the firmware assertion to the adapter line itself.
       expect(find.byKey(const Key('obd2_diag_adapter_line')), findsOneWidget);
-      expect(find.textContaining('ELM327 v1.5'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('obd2_diag_adapter_line')),
+          matching: find.textContaining('ELM327 v1.5'),
+        ),
+        findsOneWidget,
+      );
       expect(find.textContaining('E:FF'), findsOneWidget);
       // Connection lifecycle.
       expect(
@@ -191,6 +204,65 @@ void main() {
       // Fuel-tier rollup.
       expect(find.byKey(const Key('obd2_diag_fuel_line')), findsOneWidget);
       expect(find.textContaining('Suspicious 12 of 100'), findsOneWidget);
+      // Dongle init transcript (#2511): header + one line per handshake.
+      expect(find.byKey(const Key('obd2_diag_init_header')), findsOneWidget);
+      expect(find.byKey(const Key('obd2_diag_init_line_0')), findsOneWidget);
+      expect(find.byKey(const Key('obd2_diag_init_line_1')), findsOneWidget);
+      expect(find.byKey(const Key('obd2_diag_init_line_2')), findsOneWidget);
+      expect(find.byKey(const Key('obd2_diag_init_line_3')), findsNothing);
+    });
+  });
+
+  group('Obd2DiagnosticsCard — dongle init transcript (#2511)', () {
+    testWidgets('renders the handshake lines + summary header', (tester) async {
+      await pumpApp(
+        tester,
+        ListView(children: [Obd2DiagnosticsCard(session: seededSession())]),
+      );
+      await tester.tap(find.byKey(const Key('obd2_diagnostics_tile')));
+      await tester.pumpAndSettle();
+
+      // Section header is present.
+      expect(find.text('Dongle init transcript'), findsOneWidget);
+      // Summary header: protocol 6 · cold · firmware · tier · 2 supported PIDs.
+      final header = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(const Key('obd2_diag_init_header')),
+          matching: find.byType(Text),
+        ),
+      );
+      expect(header.data, contains('Protocol 6'));
+      expect(header.data, contains('cold'));
+      expect(header.data, contains('ELM327 v1.5'));
+      expect(header.data, contains('standardOnly'));
+      expect(header.data, contains('2 PIDs'));
+      // Each captured handshake line renders cmd → response (latency ms).
+      expect(find.textContaining('ATZ → ELM327 v1.5 (120 ms)'), findsWidgets);
+      expect(find.textContaining('ATE0 → OK (18 ms)'), findsOneWidget);
+      expect(find.textContaining('0100 → BE3FA813 (64 ms)'), findsOneWidget);
+    });
+
+    testWidgets('section is absent when the transcript is empty',
+        (tester) async {
+      // A presentable session (PIDs + connection) but no captured handshake.
+      const noHandshake = Obd2SessionDiagnostic(
+        linkKind: 'ble',
+        redactedMac: '···············E:FF',
+        connection: Obd2ConnectionStats(attempts: 1, successes: 1),
+        pidStats: {'010C': Obd2PidStat(polled: 10, ok: 10)},
+      );
+      await pumpApp(
+        tester,
+        ListView(
+          children: const [Obd2DiagnosticsCard(session: noHandshake)],
+        ),
+      );
+      await tester.tap(find.byKey(const Key('obd2_diagnostics_tile')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('obd2_diag_init_header')), findsNothing);
+      expect(find.byKey(const Key('obd2_diag_init_line_0')), findsNothing);
+      expect(find.text('Dongle init transcript'), findsNothing);
     });
   });
 }

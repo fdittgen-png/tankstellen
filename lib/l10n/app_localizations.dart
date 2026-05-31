@@ -9719,6 +9719,48 @@ abstract class AppLocalizations {
     String targetHz,
   );
 
+  /// Section header above the ELM327 dongle initialization-handshake transcript (the timed ATZ/ATE0/… command→response lines) on the OBD2 diagnostics card (#2511, Epic #2463).
+  ///
+  /// In en, this message translates to:
+  /// **'Dongle init transcript'**
+  String get obd2DiagnosticsInitSection;
+
+  /// Summary header above the init-transcript lines on the OBD2 diagnostics card (#2511). protocol is the auto-detected OBD protocol digit; start is the localised warm/cold word; firmware is the ELM banner version; tier is the firmware capability-tier name; pids is the count of discovered-supported PIDs. All pre-formatted (an em-dash is supplied for any unknown field).
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs'**
+  String obd2DiagnosticsInitHeader(
+    String protocol,
+    String start,
+    String firmware,
+    String tier,
+    int pids,
+  );
+
+  /// One init-handshake transcript line on the OBD2 diagnostics card (#2511): the AT/OBD command sent, an arrow, the redacted reply, and the round-trip latency in milliseconds. cmd and response are raw adapter data (AT commands / hex replies) shown verbatim.
+  ///
+  /// In en, this message translates to:
+  /// **'{cmd} → {response} ({latency} ms)'**
+  String obd2DiagnosticsInitLine(String cmd, String response, int latency);
+
+  /// Word for a warm (already-initialised, fast-path) adapter start in the init-transcript header on the OBD2 diagnostics card (#2511).
+  ///
+  /// In en, this message translates to:
+  /// **'warm'**
+  String get obd2DiagnosticsInitWarm;
+
+  /// Word for a cold (full-handshake) adapter start in the init-transcript header on the OBD2 diagnostics card (#2511).
+  ///
+  /// In en, this message translates to:
+  /// **'cold'**
+  String get obd2DiagnosticsInitCold;
+
+  /// Label for the action on the dev-tools OBD2 communication-health screen (#2511) that copies only the dongle-init handshake (adapter identity + init transcript + supported PIDs) to the clipboard as JSON, without the full per-PID/session payload.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy init transcript only'**
+  String get obd2HealthCopyInitTranscript;
+
   /// Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet.
   ///
   /// In en, this message translates to:
