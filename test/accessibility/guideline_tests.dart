@@ -120,7 +120,7 @@ void main() {
         await _pumpScreen(tester, const SearchScreen(),
             overrides: overrides());
 
-        // Known: ModeChip and GPS button are under 48px height.
+        // Known: SelectablePill and GPS button are under 48px height.
         // Evaluate and report without failing — tracked for future fix.
         final result = await androidTapTargetGuideline.evaluate(tester);
         if (!result.passed) {

@@ -24,7 +24,9 @@ import '../../../../helpers/pump_app.dart';
 /// #1901 — Trajets is no longer a tab of [ConsumptionScreen]; it is
 /// its own bottom-bar destination, reached by pumping the screen with
 /// `section: ConsumptionSection.trajets`. The screen renders
-/// [TrajetsTab] directly — no in-screen tab bar, no FAB.
+/// [TrajetsTab] directly — no in-screen tab bar. #2494 — the
+/// "Start / Resume recording" CTA floats in the Scaffold FAB slot
+/// (`TrajetsRecordFab`), matching the Carburant tab's add-fill-up FAB.
 ///
 /// These tests verify the empty-state CTA, the newest-first sort, and
 /// the navigation target of a row tap. Whether the Trajets destination

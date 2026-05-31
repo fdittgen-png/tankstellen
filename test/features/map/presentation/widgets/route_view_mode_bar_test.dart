@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/map/presentation/widgets/route_view_mode_bar.dart';
-import 'package:tankstellen/features/map/presentation/widgets/route_view_mode_chip.dart';
+import 'package:tankstellen/core/widgets/selectable_pill.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
@@ -33,11 +33,11 @@ void main() {
   }
 
   group('RouteViewModeBar', () {
-    testWidgets('renders both RouteViewModeChip widgets', (tester) async {
+    testWidgets('renders both SelectablePill widgets', (tester) async {
       await tester.pumpWidget(buildBar());
       await tester.pumpAndSettle();
 
-      expect(find.byType(RouteViewModeChip), findsNWidgets(2));
+      expect(find.byType(SelectablePill), findsNWidgets(2));
     });
 
     testWidgets(
@@ -49,7 +49,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final chips = tester
-          .widgetList<RouteViewModeChip>(find.byType(RouteViewModeChip))
+          .widgetList<SelectablePill>(find.byType(SelectablePill))
           .toList();
       expect(chips, hasLength(2));
       expect(chips[0].selected, isTrue);
@@ -61,7 +61,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final swappedChips = tester
-          .widgetList<RouteViewModeChip>(find.byType(RouteViewModeChip))
+          .widgetList<SelectablePill>(find.byType(SelectablePill))
           .toList();
       expect(swappedChips[0].selected, isFalse);
       expect(swappedChips[1].selected, isTrue);
@@ -107,7 +107,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(RouteViewModeChip).first);
+      await tester.tap(find.byType(SelectablePill).first);
       await tester.pump();
 
       expect(tapped, 1);
@@ -125,7 +125,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(RouteViewModeChip).at(1));
+      await tester.tap(find.byType(SelectablePill).at(1));
       await tester.pump();
 
       expect(tapped, 1);

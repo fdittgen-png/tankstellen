@@ -20,8 +20,8 @@ import '../../domain/entities/search_result_item.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
+import '../../../../core/widgets/selectable_pill.dart';
 import 'ev_station_card.dart';
-import 'mode_chip.dart';
 import 'station_card.dart';
 
 /// View mode toggle for route search results.
@@ -161,14 +161,14 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           const SizedBox(height: 6),
           Row(
             children: [
-              ModeChip(
+              SelectablePill(
                 label: l10n?.allStations ?? 'All stations',
                 icon: Icons.local_gas_station,
                 selected: _resultMode == RouteResultMode.allStations,
                 onTap: () => setState(() => _resultMode = RouteResultMode.allStations),
               ),
               const SizedBox(width: 8),
-              ModeChip(
+              SelectablePill(
                 label: l10n?.bestStops ?? 'Best stops',
                 icon: Icons.star,
                 selected: _resultMode == RouteResultMode.bestStops,

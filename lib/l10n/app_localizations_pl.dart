@@ -3284,6 +3284,11 @@ class AppLocalizationsPl extends AppLocalizations {
   String get alertsRadiusDeleteConfirm => 'Usunąć alert radiusowy?';
 
   @override
+  String radiusAlertDeleted(String name) {
+    return 'Radius alert \"$name\" deleted';
+  }
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 połączony: $adapterName';
   }

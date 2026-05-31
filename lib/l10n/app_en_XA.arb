@@ -988,6 +988,7 @@
   "alertsRadiusSave": "⟦Šáṽé ··⟧",
   "alertsRadiusCancel": "⟦Çáñçéł ···⟧",
   "alertsRadiusDeleteConfirm": "⟦Đéłéŧé řáđîúš áłéřŧ? ········⟧",
+  "radiusAlertDeleted": "⟦Řáđîúš áłéřŧ \"{name}\" đéłéŧéđ ········⟧",
   "obd2ConnectedTooltip": "⟦ÓƁĐ2 çóññéçŧéđ: {adapterName} ·····⟧",
   "obd2PairChipTooltip": "⟦Ƥáîř áñ ÓƁĐ2 áđáƥŧéř ·······⟧",
   "velocityAlertTitle": "⟦{fuelLabel} đřóƥƥéđ áŧ ñéářƀý šŧáŧîóñš ··········⟧",

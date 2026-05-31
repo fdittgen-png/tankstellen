@@ -23,6 +23,7 @@ import '../../providers/trip_history_provider.dart';
 import '../widgets/charging_tab.dart';
 import '../widgets/fuel_tab.dart';
 import '../widgets/obd2_status_chip.dart';
+import '../widgets/trajets_record_fab.dart';
 import '../widgets/trajets_tab.dart';
 import 'add_charging_log_screen.dart';
 import 'trajets_map_screen.dart';
@@ -253,9 +254,10 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     };
   }
 
-  /// #1901 — the Trajets destination: OBD2 trip history. No FAB (the
-  /// "Start recording" CTA lives in the tab header) and no in-screen
-  /// tab bar.
+  /// #1901 — the Trajets destination: OBD2 trip history. #2494 — the
+  /// "Start / Resume recording" CTA now floats in the Scaffold FAB slot
+  /// ([TrajetsRecordFab]) over the list, matching the Carburant tab,
+  /// instead of the old hand-rolled in-body overlay.
   ///
   /// #2374 — computes the same vehicle-filtered trip IDs that [TrajetsTab]
   /// renders, so the AppBar map action opens [TrajetsMapScreen] with exactly
@@ -277,6 +279,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
       actions: _appBarActions(l, tripIds: tripIds),
+      floatingActionButton: const TrajetsRecordFab(),
       body: TrajetsTab(vehicleId: vehicleId),
     );
   }

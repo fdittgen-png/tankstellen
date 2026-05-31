@@ -1321,6 +1321,7 @@
   "alertsRadiusSave": "Speichern",
   "alertsRadiusCancel": "Abbrechen",
   "alertsRadiusDeleteConfirm": "Umkreis-Alarm löschen?",
+  "radiusAlertDeleted": "Umkreis-Alarm \"{name}\" gelöscht",
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
   "obd2PairChipTooltip": "OBD2-Adapter koppeln",
   "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",

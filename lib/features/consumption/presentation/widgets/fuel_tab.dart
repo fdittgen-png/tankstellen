@@ -9,6 +9,7 @@ import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
@@ -51,7 +52,10 @@ class FuelTab extends ConsumerWidget {
     }
     final showGamification = ref.watch(gamificationEnabledProvider);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
-    final bottomInset = 96 + MediaQuery.of(context).viewPadding.bottom;
+    // #2494 — clears the floating add-fill-up FAB hosted by PageScaffold.
+    // The Scaffold lifts the FAB clear of the system inset, so we must NOT
+    // add `viewPadding.bottom` on top of the shared clearance constant.
+    const bottomInset = kFabScrollClearance;
 
     final headerChildren = <Widget>[
       HelpBanner(
@@ -111,7 +115,7 @@ class FuelTab extends ConsumerWidget {
           Expanded(
             flex: 2,
             child: SingleChildScrollView(
-              padding: EdgeInsets.only(top: 8, bottom: bottomInset),
+              padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: headerChildren,
@@ -122,7 +126,7 @@ class FuelTab extends ConsumerWidget {
           Expanded(
             flex: 3,
             child: ListView.builder(
-              padding: EdgeInsets.only(top: 8, bottom: bottomInset),
+              padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
               itemCount: fillUps.length,
               itemBuilder: (context, index) => buildFillUpRow(index),
             ),
@@ -132,7 +136,7 @@ class FuelTab extends ConsumerWidget {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.only(top: 8, bottom: bottomInset),
+      padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
       itemCount: fillUps.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {

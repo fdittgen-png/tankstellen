@@ -1524,6 +1524,15 @@
   "@alertsRadiusDeleteConfirm": {
     "description": "Snackbar/confirm text shown when a radius alert is dismissed for deletion (#578)."
   },
+  "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
+  "@radiusAlertDeleted": {
+    "description": "Past-tense snackbar shown after a radius alert is deleted, paired with an Undo action that re-inserts it (#2494).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "obd2ConnectedTooltip": "OBD2 connected: {adapterName}",
   "@obd2ConnectedTooltip": {
     "description": "Tooltip on the title-bar OBD2 status chip (#797 phase 3) shown only when the pinned adapter is currently connected.",

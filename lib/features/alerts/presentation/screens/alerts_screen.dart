@@ -236,10 +236,22 @@ class _RadiusAlertListTile extends ConsumerWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
-        ref.read(radiusAlertsProvider.notifier).remove(alert.id);
-        SnackBarHelper.show(
+        // #2494 — mirror the per-station tile (:142): a past-tense
+        // confirmation with an Undo that re-inserts the deleted alert,
+        // rather than the old interrogative "Delete radius alert?" copy
+        // shown *after* the deletion had already happened.
+        //
+        // Capture the (keep-alive) notifier here — this tile is removed
+        // from the tree the moment it is dismissed, so `ref` becomes
+        // unusable; the Undo callback must close over the notifier, not
+        // re-read it through the dead tile's `ref`.
+        final notifier = ref.read(radiusAlertsProvider.notifier);
+        notifier.remove(alert.id);
+        SnackBarHelper.showWithUndo(
           context,
-          l10n?.alertsRadiusDeleteConfirm ?? 'Delete radius alert?',
+          l10n?.radiusAlertDeleted(alert.label) ??
+              'Radius alert "${alert.label}" deleted',
+          onUndo: () => notifier.add(alert),
         );
       },
       child: ListTile(

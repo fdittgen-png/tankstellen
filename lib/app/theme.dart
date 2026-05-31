@@ -4,6 +4,8 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
+import '../core/theme/app_radius.dart';
+
 /// Calm forest-green palette (#1757) — the app's professional default
 /// look, drawn from the green-shield app icon (`#2E7D32`).
 ///
@@ -68,6 +70,10 @@ class AppTheme {
         cardRadius: 12.0,
         filledButtonRadius: 12.0,
         outlinedButtonRadius: 12.0,
+        // #2494 — every Material Chip shares the canonical pill corner
+        // (AppRadius.xl = 16), matching the bespoke SelectablePill/AppPill
+        // shapes so chips read as one family across the app.
+        chipRadius: AppRadius.radiusXl,
         // #2488 — light keeps its tint-only card separation: the near-white
         // scaffold (blendLevel 8) and `surfaceContainerLow` cards already
         // read apart, so no shadow (the M3 elevated-card default would be
@@ -102,6 +108,8 @@ class AppTheme {
         cardRadius: 12.0,
         filledButtonRadius: 12.0,
         outlinedButtonRadius: 12.0,
+        // #2494 — shared canonical chip corner (AppRadius.xl = 16).
+        chipRadius: AppRadius.radiusXl,
         // #2488 — a 1 dp shadow is faint on a dark surface, so dark relies
         // on the hairline `surfaceContainerHighest` outline drawn by
         // [SectionCard] for card↔scaffold separation.
@@ -168,6 +176,8 @@ class AppTheme {
         cardRadius: 12.0,
         filledButtonRadius: 12.0,
         outlinedButtonRadius: 12.0,
+        // #2494 — shared canonical chip corner (AppRadius.xl = 16).
+        chipRadius: AppRadius.radiusXl,
         // #2488 — a real card↔scaffold delta on top of the lightness step.
         cardElevation: 1.0,
         snackBarRadius: 12.0,

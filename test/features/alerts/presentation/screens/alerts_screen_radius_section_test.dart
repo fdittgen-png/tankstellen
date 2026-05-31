@@ -101,6 +101,75 @@ void main() {
 
       expect(fake.removedIds, ['r1']);
     });
+
+    // #2494 — the post-deletion snackbar is PAST-TENSE with an Undo action,
+    // mirroring the per-station tile. The old interrogative "Delete radius
+    // alert?" copy (shown AFTER the deletion already happened) must be gone.
+    testWidgets('swipe-dismiss shows a past-tense undo snackbar (not the '
+        'interrogative confirm)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+
+      final fake = _FakeRadiusAlerts([
+        _sampleAlert(id: 'r1', label: 'Home diesel'),
+      ]);
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertProvider.overrideWith(() => _EmptyAlerts()),
+          radiusAlertsProvider.overrideWith(() => fake),
+        ],
+      );
+
+      await tester.drag(find.text('Home diesel'), const Offset(-600, 0));
+      await tester.pumpAndSettle();
+
+      // Past-tense deletion copy with the alert's label.
+      expect(find.text('Radius alert "Home diesel" deleted'), findsOneWidget);
+      // Undo action button is present.
+      expect(find.text('Undo'), findsOneWidget);
+      // The old interrogative copy must not appear.
+      expect(find.text('Delete radius alert?'), findsNothing);
+    });
+
+    testWidgets('tapping Undo re-inserts the deleted alert via add()',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+
+      final fake = _FakeRadiusAlerts([
+        _sampleAlert(id: 'r1', label: 'Home diesel'),
+      ]);
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertProvider.overrideWith(() => _EmptyAlerts()),
+          radiusAlertsProvider.overrideWith(() => fake),
+        ],
+      );
+
+      await tester.drag(find.text('Home diesel'), const Offset(-600, 0));
+      await tester.pumpAndSettle();
+
+      expect(fake.removedIds, ['r1']);
+      expect(fake.addedAlerts, isEmpty);
+
+      await tester.tap(find.text('Undo'));
+      await tester.pumpAndSettle();
+
+      // The same alert (id + label) is re-inserted through the provider's
+      // add() path — not a partial reconstruction.
+      expect(fake.addedAlerts.map((a) => a.id), ['r1']);
+      expect(fake.addedAlerts.single.label, 'Home diesel');
+    });
   });
 }
 
@@ -134,6 +203,9 @@ class _EmptyAlerts extends AlertNotifier {
 
 class _FakeRadiusAlerts extends RadiusAlerts {
   final List<RadiusAlert> _initial;
+  // Mutable working copy so add/remove compose correctly (the real store
+  // upserts by id — a re-added alert must not duplicate its ValueKey).
+  late final List<RadiusAlert> _current = [..._initial];
   final List<String> toggledIds = [];
   final List<String> removedIds = [];
   final List<RadiusAlert> addedAlerts = [];
@@ -141,29 +213,32 @@ class _FakeRadiusAlerts extends RadiusAlerts {
   _FakeRadiusAlerts(this._initial);
 
   @override
-  Future<List<RadiusAlert>> build() async => _initial;
+  Future<List<RadiusAlert>> build() async => _current;
 
   @override
   Future<void> add(RadiusAlert alert) async {
     addedAlerts.add(alert);
-    state = AsyncValue.data([..._initial, alert]);
+    _current
+      ..removeWhere((a) => a.id == alert.id)
+      ..add(alert);
+    state = AsyncValue.data([..._current]);
   }
 
   @override
   Future<void> remove(String id) async {
     removedIds.add(id);
-    state = AsyncValue.data(
-      _initial.where((a) => a.id != id).toList(),
-    );
+    _current.removeWhere((a) => a.id == id);
+    state = AsyncValue.data([..._current]);
   }
 
   @override
   Future<void> toggle(String id) async {
     toggledIds.add(id);
-    state = AsyncValue.data(
-      _initial
-          .map((a) => a.id == id ? a.copyWith(enabled: !a.enabled) : a)
-          .toList(),
-    );
+    for (var i = 0; i < _current.length; i++) {
+      if (_current[i].id == id) {
+        _current[i] = _current[i].copyWith(enabled: !_current[i].enabled);
+      }
+    }
+    state = AsyncValue.data([..._current]);
   }
 }

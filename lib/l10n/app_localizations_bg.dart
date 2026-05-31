@@ -3300,6 +3300,11 @@ class AppLocalizationsBg extends AppLocalizations {
   String get alertsRadiusDeleteConfirm => 'Изтрий радиусния сигнал?';
 
   @override
+  String radiusAlertDeleted(String name) {
+    return 'Radius alert \"$name\" deleted';
+  }
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 свързан: $adapterName';
   }

@@ -2781,5 +2781,15 @@
   "@evStatusPartial": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
+  "@radiusAlertDeleted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

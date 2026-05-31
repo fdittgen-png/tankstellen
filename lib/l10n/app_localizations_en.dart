@@ -3260,6 +3260,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
 
   @override
+  String radiusAlertDeleted(String name) {
+    return 'Radius alert \"$name\" deleted';
+  }
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 connected: $adapterName';
   }
@@ -9716,6 +9721,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get alertsRadiusDeleteConfirm => '⟦Đéłéŧé řáđîúš áłéřŧ? ········⟧';
+
+  @override
+  String radiusAlertDeleted(String name) {
+    return '⟦Řáđîúš áłéřŧ \"$name\" đéłéŧéđ ········⟧';
+  }
 
   @override
   String obd2ConnectedTooltip(String adapterName) {
