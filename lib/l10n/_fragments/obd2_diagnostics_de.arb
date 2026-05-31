@@ -166,6 +166,44 @@
       }
     }
   },
+  "obd2DiagnosticsInitSection": "Dongle-Initialisierungsprotokoll",
+  "obd2DiagnosticsInitHeader": "Protokoll {protocol} · {start} · Firmware {firmware} · {tier} · {pids} PIDs",
+  "@obd2DiagnosticsInitHeader": {
+    "placeholders": {
+      "protocol": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "firmware": {
+        "type": "String"
+      },
+      "tier": {
+        "type": "String"
+      },
+      "pids": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
+  "@obd2DiagnosticsInitLine": {
+    "placeholders": {
+      "cmd": {
+        "type": "String"
+      },
+      "response": {
+        "type": "String"
+      },
+      "latency": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsInitWarm": "warm",
+  "obd2DiagnosticsInitCold": "kalt",
+  "obd2HealthCopyInitTranscript": "Nur Init-Protokoll kopieren",
   "obd2DiagnosticsEmpty": "Noch keine OBD2-Sitzung aufgezeichnet — verbinde einen Adapter und zeichne eine Fahrt mit aktiviertem Entwicklermodus auf.",
   "obd2DiagnosticsExplain": "Während der Aufzeichnung erfasst, um die Dongle↔App-Kommunikation zu debuggen — nur im Entwicklermodus erfasst.",
   "obd2HealthScreenTitle": "OBD2-Kommunikationszustand",

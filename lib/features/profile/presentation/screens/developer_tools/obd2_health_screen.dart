@@ -116,15 +116,36 @@ class Obd2HealthScreen extends ConsumerWidget {
     Obd2SessionDiagnostic session,
     Key key,
   ) {
+    // Derive a stable sibling key for the handshake-only button from the
+    // copy-JSON button's key (every caller passes a `ValueKey<String>`).
+    final keyValue = key is ValueKey ? key.value : key;
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
       child: Align(
         alignment: AlignmentDirectional.centerEnd,
-        child: TextButton.icon(
-          key: key,
-          onPressed: () => _copyAsJson(context, l, session),
-          icon: const Icon(Icons.copy_all_outlined, size: 18),
-          label: Text(l?.obd2HealthCopyJson ?? 'Copy as JSON'),
+        child: Wrap(
+          spacing: 4,
+          children: [
+            // Handshake-only export: just the adapter identity + init
+            // transcript + supported PIDs (#2511). Shown only when the
+            // session actually captured a handshake.
+            if (session.initTranscript.isNotEmpty)
+              TextButton.icon(
+                key: Key('${keyValue}_init'),
+                onPressed: () => _copyInitTranscript(context, l, session),
+                icon: const Icon(Icons.terminal_outlined, size: 18),
+                label: Text(
+                  l?.obd2HealthCopyInitTranscript ??
+                      'Copy init transcript only',
+                ),
+              ),
+            TextButton.icon(
+              key: key,
+              onPressed: () => _copyAsJson(context, l, session),
+              icon: const Icon(Icons.copy_all_outlined, size: 18),
+              label: Text(l?.obd2HealthCopyJson ?? 'Copy as JSON'),
+            ),
+          ],
         ),
       ),
     );
@@ -137,6 +158,35 @@ class Obd2HealthScreen extends ConsumerWidget {
   ) async {
     final json =
         const JsonEncoder.withIndent('  ').convert(session.toJson());
+    await Clipboard.setData(ClipboardData(text: json));
+    if (!context.mounted) return;
+    SnackBarHelper.showSuccess(
+      context,
+      l?.obd2HealthCopied ?? 'OBD2 diagnostics copied to clipboard.',
+    );
+  }
+
+  /// Copy ONLY the dongle-init handshake payload — adapter identity, the
+  /// init transcript, MTU + the discovered-supported set — to the local
+  /// clipboard (#2511). No network / TankSync; a focused subset of the
+  /// per-session JSON for pasting a handshake into a bug report.
+  Future<void> _copyInitTranscript(
+    BuildContext context,
+    AppLocalizations? l,
+    Obd2SessionDiagnostic session,
+  ) async {
+    final payload = <String, dynamic>{
+      'elmVersion': session.elmVersion,
+      'protocolDigit': session.protocolDigit,
+      'warmStart': session.warmStart,
+      'capabilityTier': session.capabilityTier,
+      'mtu': session.mtu,
+      'supportedPids': session.discoveredSupported,
+      'initTranscript': [
+        for (final line in session.initTranscript) line.toJson(),
+      ],
+    };
+    final json = const JsonEncoder.withIndent('  ').convert(payload);
     await Clipboard.setData(ClipboardData(text: json));
     if (!context.mounted) return;
     SnackBarHelper.showSuccess(

@@ -120,4 +120,68 @@ void main() {
       null,
     );
   });
+
+  testWidgets(
+      'init-only copy appears once a handshake is captured and exports just '
+      'the handshake subset (#2511)', (tester) async {
+    seedLiveSession();
+    // Capture a handshake line so the init-transcript export is offered.
+    collector.recordHandshakeLine('ATZ', 'ELM327 v1.5', 120);
+
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+
+    await pumpApp(
+      tester,
+      const Obd2HealthScreen(),
+      overrides: overrides(debugOn: true),
+    );
+
+    final initButton = find.byKey(const Key('obd2_health_copy_live_init'));
+    expect(initButton, findsOneWidget);
+
+    await tester.tap(initButton);
+    await tester.pumpAndSettle();
+
+    expect(copied, isNotNull);
+    // Long human-readable keys for the focused subset, not the compact
+    // session JSON — and it carries the captured handshake.
+    expect(copied, contains('"initTranscript"'));
+    expect(copied, contains('"elmVersion"'));
+    expect(copied, contains('ATZ'));
+    // It must NOT carry the full compact session payload — the per-PID
+    // table ("pid") and connection block ("conn") short keys are absent.
+    expect(copied, isNot(contains('"pid"')));
+    expect(copied, isNot(contains('"conn"')));
+
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      null,
+    );
+  });
+
+  testWidgets('init-only copy is hidden when no handshake was captured',
+      (tester) async {
+    // Live session with a PID but no recorded handshake line.
+    seedLiveSession();
+
+    await pumpApp(
+      tester,
+      const Obd2HealthScreen(),
+      overrides: overrides(debugOn: true),
+    );
+
+    expect(
+      find.byKey(const Key('obd2_health_copy_live_init')),
+      findsNothing,
+    );
+  });
 }

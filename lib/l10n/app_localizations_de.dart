@@ -5575,6 +5575,34 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get obd2DiagnosticsInitSection => 'Dongle-Initialisierungsprotokoll';
+
+  @override
+  String obd2DiagnosticsInitHeader(
+    String protocol,
+    String start,
+    String firmware,
+    String tier,
+    int pids,
+  ) {
+    return 'Protokoll $protocol · $start · Firmware $firmware · $tier · $pids PIDs';
+  }
+
+  @override
+  String obd2DiagnosticsInitLine(String cmd, String response, int latency) {
+    return '$cmd → $response ($latency ms)';
+  }
+
+  @override
+  String get obd2DiagnosticsInitWarm => 'warm';
+
+  @override
+  String get obd2DiagnosticsInitCold => 'kalt';
+
+  @override
+  String get obd2HealthCopyInitTranscript => 'Nur Init-Protokoll kopieren';
+
+  @override
   String get obd2DiagnosticsEmpty =>
       'Noch keine OBD2-Sitzung aufgezeichnet — verbinde einen Adapter und zeichne eine Fahrt mit aktiviertem Entwicklermodus auf.';
 

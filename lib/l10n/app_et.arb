@@ -3057,5 +3057,63 @@
   "@ocrTesterExported": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsInitSection": "Dongle init transcript",
+  "@obd2DiagnosticsInitSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
+  "@obd2DiagnosticsInitHeader": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "protocol": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "firmware": {
+        "type": "String"
+      },
+      "tier": {
+        "type": "String"
+      },
+      "pids": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
+  "@obd2DiagnosticsInitLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cmd": {
+        "type": "String"
+      },
+      "response": {
+        "type": "String"
+      },
+      "latency": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsInitWarm": "warm",
+  "@obd2DiagnosticsInitWarm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsInitCold": "cold",
+  "@obd2DiagnosticsInitCold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthCopyInitTranscript": "Copy init transcript only",
+  "@obd2HealthCopyInitTranscript": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

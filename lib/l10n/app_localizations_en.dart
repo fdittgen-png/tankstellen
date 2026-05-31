@@ -5517,6 +5517,34 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get obd2DiagnosticsInitSection => 'Dongle init transcript';
+
+  @override
+  String obd2DiagnosticsInitHeader(
+    String protocol,
+    String start,
+    String firmware,
+    String tier,
+    int pids,
+  ) {
+    return 'Protocol $protocol · $start · firmware $firmware · $tier · $pids PIDs';
+  }
+
+  @override
+  String obd2DiagnosticsInitLine(String cmd, String response, int latency) {
+    return '$cmd → $response ($latency ms)';
+  }
+
+  @override
+  String get obd2DiagnosticsInitWarm => 'warm';
+
+  @override
+  String get obd2DiagnosticsInitCold => 'cold';
+
+  @override
+  String get obd2HealthCopyInitTranscript => 'Copy init transcript only';
+
+  @override
   String get obd2DiagnosticsEmpty =>
       'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.';
 
@@ -12209,6 +12237,35 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   ) {
     return '⟦$pid: $polled ƥółłéđ · $ok óķ · $noData ÑĐ · $timeout ŦÓ · $error éřř · ƥ50 $p50 / ƥ95 $p95 ɱš · $effectiveHz/$targetHz Ĥž ·········⟧';
   }
+
+  @override
+  String get obd2DiagnosticsInitSection => '⟦Đóñǧłé îñîŧ ŧřáñšçřîƥŧ ·········⟧';
+
+  @override
+  String obd2DiagnosticsInitHeader(
+    String protocol,
+    String start,
+    String firmware,
+    String tier,
+    int pids,
+  ) {
+    return '⟦Ƥřóŧóçół $protocol · $start · ƒîřɱŵářé $firmware · $tier · $pids ƤÎĐš ·········⟧';
+  }
+
+  @override
+  String obd2DiagnosticsInitLine(String cmd, String response, int latency) {
+    return '⟦$cmd → $response ($latency ɱš) ·⟧';
+  }
+
+  @override
+  String get obd2DiagnosticsInitWarm => '⟦ŵářɱ ··⟧';
+
+  @override
+  String get obd2DiagnosticsInitCold => '⟦çółđ ··⟧';
+
+  @override
+  String get obd2HealthCopyInitTranscript =>
+      '⟦Çóƥý îñîŧ ŧřáñšçřîƥŧ óñłý ··········⟧';
 
   @override
   String get obd2DiagnosticsEmpty =>

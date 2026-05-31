@@ -5545,6 +5545,34 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get obd2DiagnosticsInitSection => 'Dongle init transcript';
+
+  @override
+  String obd2DiagnosticsInitHeader(
+    String protocol,
+    String start,
+    String firmware,
+    String tier,
+    int pids,
+  ) {
+    return 'Protocol $protocol · $start · firmware $firmware · $tier · $pids PIDs';
+  }
+
+  @override
+  String obd2DiagnosticsInitLine(String cmd, String response, int latency) {
+    return '$cmd → $response ($latency ms)';
+  }
+
+  @override
+  String get obd2DiagnosticsInitWarm => 'warm';
+
+  @override
+  String get obd2DiagnosticsInitCold => 'cold';
+
+  @override
+  String get obd2HealthCopyInitTranscript => 'Copy init transcript only';
+
+  @override
   String get obd2DiagnosticsEmpty =>
       'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.';
 
