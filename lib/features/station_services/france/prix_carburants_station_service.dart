@@ -245,10 +245,28 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     final station = parser.parsePrixCarburantsStation(r, 0, 0);
     if (station == null) throw Exception('Failed to parse station');
 
+    // #2599 — apply the SAME OSM brand enrichment the search path uses
+    // (`searchStations` above). The Prix-Carburants feed publishes no
+    // `brand` column, so a single-station re-fetch only carries the
+    // address-heuristic brand (often the "independent" sentinel). Without
+    // this, a cold notification deep-link (search cache empty → provider
+    // falls back to this re-fetch) opened a brand-less station: the detail
+    // header dropped to the street + "Independent station", while the same
+    // station opened from search results showed its real brand (e.g.
+    // "Intermarché"). Enriching here makes the deep-link path render
+    // identically — and reuses the enricher's persisted `brand_<id>` cache,
+    // so a station the user already saw in search resolves instantly (and
+    // offline). Best-effort: a null enricher or a failed lookup leaves the
+    // heuristic brand untouched, so the sentinel still shows ONLY when the
+    // brand is genuinely absent in the source data.
+    final enriched = _enricher != null
+        ? (await _enricher.enrich([station])).first
+        : station;
+
     final is24h = r['horaires_automate_24_24'] == 'Oui';
 
     return ServiceResult(
-      data: StationDetail(station: station, wholeDay: is24h),
+      data: StationDetail(station: enriched, wholeDay: is24h),
       source: ServiceSource.prixCarburantsApi,
       fetchedAt: DateTime.now(),
     );

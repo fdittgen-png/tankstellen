@@ -6,10 +6,13 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_station_service.dart';
+import 'package:tankstellen/core/services/impl/osm_brand_enricher.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import '../../../fakes/fake_storage_repository.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 void main() {
@@ -418,6 +421,82 @@ void main() {
       } catch (e) {
         expect(e, isA<Exception>());
       }
+    });
+  });
+
+  // #2599 — a single-station re-fetch (the cold notification deep-link path)
+  // must apply the SAME OSM brand enrichment the search path uses. The
+  // Prix-Carburants feed has no `brand` column, so without enrichment the
+  // re-fetched station carried only the address-heuristic brand (the
+  // "independent" sentinel) → the detail header dropped to the street +
+  // "Independent station", whereas the same station from search showed its
+  // real brand. Enriching here makes the deep-link render identically.
+  group('PrixCarburantsStationService getStationDetail enrichment (#2599)', () {
+    Map<String, dynamic> singleStationResponse() => {
+          'results': [
+            {
+              'id': '34550042',
+              // Address heuristic alone cannot detect "Intermarché" here:
+              // the feed publishes the street, not the chain.
+              'adresse': 'ROUTE ST THIBERY',
+              'ville': 'BESSAN',
+              'cp': '34550',
+              'geom': {'lat': 43.36, 'lon': 3.43},
+              'sp95_prix': 1.879,
+              'gazole_prix': 1.659,
+            },
+          ],
+        };
+
+    test('applies the OSM enricher so the re-fetched station carries its brand',
+        () async {
+      final adapter = _TrackingMockAdapter()..addResponse(singleStationResponse());
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      // Enricher resolves the real chain brand (as OSM would for the search
+      // path) instead of the address-only sentinel.
+      final enricher = _FakeBrandEnricher(brand: 'Intermarché');
+      final svc = PrixCarburantsStationService(dio: dio, enricher: enricher);
+
+      final result = await svc.getStationDetail('fr-34550042');
+
+      expect(result.data.station.brand, 'Intermarché',
+          reason: 'the re-fetch must carry the OSM-enriched brand (#2599)');
+      // Address fields are untouched — same subtitle the search path shows.
+      expect(result.data.station.street, 'ROUTE ST THIBERY');
+      expect(result.data.station.postCode, '34550');
+      expect(result.data.station.place, 'BESSAN');
+      expect(enricher.enrichCalls, 1,
+          reason: 'getStationDetail must route through the enricher');
+    });
+
+    test(
+        'leaves the heuristic sentinel when enrichment finds no brand '
+        '(genuinely independent)', () async {
+      final adapter = _TrackingMockAdapter()..addResponse(singleStationResponse());
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      // Enricher returns the station unchanged (no POI match / cache miss),
+      // mirroring a genuinely brand-less station.
+      final enricher = _FakeBrandEnricher(brand: null);
+      final svc = PrixCarburantsStationService(dio: dio, enricher: enricher);
+
+      final result = await svc.getStationDetail('fr-34550042');
+
+      // The address heuristic could not detect a brand either → the
+      // independent sentinel is preserved. "Independent station" should show
+      // ONLY here, when the brand is genuinely absent in the source data.
+      expect(result.data.station.brand, BrandRegistry.independentLabel);
+    });
+
+    test('a null enricher leaves the heuristic brand untouched (best-effort)',
+        () async {
+      final adapter = _TrackingMockAdapter()..addResponse(singleStationResponse());
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio, enricher: null);
+
+      final result = await svc.getStationDetail('fr-34550042');
+
+      // No enricher → falls back to the address heuristic (sentinel here).
+      expect(result.data.station.brand, BrandRegistry.independentLabel);
     });
   });
 
@@ -1256,6 +1335,30 @@ void main() {
       expect(adapter.lastRequestUri, startsWith('https://data.economie.gouv.fr'));
     });
   });
+}
+
+/// Test [OsmBrandEnricher] that resolves a fixed [brand] for every station
+/// without touching the network or storage (#2599). When [brand] is null the
+/// station is returned unchanged, mirroring a POI/cache miss (genuinely
+/// brand-less). Counts calls so the test can assert the re-fetch path routes
+/// through it. The base constructor needs a [SettingsStorage]; the fake
+/// repository satisfies it and is never read because [enrich] is overridden.
+class _FakeBrandEnricher extends OsmBrandEnricher {
+  final String? brand;
+  int enrichCalls = 0;
+
+  _FakeBrandEnricher({required this.brand}) : super(FakeStorageRepository());
+
+  @override
+  Future<List<Station>> enrich(
+    List<Station> stations, {
+    CancelToken? cancelToken,
+  }) async {
+    enrichCalls++;
+    final resolved = brand;
+    if (resolved == null) return stations;
+    return stations.map((s) => s.copyWith(brand: resolved)).toList();
+  }
 }
 
 /// Mock Dio adapter that tracks requests and returns canned responses.
