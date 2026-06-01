@@ -7,23 +7,12 @@ import '../../../../core/location/user_position_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Shows the user's known position and allows updating it.
-///
-/// #2111 — when [routeMode] is true the bar swaps its label to a
-/// route-context message so the user reads the results screen as a
-/// trajet view, not a point + radius. The position-update affordance
-/// is suppressed in route mode because the user's GPS is not the
-/// search anchor — the route corridor is.
 class UserPositionBar extends ConsumerWidget {
   final VoidCallback onUpdatePosition;
-
-  /// #2111 — flip the bar's content to a route-mode indicator.
-  /// Defaults to false so every existing call site behaves identically.
-  final bool routeMode;
 
   const UserPositionBar({
     super.key,
     required this.onUpdatePosition,
-    this.routeMode = false,
   });
 
   String _formatAge(DateTime updatedAt) {
@@ -44,35 +33,6 @@ class UserPositionBar extends ConsumerWidget {
     final unknownLabel = l10n?.positionUnknown ?? 'Position unknown';
     final distFromSearchLabel =
         l10n?.distancesFromCenter ?? 'Distances from search center';
-
-    // #2111 — in route mode, replace the position readout with a
-    // route-mode label so the user understands the results are
-    // along a corridor, not nearby a point. The route summary chip
-    // (km · min · station-count) lives separately in the results
-    // header — this bar just sets context.
-    if (routeMode) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3),
-        child: Row(
-          children: [
-            Icon(Icons.route,
-                size: 16, color: theme.colorScheme.tertiary),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                l10n?.routeModeBannerLabel ??
-                    'Route mode — distances are along the corridor',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
 
     if (userPos != null) {
       return Container(

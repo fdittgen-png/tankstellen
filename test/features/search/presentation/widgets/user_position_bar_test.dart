@@ -130,5 +130,26 @@ void main() {
 
       expect(tapped, isTrue);
     });
+
+    testWidgets(
+        '#2630 — the route-mode banner is gone: the bar always renders the '
+        'GPS readout (no route corridor label, no route icon)', (tester) async {
+      await pumpApp(
+        tester,
+        UserPositionBar(onUpdatePosition: () {}),
+        overrides: [
+          userPositionOverride(lat: 48.8566, lng: 2.3522, source: 'GPS'),
+        ],
+      );
+
+      // The removed route-mode branch used Icons.route + the corridor label.
+      expect(find.byIcon(Icons.route), findsNothing);
+      expect(
+        find.textContaining('distances are along the corridor'),
+        findsNothing,
+      );
+      // The normal GPS readout still renders for every mode.
+      expect(find.byIcon(Icons.my_location), findsOneWidget);
+    });
   });
 }

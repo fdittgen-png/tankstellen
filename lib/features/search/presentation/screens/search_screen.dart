@@ -209,10 +209,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         // Compact summary bar — top-level entry point for editing criteria.
         const SearchSummaryBar(),
         UserPositionBar(
-          // #2111 — route mode swaps the banner to a corridor-context
-          // label so users read the results as a trajet view.
-          routeMode:
-              ref.watch(activeSearchModeProvider) == SearchMode.route,
           onUpdatePosition: () async {
             final settings = ref.read(settingsStorageProvider);
             if (!LocationConsentDialog.hasConsent(settings)) {
