@@ -14,6 +14,8 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 
+import '../helpers/silence_error_logger.dart';
+
 /// End-to-end integration coverage for the OBD2 trip-recording journey
 /// (#1632 — epic #1612).
 ///
@@ -31,6 +33,14 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 /// and runs on every PR inside the existing sharded `test` CI job.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  // #2628 — the production code under test logs via fire-and-forget
+  // `unawaited(errorLogger.log(...))`, which lazily + asynchronously opens
+  // the IsolateErrorSpool Hive box under the temp dir. That async open/close
+  // races the synchronous `tmpDir.deleteSync(recursive: true)` teardown and
+  // throws a flaky PathNotFoundException. Silencing the spool (the canonical
+  // helper) makes the enqueue a no-op so the file is never created.
+  silenceErrorLoggerSpool();
 
   late Directory tmpDir;
 
