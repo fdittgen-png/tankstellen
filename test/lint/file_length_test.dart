@@ -158,7 +158,19 @@ void main() {
     // comment). Pure field-plumbing onto the existing TripLiveReading
     // build; decomposition of this god-class is tracked by
     // #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1484,
+    // #2565 — re-grandfathered 1484 → 1595: the GPS-DEGRADE fallback adds
+    // the `degradedGpsOnly` ACTIVE state, the `_degradedGpsOnly` latch +
+    // `gpsAlive` host wiring, a `_gpsAliveWindow` const, the `_emit`
+    // degrade guard, the shared `_overlayGpsEstimate` (extracted from the
+    // healthy `_emit` so both paths can't diverge), and the thin
+    // delegation + constructor wiring for the new emit collaborator. The
+    // bulk WAS extracted out of this file: `GpsOnlySampleBuilder`,
+    // `DegradedGpsEmitter` and the `DroppedSessionManager` repo resolver
+    // are all new files under the cap. The residual growth is the field
+    // plumbing + the host/state-machine seam that must live on the
+    // controller. Decomposition of this god-class stays tracked by
+    // #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1595,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
@@ -242,7 +254,11 @@ void main() {
     // + its `_RecordingPipelineHostAdapter` override + the TripSaveStage
     // re-export — the staged save-progress wiring mirroring `setConnectStage`.
     // Decomposition still tracked by #2187/#2188/#2190.
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1235,
+    // #2565 — re-grandfathered 1235 → 1240: the WAL-snapshot phase-string
+    // switch gained the `degradedGpsOnly` case (mapped to 'recording' — a
+    // degraded trip is still actively recording) + its rationale comment.
+    // Pure mapping; decomposition still tracked by #2187/#2188/#2190.
+    'lib/features/consumption/providers/trip_recording_provider.dart': 1240,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
     // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
     // hides results behind count-clusters. Adds the `rankForEmphasis`

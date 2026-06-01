@@ -400,6 +400,126 @@ void main() {
       expect(rows.single.id, host1.sessionId);
     });
 
+    group('#2565 GPS-only degrade', () {
+      test('a transportError drop when GPS is alive degrades to GPS-only '
+          'instead of pausing — scanner probing, NO grace timer', () async {
+        final host = _FakeHost()..gpsAlive = true;
+        final scanner = _FakeScanner();
+        final mgr = build(
+          host,
+          // A long silent window — proves degrade OUTRANKS the silent
+          // window (it must not even enter the invisible-reconnect path).
+          silentWindow: const Duration(seconds: 6),
+          // A short grace so a wrongly-armed timer would auto-finalise
+          // fast — its NON-firing is the assertion below.
+          grace: const Duration(milliseconds: 30),
+          pinnedMac: 'AA:BB',
+          scannerFactory: (mac, onReconnect) =>
+              scanner..onReconnect = onReconnect,
+        );
+
+        mgr.handleDrop();
+
+        expect(host.degradedGpsOnly, isTrue,
+            reason: 'an OBD2 drop on a live-GPS drive must degrade to '
+                'GPS-only recording, not pause');
+        expect(host.pausedDueToDrop, isFalse,
+            reason: 'degraded recording must never flip the pause state');
+        expect(mgr.silentlyReconnecting, isFalse,
+            reason: 'degrade outranks the #1904 silent window entirely');
+        expect(scanner.startCalls, 1,
+            reason: 'the reconnect scanner must probe so OBD2 can re-attach');
+        expect(host.stopSchedulerCalls, 1);
+        expect(host.disconnectDroppedServiceCalls, 1);
+        expect(host.emitStateCalls, greaterThanOrEqualTo(1),
+            reason: 'degraded mode is visible — the GPS banner must surface');
+
+        // Wait well past the grace window: a degraded trip must NEVER
+        // auto-finalise (no grace timer was armed).
+        await Future<void>.delayed(const Duration(milliseconds: 120));
+        expect(historyRepo.loadAll(), isEmpty,
+            reason: 'a degraded trip is actively recording — it must never '
+                'auto-finalise/discard via a grace timer');
+        expect(host.degradedGpsOnly, isTrue,
+            reason: 'still degraded after the would-be grace window');
+
+        await mgr.stopReconnectScanner();
+      });
+
+      test('a silentFailure drop when GPS is alive ALSO degrades — a dead '
+          'ECU still lets GPS carry the trip', () {
+        final host = _FakeHost()..gpsAlive = true;
+        final mgr = build(host);
+
+        mgr.handleDrop(reason: TripDropReason.silentFailure);
+
+        expect(host.degradedGpsOnly, isTrue);
+        expect(host.pausedDueToDrop, isFalse);
+        expect(mgr.dropReason, TripDropReason.silentFailure);
+      });
+
+      test('a drop with NO recent GPS fix keeps the classic pause path '
+          '(regression-lock)', () {
+        final host = _FakeHost(); // gpsAlive defaults to false.
+        final mgr = build(host);
+
+        mgr.handleDrop();
+
+        expect(host.degradedGpsOnly, isFalse);
+        expect(host.pausedDueToDrop, isTrue,
+            reason: 'with no live GPS the OBD2 drop must pause exactly as '
+                'before — no behaviour change on the dead-GPS path');
+      });
+
+      test('reconnect while degraded restores OBD2 recording — scheduler '
+          'restarted, degrade flag cleared, no pause ever shown', () {
+        final host = _FakeHost()..gpsAlive = true;
+        VoidCallback? capturedOnReconnect;
+        final mgr = build(
+          host,
+          pinnedMac: 'AA:BB',
+          scannerFactory: (mac, onReconnect) {
+            capturedOnReconnect = onReconnect;
+            return _FakeScanner()..onReconnect = onReconnect;
+          },
+        );
+
+        mgr.handleDrop();
+        expect(host.degradedGpsOnly, isTrue);
+        final startsBefore = host.startSchedulerCalls;
+
+        capturedOnReconnect!.call();
+
+        expect(host.degradedGpsOnly, isFalse,
+            reason: 'a reconnect must drop back to full OBD2 recording');
+        expect(host.pausedDueToDrop, isFalse,
+            reason: 'the user never saw a pause');
+        expect(host.startSchedulerCalls, startsBefore + 1,
+            reason: 'OBD2 polling must restart on reconnect');
+        expect(host.resetDropDetectorCalls, greaterThanOrEqualTo(1));
+        expect(mgr.dropReason, isNull);
+      });
+
+      test('escalateDegradedToPaused flips a degraded trip whose GPS also '
+          'died into the visible pause (both sources gone)', () {
+        final host = _FakeHost()..gpsAlive = true;
+        final mgr = build(host, grace: const Duration(hours: 1));
+
+        mgr.handleDrop();
+        expect(host.degradedGpsOnly, isTrue);
+
+        mgr.escalateDegradedToPaused();
+
+        expect(host.degradedGpsOnly, isFalse);
+        expect(host.pausedDueToDrop, isTrue,
+            reason: 'when GPS dies too, BOTH sources are gone → the '
+                'visible pause banner must finally show');
+        expect(mgr.dropReason, TripDropReason.transportError);
+
+        mgr.cancelAllTimers();
+      });
+    });
+
     test('cancelAllTimers clears the silent flag so a stopped session '
         'cannot escalate after teardown', () {
       final host = _FakeHost();
@@ -439,11 +559,18 @@ class _FakeHost implements DroppedSessionHost {
   @override
   bool pausedDueToDrop = false;
   @override
+  bool degradedGpsOnly = false;
+  @override
   bool stopped = false;
   @override
   bool started = true;
   @override
   bool paused = false;
+
+  /// #2565 — drives the degrade decision in `handleDrop`. Default false
+  /// (dead GPS → classic pause path); the degrade tests flip it true.
+  @override
+  bool gpsAlive = false;
 
   @override
   String? sessionId = '2026-05-28T12:00:00.000';

@@ -14,9 +14,11 @@ import '../../domain/services/gps_live_estimate_folder.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
+import 'degraded_gps_emitter.dart';
 import 'dropped_session_host.dart';
 import 'dropped_session_manager.dart';
 import 'elm327_protocol.dart';
+import 'gps_only_sample_builder.dart';
 import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_connection_errors.dart';
@@ -73,6 +75,12 @@ enum TripRecordingControllerState {
   recording,
   paused,
   pausedDueToDrop,
+
+  /// #2565 — OBD2 dropped mid-trip but GPS is alive, so the trip keeps
+  /// recording GPS-only samples instead of pausing. An ACTIVE sub-state
+  /// (scanner probing to re-attach OBD2); resolves to [recording] on
+  /// reconnect or escalates to [pausedDueToDrop] only if GPS also dies.
+  degradedGpsOnly,
   stopped,
 }
 
@@ -280,6 +288,12 @@ class TripRecordingController {
   bool _sawNonVeDerivedFuel = false;
   bool _paused = false;
   bool _pausedDueToDrop = false;
+
+  /// #2565 — OBD2 dropped mid-trip but GPS is alive: keep recording
+  /// GPS-only instead of pausing. Set by the [DroppedSessionManager]
+  /// degrade branch; cleared on reconnect or escalated to
+  /// [_pausedDueToDrop] when GPS also dies.
+  bool _degradedGpsOnly = false;
   bool _started = false;
   bool _stopped = false;
   String? _sessionId; // ISO start-ts, stable across pause→resume cycles
@@ -347,12 +361,23 @@ class TripRecordingController {
   /// and [_recordSpeedSample] tear-offs.
   late final LiveSampleSnapshot _liveSampleSnapshot;
 
+  /// #2565 — owns one emit tick of the GPS-only degraded phase (OBD2
+  /// dropped but GPS alive). Extracted so the controller stays near its
+  /// grandfathered file-length snapshot.
+  late final DegradedGpsEmitter _degradedEmitter;
+
   /// Maximum Δt (seconds) between samples that the distance / fuel
   /// integrators bridge (#1927). A longer gap is a connection dropout
   /// or pause — integrating across it fabricates distance and fuel, so
   /// `TripRecorder` and `VirtualOdometer` skip it. 15 s is far above
   /// the ~250 ms poll cadence and the 6 s silent-reconnect window.
   static const double _integrationGapCapSeconds = 15.0;
+
+  /// #2565 — how recent a real GPS fix must be for an OBD2 drop to
+  /// degrade to GPS-only recording (and the window past which a degraded
+  /// trip whose GPS also died escalates to "paused"). Pinned to the same
+  /// 15 s Δt the integrators refuse to bridge (`_integrationGapCapSeconds`).
+  static const Duration _gpsAliveWindow = Duration(seconds: 15);
 
   TripRecordingController({
     required Obd2Service service,
@@ -423,6 +448,24 @@ class TripRecordingController {
       onHighPriorityParse: _observeHighPriorityParse,
       onSpeedSample: _recordSpeedSample,
     );
+    _degradedEmitter = DegradedGpsEmitter(
+      now: _now,
+      recorder: _recorder,
+      sampleBuffer: _sampleBuffer,
+      gpsAliveWindow: _gpsAliveWindow,
+      onEscalate: _droppedSession.escalateDegradedToPaused,
+      onSampleAt: (at) => _lastSampleAt = at,
+      overlayEstimate: (reading,
+              {required nowTs, required effectiveSpeedKmh, required altitudeM}) =>
+          _overlayGpsEstimate(
+        reading,
+        nowTs: nowTs,
+        fuelRate: null,
+        effectiveSpeedKmh: effectiveSpeedKmh,
+        rpm: null,
+        altitudeM: altitudeM,
+      ),
+    );
   }
 
   /// Optional fuel-rate diagnostic breadcrumb sink (#1395). Wired in
@@ -456,10 +499,14 @@ class TripRecordingController {
     if (!_started) return TripRecordingControllerState.idle;
     if (_pausedDueToDrop) return TripRecordingControllerState.pausedDueToDrop;
     if (_paused) return TripRecordingControllerState.paused;
+    // #2565 — degraded GPS-only: checked after the true-pause states but
+    // is still an ACTIVE, recording state.
+    if (_degradedGpsOnly) return TripRecordingControllerState.degradedGpsOnly;
     return TripRecordingControllerState.recording;
   }
 
-  bool get isRecording => _started && !_paused && !_pausedDueToDrop;
+  bool get isRecording =>
+      (_started && !_paused && !_pausedDueToDrop) || _degradedGpsOnly;
   bool get isPaused => _paused || _pausedDueToDrop;
   bool get isPausedDueToDrop => _pausedDueToDrop;
   bool get isActive => _started;
@@ -710,6 +757,9 @@ class TripRecordingController {
     _started = false;
     _stopped = true;
     _pausedDueToDrop = false;
+    // #2565 — clear the degrade flag so a stop while degraded finalises
+    // cleanly (the drop-window GPS samples persist in the mixed trip).
+    _degradedGpsOnly = false;
     _dropDetector.reset();
     _emitState();
     if (!_stateController.isClosed) {
@@ -1076,6 +1126,13 @@ class TripRecordingController {
       return;
     }
     if (_liveController.isClosed) return;
+    // #2565 — `degradedGpsOnly` is NOT gated above: OBD2 is gone (the PID
+    // snapshot is stale) but GPS is alive, so build a GPS-only sample +
+    // run the estimate overlay instead of freezing.
+    if (_degradedGpsOnly) {
+      _emitDegradedGpsOnly();
+      return;
+    }
 
     final snap = _liveSampleSnapshot;
     final nowTs = _now();
@@ -1231,6 +1288,29 @@ class TripRecordingController {
     // nor a reliable speed PID. Skipped once any real fuel rate is seen —
     // measured data is never overwritten; a stale GPS coaching hint is then
     // cleared so `MinimalDriveSummary` swaps back to the OBD2 triplet.
+    reading = _overlayGpsEstimate(
+      reading,
+      nowTs: nowTs,
+      fuelRate: fuelRate,
+      effectiveSpeedKmh: effectiveSpeedKmh,
+      rpm: rpm,
+      altitudeM: snap.latestAltitudeM,
+    );
+    _liveController.add(reading);
+  }
+
+  /// #2506 / #2565 — fold the GPS-physics live estimate + coaching into
+  /// [reading] when NO fuel-rate PID is measurable. Shared by the healthy
+  /// `_emit` and the degraded GPS-only path so they can't diverge. Skipped
+  /// once a real fuel rate is seen (a stale coaching hint is then cleared).
+  TripLiveReading _overlayGpsEstimate(
+    TripLiveReading reading, {
+    required DateTime nowTs,
+    required double? fuelRate,
+    required double? effectiveSpeedKmh,
+    required double? rpm,
+    required double? altitudeM,
+  }) {
     final folder = _gpsEstimateFolder;
     if (fuelRate == null && !_fuelRateSeen && folder != null) {
       final overlaid = folder.overlay(
@@ -1238,14 +1318,33 @@ class TripRecordingController {
         now: nowTs,
         effectiveSpeedKmh: effectiveSpeedKmh ?? 0,
         rpm: rpm,
-        altitudeM: snap.latestAltitudeM,
+        altitudeM: altitudeM,
       );
-      reading = overlaid.reading;
       _latestGpsCoachingHint = overlaid.coachingHint;
+      return overlaid.reading;
     } else if (_fuelRateSeen) {
       _latestGpsCoachingHint = null;
     }
-    _liveController.add(reading);
+    return reading;
+  }
+
+  /// #2565 — one emit tick while in the `degradedGpsOnly` phase, delegated
+  /// to the [DegradedGpsEmitter] collaborator (which builds the GPS-only
+  /// sample + live reading and escalates to paused when GPS also dies).
+  void _emitDegradedGpsOnly() {
+    final snap = _liveSampleSnapshot;
+    final reading = _degradedEmitter.emitTick(
+      latestGpsSpeedKmh: _latestGpsSpeedKmh,
+      latitude: snap.latestLatitude,
+      longitude: snap.latestLongitude,
+      altitudeM: snap.latestAltitudeM,
+      lastGpsFixAt: _gpsEndedAt,
+      startedAt: _startedAt,
+      resolverDistanceKm: currentDistanceKm,
+      odometerStartKm: _odometerStartKm,
+      odometerLatestKm: _odometerLatestKm,
+    );
+    if (reading != null) _liveController.add(reading);
   }
 
   /// Exposed for tests: append a sample to the captured-samples buffer
@@ -1446,6 +1545,18 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
   bool get pausedDueToDrop => _c._pausedDueToDrop;
   @override
   set pausedDueToDrop(bool value) => _c._pausedDueToDrop = value;
+
+  @override
+  bool get degradedGpsOnly => _c._degradedGpsOnly;
+  @override
+  set degradedGpsOnly(bool value) => _c._degradedGpsOnly = value;
+
+  @override
+  bool get gpsAlive => GpsOnlySampleBuilder.gpsAlive(
+        lastGpsFixAt: _c._gpsEndedAt,
+        now: _c._now(),
+        window: TripRecordingController._gpsAliveWindow,
+      );
 
   @override
   bool get stopped => _c._stopped;

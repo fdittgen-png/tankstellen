@@ -1662,6 +1662,7 @@
   "obd2PauseBannerTitle": "Connexion OBD2 perdue — enregistrement en pause",
   "obd2PauseBannerResume": "Reprendre l'enregistrement",
   "obd2PauseBannerEnd": "Terminer l'enregistrement",
+  "obd2GpsDegradedBannerTitle": "Enregistrement via GPS — reconnexion OBD2",
   "veCalibratedTitle": "Étalonnage de la consommation mis à jour pour {vehicleName} — précision améliorée de {percent} %",
   "alertsRadiusSectionTitle": "Alertes de zone",
   "alertsRadiusAdd": "Ajouter une alerte de zone",

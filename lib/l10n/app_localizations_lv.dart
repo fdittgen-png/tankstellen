@@ -3328,6 +3328,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obd2PauseBannerEnd => 'Beigt ierakstīšanu';
 
   @override
+  String get obd2GpsDegradedBannerTitle =>
+      'Recording with GPS — OBD2 reconnecting';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Patēriņa kalibrēšana atjaunināta $vehicleName — precizitāte uzlabojusies par $percent%';
   }

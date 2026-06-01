@@ -651,6 +651,11 @@ class TripRecording extends _$TripRecording {
         return 'paused';
       case TripRecordingControllerState.pausedDueToDrop:
         return 'pausedDueToDrop';
+      // #2565 — a GPS-only degraded trip is still actively recording, so
+      // the WAL snapshot persists it as 'recording' (it rehydrates as a
+      // live trip on relaunch, never as a pause that needs resuming).
+      case TripRecordingControllerState.degradedGpsOnly:
+        return 'recording';
       case TripRecordingControllerState.stopped:
         return 'stopped';
     }

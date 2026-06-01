@@ -4,14 +4,13 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
 
 import '../../../../core/logging/error_logger.dart';
-import '../../../../core/storage/hive_boxes.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
 import 'auto_record_trace_log.dart';
 import 'dropped_session_host.dart';
+import 'dropped_session_repo_resolver.dart';
 import 'paused_trip_repository.dart';
 
 /// Why a recording transitioned into the paused-due-to-drop state
@@ -78,10 +77,11 @@ class DroppedSessionManager {
     VoidCallback onReconnect,
   )? _reconnectScannerFactory;
 
-  /// Test overrides — in-memory repos. Production passes null and both
-  /// are resolved lazily from the open Hive box on use.
-  final PausedTripRepository? _pausedRepoOverride;
-  final TripHistoryRepository? _historyRepoOverride;
+  /// Resolves the paused-trips + history Hive repos (#2565 — extracted to
+  /// [DroppedSessionRepoResolver] to keep this file under the 400-line
+  /// cap). Production resolves lazily from the open box; tests inject
+  /// in-memory repos through the constructor overrides.
+  final DroppedSessionRepoResolver _repos;
 
   Timer? _graceTimer;
   Timer? _silentReconnectTimer;
@@ -113,8 +113,10 @@ class DroppedSessionManager {
         _silentReconnectWindow = silentReconnectWindow,
         _pinnedAdapterMac = pinnedAdapterMac,
         _reconnectScannerFactory = reconnectScannerFactory,
-        _pausedRepoOverride = pausedRepo,
-        _historyRepoOverride = historyRepo;
+        _repos = DroppedSessionRepoResolver(
+          pausedOverride: pausedRepo,
+          historyOverride: historyRepo,
+        );
 
   /// Why the session is in (or last entered) the paused-due-to-drop
   /// state (#1330 phase 3). Null when not in that state.
@@ -151,6 +153,15 @@ class DroppedSessionManager {
     _host.disconnectDroppedService();
     _host.clearDropDetectorErrorWindow();
     _persistPausedSnapshot();
+    // #2565 — OBD2 dropped but GPS is alive: keep recording GPS-only
+    // instead of pausing. Outranks the silent window + visible pause for
+    // BOTH drop reasons — a dead ECU (silentFailure) still leaves GPS
+    // perfectly able to carry the trip. The grace timer stays DISABLED:
+    // the trip is actively recording, so it must never auto-finalise.
+    if (_host.gpsAlive) {
+      _enterDegradedGpsOnly(reason);
+      return;
+    }
     if (reason == TripDropReason.transportError &&
         _silentReconnectWindow > Duration.zero) {
       _silentlyReconnecting = true;
@@ -182,6 +193,37 @@ class DroppedSessionManager {
     // The scanner may already be running from the silent window.
     if (_reconnectScanner == null) _startReconnectScanner();
     _host.emitState();
+  }
+
+  /// #2565 — enter GPS-only degraded recording: OBD2 is gone but GPS is
+  /// alive, so the trip keeps capturing GPS samples. The scheduler is
+  /// already stopped + the dead service disconnected (by [handleDrop]);
+  /// this flips the host flag, starts the reconnect scanner so OBD2 can
+  /// re-attach, and emits — but starts NO grace timer (the trip is
+  /// actively recording and must never auto-finalise / discard).
+  void _enterDegradedGpsOnly(TripDropReason reason) {
+    _host.degradedGpsOnly = true;
+    _dropReason = reason;
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.silentReconnectStarted,
+      mac: _pinnedAdapterMac,
+    );
+    if (_reconnectScanner == null) _startReconnectScanner();
+    _host.emitState();
+  }
+
+  /// #2565 — while degraded, GPS has ALSO gone silent past the gap-cap
+  /// window: now BOTH sources are dead, so escalate to the visible pause
+  /// banner exactly as a dead-GPS drop would. Clears the degrade flag and
+  /// routes through the ordinary visible-drop path (grace timer + banner).
+  void escalateDegradedToPaused() {
+    if (!_host.degradedGpsOnly || _host.stopped) return;
+    _host.degradedGpsOnly = false;
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.dropEscalatedToVisible,
+      mac: _pinnedAdapterMac,
+    );
+    _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
   }
 
   /// #1904 — the silent reconnect window elapsed without the adapter
@@ -221,6 +263,24 @@ class DroppedSessionManager {
   /// scanner self-stops before firing this callback.
   void onScannerReconnect() {
     _reconnectScanner = null;
+    if (_host.degradedGpsOnly) {
+      // #2565 — OBD2 re-attached while recording GPS-only: drop back to
+      // full OBD2 recording. The trip never paused, so there is no grace
+      // timer to cancel and no pause-banner teardown; just clear the
+      // degrade flag, re-arm the detector, restart the scheduler and
+      // emit. The drop-window samples stay honestly GPS-only.
+      _host.degradedGpsOnly = false;
+      _dropReason = null;
+      _host.resetDropDetector();
+      clearPausedTripRow();
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.silentReconnectSucceeded,
+        mac: _pinnedAdapterMac,
+      );
+      if (!_host.paused && !_host.stopped) _host.startScheduler();
+      _host.emitState();
+      return;
+    }
     if (_silentlyReconnecting) {
       // #1904 — reconnected inside the silent window: resume polling
       // without the user ever having seen a pause. Mirrors the
@@ -273,104 +333,29 @@ class DroppedSessionManager {
     }
   }
 
-  /// Persist the in-progress trip snapshot to the paused-trips box on drop
-  /// (#797 phase 1). Fire-and-forget; Hive errors are logged by the repo and
-  /// must not throw back into the scheduler callback.
-  void _persistPausedSnapshot() {
-    final repo = _resolvePausedRepo();
-    final id = _host.sessionId;
-    if (repo == null || id == null) return;
-    final summary = _host.buildInProgressSummary();
-    final entry = PausedTripEntry(
-      id: id,
-      vehicleId: _host.vehicleId,
-      vin: _host.vin,
-      summary: summary,
-      odometerStartKm: _host.odometerStartKm,
-      odometerLatestKm: _host.odometerLatestKm,
-      pausedAt: _now(),
-      // #1004 phase 4-WAL — flag persists so the launch-time recovery
-      // service knows whether to bump the launcher-icon badge if the app
-      // is killed before the grace timer fires.
-      automatic: _host.automatic,
-    );
-    repo.save(entry);
-  }
+  /// Persist the in-progress trip snapshot to the paused-trips box on
+  /// drop (#797). Delegates to [DroppedSessionRepoResolver] (#2565).
+  void _persistPausedSnapshot() =>
+      _repos.savePausedSnapshot(_host, at: _now());
 
   /// Delete this session's row from the paused-trips box — the session is
-  /// live again, so leaving the partial behind would let a later pause stomp
-  /// the in-memory state. Best-effort.
-  void clearPausedTripRow() {
-    final id = _host.sessionId;
-    if (id == null) return;
-    _resolvePausedRepo()?.delete(id);
-  }
+  /// live again, so leaving the partial behind would let a later pause
+  /// stomp the in-memory state. Best-effort.
+  void clearPausedTripRow() => _repos.deletePausedRow(_host.sessionId);
 
   /// Grace-window auto-finalise (#797). Stops the scanner first (so a late
   /// reconnect can't race an already-finalised trip), finalises the partial
-  /// into trip-history, deletes the paused row, then stops the host.
+  /// into trip-history + deletes the paused row (#2565 — persistence in the
+  /// resolver), then stops the host.
   Future<void> _onGraceWindowElapsed() async {
     if (!_host.pausedDueToDrop) return;
     await stopReconnectScanner();
-    final id = _host.sessionId;
-    final repo = _resolvePausedRepo();
-    final historyRepo = _resolveHistoryRepo();
-    final summary = _host.buildFinalSummary();
-    if (historyRepo != null && id != null) {
-      try {
-        // #2291 — pass the still-live buffer + GPS diagnostics + automatic
-        // flag (never cleared by `buildFinalSummary()`) so a grace-finalised
-        // trip renders charts + is labelled like a normal stop.
-        await historyRepo.save(TripHistoryEntry(
-          id: id,
-          vehicleId: _host.vehicleId,
-          summary: summary,
-          samples: _host.capturedSamples,
-          gpsSampleDiagnostics: _host.capturedGpsSampleDiagnostics,
-          automatic: _host.automatic,
-        ));
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-            context: const {'where': 'DroppedSessionManager grace finalise'}));
-      }
-    }
-    if (repo != null && id != null) {
-      await repo.delete(id);
-    }
+    await _repos.finaliseToHistory(_host);
     _host.pausedDueToDrop = false;
     _host.stopped = true;
     _host.started = false;
     _graceTimer = null;
     _host.emitState();
-  }
-
-  PausedTripRepository? _resolvePausedRepo() {
-    final override = _pausedRepoOverride;
-    if (override != null) return override;
-    if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return null;
-    try {
-      return PausedTripRepository(
-          box: Hive.box<String>(HiveBoxes.obd2PausedTrips));
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'DroppedSessionManager paused repo'}));
-      return null;
-    }
-  }
-
-  TripHistoryRepository? _resolveHistoryRepo() {
-    final override = _historyRepoOverride;
-    if (override != null) return override;
-    if (!Hive.isBoxOpen(TripHistoryRepository.boxName)) return null;
-    try {
-      return TripHistoryRepository(
-        box: Hive.box<String>(TripHistoryRepository.boxName),
-      );
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'DroppedSessionManager history repo'}));
-      return null;
-    }
   }
 
   /// Cancel the grace timer + clear the drop reason — called by the

@@ -6141,6 +6141,12 @@ abstract class AppLocalizations {
   /// **'End recording'**
   String get obd2PauseBannerEnd;
 
+  /// Lightweight banner shown (#2565) when the OBD2 link drops mid-trip but GPS is still alive. Recording continues automatically from GPS, so there are no Resume/End actions — the app keeps capturing the trip while it tries to re-attach the dongle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording with GPS — OBD2 reconnecting'**
+  String get obd2GpsDegradedBannerTitle;
+
   /// Snackbar shown after #815 reconciles OBD2 integrated fuel against the pump receipt and learns a new volumetric-efficiency scalar for the vehicle.
   ///
   /// In en, this message translates to:

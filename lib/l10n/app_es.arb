@@ -3292,5 +3292,10 @@
   "@featureBlockedEnable_voiceAnnouncements": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2GpsDegradedBannerTitle": "Recording with GPS — OBD2 reconnecting",
+  "@obd2GpsDegradedBannerTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

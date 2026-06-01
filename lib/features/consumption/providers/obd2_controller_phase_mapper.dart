@@ -19,6 +19,8 @@ TripRecordingPhase phaseForController(TripRecordingController ctl) {
       return TripRecordingPhase.paused;
     case TripRecordingControllerState.pausedDueToDrop:
       return TripRecordingPhase.pausedDueToDrop;
+    case TripRecordingControllerState.degradedGpsOnly:
+      return TripRecordingPhase.degradedGpsOnly;
     case TripRecordingControllerState.stopped:
       return TripRecordingPhase.finished;
   }

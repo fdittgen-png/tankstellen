@@ -65,6 +65,22 @@ abstract class DroppedSessionHost {
   bool get pausedDueToDrop;
   set pausedDueToDrop(bool value);
 
+  /// #2565 — true while the trip is recording GPS-only because OBD2
+  /// dropped on a live-GPS drive. The manager sets this (instead of the
+  /// silent/visible pause path) when [gpsAlive] holds at drop time, and
+  /// clears it on a scanner reconnect; the controller's emit loop reads
+  /// it to switch to GPS-only sample construction.
+  bool get degradedGpsOnly;
+  set degradedGpsOnly(bool value);
+
+  // --- GPS liveness (read-only) ---------------------------------------
+
+  /// #2565 — whether a real GPS fix landed recently enough that an OBD2
+  /// drop should degrade to GPS-only recording instead of pausing.
+  /// Derived on the controller from its last-GPS-fix timestamp + clock;
+  /// no geolocator coupling reaches the manager.
+  bool get gpsAlive;
+
   bool get stopped;
   set stopped(bool value);
 

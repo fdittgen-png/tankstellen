@@ -105,7 +105,11 @@ class TripRecordingState {
   bool get isActive =>
       phase == TripRecordingPhase.recording ||
       phase == TripRecordingPhase.paused ||
-      phase == TripRecordingPhase.pausedDueToDrop;
+      phase == TripRecordingPhase.pausedDueToDrop ||
+      // #2565 — GPS-only degraded mode is still a live, recording trip
+      // (OBD2 dropped but GPS keeps the samples flowing), so the
+      // recording chrome must stay up exactly as in [recording].
+      phase == TripRecordingPhase.degradedGpsOnly;
 
   /// #2274 concern 2 — true while the start-now-connect-later flow is
   /// reaching the adapter and priming the recorder, before the first

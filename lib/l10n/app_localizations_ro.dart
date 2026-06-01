@@ -3330,6 +3330,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obd2PauseBannerEnd => 'Terminați înregistrarea';
 
   @override
+  String get obd2GpsDegradedBannerTitle =>
+      'Recording with GPS — OBD2 reconnecting';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Calibrarea consumului actualizată pentru $vehicleName — precizie îmbunătățită cu $percent%';
   }
