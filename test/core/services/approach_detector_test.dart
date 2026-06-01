@@ -268,4 +268,88 @@ void main() {
       });
     });
   });
+
+  // #2601 — priced-only surface: an in-radius station that quotes no
+  // usable price for the effective fuel must NOT trigger
+  // ApproachInRadius (the price would be non-actionable). A priced one
+  // surfaces normally.
+  group('ApproachDetector priced-only surface (#2601)', () {
+    test('an in-radius UNPRICED station never enters InRadius', () {
+      fakeAsync((async) {
+        // Single station inside the radius (≈111 m) with NO e10 price —
+        // it sells diesel only. Requesting e10 must yield no in-radius
+        // emit; the detector stays in Polling.
+        final stations = [
+          _station(id: 'A', lat: 48.001, lng: 2.0, diesel: 1.849),
+        ];
+
+        final gps = StreamController<Position>.broadcast();
+        final det = ApproachDetector(
+          gpsStream: gps.stream,
+          fetchStations: (_, _, _, _) async => stations,
+          config: const ApproachDetectorConfig(
+            radiusMeters: 1000,
+            priceMode: ApproachPriceMode.nearest,
+            minPollSeconds: 5,
+            fuelTypeApiValue: 'e10', // not sold at A
+          ),
+        );
+        final emitted = <ApproachState>[];
+        final sub = det.state.listen(emitted.add);
+
+        gps.add(_pos(48.0, 2.0, speedMps: 25));
+        async.flushMicrotasks();
+        async.elapse(const Duration(seconds: 30));
+        async.flushMicrotasks();
+
+        expect(emitted.whereType<ApproachInRadius>(), isEmpty,
+            reason: 'an unpriced station must not surface a non-actionable '
+                'price — it stays out of InRadius');
+        expect(emitted.last, isA<ApproachPolling>(),
+            reason: 'with no priced station in radius the detector polls');
+
+        sub.cancel();
+        det.dispose();
+        gps.close();
+      });
+    });
+
+    test('a PRICED in-radius station surfaces normally', () {
+      fakeAsync((async) {
+        // Same station but now it quotes the requested e10 price.
+        final stations = [
+          _station(id: 'A', lat: 48.001, lng: 2.0, e10: 1.699),
+        ];
+
+        final gps = StreamController<Position>.broadcast();
+        final det = ApproachDetector(
+          gpsStream: gps.stream,
+          fetchStations: (_, _, _, _) async => stations,
+          config: const ApproachDetectorConfig(
+            radiusMeters: 1000,
+            priceMode: ApproachPriceMode.nearest,
+            minPollSeconds: 5,
+            fuelTypeApiValue: 'e10',
+          ),
+        );
+        final emitted = <ApproachState>[];
+        final sub = det.state.listen(emitted.add);
+
+        gps.add(_pos(48.0, 2.0, speedMps: 25));
+        async.flushMicrotasks();
+        async.elapse(const Duration(seconds: 30));
+        async.flushMicrotasks();
+
+        final inRadius = emitted.whereType<ApproachInRadius>().toList();
+        expect(inRadius, isNotEmpty,
+            reason: 'a station with a price for the effective fuel must '
+                'surface');
+        expect(inRadius.last.station.id, 'A');
+
+        sub.cancel();
+        det.dispose();
+        gps.close();
+      });
+    });
+  });
 }
