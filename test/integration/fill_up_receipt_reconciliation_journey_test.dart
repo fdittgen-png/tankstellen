@@ -15,6 +15,8 @@ import 'package:tankstellen/features/consumption/domain/services/reconciler.dart
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
+import '../helpers/silence_error_logger.dart';
+
 /// End-to-end integration coverage for the fill-up + receipt-scan +
 /// trip-vs-pump reconciliation journey (#1633 — epic #1612).
 ///
@@ -33,6 +35,12 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 /// existing sharded `test` CI job.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  // #2628 — silence the IsolateErrorSpool so a fire-and-forget
+  // `errorLogger.log` from the production code under test can't lazily open
+  // a Hive file under the temp dir and race the recursive-delete teardown
+  // (flaky PathNotFoundException). See silence_error_logger.dart.
+  silenceErrorLoggerSpool();
 
   late Directory tmpDir;
 
