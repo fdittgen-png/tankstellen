@@ -1,0 +1,165 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: App Store listing
+
+# Pushes the iOS text metadata under ios/fastlane/metadata/<locale>/ to App
+# Store Connect via `fastlane deliver`, WITHOUT rebuilding or uploading a
+# binary. The mirror of `play-store-listing.yml` for Apple.
+#
+# Triggers: workflow_dispatch ONLY. Unlike Play, Apple listing changes are
+# tied to a specific app version + the review process, so a push-triggered
+# auto-publish is too risky — the maintainer dispatches this manually.
+#
+# Safety: `ios/fastlane/Deliverfile` is configured so `deliver` can only ever
+# stage TEXT metadata — submit_for_review(false), automatic_release(false),
+# skip_binary_upload(true), skip_screenshots(true). This workflow passes the
+# same flags explicitly. `submit_for_review` is only ever set true when the
+# `submit` input is explicitly true; the default is a no-op dry run.
+#
+# PREREQUISITE: `deliver` can only update localized metadata when the app has
+# a version in the "Prepare for Submission" state in App Store Connect. If no
+# such editable version exists, the run fails with a clear App Store Connect
+# error (e.g. "Could not find an editable version"). Create/edit a version in
+# App Store Connect first, then dispatch this workflow. See
+# docs/guides/app-store-listing.md.
+#
+# Secrets required (App Store Connect API key — same as ios-testflight.yml):
+# - APP_STORE_CONNECT_API_KEY_BASE64  base64 of the .p8 key file
+# - APP_STORE_CONNECT_API_KEY_ID      the key's Key ID
+# - APP_STORE_CONNECT_API_ISSUER_ID   the issuer ID
+#
+# Screenshots are intentionally NOT uploaded here: Apple requires exact
+# device-pixel sizes per device class, which we don't yet have (tracked
+# separately). See ios/fastlane/Deliverfile + the guide doc.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry-run (deliver --verify_only — validate metadata, no upload)'
+        type: boolean
+        default: true
+      submit:
+        description: 'Submit for review after upload (DANGER — only when intentional; ignored on a dry run)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: app-store-listing
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    # deliver/fastlane is most reliable on macOS, matching the iOS lanes
+    # (ios-testflight.yml also runs on macos-latest).
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Build App Store Connect API key JSON
+        env:
+          ASC_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ASC_KEY_BASE64:-}" ] || [ -z "${ASC_KEY_ID:-}" ] || [ -z "${ASC_ISSUER_ID:-}" ]; then
+            echo "::error::App Store Connect API secrets are not all set (APP_STORE_CONNECT_API_KEY_BASE64 / _KEY_ID / _ISSUER_ID)." >&2
+            exit 1
+          fi
+          # Decode the base64 secret to the raw .p8 (same source as
+          # ios-testflight.yml). `deliver --api_key_path` does NOT accept a
+          # raw .p8 + separate key_id/issuer_id flags — it expects fastlane's
+          # App Store Connect API key JSON wrapper, whose `key` field holds
+          # the full PEM contents of the .p8. jq embeds the PEM safely
+          # (newlines escaped as \n).
+          P8_PATH="$RUNNER_TEMP/asc-api-key.p8"
+          KEY_JSON="$RUNNER_TEMP/asc-api-key.json"
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$P8_PATH"
+          jq -n \
+            --arg key_id "$ASC_KEY_ID" \
+            --arg issuer_id "$ASC_ISSUER_ID" \
+            --rawfile key "$P8_PATH" \
+            '{key_id: $key_id, issuer_id: $issuer_id, key: $key, in_house: false}' \
+            > "$KEY_JSON"
+          rm -f "$P8_PATH"
+          echo "ASC_API_KEY_JSON=$KEY_JSON" >> "$GITHUB_ENV"
+
+      - name: fastlane deliver (text metadata only)
+        working-directory: ios
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          # `submit` only matters on a real run; on a dry run it is ignored.
+          SUBMIT: ${{ inputs.submit }}
+          FASTLANE_DISABLE_COLORS: '1'
+        run: |
+          set -euo pipefail
+
+          # Common args. The Deliverfile already sets these too, but we pass
+          # them explicitly so the workflow is self-documenting and safe even
+          # if the Deliverfile drifts:
+          #   --api_key_path — fastlane's ASC API key JSON wrapper built above.
+          #   --skip_binary_upload / --skip_screenshots — text metadata only.
+          #   --force true — non-interactive (no HTML-preview confirmation
+          #     prompt, which would hang a CI run forever).
+          #   --precheck_include_in_app_purchases false — we have no IAPs;
+          #     skip the precheck IAP scan.
+          ARGS=(
+            --api_key_path "$ASC_API_KEY_JSON"
+            --skip_binary_upload true
+            --skip_screenshots true
+            --force true
+            --precheck_include_in_app_purchases false
+          )
+
+          if [ "$DRY_RUN" = "true" ]; then
+            # --verify_only validates the metadata against App Store Connect
+            # WITHOUT uploading. submit_for_review is irrelevant here.
+            echo "::notice::Dry run — deliver --verify_only (validate metadata, no upload)."
+            ARGS+=( --verify_only true --submit_for_review false )
+          else
+            # Real upload. submit_for_review is true ONLY when the maintainer
+            # explicitly set the submit input; otherwise metadata is staged
+            # and a human presses Submit for Review in the console.
+            if [ "$SUBMIT" = "true" ]; then
+              echo "::warning::Real run with --submit_for_review TRUE — this will submit the app for review."
+              ARGS+=( --submit_for_review true )
+            else
+              echo "::notice::Real run — staging text metadata only (--submit_for_review false)."
+              ARGS+=( --submit_for_review false )
+            fi
+          fi
+
+          echo "Running: bundle exec fastlane deliver ${ARGS[*]}"
+          # PREREQUISITE: this fails with a clear App Store Connect error if
+          # no app version is in "Prepare for Submission" state. Create/edit
+          # a version in App Store Connect first. See the guide doc.
+          bundle exec fastlane deliver "${ARGS[@]}"
+
+      - name: Clean up decoded API key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/asc-api-key.p8" "$RUNNER_TEMP/asc-api-key.json"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## App Store listing"
+            echo ""
+            echo "- **Bundle ID:** de.tankstellen.tankstellen"
+            echo "- **Dry run:** ${{ inputs.dry_run }}"
+            echo "- **Submit for review:** ${{ inputs.submit }} (ignored on a dry run)"
+            echo "- **Uploaded:** text metadata only (no binary, no screenshots)"
+            echo ""
+            echo "Prerequisite: needs a version in **Prepare for Submission** state in App Store Connect."
+          } >> "$GITHUB_STEP_SUMMARY"
