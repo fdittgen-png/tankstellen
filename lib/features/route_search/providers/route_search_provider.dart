@@ -113,6 +113,7 @@ class RouteSearchState extends _$RouteSearchState {
               strategyType: strategyType,
               isPartial: true,
               corridorCountryCodes: corridorMap.keys.toSet(),
+              profileFuelByCountry: profileFuels,
             ));
           },
         );
@@ -141,12 +142,7 @@ class RouteSearchState extends _$RouteSearchState {
             // #2595 — price by the station's own country fuel, not the
             // single active-profile fuel, so the global cheapest across
             // a cross-border route compares like-for-like.
-            final fuel = fuelForStation(
-              item.station.lat,
-              item.station.lng,
-              profileFuels,
-              fuelType,
-            );
+            final fuel = fuelForStation(item.station, profileFuels, fuelType);
             final price = item.station.priceFor(fuel);
             if (price != null && (cheapestPrice == null || price < cheapestPrice)) {
               cheapestPrice = price;
@@ -162,6 +158,10 @@ class RouteSearchState extends _$RouteSearchState {
           results: allResults,
           fuelType: fuelType,
           segmentKm: segmentKmValue,
+          // #2631 — price each segment by ITS country's profile fuel so a
+          // cross-border ES station (E10 set, E85 null) is ranked into Best
+          // Stops rather than dropped on a null active-fuel price.
+          profileFuelByCountry: profileFuels,
         );
       }
 
@@ -172,6 +172,9 @@ class RouteSearchState extends _$RouteSearchState {
         cheapestPerSegment: segmentCheapest,
         strategyType: strategyType,
         corridorCountryCodes: corridorMap.keys.toSet(),
+        // #2631 — carried to the map/list so each station prices by its
+        // own country fuel (cross-border ES → E10 instead of '--').
+        profileFuelByCountry: profileFuels,
       ));
     } on DioException catch (e, st) {
       if (e.type == DioExceptionType.cancel) return;
@@ -230,12 +233,7 @@ class RouteSearchState extends _$RouteSearchState {
     double? cheapestPrice;
     for (final item in allResults) {
       if (item is FuelStationResult) {
-        final fuel = fuelForStation(
-          item.station.lat,
-          item.station.lng,
-          profileFuels,
-          fuelType,
-        );
+        final fuel = fuelForStation(item.station, profileFuels, fuelType);
         final price = item.station.priceFor(fuel);
         if (price != null &&
             (cheapestPrice == null || price < cheapestPrice)) {
@@ -253,9 +251,12 @@ class RouteSearchState extends _$RouteSearchState {
         results: allResults,
         fuelType: fuelType,
         segmentKm: 50.0,
+        // #2631 — per-country profile fuel for cross-border Best Stops.
+        profileFuelByCountry: profileFuels,
       ),
       strategyType: strategyType,
       corridorCountryCodes: corridorMap.keys.toSet(),
+      profileFuelByCountry: profileFuels,
     );
   }
 
