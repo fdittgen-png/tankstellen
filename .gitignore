@@ -112,6 +112,7 @@ docs/guides/*
 !docs/guides/ios-widget-extension.md
 !docs/guides/feature-flags.md
 !docs/guides/fdroid-submission.md
+!docs/guides/app-store-listing.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
