@@ -4,53 +4,80 @@
 part of 'profile_edit_sheet.dart';
 
 /// Country selector rendered as a wrap of ChoiceChips with flag + name.
-class _CountrySection extends StatelessWidget {
+///
+/// #2597 — enforces one profile per country: a country already owned by a
+/// *different* profile is rendered disabled, and tapping it surfaces a
+/// localized "edit that one instead" SnackBar rather than re-binding it.
+class _CountrySection extends ConsumerWidget {
   final ProfileEditState state;
   final ProfileEditController ctrl;
+  final String profileId;
 
-  const _CountrySection({required this.state, required this.ctrl});
+  const _CountrySection({
+    required this.state,
+    required this.ctrl,
+    required this.profileId,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repo = ref.watch(profileRepositoryProvider);
     return Wrap(
       spacing: 6,
       runSpacing: 6,
       children: Countries.verified.map((c) {
+        // A country owned by another profile is taken — the profile being
+        // edited may keep its own current country.
+        final taken =
+            repo.isCountryTaken(c.code, excludeProfileId: profileId);
         return ChoiceChip(
           label: Text('${c.flag} ${c.name}'),
           selected: c.code == state.countryCode,
-          onSelected: (_) async {
-            // Confirm silently-impactful unit changes (currency,
-            // distance, volume, price-per-unit format) before
-            // mutating the profile. Same-unit switches (e.g.
-            // FR ↔ DE, both EUR + km + L + €/L) skip the
-            // dialog. A profile with no country set yet also
-            // skips — there's nothing to warn about.
-            final currentCode = state.countryCode;
-            final current =
-                currentCode == null ? null : Countries.byCode(currentCode);
-            if (current == null || current.code == c.code) {
-              ctrl.setCountryCode(c.code);
-              return;
-            }
-            if (!countriesDifferInUnits(current, c)) {
-              ctrl.setCountryCode(c.code);
-              return;
-            }
-            final confirmed = await showCountryChangeDialog(
-              context,
-              from: current,
-              to: c,
-            );
-            if (!context.mounted) return;
-            if (confirmed) {
-              ctrl.setCountryCode(c.code);
-            }
-          },
+          // Taken countries stay tappable but, instead of re-binding,
+          // explain (SnackBar) that another profile already owns them —
+          // a clearer "edit that one instead" affordance than a silently
+          // dead chip.
+          onSelected: (_) =>
+              taken ? _explainTaken(context, c) : _selectCountry(context, c),
           visualDensity: VisualDensity.compact,
         );
       }).toList(),
     );
+  }
+
+  void _explainTaken(BuildContext context, CountryConfig c) {
+    final l10n = AppLocalizations.of(context);
+    SnackBarHelper.show(
+      context,
+      l10n?.profileCountryTaken(c.name) ??
+          'A profile for ${c.name} already exists — edit it instead.',
+    );
+  }
+
+  Future<void> _selectCountry(BuildContext context, CountryConfig c) async {
+    // Confirm silently-impactful unit changes (currency, distance, volume,
+    // price-per-unit format) before mutating the profile. Same-unit
+    // switches (e.g. FR ↔ DE, both EUR + km + L + €/L) skip the dialog. A
+    // profile with no country set yet also skips — nothing to warn about.
+    final currentCode = state.countryCode;
+    final current = currentCode == null ? null : Countries.byCode(currentCode);
+    if (current == null || current.code == c.code) {
+      ctrl.setCountryCode(c.code);
+      return;
+    }
+    if (!countriesDifferInUnits(current, c)) {
+      ctrl.setCountryCode(c.code);
+      return;
+    }
+    final confirmed = await showCountryChangeDialog(
+      context,
+      from: current,
+      to: c,
+    );
+    if (!context.mounted) return;
+    if (confirmed) {
+      ctrl.setCountryCode(c.code);
+    }
   }
 }
 

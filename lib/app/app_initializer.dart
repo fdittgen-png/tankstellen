@@ -141,7 +141,11 @@ class AppInitializer {
       // ~175k dead rows/year; reads already filter to the last 30 days,
       // so this caps storage growth, not a correctness bug.
       await PriceHistoryRepository(storage).evictOldRecords();
-      await ProfileRepository(storage).migrateProfileCountryLanguage();
+      final profileRepo = ProfileRepository(storage);
+      await profileRepo.migrateProfileCountryLanguage();
+      // #2597 — one profile per country: dedupe existing duplicates
+      // (idempotent, runs after the country backfill above).
+      await profileRepo.dedupeCountryProfiles();
     });
 
     // #795 phase 1 — defer Supabase/TankSync warm-up and community-config

@@ -301,4 +301,38 @@ void main() {
       expect(source, contains('maxWidth: 560'));
     });
   });
+
+  // #2597 — the country picker enforces one profile per country.
+  group('ProfileEditSheet one-per-country picker (#2597)', () {
+    String parts2Source() => File(
+          'lib/features/profile/presentation/widgets/profile_edit_sheet_parts2.dart',
+        ).readAsStringSync();
+    String mainSource() => File(
+          'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
+        ).readAsStringSync();
+
+    test('_CountrySection consults isCountryTaken, excluding the edited '
+        'profile', () {
+      final source = parts2Source();
+      expect(source, contains('isCountryTaken('));
+      expect(source, contains('excludeProfileId: profileId'));
+    });
+
+    test('blocks a taken country with the localized profileCountryTaken '
+        'message instead of re-binding it', () {
+      final source = parts2Source();
+      // Taken → explain (no setCountryCode); free → select.
+      expect(source, contains('profileCountryTaken'));
+      expect(
+        source,
+        matches(RegExp(r'taken\s*\?\s*_explainTaken')),
+        reason: 'taken countries route to the explain-SnackBar branch',
+      );
+    });
+
+    test('the edit sheet threads the edited profile id into _CountrySection',
+        () {
+      expect(mainSource(), contains('profileId: widget.profile.id'));
+    });
+  });
 }

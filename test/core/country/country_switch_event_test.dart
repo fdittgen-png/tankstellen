@@ -47,7 +47,9 @@ void main() {
 
   setUp(() {
     fakeStorage = FakeHiveStorage();
-    fakeStorage.putSetting(StorageKeys.autoSwitchProfile, false);
+    // #2597 — intentionally DO NOT seed StorageKeys.autoSwitchProfile here so
+    // each test exercises the real default (now ON). Tests that need the
+    // opt-out (`suggest`) behaviour set it to false explicitly.
   });
 
   ProviderContainer createContainer({
@@ -128,6 +130,24 @@ void main() {
       expect(ev.matchingProfile?.id, 'p-de');
     });
 
+    test('#2597 — auto-switch is the DEFAULT: with no setting stored a '
+        'matching profile auto-switches', () {
+      // setUp leaves StorageKeys.autoSwitchProfile unset → the `?? true`
+      // default applies, so border-crossing auto-activates the profile.
+      final c = createContainer(
+        detected: 'DE',
+        active: Countries.france,
+        profiles: const [_germanProfile],
+      );
+
+      final ev = c.read(countrySwitchEventProvider);
+      expect(ev, isNotNull);
+      expect(ev!.action, CountrySwitchAction.autoSwitch,
+          reason: 'default-on auto-switch (#2597): an unset flag must behave '
+              'as enabled, not as suggest');
+      expect(ev.matchingProfile?.id, 'p-de');
+    });
+
     test('autoSwitch only fires when a matching profile EXISTS — no profile '
         'still returns "noProfile" even with the flag on', () async {
       await fakeStorage.putSetting(StorageKeys.autoSwitchProfile, true);
@@ -144,6 +164,10 @@ void main() {
 
     test('recomputes immediately when a matching profile is created while '
         'abroad — watch, not read (#2313)', () {
+      // Pin auto-switch OFF so the recompute lands on the deterministic
+      // `suggest` action (the default is ON since #2597); this test is about
+      // the watch-driven recompute, not the auto-switch policy.
+      fakeStorage.putSetting(StorageKeys.autoSwitchProfile, false);
       // Backing store the overridden allProfilesProvider WATCHES, so a change
       // here must invalidate countrySwitchEvent without a new GPS fix.
       final c = ProviderContainer(overrides: [

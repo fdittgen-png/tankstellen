@@ -45,9 +45,14 @@ CountrySwitchEvent? countrySwitchEvent(Ref ref) {
       .toList();
   final matchingProfile = match.isNotEmpty ? match.first : null;
 
+  // #2597 — auto-switch is ON by default: crossing a border into a country
+  // that has a profile activates it automatically. The user can still
+  // disable it (Settings → Auto-switch profile), which falls back to the
+  // `suggest` prompt. The one-profile-per-country rule (enforced on
+  // create/edit + a startup dedup) keeps `matchingProfile` deterministic.
   final storage = ref.read(storageRepositoryProvider);
   final autoSwitch =
-      storage.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? false;
+      storage.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? true;
 
   if (matchingProfile != null && autoSwitch) {
     return CountrySwitchEvent(

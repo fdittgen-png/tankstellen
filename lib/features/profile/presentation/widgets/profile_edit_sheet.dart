@@ -12,6 +12,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/section_card.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
@@ -21,6 +22,7 @@ import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
+import '../../providers/profile_provider.dart';
 import '../../providers/show_electric_enabled_provider.dart';
 import '../../providers/show_fuel_enabled_provider.dart';
 import 'country_change_dialog.dart';
@@ -241,7 +243,11 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: Spacing.md),
-            _CountrySection(state: editState, ctrl: editCtrl),
+            _CountrySection(
+              state: editState,
+              ctrl: editCtrl,
+              profileId: widget.profile.id,
+            ),
             const SizedBox(height: Spacing.xl),
             Text(
               l10n?.profileLanguage ?? 'Language',
