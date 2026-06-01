@@ -95,15 +95,19 @@ void main() {
       'cross-border FR→ES route queries each leg with its own service + '
       'profile fuel and merges both into one corridor result (#2595)',
       () async {
-    // Corridor: Pézenas (FR) heading south-west into Spain. The lower
-    // vertices fall in ES-only bbox territory, so corridorCountries
-    // returns {FR, ES}. Sample points sit on the polyline.
+    // Corridor: Pézenas (FR) → Barcelona (ES) — the EXACT route from the
+    // bug report. #2621 — the Catalonian sample point (Barcelona, 41.39)
+    // sits INSIDE FR's bbox (lat 41.0–51.5), so the first-match
+    // `entryByLatLng` resolved it to FR and the whole Spanish leg was
+    // silently dropped. Using a real sub-Pyrenees Spanish point (not the
+    // earlier hand-picked lat<41.0 one) exercises the production shadow.
     const frPoint = LatLng(43.46, 3.42); // Pézenas — FR bbox
-    const esPoint = LatLng(40.50, 0.50); // Castelló-ish — ES-only bbox
+    const esPoint = LatLng(41.39, 2.17); // Barcelona — INSIDE FR's box too
     const route = RouteInfo(
       geometry: [
         frPoint,
         LatLng(42.40, 2.20), // Pyrenees crossing
+        LatLng(41.98, 2.82), // Girona — Catalonia (ES), INSIDE FR's box
         esPoint,
       ],
       distanceKm: 400,
@@ -155,6 +159,12 @@ void main() {
     expect(brands, contains('Repsol ES'),
         reason: 'Spanish leg must be present (was empty before #2595)');
 
+    // #2621 — the ES service must ACTUALLY have been queried. An empty
+    // `everyElement` matcher passes vacuously, so assert the call happened
+    // (the regression: ES was never queried because FR shadowed it).
+    expect(esService.requestedFuels, isNotEmpty,
+        reason: 'ES service must be queried for a Barcelona corridor (#2621)');
+
     // Each country's service was queried with ITS profile fuel, not the
     // single active fuel.
     expect(frService.requestedFuels, everyElement(FuelType.e85),
@@ -181,19 +191,29 @@ void main() {
         reason: 'FR + ES stops interleave by true corridor position');
   });
 
-  test('corridorCountries detects every crossed country offline (#2595)',
+  // #2621 — REAL Catalonian vertices. The previous version of this test
+  // hand-picked ES points at lat 40.50 / 39.50, BELOW FR's minLat (41.0),
+  // so they fell outside the FR box and were attributed to ES even by the
+  // first-match `entryByLatLng`. A genuine Pézenas→Barcelona route never
+  // drops below 41.0 — Girona (41.98) and Barcelona (41.39) both sit INSIDE
+  // the FR box (lat 41.0–51.5, lng −5.5–10.0), so first-match resolves them
+  // to FR and the whole Spanish leg was silently dropped. With real coords
+  // this test exercises the actual bbox shadow.
+  test('corridorCountries detects every crossed country offline (#2595/#2621)',
       () {
     const route = RouteInfo(
       geometry: [
-        LatLng(43.46, 3.42), // FR
-        LatLng(42.40, 2.20), // FR (Pyrenees)
-        LatLng(40.50, 0.50), // ES
-        LatLng(39.50, -0.40), // ES
+        LatLng(43.46, 3.42), // Pézenas — FR
+        LatLng(42.40, 2.20), // Pyrenees crossing — FR
+        LatLng(41.98, 2.82), // Girona — Catalonia (ES), INSIDE FR's box
+        LatLng(41.39, 2.17), // Barcelona — Catalonia (ES), INSIDE FR's box
       ],
       distanceKm: 500,
       durationMinutes: 300,
       samplePoints: [],
     );
-    expect(corridorCountries(route), containsAll(<String>{'FR', 'ES'}));
+    expect(corridorCountries(route), containsAll(<String>{'FR', 'ES'}),
+        reason: 'ES must be detected even though FR shadows every '
+            'Catalonian point in first-match bbox order (#2621)');
   });
 }
