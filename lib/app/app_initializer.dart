@@ -51,7 +51,6 @@ import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
 import '../features/vehicle/data/vehicle_profile_migrator.dart';
 import '../features/vehicle/providers/vehicle_aggregate_updater_provider.dart';
 import '../features/widget/data/home_widget_service.dart';
-import '../features/widget/presentation/widget_uri_parser.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'router.dart';
@@ -595,18 +594,10 @@ class AppInitializer {
       final uri = await HomeWidget.initiallyLaunchedFromHomeWidget()
           .timeout(const Duration(milliseconds: 200));
       if (uri == null) return;
-      // #2159 — the refresh-button URI is `tankstellenwidget://refresh`,
-      // which `widgetUriToPath` returns `null` for. If we stashed it,
-      // the router redirect would consume it (clear the stash) and
-      // navigate nowhere, leaving the user on the default landing
-      // screen and the widget unrefreshed. Dispatch directly to the
-      // refresh notifier instead — it's a side effect, not a route.
-      if (isWidgetRefreshUri(uri)) {
-        unawaited(
-          container.read(nearestWidgetRefreshProvider.notifier).refresh(),
-        );
-        return;
-      }
+      // #2600 — the only widget launch URI is a station deep-link now.
+      // The refresh button no longer launches the app (it is a native
+      // broadcast handled in place), so the former #2159 refresh-marker
+      // discrimination was removed: every launch URI is a route to stash.
       container.read(pendingWidgetUriProvider.notifier).set(uri);
     } on TimeoutException {
       debugPrint(

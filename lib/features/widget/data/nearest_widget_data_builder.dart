@@ -204,6 +204,13 @@ class NearestWidgetDataBuilder {
           .map((s) => _stationToRow(s, userLat: lat, userLng: lng, fuel: fuelType))
           .toList(growable: false);
 
+      // #2600 — flag the cheapest row(s) so the redesigned native widget
+      // can colour the price green. Rows are ordered by distance, so the
+      // cheapest is not necessarily first; mark every row whose preferred
+      // fuel price equals the minimum across the rendered set. Rows with no
+      // price are never the cheapest.
+      _flagCheapest(rows);
+
       final payload = NearestWidgetPayload(
         stations: rows,
         updatedAt: DateTime.now(),
@@ -322,6 +329,26 @@ class NearestWidgetDataBuilder {
       'diesel': station.diesel,
       if (predictive != null) ...predictive,
     };
+  }
+
+  /// #2600 — mark the cheapest priced row(s) with `isCheapest: true` so the
+  /// native widget colours their price green. Operates in place on the
+  /// already-built [rows]. Rows with a null/absent `preferred_fuel_price`
+  /// are ignored (never the cheapest). When two rows tie at the minimum,
+  /// both are flagged — honest, and a rare edge anyway.
+  static void _flagCheapest(List<Map<String, dynamic>> rows) {
+    double? minPrice;
+    for (final row in rows) {
+      final p = (row['preferred_fuel_price'] as num?)?.toDouble();
+      if (p == null) continue;
+      if (minPrice == null || p < minPrice) minPrice = p;
+    }
+    // Always write the key (false when no row is priced) so the field is a
+    // predictable bool the native renderer reads with a `false` default.
+    for (final row in rows) {
+      final p = (row['preferred_fuel_price'] as num?)?.toDouble();
+      row['isCheapest'] = minPrice != null && p != null && p == minPrice;
+    }
   }
 
   Future<void> _persist(

@@ -24,9 +24,12 @@ part 'nearest_widget_refresh_provider.g.dart';
 /// provider adds a foreground 2-minute tick that kicks the builder while
 /// the app is running.
 ///
-/// #1803 — the resume hook is what makes the widget's refresh button
-/// work: that button opens the app (#1801), and the app reaching the
-/// foreground triggers a tick that rebuilds both widget variants.
+/// #1803 — the resume hook keeps the widget fresh whenever the app
+/// returns to the foreground. #2600 — the widget's own refresh button no
+/// longer launches the app: it is a native broadcast that re-fetches
+/// prices in place (`FuelPriceWidgetProvider.ACTION_REFRESH` → the
+/// `widgetRefreshScan` WorkManager task), so the former explicit
+/// `refresh()` entry point this provider exposed was removed.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and
@@ -56,13 +59,6 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
     // session as soon as the user opens the app (don't wait two minutes).
     unawaited(_tick());
   }
-
-  /// Force an immediate widget rebuild — both variants — outside the
-  /// timer/resume cadence. Driven by the home-widget refresh button
-  /// (#1961): a tap launches the app with the `refresh` marker URI, and
-  /// `WidgetLaunchHandler` calls this so the rebuild is deterministic
-  /// rather than racing the resume heartbeat.
-  Future<void> refresh() => _tick();
 
   Future<void> _tick() async {
     try {

@@ -337,43 +337,30 @@ void main() {
     });
   });
 
-  group('Widget cold-launch URI dispatch (#2159)', () {
+  group('Widget cold-launch URI dispatch (#2600)', () {
     test(
-        '_stashWidgetLaunchUri intercepts refresh URIs before stashing',
-        () {
-      // #2159 — the refresh-button URI `tankstellenwidget://refresh`
-      // is NOT a route. If we let it flow into pendingWidgetUriProvider
-      // the router redirect consumes it (clears the stash) and
-      // widgetUriToPath returns null, so the user lands on the default
-      // landing screen and the widget never refreshes. The fix is to
-      // discriminate refresh URIs and call the refresh notifier
-      // directly, BEFORE the pending-URI stash.
+        '_stashWidgetLaunchUri stashes the launch URI with no refresh '
+        'discrimination', () {
+      // #2600 — the refresh button is now a native broadcast handled in
+      // place; it never launches the app. The former #2159 refresh-marker
+      // interception (`isWidgetRefreshUri` → `nearestWidgetRefreshProvider`
+      // before the stash) was therefore removed: every cold-launch URI is
+      // a station deep-link to stash for the router redirect.
       final body = _extractMethodBody(
           initSource, 'static Future<void> _stashWidgetLaunchUri');
       expect(body, isNotNull,
           reason: '_stashWidgetLaunchUri must exist');
 
-      final refreshCheck = body!.indexOf('isWidgetRefreshUri(uri)');
-      final refreshDispatch =
-          body.indexOf('nearestWidgetRefreshProvider.notifier');
-      final stash = body.indexOf('pendingWidgetUriProvider.notifier');
-
-      expect(refreshCheck, isNonNegative,
-          reason: 'must check isWidgetRefreshUri before stashing');
-      expect(refreshDispatch, isNonNegative,
-          reason: 'must dispatch refresh URIs to the refresh notifier');
-      expect(stash, isNonNegative,
-          reason: 'station URIs must still flow through the pending stash');
-
-      expect(refreshCheck, lessThan(stash),
+      expect(body, contains('pendingWidgetUriProvider.notifier'),
+          reason: 'launch URIs must flow through the pending stash');
+      expect(body, isNot(contains('isWidgetRefreshUri')),
           reason:
-              'the refresh discriminator must run BEFORE the stash, '
-              'otherwise refresh URIs are consumed by the router redirect '
-              'and silently dropped');
-      expect(refreshDispatch, lessThan(stash),
+              'the refresh-marker discriminator is gone — refresh no '
+              'longer launches the app (#2600)');
+      expect(body, isNot(contains('nearestWidgetRefreshProvider')),
           reason:
-              'the refresh dispatch must run BEFORE the stash for the '
-              'same reason');
+              'the cold-launch path must not dispatch to the refresh '
+              'notifier any more (#2600)');
     });
   });
 }

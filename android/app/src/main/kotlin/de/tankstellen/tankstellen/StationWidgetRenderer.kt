@@ -4,11 +4,13 @@
 package de.tankstellen.tankstellen
 
 import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import org.json.JSONArray
 import org.json.JSONObject
@@ -54,9 +56,14 @@ object StationWidgetRenderer {
 
     const val ACTION_TOGGLE_MODE = "de.tankstellen.fuelprices.TOGGLE_MODE"
     const val ACTION_OPEN_APP = "de.tankstellen.fuelprices.OPEN_APP"
-    // #1801 — ACTION_REFRESH removed: the refresh icon is now an
-    // Activity PendingIntent (a broadcast can't reliably startActivity
-    // on Android 10+), so there is no refresh broadcast to name.
+    // #2600 — ACTION_REFRESH re-introduced as a BROADCAST to the
+    // provider (NOT an Activity PendingIntent). Tapping the refresh icon
+    // must not launch the app: the provider's onReceive enqueues the
+    // existing `widgetRefreshScan` WorkManager task (#2412) which
+    // re-fetches prices and re-renders the widget in place. The old #1801
+    // rationale (a broadcast can't `startActivity` on Android 10+) is
+    // moot — refresh deliberately does not start an activity at all.
+    const val ACTION_REFRESH = "de.tankstellen.fuelprices.REFRESH"
 
     const val EXTRA_APP_WIDGET_ID = "appWidgetId"
 
@@ -209,21 +216,28 @@ object StationWidgetRenderer {
             ),
         )
 
-        // Refresh icon (#1801 / #1803 / #1961) — an Activity PendingIntent
-        // that opens the app carrying the `tankstellenwidget://refresh`
-        // marker URI. The Flutter side recognises that URI and runs an
-        // explicit widget rebuild (price re-fetch + re-render) instead of
-        // relying on the resume heartbeat alone — so a tap deterministically
-        // refreshes. A bare launch (uri = null) used to leave the refresh
-        // racing the resume tick.
+        // Refresh icon (#2600) — a BROADCAST to this provider's
+        // ACTION_REFRESH. onReceive enqueues the existing on-device
+        // `widgetRefreshScan` WorkManager task (#2412) which re-fetches
+        // prices and re-renders the widget in place. NO app launch: the
+        // old #1801 / #1961 Activity PendingIntent + `tankstellenwidget://
+        // refresh` marker URI cold-launched the app to refresh, which the
+        // user reported as a bug. The provider dims the glyph (alpha) while
+        // the scan is in flight; the next render restores it to full alpha.
         views.setOnClickPendingIntent(
             R.id.widget_refresh,
-            buildActivity(
+            buildBroadcast(
                 context,
-                uri = Uri.parse("tankstellenwidget://refresh"),
+                providerClass,
+                ACTION_REFRESH,
                 requestCode = appWidgetId * 10 + 2,
+                extraAppWidgetId = appWidgetId,
             ),
         )
+        // Restore the refresh glyph to full opacity on every fresh render —
+        // the transient "refreshing…" dim set by onReceive is cleared once
+        // the scan posts new data and the widget re-renders.
+        views.setInt(R.id.widget_refresh, "setImageAlpha", 255)
 
         // Tapping the widget chrome (not a row) opens the app with no
         // station context so the user lands on whatever their usual
@@ -296,6 +310,31 @@ object StationWidgetRenderer {
         return views
     }
 
+    /**
+     * #2600 — transient "refreshing…" affordance. Dims the refresh glyph
+     * to ~40% opacity via a lightweight `partiallyUpdateAppWidget` so the
+     * user gets immediate feedback that the in-place refresh broadcast was
+     * received, without rebuilding the whole RemoteViews tree (which would
+     * need a fresh data read). The dim is cleared on the next full [render]
+     * (it always resets the alpha to 255) once the scan posts new prices.
+     *
+     * A partial update that targets only `widget_refresh` is safe even
+     * when the layout was last committed by a different render pass — the
+     * RemoteViews here only carries the one alpha mutation.
+     */
+    fun setRefreshing(context: Context, appWidgetId: Int) {
+        try {
+            val views = RemoteViews(context.packageName, R.layout.station_widget_layout)
+            views.setInt(R.id.widget_refresh, "setImageAlpha", 100)
+            AppWidgetManager.getInstance(context)
+                .partiallyUpdateAppWidget(appWidgetId, views)
+        } catch (e: Exception) {
+            // Best-effort visual only — never let the affordance block the
+            // scan enqueue that actually refreshes the data.
+            android.util.Log.d("TankstellenWidget", "setRefreshing failed: $e")
+        }
+    }
+
     private fun buildRow(
         context: Context,
         station: JSONObject,
@@ -360,11 +399,37 @@ object StationWidgetRenderer {
         }
         row.setTextViewText(R.id.station_main_label, label)
         row.setTextViewText(R.id.station_main_price, priceText)
+        // #2600 — colour-code the price (the redesign's primary anchor).
+        // The Dart builder flags the cheapest priced row in the rendered
+        // set with `isCheapest` (sorted by distance, so the cheapest is
+        // not necessarily first). Cheapest → green; every other priced row
+        // → the high-contrast default. Both `@color` resources have a
+        // values-night/ variant so the hue stays legible on dark launchers.
+        val isCheapest = station.optBoolean("isCheapest", false)
+        val priceColorRes =
+            if (isCheapest) R.color.widget_price_cheap
+            else R.color.widget_price_default
+        row.setTextColor(
+            R.id.station_main_price,
+            getColorCompat(context, priceColorRes),
+        )
 
         val isOpen = station.optBoolean("isOpen", false)
         row.setTextViewText(
             R.id.station_status,
             if (isOpen) "● Open" else "○ Closed",
+        )
+        // #2600 — the status pill carried no explicit colour, so it
+        // inherited the launcher theme's default text colour, which could
+        // be near-invisible on the dark-navy widget background. Pin it:
+        // open → the cheap green, closed → the dim secondary.
+        row.setTextColor(
+            R.id.station_status,
+            getColorCompat(
+                context,
+                if (isOpen) R.color.widget_price_cheap
+                else R.color.widget_text_secondary,
+            ),
         )
 
         // #1121 — predictive nudge line. Render only when the user selected
@@ -434,6 +499,15 @@ object StationWidgetRenderer {
 
         return row
     }
+
+    /**
+     * #2600 — resolve a `@color` resource to an ARGB int for
+     * [RemoteViews.setTextColor]. Goes through [ContextCompat] so the
+     * correct values/ vs values-night/ variant is picked up from the
+     * launcher's current UI mode.
+     */
+    private fun getColorCompat(context: Context, colorRes: Int): Int =
+        ContextCompat.getColor(context, colorRes)
 
     private fun buildBroadcast(
         context: Context,

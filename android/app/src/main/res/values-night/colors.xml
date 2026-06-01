@@ -8,4 +8,11 @@
     <color name="widget_text_primary">#E6E1E5</color>
     <color name="widget_text_secondary">#CAC4D0</color>
     <color name="widget_icon_tint">#CAC4D0</color>
+    <!-- #2600 — dark-launcher price colours. Brighter green pops on the
+         dark-navy widget background; the default price matches the light
+         primary text; the address dim-grey stays above the ~4.5:1 contrast
+         floor against #1E1E1E / dark accent backgrounds. -->
+    <color name="widget_price_cheap">#5CD27A</color>
+    <color name="widget_price_default">#E6E1E5</color>
+    <color name="widget_text_tertiary">#A6A1AC</color>
 </resources>

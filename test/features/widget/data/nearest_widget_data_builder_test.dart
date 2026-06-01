@@ -339,6 +339,90 @@ void main() {
       expect(d0, lessThanOrEqualTo(d1));
     });
 
+    test('#2600 — flags the cheapest priced row(s) with isCheapest so the '
+        'redesigned widget can colour the price green', () async {
+      await settings.putSetting(StorageKeys.userPositionLat, 52.5200);
+      await settings.putSetting(StorageKeys.userPositionLng, 13.4050);
+
+      // Cheapest is NOT the nearest: rows are sorted by distance, so the
+      // isCheapest flag must track price, not position.
+      stationService.stationsToReturn = [
+        _stationFixture(
+          id: 'de-near-expensive',
+          brand: 'Aral',
+          street: 'Str0',
+          place: 'Berlin',
+          lat: 52.5201,
+          lng: 13.4051,
+          e10: 1.899,
+          dist: 0.2,
+        ),
+        _stationFixture(
+          id: 'de-far-cheapest',
+          brand: 'JET',
+          street: 'Str1',
+          place: 'Berlin',
+          lat: 52.55,
+          lng: 13.44,
+          e10: 1.749,
+          dist: 3.0,
+        ),
+        _stationFixture(
+          id: 'de-mid',
+          brand: 'Shell',
+          street: 'Str2',
+          place: 'Berlin',
+          lat: 52.53,
+          lng: 13.42,
+          e10: 1.819,
+          dist: 1.5,
+        ),
+      ];
+
+      final result = await builder.build();
+
+      final byId = {for (final s in result.stations) s['id']: s};
+      expect(byId['de-far-cheapest']!['isCheapest'], isTrue,
+          reason: 'the lowest-price row must be flagged regardless of '
+              'its distance rank');
+      expect(byId['de-near-expensive']!['isCheapest'], isFalse);
+      expect(byId['de-mid']!['isCheapest'], isFalse);
+      // Exactly one cheapest in this set (no ties).
+      expect(
+        result.stations.where((s) => s['isCheapest'] == true).length,
+        1,
+      );
+    });
+
+    test('#2600 — when no row has a price, none is flagged cheapest',
+        () async {
+      await settings.putSetting(StorageKeys.userPositionLat, 52.5200);
+      await settings.putSetting(StorageKeys.userPositionLng, 13.4050);
+      profiles.activeProfileJson = {
+        'id': 'p1',
+        'name': 'EV',
+        'preferredFuelType': 'electric',
+        'defaultSearchRadius': 10.0,
+      };
+      // Electric profile → Station.priceFor returns null → no priced rows.
+      stationService.stationsToReturn = [
+        _stationFixture(
+          id: 'de-0',
+          brand: 'Shell',
+          street: 'Str0',
+          place: 'Berlin',
+          lat: 52.52,
+          lng: 13.40,
+          e10: 1.799,
+        ),
+      ];
+
+      final result = await builder.build();
+
+      expect(result.stations, hasLength(1));
+      expect(result.stations.first['isCheapest'], isFalse);
+    });
+
     test('uses the active profile radius and fuel type (not hardcoded)',
         () async {
       await settings.putSetting(StorageKeys.userPositionLat, 52.5200);
