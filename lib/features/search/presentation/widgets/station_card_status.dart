@@ -53,6 +53,7 @@ class _StationDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final titleText = hasBrand ? station.brand : station.street;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +71,7 @@ class _StationDetails extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: Spacing.xs),
         Text(
           hasBrand
               ? '${station.street}, ${station.postCode} ${station.place}'
@@ -81,15 +82,14 @@ class _StationDetails extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: Spacing.xs),
         Row(
           children: [
-            Flexible(
-              child: Text(
-                PriceFormatter.formatDistance(station.dist),
-                style: theme.textTheme.bodySmall,
-                overflow: TextOverflow.ellipsis,
-              ),
+            // #2622 — distance gets priority in this cramped row; the
+            // timestamp (Flexible) is what wraps/ellipsises first.
+            Text(
+              PriceFormatter.formatDistance(station.dist),
+              style: theme.textTheme.bodySmall,
             ),
             if (station.updatedAt != null) ...[
               const SizedBox(width: 8),
@@ -98,12 +98,16 @@ class _StationDetails extends StatelessWidget {
                 size: 12,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(width: 2),
+              const SizedBox(width: Spacing.xs),
               Flexible(
                 child: Text(
-                  station.updatedAt!,
+                  // #2622 — wrap the upstream pre-formatted timestamp as
+                  // "Updated {time}" so it reads as freshness, not a bare
+                  // code. (No relative "2h ago": updatedAt is a lossy,
+                  // per-country pre-formatted String.)
+                  l10n?.stationUpdatedLabel(station.updatedAt!) ??
+                      'Updated ${station.updatedAt!}',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 11,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,

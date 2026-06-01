@@ -380,6 +380,37 @@ void main() {
       );
     });
 
+    testWidgets(
+        '#2622 — last-updated timestamp reads as "Updated {time}", not a '
+        'bare code', (tester) async {
+      const updatedStation = Station(
+        id: 'updated-test',
+        name: 'Test Station',
+        brand: 'TEST',
+        street: 'Teststr.',
+        postCode: '12345',
+        place: 'Teststadt',
+        lat: 52.0,
+        lng: 13.0,
+        dist: 1.0,
+        e10: 1.799,
+        isOpen: true,
+        updatedAt: '10:30',
+      );
+
+      await pumpApp(
+        tester,
+        const StationCard(
+          station: updatedStation,
+          selectedFuelType: FuelType.e10,
+        ),
+      );
+
+      expect(find.textContaining('Updated 10:30'), findsOneWidget);
+      // The bare timestamp on its own must not appear.
+      expect(find.text('10:30'), findsNothing);
+    });
+
     testWidgets('renders amenity chips on single horizontal line', (
       tester,
     ) async {
