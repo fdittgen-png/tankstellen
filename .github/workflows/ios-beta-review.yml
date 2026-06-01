@@ -1,0 +1,101 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: iOS Beta App Review Info
+
+# Push the localized Beta App Review test info (App-Review contact block plus
+# the per-locale feedback email + beta-app description) to App Store Connect
+# ahead of an external TestFlight build, so the FIRST 'extern' build clears
+# Beta App Review without manual data entry. No build, no upload, no Xcode —
+# a pure App Store Connect API mutation, so it runs on the cheap ubuntu-latest
+# runner. `workflow_dispatch` ONLY: this is an outward-facing live ASC mutation
+# triggered by hand (or the orchestrator), never automatically.
+#
+# Auth reuses the App Store Connect API key exactly like `ios-testers.yml`:
+# the base64 secret is decoded to a temp .p8 and exported as
+# ASC_API_KEY_FILEPATH, which the Fastfile's `asc_api_key` helper picks up.
+#
+# BLOCKER: the App-Review contact phone is mandatory and never fabricated —
+# set the BETA_CONTACT_PHONE repository secret before running this workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      contact_first:
+        description: 'App-Review contact first name (optional — overrides BETA_CONTACT_FIRST secret / Florian default)'
+        required: false
+        type: string
+        default: ''
+      contact_last:
+        description: 'App-Review contact last name (optional — overrides BETA_CONTACT_LAST secret / Dittgen default)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-beta-review
+  cancel-in-progress: false
+
+jobs:
+  configure-beta-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Decode App Store Connect API key
+        # Copied verbatim from ios-testers.yml: decode the base64 secret to a
+        # temp .p8 and export ASC_API_KEY_FILEPATH so the Fastfile's
+        # `asc_api_key` helper consumes the on-disk key.
+        env:
+          ASC_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          if [ -z "$ASC_KEY_BASE64" ]; then
+            echo "::error::APP_STORE_CONNECT_API_KEY_BASE64 secret is not set." >&2
+            exit 1
+          fi
+          KEY_PATH="$RUNNER_TEMP/asc-api-key.p8"
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$KEY_PATH"
+          echo "ASC_API_KEY_FILEPATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: fastlane configure_beta_review
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          # ASC_API_KEY_FILEPATH was exported by the decode step above.
+          # The App-Review contact phone is MANDATORY — the lane bails clearly
+          # (and never fabricates one) when this secret is unset.
+          BETA_CONTACT_PHONE: ${{ secrets.BETA_CONTACT_PHONE }}
+          # Workflow-dispatch inputs (if given) override the secrets / defaults.
+          BETA_CONTACT_FIRST: ${{ inputs.contact_first != '' && inputs.contact_first || secrets.BETA_CONTACT_FIRST || '' }}
+          BETA_CONTACT_LAST: ${{ inputs.contact_last != '' && inputs.contact_last || secrets.BETA_CONTACT_LAST || '' }}
+          FASTLANE_DISABLE_COLORS: '1'
+        run: bundle exec fastlane configure_beta_review
+
+      - name: Clean up decoded API key
+        if: always()
+        run: rm -f "$ASC_API_KEY_FILEPATH"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## iOS Beta App Review Info"
+            echo ""
+            echo "- **Bundle ID:** de.tankstellen.tankstellen"
+            echo "- **Locales:** en-US, fr-FR, de-DE, es-ES, it-IT, pt-PT"
+            echo "- **Trigger:** ${{ github.event_name }}"
+            echo ""
+            echo "> Sets the App-Review contact block + per-locale feedback email"
+            echo "> and beta-app description so the first external build clears"
+            echo "> Beta App Review with no manual data entry."
+          } >> "$GITHUB_STEP_SUMMARY"
