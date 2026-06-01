@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/responsive_search_layout.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -17,6 +20,7 @@ import '../../../ev/domain/entities/charging_station.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../providers/ev_charging_service_provider.dart';
+import '../../providers/ev_search_provider.dart';
 import '../../providers/station_rating_provider.dart';
 import '../widgets/ev_station_header_card.dart';
 import '../widgets/ev_station_info_cards.dart';
@@ -38,7 +42,31 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   @override
   void initState() {
     super.initState();
+    // Render the station as passed immediately (no spinner regression),
+    // then layer on any country-authoritative price/access signal (#2632).
+    // The IRVE enricher only fires on FR coordinates and is otherwise a
+    // no-op, so this is free off-France. It runs on EVERY open path —
+    // map-marker, favorite rehydrate, deep-link — not just the search-list
+    // tap (the only seam that was enriched before #2632), so the free /
+    // paid badge surfaces wherever the detail screen is opened.
     _station = widget.station;
+    _enrichOnOpen();
+  }
+
+  /// One-shot enrich of the opened station with the country-authoritative
+  /// price/access signal (#2632). Best-effort: the enricher never throws,
+  /// but we degrade defensively to the passed station on any failure so a
+  /// transient IRVE outage can never blank the detail screen.
+  Future<void> _enrichOnOpen() async {
+    try {
+      final enricher = ref.read(evPriceEnricherProvider);
+      final enriched = (await enricher.enrich([widget.station])).first;
+      if (mounted) setState(() => _station = enriched);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'EVStationDetailScreen: enrich on open',
+      }));
+    }
   }
 
   Future<void> _refreshStation() async {
@@ -60,7 +88,15 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
       final ocmId = _station.id.replaceFirst('ocm-', '');
       final refreshed = result.data.where((s) => s.id == _station.id || s.id == 'ocm-$ocmId').firstOrNull;
       if (refreshed != null && mounted) {
-        setState(() => _station = refreshed);
+        // Re-apply the same country-authoritative enrich the open path uses
+        // (#2632). The raw OCM re-fetch carries null UsageType / no IRVE
+        // flag, so a plain `_station = refreshed` here STRIPPED the badge
+        // a search-list open had shown. Inside the try/catch, so an IRVE
+        // outage degrades to the raw refreshed station rather than blanking.
+        final enriched =
+            (await ref.read(evPriceEnricherProvider).enrich([refreshed])).first;
+        if (!mounted) return;
+        setState(() => _station = enriched);
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showSuccess(context, l10n?.evStatusUpdated ?? 'Status updated');
       } else if (mounted) {
@@ -125,9 +161,12 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
               // and the isFavoriteProvider has flipped. Otherwise a quick
               // back-navigation can cancel the in-flight Hive write and
               // leave the favorite half-persisted (#566).
+              // Persist the ALREADY-ENRICHED `_station` (not the raw
+              // `widget.station`) so a later rehydrate of the favorite keeps
+              // the IRVE free/paid signal that initState enriched in (#2632).
               await ref.read(favoritesProvider.notifier).toggle(
                     station.id,
-                    rawJson: station.toJson(),
+                    rawJson: _station.toJson(),
                   );
               if (!context.mounted) return;
               // Temporary diagnostic: surface live storage counts in the
