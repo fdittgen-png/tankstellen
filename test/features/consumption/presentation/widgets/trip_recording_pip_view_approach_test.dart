@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
@@ -202,7 +203,7 @@ void main() {
       expect(find.text('Carrefour Pézenas'), findsNothing);
     });
   });
-  group('TripRecordingPipView (#2094) — context-adaptive primary', () {
+  group('TripRecordingPipView (#2094/#2601) — consumption-framed hero', () {
     Widget buildWith({double? fuelRate, double distance = 12.4}) =>
         _wrap(TripRecordingPipView(
           state: _activeState(
@@ -223,31 +224,43 @@ void main() {
       expect(find.text('elapsed'), findsNothing);
     });
 
-    testWidgets('GPS-only branch — distance ≥ 0.1 km → big distance',
-        (tester) async {
+    testWidgets(
+        '#2601 warm-up — distance ≥ 0.1 km, no estimate → "~" + est caption '
+        '(NOT big distance)', (tester) async {
       await tester.pumpWidget(buildWith(fuelRate: null, distance: 4.0));
-      // Branch 2 — distance is the hero figure.
-      expect(find.text('4.0'), findsOneWidget);
-      expect(find.text('km'), findsOneWidget);
+      // #2601 — the hero stays consumption-framed: a "~" placeholder under
+      // the est. L/100 km caption, never a huge distance.
+      expect(find.text('~'), findsOneWidget);
+      expect(find.text('est. L/100 km'), findsOneWidget);
+      // Distance is demoted to the secondary row (km suffix, not a hero).
+      expect(find.text('4.0 km'), findsOneWidget);
       expect(find.text('L/100 km'), findsNothing);
-      // Pre-#2094 the layout rendered "~" huge; assert that's gone.
-      expect(find.text('~'), findsNothing);
+      // No bare "km" caption hero anymore.
+      expect(find.text('km'), findsNothing);
     });
 
-    testWidgets('pre-roll branch — distance ≈ 0 → big elapsed time',
+    testWidgets(
+        '#2601 warm-up — distance ≈ 0 (pre-roll) → "~" + est caption with '
+        'elapsed in the secondary row (NOT big elapsed — THE BUG)',
         (tester) async {
       await tester.pumpWidget(buildWith(fuelRate: null, distance: 0.0));
-      // Branch 3 — elapsed time is the hero figure with "elapsed"
-      // caption. Default helper uses 8m 32s elapsed.
-      expect(find.text('elapsed'), findsOneWidget);
-      expect(find.text('8m 32s'), findsOneWidget);
+      // #2601 — THE BUG fix: pre-roll no longer leads with huge elapsed.
+      // The hero is the consumption-framed "~" placeholder; elapsed is
+      // demoted to the secondary row. Default helper uses 8m 32s elapsed.
+      expect(find.text('~'), findsOneWidget);
+      expect(find.text('est. L/100 km'), findsOneWidget);
+      expect(find.text('8m 32s'), findsOneWidget); // secondary row
+      // Elapsed is NOT the hero caption anymore.
+      expect(find.text('elapsed'), findsNothing);
       expect(find.text('km'), findsNothing);
       expect(find.text('L/100 km'), findsNothing);
-      expect(find.text('~'), findsNothing);
     });
 
-    testWidgets('elapsed-time formatter reads as a duration, not a clock',
-        (tester) async {
+    testWidgets(
+        'elapsed-time formatter reads as a duration, not a clock '
+        '(secondary row)', (tester) async {
+      // The formatter shapes still render — now in the warm-up branch's
+      // secondary row rather than as the hero.
       // Hour-plus shape drops seconds.
       await tester.pumpWidget(_wrap(TripRecordingPipView(
         state: _activeState(
@@ -273,15 +286,14 @@ void main() {
     });
 
     testWidgets(
-        'real-trip life-cycle — pre-roll → GPS-only → OBD2 adapts the '
-        'primary slot one transition at a time', (tester) async {
+        'real-trip life-cycle — warm-up → warm-up → OBD2 keeps the hero '
+        'consumption-framed at every step (#2601)', (tester) async {
       // Walks the widget through the natural sequence a real trip
       // produces: start parked (pre-roll, 0 km, no fuel rate), drive a
       // bit on GPS only (distance > 0.1 km, still no fuel rate),
       // adapter finally connects mid-trip (fuel rate becomes
-      // available). The big-slot caption must adapt at each step
-      // without any branch ever rendering the `~` placeholder huge
-      // that #2094 set out to kill.
+      // available). The hero must stay CONSUMPTION-framed at every step —
+      // never a huge elapsed/distance (#2601).
       Future<void> pumpAt({
         double distance = 0,
         double? fuelRate,
@@ -300,28 +312,27 @@ void main() {
       }
 
       // T = 0 — engine on, GPS still warming up, no fuel rate.
-      // Branch 3: elapsed time is the hero.
+      // #2601 warm-up: "~" hero under the est caption, elapsed secondary.
       await pumpAt(distance: 0, fuelRate: null);
-      expect(find.text('elapsed'), findsOneWidget);
-      expect(find.text('km'), findsNothing);
+      expect(find.text('~'), findsOneWidget);
+      expect(find.text('est. L/100 km'), findsOneWidget);
+      expect(find.text('42s'), findsOneWidget); // secondary row
+      expect(find.text('elapsed'), findsNothing,
+          reason: '#2601 — the hero must never be elapsed time');
       expect(find.text('L/100 km'), findsNothing);
-      expect(find.text('~'), findsNothing,
-          reason:
-              'the `~` placeholder pre-#2094 wasted the whole tile — '
-              'no branch should render it');
 
       // T = 30 s — moved 0.5 km on GPS, still no OBD2 adapter.
-      // Branch 2: distance is the hero.
+      // Still warm-up: "~" hero, distance demoted to the secondary row.
       await pumpAt(
         distance: 0.5,
         fuelRate: null,
         elapsed: const Duration(seconds: 30),
       );
-      expect(find.text('0.5'), findsOneWidget);
-      expect(find.text('km'), findsOneWidget);
-      expect(find.text('elapsed'), findsNothing);
+      expect(find.text('~'), findsOneWidget);
+      expect(find.text('est. L/100 km'), findsOneWidget);
+      expect(find.text('0.5 km'), findsOneWidget); // secondary row
+      expect(find.text('km'), findsNothing);
       expect(find.text('L/100 km'), findsNothing);
-      expect(find.text('~'), findsNothing);
 
       // T = 5 min — adapter connected, fuel-rate sample landed.
       // Branch 1: L/100 km takes the hero slot.
@@ -335,7 +346,8 @@ void main() {
       // still findable, just no longer the hero caption.
       expect(find.textContaining('4.0'), findsOneWidget);
       expect(find.text('elapsed'), findsNothing);
-      expect(find.text('~'), findsNothing);
+      // The measured value carries no "~" / est caption.
+      expect(find.text('est. L/100 km'), findsNothing);
     });
   });
 
@@ -405,31 +417,36 @@ void main() {
     });
 
     testWidgets(
-        'GPS-only warm-up (null estimate) → falls back to distance/elapsed, '
-        'no "~" or blank', (tester) async {
-      // Estimator hasn't warmed up yet: estimate is null. With distance
-      // ≥ 0.1 km the tile gracefully shows distance (no "~", no blank).
+        'GPS-only warm-up (null estimate) → "~" hero + est caption, distance '
+        'demoted (#2601)', (tester) async {
+      // Estimator hasn't warmed up yet: estimate is null. #2601 keeps the
+      // hero consumption-framed — a "~" under the est caption — with
+      // distance demoted to the secondary row (never a huge distance).
       await tester.pumpWidget(
           buildWith(fuelRate: null, gpsEstimate: null, distance: 1.2));
-      expect(find.text('1.2'), findsOneWidget);
-      expect(find.text('km'), findsOneWidget);
+      expect(find.text('~'), findsOneWidget);
+      expect(find.text('est. L/100 km'), findsOneWidget);
+      expect(find.text('1.2 km'), findsOneWidget); // secondary row
       expect(find.text('L/100 km'), findsNothing);
-      expect(find.textContaining('~'), findsNothing);
+      expect(find.text('km'), findsNothing);
     });
 
     testWidgets(
-        'GPS-only pre-roll (null estimate, distance ≈ 0) → falls back to '
-        'elapsed, no "~"', (tester) async {
+        'GPS-only pre-roll (null estimate, distance ≈ 0) → "~" hero + est '
+        'caption, elapsed demoted (#2601)', (tester) async {
       await tester.pumpWidget(buildWith(
         fuelRate: null,
         gpsEstimate: null,
         distance: 0.0,
         elapsed: const Duration(minutes: 7, seconds: 7),
       ));
-      expect(find.text('7m 7s'), findsOneWidget);
-      expect(find.text('elapsed'), findsOneWidget);
+      // #2601 — pre-roll keeps the consumption-framed hero; elapsed is
+      // demoted to the secondary row instead of leading the tile.
+      expect(find.text('~'), findsOneWidget);
+      expect(find.text('est. L/100 km'), findsOneWidget);
+      expect(find.text('7m 7s'), findsOneWidget); // secondary row
+      expect(find.text('elapsed'), findsNothing);
       expect(find.text('L/100 km'), findsNothing);
-      expect(find.textContaining('~'), findsNothing);
     });
 
     testWidgets('paused GPS-only trip suppresses the estimate', (tester) async {
@@ -447,6 +464,84 @@ void main() {
       )));
       expect(find.textContaining('~'), findsNothing);
       expect(find.text('L/100 km'), findsNothing);
+    });
+  });
+
+  group('TripRecordingPipView (#2601) — approach tap-to-navigate', () {
+    // #2601 — the approach-price tile is tappable: tapping it opens the
+    // station in the user's maps app via NavigationUtils.openInMaps,
+    // which goes through the url_launcher platform channel. We mock that
+    // channel to capture the launched URL (a geo: URI for the station's
+    // coords) without touching a real OS intent.
+    const channel = MethodChannel('plugins.flutter.io/url_launcher');
+    final launchedUrls = <String>[];
+
+    setUp(() {
+      launchedUrls.clear();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'launch' || call.method == 'launchUrl') {
+          final args = call.arguments;
+          final url = args is Map ? args['url'] as String? : args as String?;
+          if (url != null) launchedUrls.add(url);
+          return true;
+        }
+        if (call.method == 'canLaunch') return true;
+        return null;
+      });
+    });
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
+
+    testWidgets(
+        'tapping the approach-price tile launches the station in maps',
+        (tester) async {
+      await tester.pumpWidget(_wrap(TripRecordingPipView(
+        state: _activeState(),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        approachState: const ApproachInRadius(
+          station: _stationE10,
+          distanceMeters: 350,
+        ),
+        fuelType: FuelType.e10,
+      )));
+
+      // The tile carries a navigate Tooltip + a GestureDetector with a
+      // live onTap (the seam wired in #2601).
+      final gesture = tester.widget<GestureDetector>(
+        find.descendant(
+          of: find.byType(Tooltip),
+          matching: find.byType(GestureDetector),
+        ),
+      );
+      expect(gesture.onTap, isNotNull);
+
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pumpAndSettle();
+
+      // openInMaps fired → a geo: URI for the station coordinates.
+      expect(launchedUrls, isNotEmpty,
+          reason: 'tapping the approach tile must open the maps app');
+      expect(launchedUrls.first, startsWith('geo:'));
+      expect(launchedUrls.first, contains('${_stationE10.lat}'));
+      expect(launchedUrls.first, contains('${_stationE10.lng}'));
+    });
+
+    testWidgets('the default L/100 km layout is NOT tappable (no nav seam)',
+        (tester) async {
+      // Only the approach layout navigates; the default layout keeps its
+      // existing non-tappable behavior (#2601 scope guard).
+      await tester.pumpWidget(_wrap(TripRecordingPipView(
+        state: _activeState(),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        approachState: const ApproachIdle(),
+      )));
+      expect(find.byType(GestureDetector), findsNothing);
     });
   });
 }

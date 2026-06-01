@@ -275,10 +275,21 @@ class ApproachDetector {
               ))
           .where((p) => p.$2 <= _config.radiusMeters)
           .toList();
-      if (inRadius.isEmpty) {
+      // #2601 — priced-only surface (same rule as the radar #2583): an
+      // unpriced forecourt has no actionable price for the driver, so it
+      // must never trigger ApproachInRadius/Leaving. Filter to stations
+      // that quote a usable price for the effective fuel before ranking;
+      // the cheapest-ranking (#2299) + nearest-lock logic then operate on
+      // the priced subset only.
+      final fuel = FuelType.fromString(_config.fuelTypeApiValue);
+      final priced = inRadius.where((p) {
+        final price = p.$1.priceFor(fuel);
+        return price != null && price > 0;
+      }).toList();
+      if (priced.isEmpty) {
         _onNoStationInRadius(gps);
       } else {
-        _onStationsInRadius(inRadius);
+        _onStationsInRadius(priced);
       }
     } on Object {
       // Network / chain failure — stay in Polling silently. The next

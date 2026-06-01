@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/services/approach_detector.dart';
+import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -28,9 +29,10 @@ import '../../providers/trip_recording_provider.dart';
 /// On a GPS-only trajet (no OBD2 fuel-rate samples) the big figure is
 /// the live physics estimate rendered as `~X.X L/100 km` once the
 /// estimator has warmed up (#2390 / Epic #2385) — the leading `~` flags
-/// it an estimate per ADR 0012. Before the estimate lands (warm-up /
-/// uncalibrated) the tile gracefully falls back to distance, then
-/// elapsed time, so no information-free placeholder is ever shown.
+/// it an estimate per ADR 0012. Before the estimate lands (warm-up) the
+/// hero stays consumption-FRAMED — a bare `~` under the same "est.
+/// L/100 km" caption (#2601) — so the per-100 km figure always leads;
+/// distance and elapsed are demoted to the secondary row, never the hero.
 ///
 /// The widget is paint-only — it does not own the recording state.
 /// The caller passes in the live [TripRecordingState] and a band
@@ -74,32 +76,27 @@ class TripRecordingPipView extends StatelessWidget {
     return _buildDefaultLayout(context);
   }
 
-  /// Default PiP layout (no approach radius hit) — picks the **most
-  /// informative** metric for the big slot based on what the trajet
-  /// has produced so far (#2094 + #2390). Four branches, priority order:
+  /// Default PiP layout (no approach radius hit) — the hero slot is
+  /// **always consumption** (#2601): measured L/100 km, a live estimate,
+  /// or a warm-up placeholder. The user repeatedly asked for the per-100
+  /// km figure to lead, so elapsed (and distance) never take the hero —
+  /// they live in the secondary row. Three consumption states, in order:
   ///
-  /// 1. **OBD2 live fuel rate available** → huge L/100 km (or L/h on
-  ///    idle). Secondary row: distance + elapsed.
-  /// 2. **GPS-only with a live estimate** (#2390) → huge **`~X.X`** under
-  ///    the dedicated localized **`est. L/100 km`** caption (#2393), which
-  ///    reads distinctly from the OBD2 branch's bare `L/100 km`. The
-  ///    leading `~` (a literal glyph, not translatable) marks it an
-  ///    estimate per ADR 0012, and the figure block carries an
-  ///    approximate-explanation tooltip + accessibility label (#2393).
-  ///    The figure comes from `gpsEstimatedLPer100Km`, non-null only on a
-  ///    moving GPS-only trajet once the estimator has warmed up.
-  ///    Secondary row: distance + elapsed.
-  /// 3. **GPS-only, no estimate yet, distance ≥ 0.1 km** → huge
-  ///    **distance**. The estimator is still warming up (or the matrix
-  ///    isn't calibrated); distance is the most useful real-time number.
-  ///    Secondary row: elapsed.
-  /// 4. **Pre-roll (distance ≈ 0)** → huge **elapsed time**. The user
-  ///    sees the session is recording while the GPS warms up.
-  ///    Secondary row: empty.
+  /// 1. **OBD2 live fuel rate** → huge L/100 km (or L/h on idle).
+  /// 2. **GPS-only live estimate** (#2390) → huge **`~X.X`** under the
+  ///    dedicated localized **`est. L/100 km`** caption (#2393), distinct
+  ///    from the OBD2 branch's bare `L/100 km`. The leading `~` (a literal
+  ///    glyph) marks it an estimate per ADR 0012; the figure block carries
+  ///    the approximate-explanation tooltip + a11y label. The value comes
+  ///    from `gpsEstimatedLPer100Km` (moving GPS-only trajet, warmed up).
+  /// 3. **Warm-up — no rate, estimate not landed** (#2601) → a bare **`~`**
+  ///    placeholder under the same `est. L/100 km` caption (`~` already
+  ///    reads as "modelled" per ADR 0012, so it reuses the estimate
+  ///    tooltip + semantics).
   ///
-  /// The big `~` placeholder that wasted the tile pre-#2094 is gone —
-  /// no branch renders an information-free symbol huge; the `~` here
-  /// always precedes a real estimate.
+  /// All three demote distance (when ≥ 0.1 km) + elapsed to the secondary
+  /// row. A final `else` crash-guard renders a sane fallback if no live
+  /// reading exists at all (shouldn't happen during an active recording).
   Widget _buildDefaultLayout(BuildContext context) {
     final l = AppLocalizations.of(context);
     final live = state.live;
@@ -142,20 +139,19 @@ class TripRecordingPipView extends StatelessWidget {
         if (distance != null) '${distance.toStringAsFixed(1)} km',
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
-    } else if (distance != null && distance >= 0.1) {
-      // Branch 3 — GPS-only mid-trajet, no estimate yet: distance is the
-      // live signal (graceful fallback while the estimator warms up).
-      bigFigure = distance.toStringAsFixed(1);
-      bigCaption = 'km';
+    } else if (live != null && !paused) {
+      // Branch 3 (#2601) — pre-estimate warm-up: no OBD2 rate, GPS
+      // estimate not landed yet. Keep the hero consumption-FRAMED (never
+      // lead with elapsed). Placeholder glyph under the same "est.
+      // L/100 km" caption; demote distance + elapsed to the secondary
+      // row like the measured branches.
+      bigFigure = '~';
+      bigCaption = l?.tripRecordingPipEstConsumptionCaption ?? 'est. L/100 km';
+      isEstimate = true;
       secondaryRow = [
+        if (distance != null && distance >= 0.1) '${distance.toStringAsFixed(1)} km',
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
-    } else if (elapsed != null) {
-      // Branch 3 — pre-roll: lead with elapsed time so the user
-      // knows the session is recording while GPS warms up.
-      bigFigure = _fmtElapsed(elapsed);
-      bigCaption = l?.tripRecordingPipElapsedCaption ?? 'elapsed';
-      secondaryRow = const <String>[];
     } else {
       // No data at all (shouldn't happen during an active recording,
       // but render a sane fallback rather than crashing).
@@ -288,62 +284,77 @@ class TripRecordingPipView extends StatelessWidget {
         : '—';
     final fuelLabel = fuel.displayName;
 
-    return Material(
-      color: backgroundColor,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  priceText,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 56,
-                    height: 1.0,
-                    fontFeatures: const [FontFeature.tabularFigures()],
+    // #2601 — tap the approach-price tile to navigate to the station in
+    // the user's maps app (reuses NavigationUtils #2546). Only this layout
+    // is tappable; the default L/100 km layout stays non-tappable.
+    final navigateLabel = l?.navigate ?? 'Navigate';
+    return Tooltip(
+      message: navigateLabel,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => NavigationUtils.openInMaps(
+          station.lat,
+          station.lng,
+          label: station.navLabel,
+        ),
+        child: Material(
+          color: backgroundColor,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      priceText,
+                      style: TextStyle(
+                        color: foregroundColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 56,
+                        height: 1.0,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                fuelLabel,
-                style: TextStyle(
-                  color: foregroundColor.withValues(alpha: 0.85),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                station.name.isNotEmpty ? station.name : station.brand,
-                style: TextStyle(
-                  color: foregroundColor.withValues(alpha: 0.95),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (distanceMeters != null) ...[
-                const SizedBox(height: 2),
-                Text(
-                  l?.approachStationDistance(
-                          distanceMeters.toStringAsFixed(0)) ??
-                      '${distanceMeters.toStringAsFixed(0)} m',
-                  style: TextStyle(
-                    color: foregroundColor.withValues(alpha: 0.85),
-                    fontSize: 12,
-                    fontFeatures: const [FontFeature.tabularFigures()],
+                  const SizedBox(height: 2),
+                  Text(
+                    fuelLabel,
+                    style: TextStyle(
+                      color: foregroundColor.withValues(alpha: 0.85),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-              ],
-            ],
+                  const SizedBox(height: 4),
+                  Text(
+                    station.name.isNotEmpty ? station.name : station.brand,
+                    style: TextStyle(
+                      color: foregroundColor.withValues(alpha: 0.95),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (distanceMeters != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      l?.approachStationDistance(
+                              distanceMeters.toStringAsFixed(0)) ??
+                          '${distanceMeters.toStringAsFixed(0)} m',
+                      style: TextStyle(
+                        color: foregroundColor.withValues(alpha: 0.85),
+                        fontSize: 12,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
