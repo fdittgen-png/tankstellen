@@ -139,6 +139,11 @@ class EVChargingService with StationServiceHelpers {
       final statusType = item['StatusType'] as Map<String, dynamic>?;
       final isOperational = statusType?['IsOperational'] as bool? ?? true;
 
+      // Parse the access-cost signal (#2618). OCM already returns this
+      // structured object; we surface its flags + title so the UI can
+      // render a free/paid/membership badge with zero extra network.
+      final usageType = item['UsageType'] as Map<String, dynamic>?;
+
       return ChargingStation(
         id: stationId,
         name: addr['Title']?.toString() ?? operatorName,
@@ -153,6 +158,10 @@ class EVChargingService with StationServiceHelpers {
         totalPoints: (item['NumberOfPoints'] as int?) ?? connectors.length,
         isOperational: isOperational,
         usageCost: item['UsageCost']?.toString(),
+        usageTypeId: (usageType?['ID'] as num?)?.toInt(),
+        usageTypeTitle: usageType?['Title']?.toString(),
+        isPayAtLocation: usageType?['IsPayAtLocation'] as bool?,
+        isMembershipRequired: usageType?['IsMembershipRequired'] as bool?,
         updatedAt: _formatDate(item['DateLastStatusUpdate']?.toString()),
         countryCode: addr['Country']?['ISOCode']?.toString(),
       );

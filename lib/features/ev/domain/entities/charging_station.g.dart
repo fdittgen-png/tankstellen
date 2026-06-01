@@ -62,6 +62,11 @@ _ChargingStation _$ChargingStationFromJson(
   usageCost: json['usageCost'] as String?,
   updatedAt: json['updatedAt'] as String?,
   countryCode: json['countryCode'] as String?,
+  usageTypeId: (json['usageTypeId'] as num?)?.toInt(),
+  usageTypeTitle: json['usageTypeTitle'] as String?,
+  isPayAtLocation: json['isPayAtLocation'] as bool?,
+  isMembershipRequired: json['isMembershipRequired'] as bool?,
+  isFranceIrveEnriched: json['isFranceIrveEnriched'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$ChargingStationToJson(
@@ -87,4 +92,9 @@ Map<String, dynamic> _$ChargingStationToJson(
   'usageCost': instance.usageCost,
   'updatedAt': instance.updatedAt,
   'countryCode': instance.countryCode,
+  'usageTypeId': instance.usageTypeId,
+  'usageTypeTitle': instance.usageTypeTitle,
+  'isPayAtLocation': instance.isPayAtLocation,
+  'isMembershipRequired': instance.isMembershipRequired,
+  'isFranceIrveEnriched': instance.isFranceIrveEnriched,
 };

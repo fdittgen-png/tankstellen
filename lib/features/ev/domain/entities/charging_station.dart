@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
+import 'ev_access_cost.dart';
 import 'opening_hours.dart';
 
 part 'charging_station.freezed.dart';
@@ -234,6 +235,22 @@ abstract class ChargingStation with _$ChargingStation {
     String? usageCost,
     String? updatedAt,
     String? countryCode,
+    // ------------------------------------------------------------------
+    // OCM `UsageType` access-cost signal (#2618). All optional / null by
+    // default so existing callers + the legacy `fromJson` /
+    // `_normalizeChargingStationJson` path are untouched. Classified into
+    // a free/paid/membership badge via [accessCost] —
+    // [EvAccessCost.from] is the single source of truth.
+    // ------------------------------------------------------------------
+    int? usageTypeId,
+    String? usageTypeTitle,
+    bool? isPayAtLocation,
+    bool? isMembershipRequired,
+
+    /// True when [usageCost] / the access flags were enriched from a
+    /// country-authoritative source (France IRVE, #2618) rather than the
+    /// raw OCM record — gates the IRVE attribution line in the UI.
+    @Default(false) bool isFranceIrveEnriched,
   }) = _ChargingStation;
 
   /// Accepts BOTH the legacy `lat`/`lng` naming (pre-#560 search-side
@@ -246,6 +263,19 @@ abstract class ChargingStation with _$ChargingStation {
   /// Whether any connector is currently reported as `available`.
   bool get hasAvailableConnector =>
       connectors.any((c) => c.status == ConnectorStatus.available);
+
+  /// The free/paid/membership access signal derived from OCM's
+  /// `UsageType` object + the indicative [usageCost] text (#2618).
+  /// Pure — delegates to [EvAccessCost.from], the single source of truth
+  /// for the decision rule. Returns [EvAccessCostKind.unknown] (no badge)
+  /// when no signal is present.
+  EvAccessCost get accessCost => EvAccessCost.from(
+        usageTypeId: usageTypeId,
+        usageTypeTitle: usageTypeTitle,
+        isPayAtLocation: isPayAtLocation,
+        isMembershipRequired: isMembershipRequired,
+        usageCost: usageCost,
+      );
 
   /// Highest advertised max power across all connectors.
   double get maxPowerKw => connectors.isEmpty
