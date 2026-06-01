@@ -1,3 +1,7 @@
-WICHTIG — bitte deinstalliere die vorherige Version (Tankstellen / Prix Carburants), bevor du diese installierst. Die neue Version ist mit einem neuen Schlüssel signiert; Android kann nicht direkt aktualisieren.
-
-Willkommen bei Sparkilo — Tankstellen + Prix Carburants jetzt eine App: vereinte Suche Kraftstoff + EV in 17 Ländern, OBD2-Auto-Aufzeichnung, 30-Tage-Preisverlauf, 23 Sprachen.
+Sparkilo — günstigster Sprit + E-Auto laden, jetzt mit besserer ASO und 6 lokalisierten Listings.
+• Offizielle Echtzeitpreise aus 17 Ländern auf einer Karte
+• Günstigster Pin zuerst + beste Routen-Stopps mit Badge
+• Preisalarme, Favoriten (Sprit + Ladesäulen)
+• Verbrauchstracker, Spritrechner und CO₂-Dashboard
+• Freihändiges Fahrtenbuch (OBD2 oder GPS) mit Eco-Coaching
+• Keine Werbung, kein Konto, kein Tracking — Open Source

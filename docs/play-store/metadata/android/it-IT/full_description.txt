@@ -1,0 +1,39 @@
+Basta pagare troppo al distributore. Sparkilo confronta i prezzi del carburante in tempo reale e ti porta al distributore più economico vicino a te — benzina, diesel, GPL, metano, E85 e ricarica per auto elettrica. In 17 paesi, gratis, senza pubblicità, senza account, open source (MIT).
+
+PERCHÉ SPARKILO
+• Prezzi ufficiali da dati aperti, paese per paese — non stime degli utenti.
+• Un unico confronto prezzi per tutti i carburanti e le colonnine, sulla stessa mappa.
+• Prima l'economico: segnaposto colorati dal più economico al più caro, a colpo d'occhio.
+• Privacy prima di tutto: GPS e chiavi API non lasciano mai il dispositivo. Niente pubblicità, niente tracciamento, niente account.
+
+CARBURANTE ECONOMICO VICINO A TE
+• Cerca nelle vicinanze o lungo il percorso: filtri per carburante, raggio, aperto ora, servizi e solo autostrada.
+• Il miglior prezzo del tuo carburante in cima, con un badge "Il più economico" sulla mappa.
+• La modalità percorso trova le soste migliori nel corridoio così la deviazione conviene sempre.
+• Dettaglio completo della stazione: marca, orari, pagamento, distanza e servizi.
+
+AVVISI PREZZO E PREFERITI
+• Avvisi per stazione e per raggio che girano sul dispositivo solo quando sei vicino.
+• Preferiti con più righe di prezzo, più colonnine con kW, connettori e disponibilità.
+
+COSTI E CONSUMI
+• Monitoraggio consumi: livello + autonomia, l/100 km medi, costo al chilometro, spesa totale e storico dei rifornimenti con variazioni in percentuale.
+• Registra i rifornimenti a mano, con OCR del distributore o OCR dello scontrino.
+• Calcolatore del costo del carburante integrato per ogni viaggio.
+• Cruscotto carbonio: costo e CO₂ per lunghezza del tragitto e per velocità.
+
+DIARIO DI VIAGGIO ED ECO-GUIDA
+• Diario di viaggio a mani libere — registrazione automatica via adattatore OBD2 ELM327 o solo GPS.
+• Percorso GPS per viaggio colorato in base all'efficienza, più una mappa di tutti i viaggi.
+• L'eco-guida segnala gli sprechi con istogrammi di acceleratore e giri e confronto mensile.
+
+ALTRO
+• Prezzo in tempo reale all'avvicinamento, widget in home e annunci vocali alla guida.
+• Preset Base / Medio / Completo per dimensionare l'app; supporta più profili.
+• Cruscotto Privacy per vedere, esportare o eliminare tutti i tuoi dati. Sincronizzazione TankSync opzionale.
+
+PAESI SUPPORTATI (dati ufficiali in tempo reale)
+Argentina, Australia, Austria, Cile, Corea del Sud, Danimarca, Francia, Germania, Grecia, Italia, Lussemburgo, Messico, Portogallo, Regno Unito, Romania, Slovenia, Spagna. Ricarica elettrica in tutto il mondo tramite Open Charge Map.
+
+23 lingue. Open source — segnalazioni e contributi benvenuti:
+https://github.com/fdittgen-png/tankstellen

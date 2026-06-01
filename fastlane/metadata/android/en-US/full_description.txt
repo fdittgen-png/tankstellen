@@ -1,47 +1,39 @@
-Sparkilo is a free, open-source fuel and EV charging price comparison app that helps you spend less at the pump and burn less fuel behind the wheel. Built with privacy as a core principle, it contains no ads, no tracking, and no telemetry. Your location never leaves your device unless you explicitly opt into cloud sync.
+Stop overpaying at the pump. Sparkilo compares real-time fuel prices and EV charging across 17 countries and points you to the cheapest station near you — for petrol, diesel, LPG, CNG, E85 and electric. Free, ad-free, no account, open-source (MIT).
 
-FEATURES
+WHY SPARKILO
+• Official open-data prices, country by country — not crowdsourced guesses.
+• One unified search mixes every fuel type and EV chargers on the same map.
+• Cheap pins first: price pins are coloured cheapest-to-priciest at a glance.
+• Privacy-first: your GPS and API keys never leave the device. No ads, no tracking, no account.
 
-Price comparison across 17 countries
-- Real-time fuel prices from official government APIs in Germany (Tankerkoenig/MTS-K), France (Prix Carburants), Austria (Spritpreisrechner), Spain (Geoportal), Italy (MASE/MiSE), Denmark, Portugal (DGEG), United Kingdom (CMA Fuel Finder), Australia (FuelCheck NSW), Slovenia (goriva.si), Luxembourg, South Korea (Opinet), Chile (CNE Bencina en Línea), Greece (Paratiritirio Timon), Romania (Monitorul Prețurilor), Argentina, and Mexico.
-- Interactive map with OpenStreetMap tiles and marker clustering for fast browsing even in dense urban areas.
-- Search by city, postal code, or GPS position with a configurable radius.
-- EV charging stations from OpenChargeMap with connector and power details alongside fuel prices.
+FIND CHEAP FUEL NEAR YOU
+• Search nearby or along your route: filter by fuel type, radius, open-now, amenities and highway-only.
+• Best price for your fuel surfaced first, with a Cheapest badge on the map.
+• Route mode finds the best stops in your travel corridor so a detour always pays off.
+• Full station detail: brand, opening hours, payment, distance and amenities.
 
-Drive smarter, save twice
-- Trip recording with your car's OBD2 adapter (Bluetooth ELM327) for real consumption data.
-- Trajets tab with per-trip statistics, VIN decoding, and fuzzy-training calibration.
-- Fill-up history with receipt OCR for Super U, Carrefour, and generic layouts.
-- Vehicle profiles and per-trip carbon tracking.
+PRICE ALERTS & FAVOURITES
+• Per-station price thresholds and radius alerts that run on-device only when you are nearby.
+• Favourites with multi-price fuel rows, plus EV chargers showing kW, connectors and live availability.
 
-Stay in the know
-- Radius and velocity price alerts with local push notifications when prices drop.
-- Station favorites, price history charts, and best-time-to-fill statistics.
-- Android home-screen widgets for favorites and nearest stations.
-- Cross-border price comparison for routes that cross a national boundary.
+TRACK FUEL COST & CONSUMPTION
+• Consumption tracker: tank level + range, average L/100km, average cost/km, total spent and a fill-up history with percentage deltas.
+• Log fill-ups manually, via pump-display OCR or receipt OCR.
+• Built-in fuel-cost calculator to plan any trip.
+• Carbon dashboard: cost and CO₂ broken down by trip length and speed band.
 
-Privacy-first
-- Location is requested only when actively searching.
-- No account required. No data sent to third parties by default.
-- Works offline for cached results.
-- Full localisation in 23 languages.
+TRIP LOGBOOK & ECO-COACHING
+• Hands-free trip logbook — auto-record over an OBD2 ELM327 adapter or GPS only.
+• Per-trip GPS route coloured by efficiency, plus an all-trips map.
+• Eco-coaching flags wasteful behaviour with throttle and RPM histograms and monthly comparisons.
 
-OPTIONAL CLOUD SYNC (TankSync)
+MORE
+• Approach-station live-price overlay, home-screen widget and voice announcements while driving.
+• Basic / Medium / Full presets right-size the app; multiple profiles supported.
+• Privacy Dashboard to see, export or delete all your data. Optional TankSync cross-device sync.
 
-For users who want to sync favorites, vehicles, fill-ups, and alerts across multiple devices, Sparkilo supports an optional self-hosted Supabase backend called TankSync. You deploy your own instance, enter the URL and anonymous key, and the app syncs to your own server. Full data transparency: view, export, or delete everything at any time from within the app.
+SUPPORTED COUNTRIES (official real-time data)
+Austria, Argentina, Australia, Chile, Denmark, France, Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South Korea, Spain, United Kingdom. EV charging worldwide via Open Charge Map.
 
-Push notifications for price alerts are delivered via ntfy.sh, an open-source push notification service, so no Google Play Services or Firebase are required.
-
-OPEN SOURCE
-
-Sparkilo is licensed under MIT. Full source code, Supabase migration scripts, and deployment documentation are available on GitHub. Contributions and translations are welcome.
-
-SUPPORTED PLATFORMS
-
-- Android (primary target, including Android Auto).
-- Chromebook (via the Android APK).
-- iOS — in development.
-
-TECHNICAL DETAILS
-
-Built with Flutter and Riverpod for state management. All data is stored locally with Hive. Network requests go through a service abstraction layer with automatic fallback chains and caching. The app respects API rate limits and caches responses to minimise network usage.
+23 UI languages. Open source — issues and contributions welcome:
+https://github.com/fdittgen-png/tankstellen

@@ -1,3 +1,7 @@
-IMPORTANT — please uninstall the previous version (Tankstellen / Prix Carburants) before installing this one. The new release is signed with a new key, so Android cannot upgrade in place.
-
-Welcome to Sparkilo — Tankstellen + Prix Carburants are now one app: unified fuel + EV charging search across 17 countries, OBD2 auto-record, 30-day price history, best-time-to-fill predictor, 23 languages.
+Sparkilo — cheapest fuel + EV charging, now with sharper ASO and 6 localised store listings.
+• Compare official real-time prices across 17 countries on one map
+• Cheapest pin first + route best-stops with a Cheapest badge
+• Price alerts, favourites (fuel + EV connectors/availability)
+• Consumption tracker, fuel-cost calculator and Carbon dashboard
+• Hands-free trip logbook (OBD2 or GPS) with eco-coaching
+• Privacy-first: no ads, no account, no tracking — open source

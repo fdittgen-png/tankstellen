@@ -1,9 +1,7 @@
-v5.0.0 — Major release
-• 17 countries supported (added Greece, Romania, Slovenia, Luxembourg, South Korea, Chile)
-• EV charging stations from OpenChargeMap alongside fuel prices
-• Trip recording with OBD2 (Bluetooth ELM327) — real consumption data
-• Fill-up history with receipt OCR (Super U, Carrefour, generic)
-• Radius and velocity price alerts with local notifications
-• Optional self-hosted Supabase sync (TankSync)
-• Android Auto, home-screen widgets, cross-border price comparison
-• 23 languages — privacy-first, no ads, no tracking, MIT-licensed
+Sparkilo — cheapest fuel + EV charging, now with sharper ASO and 6 localised store listings.
+• Compare official real-time prices across 17 countries on one map
+• Cheapest pin first + route best-stops with a Cheapest badge
+• Price alerts, favourites (fuel + EV connectors/availability)
+• Consumption tracker, fuel-cost calculator and Carbon dashboard
+• Hands-free trip logbook (OBD2 or GPS) with eco-coaching
+• Privacy-first: no ads, no account, no tracking — open source

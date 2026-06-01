@@ -1,45 +1,39 @@
-Sparkilo ist eine kostenlose Open-Source-App zum Vergleich von Kraftstoff- und EV-Ladepreisen, die Ihnen hilft, an der Zapfsaeule weniger zu zahlen und am Steuer weniger zu verbrauchen. Datenschutz steht im Mittelpunkt: keine Werbung, kein Tracking, keine Telemetrie. Ihre Standortdaten verlassen niemals Ihr Geraet, es sei denn, Sie aktivieren die optionale Cloud-Synchronisation.
+Schluss mit zu teuer tanken. Sparkilo vergleicht Spritpreise in Echtzeit und führt dich zur günstigsten Tankstelle in der Nähe — für Benzin, Diesel, LPG, CNG, E85 und zum E-Auto laden. In 17 Ländern, kostenlos, werbefrei, ohne Konto, Open Source (MIT).
 
-FUNKTIONEN
+WARUM SPARKILO
+• Offizielle Open-Data-Preise pro Land — keine Crowdsourcing-Schätzungen.
+• Ein Tankstellen-Preisvergleich für alle Kraftstoffe und Ladesäulen auf einer Karte.
+• Günstig zuerst: Preis-Pins von billig nach teuer eingefärbt, auf einen Blick.
+• Datenschutz zuerst: GPS und API-Schlüssel verlassen nie das Gerät. Keine Werbung, kein Tracking, kein Konto.
 
-Preisvergleich in 17 Laendern
-- Echtzeit-Kraftstoffpreise von offiziellen Regierungs-APIs in Deutschland (Tankerkoenig/MTS-K), Frankreich (Prix Carburants), Oesterreich (Spritpreisrechner), Spanien (Geoportal), Italien (MASE/MiSE), Daenemark, Portugal (DGEG), Grossbritannien (CMA Fuel Finder), Australien (FuelCheck NSW), Slowenien (goriva.si), Luxemburg, Suedkorea (Opinet), Chile (CNE Bencina en Linea), Griechenland (Paratiritirio Timon), Rumaenien (Monitorul Preturilor), Argentinien und Mexiko.
-- Interaktive Karte mit OpenStreetMap-Kacheln und Marker-Clustering fuer schnelles Navigieren auch in dichten Stadtgebieten.
-- Suche nach Stadt, Postleitzahl oder GPS-Position mit einstellbarem Radius.
-- EV-Ladestationen von OpenChargeMap mit Stecker- und Leistungsdetails neben den Kraftstoffpreisen.
+BILLIG TANKEN IN DER NÄHE
+• In der Nähe oder entlang der Route suchen: Filter nach Kraftstoff, Umkreis, jetzt geöffnet, Ausstattung und nur Autobahn.
+• Bester Benzinpreis oder Dieselpreis zuerst, mit „Günstigste"-Badge auf der Karte.
+• Routenmodus findet die besten Stopps im Reisekorridor, damit sich der Umweg lohnt.
+• Volle Stationsdetails: Marke, Öffnungszeiten, Zahlung, Entfernung, Ausstattung.
 
-Klueger fahren, doppelt sparen
-- Fahrtaufzeichnung ueber den OBD2-Adapter Ihres Fahrzeugs (Bluetooth ELM327) fuer echte Verbrauchsdaten.
-- Trajets-Tab mit Statistiken pro Fahrt, VIN-Dekodierung und Fuzzy-Trainingskalibrierung.
-- Tank-Historie mit Beleg-OCR fuer Super U, Carrefour und generische Layouts.
-- Fahrzeugprofile und CO2-Berechnung pro Fahrt.
+PREISALARME & FAVORITEN
+• Preisalarme pro Station und im Umkreis, die nur in der Nähe auf dem Gerät laufen.
+• Favoriten mit mehreren Preiszeilen, dazu Ladesäulen mit kW, Steckern und Verfügbarkeit.
 
-Informiert bleiben
-- Radius- und Geschwindigkeits-Preisalarme mit lokalen Push-Benachrichtigungen bei fallenden Preisen.
-- Favoriten, Preisverlaufs-Diagramme und statistisch optimaler Tankzeitpunkt.
-- Android-Startbildschirm-Widgets fuer Favoriten und naechstgelegene Tankstellen.
-- Grenzueberschreitender Preisvergleich fuer Routen, die eine Landesgrenze queren.
+FAHRTKOSTEN & VERBRAUCHSANALYSE
+• Verbrauchstracker: Tankfüllung + Reichweite, Verbrauch in l/100 km, Kosten pro km, Gesamtausgaben und Tankhistorie mit Prozentdifferenzen.
+• Tankungen manuell, per Zapfsäulen-OCR oder Beleg-OCR erfassen.
+• Integrierter Spritrechner für jede Fahrt.
+• CO₂-Dashboard: Kosten und CO₂ nach Streckenlänge und Geschwindigkeit aufgeschlüsselt.
 
-DATENSCHUTZ
+FAHRTENBUCH & ECO-COACHING
+• Freihändiges Fahrtenbuch — Auto-Aufzeichnung per OBD2 ELM327 oder nur per GPS.
+• GPS-Route je Fahrt nach Effizienz eingefärbt, plus Karte aller Fahrten.
+• Eco-Coaching markiert Spritfresser mit Drosselklappen- und Drehzahl-Histogrammen und Monatsvergleich.
 
-Sparkilo benoetigt die Standortberechtigung nur bei der aktiven Suche. Kein Konto erforderlich. Standardmaessig werden keine Daten an Dritte uebermittelt. Die App funktioniert vollstaendig offline fuer zwischengespeicherte Ergebnisse. Vollstaendige Lokalisierung in 23 Sprachen.
+MEHR
+• Live-Preis-Overlay bei Annäherung, Homescreen-Widget und Sprachansagen während der Fahrt.
+• Presets Basic / Medium / Voll passen die App an; mehrere Profile möglich.
+• Privacy-Dashboard zum Ansehen, Exportieren oder vollständigen Löschen aller Daten. Optionale TankSync-Synchronisation.
 
-OPTIONALE CLOUD-SYNCHRONISATION (TankSync)
+UNTERSTÜTZTE LÄNDER (offizielle Echtzeitdaten)
+Argentinien, Australien, Chile, Dänemark, Deutschland, Frankreich, Griechenland, Italien, Luxemburg, Mexiko, Österreich, Portugal, Rumänien, Slowenien, Spanien, Südkorea, Vereinigtes Königreich. E-Auto laden weltweit über Open Charge Map.
 
-Fuer Benutzer, die Favoriten, Fahrzeuge, Tankungen und Alarme geraeteuebergreifend synchronisieren moechten, unterstuetzt Sparkilo ein optionales selbst gehostetes Supabase-Backend namens TankSync. Sie betreiben Ihre eigene Instanz, geben URL und anonymen Schluessel ein, und die App synchronisiert Ihre Daten auf Ihren eigenen Server. Volle Datentransparenz: Sie koennen jederzeit alles einsehen, exportieren oder loeschen.
-
-Push-Benachrichtigungen fuer Preisalarme werden ueber ntfy.sh geliefert, einen Open-Source-Push-Benachrichtigungsdienst, sodass keine Google Play Services oder Firebase erforderlich sind.
-
-OPEN SOURCE
-
-Sparkilo ist unter MIT lizenziert. Der vollstaendige Quellcode, Supabase-Migrationsskripte und die Deployment-Dokumentation sind auf GitHub verfuegbar. Beitraege und Uebersetzungen sind willkommen.
-
-UNTERSTUETZTE PLATTFORMEN
-
-- Android (primaere Zielplattform, einschliesslich Android Auto).
-- Chromebook (ueber Android-APK).
-- iOS — in Entwicklung.
-
-TECHNISCHE DETAILS
-
-Entwickelt mit Flutter und Riverpod fuer State Management. Alle Daten werden lokal mit Hive gespeichert. Netzwerkanfragen laufen ueber eine Service-Abstraktionsschicht mit automatischen Fallback-Ketten und Caching. Die App respektiert API-Ratenlimits und cached Antworten, um den Netzwerkverbrauch zu minimieren.
+23 Sprachen. Open Source — Tickets und Beiträge willkommen:
+https://github.com/fdittgen-png/tankstellen

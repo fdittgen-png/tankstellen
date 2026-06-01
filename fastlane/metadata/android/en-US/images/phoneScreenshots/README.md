@@ -3,26 +3,29 @@
   SPDX-License-Identifier: MIT
 -->
 
-# Phone screenshots — en-US
+# Phone screenshots
 
-Drop 8 PNGs (1080x1920 preferred) in this directory with the filenames
-below. Fastlane Supply uploads them in numerical order.
+Eight JPGs (1080x2316 portrait) live in this directory. Fastlane Supply
+uploads them in numerical order. The same curated set is mirrored across
+every locale (the UI is localised at runtime) and into
+`docs/play-store/metadata/android/<locale>/images/phoneScreenshots/`.
 
 | File | Scene |
 |------|------|
-| `01_search_results.png` | Search results list with cheapest-price badge |
-| `02_map_view.png` | Map view with marker clusters |
-| `03_station_detail.png` | Station detail with price history chart |
-| `04_favorites.png` | Favorites tab |
-| `05_ev_station.png` | EV charging station detail (connectors + power) |
-| `06_consumption_log.png` | Trajets / consumption log with per-trip stats |
-| `07_price_alerts.png` | Radius + velocity alert settings |
-| `08_widget_home.png` | Android home-screen widget on a home screen |
+| `01_search_results.jpg` | Unified nearby search results with price |
+| `02_map_price_pins.jpg` | Map with cheap→expensive price pins / route |
+| `03_route_best_stops.jpg` | Route-corridor best stops with Cheapest badge |
+| `04_favorites.jpg` | Favourites — fuel multi-price rows + EV chargers |
+| `05_price_alerts.jpg` | Per-station + radius price alerts |
+| `06_consumption_stats.jpg` | Consumption tracker (L/100km, cost/km, history) |
+| `07_trip_detail_gps.jpg` | Trip detail with GPS route coloured by efficiency |
+| `08_privacy_dashboard.jpg` | Privacy Dashboard (see / export / delete-all) |
 
-**These are temporary placeholders until real captures land.** Replace
-each file one-for-one; the filenames are the stable contract. After
-replacement, delete this README or update the table if the screen set
-changes.
+**Caveat:** these captures carry the device status bar with a stray
+"YouTube" / "Line 1" media notification. They are usable for an interim
+listing, but clean recaptures or device-framed mockups are recommended
+before the final store upload. Replace each file one-for-one; the
+filenames are the stable contract.
 
-See `docs/guides/PLAY-STORE-LISTING-REFRESH.md` for the full
-production plan and the de-DE / fr-FR localisation strategy.
+See `docs/guides/PLAY-STORE-LISTING-REFRESH.md` for the full production
+plan.
