@@ -40,7 +40,13 @@ BETA_APP_DESCRIPTIONS = {
   "fr-FR" => "Arrêtez de payer trop cher à la pompe. Sparkilo compare les prix carburant en temps réel et vous guide vers la station la moins chère près de vous — essence, gazole, GPL, GNV, E85 et recharge de voiture électrique. Dans 17 pays, gratuit, sans pub, sans compte, open source (MIT).",
   "de-DE" => "Schluss mit zu teuer tanken. Sparkilo vergleicht Spritpreise in Echtzeit und führt dich zur günstigsten Tankstelle in der Nähe — für Benzin, Diesel, LPG, CNG, E85 und zum E-Auto laden. In 17 Ländern, kostenlos, werbefrei, ohne Konto, Open Source (MIT).",
   "es-ES" => "Deja de pagar de más en el surtidor. Sparkilo compara los precios del combustible en tiempo real y te lleva a la gasolinera más barata cerca de ti — gasolina, diésel, GLP, GNC, E85 y recarga de coche eléctrico. En 17 países, gratis, sin anuncios, sin cuenta, de código abierto (MIT).",
-  "it-IT" => "Basta pagare troppo al distributore. Sparkilo confronta i prezzi del carburante in tempo reale e ti porta al distributore più economico vicino a te — benzina, diesel, GPL, metano, E85 e ricarica per auto elettrica. In 17 paesi, gratis, senza pubblicità, senza account, open source (MIT).",
+  # App Store Connect's locale code for Italian is "it", NOT "it-IT" (see
+  # fastlane's own supported-locale list, deliver/lib/deliver/languages.rb:
+  # ar-SA ca cs da de-DE … en-US es-ES … fr-FR … it … pt-PT …). All other keys
+  # here (en-US, fr-FR, de-DE, es-ES, pt-PT) appear in that list verbatim. Using
+  # "it-IT" made App Store Connect reject the 5th localization with
+  #   "The 'locale' value is invalid. - /data/attributes/locale" (#2611).
+  "it" => "Basta pagare troppo al distributore. Sparkilo confronta i prezzi del carburante in tempo reale e ti porta al distributore più economico vicino a te — benzina, diesel, GPL, metano, E85 e ricarica per auto elettrica. In 17 paesi, gratis, senza pubblicità, senza account, open source (MIT).",
   "pt-PT" => "Pare de pagar a mais na bomba. O Sparkilo compara os preços dos combustíveis em tempo real e leva-o ao posto mais barato perto de si — gasolina, gasóleo, GPL, GNC, E85 e carregamento de carro elétrico. Em 17 países, grátis, sem publicidade, sem conta, de código aberto (MIT).",
 }.freeze
 
@@ -512,22 +518,45 @@ platform :ios do
 
     # ---- Per-locale Beta App Localizations (feedbackEmail + description).
     # Fetch existing localizations into a {locale => model} map, then patch the
-    # ones that already exist and post the ones that don't.
+    # ones that already exist and post the ones that don't — so a re-run after a
+    # partial failure PATCHes the already-created locales rather than POSTing a
+    # duplicate (the live #2611 run had created en-US/fr-FR/de-DE/es-ES before it
+    # aborted, and they must re-apply as PATCHes on the retry).
     existing = app.get_beta_app_localizations
     by_locale = existing.each_with_object({}) { |loc, acc| acc[loc.locale] = loc }
 
+    # Each locale is patched/posted inside its own begin/rescue so a SINGLE bad
+    # locale (an invalid/unsupported App Store Connect code — the failure mode
+    # that aborted the live #2611 run on the 5th locale) is logged and skipped
+    # while the remaining locales still apply. Future Apple-side locale quirks
+    # thus degrade gracefully instead of taking the whole lane down.
+    failed_locales = []
     BETA_APP_DESCRIPTIONS.each do |locale, description|
       attributes = { feedbackEmail: beta_feedback_email, description: description }
-      if (loc = by_locale[locale])
-        Spaceship::ConnectAPI.patch_beta_app_localizations(localization_id: loc.id, attributes: attributes)
-        UI.success("Updated Beta App Localization for #{locale}.")
-      else
-        Spaceship::ConnectAPI.post_beta_app_localizations(app_id: app.id, attributes: attributes.merge(locale: locale))
-        UI.success("Created Beta App Localization for #{locale}.")
+      begin
+        if (loc = by_locale[locale])
+          Spaceship::ConnectAPI.patch_beta_app_localizations(localization_id: loc.id, attributes: attributes)
+          UI.success("Updated Beta App Localization for #{locale}.")
+        else
+          Spaceship::ConnectAPI.post_beta_app_localizations(app_id: app.id, attributes: attributes.merge(locale: locale))
+          UI.success("Created Beta App Localization for #{locale}.")
+        end
+      rescue => ex
+        failed_locales << locale
+        UI.error("Failed to stage Beta App Localization for #{locale}: #{ex.message}")
+        UI.important("Skipping #{locale} and continuing with the remaining locales.")
       end
     end
 
-    UI.success("Done. Beta App Review test info is staged for #{app.name} (#{BETA_APP_DESCRIPTIONS.keys.join(', ')}).")
+    if failed_locales.empty?
+      UI.success("Done. Beta App Review test info is staged for #{app.name} (#{BETA_APP_DESCRIPTIONS.keys.join(', ')}).")
+    else
+      applied = BETA_APP_DESCRIPTIONS.keys - failed_locales
+      UI.important("Beta App Review test info staged for #{app.name} with " \
+                   "#{applied.join(', ')}; SKIPPED (invalid/rejected locale): " \
+                   "#{failed_locales.join(', ')}. The contact block and the other " \
+                   "locales were applied.")
+    end
   end
 
   desc "Stage App Store text metadata (name/subtitle/keywords/description/etc.)."
