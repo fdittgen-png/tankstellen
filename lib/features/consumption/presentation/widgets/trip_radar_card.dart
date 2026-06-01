@@ -80,11 +80,23 @@ class TripRadarCard extends ConsumerWidget {
       );
     }
 
-    // 2. Fallback — nearest station off the live polling GPS.
+    // 2. Fallback — nearest priced station off the live polling GPS.
+    //
+    // `skipLoadingOnReload: true` routes a *re-run* (the provider goes
+    // AsyncLoading carrying its previous value via copyWithPrevious on
+    // every approach-state tick) back through `data:` with the retained
+    // station — so a rescan KEEPS the last station on screen instead of
+    // blanking it to the "Scanning…" placeholder (#2583). A genuine
+    // FIRST load (no prior value) still falls to `loading:`. The active
+    // scan is signalled by a COLOUR-only tint (`scanning`), never text
+    // and never a blanked row.
     final fallback = ref.watch(nearestStationRadarProvider);
+    final scanning = fallback.isLoading;
     return fallback.when(
+      skipLoadingOnReload: true,
       data: (station) {
         if (station == null) {
+          // A load COMPLETED with no priced station in range.
           return _RadarPlaceholder(
             title: l?.tripRadarClosestStation ?? 'Closest station',
             message: l?.tripRadarNoStationNearby ?? 'No station nearby',
@@ -99,8 +111,12 @@ class TripRadarCard extends ConsumerWidget {
           // in-radius layout's "… m away" caption.
           distanceMeters: station.dist > 0 ? station.dist * 1000.0 : null,
           live: false,
+          // Tint the leading icon while a rescan is in flight, keeping
+          // the retained station fully readable underneath (#2583).
+          scanning: scanning,
         );
       },
+      // FIRST load only (no retained value) — the row is genuinely empty.
       loading: () => _RadarPlaceholder(
         title: l?.tripRadarClosestStation ?? 'Closest station',
         message: l?.tripRadarScanning ?? 'Scanning for nearby stations',
@@ -126,12 +142,18 @@ class _RadarCard extends StatelessWidget {
   /// nearest-station fallback) — drives the leading icon emphasis.
   final bool live;
 
+  /// True while the fallback provider is re-running (a rescan). Signalled
+  /// by a COLOUR tint on the leading icon only — the retained station
+  /// stays fully readable, no text and no blanked row (#2583).
+  final bool scanning;
+
   const _RadarCard({
     required this.title,
     required this.station,
     required this.fuel,
     required this.distanceMeters,
     required this.live,
+    this.scanning = false,
   });
 
   @override
@@ -168,10 +190,15 @@ class _RadarCard extends StatelessWidget {
             station.lng,
             label: station.displayName,
           ),
+          // Leading icon doubles as the (colour-only) scan signal: an
+          // in-radius hit is the primary accent; a fallback rescan
+          // (`scanning`) tints the gas-station glyph to the primary
+          // accent too, so the driver sees the refresh without the row
+          // ever blanking or changing text (#2583).
           leading: Icon(
             live ? Icons.my_location : Icons.local_gas_station,
             size: 28,
-            color: live ? theme.colorScheme.primary : null,
+            color: (live || scanning) ? theme.colorScheme.primary : null,
           ),
           // Overline carries the localised card title; the prominent line
           // is the (data, not ARB) station name + the fuel/distance row.

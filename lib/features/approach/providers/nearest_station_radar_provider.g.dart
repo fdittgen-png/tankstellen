@@ -24,9 +24,12 @@ part of 'nearest_station_radar_provider.dart';
 ///   approach state, so the fallback stays out of the way.
 /// - `null` when the state is [ApproachIdle] / null (no GPS fix yet) —
 ///   the card shows its "scanning" placeholder.
-/// - the nearest [Station] (sorted by distance) for an
-///   [ApproachPolling] fix, or `null` when the search chain returns
-///   nothing in range.
+/// - the nearest [Station] **that has a price for the effective fuel**
+///   (the distance-sorted list filtered to `priceFor(fuel) > 0`) for an
+///   [ApproachPolling] fix, or `null` when nothing in range is priced
+///   for the driver's fuel (#2583). Unpriced nearest stations are
+///   skipped so the card only ever surfaces a station the driver can
+///   actually price-compare — never a `--` placeholder price.
 ///
 /// The lookup mirrors the detector's own `fetchStations` callback
 /// ([approachStateProvider]) — same `searchStations` chain, same
@@ -52,9 +55,12 @@ final nearestStationRadarProvider = NearestStationRadarProvider._();
 ///   approach state, so the fallback stays out of the way.
 /// - `null` when the state is [ApproachIdle] / null (no GPS fix yet) —
 ///   the card shows its "scanning" placeholder.
-/// - the nearest [Station] (sorted by distance) for an
-///   [ApproachPolling] fix, or `null` when the search chain returns
-///   nothing in range.
+/// - the nearest [Station] **that has a price for the effective fuel**
+///   (the distance-sorted list filtered to `priceFor(fuel) > 0`) for an
+///   [ApproachPolling] fix, or `null` when nothing in range is priced
+///   for the driver's fuel (#2583). Unpriced nearest stations are
+///   skipped so the card only ever surfaces a station the driver can
+///   actually price-compare — never a `--` placeholder price.
 ///
 /// The lookup mirrors the detector's own `fetchStations` callback
 /// ([approachStateProvider]) — same `searchStations` chain, same
@@ -81,9 +87,12 @@ final class NearestStationRadarProvider
   ///   approach state, so the fallback stays out of the way.
   /// - `null` when the state is [ApproachIdle] / null (no GPS fix yet) —
   ///   the card shows its "scanning" placeholder.
-  /// - the nearest [Station] (sorted by distance) for an
-  ///   [ApproachPolling] fix, or `null` when the search chain returns
-  ///   nothing in range.
+  /// - the nearest [Station] **that has a price for the effective fuel**
+  ///   (the distance-sorted list filtered to `priceFor(fuel) > 0`) for an
+  ///   [ApproachPolling] fix, or `null` when nothing in range is priced
+  ///   for the driver's fuel (#2583). Unpriced nearest stations are
+  ///   skipped so the card only ever surfaces a station the driver can
+  ///   actually price-compare — never a `--` placeholder price.
   ///
   /// The lookup mirrors the detector's own `fetchStations` callback
   /// ([approachStateProvider]) — same `searchStations` chain, same
@@ -115,4 +124,4 @@ final class NearestStationRadarProvider
 }
 
 String _$nearestStationRadarHash() =>
-    r'9922d973739e0321b79e5ddede5403fa25029a87';
+    r'04dd547eb264fa9dd992356631288e17eb4666fb';
