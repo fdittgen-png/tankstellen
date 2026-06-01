@@ -342,4 +342,45 @@ void main() {
       expect(find.text('Wasteful (≥ 10 L/100km)'), findsOneWidget);
     });
   });
+
+  group('TripPathMapCard — camera framing (#2624)', () {
+    testWidgets(
+        'first paint is framed by MapOptions.initialCameraFit, not a '
+        'post-frame fitCamera', (tester) async {
+      // #2624 — the camera is positioned during the FIRST layout pass via
+      // `MapOptions.initialCameraFit`, mirroring the main map page's
+      // #2398/#2399 fix. The OLD post-frame `fitCamera` jumped the camera
+      // after the first tile fetch had already targeted the fallback
+      // viewport, leaving grey tiles. Asserting `initialCameraFit` is
+      // non-null pins the framing mechanism so a regression to the
+      // post-frame fit fails here.
+      final samples = [
+        _sample(sec: 0, lat: 43.46, lng: 3.43),
+        _sample(sec: 1, lat: 43.47, lng: 3.44),
+        _sample(sec: 2, lat: 43.48, lng: 3.45),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final flutterMap = tester.widget<FlutterMap>(find.byType(FlutterMap));
+      expect(flutterMap.options.initialCameraFit, isNotNull,
+          reason: 'first paint must be framed via initialCameraFit so the '
+              'first tile fetch targets the right viewport (no grey tiles)');
+    });
+
+    testWidgets('single-sample trip still frames via initialCameraFit',
+        (tester) async {
+      // Degenerate bounds (single fix) must not break the framing path —
+      // `_computeBounds` synthesizes a tiny box so `CameraFit.bounds`
+      // centres on the point rather than dividing by zero.
+      final samples = [
+        _sample(sec: 0, lat: 43.46, lng: 3.43),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final flutterMap = tester.widget<FlutterMap>(find.byType(FlutterMap));
+      expect(flutterMap.options.initialCameraFit, isNotNull);
+    });
+  });
 }
