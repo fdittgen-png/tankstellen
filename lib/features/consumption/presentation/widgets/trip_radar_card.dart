@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,10 +11,12 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/effective_approach_state_provider.dart';
-import '../../../approach/providers/nearest_station_radar_provider.dart';
+import '../../../approach/providers/radar_candidate_list_provider.dart';
+import '../../../approach/providers/radar_swipe_provider.dart';
 import '../../../profile/providers/effective_fuel_type_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
+import 'radar_swipe_wrapper.dart';
 
 /// "Closest station" radar card pinned to the TOP of the active
 /// trip-recording column (#2380).
@@ -27,11 +30,17 @@ import '../../../search/domain/entities/station.dart';
 ///    [ApproachInRadius] (or [ApproachLeaving] during the exit grace).
 ///    The card renders that target station + distance, mirroring the
 ///    huge-price PiP layout in `trip_recording_pip_view.dart`.
-/// 2. **Nearest-station fallback** ([nearestStationRadarProvider]) —
+/// 2. **Nearest-station fallback** ([radarCandidateListProvider]) —
 ///    while still approaching ([ApproachPolling]) the detector carries
 ///    the live GPS fix; the fallback reuses it to query the search
-///    chain for the single nearest station so the card isn't empty
-///    before the geo-fence is crossed.
+///    chain for the ranked priced stations so the card isn't empty
+///    before the geo-fence is crossed. The driver can swipe LEFT to
+///    ignore the current station and page to the next-nearest, or
+///    swipe RIGHT to restore the last-ignored one (#2633) — the active
+///    candidate is derived (first ranked station not in the ignore
+///    stack held by [radarSwipeProvider]) and the swipe wiring lives in
+///    [RadarSwipeWrapper]. The in-radius target is a single locked
+///    station and is NOT swipeable.
 ///
 /// When neither yields a station ([ApproachIdle] / null, no GPS fix, or
 /// nothing in range) the card shows a graceful placeholder rather than
@@ -70,9 +79,12 @@ class TripRadarCard extends ConsumerWidget {
     final double? distanceMeters =
         approach is ApproachInRadius ? approach.distanceMeters : null;
 
+    final title = l?.tripRadarClosestStation ?? 'Closest station';
+
     if (inRadiusStation != null) {
-      return _RadarCard(
-        title: l?.tripRadarClosestStation ?? 'Closest station',
+      // The in-radius target is a single locked station — NOT swipeable.
+      return RadarCard(
+        title: title,
         station: inRadiusStation,
         fuel: fuel,
         distanceMeters: distanceMeters,
@@ -80,49 +92,51 @@ class TripRadarCard extends ConsumerWidget {
       );
     }
 
-    // 2. Fallback — nearest priced station off the live polling GPS.
+    // 2. Fallback — ranked priced stations off the live polling GPS, with
+    //    swipe-to-page (#2633).
     //
     // `skipLoadingOnReload: true` routes a *re-run* (the provider goes
     // AsyncLoading carrying its previous value via copyWithPrevious on
     // every approach-state tick) back through `data:` with the retained
-    // station — so a rescan KEEPS the last station on screen instead of
+    // list — so a rescan KEEPS the last station on screen instead of
     // blanking it to the "Scanning…" placeholder (#2583). A genuine
     // FIRST load (no prior value) still falls to `loading:`. The active
     // scan is signalled by a COLOUR-only tint (`scanning`), never text
     // and never a blanked row.
-    final fallback = ref.watch(nearestStationRadarProvider);
+    final fallback = ref.watch(radarCandidateListProvider);
     final scanning = fallback.isLoading;
+    final ignored = ref.watch(radarSwipeProvider).ignoredStationIds;
     return fallback.when(
       skipLoadingOnReload: true,
-      data: (station) {
-        if (station == null) {
+      data: (candidates) {
+        if (candidates.isEmpty) {
           // A load COMPLETED with no priced station in range.
-          return _RadarPlaceholder(
-            title: l?.tripRadarClosestStation ?? 'Closest station',
+          return RadarPlaceholder(
+            title: title,
             message: l?.tripRadarNoStationNearby ?? 'No station nearby',
           );
         }
-        return _RadarCard(
-          title: l?.tripRadarClosestStation ?? 'Closest station',
-          station: station,
+        // Derived current: the first ranked station the driver hasn't
+        // swiped past. `null` when every candidate is ignored (the
+        // exhausted case the wrapper recovers from — never blank, #2583).
+        final current =
+            candidates.firstWhereOrNull((s) => !ignored.contains(s.id));
+        return RadarSwipeWrapper(
+          title: title,
+          candidates: candidates,
+          current: current,
+          ignored: ignored,
           fuel: fuel,
-          // The search chain ships a great-circle distance in `dist`
-          // (km); surface it when present so the row matches the
-          // in-radius layout's "… m away" caption.
-          distanceMeters: station.dist > 0 ? station.dist * 1000.0 : null,
-          live: false,
-          // Tint the leading icon while a rescan is in flight, keeping
-          // the retained station fully readable underneath (#2583).
           scanning: scanning,
         );
       },
       // FIRST load only (no retained value) — the row is genuinely empty.
-      loading: () => _RadarPlaceholder(
-        title: l?.tripRadarClosestStation ?? 'Closest station',
+      loading: () => RadarPlaceholder(
+        title: title,
         message: l?.tripRadarScanning ?? 'Scanning for nearby stations',
       ),
-      error: (_, _) => _RadarPlaceholder(
-        title: l?.tripRadarClosestStation ?? 'Closest station',
+      error: (_, _) => RadarPlaceholder(
+        title: title,
         message: l?.tripRadarNoStationNearby ?? 'No station nearby',
       ),
     );
@@ -132,7 +146,10 @@ class TripRadarCard extends ConsumerWidget {
 /// Station + price row. Mirrors the PiP approach layout's station/price
 /// resolution (`station.priceFor(fuel)` → [PriceFormatter.formatPrice],
 /// name fallback to brand) in the trip screen's card idiom.
-class _RadarCard extends StatelessWidget {
+///
+/// Public (not `_RadarCard`) so [RadarSwipeWrapper] in the sibling file
+/// can render the current candidate inside its `Dismissible` (#2633).
+class RadarCard extends StatelessWidget {
   final String title;
   final Station station;
   final FuelType fuel;
@@ -147,13 +164,21 @@ class _RadarCard extends StatelessWidget {
   /// stays fully readable, no text and no blanked row (#2583).
   final bool scanning;
 
-  const _RadarCard({
+  /// True when the swipe-to-page affordance is available (more than one
+  /// candidate, or something ignored to restore) — surfaces a faint
+  /// `swap_horiz` glyph by the title so the gesture is discoverable
+  /// (#2633). The fallback path sets this; the in-radius path never does.
+  final bool swipeable;
+
+  const RadarCard({
+    super.key,
     required this.title,
     required this.station,
     required this.fuel,
     required this.distanceMeters,
     required this.live,
     this.scanning = false,
+    this.swipeable = false,
   });
 
   @override
@@ -206,7 +231,27 @@ class _RadarCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(title, style: theme.textTheme.bodySmall),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(title, style: theme.textTheme.bodySmall),
+                  if (swipeable) ...[
+                    const SizedBox(width: 6),
+                    // Faint, decorative swipe-available hint — the
+                    // discoverable affordance for the page gesture (#2633).
+                    // Screen-reader users get the same capability via the
+                    // wrapper's customSemanticsActions, so this glyph is
+                    // excluded from the semantics tree.
+                    ExcludeSemantics(
+                      child: Icon(
+                        Icons.swap_horiz,
+                        size: 14,
+                        color: theme.colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
               Text(
                 name.isNotEmpty ? name : title,
                 style: theme.textTheme.titleSmall,
@@ -235,10 +280,14 @@ class _RadarCard extends StatelessWidget {
 
 /// Graceful "scanning" / "no station nearby" placeholder. Keeps the
 /// top slot occupied so the section never flickers in and out.
-class _RadarPlaceholder extends StatelessWidget {
+///
+/// Public so the empty-list branch (and the sibling [RadarSwipeWrapper])
+/// can reuse the same row idiom (#2633).
+class RadarPlaceholder extends StatelessWidget {
   final String title;
   final String message;
-  const _RadarPlaceholder({required this.title, required this.message});
+  const RadarPlaceholder(
+      {super.key, required this.title, required this.message});
 
   @override
   Widget build(BuildContext context) {

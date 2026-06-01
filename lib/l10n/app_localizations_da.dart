@@ -6491,6 +6491,15 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tripRadarNoStationNearby => 'No station nearby';
 
   @override
+  String get tripRadarNoOtherStation => 'No other station nearby';
+
+  @override
+  String get tripRadarIgnoreStation => 'Ignore this station';
+
+  @override
+  String get tripRadarShowPrevious => 'Show previous station';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fastgørelse holder skærmen tændt — bruger mere batteri';
 

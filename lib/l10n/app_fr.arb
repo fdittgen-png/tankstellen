@@ -3572,5 +3572,20 @@
         "example": "France — Prix-Carburants · Spain — Geoportal Gasolineras"
       }
     }
+  },
+  "tripRadarNoOtherStation": "No other station nearby",
+  "@tripRadarNoOtherStation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripRadarIgnoreStation": "Ignore this station",
+  "@tripRadarIgnoreStation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripRadarShowPrevious": "Show previous station",
+  "@tripRadarShowPrevious": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
