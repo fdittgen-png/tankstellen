@@ -30,9 +30,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Pattern that matches a GMS or ML Kit coordinate in `:app:dependencies` output
-# (group:artifact form) and a dexed type descriptor (Lcom/google/...;).
+# (group:artifact form).
 GMS_GRAPH_PATTERN='com\.google\.android\.gms|com\.google\.mlkit'
+# A GMS/ML Kit *type descriptor* anywhere in the dex (definition OR reference).
+# NB: the project's own plugin packages are `com.google_mlkit_*` (underscore) —
+# this `com/google/(android/gms|mlkit)/` pattern (slash after google) never
+# matches those, only the proprietary `com.google.android.gms` / `com.google.mlkit`.
 GMS_DEX_PATTERN='Lcom/google/android/gms/|Lcom/google/mlkit/'
+# A GMS/ML Kit *class definition* (proprietary bytecode actually shipped). dexdump
+# prints `  Class descriptor  : 'Lcom/google/...;'` for every class DEFINED in the
+# dex. This is the authoritative "no proprietary Google code in the APK" test —
+# see the long note at the head of layer B below for why a dangling *reference*
+# (to an absent class) is NOT a failure.
+GMS_DEX_DEF_PATTERN="Class descriptor *: *'Lcom/google/android/gms/|Class descriptor *: *'Lcom/google/mlkit/"
 
 APK_PATH="${1:-}"
 FAILED=0
@@ -91,6 +101,25 @@ fi
 
 if [[ -n "${APK_PATH}" ]]; then
   echo "==> [B] dex bytecode audit — ${APK_PATH}"
+  # WHAT THIS LAYER ASSERTS (#2584):
+  #   The fdroid APK must ship NO proprietary Google code — i.e. no
+  #   `com.google.android.gms.*` / `com.google.mlkit.*` class is DEFINED in the
+  #   dex. We detect that with dexdump's `Class descriptor : 'L…;'` lines.
+  #
+  # WHY A DANGLING *REFERENCE* IS NOT A FAILURE:
+  #   The GMS/ML Kit-bearing plugins (geolocator_android, google_mlkit_*,
+  #   mobile_scanner) compile against compile-only stubs (android/build.gradle.kts,
+  #   #2584). The real classes are absent from the fdroid runtime/dex, but the
+  #   plugins' OWN compiled methods still name those absent types in their
+  #   signatures, leaving dangling type *references* in the dex constant pool.
+  #   Those references are inert: the classes do not exist, and the code that
+  #   would touch them never runs (forceLocationManager=true routes location via
+  #   Android's LocationManager; ML Kit OCR/barcode hit the caught
+  #   MissingPluginException path). It is IMPOSSIBLE to remove the references
+  #   without editing the un-editable upstream plugin sources, and they ship NO
+  #   Google bytecode — so the authoritative criterion is "no class DEFINITION".
+  #   (The release build's R8 shrinks most of them out; the CI debug build keeps
+  #   them. We still print the reference count for visibility.)
   if [[ ! -f "${APK_PATH}" ]]; then
     echo "ERROR: APK not found: ${APK_PATH}" >&2
     exit 2
@@ -130,32 +159,50 @@ if [[ -n "${APK_PATH}" ]]; then
   STRINGS_BIN=""
   command -v strings >/dev/null 2>&1 && STRINGS_BIN="$(command -v strings)"
 
-  DEX_HIT=0
+  # IMPORTANT — SIGPIPE / pipefail safety (the bug that masked #2584):
+  #   `dexdump "$dex" | grep -Eq PATTERN` is FATAL here. `grep -q` exits at the
+  #   first match and closes the pipe; dexdump then dies with SIGPIPE (exit 141);
+  #   under `set -o pipefail` the pipeline's status is dexdump's 141, so an `if`
+  #   takes the ELSE branch on a DIRTY dex — a silent false "clean". (Reproduced
+  #   on macOS bash 3.2.) We therefore NEVER `grep -q` a dexdump pipe: we capture
+  #   the full match set into a variable with a `|| true` guard, then test it.
+  DEX_DEF_HIT=0      # GMS/ML Kit class DEFINITIONS (proprietary code shipped) — FATAL
+  DEX_REF_TOTAL=0    # dangling type REFERENCES (informational only)
   DEX_COUNT=0
   shopt -s nullglob
   for dex in "${WORK_DIR}"/classes*.dex; do
     DEX_COUNT=$((DEX_COUNT + 1))
     if [[ -n "${DEXDUMP_BIN}" ]]; then
-      if "${DEXDUMP_BIN}" "${dex}" 2>/dev/null | grep -Eq "${GMS_DEX_PATTERN}"; then
-        echo "FAIL: GMS/MLKit type references in $(basename "${dex}") (dexdump):" >&2
-        "${DEXDUMP_BIN}" "${dex}" 2>/dev/null | grep -E "${GMS_DEX_PATTERN}" | sort -u | head -40 >&2
-        DEX_HIT=1
+      DUMP="$("${DEXDUMP_BIN}" -d "${dex}" 2>/dev/null || true)"
+      # (a) class DEFINITIONS — the authoritative failure condition.
+      DEFS="$(printf '%s\n' "${DUMP}" | { grep -E "${GMS_DEX_DEF_PATTERN}" || true; } | sort -u)"
+      if [[ -n "${DEFS}" ]]; then
+        echo "FAIL: GMS/ML Kit class DEFINITIONS in $(basename "${dex}") — proprietary code shipped:" >&2
+        # `head` closes the pipe early; under pipefail that would surface a
+        # spurious SIGPIPE from printf, so cap with sed (consumes all input).
+        printf '%s\n' "${DEFS}" | sed -n '1,40p' >&2
+        DEX_DEF_HIT=1
+      fi
+      # (b) dangling references — count for visibility, never a failure.
+      REFS="$(printf '%s\n' "${DUMP}" | { grep -Eo "${GMS_DEX_PATTERN}[A-Za-z0-9/_$]+;" || true; } | sort -u)"
+      if [[ -n "${REFS}" ]]; then
+        DEX_REF_TOTAL=$((DEX_REF_TOTAL + $(printf '%s\n' "${REFS}" | grep -c .)))
       fi
     else
-      # Fallback: raw type descriptors are stored as ASCII strings in the dex.
-      # Prefer `strings`; if absent, scan the binary directly with `grep -a`.
-      # `|| true`: a no-match grep returns 1, which under `set -euo pipefail`
-      # would abort the whole audit on a CLEAN dex. We treat no-match as success
-      # (empty SCAN_OUT) and only fail below when SCAN_OUT is non-empty.
+      # No dexdump: ASCII type descriptors live in the dex as plain strings, but
+      # `strings`/`grep -a` CANNOT distinguish a definition from a reference. We
+      # fall back to the conservative reference scan and FAIL on any hit (the only
+      # safe choice without dexdump); CI's ubuntu-latest always has dexdump, so
+      # this branch is the local-without-SDK degradation only.
       if [[ -n "${STRINGS_BIN}" ]]; then
         SCAN_OUT="$("${STRINGS_BIN}" -a "${dex}" | { grep -E "${GMS_DEX_PATTERN}" || true; } | sort -u | head -40)"
       else
         SCAN_OUT="$({ grep -a -E "${GMS_DEX_PATTERN}" "${dex}" || true; } | sort -u | head -40)"
       fi
       if [[ -n "${SCAN_OUT}" ]]; then
-        echo "FAIL: GMS/MLKit type strings in $(basename "${dex}") (strings fallback):" >&2
+        echo "FAIL: GMS/ML Kit type strings in $(basename "${dex}") (no dexdump — can't tell def from ref, failing conservatively):" >&2
         echo "${SCAN_OUT}" >&2
-        DEX_HIT=1
+        DEX_DEF_HIT=1
       fi
     fi
   done
@@ -166,19 +213,24 @@ if [[ -n "${APK_PATH}" ]]; then
     exit 2
   fi
   if [[ -z "${DEXDUMP_BIN}" ]]; then
-    echo "NOTE: dexdump not found — used 'strings' fallback (set ANDROID_HOME for dexdump)."
+    echo "NOTE: dexdump not found — used the conservative 'strings' reference scan"
+    echo "      (set ANDROID_HOME for the precise class-definition audit)."
+  else
+    echo "INFO: ${DEX_REF_TOTAL} dangling GMS/ML Kit type reference(s) to absent classes (inert; not a failure)."
   fi
-  if [[ "${DEX_HIT}" -eq 0 ]]; then
-    echo "OK: no GMS/MLKit type references in any dex."
+  if [[ "${DEX_DEF_HIT}" -eq 0 ]]; then
+    echo "OK: no GMS/ML Kit class DEFINITIONS in any dex — no proprietary Google code shipped."
   else
     FAILED=1
   fi
 fi
 
 if [[ "${FAILED}" -ne 0 ]]; then
-  echo "==> AUDIT FAILED: the fdroid flavor still references GMS/MLKit." >&2
+  echo "==> AUDIT FAILED: the fdroid flavor ships GMS/ML Kit code (coordinate on the" >&2
+  echo "    runtime classpath, or a proprietary class defined in the dex)." >&2
   exit 1
 fi
 
-echo "==> AUDIT PASSED: fdroid flavor is GMS/MLKit-free."
+echo "==> AUDIT PASSED: fdroid flavor ships no GMS/ML Kit coordinates and no"
+echo "    proprietary com.google.android.gms / com.google.mlkit class definitions."
 exit 0
