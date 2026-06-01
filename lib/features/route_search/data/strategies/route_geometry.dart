@@ -3,7 +3,7 @@
 
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/country/country_bounding_box.dart';
+import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
@@ -80,23 +80,33 @@ int segmentIndexFor(int nearestSampleIdx, double segmentKm) =>
 /// The unique set of ISO 3166-1 alpha-2 country codes the [route]'s
 /// polyline passes through, detected OFFLINE (#2595).
 ///
-/// Walks every vertex of [route.geometry] through the canonical
-/// bounding-box lookup ([countryCodeFromLatLng] →
-/// `CountryServiceRegistry.entryByLatLng`) and collects the non-null
-/// matches. This replaces the previous per-sample-point NETWORK geocode
-/// (`coordinatesToCountryCode`) used to pick a station service: that
-/// call cost a round-trip per point and, on null/timeout, silently fell
-/// back to the active profile's country — so a Pézenas(FR)→Barcelona(ES)
-/// route queried only FR Prix-Carburants and returned an empty Spanish
-/// leg. The bbox lookup is sub-millisecond and never blackholes.
+/// Walks every vertex of [route.geometry] and collects EVERY registered
+/// country whose bounding box contains that vertex, via the
+/// order-independent [CountryServiceRegistry.entriesByLatLng] (#2621) —
+/// NOT the first-match `countryCodeFromLatLng`. Continental boxes overlap:
+/// FR's box (lat 41.0–51.5, lng −5.5–10.0) geographically contains all of
+/// Catalonia, and ES is declared after FR, so a first-match lookup
+/// resolves every Catalonian vertex to FR and silently drops the whole
+/// Spanish leg — a Pézenas→Barcelona route then queried only FR and came
+/// back with zero Spanish stations (#2621). Unioning all matches lets the
+/// shadowed ES through; over-collecting is safe because
+/// `UniformSearchStrategy._runFilterAndSort` drops every station whose
+/// detour from the corridor exceeds the budget, so a FR station fetched
+/// near Barcelona is filtered out while the local ES stations survive.
+///
+/// (This already replaced the original per-sample-point NETWORK geocode
+/// that, on null/timeout, fell back to the active profile's country — the
+/// bbox lookup is sub-millisecond and never blackholes.)
 ///
 /// Returns the codes upper-cased so they collate with profile country
 /// codes regardless of upstream casing.
 Set<String> corridorCountries(RouteInfo route) {
   final codes = <String>{};
   for (final p in route.geometry) {
-    final code = countryCodeFromLatLng(p.latitude, p.longitude);
-    if (code != null) codes.add(code.toUpperCase());
+    for (final entry
+        in CountryServiceRegistry.entriesByLatLng(p.latitude, p.longitude)) {
+      codes.add(entry.countryCode.toUpperCase());
+    }
   }
   return codes;
 }
