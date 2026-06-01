@@ -15,7 +15,7 @@ import 'package:tankstellen/features/search/providers/ignored_stations_provider.
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
-RouteSearchResult _resultWithStations(int count) {
+RouteSearchResult _resultWithStations(int count, {bool isPartial = false}) {
   final stations = <SearchResultItem>[
     for (var i = 0; i < count; i++)
       FuelStationResult(Station(
@@ -40,6 +40,7 @@ RouteSearchResult _resultWithStations(int count) {
       samplePoints: [LatLng(43.48, 3.46)],
     ),
     stations: stations,
+    isPartial: isPartial,
   );
 }
 
@@ -154,6 +155,38 @@ void main() {
       // The header no longer carries the straighten/"Every km" duplicate.
       expect(find.byIcon(Icons.straighten), findsNothing);
       expect(find.textContaining('Every'), findsNothing);
+    });
+
+    testWidgets(
+        '#2630 — a partial result no longer renders the "Searching for more '
+        'stations…" row or its spinner; the summary + All/Best toggle stay',
+        (tester) async {
+      final test = standardTestOverrides();
+
+      await pumpApp(
+        tester,
+        const CustomScrollView(slivers: [RouteResultsView()]),
+        overrides: [
+          ...test.overrides,
+          routeSearchStateProvider.overrideWith(
+            () => _FixedRouteSearch(
+              _resultWithStations(3, isPartial: true),
+            ),
+          ),
+          ignoredStationsProvider.overrideWith(() => _NoIgnoredStations()),
+        ],
+      );
+
+      // The removed partial-results banner and its spinner are gone even
+      // though isPartial is true (the OLD code would have shown both).
+      expect(find.text('Searching for more stations…'), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+
+      // The km · min · station-count summary and the All/Best toggle remain.
+      expect(find.textContaining('306 km'), findsOneWidget);
+      expect(find.textContaining('3 stations'), findsOneWidget);
+      expect(find.text('All stations'), findsOneWidget);
+      expect(find.text('Best stops'), findsOneWidget);
     });
   });
 }
