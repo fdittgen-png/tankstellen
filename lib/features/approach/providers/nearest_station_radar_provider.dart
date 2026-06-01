@@ -1,10 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:collection/collection.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/services/approach_detector.dart';
 import '../../../core/services/service_providers.dart';
+import '../../../core/utils/station_extensions.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
@@ -28,9 +30,12 @@ part 'nearest_station_radar_provider.g.dart';
 ///   approach state, so the fallback stays out of the way.
 /// - `null` when the state is [ApproachIdle] / null (no GPS fix yet) —
 ///   the card shows its "scanning" placeholder.
-/// - the nearest [Station] (sorted by distance) for an
-///   [ApproachPolling] fix, or `null` when the search chain returns
-///   nothing in range.
+/// - the nearest [Station] **that has a price for the effective fuel**
+///   (the distance-sorted list filtered to `priceFor(fuel) > 0`) for an
+///   [ApproachPolling] fix, or `null` when nothing in range is priced
+///   for the driver's fuel (#2583). Unpriced nearest stations are
+///   skipped so the card only ever surfaces a station the driver can
+///   actually price-compare — never a `--` placeholder price.
 ///
 /// The lookup mirrors the detector's own `fetchStations` callback
 /// ([approachStateProvider]) — same `searchStations` chain, same
@@ -61,7 +66,14 @@ Future<Station?> nearestStationRadar(Ref ref) async {
         sortBy: SortBy.distance,
       ),
     );
-    return result.data.isEmpty ? null : result.data.first;
+    // The list is already distance-sorted; surface the nearest station
+    // that actually carries a price for the effective fuel (a non-null,
+    // positive [priceFor]) so the card never shows a `--` price the
+    // driver can't compare (#2583). `null` when none in range is priced.
+    return result.data.firstWhereOrNull((s) {
+      final price = s.priceFor(fuel);
+      return price != null && price > 0;
+    });
   } on Object {
     // Network / chain failure — treat as "no station nearby". The
     // provider re-runs on the next approach-state tick.

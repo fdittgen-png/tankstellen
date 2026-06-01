@@ -1,7 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
@@ -12,6 +15,7 @@ import 'package:tankstellen/features/consumption/presentation/widgets/trip_radar
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:url_launcher_platform_interface/link.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
@@ -242,6 +246,145 @@ void main() {
       await tester.tap(find.byType(ListTile));
       await tester.pump();
       expect(fake.launchedUrls, isEmpty);
+    });
+  });
+
+  // --- #2583: retain last station during rescan (colour-only) ----------------
+  group('TripRadarCard — rescan retention + scanning tint (#2583)', () {
+    testWidgets(
+        'a reload KEEPS the last station (no "Scanning…") + shows the '
+        'scanning tint on the leading icon', (tester) async {
+      // Drive a genuine reload via `container.invalidate`: while the widget
+      // still watches it the FutureProvider re-runs, going AsyncLoading
+      // carrying its previous value. Under skipLoadingOnReload that routes
+      // the retained station back through `data:` while `isLoading` flips
+      // true (the colour-only scan signal). A short async gate keeps the
+      // re-run pending across a single pump so the in-flight frame is
+      // observable.
+      final gate = Completer<void>();
+      var firstRun = true;
+      final container = ProviderContainer(
+        overrides: [
+          effectiveApproachStateProvider.overrideWithValue(null),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.diesel),
+          nearestStationRadarProvider.overrideWith((ref) async {
+            if (firstRun) {
+              firstRun = false;
+              return _pricedStation;
+            }
+            // The reload waits on the gate so the loading frame is visible.
+            await gate.future;
+            return _pricedStation;
+          }),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: TripRadarCard()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // First scan resolved: the station row is up (the diesel price shows).
+      expect(find.text(PriceFormatter.formatPrice(1.659)), findsOneWidget);
+      expect(find.text('Scanning for nearby stations'), findsNothing);
+
+      // Trigger a reload — invalidate so the FutureProvider re-runs
+      // (AsyncLoading carrying the previous value); the gated body keeps it
+      // pending across this pump.
+      container.invalidate(nearestStationRadarProvider);
+      // Force the lazy re-computation to materialise now (the gated body
+      // keeps it pending) so the in-flight loading frame is deterministic.
+      expect(
+        container.read(nearestStationRadarProvider).isLoading,
+        isTrue,
+        reason: 'invalidate puts the provider into a reload (carrying value)',
+      );
+      await tester.pump(); // let the reload propagate (do NOT settle yet)
+
+      // During the in-flight rescan the row STILL shows the last station —
+      // never the "Scanning…" placeholder — and the leading icon is tinted
+      // to the primary "scanning" accent (colour-only signal).
+      expect(find.text('Scanning for nearby stations'), findsNothing);
+      expect(find.text(PriceFormatter.formatPrice(1.659)), findsOneWidget);
+
+      final theme = Theme.of(tester.element(find.byType(ListTile)));
+      final icon = tester.widget<Icon>(
+        find.descendant(
+          of: find.byType(ListTile),
+          matching: find.byIcon(Icons.local_gas_station),
+        ),
+      );
+      expect(icon.color, theme.colorScheme.primary,
+          reason: 'in-flight rescan tints the leading icon (colour signal)');
+
+      // Let the gated reload complete; the tint clears but the station stays.
+      gate.complete();
+      await tester.pumpAndSettle();
+      final settledIcon = tester.widget<Icon>(
+        find.descendant(
+          of: find.byType(ListTile),
+          matching: find.byIcon(Icons.local_gas_station),
+        ),
+      );
+      expect(settledIcon.color, isNull,
+          reason: 'no tint once the rescan completes');
+      expect(find.text(PriceFormatter.formatPrice(1.659)), findsOneWidget);
+    });
+
+    testWidgets(
+        'first-ever load (no prior value) still shows the "Scanning…" '
+        'placeholder', (tester) async {
+      // A never-completing future keeps the AsyncValue in its FIRST loading
+      // state (no retained value) — the genuine cold start.
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            effectiveApproachStateProvider.overrideWithValue(null),
+            effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+            nearestStationRadarProvider.overrideWith(
+              (ref) => Completer<Station?>().future,
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: TripRadarCard()),
+          ),
+        ),
+      );
+      await tester.pump(); // single pump — the future never completes
+
+      expect(find.text('Scanning for nearby stations'), findsOneWidget);
+      // The cold-start placeholder is not tappable.
+      final tile = tester.widget<ListTile>(find.byType(ListTile));
+      expect(tile.onTap, isNull);
+    });
+
+    testWidgets(
+        'a completed scan with NO priced station renders "No station '
+        'nearby"', (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: [
+          effectiveApproachStateProvider.overrideWithValue(null),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+          // Provider already filters to priced-for-fuel; null models "no
+          // priced station in range".
+          nearestStationRadarProvider.overrideWith((ref) async => null),
+        ],
+      );
+
+      expect(find.text('No station nearby'), findsOneWidget);
+      expect(find.text('Scanning for nearby stations'), findsNothing);
     });
   });
 }
