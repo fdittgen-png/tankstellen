@@ -4588,6 +4588,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
 
   @override
+  String get featureLabel_voiceAnnouncements => 'Voice announcements';
+
+  @override
+  String get featureDescription_voiceAnnouncements =>
+      'Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.';
+
+  @override
+  String get featureBlockedEnable_voiceAnnouncements =>
+      'Enable the approach overlay first';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override
@@ -11371,6 +11382,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureDescription_approachOverlay =>
       '⟦Đúřîñǧ á řéçóřđéđ ŧřîƥ, ƒłîƥ ŧĥé ƒłóáŧîñǧ ŧîłé ŧó ŧĥé ƒúéł ŧýƥé\'š çółóúř áñđ šĥóŵ ŧĥé ƥřîçé áš ýóú ñéář á ƒúéł šŧáŧîóñ. ··········································⟧';
+
+  @override
+  String get featureLabel_voiceAnnouncements =>
+      '⟦Ṽóîçé áññóúñçéɱéñŧš ········⟧';
+
+  @override
+  String get featureDescription_voiceAnnouncements =>
+      '⟦Šƥéáķ ñéářƀý çĥéáƥ ƒúéł šŧáŧîóñš áłóúđ áš ýóú đřîṽé, šó ýóú çáñ ķééƥ ýóúř éýéš óñ ŧĥé řóáđ. ································⟧';
+
+  @override
+  String get featureBlockedEnable_voiceAnnouncements =>
+      '⟦Éñáƀłé ŧĥé áƥƥřóáçĥ óṽéřłáý ƒîřšŧ ·············⟧';
 
   @override
   String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';

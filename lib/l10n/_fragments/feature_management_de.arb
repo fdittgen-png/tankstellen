@@ -70,5 +70,8 @@
   "featureLabel_debugMode": "Entwickler-/Debug-Modus",
   "featureDescription_debugMode": "Blendet einen Entwicklerwerkzeuge-Bereich in den Einstellungen ein mit Diagnosefunktionen: Fehlerprotokoll-Export, Test-Benachrichtigungen, ein Test-Alarm-Durchlauf, ein Feature-Flag-Auszug, Caches leeren und Diagnose kopieren.",
   "featureLabel_approachOverlay": "Annäherungs-Overlay",
-  "featureDescription_approachOverlay": "Während einer aufgezeichneten Fahrt wechselt die schwebende Kachel zur Farbe der Kraftstoffsorte und zeigt den Preis an, wenn Sie sich einer Tankstelle nähern."
+  "featureDescription_approachOverlay": "Während einer aufgezeichneten Fahrt wechselt die schwebende Kachel zur Farbe der Kraftstoffsorte und zeigt den Preis an, wenn Sie sich einer Tankstelle nähern.",
+  "featureLabel_voiceAnnouncements": "Sprachansagen",
+  "featureDescription_voiceAnnouncements": "Sagt günstige Tankstellen in der Nähe während der Fahrt laut an, damit Sie den Blick auf der Straße behalten können.",
+  "featureBlockedEnable_voiceAnnouncements": "Aktiviere zuerst das Annäherungs-Overlay"
 }

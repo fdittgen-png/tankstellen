@@ -188,8 +188,12 @@ void main() {
     // stop-side bookend to the connecting view) plus a saving AppBar-title
     // variant — staged save feedback. Pure UI wiring; decomposition still
     // tracked under #2187/#2188/#2190.
+    // #2569 — re-grandfathered 1105 → 1113: a one-line `ref.watch` of the
+    // voice-announcement listener in `build` (keeps the keepAlive listener
+    // mounted while the screen is up) plus its import + an explaining
+    // comment. Pure wiring; decomposition still tracked under #2187/#2188.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1105,
+        1113,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
@@ -262,8 +266,11 @@ void main() {
     // cases (label / description / blocked-enable). Intrinsic per-feature
     // growth in this switch-based section; full decomposition is its own
     // task, so the snapshot tracks the new size.
+    // #2569 — +7 for Feature.voiceAnnouncements's three switch cases
+    // (label / description / blocked-enable). Same intrinsic per-feature
+    // growth in the switch-based section; decomposition still its own task.
     'lib/features/profile/presentation/widgets/feature_management_section.dart':
-        711,
+        718,
     'lib/features/vehicle/domain/entities/vehicle_profile.dart': 453,
     'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 806,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,

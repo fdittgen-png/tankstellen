@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -17,7 +18,9 @@ import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
+import '../../../profile/providers/voice_announcements_enabled_provider.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
+import '../../providers/voice_announcement_settings_provider.dart';
 
 /// Consumption / driving settings group on the profile screen.
 ///
@@ -122,6 +125,13 @@ class DrivingSettingsSection extends ConsumerWidget {
         ),
         if (ref.watch(glideCoachEnabledProvider))
           const _GlideCoachToggleTile(),
+        // #2569 — spoken nearby-cheap-fuel announcements. Visible only
+        // when the `Feature.voiceAnnouncements` flag is effectively on
+        // (it requires the approach overlay, so the gate is false unless
+        // both are enabled). Fits the coaching theme: it is hands-free
+        // driving guidance, like the haptic coaches above.
+        if (ref.watch(voiceAnnouncementsEnabledProvider))
+          const _VoiceAnnouncementsTile(),
 
         // 3. Rewards & savings — the fuel-club entry-point (when
         //    [Feature.loyaltyCards] is on) and the gamification opt-out.
@@ -187,6 +197,107 @@ class _GlideCoachToggleTile extends ConsumerWidget {
           .read(glideCoachSettingsProvider.notifier)
           .setEnabled(v),
       contentPadding: EdgeInsets.zero,
+    );
+  }
+}
+
+/// Voice-announcement settings surface (#2569).
+///
+/// Rendered only when the `Feature.voiceAnnouncements` flag is
+/// effectively enabled (the call site gates visibility via
+/// `if (ref.watch(voiceAnnouncementsEnabledProvider))`). Exposes the
+/// enable toggle plus the three tunables the dormant
+/// `AnnouncementEngine` already reads — cheap-fuel price threshold,
+/// proximity radius, and repeat cooldown — persisted by
+/// [VoiceAnnouncementSettings]. The sliders are shown only while the
+/// toggle is on, so the off-state stays a single compact row.
+class _VoiceAnnouncementsTile extends ConsumerWidget {
+  const _VoiceAnnouncementsTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final config = ref.watch(voiceAnnouncementSettingsProvider);
+    final notifier = ref.read(voiceAnnouncementSettingsProvider.notifier);
+
+    final thresholdLabel = config.priceThreshold != null
+        ? (l?.voiceAnnouncementThreshold(
+                PriceFormatter.formatPrice(config.priceThreshold)) ??
+            'Only below ${PriceFormatter.formatPrice(config.priceThreshold)}')
+        : (l?.voiceAnnouncementsDescription ??
+            'Announce nearby cheap stations while driving');
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SwitchListTile(
+          key: const Key('voiceAnnouncementsToggle'),
+          value: config.enabled,
+          title: Text(l?.voiceAnnouncementsTitle ?? 'Voice Announcements'),
+          subtitle: Text(
+            l?.voiceAnnouncementsDescription ??
+                'Announce nearby cheap stations while driving',
+            style: theme.textTheme.bodySmall,
+          ),
+          onChanged: (v) => notifier.setEnabled(v),
+          contentPadding: EdgeInsets.zero,
+        ),
+        if (config.enabled) ...[
+          // Proximity radius — 0.5 … 5 km in 0.5 km steps.
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              l?.voiceAnnouncementProximityRadius ?? 'Announcement radius',
+              style: theme.textTheme.bodyMedium,
+            ),
+            subtitle: Slider(
+              key: const Key('voiceAnnouncementRadiusSlider'),
+              value: config.proximityRadiusKm.clamp(0.5, 5.0),
+              min: 0.5,
+              max: 5.0,
+              divisions: 9,
+              label: '${config.proximityRadiusKm.toStringAsFixed(1)} km',
+              onChanged: (v) => notifier.setProximityRadiusKm(v),
+            ),
+          ),
+          // Repeat cooldown — 5 … 60 minutes in 5-minute steps.
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              l?.voiceAnnouncementCooldown ?? 'Repeat interval',
+              style: theme.textTheme.bodyMedium,
+            ),
+            subtitle: Slider(
+              key: const Key('voiceAnnouncementCooldownSlider'),
+              value: config.cooldown.inMinutes.clamp(5, 60).toDouble(),
+              min: 5,
+              max: 60,
+              divisions: 11,
+              label: '${config.cooldown.inMinutes} min',
+              onChanged: (v) =>
+                  notifier.setCooldown(Duration(minutes: v.round())),
+            ),
+          ),
+          // Cheap-fuel price threshold — current value shown in the
+          // active currency; the slider spans a sensible per-litre band.
+          ListTile(
+            key: const Key('voiceAnnouncementThresholdTile'),
+            contentPadding: EdgeInsets.zero,
+            title: Text(thresholdLabel, style: theme.textTheme.bodyMedium),
+            subtitle: Slider(
+              key: const Key('voiceAnnouncementThresholdSlider'),
+              value: (config.priceThreshold ?? 2.0).clamp(1.0, 2.5),
+              min: 1.0,
+              max: 2.5,
+              divisions: 30,
+              label: PriceFormatter.formatPrice(config.priceThreshold ?? 2.0),
+              onChanged: (v) => notifier.setPriceThreshold(v),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

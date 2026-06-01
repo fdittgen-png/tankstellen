@@ -4652,6 +4652,17 @@ class AppLocalizationsEl extends AppLocalizations {
       'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
 
   @override
+  String get featureLabel_voiceAnnouncements => 'Voice announcements';
+
+  @override
+  String get featureDescription_voiceAnnouncements =>
+      'Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.';
+
+  @override
+  String get featureBlockedEnable_voiceAnnouncements =>
+      'Enable the approach overlay first';
+
+  @override
   String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';
 
   @override
