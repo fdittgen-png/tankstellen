@@ -93,6 +93,54 @@ void main() {
       );
     });
 
+    test(
+        'a bonded Classic sighting (rssi==0 sentinel, hint=classic) passes '
+        'on the FIRST batch (#2565)', () {
+      // Bluetooth Classic has no RSSI: the bonded-device enumeration pins
+      // it at the 0 sentinel and surfaces it once per scan window. Without
+      // the hint it would have to wait for a 2nd consecutive batch (which
+      // intervening BLE batches keep resetting) — the storm signature.
+      expect(
+        shouldConnectFromScan(
+          lastSuccessfulRssi: null,
+          seenRssi: 0, // Classic bonded sentinel
+          consecutiveBatchesSeen: 1, // seen exactly once
+          transportHint: 'classic',
+        ),
+        isTrue,
+        reason: 'a bonded Classic adapter is in range by construction — '
+            'connect on the first sighting, never wait for a second batch',
+      );
+    });
+
+    test(
+        'the Classic first-batch shortcut does NOT leak into the BLE gate '
+        '(#2565)', () {
+      // A BLE adapter never reports a 0 dBm RSSI, but even if seenRssi were
+      // 0 with a BLE / null hint the legacy gate must still apply (no
+      // baseline + seen once ⇒ skip).
+      expect(
+        shouldConnectFromScan(
+          lastSuccessfulRssi: null,
+          seenRssi: 0,
+          consecutiveBatchesSeen: 1,
+          transportHint: 'ble',
+        ),
+        isFalse,
+        reason: 'the first-batch shortcut is Classic-only — BLE keeps the '
+            'two-consecutive-batches rule',
+      );
+      expect(
+        shouldConnectFromScan(
+          lastSuccessfulRssi: null,
+          seenRssi: 0,
+          consecutiveBatchesSeen: 1,
+          // No transportHint at all — the legacy callers pass none.
+        ),
+        isFalse,
+      );
+    });
+
     test('honours custom thresholds', () {
       // Tighten the window to 5 dBm: a 10 dBm drop now fails the
       // relative gate and, seen once, is skipped.

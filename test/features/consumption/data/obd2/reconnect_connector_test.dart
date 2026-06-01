@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
+import 'package:tankstellen/features/consumption/data/obd2/classic_bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
@@ -151,14 +152,197 @@ void main() {
       expect(connected, isNull);
     });
   });
+
+  group('ReconnectConnector — transport-aware reconnect (#2565)', () {
+    test(
+        "transportHint=='classic' ⇒ attempt() classic-directs FIRST and "
+        'NEVER takes the BLE direct path', () async {
+      // The root cause: a Classic adapter (vLinker FS) was reconnecting over
+      // BLE `channelForDirect` → 4 s timeout storm. The classic-direct path
+      // must run instead, and the BLE direct path must never be touched.
+      final classicChannel = _FakeChannel(respondTo: _elmOk());
+      final classicFake = _FakeClassicFacade(channel: classicChannel);
+      final ble = _FakeFacade(
+        // A non-empty batch + a direct channel: if the classic path ever
+        // fell through to BLE direct / scan it would be observable here.
+        directChannel: _FakeChannel(respondTo: _elmOk()),
+        batches: [
+          [_cand('cc:dd', 0)],
+        ],
+      );
+      Obd2Service? connected;
+      final connector = ReconnectConnector(
+        connection: _build(ble, classic: classicFake),
+        onConnected: (s) => connected = s,
+        transportHint: 'classic',
+      );
+
+      final ok = await connector.attempt('cc:dd');
+
+      expect(ok, isTrue);
+      expect(connected, isNotNull);
+      expect(connected!.linkKind, 'classic');
+      expect(classicFake.channelForCalls, ['cc:dd'],
+          reason: 'reconnect must go over the live (classic) transport');
+      expect(ble.directCalls, 0,
+          reason: 'NEVER the doomed BLE direct path for a classic adapter');
+      expect(ble.scanInvoked, isFalse,
+          reason: 'a successful classic-direct connect must NOT scan');
+      await connected!.disconnect();
+    });
+
+    test(
+        "transportHint=='classic' + classic-direct fails ⇒ goes STRAIGHT to "
+        'the transport-aware scan (no BLE direct attempt)', () async {
+      // Classic-direct init fails (silent channel), so the connector must
+      // fall to the merged BLE+Classic scan. The bonded classic candidate
+      // (rssi==0) passes the gate on the FIRST batch (#2565 RSSI hardening),
+      // and the connect routes through the classic facade. The BLE direct
+      // path must never be attempted.
+      final scanChannel = _FakeChannel(respondTo: _elmOk());
+      final classicFake = _FakeClassicFacade(
+        // First channelFor (direct) is silent → init times out; the scan
+        // path's connect() then builds a fresh channel that answers OK.
+        channels: [
+          _FakeChannel(silent: true), // classic-direct: fails init
+          scanChannel, // scan-path connect: succeeds
+        ],
+        // The bonded classic adapter ('vLinker FS' resolves to the Classic
+        // profile, rssi==0 sentinel) — seen ONCE; the #2565 gate connects it
+        // on the first batch.
+        batches: [
+          [_classicCand('cc:dd')],
+        ],
+      );
+      final ble = _FakeFacade(
+        directChannel: _FakeChannel(respondTo: _elmOk()),
+        batches: const [[]],
+      );
+      Obd2Service? connected;
+      final connector = ReconnectConnector(
+        connection: _build(ble, classic: classicFake),
+        onConnected: (s) => connected = s,
+        transportHint: 'classic',
+      );
+
+      final ok = await connector.attempt('cc:dd');
+
+      expect(ok, isTrue,
+          reason: 'the merged scan recovers the classic adapter');
+      expect(connected, isNotNull);
+      expect(connected!.linkKind, 'classic');
+      expect(ble.directCalls, 0,
+          reason: 'a failed classic-direct must NOT fall to BLE direct — '
+              'straight to the transport-aware scan');
+      expect(classicFake.scanInvoked, isTrue,
+          reason: 'the fallback is the merged BLE+Classic scan');
+      await connected!.disconnect();
+    }, timeout: const Timeout(Duration(seconds: 30)));
+
+    test(
+        "transportHint=='ble' keeps the existing BLE-direct-first path",
+        () async {
+      // Regression-lock: a BLE drop is unchanged — direct GATT first,
+      // never the classic facade.
+      final classicFake = _FakeClassicFacade(channel: _FakeChannel(silent: true));
+      final ble = _FakeFacade(
+        directChannel: _FakeChannel(respondTo: _elmOk()),
+        batches: [
+          [_cand('aa:bb', -55)],
+        ],
+      );
+      Obd2Service? connected;
+      final connector = ReconnectConnector(
+        connection: _build(ble, classic: classicFake),
+        onConnected: (s) => connected = s,
+        transportHint: 'ble',
+      );
+
+      final ok = await connector.attempt('aa:bb');
+
+      expect(ok, isTrue);
+      expect(ble.directCalls, 1,
+          reason: 'BLE drop ⇒ BLE direct first (unchanged)');
+      expect(classicFake.channelForCalls, isEmpty,
+          reason: 'a BLE drop never touches the classic facade');
+      expect(ble.scanInvoked, isFalse);
+      await connected!.disconnect();
+    });
+
+    test(
+        'attemptPassive for a classic drop bounded-retries classic-direct, '
+        'never a BLE autoConnect wait (#2565)', () async {
+      final classicFake = _FakeClassicFacade(channel: _FakeChannel(respondTo: _elmOk()));
+      final ble = _FakeFacade(
+        directChannel: _FakeChannel(respondTo: _elmOk()),
+        batches: const [[]],
+      );
+      Obd2Service? connected;
+      final connector = ReconnectConnector(
+        connection: _build(ble, classic: classicFake),
+        onConnected: (s) => connected = s,
+        transportHint: 'classic',
+      );
+
+      final ok = await connector.attemptPassive('cc:dd');
+
+      expect(ok, isTrue);
+      expect(connected!.linkKind, 'classic');
+      expect(classicFake.channelForCalls, ['cc:dd']);
+      expect(ble.passiveCalls, 0,
+          reason: 'a classic drop must NOT open a BLE autoConnect channel');
+      expect(ble.directCalls, 0);
+      await connected!.disconnect();
+    });
+  });
+}
+
+class _FakeClassicFacade implements ClassicBluetoothFacade {
+  final List<List<Obd2AdapterCandidate>> batches;
+  final ElmByteChannel? channel;
+
+  /// Per-call channel sequence — lets the direct attempt fail (silent) and
+  /// the scan-path connect succeed with a fresh channel.
+  final List<ElmByteChannel>? channels;
+  int _i = 0;
+
+  final List<String> channelForCalls = [];
+  bool scanInvoked = false;
+
+  _FakeClassicFacade({this.batches = const [], this.channel, this.channels});
+
+  @override
+  Stream<List<Obd2AdapterCandidate>> scan({
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {
+    scanInvoked = true;
+    for (final batch in batches) {
+      yield batch;
+    }
+  }
+
+  @override
+  Future<void> stopScan() async {}
+
+  @override
+  ElmByteChannel channelFor(String deviceId) {
+    channelForCalls.add(deviceId);
+    if (channels != null) return channels![_i++];
+    return channel ?? _FakeChannel(silent: true);
+  }
 }
 
 // --- helpers ---------------------------------------------------------
 
-Obd2ConnectionService _build(BluetoothFacade bt) => Obd2ConnectionService(
+Obd2ConnectionService _build(
+  BluetoothFacade bt, {
+  ClassicBluetoothFacade? classic,
+}) =>
+    Obd2ConnectionService(
       registry: Obd2AdapterRegistry.defaults(),
       permissions: _GrantPermissions(),
       bluetooth: bt,
+      classicBluetooth: classic,
     );
 
 Obd2AdapterCandidate _cand(String mac, int rssi) => Obd2AdapterCandidate(
@@ -166,6 +350,16 @@ Obd2AdapterCandidate _cand(String mac, int rssi) => Obd2AdapterCandidate(
       deviceName: 'vLinker FD',
       advertisedServiceUuids: const [],
       rssi: rssi,
+    );
+
+/// A bonded Bluetooth-Classic sighting: the `vLinker FS` name resolves to
+/// the `vlinker-fs-classic` profile, and Classic enumeration carries no
+/// RSSI (the `0` sentinel) (#2565).
+Obd2AdapterCandidate _classicCand(String mac) => Obd2AdapterCandidate(
+      deviceId: mac,
+      deviceName: 'vLinker FS',
+      advertisedServiceUuids: const [],
+      rssi: 0,
     );
 
 Map<String, String> _elmOk() => {

@@ -27,13 +27,27 @@
 /// When [lastSuccessfulRssi] is null (no successful connect recorded
 /// yet this session) there is no relative baseline, so the decision
 /// falls back to the consecutive-batches rule alone.
+///
+/// #2565 — Bluetooth **Classic** has no RSSI: a bonded device is reported by
+/// the OS exactly once per scan window with [seenRssi] pinned at the `0`
+/// sentinel (`ClassicBluetoothFacade` sets `rssi: 0`). Intervening BLE
+/// batches reset the consecutive-batch counter, so a bonded Classic adapter
+/// would never reach the two-consecutive-batches rule — the storm signature.
+/// A bonded sighting is, by definition, in range and reachable, so when
+/// [transportHint] is `'classic'` AND the sentinel RSSI is seen, the gate
+/// passes on the FIRST batch. This is scoped to the Classic transport only —
+/// a real BLE adapter never reports a 0 dBm RSSI, so the BLE gate is unchanged.
 bool shouldConnectFromScan({
   required int? lastSuccessfulRssi,
   required int seenRssi,
   required int consecutiveBatchesSeen,
+  String? transportHint,
   int relativeDropDbm = 15,
   int requiredConsecutiveBatches = 2,
 }) {
+  // #2565 — a bonded Classic sighting (no RSSI; the `0` sentinel) is in range
+  // by construction: connect on the first batch, never wait for a second one.
+  if (transportHint == 'classic' && seenRssi == 0) return true;
   final seenEnoughTimes = consecutiveBatchesSeen >= requiredConsecutiveBatches;
   if (lastSuccessfulRssi == null) return seenEnoughTimes;
   final strongEnough = seenRssi >= lastSuccessfulRssi - relativeDropDbm;

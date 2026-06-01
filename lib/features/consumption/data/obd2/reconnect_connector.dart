@@ -35,6 +35,15 @@ class ReconnectConnector {
   /// swap its service pointer. Fired exactly once per successful attempt.
   final void Function(Obd2Service service) onConnected;
 
+  /// Transport kind of the link that just dropped — `'ble'` / `'classic'`
+  /// (#2565), read off the (dead-but-typed) live service at handle-drop
+  /// time. Drives WHICH direct-connect path [attempt] / [attemptPassive]
+  /// take: a Classic drop reconnects over RFCOMM (the BLE direct path can
+  /// only ever 4 s-timeout for a Classic adapter — the field reconnect-storm
+  /// signature), while `'ble'` / null keep the existing BLE-direct-first
+  /// behaviour unchanged.
+  final String? transportHint;
+
   ResolvedObd2Candidate? _lastCandidate;
   int? _lastSuccessfulRssi;
   var _consecutiveBatchesSeen = 0;
@@ -42,7 +51,14 @@ class ReconnectConnector {
   ReconnectConnector({
     required this.connection,
     required this.onConnected,
+    this.transportHint,
   });
+
+  /// `true` when the live link that dropped was Bluetooth Classic AND a
+  /// Classic facade is wired (#2565). Drives the transport-correct reconnect
+  /// dispatch: a Classic drop must NOT take the BLE direct path.
+  bool get _isClassicDrop =>
+      transportHint == 'classic' && connection.classicBluetooth != null;
 
   /// Strongest-seen candidate from the scan fallback. Exposed for tests.
   ResolvedObd2Candidate? get lastCandidate => _lastCandidate;
@@ -56,14 +72,16 @@ class ReconnectConnector {
   /// failures are logged and surfaced as `false` so the scanner keeps
   /// its backoff schedule.
   Future<bool> attempt(String mac) async {
-    // 1) DIRECT-CONNECT FIRST — no scan. `fallbackToScan: false` keeps
-    //    the service from running its own (ungated) scan fallback, so we
-    //    never double-scan: the single scan below is ours and is gated.
+    // 1) DIRECT-CONNECT FIRST — no scan, over the LIVE transport kind (#2565).
+    //    A Classic drop reconnects over RFCOMM (`connectByMacClassicDirect`);
+    //    a BLE / unknown drop keeps the BLE direct-GATT path (#2245). The BLE
+    //    `channelForDirect` path can only ever 4 s-timeout for a Classic
+    //    adapter (no `channelForDirect` on the Classic facade), so dispatching
+    //    by transport is what de-flaps SPP adapters.
     try {
-      final direct = await connection.connectByMacDirect(
-        mac,
-        fallbackToScan: false,
-      );
+      final direct = _isClassicDrop
+          ? await connection.connectByMacClassicDirect(mac)
+          : await connection.connectByMacDirect(mac, fallbackToScan: false);
       if (direct != null) {
         // A direct connect carries no RSSI (it never scanned), so the
         // relative-RSSI baseline is left as-is — it is only ever set
@@ -79,7 +97,11 @@ class ReconnectConnector {
 
     // 2) SCAN FALLBACK (ultimate). One scan window: track the strongest
     //    sighting + consecutive-batch count, and only connect when the
-    //    relative-RSSI / two-batch gate passes.
+    //    relative-RSSI / two-batch gate passes. The scan merges BLE +
+    //    Classic, so it is transport-aware: a Classic drop reaches its own
+    //    bonded candidate here even after the (skipped-for-classic) BLE
+    //    direct path. The [transportHint] lets the gate accept a bonded
+    //    Classic sighting on the FIRST batch (#2565).
     try {
       await for (final batch in connection.scan()) {
         final seen = batch.where((c) => c.candidate.deviceId == mac);
@@ -100,6 +122,7 @@ class ReconnectConnector {
           lastSuccessfulRssi: _lastSuccessfulRssi,
           seenRssi: candidate.candidate.rssi,
           consecutiveBatchesSeen: _consecutiveBatchesSeen,
+          transportHint: transportHint,
         )) {
           // Too weak AND not yet seen twice — keep scanning this window;
           // a later batch may strengthen or repeat it.
@@ -123,9 +146,18 @@ class ReconnectConnector {
   /// the scanner hits its active-scan miss ceiling it stops burning the
   /// radio and waits on a low-power autoConnect GATT request instead.
   /// Returns `true` once a session is established. Never throws.
+  ///
+  /// #2565 — the passive path is a BLE autoConnect GATT wait, which is
+  /// meaningless for a Classic adapter (the Classic facade has no
+  /// autoConnect, and a BLE `channelForDirect` would only 4 s-timeout). For
+  /// a Classic drop the cheap "wait" is instead a single bounded
+  /// `connectByMacClassicDirect` retry — same paced cadence the scanner
+  /// drives, but over the transport that can actually reconnect.
   Future<bool> attemptPassive(String mac) async {
     try {
-      final svc = await connection.connectByMacPassive(mac);
+      final svc = _isClassicDrop
+          ? await connection.connectByMacClassicDirect(mac)
+          : await connection.connectByMacPassive(mac);
       if (svc != null) {
         onConnected(svc);
         return true;
