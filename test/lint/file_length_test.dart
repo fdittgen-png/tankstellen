@@ -44,7 +44,11 @@ void main() {
     // that reads `obd2CommDiagnosticsGateProvider` to arm the gated OBD2
     // comm-health collector from `Feature.debugMode` (mirrors the adjacent
     // #1925 `obd2DebugSessionLoggingProvider` kick-off).
-    'lib/app/app_initializer.dart': 950,
+    // #2597 — re-grandfathered 950 → 957: the post-first-frame migration
+    // block now also runs `ProfileRepository.dedupeCountryProfiles()` to
+    // enforce one profile per country for existing duplicate users (a few
+    // lines next to the adjacent country/language backfill migration).
+    'lib/app/app_initializer.dart': 957,
     // #2415 — background_service.dart graduated: the scan body moved into
     // BackgroundAlertScanCoordinator + BackgroundScanRunners +
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246

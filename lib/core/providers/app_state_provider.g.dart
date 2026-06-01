@@ -470,7 +470,7 @@ final class AutoSwitchProfileProvider
   }
 }
 
-String _$autoSwitchProfileHash() => r'd9ca4989633b5d2e0734810d113d179a8493523f';
+String _$autoSwitchProfileHash() => r'59a8d30ec90be2598bebfdfe12081ff0665be4f6';
 
 /// Auto-switch profile setting.
 

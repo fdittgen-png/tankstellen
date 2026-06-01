@@ -280,6 +280,33 @@
   },
   "autoSwitchProfile": "Profil automatisch wechseln",
   "autoSwitchDescription": "Profil beim Grenzübertritt automatisch wechseln",
+  "profileSwitchedTo": "Zu {profile} gewechselt",
+  "@profileSwitchedTo": {
+    "description": "SnackBar confirming the active profile changed after tapping Activate in the profile list.",
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCreatedNamed": "Profil {name} erstellt",
+  "@profileCreatedNamed": {
+    "description": "SnackBar confirming a new profile was created from the profile list.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCountryTaken": "Für {country} gibt es bereits ein Profil – bearbeiten Sie dieses stattdessen.",
+  "@profileCountryTaken": {
+    "description": "Blocks selecting a country in the profile editor when another profile already uses it (one profile per country).",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "switchProfile": "Wechseln",
   "dismiss": "Schließen",
   "profileCountry": "Land",

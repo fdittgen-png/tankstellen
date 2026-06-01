@@ -668,6 +668,21 @@ class AppLocalizationsDe extends AppLocalizations {
       'Profil beim Grenzübertritt automatisch wechseln';
 
   @override
+  String profileSwitchedTo(String profile) {
+    return 'Zu $profile gewechselt';
+  }
+
+  @override
+  String profileCreatedNamed(String name) {
+    return 'Profil $name erstellt';
+  }
+
+  @override
+  String profileCountryTaken(String country) {
+    return 'Für $country gibt es bereits ein Profil – bearbeiten Sie dieses stattdessen.';
+  }
+
+  @override
   String get switchProfile => 'Wechseln';
 
   @override

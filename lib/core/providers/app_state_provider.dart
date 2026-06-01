@@ -102,7 +102,10 @@ class AutoSwitchProfile extends _$AutoSwitchProfile {
   @override
   bool build() {
     final storage = ref.watch(storageRepositoryProvider);
-    return storage.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? false;
+    // #2597 — default ON so border-crossing auto-activates the country's
+    // profile out of the box; the Settings toggle persists an explicit
+    // `false` to opt out.
+    return storage.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? true;
   }
 
   Future<void> set(bool value) async {

@@ -663,6 +663,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Automatically switch profile when crossing borders';
 
   @override
+  String profileSwitchedTo(String profile) {
+    return 'Switched to $profile';
+  }
+
+  @override
+  String profileCreatedNamed(String name) {
+    return 'Profile $name created';
+  }
+
+  @override
+  String profileCountryTaken(String country) {
+    return 'A profile for $country already exists — edit it instead.';
+  }
+
+  @override
   String get switchProfile => 'Switch';
 
   @override
@@ -7392,6 +7407,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get autoSwitchDescription =>
       '⟦Áúŧóɱáŧîçáłłý šŵîŧçĥ ƥřóƒîłé ŵĥéñ çřóššîñǧ ƀóřđéřš ····················⟧';
+
+  @override
+  String profileSwitchedTo(String profile) {
+    return '⟦Šŵîŧçĥéđ ŧó $profile ·····⟧';
+  }
+
+  @override
+  String profileCreatedNamed(String name) {
+    return '⟦Ƥřóƒîłé $name çřéáŧéđ ······⟧';
+  }
+
+  @override
+  String profileCountryTaken(String country) {
+    return '⟦Á ƥřóƒîłé ƒóř $country áłřéáđý éẋîšŧš — éđîŧ îŧ îñšŧéáđ. ·················⟧';
+  }
 
   @override
   String get switchProfile => '⟦Šŵîŧçĥ ···⟧';

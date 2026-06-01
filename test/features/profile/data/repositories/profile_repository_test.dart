@@ -209,4 +209,104 @@ void main() {
       expect(after.languageCode, isNull);
     });
   });
+
+  // #2597 — one profile per country.
+  group('isCountryTaken', () {
+    test('false when no profile owns the country', () async {
+      await repo.createProfile(name: 'DE', countryCode: 'DE');
+      expect(repo.isCountryTaken('FR'), isFalse);
+    });
+
+    test('true when another profile owns the country', () async {
+      await repo.createProfile(name: 'DE', countryCode: 'DE');
+      expect(repo.isCountryTaken('DE'), isTrue);
+    });
+
+    test('excludeProfileId lets a profile keep its own country', () async {
+      final p = await repo.createProfile(name: 'DE', countryCode: 'DE');
+      expect(repo.isCountryTaken('DE', excludeProfileId: p.id), isFalse,
+          reason: 'the profile being edited must not count itself as a clash');
+    });
+
+    test('empty / unset country is never taken', () async {
+      await repo.createProfile(name: 'No country');
+      expect(repo.isCountryTaken(''), isFalse);
+    });
+  });
+
+  group('dedupeCountryProfiles (#2597 migration)', () {
+    test('keeps the ACTIVE profile and clears the others for that country',
+        () async {
+      final a = await repo.createProfile(name: 'DE-A', countryCode: 'DE');
+      final b = await repo.createProfile(name: 'DE-B', countryCode: 'DE');
+      final c = await repo.createProfile(name: 'DE-C', countryCode: 'DE');
+      // Make B the active one — it must be the keeper.
+      await repo.setActiveProfile(b.id);
+
+      final cleared = await repo.dedupeCountryProfiles();
+      expect(cleared, 2);
+
+      UserProfile byId(String id) =>
+          repo.getAllProfiles().firstWhere((p) => p.id == id);
+      expect(byId(b.id).countryCode, 'DE', reason: 'active keeper retains DE');
+      expect(byId(a.id).countryCode, isNull);
+      expect(byId(c.id).countryCode, isNull);
+      // No profile was deleted — only the country binding cleared.
+      expect(repo.getAllProfiles(), hasLength(3));
+    });
+
+    test(
+        'with no active profile in the group, keeps EXACTLY ONE for the '
+        'country and clears the rest', () async {
+      final a = await repo.createProfile(name: 'DE-A', countryCode: 'DE');
+      final b = await repo.createProfile(name: 'DE-B', countryCode: 'DE');
+      // First profile (a) is active by createProfile; switch active away to a
+      // DIFFERENT country so neither DE profile is the active one.
+      final other = await repo.createProfile(name: 'FR', countryCode: 'FR');
+      await repo.setActiveProfile(other.id);
+
+      final cleared = await repo.dedupeCountryProfiles();
+      expect(cleared, 1);
+
+      // The keeper identity is an implementation tie-break (storage order),
+      // so assert the INVARIANT, not which one survives: exactly one of the
+      // two DE profiles still owns DE, the other is cleared.
+      final deOwners = repo
+          .getAllProfiles()
+          .where((p) => (p.id == a.id || p.id == b.id) && p.countryCode == 'DE')
+          .toList();
+      expect(deOwners, hasLength(1),
+          reason: 'exactly one DE profile keeps its country');
+    });
+
+    test('leaves a country with a single profile untouched', () async {
+      final a = await repo.createProfile(name: 'DE', countryCode: 'DE');
+      final fr = await repo.createProfile(name: 'FR', countryCode: 'FR');
+
+      final cleared = await repo.dedupeCountryProfiles();
+      expect(cleared, 0);
+      expect(repo.getAllProfiles().firstWhere((p) => p.id == a.id).countryCode,
+          'DE');
+      expect(repo.getAllProfiles().firstWhere((p) => p.id == fr.id).countryCode,
+          'FR');
+    });
+
+    test('is idempotent — a second run clears nothing', () async {
+      await repo.createProfile(name: 'DE-A', countryCode: 'DE');
+      await repo.createProfile(name: 'DE-B', countryCode: 'DE');
+
+      final first = await repo.dedupeCountryProfiles();
+      expect(first, 1);
+      final second = await repo.dedupeCountryProfiles();
+      expect(second, 0, reason: 'rerun on already-deduped data is a no-op');
+    });
+
+    test('ignores profiles with no country', () async {
+      await repo.createProfile(name: 'No country A');
+      await repo.createProfile(name: 'No country B');
+      final cleared = await repo.dedupeCountryProfiles();
+      expect(cleared, 0,
+          reason: 'null country is exempt from the one-per-country rule');
+    });
+  });
 }

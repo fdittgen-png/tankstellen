@@ -3451,5 +3451,32 @@
   "restoreBackupFailed": "Échec de la restauration — le fichier n'a pas pu être lu",
   "@restoreBackupFailed": {
     "description": "Generic error SnackBar when the restore flow throws an unexpected error or the file could not be read (#2571)."
+  },
+  "profileSwitchedTo": "Profil {profile} activé",
+  "@profileSwitchedTo": {
+    "description": "SnackBar confirming the active profile changed after tapping Activate in the profile list.",
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCreatedNamed": "Profil {name} créé",
+  "@profileCreatedNamed": {
+    "description": "SnackBar confirming a new profile was created from the profile list.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCountryTaken": "Un profil existe déjà pour {country} — modifiez-le plutôt.",
+  "@profileCountryTaken": {
+    "description": "Blocks selecting a country in the profile editor when another profile already uses it (one profile per country).",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
   }
 }

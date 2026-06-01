@@ -80,6 +80,22 @@ class ProfileRepository {
     await _storage.saveProfile(profile.id, profile.toJson());
   }
 
+  /// #2597 — whether another profile already owns [countryCode]. A null /
+  /// empty country never counts as taken (profiles may have no country),
+  /// and [excludeProfileId] lets the edit flow ignore the profile being
+  /// edited so re-saving its own country isn't reported as a conflict.
+  /// Backs the one-profile-per-country rule that keeps the border-cross
+  /// auto-switch's country→profile match deterministic.
+  bool isCountryTaken(String countryCode, {String? excludeProfileId}) {
+    if (countryCode.isEmpty) return false;
+    return getAllProfiles().any(
+      (p) =>
+          p.id != excludeProfileId &&
+          p.countryCode != null &&
+          p.countryCode == countryCode,
+    );
+  }
+
   Future<void> deleteProfile(String id) async {
     await _storage.deleteProfile(id);
     if (_storage.getActiveProfileId() == id) {
@@ -122,5 +138,51 @@ class ProfileRepository {
         await updateProfile(updated);
       }
     }
+  }
+
+  /// #2597 — enforce the one-profile-per-country rule for users who already
+  /// hold duplicate same-country profiles from before the constraint
+  /// existed. For every country owned by more than one profile we KEEP one
+  /// canonical profile (the ACTIVE one if it is among them, otherwise the
+  /// FIRST in storage order — `UserProfile` carries no modified timestamp,
+  /// so storage order is the only stable, deterministic tie-break) and
+  /// CLEAR the `countryCode` of the rest. The duplicate profiles survive
+  /// intact, they just lose their country binding so the country→profile
+  /// match stays deterministic for the auto-switch.
+  ///
+  /// Returns the number of profiles whose country was cleared. Idempotent:
+  /// a second run finds no duplicates and clears nothing (returns 0), so it
+  /// is safe to invoke on every cold start.
+  Future<int> dedupeCountryProfiles() async {
+    final profiles = getAllProfiles();
+    final activeId = _storage.getActiveProfileId();
+
+    // Group profiles by their non-null country code, preserving order.
+    final byCountry = <String, List<UserProfile>>{};
+    for (final p in profiles) {
+      final code = p.countryCode;
+      if (code == null || code.isEmpty) continue;
+      byCountry.putIfAbsent(code, () => <UserProfile>[]).add(p);
+    }
+
+    var cleared = 0;
+    for (final entry in byCountry.entries) {
+      final group = entry.value;
+      if (group.length < 2) continue; // No duplication for this country.
+
+      // Pick the keeper: the active profile if it is in this group,
+      // otherwise the first one in storage order (deterministic).
+      final keeper = group.firstWhere(
+        (p) => p.id == activeId,
+        orElse: () => group.first,
+      );
+
+      for (final p in group) {
+        if (p.id == keeper.id) continue;
+        await updateProfile(p.copyWith(countryCode: null));
+        cleared++;
+      }
+    }
+    return cleared;
   }
 }
