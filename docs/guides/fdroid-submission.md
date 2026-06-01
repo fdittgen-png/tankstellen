@@ -18,10 +18,34 @@ guide covers both, but they are not the same thing:
    default F-Droid catalogue but is gated on **external review that takes days
    to weeks**.
 
-The GMS-free `fdroid` flavor (#2574) is what both paths build: it excludes
-`com.google.android.gms` and `com.google.mlkit` from the runtime classpath,
+The GMS-free `fdroid` flavor (#2574, #2584) is what both paths build: it ships
+**no proprietary `com.google.android.gms` / `com.google.mlkit` code** in the dex,
 maps are OpenStreetMap, and positioning is forced through Android's
 `LocationManager` via `--dart-define=FORCE_LOCATION_MANAGER=true`.
+
+### How GMS/ML Kit stay out of the fdroid dex (#2584)
+
+The `:app` module's `exclude(group = …)` (android/app/build.gradle.kts) cleans the
+**app's** dependency graph, but GMS/ML Kit are pulled in by the Flutter **plugin**
+sub-projects (`geolocator_android`, `google_mlkit_commons`,
+`google_mlkit_text_recognition`, `mobile_scanner`), which are un-flavored Android
+library modules whose single AAR AGP merges into both flavors. Those plugins
+`import com.google.android.gms.*` unconditionally, so a blanket exclude breaks
+compilation. The fix (android/build.gradle.kts, gated on the fdroid task graph):
+
+1. **Runtime exclude** — drop the real GMS/ML Kit coordinates from each plugin's
+   fdroid runtime classpath, so the proprietary classes never reach the dex.
+2. **Compile-only stub** — put the GMS/ML Kit *compile* API back on each plugin's
+   compile classpath as `compileOnly`, so the plugin Java still compiles against
+   the real signatures. `compileOnly` is never packaged, so it adds nothing to the
+   dex.
+
+Net: **zero `com.google.android.gms` / `com.google.mlkit` class definitions** in the
+fdroid dex. The plugins' own compiled methods still *name* those (now absent) types
+in their signatures, leaving inert dangling type *references* in the constant pool —
+they reference classes that do not exist and the code that would touch them never
+runs (see the OCR caveat below + `forceLocationManager`). The `play` flavor is
+untouched: real GMS, full functionality (fused location + ML Kit OCR/barcode).
 
 ## Submitting the official fdroiddata recipe
 
@@ -54,14 +78,16 @@ account.
 
 ## Caveats to disclose in the MR
 
-- **OCR is unavailable in the fdroid flavor.** The pump-display / receipt OCR
-  depends on Google ML Kit (`google_mlkit_text_recognition`), which pulls
-  `com.google.mlkit` → `com.google.android.gms`. It is excluded from the fdroid
-  flavor, so the OCR plugin channel is absent and the in-app scan path degrades
-  gracefully (`ReceiptScanService._recogniseRaw` catches the
-  `MissingPluginException` and returns null — no crash, the feature is just
-  inert). Manual fill-up entry is unaffected. Note this in the MR description so
-  reviewers understand the capability gap is intentional.
+- **OCR (and barcode scanning) is unavailable in the fdroid flavor by design.**
+  The pump-display / receipt OCR depends on Google ML Kit
+  (`google_mlkit_text_recognition`), and the barcode path on `mobile_scanner` —
+  both pull `com.google.mlkit` → `com.google.android.gms`. The fdroid flavor keeps
+  ML Kit on the compile classpath only (compile-only stub, #2584) with the real
+  classes absent at runtime, so any OCR call throws and the in-app scan path
+  degrades gracefully (`ReceiptScanService._recogniseRaw` catches it and returns
+  null — no crash, the feature is just inert). Manual fill-up entry is unaffected.
+  Note this in the MR description so reviewers understand the capability gap is
+  intentional.
 - **Sentry.** The app integrates Sentry for *opt-in* crash/diagnostic reporting
   (off by default). F-Droid reviewers may require either the
   `AntiFeatures: [Tracking]` flag on the recipe, **or** compiling Sentry out of
@@ -77,14 +103,23 @@ account.
 Before either submission, prove the flavor is clean:
 
 ```
-# dependency-graph layer (authoritative)
-./gradlew -p android app:dependencies \
-  --configuration fdroidReleaseRuntimeClasspath \
-  | grep -E 'com\.google\.android\.gms|com\.google\.mlkit'   # must print nothing
+# layer A — dependency-graph (authoritative): must print nothing
+( cd android && ./gradlew app:dependencies \
+  --configuration fdroidReleaseRuntimeClasspath ) \
+  | grep -E 'com\.google\.android\.gms|com\.google\.mlkit'
 
-# both layers, against a built APK
+# both layers, against a built APK. Layer B asserts no GMS/ML Kit class
+# DEFINITIONS in the dex (no proprietary Google code shipped); inert dangling
+# references to absent classes are reported but are not a failure (#2584).
 flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
 bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
+
+# contrast — the play flavor SHOULD still carry GMS (the exclude is flavor-scoped):
+( cd android && ./gradlew app:dependencies \
+  --configuration playDebugRuntimeClasspath ) | grep -E 'gms|mlkit'   # non-empty
 ```
 
 The same audit runs advisory in CI on every PR (`.github/workflows/fdroid.yml`).
+It builds a DEBUG fdroid APK (no keystore needed); the debug dex keeps the inert
+dangling references (R8 is off), so the audit's pass criterion is "no proprietary
+class definition", not "no reference" — see scripts/audit_no_gms.sh layer B.

@@ -168,6 +168,13 @@ android {
             dimension = "distribution"
             // F-Droid: no GMS, force Android LocationManager
             buildConfigField("boolean", "FORCE_LOCATION_MANAGER", "true")
+            // #2584 — GMS/ML Kit are compile-only stubs for fdroid (see the
+            // compile-only wiring in android/build.gradle.kts). The real classes
+            // are absent from the runtime/dex, so R8 on the release build would
+            // abort with "Missing class …" without these `-dontwarn` rules. The
+            // file is fdroid-scoped: the play flavor keeps the real GMS and the
+            // base `-keep com.google.mlkit.**` rule.
+            proguardFiles("proguard-rules-fdroid.pro")
         }
     }
 }
