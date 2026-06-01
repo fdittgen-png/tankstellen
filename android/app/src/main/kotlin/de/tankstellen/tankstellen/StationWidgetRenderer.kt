@@ -399,11 +399,37 @@ object StationWidgetRenderer {
         }
         row.setTextViewText(R.id.station_main_label, label)
         row.setTextViewText(R.id.station_main_price, priceText)
+        // #2600 — colour-code the price (the redesign's primary anchor).
+        // The Dart builder flags the cheapest priced row in the rendered
+        // set with `isCheapest` (sorted by distance, so the cheapest is
+        // not necessarily first). Cheapest → green; every other priced row
+        // → the high-contrast default. Both `@color` resources have a
+        // values-night/ variant so the hue stays legible on dark launchers.
+        val isCheapest = station.optBoolean("isCheapest", false)
+        val priceColorRes =
+            if (isCheapest) R.color.widget_price_cheap
+            else R.color.widget_price_default
+        row.setTextColor(
+            R.id.station_main_price,
+            getColorCompat(context, priceColorRes),
+        )
 
         val isOpen = station.optBoolean("isOpen", false)
         row.setTextViewText(
             R.id.station_status,
             if (isOpen) "● Open" else "○ Closed",
+        )
+        // #2600 — the status pill carried no explicit colour, so it
+        // inherited the launcher theme's default text colour, which could
+        // be near-invisible on the dark-navy widget background. Pin it:
+        // open → the cheap green, closed → the dim secondary.
+        row.setTextColor(
+            R.id.station_status,
+            getColorCompat(
+                context,
+                if (isOpen) R.color.widget_price_cheap
+                else R.color.widget_text_secondary,
+            ),
         )
 
         // #1121 — predictive nudge line. Render only when the user selected
@@ -473,6 +499,15 @@ object StationWidgetRenderer {
 
         return row
     }
+
+    /**
+     * #2600 — resolve a `@color` resource to an ARGB int for
+     * [RemoteViews.setTextColor]. Goes through [ContextCompat] so the
+     * correct values/ vs values-night/ variant is picked up from the
+     * launcher's current UI mode.
+     */
+    private fun getColorCompat(context: Context, colorRes: Int): Int =
+        ContextCompat.getColor(context, colorRes)
 
     private fun buildBroadcast(
         context: Context,

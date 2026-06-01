@@ -13,4 +13,16 @@
     <color name="widget_text_primary">#1C1B1F</color>
     <color name="widget_text_secondary">#49454F</color>
     <color name="widget_icon_tint">#49454F</color>
+    <!-- #2600 — row price colours. The redesign makes the price the most
+         prominent element. `widget_price_cheap` highlights the cheapest
+         station in the rendered set (green); every other priced row uses
+         `widget_price_default` (same high-contrast primary as the name so
+         the price reads as the anchor without a distracting hue). The
+         address uses the dimmer `widget_text_tertiary`. These are the
+         light-theme values; values-night/ carries the dark-launcher
+         variants (brighter green + lighter dim-grey for contrast on the
+         dark-navy widget background in the screenshot). -->
+    <color name="widget_price_cheap">#1B7F36</color>
+    <color name="widget_price_default">#1C1B1F</color>
+    <color name="widget_text_tertiary">#6E6A75</color>
 </resources>

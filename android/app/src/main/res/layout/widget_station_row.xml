@@ -4,18 +4,34 @@
   SPDX-License-Identifier: MIT
 -->
 
+<!--
+  #2600 — row redesign. Visual hierarchy is price ≫ name ≈ distance ≫
+  address, so the glanceable data dominates:
+
+    Row 1 (identity):  name (bold) ........... distance (bold, right)
+    Row 2 (anchor):    PRICE (large, bold, colour-coded) [fuel] .. status
+    Row 3 (secondary): address (small, dim, single-line ellipsised)
+    Row 4 (#1121):     predictive nudge (GONE unless predictive variant)
+
+  All view ids are unchanged from the pre-#2600 layout so the
+  StationWidgetRenderer.buildRow bindings keep working untouched; only the
+  ordering, sizes, weights and colours changed. Colours come from
+  values/ + values-night/ tokens so every scheme + night variant stays
+  legible (address dim-grey passes contrast, cheapest price pops green).
+  Sizes use sp for text, dp for spacing throughout.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/station_row_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
     android:clickable="true"
     android:focusable="true"
     android:background="?android:attr/selectableItemBackground">
 
-    <!-- Row 1: brand + distance -->
+    <!-- Row 1: name (prominent, bold) + distance (prominent, bold, right). -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@color/widget_text_primary"
             android:maxLines="1"
@@ -37,54 +53,62 @@
             android:id="@+id/station_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textColor="@color/widget_text_secondary"
-            android:paddingStart="6dp"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_text_primary"
+            android:paddingStart="8dp"
             android:visibility="gone" />
     </LinearLayout>
 
-    <!-- Row 2: address -->
-    <TextView
-        android:id="@+id/station_address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="10sp"
-        android:textColor="@color/widget_text_secondary"
-        android:maxLines="1"
-        android:ellipsize="end" />
-
-    <!-- Row 3: main fuel price + status -->
+    <!-- Row 2: the PRICE anchor. Largest, bold, colour-coded by the
+         renderer (cheapest → green, else high-contrast primary). The small
+         fuel-type label sits just after it; the open/closed status pill is
+         right-aligned. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingTop="2dp">
-
-        <TextView
-            android:id="@+id/station_main_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:textColor="@color/widget_text_secondary"
-            android:paddingEnd="4dp" />
+        android:gravity="bottom"
+        android:paddingTop="1dp">
 
         <TextView
             android:id="@+id/station_main_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_price_default" />
+
+        <TextView
+            android:id="@+id/station_main_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:textColor="#1B5E20" />
+            android:textSize="10sp"
+            android:textColor="@color/widget_text_secondary"
+            android:paddingStart="5dp"
+            android:paddingBottom="2dp"
+            android:gravity="bottom" />
 
         <TextView
             android:id="@+id/station_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="10sp"
-            android:paddingStart="6dp" />
+            android:paddingStart="6dp"
+            android:paddingBottom="2dp"
+            android:gravity="bottom" />
     </LinearLayout>
+
+    <!-- Row 3: address — secondary, small + dim, single line ellipsised. -->
+    <TextView
+        android:id="@+id/station_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="@color/widget_text_tertiary"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
     <!-- Row 4 (#1121): predictive nudge — "now €1.84/L · best Tue eve ~€1.79/L".
          Visibility is GONE by default; the renderer flips it to VISIBLE only
