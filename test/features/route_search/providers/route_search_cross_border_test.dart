@@ -10,8 +10,10 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/core/utils/station_extensions.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/features/route_search/data/cross_border_corridor.dart';
 import 'package:tankstellen/features/route_search/data/strategies/route_geometry.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
@@ -84,6 +86,72 @@ class _BrandedStationService implements StationService {
 class _NoKeyStorage implements StorageRepository {
   @override
   bool hasApiKey() => false;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
+}
+
+/// #2631 — a [StationService] that only returns a station when the queried
+/// point is INSIDE [minLat]..[maxLat], mirroring a real country source that
+/// has NO coverage abroad (FR Prix-Carburants returns nothing in Spain).
+/// The corridor query function queries every country service at every
+/// sample point, so without this gating a 1.20-priced FR station would be
+/// returned next to Barcelona and win every segment — masking the bug.
+/// Returns a station priced ONLY for the requested fuel (ES → e10 set, e85
+/// null), so the per-country-fuel ranking is what the test exercises.
+class _RegionGatedStationService implements StationService {
+  _RegionGatedStationService(
+    this.brand, {
+    required this.idPrefix,
+    required this.minLat,
+    required this.maxLat,
+    required this.price,
+  });
+
+  final String brand;
+  // #753 — real country services prefix their station ids (`es-`, `fr-`)
+  // so a Catalonian station inside FR's bbox is still attributed to ES by
+  // `Countries.countryForStation` / `fuelForStation` (#2631).
+  final String idPrefix;
+  final double minLat;
+  final double maxLat;
+  final double price;
+
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async {
+    if (params.lat < minLat || params.lat > maxLat) {
+      return ServiceResult(
+        data: const [],
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+    }
+    final station = Station(
+      id: '$idPrefix${params.lat.toStringAsFixed(2)}-${params.lng.toStringAsFixed(2)}',
+      name: '$brand station',
+      brand: brand,
+      street: 'Route',
+      postCode: '00000',
+      place: brand,
+      lat: params.lat,
+      lng: params.lng,
+      isOpen: true,
+      // Price only the requested fuel — an ES station has e10 set, e85 null,
+      // so pricing it by the active E85 yields '--' (the bug) until the
+      // per-country fuel (E10) is applied.
+      e85: params.fuelType == FuelType.e85 ? price : null,
+      e10: params.fuelType == FuelType.e10 ? price : null,
+    );
+    return ServiceResult(
+      data: [station],
+      source: ServiceSource.cache,
+      fetchedAt: DateTime.now(),
+    );
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -220,5 +288,119 @@ void main() {
     expect(corridorCountries(route), containsAll(<String>{'FR', 'ES'}),
         reason: 'ES must be detected even though FR shadows every '
             'Catalonian point in first-match bbox order (#2621)');
+  });
+
+  // #2631 — THE regression. A cross-border Best Stops result must include
+  // the Spanish leg's cheapest station. Before the fix, `computeBestStops`
+  // (and the 4 strategies) priced EVERY station by the single active fuel
+  // (FR E85). A real ES station has e10 set / e85 null, so `priceFor(E85)`
+  // is null → the station is skipped from per-segment ranking → zero
+  // Spanish best stops. With the per-country fuel threaded through, the ES
+  // station is priced on E10 and wins its own segment.
+  test(
+      'cross-border Best Stops include the cheapest Spanish station, '
+      'priced by ES profile fuel E10 (#2631)', () async {
+    // 4 FR sample points (lat ≥ 42 → segment 0) + 1 ES point at Barcelona
+    // (sample index 4 → segment 1 under the 50 km test-seam spacing:
+    // (4 * 15 / 50).floor() == 1). Region-gated services mean only FR
+    // answers in France and only ES answers in Spain — so segment 1's sole
+    // candidate is the Spanish station.
+    const frA = LatLng(43.50, 3.50);
+    const frB = LatLng(43.30, 3.30);
+    const frC = LatLng(43.10, 3.10);
+    const frD = LatLng(42.90, 2.90);
+    const esBarcelona = LatLng(41.39, 2.17);
+    const route = RouteInfo(
+      geometry: [frA, frB, frC, frD, LatLng(42.10, 2.40), esBarcelona],
+      distanceKm: 400,
+      durationMinutes: 240,
+      samplePoints: [frA, frB, frC, frD, esBarcelona],
+    );
+
+    // FR sells (gated to lat ≥ 42) at E85 1.20; ES sells (gated to lat ≤ 42)
+    // at E10 1.60 with no E85 grade — the exact shape that produced '--'.
+    // The `es-` prefix is what lets `fuelForStation` attribute the Barcelona
+    // station to ES even though it sits inside FR's continental bbox (#2631).
+    final frService = _RegionGatedStationService('Total FR',
+        idPrefix: 'fr-', minLat: 42.0, maxLat: 90.0, price: 1.20);
+    final esService = _RegionGatedStationService('Repsol ES',
+        idPrefix: 'es-', minLat: -90.0, maxLat: 42.0, price: 1.60);
+
+    final container = ProviderContainer(
+      overrides: [
+        storageRepositoryProvider.overrideWith((ref) => _NoKeyStorage()),
+        perCountryStationServiceProvider('FR')
+            .overrideWith((ref) => frService),
+        perCountryStationServiceProvider('ES')
+            .overrideWith((ref) => esService),
+        allProfilesProvider.overrideWith((ref) => const [
+              UserProfile(
+                  id: 'fr', name: 'Standard',
+                  countryCode: 'FR', preferredFuelType: FuelType.e85),
+              UserProfile(
+                  id: 'es', name: 'Espagne',
+                  countryCode: 'ES', preferredFuelType: FuelType.e10),
+            ]),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final notifier = container.read(routeSearchStateProvider.notifier);
+    final result = await notifier.searchAlongPrebuiltRouteForTest(
+      route: route,
+      fuelType: FuelType.e85, // active fuel is FR's E85.
+    );
+
+    final esStation = result.stations
+        .whereType<FuelStationResult>()
+        .firstWhere((r) => r.station.brand == 'Repsol ES');
+
+    // The ES station models a real MITECO row: E10 priced, E85 null.
+    expect(esStation.station.e10, isNotNull);
+    expect(esStation.station.e85, isNull);
+
+    // THE assertion: the Spanish station is in Best Stops. On master this
+    // is absent (the E85-priced ranking skipped it).
+    expect(result.cheapestPerSegment, isNotNull);
+    expect(result.cheapestPerSegment!.values, contains(esStation.station.id),
+        reason: 'the cheapest Spanish station must appear in Best Stops, '
+            'priced by ES profile fuel E10 (#2631)');
+
+    // #2631 — and the result carries the per-country fuel map so the
+    // map/list display can price each station the same way.
+    expect(result.profileFuelByCountry['ES'], FuelType.e10);
+  });
+
+  // #2631 — the reused resolver: an ES station priced for E10 is non-null
+  // once `fuelForStation` selects E10 from the ES profile, even though the
+  // active search fuel (E85) is null on it. This is the one-line proof that
+  // the per-country selection — not a within-country fallback — is what
+  // surfaces the price.
+  test('fuelForStation selects the ES profile fuel and yields a price (#2631)',
+      () {
+    // Barcelona (41.39) sits INSIDE FR's continental bbox; the `es-` id
+    // prefix (#753) is what attributes it to ES rather than FR.
+    const esStation = Station(
+      id: 'es-1',
+      name: 'Repsol',
+      brand: 'Repsol',
+      street: 'Calle',
+      postCode: '08001',
+      place: 'Barcelona',
+      lat: 41.39,
+      lng: 2.17,
+      e10: 1.60, // E10 priced…
+      isOpen: true,
+    );
+    final fuel = fuelForStation(
+      esStation,
+      const {'ES': FuelType.e10},
+      FuelType.e85, // …while the active fuel is E85.
+    );
+    expect(fuel, FuelType.e10, reason: 'ES profile fuel wins over the active');
+    expect(esStation.priceFor(fuel), isNotNull,
+        reason: 'priced on E10, so it is no longer dropped as "--"');
+    // And the active-fuel path (the bug) is null → the "--" on master.
+    expect(esStation.priceFor(FuelType.e85), isNull);
   });
 }

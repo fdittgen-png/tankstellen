@@ -374,6 +374,85 @@ void main() {
     );
   });
 
+  group('StationMarkerBuilder cross-border fuelResolver (#2631)', () {
+    // A Spanish MITECO station: E10 priced, NO E85 grade — the exact shape
+    // that rendered '--' on an E85 search before the per-country fix. The
+    // `es-` id prefix attributes it to ES.
+    const esStation = Station(
+      id: 'es-12345',
+      name: 'Repsol',
+      brand: 'Repsol',
+      street: 'Av. Diagonal',
+      postCode: '08001',
+      place: 'Barcelona',
+      lat: 41.39,
+      lng: 2.17,
+      e10: 1.609,
+      isOpen: true,
+    );
+
+    testWidgets(
+      'with a resolver mapping the ES station to E10, the marker shows the '
+      'E10 price even though the active fuel is E85',
+      (tester) async {
+        final marker = StationMarkerBuilder.build(
+          tester.element(find.byType(Container).first),
+          esStation,
+          FuelType.e85, // active fuel — null on this station…
+          0.50,
+          2.50,
+          // …but the cross-border resolver picks ES → E10.
+          fuelResolver: (_) => FuelType.e10,
+        );
+
+        await pumpApp(
+          tester,
+          SizedBox(
+            width: marker.width,
+            height: marker.height,
+            child: (((marker.child as RepaintBoundary).child as Semantics)
+                    .child as GestureDetector)
+                .child,
+          ),
+        );
+
+        // The E10 price (1.609 => "1,609") is shown, NOT the '--' the active
+        // E85 would have produced.
+        expect(find.text('1,609'), findsOneWidget);
+        expect(find.text('--'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'WITHOUT a resolver, the same ES station still shows "--" on an E85 '
+      'search (locks the strict #2510 single-fuel behaviour)',
+      (tester) async {
+        final marker = StationMarkerBuilder.build(
+          tester.element(find.byType(Container).first),
+          esStation,
+          FuelType.e85,
+          0.50,
+          2.50,
+          // No resolver → strict active-fuel price → '--'.
+        );
+
+        await pumpApp(
+          tester,
+          SizedBox(
+            width: marker.width,
+            height: marker.height,
+            child: (((marker.child as RepaintBoundary).child as Semantics)
+                    .child as GestureDetector)
+                .child,
+          ),
+        );
+
+        expect(find.text('--'), findsOneWidget);
+        expect(find.text('1,609'), findsNothing);
+      },
+    );
+  });
+
   group('StationMarkerBuilder compact dot (#2510)', () {
     testWidgets('a compact marker is a small price-less dot', (tester) async {
       final marker = StationMarkerBuilder.build(
