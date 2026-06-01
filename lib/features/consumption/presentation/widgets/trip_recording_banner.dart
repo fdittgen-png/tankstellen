@@ -17,6 +17,7 @@ import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'coaching_chip.dart';
+import 'gps_degraded_banner.dart';
 import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
 import 'trip_recording_banner_palette.dart';
@@ -125,6 +126,10 @@ class TripRecordingBanner extends ConsumerWidget {
         // the state so the main banner above doesn't rebuild on
         // drop/resume transitions.
         const Obd2PauseBanner(),
+        // #2565 — GPS-degraded banner (OBD2 dropped, GPS alive — still
+        // recording). Mutually exclusive with the pause banner above;
+        // zero-height unless the provider is in degradedGpsOnly.
+        const GpsDegradedBanner(),
         Expanded(child: child),
       ],
     );

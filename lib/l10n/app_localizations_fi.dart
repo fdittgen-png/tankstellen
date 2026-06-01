@@ -3311,6 +3311,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get obd2PauseBannerEnd => 'Lopeta tallennus';
 
   @override
+  String get obd2GpsDegradedBannerTitle =>
+      'Recording with GPS — OBD2 reconnecting';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Kulutuskalibrointi päivitetty ajoneuvolle $vehicleName — tarkkuus parani $percent%';
   }

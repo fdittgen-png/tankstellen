@@ -3331,6 +3331,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obd2PauseBannerEnd => 'Rögzítés befejezése';
 
   @override
+  String get obd2GpsDegradedBannerTitle =>
+      'Recording with GPS — OBD2 reconnecting';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Fogyasztás-kalibráció frissítve a(z) $vehicleName számára — pontosság $percent%-kal javult';
   }

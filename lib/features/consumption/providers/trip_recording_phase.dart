@@ -28,12 +28,24 @@
 /// already left the live loop, so the persistent recording banner must
 /// not resurface mid-save. It resolves into the summary view (or the
 /// #2509 no-movement discard notice) the instant `stop()` returns.
+///
+/// #2565 adds [degradedGpsOnly] for the "OBD2 dropped mid-trip but GPS
+/// is alive" case. Unlike [pausedDueToDrop], recording NEVER pauses: the
+/// trip keeps capturing GPS-only samples (speed from the GPS latch, a
+/// physics-derived L/100 km estimate) while the reconnect scanner tries
+/// to re-attach the dongle. It is an ACTIVE sub-state (see
+/// [TripRecordingState.isActive]) — a real trip is still being recorded,
+/// so the recording banner stays up; only the contradictory "recording
+/// paused" surface is swapped for a lightweight "GPS — OBD2 reconnecting"
+/// notice. It resolves back into [recording] the instant the dongle
+/// re-attaches, or escalates to [pausedDueToDrop] only if GPS ALSO dies.
 enum TripRecordingPhase {
   idle,
   connecting,
   recording,
   paused,
   pausedDueToDrop,
+  degradedGpsOnly,
   saving,
   finished
 }

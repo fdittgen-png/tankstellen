@@ -1352,6 +1352,7 @@
   "obd2PauseBannerTitle": "OBD2-Verbindung verloren — Aufzeichnung pausiert",
   "obd2PauseBannerResume": "Weiter aufzeichnen",
   "obd2PauseBannerEnd": "Aufzeichnung beenden",
+  "obd2GpsDegradedBannerTitle": "Aufzeichnung per GPS — OBD2 verbindet erneut",
   "veCalibratedTitle": "Verbrauchsberechnung für {vehicleName} kalibriert — Genauigkeit verbessert um {percent}%",
   "veResetConfirmTitle": "Volumetrischen Wirkungsgrad zurücksetzen?",
   "veResetConfirmBody": "Dies verwirft den gelernten volumetrischen Wirkungsgrad (η_v) und stellt den Standardwert (0,85) wieder her. Fahrt-bezogene Verbrauchsschätzungen fallen auf die Herstellerkonstante zurück, bis der Kalibrator aus kommenden Fahrten neue Messwerte sammelt.",

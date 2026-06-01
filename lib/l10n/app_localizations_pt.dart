@@ -3332,6 +3332,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get obd2PauseBannerEnd => 'Terminar gravação';
 
   @override
+  String get obd2GpsDegradedBannerTitle =>
+      'Recording with GPS — OBD2 reconnecting';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Calibração de consumo atualizada para $vehicleName — precisão melhorada em $percent%';
   }
