@@ -161,12 +161,19 @@ platform :ios do
     raw_groups = options[:groups] || ENV["TESTFLIGHT_TESTER_GROUPS"] || ""
     requested_groups = raw_groups.to_s.split(",").map(&:strip).reject(&:empty?)
 
+    # Role granted when the tester must be invited as an App Store Connect
+    # *user* — the prerequisite for INTERNAL testing (internal testers are
+    # team members). Default DEVELOPER: the least-broad role that reliably has
+    # TestFlight build access; overridable via the `role` input. The invite is
+    # always scoped to THIS app only (no all-apps visibility, no provisioning).
+    role = (options[:role] || ENV["TESTFLIGHT_TESTER_ROLE"] || "DEVELOPER").to_s.strip.upcase
+
     # Authenticate Spaceship's ConnectAPI directly with the same key the
     # upload lane uses. `asc_api_key` returns the `app_store_connect_api_key`
     # hash; `Token.from(hash:)` is exactly how pilot's own Manager logs in
     # (pilot/lib/pilot/manager.rb), so we reuse the proven path and then
-    # drive the BetaGroup/BetaTester models for full control over the
-    # "all external groups" enumeration and idempotency.
+    # drive the BetaGroup/BetaTester/User models for full control over the
+    # group enumeration, the internal-user invitation flow and idempotency.
     api_token = Spaceship::ConnectAPI::Token.from(hash: asc_api_key)
     Spaceship::ConnectAPI.token = api_token
 
@@ -178,6 +185,7 @@ platform :ios do
 
     all_groups = app.get_beta_groups
     external_groups = all_groups.reject(&:is_internal_group)
+    internal_groups = all_groups.select(&:is_internal_group)
 
     UI.message("TestFlight beta groups for #{app.name}:")
     all_groups.each do |g|
@@ -187,10 +195,18 @@ platform :ios do
 
     target_groups =
       if requested_groups.empty?
-        # No groups given → add to EVERY external group so the tester gets
-        # all current and future builds regardless of the group's name.
-        UI.message("No `groups` given — adding #{email} to ALL external beta groups.")
-        external_groups
+        # No groups given → prefer EVERY external group (an external tester
+        # needs no ASC account). When the app has NO external group at all,
+        # fall back to the internal group(s) so a freshly-set-up app (only the
+        # default internal "iPhone Tester" group) still enrolls the tester —
+        # via the internal-user flow below.
+        if external_groups.empty?
+          UI.message("No external groups exist — targeting ALL internal beta groups (internal-tester flow).")
+          internal_groups
+        else
+          UI.message("No `groups` given — adding #{email} to ALL external beta groups.")
+          external_groups
+        end
       else
         matched = all_groups.select { |g| requested_groups.include?(g.name) }
         missing = requested_groups - matched.map(&:name)
@@ -201,21 +217,23 @@ platform :ios do
     if target_groups.empty?
       UI.user_error!(
         "No target beta group(s) to add the tester to. " \
-        "The app needs at least one external beta group in App Store Connect " \
-        "(create one under TestFlight first), or pass an existing `groups` name.",
+        "Create a beta group under TestFlight first, or pass an existing " \
+        "`groups` name.",
       )
     end
 
+    external_targets = target_groups.reject(&:is_internal_group)
+    internal_targets = target_groups.select(&:is_internal_group)
+
     tester = { email: email, firstName: first_name, lastName: last_name }
 
-    target_groups.each do |group|
+    # A duplicate / already-present assignment surfaces as an already-exists
+    # error from ASC — treat it as success so the lane is idempotent.
+    assign_to = lambda do |group, kind|
       begin
         group.post_bulk_beta_tester_assignments(beta_testers: [tester])
-        UI.success("Added #{email} to external beta group '#{group.name}'.")
+        UI.success("Added #{email} to #{kind} beta group '#{group.name}'.")
       rescue => ex
-        # Re-adding an already-present tester surfaces as a duplicate /
-        # already-exists error from ASC. Treat that as success so the lane
-        # is idempotent; re-raise anything else.
         message = ex.message.to_s
         if message =~ /already|exist|duplicat/i
           UI.success("#{email} is already in '#{group.name}' — nothing to do.")
@@ -226,7 +244,64 @@ platform :ios do
       end
     end
 
-    UI.success("Done. #{email} is enrolled in: #{target_groups.map(&:name).join(', ')}.")
+    # ---- External groups: a plain email assignment (no ASC account needed).
+    external_targets.each { |group| assign_to.call(group, "external") }
+
+    # ---- Internal groups: internal testers must be App Store Connect *users*
+    # first. Ensure the user exists (invite — scoped to this app — if not),
+    # then assign to the internal group(s). The invite is accepted out-of-band
+    # by the tester via email, so assigning a freshly-invited (not-yet-
+    # accepted) user is deferred to a later re-run and reported clearly.
+    unless internal_targets.empty?
+      begin
+        existing_user = Spaceship::ConnectAPI::User.all.find { |u| u.email.to_s.casecmp?(email) }
+        pending_invite = Spaceship::ConnectAPI::UserInvitation.all.find { |i| i.email.to_s.casecmp?(email) }
+
+        if !existing_user.nil?
+          # Accepted team user → assign to the internal group(s) now.
+          internal_targets.each { |group| assign_to.call(group, "internal") }
+        elsif !pending_invite.nil?
+          UI.important("#{email} already has a PENDING App Store Connect invitation. " \
+                       "Ask them to accept it, then re-run this workflow to complete the " \
+                       "internal-group assignment for: #{internal_targets.map(&:name).join(', ')}.")
+        else
+          UI.message("#{email} is not yet an App Store Connect user — sending a " \
+                     "Users-and-Access invitation (role #{role}, scoped to #{app.name} only).")
+          Spaceship::ConnectAPI::UserInvitation.create(
+            email: email,
+            first_name: (first_name && !first_name.empty?) ? first_name : email.split("@").first,
+            last_name: (last_name && !last_name.empty?) ? last_name : "Tester",
+            roles: [role],
+            provisioning_allowed: false,
+            all_apps_visible: false,
+            visible_app_ids: [app.id],
+          )
+          UI.success("Invitation sent to #{email}. Once they accept the email and become a " \
+                     "team user, re-run this workflow to place them in: " \
+                     "#{internal_targets.map(&:name).join(', ')}.")
+        end
+      rescue => ex
+        # The ASC *API key* itself carries a role. Inviting / listing users is
+        # a Users-and-Access (Admin) capability — an App-Manager-scoped key
+        # gets FORBIDDEN here. Surface that as an actionable message instead of
+        # a raw stack trace.
+        message = ex.message.to_s
+        if message =~ /forbid|permission|not.*(allowed|permitted)|403|unauthor/i
+          UI.user_error!(
+            "The App Store Connect API key lacks permission to manage Users and " \
+            "Access (needed to invite an INTERNAL tester). Re-issue the API key with " \
+            "the Admin role, or add #{email} as an internal tester manually in App " \
+            "Store Connect → Users and Access. (#{message})",
+          )
+        else
+          raise ex
+        end
+      end
+    end
+
+    ext_summary = external_targets.empty? ? "(none)" : external_targets.map(&:name).join(", ")
+    int_summary = internal_targets.empty? ? "(none)" : internal_targets.map(&:name).join(", ")
+    UI.success("Done. External enrollment: #{ext_summary}. Internal target(s): #{int_summary}.")
   end
 
   desc "Stage App Store text metadata (name/subtitle/keywords/description/etc.)."
