@@ -1,0 +1,104 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: iOS TestFlight Testers
+
+# Add an external iOS tester to the app's TestFlight beta group(s) via the
+# App Store Connect API. `workflow_dispatch` ONLY — this is an outward-facing
+# live ASC mutation (it sends an invite email to the tester), so it must never
+# run automatically. The maintainer (or the orchestrator) triggers it by hand.
+#
+# Auth reuses the App Store Connect API key exactly like `ios-testflight.yml`:
+# the base64 secret is decoded to a temp .p8 and exported as
+# ASC_API_KEY_FILEPATH, which the Fastfile's `asc_api_key` helper picks up.
+#
+# This is an API-only operation (no build, no match, no Xcode), so it runs on
+# ubuntu-latest — much cheaper than a macOS runner.
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: 'Tester email to enroll (an invite email is sent to them)'
+        required: true
+        type: string
+        default: 'florian.dittgen@trelleborg.com'
+      groups:
+        description: 'Comma-separated beta group names. Leave empty to add the tester to ALL external groups.'
+        required: false
+        type: string
+        default: ''
+      first_name:
+        description: 'Tester first name (optional)'
+        required: false
+        type: string
+        default: ''
+      last_name:
+        description: 'Tester last name (optional)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-testers
+  cancel-in-progress: false
+
+jobs:
+  add-tester:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Decode App Store Connect API key
+        # Copied verbatim from ios-testflight.yml: decode the base64 secret to
+        # a temp .p8 and export ASC_API_KEY_FILEPATH so the Fastfile's
+        # `asc_api_key` helper consumes the on-disk key.
+        env:
+          ASC_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          if [ -z "$ASC_KEY_BASE64" ]; then
+            echo "::error::APP_STORE_CONNECT_API_KEY_BASE64 secret is not set." >&2
+            exit 1
+          fi
+          KEY_PATH="$RUNNER_TEMP/asc-api-key.p8"
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$KEY_PATH"
+          echo "ASC_API_KEY_FILEPATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: fastlane manage_testers
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          # ASC_API_KEY_FILEPATH was exported by the decode step above.
+          FASTLANE_DISABLE_COLORS: '1'
+        run: |
+          bundle exec fastlane manage_testers \
+            email:"${{ inputs.email }}" \
+            groups:"${{ inputs.groups }}" \
+            first_name:"${{ inputs.first_name }}" \
+            last_name:"${{ inputs.last_name }}"
+
+      - name: Clean up decoded API key
+        if: always()
+        run: rm -f "$ASC_API_KEY_FILEPATH"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## iOS TestFlight Tester"
+            echo ""
+            echo "- **Email:** ${{ inputs.email }}"
+            echo "- **Groups:** ${{ inputs.groups != '' && inputs.groups || 'ALL external groups' }}"
+            echo "- **Bundle ID:** de.tankstellen.tankstellen"
+            echo "- **Trigger:** ${{ github.event_name }}"
+          } >> "$GITHUB_STEP_SUMMARY"

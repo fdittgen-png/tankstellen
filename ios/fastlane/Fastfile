@@ -142,6 +142,93 @@ platform :ios do
     upload_testflight(changelog: options[:changelog])
   end
 
+  desc "Add an external TestFlight tester to the app's beta group(s)."
+  desc "Inputs (lane options or ENV): email (required), groups (optional"
+  desc "comma list — when omitted, the tester is added to EVERY external"
+  desc "beta group so they receive all current and future builds), and an"
+  desc "optional first_name / last_name. Idempotent: re-adding an existing"
+  desc "tester is a no-op, not a failure. Auth = the same App Store Connect"
+  desc "API key as upload_testflight (asc_api_key)."
+  lane :manage_testers do |options|
+    email = options[:email] || ENV["TESTFLIGHT_TESTER_EMAIL"]
+    UI.user_error!("manage_testers requires an `email` (lane option or TESTFLIGHT_TESTER_EMAIL).") if email.nil? || email.strip.empty?
+    email = email.strip
+
+    first_name = options[:first_name] || ENV["TESTFLIGHT_TESTER_FIRST_NAME"]
+    last_name = options[:last_name] || ENV["TESTFLIGHT_TESTER_LAST_NAME"]
+
+    # `groups` may arrive as a comma list (workflow input) or be empty.
+    raw_groups = options[:groups] || ENV["TESTFLIGHT_TESTER_GROUPS"] || ""
+    requested_groups = raw_groups.to_s.split(",").map(&:strip).reject(&:empty?)
+
+    # Authenticate Spaceship's ConnectAPI directly with the same key the
+    # upload lane uses. `asc_api_key` returns the `app_store_connect_api_key`
+    # hash; `Token.from(hash:)` is exactly how pilot's own Manager logs in
+    # (pilot/lib/pilot/manager.rb), so we reuse the proven path and then
+    # drive the BetaGroup/BetaTester models for full control over the
+    # "all external groups" enumeration and idempotency.
+    api_token = Spaceship::ConnectAPI::Token.from(hash: asc_api_key)
+    Spaceship::ConnectAPI.token = api_token
+
+    # Explicit app lookup by bundle id — mirrors upload_testflight's reasoning
+    # for passing the IDs explicitly rather than letting the API enumerate
+    # apps from the key alone.
+    app = Spaceship::ConnectAPI::App.find("de.tankstellen.tankstellen")
+    UI.user_error!("Could not find app de.tankstellen.tankstellen on App Store Connect.") if app.nil?
+
+    all_groups = app.get_beta_groups
+    external_groups = all_groups.reject(&:is_internal_group)
+
+    UI.message("TestFlight beta groups for #{app.name}:")
+    all_groups.each do |g|
+      kind = g.is_internal_group ? "internal" : "external"
+      UI.message("  - #{g.name} (#{kind})")
+    end
+
+    target_groups =
+      if requested_groups.empty?
+        # No groups given → add to EVERY external group so the tester gets
+        # all current and future builds regardless of the group's name.
+        UI.message("No `groups` given — adding #{email} to ALL external beta groups.")
+        external_groups
+      else
+        matched = all_groups.select { |g| requested_groups.include?(g.name) }
+        missing = requested_groups - matched.map(&:name)
+        UI.important("Requested group(s) not found and skipped: #{missing.join(', ')}") unless missing.empty?
+        matched
+      end
+
+    if target_groups.empty?
+      UI.user_error!(
+        "No target beta group(s) to add the tester to. " \
+        "The app needs at least one external beta group in App Store Connect " \
+        "(create one under TestFlight first), or pass an existing `groups` name.",
+      )
+    end
+
+    tester = { email: email, firstName: first_name, lastName: last_name }
+
+    target_groups.each do |group|
+      begin
+        group.post_bulk_beta_tester_assignments(beta_testers: [tester])
+        UI.success("Added #{email} to external beta group '#{group.name}'.")
+      rescue => ex
+        # Re-adding an already-present tester surfaces as a duplicate /
+        # already-exists error from ASC. Treat that as success so the lane
+        # is idempotent; re-raise anything else.
+        message = ex.message.to_s
+        if message =~ /already|exist|duplicat/i
+          UI.success("#{email} is already in '#{group.name}' — nothing to do.")
+        else
+          UI.error("Failed to add #{email} to '#{group.name}': #{message}")
+          raise ex
+        end
+      end
+    end
+
+    UI.success("Done. #{email} is enrolled in: #{target_groups.map(&:name).join(', ')}.")
+  end
+
   desc "Stage App Store text metadata (name/subtitle/keywords/description/etc.)."
   desc "Run manually on a maintainer workstation — never on CI, never auto-submit."
   desc "Reads metadata/<locale>/ and the safe flags in Deliverfile; a human"
