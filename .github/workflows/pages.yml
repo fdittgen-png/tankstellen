@@ -1,13 +1,22 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Deploy Privacy Policy to GitHub Pages
+name: Deploy site (privacy policy + F-Droid repo) to GitHub Pages
+
+# Single Pages site (#2576): the privacy policy (its own index.html) is the
+# site root, the self-hosted F-Droid repo index is served at /fdroid. A push
+# that changes the privacy policy OR the committed F-Droid repo index redeploys
+# the combined site. (fdroid-publish.yml deploys the SAME combined layout on a
+# version tag, after rebuilding + re-signing the APK; both share the `pages`
+# concurrency group so they never race the single site.)
 
 on:
   push:
     branches: [master]
     paths:
       - 'docs/privacy-policy/**'
+      - 'docs/icon.png'
+      - 'fdroid/repo/**'
   workflow_dispatch:
 
 permissions:
@@ -27,9 +36,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      # Combine: privacy policy at the root, the committed F-Droid repo index
+      # served directly at /fdroid (so the repo_url
+      # https://…/tankstellen/fdroid resolves /fdroid/index-v1.jar).
+      - name: Assemble _site
+        run: |
+          rm -rf _site
+          mkdir -p _site/fdroid
+          cp -R docs/privacy-policy/. _site/
+          cp -f docs/icon.png _site/icon.png 2>/dev/null || true
+          if [ -d fdroid/repo ]; then
+            cp -R fdroid/repo/. _site/fdroid/
+          fi
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: docs/privacy-policy
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v5

@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# fdroidserver config for the SELF-HOSTED Sparkilo F-Droid repo (#2576).
+#
+# Consumed by `fdroid init` / `fdroid update` (run from this directory by
+# scripts/fdroid_publish.sh and .github/workflows/fdroid-publish.yml). The repo
+# is published to GitHub Pages at https://fdittgen-png.github.io/tankstellen/fdroid.
+#
+# SECRETS ARE NEVER INLINED. The keystore path + passwords are read from the
+# environment so the same config works locally (export the vars) and in CI
+# (GitHub Secrets decode into these vars). The keystore file itself
+# (fdroid/keystore.p12 by default) is git-ignored — never commit it.
+
+repo_url: https://fdittgen-png.github.io/tankstellen/fdroid
+repo_name: Sparkilo
+repo_description: >-
+  Free, privacy-first fuel & EV charging price comparison — the GMS-free
+  F-Droid build (no Google Mobile Services, OpenStreetMap maps,
+  LocationManager positioning). 17 countries, 23 languages.
+repo_icon: icon.png
+
+# --- Repo signing key (separate from the app signing key) --------------------
+# `fdroid init` creates this keystore on first run if it does not exist.
+# Passwords are read from the ENVIRONMENT via fdroidserver's `{env: VAR}`
+# indirection (never inline a secret), so the same config works locally
+# (export the vars) and in CI (GitHub Secrets decode into them). See
+# scripts/fdroid_publish.sh and .github/workflows/fdroid-publish.yml.
+#
+# The keystore FILE itself defaults to fdroid/keystore.p12 (git-ignored); set
+# FDROID_REPO_KEYSTORE to point elsewhere (e.g. the runner-temp path CI decodes
+# into) — fdroidserver reads the `keystore:` value, so the publish script /
+# workflow `sed`-substitute it when an explicit path is provided, otherwise the
+# default below is used.
+keystore: keystore.p12
+keystorepass: {env: FDROID_REPO_KEYSTORE_PASSWORD}
+keypass: {env: FDROID_REPO_KEY_PASSWORD}
+repo_keyalias: sparkilo-fdroid-repo
+
+# Single-version repo: no /archive split — older builds are dropped, not
+# archived, so the published index stays minimal.
+archive_older: 0

@@ -1,0 +1,134 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+# F-Droid self-hosted repo publish (#2576)
+#
+# Builds + signs the GMS-free fdroid release APK, regenerates the F-Droid repo
+# index, assembles the COMBINED GitHub Pages site (privacy policy at root +
+# F-Droid repo at /fdroid), and deploys it. Triggered on a version tag or
+# manual dispatch.
+#
+# Shares the `pages` concurrency group with pages.yml so the two never deploy
+# the single Pages site concurrently (a second deploy would clobber the first).
+
+name: Publish F-Droid repo
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.41.9"
+          cache: true
+      - name: Install fdroidserver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fdroidserver
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+
+      # --- Decode the APP signing keystore (reuse the existing secrets) ------
+      - name: Decode app signing keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
+            echo "::error::Missing ANDROID_KEYSTORE_* secrets — see #48." >&2
+            exit 1
+          fi
+          APP_KEYSTORE="$RUNNER_TEMP/tankstellen-release.jks"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$APP_KEYSTORE"
+          [ -s "$APP_KEYSTORE" ] || { echo "::error::Decoded app keystore empty" >&2; exit 1; }
+          echo "ANDROID_KEYSTORE_PATH=$APP_KEYSTORE" >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
+
+      # --- Decode the F-DROID REPO signing key (NEW secrets) -----------------
+      - name: Decode F-Droid repo keystore
+        env:
+          FDROID_REPO_KEYSTORE_BASE64: ${{ secrets.FDROID_REPO_KEYSTORE_BASE64 }}
+          FDROID_REPO_KEYSTORE_PASSWORD: ${{ secrets.FDROID_REPO_KEYSTORE_PASSWORD }}
+          FDROID_REPO_KEY_PASSWORD: ${{ secrets.FDROID_REPO_KEY_PASSWORD }}
+        run: |
+          if [ -z "$FDROID_REPO_KEYSTORE_BASE64" ] || [ -z "$FDROID_REPO_KEYSTORE_PASSWORD" ] || [ -z "$FDROID_REPO_KEY_PASSWORD" ]; then
+            echo "::error::Missing FDROID_REPO_KEYSTORE_BASE64 / _PASSWORD / FDROID_REPO_KEY_PASSWORD secrets." >&2
+            exit 1
+          fi
+          # config.yml reads `keystore: keystore.p12` (relative to fdroid/), so
+          # decode the repo key straight to that configured path. Passwords are
+          # exported to the env for config.yml's {env: …} indirection.
+          mkdir -p fdroid
+          echo "$FDROID_REPO_KEYSTORE_BASE64" | base64 -d > fdroid/keystore.p12
+          [ -s fdroid/keystore.p12 ] || { echo "::error::Decoded repo keystore empty" >&2; exit 1; }
+          echo "FDROID_REPO_KEYSTORE_PASSWORD=$FDROID_REPO_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "FDROID_REPO_KEY_PASSWORD=$FDROID_REPO_KEY_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Build signed fdroid release APK
+        run: flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
+
+      - name: Audit — no GMS / MLKit
+        run: bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
+
+      - name: fdroid update
+        run: |
+          mkdir -p fdroid/repo fdroid/metadata/de.tankstellen.fuelprices
+          rsync -a fastlane/metadata/android/ fdroid/metadata/de.tankstellen.fuelprices/
+          cp -f build/app/outputs/flutter-apk/app-fdroid-release.apk fdroid/repo/
+          cp -f docs/icon.png fdroid/repo/icon.png || true
+          cd fdroid && fdroid update --create-metadata --pretty
+
+      # --- Assemble the COMBINED Pages site ----------------------------------
+      # Privacy policy + index.html at the site root, and the F-Droid repo
+      # index served directly at /fdroid (so the repo_url
+      # https://…/tankstellen/fdroid resolves /fdroid/index-v1.jar). Same
+      # layout pages.yml stages, so whichever workflow deploys last is
+      # consistent.
+      - name: Assemble _site
+        run: |
+          rm -rf _site
+          mkdir -p _site/fdroid
+          # Privacy policy (its own index.html) IS the deployed site root.
+          cp -R docs/privacy-policy/. _site/
+          cp -f docs/icon.png _site/icon.png 2>/dev/null || true
+          # F-Droid repo index served directly at /fdroid.
+          cp -R fdroid/repo/. _site/fdroid/
+
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
+      # --- Always wipe the decoded keystores ---------------------------------
+      - name: Remove decoded keystores
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/tankstellen-release.jks" fdroid/keystore.p12 || true

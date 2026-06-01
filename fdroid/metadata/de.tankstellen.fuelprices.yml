@@ -1,0 +1,21 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Minimal app metadata for the SELF-HOSTED repo (#2576) so `fdroid update`
+# accepts the prebuilt APK that scripts/fdroid_publish.sh drops into
+# fdroid/repo/. The localized title / descriptions / changelogs come from the
+# fastlane metadata rsync'd in by the publish script (en-US, de-DE, …).
+#
+# This is NOT the official fdroiddata recipe (that lives at the repo root in
+# metadata/de.tankstellen.fuelprices.yml and carries a reproducible Builds
+# block). A self-hosted repo ships a prebuilt APK, so no Builds block here.
+
+Categories:
+  - Navigation
+  - Internet
+License: MIT
+AuthorName: Florian DITTGEN
+WebSite: https://github.com/fdittgen-png/tankstellen
+SourceCode: https://github.com/fdittgen-png/tankstellen
+IssueTracker: https://github.com/fdittgen-png/tankstellen/issues
+Name: Sparkilo
