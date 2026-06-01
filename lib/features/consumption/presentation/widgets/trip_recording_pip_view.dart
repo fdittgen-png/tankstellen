@@ -16,15 +16,10 @@ import '../../providers/trip_recording_provider.dart';
 /// Picture-in-Picture tile (#2068 — replaces the prior dense
 /// one-row layout from #1977 with a single huge L/100 km figure).
 ///
-/// Layout:
-///
-/// ```
-/// ┌──────────────────────┐
-/// │       5.8            │  ← `displayLarge`-sized L/100 km
-/// │     L/100 km         │  ← `labelMedium` unit caption
-/// │  12.4 km · 8:32      │  ← compact distance + duration row
-/// └──────────────────────┘
-/// ```
+/// Layout (top→bottom): huge L/100 km figure, the unit caption, then a
+/// compact `distance · duration` secondary row. The whole stack is scaled
+/// down uniformly by one outer `FittedBox` so it never clips the small
+/// 2:1 tile (#2620).
 ///
 /// On a GPS-only trajet (no OBD2 fuel-rate samples) the big figure is
 /// the live physics estimate rendered as `~X.X L/100 km` once the
@@ -105,11 +100,14 @@ class TripRecordingPipView extends StatelessWidget {
     final elapsed = live?.elapsed;
 
     // Resolve OBD2-derived live L/100 km (or L/h at idle).
-    final raw = (live != null && !paused) ? formatInstantConsumption(live) : null;
+    final raw = (live != null && !paused)
+        ? formatInstantConsumption(live)
+        : null;
     // #2390 — GPS-only live estimate (null on OBD2 trips + during the
     // estimator's warm-up). The OBD2 `raw` figure always wins over it.
-    final gpsEstimate =
-        (live != null && !paused) ? live.gpsEstimatedLPer100Km : null;
+    final gpsEstimate = (live != null && !paused)
+        ? live.gpsEstimatedLPer100Km
+        : null;
 
     final String bigFigure;
     final String bigCaption;
@@ -149,7 +147,8 @@ class TripRecordingPipView extends StatelessWidget {
       bigCaption = l?.tripRecordingPipEstConsumptionCaption ?? 'est. L/100 km';
       isEstimate = true;
       secondaryRow = [
-        if (distance != null && distance >= 0.1) '${distance.toStringAsFixed(1)} km',
+        if (distance != null && distance >= 0.1)
+          '${distance.toStringAsFixed(1)} km',
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
     } else {
@@ -166,23 +165,22 @@ class TripRecordingPipView extends StatelessWidget {
     // no estimate disclaimer).
     final estimateInfo = isEstimate
         ? (l?.tripRecordingEstimatedInfo ??
-            'Estimated value (~) — modelled from GPS speed, not measured.')
+              'Estimated value (~) — modelled from GPS speed, not measured.')
         : null;
     Widget figureBlock = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            bigFigure,
-            style: TextStyle(
-              color: foregroundColor,
-              fontWeight: FontWeight.w800,
-              fontSize: 64,
-              height: 1.0,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
+        // #2620 — plain Text; the outer `_pipStack` FittedBox scales the
+        // WHOLE stack (figure + caption + secondary row) so nothing clips.
+        Text(
+          bigFigure,
+          style: TextStyle(
+            color: foregroundColor,
+            fontWeight: FontWeight.w800,
+            fontSize: 64,
+            height: 1.0,
+            fontFeatures: const [FontFeature.tabularFigures()],
           ),
         ),
         const SizedBox(height: 2),
@@ -203,57 +201,70 @@ class TripRecordingPipView extends StatelessWidget {
       );
     }
 
+    return _pipStack(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          figureBlock,
+          if (secondaryRow.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var i = 0; i < secondaryRow.length; i++) ...[
+                  if (i > 0)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Text(
+                        '·',
+                        style: TextStyle(
+                          color: foregroundColor.withValues(alpha: 0.6),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  Text(
+                    secondaryRow[i],
+                    style: TextStyle(
+                      color: foregroundColor.withValues(alpha: 0.9),
+                      fontSize: 12,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+          if (paused) ...[
+            const SizedBox(height: 4),
+            Text(
+              l?.tripBannerPaused ?? 'Paused',
+              style: TextStyle(
+                color: foregroundColor.withValues(alpha: 0.8),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Shared PiP host: scales the WHOLE content stack down uniformly so the
+  /// figure + caption + secondary row ALWAYS fit the small 2:1 tile without
+  /// clipping (#2620). The single outer FittedBox(scaleDown) measures the
+  /// column's full intrinsic size and shrinks it on both axes; Center keeps
+  /// it optically centred when it already fits.
+  Widget _pipStack({required Widget child}) {
     return Material(
       color: backgroundColor,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              figureBlock,
-              if (secondaryRow.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (var i = 0; i < secondaryRow.length; i++) ...[
-                      if (i > 0)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Text(
-                            '·',
-                            style: TextStyle(
-                              color: foregroundColor.withValues(alpha: 0.6),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      Text(
-                        secondaryRow[i],
-                        style: TextStyle(
-                          color: foregroundColor.withValues(alpha: 0.9),
-                          fontSize: 12,
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
-              if (paused) ...[
-                const SizedBox(height: 4),
-                Text(
-                  l?.tripBannerPaused ?? 'Paused',
-                  style: TextStyle(
-                    color: foregroundColor.withValues(alpha: 0.8),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ],
+          child: Center(
+            child: FittedBox(fit: BoxFit.scaleDown, child: child),
           ),
         ),
       ),
@@ -274,14 +285,13 @@ class TripRecordingPipView extends StatelessWidget {
     final station = approach is ApproachInRadius
         ? approach.station
         : (approach as ApproachLeaving).lastStation;
-    final distanceMeters =
-        approach is ApproachInRadius ? approach.distanceMeters : null;
+    final distanceMeters = approach is ApproachInRadius
+        ? approach.distanceMeters
+        : null;
     final fuel = fuelType ?? FuelType.e10;
     final price = station.priceFor(fuel);
 
-    final priceText = price != null
-        ? PriceFormatter.formatPrice(price)
-        : '—';
+    final priceText = price != null ? PriceFormatter.formatPrice(price) : '—';
     final fuelLabel = fuel.displayName;
 
     // #2601 — tap the approach-price tile to navigate to the station in
@@ -297,64 +307,58 @@ class TripRecordingPipView extends StatelessWidget {
           station.lng,
           label: station.navLabel,
         ),
-        child: Material(
-          color: backgroundColor,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      priceText,
-                      style: TextStyle(
-                        color: foregroundColor,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 56,
-                        height: 1.0,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    fuelLabel,
-                    style: TextStyle(
-                      color: foregroundColor.withValues(alpha: 0.85),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    station.name.isNotEmpty ? station.name : station.brand,
-                    style: TextStyle(
-                      color: foregroundColor.withValues(alpha: 0.95),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (distanceMeters != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      l?.approachStationDistance(
-                              distanceMeters.toStringAsFixed(0)) ??
-                          '${distanceMeters.toStringAsFixed(0)} m',
-                      style: TextStyle(
-                        color: foregroundColor.withValues(alpha: 0.85),
-                        fontSize: 12,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                  ],
-                ],
+        child: _pipStack(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // #2620 — plain Text; the outer `_pipStack` FittedBox scales
+              // the whole price stack so the distance line never clips.
+              Text(
+                priceText,
+                style: TextStyle(
+                  color: foregroundColor,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 56,
+                  height: 1.0,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
               ),
-            ),
+              const SizedBox(height: 2),
+              Text(
+                fuelLabel,
+                style: TextStyle(
+                  color: foregroundColor.withValues(alpha: 0.85),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                station.name.isNotEmpty ? station.name : station.brand,
+                style: TextStyle(
+                  color: foregroundColor.withValues(alpha: 0.95),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (distanceMeters != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  l?.approachStationDistance(
+                        distanceMeters.toStringAsFixed(0),
+                      ) ??
+                      '${distanceMeters.toStringAsFixed(0)} m',
+                  style: TextStyle(
+                    color: foregroundColor.withValues(alpha: 0.85),
+                    fontSize: 12,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       ),
@@ -379,15 +383,11 @@ class TripRecordingPipView extends StatelessWidget {
     return '';
   }
 
-  /// Format an elapsed [Duration] so it reads as a duration, not a
-  /// clock time (#2094). Pre-#2094 returned `"14:12"` which on a PiP
-  /// tile next to the system clock could be mistaken for 14:12 of
-  /// the day. New shapes:
-  ///
-  /// - Under 1 minute → `"42s"`.
-  /// - Under 1 hour → `"14m 12s"`.
-  /// - 1 hour or more → `"1h 14m"` (seconds drop — at hour-plus
-  ///   scale the second precision is noise).
+  /// Format an elapsed [Duration] so it reads as a duration, not a clock
+  /// time (#2094 — `"14:12"` next to the system clock read as a time of
+  /// day). Shapes: `"42s"` under a minute, `"14m 12s"` under an hour,
+  /// `"1h 14m"` at an hour-plus (seconds drop — they're noise at that
+  /// scale).
   static String _fmtElapsed(Duration d) {
     final h = d.inHours;
     final m = d.inMinutes % 60;
