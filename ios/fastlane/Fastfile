@@ -315,7 +315,7 @@ platform :ios do
           UI.message("No external groups exist — targeting ALL internal beta groups (internal-tester flow).")
           internal_groups
         else
-          UI.message("No `groups` given — adding #{email} to ALL external beta groups.")
+          UI.message("No `groups` given — adding #{emails.join(', ')} to ALL external beta groups.")
           external_groups
         end
       else
@@ -336,11 +336,19 @@ platform :ios do
     external_targets = target_groups.reject(&:is_internal_group)
     internal_targets = target_groups.select(&:is_internal_group)
 
-    # Re-fetch a tester by email with their group memberships hydrated. Returns
-    # the BetaTester model or nil. Used to add an EXISTING tester to a group and
-    # to VERIFY membership after the fact.
-    fetch_tester = lambda do |addr|
-      app.get_beta_testers(filter: { email: addr }, includes: "betaGroups").first
+    # Find a tester by email with their group memberships hydrated, returning the
+    # BetaTester model or nil. We use the ACCOUNT-SCOPED finder
+    # `Spaceship::ConnectAPI::BetaTester.find(email:)` (spaceship .../models/
+    # beta_tester.rb → global GET /v1/betaTesters?filter[email]=…) rather than
+    # the APP-SCOPED `app.get_beta_testers(filter: {email:})` that the previous
+    # implementation used. App#get_beta_testers injects `filter[:apps] = app.id`
+    # (spaceship .../models/app.rb), so a tester who exists on the account but
+    # is not yet indexed against THIS app returns nil — which is exactly why the
+    # live run could not find fdittgen@gmail.com after assignment and never
+    # landed the tester in 'extern' (#2613). The account-scoped find sees the
+    # tester regardless of app association.
+    find_tester = lambda do |addr|
+      Spaceship::ConnectAPI::BetaTester.find(email: addr, includes: "betaGroups")
     end
 
     in_group = lambda do |betatester, group|
@@ -348,54 +356,75 @@ platform :ios do
       (betatester.beta_groups || []).any? { |g| g.id == group.id }
     end
 
-    # Add `addr` to `group` and PROVE it landed. The previous implementation
-    # treated an "already exists" error from the bulk CREATE as success — but
-    # when the address already exists in ANOTHER group (e.g. an internal group),
-    # the bulk-CREATE is rejected as a duplicate and the tester is NEVER added to
-    # the target group, yet we reported success (observed: testers "added" to
-    # 'extern' that never appeared there). The fix: after the create attempt
-    # (whether it succeeds or duplicates), look up the existing tester and add it
-    # to this group via the relationship endpoint (add_beta_testers — the call
-    # for EXISTING testers, distinct from create), then re-fetch and assert the
-    # tester is actually a member before claiming success.
+    # Add `addr` to `group` and PROVE it landed, mirroring pilot's own working
+    # tester flow (pilot/lib/pilot/tester_manager.rb#add_tester) but split into
+    # the create-new vs add-existing branches and followed by a verification:
+    #
+    #   * find by email   → Spaceship::ConnectAPI::BetaTester.find(email:)
+    #   * EXISTING tester → group.add_beta_testers(beta_tester_ids: [tester.id])
+    #                       (spaceship BetaGroup#add_beta_testers →
+    #                        POST /v1/betaGroups/{id}/relationships/betaTesters)
+    #   * NEW tester      → Spaceship::ConnectAPI.post_beta_tester_assignment(
+    #                        beta_group_ids: [group.id], attributes: {...})
+    #                       (spaceship testflight.rb → POST /v1/betaTesters with
+    #                        the betaGroups relationship — creates the tester
+    #                        already attached to the target group)
+    #
+    # The previous code only ever called the bulk-assignment endpoint and then
+    # an app-scoped find; when the address already existed in ANOTHER group the
+    # bulk endpoint returns 200 with a per-tester error (it does NOT raise), so
+    # nothing was added and the find found nothing either — reported as the live
+    # "could not be found as a beta tester after assignment" failure (#2613).
     assign_to = lambda do |addr, info, group, kind|
-      # 1) Try the bulk create — the happy path for a brand-new tester. A
-      #    duplicate here is expected and NOT terminal; the relationship add
-      #    below handles the existing-tester case.
+      existing = find_tester.call(addr)
+      UI.message("[manage_testers] find(#{addr}) → " \
+                 "#{existing ? "tester id #{existing.id}" : 'nil (not yet a tester)'}; " \
+                 "target #{kind} group '#{group.name}' (#{group.id}).")
+
+      if existing && in_group.call(existing, group)
+        # Truly already a member of the target group → idempotent no-op.
+        UI.success("#{addr} is already in #{kind} beta group '#{group.name}' — nothing to do.")
+        return true
+      end
+
       begin
-        group.post_bulk_beta_tester_assignments(beta_testers: [info])
+        if existing
+          # EXISTING tester (possibly only in another group) → attach to this
+          # group via the relationship endpoint.
+          UI.message("[manage_testers] path=add-existing — attaching tester #{existing.id} to '#{group.name}'.")
+          group.add_beta_testers(beta_tester_ids: [existing.id])
+        else
+          # NEW tester → create it already attached to the target group.
+          UI.message("[manage_testers] path=create-new — creating #{addr} attached to '#{group.name}'.")
+          Spaceship::ConnectAPI.post_beta_tester_assignment(
+            beta_group_ids: [group.id],
+            attributes: {
+              email: addr,
+              firstName: info[:firstName],
+              lastName: info[:lastName],
+            },
+          )
+        end
       rescue => ex
         message = ex.message.to_s
-        unless message =~ /already|exist|duplicat/i
-          UI.error("Failed to create #{addr} in '#{group.name}': #{message}")
-          raise ex
-        end
-      end
-
-      # 2) Whatever happened above, ensure the EXISTING tester is attached to
-      #    this group via the relationship call (idempotent — adding a tester
-      #    already in the group is a no-op).
-      betatester = fetch_tester.call(addr)
-      unless in_group.call(betatester, group)
-        if betatester.nil?
-          UI.error("#{addr} could not be found as a beta tester after assignment — cannot add to '#{group.name}'.")
+        if message =~ /already|exist|duplicat/i
+          # Concurrent / prior partial run already attached it — fine; the
+          # verification below confirms the real state.
+          UI.message("[manage_testers] add reported already-exists for #{addr} in '#{group.name}'; verifying.")
+        else
+          UI.error("Failed to add #{addr} to '#{group.name}': #{message}")
           return false
         end
-        begin
-          group.add_beta_testers(beta_tester_ids: [betatester.id])
-        rescue => ex
-          message = ex.message.to_s
-          unless message =~ /already|exist|duplicat/i
-            UI.error("Failed to add existing #{addr} to '#{group.name}': #{message}")
-            return false
-          end
-        end
       end
 
-      # 3) VERIFY by re-fetching the tester's group memberships. Only claim
-      #    success when the email is genuinely present in the target group.
-      verified = fetch_tester.call(addr)
-      if in_group.call(verified, group)
+      # VERIFY by re-fetching (account-scoped) and asserting target-group
+      # membership. Only claim success when the email is genuinely present.
+      verified = find_tester.call(addr)
+      member = in_group.call(verified, group)
+      UI.message("[manage_testers] post-verify #{addr} → groups: " \
+                 "#{verified ? (verified.beta_groups || []).map(&:name).join(', ') : '(tester not found)'}; " \
+                 "in '#{group.name}'? #{member}.")
+      if member
         UI.success("#{addr} is in #{kind} beta group '#{group.name}'.")
         true
       else
