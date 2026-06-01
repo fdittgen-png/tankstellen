@@ -290,7 +290,14 @@ void main() {
     // `onStationTap` field (the map now takes the full horizontal width on
     // wide/landscape — no side panel), so the marker tap is back to its
     // pre-#2532 `/station/:id` push and the field + its plumbing are gone.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 562,
+    // #2631 — re-grandfathered 562 → 604: the optional cross-border
+    // `fuelResolver` field + its dartdoc, its constructor param + the
+    // `didUpdateWidget` identity guard, the resolver thread-through in
+    // `orderedByPriceForPainting` + `_recomputeMarkers`, and the small
+    // `_resolvedRange` helper that colours cross-border markers by each
+    // station's own country fuel. Lets a Spanish station show its E10 price
+    // instead of '--' on an E85 route. Decomposition tracked by #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 604,
     // #2382 — +5 for Feature.approachOverlay's three per-feature switch
     // cases (label / description / blocked-enable). Intrinsic per-feature
     // growth in this switch-based section; full decomposition is its own

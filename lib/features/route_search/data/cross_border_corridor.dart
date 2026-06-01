@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/country/country_bounding_box.dart';
+import '../../../core/country/country_config.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/services/country_service_registry.dart';
 import '../../../core/services/service_providers.dart';
@@ -19,6 +19,7 @@ import '../../profile/providers/profile_provider.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/search_result_item.dart';
+import '../../search/domain/entities/station.dart';
 import '../domain/entities/route_info.dart';
 import '../domain/route_search_strategy.dart';
 import 'strategies/route_geometry.dart';
@@ -225,18 +226,29 @@ StationQueryFunction buildCorridorQueryFunction(
   };
 }
 
-/// Resolve the fuel to price a station by, from its coordinates.
+/// Resolve the fuel to price a [station] by, from its origin country.
 ///
-/// Offline bbox → profile fuel for that country (from [profileFuels]),
-/// falling back to [fallback] (the incoming search fuel) when the station
-/// sits outside every box or in a country with no profile.
+/// Offline country attribution → profile fuel for that country (from
+/// [profileFuels]), falling back to [fallback] (the incoming search fuel)
+/// when the country has no profile or cannot be resolved.
+///
+/// Country attribution uses [Countries.countryForStation], which checks the
+/// station id PREFIX first (`es-…` → ES) and only then the bounding box.
+/// The id prefix is essential here: FR's continental bbox geographically
+/// CONTAINS all of Catalonia (#2621), so a bbox-only lookup resolves a
+/// Barcelona MITECO station to FR and prices it on FR's E85 (null for ES) —
+/// the very '--' bug this fixes. The `es-` prefix every MITECO row carries
+/// (#753) overrides that shadow and yields ES → E10.
 FuelType fuelForStation(
-  double lat,
-  double lng,
+  Station station,
   Map<String, FuelType> profileFuels,
   FuelType fallback,
 ) {
-  final code = countryCodeFromLatLng(lat, lng)?.toUpperCase();
+  final code = Countries.countryForStation(
+    id: station.id,
+    lat: station.lat,
+    lng: station.lng,
+  )?.code.toUpperCase();
   if (code == null) return fallback;
   return profileFuels[code] ?? fallback;
 }

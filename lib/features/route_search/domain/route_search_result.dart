@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/search_result_item.dart';
 import 'entities/route_info.dart';
 import 'route_search_strategy.dart';
@@ -35,6 +36,16 @@ class RouteSearchResult {
   /// the single-country attribution.
   final Set<String> corridorCountryCodes;
 
+  /// #2631 — profile fuel keyed by upper-cased country code (the same map
+  /// `buildCorridorServiceMap` was built from). The map + list display
+  /// resolve each station's price by ITS country's fuel from this map
+  /// (offline, via the station's lat/lng), so a cross-border ES station
+  /// shows the E10 price an E85 driver would actually pay instead of '--'.
+  /// Empty for the single-country path, where the active fuel is used and
+  /// the display is byte-identical to the pre-#2631 strict behaviour
+  /// (#2510 — no within-country fallback).
+  final Map<String, FuelType> profileFuelByCountry;
+
   const RouteSearchResult({
     required this.route,
     required this.stations,
@@ -43,5 +54,6 @@ class RouteSearchResult {
     this.strategyType = RouteSearchStrategyType.uniform,
     this.isPartial = false,
     this.corridorCountryCodes = const {},
+    this.profileFuelByCountry = const {},
   });
 }

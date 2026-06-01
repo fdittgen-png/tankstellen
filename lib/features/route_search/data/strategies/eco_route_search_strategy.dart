@@ -12,6 +12,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
+import '../cross_border_corridor.dart' show fuelForStation;
 import '../helpers/batch_query_helper.dart';
 import 'eco_route_candidate.dart';
 import 'eco_route_scoring.dart';
@@ -219,6 +220,7 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
     required List<SearchResultItem> results,
     required FuelType fuelType,
     required double segmentKm,
+    Map<String, FuelType> profileFuelByCountry = const {},
   }) {
     final segmentCheapest = <int, String>{};
     // #2183 — O(1) leader lookup via a parallel price map (was an
@@ -242,7 +244,9 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
           }
         }
         final segmentIdx = segmentIndexFor(nearestSampleIdx, segmentKm);
-        final price = station.priceFor(fuelType);
+        // #2631 — per-country profile fuel (empty map → fuelType fallback).
+        final price = station.priceFor(
+            fuelForStation(station, profileFuelByCountry, fuelType));
         if (price != null) {
           final currentBestPrice = segmentCheapestPrice[segmentIdx];
           // Strict < keeps first-occurrence-wins on equal prices.

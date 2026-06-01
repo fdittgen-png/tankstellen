@@ -78,6 +78,14 @@ class StationMapLayers extends StatefulWidget {
   /// EV charging station overlay.
   final List<Widget> extraLayers;
 
+  /// #2631 — on a cross-border route, maps a station to the fuel of ITS
+  /// country's profile (offline, from the station's lat/lng). When set,
+  /// marker price, colour and paint order all use that resolved fuel so a
+  /// Spanish station shows the E10 price an E85 driver would pay instead
+  /// of '--'. Null on a single-country search → strict [selectedFuel]
+  /// behaviour (#2510), unchanged.
+  final FuelType Function(Station)? fuelResolver;
+
   const StationMapLayers({
     super.key,
     required this.mapController,
@@ -93,6 +101,7 @@ class StationMapLayers extends StatefulWidget {
     this.showSearchRadius = true,
     this.selectedStationIds,
     this.extraLayers = const [],
+    this.fuelResolver,
   });
 
   @override
@@ -170,13 +179,17 @@ class StationMapLayers extends StatefulWidget {
   /// relative order of equal-priced stations.
   static List<Station> orderedByPriceForPainting(
     List<Station> stations,
-    FuelType selectedFuel,
-  ) {
+    FuelType selectedFuel, {
+    FuelType Function(Station)? fuelResolver,
+  }) {
     // A null selected-fuel price is treated as the most-expensive bucket
     // (+infinity) so, under a descending sort, it lands first → painted
-    // at the very bottom, beneath every priced marker.
+    // at the very bottom, beneath every priced marker. #2631 — when a
+    // cross-border resolver is set, the key is each station's OWN country
+    // fuel price so the cheapest ES (E10) marker still paints on top.
     double sortKey(Station s) =>
-        priceForFuelType(s, selectedFuel) ?? double.infinity;
+        priceForFuelType(s, fuelResolver != null ? fuelResolver(s) : selectedFuel) ??
+        double.infinity;
     final ordered = List<Station>.of(stations);
     // Descending: highest price first (bottom), lowest last (top).
     mergeSort<Station>(ordered,
@@ -266,8 +279,13 @@ class _StationMapLayersState extends State<StationMapLayers> {
     // #2510 — colour by the SELECTED-fuel price (the same strict
     // resolution the list uses), not a fallback chain. A station without
     // the selected fuel paints grey ("--") instead of being re-coloured
-    // by E10's price.
-    _priceRange = priceRange(widget.stations, widget.selectedFuel);
+    // by E10's price. #2631 — when a cross-border resolver is set, each
+    // station's price is taken for ITS country fuel, so the colour range
+    // is computed over those resolved prices to keep colour ↔ price aligned.
+    final resolver = widget.fuelResolver;
+    _priceRange = resolver == null
+        ? priceRange(widget.stations, widget.selectedFuel)
+        : _resolvedRange(widget.stations, resolver);
     final ids = widget.selectedStationIds;
     final hasSelection = ids != null && ids.isNotEmpty;
 
@@ -290,6 +308,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
     final ordered = StationMapLayers.orderedByPriceForPainting(
       widget.stations,
       widget.selectedFuel,
+      fuelResolver: resolver,
     );
     _markers = ordered.map((station) {
       final isPastel = hasSelection && !ids.contains(station.id);
@@ -301,8 +320,29 @@ class _StationMapLayersState extends State<StationMapLayers> {
         _priceRange.$2,
         pastel: isPastel,
         compact: !emphasized.contains(station.id),
+        fuelResolver: resolver,
       );
     }).toList();
+  }
+
+  /// (min, max) over each station's per-country resolved-fuel price (#2631),
+  /// used to colour cross-border markers consistently with the price each
+  /// one actually shows. Mirrors [priceRange] but resolves the fuel per
+  /// station via [resolver]. Returns `(0, 0)` when none resolve to a price.
+  static (double, double) _resolvedRange(
+    List<Station> stations,
+    FuelType Function(Station) resolver,
+  ) {
+    double minP = double.infinity;
+    double maxP = 0;
+    for (final s in stations) {
+      final p = priceForFuelType(s, resolver(s));
+      if (p != null) {
+        if (p < minP) minP = p;
+        if (p > maxP) maxP = p;
+      }
+    }
+    return minP == double.infinity ? (0, 0) : (minP, maxP);
   }
 
   @override
@@ -326,6 +366,8 @@ class _StationMapLayersState extends State<StationMapLayers> {
     if (stationsChanged ||
         oldWidget.selectedFuel != widget.selectedFuel ||
         oldWidget.sortMode != widget.sortMode ||
+        // #2631 — a changed cross-border resolver re-prices every marker.
+        !identical(oldWidget.fuelResolver, widget.fuelResolver) ||
         !identical(oldWidget.selectedStationIds, widget.selectedStationIds)) {
       _recomputeMarkers();
     }

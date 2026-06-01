@@ -230,6 +230,38 @@ void main() {
 
       expect(bestStops, isEmpty);
     });
+
+    // #2631 — backward-compat: with `profileFuelByCountry` omitted (the
+    // single-country path), each station prices by the active fuel exactly
+    // as before, so the map is byte-identical to the pre-#2631 result.
+    test('omitting profileFuelByCountry yields the identical map (#2631)', () {
+      final results = [
+        FuelStationResult(makeStation(
+            id: 'seg0_cheap', lat: 48.0, lng: 2.0, diesel: 1.65)),
+        FuelStationResult(makeStation(
+            id: 'seg0_exp', lat: 48.02, lng: 2.02, diesel: 1.90)),
+        FuelStationResult(makeStation(
+            id: 'seg1_cheap', lat: 48.2, lng: 2.2, diesel: 1.70)),
+      ];
+
+      final withoutMap = strategy.computeBestStops(
+        route: testRoute,
+        results: results,
+        fuelType: FuelType.diesel,
+        segmentKm: 15.0,
+      );
+      final withEmptyMap = strategy.computeBestStops(
+        route: testRoute,
+        results: results,
+        fuelType: FuelType.diesel,
+        segmentKm: 15.0,
+        profileFuelByCountry: const {},
+      );
+
+      expect(withoutMap, equals(withEmptyMap));
+      expect(withoutMap!.values, contains('seg0_cheap'));
+      expect(withoutMap.values, isNot(contains('seg0_exp')));
+    });
   });
 
   group('isolate filter + sort (#2102)', () {

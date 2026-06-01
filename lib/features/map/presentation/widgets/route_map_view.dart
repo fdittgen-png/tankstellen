@@ -11,8 +11,11 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../itinerary/providers/itinerary_provider.dart';
+import '../../../route_search/data/cross_border_corridor.dart'
+    show fuelForStation;
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/providers/route_search_provider.dart';
+import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/providers/search_provider.dart';
@@ -76,6 +79,15 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         : const LatLng(48.8566, 2.3522);
     final zoom = _zoomForRoute(result.route.distanceKm);
 
+    // #2631 — price each station by ITS country's profile fuel (offline,
+    // from lat/lng) so a cross-border Spanish station shows the E10 price
+    // an E85 driver would pay instead of '--'. An empty `profileFuelByCountry`
+    // (single-country search) makes this resolve to the active fuel — the
+    // strict #2510 behaviour, unchanged.
+    final fuelType = widget.selectedFuel as FuelType;
+    FuelType resolveFuel(Station s) =>
+        fuelForStation(s, result.profileFuelByCountry, fuelType);
+
     return Column(
       children: [
         RouteViewModeBar(
@@ -109,6 +121,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             showSearchRadius: false,
             selectedStationIds:
                 _selectedStationIds.isNotEmpty ? _selectedStationIds : null,
+            fuelResolver: resolveFuel,
           ),
         ),
         if (_viewMode == RouteViewMode.bestStops && displayStations.isNotEmpty)
@@ -116,6 +129,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             stations: displayStations,
             selectedStationIds: _selectedStationIds,
             selectedFuel: widget.selectedFuel,
+            fuelResolver: resolveFuel,
             onToggleStation: (id) => setState(() {
               if (_selectedStationIds.contains(id)) {
                 _selectedStationIds.remove(id);

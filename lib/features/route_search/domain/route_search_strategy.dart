@@ -49,11 +49,21 @@ abstract class RouteSearchStrategy {
   ///
   /// Returns a map of segment index → station ID for the cheapest
   /// station in each segment. Returns null if not applicable.
+  ///
+  /// #2631 — each station is priced by ITS country's profile fuel via
+  /// [profileFuelByCountry] (upper-cased country code → fuel), resolved
+  /// offline from the station's lat/lng. A cross-border E85 driver thus
+  /// sees Spanish stations ranked on the E10 price they'd actually pay,
+  /// instead of being dropped because the single active fuel (E85) is
+  /// null for ~95% of ES stations. When the map is empty (the historical
+  /// single-country path) every station is priced by [fuelType], so the
+  /// result is byte-identical to the pre-#2631 behaviour.
   Map<int, String>? computeBestStops({
     required RouteInfo route,
     required List<SearchResultItem> results,
     required FuelType fuelType,
     required double segmentKm,
+    Map<String, FuelType> profileFuelByCountry = const {},
   });
 }
 

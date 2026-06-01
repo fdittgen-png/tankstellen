@@ -14,6 +14,8 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../route_search/data/cross_border_corridor.dart'
+    show fuelForStation;
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_result_item.dart';
@@ -257,7 +259,15 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
       ),
       child: StationCard(
         station: item.station,
-        selectedFuelType: fuelType,
+        // #2631 — price by the station's OWN country profile fuel (offline,
+        // from lat/lng) so a cross-border Spanish card shows its E10 price
+        // instead of '--'. Empty `profileFuelByCountry` (single-country
+        // search) resolves to the active fuel → strict #2510 behaviour.
+        selectedFuelType: fuelForStation(
+          item.station,
+          result.profileFuelByCountry,
+          fuelType,
+        ),
         isFavorite: ref.watch(isFavoriteProvider(item.id)),
         profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
         onTap: () => context.push('/station/${item.id}'),
