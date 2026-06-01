@@ -3508,5 +3508,69 @@
   "@evPriceFranceAttribution": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "@routeStationCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stationUpdatedLabel": "Updated {time}",
+  "@stationUpdatedLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "10:30"
+      }
+    }
+  },
+  "amenityMoreTooltip": "Also: {names}",
+  "@amenityMoreTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "names": {
+        "type": "String",
+        "example": "ATM, WiFi"
+      }
+    }
+  },
+  "favoriteAdd": "Add to favorites",
+  "@favoriteAdd": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "favoriteRemove": "Remove from favorites",
+  "@favoriteRemove": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "loyaltyRawPriceTooltip": "Raw: {price}",
+  "@loyaltyRawPriceTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "€1.85"
+      }
+    }
+  },
+  "routeDataSourceMulti": "{sources}",
+  "@routeDataSourceMulti": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "sources": {
+        "type": "String",
+        "example": "France — Prix-Carburants · Spain — Geoportal Gasolineras"
+      }
+    }
   }
 }

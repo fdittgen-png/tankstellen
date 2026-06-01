@@ -6662,6 +6662,43 @@ class AppLocalizationsDe extends AppLocalizations {
       'Suche fehlgeschlagen – bitte erneut versuchen';
 
   @override
+  String routeStationCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tankstellen',
+      one: '1 Tankstelle',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String stationUpdatedLabel(String time) {
+    return 'Aktualisiert $time';
+  }
+
+  @override
+  String amenityMoreTooltip(String names) {
+    return 'Außerdem: $names';
+  }
+
+  @override
+  String get favoriteAdd => 'Zu Favoriten hinzufügen';
+
+  @override
+  String get favoriteRemove => 'Aus Favoriten entfernen';
+
+  @override
+  String loyaltyRawPriceTooltip(String price) {
+    return 'Roh: $price';
+  }
+
+  @override
+  String routeDataSourceMulti(String sources) {
+    return '$sources';
+  }
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override

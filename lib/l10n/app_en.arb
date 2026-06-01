@@ -5862,6 +5862,63 @@
   "@searchFailedSnackbar": {
     "description": "Error snackbar shown when a search request fails. Replaces a raw exception toString() that previously leaked stack-like text to the user (#1692)."
   },
+  "routeStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "@routeStationCount": {
+    "description": "Station count shown in the route-results summary line (e.g. '29 stations'). Pluralised so '1 station' reads naturally (#2622).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stationUpdatedLabel": "Updated {time}",
+  "@stationUpdatedLabel": {
+    "description": "Wraps a station's pre-formatted last-updated timestamp so the value reads as a freshness indicator rather than a bare code (#2622). {time} is the upstream-provided, already-localized time string.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "10:30"
+      }
+    }
+  },
+  "amenityMoreTooltip": "Also: {names}",
+  "@amenityMoreTooltip": {
+    "description": "Tooltip / accessibility label on the '+N' amenity overflow pill, listing the hidden amenities by localized name (#2622). {names} is a comma-joined list.",
+    "placeholders": {
+      "names": {
+        "type": "String",
+        "example": "ATM, WiFi"
+      }
+    }
+  },
+  "favoriteAdd": "Add to favorites",
+  "@favoriteAdd": {
+    "description": "Tooltip / accessibility label on the station-card favourite star when the station is NOT yet a favourite (#2622)."
+  },
+  "favoriteRemove": "Remove from favorites",
+  "@favoriteRemove": {
+    "description": "Tooltip / accessibility label on the station-card favourite star when the station IS already a favourite (#2622)."
+  },
+  "loyaltyRawPriceTooltip": "Raw: {price}",
+  "@loyaltyRawPriceTooltip": {
+    "description": "Tooltip on the price headline when a loyalty discount applies, surfacing the un-discounted raw price for power users (#2622). {price} is an already-formatted price string.",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "€1.85"
+      }
+    }
+  },
+  "routeDataSourceMulti": "{sources}",
+  "@routeDataSourceMulti": {
+    "description": "Multi-country data-source attribution shown above a cross-border route result, joining each crossed country's provider credit (#2622). {sources} is the pre-joined ' · '-separated list, e.g. 'France — Prix-Carburants · Spain — Geoportal Gasolineras'.",
+    "placeholders": {
+      "sources": {
+        "type": "String",
+        "example": "France — Prix-Carburants · Spain — Geoportal Gasolineras"
+      }
+    }
+  },
   "vinLabel": "VIN (optional)",
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",

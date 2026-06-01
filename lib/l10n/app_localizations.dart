@@ -11631,6 +11631,48 @@ abstract class AppLocalizations {
   /// **'Search failed — please try again'**
   String get searchFailedSnackbar;
 
+  /// Station count shown in the route-results summary line (e.g. '29 stations'). Pluralised so '1 station' reads naturally (#2622).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 station} other{{count} stations}}'**
+  String routeStationCount(int count);
+
+  /// Wraps a station's pre-formatted last-updated timestamp so the value reads as a freshness indicator rather than a bare code (#2622). {time} is the upstream-provided, already-localized time string.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String stationUpdatedLabel(String time);
+
+  /// Tooltip / accessibility label on the '+N' amenity overflow pill, listing the hidden amenities by localized name (#2622). {names} is a comma-joined list.
+  ///
+  /// In en, this message translates to:
+  /// **'Also: {names}'**
+  String amenityMoreTooltip(String names);
+
+  /// Tooltip / accessibility label on the station-card favourite star when the station is NOT yet a favourite (#2622).
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get favoriteAdd;
+
+  /// Tooltip / accessibility label on the station-card favourite star when the station IS already a favourite (#2622).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites'**
+  String get favoriteRemove;
+
+  /// Tooltip on the price headline when a loyalty discount applies, surfacing the un-discounted raw price for power users (#2622). {price} is an already-formatted price string.
+  ///
+  /// In en, this message translates to:
+  /// **'Raw: {price}'**
+  String loyaltyRawPriceTooltip(String price);
+
+  /// Multi-country data-source attribution shown above a cross-border route result, joining each crossed country's provider credit (#2622). {sources} is the pre-joined ' · '-separated list, e.g. 'France — Prix-Carburants · Spain — Geoportal Gasolineras'.
+  ///
+  /// In en, this message translates to:
+  /// **'{sources}'**
+  String routeDataSourceMulti(String sources);
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

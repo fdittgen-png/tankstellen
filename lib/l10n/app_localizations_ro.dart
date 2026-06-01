@@ -6667,6 +6667,43 @@ class AppLocalizationsRo extends AppLocalizations {
       'Căutarea a eșuat — vă rugăm să încercați din nou';
 
   @override
+  String routeStationCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stations',
+      one: '1 station',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String stationUpdatedLabel(String time) {
+    return 'Updated $time';
+  }
+
+  @override
+  String amenityMoreTooltip(String names) {
+    return 'Also: $names';
+  }
+
+  @override
+  String get favoriteAdd => 'Add to favorites';
+
+  @override
+  String get favoriteRemove => 'Remove from favorites';
+
+  @override
+  String loyaltyRawPriceTooltip(String price) {
+    return 'Raw: $price';
+  }
+
+  @override
+  String routeDataSourceMulti(String sources) {
+    return '$sources';
+  }
+
+  @override
   String get vinLabel => 'VIN (opțional)';
 
   @override
