@@ -6,9 +6,12 @@ name: iOS TestFlight Build
 # Build a signed iOS IPA on a macOS runner and upload it to TestFlight via the
 # App Store Connect API. Mirror of `daily-beta.yml` but for iOS.
 #
-# Build numbers are date+hour-based (YYYYMMDDHH) computed at build time, so
-# there's no commit pushed back to master and re-runs on the same day get
-# distinct, monotonically-increasing CFBundleVersions.
+# Build numbers come from a monotonic run-counter (see the build-number step),
+# computed at build time, so there's no commit pushed back to master and every
+# run gets a distinct, strictly-increasing CFBundleVersion.
+#
+# Scheduled runs (and manual runs with distribute:true) push the build to the
+# external 'extern' TestFlight group; plain manual runs stay internal-only.
 
 on:
   workflow_dispatch:
@@ -18,11 +21,16 @@ on:
         required: false
         type: string
         default: 'Daily build.'
-  # Schedule trigger intentionally left commented until we've confirmed two
-  # consecutive manual runs land in TestFlight cleanly. Then uncomment to
-  # mirror Android's nightly cadence.
-  # schedule:
-  #   - cron: '0 16 * * *'
+      distribute:
+        description: 'Distribute to external "extern" testers (submits for Beta App Review). Scheduled runs always distribute.'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # 04:30 Europe/Paris is intentionally distinct from the other daily crons:
+    # daily-beta.yml runs at 16:00 and daily-github-release.yml at 21:00, so the
+    # iOS nightly external build never collides with them.
+    - cron: '30 4 * * *'
 
 concurrency:
   group: ios-testflight
@@ -35,12 +43,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Compute date-based build number
+      - name: Compute monotonic build number
         id: bn
+        # Monotonic run-counter rather than a date stamp: a 2026060000 base
+        # offset (above every prior YYYYMMDDHH number) plus the run number and
+        # attempt guarantees a strictly-increasing, never-colliding
+        # CFBundleVersion across re-runs and re-attempts.
         run: |
-          BN=$(TZ=Europe/Paris date +%Y%m%d%H)
+          BN=$(( 2026060000 + ${{ github.run_number }} * 10 + ${{ github.run_attempt }} ))
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
-          echo "Daily build number: $BN"
+          echo "Build number: $BN"
 
       - name: Select Xcode 26+
         # macos-latest selects Xcode 16.4 (iOS 18.5 SDK) by default. Apple
@@ -125,9 +137,18 @@ jobs:
           # Fastfile's `asc_api_key` helper picks up the on-disk .p8.
           IOS_BUILD_NUMBER: ${{ steps.bn.outputs.build_number }}
           TESTFLIGHT_CHANGELOG: ${{ github.event.inputs.release_notes || 'Daily build.' }}
+          # Scheduled runs always distribute externally; manual runs only when
+          # the distribute input is checked.
+          DISTRIBUTE: ${{ github.event_name == 'schedule' || inputs.distribute }}
+          # Beta App Review contact block carried inline on an external build
+          # (the Fastfile omits it gracefully when BETA_CONTACT_PHONE is unset).
+          BETA_CONTACT_PHONE: ${{ secrets.BETA_CONTACT_PHONE }}
+          BETA_CONTACT_FIRST: ${{ secrets.BETA_CONTACT_FIRST || '' }}
+          BETA_CONTACT_LAST: ${{ secrets.BETA_CONTACT_LAST || '' }}
+          BETA_FEEDBACK_EMAIL: ${{ secrets.BETA_FEEDBACK_EMAIL || '' }}
           FASTLANE_DISABLE_COLORS: '1'
           FASTLANE_HIDE_CHANGELOG: '1'
-        run: bundle exec fastlane release_testflight build_number:"${IOS_BUILD_NUMBER}" changelog:"${TESTFLIGHT_CHANGELOG}"
+        run: bundle exec fastlane release_testflight build_number:"${IOS_BUILD_NUMBER}" changelog:"${TESTFLIGHT_CHANGELOG}" distribute_external:"${DISTRIBUTE}"
 
       - name: Clean up decoded API key
         if: always()
