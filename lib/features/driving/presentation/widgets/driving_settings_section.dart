@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -22,18 +23,24 @@ import '../../providers/haptic_eco_coach_provider.dart';
 ///
 /// Surfaced inside the Settings → Conso foldable, this widget is the
 /// single child responsible for rendering every Conso-related
-/// parameter. After #1572 it splits into three labelled sub-sections so
-/// the user can see which functionality each parameter pairs with:
+/// parameter. After #2566 it groups parameters by *purpose* — each group
+/// gathers controls that serve the same job, so the user can tell at a
+/// glance what each setting affects:
 ///
-///   1. **My vehicles** — always visible when the foldable is rendered.
+///   1. **Vehicles** — always visible when the foldable is rendered.
 ///      The vehicles tile is the primary affordance for both Medium
-///      (manual fill-up tier) and Full (OBD2 trip tier).
-///   2. **Trips (OBD2)** — only when [ConsoMode.fuelAndTrips]. Houses
-///      the glide-coach beta toggle and reserves room for future
-///      OBD2-specific parameters.
-///   3. **Driving** — always visible. Real-time eco-coach,
-///      gamification, and (when [Feature.loyaltyCards] is on) the fuel-
-///      club entry-point.
+///      (manual fill-up tier) and Full (OBD2 trip tier); the subtitle
+///      describes what `/vehicles` manages (fuel type, engine, tank
+///      size) for both combustion and EV cars.
+///   2. **Coaching while driving** — the two haptic driving assists
+///      gathered together: real-time eco-coaching (gated by the
+///      `obd2TripRecording` dependency via [canEnable]) followed by the
+///      glide-coach beta (visible only when [Feature.glideCoach] is on).
+///   3. **Rewards & savings** — the fuel-club entry-point (when
+///      [Feature.loyaltyCards] is on) and the gamification opt-out.
+///   4. **Troubleshooting** — only when the OBD2 stack is on
+///      ([ConsoMode.fuelAndTrips]). Houses the OBD2 debug-logging
+///      diagnostic, clearly separated from the user-facing features.
 class DrivingSettingsSection extends ConsumerWidget {
   const DrivingSettingsSection({super.key});
 
@@ -65,55 +72,36 @@ class DrivingSettingsSection extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // 1. Mes véhicules sub-section — always present (the foldable
-        //    itself is hidden when consumptionOn is false in
-        //    ProfileScreen, so reaching this widget already means the
-        //    Conso surface is on).
+        // 1. Vehicles — always present (the foldable itself is hidden
+        //    when consumptionOn is false in ProfileScreen, so reaching
+        //    this widget already means the Conso surface is on). One
+        //    clear header; the tile carries an accurate subtitle that
+        //    describes what /vehicles manages for both fuel + EV cars.
         SectionHeader(
-          title: l?.consoSubsectionVehicles ?? 'My vehicles',
+          title: l?.consoGroupVehicles ?? 'Vehicles',
           leadingIcon: Icons.directions_car,
-          padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+          padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
         ),
         SettingsMenuTile(
           key: const Key('consoleVehiclesTile'),
           icon: Icons.directions_car,
           title: l?.vehiclesMenuTitle ?? 'My vehicles',
           subtitle: l?.vehiclesMenuSubtitle ??
-              'Battery, connectors, charging preferences',
+              'Your cars — fuel type, engine and tank size for accurate '
+                  'consumption estimates',
           onTap: () => context.push('/vehicles'),
         ),
 
-        // 2. Trips (OBD2) sub-section — only when the OBD2 stack is on
-        //    (consoMode == fuelAndTrips). Houses glide-coach beta and
-        //    leaves room for future Trajets-specific parameters.
-        if (mode == ConsoMode.fuelAndTrips) ...[
-          const SizedBox(height: 8),
-          SectionHeader(
-            title: l?.consoSubsectionTrajets ?? 'Trips (OBD2)',
-            leadingIcon: Icons.route_outlined,
-            padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
-          ),
-          if (ref.watch(glideCoachEnabledProvider))
-            const _GlideCoachToggleTile(),
-          const _Obd2DebugLoggingToggleTile(),
-        ],
-
-        // 3. Driving sub-section — eco-coach + gamification + fuel-club.
-        const SizedBox(height: 8),
+        // 2. Coaching while driving — the two haptic driving assists
+        //    grouped together. Real-time eco-coaching keeps the #1608
+        //    `canToggleEco` dependency gate verbatim; the glide-coach
+        //    beta keeps its `glideCoachEnabledProvider` visibility gate.
+        const SizedBox(height: Spacing.md),
         SectionHeader(
-          title: l?.consoSubsectionToggles ?? 'Driving',
-          leadingIcon: Icons.tune,
-          padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+          title: l?.consoGroupCoaching ?? 'Coaching while driving',
+          leadingIcon: Icons.self_improvement,
+          padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
         ),
-        if (loyaltyOn)
-          SettingsMenuTile(
-            key: const Key('consoleFuelClubCardsTile'),
-            icon: Icons.card_membership,
-            title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
-            subtitle: l?.loyaltyMenuSubtitle ??
-                'Apply per-litre discounts from Total, Aral, Shell, …',
-            onTap: () => context.push('/loyalty-settings'),
-          ),
         SwitchListTile(
           key: const Key('hapticEcoCoachToggle'),
           value: ecoEnabled,
@@ -132,7 +120,41 @@ class DrivingSettingsSection extends ConsumerWidget {
               : null,
           contentPadding: EdgeInsets.zero,
         ),
+        if (ref.watch(glideCoachEnabledProvider))
+          const _GlideCoachToggleTile(),
+
+        // 3. Rewards & savings — the fuel-club entry-point (when
+        //    [Feature.loyaltyCards] is on) and the gamification opt-out.
+        const SizedBox(height: Spacing.md),
+        SectionHeader(
+          title: l?.consoGroupRewards ?? 'Rewards & savings',
+          leadingIcon: Icons.emoji_events_outlined,
+          padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
+        ),
+        if (loyaltyOn)
+          SettingsMenuTile(
+            key: const Key('consoleFuelClubCardsTile'),
+            icon: Icons.card_membership,
+            title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
+            subtitle: l?.loyaltyMenuSubtitle ??
+                'Apply per-litre discounts from Total, Aral, Shell, …',
+            onTap: () => context.push('/loyalty-settings'),
+          ),
         const GamificationSettingsTile(),
+
+        // 4. Troubleshooting — only when the OBD2 stack is on
+        //    (consoMode == fuelAndTrips). The OBD2 debug-logging toggle
+        //    is a developer diagnostic, kept clearly apart from the
+        //    user-facing features above.
+        if (mode == ConsoMode.fuelAndTrips) ...[
+          const SizedBox(height: Spacing.md),
+          SectionHeader(
+            title: l?.consoGroupTroubleshooting ?? 'Troubleshooting',
+            leadingIcon: Icons.bug_report_outlined,
+            padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
+          ),
+          const _Obd2DebugLoggingToggleTile(),
+        ],
       ],
     );
   }
@@ -173,8 +195,9 @@ class _GlideCoachToggleTile extends ConsumerWidget {
 ///
 /// When on, every OBD2 connection is recorded — init handshake, data
 /// gaps, drops and reconnects — as an exportable XML session log the
-/// user can hand to a developer. Off by default; lives in the Trips
-/// (OBD2) sub-section because it only concerns the OBD2 link.
+/// user can hand to a developer. Off by default; lives in the
+/// Troubleshooting group because it is a diagnostic, not a feature, and
+/// only concerns the OBD2 link (#2566).
 class _Obd2DebugLoggingToggleTile extends ConsumerWidget {
   const _Obd2DebugLoggingToggleTile();
 

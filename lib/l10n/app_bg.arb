@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Без раздел Разход и без секция за настройки на разхода.",
   "consoModeFuelDescription": "Само ръчни зареждания. Полезно без OBD2 адаптер.",
   "consoModeFuelAndTripsDescription": "Добавя автоматичен OBD2 запис на пътувания. Изисква сдвоен адаптер.",
-  "consoSubsectionVehicles": "Моите превозни средства",
-  "consoSubsectionTrajets": "Пътувания (OBD2)",
-  "consoSubsectionToggles": "Шофиране",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 частично зареждане чака пълно зареждане — не е включено в средната стойност} other{{count} частични зареждания чакат пълно зареждане — не са включени в средната стойност}}",
   "consumptionStatsCorrectionShareHint": "{percent}% от горивото е от авто-корекции — прегледайте записите",
   "fillUpCorrectionLabel": "Авто-корекция — докоснете за редактиране",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -3557,7 +3557,7 @@ abstract class AppLocalizations {
   /// No description provided for @vehiclesMenuSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Battery, connectors, charging preferences'**
+  /// **'Your cars — fuel type, engine and tank size for accurate consumption estimates'**
   String get vehiclesMenuSubtitle;
 
   /// No description provided for @vehiclesEmptyMessage.
@@ -7224,23 +7224,29 @@ abstract class AppLocalizations {
   /// **'Adds automatic OBD2 trip recording. Requires a paired adapter.'**
   String get consoModeFuelAndTripsDescription;
 
-  /// No description provided for @consoSubsectionVehicles.
+  /// No description provided for @consoGroupVehicles.
   ///
   /// In en, this message translates to:
-  /// **'My vehicles'**
-  String get consoSubsectionVehicles;
+  /// **'Vehicles'**
+  String get consoGroupVehicles;
 
-  /// No description provided for @consoSubsectionTrajets.
+  /// No description provided for @consoGroupCoaching.
   ///
   /// In en, this message translates to:
-  /// **'Trips (OBD2)'**
-  String get consoSubsectionTrajets;
+  /// **'Coaching while driving'**
+  String get consoGroupCoaching;
 
-  /// No description provided for @consoSubsectionToggles.
+  /// No description provided for @consoGroupRewards.
   ///
   /// In en, this message translates to:
-  /// **'Driving'**
-  String get consoSubsectionToggles;
+  /// **'Rewards & savings'**
+  String get consoGroupRewards;
+
+  /// No description provided for @consoGroupTroubleshooting.
+  ///
+  /// In en, this message translates to:
+  /// **'Troubleshooting'**
+  String get consoGroupTroubleshooting;
 
   /// #2262 — plain-language accuracy indicator on the consumption stats card, replacing the back-to-front A/B/C confidence letters. `level` is one of the localized High/Medium/Low words; `band` is the language-neutral expected-error mask (e.g. ±3-7%).
   ///

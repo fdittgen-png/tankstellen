@@ -3968,13 +3968,16 @@ class AppLocalizationsSv extends AppLocalizations {
       'Lägger till automatisk OBD2-reseinspelning. Kräver en ihopparad adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'Mina fordon';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Resor (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Körning';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

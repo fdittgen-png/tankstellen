@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Žiadna karta Spotreba a žiadna sekcia nastavení spotreby.",
   "consoModeFuelDescription": "Iba ručné tankovania. Vhodné bez OBD2 adaptéra.",
   "consoModeFuelAndTripsDescription": "Pridáva automatický záznam jázd OBD2. Vyžaduje spárovaný adaptér.",
-  "consoSubsectionVehicles": "Moje vozidlá",
-  "consoSubsectionTrajets": "Jazdy (OBD2)",
-  "consoSubsectionToggles": "Jazda",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 čiastočné tankovanie čaká na plné — nie je zahrnuté v priemere} other{{count} čiastočných tankovaní čaká na plné — nie sú zahrnuté v priemere}}",
   "consumptionStatsCorrectionShareHint": "{percent}% paliva z automatických korekcií — skontrolujte záznamy",
   "fillUpCorrectionLabel": "Automatická korekcia — klepnutím upraviť",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

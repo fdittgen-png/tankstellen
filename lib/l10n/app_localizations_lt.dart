@@ -3987,13 +3987,16 @@ class AppLocalizationsLt extends AppLocalizations {
       'Prideda automatinį OBD2 kelionių įrašymą. Reikalingas suporuotas adapteris.';
 
   @override
-  String get consoSubsectionVehicles => 'Mano transporto priemonės';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Kelionės (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Vairavimas';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

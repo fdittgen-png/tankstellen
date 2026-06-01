@@ -3967,13 +3967,16 @@ class AppLocalizationsFi extends AppLocalizations {
       'Lisää automaattinen OBD2-matkojen tallennus. Vaatii paritetun sovittimen.';
 
   @override
-  String get consoSubsectionVehicles => 'Omat ajoneuvot';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Matkat (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Ajaminen';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

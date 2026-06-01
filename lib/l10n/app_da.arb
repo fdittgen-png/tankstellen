@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Ingen forbrugsfane og ingen forbrugsindstillingssektion.",
   "consoModeFuelDescription": "Kun manuelle tankninger. Nyttigt uden OBD2-adapter.",
   "consoModeFuelAndTripsDescription": "Tilføjer automatisk OBD2-turoptagelse. Kræver en parret adapter.",
-  "consoSubsectionVehicles": "Mine køretøjer",
-  "consoSubsectionTrajets": "Ture (OBD2)",
-  "consoSubsectionToggles": "Kørsel",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 delvis tankning afventer fuldt fyld — ikke i gennemsnit} other{{count} delvise tankninger afventer fuldt fyld — ikke i gennemsnit}}",
   "consumptionStatsCorrectionShareHint": "{percent}% af brændstof fra automatiske korrektioner — gennemgå poster",
   "fillUpCorrectionLabel": "Automatisk korrektion — tryk for at redigere",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

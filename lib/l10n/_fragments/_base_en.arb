@@ -939,7 +939,7 @@
   "monthlyEmissionsTitle": "Monthly CO2 emissions",
   "vehiclesTitle": "My vehicles",
   "vehiclesMenuTitle": "My vehicles",
-  "vehiclesMenuSubtitle": "Battery, connectors, charging preferences",
+  "vehiclesMenuSubtitle": "Your cars — fuel type, engine and tank size for accurate consumption estimates",
   "vehiclesEmptyMessage": "Add your car to filter by connector and estimate charging costs.",
   "vehiclesWizardTitle": "My vehicles (optional)",
   "vehiclesWizardSubtitle": "Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.",

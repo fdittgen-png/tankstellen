@@ -1,5 +1,6 @@
 {
-  "consoSubsectionVehicles": "My vehicles",
-  "consoSubsectionTrajets": "Trips (OBD2)",
-  "consoSubsectionToggles": "Driving"
+  "consoGroupVehicles": "Vehicles",
+  "consoGroupCoaching": "Coaching while driving",
+  "consoGroupRewards": "Rewards & savings",
+  "consoGroupTroubleshooting": "Troubleshooting"
 }

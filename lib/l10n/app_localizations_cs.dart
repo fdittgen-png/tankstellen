@@ -3975,13 +3975,16 @@ class AppLocalizationsCs extends AppLocalizations {
       'Přidává automatické nahrávání cest přes OBD2. Vyžaduje spárovaný adaptér.';
 
   @override
-  String get consoSubsectionVehicles => 'Moje vozidla';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Cesty (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Jízda';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

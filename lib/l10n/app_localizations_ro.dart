@@ -3992,13 +3992,16 @@ class AppLocalizationsRo extends AppLocalizations {
       'Adaugă înregistrarea automată a călătoriilor OBD2. Necesită un adaptor asociat.';
 
   @override
-  String get consoSubsectionVehicles => 'Vehiculele mele';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Călătorii (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Condus';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

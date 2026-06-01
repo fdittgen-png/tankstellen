@@ -3971,13 +3971,16 @@ class AppLocalizationsSl extends AppLocalizations {
       'Doda samodejno snemanje voženj OBD2. Zahteva sparani adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'Moja vozila';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Vožnje (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Vožnja';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

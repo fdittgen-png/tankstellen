@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Kulu kaarti ega Kulu seadete jaotist pole.",
   "consoModeFuelDescription": "Ainult käsitsi tankimised. Kasulik ilma OBD2 adapterita.",
   "consoModeFuelAndTripsDescription": "Lisab automaatse OBD2 reisalvestamise. Vajalik ühendatud adapter.",
-  "consoSubsectionVehicles": "Minu sõidukid",
-  "consoSubsectionTrajets": "Reisid (OBD2)",
-  "consoSubsectionToggles": "Sõitmine",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 osaline tankimine ootab plein complet'i — pole keskmises} other{{count} osalist tankimist ootavad plein complet'i — pole keskmises}}",
   "consumptionStatsCorrectionShareHint": "{percent}% kütusest autokorrektsiooni kaudu — vaata kirjeid üle",
   "fillUpCorrectionLabel": "Autokorrektsioon — puuduta muutmiseks",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
