@@ -18,6 +18,15 @@
   "fabRunSearch": "Run search",
   "fabRefineCriteria": "Refine search",
   "routeSearchPartialBanner": "Searching for more stations…",
+  "routeSearchingChip": "Searching the route…",
+  "routeSegmentSummaryBadge": "Every {km} km",
+  "@routeSegmentSummaryBadge": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
   "searchCriteriaTitle": "Search criteria",
   "searchCriteriaOpen": "Search",
   "searchCriteriaRadiusBadge": "Within {km} km",

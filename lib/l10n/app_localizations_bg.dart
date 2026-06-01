@@ -63,6 +63,14 @@ class AppLocalizationsBg extends AppLocalizations {
   String get routeSearchPartialBanner => 'Търсене на още станции…';
 
   @override
+  String get routeSearchingChip => 'Searching the route…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Every $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Критерии за търсене';
 
   @override

@@ -63,6 +63,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get routeSearchPartialBanner => 'Recherche d\'autres stations…';
 
   @override
+  String get routeSearchingChip => 'Recherche sur l\'itinéraire…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Tous les $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Critères de recherche';
 
   @override

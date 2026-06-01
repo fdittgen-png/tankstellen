@@ -2005,6 +2005,15 @@
   "fabRunSearch": "Lancer la recherche",
   "fabRefineCriteria": "Affiner la recherche",
   "routeSearchPartialBanner": "Recherche d'autres stations…",
+  "routeSearchingChip": "Recherche sur l'itinéraire…",
+  "routeSegmentSummaryBadge": "Tous les {km} km",
+  "@routeSegmentSummaryBadge": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
   "privacySaveErrorLog": "Enregistrer le journal d'erreurs ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",

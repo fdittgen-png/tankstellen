@@ -3347,5 +3347,20 @@
   "@restoreBackupFailed": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeSearchingChip": "Searching the route…",
+  "@routeSearchingChip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeSegmentSummaryBadge": "Every {km} km",
+  "@routeSegmentSummaryBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
   }
 }

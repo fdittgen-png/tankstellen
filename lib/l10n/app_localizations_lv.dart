@@ -63,6 +63,14 @@ class AppLocalizationsLv extends AppLocalizations {
   String get routeSearchPartialBanner => 'Tiek meklētas vairāk staciju…';
 
   @override
+  String get routeSearchingChip => 'Searching the route…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Every $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Meklēšanas kritēriji';
 
   @override

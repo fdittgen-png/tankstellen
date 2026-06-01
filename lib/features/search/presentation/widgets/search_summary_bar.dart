@@ -5,7 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
+import '../../../feature_management/domain/feature_dependency_graph.dart';
+import '../../../route_search/providers/route_search_params_provider.dart';
+import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/fuel_type.dart';
+import '../../domain/entities/search_mode.dart';
+import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../screens/search_criteria_screen.dart';
 
@@ -36,15 +43,59 @@ class SearchSummaryBar extends ConsumerWidget {
     return type.displayName;
   }
 
+  /// The chip that follows the fuel chip. In nearby mode it shows the
+  /// radius ("Within {km} km"); in route mode it shows a "Searching the
+  /// route…" placeholder while results stream in, then the route-segment
+  /// summary ("Every {km} km") once the search completes (#2592).
+  Widget _secondChip(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations? l10n,
+    SearchMode mode,
+  ) {
+    if (mode != SearchMode.route) {
+      final kmText = ref.watch(searchRadiusProvider).round().toString();
+      return _SummaryChip(
+        icon: const Icon(Icons.radar, size: 16),
+        label: l10n?.searchCriteriaRadiusBadge(kmText) ?? 'Within $kmText km',
+      );
+    }
+    final routeState = ref.watch(routeSearchStateProvider);
+    final searching =
+        routeState.isLoading || routeState.value?.isPartial == true;
+    if (searching) {
+      return _SummaryChip(
+        icon: const Icon(Icons.route, size: 16),
+        label: l10n?.routeSearchingChip ?? 'Searching the route…',
+      );
+    }
+    final segmentText =
+        ref.watch(routeSegmentSearchParamProvider).round().toString();
+    return _SummaryChip(
+      icon: const Icon(Icons.route, size: 16),
+      label: l10n?.routeSegmentSummaryBadge(segmentText) ??
+          'Every $segmentText km',
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final fuelType = ref.watch(selectedFuelTypeProvider);
-    final radius = ref.watch(searchRadiusProvider);
     final theme = Theme.of(context);
 
+    // #2592 — route mode replaces the meaningless radius chip with the
+    // route-planning summary. Gate on Feature.routePlanning exactly as the
+    // criteria screen does, so a gated-off install keeps the radius chip.
+    final storedMode = ref.watch(activeSearchModeProvider);
+    final manifest = ref.watch(featureManifestProvider);
+    final enabledFlags = ref.watch(enabledFeaturesProvider);
+    final mode = isEffectivelyEnabled(
+            Feature.routePlanning, manifest, enabledFlags)
+        ? storedMode
+        : SearchMode.nearby;
+
     final fuelColor = FuelColors.forType(fuelType);
-    final kmText = radius.round().toString();
 
     return Semantics(
       label: l10n?.searchCriteriaSemanticLabel ??
@@ -71,12 +122,9 @@ class SearchSummaryBar extends ConsumerWidget {
                           label: _fuelLabel(context, fuelType),
                         ),
                         const SizedBox(width: 6),
-                        // Radius badge
-                        _SummaryChip(
-                          icon: const Icon(Icons.radar, size: 16),
-                          label: l10n?.searchCriteriaRadiusBadge(kmText) ??
-                              'Within $kmText km',
-                        ),
+                        // Second chip: radius (nearby) or route-planning
+                        // summary (route) — see [_secondChip] (#2592).
+                        _secondChip(context, ref, l10n, mode),
                       ],
                     ),
                   ),

@@ -12,9 +12,46 @@ import 'package:tankstellen/features/route_search/domain/entities/route_info.dar
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:latlong2/latlong.dart';
 
 void main() {
+  // #2592 — the criteria screen's per-search overrides win over the
+  // profile defaults; omitting them falls back to the profile, then to the
+  // hard-coded field default.
+  group('resolveRouteSegmentKm (#2592)', () {
+    const profile = UserProfile(id: 'p', name: 'P', routeSegmentKm: 120);
+
+    test('override wins over the profile default', () {
+      expect(resolveRouteSegmentKm(300, profile), 300);
+    });
+
+    test('falls back to the profile default when omitted', () {
+      expect(resolveRouteSegmentKm(null, profile), 120);
+    });
+
+    test('falls back to 50 with no profile and no override', () {
+      expect(resolveRouteSegmentKm(null, null), 50.0);
+    });
+  });
+
+  group('resolveMinRouteSaving (#2592)', () {
+    const profile =
+        UserProfile(id: 'p', name: 'P', minRouteSavingPerLiter: 0.08);
+
+    test('override wins over the profile default', () {
+      expect(resolveMinRouteSaving(0.2, profile), 0.2);
+    });
+
+    test('falls back to the profile default when omitted', () {
+      expect(resolveMinRouteSaving(null, profile), 0.08);
+    });
+
+    test('falls back to 0 (off) with no profile and no override', () {
+      expect(resolveMinRouteSaving(null, null), 0.0);
+    });
+  });
+
   group('strategyFor', () {
     test('returns UniformSearchStrategy for uniform type', () {
       final strategy = strategyFor(RouteSearchStrategyType.uniform);
