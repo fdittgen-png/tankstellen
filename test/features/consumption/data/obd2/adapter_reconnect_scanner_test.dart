@@ -362,5 +362,51 @@ void main() {
         await scanner.stop();
       });
     });
+
+    group('classic-direct reconnect pacing (#2565)', () {
+      test(
+          'repeated classic-direct failures still pace via the existing '
+          'backoff (no flood) and self-stop on success', () async {
+        // The scanner is transport-agnostic: it drives `connect`, which for a
+        // classic drop is `ReconnectConnector.attempt` routing over
+        // `connectByMacClassicDirect`. Repeated failures must NOT flood — the
+        // existing exponential backoff paces them — and a later success must
+        // self-stop the scanner exactly as the BLE path does.
+        var connectCalls = 0;
+        var reconnects = 0;
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'cc:dd',
+          probe: (_) async => true, // always in range
+          connect: (_) async {
+            connectCalls++;
+            // First three classic-direct attempts fail; the fourth lands.
+            return connectCalls >= 4;
+          },
+          onReconnect: () => reconnects++,
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+
+        // The backoff must escalate across the three failures (pacing /
+        // no-flood) before the fourth attempt succeeds.
+        await _waitFor(
+            () => connectCalls >= 2 && scanner.currentBackoff >= _kInitial * 2,
+            timeout: const Duration(seconds: 3));
+        expect(scanner.currentBackoff, greaterThanOrEqualTo(_kInitial * 2),
+            reason: 'repeated classic-direct failures must back off, not '
+                'flood — the same bounded schedule as the BLE path');
+
+        await _waitFor(() => reconnects > 0,
+            timeout: const Duration(seconds: 3));
+        expect(connectCalls, greaterThanOrEqualTo(4));
+        expect(reconnects, 1);
+        expect(scanner.isScanning, isFalse,
+            reason: 'a successful classic-direct reconnect self-stops the '
+                'scanner, exactly like BLE');
+        await scanner.stop();
+      });
+    });
   });
 }

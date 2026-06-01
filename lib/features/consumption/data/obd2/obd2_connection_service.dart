@@ -22,6 +22,7 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 
+part 'obd2_connect_by_mac.dart';
 part 'obd2_connection_service.g.dart';
 
 /// Vehicle identity the supported-PID cache (#811/#2253) refines its
@@ -275,83 +276,27 @@ class Obd2ConnectionService {
     return connect(match);
   }
 
-  /// Direct-connect-by-MAC, NO scan (#2242). Addresses the adapter via
-  /// `BluetoothDevice.fromId(mac)` with a bounded ~4 s [timeout],
-  /// skipping the active scan — essential for ELM327 clones that stop
-  /// advertising in standby (a scan never sees them; a direct GATT
-  /// connect still wakes them). Tears down any prior direct channel
-  /// first (Android GATT_ERROR 133 on a stale client), runs the SAME
-  /// service-side init as [connect] via [_openAndInit].
-  ///
-  /// On any failure it falls back to the scan-based [connectByMac], so
-  /// behaviour is never worse than today; returns null when both fail.
-  /// [fallbackToScan] `false` (the #2245 in-trip path, which owns its
-  /// own RSSI-gated scan) returns null immediately on a failed direct
-  /// attempt instead of double-scanning.
+  /// Direct-connect-by-MAC, NO scan (#2242). See [_connectByMacDirect] for the
+  /// full contract. A thin INSTANCE method (not an `extension`) so test fakes
+  /// can `@override` it — the body lives in the `part` file to keep this file
+  /// under the #1680 cap (#2190).
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
-  }) async {
-    // Tear down a prior direct channel BEFORE reopening (dead-GATT
-    // teardown). LOAD-BEARING on Android — a still-open GATT client for
-    // the same device yields GATT_ERROR 133 on the next connect.
-    await _teardownLastDirectChannel();
+  }) =>
+      _connectByMacDirect(this, mac,
+          timeout: timeout, fallbackToScan: fallbackToScan);
 
-    // No scan ⇒ no resolved profile. Use the registry's generic FFF0
-    // BLE profile for the adapter init quirks + display name; its UUIDs
-    // match the channel [channelForDirect] builds.
-    final generic = _genericBleProfile();
-    final channel = bluetooth.channelForDirect(mac, connectTimeout: timeout);
-    _lastDirectChannel = channel;
-    try {
-      return await _openAndInit(
-        channel: channel,
-        adapter: generic.adapter,
-        mac: mac,
-        name: generic.displayName,
-        logFailureAsError: false, // #2379 — recoverable (scan fallback)
-      );
-    } on Object catch (_) {
-      // #2379 — a RECOVERABLE attempt (scan fallback below routinely
-      // succeeds): NOT an error trace. Inner connect already suppressed
-      // its trace; the outcome is owned by the orchestrator + breadcrumbs.
-      await _teardownLastDirectChannel();
-      if (!fallbackToScan) return null;
-      return connectByMac(mac);
-    }
-  }
+  /// Direct-connect-by-MAC over Bluetooth **CLASSIC** SPP, NO scan (#2565).
+  /// See [_connectByMacClassicDirect]. Thin overridable instance method.
+  Future<Obd2Service?> connectByMacClassicDirect(String mac) =>
+      _connectByMacClassicDirect(this, mac);
 
-  /// Passive autoConnect reconnect (#2261 concern 2). Opens a channel
-  /// with `autoConnect:true` and NO bounded timeout, so the OS holds a
-  /// low-power background GATT request that resolves the instant the
-  /// pinned adapter advertises again — used by the reconnect scanner
-  /// past its active-scan miss ceiling so a parked car stops burning the
-  /// radio. NO scan fallback (the passive wait IS the fallback) and NO
-  /// requestMtu (FBP forbids it with autoConnect). Returns null on any
-  /// failure; runs the SAME service-side init via [_openAndInit].
-  Future<Obd2Service?> connectByMacPassive(String mac) async {
-    await _teardownLastDirectChannel();
-    final generic = _genericBleProfile();
-    final channel = bluetooth.channelForDirect(mac, autoConnect: true);
-    _lastDirectChannel = channel;
-    try {
-      return await _openAndInit(
-        channel: channel,
-        adapter: generic.adapter,
-        mac: mac,
-        name: generic.displayName,
-        logFailureAsError: false, // #2379 — recoverable (scanner re-arms)
-      );
-    } on Object catch (e, st) {
-      // #2379 — OBD2/BLE, not local storage.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-        'where': 'Obd2ConnectionService.connectByMacPassive failed',
-      }));
-      await _teardownLastDirectChannel();
-      return null;
-    }
-  }
+  /// Passive autoConnect reconnect (#2261 concern 2). See
+  /// [_connectByMacPassive]. Thin overridable instance method.
+  Future<Obd2Service?> connectByMacPassive(String mac) =>
+      _connectByMacPassive(this, mac);
 
   Future<void> _teardownLastDirectChannel() async {
     final prior = _lastDirectChannel;
@@ -366,13 +311,6 @@ class Obd2ConnectionService {
       }));
     }
   }
-
-  Obd2AdapterProfile _genericBleProfile() => registry.profiles.firstWhere(
-        (p) => p.id == 'generic-fff0',
-        orElse: () => registry.profiles.firstWhere(
-          (p) => p.transport == BluetoothTransport.ble,
-        ),
-      );
 }
 
 @Riverpod(keepAlive: true)

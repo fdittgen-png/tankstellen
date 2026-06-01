@@ -543,6 +543,103 @@ void main() {
     });
   });
 
+  group('Obd2ConnectionService.connectByMacClassicDirect (#2565)', () {
+    test(
+        'builds a ClassicElmChannel via the classic facade + runs init with '
+        "linkKind=='classic'; NEVER touches the BLE facade", () async {
+      // The transport-correct in-trip reconnect for a Classic adapter
+      // (vLinker FS): RFCOMM via the classic facade, no BLE GATT 4 s timeout.
+      final classicChannel = _FakeChannel(respondTo: _elmOkResponses());
+      final classicFake = _FakeClassicFacade(
+        batches: const [[]],
+        channel: classicChannel,
+      );
+      final ble = _FakeFacade(
+        // Non-empty batch + a direct channel: if the classic path ever fell
+        // through to BLE scan / direct, it would be observable here.
+        batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'cc:dd',
+              deviceName: 'vLinker FS 14884',
+              advertisedServiceUuids: const [],
+              rssi: 0,
+            ),
+          ],
+        ],
+        directChannel: _FakeChannel(respondTo: _elmOkResponses()),
+      );
+      final svc = Obd2ConnectionService(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: ble,
+        classicBluetooth: classicFake,
+      );
+
+      final ready = await svc.connectByMacClassicDirect('cc:dd');
+
+      expect(ready, isNotNull);
+      expect(ready!.isConnected, isTrue);
+      expect(ready.linkKind, 'classic',
+          reason: 'a classic-direct reconnect stamps the classic link kind');
+      expect(classicFake.channelForCalls, ['cc:dd'],
+          reason: 'the channel must be built via the CLASSIC facade (RFCOMM)');
+      expect(classicChannel.openCalls, 1);
+      // The defect this fixes: a Classic reconnect must NEVER take the BLE
+      // direct path (the 4 s `Timed out after 4s` storm signature).
+      expect(ble.directCalls, 0,
+          reason: 'classic-direct must NOT call the BLE channelForDirect');
+      expect(ble.scanInvoked, isFalse,
+          reason: 'classic-direct does not scan — the caller owns the scan');
+      await ready.disconnect();
+    });
+
+    test('returns null (no throw) when no classic facade is wired', () async {
+      // BLE-only configs / unit harnesses: the caller falls through to its
+      // own transport-aware scan fallback.
+      final ble = _FakeFacade(
+        batches: const [[]],
+        directChannel: _FakeChannel(respondTo: _elmOkResponses()),
+      );
+      final svc = Obd2ConnectionService(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: ble,
+        // classicBluetooth: null
+      );
+
+      final ready = await svc.connectByMacClassicDirect('cc:dd');
+      expect(ready, isNull);
+      expect(ble.directCalls, 0,
+          reason: 'a missing classic facade must NOT fall back to BLE direct');
+      expect(ble.scanInvoked, isFalse);
+    });
+
+    test('returns null when the classic init fails — never touches BLE',
+        () async {
+      // Silent channel ⇒ the transport init times out ⇒ the recoverable
+      // attempt returns null (the scanner re-arms), never a BLE fallback.
+      final ble = _FakeFacade(
+        batches: const [[]],
+        directChannel: _FakeChannel(respondTo: _elmOkResponses()),
+      );
+      final svc = Obd2ConnectionService(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: ble,
+        classicBluetooth: _FakeClassicFacade(
+          batches: const [[]],
+          channel: _FakeChannel(silent: true),
+        ),
+      );
+
+      final ready = await svc.connectByMacClassicDirect('cc:dd');
+      expect(ready, isNull);
+      expect(ble.directCalls, 0);
+      expect(ble.scanInvoked, isFalse);
+    }, timeout: const Timeout(Duration(seconds: 30)));
+  });
+
   group('Obd2ConnectionService.connectByMacPassive (#2261 concern 2)', () {
     test(
         'opens an autoConnect channel, NO scan, NO bounded timeout, '

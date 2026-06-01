@@ -3,17 +3,13 @@
 
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
-import '../data/obd2/adapter_reconnect_scanner.dart';
-import '../data/obd2/obd2_connection_service.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/obd2_session_context_block.dart';
-import '../data/obd2/reconnect_connector.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';
@@ -23,6 +19,7 @@ import '../domain/trip_recorder.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'obd2_controller_phase_mapper.dart';
 import 'recording_pipeline.dart';
+import 'reconnect_scanner_factory.dart';
 import 'reference_vehicle_match.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
@@ -159,7 +156,17 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       automatic: automatic,
       // #2459 — diagnostic capture (Feature.debugMode); default off.
       diagnosticCapture: _readDiagnosticCaptureFlag(),
-      reconnectScannerFactory: _buildReconnectScannerFactory(),
+      reconnectScannerFactory: buildReconnectScannerFactory(
+        ref: _ref,
+        onConnected: (svc) {
+          _service = svc;
+          _controller?.replaceService(svc);
+        },
+        // #2565 — read the live transport kind at handle-drop time so the
+        // reconnect dispatches over the SAME transport that dropped. The
+        // dead-but-typed service is still wired here.
+        readLinkKind: () => _service?.linkKind,
+      ),
       breadcrumbCollector: breadcrumbs,
       gpsEstimateFolder: gpsEstimateFolder,
     );
@@ -357,47 +364,4 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     );
   }
 
-  /// Build the reconnect-scanner factory handed to [TripRecordingController]
-  /// (#797 phase 3). Returns null in tests / environments where
-  /// [obd2ConnectionProvider] can't be resolved — the controller then
-  /// falls back to grace-window-only recovery.
-  AdapterReconnectScanner? Function(
-    String pinnedMac,
-    VoidCallback onReconnect,
-  )? _buildReconnectScannerFactory() {
-    final Obd2ConnectionService connection;
-    try {
-      connection = _ref.read(obd2ConnectionProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
-        'where': 'Obd2RecordingPipeline: connection provider unavailable'
-      }));
-      return null;
-    }
-    return (pinnedMac, onReconnect) {
-      // One connector per drop holds the gate bookkeeping across the
-      // scanner's repeated connect cycles. The connect callback prefers a
-      // DIRECT GATT connect (works for clones that stop advertising in
-      // standby) and only falls back to an RSSI-gated scan (#2245).
-      // #2524 — swap the pipeline's pointer (so stop() tears down the LIVE
-      // svc) AND the controller's via `replaceService` (so the loop polls the
-      // reconnected transport, not the closed one). See `replaceService`.
-      final connector = ReconnectConnector(
-        connection: connection,
-        onConnected: (svc) {
-          _service = svc;
-          _controller?.replaceService(svc);
-        },
-      );
-      return AdapterReconnectScanner(
-        pinnedMac: pinnedMac,
-        probe: (mac) async => true,
-        connect: connector.attempt,
-        // #2261 concern 2 — after the active-scan miss ceiling switch to a
-        // passive autoConnect GATT wait for the rest of the 15-min grace.
-        passiveConnect: connector.attemptPassive,
-        onReconnect: onReconnect,
-      );
-    };
-  }
 }
