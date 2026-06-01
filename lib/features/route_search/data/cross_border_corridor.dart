@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/country/country_bounding_box.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/services/country_service_registry.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
@@ -58,20 +61,31 @@ Map<String, FuelType> profileFuelByCountry(Ref ref) {
 /// Pre-resolve, OFFLINE, the `(service, fuel)` for every country the
 /// corridor crosses that has a usable station service.
 ///
-/// [corridorCountries] is intersected with the registered, key-satisfied
-/// services. A crossed country is SKIPPED when it has no registry entry, or
-/// when it requires an API key that isn't configured (the DE / CL / KR demo
-/// guard) — we never inject demo stations onto a real route. Per-country
-/// fuel is the matching profile's `preferredFuelType` from [profileFuels],
-/// falling back to E10 for a crossed country the user has no profile for.
+/// The country set is [corridorCountries] (every box a route vertex falls
+/// inside, order-independent — #2621) UNIONED with the user's PROFILE
+/// countries whose bounding box INTERSECTS the route's lat/lng extent
+/// (#2621 belt-and-braces, see [countriesTouchingRouteExtent]). The union
+/// guarantees a profile-backed country touching the corridor is never
+/// silently dropped even if a future detection gap re-shadows it — while
+/// the route-extent gate keeps a pure-FR route from pulling in a distant
+/// profile country (e.g. PT).
+///
+/// The set is intersected with the registered, key-satisfied services. A
+/// country is SKIPPED when it has no registry entry, or when it requires an
+/// API key that isn't configured (the DE / CL / KR demo guard) — we never
+/// inject demo stations onto a real route. Per-country fuel is the matching
+/// profile's `preferredFuelType` from [profileFuels], falling back to E10
+/// for a crossed country the user has no profile for.
 Map<String, CountrySource> buildCorridorServiceMap(
   Ref ref,
   RouteInfo route,
   Map<String, FuelType> profileFuels,
 ) {
   final hasKey = ref.read(storageRepositoryProvider).hasApiKey();
+  final codes = corridorCountries(route)
+    ..addAll(countriesTouchingRouteExtent(route, profileFuels.keys));
   final map = <String, CountrySource>{};
-  for (final code in corridorCountries(route)) {
+  for (final code in codes) {
     final entry = CountryServiceRegistry.entryFor(code);
     if (entry == null) continue; // unregistered → no real data source.
     if (entry.requiresApiKey && !hasKey) continue; // demo guard (#2595).
@@ -83,6 +97,43 @@ Map<String, CountrySource> buildCorridorServiceMap(
   debugPrint('RouteSearch: corridor services = '
       '${map.entries.map((e) => '${e.key}:${e.value.fuel.apiValue}').join(', ')}');
   return map;
+}
+
+/// The subset of [profileCountries] whose registered bounding box
+/// INTERSECTS the [route]'s own lat/lng bounding box (#2621).
+///
+/// Belt-and-braces for the corridor-detection union: even if per-vertex
+/// detection were to miss a country (e.g. a future shadowing regression),
+/// a profile-backed country whose box overlaps the route's extent is still
+/// queried. Gated on ACTUAL extent intersection — NOT mere profile
+/// existence — so a pure-FR route does not pull in a distant PT/ES profile
+/// the user happens to have configured. Returns upper-cased codes.
+Set<String> countriesTouchingRouteExtent(
+  RouteInfo route,
+  Iterable<String> profileCountries,
+) {
+  if (route.geometry.isEmpty) return const {};
+  var minLat = double.infinity, maxLat = double.negativeInfinity;
+  var minLng = double.infinity, maxLng = double.negativeInfinity;
+  for (final p in route.geometry) {
+    if (p.latitude < minLat) minLat = p.latitude;
+    if (p.latitude > maxLat) maxLat = p.latitude;
+    if (p.longitude < minLng) minLng = p.longitude;
+    if (p.longitude > maxLng) maxLng = p.longitude;
+  }
+  final out = <String>{};
+  for (final raw in profileCountries) {
+    final code = raw.toUpperCase();
+    final box = CountryServiceRegistry.boundingBoxFor(code);
+    if (box == null) continue;
+    // Axis-aligned bbox intersection (overlap on BOTH lat and lng).
+    final overlaps = box.minLat <= maxLat &&
+        box.maxLat >= minLat &&
+        box.minLng <= maxLng &&
+        box.maxLng >= minLng;
+    if (overlaps) out.add(code);
+  }
+  return out;
 }
 
 /// Build the per-point query function for a cross-border route.
@@ -105,6 +156,11 @@ Map<String, CountrySource> buildCorridorServiceMap(
 /// profile-backed corridor country) the active profile's service + the
 /// incoming [fuelType] are used as a fallback so a single-country route is
 /// unaffected.
+///
+/// Each per-country `searchStations` is wrapped in a try/catch (#2621): one
+/// country's outage / throw must NOT abort the whole route — the other legs
+/// still resolve, and an empty/failed ES leg is routed to [errorLogger]
+/// (ErrorLayer.services) so it is diagnosable rather than silently dropped.
 StationQueryFunction buildCorridorQueryFunction(
   Ref ref,
   FuelType fuelType, {
@@ -116,10 +172,10 @@ StationQueryFunction buildCorridorQueryFunction(
   // empty — reading it eagerly would needlessly build the active country's
   // service on every normal cross-border search.
   final sources = corridorMap.isEmpty
-      ? <CountrySource>[
-          (service: ref.read(stationServiceProvider), fuel: fuelType)
-        ]
-      : corridorMap.values.toList(growable: false);
+      ? <String, CountrySource>{
+          '*': (service: ref.read(stationServiceProvider), fuel: fuelType)
+        }
+      : corridorMap;
 
   return ({
     required double lat,
@@ -128,7 +184,7 @@ StationQueryFunction buildCorridorQueryFunction(
     required FuelType fuelType,
   }) async {
     final merged = <SearchResultItem>[];
-    for (final source in sources) {
+    for (final MapEntry(key: countryCode, value: source) in sources.entries) {
       final params = SearchParams(
         lat: lat,
         lng: lng,
@@ -136,10 +192,24 @@ StationQueryFunction buildCorridorQueryFunction(
         fuelType: source.fuel,
         sortBy: SortBy.price,
       );
-      final result = await source.service.searchStations(params);
-      final raw = result.data
-          .map((s) => FuelStationResult(s) as SearchResultItem)
-          .toList();
+      final List<SearchResultItem> raw;
+      try {
+        final result = await source.service.searchStations(params);
+        raw = result.data
+            .map((s) => FuelStationResult(s) as SearchResultItem)
+            .toList();
+      } catch (e, st) {
+        // #2621 — degrade to the other legs rather than aborting the whole
+        // route; never silently swallow (an empty ES leg must be traceable).
+        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+          'where': 'RouteSearch corridor: per-country station query',
+          'country': countryCode,
+          'fuel': source.fuel.apiValue,
+          'lat': lat,
+          'lng': lng,
+        }));
+        continue;
+      }
       // Per-country top-N reduce using THIS country's fuel, so the ranking
       // is like-for-like before the slices are concatenated.
       merged.addAll(topNForCountry(

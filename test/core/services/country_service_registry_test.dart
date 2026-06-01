@@ -382,6 +382,40 @@ void main() {
       test('entryByLatLng returns null for the Atlantic', () {
         expect(CountryServiceRegistry.entryByLatLng(0.0, -30.0), isNull);
       });
+
+      // #2621 — first-match shadowing guard. The FR box (lat 41.0–51.5,
+      // lng −5.5–10.0) geographically CONTAINS all of Catalonia, and FR is
+      // declared BEFORE ES, so the first-match `entryByLatLng` resolves
+      // every Catalonian point to FR and never reaches ES. The
+      // order-independent `entriesByLatLng` must yield BOTH — so corridor
+      // detection can union ES in even though FR shadows it.
+      test('entriesByLatLng yields BOTH FR and ES for a Barcelona point', () {
+        const barcelonaLat = 41.39;
+        const barcelonaLng = 2.17;
+        // Sanity: the point is genuinely inside both declared boxes.
+        expect(
+            CountryServiceRegistry.boundingBoxFor('FR')!
+                .contains(barcelonaLat, barcelonaLng),
+            isTrue,
+            reason: 'FR box must geographically contain Barcelona');
+        expect(
+            CountryServiceRegistry.boundingBoxFor('ES')!
+                .contains(barcelonaLat, barcelonaLng),
+            isTrue,
+            reason: 'ES box must contain Barcelona');
+
+        final codes = CountryServiceRegistry.entriesByLatLng(
+                barcelonaLat, barcelonaLng)
+            .map((e) => e.countryCode)
+            .toSet();
+        expect(codes, containsAll(<String>{'FR', 'ES'}),
+            reason: 'order-independent lookup must surface the shadowed ES, '
+                'not just the first-declared FR');
+      });
+
+      test('entriesByLatLng yields nothing for the Atlantic', () {
+        expect(CountryServiceRegistry.entriesByLatLng(0.0, -30.0), isEmpty);
+      });
     });
 
     group('availableFuelTypes (#1111)', () {

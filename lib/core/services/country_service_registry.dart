@@ -723,11 +723,33 @@ class CountryServiceRegistry {
   /// null when no box matches. Walks [entries] in declared order — the
   /// list is intentionally ordered so tighter boxes are tested before
   /// the larger boxes that incidentally overlap them.
+  ///
+  /// First-match: used for single-country attribution (#516) where one
+  /// answer is wanted. For corridor detection — where a point inside a
+  /// larger box that SHADOWS a smaller declared-later box must still
+  /// surface the shadowed country — use [entriesByLatLng] (#2621).
   static CountryServiceEntry? entryByLatLng(double lat, double lng) {
-    for (final entry in entries) {
-      if (entry.boundingBox.contains(lat, lng)) return entry;
+    for (final entry in entriesByLatLng(lat, lng)) {
+      return entry;
     }
     return null;
+  }
+
+  /// Every entry whose bounding box contains the given point, in declared
+  /// order — NOT just the first match (#2621).
+  ///
+  /// Continental bounding boxes overlap: FR's box (lat 41.0–51.5,
+  /// lng −5.5–10.0) geographically contains all of Catalonia, yet ES is
+  /// declared later, so [entryByLatLng] resolves every Catalonian point to
+  /// FR and never reaches ES. A Pézenas→Barcelona corridor then queried
+  /// only FR and returned zero Spanish stations. Corridor detection unions
+  /// these so the shadowed country (ES) is never dropped — over-collecting
+  /// is safe because the route detour filter drops off-corridor stations.
+  static Iterable<CountryServiceEntry> entriesByLatLng(
+      double lat, double lng) sync* {
+    for (final entry in entries) {
+      if (entry.boundingBox.contains(lat, lng)) yield entry;
+    }
   }
 
   /// Build a [StationService] for [countryCode], wrapped in [StationServiceChain].

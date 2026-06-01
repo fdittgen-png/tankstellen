@@ -58,7 +58,13 @@ void main() {
     // #2373 — re-grandfathered 868 → 887: one required `sourceUrl` field
     // added to every per-country FuelServicePolicy row (19 data lines) so
     // the country-service header can link the upstream data source.
-    'lib/core/services/country_service_registry.dart': 887,
+    // #2621 — re-grandfathered 887 → 909: the order-independent
+    // `entriesByLatLng` (a `sync*` yielding EVERY box that contains a point,
+    // not just the first declared) + its dartdoc, plus `entryByLatLng`
+    // refactored to delegate to it. Fixes the FR-shadows-Catalonia bbox bug
+    // that left cross-border routes with zero Spanish stations. Decomposition
+    // of this registry is tracked separately by #2187/#2188.
+    'lib/core/services/country_service_registry.dart': 909,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     // #2456 — re-grandfathered 457 → 481: two new pure parsers,
