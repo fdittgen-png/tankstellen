@@ -113,6 +113,7 @@ docs/guides/*
 !docs/guides/feature-flags.md
 !docs/guides/fdroid-submission.md
 !docs/guides/app-store-listing.md
+!docs/guides/ios-testflight-testers.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
