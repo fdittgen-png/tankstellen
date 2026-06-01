@@ -382,6 +382,30 @@
   "evNoConnectors": "No connector details available",
   "evUsageCost": "Usage cost",
   "evPricingUnavailable": "Pricing not available from provider",
+  "evPriceFree": "Free",
+  "@evPriceFree": {
+    "description": "Access-cost badge on an EV station: charging is free of charge (no payment, no membership). Derived from the OpenChargeMap UsageType signal (#2618)."
+  },
+  "evPricePayAtLocation": "Pay at location",
+  "@evPricePayAtLocation": {
+    "description": "Access-cost badge on an EV station: a tariff is paid on site (pay-as-you-go). Derived from the OpenChargeMap UsageType signal (#2618)."
+  },
+  "evPriceMembership": "Membership required",
+  "@evPriceMembership": {
+    "description": "Access-cost badge on an EV station: a network membership / RFID card is required to charge. Derived from the OpenChargeMap UsageType signal (#2618)."
+  },
+  "evPriceIndicative": "Indicative price",
+  "@evPriceIndicative": {
+    "description": "Label preceding the operator-declared, unverified indicative price text on an EV station (never a confirmed comparison price) (#2618)."
+  },
+  "evPriceDeclaredByOperator": "Indicative price declared by the operator — verify on site",
+  "@evPriceDeclaredByOperator": {
+    "description": "Honest-UX disclaimer shown under the raw operator-declared EV price text: the figure is indicative only and must be checked on site (#2618)."
+  },
+  "evPriceFranceAttribution": "Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "@evPriceFranceAttribution": {
+    "description": "Data attribution shown only on French EV stations enriched from the IRVE open dataset (Etalab / data.gouv.fr / ODRÉ) (#2618). Brand/source names are proper nouns."
+  },
   "evLastUpdated": "Last updated",
   "evUnknown": "Unknown",
   "evDataAttribution": "Data from OpenChargeMap (community-sourced)",
