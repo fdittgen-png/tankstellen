@@ -24,6 +24,53 @@ def asc_api_key
   )
 end
 
+# ---------------------------------------------------------------------------
+# Beta App Review test-info — single source of truth (#2611 / #2612)
+# ---------------------------------------------------------------------------
+# The localized Beta App Review descriptions and the App-Review contact block
+# are consumed by BOTH `configure_beta_review` (the no-build lane that pushes
+# the test info ahead of time, #2611) and `upload_testflight` (which can carry
+# the same info inline when distributing an external build, #2612). Defining
+# them once here keeps the two paths from drifting apart.
+
+# Localized "Beta App Description" shown to TestFlight reviewers and external
+# testers, keyed by ASC locale. Each string is well under the 4000-char limit.
+BETA_APP_DESCRIPTIONS = {
+  "en-US" => "Stop overpaying at the pump. Sparkilo compares real-time fuel prices and EV charging across 17 countries and points you to the cheapest station near you — for petrol, diesel, LPG, CNG, E85 and electric. Free, ad-free, no account, open-source (MIT).",
+  "fr-FR" => "Arrêtez de payer trop cher à la pompe. Sparkilo compare les prix carburant en temps réel et vous guide vers la station la moins chère près de vous — essence, gazole, GPL, GNV, E85 et recharge de voiture électrique. Dans 17 pays, gratuit, sans pub, sans compte, open source (MIT).",
+  "de-DE" => "Schluss mit zu teuer tanken. Sparkilo vergleicht Spritpreise in Echtzeit und führt dich zur günstigsten Tankstelle in der Nähe — für Benzin, Diesel, LPG, CNG, E85 und zum E-Auto laden. In 17 Ländern, kostenlos, werbefrei, ohne Konto, Open Source (MIT).",
+  "es-ES" => "Deja de pagar de más en el surtidor. Sparkilo compara los precios del combustible en tiempo real y te lleva a la gasolinera más barata cerca de ti — gasolina, diésel, GLP, GNC, E85 y recarga de coche eléctrico. En 17 países, gratis, sin anuncios, sin cuenta, de código abierto (MIT).",
+  "it-IT" => "Basta pagare troppo al distributore. Sparkilo confronta i prezzi del carburante in tempo reale e ti porta al distributore più economico vicino a te — benzina, diesel, GPL, metano, E85 e ricarica per auto elettrica. In 17 paesi, gratis, senza pubblicità, senza account, open source (MIT).",
+  "pt-PT" => "Pare de pagar a mais na bomba. O Sparkilo compara os preços dos combustíveis em tempo real e leva-o ao posto mais barato perto de si — gasolina, gasóleo, GPL, GNC, E85 e carregamento de carro elétrico. Em 17 países, grátis, sem publicidade, sem conta, de código aberto (MIT).",
+}.freeze
+
+# Feedback email shown to beta testers (overridable via BETA_FEEDBACK_EMAIL).
+def beta_feedback_email
+  ENV.fetch("BETA_FEEDBACK_EMAIL", "fdittgen@gmail.com")
+end
+
+# Notes shown to the App Review team — explains there is no sign-in to demo.
+BETA_REVIEW_NOTES = "App uses anonymous auth on launch — no sign-in or account needed to use any feature. Free, ad-free, open-source (MIT). Fuel + EV charging price comparison.".freeze
+
+# App-Review contact block in *snake_case* — the casing pilot's
+# `beta_app_review_info` option expects (pilot/lib/pilot/options.rb). Returns
+# nil when BETA_CONTACT_PHONE is unset so a plain upload doesn't crash; the
+# phone is mandatory for the App-Review submission and must come from the
+# BETA_CONTACT_PHONE repo secret (never fabricated).
+def beta_review_contact_info_snake
+  phone = ENV["BETA_CONTACT_PHONE"]
+  return nil if phone.nil? || phone.strip.empty?
+
+  {
+    contact_first_name: ENV.fetch("BETA_CONTACT_FIRST", "Florian"),
+    contact_last_name: ENV.fetch("BETA_CONTACT_LAST", "Dittgen"),
+    contact_phone: phone,
+    contact_email: beta_feedback_email,
+    demo_account_required: false,
+    notes: BETA_REVIEW_NOTES,
+  }
+end
+
 platform :ios do
   # On CI, create + unlock a dedicated temporary keychain and set it as
   # default before any signing-related action runs. Without this, fastlane
@@ -302,6 +349,63 @@ platform :ios do
     ext_summary = external_targets.empty? ? "(none)" : external_targets.map(&:name).join(", ")
     int_summary = internal_targets.empty? ? "(none)" : internal_targets.map(&:name).join(", ")
     UI.success("Done. External enrollment: #{ext_summary}. Internal target(s): #{int_summary}.")
+  end
+
+  desc "Push the localized Beta App Review test info ahead of a build (#2611)."
+  desc "No build, no upload — sets the App-Review contact block plus the"
+  desc "per-locale feedback email + beta-app description so the FIRST external"
+  desc "'extern' build sails through Beta App Review without manual data entry."
+  desc "An App-Manager-scoped API key suffices. Requires the BETA_CONTACT_PHONE"
+  desc "repo secret (the App-Review contact phone is mandatory and is never"
+  desc "fabricated). Auth = the same App Store Connect API key as upload_testflight."
+  lane :configure_beta_review do
+    # Reuse the proven ConnectAPI login path (manage_testers / pilot's Manager).
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from(hash: asc_api_key)
+
+    app = Spaceship::ConnectAPI::App.find("de.tankstellen.tankstellen")
+    UI.user_error!("Could not find app de.tankstellen.tankstellen on App Store Connect.") if app.nil?
+
+    # ---- App-Review contact block. The phone is mandatory — bail clearly
+    # rather than fabricate one. (snake-case helper returns nil when unset.)
+    if ENV["BETA_CONTACT_PHONE"].nil? || ENV["BETA_CONTACT_PHONE"].strip.empty?
+      UI.user_error!(
+        "BETA_CONTACT_PHONE is required for the Beta App Review contact info. " \
+        "Set the BETA_CONTACT_PHONE repository secret (a real reachable phone " \
+        "number) and re-run — this lane will not invent one.",
+      )
+    end
+
+    Spaceship::ConnectAPI.patch_beta_app_review_detail(
+      app_id: app.id,
+      attributes: {
+        contactFirstName: ENV.fetch("BETA_CONTACT_FIRST", "Florian"),
+        contactLastName: ENV.fetch("BETA_CONTACT_LAST", "Dittgen"),
+        contactPhone: ENV.fetch("BETA_CONTACT_PHONE"),
+        contactEmail: beta_feedback_email,
+        demoAccountRequired: false,
+        notes: BETA_REVIEW_NOTES,
+      },
+    )
+    UI.success("Beta App Review contact info updated for #{app.name}.")
+
+    # ---- Per-locale Beta App Localizations (feedbackEmail + description).
+    # Fetch existing localizations into a {locale => model} map, then patch the
+    # ones that already exist and post the ones that don't.
+    existing = app.get_beta_app_localizations
+    by_locale = existing.each_with_object({}) { |loc, acc| acc[loc.locale] = loc }
+
+    BETA_APP_DESCRIPTIONS.each do |locale, description|
+      attributes = { feedbackEmail: beta_feedback_email, description: description }
+      if (loc = by_locale[locale])
+        Spaceship::ConnectAPI.patch_beta_app_localizations(localization_id: loc.id, attributes: attributes)
+        UI.success("Updated Beta App Localization for #{locale}.")
+      else
+        Spaceship::ConnectAPI.post_beta_app_localizations(app_id: app.id, attributes: attributes.merge(locale: locale))
+        UI.success("Created Beta App Localization for #{locale}.")
+      end
+    end
+
+    UI.success("Done. Beta App Review test info is staged for #{app.name} (#{BETA_APP_DESCRIPTIONS.keys.join(', ')}).")
   end
 
   desc "Stage App Store text metadata (name/subtitle/keywords/description/etc.)."
