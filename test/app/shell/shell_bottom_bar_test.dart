@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/app/shell/notched_bar_border.dart';
 import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
 import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
@@ -167,20 +168,16 @@ void main() {
       expect(material.elevation, greaterThan(0));
     });
 
-    /// Returns the circular cradle Containers (#1885) — circular boxes
-    /// in the bar's own surface colour.
-    Iterable<Container> cradles(WidgetTester tester) {
-      final ctx = tester.element(find.byType(ShellBottomBar));
-      final barColor = Theme.of(ctx).colorScheme.surfaceContainerHighest;
-      return tester.widgetList<Container>(find.byType(Container)).where((c) {
-        final d = c.decoration;
-        return d is BoxDecoration &&
-            d.shape == BoxShape.circle &&
-            d.color == barColor;
-      });
+    /// The bar's host [Material] — the one whose `shape` is the
+    /// [NotchedBarBorder] (#2552), as opposed to the circular FAB Material.
+    NotchedBarBorder barBorder(WidgetTester tester) {
+      final material = tester
+          .widgetList<Material>(find.byType(Material))
+          .firstWhere((m) => m.shape is NotchedBarBorder);
+      return material.shape as NotchedBarBorder;
     }
 
-    testWidgets('portrait — the button is seated in a bar-coloured cradle',
+    testWidgets('portrait — the button docks into a notched bar (#2552)',
         (tester) async {
       await pumpBar(
         tester,
@@ -191,13 +188,14 @@ void main() {
         isLandscape: false,
         onTap: (_) {},
       );
-      expect(cradles(tester), isNotEmpty,
-          reason: '#1885 — the centre button sits in a circular cradle '
-              'in the bar surface colour.');
+      // #2552 — the bar Material carries a concave notch the FAB docks
+      // into: notchRadius = 56/2 + 6 = 34.
+      expect(barBorder(tester).notchRadius, 34.0,
+          reason: '#2552 — portrait carves a 34dp concave notch into the '
+              'bar top edge for the FAB to dock into.');
     });
 
-    testWidgets('landscape — no cradle (the bar is flat, no head-room)',
-        (tester) async {
+    testWidgets('landscape — flat bar, no notch (#2552)', (tester) async {
       await pumpBar(
         tester,
         items: items,
@@ -207,7 +205,9 @@ void main() {
         isLandscape: true,
         onTap: (_) {},
       );
-      expect(cradles(tester), isEmpty);
+      // Landscape stays flat: notchRadius 0 → the border degenerates to a
+      // plain rectangle.
+      expect(barBorder(tester).notchRadius, 0.0);
     });
   });
 
@@ -239,7 +239,21 @@ void main() {
   });
 
   group('ShellBottomBar layout: portrait vs landscape', () {
-    testWidgets('portrait: flat-tab labels rendered, bar Container is 64',
+    /// The bar's height comes from the [SizedBox] under the notched-bar
+    /// [Material] (#2552 — the bar is no longer a Container).
+    double barHeight(WidgetTester tester) {
+      final barMaterial = find.byWidgetPredicate(
+        (w) => w is Material && w.shape is NotchedBarBorder,
+      );
+      final sizedBox = tester.widget<SizedBox>(
+        find
+            .descendant(of: barMaterial, matching: find.byType(SizedBox))
+            .first,
+      );
+      return sizedBox.height!;
+    }
+
+    testWidgets('portrait: flat-tab labels rendered, bar is 64 tall',
         (tester) async {
       await pumpBar(
         tester,
@@ -254,13 +268,10 @@ void main() {
       expect(find.text('Map'), findsOneWidget);
       expect(find.text('Favorites'), findsOneWidget);
 
-      final barContainer =
-          tester.widget<Container>(find.byType(Container).first);
-      expect(barContainer.constraints?.maxHeight, 64.0);
+      expect(barHeight(tester), 64.0);
     });
 
-    testWidgets('landscape: labels hidden, bar Container is 48',
-        (tester) async {
+    testWidgets('landscape: labels hidden, bar is 48 tall', (tester) async {
       await pumpBar(
         tester,
         items: items,
@@ -274,9 +285,7 @@ void main() {
       for (final item in items) {
         expect(find.text(item.label), findsNothing);
       }
-      final barContainer =
-          tester.widget<Container>(find.byType(Container).first);
-      expect(barContainer.constraints?.maxHeight, 48.0);
+      expect(barHeight(tester), 48.0);
     });
   });
 
@@ -556,6 +565,111 @@ void main() {
       expect(wired, {ctrls[0], ctrls[2], ctrls[4]});
       expect(wired, isNot(contains(ctrls[1])));
       expect(wired, isNot(contains(ctrls[3])));
+    });
+  });
+
+  group('ShellBottomBar notch (#2552)', () {
+    /// The bar's host [Material] — the one whose `shape` is the
+    /// [NotchedBarBorder], as opposed to the circular FAB Material.
+    Material barMaterial(WidgetTester tester) => tester
+        .widgetList<Material>(find.byType(Material))
+        .firstWhere((m) => m.shape is NotchedBarBorder);
+
+    /// The circular FAB [Material] wrapping the centre button.
+    Material fabMaterial(WidgetTester tester, IconData icon) =>
+        tester.widget<Material>(
+          find
+              .ancestor(of: find.byIcon(icon), matching: find.byType(Material))
+              .first,
+        );
+
+    testWidgets('portrait paints a notched shape with the FAB centred',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: controllers(3),
+        isLandscape: false,
+        onTap: (_) {},
+      );
+
+      // The bar carries a concave notch (FAB radius 28 + 6 margin = 34).
+      final border = barMaterial(tester).shape as NotchedBarBorder;
+      expect(border.notchRadius, 34.0);
+
+      // The FAB is still a raised circle, centred over the notch.
+      final fab = fabMaterial(tester, Icons.search_outlined);
+      expect(fab.shape, isA<CircleBorder>());
+      expect(fab.elevation, greaterThan(0));
+
+      final fabCentre =
+          tester.getCenter(find.byIcon(Icons.search_outlined)).dx;
+      final barCentre =
+          tester.getCenter(find.byType(ShellBottomBar)).dx;
+      expect((fabCentre - barCentre).abs(), lessThan(1.0),
+          reason: 'the FAB docks in the centre of the notch.');
+    });
+
+    testWidgets('portrait — the notch clip does not eat the FAB hit-test',
+        (tester) async {
+      // Reuse the SearchFabAction harness: register an action, tap the
+      // FAB, assert it fired once — proves the antialias clip on the bar
+      // Material did not swallow the centred FAB's tap.
+      var fired = 0;
+      final container = ProviderContainer(overrides: const []);
+      addTearDown(container.dispose);
+      container.read(searchFabActionControllerProvider.notifier).set(
+            SearchFabAction(
+              icon: Icons.bolt,
+              tooltip: 'Run',
+              onTap: () => fired++,
+            ),
+          );
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: Align(
+                alignment: Alignment.bottomCenter,
+                child: ShellBottomBar(
+                  items: items,
+                  branchForSlot: const [0, 1, 2],
+                  currentIndex: 0,
+                  iconControllers: controllers(3),
+                  isLandscape: false,
+                  onTap: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.bolt));
+      await tester.pump();
+      expect(fired, 1);
+    });
+
+    testWidgets('landscape — flat bar (notchRadius 0), FAB still present',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: controllers(3),
+        isLandscape: true,
+        onTap: (_) {},
+      );
+
+      final border = barMaterial(tester).shape as NotchedBarBorder;
+      expect(border.notchRadius, 0.0);
+
+      final fab = fabMaterial(tester, Icons.search_outlined);
+      expect(fab.shape, isA<CircleBorder>());
     });
   });
 }
