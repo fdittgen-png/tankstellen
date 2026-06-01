@@ -1,39 +1,39 @@
-Find the cheapest fuel and EV chargers around you in 17 countries — real-time, free, no account, no ads. Independent and open-source.
+Stop overpaying at the pump. Sparkilo compares real-time fuel prices and EV charging across 17 countries and points you to the cheapest station near you — for petrol, diesel, LPG, CNG, E85 and electric. Free, ad-free, no account, open-source (MIT).
 
-WHY THIS APP
-• Real-time prices from official open-data partners — not crowdsourced guesses.
-• 17 countries supported, with one unified search that mixes petrol, diesel, LPG, CNG, e85 and EV charging stations on the same map.
-• Built for drivers who don't want to think about it: pair your OBD2 adapter once and trips record themselves.
-• Privacy-first: no PII leaves your device, no online inference, full data deletion in one tap.
+WHY SPARKILO
+• Official open-data prices, country by country — not crowdsourced guesses.
+• One unified search mixes every fuel type and EV chargers on the same map.
+• Cheap pins first: price pins are coloured cheapest-to-priciest at a glance.
+• Privacy-first: your GPS and API keys never leave the device. No ads, no tracking, no account.
 
-CORE FEATURES
-• Search by current location, address, or favourite radius — sorted by best price for your fuel type.
-• Map view with the cheapest pin highlighted, plus full station detail (opening hours, brand, payment, distance).
-• 30-day local price history with a "best time to fill" predictor and holiday-aware adjustments.
-• Price alerts: single station or radius, with consent-respecting evaluators that run only when you're nearby.
-• Favourites, cross-border savings hint (e.g. FR → DE / DE → CZ), home-screen widget, voice announcement during driving.
+FIND CHEAP FUEL NEAR YOU
+• Search nearby or along your route: filter by fuel type, radius, open-now, amenities and highway-only.
+• Best price for your fuel surfaced first, with a Cheapest badge on the map.
+• Route mode finds the best stops in your travel corridor so a detour always pays off.
+• Full station detail: brand, opening hours, payment, distance and amenities.
 
-DRIVING
-• OBD2 trip recording — pair an ELM327-compatible adapter once and the app records every trip end to end.
-• Hands-free auto-record (optional): trips start when the engine spins up and save themselves on disconnect. A launcher badge tells you new auto-recordings are waiting.
-• Driving insights with hard-acceleration markers on the trip-detail map, RPM/throttle histograms, eco-coach hints.
-• Consumption tracker, maintenance reminders, full backup/restore.
+PRICE ALERTS & FAVOURITES
+• Per-station price thresholds and radius alerts that run on-device only when you are nearby.
+• Favourites with multi-price fuel rows, plus EV chargers showing kW, connectors and live availability.
 
-SUPPORTED COUNTRIES (real-time data)
-Austria, Argentina, Australia, Chile, Denmark, France, Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South Korea, Spain, United Kingdom.
+TRACK FUEL COST & CONSUMPTION
+• Consumption tracker: tank level + range, average L/100km, average cost/km, total spent and a fill-up history with percentage deltas.
+• Log fill-ups manually, via pump-display OCR or receipt OCR.
+• Built-in fuel-cost calculator to plan any trip.
+• Carbon dashboard: cost and CO₂ broken down by trip length and speed band.
 
-EV CHARGING
-Open Charge Map integration — every public charger surfaces alongside fuel pumps in the unified search results, with connector/power info on the detail screen.
+TRIP LOGBOOK & ECO-COACHING
+• Hands-free trip logbook — auto-record over an OBD2 ELM327 adapter or GPS only.
+• Per-trip GPS route coloured by efficiency, plus an all-trips map.
+• Eco-coaching flags wasteful behaviour with throttle and RPM histograms and monthly comparisons.
 
-LANGUAGES
-23 UI languages: Bulgarian, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Italian, Latvian, Lithuanian, Norwegian Bokmål, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish.
+MORE
+• Approach-station live-price overlay, home-screen widget and voice announcements while driving.
+• Basic / Medium / Full presets right-size the app; multiple profiles supported.
+• Privacy Dashboard to see, export or delete all your data. Optional TankSync cross-device sync.
 
-GMS-FREE
-A separate F-Droid build is available with no Google Mobile Services dependency, for users who run de-Googled Android variants.
+SUPPORTED COUNTRIES (official real-time data)
+Austria, Argentina, Australia, Chile, Denmark, France, Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South Korea, Spain, United Kingdom. EV charging worldwide via Open Charge Map.
 
-DOCUMENTATION + COMMUNITY
-The full user manual, FAQ, supported-adapter matrix, and contributor docs live on the project wiki:
-https://github.com/fdittgen-png/tankstellen/wiki
-
-The app is open source — issues and contributions welcome at:
+23 UI languages. Open source — issues and contributions welcome:
 https://github.com/fdittgen-png/tankstellen

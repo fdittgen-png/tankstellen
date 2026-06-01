@@ -1,0 +1,39 @@
+Pare de pagar a mais na bomba. O Sparkilo compara os preços dos combustíveis em tempo real e leva-o ao posto mais barato perto de si — gasolina, gasóleo, GPL, GNC, E85 e carregamento de carro elétrico. Em 17 países, grátis, sem publicidade, sem conta, de código aberto (MIT).
+
+PORQUÊ O SPARKILO
+• Preços oficiais de dados abertos, país a país — não são estimativas dos utilizadores.
+• Um único comparador de preços para todos os combustíveis e postos de carregamento, no mesmo mapa.
+• Barato primeiro: marcadores de preço coloridos do mais barato ao mais caro, num relance.
+• Privacidade em primeiro lugar: o seu GPS e as chaves API nunca saem do dispositivo. Sem publicidade, sem rastreio, sem conta.
+
+COMBUSTÍVEL BARATO PERTO DE SI
+• Pesquise por perto ou ao longo da sua rota: filtros por combustível, raio, aberto agora, serviços e só autoestrada.
+• O melhor preço do seu combustível em primeiro, com um selo "O mais barato" no mapa.
+• O modo rota encontra as melhores paragens no corredor para que o desvio compense sempre.
+• Detalhe completo do posto: marca, horário, pagamento, distância e serviços.
+
+ALERTAS DE PREÇO E FAVORITOS
+• Alertas por posto e por raio que correm no dispositivo apenas quando está por perto.
+• Favoritos com várias linhas de preço, mais postos com kW, conectores e disponibilidade.
+
+CUSTOS E CONSUMO
+• Acompanhamento de consumo: nível + autonomia, l/100 km médio, custo por quilómetro, gasto total e histórico de abastecimentos com variações em percentagem.
+• Registe abastecimentos à mão, por OCR da bomba ou OCR do recibo.
+• Calculadora de custo de combustível integrada para qualquer viagem.
+• Painel de carbono: custo e CO₂ por extensão da viagem e por velocidade.
+
+LIVRO DE VIAGENS E CONDUÇÃO ECONÓMICA
+• Livro de viagens mãos-livres — registo automático via adaptador OBD2 ELM327 ou só GPS.
+• Rota GPS por viagem colorida segundo a eficiência, mais um mapa de todas as viagens.
+• A condução económica deteta desperdícios com histogramas de acelerador e rotações e comparação mensal.
+
+MAIS
+• Preço em direto ao aproximar-se, widget no ecrã inicial e anúncios por voz ao conduzir.
+• Predefinições Básico / Médio / Completo para dimensionar a app; suporta vários perfis.
+• Painel de Privacidade para ver, exportar ou apagar todos os seus dados. Sincronização TankSync opcional.
+
+PAÍSES SUPORTADOS (dados oficiais em tempo real)
+Alemanha, Argentina, Austrália, Áustria, Chile, Coreia do Sul, Dinamarca, Eslovénia, Espanha, França, Grécia, Itália, Luxemburgo, México, Portugal, Reino Unido, Roménia. Carregamento elétrico em todo o mundo via Open Charge Map.
+
+23 idiomas. Código aberto — problemas e contribuições bem-vindos:
+https://github.com/fdittgen-png/tankstellen

@@ -1,0 +1,7 @@
+Sparkilo — carburante e ricarica elettrica più economici, con ASO migliore e 6 schede localizzate.
+• Prezzi ufficiali in tempo reale in 17 paesi su una mappa
+• Prima l'economico + migliori soste del percorso
+• Avvisi prezzo, preferiti (carburante + colonnine)
+• Monitoraggio consumi, calcolatore di costo e carbonio
+• Diario di viaggio a mani libere (OBD2 o GPS) + eco-guida
+• Niente pubblicità, account o tracciamento — open source

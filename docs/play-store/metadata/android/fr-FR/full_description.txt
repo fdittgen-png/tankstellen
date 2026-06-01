@@ -1,39 +1,39 @@
-Trouvez les prix carburants et bornes de recharge EV les moins chers autour de vous, dans 17 pays — en temps réel, gratuit, sans compte, sans publicité. Indépendant et open source.
+Arrêtez de payer trop cher à la pompe. Sparkilo compare les prix carburant en temps réel et vous guide vers la station la moins chère près de vous — essence, gazole, GPL, GNV, E85 et recharge de voiture électrique. Dans 17 pays, gratuit, sans pub, sans compte, open source (MIT).
 
-POURQUOI CETTE APPLI
-• Prix en temps réel issus de partenaires open-data officiels — pas d'estimations crowdsourcées.
-• 17 pays, une recherche unifiée — essence, gazole, GPL, GNV, E85 et bornes EV sur la même carte.
-• Pensé pour les conducteurs qui ne veulent pas y penser : appairez votre adaptateur OBD2 une fois et les trajets s'enregistrent tout seuls.
-• Vie privée avant tout : aucune donnée personnelle ne quitte l'appareil, aucune inférence en ligne, suppression complète des données en un seul tap.
+POURQUOI SPARKILO
+• Prix open-data officiels, pays par pays — pas d'estimations crowdsourcées.
+• Un seul comparateur de prix pour tous les carburants et les bornes, sur la même carte.
+• Le moins cher d'abord : pins colorés du moins cher au plus cher, en un coup d'œil.
+• Vie privée d'abord : GPS et clés API ne quittent jamais l'appareil. Sans pub, sans pistage, sans compte.
 
-FONCTIONNALITÉS PRINCIPALES
-• Recherche par position actuelle, adresse ou rayon favori — triée par meilleur prix pour votre carburant.
-• Carte avec le pin du moins cher mis en évidence, plus le détail complet de la station (horaires, marque, paiement, distance).
-• Historique local des prix sur 30 jours avec prédicteur « meilleur moment pour faire le plein » et ajustements jours fériés.
-• Alertes prix : station unique ou par rayon, avec évaluateurs respectueux du consentement qui ne tournent qu'à proximité.
-• Favoris, suggestion d'économies transfrontalières (ex. FR → DE / DE → CZ), widget écran d'accueil, annonce vocale pendant la conduite.
+CARBURANT PAS CHER PRÈS DE VOUS
+• Recherche à proximité ou le long du trajet : filtres carburant, rayon, ouvert maintenant, services et autoroute uniquement.
+• Meilleur prix essence ou gazole en tête, avec un badge « Le moins cher » sur la carte.
+• Le mode trajet trouve les meilleurs arrêts du corridor pour que le détour soit toujours rentable.
+• Détail complet de la station : marque, horaires, paiement, distance, services.
 
-CONDUITE
-• Enregistrement de trajet OBD2 — appairez un adaptateur compatible ELM327 une seule fois, l'appli enregistre chaque trajet de bout en bout.
-• Auto-enregistrement mains libres (optionnel) : les trajets démarrent au démarrage moteur et se sauvegardent à la déconnexion. Un badge sur l'icône signale les nouveaux auto-enregistrements à consulter.
-• Analyse de conduite avec marqueurs d'accélérations fortes sur la carte du trajet, histogrammes RPM/accélérateur, conseils éco-conduite.
-• Suivi de consommation, rappels d'entretien, sauvegarde/restauration complète.
+ALERTES PRIX & FAVORIS
+• Alertes par station et par rayon, exécutées sur l'appareil uniquement à proximité.
+• Favoris avec plusieurs lignes de prix, plus les bornes avec kW, connecteurs et disponibilité.
 
-PAYS PRIS EN CHARGE (données temps réel)
-Allemagne, Argentine, Australie, Autriche, Chili, Corée du Sud, Danemark, Espagne, France, Grèce, Italie, Luxembourg, Mexique, Portugal, Roumanie, Royaume-Uni, Slovénie.
+COÛT TRAJET & CONSOMMATION
+• Suivi de consommation : niveau + autonomie, l/100 km moyen, coût au kilomètre, dépenses totales et historique des pleins avec écarts en pourcentage.
+• Saisie des pleins manuelle, par OCR de la pompe ou OCR du ticket.
+• Calculateur de coût de carburant intégré pour chaque trajet.
+• Tableau de bord carbone : coût et CO₂ par longueur de trajet et par vitesse.
 
-RECHARGE EV
-Intégration Open Charge Map — chaque borne publique apparaît à côté des pompes dans la recherche unifiée, avec type de prise / puissance dans le détail.
+CARNET DE BORD & ÉCO-CONDUITE
+• Carnet de bord mains libres — auto-enregistrement via adaptateur OBD2 ELM327 ou GPS seul.
+• Trajet GPS coloré selon l'efficacité, plus une carte de tous les trajets.
+• L'éco-conduite repère les gaspillages avec histogrammes d'accélérateur et de régime et comparaison mensuelle.
 
-LANGUES
-23 langues d'interface : allemand, anglais, bulgare, croate, danois, espagnol, estonien, finnois, français, grec, hongrois, italien, letton, lituanien, néerlandais, norvégien (bokmål), polonais, portugais, roumain, slovaque, slovène, suédois, tchèque.
+PLUS
+• Affichage du prix en direct à l'approche, widget d'accueil et annonces vocales pendant la conduite.
+• Préréglages Basic / Medium / Complet pour adapter l'appli ; plusieurs profils possibles.
+• Tableau de bord Confidentialité pour voir, exporter ou tout supprimer. Synchronisation TankSync optionnelle.
 
-VERSION SANS GMS
-Un build F-Droid distinct, sans Google Mobile Services, est disponible pour les utilisateurs d'Android dégooglisé.
+PAYS PRIS EN CHARGE (données officielles temps réel)
+Allemagne, Argentine, Australie, Autriche, Chili, Corée du Sud, Danemark, Espagne, France, Grèce, Italie, Luxembourg, Mexique, Portugal, Roumanie, Royaume-Uni, Slovénie. Recharge EV dans le monde entier via Open Charge Map.
 
-DOCUMENTATION + COMMUNAUTÉ
-Le manuel utilisateur complet, la FAQ, la matrice de compatibilité des adaptateurs et la doc contributeur vivent sur le wiki du projet :
-https://github.com/fdittgen-png/tankstellen/wiki
-
-L'appli est open source — tickets et contributions bienvenus sur :
+23 langues. Open source — tickets et contributions bienvenus :
 https://github.com/fdittgen-png/tankstellen

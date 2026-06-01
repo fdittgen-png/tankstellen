@@ -1,45 +1,39 @@
-Sparkilo est une application gratuite et open source de comparaison des prix des carburants et de la recharge electrique qui vous aide a payer moins cher a la pompe et a consommer moins au volant. Concue avec la vie privee comme principe fondamental, elle ne contient aucune publicite, aucun tracage et aucune telemetrie. Vos donnees de localisation ne quittent jamais votre appareil, sauf si vous activez la synchronisation cloud optionnelle.
+Arrêtez de payer trop cher à la pompe. Sparkilo compare les prix carburant en temps réel et vous guide vers la station la moins chère près de vous — essence, gazole, GPL, GNV, E85 et recharge de voiture électrique. Dans 17 pays, gratuit, sans pub, sans compte, open source (MIT).
 
-FONCTIONNALITES
+POURQUOI SPARKILO
+• Prix open-data officiels, pays par pays — pas d'estimations crowdsourcées.
+• Un seul comparateur de prix pour tous les carburants et les bornes, sur la même carte.
+• Le moins cher d'abord : pins colorés du moins cher au plus cher, en un coup d'œil.
+• Vie privée d'abord : GPS et clés API ne quittent jamais l'appareil. Sans pub, sans pistage, sans compte.
 
-Comparaison de prix dans 17 pays
-- Prix en temps reel provenant des API gouvernementales officielles en Allemagne (Tankerkoenig/MTS-K), France (Prix Carburants), Autriche (Spritpreisrechner), Espagne (Geoportal), Italie (MASE/MiSE), Danemark, Portugal (DGEG), Royaume-Uni (CMA Fuel Finder), Australie (FuelCheck NSW), Slovenie (goriva.si), Luxembourg, Coree du Sud (Opinet), Chili (CNE Bencina en Linea), Grece (Paratiritirio Timon), Roumanie (Monitorul Preturilor), Argentine et Mexique.
-- Carte interactive avec tuiles OpenStreetMap et regroupement de marqueurs pour une navigation rapide meme dans les zones urbaines denses.
-- Recherche par nom de ville, code postal ou position GPS avec rayon configurable.
-- Bornes de recharge electrique OpenChargeMap avec details des connecteurs et de la puissance a cote des prix des carburants.
+CARBURANT PAS CHER PRÈS DE VOUS
+• Recherche à proximité ou le long du trajet : filtres carburant, rayon, ouvert maintenant, services et autoroute uniquement.
+• Meilleur prix essence ou gazole en tête, avec un badge « Le moins cher » sur la carte.
+• Le mode trajet trouve les meilleurs arrêts du corridor pour que le détour soit toujours rentable.
+• Détail complet de la station : marque, horaires, paiement, distance, services.
 
-Conduire malin, economiser deux fois
-- Enregistrement de trajets via l'adaptateur OBD2 de votre vehicule (Bluetooth ELM327) pour des donnees de consommation reelles.
-- Onglet Trajets avec statistiques par trajet, decodage VIN et calibration par entrainement flou.
-- Historique des pleins avec OCR pour les tickets Super U, Carrefour et generiques.
-- Profils de vehicule et suivi CO2 par trajet.
+ALERTES PRIX & FAVORIS
+• Alertes par station et par rayon, exécutées sur l'appareil uniquement à proximité.
+• Favoris avec plusieurs lignes de prix, plus les bornes avec kW, connecteurs et disponibilité.
 
-Restez informe
-- Alertes de prix par rayon et par vitesse avec notifications push locales lorsque les prix baissent.
-- Favoris, graphiques d'historique des prix et meilleur moment statistique pour faire le plein.
-- Widgets d'ecran d'accueil Android pour les favoris et les stations les plus proches.
-- Comparaison transfrontaliere pour les trajets qui traversent une frontiere.
+COÛT TRAJET & CONSOMMATION
+• Suivi de consommation : niveau + autonomie, l/100 km moyen, coût au kilomètre, dépenses totales et historique des pleins avec écarts en pourcentage.
+• Saisie des pleins manuelle, par OCR de la pompe ou OCR du ticket.
+• Calculateur de coût de carburant intégré pour chaque trajet.
+• Tableau de bord carbone : coût et CO₂ par longueur de trajet et par vitesse.
 
-VIE PRIVEE
+CARNET DE BORD & ÉCO-CONDUITE
+• Carnet de bord mains libres — auto-enregistrement via adaptateur OBD2 ELM327 ou GPS seul.
+• Trajet GPS coloré selon l'efficacité, plus une carte de tous les trajets.
+• L'éco-conduite repère les gaspillages avec histogrammes d'accélérateur et de régime et comparaison mensuelle.
 
-Sparkilo ne demande la permission de localisation que lors de la recherche active. Aucun compte necessaire. Par defaut, aucune donnee n'est transmise a un tiers. L'application fonctionne entierement hors ligne pour les resultats mis en cache. Localisation complete en 23 langues.
+PLUS
+• Affichage du prix en direct à l'approche, widget d'accueil et annonces vocales pendant la conduite.
+• Préréglages Basic / Medium / Complet pour adapter l'appli ; plusieurs profils possibles.
+• Tableau de bord Confidentialité pour voir, exporter ou tout supprimer. Synchronisation TankSync optionnelle.
 
-SYNCHRONISATION CLOUD OPTIONNELLE (TankSync)
+PAYS PRIS EN CHARGE (données officielles temps réel)
+Allemagne, Argentine, Australie, Autriche, Chili, Corée du Sud, Danemark, Espagne, France, Grèce, Italie, Luxembourg, Mexique, Portugal, Roumanie, Royaume-Uni, Slovénie. Recharge EV dans le monde entier via Open Charge Map.
 
-Pour les utilisateurs souhaitant synchroniser leurs favoris, vehicules, pleins et alertes entre plusieurs appareils, Sparkilo prend en charge un backend Supabase auto-heberge optionnel appele TankSync. Vous deployez votre propre instance, entrez l'URL et la cle anonyme, et l'application synchronise vos donnees sur votre propre serveur. Transparence totale des donnees : vous pouvez consulter, exporter ou supprimer tout a tout moment depuis l'application.
-
-Les notifications push pour les alertes de prix sont envoyees via ntfy.sh, un service de notifications push open source, de sorte qu'aucun Google Play Services ni Firebase n'est necessaire.
-
-OPEN SOURCE
-
-Sparkilo est sous licence MIT. Le code source complet, les scripts de migration Supabase et la documentation de deploiement sont disponibles sur GitHub. Les contributions et traductions sont les bienvenues.
-
-PLATEFORMES SUPPORTEES
-
-- Android (plateforme cible principale, y compris Android Auto).
-- Chromebook (via APK Android).
-- iOS — en developpement.
-
-DETAILS TECHNIQUES
-
-Developpe avec Flutter et Riverpod pour la gestion d'etat. Toutes les donnees sont stockees localement avec Hive. Les requetes reseau passent par une couche d'abstraction de services avec des chaines de repli automatiques et du cache. L'application respecte les limites de debit des API et met en cache les reponses pour minimiser l'utilisation du reseau.
+23 langues. Open source — tickets et contributions bienvenus :
+https://github.com/fdittgen-png/tankstellen
