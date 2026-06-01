@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -13,7 +11,6 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../data/driving_insights_analyzer.dart';
 import 'trip_detail_charts.dart';
-import '../../../../core/logging/error_logger.dart';
 
 // ---------------------------------------------------------------------------
 // Phase 3 thresholds (#1374) — fixed defaults.
@@ -62,7 +59,8 @@ enum _SegmentBucket { efficient, borderline, wasteful }
 ///   (see thresholds above).
 /// * Two markers — first and last GPS sample — for trip start and end.
 /// * Legend below the map showing the three buckets + their labels.
-/// * Auto-fits the viewport to the polyline bounds.
+/// * Frames the viewport to the polyline bounds on the first layout pass
+///   via [MapOptions.initialCameraFit] (#2624).
 class TripPathMapCard extends StatelessWidget {
   final List<TripDetailSample> samples;
 
@@ -137,10 +135,9 @@ class TripPathMapCard extends StatelessWidget {
 }
 
 /// Stateful inner map so the [MapController] can survive rebuilds and
-/// the post-frame `fitCamera` callback can target a stable controller
-/// instance. Mirrors the pattern used by [StationMapLayers] — the
-/// outer card stays a [StatelessWidget] so callers don't have to
-/// worry about lifecycle.
+/// remain available for interaction (pinch / drag). Mirrors the pattern
+/// used by [StationMapLayers] — the outer card stays a [StatelessWidget]
+/// so callers don't have to worry about lifecycle.
 class _TripPathMap extends StatefulWidget {
   final List<LatLng> points;
   final List<TripDetailSample> pointSamples;
@@ -157,14 +154,16 @@ class _TripPathMap extends StatefulWidget {
 class _TripPathMapState extends State<_TripPathMap> {
   late final MapController _mapController = MapController();
 
-  /// Pre-computed bounds for the polyline. Single-point polylines fall
-  /// back to a degenerate bounds object centered on the point — the
-  /// `fitCamera` call handles those by centering on the point at a
-  /// sane default zoom rather than throwing.
+  /// Pre-computed bounds for the polyline, fed to
+  /// [MapOptions.initialCameraFit]. Single-point polylines fall back to a
+  /// degenerate bounds box centered on the point (see [_computeBounds]) so
+  /// `CameraFit.bounds` centres on the point at a sane zoom rather than
+  /// dividing by zero.
   late final LatLngBounds _bounds = _computeBounds(widget.points);
 
-  /// Fallback initial camera so the very first frame paints something
-  /// reasonable before the post-frame `fitCamera` callback fires.
+  /// Pre-fit fallback centre used by [MapOptions.initialCenter] for the
+  /// degenerate case where layout hasn't run yet; `initialCameraFit`
+  /// frames the real viewport on the first layout pass.
   late final LatLng _initialCenter = _bounds.center;
 
   static LatLngBounds _computeBounds(List<LatLng> points) {
@@ -179,28 +178,6 @@ class _TripPathMapState extends State<_TripPathMap> {
       );
     }
     return LatLngBounds.fromPoints(points);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Fit the camera to the polyline bounds once the map has laid out.
-    // Mirrors the pattern in `nearby_map_view.dart`: schedule via
-    // `addPostFrameCallback` so the MapController has a real viewport
-    // size by the time `fitCamera` runs.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      try {
-        _mapController.fitCamera(
-          CameraFit.bounds(
-            bounds: _bounds,
-            padding: const EdgeInsets.all(24),
-          ),
-        );
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripPathMapCard fitCamera failed'}));
-      }
-    });
   }
 
   @override
@@ -322,6 +299,19 @@ class _TripPathMapState extends State<_TripPathMap> {
       options: MapOptions(
         initialCenter: _initialCenter,
         initialZoom: 13,
+        // #2624 — frame the polyline bounds during the FIRST layout pass
+        // via `initialCameraFit`, not a post-frame `fitCamera`. The old
+        // post-frame fit (now removed) jumped the camera after the first
+        // tile fetch had already targeted the fallback viewport, leaving
+        // grey tiles. Mirrors the main map page's #2398/#2399 fix
+        // (`station_map_layers.dart`): positioning the camera as part of
+        // layout means the first tile fetch already targets the right
+        // viewport. `initialCenter`/`initialZoom` above stay as the
+        // pre-fit fallback for the degenerate no-layout-yet frame.
+        initialCameraFit: CameraFit.bounds(
+          bounds: _bounds,
+          padding: const EdgeInsets.all(32),
+        ),
         // Steady-state pinch / drag stays enabled — the user may want
         // to inspect the path. Rotation is disabled for the same
         // reason `StationMapLayers` does it: trip overlays read more

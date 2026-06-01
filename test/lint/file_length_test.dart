@@ -214,8 +214,11 @@ void main() {
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
         439,
+    // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
+    // (+ its dart:async / error_logger imports) in favour of
+    // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
     'lib/features/consumption/presentation/widgets/trip_path_map_card.dart':
-        463,
+        450,
     // #2441 — re-grandfathered 879 → 911: split the trip-vs-pump
     // reconciliation into a detect-vs-apply seam. The detector still
     // lives in reconciler.dart; the apply step (`applyReconciliation`)
