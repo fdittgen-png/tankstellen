@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/station_extensions.dart';
+import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import 'route_station_chip.dart';
 
@@ -14,12 +15,18 @@ class RouteBestStopsList extends StatelessWidget {
   final dynamic selectedFuel;
   final void Function(String stationId) onToggleStation;
 
+  /// #2631 — on a cross-border route, maps a station to ITS country's
+  /// profile fuel so the chip shows the price that station's driver pays
+  /// (Spanish stop → E10) instead of '--'. Null → strict [selectedFuel].
+  final FuelType Function(Station)? fuelResolver;
+
   const RouteBestStopsList({
     super.key,
     required this.stations,
     required this.selectedStationIds,
     required this.selectedFuel,
     required this.onToggleStation,
+    this.fuelResolver,
   });
 
   @override
@@ -36,7 +43,8 @@ class RouteBestStopsList extends StatelessWidget {
         itemBuilder: (context, index) {
           final station = stations[index];
           final isSelected = selectedStationIds.contains(station.id);
-          final price = station.priceFor(selectedFuel);
+          final price = station.priceFor(
+              fuelResolver != null ? fuelResolver!(station) : selectedFuel);
           final stopNumber = index + 1;
           return RouteStationChip(
             key: ValueKey('route-station-${station.id}'),

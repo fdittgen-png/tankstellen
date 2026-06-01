@@ -55,6 +55,14 @@ class StationMarkerBuilder {
   /// When [compact] is true, the marker renders as a small coloured dot
   /// (no price text) — used for lower-ranked stations so a bounded result
   /// set stays fully visible without the full bubbles overlapping (#2510).
+  ///
+  /// #2631 — on a cross-border route the caller may pass [fuelResolver],
+  /// which maps a station to the fuel of ITS country's profile (offline,
+  /// from the station's lat/lng). The price is then taken for that
+  /// resolved fuel so a Spanish station shows the E10 price an E85 driver
+  /// would actually pay, instead of '--'. When [fuelResolver] is null the
+  /// strict single-[fuel] behaviour (#2510) is unchanged — a station
+  /// lacking that fuel still shows '--', never a within-country fallback.
   static Marker build(
     BuildContext context,
     Station station,
@@ -63,11 +71,14 @@ class StationMarkerBuilder {
     double maxPrice, {
     bool pastel = false,
     bool compact = false,
+    FuelType Function(Station)? fuelResolver,
   }) {
     // #2510 — strict selected-fuel price, exactly like the list card. No
-    // fallback to another fuel: a station lacking the selected fuel shows
-    // "--", it must never be re-labelled with E10's price.
-    final price = station.priceFor(fuel);
+    // within-country fallback: a station lacking the selected fuel shows
+    // "--", it must never be re-labelled with E10's price. #2631 — when a
+    // cross-border resolver is supplied, the fuel is the station's OWN
+    // country profile fuel; the resolution stays strict for that fuel.
+    final price = station.priceFor(fuelResolver != null ? fuelResolver(station) : fuel);
     final baseColor = priceColor(price, minPrice, maxPrice);
     final color = pastel ? _toPastel(baseColor) : baseColor;
     final brand = truncateBrand(station.displayName, maxLength: _maxBrandLength);
