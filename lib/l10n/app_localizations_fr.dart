@@ -3752,6 +3752,39 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de l\'exportation — veuillez réessayer';
 
   @override
+  String get restoreBackupTooltip => 'Restaurer la sauvegarde';
+
+  @override
+  String get restoreBackupDialogTitle => 'Restaurer la sauvegarde';
+
+  @override
+  String get restoreBackupDialogBody =>
+      'Fusionner ajoute et met à jour les enregistrements de la sauvegarde tout en conservant tout ce qui se trouve déjà sur cet appareil. Remplacer supprime d\'abord toutes les données actuelles, puis restaure uniquement la sauvegarde — cette action est irréversible.';
+
+  @override
+  String get restoreBackupMergeAction => 'Fusionner';
+
+  @override
+  String get restoreBackupReplaceAction => 'Tout remplacer';
+
+  @override
+  String restoreBackupSuccess(int count) {
+    return 'Sauvegarde restaurée — $count enregistrements importés';
+  }
+
+  @override
+  String get restoreBackupEmpty =>
+      'Sauvegarde restaurée — elle ne contenait aucun enregistrement';
+
+  @override
+  String get restoreBackupCorrupt =>
+      'Échec de la restauration — ce fichier n\'est pas une sauvegarde Tankstellen valide';
+
+  @override
+  String get restoreBackupFailed =>
+      'Échec de la restauration — le fichier n\'a pas pu être lu';
+
+  @override
   String get brokenMapChipVerifying => 'Vérification du capteur MAP…';
 
   @override

@@ -3700,6 +3700,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportBackupFailed => 'Backup export failed — please try again';
 
   @override
+  String get restoreBackupTooltip => 'Restore backup';
+
+  @override
+  String get restoreBackupDialogTitle => 'Restore backup';
+
+  @override
+  String get restoreBackupDialogBody =>
+      'Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.';
+
+  @override
+  String get restoreBackupMergeAction => 'Merge';
+
+  @override
+  String get restoreBackupReplaceAction => 'Replace all';
+
+  @override
+  String restoreBackupSuccess(int count) {
+    return 'Backup restored — $count records imported';
+  }
+
+  @override
+  String get restoreBackupEmpty => 'Backup restored — it contained no records';
+
+  @override
+  String get restoreBackupCorrupt =>
+      'Restore failed — this file is not a valid Tankstellen backup';
+
+  @override
+  String get restoreBackupFailed =>
+      'Restore failed — the file could not be read';
+
+  @override
   String get brokenMapChipVerifying => 'MAP sensor verifying…';
 
   @override
@@ -10470,6 +10502,39 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get exportBackupFailed =>
       '⟦Ɓáçķúƥ éẋƥóřŧ ƒáîłéđ — ƥłéášé ŧřý áǧáîñ ··············⟧';
+
+  @override
+  String get restoreBackupTooltip => '⟦Řéšŧóřé ƀáçķúƥ ······⟧';
+
+  @override
+  String get restoreBackupDialogTitle => '⟦Řéšŧóřé ƀáçķúƥ ······⟧';
+
+  @override
+  String get restoreBackupDialogBody =>
+      '⟦Ṁéřǧé áđđš áñđ úƥđáŧéš řéçóřđš ƒřóɱ ŧĥé ƀáçķúƥ áñđ ķééƥš éṽéřýŧĥîñǧ áłřéáđý óñ ŧĥîš đéṽîçé. Řéƥłáçé đéłéŧéš áłł çúřřéñŧ đáŧá ƒîřšŧ, ŧĥéñ řéšŧóřéš óñłý ŧĥé ƀáçķúƥ — ŧĥîš çáññóŧ ƀé úñđóñé. ····································································⟧';
+
+  @override
+  String get restoreBackupMergeAction => '⟦Ṁéřǧé ··⟧';
+
+  @override
+  String get restoreBackupReplaceAction => '⟦Řéƥłáçé áłł ·····⟧';
+
+  @override
+  String restoreBackupSuccess(int count) {
+    return '⟦Ɓáçķúƥ řéšŧóřéđ — $count řéçóřđš îɱƥóřŧéđ ·············⟧';
+  }
+
+  @override
+  String get restoreBackupEmpty =>
+      '⟦Ɓáçķúƥ řéšŧóřéđ — îŧ çóñŧáîñéđ ñó řéçóřđš ···············⟧';
+
+  @override
+  String get restoreBackupCorrupt =>
+      '⟦Řéšŧóřé ƒáîłéđ — ŧĥîš ƒîłé îš ñóŧ á ṽáłîđ Ŧáñķšŧéłłéñ ƀáçķúƥ ······················⟧';
+
+  @override
+  String get restoreBackupFailed =>
+      '⟦Řéšŧóřé ƒáîłéđ — ŧĥé ƒîłé çóúłđ ñóŧ ƀé řéáđ ···············⟧';
 
   @override
   String get brokenMapChipVerifying => '⟦ṀÁƤ šéñšóř ṽéřîƒýîñǧ… ········⟧';

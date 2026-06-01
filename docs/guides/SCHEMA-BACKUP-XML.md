@@ -204,11 +204,32 @@ Schema version bumps require a fresh file (`tankstellen_backup_v2.xsd`)
 so existing v1 archives stay readable; the writer encodes the version
 it produced and a future importer dispatches on that value.
 
+## Restoring a backup (#2571)
+
+Restore is the mirror of export and is **now shipped**. The Consumption
+screen's **Restore backup** action (the restore icon next to the
+download/export one) drives the flow:
+
+1. The user picks a `.zip` backup via the OS document picker
+   (`file_selector` — no storage permission on Android, it uses the
+   Storage Access Framework).
+2. `BackupZipReader` decodes the zip and locates the inner `.xml` entry;
+   `BackupXmlReader` parses it. The reader **dispatches on the root
+   `version` attribute** — `1.x` parses via the v1 path, and a backup
+   produced by a future major schema (`2.0`+) is rejected with a clear
+   error rather than silently mis-read.
+3. The user chooses **Merge** (default, safe — upsert by id, never
+   deletes a local record the backup omits) or **Replace all** (wipes
+   each store first, behind an explicit confirm). `FullBackupImporter`
+   then writes the parsed entities into the same Hive boxes the writer
+   read from.
+
+Malformed, corrupt, or unsupported-version files surface a localized
+error snackbar and never crash; live data is only ever touched after a
+successful parse.
+
 ## Out of scope
 
-- **Import / restore** — read-side only. The schema is designed with
-  restore in mind (every field needed to reconstruct state is present),
-  but no import code is shipped in this iteration.
 - **Encryption** — backup is plaintext XML. If a privacy review later
   requires encryption, that's a separate issue with its own threat
   model.

@@ -3401,5 +3401,46 @@
   "@profileSectionRegion": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "restoreBackupTooltip": "Restaurer la sauvegarde",
+  "@restoreBackupTooltip": {
+    "description": "AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571)."
+  },
+  "restoreBackupDialogTitle": "Restaurer la sauvegarde",
+  "@restoreBackupDialogTitle": {
+    "description": "Title of the merge-vs-replace confirmation dialog shown after a backup .zip is picked (#2571)."
+  },
+  "restoreBackupDialogBody": "Fusionner ajoute et met à jour les enregistrements de la sauvegarde tout en conservant tout ce qui se trouve déjà sur cet appareil. Remplacer supprime d'abord toutes les données actuelles, puis restaure uniquement la sauvegarde — cette action est irréversible.",
+  "@restoreBackupDialogBody": {
+    "description": "Body of the restore confirmation dialog explaining the difference between Merge and Replace, with a data-loss warning on Replace (#2571)."
+  },
+  "restoreBackupMergeAction": "Fusionner",
+  "@restoreBackupMergeAction": {
+    "description": "Primary (safe) action button in the restore dialog: add/update by id, keep existing data (#2571)."
+  },
+  "restoreBackupReplaceAction": "Tout remplacer",
+  "@restoreBackupReplaceAction": {
+    "description": "Destructive action button in the restore dialog: wipe all current data then restore only the backup (#2571)."
+  },
+  "restoreBackupSuccess": "Sauvegarde restaurée — {count} enregistrements importés",
+  "@restoreBackupSuccess": {
+    "description": "Success SnackBar after a restore completes with at least one record (#2571).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreBackupEmpty": "Sauvegarde restaurée — elle ne contenait aucun enregistrement",
+  "@restoreBackupEmpty": {
+    "description": "Success SnackBar when the restored backup parsed correctly but held zero records (#2571)."
+  },
+  "restoreBackupCorrupt": "Échec de la restauration — ce fichier n'est pas une sauvegarde Tankstellen valide",
+  "@restoreBackupCorrupt": {
+    "description": "Error SnackBar when the chosen file is not a readable backup zip, is malformed XML, or has an unsupported schema version (#2571)."
+  },
+  "restoreBackupFailed": "Échec de la restauration — le fichier n'a pas pu être lu",
+  "@restoreBackupFailed": {
+    "description": "Generic error SnackBar when the restore flow throws an unexpected error or the file could not be read (#2571)."
   }
 }

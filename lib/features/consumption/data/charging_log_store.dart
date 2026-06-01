@@ -98,6 +98,22 @@ class ChargingLogStore {
     await box.delete('$keyPrefix$id');
   }
 
+  /// Remove every charging-log entry (#2571). Used by the full-backup
+  /// RESTORE flow in [BackupImportMode.replace]. Only deletes keys under
+  /// [keyPrefix], so the rest of the shared settings box is untouched.
+  /// No-op when the settings box is closed.
+  Future<void> clearAll() async {
+    final box = _boxOrNull();
+    if (box == null) return;
+    final keys = box.keys
+        .whereType<String>()
+        .where((k) => k.startsWith(keyPrefix))
+        .toList(growable: false);
+    for (final key in keys) {
+      await box.delete(key);
+    }
+  }
+
   /// Accept either a JSON string (our canonical shape) or a raw Map
   /// (belt-and-braces for entries written via an older code path).
   /// Returns null when neither shape applies so the caller can skip

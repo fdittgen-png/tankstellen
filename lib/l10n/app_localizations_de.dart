@@ -3742,6 +3742,39 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sicherungsexport fehlgeschlagen – bitte erneut versuchen';
 
   @override
+  String get restoreBackupTooltip => 'Sicherung wiederherstellen';
+
+  @override
+  String get restoreBackupDialogTitle => 'Sicherung wiederherstellen';
+
+  @override
+  String get restoreBackupDialogBody =>
+      'Zusammenführen fügt Datensätze aus der Sicherung hinzu und aktualisiert sie, während alles auf diesem Gerät erhalten bleibt. Ersetzen löscht zuerst alle aktuellen Daten und stellt dann nur die Sicherung wieder her – das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get restoreBackupMergeAction => 'Zusammenführen';
+
+  @override
+  String get restoreBackupReplaceAction => 'Alles ersetzen';
+
+  @override
+  String restoreBackupSuccess(int count) {
+    return 'Sicherung wiederhergestellt – $count Datensätze importiert';
+  }
+
+  @override
+  String get restoreBackupEmpty =>
+      'Sicherung wiederhergestellt – sie enthielt keine Datensätze';
+
+  @override
+  String get restoreBackupCorrupt =>
+      'Wiederherstellung fehlgeschlagen – diese Datei ist keine gültige Tankstellen-Sicherung';
+
+  @override
+  String get restoreBackupFailed =>
+      'Wiederherstellung fehlgeschlagen – die Datei konnte nicht gelesen werden';
+
+  @override
   String get brokenMapChipVerifying => 'MAP-Sensor wird geprüft…';
 
   @override
