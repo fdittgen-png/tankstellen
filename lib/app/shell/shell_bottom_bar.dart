@@ -8,6 +8,7 @@ import '../../features/route_search/providers/route_search_provider.dart';
 import '../../features/search/presentation/screens/search_criteria_screen.dart';
 import '../../features/search/providers/search_provider.dart';
 import '../routes/shell_branches.dart';
+import 'notched_bar_border.dart';
 import 'search_fab_action_provider.dart';
 import 'shell_nav_item.dart';
 
@@ -52,51 +53,66 @@ class ShellBottomBar extends ConsumerWidget {
     // #2113 — context-aware override registered by criteria / results
     // screens. Null means "default branch-switch behaviour".
     final fabAction = ref.watch(searchFabActionControllerProvider);
-    // Portrait: the centre button rises into a bar-coloured cradle (see
-    // _centerButton, #1885). Landscape keeps the bar flat — no head-room.
+    // Portrait: the centre button docks into a concave notch carved into
+    // the bar's top edge (see _centerButton, #2552). Landscape keeps the
+    // bar flat — no head-room.
     final rise = isLandscape ? 0.0 : 24.0;
 
     final primaryIndex = items.indexWhere((i) => i.isPrimary);
 
-    final bar = Container(
-      height: barHeight,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        boxShadow: [
-          BoxShadow(
-            color: theme.brightness == Brightness.dark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
+    // #2552 — the FAB docks into a true concave notch (a
+    // CircularNotchedRectangle scallop) cut into the bar's top edge. The
+    // guest circle's radius is the FAB radius plus a small margin so the
+    // bar surface curves up and embraces the button. Landscape stays flat:
+    // notchRadius 0 → the border degenerates to a plain rectangle.
+    const notchMargin = 6.0;
+    final diameter = isLandscape ? 40.0 : 56.0;
+    final notchRadius = isLandscape ? 0.0 : diameter / 2 + notchMargin;
+
+    // Material both CLIPS the notch and casts a shadow that follows the
+    // notched silhouette automatically (it derives its elevation shadow
+    // from the ShapeBorder path), so no separate upward shadow painter is
+    // needed.
+    final bar = Material(
+      color: theme.colorScheme.surfaceContainerHighest,
+      elevation: theme.brightness == Brightness.dark ? 3 : 1,
+      shadowColor: theme.brightness == Brightness.dark
+          ? Colors.black.withValues(alpha: 0.3)
+          : Colors.black.withValues(alpha: 0.12),
+      shape: NotchedBarBorder(
+        notchRadius: notchRadius,
+        notchMargin: notchMargin,
       ),
-      child: Row(
-        children: [
-          // Flat tabs left of the centre button.
-          Expanded(
-            child: Row(
-              children: [
-                for (var i = 0; i < items.length; i++)
-                  if (i < primaryIndex)
-                    Expanded(child: _flatTab(context, i)),
-              ],
+      clipBehavior: Clip.antiAlias,
+      child: SizedBox(
+        height: barHeight,
+        child: Row(
+          children: [
+            // Flat tabs left of the centre button.
+            Expanded(
+              child: Row(
+                children: [
+                  for (var i = 0; i < items.length; i++)
+                    if (i < primaryIndex)
+                      Expanded(child: _flatTab(context, i)),
+                ],
+              ),
             ),
-          ),
-          // Reserved gap the raised button straddles.
-          const SizedBox(width: 76),
-          // Flat tabs right of the centre button.
-          Expanded(
-            child: Row(
-              children: [
-                for (var i = 0; i < items.length; i++)
-                  if (i > primaryIndex)
-                    Expanded(child: _flatTab(context, i)),
-              ],
+            // Reserved gap the docked button straddles (≥ 2·notchRadius so
+            // the tabs clear the notch walls).
+            const SizedBox(width: 76),
+            // Flat tabs right of the centre button.
+            Expanded(
+              child: Row(
+                children: [
+                  for (var i = 0; i < items.length; i++)
+                    if (i > primaryIndex)
+                      Expanded(child: _flatTab(context, i)),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
 
@@ -111,7 +127,8 @@ class ShellBottomBar extends ConsumerWidget {
           child: Stack(
             children: [
               // Coloured bar pinned to the bottom. The top `rise` strip
-              // is where the centre button's cradle protrudes (#1885).
+              // is where the docked centre button protrudes above the
+              // notch carved into the bar's top edge (#2552).
               Positioned(
                 left: 0,
                 right: 0,
@@ -199,12 +216,12 @@ class ShellBottomBar extends ConsumerWidget {
 
   /// The raised, primary-tinted centre button for the core action.
   ///
-  /// Portrait (#1885): the button is seated in a circular *cradle* in
-  /// the bar's own surface colour. The cradle's lower half overlaps the
-  /// flat bar — same colour, so the seam vanishes — and its upper half
-  /// protrudes into the `rise` strip, so the bar appears to rise up and
-  /// embrace the button rather than the button floating on top of it.
-  /// Landscape has no head-room, so the button stays flat in the bar.
+  /// Portrait (#2552): the button docks into a concave notch carved into
+  /// the bar's top edge (a CircularNotchedRectangle scallop, painted by
+  /// the bar's [NotchedBarBorder] shape). The notch IS the seat — the bar
+  /// surface curves up and embraces the button instead of a flat disc
+  /// sitting behind it. Landscape has no head-room, so the button stays
+  /// flat in the bar.
   Widget _centerButton(
       BuildContext context, int i, SearchFabAction? action, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -347,35 +364,11 @@ class ShellBottomBar extends ConsumerWidget {
       button: true,
       selected: selected,
       excludeSemantics: true,
+      // #2552 — the notch in the bar (the [NotchedBarBorder] shape) is
+      // the seat now, for both orientations; no separate cradle disc.
       child: Tooltip(
         message: tooltipLabel,
-        child: isLandscape
-            ? button
-            : Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Bar-coloured cradle — blends into the bar where it
-                  // overlaps, protrudes as a soft bump above it.
-                  Container(
-                    width: diameter + 20,
-                    height: diameter + 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.brightness == Brightness.dark
-                              ? Colors.black.withValues(alpha: 0.4)
-                              : Colors.black.withValues(alpha: 0.12),
-                          blurRadius: 10,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                  ),
-                  button,
-                ],
-              ),
+        child: button,
       ),
     );
   }
