@@ -3,10 +3,13 @@
 
 name: iOS TestFlight Testers
 
-# Add an external iOS tester to the app's TestFlight beta group(s) via the
-# App Store Connect API. `workflow_dispatch` ONLY — this is an outward-facing
-# live ASC mutation (it sends an invite email to the tester), so it must never
-# run automatically. The maintainer (or the orchestrator) triggers it by hand.
+# Add an iOS tester to the app's TestFlight beta group(s) via the App Store
+# Connect API. Handles BOTH paths: external groups (plain email → invite) and
+# internal groups (the tester is invited as a Users-and-Access *user* scoped to
+# this app, then assigned to the internal group). `workflow_dispatch` ONLY —
+# this is an outward-facing live ASC mutation (it sends an invite email to the
+# tester), so it must never run automatically. The maintainer (or the
+# orchestrator) triggers it by hand.
 #
 # Auth reuses the App Store Connect API key exactly like `ios-testflight.yml`:
 # the base64 secret is decoded to a temp .p8 and exported as
@@ -24,10 +27,15 @@ on:
         type: string
         default: 'florian.dittgen@trelleborg.com'
       groups:
-        description: 'Comma-separated beta group names. Leave empty to add the tester to ALL external groups.'
+        description: 'Comma-separated beta group names. Empty = ALL external groups, or the internal group(s) when the app has no external group.'
         required: false
         type: string
         default: ''
+      role:
+        description: 'ASC role granted when an INTERNAL tester must be invited as a user (scoped to this app only). Default DEVELOPER.'
+        required: false
+        type: string
+        default: 'DEVELOPER'
       first_name:
         description: 'Tester first name (optional)'
         required: false
@@ -84,6 +92,7 @@ jobs:
           bundle exec fastlane manage_testers \
             email:"${{ inputs.email }}" \
             groups:"${{ inputs.groups }}" \
+            role:"${{ inputs.role }}" \
             first_name:"${{ inputs.first_name }}" \
             last_name:"${{ inputs.last_name }}"
 
@@ -98,7 +107,8 @@ jobs:
             echo "## iOS TestFlight Tester"
             echo ""
             echo "- **Email:** ${{ inputs.email }}"
-            echo "- **Groups:** ${{ inputs.groups != '' && inputs.groups || 'ALL external groups' }}"
+            echo "- **Groups:** ${{ inputs.groups != '' && inputs.groups || 'ALL external (or internal if no external group exists)' }}"
+            echo "- **Internal role (if invited):** ${{ inputs.role }}"
             echo "- **Bundle ID:** de.tankstellen.tankstellen"
             echo "- **Trigger:** ${{ github.event_name }}"
           } >> "$GITHUB_STEP_SUMMARY"
