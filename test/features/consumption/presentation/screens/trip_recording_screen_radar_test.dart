@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
-import 'package:tankstellen/features/approach/providers/nearest_station_radar_provider.dart';
+import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_recording_screen.dart';
@@ -75,9 +75,9 @@ void main() {
         ),
         // Deterministic fuel → deterministic price column.
         effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-        // Fallback must stay out of the way while in-radius; null keeps
+        // Fallback must stay out of the way while in-radius; empty keeps
         // it idle even if it were watched.
-        nearestStationRadarProvider.overrideWith((ref) async => null),
+        radarCandidateListProvider.overrideWith((ref) async => const []),
       ],
     );
 
@@ -112,7 +112,7 @@ void main() {
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
         effectiveApproachStateProvider.overrideWithValue(null),
         effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-        nearestStationRadarProvider.overrideWith((ref) async => null),
+        radarCandidateListProvider.overrideWith((ref) async => const []),
       ],
     );
 

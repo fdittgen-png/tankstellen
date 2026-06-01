@@ -11397,6 +11397,24 @@ abstract class AppLocalizations {
   /// **'No station nearby'**
   String get tripRadarNoStationNearby;
 
+  /// Toast shown on the trip-recording radar card when the driver swipes past every nearby station and there is no further candidate to advance to (#2633).
+  ///
+  /// In en, this message translates to:
+  /// **'No other station nearby'**
+  String get tripRadarNoOtherStation;
+
+  /// Swipe-left hint / screen-reader action on the trip-recording radar card: ignore the currently shown station and advance to the next nearby candidate (#2633).
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore this station'**
+  String get tripRadarIgnoreStation;
+
+  /// Swipe-right hint / screen-reader action on the trip-recording radar card: restore the most-recently-ignored station (#2633).
+  ///
+  /// In en, this message translates to:
+  /// **'Show previous station'**
+  String get tripRadarShowPrevious;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

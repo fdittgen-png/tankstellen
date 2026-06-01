@@ -6533,6 +6533,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRadarNoStationNearby => 'Keine Tankstelle in der Nähe';
 
   @override
+  String get tripRadarNoOtherStation => 'Keine weitere Tankstelle in der Nähe';
+
+  @override
+  String get tripRadarIgnoreStation => 'Diese Tankstelle ignorieren';
+
+  @override
+  String get tripRadarShowPrevious => 'Vorherige Tankstelle anzeigen';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 

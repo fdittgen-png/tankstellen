@@ -6463,6 +6463,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRadarNoStationNearby => 'No station nearby';
 
   @override
+  String get tripRadarNoOtherStation => 'No other station nearby';
+
+  @override
+  String get tripRadarIgnoreStation => 'Ignore this station';
+
+  @override
+  String get tripRadarShowPrevious => 'Show previous station';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 
@@ -13421,6 +13430,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripRadarNoStationNearby => '⟦Ñó šŧáŧîóñ ñéářƀý ·······⟧';
+
+  @override
+  String get tripRadarNoOtherStation => '⟦Ñó óŧĥéř šŧáŧîóñ ñéářƀý ·········⟧';
+
+  @override
+  String get tripRadarIgnoreStation => '⟦Îǧñóřé ŧĥîš šŧáŧîóñ ········⟧';
+
+  @override
+  String get tripRadarShowPrevious => '⟦Šĥóŵ ƥřéṽîóúš šŧáŧîóñ ·········⟧';
 
   @override
   String get tripRecordingPinTooltip =>

@@ -10,7 +10,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
-import 'package:tankstellen/features/approach/providers/nearest_station_radar_provider.dart';
+import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_radar_card.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -27,6 +27,12 @@ import '../../../../helpers/pump_app.dart';
 /// (no goldens) assert the launch URI shape on both card data paths, the
 /// effective-fuel price column, and that the empty/placeholder state has NO
 /// tap target.
+///
+/// #2633 — the fallback (polling) path is also swipe-to-page: swipe-left
+/// ignores the current station and advances to the next ranked candidate;
+/// swipe-right restores the last-ignored one. The swipe must never break
+/// the tap-to-navigate target, and the same two actions are exposed as
+/// `customSemanticsActions` for screen readers.
 
 /// Records every launchUrl call without touching a real platform channel, so
 /// we can assert the geo: URI the card built without emulator-only intent
@@ -77,8 +83,36 @@ const _pricedStation = Station(
   isOpen: true,
 );
 
-const _noPriceStation = Station(
+const _pricedStation2 = Station(
   id: 'radar-stn-2',
+  name: 'Tankstelle Nord',
+  brand: 'Shell',
+  street: 'Nordweg',
+  postCode: '10119',
+  place: 'Berlin',
+  lat: 52.55,
+  lng: 13.41,
+  e10: 1.829,
+  diesel: 1.699,
+  isOpen: true,
+);
+
+const _pricedStation3 = Station(
+  id: 'radar-stn-3',
+  name: 'Tankstelle Süd',
+  brand: 'Total',
+  street: 'Südweg',
+  postCode: '10961',
+  place: 'Berlin',
+  lat: 52.49,
+  lng: 13.39,
+  e10: 1.759,
+  diesel: 1.649,
+  isOpen: true,
+);
+
+const _noPriceStation = Station(
+  id: 'radar-stn-x',
   name: 'Leere Tankstelle',
   brand: 'Esso',
   street: 'Nebenweg',
@@ -112,7 +146,7 @@ void main() {
             const ApproachInRadius(station: _pricedStation, distanceMeters: 250),
           ),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-          nearestStationRadarProvider.overrideWith((ref) async => null),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
         ],
       );
 
@@ -138,7 +172,7 @@ void main() {
             const ApproachInRadius(station: _pricedStation, distanceMeters: 250),
           ),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-          nearestStationRadarProvider.overrideWith((ref) async => null),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
         ],
       );
 
@@ -157,16 +191,34 @@ void main() {
             const ApproachInRadius(station: _pricedStation, distanceMeters: 250),
           ),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-          nearestStationRadarProvider.overrideWith((ref) async => null),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
         ],
       );
 
       final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
       expect(tooltip.message, 'Navigate');
     });
+
+    testWidgets('the in-radius target is NOT wrapped in a Dismissible',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: [
+          effectiveApproachStateProvider.overrideWithValue(
+            const ApproachInRadius(station: _pricedStation, distanceMeters: 250),
+          ),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
+        ],
+      );
+
+      // The locked in-radius target is single — no swipe page-set.
+      expect(find.byType(Dismissible), findsNothing);
+    });
   });
 
-  // --- Nearest-station fallback path (nearestStationRadarProvider) ----------
+  // --- Nearest-station fallback path (radarCandidateListProvider) -----------
   group('TripRadarCard — nearest-station fallback path', () {
     testWidgets('tapping the card launches a geo: URI + shows the price',
         (tester) async {
@@ -177,11 +229,11 @@ void main() {
         tester,
         const TripRadarCard(),
         overrides: [
-          // No in-radius hit → the card falls back to the nearest station.
+          // No in-radius hit → the card falls back to the ranked list.
           effectiveApproachStateProvider.overrideWithValue(null),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.diesel),
-          nearestStationRadarProvider
-              .overrideWith((ref) async => _pricedStation),
+          radarCandidateListProvider
+              .overrideWith((ref) async => const [_pricedStation]),
         ],
       );
 
@@ -200,18 +252,188 @@ void main() {
 
     testWidgets('renders "--" when the station has no price for the fuel',
         (tester) async {
+      // The provider filters to priced stations, but a single unpriced
+      // station in the list still renders "--" on its row.
       await pumpApp(
         tester,
         const TripRadarCard(),
         overrides: [
           effectiveApproachStateProvider.overrideWithValue(null),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-          nearestStationRadarProvider
-              .overrideWith((ref) async => _noPriceStation),
+          radarCandidateListProvider
+              .overrideWith((ref) async => const [_noPriceStation]),
         ],
       );
 
       expect(find.text('--'), findsOneWidget);
+    });
+  });
+
+  // --- #2633: swipe-to-page on the fallback path ----------------------------
+  group('TripRadarCard — swipe-to-page (#2633)', () {
+    List<Object> overridesFor(List<Station> candidates, FuelType fuel) => [
+          effectiveApproachStateProvider.overrideWithValue(null),
+          effectiveFuelTypeProvider.overrideWithValue(fuel),
+          radarCandidateListProvider.overrideWith((ref) async => candidates),
+        ];
+
+    testWidgets('swipe-LEFT ignores the current station + advances to next',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: overridesFor(
+          const [_pricedStation, _pricedStation2, _pricedStation3],
+          FuelType.e10,
+        ),
+      );
+
+      // The first ranked station leads.
+      expect(find.text('Tankstelle Mitte'), findsOneWidget);
+      expect(find.text(PriceFormatter.formatPrice(1.789)), findsOneWidget);
+
+      // Swipe LEFT (endToStart) → ignore + advance to the next candidate.
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tankstelle Nord'), findsOneWidget);
+      expect(find.text(PriceFormatter.formatPrice(1.829)), findsOneWidget);
+      expect(find.text('Tankstelle Mitte'), findsNothing);
+    });
+
+    testWidgets('swipe-RIGHT restores the previously-ignored station',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: overridesFor(
+          const [_pricedStation, _pricedStation2, _pricedStation3],
+          FuelType.e10,
+        ),
+      );
+
+      // Advance once: Mitte → Nord.
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Tankstelle Nord'), findsOneWidget);
+
+      // Swipe RIGHT (startToEnd) → restore the previously-ignored Mitte.
+      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Tankstelle Mitte'), findsOneWidget);
+      expect(find.text('Tankstelle Nord'), findsNothing);
+    });
+
+    testWidgets('swipe-RIGHT with nothing ignored is a no-op',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: overridesFor(
+          const [_pricedStation, _pricedStation2],
+          FuelType.e10,
+        ),
+      );
+
+      expect(find.text('Tankstelle Mitte'), findsOneWidget);
+
+      // Nothing ignored yet → swipe-right does nothing, still on Mitte.
+      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Tankstelle Mitte'), findsOneWidget);
+    });
+
+    testWidgets('tap STILL launches the geo: URI after a swipe',
+        (tester) async {
+      final fake = _FakeUrlLauncher();
+      UrlLauncherPlatform.instance = fake;
+
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: overridesFor(
+          const [_pricedStation, _pricedStation2, _pricedStation3],
+          FuelType.e10,
+        ),
+      );
+
+      // Advance to Nord, then tap — the page-in-place must preserve the
+      // tap-to-navigate target.
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Tankstelle Nord'), findsOneWidget);
+
+      await tester.tap(find.byType(ListTile));
+      await tester.pump();
+
+      expect(fake.launchedUrls, isNotEmpty);
+      final launched = fake.launchedUrls.last;
+      expect(launched, startsWith('geo:'));
+      // Nord's coords / brand, proving the advanced station is the tap target.
+      expect(launched, contains('52.55'));
+      expect(launched, contains(Uri.encodeComponent('Shell')));
+    });
+
+    testWidgets(
+        'Semantics exposes the ignore/show-previous customSemanticsActions',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: overridesFor(
+          const [_pricedStation, _pricedStation2],
+          FuelType.e10,
+        ),
+      );
+
+      // Before any ignore: only the "Ignore this station" action exists.
+      Semantics semantics() => tester.widgetList<Semantics>(
+            find.byType(Semantics),
+          ).firstWhere(
+            (s) => (s.properties.customSemanticsActions ?? {})
+                .keys
+                .any((a) => a.label == 'Ignore this station'),
+          );
+
+      final actionsBefore =
+          semantics().properties.customSemanticsActions ?? {};
+      final labelsBefore = actionsBefore.keys.map((a) => a.label).toSet();
+      expect(labelsBefore, contains('Ignore this station'));
+      expect(labelsBefore, isNot(contains('Show previous station')));
+
+      // After ignoring one, the "Show previous station" action appears.
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+
+      final actionsAfter =
+          semantics().properties.customSemanticsActions ?? {};
+      final labelsAfter = actionsAfter.keys.map((a) => a.label).toSet();
+      expect(labelsAfter, contains('Ignore this station'));
+      expect(labelsAfter, contains('Show previous station'));
+    });
+
+    testWidgets(
+        'exhausting the list keeps the last station + toasts "no other"',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: overridesFor(
+          const [_pricedStation, _pricedStation2],
+          FuelType.e10,
+        ),
+      );
+
+      // Ignore both candidates: Mitte → Nord → exhausted.
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+
+      // The "no other station nearby" toast fires (never blanks, #2583)...
+      expect(find.text('No other station nearby'), findsOneWidget);
+      // ...and the stack resets so the nearest station is shown again.
+      expect(find.text('Tankstelle Mitte'), findsOneWidget);
     });
   });
 
@@ -228,7 +450,7 @@ void main() {
         overrides: [
           effectiveApproachStateProvider.overrideWithValue(null),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-          nearestStationRadarProvider.overrideWith((ref) async => null),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
         ],
       );
 
@@ -241,6 +463,8 @@ void main() {
 
       // And there is no Tooltip wrapping a navigable tile.
       expect(find.byType(Tooltip), findsNothing);
+      // The empty list is NOT swipeable.
+      expect(find.byType(Dismissible), findsNothing);
 
       // Tapping the placeholder must launch nothing.
       await tester.tap(find.byType(ListTile));
@@ -257,7 +481,7 @@ void main() {
       // Drive a genuine reload via `container.invalidate`: while the widget
       // still watches it the FutureProvider re-runs, going AsyncLoading
       // carrying its previous value. Under skipLoadingOnReload that routes
-      // the retained station back through `data:` while `isLoading` flips
+      // the retained list back through `data:` while `isLoading` flips
       // true (the colour-only scan signal). A short async gate keeps the
       // re-run pending across a single pump so the in-flight frame is
       // observable.
@@ -267,14 +491,14 @@ void main() {
         overrides: [
           effectiveApproachStateProvider.overrideWithValue(null),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.diesel),
-          nearestStationRadarProvider.overrideWith((ref) async {
+          radarCandidateListProvider.overrideWith((ref) async {
             if (firstRun) {
               firstRun = false;
-              return _pricedStation;
+              return const [_pricedStation];
             }
             // The reload waits on the gate so the loading frame is visible.
             await gate.future;
-            return _pricedStation;
+            return const [_pricedStation];
           }),
         ],
       );
@@ -299,11 +523,11 @@ void main() {
       // Trigger a reload — invalidate so the FutureProvider re-runs
       // (AsyncLoading carrying the previous value); the gated body keeps it
       // pending across this pump.
-      container.invalidate(nearestStationRadarProvider);
+      container.invalidate(radarCandidateListProvider);
       // Force the lazy re-computation to materialise now (the gated body
       // keeps it pending) so the in-flight loading frame is deterministic.
       expect(
-        container.read(nearestStationRadarProvider).isLoading,
+        container.read(radarCandidateListProvider).isLoading,
         isTrue,
         reason: 'invalidate puts the provider into a reload (carrying value)',
       );
@@ -349,8 +573,8 @@ void main() {
           overrides: [
             effectiveApproachStateProvider.overrideWithValue(null),
             effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-            nearestStationRadarProvider.overrideWith(
-              (ref) => Completer<Station?>().future,
+            radarCandidateListProvider.overrideWith(
+              (ref) => Completer<List<Station>>().future,
             ),
           ],
           child: const MaterialApp(
@@ -377,9 +601,9 @@ void main() {
         overrides: [
           effectiveApproachStateProvider.overrideWithValue(null),
           effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
-          // Provider already filters to priced-for-fuel; null models "no
+          // Provider already filters to priced-for-fuel; empty models "no
           // priced station in range".
-          nearestStationRadarProvider.overrideWith((ref) async => null),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
         ],
       );
 

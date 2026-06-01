@@ -10,5 +10,17 @@
   "tripRadarNoStationNearby": "Keine Tankstelle in der Nähe",
   "@tripRadarNoStationNearby": {
     "description": "Placeholder shown on the trip-recording radar card when no fuel station is within range of the live GPS fix (#2380)."
+  },
+  "tripRadarNoOtherStation": "Keine weitere Tankstelle in der Nähe",
+  "@tripRadarNoOtherStation": {
+    "description": "Toast shown on the trip-recording radar card when the driver swipes past every nearby station and there is no further candidate to advance to (#2633)."
+  },
+  "tripRadarIgnoreStation": "Diese Tankstelle ignorieren",
+  "@tripRadarIgnoreStation": {
+    "description": "Swipe-left hint / screen-reader action on the trip-recording radar card: ignore the currently shown station and advance to the next nearby candidate (#2633)."
+  },
+  "tripRadarShowPrevious": "Vorherige Tankstelle anzeigen",
+  "@tripRadarShowPrevious": {
+    "description": "Swipe-right hint / screen-reader action on the trip-recording radar card: restore the most-recently-ignored station (#2633)."
   }
 }
