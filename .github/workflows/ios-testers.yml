@@ -22,10 +22,10 @@ on:
   workflow_dispatch:
     inputs:
       email:
-        description: 'Tester email to enroll (an invite email is sent to them)'
+        description: 'Tester email(s) to enroll — a single address or a comma-separated list (an invite email is sent to each)'
         required: true
         type: string
-        default: 'florian.dittgen@trelleborg.com'
+        default: 'fdittgen@gmail.com,florian.dittgen@trelleborg.com'
       groups:
         description: 'Comma-separated beta group names. Empty = ALL external groups, or the internal group(s) when the app has no external group.'
         required: false
