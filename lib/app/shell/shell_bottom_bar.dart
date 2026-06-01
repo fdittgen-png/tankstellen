@@ -249,11 +249,13 @@ class ShellBottomBar extends ConsumerWidget {
     final defaultIcon = selected ? item.filledIcon : item.outlinedIcon;
     final iconData = action?.icon ?? defaultIcon;
     final tooltipLabel = action?.tooltip ?? item.label;
-    // #2131 — disabled override: dim the icon + swallow taps when the
-    // current registrant says the action isn't ready (e.g. route tab
-    // with no destination). Null action ⇒ default branch behaviour,
-    // always enabled.
-    final actionEnabled = action == null || action.enabled;
+    // #2131 — disabled override: dim the icon when the current
+    // registrant says the action isn't ready (e.g. route tab with no
+    // destination). Null action ⇒ default branch behaviour, always
+    // enabled.
+    // #2553 — the dim is contextual *affordance only* now; a disabled
+    // (or stale) action no longer swallows the tap — see [onTapHandler].
+    final actionEnabled = action?.enabled ?? true;
 
     // #2131 — push the criteria modal onto the **Search branch's**
     // nested Navigator (via [searchBranchNavigatorKey]) instead of the
@@ -275,12 +277,20 @@ class ShellBottomBar extends ConsumerWidget {
         // Defensive fallback for environments where the branch nav
         // isn't mounted yet (very early frame, widget tests without
         // the shell wired). Use the local context's Navigator.
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => const SearchCriteriaScreen(),
-            fullscreenDialog: true,
-          ),
-        );
+        // #2553 — if even that Navigator is torn down, degrade to a
+        // branch jump rather than throw uncaught: the FAB must never
+        // crash, only ever open criteria or jump to Search.
+        try {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const SearchCriteriaScreen(),
+              fullscreenDialog: true,
+            ),
+          );
+        } catch (e, st) {
+          debugPrint('shell FAB default fallback: $e\n$st');
+          onTap(i);
+        }
       }
     }
 
@@ -316,9 +326,13 @@ class ShellBottomBar extends ConsumerWidget {
       }
     }
 
-    final onTapHandler = action != null
-        ? (actionEnabled ? action.onTap : () {})
-        : defaultOnTap;
+    // #2553 — a registered-but-DISABLED (or stale) action must never
+    // produce a dead `() {}` no-op. Only an enabled action overrides the
+    // tap; anything else (null OR disabled OR stale) FALLS BACK to the
+    // default branch behaviour. Worst case the FAB opens criteria / jumps
+    // to Search — it can never become a permanent dead hit-target.
+    final onTapHandler =
+        (action != null && actionEnabled) ? action.onTap : defaultOnTap;
 
     // #2131 — surface + icon both dim when the registered action is
     // disabled, mirroring Material's standard disabled-button look.

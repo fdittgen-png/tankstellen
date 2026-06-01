@@ -3,11 +3,32 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/shell/notched_bar_border.dart';
 import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
 import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
+import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
+
+import '../../fixtures/stations.dart';
+
+/// #2553 — a SearchState seeded with one result so the default FAB tap
+/// takes the push-free "other tab WITH results → jump to Search" branch
+/// (proves the disabled-action FALLBACK without building the criteria
+/// modal, which needs Hive boxes the bare test container lacks).
+class _SeededSearchState extends SearchState {
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
+    return AsyncValue.data(ServiceResult(
+      data: const [FuelStationResult(testStation)],
+      source: ServiceSource.cache,
+      fetchedAt: DateTime(2026),
+    ));
+  }
+}
 
 /// Widget tests for [ShellBottomBar] after the #1874 redesign.
 ///
@@ -390,9 +411,11 @@ void main() {
     Future<ProviderContainer> pumpBarWithContainer(
       WidgetTester tester, {
       SearchFabAction? initialAction,
+      ValueChanged<int>? onTap,
+      List<Override> overrides = const [],
     }) async {
       final container = ProviderContainer(
-        overrides: const [],
+        overrides: overrides,
       );
       addTearDown(container.dispose);
       if (initialAction != null) {
@@ -413,7 +436,7 @@ void main() {
                   currentIndex: 0,
                   iconControllers: controllers(3),
                   isLandscape: false,
-                  onTap: (_) {},
+                  onTap: onTap ?? (_) {},
                 ),
               ),
             ),
@@ -442,28 +465,46 @@ void main() {
       expect(fired, 1);
     });
 
-    testWidgets('disabled action: tap is a no-op + surface dims',
-        (tester) async {
-      var fired = 0;
+    testWidgets(
+        'disabled action: tap FALLS BACK to default (never a dead no-op) '
+        '+ surface still dims (#2553)', (tester) async {
+      // #2553 — regression: previously a registered-but-disabled action
+      // produced a literal `() {}` dead handler with NO fallback, so the
+      // central FAB became a permanent no-op the moment a disabled action
+      // outlived its screen (offstage criteria modal + no shell reset).
+      // The disabled action's own onTap must NOT fire — but the FAB must
+      // fall back to the default branch behaviour instead of doing
+      // nothing. With Search at slot 1, currentIndex 0 and live results
+      // seeded, the default path jumps to the Search branch (onTap(1)).
+      var registeredFired = 0;
+      final taps = <int>[];
       await pumpBarWithContainer(
         tester,
+        onTap: taps.add,
+        overrides: [searchStateProvider.overrideWith(_SeededSearchState.new)],
         initialAction: SearchFabAction(
           icon: Icons.bolt,
           tooltip: 'Run',
           enabled: false,
-          onTap: () => fired++,
+          onTap: () => registeredFired++,
         ),
       );
 
-      // Tap still hit-tests (the FAB stays mounted) — but the
-      // registered onTap is swallowed.
       await tester.tap(find.byIcon(Icons.bolt));
       await tester.pump();
-      expect(fired, 0,
-          reason: '#2131 — disabled action must not fire onTap.');
 
-      // Dim styling: the button's Material colour is the primary
-      // alpha-reduced (matches the [_centerButton] disabled branch).
+      // The DISABLED action's own onTap is never invoked...
+      expect(registeredFired, 0,
+          reason: '#2131 — a disabled action must not fire its own onTap.');
+      // ...but the FAB is NOT dead: it fell back to the default
+      // branch-switch (onTap(1) → jump to the Search slot).
+      expect(taps, contains(1),
+          reason: '#2553 — a disabled action must FALL BACK to default, '
+              'never become a permanent dead no-op.');
+
+      // KEEP the dim-styling affordance: the button's Material colour is
+      // the primary alpha-reduced (matches the [_centerButton] disabled
+      // branch). Only the tap *behaviour* changed, not the visual.
       final ctx = tester.element(find.byType(ShellBottomBar));
       final primary = Theme.of(ctx).colorScheme.primary;
       final dimmed = primary.withValues(alpha: 0.38);
@@ -476,6 +517,34 @@ void main() {
             .first,
       );
       expect(material.color, dimmed);
+    });
+
+    testWidgets(
+        'a stale/disabled action never yields a dead no-op handler (#2553)',
+        (tester) async {
+      // Belt-and-braces: whatever a registrant left behind, a disabled
+      // action with a do-nothing onTap can never swallow the tap into
+      // nothing — the default always runs (here the seeded-results
+      // branch-jump fallback).
+      final taps = <int>[];
+      await pumpBarWithContainer(
+        tester,
+        onTap: taps.add,
+        overrides: [searchStateProvider.overrideWith(_SeededSearchState.new)],
+        initialAction: SearchFabAction(
+          icon: Icons.bolt,
+          tooltip: 'Stale',
+          enabled: false,
+          onTap: () {},
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.bolt));
+      await tester.pump();
+
+      expect(taps, isNotEmpty,
+          reason: '#2553 — the FAB must always do *something* (default '
+              'branch behaviour); it can never be a permanent no-op.');
     });
   });
 

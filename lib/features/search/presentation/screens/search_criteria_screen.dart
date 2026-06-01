@@ -77,7 +77,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       // action that makes the FAB look enabled but no-op.
       Future.microtask(() {
         try {
-          notifier.clearIf(action);
+          notifier.clearFor(this); // #2553 — clear by owner, not action.
         } catch (_) {
           // ProviderContainer torn down (e.g. test teardown) — no-op.
         }
@@ -115,7 +115,8 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       enabled: enabled,
       onTap: onTap,
     );
-    ref.read(searchFabActionControllerProvider.notifier).set(action);
+    // #2553 — register under this State as owner (self-clears by owner).
+    ref.read(searchFabActionControllerProvider.notifier).setFor(this, action);
     _registeredFabAction = action;
   }
 
@@ -123,8 +124,8 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   // window before the dispose-microtask fires).
   bool _bailIfStale() {
     if (mounted) return false;
-    final a = _registeredFabAction;
-    if (a != null) _fabNotifier?.clearIf(a);
+    // #2553 — clear by owner identity (see SearchFabActionController).
+    if (_registeredFabAction != null) _fabNotifier?.clearFor(this);
     return true;
   }
 

@@ -14,6 +14,7 @@ import '../features/vehicle/presentation/widgets/catalog_reresolve_snackbar_host
 import '../l10n/app_localizations.dart';
 import 'current_shell_branch_provider.dart';
 import 'responsive_search_layout.dart';
+import 'shell/search_fab_action_provider.dart';
 import 'shell/shell_bottom_bar.dart';
 import 'shell/shell_destinations.dart';
 import 'shell/shell_nav_rail.dart';
@@ -142,6 +143,12 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // tile-viewport nudge, #696) can react without reaching into this
     // widget's private state.
     ref.read(currentShellBranchProvider.notifier).set(index);
+    // #2553 — a contextual FAB override (e.g. the Search-branch criteria
+    // screen) is scoped to ITS branch. Clear it on every branch change so
+    // a Search-only action — especially a disabled one left mounted-but-
+    // offstage in the indexed-stack shell — can never outlive its screen
+    // and make the central FAB dead on the tab the user switched to.
+    ref.read(searchFabActionControllerProvider.notifier).set(null);
 
     // Navigate via go_router — this preserves each branch's state
     widget.navigationShell.goBranch(
@@ -202,6 +209,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
         if (routerIndex != _currentIndex) {
           setState(() => _currentIndex = routerIndex);
           ref.read(currentShellBranchProvider.notifier).set(routerIndex);
+          // #2553 — same branch-change FAB reset as _goToPage, for
+          // deep-link / programmatic branch switches that bypass it.
+          ref.read(searchFabActionControllerProvider.notifier).set(null);
         }
       });
     }
