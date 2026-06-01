@@ -5,11 +5,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/features/ev/data/services/ev_price_enricher.dart';
 import 'package:tankstellen/features/ev/data/services/open_charge_map_service.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/ev/providers/ev_providers.dart';
+import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
+
+/// Marks every station so we can assert the viewport list was enriched
+/// (#2632) — the map markers + the station handed to the detail screen on
+/// tap must carry the access-cost signal, not just the search-list path.
+class _MarkingEnricher implements EvPriceEnricher {
+  const _MarkingEnricher();
+
+  @override
+  Future<List<ChargingStation>> enrich(List<ChargingStation> stations) async =>
+      [for (final s in stations) s.copyWith(isFranceIrveEnriched: true)];
+}
 
 void main() {
   group('EvFilter.matches', () {
@@ -171,6 +184,33 @@ void main() {
       // Repository should now hold the full (unfiltered) list.
       final repo = container.read(evStationRepositoryProvider);
       expect(repo.getAll(), isNotEmpty);
+    });
+
+    test('applies the price enricher to the viewport list (#2632)', () async {
+      final storage = _FakeSettings();
+      final container = ProviderContainer(
+        overrides: [
+          settingsStorageProvider.overrideWithValue(storage),
+          evStationServiceProvider.overrideWith(
+            (ref) => const DemoEvStationService(),
+          ),
+          // Replace the default IRVE enricher with a marker so the result
+          // is deterministically observable without a network call.
+          evPriceEnricherProvider.overrideWithValue(const _MarkingEnricher()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final result = await container.read(
+        evStationsProvider(
+          const EvViewport(latitude: 48.85, longitude: 2.35, radiusKm: 5),
+        ).future,
+      );
+
+      expect(result, isNotEmpty);
+      // Every returned station carries the enricher's signal — proving the
+      // viewport path now enriches (map markers + detail-on-tap, #2632).
+      expect(result.every((s) => s.isFranceIrveEnriched), isTrue);
     });
   });
 }
