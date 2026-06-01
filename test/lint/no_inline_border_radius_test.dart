@@ -108,4 +108,8 @@ const _radiusTokenFile = 'lib/core/theme/app_radius.dart';
 
 /// Inline-radius count outside the token file. Driven toward **0** by the
 /// Epic #2487 cards/chips children. Never raise it.
-const _baseline = 126;
+///
+/// #2622 — dropped to 122: the station-card Cheapest badge + loyalty badge
+/// migrated their `BorderRadius.circular(8)` onto `AppRadius.sm`, and the
+/// pre-existing count had also slipped below the prior 126 baseline.
+const _baseline = 122;

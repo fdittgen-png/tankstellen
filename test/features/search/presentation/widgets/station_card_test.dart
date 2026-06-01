@@ -294,7 +294,9 @@ void main() {
       expect(filledStars, findsNWidgets(5));
     });
 
-    testWidgets('favorite star and price are on same row', (tester) async {
+    testWidgets(
+        '#2622 — favourite star is hoisted OUT of the price row but keeps '
+        'its 32x32 tap target', (tester) async {
       await pumpApp(
         tester,
         const StationCard(
@@ -304,9 +306,7 @@ void main() {
         ),
       );
 
-      // Both the price RichText and the favorite IconButton should be
-      // inside the same Row (the right-side price+fav row).
-      // Verify both are rendered and the favorite icon is 22px (compact).
+      // The favourite icon is still rendered and 22px (compact).
       final favIcon = find.byWidgetPredicate(
         (widget) =>
             widget is Icon &&
@@ -315,7 +315,8 @@ void main() {
       );
       expect(favIcon, findsOneWidget);
 
-      // The favorite IconButton should be compact (32x32 SizedBox)
+      // The favourite IconButton retains its compact 32x32 tap target even
+      // after being relocated to the card's top-right (#2622).
       final sizedBox = find.ancestor(
         of: find.byIcon(Icons.star),
         matching: find.byWidgetPredicate(
@@ -323,6 +324,60 @@ void main() {
         ),
       );
       expect(sizedBox, findsOneWidget);
+
+      // The star now sits ABOVE the price headline (own line), not on the
+      // same baseline as the price RichText.
+      final starTop = tester.getTopLeft(find.byIcon(Icons.star)).dy;
+      final priceTop =
+          tester.getTopLeft(find.byType(RichText).last).dy;
+      expect(
+        starTop,
+        lessThan(priceTop),
+        reason: 'favourite star is hoisted above the price row (#2622)',
+      );
+    });
+
+    testWidgets('#2622 — favourite star still toggles when tapped after move',
+        (tester) async {
+      var favTapped = false;
+      await pumpApp(
+        tester,
+        StationCard(
+          station: testStation,
+          selectedFuelType: FuelType.e10,
+          onFavoriteTap: () => favTapped = true,
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.star_border));
+      await tester.pump();
+      expect(favTapped, isTrue);
+    });
+
+    testWidgets(
+        '#2622 — Cheapest badge precedes the price in the widget tree',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const StationCard(
+          station: testStation,
+          selectedFuelType: FuelType.e10,
+          isCheapest: true,
+        ),
+      );
+
+      // The "Cheapest" badge must sit visually ABOVE the price headline so
+      // it anchors the stop before the eye reaches the number (#2622).
+      final cheapest = find.text('Cheapest');
+      expect(cheapest, findsOneWidget);
+
+      final cheapestTop = tester.getTopLeft(cheapest).dy;
+      final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
+      expect(
+        cheapestTop,
+        lessThan(priceTop),
+        reason: 'Cheapest badge must be promoted above the price (#2622)',
+      );
     });
 
     testWidgets('renders amenity chips on single horizontal line', (
