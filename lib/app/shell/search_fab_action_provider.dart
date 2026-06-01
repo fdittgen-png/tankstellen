@@ -42,11 +42,29 @@ class SearchFabAction {
 
 @Riverpod(keepAlive: true)
 class SearchFabActionController extends _$SearchFabActionController {
+  /// #2553 — the screen that owns the current action, when it registered
+  /// via [setFor]. Tracking the owner (not the action) lets a screen
+  /// self-clear by identity even if its `dispose` clearer never fires
+  /// (e.g. it was pushed onto a branch the user tabbed away from, leaving
+  /// it mounted-but-offstage in the indexed-stack shell). A LATER owner's
+  /// [setFor] supersedes the token, so a stale earlier owner's [clearFor]
+  /// can never stomp the live registrant.
+  Object? _owner;
+
   @override
   SearchFabAction? build() => null;
 
-  /// Replace the current FAB action. Pass null to clear.
+  /// Replace the current FAB action. Pass null to clear. Clears any
+  /// owner token — use [setFor] when you want owner-scoped self-clearing.
   void set(SearchFabAction? action) {
+    _owner = null;
+    state = action;
+  }
+
+  /// Register [action] on behalf of [owner]. The owner becomes the sole
+  /// holder; a subsequent [setFor] from another owner supersedes it.
+  void setFor(Object owner, SearchFabAction action) {
+    _owner = owner;
     state = action;
   }
 
@@ -56,6 +74,20 @@ class SearchFabActionController extends _$SearchFabActionController {
   /// registered. Comparison is by identity — both `set` and `clearIf`
   /// use the same `SearchFabAction` instance.
   void clearIf(SearchFabAction action) {
-    if (identical(state, action)) state = null;
+    if (identical(state, action)) {
+      _owner = null;
+      state = null;
+    }
+  }
+
+  /// Clears the action only if [owner] is still the current registrant
+  /// (compared by identity). A stale owner whose registration was already
+  /// superseded by a live one is a no-op, so a late dispose/teardown can
+  /// never blank out the FAB the live screen registered.
+  void clearFor(Object owner) {
+    if (identical(_owner, owner)) {
+      _owner = null;
+      state = null;
+    }
   }
 }

@@ -42,7 +42,7 @@ final class SearchFabActionControllerProvider
 }
 
 String _$searchFabActionControllerHash() =>
-    r'2138e732c10b57351810fa2d7053f3d25033c21e';
+    r'1c1d7c66024a83e47391a5f0799c780fbcd8534d';
 
 abstract class _$SearchFabActionController extends $Notifier<SearchFabAction?> {
   SearchFabAction? build();

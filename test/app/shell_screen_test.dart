@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
 import 'package:tankstellen/app/shell_screen.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -367,6 +368,107 @@ void main() {
       expect(find.bySemanticsLabel('Trips'), findsOneWidget);
 
       handle.dispose();
+    });
+
+    testWidgets(
+        'switching branch clears a registered SearchFabAction override '
+        '(#2553 layer 2)', (tester) async {
+      // #2553 — a contextual FAB action registered on the Search branch
+      // (e.g. the criteria screen) must not outlive its branch. When the
+      // user tabs to Map, the shell resets the override so a Search-only
+      // (possibly disabled) action can never make the central FAB dead on
+      // the destination tab. Drive the real ShellScreen's branch switch
+      // and assert the override is cleared.
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final container = ProviderContainer(overrides: overrides.cast());
+      addTearDown(container.dispose);
+
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          StatefulShellRoute.indexedStack(
+            builder: (context, state, navigationShell) =>
+                ShellScreen(navigationShell: navigationShell),
+            branches: [
+              StatefulShellBranch(routes: [
+                GoRoute(
+                  path: '/',
+                  builder: (_, _) => const Center(child: Text('SearchScreen')),
+                ),
+              ]),
+              StatefulShellBranch(routes: [
+                GoRoute(
+                  path: '/map',
+                  builder: (_, _) => const Center(child: Text('MapScreen')),
+                ),
+              ]),
+              StatefulShellBranch(routes: [
+                GoRoute(
+                  path: '/favorites',
+                  builder: (_, _) =>
+                      const Center(child: Text('FavoritesScreen')),
+                ),
+              ]),
+              StatefulShellBranch(routes: [
+                GoRoute(
+                  path: '/consumption-tab',
+                  builder: (_, _) =>
+                      const Center(child: Text('ConsumptionScreen')),
+                ),
+              ]),
+              StatefulShellBranch(routes: [
+                GoRoute(
+                  path: '/profile',
+                  builder: (_, _) => const Center(child: Text('ProfileScreen')),
+                ),
+              ]),
+              StatefulShellBranch(routes: [
+                GoRoute(
+                  path: '/trajets-tab',
+                  builder: (_, _) => const Center(child: Text('TrajetsScreen')),
+                ),
+              ]),
+            ],
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+
+      // Register a (disabled, Search-only) override, mimicking the
+      // criteria screen on the Search branch.
+      container.read(searchFabActionControllerProvider.notifier).set(
+            SearchFabAction(
+              icon: Icons.search,
+              tooltip: 'Run',
+              enabled: false,
+              onTap: () {},
+            ),
+          );
+      expect(container.read(searchFabActionControllerProvider), isNotNull);
+
+      // Tab to the Map branch — _goToPage must reset the override.
+      await tester.tap(find.bySemanticsLabel('Map'));
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(container.read(searchFabActionControllerProvider), isNull,
+          reason: '#2553 — a branch switch must clear the FAB override so '
+              'a Search-only action cannot outlive its screen.');
     });
   });
 }
