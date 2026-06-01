@@ -57,18 +57,19 @@ Features that don't serve at least one of those three layers don't belong.
 
 ### Layer 1 — buying cheaper
 
-- **Real-time prices** from each country's official government data source — no scraping
+- **Real-time prices** from each country's official government open-data source — not crowdsourced, not scraped. The results header surfaces the live source and links straight to it (e.g. *France — Prix-Carburants (gouv.fr)*).
 - **17 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, Luxembourg, Slovenia, UK, Argentina, Australia, Mexico, South Korea, Chile, Greece, Romania
-- **23 languages** — from Bulgarian to Swedish
-- **One central FAB owns search** — the bottom-bar search button is context-aware: tap to open the criteria sheet, tap again to run the search. Same button across every tab.
-- **Route-aware search** — uniform / cheapest / balanced strategies, "best stops" along a planned trip; partial-results banner so a slow country never blocks the cheap result
+- **23 languages** — from Bulgarian to Swedish, every UI surface fully translated
+- **One central search button** — a docked button seated in a concave notch at the centre of the 5-tab bottom bar (Favorites · Map · **Search** · Fuel · Trips). Tap it to open the **Search criteria** sheet — Nearby vs Search-along-route, fuel-type chips (Super E10 / E5 / 98, Diesel, LPG, CNG, E85, plus EV charging), a radius slider, an *Open only* toggle, amenity filters (Shop, Car Wash, Air, WC…), a highway / no-highway filter, and *Save as my defaults*.
+- **Result sorting & detail** — *N stations found*, sort by Distance / Price / A-Z / 24h-open; each card shows price, an up/down price-trend arrow, a community star rating, amenity badges, distance, last-update time, and a one-tap favourite star.
+- **Route-aware search** — plan a trip and switch between *All stations* and *Best stops*; distances are measured **along the corridor**, the cheapest stop carries a *Cheapest* badge (e.g. *117 km · 78 min · 24 stations*), and a partial-results banner means a slow country never blocks the cheap result
 - **Cross-border suggestions** — when the next country over is meaningfully cheaper, the app says so
-- **Price alerts** — threshold-based notifications, evaluated by a background job
+- **Price alerts** — per-station thresholds (e.g. *Diesel ≤ 2.040 €*) plus radius alerts (e.g. *Super E10 ≤ 2.100 € · 10 km*), with an Active / Today / This week activity summary. On-device, consent-respecting, evaluated only when you're nearby.
 - **Price history & predictions** — 30-day charts plus "best time to fill" guidance (a day-of-week + price-threshold heuristic) from your local history
 - **Brand filter** — Total / Esso / Shell / Aral, country-aware brand registry
-- **Favorites** — quick access with swipe-to-navigate / swipe-to-remove; landscape splits the panel side-by-side with the alerts pane
+- **Favorites** — fuel stations (multi-fuel price rows: E5 / E10 / Diesel) and EV chargers (e.g. *120 kW · 3/3 available · CCS Type 2 · Type 2*) in one list, with swipe-to-navigate / swipe-to-remove; landscape splits the panel side-by-side with the alerts pane
 - **Home-screen widget** — current prices in two layouts (standard + predictive), a tap that opens the right station whether the app is cold or warm, plus a refresh button that re-pulls without ever opening the app
-- **EV charging** — OpenChargeMap integration with connector type, max power, and pricing
+- **EV charging** — Open Charge Map integration with connector type, max power, and live availability
 
 ### Layer 2 — burning less
 
@@ -78,10 +79,10 @@ Features that don't serve at least one of those three layers don't belong.
 - **Always-both recording** — OBD2 and GPS run in parallel during every recording. Mid-trip adapter dropouts are tolerated; the trip classifies as `gpsOnly` / `gpsPlusObd2` / `hybrid` at trip end based on coverage ratio.
 - **Auto-record** — pair adapter to vehicle, auto-connect on Bluetooth, auto-start on movement, auto-save on disconnect (Android-verified; iOS background-wake pending #1542).
 - **Live coaching** — OBD2 trajets get shift-up / shift-down / ease-pedal tiles. GPS-only trajets get lift-off-coast / anticipate-brake / smooth-accel tiles, derived from a rolling 5-second GPS sample window.
-- **Trip detail view** — per-trip charts (speed, fuel rate, RPM, engine load when present) plus GPS route map with consumption-band colour coding and a shareable GPX export.
-- **Driving insights** — hard-accel waste, idling fuel, cold-start surcharge, low-gear coaching.
+- **Trip detail view** — a summary (vehicle, OBD2 adapter, distance, duration, avg consumption, fuel used, fuel cost, avg/max speed) plus a GPS route map colour-coded by efficiency band (*Efficient* / *Borderline* / *Wasteful*) and a shareable GPX export.
+- **Eco-coaching** — a *Top wasteful behaviours* card (low-gear labouring, hard accelerations and the litres they wasted, time over a high RPM) turns each trip into a concrete "here's where the fuel went" readout.
+- **"How you used the engine"** — throttle-position breakdown (Coast / Light / Firm / Wide-open %) and engine-RPM-band breakdown (Idle / Cruise / Spirited / Hard %) so you can see the engine zone you actually drive in.
 - **Driving score** — composite 0-100 score per trip with breakdown chips, opt-in.
-- **Throttle / RPM histogram** — see the engine zone you actually drive in (OBD2 only).
 - **Visual eco-coach** — live haptic + on-screen feedback when behaviour costs fuel.
 - **Driving mode** — full-screen, in-car friendly map with large markers and voice announcements; PiP overlay shows context-adaptive primary (live L/100 km if OBD2, distance if GPS-only mid-trajet, elapsed time during pre-roll — #2094) and flips to a huge price layout when you cross a station's radius (the **approach overlay**, Epic #2065).
 - **Approach overlay (test before you drive)** — the Privacy Dashboard carries a "Test approach overlay" button that pushes a synthetic in-radius signal for 30 s so the PiP price flip can be verified from the couch.
@@ -89,66 +90,69 @@ Features that don't serve at least one of those three layers don't belong.
 
 ### Layer 3 — seeing what you actually spend
 
-- **Fill-up log** — manual entry, receipt OCR scan, pump-display OCR, or OBD-II auto-import on disconnect
-- **Trip history** — every recorded trip with distance, duration, avg consumption, fuel used, fuel cost
+- **Fill-up log** — manual entry, pump-display OCR, receipt OCR, or OBD-II auto-import on disconnect; every fill shows L/100 km, the % delta vs the previous fill, and the €/L paid, exportable in one tap
+- **Fuel tab at a glance** — live tank level + estimated range (e.g. *≈ 434 km*), and a consumption-stats card with an accuracy indicator (*High · ±3-7 %*), the learned volumetric efficiency η_v, average L/100 km, average cost/km, total litres, total spent, fill-up count, and correction total
+- **Trip history** — every recorded trip with distance, duration, avg consumption, fuel used, fuel cost, and a this-month-vs-last comparison
 - **Vehicle profiles** — combustion, hybrid, or EV; tank capacity, battery, connectors, multi-vehicle households
-- **Cost calculator** — tank fill cost, cross-station savings, fuel-budget projections
-- **CO₂ dashboard** — emissions per vehicle with 30-day rolling chart
+- **Fuel-cost calculator** — distance × consumption × price → litres, total cost, and cost/km, with smart prefill from your active vehicle and profile
+- **Carbon dashboard** — total cost and total CO₂, plus consumption broken down by trip length (short < 5 / medium 5-25 / long > 25 km) and by speed band (idle, urban, suburban, rural, eco-cruise, motorway, motorway-fast) with each band's share of your driving
 - **Service reminders** — interval + mileage-driven, configurable per vehicle
 
 ### Cross-cutting
 
-- **Right-sized profiles** — Basic (search + favorites + alerts), Medium (+ manual fill-ups + GPS-only trajets), Full (+ OBD2 auto-record + driving scores + loyalty cards), Custom (à la carte). Switching is one tap in Settings.
+- **Feature-management presets** — right-size the app to how you actually use it: **Basic** (cheapest fuel + EV charging nearby, favourites, price alerts), **Medium** (+ track fill-ups and EV charging by hand), **Full** (+ automatic OBD2 trip recording, driving scores, loyalty cards), or **Custom** (à la carte). Switching is one tap in Settings.
+- **Multiple profiles** — preferred fuel, search radius, start screen, and route-planning settings per profile; the redesigned profile editor groups everything into section cards with a docked Save bar.
+- **Grouped Settings** — Profile · Setup & data sources · Features & usage · Account & sync · Appearance · Privacy · About.
+- **Approach-station overlay** — when you drive near a station, a Picture-in-Picture overlay flips to a big live price (Epic #2065); a *Test approach overlay* button in the Privacy Dashboard fires a synthetic in-radius signal so you can verify it from the couch.
+- **Voice announcements** — spoken price/stop callouts while driving, in-car friendly.
 - **Local-first** — Hive storage, smart caching, offline-capable.
-- **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase), free, anonymous-or-email auth, opt-in trajet sync.
-- **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant. Privacy Dashboard surfaces every stored row with one-tap JSON / CSV export, a "Save" button to dump the local error log, an in-app approach-overlay test surface, and delete-all.
+- **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase), free, anonymous-or-email auth, opt-in trajet sync for favourites, alerts, and trips.
+- **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant. Your GPS position and API keys **never leave the device**. The Privacy Dashboard surfaces every stored row with one-tap JSON / CSV export, a "Save" button to dump the local error log, an in-app approach-overlay test surface, and a one-tap delete-all.
 - **23 locales fully translated** — every UI label, including new feature surfaces; no English fallbacks except for brand names and unit masks.
 - **Accessibility** — meets Android tap-target and Apple Human Interface tap-target guidelines, semantic labels throughout.
 - **Cross-platform architecture** — iOS and Android share the same Dart codebase; platform-specific surfaces (BLE OBD2, background tasks, widgets) live behind plugin interfaces, never inline `Platform.isIOS` branches. Android is the verified platform; the iOS background-wake path for auto-record is pending #1542.
 
 ## Screenshots
 
-Captured 2026-05-25 on a Samsung Galaxy S20 (Android 14, French locale) running Sparkilo against the live `Prix Carburants` (France) API. UI is fully localised across 23 languages — these are the French strings; English / German / 20 others render the same screens.
+Captured 2026-06 on Android running Sparkilo against the live `Prix-Carburants` (France) open data. The UI is fully localised across 23 languages — these are the French strings; English / German / 20 others render the same screens.
 
 ### Find fuel & EV charging
 
-| Search list | Search criteria | Favorites + alerts |
+| Search criteria | Search results | Best stops along a route |
 |:--:|:--:|:--:|
-| ![Sparkilo home — 10 stations near Pézenas with E85 filter, sorted by distance, price arrow + amenity badges](docs/screenshots/01-search-results.png) | ![Search criteria modal — Nearby vs Search-along-route toggle, fuel-type chips, 10 km radius slider, Open-only toggle, amenity + brand filters, Save as my defaults](docs/screenshots/15-search-criteria.png) | ![Favorites tab — Independent + Pézenas Carburant pinned, with full per-fuel pricing and a 22 kW Type-2 EV charger card](docs/screenshots/02-favorites-and-alerts.png) |
-| Real-time prices ranked by distance with amenity badges and a one-tap driving-mode launcher. | Single modal: Nearby vs Search-along-route mode, fuel type, radius, Open-only filter, 8 amenity chips, brand multi-select. Save-as-defaults pins your usual filter set. | Saved fuel stations AND EV chargers in one list, with full per-fuel pricing and one-tap toggle to the price-alerts pane. |
+| ![Search criteria sheet — Nearby vs Search-along-route toggle, fuel-type chips, 10 km radius slider, Open only toggle, amenity and highway filters, Save as my defaults](docs/screenshots/01-search-criteria.jpg) | ![Search results — France/Prix-Carburants source link, 10 stations found, Distance/Price/A-Z/24h sort chips, station cards with price arrows, star ratings and amenity badges](docs/screenshots/02-search-results.jpg) | ![Route mode in Best stops — 117 km / 78 min / 24 stations, the cheapest stop (Auchan 0.768 €) flagged Cheapest, distances measured along the corridor](docs/screenshots/03-route-best-stops.jpg) |
+| The central search button opens one sheet: Nearby vs along-route, fuel type, radius, Open-only, amenity and highway filters, then *Save as my defaults*. | Real-time official prices with a tappable data-source link, four sort modes, price-trend arrows, community ratings, amenity badges and a favourite star. | Plan a trip and surface the cheapest stops along it — *All stations* vs *Best stops*, with distances measured along the corridor. |
 
-| Map (nearby) | Map (best stops along route) |
+| Map (route corridor) | Favorites — fuel & EV |
 |:--:|:--:|
-| ![Map view — 10 stations within 10 km radius, green-to-red price markers + a bon-marché/cher legend](docs/screenshots/03-map-price-clusters.png) | ![Map view in Best stops mode — Perpignan→Agde 117 km/77 min route with the 3 cheapest stops surfaced inline (Auchan 0.768 €, Intermarché 0.798 €) on a color-coded price scale](docs/screenshots/14-route-search-best-stops.png) |
-| Interactive map with green-to-red price markers across a country-wide radius, fuel-station / EV toggle in the app bar. | Plan a route, get the cheapest stops along it surfaced as ranked chips — saves money + time without making you scroll a list. |
+| ![Map view — Perpignan-to-Agde route polyline with green-to-red price pins along the corridor and a cheap-to-expensive legend](docs/screenshots/04-map-route-corridor.jpg) | ![Favorites tab — a 120 kW CCS/Type-2 EV charger (3/3 available) alongside fuel stations showing per-fuel E5/E10/Diesel price rows](docs/screenshots/05-favorites-fuel-and-ev.jpg) |
+| Interactive map with green-to-red price pins, the route corridor drawn as a polyline, plus EV-charging toggle, share and fit-to-results. | Saved fuel stations (multi-fuel price rows) and EV chargers (power, availability, connector types) in one list, with a tab to the price-alerts pane. |
 
 ### Track & alert
 
-| Price alerts | Trips list | Per-trip GPS route |
-|:--:|:--:|:--:|
-| ![Price alerts tab — Diesel ≤ 2.040 € on 26 AVENUE DE VERDUN with the explanatory zone-alerts card and on/off toggle](docs/screenshots/04-price-alerts.png) | ![Trips tab — monthly stats (57 trips, 1176 km, 7.4 L/100), per-trip cards with distance + duration + L/100 km, View all on map link](docs/screenshots/06-trips-monthly.png) | ![Trip detail — 21.4 km / 24m20 / 7.6 L/100 km Peugeot trip with GPS path map and an Efficient / Borderline / Wasteful color legend](docs/screenshots/07-trip-detail-gps-route.png) |
-| Per-station, per-fuel-type threshold alerts — background check fires every 30 min. Plus a zone-alert mode for nearby price drops. | Auto + manual trip recording with month-over-month comparison. Every trip carries distance, duration, and (when OBD2 is paired) real L/100 km. | GPS-recorded route per trip, color-coded by instantaneous consumption band — find your wasteful segments at a glance. |
+| Price alerts | Trips logbook |
+|:--:|:--:|
+| ![Price Alerts — Active/Today/This week summary, a per-station Diesel ≤ 2.040 € alert and a radius alert Super E10 ≤ 2.100 € · 10 km, each with an on/off toggle](docs/screenshots/06-price-alerts.jpg) | ![Trips tab — this-month-vs-last comparison and a list of recorded trips, each with date, distance, duration and L/100 km, plus a Start recording button](docs/screenshots/07-trips-list.jpg) |
+| Per-station thresholds and radius alerts in one place, with an Active / Today / This week activity summary. On-device and evaluated only when you're nearby. | Auto + manual trip recording with a month-over-month comparison. Every trip carries distance, duration and (when measured) real L/100 km. |
 
 ### Consumption & coaching
 
-| Fuel + tank + stats | Trajets aggregated | Feature presets |
+| Fuel + tank + stats | Carbon dashboard | Trip detail + GPS route |
 |:--:|:--:|:--:|
-| ![Fuel tab — 16.5 L tank level + 235 km range, Avg L/100 km 6.70, Total liters 87.8, η_v 0.84 learning chip, per-fill-up cards with L/100 km trend](docs/screenshots/05-fuel-tank-and-stats.png) | ![Trajets-on-map — every recorded trip layered over France with color-coded path lines from Montpellier to Provence-Alpes-Côte d'Azur](docs/screenshots/08-trajets-on-map.png) | ![Settings — Feature management with Basic / Medium / Full / Custom preset cards explaining each tier](docs/screenshots/13-feature-management.png) |
-| Live tank level (OBD2-measured when an adapter is paired), L/100 km + cost/km totals, per-fill-up trend chips, and a self-learning η_v calibration badge. | All your recorded trips layered onto a single map — see where you spend most of your driving life. | Right-size the app: Basic (search-only), Medium (+ manual fill-ups + GPS trajets), Full (+ OBD2 auto-record), or Custom. |
+| ![Fuel tab — 30.4 L tank level / ≈ 434 km range, consumption stats with Accuracy High ±3-7 %, η_v 0.90, avg 6.57 L/100 km, cost/km, totals, and per-fill-up cards with L/100 km trend](docs/screenshots/08-fuel-stats.jpg) | ![Carbon dashboard — total cost 111 € and total CO2 173 kg, consumption by trip length (short/medium/long) and by speed band (idle, urban, suburban, rural, eco-cruise, motorway)](docs/screenshots/09-carbon-dashboard.jpg) | ![Trip detail — summary (Peugeot, vLinker OBD2 adapter, 46.9 km, 48m30s, 7.5 L/100 km, fuel used and cost, avg/max speed) and a GPS route map colour-coded Efficient/Borderline/Wasteful](docs/screenshots/10-trip-detail-gps-route.jpg) |
+| Live tank level and range, an accuracy indicator and learned η_v, L/100 km + cost/km totals, and per-fill-up trend chips with % delta and €/L. | Total cost and CO₂ at the top, then consumption sliced by trip length and by speed band — see exactly where the litres go. | The per-trip summary plus a GPS route map colour-coded by efficiency band — find your wasteful segments at a glance. |
 
-### Privacy & sync
+| Eco-coaching + engine usage | Trajets on map |
+|:--:|:--:|
+| ![Trip detail — Top wasteful behaviours (low-gear labouring, hard accelerations wasting 1.5 L, high RPM) and How you used the engine (throttle-position % and engine-RPM-band %)](docs/screenshots/11-trip-eco-coaching.jpg) | ![Trajets on map — every recorded trip drawn as colour-coded polylines over southern France, from Montpellier to Provence-Alpes-Côte d'Azur](docs/screenshots/12-trajets-on-map.jpg) |
+| *Top wasteful behaviours* turns each trip into litres wasted; *How you used the engine* shows the throttle and RPM zones you actually drive in. | All your recorded trips layered onto a single map — see where you spend most of your driving life. |
 
-| TankSync settings | Privacy dashboard | Data on device |
-|:--:|:--:|:--:|
-| ![TankSync card — Sparkilo Community connected via email, Switch to anonymous + Sync trip recordings toggle ON, View my data + Link device + Disconnect](docs/screenshots/09-tank-sync.png) | ![Privacy Dashboard — Profile (Standard, E85, FR), API keys (community + shared defaults), Cloud Sync connected via email, Privacy summary card](docs/screenshots/11-privacy-dashboard.png) | ![Privacy Dashboard — Data on this device (2 favorites, 1 rating, 1 alert, 2 price-history stations, 26 cache entries, 140.5 KB), Cloud sync details + Share learned vehicle profiles toggle](docs/screenshots/12-privacy-data-on-device.png) |
-| Free cross-device sync via TankSync — favorites, alerts, trip recordings. Anonymous mode keeps the same database without an email. | One-glance summary of what's stored, who has it, and which API keys are in use. Profile section explicit about country + active fuel type. | Detailed breakdown of every stored row — favorites, ratings, alerts, cache, API keys — with the on-device storage footprint in plain KB. |
+### Right-size & privacy
 
-### Setup
-
-| API key setup |
-|:--:|
-| ![Settings — API key setup card with Tankerkoenig (not configured, registration link) + EV Charging via OpenChargeMap (app default key)](docs/screenshots/10-api-keys-and-theme.png) |
-| Bring-your-own API keys when the community shared key isn't enough. Registration links built in. EV charging uses the bundled default unless you override. |
+| Feature presets | Privacy dashboard |
+|:--:|:--:|
+| ![Settings — Feature management with Basic / Medium / Full / Custom preset cards, each describing the feature set it enables](docs/screenshots/14-feature-presets.jpg) | ![Privacy Dashboard — your data belongs to you, with Profile, API keys (community + shared defaults), Cloud Sync status and a privacy summary noting GPS and API keys never leave the device](docs/screenshots/13-privacy-dashboard.jpg) |
+| Right-size the app: Basic (cheapest fuel + EV, favourites, alerts), Medium (+ manual fill-up & EV tracking), Full (+ OBD2 auto-record, driving scores, loyalty), or Custom. | See, export or delete everything stored on-device in one place; GPS position and API keys never leave the device, with optional TankSync for cross-device access. |
 
 ## Getting Started
 
@@ -197,29 +201,37 @@ lib/
   app/              # App entry, routing, theme
   core/
     cache/          # Unified CacheManager with TTLs
-    services/       # Abstract interfaces + country implementations
+    country/        # Country registry + ServiceSource enum
     storage/        # Hive local storage
     sync/           # TankSync cloud backend (optional)
-    telemetry/  # Structured error capture
+    telemetry/      # Structured error capture
+    ...             # location, network, notifications, navigation, theme, …
   features/
-    search/         # City/postal code search
-    map/            # Interactive map with clustering
-    favorites/      # Saved stations with swipe actions
-    alerts/         # Price drop notifications
-    calculator/     # Trip cost calculator
-    price_history/  # 30-day charts & predictions
-    route_search/   # Along-the-route cheapest station
-    station_detail/ # Station info, prices, reports
-    profile/        # Settings & preferences
-    sync/           # Cross-device sync UI
-    widget/         # Home screen widget
+    search/             # Nearby + along-route search
+    map/                # Interactive map with clustering
+    favorites/          # Saved stations + EV chargers, swipe actions
+    alerts/             # Price-drop + radius notifications
+    calculator/         # Fuel-cost calculator
+    price_history/      # 30-day charts & predictions
+    route_search/       # Along-the-route cheapest stops
+    station_services/   # StationService interface + 17 country implementations
+    station_detail/     # Station info, prices, reports
+    consumption/        # Fill-up log + tank/consumption stats
+    carbon/             # CO₂ + consumption dashboard
+    driving/            # Trips, trip detail, eco-coaching
+    ev/                 # EV charging (Open Charge Map)
+    feature_management/ # Basic / Medium / Full / Custom presets
+    profile/            # Profiles & settings
+    sync/               # Cross-device sync UI
+    widget/             # Home-screen widget
     ...
 ```
 
 **Key patterns:**
-- Feature-first clean architecture with data / domain / presentation layers
+- Feature-first clean architecture with data / domain / presentation / providers layers
 - Riverpod 3.0 with code generation for state management
-- Service abstraction with 4-step fallback: fresh cache → API → stale cache → error
+- Country support is consolidated onto one `CountryServiceEntry` in the registry — each country implements the `StationService` interface in `lib/features/station_services/<country>/`
+- Service abstraction with a 4-step fallback: fresh cache → API → stale cache → error
 - All API responses wrapped in `ServiceResult<T>` with source tracking
 
 ## Development
@@ -243,7 +255,7 @@ flutter build apk --release
 
 ### Adding a New Country
 
-The app is designed to be easily extensible. Each country has its own service implementation behind the `StationService` interface. See `lib/features/station_services/` for examples.
+The app is designed to be easily extensible. Each of the 17 supported countries has its own service implementation behind the `StationService` interface in `lib/features/station_services/<country>/`. Since the registry was consolidated, adding a country is **one new file** (the service) plus **two small appends** (the `CountryServiceEntry` registry entry and the `ServiceSource` enum value). See [docs/guides/NEW_COUNTRY.md](docs/guides/NEW_COUNTRY.md) for the full walkthrough.
 
 ## Tech Stack
 
