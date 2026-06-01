@@ -172,6 +172,46 @@ android {
     }
 }
 
+// -----------------------------------------------------------------------------
+// F-Droid GMS/MLKit exclusion (#2574)
+//
+// The `fdroid` flavor must ship ZERO proprietary Google Mobile Services. Two
+// transitive sources pull GMS in:
+//   1. geolocator_android      -> com.google.android.gms:play-services-location
+//   2. google_mlkit_text_recognition (pump/receipt OCR)
+//                              -> com.google.mlkit:text-recognition
+//                              -> com.google.android.gms:play-services-base/basement
+//
+// We strip both groups from the fdroid `implementation` base configuration
+// (geolocator's own documented F-Droid recipe) AND, belt-and-braces, from each
+// fdroid runtime classpath. The app module's own Kotlin never references GMS or
+// ML Kit directly — those deps come in transitively from the geolocator_android
+// and google_mlkit_text_recognition plugin modules — so removing them from the
+// app's fdroid graph does not break compilation; it only drops the classes from
+// the resolved APK. After that the OCR plugin channel simply isn't there and
+// ReceiptScanService degrades gracefully (MissingPluginException is caught in
+// _recogniseRaw -> returns null). Maps are already OSM (flutter_map), so after
+// these two excludes the fdroid APK is GMS-free. geolocator falls back to
+// Android's LocationManager — see GeolocatorWrapper.forceLocationManager.
+//
+// Scope is the fdroid flavor ONLY: the play flavor keeps GMS+MLKit unchanged.
+// The exact configuration names below were confirmed against
+// `./gradlew -p android app:dependencies`; the audit (scripts/audit_no_gms.sh +
+// .github/workflows/fdroid.yml) inspects `fdroidReleaseRuntimeClasspath` and
+// the built dex to prove the runtime classpath is clean.
+val gmsExcludeGroups = listOf("com.google.android.gms", "com.google.mlkit")
+val fdroidExcludedConfigs = listOf(
+    "fdroidImplementation",
+    "fdroidReleaseRuntimeClasspath",
+    "fdroidDebugRuntimeClasspath",
+    "fdroidProfileRuntimeClasspath",
+)
+fdroidExcludedConfigs.forEach { configName ->
+    configurations.matching { it.name == configName }.configureEach {
+        gmsExcludeGroups.forEach { excludedGroup -> exclude(group = excludedGroup) }
+    }
+}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("androidx.car.app:app:1.4.0")

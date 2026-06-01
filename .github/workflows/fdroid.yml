@@ -1,0 +1,71 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+# F-Droid no-GMS audit (#2575)
+#
+# ADVISORY workflow — proves the `fdroid` flavor ships ZERO proprietary Google
+# Mobile Services. It is intentionally NOT a required check / branch-protection
+# context: it has no ci-docs-stub.yml coverage, and a transient Android/Gradle
+# failure must never block `gh pr merge --auto`. The authoritative gate is the
+# dependency-graph layer (layer A of scripts/audit_no_gms.sh), which is fast and
+# deterministic; the debug-APK dex layer (layer B) is the belt-and-braces proof
+# that nothing GMS survives into the shipped bytecode.
+#
+# A DEBUG apk is built deliberately: it needs no keystore (the dependency graph,
+# not the signature, proves the exclude), and --flavor fdroid
+# --dart-define=FORCE_LOCATION_MANAGER=true exercises the exact runtime config
+# the release/F-Droid builds use.
+
+name: F-Droid no-GMS audit
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+# Single self-contained job → exactly one status context ("build-fdroid"),
+# never gated per-step. Keep it OUT of required checks.
+concurrency:
+  group: fdroid-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-fdroid:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Pin to the build-android-green SDK (matches ci.yml's build-android).
+          flutter-version: "3.41.9"
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      # Build the unsigned DEBUG fdroid APK with the GMS-free runtime config.
+      - name: Build fdroid debug APK
+        run: flutter build apk --debug --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
+      # Layer A (dependency graph) ALWAYS runs; layer B (dex) runs on the
+      # debug APK just produced. dexdump comes from the runner's Android SDK
+      # build-tools (ANDROID_HOME is set on ubuntu-latest); the script falls
+      # back to `strings` if it cannot find it.
+      - name: Audit — no GMS / MLKit
+        run: bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-debug.apk

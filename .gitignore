@@ -111,6 +111,7 @@ docs/guides/*
 !docs/guides/ios-codesigning.md
 !docs/guides/ios-widget-extension.md
 !docs/guides/feature-flags.md
+!docs/guides/fdroid-submission.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
@@ -118,3 +119,19 @@ assets_dev/
 # fastlane (Ruby) — local bundler install path
 vendor/bundle/
 .bundle/
+
+# F-Droid self-hosted repo (#2576). The repo SIGNING KEY and fdroidserver
+# working dirs are local-only and NEVER committed; the config, app metadata,
+# and the generated repo index ARE committed (the maintainer commits
+# fdroid/repo/ after the local fdroid_publish.sh run, which pages.yml then
+# deploys). The global *.jks / *.keystore rules above already cover keystore
+# files anywhere; these add the fdroid-specific keystore + python config dump +
+# fdroidserver working dirs.
+fdroid/keystore*
+fdroid/config.py
+fdroid/*.p12
+fdroid/*.jks
+fdroid/tmp/
+fdroid/archive/
+# fdroid/config.yml, fdroid/metadata/, and fdroid/repo/ are intentionally
+# TRACKED — do not ignore them.
