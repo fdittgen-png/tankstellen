@@ -63,6 +63,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get routeSearchPartialBanner => 'Weitere Tankstellen werden gesucht…';
 
   @override
+  String get routeSearchingChip => 'Route wird gesucht…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Alle $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Suchkriterien';
 
   @override

@@ -14,6 +14,7 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../route_search/providers/route_search_params_provider.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_result_item.dart';
@@ -157,6 +158,31 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
                 ),
               ),
             ],
+          ),
+          // #2592 — surface the route segment, not the radius: the
+          // route-planning param actually applied to this search.
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Row(
+              children: [
+                Icon(Icons.straighten,
+                    size: 14, color: theme.colorScheme.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Builder(builder: (_) {
+                  final segmentText = ref
+                      .watch(routeSegmentSearchParamProvider)
+                      .round()
+                      .toString();
+                  return Text(
+                    l10n?.routeSegmentSummaryBadge(segmentText) ??
+                        'Every $segmentText km',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  );
+                }),
+              ],
+            ),
           ),
           const SizedBox(height: 6),
           Row(

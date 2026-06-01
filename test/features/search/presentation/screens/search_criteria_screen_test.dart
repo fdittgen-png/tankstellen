@@ -10,6 +10,7 @@ import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/search_mode.dart';
 import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_criteria_screen.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
@@ -230,6 +231,43 @@ void main() {
             StorageKeys.defaultAmenities,
             [StationAmenity.airPump.name],
           )).called(1);
+    });
+
+    testWidgets(
+        '#2592 — save-as-defaults persists route params in route mode',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.putSetting(any(), any()))
+          .thenAnswer((_) async {});
+
+      const initialProfile = UserProfile(id: 'p1', name: 'Standard');
+      final fake = _FakeActiveProfile(initialProfile);
+
+      await pumpApp(
+        tester,
+        const SearchCriteriaScreen(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.diesel),
+          searchRadiusOverride(15),
+          userPositionNullOverride(),
+          activeSearchModeOverride(SearchMode.route),
+          routeSegmentSearchParamOverride(250),
+          activeProfileProvider.overrideWith(() => fake),
+        ],
+      );
+
+      final saveBtn =
+          find.byKey(const ValueKey('criteria-save-defaults-button'));
+      await tester.ensureVisible(saveBtn);
+      await tester.pump();
+      await tester.tap(saveBtn);
+      await tester.pump();
+
+      expect(fake.updates, hasLength(1));
+      // Route mode persists the route-segment override onto the profile.
+      expect(fake.updates.single.routeSegmentKm, 250);
     });
 
     testWidgets('has a close (X) button that pops the route', (tester) async {

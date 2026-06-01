@@ -249,6 +249,18 @@ abstract class AppLocalizations {
   /// **'Searching for more stations…'**
   String get routeSearchPartialBanner;
 
+  /// No description provided for @routeSearchingChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching the route…'**
+  String get routeSearchingChip;
+
+  /// No description provided for @routeSegmentSummaryBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Every {km} km'**
+  String routeSegmentSummaryBadge(String km);
+
   /// No description provided for @searchCriteriaTitle.
   ///
   /// In en, this message translates to:

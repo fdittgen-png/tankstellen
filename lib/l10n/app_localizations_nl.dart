@@ -63,6 +63,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get routeSearchPartialBanner => 'Zoekt naar meer stations…';
 
   @override
+  String get routeSearchingChip => 'Searching the route…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Every $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Zoekcriteria';
 
   @override

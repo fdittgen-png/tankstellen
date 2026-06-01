@@ -18,6 +18,15 @@
   "fabRunSearch": "Suche starten",
   "fabRefineCriteria": "Suche verfeinern",
   "routeSearchPartialBanner": "Weitere Tankstellen werden gesucht…",
+  "routeSearchingChip": "Route wird gesucht…",
+  "routeSegmentSummaryBadge": "Alle {km} km",
+  "@routeSegmentSummaryBadge": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
   "searchCriteriaTitle": "Suchkriterien",
   "searchCriteriaOpen": "Suchen",
   "searchCriteriaRadiusBadge": "Im Umkreis von {km} km",

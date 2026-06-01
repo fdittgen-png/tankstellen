@@ -47,14 +47,19 @@ class RouteSearchState extends _$RouteSearchState {
     required FuelType fuelType,
     double searchRadiusKm = 5.0,
     RouteSearchStrategyType strategyType = RouteSearchStrategyType.uniform,
+    // #2592 — per-search overrides from the criteria screen. When omitted
+    // (e.g. the itineraries screen) they null-coalesce to the profile
+    // defaults so existing callers are untouched.
+    double? segmentKm,
+    double? minSavingPerLiter,
   }) async {
     state = const AsyncValue.loading();
     try {
       // 1. Get route from OSRM
       final profile = ref.read(activeProfileProvider);
       final avoidHighways = profile?.avoidHighways ?? false;
-      final segmentKm = profile?.routeSegmentKm ?? 50.0;
-      final minSaving = profile?.minRouteSavingPerLiter ?? 0.0;
+      final segmentKmValue = resolveRouteSegmentKm(segmentKm, profile);
+      final minSaving = resolveMinRouteSaving(minSavingPerLiter, profile);
       // #2101 lever B — profile-configurable top-N cap + criterion.
       final topN = profile?.routeSearchTopNPerSamplePoint ?? 10;
       final criterion =
@@ -129,7 +134,7 @@ class RouteSearchState extends _$RouteSearchState {
           route: route,
           results: allResults,
           fuelType: fuelType,
-          segmentKm: segmentKm,
+          segmentKm: segmentKmValue,
         );
       }
 
@@ -315,3 +320,18 @@ List<SearchResultItem> filterRouteResultsByMinSaving(
     return price == null || price <= ceiling;
   }).toList();
 }
+
+/// Resolves the route-segment spacing for a search (#2592).
+///
+/// A per-search [override] (from the criteria screen) wins; otherwise the
+/// active [profile]'s `routeSegmentKm` default applies; with neither, the
+/// 50 km fallback matches the profile field default. This keeps existing
+/// callers that pass no override (e.g. the itineraries screen) on the
+/// profile-default path.
+double resolveRouteSegmentKm(double? override, UserProfile? profile) =>
+    override ?? profile?.routeSegmentKm ?? 50.0;
+
+/// Resolves the minimum-saving floor for a search (#2592). Same precedence
+/// as [resolveRouteSegmentKm]: per-search override → profile → 0.0 (off).
+double resolveMinRouteSaving(double? override, UserProfile? profile) =>
+    override ?? profile?.minRouteSavingPerLiter ?? 0.0;

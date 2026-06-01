@@ -63,6 +63,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get routeSearchPartialBanner => 'További állomások keresése…';
 
   @override
+  String get routeSearchingChip => 'Searching the route…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Every $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Keresési feltételek';
 
   @override

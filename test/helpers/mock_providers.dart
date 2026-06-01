@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
@@ -11,7 +12,11 @@ import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/route_search/providers/route_search_params_provider.dart';
+import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/search_mode.dart';
+import 'package:tankstellen/features/search/providers/search_mode_provider.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../fakes/fake_hive_storage.dart';
@@ -139,6 +144,49 @@ class _FixedSearchRadius extends SearchRadius {
 
   @override
   double build() => _radius;
+}
+
+/// Override [activeSearchModeProvider] with a fixed [SearchMode] (#2592).
+Object activeSearchModeOverride(SearchMode mode) {
+  return activeSearchModeProvider.overrideWith(() => _FixedSearchMode(mode));
+}
+
+class _FixedSearchMode extends ActiveSearchMode {
+  final SearchMode _mode;
+  _FixedSearchMode(this._mode);
+
+  @override
+  SearchMode build() => _mode;
+}
+
+/// Override [routeSegmentSearchParamProvider] with a fixed segment (#2592).
+Object routeSegmentSearchParamOverride(double km) {
+  return routeSegmentSearchParamProvider
+      .overrideWith(() => _FixedRouteSegmentParam(km));
+}
+
+class _FixedRouteSegmentParam extends RouteSegmentSearchParam {
+  final double _km;
+  _FixedRouteSegmentParam(this._km);
+
+  @override
+  double build() => _km;
+}
+
+/// Override [routeSearchStateProvider] with a fixed [AsyncValue] (#2592).
+///
+/// Pass `AsyncValue.loading()` for the searching state or
+/// `AsyncValue.data(result)` for the completed state.
+Object routeSearchStateOverride(AsyncValue<RouteSearchResult?> value) {
+  return routeSearchStateProvider.overrideWith(() => _FixedRouteSearch(value));
+}
+
+class _FixedRouteSearch extends RouteSearchState {
+  final AsyncValue<RouteSearchResult?> _value;
+  _FixedRouteSearch(this._value);
+
+  @override
+  AsyncValue<RouteSearchResult?> build() => _value;
 }
 
 /// Override [searchLocationProvider] with a specific location string.

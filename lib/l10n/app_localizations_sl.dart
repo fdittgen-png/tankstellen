@@ -63,6 +63,14 @@ class AppLocalizationsSl extends AppLocalizations {
   String get routeSearchPartialBanner => 'Iskanje dodatnih postaj…';
 
   @override
+  String get routeSearchingChip => 'Searching the route…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Every $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Merila iskanja';
 
   @override

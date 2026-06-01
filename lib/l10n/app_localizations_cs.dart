@@ -63,6 +63,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get routeSearchPartialBanner => 'Hledání dalších stanic…';
 
   @override
+  String get routeSearchingChip => 'Searching the route…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Every $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Kritéria hledání';
 
   @override

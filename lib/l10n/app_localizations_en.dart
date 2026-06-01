@@ -63,6 +63,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get routeSearchPartialBanner => 'Searching for more stations…';
 
   @override
+  String get routeSearchingChip => 'Searching the route…';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return 'Every $km km';
+  }
+
+  @override
   String get searchCriteriaTitle => 'Search criteria';
 
   @override
@@ -6773,6 +6781,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get routeSearchPartialBanner =>
       '⟦Šéářçĥîñǧ ƒóř ɱóřé šŧáŧîóñš… ···········⟧';
+
+  @override
+  String get routeSearchingChip => '⟦Šéářçĥîñǧ ŧĥé řóúŧé… ········⟧';
+
+  @override
+  String routeSegmentSummaryBadge(String km) {
+    return '⟦Éṽéřý $km ķɱ ···⟧';
+  }
 
   @override
   String get searchCriteriaTitle => '⟦Šéářçĥ çřîŧéřîá ······⟧';
