@@ -20,6 +20,7 @@ import '../../data/exporters/backup/full_backup_exporter.dart';
 import '../../providers/charging_logs_provider.dart';
 import '../../providers/consumption_providers.dart';
 import '../../providers/trip_history_provider.dart';
+import '../widgets/backup_restore_flow.dart';
 import '../widgets/charging_tab.dart';
 import '../widgets/fuel_tab.dart';
 import '../widgets/obd2_status_chip.dart';
@@ -198,6 +199,16 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
           tooltip: l?.exportBackupTooltip ?? 'Export backup',
           icon: const Icon(Icons.download_outlined),
           onPressed: () => unawaited(_runBackupExport()),
+        ),
+        // #2571 — full-backup RESTORE, paired with the export button.
+        // The whole flow (pick .zip → merge/replace confirm → import →
+        // feedback) lives in [BackupRestoreFlow] so this screen stays
+        // under the 400-line guard.
+        IconButton(
+          key: const Key('restore_backup'),
+          tooltip: l?.restoreBackupTooltip ?? 'Restore backup',
+          icon: const Icon(Icons.restore_outlined),
+          onPressed: () => unawaited(BackupRestoreFlow.run(context, ref)),
         ),
         // #1613 — the Carbon dashboard entry point is gated on the
         // central Feature enum so it can be toggled per profile.

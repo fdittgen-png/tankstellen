@@ -2094,6 +2094,47 @@
   "@exportBackupFailed": {
     "description": "SnackBar shown when the backup export pipeline throws (#1317)."
   },
+  "restoreBackupTooltip": "Restore backup",
+  "@restoreBackupTooltip": {
+    "description": "AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571)."
+  },
+  "restoreBackupDialogTitle": "Restore backup",
+  "@restoreBackupDialogTitle": {
+    "description": "Title of the merge-vs-replace confirmation dialog shown after a backup .zip is picked (#2571)."
+  },
+  "restoreBackupDialogBody": "Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.",
+  "@restoreBackupDialogBody": {
+    "description": "Body of the restore confirmation dialog explaining the difference between Merge and Replace, with a data-loss warning on Replace (#2571)."
+  },
+  "restoreBackupMergeAction": "Merge",
+  "@restoreBackupMergeAction": {
+    "description": "Primary (safe) action button in the restore dialog: add/update by id, keep existing data (#2571)."
+  },
+  "restoreBackupReplaceAction": "Replace all",
+  "@restoreBackupReplaceAction": {
+    "description": "Destructive action button in the restore dialog: wipe all current data then restore only the backup (#2571)."
+  },
+  "restoreBackupSuccess": "Backup restored — {count} records imported",
+  "@restoreBackupSuccess": {
+    "description": "Success SnackBar after a restore completes with at least one record (#2571).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreBackupEmpty": "Backup restored — it contained no records",
+  "@restoreBackupEmpty": {
+    "description": "Success SnackBar when the restored backup parsed correctly but held zero records (#2571)."
+  },
+  "restoreBackupCorrupt": "Restore failed — this file is not a valid Tankstellen backup",
+  "@restoreBackupCorrupt": {
+    "description": "Error SnackBar when the chosen file is not a readable backup zip, is malformed XML, or has an unsupported schema version (#2571)."
+  },
+  "restoreBackupFailed": "Restore failed — the file could not be read",
+  "@restoreBackupFailed": {
+    "description": "Generic error SnackBar when the restore flow throws an unexpected error or the file could not be read (#2571)."
+  },
   "brokenMapChipVerifying": "MAP sensor verifying…",
   "@brokenMapChipVerifying": {
     "description": "Diagnostic-overlay chip shown while the broken-MAP belief is in the 0.4–0.7 confidence band — the app is still gathering observations and not yet ready to warn the user (#1423 phase 5)."

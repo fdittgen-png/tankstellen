@@ -3297,5 +3297,55 @@
   "@obd2GpsDegradedBannerTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "restoreBackupTooltip": "Restore backup",
+  "@restoreBackupTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupDialogTitle": "Restore backup",
+  "@restoreBackupDialogTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupDialogBody": "Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.",
+  "@restoreBackupDialogBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupMergeAction": "Merge",
+  "@restoreBackupMergeAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupReplaceAction": "Replace all",
+  "@restoreBackupReplaceAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupSuccess": "Backup restored — {count} records imported",
+  "@restoreBackupSuccess": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreBackupEmpty": "Backup restored — it contained no records",
+  "@restoreBackupEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupCorrupt": "Restore failed — this file is not a valid Tankstellen backup",
+  "@restoreBackupCorrupt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupFailed": "Restore failed — the file could not be read",
+  "@restoreBackupFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

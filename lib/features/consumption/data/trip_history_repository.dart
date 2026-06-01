@@ -357,6 +357,13 @@ class TripHistoryRepository {
     await _box.delete(id);
   }
 
+  /// Wipe every persisted trip (#2571). Used by the full-backup RESTORE
+  /// flow in [BackupImportMode.replace] before the backup's trips are
+  /// written back. A no-op-equivalent when the box is already empty.
+  Future<void> clearAll() async {
+    await _box.clear();
+  }
+
   Future<void> _trim() async {
     if (_box.length <= cap) return;
     final entries = loadAll(); // newest-first

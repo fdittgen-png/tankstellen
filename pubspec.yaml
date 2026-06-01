@@ -105,6 +105,13 @@ dependencies:
   wakelock_plus: ^1.2.8
   app_badge_plus: ^1.2.10
   archive: ^4.0.9
+  # User-driven .zip picker for the full-backup RESTORE flow (#2571).
+  # file_selector over file_picker: no runtime storage permission on
+  # Android (it routes through the Storage Access Framework document
+  # picker) and a smaller plugin surface; the platform implementations
+  # are already in the lock as transitive deps of the image/scanner
+  # stack, so this only promotes the umbrella package to a direct dep.
+  file_selector: ^1.0.3
 
   # On-device ML inference (#1117 phase 2 — price prediction).
   # Phase 2 ships only the inference plumbing + interpreter seam; a real

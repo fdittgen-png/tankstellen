@@ -6810,6 +6810,60 @@ abstract class AppLocalizations {
   /// **'Backup export failed — please try again'**
   String get exportBackupFailed;
 
+  /// AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get restoreBackupTooltip;
+
+  /// Title of the merge-vs-replace confirmation dialog shown after a backup .zip is picked (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get restoreBackupDialogTitle;
+
+  /// Body of the restore confirmation dialog explaining the difference between Merge and Replace, with a data-loss warning on Replace (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.'**
+  String get restoreBackupDialogBody;
+
+  /// Primary (safe) action button in the restore dialog: add/update by id, keep existing data (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get restoreBackupMergeAction;
+
+  /// Destructive action button in the restore dialog: wipe all current data then restore only the backup (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Replace all'**
+  String get restoreBackupReplaceAction;
+
+  /// Success SnackBar after a restore completes with at least one record (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored — {count} records imported'**
+  String restoreBackupSuccess(int count);
+
+  /// Success SnackBar when the restored backup parsed correctly but held zero records (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored — it contained no records'**
+  String get restoreBackupEmpty;
+
+  /// Error SnackBar when the chosen file is not a readable backup zip, is malformed XML, or has an unsupported schema version (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed — this file is not a valid Tankstellen backup'**
+  String get restoreBackupCorrupt;
+
+  /// Generic error SnackBar when the restore flow throws an unexpected error or the file could not be read (#2571).
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed — the file could not be read'**
+  String get restoreBackupFailed;
+
   /// Diagnostic-overlay chip shown while the broken-MAP belief is in the 0.4–0.7 confidence band — the app is still gathering observations and not yet ready to warn the user (#1423 phase 5).
   ///
   /// In en, this message translates to:

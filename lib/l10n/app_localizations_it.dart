@@ -3732,6 +3732,38 @@ class AppLocalizationsIt extends AppLocalizations {
   String get exportBackupFailed => 'Esportazione backup non riuscita — riprova';
 
   @override
+  String get restoreBackupTooltip => 'Restore backup';
+
+  @override
+  String get restoreBackupDialogTitle => 'Restore backup';
+
+  @override
+  String get restoreBackupDialogBody =>
+      'Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.';
+
+  @override
+  String get restoreBackupMergeAction => 'Merge';
+
+  @override
+  String get restoreBackupReplaceAction => 'Replace all';
+
+  @override
+  String restoreBackupSuccess(int count) {
+    return 'Backup restored — $count records imported';
+  }
+
+  @override
+  String get restoreBackupEmpty => 'Backup restored — it contained no records';
+
+  @override
+  String get restoreBackupCorrupt =>
+      'Restore failed — this file is not a valid Tankstellen backup';
+
+  @override
+  String get restoreBackupFailed =>
+      'Restore failed — the file could not be read';
+
+  @override
   String get brokenMapChipVerifying => 'Verifica sensore MAP…';
 
   @override

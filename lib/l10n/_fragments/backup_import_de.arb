@@ -1,0 +1,11 @@
+{
+  "restoreBackupTooltip": "Sicherung wiederherstellen",
+  "restoreBackupDialogTitle": "Sicherung wiederherstellen",
+  "restoreBackupDialogBody": "Zusammenführen fügt Datensätze aus der Sicherung hinzu und aktualisiert sie, während alles auf diesem Gerät erhalten bleibt. Ersetzen löscht zuerst alle aktuellen Daten und stellt dann nur die Sicherung wieder her – das kann nicht rückgängig gemacht werden.",
+  "restoreBackupMergeAction": "Zusammenführen",
+  "restoreBackupReplaceAction": "Alles ersetzen",
+  "restoreBackupSuccess": "Sicherung wiederhergestellt – {count} Datensätze importiert",
+  "restoreBackupEmpty": "Sicherung wiederhergestellt – sie enthielt keine Datensätze",
+  "restoreBackupCorrupt": "Wiederherstellung fehlgeschlagen – diese Datei ist keine gültige Tankstellen-Sicherung",
+  "restoreBackupFailed": "Wiederherstellung fehlgeschlagen – die Datei konnte nicht gelesen werden"
+}
