@@ -668,6 +668,21 @@ class AppLocalizationsCs extends AppLocalizations {
       'Automaticky přepnout profil při překročení hranic';
 
   @override
+  String profileSwitchedTo(String profile) {
+    return 'Switched to $profile';
+  }
+
+  @override
+  String profileCreatedNamed(String name) {
+    return 'Profile $name created';
+  }
+
+  @override
+  String profileCountryTaken(String country) {
+    return 'A profile for $country already exists — edit it instead.';
+  }
+
+  @override
   String get switchProfile => 'Přepnout';
 
   @override

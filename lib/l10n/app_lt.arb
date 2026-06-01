@@ -3362,5 +3362,35 @@
         "type": "String"
       }
     }
+  },
+  "profileSwitchedTo": "Switched to {profile}",
+  "@profileSwitchedTo": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCreatedNamed": "Profile {name} created",
+  "@profileCreatedNamed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCountryTaken": "A profile for {country} already exists — edit it instead.",
+  "@profileCountryTaken": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
   }
 }

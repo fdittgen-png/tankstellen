@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/data/repositories/profile_repository.dart';
@@ -357,8 +358,11 @@ void main() {
       final source = readSource();
       // The createProfile call must thread country.code and language.code,
       // not raw values pulled from the profile being edited or hardcoded.
+      // #2597 — the country is suppressed when already taken
+      // (`countryTaken ? null : country.code`) to hold the one-per-country
+      // invariant, so assert the free-country branch threads `country.code`.
       expect(source, contains('repo.createProfile('));
-      expect(source, contains('countryCode: country.code'));
+      expect(source, contains('country.code'));
       expect(source, contains('languageCode: language.code'));
     });
 
@@ -388,5 +392,105 @@ void main() {
       expect(source,
           contains('tooltip: AppLocalizations.of(context)?.editProfile'));
     });
+  });
+
+  // #2596 — reactivity + status feedback. These run against the REAL
+  // ActiveProfile / allProfiles / profileRepository providers wired to a
+  // stateful FakeStorageRepository, so a mutation must actually flow back
+  // to the list (mocked-repo tests above can't observe the rebuild).
+  group('ProfileListSection reactivity (#2596)', () {
+    Future<void> pumpWithFakeStorage(
+      WidgetTester tester, {
+      required List<UserProfile> seed,
+      String? activeId,
+      CountryConfig activeCountry = Countries.germany,
+    }) async {
+      final std = standardFakeTestOverrides(country: activeCountry);
+      for (final p in seed) {
+        await std.fakeStorage.saveProfile(p.id, p.toJson());
+      }
+      if (activeId != null) {
+        await std.fakeStorage.setActiveProfileId(activeId);
+      }
+      await pumpApp(
+        tester,
+        const ProfileListSection(),
+        overrides: [
+          ...std.overrides,
+          activeLanguageProvider
+              .overrideWith(() => _FixedActiveLanguage(AppLanguages.all.first)),
+        ],
+      );
+    }
+
+    const fr = UserProfile(
+      id: 'profile-fr',
+      name: 'France',
+      preferredFuelType: FuelType.diesel,
+      defaultSearchRadius: 12.0,
+      landingScreen: LandingScreen.map,
+      countryCode: 'FR',
+    );
+
+    testWidgets(
+      'tapping Activate flips the highlighted card + the Activate buttons '
+      'and shows a confirmation SnackBar',
+      (tester) async {
+        await pumpWithFakeStorage(
+          tester,
+          seed: const [_activeProfile, fr],
+          activeId: _activeProfile.id,
+        );
+
+        // Initially "Home" (DE) is active → only "France" offers Activate.
+        expect(find.text('Activate'), findsOneWidget);
+
+        await tester.tap(find.text('Activate'));
+        await tester.pumpAndSettle();
+
+        // The active card flipped to France → now "Home" offers Activate.
+        expect(find.text('Activate'), findsOneWidget);
+        // Confirmation SnackBar names the newly-activated profile.
+        expect(find.text('Switched to France'), findsOneWidget);
+
+        // Active highlight moved to the France card: exactly one filled
+        // person icon and it belongs to France's tile.
+        expect(find.byIcon(Icons.person), findsOneWidget);
+        final cards = tester.widgetList<Card>(find.byType(Card)).toList();
+        final ctx = tester.element(find.text('France'));
+        final theme = Theme.of(ctx);
+        // France is the second seeded profile → second card highlighted.
+        expect(cards[1].color, theme.colorScheme.primaryContainer);
+        expect(cards[0].color, isNull);
+      },
+    );
+
+    testWidgets(
+      'creating a profile makes the new card appear immediately + shows a '
+      'created SnackBar',
+      (tester) async {
+        // Seed an active FR profile so the active DE country is free.
+        await pumpWithFakeStorage(
+          tester,
+          seed: const [fr],
+          activeId: fr.id,
+          activeCountry: Countries.germany,
+        );
+
+        expect(find.byType(Card), findsOneWidget); // Only France so far.
+
+        await tester.tap(find.widgetWithText(OutlinedButton, 'New profile'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField), 'Weekend');
+        await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+        await tester.pumpAndSettle();
+
+        // The new profile card is now rendered (was the stale bug).
+        expect(find.text('Weekend'), findsOneWidget);
+        expect(find.byType(Card), findsNWidgets(2));
+        // Created-confirmation SnackBar.
+        expect(find.text('Profile Weekend created'), findsOneWidget);
+      },
+    );
   });
 }

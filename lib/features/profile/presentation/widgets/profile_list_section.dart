@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../core/country/country_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_provider.dart';
@@ -52,11 +53,7 @@ class ProfileListSection extends ConsumerWidget {
                 children: [
                   if (!isActive)
                     TextButton(
-                      onPressed: () {
-                        ref
-                            .read(activeProfileProvider.notifier)
-                            .switchProfile(profile.id);
-                      },
+                      onPressed: () => _activateProfile(context, ref, profile),
                       child: Text(AppLocalizations.of(context)?.activate ?? 'Activate'),
                     ),
                   IconButton(
@@ -81,6 +78,25 @@ class ProfileListSection extends ConsumerWidget {
     );
   }
 
+  /// #2596 — activating a profile must immediately re-highlight the active
+  /// card and flip every "Activate" button. `switchProfile` mutates the
+  /// `ActiveProfile` notifier, but `allProfilesProvider` only recomputes
+  /// once that mutation has completed, so we await it, then refresh the
+  /// active provider and invalidate the list before surfacing feedback.
+  Future<void> _activateProfile(
+      BuildContext context, WidgetRef ref, UserProfile profile) async {
+    await ref.read(activeProfileProvider.notifier).switchProfile(profile.id);
+    ref.read(activeProfileProvider.notifier).refresh();
+    ref.invalidate(allProfilesProvider);
+    if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context);
+    SnackBarHelper.showSuccess(
+      context,
+      l10n?.profileSwitchedTo(profile.name) ??
+          'Switched to ${profile.name}',
+    );
+  }
+
   Future<void> _createProfile(BuildContext context, WidgetRef ref) async {
     final name = await _showNameDialog(
       context,
@@ -92,12 +108,29 @@ class ProfileListSection extends ConsumerWidget {
     final country = ref.read(activeCountryProvider);
     final language = ref.read(activeLanguageProvider);
     final repo = ref.read(profileRepositoryProvider);
+    // #2597 — one profile per country. A new profile defaults to the active
+    // country, but if another profile already owns it we create the profile
+    // WITHOUT a country (rather than blocking the whole flow); the user then
+    // assigns a still-free country in the editor. This preserves the
+    // invariant the border-cross auto-switch relies on.
+    final countryTaken = repo.isCountryTaken(country.code);
     await repo.createProfile(
       name: name,
-      countryCode: country.code,
+      countryCode: countryTaken ? null : country.code,
       languageCode: language.code,
     );
+    // #2596 — `refresh()` alone only re-reads the *active* profile, which
+    // does not change when a non-first profile is added, so the new card
+    // never appeared. Invalidate the list provider so the new profile
+    // shows immediately, then confirm with a SnackBar.
     ref.read(activeProfileProvider.notifier).refresh();
+    ref.invalidate(allProfilesProvider);
+    if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context);
+    SnackBarHelper.showSuccess(
+      context,
+      l10n?.profileCreatedNamed(name) ?? 'Profile $name created',
+    );
   }
 
   Future<void> _editProfile(
@@ -115,6 +148,10 @@ class ProfileListSection extends ConsumerWidget {
           await ref
               .read(activeProfileProvider.notifier)
               .updateProfile(updated);
+          // #2596 — refresh the active provider too so an edit to the
+          // active profile's own fields (name, country) re-renders the
+          // highlighted card, not just the list.
+          ref.read(activeProfileProvider.notifier).refresh();
           ref.invalidate(allProfilesProvider);
         },
         // Default profile (last remaining) cannot be deleted
@@ -122,6 +159,7 @@ class ProfileListSection extends ConsumerWidget {
           final repo = ref.read(profileRepositoryProvider);
           await repo.deleteProfile(profile.id);
           ref.read(activeProfileProvider.notifier).refresh();
+          ref.invalidate(allProfilesProvider);
         } : null,
       ),
     );
@@ -154,7 +192,13 @@ class ProfileListSection extends ConsumerWidget {
         ],
       ),
     );
-    controller.dispose();
+    // Defer disposal to after the current frame: the dialog's dismiss
+    // transition still reads the controller while animating out, so a
+    // synchronous dispose here tears it down mid-frame (a
+    // "TextEditingController used after disposed" assertion under the test
+    // framework's pump-driven teardown). The post-frame hop lets the route
+    // finish closing before we release it.
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
     return result;
   }
 }

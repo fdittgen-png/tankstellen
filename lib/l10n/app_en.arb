@@ -299,6 +299,33 @@
   },
   "autoSwitchProfile": "Auto-switch profile",
   "autoSwitchDescription": "Automatically switch profile when crossing borders",
+  "profileSwitchedTo": "Switched to {profile}",
+  "@profileSwitchedTo": {
+    "description": "SnackBar confirming the active profile changed after tapping Activate in the profile list.",
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCreatedNamed": "Profile {name} created",
+  "@profileCreatedNamed": {
+    "description": "SnackBar confirming a new profile was created from the profile list.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profileCountryTaken": "A profile for {country} already exists — edit it instead.",
+  "@profileCountryTaken": {
+    "description": "Blocks selecting a country in the profile editor when another profile already uses it (one profile per country).",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "switchProfile": "Switch",
   "dismiss": "Dismiss",
   "profileCountry": "Country",

@@ -1365,6 +1365,24 @@ abstract class AppLocalizations {
   /// **'Automatically switch profile when crossing borders'**
   String get autoSwitchDescription;
 
+  /// SnackBar confirming the active profile changed after tapping Activate in the profile list.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched to {profile}'**
+  String profileSwitchedTo(String profile);
+
+  /// SnackBar confirming a new profile was created from the profile list.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile {name} created'**
+  String profileCreatedNamed(String name);
+
+  /// Blocks selecting a country in the profile editor when another profile already uses it (one profile per country).
+  ///
+  /// In en, this message translates to:
+  /// **'A profile for {country} already exists — edit it instead.'**
+  String profileCountryTaken(String country);
+
   /// No description provided for @switchProfile.
   ///
   /// In en, this message translates to:
