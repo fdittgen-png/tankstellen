@@ -276,6 +276,28 @@ class Obd2ConnectionService {
     return connect(match);
   }
 
+  /// Direct-connect-by-MAC, NO scan (#2242). See [_connectByMacDirect] for the
+  /// full contract. A thin INSTANCE method (not an `extension`) so test fakes
+  /// can `@override` it — the body lives in the `part` file to keep this file
+  /// under the #1680 cap (#2190).
+  Future<Obd2Service?> connectByMacDirect(
+    String mac, {
+    Duration timeout = const Duration(seconds: 4),
+    bool fallbackToScan = true,
+  }) =>
+      _connectByMacDirect(this, mac,
+          timeout: timeout, fallbackToScan: fallbackToScan);
+
+  /// Direct-connect-by-MAC over Bluetooth **CLASSIC** SPP, NO scan (#2565).
+  /// See [_connectByMacClassicDirect]. Thin overridable instance method.
+  Future<Obd2Service?> connectByMacClassicDirect(String mac) =>
+      _connectByMacClassicDirect(this, mac);
+
+  /// Passive autoConnect reconnect (#2261 concern 2). See
+  /// [_connectByMacPassive]. Thin overridable instance method.
+  Future<Obd2Service?> connectByMacPassive(String mac) =>
+      _connectByMacPassive(this, mac);
+
   Future<void> _teardownLastDirectChannel() async {
     final prior = _lastDirectChannel;
     _lastDirectChannel = null;
