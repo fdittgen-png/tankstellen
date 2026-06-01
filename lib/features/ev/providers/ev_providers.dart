@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../search/providers/ev_search_provider.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart' show ConnectorType;
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/repositories/ev_station_repository.dart';
@@ -220,6 +221,15 @@ Future<List<ChargingStation>> evStations(
     // Fall back to whatever we have cached if the service fails.
     stations = repo.getAll();
   }
+
+  // Layer on any country-authoritative price/access signal so map markers
+  // — and the station handed to EVStationDetailScreen on tap — carry the
+  // free/paid badge (#2632). The enricher is a no-op for result sets with
+  // no FR stations (free off-France) and never throws, degrading to the
+  // un-enriched list. Riverpod caches this future, so the enriched list is
+  // a stable instance across rebuilds — the map overlay's `identical`
+  // marker memoisation still holds.
+  stations = await ref.watch(evPriceEnricherProvider).enrich(stations);
 
   return stations.where(filter.matches).toList();
 }
