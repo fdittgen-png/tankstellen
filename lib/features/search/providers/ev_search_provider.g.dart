@@ -8,6 +8,62 @@ part of 'ev_search_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// The EV price/access enricher applied after the OCM search returns
+/// (#2618). Defaults to the France IRVE enricher, which is itself a
+/// no-op for any result set with no FR stations — so non-FR searches
+/// make zero extra network calls. Overridable in tests.
+
+@ProviderFor(evPriceEnricher)
+final evPriceEnricherProvider = EvPriceEnricherProvider._();
+
+/// The EV price/access enricher applied after the OCM search returns
+/// (#2618). Defaults to the France IRVE enricher, which is itself a
+/// no-op for any result set with no FR stations — so non-FR searches
+/// make zero extra network calls. Overridable in tests.
+
+final class EvPriceEnricherProvider
+    extends
+        $FunctionalProvider<EvPriceEnricher, EvPriceEnricher, EvPriceEnricher>
+    with $Provider<EvPriceEnricher> {
+  /// The EV price/access enricher applied after the OCM search returns
+  /// (#2618). Defaults to the France IRVE enricher, which is itself a
+  /// no-op for any result set with no FR stations — so non-FR searches
+  /// make zero extra network calls. Overridable in tests.
+  EvPriceEnricherProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'evPriceEnricherProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$evPriceEnricherHash();
+
+  @$internal
+  @override
+  $ProviderElement<EvPriceEnricher> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  EvPriceEnricher create(Ref ref) {
+    return evPriceEnricher(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(EvPriceEnricher value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<EvPriceEnricher>(value),
+    );
+  }
+}
+
+String _$evPriceEnricherHash() => r'2da95b963489e3094a783a14f1eb40f6ebed396d';
+
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
 ///
 /// Uses `keepAlive` because SearchState dispatches to this notifier
@@ -65,7 +121,7 @@ final class EVSearchStateProvider
   }
 }
 
-String _$eVSearchStateHash() => r'173762539fdc8835ac3621044e7be22fa6870e95';
+String _$eVSearchStateHash() => r'cf50b050b303acd2ba9709c6a384721f6818b583';
 
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
 ///

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/ev_access_cost.dart';
 import 'package:tankstellen/features/search/data/services/ev_charging_service.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
@@ -260,6 +261,90 @@ void main() {
 
         expect(operational.isOperational, true);
         expect(notOperational.isOperational, false);
+      });
+    });
+
+    group('UsageType access-cost extraction (#2618)', () {
+      Map<String, dynamic> ocmItem({Map<String, dynamic>? usageType}) {
+        final item = <String, dynamic>{
+          'ID': 42,
+          'AddressInfo': {
+            'Title': 'Test Hub',
+            'Latitude': 48.85,
+            'Longitude': 2.35,
+            'AddressLine1': '1 Rue de Test',
+            'Town': 'Paris',
+            'Postcode': '75001',
+            'Country': {'ISOCode': 'FR'},
+          },
+          'Connections': const <dynamic>[],
+          'NumberOfPoints': 2,
+          'UsageCost': '0.45 EUR/kWh',
+        };
+        if (usageType != null) item['UsageType'] = usageType;
+        return item;
+      }
+
+      Future<ChargingStation> parseSingle(Map<String, dynamic> item) async {
+        final dio = MockDio();
+        when(() => dio.get(
+              any(),
+              queryParameters: any(named: 'queryParameters'),
+              cancelToken: any(named: 'cancelToken'),
+            )).thenAnswer((_) async => Response<dynamic>(
+              requestOptions: RequestOptions(path: '/poi/'),
+              statusCode: 200,
+              data: <dynamic>[item],
+            ));
+        final service = EVChargingService(apiKey: 'k', dio: dio);
+        final result = await service.searchStations(
+          lat: 48.85,
+          lng: 2.35,
+          radiusKm: 5,
+        );
+        expect(result.data, hasLength(1));
+        return result.data.single;
+      }
+
+      test('item WITH a UsageType block populates the 4 fields', () async {
+        final station = await parseSingle(ocmItem(usageType: const {
+          'ID': 4,
+          'Title': 'Public - Pay At Location',
+          'IsPayAtLocation': true,
+          'IsMembershipRequired': false,
+        }));
+
+        expect(station.usageTypeId, 4);
+        expect(station.usageTypeTitle, 'Public - Pay At Location');
+        expect(station.isPayAtLocation, isTrue);
+        expect(station.isMembershipRequired, isFalse);
+        // usageCost stays the raw indicative text, untouched.
+        expect(station.usageCost, '0.45 EUR/kWh');
+        // Derived signal.
+        expect(station.accessCost.kind, EvAccessCostKind.paid);
+      });
+
+      test('item WITHOUT a UsageType yields all-null, no crash', () async {
+        final station = await parseSingle(ocmItem());
+
+        expect(station.usageTypeId, isNull);
+        expect(station.usageTypeTitle, isNull);
+        expect(station.isPayAtLocation, isNull);
+        expect(station.isMembershipRequired, isNull);
+        expect(station.isFranceIrveEnriched, isFalse);
+        expect(station.usageCost, '0.45 EUR/kWh');
+      });
+
+      test('a free UsageType resolves to a free access badge', () async {
+        final station = await parseSingle(ocmItem(usageType: const {
+          'ID': 1,
+          'Title': 'Public - Free',
+          'IsPayAtLocation': false,
+          'IsMembershipRequired': false,
+        })
+          ..['UsageCost'] = null);
+
+        expect(station.accessCost.kind, EvAccessCostKind.free);
       });
     });
 

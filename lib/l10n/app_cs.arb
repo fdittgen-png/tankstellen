@@ -3392,5 +3392,35 @@
         "type": "String"
       }
     }
+  },
+  "evPriceFree": "Free",
+  "@evPriceFree": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "evPricePayAtLocation": "Pay at location",
+  "@evPricePayAtLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "evPriceMembership": "Membership required",
+  "@evPriceMembership": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "evPriceIndicative": "Indicative price",
+  "@evPriceIndicative": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "evPriceDeclaredByOperator": "Indicative price declared by the operator — verify on site",
+  "@evPriceDeclaredByOperator": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "evPriceFranceAttribution": "Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "@evPriceFranceAttribution": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

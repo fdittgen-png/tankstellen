@@ -3,9 +3,11 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_station.dart';
+import '../../../ev/domain/entities/ev_access_cost.dart';
 import 'ev_connector_tile.dart';
 
 /// Address card for an EV charging station.
@@ -103,14 +105,68 @@ class EVPricingCard extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    if (station.usageCost != null && station.usageCost!.isNotEmpty) {
+    final cost = station.accessCost;
+    final usageCost = station.usageCost?.trim() ?? '';
+    final hasUsageCost = usageCost.isNotEmpty;
+
+    // Honest-UX (#2618): the structured free/paid/membership chip is the
+    // only confirmed signal — it gets the leading badge. The raw scraped
+    // `usageCost` text is rendered NEUTRALLY (never as a bold colored
+    // price) and always carries the operator-declared disclaimer so it
+    // can never masquerade as a verified comparison price.
+    if (cost.isKnown || hasUsageCost) {
       return Card(
-        child: ListTile(
-          leading: Icon(Icons.payments, color: evColor),
-          title: Text(l10n?.evUsageCost ?? 'Usage cost'),
-          subtitle: Text(
-            station.usageCost!,
-            style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: evColor),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.payments, color: evColor, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n?.evUsageCost ?? 'Usage cost',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              if (cost.isKnown) ...[
+                const SizedBox(height: 12),
+                _EvPriceBadge(kind: cost.kind),
+              ],
+              if (hasUsageCost) ...[
+                const SizedBox(height: 12),
+                Text(
+                  usageCost,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n?.evPriceDeclaredByOperator ??
+                      'Indicative price declared by the operator '
+                          '— verify on site',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+              if (station.isFranceIrveEnriched) ...[
+                const SizedBox(height: 8),
+                Text(
+                  l10n?.evPriceFranceAttribution ??
+                      'Pricing: Base nationale des IRVE '
+                          '— Licence Ouverte / data.gouv.fr / ODRÉ',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       );
@@ -122,8 +178,72 @@ class EVPricingCard extends StatelessWidget {
         title: Text(l10n?.evUsageCost ?? 'Usage cost'),
         subtitle: Text(
           l10n?.evPricingUnavailable ?? 'Pricing not available from provider',
-          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodySmall
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
+      ),
+    );
+  }
+}
+
+/// Confirmed free/paid/membership access chip for an EV station (#2618).
+///
+/// The ONLY place the bold, colour-coded price style is used — the raw
+/// scraped `usageCost` text never gets this treatment (honest-UX).
+class _EvPriceBadge extends StatelessWidget {
+  final EvAccessCostKind kind;
+
+  const _EvPriceBadge({required this.kind});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+
+    final (IconData icon, String label, Color fg, Color bg) = switch (kind) {
+      EvAccessCostKind.free => (
+          Icons.money_off,
+          l10n?.evPriceFree ?? 'Free',
+          // Eco / green — reuse the tertiary "positive" surface.
+          scheme.onTertiaryContainer,
+          scheme.tertiaryContainer,
+        ),
+      EvAccessCostKind.paid => (
+          Icons.payments,
+          l10n?.evPricePayAtLocation ?? 'Pay at location',
+          scheme.onErrorContainer,
+          scheme.errorContainer,
+        ),
+      EvAccessCostKind.membership => (
+          Icons.card_membership,
+          l10n?.evPriceMembership ?? 'Membership required',
+          scheme.onSecondaryContainer,
+          scheme.secondaryContainer,
+        ),
+      // Never rendered — the caller gates on `cost.isKnown`.
+      EvAccessCostKind.unknown => (
+          Icons.help_outline,
+          '',
+          scheme.onSurfaceVariant,
+          scheme.surfaceContainerHighest,
+        ),
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: bg, borderRadius: AppRadius.sm),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: fg),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: theme.textTheme.labelLarge
+                ?.copyWith(color: fg, fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }

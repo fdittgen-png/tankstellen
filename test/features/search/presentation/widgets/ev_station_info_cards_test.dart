@@ -161,8 +161,60 @@ void main() {
   });
 
   group('EVPricingCard', () {
-    testWidgets('renders usage cost when present', (tester) async {
-      final station = baseStation.copyWith(usageCost: '0.45 €/kWh');
+    testWidgets('free access → "Free" chip with money-off icon',
+        (tester) async {
+      final station = baseStation.copyWith(
+        usageTypeId: 1,
+        usageTypeTitle: 'Public - Free',
+        isPayAtLocation: false,
+        isMembershipRequired: false,
+      );
+
+      await pumpApp(
+        tester,
+        EVPricingCard(station: station, evColor: Colors.green),
+      );
+
+      expect(find.text('Free'), findsOneWidget);
+      expect(find.byIcon(Icons.money_off), findsOneWidget);
+    });
+
+    testWidgets('paid access → "Pay at location" chip', (tester) async {
+      final station = baseStation.copyWith(
+        usageTypeId: 4,
+        usageTypeTitle: 'Public - Pay At Location',
+        isPayAtLocation: true,
+      );
+
+      await pumpApp(
+        tester,
+        EVPricingCard(station: station, evColor: Colors.green),
+      );
+
+      expect(find.text('Pay at location'), findsOneWidget);
+    });
+
+    testWidgets('membership access → "Membership required" chip',
+        (tester) async {
+      final station = baseStation.copyWith(
+        usageTypeId: 5,
+        usageTypeTitle: 'Public - Membership Required',
+        isMembershipRequired: true,
+      );
+
+      await pumpApp(
+        tester,
+        EVPricingCard(station: station, evColor: Colors.green),
+      );
+
+      expect(find.text('Membership required'), findsOneWidget);
+      expect(find.byIcon(Icons.card_membership), findsOneWidget);
+    });
+
+    testWidgets('raw usageCost text → renders text + indicative disclaimer',
+        (tester) async {
+      // No structured access signal — only the scraped indicative text.
+      final station = baseStation.copyWith(usageCost: 'Ask the operator');
 
       await pumpApp(
         tester,
@@ -170,11 +222,41 @@ void main() {
       );
 
       expect(find.text('Usage cost'), findsOneWidget);
-      expect(find.text('0.45 €/kWh'), findsOneWidget);
-      expect(find.byIcon(Icons.payments), findsOneWidget);
+      expect(find.text('Ask the operator'), findsOneWidget);
+      expect(
+        find.textContaining('declared by the operator'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('renders unavailable fallback when usageCost null',
+    testWidgets('France IRVE attribution shows only when enriched',
+        (tester) async {
+      final enriched = baseStation.copyWith(
+        usageCost: '0.42 EUR/kWh',
+        isPayAtLocation: true,
+        isFranceIrveEnriched: true,
+      );
+
+      await pumpApp(
+        tester,
+        EVPricingCard(station: enriched, evColor: Colors.green),
+      );
+
+      expect(find.textContaining('Base nationale des IRVE'), findsOneWidget);
+
+      // A non-enriched station with the same data must NOT show it.
+      final plain = baseStation.copyWith(
+        usageCost: '0.42 EUR/kWh',
+        isPayAtLocation: true,
+      );
+      await pumpApp(
+        tester,
+        EVPricingCard(station: plain, evColor: Colors.green),
+      );
+      expect(find.textContaining('Base nationale des IRVE'), findsNothing);
+    });
+
+    testWidgets('unknown access + empty usageCost → unavailable fallback',
         (tester) async {
       await pumpApp(
         tester,
@@ -188,7 +270,7 @@ void main() {
       );
     });
 
-    testWidgets('renders unavailable fallback when usageCost empty',
+    testWidgets('unknown access + empty-string usageCost → fallback',
         (tester) async {
       final station = baseStation.copyWith(usageCost: '');
 

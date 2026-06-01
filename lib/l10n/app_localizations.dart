@@ -1593,6 +1593,42 @@ abstract class AppLocalizations {
   /// **'Pricing not available from provider'**
   String get evPricingUnavailable;
 
+  /// Access-cost badge on an EV station: charging is free of charge (no payment, no membership). Derived from the OpenChargeMap UsageType signal (#2618).
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get evPriceFree;
+
+  /// Access-cost badge on an EV station: a tariff is paid on site (pay-as-you-go). Derived from the OpenChargeMap UsageType signal (#2618).
+  ///
+  /// In en, this message translates to:
+  /// **'Pay at location'**
+  String get evPricePayAtLocation;
+
+  /// Access-cost badge on an EV station: a network membership / RFID card is required to charge. Derived from the OpenChargeMap UsageType signal (#2618).
+  ///
+  /// In en, this message translates to:
+  /// **'Membership required'**
+  String get evPriceMembership;
+
+  /// Label preceding the operator-declared, unverified indicative price text on an EV station (never a confirmed comparison price) (#2618).
+  ///
+  /// In en, this message translates to:
+  /// **'Indicative price'**
+  String get evPriceIndicative;
+
+  /// Honest-UX disclaimer shown under the raw operator-declared EV price text: the figure is indicative only and must be checked on site (#2618).
+  ///
+  /// In en, this message translates to:
+  /// **'Indicative price declared by the operator — verify on site'**
+  String get evPriceDeclaredByOperator;
+
+  /// Data attribution shown only on French EV stations enriched from the IRVE open dataset (Etalab / data.gouv.fr / ODRÉ) (#2618). Brand/source names are proper nouns.
+  ///
+  /// In en, this message translates to:
+  /// **'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ'**
+  String get evPriceFranceAttribution;
+
   /// No description provided for @evLastUpdated.
   ///
   /// In en, this message translates to:

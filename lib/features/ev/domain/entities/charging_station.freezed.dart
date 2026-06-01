@@ -325,7 +325,17 @@ mixin _$ChargingStation {
 // Kept optional / defaulted so existing EV callers don't have to
 // pass them.
 // ------------------------------------------------------------------
- double get dist; String? get postCode; String? get place; int get totalPoints; bool? get isOperational; String? get usageCost; String? get updatedAt; String? get countryCode;
+ double get dist; String? get postCode; String? get place; int get totalPoints; bool? get isOperational; String? get usageCost; String? get updatedAt; String? get countryCode;// ------------------------------------------------------------------
+// OCM `UsageType` access-cost signal (#2618). All optional / null by
+// default so existing callers + the legacy `fromJson` /
+// `_normalizeChargingStationJson` path are untouched. Classified into
+// a free/paid/membership badge via [accessCost] —
+// [EvAccessCost.from] is the single source of truth.
+// ------------------------------------------------------------------
+ int? get usageTypeId; String? get usageTypeTitle; bool? get isPayAtLocation; bool? get isMembershipRequired;/// True when [usageCost] / the access flags were enriched from a
+/// country-authoritative source (France IRVE, #2618) rather than the
+/// raw OCM record — gates the IRVE attribution line in the UI.
+ bool get isFranceIrveEnriched;
 /// Create a copy of ChargingStation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -338,16 +348,16 @@ $ChargingStationCopyWith<ChargingStation> get copyWith => _$ChargingStationCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChargingStation&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.operator, operator) || other.operator == operator)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other.connectors, connectors)&&const DeepCollectionEquality().equals(other.amenities, amenities)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.totalPoints, totalPoints) || other.totalPoints == totalPoints)&&(identical(other.isOperational, isOperational) || other.isOperational == isOperational)&&(identical(other.usageCost, usageCost) || other.usageCost == usageCost)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChargingStation&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.operator, operator) || other.operator == operator)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other.connectors, connectors)&&const DeepCollectionEquality().equals(other.amenities, amenities)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.totalPoints, totalPoints) || other.totalPoints == totalPoints)&&(identical(other.isOperational, isOperational) || other.isOperational == isOperational)&&(identical(other.usageCost, usageCost) || other.usageCost == usageCost)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode)&&(identical(other.usageTypeId, usageTypeId) || other.usageTypeId == usageTypeId)&&(identical(other.usageTypeTitle, usageTypeTitle) || other.usageTypeTitle == usageTypeTitle)&&(identical(other.isPayAtLocation, isPayAtLocation) || other.isPayAtLocation == isPayAtLocation)&&(identical(other.isMembershipRequired, isMembershipRequired) || other.isMembershipRequired == isMembershipRequired)&&(identical(other.isFranceIrveEnriched, isFranceIrveEnriched) || other.isFranceIrveEnriched == isFranceIrveEnriched));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,operator,latitude,longitude,address,const DeepCollectionEquality().hash(connectors),const DeepCollectionEquality().hash(amenities),openingHours,lastUpdate,dist,postCode,place,totalPoints,isOperational,usageCost,updatedAt,countryCode);
+int get hashCode => Object.hashAll([runtimeType,id,name,operator,latitude,longitude,address,const DeepCollectionEquality().hash(connectors),const DeepCollectionEquality().hash(amenities),openingHours,lastUpdate,dist,postCode,place,totalPoints,isOperational,usageCost,updatedAt,countryCode,usageTypeId,usageTypeTitle,isPayAtLocation,isMembershipRequired,isFranceIrveEnriched]);
 
 @override
 String toString() {
-  return 'ChargingStation(id: $id, name: $name, operator: $operator, latitude: $latitude, longitude: $longitude, address: $address, connectors: $connectors, amenities: $amenities, openingHours: $openingHours, lastUpdate: $lastUpdate, dist: $dist, postCode: $postCode, place: $place, totalPoints: $totalPoints, isOperational: $isOperational, usageCost: $usageCost, updatedAt: $updatedAt, countryCode: $countryCode)';
+  return 'ChargingStation(id: $id, name: $name, operator: $operator, latitude: $latitude, longitude: $longitude, address: $address, connectors: $connectors, amenities: $amenities, openingHours: $openingHours, lastUpdate: $lastUpdate, dist: $dist, postCode: $postCode, place: $place, totalPoints: $totalPoints, isOperational: $isOperational, usageCost: $usageCost, updatedAt: $updatedAt, countryCode: $countryCode, usageTypeId: $usageTypeId, usageTypeTitle: $usageTypeTitle, isPayAtLocation: $isPayAtLocation, isMembershipRequired: $isMembershipRequired, isFranceIrveEnriched: $isFranceIrveEnriched)';
 }
 
 
@@ -358,7 +368,7 @@ abstract mixin class $ChargingStationCopyWith<$Res>  {
   factory $ChargingStationCopyWith(ChargingStation value, $Res Function(ChargingStation) _then) = _$ChargingStationCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? operator, double latitude, double longitude, String? address,@EvConnectorListConverter() List<EvConnector> connectors, List<String> amenities,@OpeningHoursNullableConverter() OpeningHours? openingHours, DateTime? lastUpdate, double dist, String? postCode, String? place, int totalPoints, bool? isOperational, String? usageCost, String? updatedAt, String? countryCode
+ String id, String name, String? operator, double latitude, double longitude, String? address,@EvConnectorListConverter() List<EvConnector> connectors, List<String> amenities,@OpeningHoursNullableConverter() OpeningHours? openingHours, DateTime? lastUpdate, double dist, String? postCode, String? place, int totalPoints, bool? isOperational, String? usageCost, String? updatedAt, String? countryCode, int? usageTypeId, String? usageTypeTitle, bool? isPayAtLocation, bool? isMembershipRequired, bool isFranceIrveEnriched
 });
 
 
@@ -375,7 +385,7 @@ class _$ChargingStationCopyWithImpl<$Res>
 
 /// Create a copy of ChargingStation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? operator = freezed,Object? latitude = null,Object? longitude = null,Object? address = freezed,Object? connectors = null,Object? amenities = null,Object? openingHours = freezed,Object? lastUpdate = freezed,Object? dist = null,Object? postCode = freezed,Object? place = freezed,Object? totalPoints = null,Object? isOperational = freezed,Object? usageCost = freezed,Object? updatedAt = freezed,Object? countryCode = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? operator = freezed,Object? latitude = null,Object? longitude = null,Object? address = freezed,Object? connectors = null,Object? amenities = null,Object? openingHours = freezed,Object? lastUpdate = freezed,Object? dist = null,Object? postCode = freezed,Object? place = freezed,Object? totalPoints = null,Object? isOperational = freezed,Object? usageCost = freezed,Object? updatedAt = freezed,Object? countryCode = freezed,Object? usageTypeId = freezed,Object? usageTypeTitle = freezed,Object? isPayAtLocation = freezed,Object? isMembershipRequired = freezed,Object? isFranceIrveEnriched = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -395,7 +405,12 @@ as int,isOperational: freezed == isOperational ? _self.isOperational : isOperati
 as bool?,usageCost: freezed == usageCost ? _self.usageCost : usageCost // ignore: cast_nullable_to_non_nullable
 as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as String?,countryCode: freezed == countryCode ? _self.countryCode : countryCode // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,usageTypeId: freezed == usageTypeId ? _self.usageTypeId : usageTypeId // ignore: cast_nullable_to_non_nullable
+as int?,usageTypeTitle: freezed == usageTypeTitle ? _self.usageTypeTitle : usageTypeTitle // ignore: cast_nullable_to_non_nullable
+as String?,isPayAtLocation: freezed == isPayAtLocation ? _self.isPayAtLocation : isPayAtLocation // ignore: cast_nullable_to_non_nullable
+as bool?,isMembershipRequired: freezed == isMembershipRequired ? _self.isMembershipRequired : isMembershipRequired // ignore: cast_nullable_to_non_nullable
+as bool?,isFranceIrveEnriched: null == isFranceIrveEnriched ? _self.isFranceIrveEnriched : isFranceIrveEnriched // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of ChargingStation
@@ -492,10 +507,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? operator,  double latitude,  double longitude,  String? address, @EvConnectorListConverter()  List<EvConnector> connectors,  List<String> amenities, @OpeningHoursNullableConverter()  OpeningHours? openingHours,  DateTime? lastUpdate,  double dist,  String? postCode,  String? place,  int totalPoints,  bool? isOperational,  String? usageCost,  String? updatedAt,  String? countryCode)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? operator,  double latitude,  double longitude,  String? address, @EvConnectorListConverter()  List<EvConnector> connectors,  List<String> amenities, @OpeningHoursNullableConverter()  OpeningHours? openingHours,  DateTime? lastUpdate,  double dist,  String? postCode,  String? place,  int totalPoints,  bool? isOperational,  String? usageCost,  String? updatedAt,  String? countryCode,  int? usageTypeId,  String? usageTypeTitle,  bool? isPayAtLocation,  bool? isMembershipRequired,  bool isFranceIrveEnriched)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChargingStation() when $default != null:
-return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitude,_that.address,_that.connectors,_that.amenities,_that.openingHours,_that.lastUpdate,_that.dist,_that.postCode,_that.place,_that.totalPoints,_that.isOperational,_that.usageCost,_that.updatedAt,_that.countryCode);case _:
+return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitude,_that.address,_that.connectors,_that.amenities,_that.openingHours,_that.lastUpdate,_that.dist,_that.postCode,_that.place,_that.totalPoints,_that.isOperational,_that.usageCost,_that.updatedAt,_that.countryCode,_that.usageTypeId,_that.usageTypeTitle,_that.isPayAtLocation,_that.isMembershipRequired,_that.isFranceIrveEnriched);case _:
   return orElse();
 
 }
@@ -513,10 +528,10 @@ return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitud
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? operator,  double latitude,  double longitude,  String? address, @EvConnectorListConverter()  List<EvConnector> connectors,  List<String> amenities, @OpeningHoursNullableConverter()  OpeningHours? openingHours,  DateTime? lastUpdate,  double dist,  String? postCode,  String? place,  int totalPoints,  bool? isOperational,  String? usageCost,  String? updatedAt,  String? countryCode)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? operator,  double latitude,  double longitude,  String? address, @EvConnectorListConverter()  List<EvConnector> connectors,  List<String> amenities, @OpeningHoursNullableConverter()  OpeningHours? openingHours,  DateTime? lastUpdate,  double dist,  String? postCode,  String? place,  int totalPoints,  bool? isOperational,  String? usageCost,  String? updatedAt,  String? countryCode,  int? usageTypeId,  String? usageTypeTitle,  bool? isPayAtLocation,  bool? isMembershipRequired,  bool isFranceIrveEnriched)  $default,) {final _that = this;
 switch (_that) {
 case _ChargingStation():
-return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitude,_that.address,_that.connectors,_that.amenities,_that.openingHours,_that.lastUpdate,_that.dist,_that.postCode,_that.place,_that.totalPoints,_that.isOperational,_that.usageCost,_that.updatedAt,_that.countryCode);case _:
+return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitude,_that.address,_that.connectors,_that.amenities,_that.openingHours,_that.lastUpdate,_that.dist,_that.postCode,_that.place,_that.totalPoints,_that.isOperational,_that.usageCost,_that.updatedAt,_that.countryCode,_that.usageTypeId,_that.usageTypeTitle,_that.isPayAtLocation,_that.isMembershipRequired,_that.isFranceIrveEnriched);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -533,10 +548,10 @@ return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitud
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? operator,  double latitude,  double longitude,  String? address, @EvConnectorListConverter()  List<EvConnector> connectors,  List<String> amenities, @OpeningHoursNullableConverter()  OpeningHours? openingHours,  DateTime? lastUpdate,  double dist,  String? postCode,  String? place,  int totalPoints,  bool? isOperational,  String? usageCost,  String? updatedAt,  String? countryCode)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? operator,  double latitude,  double longitude,  String? address, @EvConnectorListConverter()  List<EvConnector> connectors,  List<String> amenities, @OpeningHoursNullableConverter()  OpeningHours? openingHours,  DateTime? lastUpdate,  double dist,  String? postCode,  String? place,  int totalPoints,  bool? isOperational,  String? usageCost,  String? updatedAt,  String? countryCode,  int? usageTypeId,  String? usageTypeTitle,  bool? isPayAtLocation,  bool? isMembershipRequired,  bool isFranceIrveEnriched)?  $default,) {final _that = this;
 switch (_that) {
 case _ChargingStation() when $default != null:
-return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitude,_that.address,_that.connectors,_that.amenities,_that.openingHours,_that.lastUpdate,_that.dist,_that.postCode,_that.place,_that.totalPoints,_that.isOperational,_that.usageCost,_that.updatedAt,_that.countryCode);case _:
+return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitude,_that.address,_that.connectors,_that.amenities,_that.openingHours,_that.lastUpdate,_that.dist,_that.postCode,_that.place,_that.totalPoints,_that.isOperational,_that.usageCost,_that.updatedAt,_that.countryCode,_that.usageTypeId,_that.usageTypeTitle,_that.isPayAtLocation,_that.isMembershipRequired,_that.isFranceIrveEnriched);case _:
   return null;
 
 }
@@ -548,7 +563,7 @@ return $default(_that.id,_that.name,_that.operator,_that.latitude,_that.longitud
 @JsonSerializable()
 
 class _ChargingStation extends ChargingStation {
-  const _ChargingStation({required this.id, required this.name, this.operator, required this.latitude, required this.longitude, this.address, @EvConnectorListConverter() final  List<EvConnector> connectors = const <EvConnector>[], final  List<String> amenities = const <String>[], @OpeningHoursNullableConverter() this.openingHours, this.lastUpdate, this.dist = 0, this.postCode, this.place, this.totalPoints = 0, this.isOperational, this.usageCost, this.updatedAt, this.countryCode}): _connectors = connectors,_amenities = amenities,super._();
+  const _ChargingStation({required this.id, required this.name, this.operator, required this.latitude, required this.longitude, this.address, @EvConnectorListConverter() final  List<EvConnector> connectors = const <EvConnector>[], final  List<String> amenities = const <String>[], @OpeningHoursNullableConverter() this.openingHours, this.lastUpdate, this.dist = 0, this.postCode, this.place, this.totalPoints = 0, this.isOperational, this.usageCost, this.updatedAt, this.countryCode, this.usageTypeId, this.usageTypeTitle, this.isPayAtLocation, this.isMembershipRequired, this.isFranceIrveEnriched = false}): _connectors = connectors,_amenities = amenities,super._();
   factory _ChargingStation.fromJson(Map<String, dynamic> json) => _$ChargingStationFromJson(json);
 
 @override final  String id;
@@ -586,6 +601,21 @@ class _ChargingStation extends ChargingStation {
 @override final  String? usageCost;
 @override final  String? updatedAt;
 @override final  String? countryCode;
+// ------------------------------------------------------------------
+// OCM `UsageType` access-cost signal (#2618). All optional / null by
+// default so existing callers + the legacy `fromJson` /
+// `_normalizeChargingStationJson` path are untouched. Classified into
+// a free/paid/membership badge via [accessCost] —
+// [EvAccessCost.from] is the single source of truth.
+// ------------------------------------------------------------------
+@override final  int? usageTypeId;
+@override final  String? usageTypeTitle;
+@override final  bool? isPayAtLocation;
+@override final  bool? isMembershipRequired;
+/// True when [usageCost] / the access flags were enriched from a
+/// country-authoritative source (France IRVE, #2618) rather than the
+/// raw OCM record — gates the IRVE attribution line in the UI.
+@override@JsonKey() final  bool isFranceIrveEnriched;
 
 /// Create a copy of ChargingStation
 /// with the given fields replaced by the non-null parameter values.
@@ -600,16 +630,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChargingStation&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.operator, operator) || other.operator == operator)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other._connectors, _connectors)&&const DeepCollectionEquality().equals(other._amenities, _amenities)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.totalPoints, totalPoints) || other.totalPoints == totalPoints)&&(identical(other.isOperational, isOperational) || other.isOperational == isOperational)&&(identical(other.usageCost, usageCost) || other.usageCost == usageCost)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChargingStation&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.operator, operator) || other.operator == operator)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other._connectors, _connectors)&&const DeepCollectionEquality().equals(other._amenities, _amenities)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.totalPoints, totalPoints) || other.totalPoints == totalPoints)&&(identical(other.isOperational, isOperational) || other.isOperational == isOperational)&&(identical(other.usageCost, usageCost) || other.usageCost == usageCost)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode)&&(identical(other.usageTypeId, usageTypeId) || other.usageTypeId == usageTypeId)&&(identical(other.usageTypeTitle, usageTypeTitle) || other.usageTypeTitle == usageTypeTitle)&&(identical(other.isPayAtLocation, isPayAtLocation) || other.isPayAtLocation == isPayAtLocation)&&(identical(other.isMembershipRequired, isMembershipRequired) || other.isMembershipRequired == isMembershipRequired)&&(identical(other.isFranceIrveEnriched, isFranceIrveEnriched) || other.isFranceIrveEnriched == isFranceIrveEnriched));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,operator,latitude,longitude,address,const DeepCollectionEquality().hash(_connectors),const DeepCollectionEquality().hash(_amenities),openingHours,lastUpdate,dist,postCode,place,totalPoints,isOperational,usageCost,updatedAt,countryCode);
+int get hashCode => Object.hashAll([runtimeType,id,name,operator,latitude,longitude,address,const DeepCollectionEquality().hash(_connectors),const DeepCollectionEquality().hash(_amenities),openingHours,lastUpdate,dist,postCode,place,totalPoints,isOperational,usageCost,updatedAt,countryCode,usageTypeId,usageTypeTitle,isPayAtLocation,isMembershipRequired,isFranceIrveEnriched]);
 
 @override
 String toString() {
-  return 'ChargingStation(id: $id, name: $name, operator: $operator, latitude: $latitude, longitude: $longitude, address: $address, connectors: $connectors, amenities: $amenities, openingHours: $openingHours, lastUpdate: $lastUpdate, dist: $dist, postCode: $postCode, place: $place, totalPoints: $totalPoints, isOperational: $isOperational, usageCost: $usageCost, updatedAt: $updatedAt, countryCode: $countryCode)';
+  return 'ChargingStation(id: $id, name: $name, operator: $operator, latitude: $latitude, longitude: $longitude, address: $address, connectors: $connectors, amenities: $amenities, openingHours: $openingHours, lastUpdate: $lastUpdate, dist: $dist, postCode: $postCode, place: $place, totalPoints: $totalPoints, isOperational: $isOperational, usageCost: $usageCost, updatedAt: $updatedAt, countryCode: $countryCode, usageTypeId: $usageTypeId, usageTypeTitle: $usageTypeTitle, isPayAtLocation: $isPayAtLocation, isMembershipRequired: $isMembershipRequired, isFranceIrveEnriched: $isFranceIrveEnriched)';
 }
 
 
@@ -620,7 +650,7 @@ abstract mixin class _$ChargingStationCopyWith<$Res> implements $ChargingStation
   factory _$ChargingStationCopyWith(_ChargingStation value, $Res Function(_ChargingStation) _then) = __$ChargingStationCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? operator, double latitude, double longitude, String? address,@EvConnectorListConverter() List<EvConnector> connectors, List<String> amenities,@OpeningHoursNullableConverter() OpeningHours? openingHours, DateTime? lastUpdate, double dist, String? postCode, String? place, int totalPoints, bool? isOperational, String? usageCost, String? updatedAt, String? countryCode
+ String id, String name, String? operator, double latitude, double longitude, String? address,@EvConnectorListConverter() List<EvConnector> connectors, List<String> amenities,@OpeningHoursNullableConverter() OpeningHours? openingHours, DateTime? lastUpdate, double dist, String? postCode, String? place, int totalPoints, bool? isOperational, String? usageCost, String? updatedAt, String? countryCode, int? usageTypeId, String? usageTypeTitle, bool? isPayAtLocation, bool? isMembershipRequired, bool isFranceIrveEnriched
 });
 
 
@@ -637,7 +667,7 @@ class __$ChargingStationCopyWithImpl<$Res>
 
 /// Create a copy of ChargingStation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? operator = freezed,Object? latitude = null,Object? longitude = null,Object? address = freezed,Object? connectors = null,Object? amenities = null,Object? openingHours = freezed,Object? lastUpdate = freezed,Object? dist = null,Object? postCode = freezed,Object? place = freezed,Object? totalPoints = null,Object? isOperational = freezed,Object? usageCost = freezed,Object? updatedAt = freezed,Object? countryCode = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? operator = freezed,Object? latitude = null,Object? longitude = null,Object? address = freezed,Object? connectors = null,Object? amenities = null,Object? openingHours = freezed,Object? lastUpdate = freezed,Object? dist = null,Object? postCode = freezed,Object? place = freezed,Object? totalPoints = null,Object? isOperational = freezed,Object? usageCost = freezed,Object? updatedAt = freezed,Object? countryCode = freezed,Object? usageTypeId = freezed,Object? usageTypeTitle = freezed,Object? isPayAtLocation = freezed,Object? isMembershipRequired = freezed,Object? isFranceIrveEnriched = null,}) {
   return _then(_ChargingStation(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -657,7 +687,12 @@ as int,isOperational: freezed == isOperational ? _self.isOperational : isOperati
 as bool?,usageCost: freezed == usageCost ? _self.usageCost : usageCost // ignore: cast_nullable_to_non_nullable
 as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as String?,countryCode: freezed == countryCode ? _self.countryCode : countryCode // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,usageTypeId: freezed == usageTypeId ? _self.usageTypeId : usageTypeId // ignore: cast_nullable_to_non_nullable
+as int?,usageTypeTitle: freezed == usageTypeTitle ? _self.usageTypeTitle : usageTypeTitle // ignore: cast_nullable_to_non_nullable
+as String?,isPayAtLocation: freezed == isPayAtLocation ? _self.isPayAtLocation : isPayAtLocation // ignore: cast_nullable_to_non_nullable
+as bool?,isMembershipRequired: freezed == isMembershipRequired ? _self.isMembershipRequired : isMembershipRequired // ignore: cast_nullable_to_non_nullable
+as bool?,isFranceIrveEnriched: null == isFranceIrveEnriched ? _self.isFranceIrveEnriched : isFranceIrveEnriched // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

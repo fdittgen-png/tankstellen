@@ -790,6 +790,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get evPricingUnavailable => 'Pricing not available from provider';
 
   @override
+  String get evPriceFree => 'Free';
+
+  @override
+  String get evPricePayAtLocation => 'Pay at location';
+
+  @override
+  String get evPriceMembership => 'Membership required';
+
+  @override
+  String get evPriceIndicative => 'Indicative price';
+
+  @override
+  String get evPriceDeclaredByOperator =>
+      'Indicative price declared by the operator — verify on site';
+
+  @override
+  String get evPriceFranceAttribution =>
+      'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
+
+  @override
   String get evLastUpdated => 'Last updated';
 
   @override
@@ -7537,6 +7557,26 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get evPricingUnavailable =>
       '⟦Ƥřîçîñǧ ñóŧ áṽáîłáƀłé ƒřóɱ ƥřóṽîđéř ··············⟧';
+
+  @override
+  String get evPriceFree => '⟦Ƒřéé ··⟧';
+
+  @override
+  String get evPricePayAtLocation => '⟦Ƥáý áŧ łóçáŧîóñ ······⟧';
+
+  @override
+  String get evPriceMembership => '⟦Ṁéɱƀéřšĥîƥ řéɋúîřéđ ········⟧';
+
+  @override
+  String get evPriceIndicative => '⟦Îñđîçáŧîṽé ƥřîçé ·······⟧';
+
+  @override
+  String get evPriceDeclaredByOperator =>
+      '⟦Îñđîçáŧîṽé ƥřîçé đéçłářéđ ƀý ŧĥé óƥéřáŧóř — ṽéřîƒý óñ šîŧé ······················⟧';
+
+  @override
+  String get evPriceFranceAttribution =>
+      '⟦Ƥřîçîñǧ: Ɓášé ñáŧîóñáłé đéš ÎŘṼÉ — Łîçéñçé Óúṽéřŧé / đáŧá.ǧóúṽ.ƒř / ÓĐŘÉ ························⟧';
 
   @override
   String get evLastUpdated => '⟦Łášŧ úƥđáŧéđ ·····⟧';

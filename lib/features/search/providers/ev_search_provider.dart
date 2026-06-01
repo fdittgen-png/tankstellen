@@ -7,10 +7,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/country/country_provider.dart';
+import '../../ev/data/services/ev_price_enricher.dart';
+import '../../ev/data/services/fr_irve_price_service.dart';
 import '../../ev/domain/entities/charging_station.dart';
 import 'ev_charging_service_provider.dart';
 
 part 'ev_search_provider.g.dart';
+
+/// The EV price/access enricher applied after the OCM search returns
+/// (#2618). Defaults to the France IRVE enricher, which is itself a
+/// no-op for any result set with no FR stations — so non-FR searches
+/// make zero extra network calls. Overridable in tests.
+@Riverpod(keepAlive: true)
+EvPriceEnricher evPriceEnricher(Ref ref) => FrIrvePriceService();
 
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
 ///
@@ -47,7 +56,20 @@ class EVSearchState extends _$EVSearchState {
         radiusKm: radiusKm,
         countryCode: country.code,
       );
-      state = AsyncValue.data(result);
+
+      // Layer onto the OCM result any country-authoritative price/access
+      // signal (#2618). The enricher is a no-op for result sets with no
+      // FR stations, so this is free outside France; it never throws,
+      // degrading to the un-enriched result on any failure.
+      final enricher = ref.read(evPriceEnricherProvider);
+      final enriched = await enricher.enrich(result.data);
+      state = AsyncValue.data(ServiceResult(
+        data: enriched,
+        source: result.source,
+        fetchedAt: result.fetchedAt,
+        isStale: result.isStale,
+        errors: result.errors,
+      ));
     } on DioException catch (e, st) {
       if (e.type == DioExceptionType.cancel) return;
       state = AsyncValue.error(e, st);

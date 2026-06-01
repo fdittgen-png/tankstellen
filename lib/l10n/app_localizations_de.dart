@@ -796,6 +796,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get evPricingUnavailable => 'Preisangabe vom Anbieter nicht verfügbar';
 
   @override
+  String get evPriceFree => 'Kostenlos';
+
+  @override
+  String get evPricePayAtLocation => 'Zahlung vor Ort';
+
+  @override
+  String get evPriceMembership => 'Mitgliedschaft erforderlich';
+
+  @override
+  String get evPriceIndicative => 'Richtpreis';
+
+  @override
+  String get evPriceDeclaredByOperator =>
+      'Richtpreis laut Betreiber — vor Ort prüfen';
+
+  @override
+  String get evPriceFranceAttribution =>
+      'Preise: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
+
+  @override
   String get evLastUpdated => 'Zuletzt aktualisiert';
 
   @override
