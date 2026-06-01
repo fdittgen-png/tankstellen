@@ -1,0 +1,1 @@
+Sharper price map and faster nearby and route search, a cleaner consumption and carbon dashboard, smoother OBD2 and GPS trip recording, and the live approach-station price overlay. Bug fixes and performance polish throughout.

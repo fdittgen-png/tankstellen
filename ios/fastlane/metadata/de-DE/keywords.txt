@@ -1,0 +1,1 @@
+Sprit,Benzin,Diesel,Tankstelle,Fahrtenbuch,Fahrtkosten,Verbrauchsanalyse,Spritverbrauch,Ladesäule

@@ -1,0 +1,1 @@
+combustible,diésel,precio,comparador,gasolinera,eléctrico,viaje,coste,consumo,gasoil,ahorro,ruta

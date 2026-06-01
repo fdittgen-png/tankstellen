@@ -1,0 +1,1 @@
+carburante,diesel,prezzo,confronto,distributore,elettrico,viaggio,costo,consumi,gasolio,risparmio
