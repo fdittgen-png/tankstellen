@@ -116,7 +116,7 @@ final class FillUpGuidanceProvider
   }
 }
 
-String _$fillUpGuidanceHash() => r'd3bd35a190dade11bbd64e59904ba654d25b2e85';
+String _$fillUpGuidanceHash() => r'a1080417bd8854845a36e457966ac5b16f7a7876';
 
 /// On-device "best time to fill up?" guidance for a station + fuel type
 /// (#1543, no-ML heuristic).
