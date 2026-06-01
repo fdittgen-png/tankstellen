@@ -4983,6 +4983,12 @@ class AppLocalizationsLv extends AppLocalizations {
       'Kā šis transportlīdzeklis pārvietojas';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibrēšanas režīms';
 
   @override

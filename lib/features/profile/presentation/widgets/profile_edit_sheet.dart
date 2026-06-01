@@ -8,7 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
@@ -112,6 +115,9 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
     final editCtrl =
         ref.read(profileEditControllerProvider(widget.profile).notifier);
 
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
     // #1602 — the route-planning preferences are only meaningful when
     // the "along the route" search mode is reachable, so the section
     // tracks `Feature.routePlanning` exactly as search_criteria_screen
@@ -122,110 +128,228 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       ref.watch(enabledFeaturesProvider),
     );
 
+    // #2551 — render the whole Vehicle card only when there is at least
+    // one vehicle to pick from (matching the prior section-level hide).
+    final hasVehicles = ref.watch(vehicleProfileListProvider).isNotEmpty;
+
+    final cards = <Widget>[
+      // 1 — Identity: name + preferred-fuel (disabled when a vehicle
+      // owns the fuel, #695) + the derived-fuel hint.
+      SectionCard(
+        title: l10n?.vehicleSectionIdentityTitle ?? 'Identity',
+        leadingIcon: Icons.person_outline,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: l10n?.profileName ?? 'Profile name',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: Spacing.xl),
+            // Fuel preference is EITHER derived from the default vehicle
+            // OR picked directly. The dropdown is disabled when a
+            // vehicle is selected, removing the conflict shown in
+            // image #7 (#695).
+            Opacity(
+              opacity: editState.defaultVehicleId != null ? 0.5 : 1.0,
+              child: IgnorePointer(
+                ignoring: editState.defaultVehicleId != null,
+                child: ProfileFuelTypeDropdown(
+                  value: editState.fuelType,
+                  onChanged: editCtrl.setFuelType,
+                ),
+              ),
+            ),
+            if (editState.defaultVehicleId != null) ...[
+              const SizedBox(height: Spacing.sm),
+              Text(
+                l10n?.profileFuelFromVehicleHint ??
+                    'Fuel type is derived from your default vehicle. '
+                        'Clear the vehicle to pick a fuel directly.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      // 2 — Search radius.
+      SectionCard(
+        title: l10n?.defaultRadius ?? 'Default radius',
+        leadingIcon: Icons.my_location,
+        child: ProfileRadiusSlider(
+          value: editState.radius,
+          onChanged: editCtrl.setRadius,
+        ),
+      ),
+      // 3 — Route planning (gated on Feature.routePlanning).
+      if (routePlanningOn)
+        SectionCard(
+          title: l10n?.routePlanningSection ?? 'Route planning',
+          leadingIcon: Icons.alt_route,
+          child: _RouteSegmentSection(state: editState, ctrl: editCtrl),
+        ),
+      // 4 — Display & stations toggles.
+      SectionCard(
+        title:
+            l10n?.profileSectionDisplayStations ?? 'Display & stations',
+        leadingIcon: Icons.tune,
+        child: _TogglesSection(state: editState, ctrl: editCtrl),
+      ),
+      // 5 — Station ratings.
+      SectionCard(
+        title: l10n?.privacyRatings ?? 'Station ratings',
+        leadingIcon: Icons.reviews_outlined,
+        child: _RatingModeSection(state: editState, ctrl: editCtrl),
+      ),
+      // 6 — Start screen.
+      SectionCard(
+        title: l10n?.landingScreen ?? 'Start screen',
+        leadingIcon: Icons.home_outlined,
+        child: ProfileLandingScreenDropdown(
+          value: editState.landingScreen,
+          onChanged: editCtrl.setLandingScreen,
+        ),
+      ),
+      // 7 — Approach overlay.
+      SectionCard(
+        title: l10n?.approachOverlaySection ?? 'Approach-station overlay',
+        leadingIcon: Icons.radar,
+        child: _ApproachOverlaySection(state: editState, ctrl: editCtrl),
+      ),
+      // 8 — Vehicle (only when a vehicle exists).
+      if (hasVehicles)
+        SectionCard(
+          title: l10n?.fillUpVehicleLabel ?? 'Vehicle',
+          leadingIcon: Icons.directions_car_outlined,
+          child: _DefaultVehicleSection(state: editState, ctrl: editCtrl),
+        ),
+      // 9 — Region: country + language under one card.
+      SectionCard(
+        title: l10n?.profileSectionRegion ?? 'Region',
+        leadingIcon: Icons.public,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n?.profileCountry ?? 'Country',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: Spacing.md),
+            _CountrySection(state: editState, ctrl: editCtrl),
+            const SizedBox(height: Spacing.xl),
+            Text(
+              l10n?.profileLanguage ?? 'Language',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: Spacing.md),
+            _LanguageSection(state: editState, ctrl: editCtrl),
+          ],
+        ),
+      ),
+      // 10 — Home postal code.
+      SectionCard(
+        title: l10n?.home ?? 'Home',
+        leadingIcon: Icons.location_on_outlined,
+        child: TextField(
+          controller: _zipController,
+          keyboardType: TextInputType.number,
+          maxLength: editState.countryCode != null
+              ? (Countries.byCode(editState.countryCode!)?.postalCodeLength ??
+                  5)
+              : 5,
+          decoration: InputDecoration(
+            labelText: l10n?.homeZip ?? 'Home postal code',
+            border: const OutlineInputBorder(),
+            counterText: '',
+          ),
+        ),
+      ),
+    ];
+
+    final footer = _SaveDeleteActions(
+      state: editState,
+      profile: widget.profile,
+      nameController: _nameController,
+      zipController: _zipController,
+      onSave: widget.onSave,
+      onDelete: widget.onDelete,
+      onConfirmDelete: () => _confirmDelete(context),
+    );
+
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.5,
       maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: ListView(
-            controller: scrollController,
-            children: [
-              Text(
-                AppLocalizations.of(context)?.editProfile ?? 'Edit profile',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)?.profileName ?? 'Profile name',
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Fuel preference is EITHER derived from the default vehicle
-              // OR picked directly. The dropdown is disabled when a
-              // vehicle is selected, removing the conflict shown in
-              // image #7 (#695).
-              Opacity(
-                opacity: editState.defaultVehicleId != null ? 0.5 : 1.0,
-                child: IgnorePointer(
-                  ignoring: editState.defaultVehicleId != null,
-                  child: ProfileFuelTypeDropdown(
-                    value: editState.fuelType,
-                    onChanged: editCtrl.setFuelType,
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Cap content width on tablets / landscape so the cards stay
+            // a comfortable reading measure instead of stretching edge
+            // to edge (#2551). Below 600 keep the plain single column.
+            final wide = constraints.maxWidth >= 600;
+            Widget constrain(Widget child) => wide
+                ? Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 560),
+                      child: child,
+                    ),
+                  )
+                : child;
+
+            // The scrollController MUST stay wired to the inner ListView
+            // or DraggableScrollableSheet drag-to-resize breaks (#2551).
+            final list = ListView(
+              controller: scrollController,
+              padding: const EdgeInsets.all(Spacing.xl),
+              children: [
+                // Cosmetic grabber.
+                Center(
+                  child: Container(
+                    width: 32,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: Spacing.lg),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppRadius.sm,
+                    ),
                   ),
                 ),
-              ),
-              if (editState.defaultVehicleId != null) ...[
-                const SizedBox(height: 4),
                 Text(
-                  AppLocalizations.of(context)?.profileFuelFromVehicleHint ??
-                      'Fuel type is derived from your default vehicle. '
-                          'Clear the vehicle to pick a fuel directly.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
+                  l10n?.editProfile ?? 'Edit profile',
+                  style: theme.textTheme.titleLarge,
+                ),
+                const SizedBox(height: Spacing.xl),
+                for (final card in cards) ...[
+                  card,
+                  const SizedBox(height: Spacing.md),
+                ],
+              ],
+            );
+
+            return Column(
+              children: [
+                Expanded(child: constrain(list)),
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                ),
+                constrain(
+                  Padding(
+                    padding: const EdgeInsets.all(Spacing.xl),
+                    child: footer,
+                  ),
                 ),
               ],
-              const SizedBox(height: 16),
-              ProfileRadiusSlider(
-                value: editState.radius,
-                onChanged: editCtrl.setRadius,
-              ),
-              const SizedBox(height: 16),
-              if (routePlanningOn) ...[
-                _RouteSegmentSection(state: editState, ctrl: editCtrl),
-                const SizedBox(height: 16),
-              ],
-              _TogglesSection(state: editState, ctrl: editCtrl),
-              const SizedBox(height: 16),
-              _RatingModeSection(state: editState, ctrl: editCtrl),
-              const SizedBox(height: 16),
-              ProfileLandingScreenDropdown(
-                value: editState.landingScreen,
-                onChanged: editCtrl.setLandingScreen,
-              ),
-              const SizedBox(height: 16),
-              _ApproachOverlaySection(state: editState, ctrl: editCtrl),
-              const SizedBox(height: 16),
-              _DefaultVehicleSection(state: editState, ctrl: editCtrl),
-              const SizedBox(height: 16),
-              _CountrySection(state: editState, ctrl: editCtrl),
-              const SizedBox(height: 16),
-              _LanguageSection(state: editState, ctrl: editCtrl),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _zipController,
-                keyboardType: TextInputType.number,
-                maxLength: editState.countryCode != null
-                    ? (Countries.byCode(editState.countryCode!)?.postalCodeLength ?? 5)
-                    : 5,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)?.homeZip ?? 'Home postal code',
-                  border: const OutlineInputBorder(),
-                  counterText: '',
-                ),
-              ),
-              const SizedBox(height: 24),
-              _SaveDeleteActions(
-                state: editState,
-                profile: widget.profile,
-                nameController: _nameController,
-                zipController: _zipController,
-                onSave: widget.onSave,
-                onDelete: widget.onDelete,
-                onConfirmDelete: () => _confirmDelete(context),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

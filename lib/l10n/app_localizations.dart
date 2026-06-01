@@ -8856,6 +8856,18 @@ abstract class AppLocalizations {
   /// **'How this vehicle moves'**
   String get vehicleSectionDrivetrainSubtitle;
 
+  /// Card title grouping the avoid-highways, show-fuel and show-EV toggles on the edit-profile form (#2551).
+  ///
+  /// In en, this message translates to:
+  /// **'Display & stations'**
+  String get profileSectionDisplayStations;
+
+  /// Card title grouping the country and language selectors on the edit-profile form (#2551).
+  ///
+  /// In en, this message translates to:
+  /// **'Region'**
+  String get profileSectionRegion;
+
   /// Label above the rule/fuzzy segmented button on the vehicle edit screen (#894).
   ///
   /// In en, this message translates to:

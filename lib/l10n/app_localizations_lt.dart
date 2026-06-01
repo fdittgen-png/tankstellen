@@ -4980,6 +4980,12 @@ class AppLocalizationsLt extends AppLocalizations {
       'Kaip juda ši transporto priemonė';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibravimo režimas';
 
   @override

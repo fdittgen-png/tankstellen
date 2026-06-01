@@ -5003,6 +5003,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Comment ce véhicule se déplace';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Mode de calibration';
 
   @override

@@ -3737,6 +3737,14 @@
   "@vehicleSectionDrivetrainSubtitle": {
     "description": "Sub-title for the drivetrain card (#751 phase 2)."
   },
+  "profileSectionDisplayStations": "Display & stations",
+  "@profileSectionDisplayStations": {
+    "description": "Card title grouping the avoid-highways, show-fuel and show-EV toggles on the edit-profile form (#2551)."
+  },
+  "profileSectionRegion": "Region",
+  "@profileSectionRegion": {
+    "description": "Card title grouping the country and language selectors on the edit-profile form (#2551)."
+  },
   "calibrationModeLabel": "Calibration mode",
   "@calibrationModeLabel": {
     "description": "Label above the rule/fuzzy segmented button on the vehicle edit screen (#894)."

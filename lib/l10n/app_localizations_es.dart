@@ -4991,6 +4991,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Cómo se mueve este vehículo';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Modo de calibración';
 
   @override

@@ -4949,6 +4949,12 @@ class AppLocalizationsDa extends AppLocalizations {
       'Hvordan dette køretøj bevæger sig';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibringstilstand';
 
   @override

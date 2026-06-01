@@ -4977,6 +4977,12 @@ class AppLocalizationsSk extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Ako sa toto vozidlo pohybuje';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Režim kalibrácie';
 
   @override

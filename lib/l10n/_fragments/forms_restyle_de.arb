@@ -17,5 +17,7 @@
   "vehicleSectionIdentityTitle": "Identität",
   "vehicleSectionIdentitySubtitle": "Name & FIN",
   "vehicleSectionDrivetrainTitle": "Antrieb",
-  "vehicleSectionDrivetrainSubtitle": "Wie sich dieses Fahrzeug bewegt"
+  "vehicleSectionDrivetrainSubtitle": "Wie sich dieses Fahrzeug bewegt",
+  "profileSectionDisplayStations": "Anzeige & Tankstellen",
+  "profileSectionRegion": "Region"
 }

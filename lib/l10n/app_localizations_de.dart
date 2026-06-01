@@ -4983,6 +4983,12 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wie sich dieses Fahrzeug bewegt';
 
   @override
+  String get profileSectionDisplayStations => 'Anzeige & Tankstellen';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibrierungsmodus';
 
   @override

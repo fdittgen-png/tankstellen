@@ -4989,6 +4989,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Hogyan mozog ez a jármű';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibrációs mód';
 
   @override

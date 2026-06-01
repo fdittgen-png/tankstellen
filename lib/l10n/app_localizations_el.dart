@@ -4998,6 +4998,12 @@ class AppLocalizationsEl extends AppLocalizations {
       'Τρόπος κίνησης αυτού του οχήματος';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Λειτουργία βαθμονόμησης';
 
   @override
