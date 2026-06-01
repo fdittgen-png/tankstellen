@@ -39,27 +39,48 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        // #1801 — the refresh icon is now an Activity PendingIntent
-        // (see StationWidgetRenderer), not a broadcast: a
-        // BroadcastReceiver cannot reliably `startActivity` on
-        // Android 10+, so the old ACTION_REFRESH broadcast silently
-        // no-op'd. Only the mode toggle stays a broadcast — it merely
-        // re-renders, which is allowed from onReceive.
-        if (intent.action == StationWidgetRenderer.ACTION_TOGGLE_MODE) {
-            val id = intent.getIntExtra(
-                StationWidgetRenderer.EXTRA_APP_WIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID,
-            )
-            if (id != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                StationWidgetRenderer.toggleMode(
-                    context,
-                    id,
-                    StationWidgetRenderer.MODE_FAVORITES,
+        when (intent.action) {
+            // The mode toggle is a broadcast — it merely re-renders, which
+            // is allowed from onReceive.
+            StationWidgetRenderer.ACTION_TOGGLE_MODE -> {
+                val id = intent.getIntExtra(
+                    StationWidgetRenderer.EXTRA_APP_WIDGET_ID,
+                    AppWidgetManager.INVALID_APPWIDGET_ID,
                 )
-                renderAndCommit(
+                if (id != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    StationWidgetRenderer.toggleMode(
+                        context,
+                        id,
+                        StationWidgetRenderer.MODE_FAVORITES,
+                    )
+                    renderAndCommit(
+                        context,
+                        AppWidgetManager.getInstance(context),
+                        id,
+                    )
+                }
+            }
+            // #2600 — refresh-in-place. The refresh icon is now a broadcast
+            // (not an Activity PendingIntent), so a tap NEVER launches the
+            // app. We dim the glyph for immediate feedback, then enqueue the
+            // SAME on-device `widgetRefreshScan` WorkManager task that the
+            // periodic onUpdate wake uses (#2412): the Dart
+            // `BackgroundService.widgetRefreshScanTask` re-fetches prices and
+            // calls back into HomeWidget to re-render every placed widget.
+            // The coordinator's cross-trigger cooldown (#2415) dedups this
+            // against a concurrent periodic scan, so a rapid tap is cheap.
+            StationWidgetRenderer.ACTION_REFRESH -> {
+                val id = intent.getIntExtra(
+                    StationWidgetRenderer.EXTRA_APP_WIDGET_ID,
+                    AppWidgetManager.INVALID_APPWIDGET_ID,
+                )
+                if (id != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    StationWidgetRenderer.setRefreshing(context, id)
+                }
+                BackgroundScanEnqueuer.enqueue(
                     context,
-                    AppWidgetManager.getInstance(context),
-                    id,
+                    dartTask = WIDGET_SCAN_TASK,
+                    uniqueName = WIDGET_SCAN_UNIQUE_NAME,
                 )
             }
         }

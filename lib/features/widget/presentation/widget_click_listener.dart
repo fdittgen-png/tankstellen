@@ -11,11 +11,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/router.dart';
 import '../../consumption/data/obd2/event_channel_cancel.dart';
-import '../providers/nearest_widget_refresh_provider.dart';
 import 'widget_uri_parser.dart';
 import '../../../core/logging/error_logger.dart';
 
-export 'widget_uri_parser.dart' show isWidgetRefreshUri, widgetUriToPath;
+export 'widget_uri_parser.dart' show widgetUriToPath;
 
 part 'widget_click_listener.g.dart';
 
@@ -28,24 +27,17 @@ part 'widget_click_listener.g.dart';
 /// sits **above** the `InheritedGoRouter` the router widget inserts.
 /// This is the class that the `homeWidget.widgetClicked` stream and
 /// the cold-start launch probe both drive.
+///
+/// #2600 — the ONLY widget launch URI is the station deep-link now. The
+/// refresh button is a broadcast handled natively in place (it never
+/// launches the app), so the former refresh-marker branch + `_onRefresh`
+/// callback were removed.
 class WidgetLaunchHandler {
   final GoRouter _router;
 
-  /// Invoked when the launch URI is the [isWidgetRefreshUri] marker —
-  /// rebuilds the home-screen widget instead of navigating (#1961).
-  final VoidCallback _onRefresh;
-
-  WidgetLaunchHandler(this._router, this._onRefresh);
+  WidgetLaunchHandler(this._router);
 
   void handle(Uri? uri) {
-    // #1961 — the refresh button launches the app with a `refresh`
-    // marker URI rather than a station route. Rebuild the widget and
-    // stay on whatever screen the user is on; never navigate.
-    if (isWidgetRefreshUri(uri)) {
-      debugPrint('WidgetLaunchHandler.handle uri=$uri outcome=refresh');
-      _onRefresh();
-      return;
-    }
     final path = widgetUriToPath(uri);
     // #753 diagnostic — prints every widget launch so the user can
     // diff what Kotlin bound to the row (see StationWidgetRenderer
@@ -65,12 +57,7 @@ class WidgetLaunchHandler {
 
 @riverpod
 WidgetLaunchHandler widgetLaunchHandler(Ref ref) {
-  return WidgetLaunchHandler(
-    ref.watch(routerProvider),
-    // Lazily triggered — only a refresh-marker tap reads (and so starts)
-    // the keep-alive refresh provider; an ordinary row tap never does.
-    () => ref.read(nearestWidgetRefreshProvider.notifier).refresh(),
-  );
+  return WidgetLaunchHandler(ref.watch(routerProvider));
 }
 
 /// Listens for taps on a home-screen widget row and navigates the app

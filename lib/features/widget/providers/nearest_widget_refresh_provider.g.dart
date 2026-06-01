@@ -18,9 +18,12 @@ part of 'nearest_widget_refresh_provider.dart';
 /// provider adds a foreground 2-minute tick that kicks the builder while
 /// the app is running.
 ///
-/// #1803 — the resume hook is what makes the widget's refresh button
-/// work: that button opens the app (#1801), and the app reaching the
-/// foreground triggers a tick that rebuilds both widget variants.
+/// #1803 — the resume hook keeps the widget fresh whenever the app
+/// returns to the foreground. #2600 — the widget's own refresh button no
+/// longer launches the app: it is a native broadcast that re-fetches
+/// prices in place (`FuelPriceWidgetProvider.ACTION_REFRESH` → the
+/// `widgetRefreshScan` WorkManager task), so the former explicit
+/// `refresh()` entry point this provider exposed was removed.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and
@@ -39,9 +42,12 @@ final nearestWidgetRefreshProvider = NearestWidgetRefreshProvider._();
 /// provider adds a foreground 2-minute tick that kicks the builder while
 /// the app is running.
 ///
-/// #1803 — the resume hook is what makes the widget's refresh button
-/// work: that button opens the app (#1801), and the app reaching the
-/// foreground triggers a tick that rebuilds both widget variants.
+/// #1803 — the resume hook keeps the widget fresh whenever the app
+/// returns to the foreground. #2600 — the widget's own refresh button no
+/// longer launches the app: it is a native broadcast that re-fetches
+/// prices in place (`FuelPriceWidgetProvider.ACTION_REFRESH` → the
+/// `widgetRefreshScan` WorkManager task), so the former explicit
+/// `refresh()` entry point this provider exposed was removed.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and
@@ -58,9 +64,12 @@ final class NearestWidgetRefreshProvider
   /// provider adds a foreground 2-minute tick that kicks the builder while
   /// the app is running.
   ///
-  /// #1803 — the resume hook is what makes the widget's refresh button
-  /// work: that button opens the app (#1801), and the app reaching the
-  /// foreground triggers a tick that rebuilds both widget variants.
+  /// #1803 — the resume hook keeps the widget fresh whenever the app
+  /// returns to the foreground. #2600 — the widget's own refresh button no
+  /// longer launches the app: it is a native broadcast that re-fetches
+  /// prices in place (`FuelPriceWidgetProvider.ACTION_REFRESH` → the
+  /// `widgetRefreshScan` WorkManager task), so the former explicit
+  /// `refresh()` entry point this provider exposed was removed.
   ///
   /// Reading the provider once (e.g. from the app's root widget) starts
   /// the tick; the provider owns its Timer + [AppLifecycleListener] and
@@ -93,7 +102,7 @@ final class NearestWidgetRefreshProvider
 }
 
 String _$nearestWidgetRefreshHash() =>
-    r'a9ac6b47255890ba9de4e86a9e3c05346eb8087d';
+    r'9381374c118f967eb22d7a1a7356bbd59cb03cb1';
 
 /// Foreground heartbeat that rebuilds the home-screen widget — both the
 /// favorites and the nearest variants — every
@@ -105,9 +114,12 @@ String _$nearestWidgetRefreshHash() =>
 /// provider adds a foreground 2-minute tick that kicks the builder while
 /// the app is running.
 ///
-/// #1803 — the resume hook is what makes the widget's refresh button
-/// work: that button opens the app (#1801), and the app reaching the
-/// foreground triggers a tick that rebuilds both widget variants.
+/// #1803 — the resume hook keeps the widget fresh whenever the app
+/// returns to the foreground. #2600 — the widget's own refresh button no
+/// longer launches the app: it is a native broadcast that re-fetches
+/// prices in place (`FuelPriceWidgetProvider.ACTION_REFRESH` → the
+/// `widgetRefreshScan` WorkManager task), so the former explicit
+/// `refresh()` entry point this provider exposed was removed.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and

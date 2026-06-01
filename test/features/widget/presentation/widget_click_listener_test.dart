@@ -138,55 +138,27 @@ void main() {
     });
   });
 
-  group('isWidgetRefreshUri (#1961 — refresh marker)', () {
-    test('tankstellenwidget://refresh → true', () {
-      expect(
-        isWidgetRefreshUri(Uri.parse('tankstellenwidget://refresh')),
-        isTrue,
-      );
-    });
-
-    test('a station deep-link → false', () {
-      expect(
-        isWidgetRefreshUri(
-          Uri.parse('tankstellenwidget://station?id=abc'),
-        ),
-        isFalse,
-      );
-    });
-
-    test('null / wrong scheme → false', () {
-      expect(isWidgetRefreshUri(null), isFalse);
-      expect(isWidgetRefreshUri(Uri.parse('https://refresh')), isFalse);
-    });
-
-    test('the refresh marker is not also a navigation target', () {
-      // The two parsers must stay mutually exclusive — a refresh tap
-      // must never resolve to a route to push.
-      final refresh = Uri.parse('tankstellenwidget://refresh');
-      expect(isWidgetRefreshUri(refresh), isTrue);
-      expect(widgetUriToPath(refresh), isNull);
-    });
-  });
-
-  group('WidgetLaunchHandler — refresh marker (#1961)', () {
-    GoRouter buildRouter() => GoRouter(
-          initialLocation: '/',
-          routes: [
-            GoRoute(path: '/', builder: (_, _) => const Text('home')),
-            GoRoute(
-              path: '/station/:id',
-              builder: (_, state) =>
-                  Text('station ${state.pathParameters['id']}'),
-            ),
-          ],
-        );
-
-    testWidgets('a refresh URI runs onRefresh and does not navigate',
+  group('WidgetLaunchHandler — refresh URI removed (#2600)', () {
+    // #2600 — the refresh button is now a native broadcast handled in
+    // place; it never launches the app. The old refresh-marker URI is
+    // therefore no longer a navigation seam at all. A
+    // `tankstellenwidget://refresh` URI (host != station) resolves to no
+    // path and is a harmless no-op should one ever still arrive.
+    testWidgets(
+        'a (legacy) refresh URI resolves to no path and never navigates',
         (tester) async {
-      final router = buildRouter();
-      var refreshCount = 0;
-      final handler = WidgetLaunchHandler(router, () => refreshCount++);
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          GoRoute(path: '/', builder: (_, _) => const Text('home')),
+          GoRoute(
+            path: '/station/:id',
+            builder: (_, state) =>
+                Text('station ${state.pathParameters['id']}'),
+          ),
+        ],
+      );
+      final handler = WidgetLaunchHandler(router);
 
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       expect(find.text('home'), findsOneWidget);
@@ -194,23 +166,10 @@ void main() {
       handler.handle(Uri.parse('tankstellenwidget://refresh'));
       await tester.pumpAndSettle();
 
-      expect(refreshCount, 1);
       expect(find.text('home'), findsOneWidget,
-          reason: 'a refresh tap must rebuild the widget, never navigate');
-    });
-
-    testWidgets('a station URI navigates and does NOT run onRefresh',
-        (tester) async {
-      final router = buildRouter();
-      var refreshCount = 0;
-      final handler = WidgetLaunchHandler(router, () => refreshCount++);
-
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-      handler.handle(Uri.parse('tankstellenwidget://station?id=abc'));
-      await tester.pumpAndSettle();
-
-      expect(refreshCount, 0);
-      expect(find.text('station abc'), findsOneWidget);
+          reason: 'host != station → widgetUriToPath null → no navigation');
+      expect(widgetUriToPath(Uri.parse('tankstellenwidget://refresh')),
+          isNull);
     });
   });
 
