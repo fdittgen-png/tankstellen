@@ -10,6 +10,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
+import '../cross_border_corridor.dart' show fuelForStation;
 import '../helpers/batch_query_helper.dart';
 import 'route_filter_sort_isolate.dart';
 import 'route_geometry.dart';
@@ -75,6 +76,7 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
     required List<SearchResultItem> results,
     required FuelType fuelType,
     required double segmentKm,
+    Map<String, FuelType> profileFuelByCountry = const {},
   }) {
     // Same segment logic as uniform, but with price-first ordering.
     // #2183 — carry the leader's price in a parallel map so the
@@ -101,7 +103,9 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
         }
         final segmentIdx = segmentIndexFor(nearestSampleIdx, segmentKm);
 
-        final price = station.priceFor(fuelType);
+        // #2631 — per-country profile fuel (empty map → fuelType fallback).
+        final price = station.priceFor(
+            fuelForStation(station, profileFuelByCountry, fuelType));
         if (price != null) {
           final currentBestPrice = segmentCheapestPrice[segmentIdx];
           // Strict < keeps first-occurrence-wins on equal prices,

@@ -12,6 +12,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
+import '../cross_border_corridor.dart' show fuelForStation;
 import '../helpers/batch_query_helper.dart';
 
 /// Default strategy: samples every ~15 km along the route,
@@ -81,11 +82,16 @@ class UniformSearchStrategy implements RouteSearchStrategy {
     required List<SearchResultItem> results,
     required FuelType fuelType,
     required double segmentKm,
+    Map<String, FuelType> profileFuelByCountry = const {},
   }) {
     final stations = <_StationLite>[];
     for (final item in results) {
       if (item is FuelStationResult) {
-        final price = item.station.priceFor(fuelType);
+        // #2631 — price by the station's OWN country profile fuel so a
+        // cross-border ES station (E10 populated, E85 null) is ranked, not
+        // dropped. Empty map → fallback = fuelType → unchanged single-country.
+        final price = item.station.priceFor(
+            fuelForStation(item.station, profileFuelByCountry, fuelType));
         if (price == null) continue;
         stations.add(_StationLite(
           id: item.id,
