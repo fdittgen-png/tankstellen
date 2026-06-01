@@ -3,8 +3,10 @@
 
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/country/country_bounding_box.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../../search/domain/entities/search_result_item.dart';
+import '../../domain/entities/route_info.dart';
 
 /// Shared route-search geometry helpers (#2197).
 ///
@@ -74,3 +76,27 @@ void sortByItineraryOrder(
 /// `(nearestSampleIdx * 15 / segmentKm).floor()` semantics exactly.
 int segmentIndexFor(int nearestSampleIdx, double segmentKm) =>
     (nearestSampleIdx * kSamplePointSpacingKm / segmentKm).floor();
+
+/// The unique set of ISO 3166-1 alpha-2 country codes the [route]'s
+/// polyline passes through, detected OFFLINE (#2595).
+///
+/// Walks every vertex of [route.geometry] through the canonical
+/// bounding-box lookup ([countryCodeFromLatLng] →
+/// `CountryServiceRegistry.entryByLatLng`) and collects the non-null
+/// matches. This replaces the previous per-sample-point NETWORK geocode
+/// (`coordinatesToCountryCode`) used to pick a station service: that
+/// call cost a round-trip per point and, on null/timeout, silently fell
+/// back to the active profile's country — so a Pézenas(FR)→Barcelona(ES)
+/// route queried only FR Prix-Carburants and returned an empty Spanish
+/// leg. The bbox lookup is sub-millisecond and never blackholes.
+///
+/// Returns the codes upper-cased so they collate with profile country
+/// codes regardless of upstream casing.
+Set<String> corridorCountries(RouteInfo route) {
+  final codes = <String>{};
+  for (final p in route.geometry) {
+    final code = countryCodeFromLatLng(p.latitude, p.longitude);
+    if (code != null) codes.add(code.toUpperCase());
+  }
+  return codes;
+}

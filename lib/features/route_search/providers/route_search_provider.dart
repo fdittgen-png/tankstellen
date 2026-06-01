@@ -9,16 +9,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
 import '../../../core/logging/error_logger.dart';
-import '../../../core/services/service_providers.dart';
-import '../../../core/services/station_service.dart';
+import '../../../core/country/country_bounding_box.dart';
 import '../../../core/country/country_provider.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../profile/data/models/user_profile.dart';
-import '../../search/data/models/search_params.dart';
 import '../../search/providers/ev_charging_service_provider.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/search_result_item.dart';
 import '../../profile/providers/profile_provider.dart';
+import '../data/cross_border_corridor.dart';
 import '../data/strategies/route_geometry.dart';
 import '../data/services/routing_service.dart';
 import '../domain/entities/route_info.dart';
@@ -75,12 +74,24 @@ class RouteSearchState extends _$RouteSearchState {
       // (sample points are 15km apart, so smaller radius would create gaps).
       final effectiveRadius = searchRadiusKm < 15 ? 15.0 : searchRadiusKm;
 
+      // #2595 — resolve, OFFLINE, which countries the corridor crosses and
+      // map each to its (service, profile-fuel). Used by the fuel query
+      // function below and by the cross-border cheapest pricing.
+      final profileFuels = profileFuelByCountry(ref);
+      final corridorMap = buildCorridorServiceMap(ref, route, profileFuels);
+
       List<SearchResultItem> allResults;
       if (fuelType == FuelType.electric) {
         allResults = await _searchEVAlongRoute(route, effectiveRadius);
       } else {
         final strategy = strategyFor(strategyType);
-        final queryFn = await _buildQueryFunction(route, fuelType);
+        final queryFn = buildCorridorQueryFunction(
+          ref,
+          fuelType,
+          corridorMap: corridorMap,
+          criterion: criterion,
+          topNPerSamplePoint: topN,
+        );
         allResults = await strategy.searchAlongRoute(
           route: route,
           fuelType: fuelType,
@@ -106,11 +117,17 @@ class RouteSearchState extends _$RouteSearchState {
         );
       }
 
-      // 2b. #1872 — drop fuel stations that don't beat the route's
-      // cheapest by at least the user's minimum-saving threshold.
+      // 2b. #1872 / #2595 — drop fuel stations that don't beat the
+      // route's cheapest by at least the user's minimum-saving threshold.
+      // Each station is priced by ITS country's profile fuel so an
+      // E85-vs-E10 cross-border compare isn't apples-to-oranges.
       if (fuelType != FuelType.electric && minSaving > 0) {
-        allResults =
-            filterRouteResultsByMinSaving(allResults, fuelType, minSaving);
+        allResults = filterRouteResultsByMinSaving(
+          allResults,
+          fuelType,
+          minSaving,
+          profileFuelByCountry: profileFuels,
+        );
       }
 
       // 3. Identify cheapest fuel station
@@ -120,7 +137,16 @@ class RouteSearchState extends _$RouteSearchState {
         double? cheapestPrice;
         for (final item in allResults) {
           if (item is FuelStationResult) {
-            final price = item.station.priceFor(fuelType);
+            // #2595 — price by the station's own country fuel, not the
+            // single active-profile fuel, so the global cheapest across
+            // a cross-border route compares like-for-like.
+            final fuel = fuelForStation(
+              item.station.lat,
+              item.station.lng,
+              profileFuels,
+              fuelType,
+            );
+            final price = item.station.priceFor(fuel);
             if (price != null && (cheapestPrice == null || price < cheapestPrice)) {
               cheapestPrice = price;
               cheapestId = item.id;
@@ -163,65 +189,71 @@ class RouteSearchState extends _$RouteSearchState {
     }
   }
 
-  /// Build a query function that detects country per sample point.
-  ///
-  /// Cross-border routes (e.g. Berlin→Paris) traverse multiple countries.
-  /// Each query resolves the country from its coordinates and uses the
-  /// matching country-specific station service.
-  Future<StationQueryFunction> _buildQueryFunction(
-    RouteInfo route,
-    FuelType fuelType,
-  ) async {
-    final geocoding = ref.read(geocodingChainProvider);
-    final fallbackService = ref.read(stationServiceProvider);
-
-    // Cache: country code per sample point to avoid redundant geocoding
-    String? lastCountry;
-    StationService? lastService;
-
-    return ({
-      required double lat,
-      required double lng,
-      required double radiusKm,
-      required FuelType fuelType,
-    }) async {
-      // Detect country for this specific point
-      String? country;
-      try {
-        country = await geocoding.coordinatesToCountryCode(lat, lng);
-      } catch (e, st) {
-        // #2146 — non-fatal (falls through to fallbackService) but
-        // surface on the log so country-detection blackholes are
-        // recoverable from a bug report.
-        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
-          'where': 'RouteSearch: fuel country detection',
-          'lat': lat, 'lng': lng,
-        }));
+  /// Test seam (#2595): runs the cross-border station-search portion of
+  /// [searchAlongRoute] against a PRE-BUILT [route], skipping the OSRM
+  /// fetch (the `RoutingService` is constructed internally and not
+  /// injectable). Exercises the real corridor-map build, per-country-fuel
+  /// query function, strategy sweep + merge, and cross-border cheapest —
+  /// so a test can assert each leg routes to its own service + fuel and
+  /// the merged result interleaves both countries by corridor position.
+  @visibleForTesting
+  Future<RouteSearchResult> searchAlongPrebuiltRouteForTest({
+    required RouteInfo route,
+    required FuelType fuelType,
+    double searchRadiusKm = 15.0,
+    RouteSearchStrategyType strategyType = RouteSearchStrategyType.uniform,
+    RouteSearchCriterion criterion = RouteSearchCriterion.cheapest,
+    int topNPerSamplePoint = 10,
+  }) async {
+    final profileFuels = profileFuelByCountry(ref);
+    final corridorMap = buildCorridorServiceMap(ref, route, profileFuels);
+    final strategy = strategyFor(strategyType);
+    final queryFn = buildCorridorQueryFunction(
+      ref,
+      fuelType,
+      corridorMap: corridorMap,
+      criterion: criterion,
+      topNPerSamplePoint: topNPerSamplePoint,
+    );
+    final allResults = await strategy.searchAlongRoute(
+      route: route,
+      fuelType: fuelType,
+      searchRadiusKm: searchRadiusKm,
+      queryStations: queryFn,
+      maxDetourKm: searchRadiusKm,
+      topNPerSamplePoint: topNPerSamplePoint,
+      criterion: criterion,
+    );
+    String? cheapestId;
+    double? cheapestPrice;
+    for (final item in allResults) {
+      if (item is FuelStationResult) {
+        final fuel = fuelForStation(
+          item.station.lat,
+          item.station.lng,
+          profileFuels,
+          fuelType,
+        );
+        final price = item.station.priceFor(fuel);
+        if (price != null &&
+            (cheapestPrice == null || price < cheapestPrice)) {
+          cheapestPrice = price;
+          cheapestId = item.id;
+        }
       }
-
-      // Reuse cached service if country unchanged
-      final StationService service;
-      if (country != null && country == lastCountry && lastService != null) {
-        service = lastService!;
-      } else if (country != null) {
-        service = stationServiceForCountry(ref, country);
-        lastCountry = country;
-        lastService = service;
-        debugPrint('RouteSearch: switched to country=$country at $lat,$lng');
-      } else {
-        service = fallbackService;
-      }
-
-      final params = SearchParams(
-        lat: lat,
-        lng: lng,
-        radiusKm: radiusKm,
+    }
+    return RouteSearchResult(
+      route: route,
+      stations: allResults,
+      cheapestId: cheapestId,
+      cheapestPerSegment: strategy.computeBestStops(
+        route: route,
+        results: allResults,
         fuelType: fuelType,
-        sortBy: SortBy.price,
-      );
-      final result = await service.searchStations(params);
-      return result.data.map((s) => FuelStationResult(s) as SearchResultItem).toList();
-    };
+        segmentKm: 50.0,
+      ),
+      strategyType: strategyType,
+    );
   }
 
   Future<List<SearchResultItem>> _searchEVAlongRoute(
@@ -233,28 +265,21 @@ class RouteSearchState extends _$RouteSearchState {
       throw const ApiException(message: 'OpenChargeMap API key required');
     }
 
-    final geocoding = ref.read(geocodingChainProvider);
     final fallbackCountry = ref.read(activeCountryProvider).code;
     final seen = <String>{};
     final results = <SearchResultItem>[];
 
     for (final point in route.samplePoints) {
       try {
-        // Detect country per sample point for cross-border routes
-        String countryCode = fallbackCountry;
-        try {
-          final detected = await geocoding.coordinatesToCountryCode(
-            point.latitude, point.longitude,
-          );
-          if (detected != null) countryCode = detected;
-        } catch (e, st) {
-          // #2146 — non-fatal (uses fallbackCountry) but surface
-          // so triage can spot misconfigured geocoding chains.
-          unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
-            'where': 'RouteSearch EV: country detection',
-            'lat': point.latitude, 'lng': point.longitude,
-          }));
-        }
+        // #2595 — detect the per-point country OFFLINE via the bbox
+        // registry (no network geocode that could blackhole and fall
+        // back to the active country). Outside every box (e.g. mid-sea)
+        // falls back to the active country.
+        final countryCode = countryCodeFromLatLng(
+              point.latitude,
+              point.longitude,
+            ) ??
+            fallbackCountry;
 
         final result = await service.searchStations(
           lat: point.latitude,
@@ -292,21 +317,39 @@ class RouteSearchState extends _$RouteSearchState {
 /// Keeps only fuel stations priced within [minSaving] €/L of the
 /// cheapest station found along the route (#1872).
 ///
-/// The cheapest priced station is the anchor; a station survives when
-/// its [fuelType] price is at most `cheapest + minSaving`. Stations
-/// with no price for [fuelType] are kept — an unknown price is not a
-/// reason to hide a stop — and the list is returned unchanged when no
-/// station carries a comparable price. EV results never reach here
-/// (the caller gates on a non-electric fuel type).
+/// The cheapest priced station is the anchor; a station survives when its
+/// price is at most `cheapest + minSaving`. Stations with no price are
+/// kept — an unknown price is not a reason to hide a stop — and the list
+/// is returned unchanged when no station carries a comparable price. EV
+/// results never reach here (the caller gates on a non-electric fuel
+/// type).
+///
+/// #2595 — each station is priced by ITS country's profile fuel via
+/// [profileFuelByCountry] (resolved offline from the station's lat/lng),
+/// falling back to [fuelType] for a country with no profile or a station
+/// outside every bbox. This keeps the cross-border min-saving compare
+/// like-for-like (FR→E85 vs ES→E10) instead of pricing every station by a
+/// single fuel one country may not even sell. When [profileFuelByCountry]
+/// is empty (the historical single-country path) every station is priced
+/// by [fuelType], preserving the original behaviour exactly.
 List<SearchResultItem> filterRouteResultsByMinSaving(
   List<SearchResultItem> results,
   FuelType fuelType,
-  double minSaving,
-) {
+  double minSaving, {
+  Map<String, FuelType> profileFuelByCountry = const {},
+}) {
+  FuelType fuelFor(FuelStationResult item) {
+    if (profileFuelByCountry.isEmpty) return fuelType;
+    final code =
+        countryCodeFromLatLng(item.station.lat, item.station.lng)?.toUpperCase();
+    if (code == null) return fuelType;
+    return profileFuelByCountry[code] ?? fuelType;
+  }
+
   double? cheapest;
   for (final item in results) {
     if (item is FuelStationResult) {
-      final price = item.station.priceFor(fuelType);
+      final price = item.station.priceFor(fuelFor(item));
       if (price != null && (cheapest == null || price < cheapest)) {
         cheapest = price;
       }
@@ -316,7 +359,7 @@ List<SearchResultItem> filterRouteResultsByMinSaving(
   final ceiling = cheapest + minSaving;
   return results.where((item) {
     if (item is! FuelStationResult) return true;
-    final price = item.station.priceFor(fuelType);
+    final price = item.station.priceFor(fuelFor(item));
     return price == null || price <= ceiling;
   }).toList();
 }
