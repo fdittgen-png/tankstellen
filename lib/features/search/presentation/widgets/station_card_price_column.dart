@@ -57,6 +57,7 @@ class _StationPriceColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final effective = _effectivePrice;
     final hasDiscount = loyaltyDiscount != null &&
         loyaltyDiscount! > 0 &&
@@ -66,10 +67,52 @@ class _StationPriceColumn extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        // #2622 — the favourite star is hoisted OUT of the price row to the
+        // card's top-right so the price headline owns its own line. The
+        // 32×32 tap target + tooltip are preserved for a11y.
+        SizedBox(
+          width: 32,
+          height: 32,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: AnimatedFavoriteStar(
+              isFavorite: isFavorite,
+              size: 22,
+            ),
+            onPressed: onFavoriteTap,
+            tooltip: isFavorite
+                ? (l10n?.favoriteRemove ?? 'Remove from favorites')
+                : (l10n?.favoriteAdd ?? 'Add to favorites'),
+          ),
+        ),
         if (rating != null && rating! >= 1 && rating! <= 5)
           Padding(
             padding: const EdgeInsets.only(bottom: 2),
             child: _RatingStars(rating: rating!),
+          ),
+        // #2622 — promote the Cheapest badge ABOVE the price so it anchors
+        // the bestStops-default list before the eye reaches the number.
+        if (isCheapest)
+          Container(
+            margin: const EdgeInsets.only(bottom: 2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 6,
+              vertical: 1,
+            ),
+            decoration: BoxDecoration(
+              color: DarkModeColors.successSurface(context),
+              borderRadius: AppRadius.sm,
+            ),
+            child: Text(
+              l10n?.cheapest ?? 'Cheapest',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: DarkModeColors.success(context),
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -92,7 +135,10 @@ class _StationPriceColumn extends StatelessWidget {
                 // tooltip surfaces the un-discounted raw price so
                 // power users can verify what the operator quoted.
                 message: hasDiscount
-                    ? 'Raw: ${PriceFormatter.formatPrice(price, currencyOverride: currencyOverride)}'
+                    ? (l10n?.loyaltyRawPriceTooltip(
+                            PriceFormatter.formatPrice(price,
+                                currencyOverride: currencyOverride)) ??
+                        'Raw: ${PriceFormatter.formatPrice(price, currencyOverride: currencyOverride)}')
                     : '',
                 child: RichText(
                   overflow: TextOverflow.ellipsis,
@@ -109,23 +155,6 @@ class _StationPriceColumn extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
-            SizedBox(
-              width: 32,
-              height: 32,
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: AnimatedFavoriteStar(
-                  isFavorite: isFavorite,
-                  size: 22,
-                ),
-                onPressed: onFavoriteTap,
-                tooltip: isFavorite
-                    ? 'Remove from favorites'
-                    : 'Add to favorites',
-              ),
-            ),
           ],
         ),
         if (hasDiscount)
@@ -134,27 +163,6 @@ class _StationPriceColumn extends StatelessWidget {
             discount: loyaltyDiscount!,
             rawPrice: price!,
             currencyOverride: currencyOverride,
-          ),
-        if (isCheapest)
-          Container(
-            margin: const EdgeInsets.only(top: 2),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 6,
-              vertical: 1,
-            ),
-            decoration: BoxDecoration(
-              color: DarkModeColors.successSurface(context),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              AppLocalizations.of(context)?.cheapest ?? 'Cheapest',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: DarkModeColors.success(context),
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
           ),
         if (selectedFuelType == FuelType.all && !isCheapest) ...[
           const SizedBox(height: 2),
@@ -219,7 +227,7 @@ class _LoyaltyDiscountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
       decoration: BoxDecoration(
         color: theme.colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.sm,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

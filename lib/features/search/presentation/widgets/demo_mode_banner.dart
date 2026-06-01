@@ -14,12 +14,33 @@ import '../../../../l10n/app_localizations.dart';
 class DemoModeBanner extends ConsumerWidget {
   final CountryConfig country;
 
-  const DemoModeBanner({super.key, required this.country});
+  /// #2622 — the upper-cased ISO codes of every country a cross-border route
+  /// search actually queried (see `RouteSearchResult.corridorCountryCodes`).
+  ///
+  /// When this carries MORE THAN ONE code, the banner renders a multi-source
+  /// attribution header crediting each crossed country's data provider
+  /// (e.g. "France — Prix-Carburants · Spain — Geoportal Gasolineras")
+  /// instead of the single active-country header — fixing the visible
+  /// inconsistency where a FR→ES route credited only France. For nearby mode
+  /// or a single-country route this is empty and the historical
+  /// single-country header is shown unchanged.
+  final Set<String> corridorCountryCodes;
+
+  const DemoModeBanner({
+    super.key,
+    required this.country,
+    this.corridorCountryCodes = const {},
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final storage = ref.read(apiKeyStorageProvider);
     final l10n = AppLocalizations.of(context);
+
+    // #2622 — a cross-border route crosses >1 data source; credit them all.
+    if (corridorCountryCodes.length > 1) {
+      return _MultiSourceHeader(countryCodes: corridorCountryCodes);
+    }
 
     if (country.requiresApiKey && !storage.hasApiKey()) {
       // #1696 — jargon-free copy: the banner names neither "API key"
@@ -182,5 +203,60 @@ class _CountryServiceHeader extends StatelessWidget {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+/// #2622 — the multi-source attribution header shown above a CROSS-BORDER
+/// route result. Joins each crossed corridor country's data-source credit —
+/// "France — Prix-Carburants · Spain — Geoportal Gasolineras" — so a result
+/// that surfaces stations from several countries (#2626) no longer credits
+/// only the active country.
+///
+/// Each segment is `<country name> — <policy.attribution>` resolved from the
+/// registry (the same single source of truth `_CountryServiceHeader` uses);
+/// the joined string is then formatted through the `routeDataSourceMulti`
+/// ARB key. Country names + provider names are proper nouns, so only the
+/// join itself is localized. Codes with no registered policy are skipped.
+class _MultiSourceHeader extends StatelessWidget {
+  const _MultiSourceHeader({required this.countryCodes});
+
+  final Set<String> countryCodes;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+
+    final flags = <String>[];
+    final segments = <String>[];
+    // Sorted for a stable, deterministic order regardless of corridor
+    // detection order (FR before ES → "France … · Spain …").
+    for (final code in countryCodes.toList()..sort()) {
+      final config = Countries.byCode(code);
+      final policy = CountryServiceRegistry.policyFor(code);
+      if (config == null || policy == null) continue;
+      flags.add(config.flag);
+      // i18n-ignore: country name + provider attribution are proper nouns.
+      segments.add('${config.name} — ${policy.attribution}');
+    }
+
+    if (segments.isEmpty) return const SizedBox.shrink();
+
+    final joined = segments.join(' · ');
+    final labelText = l10n?.routeDataSourceMulti(joined) ?? joined;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(flags.join(' '), style: const TextStyle(fontSize: 14)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(labelText, style: theme.textTheme.labelSmall),
+          ),
+        ],
+      ),
+    );
   }
 }

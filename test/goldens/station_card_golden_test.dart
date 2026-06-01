@@ -1,92 +1,88 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// #2622 — the station-card layout was reworked (favourite star hoisted out
+// of the price row to the top-right, Cheapest badge promoted above the
+// price). The previous pixel-golden baselines became stale and, per the
+// project rule, macOS-baselined goldens fail Linux CI (3-4% > 1.5% tol) and
+// turn master red. These assertions were converted to STRUCTURAL widget
+// tests — they exercise the same scenarios without committing platform-
+// specific PNGs, so they run identically on macOS and Linux.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
+import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 
 import '../helpers/pump_app.dart';
 import '../fixtures/stations.dart';
 
 void main() {
-  group('StationCard golden tests', () {
-    testWidgets('normal open station', (tester) async {
+  group('StationCard structural snapshots (#2622 — ex-goldens)', () {
+    testWidgets('normal open station renders brand + a price', (tester) async {
       await pumpApp(
         tester,
-        const RepaintBoundary(
-          child: StationCard(
-            station: testStation,
-            selectedFuelType: FuelType.e10,
-          ),
+        const StationCard(
+          station: testStation,
+          selectedFuelType: FuelType.e10,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_normal.png'),
-      );
+      expect(find.text('STAR'), findsOneWidget);
+      expect(find.byType(RichText), findsWidgets);
     });
 
-    testWidgets('favorite station', (tester) async {
+    testWidgets('favorite station shows the filled amber star', (tester) async {
       await pumpApp(
         tester,
-        const RepaintBoundary(
-          child: StationCard(
-            station: testStation,
-            selectedFuelType: FuelType.e10,
-            isFavorite: true,
-          ),
+        const StationCard(
+          station: testStation,
+          selectedFuelType: FuelType.e10,
+          isFavorite: true,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_favorite.png'),
-      );
+      final star = tester.widget<Icon>(find.byIcon(Icons.star));
+      expect(star.color, Colors.amber);
     });
 
-    testWidgets('cheapest station with badge', (tester) async {
+    testWidgets('cheapest station shows the Cheapest badge above the price',
+        (tester) async {
       await pumpApp(
         tester,
-        RepaintBoundary(
-          child: StationCard(
-            station: testStationList[0], // cheap station
-            selectedFuelType: FuelType.diesel,
-            isCheapest: true,
-            priceTier: PriceTier.cheap,
-          ),
+        StationCard(
+          station: testStationList[0],
+          selectedFuelType: FuelType.diesel,
+          isCheapest: true,
+          priceTier: PriceTier.cheap,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_cheapest.png'),
-      );
+      final cheapest = find.text('Cheapest');
+      expect(cheapest, findsOneWidget);
+      final cheapestTop = tester.getTopLeft(cheapest).dy;
+      final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
+      expect(cheapestTop, lessThan(priceTop));
     });
 
-    testWidgets('closed station', (tester) async {
+    testWidgets('closed station shows the expensive tier arrow', (tester) async {
       await pumpApp(
         tester,
-        RepaintBoundary(
-          child: StationCard(
-            station: testStationList[2], // isOpen: false
-            selectedFuelType: FuelType.e10,
-            priceTier: PriceTier.expensive,
-          ),
+        StationCard(
+          station: testStationList[2], // isOpen: false
+          selectedFuelType: FuelType.e10,
+          priceTier: PriceTier.expensive,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_closed.png'),
-      );
+      expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
     });
 
-    testWidgets('station with no price', (tester) async {
+    testWidgets('station with no price still renders the card', (tester) async {
       const noPriceStation = Station(
         id: 'no-price',
         name: 'No Price Station',
@@ -102,21 +98,17 @@ void main() {
 
       await pumpApp(
         tester,
-        const RepaintBoundary(
-          child: StationCard(
-            station: noPriceStation,
-            selectedFuelType: FuelType.diesel,
-          ),
+        const StationCard(
+          station: noPriceStation,
+          selectedFuelType: FuelType.diesel,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_no_price.png'),
-      );
+      expect(find.byType(StationCard), findsOneWidget);
+      expect(find.text('ESSO'), findsOneWidget);
     });
 
-    testWidgets('station with amenities', (tester) async {
+    testWidgets('station with amenities renders amenity chips', (tester) async {
       const amenityStation = Station(
         id: 'amenity-station',
         name: 'Full Service',
@@ -142,38 +134,30 @@ void main() {
 
       await pumpApp(
         tester,
-        const RepaintBoundary(
-          child: StationCard(
-            station: amenityStation,
-            selectedFuelType: FuelType.e10,
-          ),
+        const StationCard(
+          station: amenityStation,
+          selectedFuelType: FuelType.e10,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_amenities.png'),
-      );
+      expect(find.byType(AmenityChips), findsOneWidget);
     });
 
-    testWidgets('station with all fuel types displayed', (tester) async {
+    testWidgets('all-fuels view renders the three price rows', (tester) async {
       await pumpApp(
         tester,
-        const RepaintBoundary(
-          child: StationCard(
-            station: testStation,
-            selectedFuelType: FuelType.all,
-          ),
+        const StationCard(
+          station: testStation,
+          selectedFuelType: FuelType.all,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_all_fuels.png'),
-      );
+      expect(find.text('E5: '), findsOneWidget);
+      expect(find.text('E10: '), findsOneWidget);
+      expect(find.text('Diesel: '), findsOneWidget);
     });
 
-    testWidgets('24h station', (tester) async {
+    testWidgets('24h station shows the 24h badge', (tester) async {
       const station24h = Station(
         id: '24h-station',
         name: '24h Tankstelle',
@@ -192,21 +176,16 @@ void main() {
 
       await pumpApp(
         tester,
-        const RepaintBoundary(
-          child: StationCard(
-            station: station24h,
-            selectedFuelType: FuelType.e10,
-          ),
+        const StationCard(
+          station: station24h,
+          selectedFuelType: FuelType.e10,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_24h.png'),
-      );
+      expect(find.text('24h'), findsOneWidget);
     });
 
-    testWidgets('no brand — address as title', (tester) async {
+    testWidgets('no brand — address used as the title', (tester) async {
       const noBrandStation = Station(
         id: 'no-brand',
         name: 'Unknown',
@@ -224,18 +203,13 @@ void main() {
 
       await pumpApp(
         tester,
-        const RepaintBoundary(
-          child: StationCard(
-            station: noBrandStation,
-            selectedFuelType: FuelType.e10,
-          ),
+        const StationCard(
+          station: noBrandStation,
+          selectedFuelType: FuelType.e10,
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('station_card_no_brand.png'),
-      );
+      expect(find.text('Unter den Linden'), findsOneWidget);
     });
   });
 }

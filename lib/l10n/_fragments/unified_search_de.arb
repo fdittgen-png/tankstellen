@@ -3,5 +3,12 @@
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Beide",
   "unifiedNoResultsForFilter": "Keine Ergebnisse für diesen Filter",
-  "searchFailedSnackbar": "Suche fehlgeschlagen – bitte erneut versuchen"
+  "searchFailedSnackbar": "Suche fehlgeschlagen – bitte erneut versuchen",
+  "routeStationCount": "{count, plural, =1{1 Tankstelle} other{{count} Tankstellen}}",
+  "stationUpdatedLabel": "Aktualisiert {time}",
+  "amenityMoreTooltip": "Außerdem: {names}",
+  "favoriteAdd": "Zu Favoriten hinzufügen",
+  "favoriteRemove": "Aus Favoriten entfernen",
+  "loyaltyRawPriceTooltip": "Roh: {price}",
+  "routeDataSourceMulti": "{sources}"
 }

@@ -67,6 +67,33 @@ void main() {
       expect(find.text('+2'), findsOneWidget);
     });
 
+    testWidgets(
+        '#2622 — the "+N" overflow pill carries a tooltip listing the hidden '
+        'amenities by name', (tester) async {
+      await pumpApp(
+        tester,
+        const AmenityChips(
+          amenities: {
+            StationAmenity.shop,
+            StationAmenity.carWash,
+            StationAmenity.toilet,
+            StationAmenity.airPump,
+            StationAmenity.atm,
+            StationAmenity.wifi,
+          },
+          maxVisible: 4,
+        ),
+      );
+
+      expect(find.text('+2'), findsOneWidget);
+
+      // The overflow pill is wrapped in a Tooltip whose message names the
+      // hidden amenities (ATM + WiFi are the 5th/6th, beyond maxVisible: 4).
+      final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
+      expect(tooltip.message, contains('ATM'));
+      expect(tooltip.message, contains('WiFi'));
+    });
+
     testWidgets('does not show overflow when within maxVisible',
         (tester) async {
       await pumpApp(

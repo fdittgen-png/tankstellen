@@ -40,7 +40,25 @@ class AmenityChips extends StatelessWidget {
               icon: amenityIcon(a),
               label: _localizedLabel(a, l10n),
             )),
-        if (overflow > 0) AppPill(label: '+$overflow'),
+        // #2622 — make the "+N" overflow pill meaningful: a tooltip +
+        // accessibility label spell out the hidden amenities by localized
+        // name so the count is no longer opaque.
+        if (overflow > 0)
+          Builder(builder: (_) {
+            final hiddenNames = sorted
+                .skip(maxVisible)
+                .map((a) => _localizedLabel(a, l10n))
+                .join(', ');
+            final message =
+                l10n?.amenityMoreTooltip(hiddenNames) ?? 'Also: $hiddenNames';
+            return Tooltip(
+              message: message,
+              child: Semantics(
+                label: message,
+                child: AppPill(label: '+$overflow'),
+              ),
+            );
+          }),
       ],
     );
   }

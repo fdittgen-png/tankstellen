@@ -25,6 +25,16 @@ class RouteSearchResult {
   /// consumers see no behaviour change.
   final bool isPartial;
 
+  /// #2622 — the upper-cased ISO codes of every country the search's
+  /// corridor actually queried (the keys of `buildCorridorServiceMap`).
+  ///
+  /// For a cross-border route (#2626) this carries e.g. `{FR, ES}` so the
+  /// result header can credit BOTH data sources instead of only the active
+  /// country. Empty for a single-country route or when the corridor map was
+  /// empty (an entirely mid-sea route), in which case the UI falls back to
+  /// the single-country attribution.
+  final Set<String> corridorCountryCodes;
+
   const RouteSearchResult({
     required this.route,
     required this.stations,
@@ -32,5 +42,6 @@ class RouteSearchResult {
     this.cheapestPerSegment,
     this.strategyType = RouteSearchStrategyType.uniform,
     this.isPartial = false,
+    this.corridorCountryCodes = const {},
   });
 }

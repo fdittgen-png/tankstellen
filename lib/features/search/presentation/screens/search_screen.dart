@@ -19,6 +19,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../map/presentation/widgets/inline_map.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
+import '../../../route_search/providers/route_search_provider.dart';
 import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
@@ -193,9 +194,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final country = ref.watch(activeCountryProvider);
     final l10n = AppLocalizations.of(context);
 
+    // #2622 — in route mode, surface the corridor's multi-country data
+    // sources (#2626) so a cross-border result credits every provider, not
+    // just the active country. Empty for nearby mode / single-country routes.
+    final isRoute = ref.watch(activeSearchModeProvider) == SearchMode.route;
+    final corridorCodes = isRoute
+        ? (ref.watch(routeSearchStateProvider).value?.corridorCountryCodes ??
+            const <String>{})
+        : const <String>{};
+
     return Column(
       children: [
-        DemoModeBanner(country: country),
+        DemoModeBanner(country: country, corridorCountryCodes: corridorCodes),
         // Compact summary bar — top-level entry point for editing criteria.
         const SearchSummaryBar(),
         UserPositionBar(
