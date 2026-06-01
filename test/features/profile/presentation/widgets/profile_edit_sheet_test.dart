@@ -252,4 +252,53 @@ void main() {
       expect(source, contains('widget.onDelete!()'));
     });
   });
+
+  group('ProfileEditSheet #2551 SectionCard redesign', () {
+    String mainSource() => File(
+          'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
+        ).readAsStringSync();
+
+    test('groups every section in a SectionCard', () {
+      expect(mainSource(), contains('SectionCard('));
+    });
+
+    test('references all 10 expected card title ARB keys', () {
+      final source = mainSource();
+      const keys = [
+        'vehicleSectionIdentityTitle', // 1 Identity
+        'defaultRadius', // 2 Search radius
+        'routePlanningSection', // 3 Route planning
+        'profileSectionDisplayStations', // 4 Display & stations
+        'privacyRatings', // 5 Station ratings
+        'landingScreen', // 6 Start screen
+        'approachOverlaySection', // 7 Approach overlay
+        'fillUpVehicleLabel', // 8 Vehicle
+        'profileSectionRegion', // 9 Region
+        'home', // 10 Home
+      ];
+      for (final key in keys) {
+        expect(
+          source,
+          contains(key),
+          reason: 'Edit-profile form must reference the $key card title',
+        );
+      }
+    });
+
+    test('docks the Save action outside the scrolling ListView', () {
+      final source = mainSource();
+      // The footer is built once and placed in a Column below the
+      // Expanded ListView so Save is always visible.
+      expect(source, contains('final footer = _SaveDeleteActions('));
+      expect(source, contains('Expanded(child: constrain(list))'));
+      // scrollController stays wired to the inner ListView.
+      expect(source, contains('controller: scrollController'));
+    });
+
+    test('centres content on wide layouts via a 560px ConstrainedBox', () {
+      final source = mainSource();
+      expect(source, contains('LayoutBuilder'));
+      expect(source, contains('maxWidth: 560'));
+    });
+  });
 }

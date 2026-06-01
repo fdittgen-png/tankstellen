@@ -4960,6 +4960,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Jak se toto vozidlo pohání';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Režim kalibrace';
 
   @override

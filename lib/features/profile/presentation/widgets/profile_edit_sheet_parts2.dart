@@ -12,56 +12,44 @@ class _CountrySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n?.profileCountry ?? 'Country',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: Countries.verified.map((c) {
-            return ChoiceChip(
-              label: Text('${c.flag} ${c.name}'),
-              selected: c.code == state.countryCode,
-              onSelected: (_) async {
-                // Confirm silently-impactful unit changes (currency,
-                // distance, volume, price-per-unit format) before
-                // mutating the profile. Same-unit switches (e.g.
-                // FR ↔ DE, both EUR + km + L + €/L) skip the
-                // dialog. A profile with no country set yet also
-                // skips — there's nothing to warn about.
-                final currentCode = state.countryCode;
-                final current = currentCode == null
-                    ? null
-                    : Countries.byCode(currentCode);
-                if (current == null || current.code == c.code) {
-                  ctrl.setCountryCode(c.code);
-                  return;
-                }
-                if (!countriesDifferInUnits(current, c)) {
-                  ctrl.setCountryCode(c.code);
-                  return;
-                }
-                final confirmed = await showCountryChangeDialog(
-                  context,
-                  from: current,
-                  to: c,
-                );
-                if (!context.mounted) return;
-                if (confirmed) {
-                  ctrl.setCountryCode(c.code);
-                }
-              },
-              visualDensity: VisualDensity.compact,
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: Countries.verified.map((c) {
+        return ChoiceChip(
+          label: Text('${c.flag} ${c.name}'),
+          selected: c.code == state.countryCode,
+          onSelected: (_) async {
+            // Confirm silently-impactful unit changes (currency,
+            // distance, volume, price-per-unit format) before
+            // mutating the profile. Same-unit switches (e.g.
+            // FR ↔ DE, both EUR + km + L + €/L) skip the
+            // dialog. A profile with no country set yet also
+            // skips — there's nothing to warn about.
+            final currentCode = state.countryCode;
+            final current =
+                currentCode == null ? null : Countries.byCode(currentCode);
+            if (current == null || current.code == c.code) {
+              ctrl.setCountryCode(c.code);
+              return;
+            }
+            if (!countriesDifferInUnits(current, c)) {
+              ctrl.setCountryCode(c.code);
+              return;
+            }
+            final confirmed = await showCountryChangeDialog(
+              context,
+              from: current,
+              to: c,
             );
-          }).toList(),
-        ),
-      ],
+            if (!context.mounted) return;
+            if (confirmed) {
+              ctrl.setCountryCode(c.code);
+            }
+          },
+          visualDensity: VisualDensity.compact,
+        );
+      }).toList(),
     );
   }
 }
@@ -90,11 +78,6 @@ class _ApproachOverlaySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n?.approachOverlaySection ?? 'Approach-station overlay',
-          style: theme.textTheme.titleSmall,
-        ),
-        const SizedBox(height: 4),
         Row(
           children: [
             Text('${l10n?.approachRadiusLabel ?? "Radius"}:'),
@@ -111,25 +94,22 @@ class _ApproachOverlaySection extends StatelessWidget {
             Text('${state.approachRadiusKm.toStringAsFixed(1)} km'),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(
-            l10n?.approachRadiusCaption(
-                    state.approachRadiusKm.toStringAsFixed(1)) ??
-                'Overlay grows + shows the price when within '
-                    '${state.approachRadiusKm.toStringAsFixed(1)} km '
-                    'of a fuel station',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        Text(
+          l10n?.approachRadiusCaption(
+                  state.approachRadiusKm.toStringAsFixed(1)) ??
+              'Overlay grows + shows the price when within '
+                  '${state.approachRadiusKm.toStringAsFixed(1)} km '
+                  'of a fuel station',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: Spacing.md),
         Text(
           l10n?.approachPriceModeLabel ?? 'Show price for',
           style: theme.textTheme.bodyMedium,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: Spacing.sm),
         Wrap(
           spacing: 6,
           children: [
@@ -152,7 +132,7 @@ class _ApproachOverlaySection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: Spacing.md),
         Row(
           children: [
             Text('${l10n?.approachMinPollLabel ?? "Min refresh"}:'),
@@ -170,16 +150,13 @@ class _ApproachOverlaySection extends StatelessWidget {
             Text('${state.approachMinPollSeconds} s'),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(
-            l10n?.approachMinPollCaption(state.approachMinPollSeconds) ??
-                'Floor on how often the overlay refreshes the nearest '
-                    'station (faster at speed, never tighter than '
-                    '${state.approachMinPollSeconds} s)',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        Text(
+          l10n?.approachMinPollCaption(state.approachMinPollSeconds) ??
+              'Floor on how often the overlay refreshes the nearest '
+                  'station (faster at speed, never tighter than '
+                  '${state.approachMinPollSeconds} s)',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -196,28 +173,17 @@ class _LanguageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n?.profileLanguage ?? 'Language',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: AppLanguages.all.map((l) {
-            return ChoiceChip(
-              label: Text(l.nativeName),
-              selected: l.code == state.languageCode,
-              onSelected: (_) => ctrl.setLanguageCode(l.code),
-              visualDensity: VisualDensity.compact,
-            );
-          }).toList(),
-        ),
-      ],
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: AppLanguages.all.map((l) {
+        return ChoiceChip(
+          label: Text(l.nativeName),
+          selected: l.code == state.languageCode,
+          onSelected: (_) => ctrl.setLanguageCode(l.code),
+          visualDensity: VisualDensity.compact,
+        );
+      }).toList(),
     );
   }
 }

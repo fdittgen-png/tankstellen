@@ -4995,6 +4995,12 @@ class AppLocalizationsBg extends AppLocalizations {
       'Как се движи превозното средство';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Режим на калибровка';
 
   @override

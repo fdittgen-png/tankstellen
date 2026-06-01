@@ -4949,6 +4949,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Hur detta fordon drivs';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibreringsläge';
 
   @override

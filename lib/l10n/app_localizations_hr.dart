@@ -4965,6 +4965,12 @@ class AppLocalizationsHr extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Kako se ovo vozilo kreće';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Način kalibracije';
 
   @override

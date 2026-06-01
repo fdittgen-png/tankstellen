@@ -4969,6 +4969,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Hoe dit voertuig rijdt';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibratiemodus';
 
   @override

@@ -4948,6 +4948,12 @@ class AppLocalizationsFi extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Miten ajoneuvo liikkuu';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Kalibrointitapa';
 
   @override

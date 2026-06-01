@@ -2168,6 +2168,8 @@
   "vehicleSectionIdentitySubtitle": "Name & FIN",
   "vehicleSectionDrivetrainTitle": "Antrieb",
   "vehicleSectionDrivetrainSubtitle": "Wie sich dieses Fahrzeug bewegt",
+  "profileSectionDisplayStations": "Anzeige & Tankstellen",
+  "profileSectionRegion": "Region",
   "calibrationModeLabel": "Kalibrierungsmodus",
   "calibrationModeRule": "Regelbasiert",
   "calibrationModeFuzzy": "Fuzzy",

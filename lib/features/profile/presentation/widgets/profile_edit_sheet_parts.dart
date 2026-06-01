@@ -21,9 +21,6 @@ class _RouteSegmentSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n?.routePlanningSection ?? 'Route planning',
-            style: theme.textTheme.titleSmall),
-        const SizedBox(height: 4),
         Row(
           children: [
             Text('${l10n?.routeSegment ?? "Route segment"}:'),
@@ -40,14 +37,11 @@ class _RouteSegmentSection extends StatelessWidget {
             Text('${state.routeSegmentKm.round()} km'),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(
-            l10n?.showCheapestEveryNKm(state.routeSegmentKm.round()) ??
-                'Show cheapest station every ${state.routeSegmentKm.round()} km along route',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        Text(
+          l10n?.showCheapestEveryNKm(state.routeSegmentKm.round()) ??
+              'Show cheapest station every ${state.routeSegmentKm.round()} km along route',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         Row(
@@ -66,15 +60,12 @@ class _RouteSegmentSection extends StatelessWidget {
             Text('${state.routeDetourBudgetKm.round()} km'),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(
-            l10n?.routeDetourBudgetCaption(state.routeDetourBudgetKm.round()) ??
-                'Surface stations up to ${state.routeDetourBudgetKm.round()} '
-                    'km off your direct route',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        Text(
+          l10n?.routeDetourBudgetCaption(state.routeDetourBudgetKm.round()) ??
+              'Surface stations up to ${state.routeDetourBudgetKm.round()} '
+                  'km off your direct route',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         _buildMinSavingRow(context, theme, l10n),
@@ -113,17 +104,14 @@ class _RouteSegmentSection extends StatelessWidget {
             Text(valueLabel),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(
-            off
-                ? (l10n?.routeMinSavingOffCaption ??
-                    'Showing every station found along the route')
-                : (l10n?.routeMinSavingCaption(amount) ??
-                    "Only stations within $amount of the route's cheapest"),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        Text(
+          off
+              ? (l10n?.routeMinSavingOffCaption ??
+                  'Showing every station found along the route')
+              : (l10n?.routeMinSavingCaption(amount) ??
+                  "Only stations within $amount of the route's cheapest"),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -205,9 +193,6 @@ class _RatingModeSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n?.privacyRatings ?? 'Station ratings',
-            style: theme.textTheme.titleSmall),
-        const SizedBox(height: 4),
         SegmentedButton<String>(
           segments: [
             ButtonSegment(
@@ -226,20 +211,17 @@ class _RatingModeSection extends StatelessWidget {
           selected: {state.ratingMode},
           onSelectionChanged: (s) => ctrl.setRatingMode(s.first),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 4, top: 4),
-          child: Text(
-            state.ratingMode == 'local'
-                ? (l10n?.ratingDescLocal ??
-                    'Ratings saved on this device only')
-                : state.ratingMode == 'private'
-                    ? (l10n?.ratingDescPrivate ??
-                        'Synced with your database (not visible to others)')
-                    : (l10n?.ratingDescShared ??
-                        'Visible to all users of your database'),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        const SizedBox(height: Spacing.sm),
+        Text(
+          state.ratingMode == 'local'
+              ? (l10n?.ratingDescLocal ?? 'Ratings saved on this device only')
+              : state.ratingMode == 'private'
+                  ? (l10n?.ratingDescPrivate ??
+                      'Synced with your database (not visible to others)')
+                  : (l10n?.ratingDescShared ??
+                      'Visible to all users of your database'),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],

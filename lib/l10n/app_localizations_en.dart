@@ -4926,6 +4926,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
 
   @override
+  String get profileSectionDisplayStations => 'Display & stations';
+
+  @override
+  String get profileSectionRegion => 'Region';
+
+  @override
   String get calibrationModeLabel => 'Calibration mode';
 
   @override
@@ -11712,6 +11718,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get vehicleSectionDrivetrainSubtitle =>
       '⟦Ĥóŵ ŧĥîš ṽéĥîçłé ɱóṽéš ·········⟧';
+
+  @override
+  String get profileSectionDisplayStations => '⟦Đîšƥłáý & šŧáŧîóñš ·······⟧';
+
+  @override
+  String get profileSectionRegion => '⟦Řéǧîóñ ···⟧';
 
   @override
   String get calibrationModeLabel => '⟦Çáłîƀřáŧîóñ ɱóđé ·······⟧';

@@ -3250,5 +3250,15 @@
   "@tripRecordingSavingTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "profileSectionDisplayStations": "Display & stations",
+  "@profileSectionDisplayStations": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "profileSectionRegion": "Region",
+  "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
