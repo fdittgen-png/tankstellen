@@ -14,7 +14,6 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
-import '../../../route_search/providers/route_search_params_provider.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_result_item.dart';
@@ -143,62 +142,51 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
             ),
             const SizedBox(height: 6),
           ],
-          Row(
+          // #2622 — de-densify: the route summary and the All/Best toggle
+          // share ONE row (summary left, pills right) and wrap when narrow.
+          // The "Every {km} km" segment row was a verbatim duplicate of the
+          // SearchSummaryBar's second chip (same routeSegmentSummaryBadge
+          // key); it stays visible there, so it is dropped from the header.
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 8,
+            runSpacing: 6,
             children: [
-              Icon(Icons.route, size: 16, color: theme.colorScheme.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${result.route.distanceKm.round()} km · '
-                  '${result.route.durationMinutes.round()} min · '
-                  '${result.stations.length} stations',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // #2592 — surface the route segment, not the radius: the
-          // route-planning param actually applied to this search.
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Row(
-              children: [
-                Icon(Icons.straighten,
-                    size: 14, color: theme.colorScheme.onSurfaceVariant),
-                const SizedBox(width: 8),
-                Builder(builder: (_) {
-                  final segmentText = ref
-                      .watch(routeSegmentSearchParamProvider)
-                      .round()
-                      .toString();
-                  return Text(
-                    l10n?.routeSegmentSummaryBadge(segmentText) ??
-                        'Every $segmentText km',
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.route, size: 16, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${result.route.distanceKm.round()} km · '
+                    '${result.route.durationMinutes.round()} min · '
+                    '${l10n?.routeStationCount(result.stations.length) ?? '${result.stations.length} stations'}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
                     ),
-                  );
-                }),
-              ],
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              SelectablePill(
-                label: l10n?.allStations ?? 'All stations',
-                icon: Icons.local_gas_station,
-                selected: _resultMode == RouteResultMode.allStations,
-                onTap: () => setState(() => _resultMode = RouteResultMode.allStations),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              SelectablePill(
-                label: l10n?.bestStops ?? 'Best stops',
-                icon: Icons.star,
-                selected: _resultMode == RouteResultMode.bestStops,
-                onTap: () => setState(() => _resultMode = RouteResultMode.bestStops),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SelectablePill(
+                    label: l10n?.allStations ?? 'All stations',
+                    icon: Icons.local_gas_station,
+                    selected: _resultMode == RouteResultMode.allStations,
+                    onTap: () => setState(
+                        () => _resultMode = RouteResultMode.allStations),
+                  ),
+                  const SizedBox(width: 8),
+                  SelectablePill(
+                    label: l10n?.bestStops ?? 'Best stops',
+                    icon: Icons.star,
+                    selected: _resultMode == RouteResultMode.bestStops,
+                    onTap: () => setState(
+                        () => _resultMode = RouteResultMode.bestStops),
+                  ),
+                ],
               ),
             ],
           ),
