@@ -141,4 +141,25 @@ platform :ios do
     build_appstore(build_number: options[:build_number])
     upload_testflight(changelog: options[:changelog])
   end
+
+  desc "Stage App Store text metadata (name/subtitle/keywords/description/etc.)."
+  desc "Run manually on a maintainer workstation — never on CI, never auto-submit."
+  desc "Reads metadata/<locale>/ and the safe flags in Deliverfile; a human"
+  desc "still presses 'Submit for Review' in App Store Connect afterwards."
+  lane :upload_metadata do
+    UI.user_error!("Refusing to upload metadata from CI — run this lane locally") if ENV["CI"] == "true"
+    # The flags below mirror Deliverfile so the safe mode holds even if this
+    # lane is invoked directly: text metadata is staged, never submitted or
+    # released, and the binary and screenshots are left untouched.
+    deliver(
+      api_key: asc_api_key,
+      submit_for_review: false,
+      automatic_release: false,
+      force: false,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      overwrite_screenshots: false,
+      skip_metadata: false,
+    )
+  end
 end

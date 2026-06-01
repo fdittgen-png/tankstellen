@@ -1,0 +1,31 @@
+Sparkilo finds the cheapest fuel and EV charging near you, then helps you burn less behind the wheel. Open-source (MIT), ad-free, no account, privacy-first. Live official prices across 17 countries, in 23 languages.
+
+FIND THE CHEAPEST PRICE
+- One search for stations nearby or along your route. Filter by fuel type, radius, open-now, amenities and highway-only.
+- Real-time prices from each country's official open-data source, plus EV charging via Open Charge Map.
+- Cheap-to-expensive price pins on a clear map. On a route, the best stops carry a Cheapest badge.
+- Favourites for fuel (every price) and EV chargers (kW, connectors, live availability).
+- Price alerts, per-station or by radius, computed on your device and firing when a deal is near you.
+
+DRIVE SMARTER, SAVE TWICE
+- Consumption tracker: tank level and range, average L/100km, average cost per km, total spent and full fill-up history. Add fill-ups by hand or scan the pump/receipt with OCR.
+- Carbon dashboard: cost and CO2 broken down by trip length and speed band.
+- Trip logbook: record by hand, hands-free over an OBD2/ELM327 adapter, or GPS-only. Your GPS route is coloured by efficiency.
+- Eco-coaching highlights wasteful habits with throttle and RPM histograms, a month-by-month comparison and an all-trips map.
+- Fuel-cost calculator, multiple driver profiles, and Basic / Medium / Full feature presets so the app stays as simple or as deep as you want.
+
+ON THE ROAD
+- Approach overlay shows the live price of the station you are heading toward.
+- Home-screen widget for favourites and the nearest stations.
+- Voice announcements read out prices while you drive.
+
+PRIVACY FIRST
+- No account, no ads, no tracking. Your GPS position and any API keys never leave your device.
+- Privacy Dashboard: see, export or delete everything at any time.
+- Optional TankSync for cross-device sync of favourites, vehicles, fill-ups and alerts to a server you control.
+
+COUNTRIES COVERED
+Austria, Argentina, Australia, Chile, Denmark, France, Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South Korea, Spain and the United Kingdom.
+
+OPEN SOURCE
+Sparkilo is licensed under MIT. Full source, deployment docs and translations live on GitHub. Contributions and new-country sources are welcome.

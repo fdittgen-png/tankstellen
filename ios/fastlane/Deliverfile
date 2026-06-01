@@ -1,0 +1,28 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Configuration for `fastlane deliver` (App Store Connect metadata upload).
+#
+# SAFETY: this file is deliberately configured so that running `deliver` can
+# only ever stage text metadata in App Store Connect — it can NEVER submit the
+# app for review, release a build, or touch the binary or screenshots. The
+# maintainer runs `deliver` manually with App Store Connect credentials; a
+# human still presses "Submit for Review" in the web console afterwards.
+
+app_identifier("de.tankstellen.tankstellen")
+
+# Never submit for review or auto-release — a human does both in the console.
+submit_for_review(false)
+automatic_release(false)
+
+# Never prompt to overwrite or skip the interactive confirmation blindly.
+force(false)
+
+# This repo holds text metadata only. Do not upload a binary and do not push
+# screenshots (we have no Apple-sized device screenshots yet, see README.md).
+skip_binary_upload(true)
+skip_screenshots(true)
+overwrite_screenshots(false)
+
+# Localised text metadata lives under ios/fastlane/metadata/<locale>/.
+# `deliver` discovers it automatically relative to this file.

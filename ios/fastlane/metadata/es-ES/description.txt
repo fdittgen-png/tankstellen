@@ -1,0 +1,31 @@
+Sparkilo encuentra el combustible y la recarga eléctrica más baratos cerca de ti y te ayuda a consumir menos al volante. Código abierto (MIT), sin anuncios, sin cuenta, privacidad primero. Precios en tiempo real en 17 países y en 23 idiomas.
+
+ENCUENTRA EL PRECIO MÁS BAJO
+- Una sola búsqueda para estaciones cercanas o a lo largo de tu ruta. Filtros por tipo de combustible, radio, abierto ahora, servicios y solo autopista.
+- Precios en tiempo real de la fuente oficial de datos abiertos de cada país, además de recarga eléctrica vía Open Charge Map.
+- Marcadores de precio de barato a caro en un mapa claro. En una ruta, las mejores paradas llevan la insignia Más barato.
+- Favoritos para combustible (todos los precios) y puntos de recarga (kW, conectores, disponibilidad en directo).
+- Alertas de precio por estación o por radio, calculadas en tu dispositivo y activadas cuando una buena oferta está cerca de ti.
+
+CONDUCE LISTO, AHORRA DOBLE
+- Seguimiento de consumo: nivel del depósito y autonomía, media de L/100km, coste medio por km, gasto total e historial completo de repostajes. Añade repostajes a mano o escanea el surtidor o el recibo con OCR.
+- Panel de carbono: coste y CO2 desglosados por longitud del trayecto y franja de velocidad.
+- Cuaderno de viajes: registro manual, manos libres con un adaptador OBD2/ELM327, o solo GPS. Tu ruta GPS se colorea según la eficiencia.
+- El eco-coaching destaca los hábitos que gastan de más con histogramas de acelerador y revoluciones, una comparación mes a mes y un mapa de todos los viajes.
+- Calculadora de coste de combustible, varios perfiles de conductor y ajustes Basic / Medium / Full para que la app sea tan sencilla o tan completa como quieras.
+
+EN LA CARRETERA
+- La vista de aproximación muestra el precio en directo de la estación a la que te diriges.
+- Widget en la pantalla de inicio para favoritos y las estaciones más cercanas.
+- Anuncios de voz que leen los precios mientras conduces.
+
+PRIVACIDAD PRIMERO
+- Sin cuenta, sin anuncios, sin rastreo. Tu posición GPS y tus claves de API nunca salen de tu dispositivo.
+- Panel de privacidad: consulta, exporta o borra todo en cualquier momento.
+- TankSync opcional para sincronizar favoritos, vehículos, repostajes y alertas entre dispositivos, hacia un servidor que tú controlas.
+
+PAÍSES CUBIERTOS
+Austria, Argentina, Australia, Chile, Dinamarca, Francia, Alemania, Grecia, Italia, Luxemburgo, México, Portugal, Rumanía, Eslovenia, Corea del Sur, España y Reino Unido.
+
+CÓDIGO ABIERTO
+Sparkilo tiene licencia MIT. El código fuente completo, la documentación de despliegue y las traducciones están en GitHub. Se agradecen las contribuciones y nuevas fuentes de países.

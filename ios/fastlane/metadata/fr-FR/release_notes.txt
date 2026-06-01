@@ -1,0 +1,1 @@
+Carte des prix plus nette et recherche plus rapide à proximité et le long du trajet, un tableau de bord consommation et carbone plus clair, un enregistrement OBD2 et GPS plus fluide, et l'aperçu du prix de la station à l'approche. Corrections de bugs et optimisations partout.
