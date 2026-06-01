@@ -3964,13 +3964,16 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lisab automaatse OBD2 reisalvestamise. Vajalik ühendatud adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'Minu sõidukid';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Reisid (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Sõitmine';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Ei Kulutus-välilehteä eikä Kulutus-asetusosioita.",
   "consoModeFuelDescription": "Vain manuaaliset tankkaukset. Hyödyllinen ilman OBD2-sovitinta.",
   "consoModeFuelAndTripsDescription": "Lisää automaattinen OBD2-matkojen tallennus. Vaatii paritetun sovittimen.",
-  "consoSubsectionVehicles": "Omat ajoneuvot",
-  "consoSubsectionTrajets": "Matkat (OBD2)",
-  "consoSubsectionToggles": "Ajaminen",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 osittainen tankkaus odottaa plein complet — ei mukana keskiarvossa} other{{count} osittaista tankkausta odottaa plein complet — ei mukana keskiarvossa}}",
   "consumptionStatsCorrectionShareHint": "{percent}% polttoaineesta automaattikorjauksista — tarkista merkinnät",
   "fillUpCorrectionLabel": "Automaattikorjaus — napauta muokataksesi",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

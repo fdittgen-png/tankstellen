@@ -3999,13 +3999,16 @@ class AppLocalizationsEl extends AppLocalizations {
       'Προσθέτει αυτόματη καταγραφή ταξιδιών OBD2. Απαιτεί συζευγμένο προσαρμογέα.';
 
   @override
-  String get consoSubsectionVehicles => 'Τα οχήματά μου';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Ταξίδια (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Οδήγηση';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

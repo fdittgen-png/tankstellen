@@ -3984,13 +3984,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'Aggiunge la registrazione automatica dei percorsi OBD2. Richiede un adattatore abbinato.';
 
   @override
-  String get consoSubsectionVehicles => 'I miei veicoli';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Percorsi (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Guida';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

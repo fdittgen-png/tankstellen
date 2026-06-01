@@ -1881,7 +1881,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+      'Your cars — fuel type, engine and tank size for accurate consumption estimates';
 
   @override
   String get vehiclesEmptyMessage =>
@@ -3950,13 +3950,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Adds automatic OBD2 trip recording. Requires a paired adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'My vehicles';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Trips (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Driving';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {
@@ -8585,7 +8588,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get vehiclesMenuSubtitle =>
-      '⟦Ɓáŧŧéřý, çóññéçŧóřš, çĥářǧîñǧ ƥřéƒéřéñçéš ················⟧';
+      '⟦Ýóúř çářš — ƒúéł ŧýƥé, éñǧîñé áñđ ŧáñķ šîžé ƒóř áççúřáŧé çóñšúɱƥŧîóñ éšŧîɱáŧéš ·····························⟧';
 
   @override
   String get vehiclesEmptyMessage =>
@@ -10709,13 +10712,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Áđđš áúŧóɱáŧîç ÓƁĐ2 ŧřîƥ řéçóřđîñǧ. Řéɋúîřéš á ƥáîřéđ áđáƥŧéř. ·······················⟧';
 
   @override
-  String get consoSubsectionVehicles => '⟦Ṁý ṽéĥîçłéš ·····⟧';
+  String get consoGroupVehicles => '⟦Ṽéĥîçłéš ····⟧';
 
   @override
-  String get consoSubsectionTrajets => '⟦Ŧřîƥš (ÓƁĐ2) ····⟧';
+  String get consoGroupCoaching => '⟦Çóáçĥîñǧ ŵĥîłé đřîṽîñǧ ·········⟧';
 
   @override
-  String get consoSubsectionToggles => '⟦Đřîṽîñǧ ···⟧';
+  String get consoGroupRewards => '⟦Řéŵářđš & šáṽîñǧš ······⟧';
+
+  @override
+  String get consoGroupTroubleshooting => '⟦Ŧřóúƀłéšĥóóŧîñǧ ·······⟧';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

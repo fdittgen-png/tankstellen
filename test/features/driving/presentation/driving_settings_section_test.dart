@@ -6,11 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/core/widgets/section_header.dart';
 import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_settings_section.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/glide_coach/providers/glide_coach_enabled_provider.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/gamification_settings_tile.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
 import '../../../helpers/pump_app.dart';
@@ -147,18 +150,19 @@ void main() {
         ],
       );
 
-      // #1572 — Mes véhicules is back inside the Conso foldable as the
-      // first sub-section. Fuel-club lives in the Driving sub-section.
+      // #2566 — the vehicles tile is the first group (Vehicles); the
+      // fuel-club tile lives in the Rewards & savings group.
       expect(
         find.byKey(const Key('consoleVehiclesTile')),
         findsOneWidget,
         reason: 'My vehicles tile must render inside the Conso section '
-            'as the first sub-section after #1572.',
+            'as the first (Vehicles) group after #2566.',
       );
       expect(
         find.byKey(const Key('consoleFuelClubCardsTile')),
         findsOneWidget,
-        reason: 'Fuel club cards tile is part of the Driving sub-section.',
+        reason: 'Fuel club cards tile is part of the Rewards & savings '
+            'group.',
       );
 
       final children = <Widget>[
@@ -169,10 +173,117 @@ void main() {
       expect(
         children.length,
         2,
-        reason: 'Exactly two SettingsMenuTile children: My vehicles '
-            '(Mes véhicules sub-section) + Fuel club cards (Driving '
-            'sub-section).',
+        reason: 'Exactly two SettingsMenuTile children: the vehicles tile '
+            '(Vehicles group) + Fuel club cards (Rewards & savings group).',
       );
+    },
+  );
+
+  testWidgets(
+    'regroups the section into the #2566 purpose-driven IA — Vehicles, '
+    'Coaching while driving, Rewards & savings, Troubleshooting — in '
+    'order, with the OBD2 diagnostic gated behind the OBD2 stack',
+    (tester) async {
+      // OBD2 stack on (obd2TripRecording) + loyalty + glide-coach + its
+      // prereq so every group and both coaching toggles render. Override
+      // glideCoachEnabledProvider directly so the toggle is visible.
+      await pumpApp(
+        tester,
+        const DrivingSettingsSection(),
+        overrides: [
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+          featureFlagsProvider.overrideWith(
+            () => _TestFeatureFlags(<Feature>{
+              // showConsumptionTab + obd2TripRecording => ConsoMode
+              // .fuelAndTrips, which surfaces the Troubleshooting group.
+              Feature.showConsumptionTab,
+              Feature.obd2TripRecording,
+              Feature.loyaltyCards,
+            }),
+          ),
+          glideCoachEnabledProvider.overrideWithValue(true),
+        ],
+      );
+
+      // Resolve the localized group-header strings from the running app.
+      final l = AppLocalizations.of(
+        tester.element(find.byType(DrivingSettingsSection)),
+      )!;
+      final headerTitles = tester
+          .widgetList<SectionHeader>(find.byType(SectionHeader))
+          .map((h) => h.title)
+          .toList();
+      expect(
+        headerTitles,
+        <String>[
+          l.consoGroupVehicles,
+          l.consoGroupCoaching,
+          l.consoGroupRewards,
+          l.consoGroupTroubleshooting,
+        ],
+        reason: 'The four purpose-driven groups must render in IA order '
+            '(#2566): Vehicles, Coaching while driving, Rewards & savings, '
+            'Troubleshooting.',
+      );
+
+      // Every preserved control + Key must still be present.
+      expect(find.byKey(const Key('consoleVehiclesTile')), findsOneWidget);
+      expect(find.byKey(const Key('hapticEcoCoachToggle')), findsOneWidget);
+      expect(find.byKey(const Key('glideCoachToggle')), findsOneWidget);
+      expect(find.byKey(const Key('consoleFuelClubCardsTile')), findsOneWidget);
+      expect(find.byType(GamificationSettingsTile), findsOneWidget);
+      expect(
+        find.byKey(const Key('obd2DebugLoggingToggle')),
+        findsOneWidget,
+        reason: 'The OBD2 debug-logging diagnostic lives in the '
+            'Troubleshooting group, shown only when the OBD2 stack is on.',
+      );
+
+      // The two coaching toggles must sit together, eco-coach first then
+      // glide-coach, between the Coaching and Rewards headers.
+      final ecoY = tester
+          .getTopLeft(find.byKey(const Key('hapticEcoCoachToggle')))
+          .dy;
+      final glideY =
+          tester.getTopLeft(find.byKey(const Key('glideCoachToggle'))).dy;
+      expect(
+        ecoY < glideY,
+        isTrue,
+        reason: 'Eco-coaching must render above glide-coach within the '
+            'Coaching while driving group.',
+      );
+    },
+  );
+
+  testWidgets(
+    'hides the Troubleshooting group (and OBD2 debug-logging) while the '
+    'OBD2 stack is off (consoMode != fuelAndTrips)',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const DrivingSettingsSection(),
+        overrides: [
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+          featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
+        ],
+      );
+
+      final l = AppLocalizations.of(
+        tester.element(find.byType(DrivingSettingsSection)),
+      )!;
+      final headerTitles = tester
+          .widgetList<SectionHeader>(find.byType(SectionHeader))
+          .map((h) => h.title)
+          .toList();
+      expect(
+        headerTitles,
+        isNot(contains(l.consoGroupTroubleshooting)),
+        reason: 'No Troubleshooting group without the OBD2 stack — the '
+            'debug-logging diagnostic only concerns the OBD2 link.',
+      );
+      expect(find.byKey(const Key('obd2DebugLoggingToggle')), findsNothing);
     },
   );
 

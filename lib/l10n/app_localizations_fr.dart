@@ -1904,7 +1904,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get vehiclesMenuSubtitle =>
-      'Batterie, connecteurs, préférences de recharge';
+      'Vos voitures — type de carburant, moteur et capacité du réservoir pour des estimations de consommation précises';
 
   @override
   String get vehiclesEmptyMessage =>
@@ -4005,13 +4005,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ajoute l\'enregistrement OBD2 automatique des trajets. Nécessite un adaptateur appairé.';
 
   @override
-  String get consoSubsectionVehicles => 'Mes véhicules';
+  String get consoGroupVehicles => 'Véhicules';
 
   @override
-  String get consoSubsectionTrajets => 'Trajets (OBD2)';
+  String get consoGroupCoaching => 'Coaching pendant la conduite';
 
   @override
-  String get consoSubsectionToggles => 'Conduite';
+  String get consoGroupRewards => 'Récompenses et économies';
+
+  @override
+  String get consoGroupTroubleshooting => 'Dépannage';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

@@ -3992,13 +3992,16 @@ class AppLocalizationsLv extends AppLocalizations {
       'Pievieno automātisku OBD2 braucienu ierakstīšanu. Nepieciešams savienots adapteris.';
 
   @override
-  String get consoSubsectionVehicles => 'Mani transportlīdzekļi';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Braucieni (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Braukšana';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

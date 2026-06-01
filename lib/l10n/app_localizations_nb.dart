@@ -3966,13 +3966,16 @@ class AppLocalizationsNb extends AppLocalizations {
       'Legger til automatisk OBD2-turregistrering. Krever en tilknyttet adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'Mine kjøretøy';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Turer (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Kjøring';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

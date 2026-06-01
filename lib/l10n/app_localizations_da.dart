@@ -3967,13 +3967,16 @@ class AppLocalizationsDa extends AppLocalizations {
       'Tilføjer automatisk OBD2-turoptagelse. Kræver en parret adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'Mine køretøjer';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Ture (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Kørsel';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

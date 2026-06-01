@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Nincs Fogyasztás fül és Fogyasztás beállítási szakasz.",
   "consoModeFuelDescription": "Csak kézi tankolások. Hasznos OBD2-adapter nélkül.",
   "consoModeFuelAndTripsDescription": "Automatikus OBD2-útfelvételt ad hozzá. Párosított adapter szükséges.",
-  "consoSubsectionVehicles": "Járműveim",
-  "consoSubsectionTrajets": "Utak (OBD2)",
-  "consoSubsectionToggles": "Vezetés",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 részleges tankolás vár teljes töltésre — nincs az átlagban} other{{count} részleges tankolás vár teljes töltésre — nincs az átlagban}}",
   "consumptionStatsCorrectionShareHint": "Az üzemanyag {percent}%-a automatikus korrekcióból — tekintse át a bejegyzéseket",
   "fillUpCorrectionLabel": "Automatikus korrekció — szerkesztéshez érintsen",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

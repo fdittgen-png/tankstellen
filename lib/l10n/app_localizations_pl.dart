@@ -3979,13 +3979,16 @@ class AppLocalizationsPl extends AppLocalizations {
       'Dodaje automatyczne nagrywanie tras OBD2. Wymaga sparowanego adaptera.';
 
   @override
-  String get consoSubsectionVehicles => 'Moje pojazdy';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Trasy (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Jazda';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

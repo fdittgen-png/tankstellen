@@ -3983,13 +3983,16 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voegt automatische OBD2-ritopname toe. Vereist een gekoppelde adapter.';
 
   @override
-  String get consoSubsectionVehicles => 'Mijn voertuigen';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Ritten (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Rijden';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Nėra Suvartojimo skirtuko ir Suvartojimo nustatymų skyriaus.",
   "consoModeFuelDescription": "Tik rankinis tankavimas. Tinka be OBD2 adapterio.",
   "consoModeFuelAndTripsDescription": "Prideda automatinį OBD2 kelionių įrašymą. Reikalingas suporuotas adapteris.",
-  "consoSubsectionVehicles": "Mano transporto priemonės",
-  "consoSubsectionTrajets": "Kelionės (OBD2)",
-  "consoSubsectionToggles": "Vairavimas",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 dalinis tankavimas laukia baigto tankavimo — neįskaičiuotas į vidurkį} other{{count} daliniai tankavimai laukia baigto tankavimo — neįskaičiuoti į vidurkį}}",
   "consumptionStatsCorrectionShareHint": "{percent}% kuro iš automatinių pataisymų — peržiūrėkite įrašus",
   "fillUpCorrectionLabel": "Automatinis pataisymas — palieskite, kad redaguotumėte",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

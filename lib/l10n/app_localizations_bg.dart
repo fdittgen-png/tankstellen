@@ -3995,13 +3995,16 @@ class AppLocalizationsBg extends AppLocalizations {
       'Добавя автоматичен OBD2 запис на пътувания. Изисква сдвоен адаптер.';
 
   @override
-  String get consoSubsectionVehicles => 'Моите превозни средства';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Пътувания (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Шофиране';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

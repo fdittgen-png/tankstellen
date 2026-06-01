@@ -3996,13 +3996,16 @@ class AppLocalizationsHu extends AppLocalizations {
       'Automatikus OBD2-útfelvételt ad hozzá. Párosított adapter szükséges.';
 
   @override
-  String get consoSubsectionVehicles => 'Járműveim';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Utak (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Vezetés';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

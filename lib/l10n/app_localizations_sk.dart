@@ -3985,13 +3985,16 @@ class AppLocalizationsSk extends AppLocalizations {
       'Pridáva automatický záznam jázd OBD2. Vyžaduje spárovaný adaptér.';
 
   @override
-  String get consoSubsectionVehicles => 'Moje vozidlá';
+  String get consoGroupVehicles => 'Vehicles';
 
   @override
-  String get consoSubsectionTrajets => 'Jazdy (OBD2)';
+  String get consoGroupCoaching => 'Coaching while driving';
 
   @override
-  String get consoSubsectionToggles => 'Jazda';
+  String get consoGroupRewards => 'Rewards & savings';
+
+  @override
+  String get consoGroupTroubleshooting => 'Troubleshooting';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {

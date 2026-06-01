@@ -1153,9 +1153,6 @@
   "consoModeOffDescription": "Sem separador Conso nem secção de definições Conso.",
   "consoModeFuelDescription": "Apenas abastecimentos manuais. Útil sem adaptador OBD2.",
   "consoModeFuelAndTripsDescription": "Adiciona gravação automática de viagens OBD2. Requer adaptador emparelhado.",
-  "consoSubsectionVehicles": "Os meus veículos",
-  "consoSubsectionTrajets": "Viagens (OBD2)",
-  "consoSubsectionToggles": "Condução",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 abastecimento parcial pendente de tanque cheio — não incluído na média} other{{count} abastecimentos parciais pendentes de tanque cheio — não incluídos na média}}",
   "consumptionStatsCorrectionShareHint": "{percent}% de combustível de correções automáticas — reveja as entradas",
   "fillUpCorrectionLabel": "Correção automática — toque para editar",
@@ -3258,6 +3255,26 @@
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupVehicles": "Vehicles",
+  "@consoGroupVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupCoaching": "Coaching while driving",
+  "@consoGroupCoaching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupRewards": "Rewards & savings",
+  "@consoGroupRewards": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consoGroupTroubleshooting": "Troubleshooting",
+  "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
