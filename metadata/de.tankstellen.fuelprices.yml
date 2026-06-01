@@ -1,0 +1,49 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# OFFICIAL fdroiddata recipe (#2577) — submit this to
+# https://gitlab.com/fdroid/fdroiddata by copying it to
+# metadata/de.tankstellen.fuelprices.yml in a fork and opening a merge request.
+# See docs/guides/fdroid-submission.md for the full fork → lint → build → MR
+# flow and the external-review caveats.
+#
+# This is the REPRODUCIBLE-BUILD recipe: F-Droid's buildserver checks out the
+# tagged source and builds the GMS-free `fdroid` flavor itself (unlike the
+# self-hosted repo under fdroid/, which ships a prebuilt APK).
+
+Categories:
+  - Navigation
+  - Internet
+License: MIT
+AuthorName: Florian DITTGEN
+WebSite: https://github.com/fdittgen-png/tankstellen
+SourceCode: https://github.com/fdittgen-png/tankstellen
+IssueTracker: https://github.com/fdittgen-png/tankstellen/issues
+
+RepoType: git
+Repo: https://github.com/fdittgen-png/tankstellen.git
+
+Builds:
+  - versionName: 5.0.0
+    versionCode: 5132
+    commit: v5.0.0
+    subdir: android/app
+    # ndk: r27  # TODO: set the exact NDK after a clean `fdroid build` test —
+    #           # F-Droid's buildserver reports the version it needs in the log.
+    gradle:
+      - fdroid
+    srclibs:
+      - flutter@stable
+    prebuild:
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get
+      - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
+    build: |
+      $$flutter$$/bin/flutter build apk --release --flavor fdroid \
+        --dart-define=FORCE_LOCATION_MANAGER=true
+    output: build/app/outputs/flutter-apk/app-fdroid-release.apk
+
+AutoUpdateMode: Version v%v
+UpdateCheckMode: Tags ^v\d
+CurrentVersion: 5.0.0
+CurrentVersionCode: 5132

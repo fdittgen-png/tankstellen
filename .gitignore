@@ -111,6 +111,7 @@ docs/guides/*
 !docs/guides/ios-codesigning.md
 !docs/guides/ios-widget-extension.md
 !docs/guides/feature-flags.md
+!docs/guides/fdroid-submission.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
