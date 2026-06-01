@@ -542,6 +542,8 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_debugMode ?? m.displayName;
     case Feature.approachOverlay:
       return l?.featureLabel_approachOverlay ?? m.displayName;
+    case Feature.voiceAnnouncements:
+      return l?.featureLabel_voiceAnnouncements ?? m.displayName;
   }
 }
 
@@ -626,6 +628,8 @@ String _featureDescription(AppLocalizations? l, Feature f) {
       return l?.featureDescription_debugMode ?? m.description;
     case Feature.approachOverlay:
       return l?.featureDescription_approachOverlay ?? m.description;
+    case Feature.voiceAnnouncements:
+      return l?.featureDescription_voiceAnnouncements ?? m.description;
   }
 }
 
@@ -661,6 +665,9 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.tflitePricePrediction:
       return l?.featureBlockedEnable_tflitePricePrediction ??
           'Enable price history first';
+    case Feature.voiceAnnouncements:
+      return l?.featureBlockedEnable_voiceAnnouncements ??
+          'Enable the approach overlay first';
     // Features without prerequisites can never reach this branch — the
     // dependency-graph helpers short-circuit. Return a generic fallback
     // so the function is total in case the manifest changes.

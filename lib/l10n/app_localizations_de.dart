@@ -4640,6 +4640,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Während einer aufgezeichneten Fahrt wechselt die schwebende Kachel zur Farbe der Kraftstoffsorte und zeigt den Preis an, wenn Sie sich einer Tankstelle nähern.';
 
   @override
+  String get featureLabel_voiceAnnouncements => 'Sprachansagen';
+
+  @override
+  String get featureDescription_voiceAnnouncements =>
+      'Sagt günstige Tankstellen in der Nähe während der Fahrt laut an, damit Sie den Blick auf der Straße behalten können.';
+
+  @override
+  String get featureBlockedEnable_voiceAnnouncements =>
+      'Aktiviere zuerst das Annäherungs-Overlay';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

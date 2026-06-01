@@ -17,6 +17,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/haptic_eco_coach.dart';
 import '../../../driving/providers/haptic_eco_coach_provider.dart';
+import '../../../driving/providers/voice_announcement_listener_provider.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/broken_map_belief.dart';
 import '../../data/pip_controller.dart';
@@ -626,6 +627,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final l = AppLocalizations.of(context);
     final state = ref.watch(tripRecordingProvider);
     final stopped = _stopped;
+
+    // #2569 — keep the voice-announcement listener mounted while this
+    // screen is up. It is keepAlive + self-gating (it subscribes to the
+    // live approach stream only while `Feature.voiceAnnouncements` is on),
+    // but its internal `ref.listen` fires only while the provider itself
+    // has a live watcher — so we `watch` (not `read`) it here.
+    ref.watch(voiceAnnouncementListenerProvider);
 
     // #2274 concern 1 — the screen may have mounted in the connecting
     // phase (concern 2) before any trip was active, so the initState

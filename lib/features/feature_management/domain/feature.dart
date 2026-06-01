@@ -185,4 +185,16 @@ enum Feature {
   /// presets. No prerequisite — the overlay degrades gracefully on
   /// GPS-only trajets (no OBD2 required).
   approachOverlay,
+
+  /// Spoken voice announcements of nearby cheap fuel while driving
+  /// (#2569 / Epic #2065). When on and a trip is recording, the live
+  /// [ApproachDetector] signal is fed into the dormant
+  /// `AnnouncementEngine` + `FlutterTtsAnnouncementService`, which speaks
+  /// the cheapest in-radius station (subject to the user's price
+  /// threshold, proximity radius, and per-station cooldown). Default-off
+  /// everywhere — TTS while driving is opt-in. Requires
+  /// [approachOverlay]: the announcement consumes the same live
+  /// geofence stream the overlay drives, so without the overlay the
+  /// detector never runs and there is nothing to speak.
+  voiceAnnouncements,
 }

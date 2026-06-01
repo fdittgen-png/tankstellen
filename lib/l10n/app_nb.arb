@@ -3277,5 +3277,20 @@
   "@consoGroupTroubleshooting": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "featureLabel_voiceAnnouncements": "Voice announcements",
+  "@featureLabel_voiceAnnouncements": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureDescription_voiceAnnouncements": "Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.",
+  "@featureDescription_voiceAnnouncements": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "@featureBlockedEnable_voiceAnnouncements": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

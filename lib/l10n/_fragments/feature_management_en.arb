@@ -286,5 +286,17 @@
   "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
   "@featureDescription_approachOverlay": {
     "description": "Settings toggle description for the in-trip approach overlay (#2382)."
+  },
+  "featureLabel_voiceAnnouncements": "Voice announcements",
+  "@featureLabel_voiceAnnouncements": {
+    "description": "Settings toggle label for spoken voice announcements of nearby cheap fuel while driving (#2569). Default-off."
+  },
+  "featureDescription_voiceAnnouncements": "Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.",
+  "@featureDescription_voiceAnnouncements": {
+    "description": "Settings toggle description for spoken voice announcements while driving (#2569)."
+  },
+  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "@featureBlockedEnable_voiceAnnouncements": {
+    "description": "Tooltip shown on the disabled voice-announcements toggle when its prerequisite (approachOverlay) is off (#2569)."
   }
 }

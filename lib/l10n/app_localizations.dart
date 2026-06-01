@@ -8274,6 +8274,24 @@ abstract class AppLocalizations {
   /// **'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.'**
   String get featureDescription_approachOverlay;
 
+  /// Settings toggle label for spoken voice announcements of nearby cheap fuel while driving (#2569). Default-off.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice announcements'**
+  String get featureLabel_voiceAnnouncements;
+
+  /// Settings toggle description for spoken voice announcements while driving (#2569).
+  ///
+  /// In en, this message translates to:
+  /// **'Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.'**
+  String get featureDescription_voiceAnnouncements;
+
+  /// Tooltip shown on the disabled voice-announcements toggle when its prerequisite (approachOverlay) is off (#2569).
+  ///
+  /// In en, this message translates to:
+  /// **'Enable the approach overlay first'**
+  String get featureBlockedEnable_voiceAnnouncements;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

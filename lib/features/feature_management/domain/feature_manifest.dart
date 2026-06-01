@@ -346,5 +346,20 @@ class FeatureManifest {
           'During a recorded trip, flip the floating tile to the fuel '
               'type\'s colour and show the price as you near a fuel station.',
     ),
+    // Default-off on every channel (#2569) — speaking aloud while driving
+    // is strictly opt-in and is in no AppProfile preset bundle.
+    // `requires: {approachOverlay}` because the announcement consumes the
+    // same live geofence stream (`approachStateProvider`) the overlay
+    // drives: without the overlay the detector never starts, so there is
+    // nothing to announce.
+    Feature.voiceAnnouncements: FeatureManifestEntry.allChannels(
+      feature: Feature.voiceAnnouncements,
+      defaultOn: false,
+      requires: {Feature.approachOverlay},
+      displayName: 'Voice announcements',
+      description:
+          'Speak nearby cheap fuel stations aloud as you drive, so you '
+              'can keep your eyes on the road.',
+    ),
   });
 }
