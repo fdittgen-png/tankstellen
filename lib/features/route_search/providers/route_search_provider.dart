@@ -112,6 +112,7 @@ class RouteSearchState extends _$RouteSearchState {
               cheapestPerSegment: null,
               strategyType: strategyType,
               isPartial: true,
+              corridorCountryCodes: corridorMap.keys.toSet(),
             ));
           },
         );
@@ -170,6 +171,7 @@ class RouteSearchState extends _$RouteSearchState {
         cheapestId: cheapestId,
         cheapestPerSegment: segmentCheapest,
         strategyType: strategyType,
+        corridorCountryCodes: corridorMap.keys.toSet(),
       ));
     } on DioException catch (e, st) {
       if (e.type == DioExceptionType.cancel) return;
@@ -253,6 +255,7 @@ class RouteSearchState extends _$RouteSearchState {
         segmentKm: 50.0,
       ),
       strategyType: strategyType,
+      corridorCountryCodes: corridorMap.keys.toSet(),
     );
   }
 

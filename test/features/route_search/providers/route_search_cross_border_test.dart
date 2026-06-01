@@ -159,6 +159,11 @@ void main() {
     expect(brands, contains('Repsol ES'),
         reason: 'Spanish leg must be present (was empty before #2595)');
 
+    // #2622 — the result carries the queried corridor country codes so the
+    // header can credit BOTH data sources, not just the active country.
+    expect(result.corridorCountryCodes, containsAll(<String>{'FR', 'ES'}),
+        reason: 'corridorCountryCodes must surface every queried country');
+
     // #2621 — the ES service must ACTUALLY have been queried. An empty
     // `everyElement` matcher passes vacuously, so assert the call happened
     // (the regression: ES was never queried because FR shadowed it).

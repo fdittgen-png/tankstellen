@@ -198,6 +198,69 @@ void main() {
       },
     );
 
+    // #2622 — a cross-border route crosses more than one data source; the
+    // header must credit EACH crossed country's provider, not just the
+    // active country.
+    group('multi-source attribution for cross-border routes (#2622)', () {
+      testWidgets(
+        'a {FR, ES} corridor renders BOTH providers in the header',
+        (tester) async {
+          final storage = mockHiveStorageOverride();
+
+          await pumpApp(
+            tester,
+            const DemoModeBanner(
+              country: Countries.france,
+              corridorCountryCodes: {'FR', 'ES'},
+            ),
+            overrides: [
+              storage.override,
+              activeCountryOverride(Countries.france),
+            ],
+          );
+
+          // Both crossed countries' registry attributions are present.
+          final frAttr = CountryServiceRegistry.policyFor('FR')!.attribution;
+          final esAttr = CountryServiceRegistry.policyFor('ES')!.attribution;
+          expect(find.textContaining(frAttr), findsOneWidget);
+          expect(find.textContaining(esAttr), findsOneWidget);
+          // Both country names appear in the same joined header line.
+          expect(find.textContaining('France'), findsOneWidget);
+          expect(find.textContaining('España'), findsOneWidget);
+          // It is NOT the single-country MaterialBanner / link header.
+          expect(find.byType(MaterialBanner), findsNothing);
+        },
+      );
+
+      testWidgets(
+        'a single-country corridor still shows the single-country header',
+        (tester) async {
+          final storage = mockHiveStorageOverride();
+
+          await pumpApp(
+            tester,
+            const DemoModeBanner(
+              country: Countries.france,
+              corridorCountryCodes: {'FR'},
+            ),
+            overrides: [
+              storage.override,
+              activeCountryOverride(Countries.france),
+            ],
+          );
+
+          // One code → falls through to the historical single-country
+          // header (the tappable Prix-Carburants link), Spain not credited.
+          expect(find.textContaining('Prix-Carburants'), findsOneWidget);
+          expect(
+            find.textContaining(
+                CountryServiceRegistry.policyFor('ES')!.attribution),
+            findsNothing,
+          );
+        },
+      );
+    });
+
     // #2373 — the country-service header is now a tappable link to the
     // upstream data source, replacing the old bottom attribution footer.
     group('country-service source link (#2373)', () {
