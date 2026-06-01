@@ -11,6 +11,7 @@ import '../../feature_management/domain/feature_dependency_graph.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../data/models/price_prediction.dart';
 import '../domain/entities/feature_vector.dart';
+import '../domain/services/holiday_premium.dart';
 import '../domain/services/price_feature_extractor.dart';
 import 'price_history_provider.dart';
 import 'tflite_price_predictor_provider.dart';
@@ -27,15 +28,6 @@ const _dayNames = {
   6: 'Saturday',
   7: 'Sunday',
 };
-
-/// Minimum holiday samples required to surface a [PricePrediction.holidayPremium].
-/// Below this, the signal is too noisy to be useful (#1117 phase 1).
-const int _kMinHolidaySamples = 3;
-
-/// Threshold (EUR/L) above which the holiday premium is appended to the
-/// recommendation string. Below 2 cents the difference is not worth
-/// nagging the user about.
-const double _kHolidayPremiumNoticeThreshold = 0.02;
 
 /// Computes "best time to fill" predictions from locally stored price history.
 ///
@@ -185,9 +177,10 @@ double? _maybeModelPredict({
 }
 
 /// Average EUR/L delta between holiday and non-holiday samples in
-/// [vectors]. Returns `null` when fewer than [_kMinHolidaySamples]
-/// holiday observations exist or when no non-holiday baseline is
-/// available.
+/// [vectors], delegating the maths to the shared [HolidayPremium]
+/// helper so this provider and the [FillUpGuidancePredictor] heuristic
+/// share exactly one implementation (#2570). Returns `null` when the
+/// signal is too thin to trust (see [HolidayPremium.compute]).
 double? _computeHolidayPremium(List<FeatureVector> vectors) {
   final holidayPrices = <double>[];
   final nonHolidayPrices = <double>[];
@@ -198,21 +191,17 @@ double? _computeHolidayPremium(List<FeatureVector> vectors) {
       nonHolidayPrices.add(v.priceEur);
     }
   }
-  if (holidayPrices.length < _kMinHolidaySamples) return null;
-  if (nonHolidayPrices.isEmpty) return null;
-
-  final hAvg = holidayPrices.average;
-  final nAvg = nonHolidayPrices.average;
-  final delta = hAvg - nAvg;
-  return double.parse(delta.toStringAsFixed(3));
+  return HolidayPremium.compute(
+    holidayPrices: holidayPrices,
+    nonHolidayPrices: nonHolidayPrices,
+  );
 }
 
 /// Optionally appends a one-sentence holiday hint to [base] when the
 /// computed [holidayPremium] is large enough to be actionable.
 String _maybeAppendHolidayHint(String base, double? holidayPremium) {
-  if (holidayPremium == null) return base;
-  if (holidayPremium.abs() <= _kHolidayPremiumNoticeThreshold) return base;
-  final cents = (holidayPremium.abs() * 100).toStringAsFixed(1);
+  if (!HolidayPremium.isActionable(holidayPremium)) return base;
+  final cents = (holidayPremium!.abs() * 100).toStringAsFixed(1);
   final direction = holidayPremium > 0 ? 'higher' : 'lower';
   return '$base. Holidays trend $cents ct/L $direction';
 }

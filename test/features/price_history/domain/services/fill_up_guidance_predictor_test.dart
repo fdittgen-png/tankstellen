@@ -373,5 +373,197 @@ void main() {
       expect(g.sampleCount, 15);
     });
   });
+
+  group('holiday adjustment (#2570)', () {
+    // All cases below share a fixed window anchored on New Year's Day
+    // 2027 (a country-agnostic public holiday) so "now" is itself a
+    // holiday without needing a country code. The trailing 30-day
+    // window also captures Christmas Day 2026 — the second
+    // country-agnostic date — giving 3+ holiday readings for the
+    // shared premium maths to trust.
+    final newYear = DateTime(2027, 1, 1, 12); // Fri, public holiday
+
+    /// History where holiday readings run *dearer* than the
+    /// non-holiday baseline, with the current (New Year) price sitting
+    /// in the near-dear band (~61st percentile) and a genuine cheaper
+    /// day-of-week / day-part window present. Engineered so the
+    /// baseline (non-holiday) verdict is `fillSoonRising` but a
+    /// dearer-holiday nudge escalates it to `waitCheaperWindow`.
+    List<PriceRecord> dearerHolidayHistory() => <PriceRecord>[
+          rec(newYear, 1.625), // current — New Year, near-dear
+          // 3 dear Christmas readings → holiday avg well above baseline.
+          rec(DateTime(2026, 12, 25, 9), 1.72),
+          rec(DateTime(2026, 12, 25, 14), 1.73),
+          rec(DateTime(2026, 12, 25, 19), 1.71),
+          // Non-holiday baseline spread across weekdays + dayparts so a
+          // cheaper window genuinely exists. Two readings sit above the
+          // current price to keep the percentile below the 75th.
+          rec(DateTime(2026, 12, 14, 9), 1.55),
+          rec(DateTime(2026, 12, 14, 20), 1.58),
+          rec(DateTime(2026, 12, 15, 9), 1.56),
+          rec(DateTime(2026, 12, 15, 20), 1.59),
+          rec(DateTime(2026, 12, 16, 10), 1.57),
+          rec(DateTime(2026, 12, 16, 20), 1.60),
+          rec(DateTime(2026, 12, 17, 10), 1.61),
+          rec(DateTime(2026, 12, 17, 20), 1.62),
+          rec(DateTime(2026, 12, 21, 10), 1.66),
+          rec(DateTime(2026, 12, 22, 10), 1.68),
+        ];
+
+    /// History where holiday readings run *cheaper* than baseline, with
+    /// the current (New Year) price in the slightly-above-cheap band
+    /// (~39th percentile). Baseline verdict is `neutral`; a
+    /// cheaper-holiday nudge promotes it to `goodTimeNow`.
+    List<PriceRecord> cheaperHolidayHistory() => <PriceRecord>[
+          rec(newYear, 1.50), // current — New Year, mid-low
+          rec(DateTime(2026, 12, 25, 9), 1.40),
+          rec(DateTime(2026, 12, 25, 14), 1.41),
+          rec(DateTime(2026, 12, 25, 19), 1.42),
+          rec(DateTime(2026, 12, 14, 9), 1.55),
+          rec(DateTime(2026, 12, 14, 20), 1.60),
+          rec(DateTime(2026, 12, 15, 9), 1.52),
+          rec(DateTime(2026, 12, 15, 20), 1.62),
+          rec(DateTime(2026, 12, 16, 10), 1.48),
+          rec(DateTime(2026, 12, 16, 20), 1.64),
+          rec(DateTime(2026, 12, 17, 10), 1.49),
+          rec(DateTime(2026, 12, 17, 20), 1.66),
+          rec(DateTime(2026, 12, 21, 10), 1.53),
+          rec(DateTime(2026, 12, 22, 10), 1.58),
+        ];
+
+    test('today a holiday + holidays historically dearer → leans wait', () {
+      final g = predictor.predict(
+        history: dearerHolidayHistory(),
+        fuelType: FuelType.e10,
+        now: newYear, // New Year is itself the holiday
+      );
+      // Sanity: the current price is near-dear but below the 75th, so
+      // the standard dear gate would NOT fire on its own.
+      expect(g.currentPercentile, inInclusiveRange(60, 74));
+      expect(g.kind, FillUpGuidanceKind.waitCheaperWindow,
+          reason: 'a dearer holiday nudges a near-dear reading to wait');
+    });
+
+    test('today a holiday + holidays historically cheaper → leans fill', () {
+      final g = predictor.predict(
+        history: cheaperHolidayHistory(),
+        fuelType: FuelType.e10,
+        now: newYear,
+      );
+      // Sanity: the current price is above the cheap band, so the
+      // standard cheap gate would NOT fire on its own.
+      expect(g.currentPercentile, greaterThan(
+          FillUpGuidancePredictor.cheapPercentile));
+      expect(g.kind, FillUpGuidanceKind.goodTimeNow,
+          reason: 'a cheaper holiday nudges a near-cheap reading to fill now');
+    });
+
+    test('same dearer history but today NOT a holiday → verdict unchanged', () {
+      // Anchor "now" one day later (Jan 2 2027 — not a holiday). The
+      // newest sample is still the Jan 1 reading and the 30-day window
+      // is identical, so the only thing that changes vs the case above
+      // is that today is no longer a holiday → no nudge → the baseline
+      // verdict stands. This is the regression-lock for #2570.
+      final notAHoliday = DateTime(2027, 1, 2, 12);
+      final g = predictor.predict(
+        history: dearerHolidayHistory(),
+        fuelType: FuelType.e10,
+        now: notAHoliday,
+      );
+      expect(g.currentPercentile, inInclusiveRange(60, 74));
+      expect(g.kind, FillUpGuidanceKind.fillSoonRising,
+          reason: 'no holiday today → the pre-#2570 verdict is preserved');
+    });
+
+    test('same cheaper history but today NOT a holiday → verdict unchanged', () {
+      final notAHoliday = DateTime(2027, 1, 2, 12);
+      final g = predictor.predict(
+        history: cheaperHolidayHistory(),
+        fuelType: FuelType.e10,
+        now: notAHoliday,
+      );
+      expect(g.kind, FillUpGuidanceKind.neutral,
+          reason: 'no holiday today → the pre-#2570 verdict is preserved');
+    });
+
+    test('no holiday readings in the window → holiday path is inert', () {
+      // A plain rising series on distinct weekdays, none on a holiday.
+      // With zero holiday samples the shared premium is null, so the
+      // holiday term contributes nothing and the verdict must be
+      // identical whether or not a country code is supplied. This is the
+      // regression-lock: the #2570 change is a no-op when there is no
+      // holiday signal.
+      final baseNow = DateTime(2026, 3, 13, 22); // the file's default now
+      final history = <PriceRecord>[
+        for (int i = 0; i < 21; i++)
+          rec(baseNow.subtract(Duration(days: i)), 1.70 - i * 0.02),
+      ];
+      final withoutCountry = predictor.predict(
+        history: history,
+        fuelType: FuelType.e10,
+        now: baseNow,
+      );
+      final withCountry = predictor.predict(
+        history: history,
+        fuelType: FuelType.e10,
+        now: baseNow,
+        countryCode: 'DE',
+      );
+      expect(withoutCountry.trend, FillUpTrend.rising);
+      // No holiday samples → the country code changes nothing.
+      expect(withCountry.kind, withoutCountry.kind);
+      expect(withCountry.currentPercentile, withoutCountry.currentPercentile);
+    });
+
+    test('country-specific holiday only nudges when its countryCode is set',
+        () {
+      // German Unity Day (Oct 3) is a DE-only fixed date — it is NOT a
+      // country-agnostic holiday, so it flags only when countryCode
+      // resolves to 'DE'. We reuse the dearer-history shape but move the
+      // holiday readings and "now" onto Oct 3 2026 so the nudge depends
+      // entirely on the country code. "now" is the evening so all four
+      // Unity-Day readings fall before it (records after `now` are
+      // excluded), giving the 3+ holiday samples the premium needs.
+      final unityDay = DateTime(2026, 10, 3, 22); // Sat evening, DE day
+      List<PriceRecord> deHistory() => <PriceRecord>[
+            rec(DateTime(2026, 10, 3, 18), 1.625), // current — Unity Day
+            // 3 more dear readings, also on Unity Day (distinct hours).
+            rec(DateTime(2026, 10, 3, 7), 1.72),
+            rec(DateTime(2026, 10, 3, 10), 1.73),
+            rec(DateTime(2026, 10, 3, 14), 1.71),
+            // Non-holiday baseline across distinct weekdays / dayparts.
+            rec(DateTime(2026, 9, 14, 9), 1.55),
+            rec(DateTime(2026, 9, 14, 20), 1.58),
+            rec(DateTime(2026, 9, 15, 9), 1.56),
+            rec(DateTime(2026, 9, 15, 20), 1.59),
+            rec(DateTime(2026, 9, 16, 10), 1.57),
+            rec(DateTime(2026, 9, 16, 20), 1.60),
+            rec(DateTime(2026, 9, 17, 10), 1.61),
+            rec(DateTime(2026, 9, 17, 20), 1.62),
+            rec(DateTime(2026, 9, 21, 10), 1.66),
+            rec(DateTime(2026, 9, 22, 10), 1.68),
+          ];
+
+      // Without a country code, Oct 3 is just a normal day → no nudge →
+      // baseline verdict (fillSoonRising for this near-dear rising set).
+      final withoutCountry = predictor.predict(
+        history: deHistory(),
+        fuelType: FuelType.e10,
+        now: unityDay,
+      );
+      expect(withoutCountry.kind, FillUpGuidanceKind.fillSoonRising,
+          reason: 'Oct 3 is not country-agnostic; null country = no nudge');
+
+      // With 'DE', Oct 3 flags as a holiday → dearer nudge → wait.
+      final withCountry = predictor.predict(
+        history: deHistory(),
+        fuelType: FuelType.e10,
+        now: unityDay,
+        countryCode: 'DE',
+      );
+      expect(withCountry.kind, FillUpGuidanceKind.waitCheaperWindow,
+          reason: 'DE country code flags Unity Day → dearer-holiday nudge');
+    });
+  });
 }
 

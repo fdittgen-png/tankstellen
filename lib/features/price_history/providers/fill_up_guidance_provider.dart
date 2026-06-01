@@ -3,6 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/country/country_config.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
@@ -51,11 +52,18 @@ FillUpGuidance? fillUpGuidance(
   final repo = ref.watch(priceHistoryRepositoryProvider);
   final history = repo.getHistory(stationId, days: 30);
 
+  // Resolve the station's country from its id prefix so the predictor's
+  // holiday adjustment (#2570) can flag the country-specific national
+  // holiday in addition to the country-agnostic dates. Mirrors how
+  // `pricePredictionProvider` feeds country into the feature extractor.
+  final countryCode = Countries.countryCodeForStationId(stationId);
+
   const predictor = FillUpGuidancePredictor();
   final guidance = predictor.predict(
     history: history,
     fuelType: fuelType,
     now: DateTime.now(),
+    countryCode: countryCode,
   );
 
   return guidance.hasGuidance ? guidance : null;
