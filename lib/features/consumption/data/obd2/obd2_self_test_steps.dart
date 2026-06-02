@@ -1,0 +1,248 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+part of 'obd2_self_test_driver.dart';
+
+/// The per-step bodies + small pure helpers of the #2645 adapter
+/// self-test. Lives in this `part` of `obd2_self_test_driver.dart` so the
+/// driver file keeps its orchestration + public types under the 400-line
+/// cap; everything here is `_`-private to the library.
+
+Obd2SelfTestStepResult _step(
+        Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs) =>
+    Obd2SelfTestStepResult(id: id, status: status, latencyMs: latencyMs);
+
+/// Info step: AT@1 (device description) + ATRV (battery voltage) are sent
+/// RAW because they are absent from the production init list, and treated
+/// as free-form "info" lines — a `12.4V` reply is `garbage` to the hex
+/// classifier, so the step is judged ok when BOTH replies are non-empty
+/// and carry no error token, rather than hex-classified.
+Future<Obd2SelfTestStepResult> _infoStep(
+  Obd2Service service,
+  Obd2CommDiagnostics diag,
+  Duration deadline,
+) async {
+  final sw = Stopwatch()..start();
+  try {
+    final desc = await service.sendCommand('AT@1\r').timeout(deadline);
+    diag.recordHandshakeLine('AT@1', desc, sw.elapsedMilliseconds);
+    final rvSw = Stopwatch()..start();
+    final voltage = await service.sendCommand('ATRV\r').timeout(deadline);
+    diag.recordHandshakeLine('ATRV', voltage, rvSw.elapsedMilliseconds);
+    sw.stop();
+    final ok = _looksLikeInfoReply(desc) && _looksLikeInfoReply(voltage);
+    return _step(
+      Obd2SelfTestStepId.info,
+      ok ? Obd2SelfTestStepStatus.ok : Obd2SelfTestStepStatus.garbage,
+      sw.elapsedMilliseconds,
+    );
+  } on TimeoutException {
+    sw.stop();
+    diag.recordHandshakeLine('ATRV', 'TIMEOUT', sw.elapsedMilliseconds);
+    return _step(Obd2SelfTestStepId.info, Obd2SelfTestStepStatus.timeout,
+        sw.elapsedMilliseconds);
+  } catch (_) {
+    sw.stop();
+    return _step(Obd2SelfTestStepId.info, Obd2SelfTestStepStatus.fail,
+        sw.elapsedMilliseconds);
+  }
+}
+
+/// A free-form info reply (AT@1 / ATRV) is "ok" when it is non-empty and
+/// carries no ELM error token (`?`, `NO DATA`, `STOPPED`, `UNABLE`).
+bool _looksLikeInfoReply(String raw) {
+  final trimmed = raw
+      .replaceAll('>', ' ')
+      .replaceAll('\r', ' ')
+      .replaceAll('\n', ' ')
+      .trim();
+  if (trimmed.isEmpty) return false;
+  final upper = trimmed.toUpperCase();
+  if (upper.contains('?') ||
+      upper.contains('NO DATA') ||
+      upper.contains('NODATA') ||
+      upper.contains('STOPPED') ||
+      upper.contains('UNABLE')) {
+    return false;
+  }
+  return true;
+}
+
+/// Supported-PID step: `0100` request + bitmask classification. Records
+/// the supported tri-state for `0100` so the trace + Copy-as-JSON show it.
+Future<Obd2SelfTestStepResult> _supportedPidsStep(
+  Obd2Service service,
+  Obd2CommDiagnostics diag,
+  Duration deadline,
+) async {
+  final sw = Stopwatch()..start();
+  try {
+    final raw = await service.sendCommand('0100\r').timeout(deadline);
+    sw.stop();
+    final cls = classifyObd2Response(raw);
+    diag.recordHandshakeLine('0100', raw, sw.elapsedMilliseconds);
+    diag.recordSupportedTriState(
+        '0100', cls == ResponseClass.ok ? 'supported' : 'unsupported');
+    return _step(Obd2SelfTestStepId.supportedPids,
+        statusForResponseClass(cls), sw.elapsedMilliseconds);
+  } on TimeoutException {
+    sw.stop();
+    diag.recordSupportedTriState('0100', 'unknown');
+    return _step(Obd2SelfTestStepId.supportedPids,
+        Obd2SelfTestStepStatus.timeout, sw.elapsedMilliseconds);
+  } catch (_) {
+    sw.stop();
+    return _step(Obd2SelfTestStepId.supportedPids, Obd2SelfTestStepStatus.fail,
+        sw.elapsedMilliseconds);
+  }
+}
+
+/// Sample-reads step: 010C / 010D / 0105, each `noteDispatch` + timed
+/// `sendCommand` + classify + `noteResult`. The step is ok only when ALL
+/// three classify ok; otherwise it reports the worst observed status so a
+/// partially-answering ECU surfaces (timeout > garbage > noResponse > ok).
+Future<Obd2SelfTestStepResult> _sampleReadsStep(
+  Obd2Service service,
+  Obd2CommDiagnostics diag,
+  Duration deadline,
+) async {
+  const pids = ['010C', '010D', '0105'];
+  var worst = Obd2SelfTestStepStatus.ok;
+  final sw = Stopwatch()..start();
+  for (final pid in pids) {
+    diag.noteDispatch(pid);
+    final pidSw = Stopwatch()..start();
+    try {
+      final raw = await service.sendCommand('$pid\r').timeout(deadline);
+      pidSw.stop();
+      final cls = classifyObd2Response(raw);
+      diag.noteResult(pid, cls, rttMs: pidSw.elapsedMilliseconds);
+      worst = _worse(worst, statusForResponseClass(cls));
+    } on TimeoutException {
+      pidSw.stop();
+      diag.noteResult(pid, ResponseClass.timeout,
+          rttMs: pidSw.elapsedMilliseconds);
+      worst = _worse(worst, Obd2SelfTestStepStatus.timeout);
+    } catch (_) {
+      pidSw.stop();
+      worst = _worse(worst, Obd2SelfTestStepStatus.fail);
+    }
+  }
+  sw.stop();
+  return _step(Obd2SelfTestStepId.sampleReads, worst, sw.elapsedMilliseconds);
+}
+
+/// Reconnect step: deliberate `disconnect()` (noteConnectionEvent drop)
+/// then reconnect via the production `connectByMacDirect` machinery,
+/// wall-clock-timed. Returns the (possibly new) live service for the final
+/// clean disconnect. A reconnect failure CONTINUES (status fail).
+Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
+  Obd2ConnectionService connection,
+  Obd2Service service,
+  Obd2CommDiagnostics diag,
+  String? mac,
+  Duration deadline,
+) async {
+  try {
+    await service.disconnect();
+  } catch (_) {
+    // A failed deliberate drop still proceeds to attempt reconnect.
+  }
+  diag.noteConnectionEvent(drop: true);
+  if (mac == null) {
+    return (
+      result: _step(
+          Obd2SelfTestStepId.reconnect, Obd2SelfTestStepStatus.fail, null),
+      service: null,
+    );
+  }
+  final start = DateTime.now();
+  try {
+    final reconnected =
+        await connection.connectByMacDirect(mac).timeout(deadline);
+    final elapsed = DateTime.now().difference(start).inMilliseconds;
+    if (reconnected == null) {
+      return (
+        result: _step(Obd2SelfTestStepId.reconnect,
+            Obd2SelfTestStepStatus.noResponse, elapsed),
+        service: null,
+      );
+    }
+    diag.noteConnectionEvent(
+        visibleReconnect: true, timeToReconnectMs: elapsed);
+    return (
+      result: _step(
+          Obd2SelfTestStepId.reconnect, Obd2SelfTestStepStatus.ok, elapsed),
+      service: reconnected,
+    );
+  } on TimeoutException {
+    final elapsed = DateTime.now().difference(start).inMilliseconds;
+    return (
+      result: _step(Obd2SelfTestStepId.reconnect,
+          Obd2SelfTestStepStatus.timeout, elapsed),
+      service: null,
+    );
+  } catch (_) {
+    final elapsed = DateTime.now().difference(start).inMilliseconds;
+    return (
+      result: _step(
+          Obd2SelfTestStepId.reconnect, Obd2SelfTestStepStatus.fail, elapsed),
+      service: null,
+    );
+  }
+}
+
+/// Severity ordering for the worst-status fold in [_sampleReadsStep]:
+/// fail > timeout > garbage > noResponse > ok.
+Obd2SelfTestStepStatus _worse(
+    Obd2SelfTestStepStatus a, Obd2SelfTestStepStatus b) {
+  int rank(Obd2SelfTestStepStatus s) {
+    switch (s) {
+      case Obd2SelfTestStepStatus.ok:
+        return 0;
+      case Obd2SelfTestStepStatus.noResponse:
+        return 1;
+      case Obd2SelfTestStepStatus.garbage:
+        return 2;
+      case Obd2SelfTestStepStatus.timeout:
+        return 3;
+      case Obd2SelfTestStepStatus.fail:
+      case Obd2SelfTestStepStatus.skipped:
+        return 4;
+    }
+  }
+
+  return rank(a) >= rank(b) ? a : b;
+}
+
+/// Build a partial report after an abort: mark the steps that never ran as
+/// skipped so the UI shows where the test died.
+Obd2SelfTestReport _finalise(
+  List<Obd2SelfTestStepResult> results,
+  Stopwatch overall,
+) {
+  final ran = results.map((r) => r.id).toSet();
+  for (final id in Obd2SelfTestStepId.values) {
+    if (!ran.contains(id)) {
+      results.add(_step(id, Obd2SelfTestStepStatus.skipped, null));
+    }
+  }
+  return _buildReport(results, overall);
+}
+
+Obd2SelfTestReport _buildReport(
+  List<Obd2SelfTestStepResult> results,
+  Stopwatch overall,
+) {
+  overall.stop();
+  // The run passes when every step that the driver attempted ended ok —
+  // skipped steps (after an abort) are failures, so an aborted run never
+  // reports passed.
+  final passed = results.isNotEmpty &&
+      results.every((r) => r.status == Obd2SelfTestStepStatus.ok);
+  return Obd2SelfTestReport(
+    steps: List.unmodifiable(results),
+    passed: passed,
+    elapsedMs: overall.elapsedMilliseconds,
+  );
+}
