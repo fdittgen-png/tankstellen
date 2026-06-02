@@ -65,4 +65,27 @@ void main() {
       expect(snap.latestBearingDeg, isNull);
     });
   });
+
+  group('#2692 C4-B LiveSampleSnapshot altitude isFinite guard', () {
+    test('a NaN altitude is dropped to null (not propagated to grade math)',
+        () {
+      final snap = _snapshot();
+      snap.updateGpsFix(latitude: 43.4, longitude: 3.5, altitudeM: double.nan);
+      expect(snap.latestAltitudeM, isNull);
+    });
+
+    test('infinite altitude is also dropped to null', () {
+      final snap = _snapshot();
+      snap.updateGpsFix(altitudeM: double.infinity);
+      expect(snap.latestAltitudeM, isNull);
+      snap.updateGpsFix(altitudeM: double.negativeInfinity);
+      expect(snap.latestAltitudeM, isNull);
+    });
+
+    test('a finite altitude latches unchanged', () {
+      final snap = _snapshot();
+      snap.updateGpsFix(altitudeM: 123.5);
+      expect(snap.latestAltitudeM, 123.5);
+    });
+  });
 }

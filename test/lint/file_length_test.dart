@@ -102,7 +102,11 @@ void main() {
     // null-guarded like altitude) so the OBD2 emit path stops dropping
     // them (they reached only 0.3 % of samples). Net +21; decomposition
     // is still tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 673,
+    // #2692 C4-B — re-grandfathered 673 → 674: one comment line documenting
+    // the altitude isFinite chokepoint guard (NaN altitude was poisoning the
+    // RoadGradeCalculator on ~22 % of the 77-trip backup). The guard itself
+    // is a net-neutral token swap; only the explanatory comment adds a line.
+    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 674,
     // #2379 — re-grandfathered 1457 → 1468: threaded the
     // `logFailureAsError` flag through `connect()` (param + doc + the
     // guarded `if` around the now-conditional connect-failed trace) so a
