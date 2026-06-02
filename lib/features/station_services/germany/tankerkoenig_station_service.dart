@@ -9,6 +9,8 @@ import '../../../core/error/exceptions.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../station_detail/domain/opening_hours.dart';
+import 'germany_opening_hours_adapter.dart';
 import 'tankerkoenig_batch_price_fetcher.dart';
 
 // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
@@ -141,6 +143,15 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
         }
       }
 
+      // Epic #2707 C5 (#2712) — normalise the structured `openingTimes[]` +
+      // `wholeDay` flag into the common [WeeklyOpeningHours] via the per-country
+      // adapter. The legacy `openingTimes` / `wholeDay` fields stay populated
+      // for back-compat; `openingHours` is the canonical structured signal and
+      // is left null when the adapter found no usable data so the display layer
+      // falls back through `legacyOpeningHoursBridge`.
+      final weeklyHours =
+          const GermanyOpeningHoursAdapter().parse(stationJson);
+
       return ServiceResult(
         data: StationDetail(
           station: station,
@@ -148,6 +159,10 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
           overrides: overrides,
           wholeDay: stationJson['wholeDay'] as bool? ?? false,
           state: stationJson['state'] as String?,
+          openingHours: weeklyHours.availability ==
+                  OpeningHoursAvailability.notProvided
+              ? null
+              : weeklyHours,
         ),
         source: ServiceSource.tankerkoenigApi,
         fetchedAt: DateTime.now(),
