@@ -405,12 +405,15 @@ class TripRecordingController {
     )? reconnectScannerFactory,
     Obd2BreadcrumbRecorder? breadcrumbCollector,
     GpsLiveEstimateFolder? gpsEstimateFolder,
+    void Function(HarshEvent event)? onHarshEvent,
   })  : _service = service,
         _diagnosticCapture = diagnosticCapture,
         _gpsEstimateFolder = gpsEstimateFolder,
         _recorder = recorder ??
             TripRecorder(
-                maxIntegrationGapSeconds: _integrationGapCapSeconds),
+              maxIntegrationGapSeconds: _integrationGapCapSeconds,
+              onHarshEvent: onHarshEvent,
+            ),
         _pollInterval = pollInterval,
         _now = now ?? DateTime.now,
         _vehicle = vehicle,

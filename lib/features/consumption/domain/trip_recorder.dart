@@ -72,9 +72,11 @@ class TripRecorder {
     this.maxIntegrationGapSeconds = double.infinity,
     double harshBrakeThresholdMps2 = 3.5,
     double harshAccelThresholdMps2 = 3.0,
+    void Function(HarshEvent event)? onHarshEvent,
   }) : _harshDetector = HarshEventDetector(
           brakeThresholdMps2: harshBrakeThresholdMps2,
           accelThresholdMps2: harshAccelThresholdMps2,
+          onEvent: onHarshEvent,
         );
 
   /// Feed one sample. Safe to call with arbitrary cadence; the

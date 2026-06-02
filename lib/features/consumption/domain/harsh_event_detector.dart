@@ -63,7 +63,16 @@ class HarshEventDetector {
     this.minSpeedKmh = 5.0,
     this.maxHAccuracyM = 10.0,
     this.smoothSpeed = false,
+    this.onEvent,
   });
+
+  /// Optional live callback invoked the instant a (de-noised) event is
+  /// detected (#2663). Post-#2653 the detector fires only on REAL,
+  /// sustained, accuracy-/speed-/source-gated events — exactly the
+  /// signal the driving-coach voice listener should speak. Off by
+  /// default so the post-trip [events] path is unchanged; the recorder
+  /// threads it in only when a live consumer is attached.
+  void Function(HarshEvent event)? onEvent;
 
   /// Deceleration magnitude (m/s², positive number) at or above which
   /// an interval counts as a harsh brake.
@@ -183,14 +192,14 @@ class HarshEventDetector {
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
     final accelMps2 = ((speed - anchorSpeed) / 3.6) / dt;
     if (scorable && accelMps2 <= -brakeThresholdMps2) {
-      _events.add(HarshEvent(
+      _record(HarshEvent(
         timestamp: timestamp,
         magnitudeG: (-accelMps2) / standardGravityMps2,
         speedKmh: speed,
         type: HarshEventType.brake,
       ));
     } else if (scorable && accelMps2 >= accelThresholdMps2) {
-      _events.add(HarshEvent(
+      _record(HarshEvent(
         timestamp: timestamp,
         magnitudeG: accelMps2 / standardGravityMps2,
         speedKmh: speed,
@@ -199,6 +208,14 @@ class HarshEventDetector {
     }
     _anchorAt = timestamp;
     _anchorSpeedKmh = speed;
+  }
+
+  /// Append [event] to the post-trip list and fire the optional live
+  /// [onEvent] callback (#2663) — the single record point both consumers
+  /// flow through.
+  void _record(HarshEvent event) {
+    _events.add(event);
+    onEvent?.call(event);
   }
 
   /// Push [raw] into the moving-average window and return the smoothed

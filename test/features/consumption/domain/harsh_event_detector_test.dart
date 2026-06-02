@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/domain/harsh_event.dart';
 import 'package:tankstellen/features/consumption/domain/harsh_event_detector.dart';
 
 /// Unit tests for [HarshEventDetector] (#1922).
@@ -303,6 +304,33 @@ void main() {
         raw.onSample(51, start.add(const Duration(seconds: 3)));
         raw.onSample(51, start.add(const Duration(seconds: 4)));
         expect(raw.accelerations, greaterThanOrEqualTo(1));
+      });
+    });
+
+    group('live onEvent callback (#2663)', () {
+      test('fires onEvent the instant a de-noised event is detected', () {
+        final fired = <HarshEvent>[];
+        final d = HarshEventDetector(onEvent: fired.add);
+        d.onSample(0, start);
+        // 0 → 50 km/h in 3 s → +4.63 m/s² → one harsh accel.
+        d.onSample(50, start.add(const Duration(seconds: 3)));
+        expect(fired, hasLength(1));
+        expect(fired.single.type, HarshEventType.acceleration);
+        // The callback and the post-trip list agree on the same event.
+        expect(d.events, equals(fired));
+      });
+
+      test('does NOT fire onEvent for a suppressed / sub-threshold sample',
+          () {
+        final fired = <HarshEvent>[];
+        final d = HarshEventDetector(onEvent: fired.add);
+        // Suppressed source: ignored entirely.
+        d.onSample(90, start, suppress: true);
+        d.onSample(40, start.add(const Duration(seconds: 1)), suppress: true);
+        // Gentle change: below threshold.
+        d.onSample(50, start.add(const Duration(seconds: 2)));
+        d.onSample(48, start.add(const Duration(seconds: 5)));
+        expect(fired, isEmpty);
       });
     });
   });
