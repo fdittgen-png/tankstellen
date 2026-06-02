@@ -98,15 +98,29 @@ Map<String, CountrySource> buildCorridorServiceMap(
   return map;
 }
 
-/// The subset of [profileCountries] whose registered bounding box
-/// INTERSECTS the [route]'s own lat/lng bounding box (#2621).
+/// The subset of [profileCountries] whose registered bounding box actually
+/// CONTAINS at least one route vertex (#2621 / #2703).
 ///
 /// Belt-and-braces for the corridor-detection union: even if per-vertex
 /// detection were to miss a country (e.g. a future shadowing regression),
-/// a profile-backed country whose box overlaps the route's extent is still
-/// queried. Gated on ACTUAL extent intersection — NOT mere profile
-/// existence — so a pure-FR route does not pull in a distant PT/ES profile
-/// the user happens to have configured. Returns upper-cased codes.
+/// a profile-backed country the route genuinely touches is still queried.
+///
+/// #2703 — the over-inclusion fix. The previous gate credited a profile
+/// country whenever its box overlapped the route's single coarse whole-route
+/// AABB. That AABB is the rectangle [minLat..maxLat] × [minLng..maxLng] of
+/// EVERY vertex, so its corners are synthetic points the polyline never
+/// visits: a southern-France route whose extreme NW vertex reaches toward the
+/// Channel makes the AABB's (maxLat, minLng) corner clip GB's box
+/// [49.5+, ≤2.0] even though no actual vertex is in GB — so GB was queried,
+/// wasting requests on the flaky UK feed and spamming the error log.
+///
+/// The fix keeps the AABB as a cheap PRE-FILTER and adds vertex-containment
+/// as the CONFIRM: a profile country is credited only when its box contains
+/// ≥1 real route vertex (the same per-vertex [CountryBoundingBox.contains]
+/// test [corridorCountries] uses). A profile country the polyline truly
+/// touches is therefore still never dropped (preserves the #2621 recovery
+/// intent), but a country merely clipped by a synthetic AABB corner is not.
+/// Returns upper-cased codes.
 Set<String> countriesTouchingRouteExtent(
   RouteInfo route,
   Iterable<String> profileCountries,
@@ -125,12 +139,17 @@ Set<String> countriesTouchingRouteExtent(
     final code = raw.toUpperCase();
     final box = CountryServiceRegistry.boundingBoxFor(code);
     if (box == null) continue;
-    // Axis-aligned bbox intersection (overlap on BOTH lat and lng).
+    // Cheap AABB PRE-FILTER: skip a box that can't possibly hold a vertex.
     final overlaps = box.minLat <= maxLat &&
         box.maxLat >= minLat &&
         box.minLng <= maxLng &&
         box.maxLng >= minLng;
-    if (overlaps) out.add(code);
+    if (!overlaps) continue;
+    // CONFIRM with per-vertex containment — the synthetic AABB corner that
+    // clipped GB on a southern-France route holds no real vertex (#2703).
+    final touches = route.geometry
+        .any((p) => box.contains(p.latitude, p.longitude));
+    if (touches) out.add(code);
   }
   return out;
 }
