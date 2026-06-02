@@ -43,8 +43,15 @@ library;
 
 import 'dart:math' as math;
 
+import '../domain/accel_event_gate.dart';
 import '../domain/driving_score.dart';
 import '../domain/trip_recorder.dart';
+
+// #2667 — re-export the canonical accel/brake thresholds so existing
+// importers of this file (lessons, tests) keep resolving them, while the
+// SINGLE source of truth is `accel_event_gate.dart`.
+export '../domain/accel_event_gate.dart'
+    show kHardAccelThresholdMps2, kHardBrakeThresholdMps2;
 
 // #2460 — the per-interval accumulator + the inline Welford helper live in
 // a part file so this orchestrator stays under the 400-line guard. They
@@ -52,16 +59,12 @@ import '../domain/trip_recorder.dart';
 part 'driving_score_accumulators.dart';
 
 // ---- Canonical thresholds (shared by analyzer + lessons + score) ----
+//
+// kHardAccelThresholdMps2 / kHardBrakeThresholdMps2 now live in
+// `accel_event_gate.dart` (#2667 — the ONE source) and are imported above.
 
 /// RPM above which a sample counts as "high RPM".
 const double kHighRpmThreshold = 3000;
-
-/// Acceleration (m/s²) at/above which an interval is a hard-accel event.
-const double kHardAccelThresholdMps2 = 3.0;
-
-/// Deceleration (m/s², positive) at/below whose negation an interval is
-/// a hard-brake event. Canonical 3.5 (#2460).
-const double kHardBrakeThresholdMps2 = 3.5;
 
 /// Pedal / throttle percent at/above which a sample counts as "full
 /// throttle".
@@ -150,9 +153,24 @@ DrivingScore computeDrivingScore(
     acc.accumulate(prev: prev, cur: cur, dt: dt);
   }
 
+  // Hard-accel / hard-brake EPISODES via the ONE shared gate (#2667) — so
+  // the score agrees with the harsh detector, the insights, and the GPS
+  // features on what counts as a single physical event (the accumulator no
+  // longer over-counts a multi-interval manoeuvre once per interval).
+  final accelCounts = countAccelEvents([
+    for (final s in sorted)
+      AccelSamplePoint(
+        timestamp: s.timestamp,
+        speedKmh: s.speedKmh,
+        hAccuracyM: s.hAccuracyM,
+      ),
+  ]);
+
   return acc.build(
     totalDt: totalDt,
     secondsBelowOptimalGear: secondsBelowOptimalGear,
+    hardAccelEvents: accelCounts.accelEvents,
+    hardBrakeEvents: accelCounts.brakeEvents,
   );
 }
 

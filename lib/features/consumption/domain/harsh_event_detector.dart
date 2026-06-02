@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'accel_event_gate.dart';
 import 'harsh_event.dart';
 
 /// Detects harsh-braking / harsh-acceleration events from a stream of
@@ -57,11 +58,11 @@ import 'harsh_event.dart';
 /// needs to surface "harsh brake at 14:23, 0.45 g while doing 80 km/h".
 class HarshEventDetector {
   HarshEventDetector({
-    this.brakeThresholdMps2 = 3.5,
-    this.accelThresholdMps2 = 3.0,
-    this.minSustainedSec = 1.0,
-    this.minSpeedKmh = 5.0,
-    this.maxHAccuracyM = 10.0,
+    this.brakeThresholdMps2 = kHardBrakeThresholdMps2,
+    this.accelThresholdMps2 = kHardAccelThresholdMps2,
+    this.minSustainedSec = kAccelEventMinSustainedSec,
+    this.minSpeedKmh = kAccelEventMinSpeedKmh,
+    this.maxHAccuracyM = kAccelEventAccuracyGateM,
     this.smoothSpeed = false,
     this.onEvent,
   });
@@ -124,6 +125,15 @@ class HarshEventDetector {
   double? _anchorSpeedKmh;
   DateTime? _anchorAt;
 
+  // Episode latches (#2667). An "event" is one sustained threshold-crossing
+  // episode, not one per evaluated ~1 s interval — a multi-second hard
+  // brake is ONE brake. We count on the transition INTO an episode and
+  // re-arm only when an evaluated interval falls back below the threshold.
+  // This is the count semantics shared with `countAccelEvents`, so the
+  // detector agrees with the score / insights / GPS features.
+  bool _inAccelEpisode = false;
+  bool _inBrakeEpisode = false;
+
   /// Number of harsh-braking events counted so far.
   int get brakes => _events
       .where((e) => e.type == HarshEventType.brake)
@@ -161,11 +171,14 @@ class HarshEventDetector {
     if (suppress) return;
 
     // Accuracy gate: a bad fix is worse than no fix — drop it and break
-    // the anchor so the derivative is never taken across it.
+    // the anchor (and the running episode) so the derivative is never
+    // taken across it.
     if (hAccuracyM != null && hAccuracyM.isFinite && hAccuracyM > maxHAccuracyM) {
       _anchorAt = null;
       _anchorSpeedKmh = null;
       _speedWindow.clear();
+      _inAccelEpisode = false;
+      _inBrakeEpisode = false;
       return;
     }
 
@@ -191,20 +204,40 @@ class HarshEventDetector {
 
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
     final accelMps2 = ((speed - anchorSpeed) / 3.6) / dt;
-    if (scorable && accelMps2 <= -brakeThresholdMps2) {
-      _record(HarshEvent(
-        timestamp: timestamp,
-        magnitudeG: (-accelMps2) / standardGravityMps2,
-        speedKmh: speed,
-        type: HarshEventType.brake,
-      ));
-    } else if (scorable && accelMps2 >= accelThresholdMps2) {
-      _record(HarshEvent(
-        timestamp: timestamp,
-        magnitudeG: accelMps2 / standardGravityMps2,
-        speedKmh: speed,
-        type: HarshEventType.acceleration,
-      ));
+
+    // Episode semantics (#2667): record at most once on entry into a
+    // sustained harsh stretch, and re-arm only when an evaluated interval
+    // drops back below the threshold — so a multi-interval manoeuvre is
+    // ONE event, agreeing with the shared gate.
+    final isBrake = scorable && accelMps2 <= -brakeThresholdMps2;
+    final isAccel = scorable && accelMps2 >= accelThresholdMps2;
+
+    if (isBrake) {
+      if (!_inBrakeEpisode) {
+        _record(HarshEvent(
+          timestamp: timestamp,
+          magnitudeG: (-accelMps2) / standardGravityMps2,
+          speedKmh: speed,
+          type: HarshEventType.brake,
+        ));
+        _inBrakeEpisode = true;
+      }
+    } else {
+      _inBrakeEpisode = false;
+    }
+
+    if (isAccel) {
+      if (!_inAccelEpisode) {
+        _record(HarshEvent(
+          timestamp: timestamp,
+          magnitudeG: accelMps2 / standardGravityMps2,
+          speedKmh: speed,
+          type: HarshEventType.acceleration,
+        ));
+        _inAccelEpisode = true;
+      }
+    } else {
+      _inAccelEpisode = false;
     }
     _anchorAt = timestamp;
     _anchorSpeedKmh = speed;
@@ -237,5 +270,7 @@ class HarshEventDetector {
     _speedWindow.clear();
     _anchorSpeedKmh = null;
     _anchorAt = null;
+    _inAccelEpisode = false;
+    _inBrakeEpisode = false;
   }
 }
