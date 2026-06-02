@@ -6689,7 +6689,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get fuelStationRadarFarther => 'Farther station';
 
   @override
-  String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
+  String get fuelStationRadarStart => 'Start fuel station radar';
 
   @override
   String get fuelStationRadarResultBadge => 'Fuel Station Radar result';

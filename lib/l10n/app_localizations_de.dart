@@ -6692,7 +6692,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fuelStationRadarFarther => 'Weiter entfernte Tankstelle';
 
   @override
-  String get fuelStationRadarButtonTooltip => 'Mit Tankstellen-Radar suchen';
+  String get fuelStationRadarStart => 'Tankstellen-Radar starten';
 
   @override
   String get fuelStationRadarResultBadge => 'Tankstellen-Radar-Ergebnis';

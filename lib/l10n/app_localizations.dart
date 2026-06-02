@@ -11679,11 +11679,11 @@ abstract class AppLocalizations {
   /// **'Farther station'**
   String get fuelStationRadarFarther;
 
-  /// Tooltip / accessibility label on the radar button in the search-results header that runs a cache-first radar scan around the user and shows the nearby stations in the results list (#2675).
+  /// Label on the extended floating-action button (styled like the trip 'Start recording' pill) that launches a cache-first Fuel Station Radar scan around the user and shows the nearby stations in the search-results list (#2682).
   ///
   /// In en, this message translates to:
-  /// **'Search with Fuel Station Radar'**
-  String get fuelStationRadarButtonTooltip;
+  /// **'Start fuel station radar'**
+  String get fuelStationRadarStart;
 
   /// Label of the grey summary-bar chip shown above the results list while the on-search Fuel Station Radar owns the results, replacing the radius chip to signal the list is a radar scan rather than a regular search (#2676).
   ///

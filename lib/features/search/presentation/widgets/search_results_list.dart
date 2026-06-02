@@ -25,7 +25,6 @@ import '../../domain/entities/station.dart';
 import '../../providers/selected_station_provider.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
-import '../../providers/radar_search_provider.dart';
 import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import '../../providers/station_rating_provider.dart';
@@ -138,12 +137,11 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                 ),
               ),
               const SizedBox(width: 4),
-              // #2675 — Fuel Station Radar: a one-shot, cache-first scan
-              // around the user's persisted position whose stations render in
-              // this same list like a regular search. Extracted to the parts
-              // file to keep this file under the length cap.
-              const _RadarSearchButton(),
-              const SizedBox(width: 4),
+              // #2682 — the Fuel Station Radar launch affordance moved out of
+              // this header (the cramped #2675 IconButton) to a "Start
+              // recording"-style extended-FAB pill (`RadarSearchFab`) floated
+              // bottom-right by the search screen, clear of the central search
+              // FAB + bottom nav.
               // #1613 — gated entry point for the fuel-cost Calculator.
               // The /calculator route exists but had no navigation entry
               // point anywhere in lib/; this affordance makes it

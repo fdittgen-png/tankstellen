@@ -6617,7 +6617,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelStationRadarFarther => 'Farther station';
 
   @override
-  String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
+  String get fuelStationRadarStart => 'Start fuel station radar';
 
   @override
   String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
@@ -13750,8 +13750,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get fuelStationRadarFarther => '⟦Ƒářŧĥéř šŧáŧîóñ ······⟧';
 
   @override
-  String get fuelStationRadarButtonTooltip =>
-      '⟦Šéářçĥ ŵîŧĥ Ƒúéł Šŧáŧîóñ Řáđář ············⟧';
+  String get fuelStationRadarStart => '⟦Šŧářŧ ƒúéł šŧáŧîóñ řáđář ·········⟧';
 
   @override
   String get fuelStationRadarResultBadge =>
