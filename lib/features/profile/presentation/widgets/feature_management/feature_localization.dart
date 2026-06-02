@@ -81,6 +81,8 @@ String featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_addFillUpOcrReceipt ?? m.displayName;
     case Feature.addFillUpOcrPump:
       return l?.featureLabel_addFillUpOcrPump ?? m.displayName;
+    case Feature.addFillUpShareIntentReceipt:
+      return l?.featureLabel_addFillUpShareIntentReceipt ?? m.displayName;
     case Feature.developerPatToken:
       return l?.featureLabel_developerPatToken ?? m.displayName;
     case Feature.debugMode:
@@ -162,6 +164,8 @@ String featureDescription(AppLocalizations? l, Feature f) {
       return l?.featureDescription_addFillUpOcrReceipt ?? m.description;
     case Feature.addFillUpOcrPump:
       return l?.featureDescription_addFillUpOcrPump ?? m.description;
+    case Feature.addFillUpShareIntentReceipt:
+      return l?.featureDescription_addFillUpShareIntentReceipt ?? m.description;
     case Feature.developerPatToken:
       // note: manifest differs — this subtitle adds a "Power-user /
       // contributor feature." sentence absent from the manifest
@@ -236,6 +240,7 @@ String blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.obd2Optional:
     case Feature.addFillUpOcrReceipt:
     case Feature.addFillUpOcrPump:
+    case Feature.addFillUpShareIntentReceipt:
     case Feature.developerPatToken:
     case Feature.debugMode:
     case Feature.approachOverlay:

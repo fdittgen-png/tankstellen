@@ -103,6 +103,7 @@ const Map<Feature, FeatureCategory> featureCategory = <Feature, FeatureCategory>
   // 6. Input & scanning.
   Feature.addFillUpOcrReceipt: FeatureCategory.input,
   Feature.addFillUpOcrPump: FeatureCategory.input,
+  Feature.addFillUpShareIntentReceipt: FeatureCategory.input,
   Feature.loyaltyCards: FeatureCategory.input,
 
   // 7. Developer & experimental (last).

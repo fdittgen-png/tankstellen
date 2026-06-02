@@ -108,6 +108,28 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- #2735 — inbound OS share-intent receiver (Epic #2687).
+                 When the user shares a receipt image (or, once #2737
+                 lands, a PDF) from another app, Android offers Sparkilo
+                 in the share sheet; the share_handler plugin reads the
+                 SEND / SEND_MULTIPLE intent on this singleTop activity
+                 (via the onNewIntent + setIntent already overridden in
+                 MainActivity.kt) and hands the attachment path to the
+                 Dart ShareReceiptListener. image/* flows through receipt
+                 OCR; application/pdf currently shows the graceful
+                 "unsupported format — coming soon" message (#2737). -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="application/pdf"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="application/pdf"/>
+            </intent-filter>
         </activity>
         <!-- Home-screen widget: single provider with a header toggle that
              flips between favorites and nearest-stations modes (#713).

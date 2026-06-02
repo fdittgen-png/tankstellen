@@ -4067,5 +4067,30 @@
   "@consumptionStatsChartConsumption": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "shareReceiptImporting": "Importing shared receipt…",
+  "@shareReceiptImporting": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
+  "@shareReceiptUnsupportedFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "shareReceiptFailed": "Couldn't read the shared receipt — try sharing it again or add the fill-up manually.",
+  "@shareReceiptFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureLabel_addFillUpShareIntentReceipt": "Share receipt to import",
+  "@featureLabel_addFillUpShareIntentReceipt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureDescription_addFillUpShareIntentReceipt": "Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.",
+  "@featureDescription_addFillUpShareIntentReceipt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

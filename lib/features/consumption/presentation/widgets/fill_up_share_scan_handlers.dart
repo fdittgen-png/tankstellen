@@ -1,11 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_scan_service.dart';
+import '../../providers/pending_shared_receipt_provider.dart';
 import 'fill_up_scan_handlers.dart';
 
 /// Shared receipt-prefill body + the path-fed share-scan sibling
@@ -138,4 +143,42 @@ Future<void> runSharedReceiptScan(
   } finally {
     if (state.isMounted()) state.setScanning(false);
   }
+}
+
+/// #2735 — drains the inbound-share receipt path stashed by
+/// `ShareReceiptHandler` and runs [runSharedReceiptScan] on the next
+/// frame, prefilling the host form from the shared receipt's OCR. Called
+/// from `AddFillUpScreen.initState`; a no-op when nothing was shared (the
+/// common case of opening the form manually).
+///
+/// Lives here, not on the screen, so the screen file stays close to its
+/// grandfathered size (#1680). [ref] reads the stash via `consumeDeferred`
+/// — `initState` is a Riverpod-locked phase that forbids the synchronous
+/// notifier write `consume` would do (the same constraint the router
+/// redirect hits); the deferred clear runs on a microtask so a rebuild
+/// can't re-scan. [buildHost] is the screen's `_buildScanHostState`, fed
+/// to the never-throws (#2349) [runSharedReceiptScan] after first frame
+/// so `context` carries a live `ScaffoldMessenger` and the form is built.
+void scheduleSharedReceiptScanIfPending(
+  WidgetRef ref,
+  BuildContext context,
+  FillUpScanHostState Function() buildHost,
+  bool Function() isMounted,
+) {
+  String? path;
+  try {
+    path =
+        ref.read(pendingSharedReceiptProvider.notifier).consumeDeferred();
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+      'where': 'AddFillUp: pending shared-receipt read failed',
+    }));
+    return;
+  }
+  if (path == null) return;
+  final sharedPath = path;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!isMounted()) return;
+    unawaited(runSharedReceiptScan(context, buildHost(), sharedPath));
+  });
 }

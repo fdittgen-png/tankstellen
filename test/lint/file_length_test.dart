@@ -234,8 +234,14 @@ void main() {
     // `scannedPricePerLiter:` arg on the saved `FillUp` (+ rationale) so the
     // exact receipt-scanned unit price is persisted instead of discarded.
     // Pure field plumbing; decomposition stays tracked under #2187/#2188/#2190.
+    // #2735 — re-grandfathered 526 → 537: initState now kicks the inbound
+    // OS share-intent receipt scan via `scheduleSharedReceiptScanIfPending`
+    // (the consume + post-frame + OCR body lives in
+    // `fill_up_share_scan_handlers.dart`, NOT here, to keep this file's
+    // growth to the call site + dartdoc). Decomposition stays tracked under
+    // #2187/#2188/#2190.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        526,
+        537,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
