@@ -19,5 +19,7 @@
   "insightFullThrottle": "Vollgas ({pctTime}% der Fahrt): {liters} L verschwendet",
   "lessonAdviceFullThrottle": "Sanfter Gas geben – mit etwa 70 % Pedalweg kommst du mit deutlich weniger Sprit auf Tempo.",
   "insightLambdaEnrichment": "Fettes Gemisch unter Last ({pctTime}% der Fahrt): {liters} L verschwendet",
-  "lessonAdviceLambdaEnrichment": "Hohe Dauerlast lässt den Motor anfetten – früher hochschalten und an langen Steigungen Gas wegnehmen, damit das Gemisch mager bleibt."
+  "lessonAdviceLambdaEnrichment": "Hohe Dauerlast lässt den Motor anfetten – früher hochschalten und an langen Steigungen Gas wegnehmen, damit das Gemisch mager bleibt.",
+  "insightClimbingCost": "Bergauf bei {gradePercent}% Steigung ({pctTime}% der Fahrt): {liters} L verschwendet",
+  "lessonAdviceClimbingCost": "Vor Steigungen Schwung mitnehmen und gleichmäßig Gas geben – schub­weises Beschleunigen am Berg kostet zusätzlich Sprit."
 }

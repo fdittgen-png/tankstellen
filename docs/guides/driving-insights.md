@@ -60,6 +60,31 @@ engine off. Wasted liters = idle_time × idle_fuel_rate. The rate
 defaults to **0.6 L/h** (typical petrol passenger-car warm idle at
 700-900 RPM) when measured fuel-rate samples are unavailable.
 
+> GPS-only / degraded samples carry `rpm == null` (no engine signal,
+> #2692 C4-G); the idle and high-RPM gates read null as 0, so a GPS-only
+> trip never fabricates an idling or over-revving cost line.
+
+### Climbing cost (`labelKey: insightClimbingCost`, #2693 C6)
+
+Recomputes confident road grade inline over the trip's altitude samples
+using the **same** `RoadGradeCalculator` configuration the live GPS fuel
+folder uses (`gps_live_estimate_folder.dart`: 150 m window, 0.2
+exp-smoothing, `minSamplesInWindow = 5`) and the same `speedMps · Δt`
+distance integral, so the post-trip figure lines up with what the live
+estimator saw. While the grade is **confident** and above **2 %**, the
+extra fuel over a flat-road counterfactual is attributed to the climb:
+
+```
+wastedLiters += measuredRate × (1 − 0.7) × Δt / 3600
+```
+
+i.e. the same distance on the flat would have burned ~70 % of what the
+climb did. When no fuel-rate samples exist (GPS-only), a **9 L/h**
+fallback load rate stands in. The `metadata.gradePercent` carries the
+peak confident grade for the subtitle. The detector is a pure helper,
+`lib/features/consumption/domain/climb_restart_detector.dart`, so the
+analyzer stays under its line guard.
+
 ## Noise floor
 
 Categories below **0.05 L** are dropped — they're indistinguishable

@@ -516,4 +516,45 @@ void main() {
           reason: 'rpm null must never be counted as an idling engine');
     });
   });
+
+  group('#2693 C6 — climbing-fuel insight from confident grade', () {
+    final start = DateTime.utc(2026);
+
+    DrivingInsight? find(List<DrivingInsight> list, String key) {
+      for (final i in list) {
+        if (i.labelKey == key) return i;
+      }
+      return null;
+    }
+
+    List<TripSample> climb(double gradeFraction) {
+      final samples = <TripSample>[];
+      var altitude = 100.0;
+      for (var i = 0; i < 40; i++) {
+        samples.add(TripSample(
+          timestamp: start.add(Duration(seconds: i * 3)),
+          speedKmh: 36,
+          rpm: 2200,
+          altitudeM: altitude,
+          fuelRateLPerHour: 10,
+        ));
+        altitude += 30.0 * gradeFraction;
+      }
+      return samples;
+    }
+
+    test('a confident ~6% climb surfaces an insightClimbingCost line', () {
+      final insight = find(analyzeTrip(climb(0.06)), 'insightClimbingCost');
+      expect(insight, isNotNull);
+      expect(insight!.litersWasted, greaterThan(0));
+      // The metadata carries the peak confident grade for the subtitle.
+      final gradePct = insight.metadata['gradePercent']! as double;
+      expect(gradePct, greaterThan(3.0));
+      expect(gradePct, lessThan(7.0));
+    });
+
+    test('a flat trip raises NO climbing insight', () {
+      expect(find(analyzeTrip(climb(0.0)), 'insightClimbingCost'), isNull);
+    });
+  });
 }

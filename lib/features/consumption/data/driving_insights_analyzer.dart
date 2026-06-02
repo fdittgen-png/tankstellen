@@ -18,6 +18,7 @@
 library;
 
 import '../domain/accel_event_gate.dart';
+import '../domain/climb_restart_detector.dart';
 import '../domain/driving_insight.dart';
 import '../domain/trip_recorder.dart';
 import '../presentation/widgets/trip_detail_charts.dart';
@@ -308,6 +309,24 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
         },
       ));
     }
+  }
+
+  // Climbing-fuel cost line (#2693 C6). Recomputes confident road grade
+  // inline (same RoadGradeCalculator config the live folder uses) and
+  // attributes the extra litres burned over a flat-road counterfactual.
+  final climb = detectClimbCost(sorted);
+  if (climb.climbingLiters >= _noiseFloorLiters) {
+    final pctTime = climb.climbSeconds / totalDt * 100.0;
+    candidates.add(DrivingInsight(
+      labelKey: 'insightClimbingCost',
+      litersWasted: climb.climbingLiters,
+      percentOfTrip: pctTime,
+      metadata: {
+        'gradePercent': climb.peakGradePercent,
+        'climbSeconds': climb.climbSeconds,
+        'pctTime': pctTime,
+      },
+    ));
   }
 
   // Sort by wasted litres descending and cap at [_topN].
