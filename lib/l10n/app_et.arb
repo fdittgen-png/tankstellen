@@ -3688,11 +3688,6 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarButtonTooltip": "Search with Fuel Station Radar",
-  "@fuelStationRadarButtonTooltip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "fuelStationRadarResultBadge": "Fuel Station Radar result",
   "@fuelStationRadarResultBadge": {
     "x-mt": "needs-native-review",
@@ -3755,6 +3750,16 @@
   },
   "featureGroupDescription_developer": "Power-user and contributor tools.",
   "@featureGroupDescription_developer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelStationRadarStart": "Start fuel station radar",
+  "@fuelStationRadarStart": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "@evPriceBestEffortOcm": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

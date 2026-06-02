@@ -369,6 +369,7 @@
   "evPriceIndicative": "Richtpreis",
   "evPriceDeclaredByOperator": "Richtpreis laut Betreiber — vor Ort prüfen",
   "evPriceFranceAttribution": "Preise: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "evPriceBestEffortOcm": "Bestmögliche Preisangabe von OpenChargeMap — lückenhaft und ggf. unvollständig.",
   "evLastUpdated": "Zuletzt aktualisiert",
   "evUnknown": "Unbekannt",
   "evDataAttribution": "Daten von OpenChargeMap (Community-basiert)",
@@ -3007,9 +3008,9 @@
   "@fuelStationRadarFarther": {
     "description": "Swipe-right hint / screen-reader action on the Fuel Station Radar card: page to the next-farther station in the distance-ranked list (#2661)."
   },
-  "fuelStationRadarButtonTooltip": "Mit Tankstellen-Radar suchen",
-  "@fuelStationRadarButtonTooltip": {
-    "description": "Tooltip / accessibility label on the radar button in the search-results header that runs a cache-first radar scan around the user and shows the nearby stations in the results list (#2675)."
+  "fuelStationRadarStart": "Tankstellen-Radar starten",
+  "@fuelStationRadarStart": {
+    "description": "Label on the extended floating-action button (styled like the trip 'Start recording' pill) that launches a cache-first Fuel Station Radar scan around the user and shows the nearby stations in the search-results list (#2682)."
   },
   "fuelStationRadarResultBadge": "Tankstellen-Radar-Ergebnis",
   "@fuelStationRadarResultBadge": {

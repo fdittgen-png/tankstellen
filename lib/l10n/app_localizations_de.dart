@@ -816,6 +816,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Preise: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
 
   @override
+  String get evPriceBestEffortOcm =>
+      'Bestmögliche Preisangabe von OpenChargeMap — lückenhaft und ggf. unvollständig.';
+
+  @override
   String get evLastUpdated => 'Zuletzt aktualisiert';
 
   @override
@@ -6692,7 +6696,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fuelStationRadarFarther => 'Weiter entfernte Tankstelle';
 
   @override
-  String get fuelStationRadarButtonTooltip => 'Mit Tankstellen-Radar suchen';
+  String get fuelStationRadarStart => 'Tankstellen-Radar starten';
 
   @override
   String get fuelStationRadarResultBadge => 'Tankstellen-Radar-Ergebnis';

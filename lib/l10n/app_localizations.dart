@@ -1629,6 +1629,12 @@ abstract class AppLocalizations {
   /// **'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ'**
   String get evPriceFranceAttribution;
 
+  /// Best-effort pricing caption shown on non-IRVE EV stations whose usage cost came from OpenChargeMap's community-sourced (and sparse) UsageCost field (#2616). Mutually exclusive with the France IRVE attribution. OpenChargeMap is a proper noun within the localized sentence.
+  ///
+  /// In en, this message translates to:
+  /// **'Best-effort pricing from OpenChargeMap — sparse and may be incomplete.'**
+  String get evPriceBestEffortOcm;
+
   /// No description provided for @evLastUpdated.
   ///
   /// In en, this message translates to:
@@ -11679,11 +11685,11 @@ abstract class AppLocalizations {
   /// **'Farther station'**
   String get fuelStationRadarFarther;
 
-  /// Tooltip / accessibility label on the radar button in the search-results header that runs a cache-first radar scan around the user and shows the nearby stations in the results list (#2675).
+  /// Label on the extended floating-action button (styled like the trip 'Start recording' pill) that launches a cache-first Fuel Station Radar scan around the user and shows the nearby stations in the search-results list (#2682).
   ///
   /// In en, this message translates to:
-  /// **'Search with Fuel Station Radar'**
-  String get fuelStationRadarButtonTooltip;
+  /// **'Start fuel station radar'**
+  String get fuelStationRadarStart;
 
   /// Label of the grey summary-bar chip shown above the results list while the on-search Fuel Station Radar owns the results, replacing the radius chip to signal the list is a radar scan rather than a regular search (#2676).
   ///

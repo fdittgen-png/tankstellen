@@ -810,6 +810,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
 
   @override
+  String get evPriceBestEffortOcm =>
+      'Best-effort pricing from OpenChargeMap — sparse and may be incomplete.';
+
+  @override
   String get evLastUpdated => 'Last updated';
 
   @override
@@ -6617,7 +6621,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelStationRadarFarther => 'Farther station';
 
   @override
-  String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
+  String get fuelStationRadarStart => 'Start fuel station radar';
 
   @override
   String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
@@ -7774,6 +7778,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get evPriceFranceAttribution =>
       '⟦Ƥřîçîñǧ: Ɓášé ñáŧîóñáłé đéš ÎŘṼÉ — Łîçéñçé Óúṽéřŧé / đáŧá.ǧóúṽ.ƒř / ÓĐŘÉ ························⟧';
+
+  @override
+  String get evPriceBestEffortOcm =>
+      '⟦Ɓéšŧ-éƒƒóřŧ ƥřîçîñǧ ƒřóɱ ÓƥéñÇĥářǧéṀáƥ — šƥářšé áñđ ɱáý ƀé îñçóɱƥłéŧé. ··························⟧';
 
   @override
   String get evLastUpdated => '⟦Łášŧ úƥđáŧéđ ·····⟧';
@@ -13750,8 +13758,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get fuelStationRadarFarther => '⟦Ƒářŧĥéř šŧáŧîóñ ······⟧';
 
   @override
-  String get fuelStationRadarButtonTooltip =>
-      '⟦Šéářçĥ ŵîŧĥ Ƒúéł Šŧáŧîóñ Řáđář ············⟧';
+  String get fuelStationRadarStart => '⟦Šŧářŧ ƒúéł šŧáŧîóñ řáđář ·········⟧';
 
   @override
   String get fuelStationRadarResultBadge =>

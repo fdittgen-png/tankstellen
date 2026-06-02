@@ -32,6 +32,7 @@ import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
 import '../widgets/demo_mode_banner.dart';
+import '../widgets/radar_search_fab.dart';
 import '../widgets/search_results_content.dart';
 import '../widgets/search_summary_bar.dart';
 import '../widgets/user_position_bar.dart';
@@ -291,6 +292,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
+      // #2682 — the Fuel Station Radar launches from a "Start recording"-style
+      // extended-FAB pill (`RadarSearchFab`) floated bottom-right via the
+      // Scaffold FAB slot, clear of the shell's central search FAB (docked into
+      // the bottom-nav notch) + the bottom nav itself. The pill flips to a stop
+      // treatment while the radar owns the results list.
+      floatingActionButton: const RadarSearchFab(),
       // #2530 — the shared master/detail scaffold owns the breakpoint +
       // foldable-hinge + 1:1/2:3 ratios. Compact (< 600dp) renders
       // `_buildSearchContent` full-width, byte-for-byte unchanged. On wide
