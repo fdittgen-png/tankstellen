@@ -324,10 +324,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     // #2622 — in route mode, surface the corridor's multi-country data
     // sources (#2626) so a cross-border result credits every provider, not
-    // just the active country. Empty for nearby mode / single-country routes.
+    // just the active country. #2680 — credit only the countries that
+    // actually PRODUCED a station (contributingCountryCodes), not every
+    // country the corridor geographically crossed, so a leg that returned
+    // nothing (E85 in Spain) is dropped from the banner. Empty for nearby
+    // mode / single-country routes.
     final isRoute = ref.watch(activeSearchModeProvider) == SearchMode.route;
     final corridorCodes = isRoute
-        ? (ref.watch(routeSearchStateProvider).value?.corridorCountryCodes ??
+        ? (ref
+                .watch(routeSearchStateProvider)
+                .value
+                ?.contributingCountryCodes(ref.watch(selectedFuelTypeProvider)) ??
             const <String>{})
         : const <String>{};
 

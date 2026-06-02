@@ -252,6 +252,57 @@ StationQueryFunction buildCorridorQueryFunction(
 /// ES station carrying E10 stays on E10); only an E5-only real Spanish station
 /// resolves to E5. This lives only in the corridor/route resolver — the
 /// nearby/single-country strict `station.priceFor` path stays strict (#2510).
+/// #2680 — the upper-cased ISO codes of the countries that ACTUALLY produced
+/// a *displayable* fuel station in [stations] — a SUBSET of the corridor's
+/// queried codes (`RouteSearchResult.corridorCountryCodes`).
+///
+/// The corridor query (#2622) credits every country it *geographically*
+/// crossed. But a cross-border search for a fuel a country doesn't sell
+/// (E85 in Spain — #2641: every Spanish MITECO row carries an EMPTY
+/// `Precio Bioetanol`) brings back stations with NO price for the displayed
+/// grade, shown as "--". Crediting that country's data source in the
+/// attribution banner is misleading — it produced nothing the user can act
+/// on. This narrows the set to the countries that produced ≥1 station with a
+/// resolvable, non-null price.
+///
+/// "Displayable" mirrors the list/map exactly: a station's grade comes from
+/// [fuelForStation] (its OWN country's [profileFuels] grade, with the #2641
+/// E5↔E10 95-octane sibling fallback), and the station counts only when
+/// `priceFor(thatGrade) != null`. So a Spanish E5-only station priced for an
+/// E10 driver still counts (sibling fallback → E5 price), but the same
+/// station for an E85 driver does NOT (no E85, no E85 sibling) — exactly the
+/// field case where ES must drop off the banner.
+///
+/// Country attribution uses the SAME [Countries.countryForStation] resolver as
+/// [fuelForStation] (id prefix first, then bounding box — #753/#2631), so a
+/// Catalonian MITECO station sitting inside FR's continental bbox is still
+/// attributed to ES. Only [FuelStationResult]s are considered: EV attribution
+/// is not a per-country open-data policy and the banner never credits it. A
+/// station whose country cannot be resolved is dropped (no policy to credit).
+///
+/// Derived from the full found set (`RouteSearchResult.stations`, NOT the
+/// Best-Stops display subset) so the banner is stable across the All / Best
+/// toggle.
+Set<String> contributingCountryCodesFor(
+  Iterable<SearchResultItem> stations,
+  Map<String, FuelType> profileFuels,
+  FuelType fallback,
+) {
+  final out = <String>{};
+  for (final item in stations.whereType<FuelStationResult>()) {
+    final code = Countries.countryForStation(
+      id: item.station.id,
+      lat: item.station.lat,
+      lng: item.station.lng,
+    )?.code.toUpperCase();
+    if (code == null || out.contains(code)) continue;
+    // Displayable only — the same grade the list/map prices this station by.
+    final grade = fuelForStation(item.station, profileFuels, fallback);
+    if (item.station.priceFor(grade) != null) out.add(code);
+  }
+  return out;
+}
+
 FuelType fuelForStation(
   Station station,
   Map<String, FuelType> profileFuels,
