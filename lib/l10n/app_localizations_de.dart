@@ -4756,11 +4756,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Blendet einen Entwicklerwerkzeuge-Bereich in den Einstellungen ein mit Diagnosefunktionen: Fehlerprotokoll-Export, Test-Benachrichtigungen, ein Test-Alarm-Durchlauf, ein Feature-Flag-Auszug, Caches leeren und Diagnose kopieren.';
 
   @override
-  String get featureLabel_approachOverlay => 'Annäherungs-Overlay';
+  String get featureLabel_approachOverlay => 'Tankstellen-Radar';
 
   @override
   String get featureDescription_approachOverlay =>
-      'Während einer aufgezeichneten Fahrt wechselt die schwebende Kachel zur Farbe der Kraftstoffsorte und zeigt den Preis an, wenn Sie sich einer Tankstelle nähern.';
+      'Verwandelt die schwebende Fahrt-Kachel in ein Live-Tankstellen-Radar — sobald Sie sich einer Tankstelle nähern, wechselt sie zur Farbe der Kraftstoffsorte und zeigt den Preis an.';
 
   @override
   String get featureLabel_voiceAnnouncements => 'Sprachansagen';
@@ -4771,7 +4771,49 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get featureBlockedEnable_voiceAnnouncements =>
-      'Aktiviere zuerst das Annäherungs-Overlay';
+      'Aktiviere zuerst das Tankstellen-Radar';
+
+  @override
+  String get featureGroupTitle_finding => 'Finden & Karte';
+
+  @override
+  String get featureGroupDescription_finding =>
+      'Wo Sie tanken oder laden können — Suche, Karte, Routenplanung.';
+
+  @override
+  String get featureGroupTitle_prices => 'Preise & Benachrichtigungen';
+
+  @override
+  String get featureGroupDescription_prices =>
+      'Preisrückgänge, Verlauf und Meldungen.';
+
+  @override
+  String get featureGroupTitle_radar => 'Tankstellen-Radar';
+
+  @override
+  String get featureGroupDescription_radar =>
+      'Live-Preishinweise während der Fahrt.';
+
+  @override
+  String get featureGroupTitle_sync => 'Sync & Backup';
+
+  @override
+  String get featureGroupDescription_sync =>
+      'Behalten Sie Ihre Daten geräteübergreifend.';
+
+  @override
+  String get featureGroupTitle_input => 'Eingabe & Scannen';
+
+  @override
+  String get featureGroupDescription_input =>
+      'Hilfen zum Erfassen von Tankvorgängen.';
+
+  @override
+  String get featureGroupTitle_developer => 'Entwickler & experimentell';
+
+  @override
+  String get featureGroupDescription_developer =>
+      'Werkzeuge für Power-User und Mitwirkende.';
 
   @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';

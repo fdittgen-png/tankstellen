@@ -334,15 +334,14 @@ void main() {
     // station's own country fuel. Lets a Spanish station show its E10 price
     // instead of '--' on an E85 route. Decomposition tracked by #2187/#2188.
     'lib/features/map/presentation/widgets/station_map_layers.dart': 604,
-    // #2382 — +5 for Feature.approachOverlay's three per-feature switch
-    // cases (label / description / blocked-enable). Intrinsic per-feature
-    // growth in this switch-based section; full decomposition is its own
-    // task, so the snapshot tracks the new size.
-    // #2569 — +7 for Feature.voiceAnnouncements's three switch cases
-    // (label / description / blocked-enable). Same intrinsic per-feature
-    // growth in the switch-based section; decomposition still its own task.
-    'lib/features/profile/presentation/widgets/feature_management_section.dart':
-        718,
+    // #2681 — feature_management_section.dart graduated: the #2681 ordered-
+    // category reorg decomposed the 718-line god-class into the
+    // widgets/feature_management/ folder (conso_feature_card.dart,
+    // feature_group_card.dart, feature_localization.dart,
+    // feature_grouping.dart, feature_section_header.dart) so the section
+    // dropped to ~168 content lines (below the cap). Removed from the
+    // snapshot per the shrink ratchet; every extracted file is new and
+    // under 400.
     'lib/features/vehicle/domain/entities/vehicle_profile.dart': 453,
     'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 806,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,

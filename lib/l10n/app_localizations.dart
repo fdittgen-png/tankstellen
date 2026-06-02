@@ -7377,7 +7377,7 @@ abstract class AppLocalizations {
   /// No description provided for @consoFeatureGroupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Conso'**
+  /// **'Consumption'**
   String get consoFeatureGroupTitle;
 
   /// No description provided for @consoFeatureGroupDescription.
@@ -8460,16 +8460,16 @@ abstract class AppLocalizations {
   /// **'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.'**
   String get featureDescription_debugMode;
 
-  /// Settings toggle label for the in-trip approach overlay (#2382). Default-on for the Medium and Full use-modes.
+  /// Settings toggle label for the in-trip Fuel Station Radar / approach overlay (#2382 / #2661 rename). Default-on for the Medium and Full use-modes. The enum value + persistence key remain approachOverlay.
   ///
   /// In en, this message translates to:
-  /// **'Approach overlay'**
+  /// **'Fuel Station Radar'**
   String get featureLabel_approachOverlay;
 
-  /// Settings toggle description for the in-trip approach overlay (#2382).
+  /// Settings toggle description for the in-trip Fuel Station Radar (#2382 / #2661).
   ///
   /// In en, this message translates to:
-  /// **'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.'**
+  /// **'Turn the floating trip tile into a live Fuel Station Radar — as you near a fuel station it flips to the fuel type\'s colour and shows the price.'**
   String get featureDescription_approachOverlay;
 
   /// Settings toggle label for spoken voice announcements of nearby cheap fuel while driving (#2569). Default-off.
@@ -8484,11 +8484,83 @@ abstract class AppLocalizations {
   /// **'Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.'**
   String get featureDescription_voiceAnnouncements;
 
-  /// Tooltip shown on the disabled voice-announcements toggle when its prerequisite (approachOverlay) is off (#2569).
+  /// Tooltip shown on the disabled voice-announcements toggle when its prerequisite (approachOverlay, surfaced as Fuel Station Radar) is off (#2569 / #2681).
   ///
   /// In en, this message translates to:
-  /// **'Enable the approach overlay first'**
+  /// **'Enable the Fuel Station Radar first'**
   String get featureBlockedEnable_voiceAnnouncements;
+
+  /// Section header title for the Finding & map category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Finding & map'**
+  String get featureGroupTitle_finding;
+
+  /// Section header subtitle for the Finding & map category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Where to fuel up or charge — search, map, routing.'**
+  String get featureGroupDescription_finding;
+
+  /// Section header title for the Prices & alerts category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices & alerts'**
+  String get featureGroupTitle_prices;
+
+  /// Section header subtitle for the Prices & alerts category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Price drops, history, and reporting.'**
+  String get featureGroupDescription_prices;
+
+  /// Section header title for the Fuel Station Radar category in Feature management (#2681 / #2661).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel Station Radar'**
+  String get featureGroupTitle_radar;
+
+  /// Section header subtitle for the Fuel Station Radar category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Live price nudges as you drive.'**
+  String get featureGroupDescription_radar;
+
+  /// Section header title for the Sync & backup category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Sync & backup'**
+  String get featureGroupTitle_sync;
+
+  /// Section header subtitle for the Sync & backup category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your data across devices.'**
+  String get featureGroupDescription_sync;
+
+  /// Section header title for the Input & scanning category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Input & scanning'**
+  String get featureGroupTitle_input;
+
+  /// Section header subtitle for the Input & scanning category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Helpers for logging fill-ups.'**
+  String get featureGroupDescription_input;
+
+  /// Section header title for the Developer & experimental category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Developer & experimental'**
+  String get featureGroupTitle_developer;
+
+  /// Section header subtitle for the Developer & experimental category in Feature management (#2681).
+  ///
+  /// In en, this message translates to:
+  /// **'Power-user and contributor tools.'**
+  String get featureGroupDescription_developer;
 
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///

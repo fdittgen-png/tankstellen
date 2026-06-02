@@ -88,6 +88,10 @@ void main() {
         Feature.glideCoach,
         Feature.gpsTripPath,
         Feature.autoRecord,
+        // #2681 — `obd2Optional` is now rendered as an always-enabled
+        // indented row inside the Conso card (presentation-only placement
+        // in the Consumption category; no manifest requires edge).
+        Feature.obd2Optional,
       ];
       final consoCard = find.byKey(const Key('featureGroup_conso'));
       expect(consoCard, findsOneWidget,
@@ -297,7 +301,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap the "Fuel" segment.
+      // #2681 — the Conso card is no longer top-pinned; it now sits in the
+      // Consumption category section (4th), so scroll the segmented
+      // control into view before tapping the "Fuel" segment.
+      await tester.scrollUntilVisible(
+        find.byType(SegmentedButton<ConsoMode>),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Fuel'));
       await tester.pumpAndSettle();
 
@@ -335,6 +347,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // #2681 — scroll the segmented control into view (Conso card moved
+      // into the Consumption category section) before tapping "Off".
+      await tester.scrollUntilVisible(
+        find.byType(SegmentedButton<ConsoMode>),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Off'));
       await tester.pumpAndSettle();
 

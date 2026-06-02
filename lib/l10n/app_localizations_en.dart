@@ -4044,7 +4044,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Month';
 
   @override
-  String get consoFeatureGroupTitle => 'Conso';
+  String get consoFeatureGroupTitle => 'Consumption';
 
   @override
   String get consoFeatureGroupDescription =>
@@ -4703,11 +4703,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Surface a Developer tools section in Settings with diagnostics: error-log export, test notifications, a test-alert pipeline run, a feature-flag dump, clear caches, and copy diagnostics.';
 
   @override
-  String get featureLabel_approachOverlay => 'Approach overlay';
+  String get featureLabel_approachOverlay => 'Fuel Station Radar';
 
   @override
   String get featureDescription_approachOverlay =>
-      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+      'Turn the floating trip tile into a live Fuel Station Radar — as you near a fuel station it flips to the fuel type\'s colour and shows the price.';
 
   @override
   String get featureLabel_voiceAnnouncements => 'Voice announcements';
@@ -4718,7 +4718,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get featureBlockedEnable_voiceAnnouncements =>
-      'Enable the approach overlay first';
+      'Enable the Fuel Station Radar first';
+
+  @override
+  String get featureGroupTitle_finding => 'Finding & map';
+
+  @override
+  String get featureGroupDescription_finding =>
+      'Where to fuel up or charge — search, map, routing.';
+
+  @override
+  String get featureGroupTitle_prices => 'Prices & alerts';
+
+  @override
+  String get featureGroupDescription_prices =>
+      'Price drops, history, and reporting.';
+
+  @override
+  String get featureGroupTitle_radar => 'Fuel Station Radar';
+
+  @override
+  String get featureGroupDescription_radar => 'Live price nudges as you drive.';
+
+  @override
+  String get featureGroupTitle_sync => 'Sync & backup';
+
+  @override
+  String get featureGroupDescription_sync => 'Keep your data across devices.';
+
+  @override
+  String get featureGroupTitle_input => 'Input & scanning';
+
+  @override
+  String get featureGroupDescription_input => 'Helpers for logging fill-ups.';
+
+  @override
+  String get featureGroupTitle_developer => 'Developer & experimental';
+
+  @override
+  String get featureGroupDescription_developer =>
+      'Power-user and contributor tools.';
 
   @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
@@ -11062,7 +11101,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get chargingChartsMonthAxis => '⟦Ṁóñŧĥ ··⟧';
 
   @override
-  String get consoFeatureGroupTitle => '⟦Çóñšó ··⟧';
+  String get consoFeatureGroupTitle => '⟦Çóñšúɱƥŧîóñ ·····⟧';
 
   @override
   String get consoFeatureGroupDescription =>
@@ -11744,11 +11783,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Šúřƒáçé á Đéṽéłóƥéř ŧóółš šéçŧîóñ îñ Šéŧŧîñǧš ŵîŧĥ đîáǧñóšŧîçš: éřřóř-łóǧ éẋƥóřŧ, ŧéšŧ ñóŧîƒîçáŧîóñš, á ŧéšŧ-áłéřŧ ƥîƥéłîñé řúñ, á ƒéáŧúřé-ƒłáǧ đúɱƥ, çłéář çáçĥéš, áñđ çóƥý đîáǧñóšŧîçš. ····································································⟧';
 
   @override
-  String get featureLabel_approachOverlay => '⟦Áƥƥřóáçĥ óṽéřłáý ·······⟧';
+  String get featureLabel_approachOverlay => '⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧';
 
   @override
   String get featureDescription_approachOverlay =>
-      '⟦Đúřîñǧ á řéçóřđéđ ŧřîƥ, ƒłîƥ ŧĥé ƒłóáŧîñǧ ŧîłé ŧó ŧĥé ƒúéł ŧýƥé\'š çółóúř áñđ šĥóŵ ŧĥé ƥřîçé áš ýóú ñéář á ƒúéł šŧáŧîóñ. ··········································⟧';
+      '⟦Ŧúřñ ŧĥé ƒłóáŧîñǧ ŧřîƥ ŧîłé îñŧó á łîṽé Ƒúéł Šŧáŧîóñ Řáđář — áš ýóú ñéář á ƒúéł šŧáŧîóñ îŧ ƒłîƥš ŧó ŧĥé ƒúéł ŧýƥé\'š çółóúř áñđ šĥóŵš ŧĥé ƥřîçé. ··················································⟧';
 
   @override
   String get featureLabel_voiceAnnouncements =>
@@ -11760,7 +11799,50 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get featureBlockedEnable_voiceAnnouncements =>
-      '⟦Éñáƀłé ŧĥé áƥƥřóáçĥ óṽéřłáý ƒîřšŧ ·············⟧';
+      '⟦Éñáƀłé ŧĥé Ƒúéł Šŧáŧîóñ Řáđář ƒîřšŧ ··············⟧';
+
+  @override
+  String get featureGroupTitle_finding => '⟦Ƒîñđîñǧ & ɱáƥ ·····⟧';
+
+  @override
+  String get featureGroupDescription_finding =>
+      '⟦Ŵĥéřé ŧó ƒúéł úƥ óř çĥářǧé — šéářçĥ, ɱáƥ, řóúŧîñǧ. ·················⟧';
+
+  @override
+  String get featureGroupTitle_prices => '⟦Ƥřîçéš & áłéřŧš ·····⟧';
+
+  @override
+  String get featureGroupDescription_prices =>
+      '⟦Ƥřîçé đřóƥš, ĥîšŧóřý, áñđ řéƥóřŧîñǧ. ·············⟧';
+
+  @override
+  String get featureGroupTitle_radar => '⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧';
+
+  @override
+  String get featureGroupDescription_radar =>
+      '⟦Łîṽé ƥřîçé ñúđǧéš áš ýóú đřîṽé. ···········⟧';
+
+  @override
+  String get featureGroupTitle_sync => '⟦Šýñç & ƀáçķúƥ ·····⟧';
+
+  @override
+  String get featureGroupDescription_sync =>
+      '⟦Ķééƥ ýóúř đáŧá áçřóšš đéṽîçéš. ···········⟧';
+
+  @override
+  String get featureGroupTitle_input => '⟦Îñƥúŧ & šçáññîñǧ ······⟧';
+
+  @override
+  String get featureGroupDescription_input =>
+      '⟦Ĥéłƥéřš ƒóř łóǧǧîñǧ ƒîłł-úƥš. ···········⟧';
+
+  @override
+  String get featureGroupTitle_developer =>
+      '⟦Đéṽéłóƥéř & éẋƥéřîɱéñŧáł ·········⟧';
+
+  @override
+  String get featureGroupDescription_developer =>
+      '⟦Ƥóŵéř-úšéř áñđ çóñŧřîƀúŧóř ŧóółš. ·············⟧';
 
   @override
   String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';

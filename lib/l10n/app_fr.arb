@@ -3783,5 +3783,65 @@
   "@fuelStationRadarResultBadge": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "featureGroupTitle_finding": "Finding & map",
+  "@featureGroupTitle_finding": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_finding": "Where to fuel up or charge — search, map, routing.",
+  "@featureGroupDescription_finding": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupTitle_prices": "Prices & alerts",
+  "@featureGroupTitle_prices": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_prices": "Price drops, history, and reporting.",
+  "@featureGroupDescription_prices": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupTitle_radar": "Fuel Station Radar",
+  "@featureGroupTitle_radar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_radar": "Live price nudges as you drive.",
+  "@featureGroupDescription_radar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupTitle_sync": "Sync & backup",
+  "@featureGroupTitle_sync": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_sync": "Keep your data across devices.",
+  "@featureGroupDescription_sync": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupTitle_input": "Input & scanning",
+  "@featureGroupTitle_input": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_input": "Helpers for logging fill-ups.",
+  "@featureGroupDescription_input": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupTitle_developer": "Developer & experimental",
+  "@featureGroupTitle_developer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_developer": "Power-user and contributor tools.",
+  "@featureGroupDescription_developer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

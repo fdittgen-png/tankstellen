@@ -4741,6 +4741,45 @@ class AppLocalizationsFi extends AppLocalizations {
       'Enable the approach overlay first';
 
   @override
+  String get featureGroupTitle_finding => 'Finding & map';
+
+  @override
+  String get featureGroupDescription_finding =>
+      'Where to fuel up or charge — search, map, routing.';
+
+  @override
+  String get featureGroupTitle_prices => 'Prices & alerts';
+
+  @override
+  String get featureGroupDescription_prices =>
+      'Price drops, history, and reporting.';
+
+  @override
+  String get featureGroupTitle_radar => 'Fuel Station Radar';
+
+  @override
+  String get featureGroupDescription_radar => 'Live price nudges as you drive.';
+
+  @override
+  String get featureGroupTitle_sync => 'Sync & backup';
+
+  @override
+  String get featureGroupDescription_sync => 'Keep your data across devices.';
+
+  @override
+  String get featureGroupTitle_input => 'Input & scanning';
+
+  @override
+  String get featureGroupDescription_input => 'Helpers for logging fill-ups.';
+
+  @override
+  String get featureGroupTitle_developer => 'Developer & experimental';
+
+  @override
+  String get featureGroupDescription_developer =>
+      'Power-user and contributor tools.';
+
+  @override
   String get feedbackConsentTitle => 'Lähetetäänkö raportti GitHubiin?';
 
   @override

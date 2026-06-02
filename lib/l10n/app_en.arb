@@ -2627,7 +2627,7 @@
   "@chargingChartsMonthAxis": {
     "description": "Axis label for the X axis (month) on the charging charts (#582 phase 3)."
   },
-  "consoFeatureGroupTitle": "Conso",
+  "consoFeatureGroupTitle": "Consumption",
   "consoFeatureGroupDescription": "Track your consumption — manual fill-ups, or automatic OBD2 trip recording.",
   "consoModeOff": "Off",
   "consoModeFuel": "Fuel",
@@ -3456,13 +3456,13 @@
   "@featureDescription_debugMode": {
     "description": "Settings toggle description for Developer / Debug mode (#2248)."
   },
-  "featureLabel_approachOverlay": "Approach overlay",
+  "featureLabel_approachOverlay": "Fuel Station Radar",
   "@featureLabel_approachOverlay": {
-    "description": "Settings toggle label for the in-trip approach overlay (#2382). Default-on for the Medium and Full use-modes."
+    "description": "Settings toggle label for the in-trip Fuel Station Radar / approach overlay (#2382 / #2661 rename). Default-on for the Medium and Full use-modes. The enum value + persistence key remain approachOverlay."
   },
-  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "featureDescription_approachOverlay": "Turn the floating trip tile into a live Fuel Station Radar — as you near a fuel station it flips to the fuel type's colour and shows the price.",
   "@featureDescription_approachOverlay": {
-    "description": "Settings toggle description for the in-trip approach overlay (#2382)."
+    "description": "Settings toggle description for the in-trip Fuel Station Radar (#2382 / #2661)."
   },
   "featureLabel_voiceAnnouncements": "Voice announcements",
   "@featureLabel_voiceAnnouncements": {
@@ -3472,9 +3472,57 @@
   "@featureDescription_voiceAnnouncements": {
     "description": "Settings toggle description for spoken voice announcements while driving (#2569)."
   },
-  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "featureBlockedEnable_voiceAnnouncements": "Enable the Fuel Station Radar first",
   "@featureBlockedEnable_voiceAnnouncements": {
-    "description": "Tooltip shown on the disabled voice-announcements toggle when its prerequisite (approachOverlay) is off (#2569)."
+    "description": "Tooltip shown on the disabled voice-announcements toggle when its prerequisite (approachOverlay, surfaced as Fuel Station Radar) is off (#2569 / #2681)."
+  },
+  "featureGroupTitle_finding": "Finding & map",
+  "@featureGroupTitle_finding": {
+    "description": "Section header title for the Finding & map category in Feature management (#2681)."
+  },
+  "featureGroupDescription_finding": "Where to fuel up or charge — search, map, routing.",
+  "@featureGroupDescription_finding": {
+    "description": "Section header subtitle for the Finding & map category in Feature management (#2681)."
+  },
+  "featureGroupTitle_prices": "Prices & alerts",
+  "@featureGroupTitle_prices": {
+    "description": "Section header title for the Prices & alerts category in Feature management (#2681)."
+  },
+  "featureGroupDescription_prices": "Price drops, history, and reporting.",
+  "@featureGroupDescription_prices": {
+    "description": "Section header subtitle for the Prices & alerts category in Feature management (#2681)."
+  },
+  "featureGroupTitle_radar": "Fuel Station Radar",
+  "@featureGroupTitle_radar": {
+    "description": "Section header title for the Fuel Station Radar category in Feature management (#2681 / #2661)."
+  },
+  "featureGroupDescription_radar": "Live price nudges as you drive.",
+  "@featureGroupDescription_radar": {
+    "description": "Section header subtitle for the Fuel Station Radar category in Feature management (#2681)."
+  },
+  "featureGroupTitle_sync": "Sync & backup",
+  "@featureGroupTitle_sync": {
+    "description": "Section header title for the Sync & backup category in Feature management (#2681)."
+  },
+  "featureGroupDescription_sync": "Keep your data across devices.",
+  "@featureGroupDescription_sync": {
+    "description": "Section header subtitle for the Sync & backup category in Feature management (#2681)."
+  },
+  "featureGroupTitle_input": "Input & scanning",
+  "@featureGroupTitle_input": {
+    "description": "Section header title for the Input & scanning category in Feature management (#2681)."
+  },
+  "featureGroupDescription_input": "Helpers for logging fill-ups.",
+  "@featureGroupDescription_input": {
+    "description": "Section header subtitle for the Input & scanning category in Feature management (#2681)."
+  },
+  "featureGroupTitle_developer": "Developer & experimental",
+  "@featureGroupTitle_developer": {
+    "description": "Section header title for the Developer & experimental category in Feature management (#2681)."
+  },
+  "featureGroupDescription_developer": "Power-user and contributor tools.",
+  "@featureGroupDescription_developer": {
+    "description": "Section header subtitle for the Developer & experimental category in Feature management (#2681)."
   },
   "feedbackConsentTitle": "Send report to GitHub?",
   "@feedbackConsentTitle": {
