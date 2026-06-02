@@ -12,7 +12,7 @@ import '../../providers/radar_search_provider.dart';
 /// (`TrajetsRecordFab`): a brand-tinted, rounded [FloatingActionButton.extended]
 /// floating bottom-right, with a leading filled icon + a label.
 ///
-/// Replaces the cramped header `IconButton(Icons.radar)` (#2675) — the launch
+/// Replaces the cramped header radar icon-button (#2675) — the launch
 /// affordance only; all radar behaviour (cache-first fetch, results injection,
 /// grey result-badge, PiP controls) is unchanged and still owned by
 /// [RadarSearch] + `SearchResultsContent`.
