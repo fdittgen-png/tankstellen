@@ -116,6 +116,17 @@ class LiveSampleSnapshot {
   // alongside the lat/lon fix. Feeds the road-grade calculator (#1941).
   double? _latestAltitudeM;
 
+  // #2648 — most recent GPS horizontal accuracy (metres) + bearing
+  // (compass degrees), pushed in alongside the lat/lon fix. The
+  // `Position` already carries both, but the OBD2 / degraded recording
+  // paths used to drop them (only the GPS-only pipeline kept them), so
+  // they reached only 0.3 % of samples. Latched here so every emitted
+  // [TripSample] carries them — reviving the cornering analytic
+  // (bearing) and the harsh-event accuracy-gate (accuracy). Null when
+  // the provider hasn't pushed a fix (matching pre-#2648 behaviour).
+  double? _latestHAccuracyM;
+  double? _latestBearingDeg;
+
   // #1615 — most recent exact-litre OEM-PID fuel reading, pushed in by
   // the provider layer (`TripOemFuelLevelController`) when the
   // `experimentalOemPids` flag is on and an OEM-capable adapter resolved
@@ -133,6 +144,9 @@ class LiveSampleSnapshot {
   double? get latestLatitude => _latestLatitude;
   double? get latestLongitude => _latestLongitude;
   double? get latestAltitudeM => _latestAltitudeM;
+  // #2648 — GPS horizontal accuracy + bearing latches (see field doc).
+  double? get latestHAccuracyM => _latestHAccuracyM;
+  double? get latestBearingDeg => _latestBearingDeg;
   double? get latestOemFuelLevelLitres => _latestOemFuelLevelLitres;
 
   // #2456 / #2458 / #2459 — latest-value getters for the signals the
@@ -161,12 +175,20 @@ class LiveSampleSnapshot {
   double? get latestLtft => _latestLtft;
 
   /// Push the most recent GPS fix into the per-tick snapshot
-  /// (#1374 phase 1; altitude added #1935 child A). Pass `null` for a
-  /// field to clear that latch.
-  void updateGpsFix({double? latitude, double? longitude, double? altitudeM}) {
+  /// (#1374 phase 1; altitude added #1935 child A; horizontal accuracy +
+  /// bearing added #2648). Pass `null` for a field to clear that latch.
+  void updateGpsFix({
+    double? latitude,
+    double? longitude,
+    double? altitudeM,
+    double? hAccuracyM,
+    double? bearingDeg,
+  }) {
     _latestLatitude = latitude;
     _latestLongitude = longitude;
     _latestAltitudeM = altitudeM;
+    _latestHAccuracyM = hAccuracyM;
+    _latestBearingDeg = bearingDeg;
   }
 
   /// Push the most recent exact-litre OEM-PID fuel reading into the

@@ -90,7 +90,18 @@ class TripGpsStreamController {
             latitude: pos.latitude,
             longitude: pos.longitude,
             // #1935 child A — altitude feeds the road-grade calculator.
-            altitudeM: pos.altitude,
+            // #2648 (Fix B) — drop a NaN / ±∞ altitude (some OS / mock
+            // fixes report garbage) instead of propagating it into the
+            // grade math, mirroring the GPS-only pipeline's isFinite guard.
+            altitudeM: pos.altitude.isFinite ? pos.altitude : null,
+            // #2648 (Fix A) — forward GPS horizontal accuracy + bearing
+            // (both already on `pos`; `pos.heading` is read ~100 lines
+            // down for the glide-coach, then was discarded). The OBD2
+            // path used to drop them, so they reached only 0.3 % of
+            // samples. isFinite-guarded like the GPS-only pipeline
+            // (gps_only_recording_pipeline.dart) so a NaN never persists.
+            hAccuracyM: pos.accuracy.isFinite ? pos.accuracy : null,
+            bearingDeg: pos.heading.isFinite ? pos.heading : null,
             // #2506 — forward GPS ground-speed (m/s → km/h) so the live
             // read-out has a speed source when the OBD2 speed PID (0x0D) is
             // momentarily absent. The controller latches it as a fallback;
