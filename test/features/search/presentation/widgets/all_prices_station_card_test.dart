@@ -538,6 +538,66 @@ void main() {
       });
     });
 
+    group('Mexico PEMEX fuel-grade labels (#2717)', () {
+      // A Mexican (mx-) station: CRE regular→e5, premium→e98 (the #2704
+      // mapping). The label seam must render PEMEX grade names — Magna for
+      // the e5-family regular, Premium for the e98-family — instead of the
+      // European E5/E98 codes.
+      const mxStation = Station(
+        id: 'mx-11702',
+        name: 'TRENOGAS SA DE CV',
+        brand: '',
+        street: 'TRENOGAS SA DE CV',
+        postCode: '',
+        place: '',
+        lat: 19.43,
+        lng: -99.13,
+        e5: 22.95,
+        e98: 24.89,
+        diesel: 23.45,
+        isOpen: true,
+      );
+
+      testWidgets('mx- station shows Magna + Premium, never E5/E98', (
+        tester,
+      ) async {
+        await pumpApp(tester, const AllPricesStationCard(station: mxStation));
+
+        expect(find.text('Magna'), findsOneWidget);
+        expect(find.text('Premium'), findsOneWidget);
+        expect(find.text('E5'), findsNothing);
+        expect(find.text('E98'), findsNothing);
+        // Diesel is NOT a PEMEX-renamed grade — its code is unchanged.
+        expect(find.text('Diesel'), findsOneWidget);
+      });
+
+      testWidgets('non-MX (de-) station never shows Magna/Premium', (
+        tester,
+      ) async {
+        const deStation = Station(
+          id: 'de-abc',
+          name: 'Aral',
+          brand: 'ARAL',
+          street: 'Hauptstr. 1',
+          postCode: '10115',
+          place: 'Berlin',
+          lat: 52.52,
+          lng: 13.40,
+          e5: 1.859,
+          e98: 1.989,
+          diesel: 1.659,
+          isOpen: true,
+        );
+
+        await pumpApp(tester, const AllPricesStationCard(station: deStation));
+
+        expect(find.text('Magna'), findsNothing);
+        expect(find.text('Premium'), findsNothing);
+        expect(find.text('E5'), findsOneWidget);
+        expect(find.text('E98'), findsOneWidget);
+      });
+    });
+
     group('StationCardShell composition (#2493)', () {
       testWidgets('built from the shared shell with no accent stripe', (
         tester,

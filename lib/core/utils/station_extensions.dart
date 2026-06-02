@@ -69,3 +69,25 @@ String shortFuelLabel(FuelType fuel) => switch (fuel) {
       FuelTypeAll() => '', // no label for the wildcard
     };
 
+/// Country-aware pump label for [fuel] (#2717).
+///
+/// Mexico's CRE feed has no European E5/E98 grades — its pumps are
+/// PEMEX **Magna** (~87-oct regular, mapped to the e5 family by #2704)
+/// and **Premium** (~91-92 oct, mapped to e98). The underlying mapping
+/// is physically correct (eco/CO₂ factor, fuel colour and compatibility
+/// family all match), so this only fixes the rendered *string*: for
+/// `countryCode == 'MX'` it returns the real PEMEX grade name, and for
+/// every other country (and `null`) it falls straight through to
+/// [shortFuelLabel] — guaranteeing zero change for FR/DE/etc. Diesel,
+/// e10, lpg, … always use [shortFuelLabel], even in Mexico.
+String fuelDisplayLabel(FuelType fuel, {String? countryCode}) {
+  if (countryCode == 'MX') {
+    return switch (fuel) {
+      FuelTypeE5() => 'Magna', // i18n-ignore: PEMEX fuel-grade proper noun
+      FuelTypeE98() => 'Premium', // i18n-ignore: PEMEX fuel-grade proper noun
+      _ => shortFuelLabel(fuel),
+    };
+  }
+  return shortFuelLabel(fuel);
+}
+

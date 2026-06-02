@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/country/country_config.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -34,16 +35,34 @@ class StationPricesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    // #2717 — Mexican (mx-) stations show PEMEX grade names (Magna for the
+    // e5-family regular, Premium for the e98-family). Every other country
+    // keeps its existing European "Super E5"/"Super 98" labels untouched.
+    final cc = Countries.countryCodeForStationId(station.id);
+    final isMx = cc == 'MX';
+
     return SectionCard(
       title: l10n?.prices ?? 'Prices',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PriceTile(label: 'Super E5', price: station.e5, fuelType: FuelType.e5),
+          PriceTile(
+            label: isMx
+                ? fuelDisplayLabel(FuelType.e5, countryCode: cc)
+                : 'Super E5', // i18n-ignore: language-neutral fuel code
+            price: station.e5,
+            fuelType: FuelType.e5,
+          ),
           PriceTile(label: 'Super E10', price: station.e10, fuelType: FuelType.e10),
           PriceTile(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
           if (station.e98 != null)
-            PriceTile(label: 'Super 98', price: station.e98, fuelType: FuelType.e98),
+            PriceTile(
+              label: isMx
+                  ? fuelDisplayLabel(FuelType.e98, countryCode: cc)
+                  : 'Super 98', // i18n-ignore: language-neutral fuel code
+              price: station.e98,
+              fuelType: FuelType.e98,
+            ),
           if (station.e85 != null)
             PriceTile(label: 'E85', price: station.e85, fuelType: FuelType.e85),
           if (station.lpg != null)
