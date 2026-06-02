@@ -6154,6 +6154,98 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle einen Nutzungsmodus, um fortzufahren.';
 
   @override
+  String get openNow => 'Geöffnet';
+
+  @override
+  String get openNowClosed => 'Geschlossen';
+
+  @override
+  String get openHoursUnknown => 'Öffnungszeiten unbekannt';
+
+  @override
+  String closesAt(String time) {
+    return 'Schließt um $time';
+  }
+
+  @override
+  String opensAt(String day, String time) {
+    return 'Öffnet $day $time';
+  }
+
+  @override
+  String opensToday(String time) {
+    return 'Öffnet um $time';
+  }
+
+  @override
+  String get open24Hours => '24 Stunden geöffnet';
+
+  @override
+  String get badge24h => '24h';
+
+  @override
+  String get dayMon => 'Montag';
+
+  @override
+  String get dayTue => 'Dienstag';
+
+  @override
+  String get dayWed => 'Mittwoch';
+
+  @override
+  String get dayThu => 'Donnerstag';
+
+  @override
+  String get dayFri => 'Freitag';
+
+  @override
+  String get daySat => 'Samstag';
+
+  @override
+  String get daySun => 'Sonntag';
+
+  @override
+  String get dayShortMon => 'Mo';
+
+  @override
+  String get dayShortTue => 'Di';
+
+  @override
+  String get dayShortWed => 'Mi';
+
+  @override
+  String get dayShortThu => 'Do';
+
+  @override
+  String get dayShortFri => 'Fr';
+
+  @override
+  String get dayShortSat => 'Sa';
+
+  @override
+  String get dayShortSun => 'So';
+
+  @override
+  String dayRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get publicHolidays => 'Feiertage';
+
+  @override
+  String get closedLabel => 'Geschlossen';
+
+  @override
+  String get openingHoursNotAvailable => 'Öffnungszeiten nicht verfügbar';
+
+  @override
+  String get showAllHours => 'Alle Zeiten anzeigen';
+
+  @override
+  String get showLessHours => 'Weniger anzeigen';
+
+  @override
   String get tripRecordingPipEstConsumptionCaption => 'gesch. L/100 km';
 
   @override

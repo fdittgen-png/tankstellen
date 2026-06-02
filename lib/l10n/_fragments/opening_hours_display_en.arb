@@ -1,0 +1,140 @@
+{
+  "openNow": "Open",
+  "@openNow": {
+    "description": "Opening-hours status line — station is currently open (#2709)."
+  },
+  "openNowClosed": "Closed",
+  "@openNowClosed": {
+    "description": "Opening-hours status line — station is currently closed (#2709)."
+  },
+  "openHoursUnknown": "Hours unknown",
+  "@openHoursUnknown": {
+    "description": "Opening-hours status line — the schedule could not be resolved (#2709)."
+  },
+  "closesAt": "Closes {time}",
+  "@closesAt": {
+    "description": "Opening-hours status detail — when an open station next closes (#2709).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "opensAt": "Opens {day} {time}",
+  "@opensAt": {
+    "description": "Opening-hours status detail — when a closed station next opens on a future day (#2709).",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "opensToday": "Opens {time}",
+  "@opensToday": {
+    "description": "Opening-hours status detail — when a closed station next opens later the same day (#2709).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "open24Hours": "Open 24 hours",
+  "@open24Hours": {
+    "description": "Opening-hours row shown when the station is open every day around the clock (#2709)."
+  },
+  "badge24h": "24h",
+  "@badge24h": {
+    "description": "Compact badge shown next to the status for an around-the-clock station (#2709)."
+  },
+  "dayMon": "Monday",
+  "@dayMon": {
+    "description": "Full weekday name — Monday (opening-hours table, #2709)."
+  },
+  "dayTue": "Tuesday",
+  "@dayTue": {
+    "description": "Full weekday name — Tuesday (opening-hours table, #2709)."
+  },
+  "dayWed": "Wednesday",
+  "@dayWed": {
+    "description": "Full weekday name — Wednesday (opening-hours table, #2709)."
+  },
+  "dayThu": "Thursday",
+  "@dayThu": {
+    "description": "Full weekday name — Thursday (opening-hours table, #2709)."
+  },
+  "dayFri": "Friday",
+  "@dayFri": {
+    "description": "Full weekday name — Friday (opening-hours table, #2709)."
+  },
+  "daySat": "Saturday",
+  "@daySat": {
+    "description": "Full weekday name — Saturday (opening-hours table, #2709)."
+  },
+  "daySun": "Sunday",
+  "@daySun": {
+    "description": "Full weekday name — Sunday (opening-hours table, #2709)."
+  },
+  "dayShortMon": "Mon",
+  "@dayShortMon": {
+    "description": "Abbreviated weekday name — Monday (collapsed opening-hours range, #2709)."
+  },
+  "dayShortTue": "Tue",
+  "@dayShortTue": {
+    "description": "Abbreviated weekday name — Tuesday (collapsed opening-hours range, #2709)."
+  },
+  "dayShortWed": "Wed",
+  "@dayShortWed": {
+    "description": "Abbreviated weekday name — Wednesday (collapsed opening-hours range, #2709)."
+  },
+  "dayShortThu": "Thu",
+  "@dayShortThu": {
+    "description": "Abbreviated weekday name — Thursday (collapsed opening-hours range, #2709)."
+  },
+  "dayShortFri": "Fri",
+  "@dayShortFri": {
+    "description": "Abbreviated weekday name — Friday (collapsed opening-hours range, #2709)."
+  },
+  "dayShortSat": "Sat",
+  "@dayShortSat": {
+    "description": "Abbreviated weekday name — Saturday (collapsed opening-hours range, #2709)."
+  },
+  "dayShortSun": "Sun",
+  "@dayShortSun": {
+    "description": "Abbreviated weekday name — Sunday (collapsed opening-hours range, #2709)."
+  },
+  "dayRange": "{from} – {to}",
+  "@dayRange": {
+    "description": "Collapsed weekday span, e.g. \"Mon – Fri\" (opening-hours table, #2709).",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "publicHolidays": "Public holidays",
+  "@publicHolidays": {
+    "description": "Opening-hours table row label for the public-holiday schedule (#2709)."
+  },
+  "closedLabel": "Closed",
+  "@closedLabel": {
+    "description": "Opening-hours table value shown for a day the station is closed (#2709)."
+  },
+  "openingHoursNotAvailable": "Opening hours not available",
+  "@openingHoursNotAvailable": {
+    "description": "Muted message when no opening-hours data was provided for a station (#2709)."
+  },
+  "showAllHours": "Show all hours",
+  "@showAllHours": {
+    "description": "Expand affordance under the collapsed opening-hours week — reveals the full per-day table (#2709)."
+  },
+  "showLessHours": "Show less",
+  "@showLessHours": {
+    "description": "Collapse affordance shown when the full opening-hours table is expanded (#2709)."
+  }
+}

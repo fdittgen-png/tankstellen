@@ -6125,6 +6125,98 @@ class AppLocalizationsCs extends AppLocalizations {
   String get onboardingPickUseMode => 'Pro pokračování vyberte režim použití.';
 
   @override
+  String get openNow => 'Open';
+
+  @override
+  String get openNowClosed => 'Closed';
+
+  @override
+  String get openHoursUnknown => 'Hours unknown';
+
+  @override
+  String closesAt(String time) {
+    return 'Closes $time';
+  }
+
+  @override
+  String opensAt(String day, String time) {
+    return 'Opens $day $time';
+  }
+
+  @override
+  String opensToday(String time) {
+    return 'Opens $time';
+  }
+
+  @override
+  String get open24Hours => 'Open 24 hours';
+
+  @override
+  String get badge24h => '24h';
+
+  @override
+  String get dayMon => 'Monday';
+
+  @override
+  String get dayTue => 'Tuesday';
+
+  @override
+  String get dayWed => 'Wednesday';
+
+  @override
+  String get dayThu => 'Thursday';
+
+  @override
+  String get dayFri => 'Friday';
+
+  @override
+  String get daySat => 'Saturday';
+
+  @override
+  String get daySun => 'Sunday';
+
+  @override
+  String get dayShortMon => 'Mon';
+
+  @override
+  String get dayShortTue => 'Tue';
+
+  @override
+  String get dayShortWed => 'Wed';
+
+  @override
+  String get dayShortThu => 'Thu';
+
+  @override
+  String get dayShortFri => 'Fri';
+
+  @override
+  String get dayShortSat => 'Sat';
+
+  @override
+  String get dayShortSun => 'Sun';
+
+  @override
+  String dayRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get publicHolidays => 'Public holidays';
+
+  @override
+  String get closedLabel => 'Closed';
+
+  @override
+  String get openingHoursNotAvailable => 'Opening hours not available';
+
+  @override
+  String get showAllHours => 'Show all hours';
+
+  @override
+  String get showLessHours => 'Show less';
+
+  @override
   String get tripRecordingPipEstConsumptionCaption => 'est. L/100 km';
 
   @override
