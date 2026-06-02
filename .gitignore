@@ -114,6 +114,7 @@ docs/guides/*
 !docs/guides/fdroid-submission.md
 !docs/guides/app-store-listing.md
 !docs/guides/ios-testflight-testers.md
+!docs/guides/opening-hours.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/

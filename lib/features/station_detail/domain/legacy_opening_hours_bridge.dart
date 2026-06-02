@@ -13,6 +13,13 @@ import 'opening_hours.dart';
 /// schedule via this synthesiser — so no country regresses before its
 /// adapter lands.
 ///
+/// The 11 countries with no opening-hours data today (GB, IT, DK, GR, RO,
+/// SI, LU, AU, MX, AR, KR) carry none of these legacy fields either, so they
+/// fall through to [WeeklyOpeningHours.notAvailable] and render the graceful
+/// "Opening hours not available" line. That no-data path is locked by
+/// `opening_hours_no_data_test.dart`; see `docs/guides/opening-hours.md` for
+/// the per-country deferral list and when to revisit each one (#2716).
+///
 /// Mapping, in priority order:
 ///   1. If [StationDetail.openingHours] is already populated (an adapter ran)
 ///      and is not the no-data sentinel, it is returned unchanged.
