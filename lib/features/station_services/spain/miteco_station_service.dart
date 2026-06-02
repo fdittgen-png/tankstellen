@@ -238,7 +238,45 @@ class MitecoStationService with StationServiceHelpers implements StationService 
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
   ) async {
+    // #2706 — MITECO is a BULK feed: there is no per-station detail endpoint.
+    // A search already cached every province's full rows in [_byProvince],
+    // and each row carries name/brand/street/prices/coords. So a detail tap
+    // that falls through the provider's in-search fast path (widget rows,
+    // deep links, favorites) is resolved from that cache rather than throwing.
+    final rawId = stationId.startsWith('es-')
+        ? stationId.substring(3) // inverse of the `es-` prefixing at _parseStation
+        : stationId;
+    final row = _findCachedRow(rawId);
+    if (row != null) {
+      final lat = _parseCommaDouble(row['Latitud']?.toString()) ?? 0;
+      final lng = _parseCommaDouble(row['Longitud (WGS84)']?.toString()) ?? 0;
+      // Reuse the search parser; `dist` is irrelevant on the detail screen so
+      // the station's own coords double as the (no-op) search centre.
+      final station = _parseStation(row, lat, lng);
+      if (station != null) {
+        return ServiceResult<StationDetail>(
+          data: StationDetail(station: station),
+          source: ServiceSource.cache,
+          fetchedAt: DateTime.now(),
+        );
+      }
+    }
+    // Cold cache (no prior search) — IDEESS does not encode its province, so a
+    // cold re-fetch is impossible here; preserve today's behaviour and let the
+    // provider's error/retry branch handle it. Cold-resolution is a follow-up.
     throwDetailUnavailable('MITECO API');
+  }
+
+  /// Linear scan of every cached province for the raw `IDEESS` row matching
+  /// [rawId] (#2706). A per-detail-tap scan is cheap and deliberately does NOT
+  /// restructure [_byProvince] (that would collide with the #2713 OH adapter).
+  Map<String, dynamic>? _findCachedRow(String rawId) {
+    for (final province in _byProvince.values) {
+      for (final row in province.rows) {
+        if (row['IDEESS']?.toString() == rawId) return row;
+      }
+    }
+    return null;
   }
 
   @override
