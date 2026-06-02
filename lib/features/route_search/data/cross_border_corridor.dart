@@ -1,13 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/country/country_config.dart';
-import '../../../core/logging/error_logger.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../core/services/country_service_registry.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
@@ -100,15 +98,29 @@ Map<String, CountrySource> buildCorridorServiceMap(
   return map;
 }
 
-/// The subset of [profileCountries] whose registered bounding box
-/// INTERSECTS the [route]'s own lat/lng bounding box (#2621).
+/// The subset of [profileCountries] whose registered bounding box actually
+/// CONTAINS at least one route vertex (#2621 / #2703).
 ///
 /// Belt-and-braces for the corridor-detection union: even if per-vertex
 /// detection were to miss a country (e.g. a future shadowing regression),
-/// a profile-backed country whose box overlaps the route's extent is still
-/// queried. Gated on ACTUAL extent intersection — NOT mere profile
-/// existence — so a pure-FR route does not pull in a distant PT/ES profile
-/// the user happens to have configured. Returns upper-cased codes.
+/// a profile-backed country the route genuinely touches is still queried.
+///
+/// #2703 — the over-inclusion fix. The previous gate credited a profile
+/// country whenever its box overlapped the route's single coarse whole-route
+/// AABB. That AABB is the rectangle [minLat..maxLat] × [minLng..maxLng] of
+/// EVERY vertex, so its corners are synthetic points the polyline never
+/// visits: a southern-France route whose extreme NW vertex reaches toward the
+/// Channel makes the AABB's (maxLat, minLng) corner clip GB's box
+/// [49.5+, ≤2.0] even though no actual vertex is in GB — so GB was queried,
+/// wasting requests on the flaky UK feed and spamming the error log.
+///
+/// The fix keeps the AABB as a cheap PRE-FILTER and adds vertex-containment
+/// as the CONFIRM: a profile country is credited only when its box contains
+/// ≥1 real route vertex (the same per-vertex [CountryBoundingBox.contains]
+/// test [corridorCountries] uses). A profile country the polyline truly
+/// touches is therefore still never dropped (preserves the #2621 recovery
+/// intent), but a country merely clipped by a synthetic AABB corner is not.
+/// Returns upper-cased codes.
 Set<String> countriesTouchingRouteExtent(
   RouteInfo route,
   Iterable<String> profileCountries,
@@ -127,12 +139,17 @@ Set<String> countriesTouchingRouteExtent(
     final code = raw.toUpperCase();
     final box = CountryServiceRegistry.boundingBoxFor(code);
     if (box == null) continue;
-    // Axis-aligned bbox intersection (overlap on BOTH lat and lng).
+    // Cheap AABB PRE-FILTER: skip a box that can't possibly hold a vertex.
     final overlaps = box.minLat <= maxLat &&
         box.maxLat >= minLat &&
         box.minLng <= maxLng &&
         box.maxLng >= minLng;
-    if (overlaps) out.add(code);
+    if (!overlaps) continue;
+    // CONFIRM with per-vertex containment — the synthetic AABB corner that
+    // clipped GB on a southern-France route holds no real vertex (#2703).
+    final touches = route.geometry
+        .any((p) => box.contains(p.latitude, p.longitude));
+    if (touches) out.add(code);
   }
   return out;
 }
@@ -160,8 +177,12 @@ Set<String> countriesTouchingRouteExtent(
 ///
 /// Each per-country `searchStations` is wrapped in a try/catch (#2621): one
 /// country's outage / throw must NOT abort the whole route — the other legs
-/// still resolve, and an empty/failed ES leg is routed to [errorLogger]
-/// (ErrorLayer.services) so it is diagnosable rather than silently dropped.
+/// still resolve. #2703 — a recoverable per-leg failure (the overall corridor
+/// still returns results) records a diagnostic [BreadcrumbCollector]
+/// breadcrumb rather than a top-level ERROR trace, so a flaky feed (the
+/// southern-France UK-feed timeouts) no longer spams the error log; the
+/// orchestrator raises ONE aggregate ERROR only when the merged result is
+/// empty.
 StationQueryFunction buildCorridorQueryFunction(
   Ref ref,
   FuelType fuelType, {
@@ -199,16 +220,24 @@ StationQueryFunction buildCorridorQueryFunction(
         raw = result.data
             .map((s) => FuelStationResult(s) as SearchResultItem)
             .toList();
-      } catch (e, st) {
+      } catch (e, st) { // ignore: unused_catch_stack
         // #2621 — degrade to the other legs rather than aborting the whole
-        // route; never silently swallow (an empty ES leg must be traceable).
-        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
-          'where': 'RouteSearch corridor: per-country station query',
-          'country': countryCode,
-          'fuel': source.fuel.apiValue,
-          'lat': lat,
-          'lng': lng,
-        }));
+        // route; never silently swallow. #2703 — a single country's feed
+        // failing in a multi-country corridor where the overall search still
+        // returns results is RECOVERABLE (the chain already retries transient
+        // faults), so it must NOT spam a top-level ERROR trace for every
+        // failed leg (the 5 UK-feed ERRORs from the field log). Record a
+        // diagnostic BREADCRUMB instead — a chronically-failing feed is still
+        // visible in any trace that DOES surface, but a recoverable leg outage
+        // is silent. (The orchestrator raises one aggregate ERROR only when
+        // the final merged corridor result is empty — see
+        // `route_search_provider`.)
+        BreadcrumbCollector.add(
+          'RouteSearch corridor: per-country station query failed',
+          detail: 'country=$countryCode fuel=${source.fuel.apiValue} '
+              'lat=$lat lng=$lng type=${e.runtimeType}',
+        );
+        debugPrint('RouteSearch corridor: $countryCode leg failed ($e)');
         continue;
       }
       // Per-country top-N reduce using THIS country's fuel, so the ranking

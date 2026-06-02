@@ -17,11 +17,18 @@
 // the `home_widget` plugin via platform channels; we mock the channel so
 // the call path completes instead of throwing.
 
+import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/network/connectivity_service.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
+import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/services/station_service.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../../../helpers/silence_error_logger.dart';
 
@@ -119,6 +126,65 @@ void main() {
       expect(container.dispose, returnsNormally);
     });
 
+    // #2703 — the nearest-widget refresh hits the network. When the device
+    // is offline the call is doomed and ERROR-logged (the field-log offline
+    // home-widget refresh). `_tick` must read connectivity and skip the
+    // nearest-widget network refresh while offline, WITHOUT touching the
+    // station service — but the local-only favorites `updateWidget` still
+    // runs (it never errored).
+    group('offline guard (#2703)', () {
+      late _CountingStationService countingService;
+
+      ProviderContainer makeContainer({required bool online}) {
+        countingService = _CountingStationService();
+        // A profile + a known GPS fix so the nearest builder WOULD call
+        // searchStations when online (otherwise the no-GPS path
+        // short-circuits and the test proves nothing).
+        final fake = FakeHiveStorage();
+        fake.putSetting(StorageKeys.userPositionLat, 43.44);
+        fake.putSetting(StorageKeys.userPositionLng, 3.44);
+        fake.saveProfile('p1', const {
+          'id': 'p1',
+          'name': 'Std',
+          'preferredFuelType': 'e10',
+          'defaultSearchRadius': 10.0,
+        });
+        fake.setActiveProfileId('p1');
+        final repo = FakeStorageRepository(inner: fake);
+
+        return ProviderContainer(
+          overrides: [
+            storageRepositoryProvider.overrideWithValue(repo),
+            stationServiceProvider.overrideWithValue(countingService),
+            currentConnectivityProvider.overrideWith((ref) async => online),
+          ],
+        );
+      }
+
+      test('offline tick does NOT call the station service', () async {
+        final c = makeContainer(online: false);
+        addTearDown(c.dispose);
+
+        c.read(nearestWidgetRefreshProvider);
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+
+        expect(countingService.searchCalls, 0,
+            reason: 'an offline tick must skip the nearest-widget network '
+                'refresh (the doomed offline call, #2703)');
+      });
+
+      test('online tick DOES call the station service (control)', () async {
+        final c = makeContainer(online: true);
+        addTearDown(c.dispose);
+
+        c.read(nearestWidgetRefreshProvider);
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+
+        expect(countingService.searchCalls, greaterThanOrEqualTo(1),
+            reason: 'when online the nearest-widget refresh still runs');
+      });
+    });
+
     test('a tick whose storage layer throws does not bubble up', () async {
       // Wire a fake whose getSetting throws on every call. The provider's
       // try/catch must swallow it — `unawaited(_tick())` means an
@@ -165,4 +231,27 @@ class _ThrowingFake extends FakeHiveStorage {
   dynamic getSetting(String key) {
     throw StateError('storage exploded');
   }
+}
+
+/// #2703 — counts `searchStations` calls so the offline guard can be proven:
+/// 0 while offline (the nearest refresh is skipped), ≥1 while online.
+class _CountingStationService implements StationService {
+  int searchCalls = 0;
+
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async {
+    searchCalls++;
+    return ServiceResult(
+      data: const [],
+      source: ServiceSource.cache,
+      fetchedAt: DateTime.now(),
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
 }

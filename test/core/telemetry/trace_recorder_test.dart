@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -329,6 +330,133 @@ void main() {
         expect(storage.stored, hasLength(1),
             reason: 'only host-lookup (offline DNS) is benign; a refused '
                 'connection is a real failure worth a trace');
+      });
+    });
+
+    // #2703 — the field shapes from the southern-France route corridor that
+    // slipped through the #2671 filter: a DioException[connectionError] that
+    // WRAPS the host-lookup SocketException, a DioException[connectionTimeout]
+    // (the 4 UK-feed timeouts), a DioException[unknown] wrapping a
+    // SocketException, and a bare HttpException connection-abort. These are
+    // expected transients and must NOT persist; a badResponse (4xx/5xx) and a
+    // connection-refused SocketException (while ONLINE) still must.
+    group('connection-layer transient suppression (#2703)', () {
+      test(
+          'a DioException[connectionError] wrapping a host-lookup '
+          'SocketException is NOT persisted', () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/stations'),
+          type: DioExceptionType.connectionError,
+          error: const SocketException('Failed host lookup: api2.krlmedia.com'),
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'a connectionError wrapping a host lookup is offline');
+        expect(uploader.uploadCalled, isFalse);
+      });
+
+      test('a DioException[connectionTimeout] is NOT persisted', () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/stations'),
+          type: DioExceptionType.connectionTimeout,
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'a connection timeout is an expected transient (#2703)');
+        expect(uploader.uploadCalled, isFalse);
+      });
+
+      test('a DioException[receiveTimeout] is NOT persisted', () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/stations'),
+          type: DioExceptionType.receiveTimeout,
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty);
+      });
+
+      test(
+          'a DioException[unknown] wrapping a SocketException is NOT persisted',
+          () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/stations'),
+          type: DioExceptionType.unknown,
+          error: const SocketException('Connection failed'),
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'an unknown Dio error wrapping a SocketException is '
+                'an offline transient on some platforms (#2703)');
+      });
+
+      test('a bare HttpException (connection abort) is NOT persisted',
+          () async {
+        const error = HttpException('Software caused connection abort');
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'a raw socket-layer connection abort is a transient');
+      });
+
+      test(
+          'a DioException[badResponse] (a real 4xx/5xx) IS still persisted '
+          '— the filter never suppresses a server answer', () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/stations'),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: RequestOptions(path: '/stations'),
+            statusCode: 503,
+          ),
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, hasLength(1),
+            reason: 'a 5xx is a real server error and must persist (#2703)');
+        expect(uploader.uploadCalled, isTrue);
+      });
+    });
+
+    // #2703 — the offline SECONDARY signal: with the connectivity probe
+    // reporting `none`, a network-category transient with NO offline-specific
+    // shape (a generic TimeoutException) is still suppressed. The default
+    // setUp mock reports `wifi` (online); this group re-mocks `none`.
+    group('offline secondary signal (#2703)', () {
+      setUp(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+          const MethodChannel('dev.fluttercommunity.plus/connectivity'),
+          (MethodCall methodCall) async {
+            if (methodCall.method == 'check') {
+              return <String>['none'];
+            }
+            return null;
+          },
+        );
+      });
+
+      test('a generic TimeoutException while offline is NOT persisted',
+          () async {
+        final error = TimeoutException('request timed out');
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'a network call made while offline is a doomed transient');
+        expect(uploader.uploadCalled, isFalse);
+      });
+
+      test(
+          'a connection-refused SocketException while offline is suppressed '
+          '(it would persist while online)', () async {
+        const error = SocketException('Connection refused');
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'offline → any socket failure is an expected transient');
       });
     });
   });
