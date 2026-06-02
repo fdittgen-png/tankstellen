@@ -31,6 +31,9 @@ class _FakeVoiceAnnouncementService implements VoiceAnnouncementService {
   }
 
   @override
+  Future<void> speakLine(String text) async {}
+
+  @override
   Future<void> stop() async => stopped = true;
 
   @override

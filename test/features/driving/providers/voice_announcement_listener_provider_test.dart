@@ -40,6 +40,9 @@ class _FakeVoiceAnnouncementService implements VoiceAnnouncementService {
       announced.add(candidate);
 
   @override
+  Future<void> speakLine(String text) async {}
+
+  @override
   Future<void> stop() async {}
 
   @override
