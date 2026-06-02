@@ -16,6 +16,7 @@ import '../../../../consumption/data/obd2/obd2_session_diagnostic.dart';
 import '../../../../consumption/presentation/widgets/obd2_diagnostics_card.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/feature.dart';
+import 'obd2_self_test_panel.dart';
 
 /// 'OBD2 Communication Health' developer-tools screen (#2471, TAIL of
 /// Epic #2463). Gated behind [Feature.debugMode] via the Developer tools
@@ -70,6 +71,9 @@ class Obd2HealthScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
+
+          // --- Active adapter self-test (#2645) -------------------------
+          const Obd2SelfTestPanel(),
 
           // --- Live session ---------------------------------------------
           SectionHeader(
