@@ -3,6 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../station_detail/domain/opening_hours.dart';
 import 'station_amenity.dart';
 
 part 'station.freezed.dart';
@@ -79,6 +80,12 @@ abstract class StationDetail with _$StationDetail {
     @Default([]) List<String> overrides,
     @Default(false) bool wholeDay,
     String? state,
+    // Epic C1 (#2708) — structured opening hours from a per-country
+    // [OpeningHoursAdapter]. ADDITIVE: the legacy `Station.is24h` /
+    // `openingHoursText` and this entity's `openingTimes` / `wholeDay` stay
+    // for back-compat; until a country's adapter lands this is null and the
+    // display layer falls back through `legacyOpeningHoursBridge`.
+    WeeklyOpeningHours? openingHours,
   }) = _StationDetail;
 }
 

@@ -5,6 +5,7 @@ import 'dart:async';
 
 import '../../core/logging/error_logger.dart';
 import '../../features/search/domain/entities/station.dart';
+import '../../features/station_detail/domain/opening_hours.dart';
 import 'station_service.dart';
 
 /// JSON-safe (de)serialization helpers for the [StationServiceChain] cache
@@ -42,6 +43,9 @@ Map<String, dynamic> serializeStationDetail(StationDetail detail) => {
       'overrides': detail.overrides,
       'wholeDay': detail.wholeDay,
       'state': detail.state,
+      // #2708 — round-trip the structured opening hours (null when no
+      // adapter has run yet; the legacy fields above carry the fallback).
+      'openingHours': detail.openingHours?.toJson(),
     };
 
 StationDetail? deserializeStationDetail(Map<String, dynamic> data) {
@@ -50,6 +54,7 @@ StationDetail? deserializeStationDetail(Map<String, dynamic> data) {
     if (stationJson == null) return null;
 
     final otList = data['openingTimes'] as List<dynamic>? ?? [];
+    final ohJson = data['openingHours'];
     return StationDetail(
       station: Station.fromJson(stationJson),
       openingTimes: otList
@@ -58,6 +63,11 @@ StationDetail? deserializeStationDetail(Map<String, dynamic> data) {
       overrides: List<String>.from(data['overrides'] as List? ?? []),
       wholeDay: data['wholeDay'] as bool? ?? false,
       state: data['state'] as String?,
+      // #2708 — older cache entries (pre-field) have no key → null, which
+      // round-trips cleanly to the back-compat legacy fallback.
+      openingHours: ohJson is Map
+          ? WeeklyOpeningHours.fromJson(Map<String, dynamic>.from(ohJson))
+          : null,
     );
     // #2296 — catch Object (TypeError from a bad cast on a corrupt /
     // older-schema entry is an Error, not an Exception) so a corrupt cache
