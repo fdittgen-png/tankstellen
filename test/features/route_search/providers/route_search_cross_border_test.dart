@@ -1,13 +1,19 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tankstellen/core/cache/cache_manager.dart';
+import 'package:tankstellen/core/services/fuel_service_policy.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
+import 'package:tankstellen/core/services/station_service_chain.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/utils/station_extensions.dart';
@@ -21,6 +27,7 @@ import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/station_services/spain/miteco_station_service.dart';
 
 /// #2595 — a route that crosses from France into Spain must query BOTH
 /// countries' open-data sources (per the available profiles) and merge
@@ -157,6 +164,71 @@ class _RegionGatedStationService implements StationService {
   dynamic noSuchMethod(Invocation invocation) =>
       super.noSuchMethod(invocation);
 }
+
+/// #2641 — serves the recorded REAL geoportalgasolineras province-08 fixture
+/// for `…/FiltroProvincia/08`, and an empty (but `OK`) list for any other
+/// province id, so a Barcelona search drives the REAL [MitecoStationService]
+/// parse against the live field split (`Precio Gasolina 95 E5` populated,
+/// `Precio Gasolina 95 E10` EMPTY — Spain sells E5, not E10). NEVER hits the
+/// network.
+class _MitecoFixtureAdapter implements HttpClientAdapter {
+  _MitecoFixtureAdapter(this._province08Body);
+
+  final String _province08Body;
+
+  @override
+  Future<ResponseBody> fetch(RequestOptions options,
+      Stream<List<int>>? requestStream, Future<void>? cancelFuture) async {
+    final id = options.uri.path.split('/').last; // …/FiltroProvincia/<id>
+    final body = id == '08'
+        ? _province08Body
+        : jsonEncode({'ResultadoConsulta': 'OK', 'ListaEESSPrecio': const []});
+    return ResponseBody.fromBytes(utf8.encode(body), 200, headers: {
+      Headers.contentTypeHeader: ['application/json'],
+    });
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+/// In-memory [CacheStrategy] so the production ES [StationServiceChain] can be
+/// stood up without Hive (#2641). The chain's bulkFile policy answers nearby
+/// straight from the primary, so this is essentially a no-op store.
+class _MemoryCache implements CacheStrategy {
+  final Map<String, CacheEntry> _store = {};
+
+  @override
+  Future<void> put(String key, Map<String, dynamic> data,
+      {required Duration ttl, required ServiceSource source}) async {
+    _store[key] = CacheEntry(
+        payload: data, storedAt: DateTime.now(), originalSource: source, ttl: ttl);
+  }
+
+  @override
+  CacheEntry? get(String key) => _store[key];
+
+  @override
+  CacheEntry? getFresh(String key) {
+    final e = _store[key];
+    if (e == null || e.isExpired) return null;
+    return e;
+  }
+}
+
+/// Mirrors `_esPolicy` in country_service_registry.dart so the test wraps the
+/// real MITECO service exactly as production's `_createMiteco` →
+/// `buildService` does (bulkFile model, 6 h/24 h TTLs).
+const _esBulkPolicy = FuelServicePolicy(
+  model: SourceModel.bulkFile,
+  minInterval: Duration(minutes: 30),
+  datasetTtlSoft: Duration(hours: 6),
+  datasetTtlHard: Duration(hours: 24),
+  searchResultTtl: Duration.zero,
+  attribution: 'Geoportal Gasolineras (MITECO)',
+  license: 'Open data (MITECO)',
+  sourceUrl: 'https://geoportalgasolineras.es/',
+);
 
 void main() {
   test(
@@ -402,5 +474,117 @@ void main() {
         reason: 'priced on E10, so it is no longer dropped as "--"');
     // And the active-fuel path (the bug) is null → the "--" on master.
     expect(esStation.priceFor(FuelType.e85), isNull);
+  });
+
+  // #2641 — THE faithful reproduction. The prior tests prove the per-country
+  // selection mechanics with a FAKE ES station that carries whatever fuel was
+  // requested (so querying ES with E10 always returned an E10 price). The
+  // REAL world is the opposite: Spain sells "Gasolina 95 E5", NOT E10 —
+  // 769/798 province-08 stations carry E5, exactly 1 carries E10. So the ES
+  // profile grade (Super-E10) prices a real Spanish station as null → the
+  // station is dropped from Best Stops / never cheapest / shows '--'. This
+  // drives the REAL MitecoStationService (injected Dio, fixture parse) through
+  // the REAL production ES StationServiceChain + the real corridor build, and
+  // asserts the displayed price + Best-Stops membership. RED on master (no
+  // E5↔E10 sibling fallback), GREEN on the fix.
+  test(
+      'cross-border ES leg from the REAL MITECO fixture (E5 only, no E10) is '
+      'priced + enters Best Stops via the E5↔E10 sibling fallback (#2641)',
+      () async {
+    final fixture = File(
+            'test/fixtures/miteco_barcelona_08.json')
+        .readAsStringSync();
+
+    // Pézenas (FR) → Barcelona (ES) — the bug-report corridor. 4 FR sample
+    // points (lat ≥ 42 → segment 0) + Barcelona at sample index 4 → segment 1
+    // ((4 * 15 / 50).floor() == 1), so the Spanish station ranks in its OWN
+    // segment rather than being out-priced by the cheaper FR E85 station in a
+    // shared segment 0. The Barcelona point (41.39, 2.17) resolves to province
+    // 08 and hits the fixture; FR points stay in France.
+    const frA = LatLng(43.50, 3.50);
+    const frB = LatLng(43.30, 3.30);
+    const frC = LatLng(43.10, 3.10);
+    const frD = LatLng(42.90, 2.90);
+    const esPoint = LatLng(41.39, 2.17); // Barcelona — INSIDE FR's bbox too
+    const route = RouteInfo(
+      geometry: [frA, frB, frC, frD, LatLng(42.10, 2.40), esPoint],
+      distanceKm: 400,
+      durationMinutes: 240,
+      samplePoints: [frA, frB, frC, frD, esPoint],
+    );
+
+    // The REAL ES service: a genuine MitecoStationService whose Dio adapter
+    // returns the recorded fixture, wrapped in the production StationService
+    // Chain exactly as `_createMiteco` → `buildService` builds it for ES.
+    final mitecoDio = Dio()
+      ..httpClientAdapter = _MitecoFixtureAdapter(fixture);
+    final realMiteco = MitecoStationService(dio: mitecoDio);
+    final esChain = StationServiceChain(
+      realMiteco,
+      _MemoryCache(),
+      errorSource: ServiceSource.mitecoApi,
+      countryCode: 'ES',
+      policy: _esBulkPolicy,
+    );
+
+    // FR is not the focus — a small region-gated fake with an E85 grade so
+    // the FR leg is non-empty (and FR stations never bleed into Spain).
+    final frService = _RegionGatedStationService('Total FR',
+        idPrefix: 'fr-', minLat: 42.0, maxLat: 90.0, price: 1.20);
+
+    final container = ProviderContainer(
+      overrides: [
+        storageRepositoryProvider.overrideWith((ref) => _NoKeyStorage()),
+        perCountryStationServiceProvider('FR')
+            .overrideWith((ref) => frService),
+        perCountryStationServiceProvider('ES')
+            .overrideWith((ref) => esChain),
+        // The user's real profiles: FR/E85 active, ES/E10 — and Spain has no
+        // E10 in the data, which is the whole bug.
+        allProfilesProvider.overrideWith((ref) => const [
+              UserProfile(
+                  id: 'fr', name: 'Standard',
+                  countryCode: 'FR', preferredFuelType: FuelType.e85),
+              UserProfile(
+                  id: 'es', name: 'Espagne',
+                  countryCode: 'ES', preferredFuelType: FuelType.e10),
+            ]),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final notifier = container.read(routeSearchStateProvider.notifier);
+    final result = await notifier.searchAlongPrebuiltRouteForTest(
+      route: route,
+      fuelType: FuelType.e85, // active fuel is FR's E85.
+    );
+
+    // (i) The Spanish leg arrives — a real MITECO row (id `es-…`).
+    final esStation = result.stations
+        .whereType<FuelStationResult>()
+        .firstWhere((r) => r.station.id.startsWith('es-'),
+            orElse: () => throw StateError('no ES station in corridor result'));
+
+    // The real fixture row models live Spain: E5 priced, E10 EMPTY.
+    expect(esStation.station.e5, isNotNull,
+        reason: 'fixture E5 must parse (Spain sells E5)');
+    expect(esStation.station.e10, isNull,
+        reason: 'fixture E10 is empty (Spain does not sell E10)');
+
+    // (ii) The PRODUCTION displayed price — priced via fuelForStation with the
+    // ES/E10 profile grade. RED on master: E10 → null → '--'. GREEN on fix:
+    // the E5↔E10 sibling fallback yields the E5 price.
+    final displayedFuel = fuelForStation(
+        esStation.station, result.profileFuelByCountry, FuelType.e85);
+    expect(esStation.station.priceFor(displayedFuel), isNotNull,
+        reason: 'the ES station must show a price, not "--" (#2641)');
+
+    // (iii) The cheapest Spanish station must enter Best Stops. RED on master:
+    // computeBestStops drops the null-E10 station.
+    expect(result.cheapestPerSegment, isNotNull);
+    expect(result.cheapestPerSegment!.values,
+        contains(esStation.station.id),
+        reason: 'the cheapest Spanish station must appear in Best Stops, '
+            'priced by its E5 grade via the sibling fallback (#2641)');
   });
 }
