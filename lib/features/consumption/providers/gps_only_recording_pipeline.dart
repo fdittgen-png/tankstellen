@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
@@ -96,7 +97,12 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   /// are notifier concerns), so this entry point assumes it is clear to
   /// start.
   void start() {
-    _recorder = TripRecorder(maxIntegrationGapSeconds: 30);
+    _recorder = TripRecorder(
+      maxIntegrationGapSeconds: 30,
+      // #2663 — feed harsh events from GPS-only trips onto the same live
+      // bus the OBD2 path uses, so spoken coaching works dongle-less too.
+      onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
+    );
     _samples.clear();
     _startedAt = DateTime.now();
     _host.lastTripStartedAt = DateTime.now();

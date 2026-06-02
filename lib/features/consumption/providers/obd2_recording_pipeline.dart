@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
+import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/obd2_session_context_block.dart';
@@ -169,6 +170,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       ),
       breadcrumbCollector: breadcrumbs,
       gpsEstimateFolder: gpsEstimateFolder,
+      // #2663 — forward every (de-noised, post-#2653) harsh event onto the
+      // app-wide bus so the driving-coach voice listener can speak it live.
+      onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
     );
     _controller = ctl;
 

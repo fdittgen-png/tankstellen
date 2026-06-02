@@ -2614,6 +2614,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get coachingEasePedal => 'Gas zurücknehmen';
 
   @override
+  String get coachingVoiceHardAcceleration => 'Sanfter Gas geben';
+
+  @override
+  String get coachingVoiceHarshBraking => 'Versuche, sanfter zu bremsen';
+
+  @override
+  String get coachingVoiceShiftUp => 'Hochschalten spart Kraftstoff';
+
+  @override
+  String get coachingVoiceShiftDown => 'Runterschalten, der Motor müht sich';
+
+  @override
+  String get coachingVoiceEasePedal =>
+      'Nimm das Gas zurück, das spart Kraftstoff';
+
+  @override
+  String get coachingVoiceLiftOff => 'Geh vom Gas und lass rollen';
+
+  @override
+  String get coachingVoiceAnticipateBrake =>
+      'Schau weiter voraus und geh früher vom Gas';
+
+  @override
+  String get coachingVoiceSmoothAccel => 'Beschleunige gleichmäßiger';
+
+  @override
+  String get voiceCoachingSettingTitle => 'Gesprochenes Fahrcoaching';
+
+  @override
+  String get voiceCoachingSettingSubtitle =>
+      'Höre Fahrtipps während der Fahrt — starkes Beschleunigen, hartes Bremsen und Schalthinweise';
+
+  @override
   String get tooltipUseGps => 'GPS-Standort verwenden';
 
   @override

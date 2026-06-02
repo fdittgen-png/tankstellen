@@ -197,7 +197,14 @@ void main() {
     // comment) so the harsh-event detector suppresses scoring on the
     // `virtual` dead-reckoning source. Net +2; the wiring must live at the
     // controller's emit site. Decomposition stays tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1623,
+    // #2663 — re-grandfathered 1623 → 1626: the ctor gained an optional
+    // `onHarshEvent` callback (forwarded into the default TripRecorder) +
+    // a rationale comment, so harsh events stream live to the driving-coach
+    // voice listener (the dead-link fix). Net +3 (HarshEvent resolves via
+    // the existing trip_recorder re-export, no new import); the wiring must
+    // live where the controller builds its recorder. Decomposition stays
+    // tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1626,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
@@ -231,8 +238,13 @@ void main() {
     // voice-announcement listener in `build` (keeps the keepAlive listener
     // mounted while the screen is up) plus its import + an explaining
     // comment. Pure wiring; decomposition still tracked under #2187/#2188.
+    // #2663 — re-grandfathered 1113 → 1123: a one-line `ref.watch` of the
+    // NEW driving-coach voice listener in `build` (the missing
+    // event→coach→speak wire — keeps the keepAlive listener mounted while
+    // the screen is up) plus its import + an explaining comment. Pure
+    // wiring; decomposition still tracked under #2187/#2188.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1113,
+        1123,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':

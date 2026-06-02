@@ -29,6 +29,16 @@ abstract class VoiceAnnouncementService {
   /// Speak an announcement for the given candidate.
   Future<void> announce(AnnouncementCandidate candidate);
 
+  /// Speak an already-formatted line of text (#2663).
+  ///
+  /// The plain-text counterpart to [announce]: where [announce] takes a
+  /// station [AnnouncementCandidate] and formats the spoken string
+  /// internally, [speakLine] speaks [text] verbatim. The driving-coach
+  /// voice listener builds a localised cue sentence and hands it here, so
+  /// the station-only [AnnouncementCandidate] contract is not overloaded
+  /// with non-station cues. Both paths drive the same underlying engine.
+  Future<void> speakLine(String text);
+
   /// Stop any currently playing announcement.
   Future<void> stop();
 

@@ -3706,5 +3706,55 @@
   "@trajetDetailDownloadError": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "coachingVoiceHardAcceleration": "Easy on the accelerator",
+  "@coachingVoiceHardAcceleration": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceHarshBraking": "Try to brake more gently",
+  "@coachingVoiceHarshBraking": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceShiftUp": "Shift up a gear to save fuel",
+  "@coachingVoiceShiftUp": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceShiftDown": "Shift down, the engine is labouring",
+  "@coachingVoiceShiftDown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceEasePedal": "Ease off the pedal to cut your fuel use",
+  "@coachingVoiceEasePedal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceLiftOff": "Lift off the accelerator and coast",
+  "@coachingVoiceLiftOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceAnticipateBrake": "Look further ahead and lift off earlier",
+  "@coachingVoiceAnticipateBrake": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceSmoothAccel": "Accelerate more smoothly",
+  "@coachingVoiceSmoothAccel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "voiceCoachingSettingTitle": "Spoken driving coaching",
+  "@voiceCoachingSettingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "voiceCoachingSettingSubtitle": "Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints",
+  "@voiceCoachingSettingSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

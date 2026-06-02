@@ -2603,6 +2603,39 @@ class AppLocalizationsPl extends AppLocalizations {
   String get coachingEasePedal => 'Puść gaz';
 
   @override
+  String get coachingVoiceHardAcceleration => 'Easy on the accelerator';
+
+  @override
+  String get coachingVoiceHarshBraking => 'Try to brake more gently';
+
+  @override
+  String get coachingVoiceShiftUp => 'Shift up a gear to save fuel';
+
+  @override
+  String get coachingVoiceShiftDown => 'Shift down, the engine is labouring';
+
+  @override
+  String get coachingVoiceEasePedal =>
+      'Ease off the pedal to cut your fuel use';
+
+  @override
+  String get coachingVoiceLiftOff => 'Lift off the accelerator and coast';
+
+  @override
+  String get coachingVoiceAnticipateBrake =>
+      'Look further ahead and lift off earlier';
+
+  @override
+  String get coachingVoiceSmoothAccel => 'Accelerate more smoothly';
+
+  @override
+  String get voiceCoachingSettingTitle => 'Spoken driving coaching';
+
+  @override
+  String get voiceCoachingSettingSubtitle =>
+      'Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints';
+
+  @override
   String get tooltipUseGps => 'Użyj lokalizacji GPS';
 
   @override

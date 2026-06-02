@@ -38,6 +38,15 @@ class FlutterTtsAnnouncementService implements VoiceAnnouncementService {
   }
 
   @override
+  Future<void> speakLine(String text) async {
+    if (!_initialized) {
+      debugPrint('VoiceAnnouncement: TTS not initialized, skipping');
+      return;
+    }
+    await _tts.speak(text);
+  }
+
+  @override
   Future<void> stop() async {
     await _tts.stop();
   }
