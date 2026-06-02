@@ -169,5 +169,141 @@ void main() {
       lenient.onSample(30, start.add(const Duration(seconds: 2)));
       expect(lenient.brakes, 0);
     });
+
+    // ---- #2653 de-noising gates -----------------------------------------
+
+    group('sustained-window gate (#2653)', () {
+      test('a single sub-1 s spike does NOT fire', () {
+        // 80 → 60 km/h is -6.2 m/s² — harsh by magnitude — but it
+        // happened across only a 0.9 s window. A coarse staircase
+        // sampled against the ~0.9 s resample produces exactly this kind
+        // of one-interval phasing artefact; the sustained gate rejects
+        // it because the derivative did not span ≥ 1 s.
+        detector.onSample(80, start);
+        detector.onSample(
+            60, start.add(const Duration(milliseconds: 900)));
+        expect(detector.brakes, 0);
+        expect(detector.accelerations, 0);
+      });
+
+      test('a ≥1 s sustained event DOES fire', () {
+        // The same -6.2 m/s² magnitude, now measured over a full 1.0 s
+        // window — a genuine hard brake, counted.
+        detector.onSample(90, start);
+        detector.onSample(74, start.add(const Duration(seconds: 1)));
+        expect(detector.brakes, 1);
+      });
+
+      test('minSustainedSec is configurable', () {
+        // Tighten the window to 0.5 s and the 0.9 s spike now counts —
+        // proves the gate is the only thing suppressing it above.
+        final loose = HarshEventDetector(minSustainedSec: 0.5);
+        loose.onSample(80, start);
+        loose.onSample(60, start.add(const Duration(milliseconds: 900)));
+        expect(loose.brakes, 1);
+      });
+    });
+
+    group('accuracy gate (#2653)', () {
+      test('a bad-fix sample (> 10 m) is rejected and breaks the anchor',
+          () {
+        // A jittery urban-canyon fix with 25 m accuracy must not feed the
+        // derivative — "a bad fix is worse than no fix". The anchor at
+        // 80 km/h is dropped, so no brake is computed across it.
+        detector.onSample(80, start, hAccuracyM: 4);
+        detector.onSample(30, start.add(const Duration(seconds: 2)),
+            hAccuracyM: 25);
+        expect(detector.brakes, 0);
+      });
+
+      test('a good-fix sample (≤ 10 m) is scored normally', () {
+        detector.onSample(80, start, hAccuracyM: 4);
+        detector.onSample(30, start.add(const Duration(seconds: 2)),
+            hAccuracyM: 6);
+        expect(detector.brakes, 1);
+      });
+
+      test('a null / unknown accuracy is accepted (OBD-speed-only path)',
+          () {
+        detector.onSample(80, start);
+        detector.onSample(30, start.add(const Duration(seconds: 2)));
+        expect(detector.brakes, 1);
+      });
+    });
+
+    group('min-speed floor (#2653)', () {
+      // A genuine ≥ 3.5 m/s² derivative is physically impossible below a
+      // 5 km/h mean over a ≥ 1 s window (both endpoints < 10 km/h ⇒
+      // Δv < 2.8 m/s²), so the floor is exercised against a *lenient*
+      // threshold that a low-speed dead-reckoning wobble can cross —
+      // proving the floor, not the magnitude threshold.
+      test('a crawl-speed wobble below the floor is not scored', () {
+        final crawl = HarshEventDetector(brakeThresholdMps2: 1.0);
+        crawl.onSample(7, start);
+        // 7 → 0 km/h over 1 s = -1.94 m/s² (≥ 1.0 lenient threshold), but
+        // the mean is 3.5 km/h — below the 5 km/h floor → not scored.
+        crawl.onSample(0, start.add(const Duration(seconds: 1)));
+        expect(crawl.brakes, 0);
+        expect(crawl.accelerations, 0);
+      });
+
+      test('the same wobble above the floor IS scored', () {
+        final fast = HarshEventDetector(brakeThresholdMps2: 1.0);
+        fast.onSample(20, start);
+        // 20 → 13 km/h over 1 s = -1.94 m/s², mean 16.5 km/h ≥ 5 → counts.
+        fast.onSample(13, start.add(const Duration(seconds: 1)));
+        expect(fast.brakes, 1);
+      });
+
+      test('minSpeedKmh is configurable', () {
+        // Drop the floor to 0 and the crawl-speed wobble now counts —
+        // confirming the floor is the only thing suppressing it above.
+        final noFloor =
+            HarshEventDetector(brakeThresholdMps2: 1.0, minSpeedKmh: 0);
+        noFloor.onSample(7, start);
+        noFloor.onSample(0, start.add(const Duration(seconds: 1)));
+        expect(noFloor.brakes, 1);
+      });
+    });
+
+    group('source-aware suppression (#2653)', () {
+      test('a suppressed sample is ignored entirely (anchor not seeded)',
+          () {
+        // Feed a clearly-harsh brake on a suppressed (virtual) source —
+        // it must produce nothing AND not even seed the anchor, so a
+        // following non-suppressed sample starts fresh.
+        detector.onSample(90, start, suppress: true);
+        detector.onSample(40, start.add(const Duration(seconds: 1)),
+            suppress: true);
+        expect(detector.brakes, 0);
+        expect(detector.accelerations, 0);
+      });
+    });
+
+    group('optional speed pre-smoothing (#2653)', () {
+      test('a 3-sample moving average damps a single-step quantisation '
+          'spike', () {
+        // A 1 km/h-quantised signal sits at 50, jumps to 70 for one
+        // sample, then settles at 51. Differentiated raw, the 50→70
+        // step over 1 s is +5.6 m/s² → a phantom harsh accel. The
+        // 3-sample MA blunts the lone spike below the threshold.
+        final smoothed = HarshEventDetector(smoothSpeed: true);
+        smoothed.onSample(50, start);
+        smoothed.onSample(50, start.add(const Duration(seconds: 1)));
+        smoothed.onSample(70, start.add(const Duration(seconds: 2)));
+        smoothed.onSample(51, start.add(const Duration(seconds: 3)));
+        smoothed.onSample(51, start.add(const Duration(seconds: 4)));
+        expect(smoothed.accelerations, 0);
+
+        // The same series WITHOUT smoothing fires the phantom.
+        final raw = HarshEventDetector();
+        raw.onSample(50, start);
+        raw.onSample(50, start.add(const Duration(seconds: 1)));
+        raw.onSample(70, start.add(const Duration(seconds: 2)));
+        raw.onSample(51, start.add(const Duration(seconds: 3)));
+        raw.onSample(51, start.add(const Duration(seconds: 4)));
+        expect(raw.accelerations, greaterThanOrEqualTo(1));
+      });
+    });
   });
 }

@@ -192,7 +192,12 @@ void main() {
     // `@visibleForTesting` debug getters. Net +26; the field plumbing
     // must live on the controller seam. Decomposition stays tracked by
     // #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1621,
+    // #2653 — re-grandfathered 1621 → 1623: the `_recorder.onSample`
+    // call now threads the live `distanceSource` (+ a 2-line rationale
+    // comment) so the harsh-event detector suppresses scoring on the
+    // `virtual` dead-reckoning source. Net +2; the wiring must live at the
+    // controller's emit site. Decomposition stays tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1623,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
