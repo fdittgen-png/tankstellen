@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/storage_repository.dart';
+import '../logging/error_logger.dart';
 import '../services/service_result.dart';
 import '../storage/storage_providers.dart';
 import 'cache_eviction_policy.dart';
@@ -51,9 +54,6 @@ class CacheTtl {
   /// search list is dominated by those prices; longer would surface stale
   /// figures, shorter would defeat the cache between back-to-back queries.
   /// Matches [prices] and the Tankerkoenig update cadence on purpose.
-  ///
-  /// Intentionally compile-time (see class-level policy note); a future
-  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration stationSearch = Duration(minutes: 5);
 
   /// TTL for a single station's detail payload (address, hours, brand).
@@ -61,9 +61,6 @@ class CacheTtl {
   /// 15 minutes because detail data is mostly slow-changing metadata
   /// (opening hours, address) rather than live prices, so it tolerates a
   /// longer cache than a search list while still refreshing within a visit.
-  ///
-  /// Intentionally compile-time (see class-level policy note); a future
-  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration stationDetail = Duration(minutes: 15);
 
   /// TTL for a bulk price lookup keyed by station ids.
@@ -71,9 +68,6 @@ class CacheTtl {
   /// 5 minutes to match the Tankerkoenig price-update cadence and rate
   /// limit: refreshing faster cannot yield newer data and risks tripping
   /// the upstream limit, refreshing slower serves stale prices.
-  ///
-  /// Intentionally compile-time (see class-level policy note); a future
-  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration prices = Duration(minutes: 5);
 
   /// TTL for forward/reverse geocode results (ZIP <-> coordinates).
@@ -81,9 +75,6 @@ class CacheTtl {
   /// 24 hours because ZIP-code centroids and place coordinates are
   /// effectively static; caching for a day avoids repeated geocoder calls
   /// for the same query with no meaningful staleness risk.
-  ///
-  /// Intentionally compile-time (see class-level policy note); a future
-  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration geocode = Duration(hours: 24);
 
   /// TTL for a favourited station's cached snapshot (offline view).
@@ -91,9 +82,6 @@ class CacheTtl {
   /// 30 minutes as a middle ground: long enough that opening the favourites
   /// list offline shows a recent snapshot, short enough that a returning
   /// online user re-fetches reasonably fresh prices.
-  ///
-  /// Intentionally compile-time (see class-level policy note); a future
-  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration stationData = Duration(minutes: 30);
 
   /// TTL for city-name autocomplete / lookup results.
@@ -101,9 +89,6 @@ class CacheTtl {
   /// 30 minutes because city-name -> location mappings are stable; caching
   /// avoids re-querying the lookup service for the same typed prefix within
   /// a session without risking stale results.
-  ///
-  /// Intentionally compile-time (see class-level policy note); a future
-  /// `RuntimeConfig`/remote-config could make this tunable.
   static const Duration citySearch = Duration(minutes: 30);
 }
 
@@ -223,6 +208,10 @@ class CacheManager implements CacheStrategy {
   CacheManager(this._storage);
 
   /// Store data in cache with metadata envelope.
+  ///
+  /// #2670 — a [FileSystemException] from a box closed mid-flight degrades to
+  /// "not cached", never a throw on a routine API success (belt-and-braces;
+  /// the store guard already no-ops a closed box).
   @override
   Future<void> put(
     String key,
@@ -230,20 +219,34 @@ class CacheManager implements CacheStrategy {
     required Duration ttl,
     required ServiceSource source,
   }) async {
-    await _storage.cacheData(key, {
-      'payload': data,
-      'storedAt': DateTime.now().millisecondsSinceEpoch,
-      'source': source.index,
-      'ttlMs': ttl.inMilliseconds,
-    });
+    try {
+      await _storage.cacheData(key, {
+        'payload': data,
+        'storedAt': DateTime.now().millisecondsSinceEpoch,
+        'source': source.index,
+        'ttlMs': ttl.inMilliseconds,
+      });
+    } on FileSystemException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: {'where': 'CacheManager.put (closed box)', 'key': key}));
+    }
   }
 
   /// Retrieve cached data. Returns the entry even if expired —
   /// the caller (fallback chain) decides whether stale data is acceptable.
-  /// Returns null only if the key was never cached.
+  /// Returns null only if the key was never cached (or the box is closed —
+  /// #2670, a closed box reads as a clean miss so the chain falls through to
+  /// the API / stale path instead of throwing).
   @override
   CacheEntry? get(String key) {
-    final raw = _storage.getCachedData(key);
+    final Map<String, dynamic>? raw;
+    try {
+      raw = _storage.getCachedData(key);
+    } on FileSystemException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: {'where': 'CacheManager.get (closed box)', 'key': key}));
+      return null;
+    }
     if (raw == null) return null;
 
     final payload = raw['payload'];

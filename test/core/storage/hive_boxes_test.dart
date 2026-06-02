@@ -197,11 +197,15 @@ void main() {
       });
 
       test('migration logic exists for encrypted boxes', () {
+        // #2670 — the legacy-migration concern moved to its own file so the
+        // box-lifecycle file stays under the file-length norm; the contract
+        // is unchanged.
         final source =
-            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+            File('lib/core/storage/hive_legacy_migration.dart')
+                .readAsStringSync();
 
         expect(
-          source.contains('_migrateToEncrypted'),
+          source.contains('migrateToEncrypted'),
           isTrue,
           reason: 'Migration method must exist for unencrypted-to-encrypted',
         );

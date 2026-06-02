@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/stores/cache_hive_store.dart';
 
@@ -90,6 +91,63 @@ void main() {
       // crashing.
       await store.cacheData('list', [1, 2, 3]);
       expect(store.getCachedData('list'), isNull);
+    });
+  });
+
+  // #2670 — a foreground background scan can close the shared `cache` box
+  // (closeIsolateBoxes) while the rest of the app still references it. Before
+  // the fix the unguarded `Hive.box(cache)` getter threw
+  // `FileSystemException: File closed` on the next routine read (43× in
+  // field). Every access must degrade to a clean miss / no-op instead.
+  group('CacheHiveStore — closed cache box (#2670)', () {
+    test('getCachedData returns null instead of throwing when the box '
+        'was closed mid-flight', () async {
+      await store.cacheData('k1', {'hello': 'world'});
+      expect(store.getCachedData('k1'), isNotNull);
+
+      // Simulate closeIsolateBoxes() closing the live handle.
+      await Hive.box(HiveBoxes.cache).close();
+
+      expect(() => store.getCachedData('k1'), returnsNormally);
+      expect(store.getCachedData('k1'), isNull);
+
+      // Re-open so tearDown's Hive.close() runs cleanly.
+      await HiveStorage.initForTest();
+    });
+
+    test('getItineraries returns an empty list, not a throw, on a '
+        'closed box', () async {
+      await store.saveItineraries([
+        {'id': 'i1', 'name': 'Trip'},
+      ]);
+      await Hive.box(HiveBoxes.cache).close();
+
+      expect(() => store.getItineraries(), returnsNormally);
+      expect(store.getItineraries(), isEmpty);
+
+      await HiveStorage.initForTest();
+    });
+
+    test('cacheData is a silent no-op on a closed box (never throws)',
+        () async {
+      await Hive.box(HiveBoxes.cache).close();
+
+      await expectLater(store.cacheData('k', {'x': 1}), completes);
+
+      await HiveStorage.initForTest();
+    });
+
+    test('saveItineraries / clearCache / deleteCacheEntry no-op on a '
+        'closed box', () async {
+      await Hive.box(HiveBoxes.cache).close();
+
+      await expectLater(store.saveItineraries(const []), completes);
+      await expectLater(store.clearCache(), completes);
+      await expectLater(store.deleteCacheEntry('k'), completes);
+      expect(store.cacheKeys, isEmpty);
+      expect(store.cacheEntryCount, 0);
+
+      await HiveStorage.initForTest();
     });
   });
 
