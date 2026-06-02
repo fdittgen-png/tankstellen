@@ -18,6 +18,7 @@
 library;
 
 import '../domain/accel_event_gate.dart';
+import '../domain/climb_restart_detector.dart';
 import '../domain/driving_insight.dart';
 import '../domain/trip_recorder.dart';
 import '../presentation/widgets/trip_detail_charts.dart';
@@ -174,7 +175,7 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
     // convention of attributing the whole interval to the start
     // sample's RPM (the ~1 Hz cadence is short relative to gear
     // shifts).
-    if (prev.rpm > _highRpmThreshold) {
+    if ((prev.rpm ?? 0) > _highRpmThreshold) {
       highRpmSeconds += dt;
       final measuredRate = prev.fuelRateLPerHour;
       if (measuredRate != null && measuredRate > 0) {
@@ -194,7 +195,9 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
     // Idling: engine on (rpm > 0), car stationary (speed == 0) for
     // the whole interval. Use a small tolerance on speed to absorb
     // the OBD2 noise floor.
-    if (prev.speedKmh <= 0.5 && prev.rpm > 0) {
+    // #2692 C4-G — `(prev.rpm ?? 0)`: a GPS-only sample (rpm null, no
+    // engine signal) is never counted as an idling engine.
+    if (prev.speedKmh <= 0.5 && (prev.rpm ?? 0) > 0) {
       idleSeconds += dt;
       final measuredRate = prev.fuelRateLPerHour;
       // Idle wastes 100% of the fuel — there's no counterfactual,
@@ -306,6 +309,41 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
         },
       ));
     }
+  }
+
+  // Climbing-fuel cost line (#2693 C6). Recomputes confident road grade
+  // inline (same RoadGradeCalculator config the live folder uses) and
+  // attributes the extra litres burned over a flat-road counterfactual.
+  final climb = detectClimbCost(sorted);
+  if (climb.climbingLiters >= _noiseFloorLiters) {
+    final pctTime = climb.climbSeconds / totalDt * 100.0;
+    candidates.add(DrivingInsight(
+      labelKey: 'insightClimbingCost',
+      litersWasted: climb.climbingLiters,
+      percentOfTrip: pctTime,
+      metadata: {
+        'gradePercent': climb.peakGradePercent,
+        'climbSeconds': climb.climbSeconds,
+        'pctTime': pctTime,
+      },
+    ));
+  }
+
+  // Stop-and-go restart cost line (#2694 C8). Counts genuine
+  // stop→accelerate restarts (distinguished from a rolling start) and
+  // attributes the extra litres of accelerating a stopped car from rest.
+  final restart = detectRestartCost(sorted);
+  if (restart.restartLiters >= _noiseFloorLiters) {
+    candidates.add(DrivingInsight(
+      labelKey: 'insightRestartCost',
+      litersWasted: restart.restartLiters,
+      // percentOfTrip is not meaningful for a count-based category; the
+      // metadata carries the restart count for the subtitle.
+      percentOfTrip: 0,
+      metadata: {
+        'restartCount': restart.restartCount,
+      },
+    ));
   }
 
   // Sort by wasted litres descending and cap at [_topN].

@@ -350,5 +350,59 @@ void main() {
       expect(f.distanceKm, 0);
       expect(f.accelEventsPerKm, 0);
     });
+
+    group('#2695 C9 speed-only energy KPIs', () {
+      test('a steady acceleration ramp has positive RPA / PKE / VAPOS', () {
+        // 0 → 36 km/h (10 m/s) ramped in 1 m/s² steps, one sample per
+        // second, so intermediate leading-sample speeds are non-zero (the
+        // rectangle-rule distance + RPA terms are then non-degenerate).
+        final samples = <TripSample>[
+          for (var i = 0; i <= 10; i++)
+            _s(t0.add(Duration(seconds: i)), i * 3.6), // i m/s in km/h
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        // PKE = ∑(v_f² − v_i²)⁺ / distance > 0 for a pure accel ramp.
+        expect(f.positiveKineticEnergy, greaterThan(0));
+        // RPA / VAPOS accumulate v·a over the accelerating interior.
+        expect(f.relativePositiveAcceleration, greaterThan(0));
+        expect(f.meanPositiveVa, greaterThan(0));
+        // Pure acceleration → no coasting.
+        expect(f.coastShare, 0);
+      });
+
+      test('a sustained cruise then gentle decel registers a coast share', () {
+        // cruise 20 s at 50 km/h, then gently slow 50 → 40 km/h over 5 s
+        // (−0.55 m/s², below the harsh-brake threshold → coasting).
+        final samples = <TripSample>[
+          for (var i = 0; i <= 20; i++)
+            _s(t0.add(Duration(seconds: i)), 50),
+          _s(t0.add(const Duration(seconds: 25)), 40),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.coastShare, greaterThan(0));
+        expect(f.coastShare, lessThanOrEqualTo(1.0));
+      });
+
+      test('climb energy per km tracks the altitude gain', () {
+        // climb 100 m over a 1 km leg at 36 km/h (10 m/s).
+        final samples = <TripSample>[
+          for (var i = 0; i <= 100; i++)
+            _s(t0.add(Duration(seconds: i)), 36, altM: 100.0 + i),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        // ~1000 m travelled, ~100 m climbed → ~100 m/km.
+        expect(f.climbEnergyPerKm, greaterThan(50));
+        expect(f.distanceKm, greaterThan(0.5));
+      });
+
+      test('zero-distance stream leaves all energy KPIs at 0', () {
+        final samples = [_s(t0, 0), _s(t0.add(const Duration(seconds: 30)), 0)];
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.relativePositiveAcceleration, 0);
+        expect(f.positiveKineticEnergy, 0);
+        expect(f.meanPositiveVa, 0);
+        expect(f.climbEnergyPerKm, 0);
+      });
+    });
   });
 }

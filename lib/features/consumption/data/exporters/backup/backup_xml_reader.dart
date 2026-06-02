@@ -290,7 +290,9 @@ class BackupXmlReader {
         samples.add(TripSample(
           timestamp: _reqDate(s, 'Timestamp'),
           speedKmh: _reqDouble(s, 'SpeedKmh'),
-          rpm: _reqDouble(s, 'Rpm'),
+          // #2692 C4-G — optional now: legacy backups always wrote Rpm, so
+          // they still read back unchanged; a GPS-only sample reads null.
+          rpm: _double(s, 'Rpm'),
           fuelRateLPerHour: _double(s, 'FuelRateLPerHour'),
           throttlePercent: _double(s, 'ThrottlePercent'),
           engineLoadPercent: _double(s, 'EngineLoadPercent'),

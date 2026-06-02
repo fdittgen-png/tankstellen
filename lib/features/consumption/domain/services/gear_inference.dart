@@ -150,7 +150,10 @@ GearInferenceResult inferGears({
   final validRatios = <double>[];
   for (var i = 0; i < sampleList.length; i++) {
     final s = sampleList[i];
-    if (s.speedKmh < _minSpeedKmh || s.rpm < _minRpm) {
+    // #2692 C4-G — gear inference needs a real engine RPM; a GPS-only
+    // sample (rpm null) has none, so it can't yield an rpm/wheel ratio.
+    final rpm = s.rpm;
+    if (rpm == null || s.speedKmh < _minSpeedKmh || rpm < _minRpm) {
       continue;
     }
     final wheelRpm = (s.speedKmh / 3.6) / tireCircumferenceMeters * 60.0;
@@ -159,7 +162,7 @@ GearInferenceResult inferGears({
       // treat as a skip rather than throw.
       continue;
     }
-    final ratio = s.rpm / wheelRpm;
+    final ratio = rpm / wheelRpm;
     if (!ratio.isFinite || ratio <= 0) {
       continue;
     }

@@ -13,6 +13,7 @@ import '../../data/lessons/driving_lesson_registry.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/driving_insight.dart';
 import '../../domain/driving_score.dart';
+import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/services/throttle_rpm_histogram_calculator.dart';
@@ -20,10 +21,12 @@ import '../../domain/trip_recorder.dart';
 import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
 import 'gps_diagnostics_card.dart';
+import 'gps_efficiency_kpi_card.dart';
 import 'obd2_diagnostics_trip_card.dart';
 import 'throttle_rpm_histogram_card.dart';
 import 'trip_chart_section.dart';
 import 'trip_detail_charts.dart';
+import 'trip_detail_to_trip_sample.dart';
 import 'trip_path_map_card.dart';
 import 'trip_summary_card.dart';
 
@@ -106,6 +109,10 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   final DrivingLessonRegistry _lessonRegistry =
       DrivingLessonRegistry.standard();
 
+  /// GPS-only efficiency features (#2697 P3) — null for OBD2/EV/empty.
+  late final GpsDrivingFeatures? _gpsFeatures = GpsEfficiencyKpiCard
+      .featuresFor(widget.samples.map(tripDetailToTripSample), isEv: widget.isEv);
+
   List<DrivingInsight> _computeInsights() {
     if (widget.samples.isEmpty) return const [];
     // Insights are only meaningful for combustion trips — EV trips
@@ -115,7 +122,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // Skip the analysis for EVs entirely; phase 4 will revisit once
     // the kWh equivalent lands.
     if (widget.isEv) return const [];
-    final tripSamples = widget.samples.map(_toTripSample).toList(
+    final tripSamples = widget.samples.map(tripDetailToTripSample).toList(
           growable: false,
         );
     return analyzeTrip(tripSamples);
@@ -124,7 +131,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   DrivingScore _computeScore() {
     if (widget.samples.isEmpty) return DrivingScore.perfect;
     if (widget.isEv) return DrivingScore.perfect;
-    final tripSamples = widget.samples.map(_toTripSample).toList(
+    final tripSamples = widget.samples.map(tripDetailToTripSample).toList(
           growable: false,
         );
     // #2460 — thread the trip-end lugging metric stored on the summary
@@ -221,7 +228,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             : _lessonRegistry.evaluateContext(
                 LessonContext(
                   summary: widget.entry.summary,
-                  samples: widget.samples.map(_toTripSample).toList(
+                  samples: widget.samples.map(tripDetailToTripSample).toList(
                         growable: false,
                       ),
                   score: _score,
@@ -274,6 +281,9 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // empty-samples-skip rules.
         if (!widget.isEv && widget.samples.isNotEmpty)
           ThrottleRpmHistogramCard(histogram: _histogram),
+        // GPS-only efficiency KPIs (#2697 P3) — only for engine-signal-less trips.
+        if (_gpsFeatures != null)
+          GpsEfficiencyKpiCard(features: _gpsFeatures),
         // GPS sample diagnostics inspector (#1458 phase 2.5).
         // Read-only — rendered only when at least one diagnostic was
         // captured (legacy trips and flag-off trips skip this card so
@@ -374,21 +384,3 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   }
 }
 
-/// Convert a presentation-layer [TripDetailSample] into the domain
-/// [TripSample] the analyzer consumes. Mirrors `_toDetailSample` in
-/// `trip_detail_screen.dart` — kept inline here to keep the screen
-/// boundary clean. The analyzer treats `rpm: null` as zero, which
-/// matches "no engine reading available" semantically.
-TripSample _toTripSample(TripDetailSample s) => TripSample(
-      timestamp: s.timestamp,
-      speedKmh: s.speedKmh,
-      rpm: s.rpm ?? 0,
-      fuelRateLPerHour: s.fuelRateLPerHour,
-      // #2460 — carry the persisted driver-intent + mixture signals so
-      // the canonical score computes the full-throttle, pedal-velocity,
-      // smoothness, and λ-enrichment terms (the old converter dropped
-      // them, which is why the full-throttle penalty appeared dead).
-      throttlePercent: s.throttlePercent,
-      pedalPercent: s.pedalPercent,
-      lambda: s.lambda,
-    );

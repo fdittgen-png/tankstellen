@@ -3069,6 +3069,41 @@
   "@lessonAdviceLambdaEnrichment": {
     "description": "How-to-improve advice for the lambda-enrichment lesson (#2461). Embedded in the GPX recording export."
   },
+  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "@insightClimbingCost": {
+    "description": "Cost-line copy for the climbing-fuel insight on the Trip detail screen (#2693 C6) — extra fuel burned over a flat-road counterfactual while on a confident uphill grade. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "gradePercent": {
+        "type": "String"
+      },
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "@lessonAdviceClimbingCost": {
+    "description": "How-to-improve advice for the climbing-fuel lesson (#2693 C6). Embedded in the GPX recording export."
+  },
+  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "@insightRestartCost": {
+    "description": "Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "@lessonAdviceRestartCost": {
+    "description": "How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export."
+  },
   "drivingScoreCardTitle": "Driving score",
   "@drivingScoreCardTitle": {
     "description": "Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A)."
@@ -3145,6 +3180,39 @@
   "drivingScorePenaltyLambda": "Rich mixture",
   "@drivingScorePenaltyLambda": {
     "description": "Breakdown chip beneath the driving-score number when the engine ran a rich mixture (lambda < 1) under load, dumping extra fuel, as a top contributor (#2460)."
+  },
+  "gpsKpiCardTitle": "GPS efficiency",
+  "@gpsKpiCardTitle": {
+    "description": "Title of the GPS-only efficiency KPI card on the Trip detail screen (#2695 C9) — shown for trips recorded without an engine signal."
+  },
+  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "@gpsKpiRpa": {
+    "description": "Label for the Relative Positive Acceleration KPI on the GPS efficiency card (#2695 C9) — a speed-only eco-driving aggressiveness index."
+  },
+  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "@gpsKpiPke": {
+    "description": "Label for the Positive Kinetic Energy KPI on the GPS efficiency card (#2695 C9) — distance-normalised positive kinetic-energy changes."
+  },
+  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "@gpsKpiVapos": {
+    "description": "Label for the mean positive v·a KPI on the GPS efficiency card (#2695 C9) — average power-proxy while accelerating."
+  },
+  "gpsKpiCoast": "Coasting share",
+  "@gpsKpiCoast": {
+    "description": "Label for the coasting-share KPI on the GPS efficiency card (#2695 C9) — fraction of moving time spent coasting, an eco-positive signal."
+  },
+  "gpsKpiClimbEnergy": "Climb energy",
+  "@gpsKpiClimbEnergy": {
+    "description": "Label for the climb-energy-per-km KPI on the GPS efficiency card (#2695 C9) — metres climbed per kilometre, a potential-energy work proxy."
+  },
+  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "@drivingScoreBaselineDelta": {
+    "description": "Trip-detail line comparing this trip's average consumption to the driver's synced efficient baseline (#2696 C10). The placeholder is a pre-formatted signed percentage (e.g. '+8%' worse, '-5%' better). Hidden when there is no learned baseline yet.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
   },
   "ecoRouteOption": "Eco",
   "@ecoRouteOption": {
@@ -4498,6 +4566,10 @@
   "consumptionMonthlyComparisonNotReliable": "Need at least 3 trips per month for comparison",
   "@consumptionMonthlyComparisonNotReliable": {
     "description": "Caption shown on the monthly-insights card when one or both months has fewer than 3 trips. The card still shows the current-month numbers but skips the previous-month column and the delta arrows (#1041 phase 4)."
+  },
+  "consumptionMonthlyClimbLabel": "Climbed",
+  "@consumptionMonthlyClimbLabel": {
+    "description": "Row label on the monthly-insights card for total metres climbed across the month (#2697 P3) — now trustworthy that altitude is guarded + persisted. Rendered only when at least one trip carried altitude samples."
   },
   "obd2CapabilitySectionTitle": "Adapter capabilities",
   "@obd2CapabilitySectionTitle": {

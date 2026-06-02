@@ -19,8 +19,9 @@ import '../../domain/trip_sample.dart';
 class GpsOnlySampleBuilder {
   /// Build a GPS-only [TripSample] equivalent to
   /// `GpsOnlyRecordingPipeline._onPosition`: speed from the GPS latch,
-  /// `rpm: 0`, lat/lon/alt from the latest snapshot, `fuelRateLPerHour`
-  /// left null so the GPS-physics estimate + coaching overlay runs.
+  /// `rpm: null` (no engine signal, #2692 C4-G), lat/lon/alt from the
+  /// latest snapshot, `fuelRateLPerHour` left null so the GPS-physics
+  /// estimate + coaching overlay runs.
   static TripSample build({
     required DateTime timestamp,
     required double speedKmh,
@@ -33,7 +34,7 @@ class GpsOnlySampleBuilder {
     return TripSample(
       timestamp: timestamp,
       speedKmh: speedKmh,
-      rpm: 0,
+      rpm: null,
       latitude: latitude,
       longitude: longitude,
       altitudeM: altitudeM,

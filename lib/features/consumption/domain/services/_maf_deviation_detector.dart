@@ -55,8 +55,11 @@ double? _medianCruiseFuelRate(List<TripSample> samples) {
     if (s.speedKmh > MaintenanceAnalyzerThresholds.cruiseSpeedMaxKmh) {
       continue;
     }
-    if (s.rpm < MaintenanceAnalyzerThresholds.cruiseRpmMin) continue;
-    if (s.rpm > MaintenanceAnalyzerThresholds.cruiseRpmMax) continue;
+    // #2692 C4-G — a GPS-only sample (rpm null) is not an OBD2 cruise point.
+    final rpm = s.rpm;
+    if (rpm == null) continue;
+    if (rpm < MaintenanceAnalyzerThresholds.cruiseRpmMin) continue;
+    if (rpm > MaintenanceAnalyzerThresholds.cruiseRpmMax) continue;
     rates.add(fuel);
   }
   if (rates.length < 4) return null;

@@ -217,4 +217,29 @@ void main() {
       expect(TripMetrics.speedStdDev(samples), closeTo(0, 0.001));
     });
   });
+
+  group('TripMetrics.consumptionDelta (#2696 C10)', () {
+    test('a trip above the baseline yields a positive signed percent', () {
+      // 6.6 L/100 km vs a 6.0 baseline → +10 %.
+      final delta = TripMetrics.consumptionDelta(tripAvg: 6.6, baseline: 6.0);
+      expect(delta, closeTo(10.0, 0.001));
+    });
+
+    test('a trip below the baseline yields a negative signed percent', () {
+      // 5.7 vs 6.0 → −5 %.
+      final delta = TripMetrics.consumptionDelta(tripAvg: 5.7, baseline: 6.0);
+      expect(delta, closeTo(-5.0, 0.001));
+    });
+
+    test('a non-positive baseline returns null (no learned baseline yet)', () {
+      expect(TripMetrics.consumptionDelta(tripAvg: 6.0, baseline: 0), isNull);
+      expect(
+          TripMetrics.consumptionDelta(tripAvg: 6.0, baseline: -1), isNull);
+    });
+
+    test('a missing trip average returns null', () {
+      expect(
+          TripMetrics.consumptionDelta(tripAvg: null, baseline: 6.0), isNull);
+    });
+  });
 }

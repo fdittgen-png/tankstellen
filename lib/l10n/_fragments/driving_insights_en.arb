@@ -150,5 +150,40 @@
   "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
   "@lessonAdviceLambdaEnrichment": {
     "description": "How-to-improve advice for the lambda-enrichment lesson (#2461). Embedded in the GPX recording export."
+  },
+  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "@insightClimbingCost": {
+    "description": "Cost-line copy for the climbing-fuel insight on the Trip detail screen (#2693 C6) — extra fuel burned over a flat-road counterfactual while on a confident uphill grade. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "gradePercent": {
+        "type": "String"
+      },
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "@lessonAdviceClimbingCost": {
+    "description": "How-to-improve advice for the climbing-fuel lesson (#2693 C6). Embedded in the GPX recording export."
+  },
+  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "@insightRestartCost": {
+    "description": "Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "@lessonAdviceRestartCost": {
+    "description": "How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export."
   }
 }

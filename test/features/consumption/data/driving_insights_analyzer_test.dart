@@ -487,4 +487,120 @@ void main() {
       expect(find(analyzeTrip(samples), 'insightLambdaEnrichment'), isNull);
     });
   });
+
+  group('#2692 C4-G — GPS-only (rpm null) raises no rpm-based insight', () {
+    final start = DateTime.utc(2026);
+
+    DrivingInsight? find(List<DrivingInsight> list, String key) {
+      for (final i in list) {
+        if (i.labelKey == key) return i;
+      }
+      return null;
+    }
+
+    test(
+        'a GPS-only stream (rpm null) at standstill + high speed yields '
+        'NO high-RPM and NO idling insight', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 60; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: i.isEven ? 0 : 60,
+            rpm: null, // GPS-only — no engine signal
+          ),
+      ];
+      final insights = analyzeTrip(samples);
+      expect(find(insights, 'insightHighRpm'), isNull,
+          reason: 'rpm null must never trip the high-RPM insight');
+      expect(find(insights, 'insightIdling'), isNull,
+          reason: 'rpm null must never be counted as an idling engine');
+    });
+  });
+
+  group('#2693 C6 — climbing-fuel insight from confident grade', () {
+    final start = DateTime.utc(2026);
+
+    DrivingInsight? find(List<DrivingInsight> list, String key) {
+      for (final i in list) {
+        if (i.labelKey == key) return i;
+      }
+      return null;
+    }
+
+    List<TripSample> climb(double gradeFraction) {
+      final samples = <TripSample>[];
+      var altitude = 100.0;
+      for (var i = 0; i < 40; i++) {
+        samples.add(TripSample(
+          timestamp: start.add(Duration(seconds: i * 3)),
+          speedKmh: 36,
+          rpm: 2200,
+          altitudeM: altitude,
+          fuelRateLPerHour: 10,
+        ));
+        altitude += 30.0 * gradeFraction;
+      }
+      return samples;
+    }
+
+    test('a confident ~6% climb surfaces an insightClimbingCost line', () {
+      final insight = find(analyzeTrip(climb(0.06)), 'insightClimbingCost');
+      expect(insight, isNotNull);
+      expect(insight!.litersWasted, greaterThan(0));
+      // The metadata carries the peak confident grade for the subtitle.
+      final gradePct = insight.metadata['gradePercent']! as double;
+      expect(gradePct, greaterThan(3.0));
+      expect(gradePct, lessThan(7.0));
+    });
+
+    test('a flat trip raises NO climbing insight', () {
+      expect(find(analyzeTrip(climb(0.0)), 'insightClimbingCost'), isNull);
+    });
+  });
+
+  group('#2694 C8 — stop-and-go restart insight', () {
+    final start = DateTime.utc(2026);
+
+    DrivingInsight? find(List<DrivingInsight> list, String key) {
+      for (final i in list) {
+        if (i.labelKey == key) return i;
+      }
+      return null;
+    }
+
+    List<TripSample> stopGo(int restarts) {
+      final samples = <TripSample>[];
+      var t = start;
+      for (var r = 0; r < restarts; r++) {
+        for (var i = 0; i < 3; i++) {
+          samples.add(TripSample(timestamp: t, speedKmh: 0, rpm: 800));
+          t = t.add(const Duration(seconds: 1));
+        }
+        for (final v in [5.0, 15.0, 30.0]) {
+          samples.add(TripSample(timestamp: t, speedKmh: v, rpm: 2500));
+          t = t.add(const Duration(seconds: 1));
+        }
+      }
+      return samples;
+    }
+
+    test('several restarts surface an insightRestartCost with the count', () {
+      final insight = find(analyzeTrip(stopGo(3)), 'insightRestartCost');
+      expect(insight, isNotNull);
+      expect(insight!.metadata['restartCount'], 3);
+      expect(insight.litersWasted, greaterThan(0));
+    });
+
+    test('a steady cruise (no stops) raises NO restart insight', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 30; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: 80,
+            rpm: 2000,
+          ),
+      ];
+      expect(find(analyzeTrip(samples), 'insightRestartCost'), isNull);
+    });
+  });
 }

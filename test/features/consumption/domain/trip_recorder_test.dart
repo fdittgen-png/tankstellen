@@ -152,6 +152,34 @@ void main() {
       expect(summary.avgLPer100Km, closeTo(10.0, 0.1));
     });
 
+    test(
+        '#2692 C4-E — a single transient null fuelRate is carried forward, '
+        'integrating BOTH intervals (not zero them)', () {
+      // [rate=5, null, 5] over two equal 1-hour steps. Pre-fix the
+      // both-endpoints-non-null gate skipped BOTH intervals (each touches
+      // the middle null) → 0 L. With carry-forward the middle sample
+      // resolves the last-known 5 L/h, so both 1-hour intervals integrate
+      // at 5 L/h → 2 × 5 = 10 L total.
+      final start = DateTime.utc(2026);
+      recorder.onSample(TripSample(
+          timestamp: start, speedKmh: 60, rpm: 2000, fuelRateLPerHour: 5));
+      recorder.onSample(TripSample(
+        timestamp: start.add(const Duration(hours: 1)),
+        speedKmh: 60,
+        rpm: 2000,
+        // fuelRateLPerHour omitted → null (transient PID dropout).
+      ));
+      recorder.onSample(TripSample(
+        timestamp: start.add(const Duration(hours: 2)),
+        speedKmh: 60,
+        rpm: 2000,
+        fuelRateLPerHour: 5,
+      ));
+      // 5 L/h × 2 h = 10 L; pre-fix would have been 0 L (both intervals
+      // touch the middle null and were skipped entirely).
+      expect(recorder.buildSummary().fuelLitersConsumed, closeTo(10.0, 0.01));
+    });
+
     test('throttlePercent on TripSample is preserved (#1261)', () {
       // The recorder doesn't aggregate throttle today — but the field
       // must round-trip through TripSample so the persisted samples

@@ -4428,6 +4428,28 @@ class AppLocalizationsDe extends AppLocalizations {
       'Hohe Dauerlast lässt den Motor anfetten – früher hochschalten und an langen Steigungen Gas wegnehmen, damit das Gemisch mager bleibt.';
 
   @override
+  String insightClimbingCost(
+    String gradePercent,
+    String pctTime,
+    String liters,
+  ) {
+    return 'Bergauf bei $gradePercent% Steigung ($pctTime% der Fahrt): $liters L verschwendet';
+  }
+
+  @override
+  String get lessonAdviceClimbingCost =>
+      'Vor Steigungen Schwung mitnehmen und gleichmäßig Gas geben – schub­weises Beschleunigen am Berg kostet zusätzlich Sprit.';
+
+  @override
+  String insightRestartCost(String count, String liters) {
+    return '$count Anfahrten aus dem Stand: $liters L verschwendet';
+  }
+
+  @override
+  String get lessonAdviceRestartCost =>
+      'Vorausschauend fahren und vor Stopps ausrollen, statt anzuhalten – das Anfahren aus dem Stand verbraucht im Stop-and-go am meisten.';
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override
@@ -4483,6 +4505,29 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get drivingScorePenaltyLambda => 'Fettes Gemisch';
+
+  @override
+  String get gpsKpiCardTitle => 'GPS-Effizienz';
+
+  @override
+  String get gpsKpiRpa => 'Positive Beschleunigung (RPA)';
+
+  @override
+  String get gpsKpiPke => 'Kinetischer Energiebedarf (PKE)';
+
+  @override
+  String get gpsKpiVapos => 'Beschleunigungsintensität (VAPOS)';
+
+  @override
+  String get gpsKpiCoast => 'Anteil Ausrollen';
+
+  @override
+  String get gpsKpiClimbEnergy => 'Steigungsenergie';
+
+  @override
+  String drivingScoreBaselineDelta(String pct) {
+    return '$pct gegenüber deinem Sparwert';
+  }
 
   @override
   String get ecoRouteOption => 'Sparsam';
@@ -5664,6 +5709,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get consumptionMonthlyComparisonNotReliable =>
       'Mindestens 3 Fahrten pro Monat für den Vergleich nötig';
+
+  @override
+  String get consumptionMonthlyClimbLabel => 'Anstieg';
 
   @override
   String get obd2CapabilitySectionTitle => 'Adapter-Fähigkeiten';

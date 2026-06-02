@@ -186,7 +186,8 @@ class LiveSampleSnapshot {
   }) {
     _latestLatitude = latitude;
     _latestLongitude = longitude;
-    _latestAltitudeM = altitudeM;
+    // #2692 C4-B — chokepoint isFinite guard (NaN altitude poisoned grade math).
+    _latestAltitudeM = (altitudeM != null && altitudeM.isFinite) ? altitudeM : null;
     _latestHAccuracyM = hAccuracyM;
     _latestBearingDeg = bearingDeg;
   }

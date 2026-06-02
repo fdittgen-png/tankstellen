@@ -1,0 +1,27 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import '../../domain/trip_recorder.dart';
+import 'trip_detail_charts.dart';
+
+/// Convert a presentation-layer [TripDetailSample] into the domain
+/// [TripSample] the analyzer / score / GPS features consume. Extracted
+/// from `trip_detail_body.dart` (#2697 P3) to keep that body under its
+/// 400-line guard.
+///
+/// #2692 C4-G — rpm threads through nullable (NOT `?? 0`): a GPS-only
+/// sample stays rpm null so the source-aware score re-weight + the
+/// GPS-efficiency card fire instead of seeing a fabricated 0.
+TripSample tripDetailToTripSample(TripDetailSample s) => TripSample(
+      timestamp: s.timestamp,
+      speedKmh: s.speedKmh,
+      rpm: s.rpm,
+      fuelRateLPerHour: s.fuelRateLPerHour,
+      // #2460 — carry the persisted driver-intent + mixture signals so the
+      // canonical score computes the full-throttle, pedal-velocity,
+      // smoothness, and λ-enrichment terms (the old converter dropped them,
+      // which is why the full-throttle penalty appeared dead).
+      throttlePercent: s.throttlePercent,
+      pedalPercent: s.pedalPercent,
+      lambda: s.lambda,
+    );

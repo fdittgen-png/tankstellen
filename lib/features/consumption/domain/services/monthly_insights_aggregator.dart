@@ -78,6 +78,11 @@ class MonthlyInsightsSummary {
   final double? currentMonthAvgConsumptionLPer100km;
   final double? previousMonthAvgConsumptionLPer100km;
 
+  /// Total metres climbed (sum of positive altitude deltas) across the
+  /// bucket's trips (#2697 P3). 0 when no trip carried altitude samples.
+  final double currentMonthClimbMeters;
+  final double previousMonthClimbMeters;
+
   /// True only if BOTH months recorded ≥ 3 trips. The card uses this
   /// to decide whether to render delta arrows or just current values.
   final bool isComparisonReliable;
@@ -92,6 +97,8 @@ class MonthlyInsightsSummary {
     required this.currentMonthAvgConsumptionLPer100km,
     required this.previousMonthAvgConsumptionLPer100km,
     required this.isComparisonReliable,
+    this.currentMonthClimbMeters = 0,
+    this.previousMonthClimbMeters = 0,
   });
 
   /// All-zero / null summary used when the trip list is empty.
@@ -120,6 +127,11 @@ class MonthlyInsightsSummary {
   /// indicator.
   double get distanceKmDelta =>
       currentMonthDistanceKm - previousMonthDistanceKm;
+
+  /// Climb-metres delta (current minus previous), #2697 P3. Neutral
+  /// activity indicator — more climbing is terrain, not behaviour.
+  double get climbMetersDelta =>
+      currentMonthClimbMeters - previousMonthClimbMeters;
 
   /// Consumption delta (current minus previous), in L/100 km. Null
   /// when either month lacks a reliable consumption figure. NEGATIVE
@@ -195,6 +207,7 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
       final (distanceKm, fuelLitres, hadFuelRate) =
           _integrateSamples(samples);
       bucket.distanceKm += distanceKm;
+      bucket.climbMeters += _climbMeters(samples); // #2697 P3
       if (hadFuelRate && distanceKm > 0) {
         bucket.fuelLitres += fuelLitres;
         bucket.consumptionDistanceKm += distanceKm;
@@ -233,6 +246,8 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
     previousMonthDistanceKm: previousBucket.distanceKm,
     currentMonthAvgConsumptionLPer100km: currentAvg,
     previousMonthAvgConsumptionLPer100km: previousAvg,
+    currentMonthClimbMeters: currentBucket.climbMeters,
+    previousMonthClimbMeters: previousBucket.climbMeters,
     isComparisonReliable: reliable,
   );
 }
@@ -289,6 +304,20 @@ void _addSummaryFuelFallback(
   return (distanceKm, fuelLitres, hadFuelRate);
 }
 
+/// Sum of positive altitude deltas (metres climbed) across [samples]
+/// (#2697 P3). Samples without altitude contribute nothing.
+double _climbMeters(List<TripSample> samples) {
+  if (samples.length < 2) return 0;
+  final sorted = [...samples]
+    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  double climb = 0;
+  for (var i = 1; i < sorted.length; i++) {
+    final pAlt = sorted[i - 1].altitudeM, cAlt = sorted[i].altitudeM;
+    if (pAlt != null && cAlt != null && cAlt > pAlt) climb += cAlt - pAlt;
+  }
+  return climb;
+}
+
 /// Average L/100 km for a bucket. Null when the bucket's qualifying
 /// distance is below the noise floor — averaging a litre over <5 km is
 /// dominated by warm-up burn and would mislead the comparison.
@@ -320,4 +349,7 @@ class _MonthBucket {
   /// Differs from [distanceKm] (which counts every trip) — the
   /// consumption average must divide by the same trips it summed.
   double consumptionDistanceKm = 0;
+
+  /// Total metres climbed across the bucket (#2697 P3).
+  double climbMeters = 0;
 }

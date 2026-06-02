@@ -4396,6 +4396,28 @@ class AppLocalizationsNb extends AppLocalizations {
       'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.';
 
   @override
+  String insightClimbingCost(
+    String gradePercent,
+    String pctTime,
+    String liters,
+  ) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceClimbingCost =>
+      'Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.';
+
+  @override
+  String insightRestartCost(String count, String liters) {
+    return '$count stop-and-go restarts: wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceRestartCost =>
+      'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.';
+
+  @override
   String get drivingScoreCardTitle => 'Kjørescore';
 
   @override
@@ -4451,6 +4473,29 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get drivingScorePenaltyLambda => 'Rich mixture';
+
+  @override
+  String get gpsKpiCardTitle => 'GPS efficiency';
+
+  @override
+  String get gpsKpiRpa => 'Positive acceleration (RPA)';
+
+  @override
+  String get gpsKpiPke => 'Kinetic energy demand (PKE)';
+
+  @override
+  String get gpsKpiVapos => 'Acceleration intensity (VAPOS)';
+
+  @override
+  String get gpsKpiCoast => 'Coasting share';
+
+  @override
+  String get gpsKpiClimbEnergy => 'Climb energy';
+
+  @override
+  String drivingScoreBaselineDelta(String pct) {
+    return '$pct vs your efficient baseline';
+  }
 
   @override
   String get ecoRouteOption => 'Øko';
@@ -5628,6 +5673,9 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get consumptionMonthlyComparisonNotReliable =>
       'Trenger minst 3 turer per måned for sammenligning';
+
+  @override
+  String get consumptionMonthlyClimbLabel => 'Climbed';
 
   @override
   String get obd2CapabilitySectionTitle => 'Adapter-kapabiliteter';

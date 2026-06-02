@@ -133,10 +133,13 @@ void main() {
       expect(ctl.capturedSamples.length, greaterThan(samplesAtDrop),
           reason: 'the trip must keep capturing GPS samples across the '
               'OBD2 drop — no recording gap');
-      // The degraded sample is GPS-only: speed ~85, rpm 0, no fuel rate.
+      // The degraded sample is GPS-only: speed ~85, NO engine signal, no
+      // fuel rate. #2692 C4-G — a GPS-only sample now carries rpm null
+      // (rather than faking idle with 0) so the recorder never inflates
+      // maxRpm / high-RPM / idle time from a drive with no OBD2 link.
       final degradedSample = ctl.capturedSamples.last;
       expect(degradedSample.speedKmh, closeTo(85, 0.001));
-      expect(degradedSample.rpm, 0);
+      expect(degradedSample.rpm, isNull);
       expect(degradedSample.fuelRateLPerHour, isNull);
       // The live reading carries the genuine live GPS speed (not frozen).
       expect(readings.where((r) => r.speedKmh == 85), isNotEmpty,

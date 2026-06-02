@@ -75,5 +75,38 @@
   "drivingScorePenaltyLambda": "Rich mixture",
   "@drivingScorePenaltyLambda": {
     "description": "Breakdown chip beneath the driving-score number when the engine ran a rich mixture (lambda < 1) under load, dumping extra fuel, as a top contributor (#2460)."
+  },
+  "gpsKpiCardTitle": "GPS efficiency",
+  "@gpsKpiCardTitle": {
+    "description": "Title of the GPS-only efficiency KPI card on the Trip detail screen (#2695 C9) — shown for trips recorded without an engine signal."
+  },
+  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "@gpsKpiRpa": {
+    "description": "Label for the Relative Positive Acceleration KPI on the GPS efficiency card (#2695 C9) — a speed-only eco-driving aggressiveness index."
+  },
+  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "@gpsKpiPke": {
+    "description": "Label for the Positive Kinetic Energy KPI on the GPS efficiency card (#2695 C9) — distance-normalised positive kinetic-energy changes."
+  },
+  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "@gpsKpiVapos": {
+    "description": "Label for the mean positive v·a KPI on the GPS efficiency card (#2695 C9) — average power-proxy while accelerating."
+  },
+  "gpsKpiCoast": "Coasting share",
+  "@gpsKpiCoast": {
+    "description": "Label for the coasting-share KPI on the GPS efficiency card (#2695 C9) — fraction of moving time spent coasting, an eco-positive signal."
+  },
+  "gpsKpiClimbEnergy": "Climb energy",
+  "@gpsKpiClimbEnergy": {
+    "description": "Label for the climb-energy-per-km KPI on the GPS efficiency card (#2695 C9) — metres climbed per kilometre, a potential-energy work proxy."
+  },
+  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "@drivingScoreBaselineDelta": {
+    "description": "Trip-detail line comparing this trip's average consumption to the driver's synced efficient baseline (#2696 C10). The placeholder is a pre-formatted signed percentage (e.g. '+8%' worse, '-5%' better). Hidden when there is no learned baseline yet.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
   }
 }
