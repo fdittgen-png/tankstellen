@@ -389,7 +389,12 @@ as Set<StationAmenity>,
 /// @nodoc
 mixin _$StationDetail {
 
- Station get station; List<OpeningTime> get openingTimes; List<String> get overrides; bool get wholeDay; String? get state;
+ Station get station; List<OpeningTime> get openingTimes; List<String> get overrides; bool get wholeDay; String? get state;// Epic C1 (#2708) — structured opening hours from a per-country
+// [OpeningHoursAdapter]. ADDITIVE: the legacy `Station.is24h` /
+// `openingHoursText` and this entity's `openingTimes` / `wholeDay` stay
+// for back-compat; until a country's adapter lands this is null and the
+// display layer falls back through `legacyOpeningHoursBridge`.
+ WeeklyOpeningHours? get openingHours;
 /// Create a copy of StationDetail
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -400,16 +405,16 @@ $StationDetailCopyWith<StationDetail> get copyWith => _$StationDetailCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StationDetail&&(identical(other.station, station) || other.station == station)&&const DeepCollectionEquality().equals(other.openingTimes, openingTimes)&&const DeepCollectionEquality().equals(other.overrides, overrides)&&(identical(other.wholeDay, wholeDay) || other.wholeDay == wholeDay)&&(identical(other.state, state) || other.state == state));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StationDetail&&(identical(other.station, station) || other.station == station)&&const DeepCollectionEquality().equals(other.openingTimes, openingTimes)&&const DeepCollectionEquality().equals(other.overrides, overrides)&&(identical(other.wholeDay, wholeDay) || other.wholeDay == wholeDay)&&(identical(other.state, state) || other.state == state)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,station,const DeepCollectionEquality().hash(openingTimes),const DeepCollectionEquality().hash(overrides),wholeDay,state);
+int get hashCode => Object.hash(runtimeType,station,const DeepCollectionEquality().hash(openingTimes),const DeepCollectionEquality().hash(overrides),wholeDay,state,openingHours);
 
 @override
 String toString() {
-  return 'StationDetail(station: $station, openingTimes: $openingTimes, overrides: $overrides, wholeDay: $wholeDay, state: $state)';
+  return 'StationDetail(station: $station, openingTimes: $openingTimes, overrides: $overrides, wholeDay: $wholeDay, state: $state, openingHours: $openingHours)';
 }
 
 
@@ -420,11 +425,11 @@ abstract mixin class $StationDetailCopyWith<$Res>  {
   factory $StationDetailCopyWith(StationDetail value, $Res Function(StationDetail) _then) = _$StationDetailCopyWithImpl;
 @useResult
 $Res call({
- Station station, List<OpeningTime> openingTimes, List<String> overrides, bool wholeDay, String? state
+ Station station, List<OpeningTime> openingTimes, List<String> overrides, bool wholeDay, String? state, WeeklyOpeningHours? openingHours
 });
 
 
-$StationCopyWith<$Res> get station;
+$StationCopyWith<$Res> get station;$WeeklyOpeningHoursCopyWith<$Res>? get openingHours;
 
 }
 /// @nodoc
@@ -437,14 +442,15 @@ class _$StationDetailCopyWithImpl<$Res>
 
 /// Create a copy of StationDetail
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? station = null,Object? openingTimes = null,Object? overrides = null,Object? wholeDay = null,Object? state = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? station = null,Object? openingTimes = null,Object? overrides = null,Object? wholeDay = null,Object? state = freezed,Object? openingHours = freezed,}) {
   return _then(_self.copyWith(
 station: null == station ? _self.station : station // ignore: cast_nullable_to_non_nullable
 as Station,openingTimes: null == openingTimes ? _self.openingTimes : openingTimes // ignore: cast_nullable_to_non_nullable
 as List<OpeningTime>,overrides: null == overrides ? _self.overrides : overrides // ignore: cast_nullable_to_non_nullable
 as List<String>,wholeDay: null == wholeDay ? _self.wholeDay : wholeDay // ignore: cast_nullable_to_non_nullable
 as bool,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,openingHours: freezed == openingHours ? _self.openingHours : openingHours // ignore: cast_nullable_to_non_nullable
+as WeeklyOpeningHours?,
   ));
 }
 /// Create a copy of StationDetail
@@ -455,6 +461,18 @@ $StationCopyWith<$Res> get station {
   
   return $StationCopyWith<$Res>(_self.station, (value) {
     return _then(_self.copyWith(station: value));
+  });
+}/// Create a copy of StationDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WeeklyOpeningHoursCopyWith<$Res>? get openingHours {
+    if (_self.openingHours == null) {
+    return null;
+  }
+
+  return $WeeklyOpeningHoursCopyWith<$Res>(_self.openingHours!, (value) {
+    return _then(_self.copyWith(openingHours: value));
   });
 }
 }
@@ -538,10 +556,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Station station,  List<OpeningTime> openingTimes,  List<String> overrides,  bool wholeDay,  String? state)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Station station,  List<OpeningTime> openingTimes,  List<String> overrides,  bool wholeDay,  String? state,  WeeklyOpeningHours? openingHours)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StationDetail() when $default != null:
-return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,_that.state);case _:
+return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,_that.state,_that.openingHours);case _:
   return orElse();
 
 }
@@ -559,10 +577,10 @@ return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Station station,  List<OpeningTime> openingTimes,  List<String> overrides,  bool wholeDay,  String? state)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Station station,  List<OpeningTime> openingTimes,  List<String> overrides,  bool wholeDay,  String? state,  WeeklyOpeningHours? openingHours)  $default,) {final _that = this;
 switch (_that) {
 case _StationDetail():
-return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,_that.state);case _:
+return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,_that.state,_that.openingHours);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -579,10 +597,10 @@ return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Station station,  List<OpeningTime> openingTimes,  List<String> overrides,  bool wholeDay,  String? state)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Station station,  List<OpeningTime> openingTimes,  List<String> overrides,  bool wholeDay,  String? state,  WeeklyOpeningHours? openingHours)?  $default,) {final _that = this;
 switch (_that) {
 case _StationDetail() when $default != null:
-return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,_that.state);case _:
+return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,_that.state,_that.openingHours);case _:
   return null;
 
 }
@@ -594,7 +612,7 @@ return $default(_that.station,_that.openingTimes,_that.overrides,_that.wholeDay,
 
 
 class _StationDetail implements StationDetail {
-  const _StationDetail({required this.station, final  List<OpeningTime> openingTimes = const [], final  List<String> overrides = const [], this.wholeDay = false, this.state}): _openingTimes = openingTimes,_overrides = overrides;
+  const _StationDetail({required this.station, final  List<OpeningTime> openingTimes = const [], final  List<String> overrides = const [], this.wholeDay = false, this.state, this.openingHours}): _openingTimes = openingTimes,_overrides = overrides;
   
 
 @override final  Station station;
@@ -614,6 +632,12 @@ class _StationDetail implements StationDetail {
 
 @override@JsonKey() final  bool wholeDay;
 @override final  String? state;
+// Epic C1 (#2708) — structured opening hours from a per-country
+// [OpeningHoursAdapter]. ADDITIVE: the legacy `Station.is24h` /
+// `openingHoursText` and this entity's `openingTimes` / `wholeDay` stay
+// for back-compat; until a country's adapter lands this is null and the
+// display layer falls back through `legacyOpeningHoursBridge`.
+@override final  WeeklyOpeningHours? openingHours;
 
 /// Create a copy of StationDetail
 /// with the given fields replaced by the non-null parameter values.
@@ -625,16 +649,16 @@ _$StationDetailCopyWith<_StationDetail> get copyWith => __$StationDetailCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StationDetail&&(identical(other.station, station) || other.station == station)&&const DeepCollectionEquality().equals(other._openingTimes, _openingTimes)&&const DeepCollectionEquality().equals(other._overrides, _overrides)&&(identical(other.wholeDay, wholeDay) || other.wholeDay == wholeDay)&&(identical(other.state, state) || other.state == state));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StationDetail&&(identical(other.station, station) || other.station == station)&&const DeepCollectionEquality().equals(other._openingTimes, _openingTimes)&&const DeepCollectionEquality().equals(other._overrides, _overrides)&&(identical(other.wholeDay, wholeDay) || other.wholeDay == wholeDay)&&(identical(other.state, state) || other.state == state)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,station,const DeepCollectionEquality().hash(_openingTimes),const DeepCollectionEquality().hash(_overrides),wholeDay,state);
+int get hashCode => Object.hash(runtimeType,station,const DeepCollectionEquality().hash(_openingTimes),const DeepCollectionEquality().hash(_overrides),wholeDay,state,openingHours);
 
 @override
 String toString() {
-  return 'StationDetail(station: $station, openingTimes: $openingTimes, overrides: $overrides, wholeDay: $wholeDay, state: $state)';
+  return 'StationDetail(station: $station, openingTimes: $openingTimes, overrides: $overrides, wholeDay: $wholeDay, state: $state, openingHours: $openingHours)';
 }
 
 
@@ -645,11 +669,11 @@ abstract mixin class _$StationDetailCopyWith<$Res> implements $StationDetailCopy
   factory _$StationDetailCopyWith(_StationDetail value, $Res Function(_StationDetail) _then) = __$StationDetailCopyWithImpl;
 @override @useResult
 $Res call({
- Station station, List<OpeningTime> openingTimes, List<String> overrides, bool wholeDay, String? state
+ Station station, List<OpeningTime> openingTimes, List<String> overrides, bool wholeDay, String? state, WeeklyOpeningHours? openingHours
 });
 
 
-@override $StationCopyWith<$Res> get station;
+@override $StationCopyWith<$Res> get station;@override $WeeklyOpeningHoursCopyWith<$Res>? get openingHours;
 
 }
 /// @nodoc
@@ -662,14 +686,15 @@ class __$StationDetailCopyWithImpl<$Res>
 
 /// Create a copy of StationDetail
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? station = null,Object? openingTimes = null,Object? overrides = null,Object? wholeDay = null,Object? state = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? station = null,Object? openingTimes = null,Object? overrides = null,Object? wholeDay = null,Object? state = freezed,Object? openingHours = freezed,}) {
   return _then(_StationDetail(
 station: null == station ? _self.station : station // ignore: cast_nullable_to_non_nullable
 as Station,openingTimes: null == openingTimes ? _self._openingTimes : openingTimes // ignore: cast_nullable_to_non_nullable
 as List<OpeningTime>,overrides: null == overrides ? _self._overrides : overrides // ignore: cast_nullable_to_non_nullable
 as List<String>,wholeDay: null == wholeDay ? _self.wholeDay : wholeDay // ignore: cast_nullable_to_non_nullable
 as bool,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,openingHours: freezed == openingHours ? _self.openingHours : openingHours // ignore: cast_nullable_to_non_nullable
+as WeeklyOpeningHours?,
   ));
 }
 
@@ -681,6 +706,18 @@ $StationCopyWith<$Res> get station {
   
   return $StationCopyWith<$Res>(_self.station, (value) {
     return _then(_self.copyWith(station: value));
+  });
+}/// Create a copy of StationDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WeeklyOpeningHoursCopyWith<$Res>? get openingHours {
+    if (_self.openingHours == null) {
+    return null;
+  }
+
+  return $WeeklyOpeningHoursCopyWith<$Res>(_self.openingHours!, (value) {
+    return _then(_self.copyWith(openingHours: value));
   });
 }
 }
