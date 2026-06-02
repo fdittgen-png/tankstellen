@@ -3651,14 +3651,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Umkreis-Alarme prüfen derzeit nur Tankstellen in Deutschland.';
 
   @override
-  String get approachOverlaySection => 'Tankstellen-Annäherungs-Overlay';
+  String get approachOverlaySection => 'Tankstellen-Radar';
 
   @override
   String get approachRadiusLabel => 'Radius';
 
   @override
   String approachRadiusCaption(String km) {
-    return 'Overlay vergrößert sich und zeigt den Preis an, wenn Sie sich innerhalb von $km km einer Tankstelle befinden';
+    return 'Der Radar zeigt den Preis an, wenn Sie sich innerhalb von $km km einer Tankstelle befinden';
   }
 
   @override
@@ -3679,23 +3679,33 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get approachTestSimulateButton => 'Annäherungs-Overlay testen';
+  String get approachTestSimulateButton => 'Tankstellen-Radar testen';
 
   @override
   String get approachTestStopButton => 'Test stoppen';
 
   @override
   String approachTestActiveCaption(String station) {
-    return 'Test läuft – Overlay zeigt den Preis für $station';
+    return 'Test läuft – Radar zeigt den Preis für $station';
   }
 
   @override
   String get approachTestUnavailable =>
-      'Fügen Sie einen Favoriten hinzu, um das Annäherungs-Overlay zu testen';
+      'Fügen Sie einen Favoriten hinzu, um den Tankstellen-Radar zu testen';
 
   @override
   String approachStationDistance(String meters) {
     return '$meters m entfernt';
+  }
+
+  @override
+  String fuelStationRadarDistanceKm(String km) {
+    return '$km km entfernt';
+  }
+
+  @override
+  String fuelStationRadarProximity(int percent) {
+    return 'Nähe $percent%';
   }
 
   @override
@@ -6625,7 +6635,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripPathLegendWasteful => 'Verschwenderisch (≥ 10 L/100km)';
 
   @override
-  String get tripRadarClosestStation => 'Nächste Tankstelle';
+  String get tripRadarClosestStation => 'Tankstellen-Radar';
 
   @override
   String get tripRadarScanning => 'Suche nach Tankstellen in der Nähe';
@@ -6634,13 +6644,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRadarNoStationNearby => 'Keine Tankstelle in der Nähe';
 
   @override
-  String get tripRadarNoOtherStation => 'Keine weitere Tankstelle in der Nähe';
+  String get fuelStationRadarNearer => 'Nähere Tankstelle';
 
   @override
-  String get tripRadarIgnoreStation => 'Diese Tankstelle ignorieren';
-
-  @override
-  String get tripRadarShowPrevious => 'Vorherige Tankstelle anzeigen';
+  String get fuelStationRadarFarther => 'Weiter entfernte Tankstelle';
 
   @override
   String get tripRecordingPinTooltip =>

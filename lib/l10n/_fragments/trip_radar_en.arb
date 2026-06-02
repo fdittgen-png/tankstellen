@@ -1,7 +1,7 @@
 {
-  "tripRadarClosestStation": "Closest station",
+  "tripRadarClosestStation": "Fuel Station Radar",
   "@tripRadarClosestStation": {
-    "description": "Title of the closest-station radar card at the top of the active trip-recording screen (#2380)."
+    "description": "Title of the Fuel Station Radar card at the top of the active trip-recording screen (#2380 / #2661)."
   },
   "tripRadarScanning": "Scanning for nearby stations",
   "@tripRadarScanning": {
@@ -11,16 +11,12 @@
   "@tripRadarNoStationNearby": {
     "description": "Placeholder shown on the trip-recording radar card when no fuel station is within range of the live GPS fix (#2380)."
   },
-  "tripRadarNoOtherStation": "No other station nearby",
-  "@tripRadarNoOtherStation": {
-    "description": "Toast shown on the trip-recording radar card when the driver swipes past every nearby station and there is no further candidate to advance to (#2633)."
+  "fuelStationRadarNearer": "Nearer station",
+  "@fuelStationRadarNearer": {
+    "description": "Swipe-left hint / screen-reader action on the Fuel Station Radar card: page to the next-nearer station in the distance-ranked list (#2661)."
   },
-  "tripRadarIgnoreStation": "Ignore this station",
-  "@tripRadarIgnoreStation": {
-    "description": "Swipe-left hint / screen-reader action on the trip-recording radar card: ignore the currently shown station and advance to the next nearby candidate (#2633)."
-  },
-  "tripRadarShowPrevious": "Show previous station",
-  "@tripRadarShowPrevious": {
-    "description": "Swipe-right hint / screen-reader action on the trip-recording radar card: restore the most-recently-ignored station (#2633)."
+  "fuelStationRadarFarther": "Farther station",
+  "@fuelStationRadarFarther": {
+    "description": "Swipe-right hint / screen-reader action on the Fuel Station Radar card: page to the next-farther station in the distance-ranked list (#2661)."
   }
 }

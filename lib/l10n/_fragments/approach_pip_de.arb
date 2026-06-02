@@ -5,5 +5,19 @@
     "placeholders": {
       "meters": {"type": "String", "example": "350"}
     }
+  },
+  "fuelStationRadarDistanceKm": "{km} km entfernt",
+  "@fuelStationRadarDistanceKm": {
+    "description": "Fuel Station Radar caption (#2661) showing how far the driver is from the radar station while still approaching, in kilometres.",
+    "placeholders": {
+      "km": {"type": "String", "example": "2.4"}
+    }
+  },
+  "fuelStationRadarProximity": "Nähe {percent}%",
+  "@fuelStationRadarProximity": {
+    "description": "Accessibility label for the battery-style proximity fill bar (#2661): how close the driver is to the radar station, as a percentage (100% at the station, 0% at the radar radius edge).",
+    "placeholders": {
+      "percent": {"type": "int", "example": "60"}
+    }
   }
 }

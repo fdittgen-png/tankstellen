@@ -3613,14 +3613,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Radius alerts currently only check stations in Germany.';
 
   @override
-  String get approachOverlaySection => 'Approach-station overlay';
+  String get approachOverlaySection => 'Fuel Station Radar';
 
   @override
   String get approachRadiusLabel => 'Radius';
 
   @override
   String approachRadiusCaption(String km) {
-    return 'Overlay grows + shows the price when within $km km of a fuel station';
+    return 'Radar leads with the price when within $km km of a fuel station';
   }
 
   @override
@@ -3641,23 +3641,33 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get approachTestSimulateButton => 'Test approach overlay';
+  String get approachTestSimulateButton => 'Test Fuel Station Radar';
 
   @override
   String get approachTestStopButton => 'Stop test';
 
   @override
   String approachTestActiveCaption(String station) {
-    return 'Test active — overlay shows the price for $station';
+    return 'Test active — radar shows the price for $station';
   }
 
   @override
   String get approachTestUnavailable =>
-      'Add a favorite station to test the approach overlay';
+      'Add a favorite station to test the Fuel Station Radar';
 
   @override
   String approachStationDistance(String meters) {
     return '$meters m away';
+  }
+
+  @override
+  String fuelStationRadarDistanceKm(String km) {
+    return '$km km away';
+  }
+
+  @override
+  String fuelStationRadarProximity(int percent) {
+    return 'Proximity $percent%';
   }
 
   @override
@@ -6553,7 +6563,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
 
   @override
-  String get tripRadarClosestStation => 'Closest station';
+  String get tripRadarClosestStation => 'Fuel Station Radar';
 
   @override
   String get tripRadarScanning => 'Scanning for nearby stations';
@@ -6562,13 +6572,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRadarNoStationNearby => 'No station nearby';
 
   @override
-  String get tripRadarNoOtherStation => 'No other station nearby';
+  String get fuelStationRadarNearer => 'Nearer station';
 
   @override
-  String get tripRadarIgnoreStation => 'Ignore this station';
-
-  @override
-  String get tripRadarShowPrevious => 'Show previous station';
+  String get fuelStationRadarFarther => 'Farther station';
 
   @override
   String get tripRecordingPinTooltip =>
@@ -10601,14 +10608,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Řáđîúš áłéřŧš çúřřéñŧłý óñłý çĥéçķ šŧáŧîóñš îñ Ǧéřɱáñý. ·····················⟧';
 
   @override
-  String get approachOverlaySection => '⟦Áƥƥřóáçĥ-šŧáŧîóñ óṽéřłáý ··········⟧';
+  String get approachOverlaySection => '⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧';
 
   @override
   String get approachRadiusLabel => '⟦Řáđîúš ···⟧';
 
   @override
   String approachRadiusCaption(String km) {
-    return '⟦Óṽéřłáý ǧřóŵš + šĥóŵš ŧĥé ƥřîçé ŵĥéñ ŵîŧĥîñ $km ķɱ óƒ á ƒúéł šŧáŧîóñ ·······················⟧';
+    return '⟦Řáđář łéáđš ŵîŧĥ ŧĥé ƥřîçé ŵĥéñ ŵîŧĥîñ $km ķɱ óƒ á ƒúéł šŧáŧîóñ ······················⟧';
   }
 
   @override
@@ -10630,23 +10637,34 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String get approachTestSimulateButton => '⟦Ŧéšŧ áƥƥřóáçĥ óṽéřłáý ·········⟧';
+  String get approachTestSimulateButton =>
+      '⟦Ŧéšŧ Ƒúéł Šŧáŧîóñ Řáđář ·········⟧';
 
   @override
   String get approachTestStopButton => '⟦Šŧóƥ ŧéšŧ ····⟧';
 
   @override
   String approachTestActiveCaption(String station) {
-    return '⟦Ŧéšŧ áçŧîṽé — óṽéřłáý šĥóŵš ŧĥé ƥřîçé ƒóř $station ···············⟧';
+    return '⟦Ŧéšŧ áçŧîṽé — řáđář šĥóŵš ŧĥé ƥřîçé ƒóř $station ··············⟧';
   }
 
   @override
   String get approachTestUnavailable =>
-      '⟦Áđđ á ƒáṽóřîŧé šŧáŧîóñ ŧó ŧéšŧ ŧĥé áƥƥřóáçĥ óṽéřłáý ···················⟧';
+      '⟦Áđđ á ƒáṽóřîŧé šŧáŧîóñ ŧó ŧéšŧ ŧĥé Ƒúéł Šŧáŧîóñ Řáđář ····················⟧';
 
   @override
   String approachStationDistance(String meters) {
     return '⟦$meters ɱ áŵáý ··⟧';
+  }
+
+  @override
+  String fuelStationRadarDistanceKm(String km) {
+    return '⟦$km ķɱ áŵáý ···⟧';
+  }
+
+  @override
+  String fuelStationRadarProximity(int percent) {
+    return '⟦Ƥřóẋîɱîŧý $percent% ····⟧';
   }
 
   @override
@@ -13629,7 +13647,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get tripPathLegendWasteful => '⟦Ŵášŧéƒúł (≥ 10 Ł/100ķɱ) ·····⟧';
 
   @override
-  String get tripRadarClosestStation => '⟦Çłóšéšŧ šŧáŧîóñ ······⟧';
+  String get tripRadarClosestStation => '⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧';
 
   @override
   String get tripRadarScanning => '⟦Šçáññîñǧ ƒóř ñéářƀý šŧáŧîóñš ···········⟧';
@@ -13638,13 +13656,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get tripRadarNoStationNearby => '⟦Ñó šŧáŧîóñ ñéářƀý ·······⟧';
 
   @override
-  String get tripRadarNoOtherStation => '⟦Ñó óŧĥéř šŧáŧîóñ ñéářƀý ·········⟧';
+  String get fuelStationRadarNearer => '⟦Ñéářéř šŧáŧîóñ ······⟧';
 
   @override
-  String get tripRadarIgnoreStation => '⟦Îǧñóřé ŧĥîš šŧáŧîóñ ········⟧';
-
-  @override
-  String get tripRadarShowPrevious => '⟦Šĥóŵ ƥřéṽîóúš šŧáŧîóñ ·········⟧';
+  String get fuelStationRadarFarther => '⟦Ƒářŧĥéř šŧáŧîóñ ······⟧';
 
   @override
   String get tripRecordingPinTooltip =>
