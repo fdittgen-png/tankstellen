@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
 import 'package:tankstellen/features/station_services/portugal/portugal_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
@@ -40,13 +41,44 @@ class _FakeDgegAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
-Dio _dioWith(_FakeDgegAdapter adapter) {
+/// Routes by endpoint path so a search-then-detail flow can return distinct
+/// payloads (`PesquisarPostos` vs `GetDadosPostoMapa`).
+class _RoutingDgegAdapter implements HttpClientAdapter {
+  _RoutingDgegAdapter({required this.searchReply, required this.detailReply});
+
+  final Object searchReply;
+  final Object detailReply;
+  final List<RequestOptions> calls = [];
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls.add(options);
+    final reply =
+        options.uri.path.endsWith('/GetDadosPostoMapa') ? detailReply : searchReply;
+    return ResponseBody.fromString(
+      reply is String ? reply : jsonEncode(reply),
+      200,
+      headers: {
+        Headers.contentTypeHeader: ['application/json; charset=utf-8'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+Dio _dioWith(HttpClientAdapter adapter) {
   final dio = Dio();
   dio.httpClientAdapter = adapter;
   return dio;
 }
 
-PortugalStationService _serviceWith(_FakeDgegAdapter adapter) {
+PortugalStationService _serviceWith(HttpClientAdapter adapter) {
   return PortugalStationService(
     dio: _dioWith(adapter),
     baseUrl: 'https://fake.dgeg/api/PrecoComb',
@@ -90,17 +122,54 @@ const _lisboaParams = SearchParams(
   radiusKm: 10,
 );
 
+/// A DGEG `HorarioPosto` object (live `GetDadosPostoMapa` shape, #2714).
+const _open24Horario = {
+  'DiasUteis': 'Aberto 24 horas',
+  'Sabado': 'Aberto 24 horas',
+  'Domingo': 'Aberto 24 horas',
+  'Feriado': 'Aberto 24 horas',
+};
+
+const _rangeWithClosedSundayHorario = {
+  'DiasUteis': '07:00-18:00',
+  'Sabado': '07:00-18:00',
+  'Domingo': 'Fechado',
+  'Feriado': 'Fechado',
+};
+
+/// A canned `GetDadosPostoMapa` reply (nested `Morada`, no coordinates).
+Map<String, dynamic> _detailReply(Map<String, dynamic> horario) => {
+      'status': true,
+      'mensagem': 'sucesso',
+      'resultado': {
+        'Nome': 'RECHEIO Portimão',
+        'Marca': 'RECHEIO',
+        'HorarioPosto': horario,
+        'Morada': {
+          'Morada': 'Sítio do Poço Fojo',
+          'Localidade': 'Portimão',
+          'CodPostal': '8500-998',
+        },
+      },
+    };
+
 void main() {
   group('PortugalStationService (public surface)', () {
     test('implements StationService interface', () {
       expect(PortugalStationService(), isA<StationService>());
     });
 
-    test('getStationDetail throws ApiException', () {
-      expect(
-        () => PortugalStationService().getStationDetail('pt-123'),
-        throwsA(isA<Exception>()),
-      );
+    test('getStationDetail hits GetDadosPostoMapa with the bare numeric id',
+        () async {
+      final adapter = _FakeDgegAdapter(reply: _detailReply(_open24Horario));
+      final service = _serviceWith(adapter);
+
+      await service.getStationDetail('pt-93159');
+
+      final call = adapter.calls.single;
+      expect(call.uri.path, endsWith('/GetDadosPostoMapa'));
+      expect(call.uri.queryParameters['id'], '93159');
+      expect(call.uri.queryParameters['f'], 'json');
     });
 
     test('getPrices returns empty map with correct source', () async {
@@ -493,6 +562,107 @@ void main() {
       expect(
         PortugalStationService.parsePriceForTest(' 1 , 5 9 9 € '),
         closeTo(1.599, 0.0001),
+      );
+    });
+  });
+
+  group('getStationDetail (GetDadosPostoMapa — opening hours #2714)', () {
+    test('parses HorarioPosto "Aberto 24 horas" → open24h on the detail',
+        () async {
+      final service = _serviceWith(
+        _FakeDgegAdapter(reply: _detailReply(_open24Horario)),
+      );
+
+      final result = await service.getStationDetail('pt-93159');
+      final hours = result.data.openingHours;
+      expect(hours, isNotNull);
+      for (final d in kRegularWeekdays) {
+        expect(hours!.dayFor(d)?.state, DayState.open24h, reason: '$d');
+      }
+      expect(hours!.dayFor(OpeningDay.publicHoliday)?.state, DayState.open24h);
+      expect(result.source, ServiceSource.portugalApi);
+    });
+
+    test('parses day ranges + Fechado (Sun/Feriado closed)', () async {
+      final service = _serviceWith(
+        _FakeDgegAdapter(reply: _detailReply(_rangeWithClosedSundayHorario)),
+      );
+
+      final hours = (await service.getStationDetail('pt-80797')).data
+          .openingHours;
+      expect(hours!.dayFor(OpeningDay.mon)?.ranges.single.startMinutes, 7 * 60);
+      expect(hours.dayFor(OpeningDay.mon)?.ranges.single.endMinutes, 18 * 60);
+      expect(hours.dayFor(OpeningDay.sun)?.state, DayState.closed);
+      expect(hours.dayFor(OpeningDay.publicHoliday)?.state, DayState.closed);
+    });
+
+    test('falls back to the detail Morada when no search row is cached',
+        () async {
+      final service = _serviceWith(
+        _FakeDgegAdapter(reply: _detailReply(_open24Horario)),
+      );
+
+      final station = (await service.getStationDetail('pt-93159')).data.station;
+      expect(station.id, 'pt-93159');
+      expect(station.name, 'RECHEIO Portimão');
+      expect(station.street, 'Sítio do Poço Fojo');
+      expect(station.postCode, '8500-998');
+      expect(station.place, 'Portimão');
+    });
+
+    test('merges parsed hours onto the cached search row (coords + prices)',
+        () async {
+      // A path-routing fake: search returns the geo-complete dataset, detail
+      // returns the HorarioPosto-only payload for the same Id.
+      final search = {
+        'status': true,
+        'mensagem': 'sucesso',
+        'resultado': [
+          _row(
+            id: 93159,
+            name: 'GALP Lisboa',
+            lat: 38.7223,
+            lng: -9.1393,
+            fuel: 'Gasolina simples 95',
+            preco: '1,719 €',
+          ),
+        ],
+      };
+      final adapter = _RoutingDgegAdapter(
+        searchReply: search,
+        detailReply: _detailReply(_open24Horario),
+      );
+      final service = _serviceWith(adapter);
+
+      // Warm the in-memory dataset cache via a search first.
+      await service.searchStations(_lisboaParams);
+      final station =
+          (await service.getStationDetail('pt-93159')).data.station;
+
+      // Coordinates + price come from the cached search row …
+      expect(station.lat, closeTo(38.7223, 0.0001));
+      expect(station.lng, closeTo(-9.1393, 0.0001));
+      expect(station.e5, closeTo(1.719, 0.0001));
+      // … while name/brand/address are overlaid from the detail payload.
+      expect(station.name, 'RECHEIO Portimão');
+      expect(station.street, 'Sítio do Poço Fojo');
+    });
+
+    test('throws ApiException on a non-object detail response', () {
+      final service = _serviceWith(_FakeDgegAdapter(reply: '[]'));
+      expect(
+        () => service.getStationDetail('pt-1'),
+        throwsA(isA<ApiException>()),
+      );
+    });
+
+    test('throws ApiException on an HTTP error', () {
+      final service = _serviceWith(
+        _FakeDgegAdapter(reply: '<html>500</html>', statusCode: 500),
+      );
+      expect(
+        () => service.getStationDetail('pt-1'),
+        throwsA(isA<ApiException>()),
       );
     });
   });

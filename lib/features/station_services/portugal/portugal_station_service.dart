@@ -16,6 +16,9 @@ import '../../../core/services/station_service.dart';
 import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../station_detail/domain/opening_hours.dart';
+import 'portugal_detail_parser.dart';
+import 'portugal_opening_hours_adapter.dart';
 
 /// DGEG (Direção-Geral de Energia e Geologia) Portuguese fuel price service.
 ///
@@ -270,14 +273,73 @@ class PortugalStationService
     return double.tryParse(cleaned);
   }
 
-  // #2264 — route the unsupported endpoints through the shared helpers
-  // (throwDetailUnavailable / emptyPricesResult) like the other services.
+  /// Fetches the DGEG `GetDadosPostoMapa` detail endpoint for [stationId] and
+  /// returns a [StationDetail] carrying the weekly opening hours parsed from
+  /// `HorarioPosto` (Epic #2707 C7, #2714). The detail endpoint has no
+  /// coordinates, so [PortugalDetailParser] merges its payload onto the cached
+  /// search row (coords + prices) — see that helper for the split-endpoint
+  /// rationale.
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
   ) async {
-    throwDetailUnavailable('DGEG API');
+    try {
+      final numericId = _stripCountryPrefix(stationId);
+      final response = await _dio.get<dynamic>(
+        '$_baseUrl/GetDadosPostoMapa',
+        queryParameters: {'id': numericId, 'f': 'json'},
+      );
+
+      final data = response.data;
+      if (data is! Map) {
+        throw const ApiException(
+          message: 'Invalid DGEG detail response (not an object)',
+        );
+      }
+      final resultado = data['resultado'];
+      if (resultado is! Map) {
+        throw const ApiException(
+          message: 'Invalid DGEG detail response (resultado is not an object)',
+        );
+      }
+
+      final weeklyHours =
+          const PortugalOpeningHoursAdapter().parse(resultado['HorarioPosto']);
+      final station = PortugalDetailParser.stationFromDetail(
+        stationId: stationId,
+        numericId: numericId,
+        resultado: resultado,
+        cachedSearchRow: PortugalDetailParser.cachedSearchRow(
+          numericId,
+          _cachedResultado,
+          parseAndFilter,
+        ),
+      );
+
+      return ServiceResult(
+        data: StationDetail(
+          station: station,
+          openingHours: weeklyHours.availability ==
+                  OpeningHoursAvailability.notProvided
+              ? null
+              : weeklyHours,
+        ),
+        source: ServiceSource.portugalApi,
+        fetchedAt: DateTime.now(),
+      );
+    } on DioException catch (e, st) {
+      throwApiException(
+        e,
+        defaultMessage: 'DGEG detail API error',
+        stackTrace: st,
+      );
+    }
   }
+
+  /// Strip the `pt-` prefix so the DGEG endpoint receives the bare numeric id.
+  /// Tolerant of legacy unprefixed favourites.
+  static String _stripCountryPrefix(String id) =>
+      id.startsWith('pt-') ? id.substring(3) : id;
 
   @override
   Future<ServiceResult<Map<String, StationPrices>>> getPrices(
