@@ -12,6 +12,11 @@ on:
       - 'docs/**'
       - 'LICENSE'
       - '.gitignore'
+      # #2568 — store-metadata-only changes never affect the Dart/Android
+      # build, so skip the heavy matrix. ci-docs-stub.yml triggers on these
+      # same paths and re-emits every required context so auto-merge fires.
+      - 'ios/fastlane/**'
+      - 'fastlane/metadata/**'
   pull_request:
     branches: [master]
     paths-ignore:
@@ -19,6 +24,9 @@ on:
       - 'docs/**'
       - 'LICENSE'
       - '.gitignore'
+      # #2568 — see the push trigger above; mirrored by ci-docs-stub.yml.
+      - 'ios/fastlane/**'
+      - 'fastlane/metadata/**'
   schedule:
     - cron: '0 6 * * 0'
   # #2128 — manual hatch so maintainers can re-fire CI on the active

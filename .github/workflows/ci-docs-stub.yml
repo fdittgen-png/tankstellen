@@ -4,13 +4,19 @@
 name: CI
 
 # Docs-only "stub" workflow. `ci.yml` carries `paths-ignore` for
-# `**/*.md`, `docs/**`, `LICENSE`, `.gitignore`, so on a docs-only PR
-# the real CI workflow never runs — which means none of its required
-# status-check contexts are ever reported, and branch protection would
-# pin the PR at `mergeStateStatus: BLOCKED` forever. This workflow is
-# the mirror image: it triggers ONLY on those same paths and re-emits
-# every required-check context as a trivial pass, so docs-only PRs
-# satisfy branch protection and keep auto-merge autonomy.
+# `**/*.md`, `docs/**`, `LICENSE`, `.gitignore` (and, since #2568, the
+# store-metadata paths `ios/fastlane/**`, `fastlane/metadata/**`), so on a
+# change touching ONLY those paths the real CI workflow never runs — which
+# means none of its required status-check contexts are ever reported, and
+# branch protection would pin the PR at `mergeStateStatus: BLOCKED`
+# forever. This workflow is the mirror image: it triggers ONLY on those
+# same paths and re-emits every required-check context as a trivial pass,
+# so docs-only / metadata-only PRs satisfy branch protection and keep
+# auto-merge autonomy.
+#
+# IMPORTANT: this `paths` set MUST stay the exact complement of `ci.yml`'s
+# `paths-ignore` — every path ignored there has to be triggered here, or a
+# PR touching only that path has no producer for the required contexts.
 #
 # CONTRACT (keep in lock-step with branch protection's
 # required_status_checks): every required context MUST have a job here
@@ -31,6 +37,10 @@ on:
       - 'docs/**'
       - 'LICENSE'
       - '.gitignore'
+      # #2568 — store-metadata paths ci.yml now path-ignores. The stub must
+      # produce the required contexts so metadata-only PRs aren't BLOCKED.
+      - 'ios/fastlane/**'
+      - 'fastlane/metadata/**'
   pull_request:
     branches: [master]
     paths:
@@ -38,6 +48,9 @@ on:
       - 'docs/**'
       - 'LICENSE'
       - '.gitignore'
+      # #2568 — see the push trigger above; complement of ci.yml paths-ignore.
+      - 'ios/fastlane/**'
+      - 'fastlane/metadata/**'
 
 jobs:
   analyze:
