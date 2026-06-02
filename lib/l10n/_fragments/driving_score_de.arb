@@ -22,5 +22,6 @@
   "gpsKpiPke": "Kinetischer Energiebedarf (PKE)",
   "gpsKpiVapos": "Beschleunigungsintensität (VAPOS)",
   "gpsKpiCoast": "Anteil Ausrollen",
-  "gpsKpiClimbEnergy": "Steigungsenergie"
+  "gpsKpiClimbEnergy": "Steigungsenergie",
+  "drivingScoreBaselineDelta": "{pct} gegenüber deinem Sparwert"
 }

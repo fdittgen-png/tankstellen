@@ -99,5 +99,14 @@
   "gpsKpiClimbEnergy": "Climb energy",
   "@gpsKpiClimbEnergy": {
     "description": "Label for the climb-energy-per-km KPI on the GPS efficiency card (#2695 C9) — metres climbed per kilometre, a potential-energy work proxy."
+  },
+  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "@drivingScoreBaselineDelta": {
+    "description": "Trip-detail line comparing this trip's average consumption to the driver's synced efficient baseline (#2696 C10). The placeholder is a pre-formatted signed percentage (e.g. '+8%' worse, '-5%' better). Hidden when there is no learned baseline yet.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
   }
 }

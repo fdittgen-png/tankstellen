@@ -145,4 +145,21 @@ class TripMetrics {
   static MapEntry<String, int> scoreEntry(TripHistoryEntry entry) {
     return MapEntry(entry.id, drivingScore(entry.summary));
   }
+
+  /// Signed percentage by which a trip's average consumption [tripAvg]
+  /// (L/100 km) differs from the driver's synced efficient [baseline]
+  /// (L/100 km) — `((tripAvg − baseline) / baseline) × 100` (#2696 C10).
+  ///
+  /// Positive = the trip burned MORE than the baseline (worse); negative =
+  /// the trip beat the baseline (better). Returns null when no comparison
+  /// is meaningful: a missing trip average, or a non-positive baseline
+  /// (`baseline <= 0` — e.g. the driver has no learned baseline yet, so the
+  /// caller shows nothing rather than a divide-by-zero or a fake 0 %).
+  static double? consumptionDelta({
+    required double? tripAvg,
+    required double? baseline,
+  }) {
+    if (tripAvg == null || baseline == null || baseline <= 0) return null;
+    return (tripAvg - baseline) / baseline * 100.0;
+  }
 }
