@@ -6,6 +6,7 @@ import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/obd2/trip_live_reading.dart';
 import '../driving_coaching.dart'
     show DrivingCoachingHint, gpsCoachingHint, recentSamplesWithin;
+import '../road_grade_calculator.dart';
 import '../trip_recorder.dart' show TripSample;
 import 'gps_live_fuel_estimator.dart';
 
@@ -87,6 +88,20 @@ class GpsLiveEstimateFolder {
   final GpsLiveFuelEstimator _estimator;
   final Duration _coachingWindow;
 
+  /// Road-grade estimator (#2654) — driven IDENTICALLY to
+  /// [BaselineRollingState]: 150 m window, 0.2 exp-smoothing,
+  /// minSamplesInWindow=5 confidence gate. Fed the running horizontal
+  /// distance + each fix's GPS altitude in [fold]; its confident grade is
+  /// passed straight into [GpsLiveFuelEstimator.onSample] so the existing
+  /// `m·g·gradeFraction` term (previously always zeroed because the folder
+  /// never supplied a grade) finally bites on hilly GPS-only trips.
+  final RoadGradeCalculator _gradeCalc = RoadGradeCalculator();
+
+  /// Running horizontal distance (metres) since the first fix — the grade
+  /// calculator's window axis. Accumulated from `speedMps · dt` per fold,
+  /// mirroring the estimator's own internal distance integral.
+  double _cumulativeDistanceM = 0;
+
   /// Previous fix's ground speed (m/s) + timestamp — the finite-diff basis
   /// the estimator needs for acceleration. Null before the first fix.
   double? _prevSpeedMps;
@@ -99,11 +114,13 @@ class GpsLiveEstimateFolder {
 
   /// Fold one GPS-stamped [sample] into the estimate + coaching state and
   /// return the new triplet. The sample's `speedKmh` drives the physics;
-  /// its `timestamp` + `altitudeM` feed the coaching window.
+  /// its `altitudeM` (with the running horizontal distance) drives the
+  /// road-grade term (#2654) and feeds the coaching window alongside its
+  /// `timestamp`.
   ///
   /// The first fold (no previous fix yet) only seeds the finite-diff basis
-  /// and returns null estimate figures, matching the GPS-only pipeline's
-  /// behaviour verbatim.
+  /// (and the grade window's first altitude point) and returns null estimate
+  /// figures, matching the GPS-only pipeline's behaviour verbatim.
   GpsLiveEstimate fold(TripSample sample) {
     final speedMps = sample.speedKmh / 3.6;
     double? instant;
@@ -111,13 +128,27 @@ class GpsLiveEstimateFolder {
     double? litersSoFar;
     final prevSpeed = _prevSpeedMps;
     final prevAt = _prevSampleAt;
-    if (prevSpeed != null && prevAt != null) {
-      final dt =
-          sample.timestamp.difference(prevAt).inMilliseconds / 1000.0;
+    final dt = prevAt == null
+        ? null
+        : sample.timestamp.difference(prevAt).inMilliseconds / 1000.0;
+    // Advance the running horizontal distance, then fold this fix's
+    // altitude in at the new cumulative distance — identical to how
+    // BaselineRollingState drives the calculator (#2654). A null altitude
+    // adds no point, so confidence never rises and the grade term stays
+    // gated off (honest); the first fix seeds the window at distance 0.
+    if (dt != null && dt > 0) _cumulativeDistanceM += speedMps * dt;
+    _gradeCalc.addSample(
+      cumulativeDistanceKm: _cumulativeDistanceM / 1000.0,
+      altitudeM: sample.altitudeM,
+    );
+    final grade = _gradeCalc.current;
+    if (prevSpeed != null && dt != null) {
       instant = _estimator.onSample(
         speedMps: speedMps,
         prevSpeedMps: prevSpeed,
         dtSeconds: dt,
+        gradeFraction: grade.gradeFraction,
+        gradeConfident: grade.confident,
       );
       avg = _estimator.runningAvgLPer100Km;
       final liters = _estimator.litersSoFar;
