@@ -32,14 +32,17 @@ import '../../../core/logging/error_logger.dart';
 ///   returns one `<place>` per station with `<name>`, `<cre_id>`, and
 ///   `<location><x/><y/></location>` (x = longitude, y = latitude).
 /// - `https://publicacionexterna.azurewebsites.net/publicaciones/prices`
-///   returns one `<place>` per station with one or more
-///   `<gas_price type="regular|premium|diesel">` children. Prices
-///   are Mexican pesos per litre.
+///   returns one or more `<place>` per station with
+///   `<gas_price type="regular|premium|diesel">` DIRECT children (verified
+///   #2704: 37 021/37 021 are direct, none nested under `<location>`). MXN/L.
 ///
 /// Both feeds are joined client-side by `place_id` to produce
 /// fully-populated [Station] records. The merged list is cached for
 /// 4 hours — the CRE dataset updates several times daily but rarely
 /// faster than that.
+///
+/// #2704 — grades map regular→e5, premium→e98 (high-octane, not the
+/// non-existent-in-MX e10), diesel→diesel. No brand/address in either feed.
 class MexicoStationService
     with StationServiceHelpers, CachedDatasetMixin
     implements StationService {
@@ -69,7 +72,11 @@ class MexicoStationService
             : PersistentDataset<List<_CreStation>>(
                 cache: cache,
                 countryCode: 'MX',
-                datasetName: 'stations',
+                // #2704 — bumped from 'stations' to 'stations.v2' so warm
+                // devices holding the pre-fix merged cache (truncated names,
+                // premium-in-e10) read-miss and re-pull immediately, instead
+                // of waiting out the 24-hour hard TTL.
+                datasetName: 'stations.v2',
                 source: ServiceSource.mexicoApi,
                 serialize: (stations) =>
                     {'stations': stations.map((s) => s.toJson()).toList()},
@@ -106,18 +113,27 @@ class MexicoStationService
       for (final c in cached) {
         final dist = distanceKm(params.lat, params.lng, c.lat, c.lng);
         if (dist > params.radiusKm) continue;
+        // #2704 — CRE's <name> is the operator's full company name
+        // ("TRENOGAS SA DE CV"), NOT a brand, with no brand/address field.
+        // `name.split(' ').first` used to truncate it to a fragment. Keep
+        // `brand` empty and mirror the full name into name + street so the
+        // card's hasBrand==false branch (station_card_status.dart:57/76, the
+        // #2161 fallback) shows the full name and collapses the empty
+        // postCode/place line — no fragment, no orphan comma. Grade mapping
+        // (option A, ARB-free): regular→e5, premium→e98 (high-octane, not the
+        // non-existent-in-MX e10), diesel→diesel. Labels = follow-up #2717.
         stations.add(Station(
           id: 'mx-${c.id}',
           name: c.name,
-          brand: c.name.split(' ').first,
-          street: '',
+          brand: '',
+          street: c.name,
           postCode: '',
           place: '',
           lat: c.lat,
           lng: c.lng,
           dist: dist,
           e5: c.regular,
-          e10: c.premium,
+          e98: c.premium,
           diesel: c.diesel,
           isOpen: true,
         ));
@@ -229,8 +245,10 @@ class MexicoStationService
     final out = <String, _CrePlace>{};
     for (final node in doc.findAllElements('place')) {
       try {
-        final id = node.getAttribute('place_id');
-        if (id == null) continue;
+        // #2704 — trim the join key on both feeds so a stray space never
+        // breaks the place↔price join.
+        final id = node.getAttribute('place_id')?.trim();
+        if (id == null || id.isEmpty) continue;
         final name =
             node.findElements('name').firstOrNull?.innerText.trim() ?? '';
         final location = node.findElements('location').firstOrNull;
@@ -256,9 +274,19 @@ class MexicoStationService
     final out = <String, _CrePrices>{};
     for (final node in doc.findAllElements('place')) {
       try {
-        final id = node.getAttribute('place_id');
-        if (id == null) continue;
-        double? regular, premium, diesel;
+        // #2704 — trim the join key: the prices feed splits a single
+        // station's grades across MULTIPLE <place> blocks with the SAME
+        // place_id (1 577 of ~14 k stations on the live feed). The previous
+        // `out[id] = _CrePrices(...)` did last-wins, so a station whose
+        // regular was in block A and premium in block B kept only B's grades
+        // and dropped the rest → "--" prices. Accumulate across blocks
+        // instead, keeping whatever each duplicate contributes.
+        final id = node.getAttribute('place_id')?.trim();
+        if (id == null || id.isEmpty) continue;
+        final prev = out[id];
+        double? regular = prev?.regular,
+            premium = prev?.premium,
+            diesel = prev?.diesel;
         for (final gp in node.findElements('gas_price')) {
           final type = gp.getAttribute('type');
           final value = double.tryParse(gp.innerText.trim());

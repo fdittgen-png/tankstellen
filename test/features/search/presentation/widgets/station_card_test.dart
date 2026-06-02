@@ -39,6 +39,42 @@ void main() {
       expect(find.textContaining('10115'), findsOneWidget);
     });
 
+    testWidgets(
+        'brand-less CRE station shows full name as title and NO orphan '
+        'comma in the address line (#2704)', (tester) async {
+      // #2704 — Mexican CRE stations carry no brand and no address: the
+      // service sets brand:'' and mirrors the full company name into both
+      // name and street, leaving postCode/place empty. The card's
+      // hasBrand==false branch must render the full name as the title and
+      // collapse the address line to blank — never a lone ", ".
+      const mxStation = Station(
+        id: 'mx-11702',
+        name: 'TRENOGAS SA DE CV',
+        brand: '',
+        street: 'TRENOGAS SA DE CV',
+        postCode: '',
+        place: '',
+        lat: 19.43,
+        lng: -99.13,
+        dist: 2.7,
+        e5: 22.95,
+        e98: 24.89,
+        diesel: 23.45,
+        isOpen: true,
+      );
+      await pumpApp(
+        tester,
+        const StationCard(station: mxStation, selectedFuelType: FuelType.e5),
+      );
+
+      expect(find.text('TRENOGAS SA DE CV'), findsOneWidget,
+          reason: 'full company name is the card title');
+      // The address line collapses to '' (postCode + place both empty);
+      // there must be no orphan comma anywhere on the card.
+      expect(find.text(', '), findsNothing);
+      expect(find.text(','), findsNothing);
+    });
+
     testWidgets('renders price for selected fuel type', (tester) async {
       await pumpApp(
         tester,

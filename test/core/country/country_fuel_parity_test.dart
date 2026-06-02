@@ -119,16 +119,20 @@ void main() {
       }
     });
 
-    test('regression: Mexico offers e10 (premium grade) not e98 (#2180)', () {
-      // MexicoStationService maps CRE "premium" onto Station.e10, never
-      // e98, so the picker offering e98 was a dead, unsearchable option.
-      expect(Countries.mexico.supportedFuelTypes, contains(FuelType.e10));
+    test('regression: Mexico offers e98 (premium grade) not e10 (#2704)', () {
+      // #2704 — MexicoStationService maps CRE "premium" (Mexico's
+      // high-octane 91–92 grade) onto Station.e98, never e10 (a European
+      // ethanol blend that does not exist in Mexico). The picker must offer
+      // e98 and must NOT offer e10, otherwise it surfaces an unsearchable
+      // grade and hides the one premium prices actually populate.
+      expect(Countries.mexico.supportedFuelTypes, contains(FuelType.e98));
       expect(
         Countries.mexico.supportedFuelTypes,
-        isNot(contains(FuelType.e98)),
-        reason: 'MX premium grade lands in the e10 slot, not e98',
+        isNot(contains(FuelType.e10)),
+        reason: 'MX premium grade lands in the e98 slot, not e10',
       );
-      expect(registrySet('MX'), contains(FuelType.e10));
+      expect(registrySet('MX'), contains(FuelType.e98));
+      expect(registrySet('MX'), isNot(contains(FuelType.e10)));
     });
 
     test('regression: Denmark offers e10 in BOTH structures (#2180)', () {
