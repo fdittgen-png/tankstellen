@@ -523,5 +523,38 @@ Date Heure  Num Ticket
         },
       );
     });
+
+    // -------------------------------------------------------------------
+    // #2689 — German-format receipt fixture (e-receipt Phase 1). DE
+    // receipts use comma decimals and the `BETRAG` / `Literpreis` labels.
+    // This locks in that the parser populates the four fields the
+    // fill-up scan now persists — liters + pricePerLiter + fuelType +
+    // stationName — so the discard→persist plumbing in the screen always
+    // has real values to thread through.
+    // -------------------------------------------------------------------
+    group('Aral DE-format receipt fixture (#2689)', () {
+      test(
+        'populates liters + pricePerLiter + fuelType + stationName from '
+        'comma-decimal BETRAG / Literpreis layout',
+        () {
+          final receipt = File(
+            'test/features/consumption/data/receipt_parser/'
+            'fixtures/aral_hamburg_2026-04-25.txt',
+          ).readAsStringSync();
+          final result = parser.parse(receipt);
+          expect(result.liters, closeTo(38.50, 0.01));
+          expect(result.totalCost, closeTo(69.26, 0.01));
+          expect(
+            result.pricePerLiter,
+            closeTo(1.799, 0.001),
+            reason: 'the scanned unit price the screen now persists',
+          );
+          expect(result.fuelType, FuelType.e10);
+          expect(result.stationName, contains('ARAL'));
+          expect(result.date, DateTime(2026, 4, 25));
+          expect(result.hasData, isTrue);
+        },
+      );
+    });
   });
 }

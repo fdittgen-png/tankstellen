@@ -1,0 +1,14 @@
+ARAL Tankstelle
+Bahrenfelder Chaussee 12
+22761 HAMBURG
+Tel 040 89 70 12
+
+QUITTUNG               KARTENZAHLUNG
+Datum 25.04.2026 08:14:37
+Zapfsaeule 2           Super E10
+Menge                  38,50 L
+Literpreis             1,799 EUR/L
+BETRAG                 69,26 EUR
+
+MwSt 19,00 %           11,06 EUR
+Netto                  58,20 EUR

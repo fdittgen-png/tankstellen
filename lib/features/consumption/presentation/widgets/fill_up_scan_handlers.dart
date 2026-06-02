@@ -49,6 +49,11 @@ class FillUpScanHostState {
   final void Function(bool) setScanningPump;
   final void Function(DateTime) setDate;
   final void Function(FuelType) setFuelType;
+
+  /// Stores the receipt-scanned unit price per litre on the host so the
+  /// saved [FillUp] carries the exact quoted price (#2689) instead of
+  /// only the `totalCost / liters` quotient.
+  final void Function(double) setScannedPricePerLiter;
   final void Function(ReceiptScanOutcome) setLastScan;
 
   /// `mounted` predicate from the host state — checked after every
@@ -81,6 +86,7 @@ class FillUpScanHostState {
     required this.setScanningPump,
     required this.setDate,
     required this.setFuelType,
+    required this.setScannedPricePerLiter,
     required this.setLastScan,
     required this.isMounted,
     required this.capturePumpImage,
@@ -133,6 +139,12 @@ Future<void> runReceiptScan(
     }
     if (result.date != null) {
       state.setDate(result.date!);
+    }
+    // #2689 — keep the exact scanned unit price so the saved FillUp
+    // preserves it verbatim rather than re-deriving totalCost / liters
+    // (which rounds differently and drifts if either field is edited).
+    if (result.pricePerLiter != null) {
+      state.setScannedPricePerLiter(result.pricePerLiter!);
     }
     // Only pre-select the fuel when there is no vehicle bound — the
     // vehicle's configured fuel always wins (#698 single source of

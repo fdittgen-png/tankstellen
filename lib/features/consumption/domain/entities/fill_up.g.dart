@@ -26,6 +26,7 @@ _FillUp _$FillUpFromJson(Map<String, dynamic> json) => _FillUp(
   isCorrection: json['isCorrection'] as bool? ?? false,
   fuelLevelBeforeL: (json['fuelLevelBeforeL'] as num?)?.toDouble(),
   fuelLevelAfterL: (json['fuelLevelAfterL'] as num?)?.toDouble(),
+  scannedPricePerLiter: (json['scannedPricePerLiter'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
@@ -44,4 +45,5 @@ Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
   'isCorrection': instance.isCorrection,
   'fuelLevelBeforeL': instance.fuelLevelBeforeL,
   'fuelLevelAfterL': instance.fuelLevelAfterL,
+  'scannedPricePerLiter': instance.scannedPricePerLiter,
 };

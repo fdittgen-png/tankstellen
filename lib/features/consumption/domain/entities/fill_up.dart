@@ -74,6 +74,18 @@ abstract class FillUp with _$FillUp {
     /// [fuelLevelBeforeL]. Existing fill-ups deserialise with null so
     /// historical data keeps working.
     double? fuelLevelAfterL,
+
+    /// Unit price per litre as printed on the scanned receipt / pump
+    /// display (#2689, e-receipt Phase 1). When the OCR parser reads a
+    /// `pricePerLiter` off the receipt it is persisted verbatim here,
+    /// preserving the exact quoted price (e.g. `1.999`) rather than the
+    /// `totalCost / liters` quotient — which rounds differently and can
+    /// drift when either field was hand-corrected after the scan. Null
+    /// when the fill-up was entered manually or the scan didn't read a
+    /// price; the [FillUpX.pricePerLiter] getter then falls back to the
+    /// computed quotient. Existing fill-ups deserialise with null so
+    /// historical data keeps working.
+    double? scannedPricePerLiter,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);
@@ -82,7 +94,13 @@ abstract class FillUp with _$FillUp {
 /// Convenience getters for an individual fill-up.
 extension FillUpX on FillUp {
   /// Price per liter in the store currency (e.g. EUR/L).
-  double get pricePerLiter => liters > 0 ? totalCost / liters : 0;
+  ///
+  /// Prefers the receipt-scanned [FillUp.scannedPricePerLiter] when one
+  /// was captured (#2689) so the exact quoted unit price is shown; falls
+  /// back to the `totalCost / liters` quotient for manually-entered
+  /// fill-ups (and a 0 guard when no litres were recorded).
+  double get pricePerLiter =>
+      scannedPricePerLiter ?? (liters > 0 ? totalCost / liters : 0);
 
   /// Estimated CO2 emissions for this fill-up, in kilograms.
   ///
