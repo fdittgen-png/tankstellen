@@ -32,6 +32,7 @@ import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
 import '../../search/domain/entities/station.dart';
+import 'prix_carburants_parsers.dart' as parser;
 
 /// Decode the flux ZIP [bytes], locate the inner XML entry, and parse every
 /// point-of-sale into a [Station] (distance 0 — the caller stamps it per
@@ -98,6 +99,17 @@ Station? parseFluxPdv(XmlElement pdv) {
   final adresse = pdv.findElements('adresse').firstOrNull?.innerText.trim() ?? '';
   final ville = pdv.findElements('ville').firstOrNull?.innerText.trim() ?? '';
 
+  // #2710 — the flux XML carries opening hours the legacy JSON feed flattened
+  // into `horaires_jour`. Flatten the `<horaires>/<jour>/<horaire>` tree into
+  // the SAME comma-joined `horaires_jour` form, then run it through the shared
+  // `parsePrixCarburantsOpeningHours` so the Station's legacy `openingHoursText`
+  // reads identically to the polling path (`Lundi 07:00-18:30`). The flux
+  // service rebuilds the structured `WeeklyOpeningHours` from this same text
+  // via [FranceOpeningHoursAdapter] (which tolerates `.`/`:` + any separator).
+  final rawHoraires = _flattenHoraires(pdv);
+  final openingHoursText = parser.parsePrixCarburantsOpeningHours(rawHoraires);
+  final is24h = _isAutomate24h(pdv);
+
   double? e5, e10, e98, diesel, e85, lpg;
   String? mostRecentMaj;
   for (final prix in pdv.findElements('prix')) {
@@ -153,7 +165,46 @@ Station? parseFluxPdv(XmlElement pdv) {
     isOpen: true,
     updatedAt: _formatMaj(mostRecentMaj),
     stationType: pop.isEmpty ? null : pop,
+    is24h: is24h,
+    openingHoursText: openingHoursText,
   );
+}
+
+/// Whether the `<horaires automate-24-24="1">` flag is set on the pdv's
+/// opening-hours element. The gouv.fr flux uses `"1"` for the 24/7 automate.
+bool _isAutomate24h(XmlElement pdv) {
+  final horaires = pdv.findElements('horaires').firstOrNull;
+  if (horaires == null) return false;
+  final flag = horaires.getAttribute('automate-24-24')?.trim();
+  return flag == '1' || flag?.toLowerCase() == 'oui';
+}
+
+/// Flatten the flux `<horaires>/<jour>/<horaire>` tree into the SAME
+/// comma-joined `horaires_jour` string the JSON feed publishes (e.g.
+/// `"Lundi07.00-18.30, Mardi08.00-12.00, Mardi14.00-19.00"`), so the single
+/// [FranceOpeningHoursAdapter] handles both feeds. Each `<jour>` carries its
+/// French `nom` + one or more `<horaire ouverture="HH.MM" fermeture="HH.MM"/>`
+/// children; split shifts become repeated `<jour>` entries. Returns `null`
+/// when the pdv carries no usable opening-hours element.
+String? _flattenHoraires(XmlElement pdv) {
+  final horaires = pdv.findElements('horaires').firstOrNull;
+  if (horaires == null) return null;
+
+  final parts = <String>[];
+  for (final jour in horaires.findElements('jour')) {
+    final nom = jour.getAttribute('nom')?.trim() ?? '';
+    if (nom.isEmpty) continue;
+    for (final h in jour.findElements('horaire')) {
+      final open = h.getAttribute('ouverture')?.trim();
+      final close = h.getAttribute('fermeture')?.trim();
+      if (open == null || close == null || open.isEmpty || close.isEmpty) {
+        continue;
+      }
+      parts.add('$nom$open-$close');
+    }
+  }
+  if (parts.isEmpty) return null;
+  return parts.join(', ');
 }
 
 /// GeoDecimal coordinate → WGS84 degrees (÷ 100000). Tolerates a value that is

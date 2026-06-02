@@ -203,12 +203,16 @@ void main() {
   });
 
   group('parsePrixCarburantsOpeningHours', () {
-    test('formats hours and strips Automate-24-24 prefix', () {
+    test('formats hours, strips Automate-24-24, and un-glues the day↔clock',
+        () {
       final out = parsePrixCarburantsOpeningHours(
         'Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30',
       );
       expect(out, isNotNull);
-      expect(out, contains('Lundi07:00-18:30'));
+      // #2710 — the missing-space bug is fixed: the day name is separated
+      // from its first clock (`Lundi 07:00-18:30`), never glued.
+      expect(out, contains('Lundi 07:00-18:30'));
+      expect(out, isNot(contains('Lundi07:00')));
       expect(out, isNot(contains('Automate-24-24')));
       expect(out, isNot(contains(', ')));
     });
