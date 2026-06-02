@@ -11,6 +11,8 @@ TripSample _s(
   double? lat,
   double? lng,
   double? altM,
+  double? bearingDeg,
+  double? hAccuracyM,
 }) =>
     TripSample(
       timestamp: t,
@@ -19,6 +21,8 @@ TripSample _s(
       latitude: lat,
       longitude: lng,
       altitudeM: altM,
+      bearingDeg: bearingDeg,
+      hAccuracyM: hAccuracyM,
     );
 
 Iterable<TripSample> _constantSpeed({
@@ -195,6 +199,111 @@ void main() {
         )!;
         expect(f.gradeClimbMeters, 0);
         expect(f.gradeDescentMeters, 0);
+      });
+    });
+
+    group('cornering load (#2655 — revived from persisted bearing)', () {
+      test('a curvy track accumulates cornerLoadIntegral + a sharp-corner '
+          'event', () {
+        // 80 km/h ≈ 22.2 m/s. Sweep the bearing through a tight turn:
+        // 90° → 130° over 1 s = 40°/s ≈ 0.698 rad/s yaw-rate.
+        // a_lat ≈ v · ω = 22.2 · 0.698 ≈ 15.5 m/s² — well past the
+        // ~3.5 m/s² sharp-corner threshold, so it fires an event.
+        final samples = <TripSample>[];
+        var bearing = 90.0;
+        for (var i = 0; i <= 6; i++) {
+          samples.add(_s(
+            t0.add(Duration(seconds: i)),
+            80,
+            lat: 45,
+            lng: 5 + i * 0.0002,
+            bearingDeg: bearing,
+            hAccuracyM: 4,
+          ));
+          bearing += 40; // 40°/s sweep
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.cornerLoadIntegral, greaterThan(0));
+        expect(f.sharpCornerEvents, greaterThanOrEqualTo(1));
+      });
+
+      test('a straight track (constant bearing) has ~0 corner load', () {
+        final samples = <TripSample>[];
+        for (var i = 0; i <= 30; i++) {
+          samples.add(_s(
+            t0.add(Duration(seconds: i)),
+            80,
+            lat: 45,
+            lng: 5 + i * 0.0002,
+            bearingDeg: 90, // dead straight
+            hAccuracyM: 4,
+          ));
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.cornerLoadIntegral, closeTo(0.0, 0.001));
+        expect(f.sharpCornerEvents, 0);
+      });
+
+      test('bearing wrap-around 350° → 10° is a +20° delta, not −340°', () {
+        // Crossing true-north: at low yaw the wrap must NOT manufacture a
+        // huge phantom corner. 350 → 10 over 1 s = +20°/s ≈ 0.349 rad/s.
+        // At 36 km/h (10 m/s) a_lat ≈ 3.49 m/s² — just under threshold,
+        // so it contributes to the integral but stays a gentle bend, and
+        // the integral must be small (it would be ~17× larger if the
+        // delta were mis-computed as 340°).
+        final samples = <TripSample>[
+          _s(t0, 36, lat: 45, lng: 5, bearingDeg: 350, hAccuracyM: 4),
+          _s(t0.add(const Duration(seconds: 1)), 36,
+              lat: 45, lng: 5.0002, bearingDeg: 10, hAccuracyM: 4),
+          _s(t0.add(const Duration(seconds: 2)), 36,
+              lat: 45, lng: 5.0004, bearingDeg: 10, hAccuracyM: 4),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        // a_lat·dt for the +20° step = 10 m/s · 0.349 rad/s · 1 s ≈ 3.49.
+        // A −340° mis-read would give ≈ 59.3 — assert we are in the small
+        // regime, proving the signed-minimal-delta wrap handling.
+        expect(f.cornerLoadIntegral, closeTo(3.49, 0.3));
+        expect(f.sharpCornerEvents, 0);
+      });
+
+      test('legacy samples without bearing stay at 0 (no crash)', () {
+        // Pre-#2650 trips carry bearingDeg == null on every sample. The
+        // term must gracefully degrade to the historical hard-zero.
+        final samples = <TripSample>[];
+        for (var i = 0; i <= 30; i++) {
+          samples.add(_s(
+            t0.add(Duration(seconds: i)),
+            80,
+            lat: 45,
+            lng: 5 + i * 0.0002,
+            // bearingDeg omitted → null
+          ));
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.cornerLoadIntegral, 0);
+        expect(f.sharpCornerEvents, 0);
+      });
+
+      test('a low-accuracy fix is gated out of the corner integral', () {
+        // Same tight 40°/s sweep as the curvy test, but every fix is
+        // jittery (hAccuracyM = 40 m). The accuracy gate must reject it
+        // so a bad fix doesn't manufacture a phantom corner.
+        final samples = <TripSample>[];
+        var bearing = 90.0;
+        for (var i = 0; i <= 6; i++) {
+          samples.add(_s(
+            t0.add(Duration(seconds: i)),
+            80,
+            lat: 45,
+            lng: 5 + i * 0.0002,
+            bearingDeg: bearing,
+            hAccuracyM: 40, // jittery — beyond the gate
+          ));
+          bearing += 40;
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.cornerLoadIntegral, 0);
+        expect(f.sharpCornerEvents, 0);
       });
     });
 

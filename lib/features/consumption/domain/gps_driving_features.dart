@@ -1,8 +1,24 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:math' as math;
+
 import '../../../core/utils/geo_utils.dart' as geo;
 import 'trip_recorder.dart';
+
+/// Lateral-acceleration threshold (m/s²) above which a turn counts as a
+/// "sharp corner" event. 3.5 m/s² ≈ 0.36 g — the telematics convention
+/// for a harsh-cornering event (Digital Matter 3.5 m/s²; Verizon 0.4 g
+/// sustained; Geotab ~0.47 g). We sit at the conservative end of that
+/// band so a brisk-but-controlled bend doesn't trip it.
+const double kSharpCornerThresholdMps2 = 3.5;
+
+/// Horizontal-accuracy ceiling (m) for trusting a fix's bearing in the
+/// corner-load integral. A jittery fix (urban canyon / cold start)
+/// reports a noisy heading that would manufacture a phantom corner, so
+/// fixes worse than this are skipped — "a bad fix is worse than no fix"
+/// (HDOP > 2.5–3.0 / accuracy > 10 m, per the GNSS telematics guidance).
+const double kCornerAccuracyGateM = 10.0;
 
 /// Driving-style aggregate derived from a stream of [TripSample]s
 /// **without** any OBD2 telemetry — the lean feature set the GPS
@@ -76,9 +92,18 @@ class GpsDrivingFeatures {
   /// deltas summed). Reserved.
   final double gradeDescentMeters;
 
-  /// Heading-rate × speed² integral — a proxy for lateral g-load over
-  /// the trajet. Higher = more aggressive cornering. Reserved.
+  /// Lateral-acceleration integral over the trajet (m/s² · s), a proxy
+  /// for cumulative cornering g-load. Computed from the persisted
+  /// `bearingDeg` (#2650): per segment `a_lat ≈ v · (dBearing/dt)`
+  /// (yaw-rate × speed), accumulated as `|a_lat| · dt`. Higher = more
+  /// aggressive cornering. Stays `0` on legacy trips that predate the
+  /// persisted heading (#2655) and on fixes the accuracy gate rejects.
   final double cornerLoadIntegral;
+
+  /// Count of sharp-corner events: segments whose lateral acceleration
+  /// `|a_lat|` exceeds [kSharpCornerThresholdMps2] (#2655). Counted once
+  /// per qualifying segment; `0` when heading is absent (legacy trips).
+  final int sharpCornerEvents;
 
   const GpsDrivingFeatures({
     required this.idleSeconds,
@@ -94,6 +119,7 @@ class GpsDrivingFeatures {
     required this.gradeClimbMeters,
     required this.gradeDescentMeters,
     required this.cornerLoadIntegral,
+    this.sharpCornerEvents = 0,
   });
 
   /// Idle share of the trajet (0.0–1.0). Used by the matrix's
@@ -111,6 +137,13 @@ class GpsDrivingFeatures {
   /// `accelEventCost` term. Returns 0 for zero-distance trajets.
   double get accelEventsPerKm =>
       distanceKm > 0 ? accelEvents / distanceKm : 0.0;
+
+  /// Sharp-corner events per km (#2655) — the cornering analogue of
+  /// [accelEventsPerKm], normalised so a long calm motorway leg with one
+  /// brisk exit ramp doesn't read worse than a short twisty drive.
+  /// Returns 0 for zero-distance trajets.
+  double get sharpCornersPerKm =>
+      distanceKm > 0 ? sharpCornerEvents / distanceKm : 0.0;
 
   /// Derives the feature aggregate from [samples]. Returns `null`
   /// when the stream is empty or carries fewer than 2 samples (one
@@ -139,6 +172,7 @@ class GpsDrivingFeatures {
     double maxAccelG = 0;
     double climb = 0, descent = 0;
     double cornerLoad = 0;
+    int sharpCorners = 0;
 
     // Acceleration-event detector state.
     bool inAccelEvent = false, inBrakeEvent = false;
@@ -211,12 +245,28 @@ class GpsDrivingFeatures {
         }
       }
 
-      // Corner-load integral: |Δheading| ≈ atan2(crossTrack) — we don't
-      // have heading directly, so approximate via successive bearings
-      // when 3 GPS-fixed samples are available. For v1 we keep this
-      // term at zero unless extended in #G; the 4-coef lean fit
-      // doesn't read it. Field stays present for the future expansion.
-      cornerLoad += 0;
+      // Corner-load integral (#2655). Now that #2650 persists `bearingDeg`
+      // on every sample, lateral acceleration follows from yaw-rate ×
+      // speed:  a_lat ≈ v · (dBearing/dt). The heading is null on legacy
+      // (pre-#2650) samples and on cars/paths that never reported one, so
+      // the term gracefully stays 0 for old data. Jittery fixes are gated
+      // out (a noisy bearing manufactures phantom corners — a bad fix is
+      // worse than no fix).
+      final pBear = prev.bearingDeg, cBear = cur.bearingDeg;
+      final pAcc = prev.hAccuracyM, cAcc = cur.hAccuracyM;
+      final accurate = (pAcc == null || pAcc <= kCornerAccuracyGateM) &&
+          (cAcc == null || cAcc <= kCornerAccuracyGateM);
+      if (pBear != null && cBear != null && accurate) {
+        // Signed minimal angular delta — handles the 0/360 wrap so a
+        // 350°→10° step is +20°, not −340° ((d+540) mod 360) − 180.
+        final dBearingDeg = ((cBear - pBear + 540.0) % 360.0) - 180.0;
+        final yawRateRadPerSec = dBearingDeg * math.pi / 180.0 / dt;
+        // v in m/s (speed in km/h ÷ 3.6) on the leading sample.
+        final aLat = (v / 3.6) * yawRateRadPerSec;
+        final absLat = aLat.abs();
+        cornerLoad += absLat * dt;
+        if (absLat > kSharpCornerThresholdMps2) sharpCorners++;
+      }
     }
 
     final total = idle + low + cruise + high;
@@ -238,6 +288,7 @@ class GpsDrivingFeatures {
       gradeClimbMeters: climb,
       gradeDescentMeters: descent,
       cornerLoadIntegral: cornerLoad,
+      sharpCornerEvents: sharpCorners,
     );
   }
 
