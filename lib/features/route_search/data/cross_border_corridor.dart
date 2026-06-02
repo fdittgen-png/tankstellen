@@ -1,13 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/country/country_config.dart';
-import '../../../core/logging/error_logger.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../core/services/country_service_registry.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
@@ -160,8 +158,12 @@ Set<String> countriesTouchingRouteExtent(
 ///
 /// Each per-country `searchStations` is wrapped in a try/catch (#2621): one
 /// country's outage / throw must NOT abort the whole route — the other legs
-/// still resolve, and an empty/failed ES leg is routed to [errorLogger]
-/// (ErrorLayer.services) so it is diagnosable rather than silently dropped.
+/// still resolve. #2703 — a recoverable per-leg failure (the overall corridor
+/// still returns results) records a diagnostic [BreadcrumbCollector]
+/// breadcrumb rather than a top-level ERROR trace, so a flaky feed (the
+/// southern-France UK-feed timeouts) no longer spams the error log; the
+/// orchestrator raises ONE aggregate ERROR only when the merged result is
+/// empty.
 StationQueryFunction buildCorridorQueryFunction(
   Ref ref,
   FuelType fuelType, {
@@ -199,16 +201,24 @@ StationQueryFunction buildCorridorQueryFunction(
         raw = result.data
             .map((s) => FuelStationResult(s) as SearchResultItem)
             .toList();
-      } catch (e, st) {
+      } catch (e, st) { // ignore: unused_catch_stack
         // #2621 — degrade to the other legs rather than aborting the whole
-        // route; never silently swallow (an empty ES leg must be traceable).
-        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
-          'where': 'RouteSearch corridor: per-country station query',
-          'country': countryCode,
-          'fuel': source.fuel.apiValue,
-          'lat': lat,
-          'lng': lng,
-        }));
+        // route; never silently swallow. #2703 — a single country's feed
+        // failing in a multi-country corridor where the overall search still
+        // returns results is RECOVERABLE (the chain already retries transient
+        // faults), so it must NOT spam a top-level ERROR trace for every
+        // failed leg (the 5 UK-feed ERRORs from the field log). Record a
+        // diagnostic BREADCRUMB instead — a chronically-failing feed is still
+        // visible in any trace that DOES surface, but a recoverable leg outage
+        // is silent. (The orchestrator raises one aggregate ERROR only when
+        // the final merged corridor result is empty — see
+        // `route_search_provider`.)
+        BreadcrumbCollector.add(
+          'RouteSearch corridor: per-country station query failed',
+          detail: 'country=$countryCode fuel=${source.fuel.apiValue} '
+              'lat=$lat lng=$lng type=${e.runtimeType}',
+        );
+        debugPrint('RouteSearch corridor: $countryCode leg failed ($e)');
         continue;
       }
       // Per-country top-N reduce using THIS country's fuel, so the ranking
