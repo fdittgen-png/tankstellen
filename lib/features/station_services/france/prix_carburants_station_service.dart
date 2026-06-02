@@ -9,6 +9,7 @@ import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/services/impl/osm_brand_enricher.dart';
 import 'prix_carburants_parsers.dart' as parser;
+import '../../../core/network/dio_offline.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
@@ -178,24 +179,10 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
   }
 
   /// Whether [e] is an offline / no-network failure rather than a real
-  /// API error (#2524). A "Failed host lookup" / SocketException surfaces
-  /// either as [DioExceptionType.connectionError] or, on some platforms,
-  /// as a [DioExceptionType.unknown] wrapping the raw SocketException — both
-  /// mean "the device has no working connection", which is expected and
-  /// already handled by returning an empty list, so it must not pollute the
-  /// error spool.
-  static bool _isOffline(DioException e) {
-    if (e.type == DioExceptionType.connectionError ||
-        e.type == DioExceptionType.connectionTimeout) {
-      return true;
-    }
-    if (e.type == DioExceptionType.unknown) {
-      // i18n-ignore: matching a platform exception class name, not UI text.
-      return e.error?.runtimeType.toString().contains('SocketException') ??
-          false;
-    }
-    return false;
-  }
+  /// API error (#2524). Delegates to the shared [isOfflineDioException]
+  /// classifier (#2703) so this and the trace-recorder de-noise gate
+  /// classify connection-layer transients identically and can't drift.
+  static bool _isOffline(DioException e) => isOfflineDioException(e);
 
   /// Merge two raw API result lists, deduplicating by station id.
   /// Stations from [primary] win when an id collides.

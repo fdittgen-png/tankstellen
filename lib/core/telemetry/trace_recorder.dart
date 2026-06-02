@@ -3,12 +3,14 @@
 
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../error/exceptions.dart';
 import '../logging/error_logger.dart';
+import '../network/dio_offline.dart';
 import '../services/service_result.dart';
 import 'collectors/app_state_collector.dart';
 import 'collectors/breadcrumb_collector.dart';
@@ -63,18 +65,27 @@ class TraceRecorder {
       effectiveError = error;
     }
 
-    // #2671 — benign offline/cancelled transients are EXPECTED, not errors.
-    // A no-network DNS failure (`SocketException: Failed host lookup …`) and
-    // a user-cancelled request (`DioException [request cancelled]`) reached
-    // the trace store with NO suppression, polluting a signal-rich error
-    // log. Skip them with a breadcrumb only — no store, no upload. Placed in
-    // `record()` (not the classifier) so EVERY caller path (dio interceptor,
-    // `errorLogger.log`, the service chain) is covered, and matched against
-    // the UNWRAPPED [effectiveError] so a ContextualError-wrapped transient
-    // is suppressed too.
-    if (_isBenignTransient(effectiveError)) {
+    // #2671 / #2703 — benign offline/cancelled/connection transients are
+    // EXPECTED, not errors. A no-network DNS failure, a user-cancelled
+    // request, AND the connection-layer transients that slipped through
+    // (#2703: a `DioException[connectionError]` WRAPPING the host-lookup
+    // SocketException, the *timeout types, an `HttpException` connection
+    // abort) reached the trace store with NO suppression, polluting a
+    // signal-rich error log. Skip them with a breadcrumb only — no store,
+    // no upload. Placed in `record()` (not the classifier) so EVERY caller
+    // path (dio interceptor, `errorLogger.log`, the service chain) is
+    // covered, and matched against the UNWRAPPED [effectiveError] so a
+    // ContextualError-wrapped transient is suppressed too.
+    //
+    // #2703 — read the device online-state UPFRONT so the gate can suppress
+    // any network-category transient while the device is offline. Shape-match
+    // is PRIMARY (it catches online-but-DNS-dead); `isOnline == false` is the
+    // secondary signal for a network failure with no offline-specific shape.
+    final isOnline = await _isDeviceOnline();
+    if (_isBenignTransient(effectiveError, isOnline: isOnline)) {
       debugPrint('TraceRecorder: skipping benign transient (offline/'
-          'cancelled), not persisting (#2671): $effectiveError');
+          'cancelled/connection), not persisting (#2671/#2703): '
+          '$effectiveError');
       return;
     }
 
@@ -136,22 +147,64 @@ class TraceRecorder {
     await _uploader.uploadIfEnabled(trace);
   }
 
-  /// #2671 — true for an EXPECTED offline/cancelled transient that must not
-  /// be persisted as an error trace:
+  /// #2671 / #2703 — true for an EXPECTED offline/cancelled/connection
+  /// transient that must not be persisted as an error trace:
   ///   1. a [SocketException] whose message reports a failed host lookup
   ///      (the device is simply offline — DNS can't resolve the API host);
   ///   2. a [DioException] of type [DioExceptionType.cancel] (the user
-  ///      navigated away / a newer request superseded this one).
-  /// Narrow by construction: a connection-refused [SocketException] or any
-  /// non-cancel Dio failure is a real error and still persists.
-  static bool _isBenignTransient(Object error) {
+  ///      navigated away / a newer request superseded this one);
+  ///   3. (#2703) a connection-LAYER Dio transient or a bare [HttpException]
+  ///      — classified by the shared [isOfflineDioException] util so this
+  ///      and the FR service can't drift (`connectionError` /
+  ///      `connectionTimeout` / `sendTimeout` / `receiveTimeout`, an
+  ///      `unknown` wrapping a SocketException, a connection abort);
+  ///   4. (#2703) when [isOnline] is `false`, any other network-category
+  ///      exception (`SocketException` / `TimeoutException` / `HttpException`)
+  ///      — a doomed call made while the device has no connection.
+  /// Narrow by construction: a [DioExceptionType.badResponse] (a 4xx/5xx the
+  /// server actually answered) and a connection-REFUSED [SocketException]
+  /// while online are real errors and still persist.
+  static bool _isBenignTransient(Object error, {required bool isOnline}) {
     if (error is SocketException) {
-      return error.message.toUpperCase().contains('FAILED HOST LOOKUP');
+      if (error.message.toUpperCase().contains('FAILED HOST LOOKUP')) {
+        return true;
+      }
+      // Any socket failure while the device is offline is expected (#2703);
+      // while online (e.g. connection refused) it stays a real error.
+      return !isOnline;
     }
-    if (error is DioException) {
-      return error.type == DioExceptionType.cancel;
+    if (error is DioException && error.type == DioExceptionType.cancel) {
+      return true;
     }
+    // #2703 — shared connection-layer classification (PRIMARY signal).
+    if (isOfflineDioException(error)) return true;
+    // #2703 — secondary offline signal: a doomed network call while offline.
+    if (!isOnline && _isNetworkCategory(error)) return true;
     return false;
+  }
+
+  /// Whether [error] is a network-category exception by SHAPE — used only as
+  /// the secondary `isOnline == false` signal (#2703). Deliberately EXCLUDES
+  /// [DioException]: a connection-layer Dio failure is already caught as the
+  /// PRIMARY signal by [isOfflineDioException], while a
+  /// [DioExceptionType.badResponse] is a real server answer that must persist
+  /// even if the connectivity probe momentarily reports offline.
+  static bool _isNetworkCategory(Object error) =>
+      error is SocketException ||
+      error is HttpException ||
+      error.runtimeType.toString().contains('TimeoutException');
+
+  /// Read the current device online-state for the de-noise gate (#2703).
+  /// Best-effort: any failure of the connectivity plugin returns `true`
+  /// (assume online) so the gate falls back to pure shape-matching rather
+  /// than wrongly suppressing a real error.
+  static Future<bool> _isDeviceOnline() async {
+    try {
+      final results = await Connectivity().checkConnectivity();
+      return results.isNotEmpty && !results.contains(ConnectivityResult.none);
+    } catch (_) {
+      return true;
+    }
   }
 }
 
