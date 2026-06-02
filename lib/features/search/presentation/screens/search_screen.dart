@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/responsive_search_layout.dart';
 import '../../../../app/shell/settings_app_bar_action.dart';
@@ -16,6 +17,9 @@ import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/data/pip_controller.dart';
+import '../../../consumption/providers/pip_mode_provider.dart';
+import '../../../consumption/providers/wakelock_facade.dart';
 import '../../../map/presentation/widgets/inline_map.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -23,6 +27,7 @@ import '../../../route_search/providers/route_search_provider.dart';
 import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
+import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
@@ -46,9 +51,25 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   bool _autoSearchAttempted = false;
 
+  /// #2677 — ephemeral pin state for the on-search radar, mirroring the
+  /// trip-recording screen's pin (#891): keeps the screen on + hides system
+  /// bars so the radar result stays readable on a dashboard mount. Not
+  /// persisted — the user opts back in each scan. Android-only affordance.
+  bool _pinned = false;
+
+  /// Cached facade so [dispose] can release the wake lock without touching
+  /// `ref` after the widget has been deactivated.
+  WakelockFacade? _cachedFacade;
+
+  /// #2677 — the single app-wide PiP controller (`pipControllerProvider`).
+  /// Never construct a second one: the `tankstellen/pip` channel admits one
+  /// handler. Drives the minimise button + (#2678) the auto-PiP opt-in.
+  late final PipController _pip;
+
   @override
   void initState() {
     super.initState();
+    _pip = ref.read(pipControllerProvider);
     safePostFrame(() {
       if (_autoSearchAttempted) return;
       _autoSearchAttempted = true;
@@ -122,6 +143,56 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   // ---------------------------------------------------------------------------
+  // #2677 — radar pin + reduce-to-PiP (Android-only via PipController.isSupported)
+  // ---------------------------------------------------------------------------
+
+  /// Toggle the radar pin (wake lock + immersive bars). Copied from the
+  /// trip-recording screen so the pinned state is identical.
+  Future<void> _togglePin() async {
+    final nextPinned = !_pinned;
+    setState(() => _pinned = nextPinned);
+    if (nextPinned) {
+      await _enablePin();
+    } else {
+      await _disablePin();
+    }
+  }
+
+  Future<void> _enablePin() async {
+    final facade = ref.read(wakelockFacadeProvider);
+    _cachedFacade = facade;
+    await facade.enable();
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  Future<void> _disablePin() async {
+    final facade = ref.read(wakelockFacadeProvider);
+    _cachedFacade = facade;
+    await facade.disable();
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+  }
+
+  @override
+  void dispose() {
+    // Release the wake lock + restore system UI if the user leaves while
+    // pinned. Best-effort + fire-and-forget — `dispose` must stay sync.
+    if (_pinned) {
+      final facade = _cachedFacade;
+      if (facade != null) unawaited(facade.disable());
+      unawaited(
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: SystemUiOverlay.values,
+        ),
+      );
+    }
+    super.dispose();
+  }
+
+  // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
 
@@ -147,6 +218,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
+    // #2677 — while the on-search radar owns the results, surface the same
+    // pin + reduce-to-PiP controls the trip-recording screen carries. Both
+    // are Android-only (the minimise button hides where PiP can't host app
+    // UI); iOS shows neither — gated on the radar being active.
+    final radarActive = ref.watch(radarSearchProvider).active;
+
     return PageScaffold(
       title: l10n?.appTitle ?? 'Fuel Prices',
       toolbarHeight: isLandscape ? 40 : null,
@@ -160,6 +237,38 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           },
           tooltip: l10n?.refreshPrices ?? 'Refresh prices',
         ),
+        if (radarActive) ...[
+          // Pin — wake lock + immersive bars (copied from the trip screen).
+          Semantics(
+            container: true,
+            button: true,
+            toggled: _pinned,
+            label: _pinned
+                ? (l10n?.tripRecordingPinSemanticOn ?? 'Unpin recording form')
+                : (l10n?.tripRecordingPinSemanticOff ?? 'Pin recording form'),
+            child: IconButton(
+              key: const Key('radarPinButton'),
+              icon: Icon(
+                _pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                color:
+                    _pinned ? Theme.of(context).colorScheme.primary : null,
+              ),
+              tooltip: l10n?.tripRecordingPinTooltip ??
+                  'Pinning keeps the screen on — uses more battery',
+              isSelected: _pinned,
+              onPressed: _togglePin,
+            ),
+          ),
+          // Minimise to a PiP tile — Android-only.
+          if (_pip.isSupported)
+            IconButton(
+              key: const Key('radarMinimiseButton'),
+              icon: const Icon(Icons.picture_in_picture_alt),
+              tooltip: l10n?.tripRecordingMinimiseTooltip ??
+                  'Minimise to a floating tile',
+              onPressed: () => _pip.enterPip(),
+            ),
+        ],
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
