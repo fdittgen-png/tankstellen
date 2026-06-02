@@ -6,8 +6,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/consumption/presentation/screens/trip_detail_downloads.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_detail_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/providers/trip_fuel_cost_provider.dart';
@@ -450,6 +452,176 @@ void main() {
         );
       },
     );
+  });
+
+  group('TripDetailScreen telemetry download (#2652)', () {
+    tearDown(() {
+      debugTripDetailDownloadOverride = null;
+      debugPublicFileExporterOverride = null;
+    });
+
+    // An entry whose `entry.samples` is non-empty so the download
+    // handler doesn't short-circuit on the empty-trip guard.
+    TripHistoryEntry entryWithSamples() {
+      final start = DateTime.utc(2026, 4, 22, 10, 0);
+      return TripHistoryEntry(
+        id: 'trip-1',
+        vehicleId: 'v1',
+        summary: TripSummary(
+          distanceKm: 52.5,
+          maxRpm: 3500,
+          highRpmSeconds: 120,
+          idleSeconds: 30,
+          harshBrakes: 1,
+          harshAccelerations: 2,
+          avgLPer100Km: 6.4,
+          fuelLitersConsumed: 3.36,
+          startedAt: start,
+          endedAt: start.add(const Duration(hours: 1)),
+        ),
+        samples: [
+          TripSample(timestamp: start, speedKmh: 30, rpm: 1500),
+          TripSample(
+            timestamp: start.add(const Duration(seconds: 1)),
+            speedKmh: 32,
+            rpm: 1700,
+          ),
+        ],
+      );
+    }
+
+    testWidgets('CSV item saves a .csv file with text/csv mime + success',
+        (tester) async {
+      String? capturedFileName;
+      String? capturedMime;
+      String? capturedText;
+      debugTripDetailDownloadOverride = ({
+        required String text,
+        required String fileName,
+        required String mimeType,
+      }) async {
+        capturedText = text;
+        capturedFileName = fileName;
+        capturedMime = mimeType;
+      };
+
+      await _pumpDetail(
+        tester,
+        entry: entryWithSamples(),
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+        samples: _seedSamples(),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('trip_detail_download_csv_option')));
+      await tester.pumpAndSettle();
+
+      // The test seam captures the save call (and returns before the
+      // production snackbar, mirroring debugTripDetailGpxShareOverride).
+      expect(capturedMime, 'text/csv');
+      expect(capturedFileName, endsWith('.csv'));
+      expect(capturedFileName, 'tankstellen-trajet-20260422T1000.csv');
+      expect(capturedText, isNotNull);
+      expect(capturedText, contains('timestamp_iso8601'));
+    });
+
+    testWidgets('JSON item saves a .json file with application/json mime',
+        (tester) async {
+      String? capturedFileName;
+      String? capturedMime;
+      String? capturedText;
+      debugTripDetailDownloadOverride = ({
+        required String text,
+        required String fileName,
+        required String mimeType,
+      }) async {
+        capturedText = text;
+        capturedFileName = fileName;
+        capturedMime = mimeType;
+      };
+
+      await _pumpDetail(
+        tester,
+        entry: entryWithSamples(),
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+        samples: _seedSamples(),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+      await tester.pumpAndSettle();
+      await tester
+          .tap(find.byKey(const Key('trip_detail_download_json_option')));
+      await tester.pumpAndSettle();
+
+      expect(capturedMime, 'application/json');
+      expect(capturedFileName, endsWith('.json'));
+      expect(capturedFileName, 'tankstellen-trajet-20260422T1000.json');
+      expect(capturedText, contains('"samples"'));
+    });
+
+    testWidgets('successful save surfaces the Downloads-folder snackbar',
+        (tester) async {
+      // Drive the FULL handler (no high-level download override) through
+      // the low-level PublicFileExporter seam so the success snackbar
+      // fires — the path the high-level override returns before.
+      debugPublicFileExporterOverride = ({
+        required bytes,
+        required fileName,
+        required mimeType,
+      }) async =>
+          '/tmp/$fileName';
+
+      await _pumpDetail(
+        tester,
+        entry: entryWithSamples(),
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+        samples: _seedSamples(),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('trip_detail_download_csv_option')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Saved to your Downloads folder'), findsOneWidget);
+    });
+
+    testWidgets('empty-samples trip short-circuits with the empty message',
+        (tester) async {
+      var saverCalled = false;
+      debugTripDetailDownloadOverride = ({
+        required String text,
+        required String fileName,
+        required String mimeType,
+      }) async {
+        saverCalled = true;
+      };
+
+      // _seedEntry has no entry.samples — the handler must not save.
+      await _pumpDetail(
+        tester,
+        entry: _seedEntry(),
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+        samples: _seedSamples(),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('trip_detail_download_csv_option')));
+      await tester.pumpAndSettle();
+
+      expect(saverCalled, isFalse, reason: 'empty trip must not write a file');
+      expect(find.text('No GPS samples in this trip'), findsOneWidget);
+    });
   });
 
   group('TripDetailScreen Delete action (#890)', () {

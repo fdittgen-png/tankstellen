@@ -6502,6 +6502,15 @@ class AppLocalizationsRo extends AppLocalizations {
       'Nu s-a putut genera imaginea de partajare';
 
   @override
+  String get trajetDetailDownloadCsvOption => 'Download telemetry (CSV)';
+
+  @override
+  String get trajetDetailDownloadJsonOption => 'Download telemetry (JSON)';
+
+  @override
+  String get trajetDetailDownloadError => 'Couldn\'t save the file';
+
+  @override
   String get trajetDetailDeleteAction => 'Ștergeți';
 
   @override

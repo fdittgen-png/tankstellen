@@ -6430,6 +6430,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trajetDetailShareError => 'Couldn\'t generate share image';
 
   @override
+  String get trajetDetailDownloadCsvOption => 'Download telemetry (CSV)';
+
+  @override
+  String get trajetDetailDownloadJsonOption => 'Download telemetry (JSON)';
+
+  @override
+  String get trajetDetailDownloadError => 'Couldn\'t save the file';
+
+  @override
   String get trajetDetailDeleteAction => 'Delete';
 
   @override
@@ -13453,6 +13462,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get trajetDetailShareError =>
       '⟦Çóúłđñ\'ŧ ǧéñéřáŧé šĥářé îɱáǧé ···········⟧';
+
+  @override
+  String get trajetDetailDownloadCsvOption =>
+      '⟦Đóŵñłóáđ ŧéłéɱéŧřý (ÇŠṼ) ·········⟧';
+
+  @override
+  String get trajetDetailDownloadJsonOption =>
+      '⟦Đóŵñłóáđ ŧéłéɱéŧřý (ĴŠÓÑ) ·········⟧';
+
+  @override
+  String get trajetDetailDownloadError => '⟦Çóúłđñ\'ŧ šáṽé ŧĥé ƒîłé ········⟧';
 
   @override
   String get trajetDetailDeleteAction => '⟦Đéłéŧé ···⟧';

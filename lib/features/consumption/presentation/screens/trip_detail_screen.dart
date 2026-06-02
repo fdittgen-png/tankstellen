@@ -17,13 +17,13 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
 import '../../providers/shared_trips_provider.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
 import '../widgets/trip_detail_charts.dart';
 import '../widgets/trip_share_sheet.dart';
+import 'trip_detail_downloads.dart';
 import 'trip_detail_gpx_share.dart';
 import 'trip_detail_sample_converter.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -181,53 +181,19 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       unawaited(_onShare(context, l, entry, vehicle));
                     case 'gpx':
                       unawaited(shareTripGpx(context, l, entry));
+                    case 'download_csv':
+                      unawaited(downloadTripCsv(context, l, entry));
+                    case 'download_json':
+                      unawaited(downloadTripJson(context, l, entry));
                     case 'cross_account':
                       unawaited(showTripShareSheet(context, entry.id));
                   }
                 },
-                itemBuilder: (_) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    key: const Key('trip_detail_share_image_option'),
-                    value: 'image',
-                    child: ListTile(
-                      leading: const Icon(Icons.image_outlined),
-                      title: Text(
-                        l?.trajetDetailShareImageOption ?? 'Share image',
-                      ),
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    key: const Key('trip_detail_share_gpx_option'),
-                    value: 'gpx',
-                    enabled: countGpsFixes(entry) > 0,
-                    child: ListTile(
-                      leading: const Icon(Icons.route_outlined),
-                      title: Text(
-                        l?.trajetDetailShareGpxOption ??
-                            'Share GPS track (GPX)',
-                      ),
-                      subtitle: countGpsFixes(entry) > 0
-                          ? null
-                          : Text(
-                              l?.trajetDetailShareGpxEmpty ??
-                                  'No GPS samples in this trip',
-                            ),
-                    ),
-                  ),
-                  // #2240 — cross-account share, only when trip sync is
-                  // on (you can't share a trip the server doesn't have).
-                  if (canShareCrossAccount)
-                    PopupMenuItem<String>(
-                      key: const Key('trip_detail_share_cross_account_option'),
-                      value: 'cross_account',
-                      child: ListTile(
-                        leading: const Icon(Icons.group_add_outlined),
-                        title: Text(
-                          l?.tripShareAction ?? 'Share with another account',
-                        ),
-                      ),
-                    ),
-                ],
+                itemBuilder: (_) => buildTripDetailShareMenuItems(
+                  l,
+                  entry,
+                  showCrossAccount: canShareCrossAccount,
+                ),
               ),
               // Delete mutates the local Hive history — meaningless for
               // a trip shared WITH you (you don't own it). Hidden for

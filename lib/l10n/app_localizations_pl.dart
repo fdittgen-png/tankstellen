@@ -6485,6 +6485,15 @@ class AppLocalizationsPl extends AppLocalizations {
       'Nie można wygenerować obrazu do udostępnienia';
 
   @override
+  String get trajetDetailDownloadCsvOption => 'Download telemetry (CSV)';
+
+  @override
+  String get trajetDetailDownloadJsonOption => 'Download telemetry (JSON)';
+
+  @override
+  String get trajetDetailDownloadError => 'Couldn\'t save the file';
+
+  @override
   String get trajetDetailDeleteAction => 'Usuń';
 
   @override

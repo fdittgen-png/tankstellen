@@ -6499,6 +6499,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailShareError => 'Bild konnte nicht erstellt werden';
 
   @override
+  String get trajetDetailDownloadCsvOption => 'Telemetrie herunterladen (CSV)';
+
+  @override
+  String get trajetDetailDownloadJsonOption =>
+      'Telemetrie herunterladen (JSON)';
+
+  @override
+  String get trajetDetailDownloadError =>
+      'Datei konnte nicht gespeichert werden';
+
+  @override
   String get trajetDetailDeleteAction => 'Löschen';
 
   @override

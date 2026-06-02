@@ -6507,6 +6507,15 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo generar la imagen para compartir';
 
   @override
+  String get trajetDetailDownloadCsvOption => 'Download telemetry (CSV)';
+
+  @override
+  String get trajetDetailDownloadJsonOption => 'Download telemetry (JSON)';
+
+  @override
+  String get trajetDetailDownloadError => 'Couldn\'t save the file';
+
+  @override
   String get trajetDetailDeleteAction => 'Eliminar';
 
   @override
