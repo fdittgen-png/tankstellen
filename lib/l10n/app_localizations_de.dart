@@ -4157,6 +4157,40 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nur GPS – noch keine Tankfüllungen haben das Verbrauchsmodell verankert. Füge ein paar volle Tankfüllungen hinzu, um die Genauigkeit zu verbessern.';
 
   @override
+  String get consumptionStatsPageTitle => 'Verbrauchsstatistik';
+
+  @override
+  String get consumptionStatsComparisonTitle =>
+      'Dieser Monat vs. letzter Monat';
+
+  @override
+  String get consumptionStatsTrendsTitle => 'Entwicklung über die Zeit';
+
+  @override
+  String get consumptionStatsNeedTwoMonths =>
+      'Erfasse Tankvorgänge über mindestens zwei Monate, um zu vergleichen.';
+
+  @override
+  String get consumptionStatsPricePerLiter => 'Ø Preis/L';
+
+  @override
+  String consumptionStatsDeltaPercent(String pct) {
+    return '$pct%';
+  }
+
+  @override
+  String get consumptionStatsChartLiters => 'Liter pro Monat';
+
+  @override
+  String get consumptionStatsChartSpend => 'Ausgaben pro Monat';
+
+  @override
+  String get consumptionStatsChartPricePerLiter => 'Preis pro Liter';
+
+  @override
+  String get consumptionStatsChartConsumption => 'L/100km pro Monat';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

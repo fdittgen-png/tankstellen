@@ -4098,5 +4098,60 @@
   "@showLessHours": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "consumptionStatsPageTitle": "Consumption statistics",
+  "@consumptionStatsPageTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsComparisonTitle": "This month vs last month",
+  "@consumptionStatsComparisonTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsTrendsTitle": "Evolution over time",
+  "@consumptionStatsTrendsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsNeedTwoMonths": "Log fill-ups across at least two months to compare.",
+  "@consumptionStatsNeedTwoMonths": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsPricePerLiter": "Avg price/L",
+  "@consumptionStatsPricePerLiter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsDeltaPercent": "{pct}%",
+  "@consumptionStatsDeltaPercent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionStatsChartLiters": "Litres per month",
+  "@consumptionStatsChartLiters": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsChartSpend": "Spend per month",
+  "@consumptionStatsChartSpend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsChartPricePerLiter": "Price per litre",
+  "@consumptionStatsChartPricePerLiter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionStatsChartConsumption": "L/100km per month",
+  "@consumptionStatsChartConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

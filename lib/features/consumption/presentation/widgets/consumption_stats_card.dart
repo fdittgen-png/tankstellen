@@ -14,6 +14,8 @@ import '../../providers/pending_reconciliation_provider.dart';
 import 'confidence_tier_badge.dart';
 import 'resolve_gap_banner.dart';
 
+part 'consumption_stats_card_parts.dart';
+
 /// Card summarising aggregated consumption statistics.
 ///
 /// Since #1362 the card grows two optional decorations on top of the stat
@@ -53,12 +55,20 @@ class ConsumptionStatsCard extends ConsumerWidget {
   /// no migration data still sees the historical default.
   final bool hasGpsPlusObd2Trip;
 
+  /// #2698 — when non-null the card body becomes an [InkWell]
+  /// (mirroring [ResolveGapBanner]) and a trailing chevron joins the
+  /// title row, opening the consumption-statistics detail page. When
+  /// null the card renders byte-identical to its pre-#2698 shape so the
+  /// existing summary-card tests keep passing.
+  final VoidCallback? onTap;
+
   const ConsumptionStatsCard({
     super.key,
     required this.stats,
     this.volumetricEfficiency,
     this.volumetricEfficiencySamples,
     this.hasGpsPlusObd2Trip = true,
+    this.onTap,
   });
 
   @override
@@ -71,8 +81,9 @@ class ConsumptionStatsCard extends ConsumerWidget {
     // plain accuracy indicator from [ConfidenceTierBadge]; the raw
     // chip is gated behind Developer mode (`Feature.debugMode`,
     // shipped #2248) so only power users see it.
-    final showRawCalibration =
-        ref.watch(enabledFeaturesProvider).contains(Feature.debugMode);
+    final showRawCalibration = ref
+        .watch(enabledFeaturesProvider)
+        .contains(Feature.debugMode);
 
     final avgConsumption = stats.avgConsumptionL100km;
     final avgCostKm = stats.avgCostPerKm;
@@ -86,318 +97,175 @@ class ConsumptionStatsCard extends ConsumerWidget {
     final showCorrectionHint =
         !showResolveGapBanner && stats.correctionShare > 0.05;
 
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (showOpenWindowBanner) ...[
-              _OpenWindowBanner(
-                text: l?.consumptionStatsOpenWindowBanner(
-                      stats.openWindowFillCount,
-                    ) ??
-                    '${stats.openWindowFillCount} partial fill(s) pending '
-                        'plein complet — not in average',
-              ),
-              const SizedBox(height: 8),
-            ],
-            if (showResolveGapBanner) ...[
-              ResolveGapBanner(pending: pendingGap),
-              const SizedBox(height: 8),
-            ],
-            if (showCorrectionHint) ...[
-              _CorrectionShareHint(
-                text: l?.consumptionStatsCorrectionShareHint(
-                      (stats.correctionShare * 100).round(),
-                    ) ??
-                    '${(stats.correctionShare * 100).round()}% of fuel from '
-                        'auto-corrections — review entries',
-              ),
-              const SizedBox(height: 8),
-            ],
-            Text(
-              l?.consumptionStatsTitle ?? 'Consumption stats',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            // #2433 — the precision rating rides a subtitle row directly
-            // under the card title: the confidence tier (A/B/C — #2027)
-            // and η_v (#1397 / #815) sit side-by-side on a phone in a
-            // single Wrap so they read as one calibration-state group and
-            // stack only when the row genuinely overflows. The confidence
-            // tier leads (user-facing accuracy band); η_v trails
-            // (engineer-detail anchor) and is shown ONLY in Developer mode
-            // (#2262) — for normal users the accuracy indicator alone
-            // conveys trust.
-            if (volumetricEfficiencySamples != null) ...[
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  ConfidenceTierBadge(
-                    samples: volumetricEfficiencySamples!,
-                    hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
-                  ),
-                  if (showRawCalibration)
-                    _CalibrationChip(
-                      volumetricEfficiency: volumetricEfficiency ?? 0.85,
-                      samples: volumetricEfficiencySamples!,
-                    ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.speed,
-                    label: l?.statAvgConsumption ?? 'Avg L/100km',
-                    value: avgConsumption != null
-                        ? avgConsumption.toStringAsFixed(2)
-                        : '—',
-                  ),
-                ),
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.euro,
-                    label: l?.statAvgCostPerKm ?? 'Avg /km',
-                    // #2491 — locale-aware 3 dp via formatPerKm.
-                    value: avgCostKm != null
-                        ? PriceFormatter.formatPerKm(avgCostKm)
-                        : '—',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.local_gas_station,
-                    label: l?.statTotalLiters ?? 'Total L',
-                    value: stats.totalLiters.toStringAsFixed(1),
-                  ),
-                ),
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.payments_outlined,
-                    label: l?.statTotalSpent ?? 'Total spent',
-                    // #2491 — locale-aware 2 dp + currency symbol.
-                    value: PriceFormatter.formatTotal(stats.totalSpent),
-                  ),
-                ),
-              ],
-            ),
-            if (stats.fillUpCount > 0) ...[
-              const SizedBox(height: 8),
-              Text(
-                '${l?.statFillUpCount ?? 'Fill-ups'}: ${stats.fillUpCount}',
-                style: theme.textTheme.bodySmall,
-              ),
-            ],
-            // #2446 — corrections are surfaced transparently on their
-            // own line, never folded into the headline Total L. Shown
-            // only when at least one correction landed in a closed
-            // window so the line stays out of the way otherwise.
-            // #2491 — neutral onSurfaceVariant, not warning (#2487).
-            if (stats.correctionLitersTotal > 0) ...[
-              const SizedBox(height: 4),
-              Text(
-                l?.statCorrectionLiters(
-                      stats.correctionLitersTotal.toStringAsFixed(1),
-                    ) ??
-                    'Corrections: +${stats.correctionLitersTotal.toStringAsFixed(1)} L',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
+    final titleText = Text(
+      l?.consumptionStatsTitle ?? 'Consumption stats',
+      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
     );
-  }
-}
+    // #2698 — when tappable, the title gains a trailing chevron so the
+    // affordance reads as a link into the detail page; otherwise it is
+    // the bare Text the summary-card tests assert against.
+    final Widget titleRow = onTap == null
+        ? titleText
+        : Row(
+            children: [
+              Expanded(child: titleText),
+              Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
+          );
 
-/// Grey informational banner — partials are pending a plein-complet
-/// close. Non-tappable v1; tap-to-jump to fill-up list is a follow-up.
-class _OpenWindowBanner extends StatelessWidget {
-  final String text;
-
-  const _OpenWindowBanner({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
+    final body = Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.hourglass_bottom,
-            size: 18,
-            color: theme.colorScheme.onSurfaceVariant,
+          if (showOpenWindowBanner) ...[
+            _OpenWindowBanner(
+              text:
+                  l?.consumptionStatsOpenWindowBanner(
+                    stats.openWindowFillCount,
+                  ) ??
+                  '${stats.openWindowFillCount} partial fill(s) pending '
+                      'plein complet — not in average',
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (showResolveGapBanner) ...[
+            ResolveGapBanner(pending: pendingGap),
+            const SizedBox(height: 8),
+          ],
+          if (showCorrectionHint) ...[
+            _CorrectionShareHint(
+              text:
+                  l?.consumptionStatsCorrectionShareHint(
+                    (stats.correctionShare * 100).round(),
+                  ) ??
+                  '${(stats.correctionShare * 100).round()}% of fuel from '
+                      'auto-corrections — review entries',
+            ),
+            const SizedBox(height: 8),
+          ],
+          titleRow,
+          // #2433 — the precision rating rides a subtitle row directly
+          // under the card title: the confidence tier (A/B/C — #2027)
+          // and η_v (#1397 / #815) sit side-by-side on a phone in a
+          // single Wrap so they read as one calibration-state group and
+          // stack only when the row genuinely overflows. The confidence
+          // tier leads (user-facing accuracy band); η_v trails
+          // (engineer-detail anchor) and is shown ONLY in Developer mode
+          // (#2262) — for normal users the accuracy indicator alone
+          // conveys trust.
+          if (volumetricEfficiencySamples != null) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ConfidenceTierBadge(
+                  samples: volumetricEfficiencySamples!,
+                  hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
+                ),
+                if (showRawCalibration)
+                  _CalibrationChip(
+                    volumetricEfficiency: volumetricEfficiency ?? 0.85,
+                    samples: volumetricEfficiencySamples!,
+                  ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.speed,
+                  label: l?.statAvgConsumption ?? 'Avg L/100km',
+                  value: avgConsumption != null
+                      ? avgConsumption.toStringAsFixed(2)
+                      : '—',
+                ),
+              ),
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.euro,
+                  label: l?.statAvgCostPerKm ?? 'Avg /km',
+                  // #2491 — locale-aware 3 dp via formatPerKm.
+                  value: avgCostKm != null
+                      ? PriceFormatter.formatPerKm(avgCostKm)
+                      : '—',
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.local_gas_station,
+                  label: l?.statTotalLiters ?? 'Total L',
+                  value: stats.totalLiters.toStringAsFixed(1),
+                ),
+              ),
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.payments_outlined,
+                  label: l?.statTotalSpent ?? 'Total spent',
+                  // #2491 — locale-aware 2 dp + currency symbol.
+                  value: PriceFormatter.formatTotal(stats.totalSpent),
+                ),
+              ),
+            ],
+          ),
+          if (stats.fillUpCount > 0) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${l?.statFillUpCount ?? 'Fill-ups'}: ${stats.fillUpCount}',
+              style: theme.textTheme.bodySmall,
+            ),
+          ],
+          // #2446 — corrections are surfaced transparently on their
+          // own line, never folded into the headline Total L. Shown
+          // only when at least one correction landed in a closed
+          // window so the line stays out of the way otherwise.
+          // #2491 — neutral onSurfaceVariant, not warning (#2487).
+          if (stats.correctionLitersTotal > 0) ...[
+            const SizedBox(height: 4),
+            Text(
+              l?.statCorrectionLiters(
+                    stats.correctionLitersTotal.toStringAsFixed(1),
+                  ) ??
+                  'Corrections: +${stats.correctionLitersTotal.toStringAsFixed(1)} L',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
-  }
-}
 
-/// Orange-tinted hint — too much of the average comes from auto-
-/// corrections. Encourages the user to review the orange entries.
-class _CorrectionShareHint extends StatelessWidget {
-  final String text;
-
-  const _CorrectionShareHint({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // Reuse the orange palette established by the correction fill-up
-    // card (#1361) so the visual language stays consistent.
-    final orange = DarkModeColors.warning(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: orange.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: orange.withValues(alpha: 0.40)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.warning_amber_outlined, size: 18, color: orange),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: theme.textTheme.bodySmall,
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      // #2698 — when null the card stays a plain Padding-in-Card so its
+      // render is byte-identical to the pre-#2698 summary card; when
+      // set the body becomes a tappable InkWell that opens the
+      // consumption-statistics detail page (mirrors [ResolveGapBanner]).
+      child: onTap == null
+          ? body
+          : InkWell(
+              key: const Key('consumption-stats-card-link'),
+              onTap: onTap,
+              child: body,
             ),
-          ),
-        ],
-      ),
     );
   }
 }
 
-/// Engineer-detail pill surfacing the auto-learner's η_v state
-/// (#1397 / #815). #2112 — restyled to match [ConfidenceTierBadge]'s
-/// recipe so the two land as one harmonised group on the Fuel tab.
-///
-/// Three branches drive the label:
-///   * `samples >= 3` → "η_v: 0.87 · N samples"
-///   * `0 < samples < 3` → "η_v: 0.87 · N samples" (same shape; the
-///     learning vs calibrated distinction lives on the confidence
-///     tier next to it — keep this pill engineer-bare).
-///   * `samples == 0` → "η_v: ?? · no plein-complet yet"
-///
-/// Variance tracking would let us print "± 0.04" alongside the mean,
-/// but the existing [VeLearner] only stores the EWMA scalar — adding
-/// a Welford branch is left to a follow-up. For now the calibrated
-/// branch keeps the bare mean.
-class _CalibrationChip extends StatelessWidget {
-  final double volumetricEfficiency;
-  final int samples;
-
-  const _CalibrationChip({
-    required this.volumetricEfficiency,
-    required this.samples,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final eta = volumetricEfficiency.toStringAsFixed(2);
-    final String label;
-    if (samples == 0) {
-      label = l?.calibrationLearnerStatusNoSamples ??
-          'η_v: ?? — no plein-complet yet';
-    } else {
-      // #2112 — single label shape across learning + calibrated;
-      // confidence tier carries the maturity colour.
-      label = l?.calibrationLearnerEtaCompact(eta, samples) ??
-          'η_v: $eta · $samples samples';
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: scheme.onSurfaceVariant,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-class _StatTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _StatTile({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: theme.colorScheme.primary),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.labelSmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              // #1902 — the stat figures (litres, total spent, …) read
-              // far smaller than the old bold titleMedium: they were
-              // dominating the summary card. Weight still sets them
-              // apart from the label above.
-              Text(
-                value,
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
+// The four private decoration widgets (_OpenWindowBanner,
+// _CorrectionShareHint, _CalibrationChip, _StatTile) live in the
+// `part`'d consumption_stats_card_parts.dart so this file stays under
+// the 400-line cap (#2698 / file_length_test).
