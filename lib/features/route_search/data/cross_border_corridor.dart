@@ -239,6 +239,19 @@ StationQueryFunction buildCorridorQueryFunction(
 /// Barcelona MITECO station to FR and prices it on FR's E85 (null for ES) —
 /// the very '--' bug this fixes. The `es-` prefix every MITECO row carries
 /// (#753) overrides that shadow and yields ES → E10.
+///
+/// #2641 — a 95-octane-unleaded SIBLING fallback after the country grade:
+/// the user's Spain profile is Super-E10, but Spain does NOT sell E10 — it
+/// sells "Gasolina 95 E5" (769/798 province-08 stations have E5, ~1 has E10).
+/// So the ES leg priced by E10 yields `priceFor(E10) == null` → the station is
+/// dropped from Best Stops, never cheapest, and shown as '--'. When the
+/// resolved grade has no price on this station AND it is a 95-octane unleaded
+/// grade (E5 / E10 ONLY — never E85 / E98 / diesel), fall through to the
+/// equivalent sibling the station DOES carry. The requested grade is always
+/// tried FIRST, so a station that has the requested grade keeps it (the fake
+/// ES station carrying E10 stays on E10); only an E5-only real Spanish station
+/// resolves to E5. This lives only in the corridor/route resolver — the
+/// nearby/single-country strict `station.priceFor` path stays strict (#2510).
 FuelType fuelForStation(
   Station station,
   Map<String, FuelType> profileFuels,
@@ -249,8 +262,16 @@ FuelType fuelForStation(
     lat: station.lat,
     lng: station.lng,
   )?.code.toUpperCase();
-  if (code == null) return fallback;
-  return profileFuels[code] ?? fallback;
+  final grade = code == null ? fallback : (profileFuels[code] ?? fallback);
+  if (station.priceFor(grade) != null) return grade; // requested grade first.
+  // #2641 — the E5↔E10 95-octane-unleaded sibling fallback (and ONLY that).
+  if (grade == FuelType.e10 && station.priceFor(FuelType.e5) != null) {
+    return FuelType.e5;
+  }
+  if (grade == FuelType.e5 && station.priceFor(FuelType.e10) != null) {
+    return FuelType.e10;
+  }
+  return grade;
 }
 
 /// Rank one corridor country's slice of a sample point's response to the
