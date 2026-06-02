@@ -69,7 +69,14 @@ Stream<ApproachState> approachState(Ref ref) {
   );
 
   final detector = ApproachDetector(
-    gpsStream: geo.getPositionStream(
+    // #2646 — consume the SHARED, refcounted broadcast position source so the
+    // detector receives the SAME fixes as the GPS-only recorder. Before this,
+    // both opened their own `getPositionStream`; geolocator's single platform
+    // EventChannel let the recorder starve the detector in GPS-only mode, so
+    // it never left ApproachIdle and the radar / swipe stayed dead. The
+    // detector already treats its input as a hot/late-join stream — the shared
+    // source replays the latest fix to late joiners, so no detector change.
+    gpsStream: geo.sharedPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
       ),
