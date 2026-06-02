@@ -66,6 +66,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   /// handler. Drives the minimise button + (#2678) the auto-PiP opt-in.
   late final PipController _pip;
 
+  /// #2678 — last value pushed to [PipController.setAutoEnterEnabled], so the
+  /// build only crosses the channel when the radar opt-in actually changes.
+  bool? _radarAutoPipRequested;
+
   @override
   void initState() {
     super.initState();
@@ -189,6 +193,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       );
     }
+    // #2678 — drop the auto-PiP opt-in so leaving the app from an unrelated
+    // screen never shrinks the search UI into a tile. The controller itself
+    // is owned by `pipControllerProvider`, not disposed here.
+    unawaited(_pip.setAutoEnterEnabled(false));
     super.dispose();
   }
 
@@ -223,6 +231,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     // are Android-only (the minimise button hides where PiP can't host app
     // UI); iOS shows neither — gated on the radar being active.
     final radarActive = ref.watch(radarSearchProvider).active;
+
+    // #2678 — arm the native auto-PiP opt-in while the radar is active, so the
+    // app shrinks into the tile (onUserLeaveHint) when the user leaves to
+    // Maps mid-scan — mirroring the trip-recording arming. The global OS
+    // observer (TankstellenApp) is unchanged; only this per-screen flag is
+    // new. Disarmed on dismiss (radar inactive) + in dispose. Android-only:
+    // `setAutoEnterEnabled` is an inert no-op where PiP can't host app UI.
+    if (radarActive != _radarAutoPipRequested) {
+      _radarAutoPipRequested = radarActive;
+      unawaited(_pip.setAutoEnterEnabled(radarActive));
+    }
 
     return PageScaffold(
       title: l10n?.appTitle ?? 'Fuel Prices',
