@@ -152,10 +152,17 @@ void main() {
   });
 
   group('searchStations (CRE azure feeds — #505 fix)', () {
-    test('fetches /places and /prices and joins by place_id', () async {
+    test(
+        'fetches /places and /prices and joins by place_id '
+        '(full name, e5/e98/diesel — #2704)', () async {
+      // #2704 — REAL CRE <name> is the operator's full company name with no
+      // brand field; the field bug truncated "TRENOGAS SA DE CV" to a
+      // fragment. Assert the FULL name survives and lands in name + street
+      // (card title fallback), brand stays empty, and CRE
+      // regular/premium/diesel map to e5/e98/diesel — NOT e5/e10.
       final service = _serviceWith(
         placesXml: _placesXml([
-          (id: '11702', name: 'Gasolinera Centro', x: -99.13, y: 19.43),
+          (id: '11702', name: 'TRENOGAS SA DE CV', x: -99.13, y: 19.43),
         ]),
         pricesXml: _pricesXml([
           (id: '11702', regular: 22.95, premium: 24.89, diesel: 23.45),
@@ -167,12 +174,19 @@ void main() {
       expect(result.data, hasLength(1));
       final s = result.data.first;
       expect(s.id, 'mx-11702');
-      expect(s.name, 'Gasolinera Centro');
-      expect(s.brand, 'Gasolinera');
+      expect(s.name, 'TRENOGAS SA DE CV',
+          reason: 'full CRE company name, never the first-token fragment');
+      expect(s.brand, '', reason: 'CRE has no brand field');
+      expect(s.street, 'TRENOGAS SA DE CV',
+          reason: 'name mirrored into street so the card title shows it '
+              'via the hasBrand==false fallback');
+      expect(s.postCode, '');
+      expect(s.place, '');
       expect(s.lat, 19.43);
       expect(s.lng, closeTo(-99.13, 0.0001));
-      expect(s.e5, 22.95);
-      expect(s.e10, 24.89);
+      expect(s.e5, 22.95, reason: 'CRE regular → e5');
+      expect(s.e98, 24.89, reason: 'CRE premium → e98 (high-octane), not e10');
+      expect(s.e10, isNull, reason: 'no European e10 grade in Mexico');
       expect(s.diesel, 23.45);
       expect(s.isOpen, isTrue);
     });
@@ -368,6 +382,91 @@ void main() {
         firstCount,
         reason: 'second search within TTL must NOT hit the network',
       );
+    });
+
+    test(
+        'merges grades split across DUPLICATE place_id blocks — the real '
+        'CRE /prices shape, decisive "no prices" guard (#2704)', () async {
+      // #2704 — the LIVE CRE /prices feed splits a single station's grades
+      // across multiple <place place_id="X"> blocks (1 577 of ~14 k
+      // stations). The old `out[id] = _CrePrices(...)` was last-wins, so a
+      // station whose regular sat in block A and premium in block B kept
+      // only block B and rendered "--" for the rest. This fixture reproduces
+      // that exact shape — regular alone in block 1, premium+diesel in
+      // block 2. On master the merge drops regular (RED: s.e5 == null);
+      // after the accumulate-across-blocks fix all three survive.
+      const splitPrices = '<?xml version="1.0" encoding="utf-8"?>\n'
+          '<places>'
+          '<place place_id="11702">'
+          '<gas_price type="regular">22.95</gas_price>'
+          '</place>'
+          '<place place_id="11702">'
+          '<gas_price type="premium">24.89</gas_price>'
+          '<gas_price type="diesel">23.45</gas_price>'
+          '</place>'
+          '</places>';
+      final service = _serviceWith(
+        placesXml: _placesXml([
+          (id: '11702', name: 'TRENOGAS SA DE CV', x: -99.13, y: 19.43),
+        ]),
+        pricesXml: splitPrices,
+      );
+      final result = await service.searchStations(_cdmxParams);
+      expect(result.data, hasLength(1));
+      final s = result.data.first;
+      expect(s.e5, 22.95,
+          reason: 'regular from the FIRST duplicate block must survive');
+      expect(s.e98, 24.89, reason: 'premium → e98');
+      expect(s.diesel, 23.45);
+    });
+
+    test('joins on a place_id with surrounding whitespace (#2704)', () async {
+      // Defensive: trim the join key on both feeds so a stray space never
+      // collapses prices to "--".
+      const placesWs = '<?xml version="1.0" encoding="utf-8"?>\n'
+          '<places>'
+          '<place place_id=" 11702 ">'
+          '<name>TRENOGAS SA DE CV</name>'
+          '<location><x>-99.13</x><y>19.43</y></location>'
+          '</place>'
+          '</places>';
+      const pricesWs = '<?xml version="1.0" encoding="utf-8"?>\n'
+          '<places>'
+          '<place place_id="11702">'
+          '<gas_price type="regular">22.95</gas_price>'
+          '</place>'
+          '</places>';
+      final service = _serviceWith(placesXml: placesWs, pricesXml: pricesWs);
+      final result = await service.searchStations(_cdmxParams);
+      expect(result.data, hasLength(1));
+      expect(result.data.first.e5, 22.95);
+    });
+
+    test(
+        'distance is computed from the search center, not zero — a station '
+        '~5 km away reports dist ~5 (#2704 "0 m" service-layer guard)',
+        () async {
+      // #2704 — the field "0 m" for every station does NOT originate in this
+      // service: it parses x→lng / y→lat correctly and computes the haversine
+      // from params.lat/lng. This guards that fact — a place ~5 km north of
+      // the search center reports a non-zero ~5 km distance. (The remaining
+      // "0 m" reproduction lives in the search-center wiring, NOT here; see
+      // the PR body.)
+      // 0.045° of latitude ≈ 5.0 km.
+      final service = _serviceWith(
+        placesXml: _placesXml([
+          (id: '1', name: 'NORTE SA DE CV', x: -99.13, y: 19.475),
+        ]),
+        pricesXml: _pricesXml([
+          (id: '1', regular: 22.0, premium: null, diesel: null),
+        ]),
+      );
+      final result = await service.searchStations(_cdmxParams);
+      expect(result.data, hasLength(1));
+      final d = result.data.first.dist;
+      expect(d, greaterThan(0), reason: 'never collapses to 0 m');
+      expect(d, closeTo(5.0, 0.5),
+          reason: 'haversine from the search center, ~5 km north');
     });
   });
 }

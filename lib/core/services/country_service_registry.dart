@@ -578,7 +578,14 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: 14.0, maxLat: 33.0, minLng: -119.0, maxLng: -86.0,
       ),
-      availableFuelTypes: _defaultFuelTypes,
+      // MX (#2704): CRE sells Regular (Magna, e5), Premium (91–92, e98) and
+      // Diesel in MXN — premium maps to the high-octane e98 slot, NOT the
+      // European e10 ethanol blend. The picker must offer what the parser
+      // surfaces.
+      availableFuelTypes: [
+        FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.electric, FuelType.all,
+      ],
       policy: _mxPolicy,
       createService: _createMexico,
     ),

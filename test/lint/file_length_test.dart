@@ -64,7 +64,12 @@ void main() {
     // refactored to delegate to it. Fixes the FR-shadows-Catalonia bbox bug
     // that left cross-border routes with zero Spanish stations. Decomposition
     // of this registry is tracked separately by #2187/#2188.
-    'lib/core/services/country_service_registry.dart': 909,
+    // #2704 — re-grandfathered 909 → 916: MX's availableFuelTypes was made
+    // explicit ([e5, e98, diesel, electric, all]) instead of _defaultFuelTypes
+    // (which carries the wrong e10), with a 4-line rationale comment. Premium
+    // is MX's high-octane grade, not the European e10 blend. Decomposition of
+    // this registry is tracked separately by #2187/#2188.
+    'lib/core/services/country_service_registry.dart': 916,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     // #2456 — re-grandfathered 457 → 481: two new pure parsers,

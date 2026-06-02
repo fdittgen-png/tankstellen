@@ -388,13 +388,13 @@ class Countries {
     apiProvider: 'CRE / datos.gob.mx',
     attribution: 'Datos: Comisión Reguladora de Energía',
     fuelTypes: ['Regular', 'Premium', 'Diesel'],
-    // #2180 — MexicoStationService maps CRE's gas_price types to Station
-    // fields as regular → e5, premium → e10, diesel → diesel. The premium
-    // grade lands in the e10 slot, never e98, so the picker must offer e10
-    // (not e98) to match the data the search selector surfaces.
+    // #2704 — MexicoStationService maps CRE regular→e5, premium→e98 (MX's
+    // high-octane 91–92 grade, NOT the European e10 ethanol blend, absent in
+    // MX), diesel→diesel. The picker must offer e98 (not e10) to match the
+    // data the search selector surfaces.
     supportedFuelTypes: {
       FuelType.e5,
-      FuelType.e10,
+      FuelType.e98,
       FuelType.diesel,
       FuelType.electric,
     },

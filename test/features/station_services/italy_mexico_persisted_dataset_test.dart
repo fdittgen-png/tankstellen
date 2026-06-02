@@ -201,7 +201,8 @@ void main() {
 
       expect(result.data, isNotEmpty);
       expect(result.data.first.e5, 22.95);
-      expect(cache.get(PersistentDataset.datasetKey('MX', 'stations')),
+      // #2704 — datasetName bumped to 'stations.v2' to evict pre-fix caches.
+      expect(cache.get(PersistentDataset.datasetKey('MX', 'stations.v2')),
           isNotNull,
           reason: 'MX dataset must be persisted to the shared cache');
     });
@@ -223,7 +224,9 @@ void main() {
       expect(s.id, 'mx-11702');
       expect(s.name, 'Gasolinera Centro');
       expect(s.e5, 22.95);
-      expect(s.e10, 24.89);
+      // #2704 — CRE premium maps to e98 (high-octane), not e10.
+      expect(s.e98, 24.89);
+      expect(s.e10, isNull);
       expect(s.diesel, 23.45);
     });
 
