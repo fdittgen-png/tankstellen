@@ -100,9 +100,17 @@ void main() {
 
     test('harsh counts are independent of emit cadence', () {
       // The same speed profile fed at 1 Hz and at 4 Hz must yield the
-      // same counts — a faster cadence must not manufacture events. The
-      // profile carries genuine harsh accels (0→14, 14→28, 28→40 km/h
-      // in 1 s) and harsh brakes (50→35, 35→20 km/h in 1 s).
+      // same counts — a faster cadence must not manufacture events.
+      //
+      // #2667 — counts are now per *episode* (one sustained crossing),
+      // not one per qualifying ~1 s interval, so a physical event yields
+      // ONE count and the detector agrees with the score / insights / GPS
+      // features. The profile has ONE sustained accel episode (0→14→28→40
+      // km/h, three back-to-back >3.0 m/s² intervals = one hard accel) and
+      // ONE sustained brake episode (50→35→20 km/h, two back-to-back
+      // ≤-3.5 m/s² intervals = one hard brake; the later 20→8→0 is gentler
+      // than the 3.5 brake threshold). The cadence-independence guarantee
+      // is unchanged — both feeds report the same episode counts.
       const profile = <double>[0, 14, 28, 40, 50, 50, 35, 20, 8, 0];
 
       final atOneHz = HarshEventDetector();
@@ -113,8 +121,8 @@ void main() {
       feedStaircase(atFourHz, profile,
           emitInterval: const Duration(milliseconds: 250));
 
-      expect(atOneHz.accelerations, 3);
-      expect(atOneHz.brakes, 2);
+      expect(atOneHz.accelerations, 1);
+      expect(atOneHz.brakes, 1);
       expect(atFourHz.accelerations, atOneHz.accelerations);
       expect(atFourHz.brakes, atOneHz.brakes);
     });
@@ -124,12 +132,17 @@ void main() {
       // An emergency stop: the 1 Hz speed PID drops ~25 km/h between
       // refreshes (~6.9 m/s²). Cadence-independent detection must still
       // register it rather than smoothing it away.
+      //
+      // #2667 — the sustained multi-second stop is now ONE brake episode
+      // (it used to count once per qualifying ~1 s interval). The
+      // guarantee being tested is "the genuine hard brake is not smoothed
+      // away", i.e. it is counted at all.
       feedStaircase(
         detector,
         const <double>[90, 90, 65, 40, 15, 0],
         emitInterval: const Duration(milliseconds: 250),
       );
-      expect(detector.brakes, greaterThanOrEqualTo(3));
+      expect(detector.brakes, greaterThanOrEqualTo(1));
     });
 
     test('a long speed plateau before a sharp drop is not under-counted',

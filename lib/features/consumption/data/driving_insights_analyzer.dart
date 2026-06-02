@@ -17,6 +17,7 @@
 /// throttle, coolant temp, and elevation data.
 library;
 
+import '../domain/accel_event_gate.dart';
 import '../domain/driving_insight.dart';
 import '../domain/trip_recorder.dart';
 import '../presentation/widgets/trip_detail_charts.dart';
@@ -24,8 +25,11 @@ import '../presentation/widgets/trip_detail_charts.dart';
 /// RPM above which a sample counts as "high RPM".
 const double _highRpmThreshold = 3000;
 
-/// Acceleration (m/s²) above which an interval counts as "hard accel".
-const double _hardAccelThresholdMps2 = 3.0;
+// Hard-accel detection now routes through the ONE shared accel-event gate
+// (#2667): `kHardAccelThresholdMps2` (3.0) sustained ≥ 1 s with the
+// accuracy + min-speed gate, so the insight count agrees with the harsh
+// detector, the driving score, and the GPS features. The old raw
+// per-interval `_hardAccelThresholdMps2` constant is gone.
 
 /// Liters wasted per hard-accel event. Documented constant — see
 /// `docs/guides/driving-insights.md`. Order-of-magnitude estimate
@@ -97,13 +101,23 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
       Duration.microsecondsPerSecond;
   if (totalDt <= 0) return const [];
 
+  // Hard-accel EPISODES via the ONE shared gate (#2667) — same count the
+  // harsh detector, the score, and the GPS features report.
+  final accelCounts = countAccelEvents([
+    for (final s in sorted)
+      AccelSamplePoint(
+        timestamp: s.timestamp,
+        speedKmh: s.speedKmh,
+        hAccuracyM: s.hAccuracyM,
+      ),
+  ]);
+  final hardAccelEvents = accelCounts.accelEvents;
+  final hardAccelTotalDt = accelCounts.accelSeconds;
+
   // Accumulators.
   double highRpmSeconds = 0;
   double highRpmWastedLiters = 0;
   bool sawFuelRateInHighRpm = false;
-
-  int hardAccelEvents = 0;
-  double hardAccelTotalDt = 0;
 
   double idleSeconds = 0;
   double idleWastedLiters = 0;
@@ -174,14 +188,8 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
       }
     }
 
-    // Hard-acceleration: derivative of speed across the interval.
-    // Convert km/h → m/s by / 3.6.
-    final dvMps = (cur.speedKmh - prev.speedKmh) / 3.6;
-    final accelMps2 = dvMps / dt;
-    if (accelMps2 >= _hardAccelThresholdMps2) {
-      hardAccelEvents++;
-      hardAccelTotalDt += dt;
-    }
+    // Hard-acceleration is counted ABOVE via the shared gate (#2667), not
+    // per-interval here.
 
     // Idling: engine on (rpm > 0), car stationary (speed == 0) for
     // the whole interval. Use a small tolerance on speed to absorb
@@ -235,7 +243,7 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
         percentOfTrip: pctTime,
         metadata: {
           'eventCount': hardAccelEvents,
-          'thresholdMps2': _hardAccelThresholdMps2,
+          'thresholdMps2': kHardAccelThresholdMps2,
           'pctTime': pctTime,
         },
       ));
@@ -306,13 +314,18 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
   return candidates.sublist(0, _topN);
 }
 
-/// Returns the indices of samples (in the sorted-by-timestamp ordering)
-/// where a hard-acceleration event ended — i.e. where the speed delta
-/// from the previous sample exceeds [_hardAccelThresholdMps2]. Mirrors
-/// the detection logic in [analyzeTrip] so the trip-detail map can
-/// render markers at the matching positions (#1458 phase 1).
+/// Returns one index per hard-acceleration EPISODE (in the
+/// sorted-by-timestamp ordering): the end index of the interval at which
+/// the episode first crossed the canonical [kHardAccelThresholdMps2]
+/// sustained ≥ 1 s, via the ONE shared [countAccelEvents] gate (#2667).
+/// The trip-detail map drops a bolt marker at each (#1458 phase 1).
 ///
-/// Sorting + dt-guard contract identical to [analyzeTrip]:
+/// Reconciled (#2667): markers now come from the same gate the analyzer's
+/// hard-accel count uses, so a single physical hard accel yields ONE
+/// marker — not one per qualifying sample interval as the old raw
+/// per-interval logic produced on a multi-second pull.
+///
+/// Sorting + dt-guard contract (delegated to the gate):
 ///   * input is copied + sorted by timestamp before iteration so an
 ///     out-of-order list never spuriously reports an event;
 ///   * intervals with `dt <= 0` are skipped (duplicate timestamps);
@@ -320,37 +333,19 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
 ///     no previous sample to derive an acceleration from.
 ///
 /// IMPORTANT: the returned indices reference positions in the
-/// INTERNALLY-SORTED list, NOT the caller's input order. Callers that
-/// want to map indices back to coordinates must sort their own samples
-/// by timestamp the same way before indexing. The trip-detail map
-/// already passes timestamp-sorted samples (recorder writes monotonic
-/// timestamps), so it can use the indices directly.
+/// INTERNALLY-SORTED list, NOT the caller's input order. The trip-detail
+/// map already passes timestamp-sorted samples, so it can use them
+/// directly.
 List<int> hardAccelSampleIndices(List<TripDetailSample> samples) {
   if (samples.length < 2) return const <int>[];
-
-  // Copy + sort so out-of-order persistence (#1040 race conditions)
-  // doesn't blow up the integration. Same pattern as [analyzeTrip].
-  final sorted = [...samples]
-    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-  final indices = <int>[];
-  for (var i = 1; i < sorted.length; i++) {
-    final prev = sorted[i - 1];
-    final cur = sorted[i];
-    final dt =
-        cur.timestamp.difference(prev.timestamp).inMicroseconds /
-            Duration.microsecondsPerSecond;
-    if (dt <= 0) continue;
-
-    // Same conversion as [analyzeTrip]: km/h → m/s by / 3.6, then
-    // divide by Δt to get acceleration in m/s².
-    final dvMps = (cur.speedKmh - prev.speedKmh) / 3.6;
-    final accelMps2 = dvMps / dt;
-    if (accelMps2 >= _hardAccelThresholdMps2) {
-      indices.add(i);
-    }
-  }
-  return indices;
+  return countAccelEvents([
+    for (final s in samples)
+      // TripDetailSample carries no horizontal accuracy — pass null
+      // ("unknown, accept") so the gate behaves exactly as before for the
+      // accuracy dimension while still applying the shared sustained-window
+      // + min-speed + canonical-threshold gate.
+      AccelSamplePoint(timestamp: s.timestamp, speedKmh: s.speedKmh),
+  ]).accelStartIndices;
 }
 
 /// Fallback when no fuel-rate samples are available during the

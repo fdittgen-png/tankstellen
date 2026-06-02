@@ -20,8 +20,6 @@ class _Accumulators {
   double coastSeconds = 0;
   double highSpeedSeconds = 0;
   double lambdaEnrichSeconds = 0;
-  int hardAccelEvents = 0;
-  int hardBrakeEvents = 0;
   int hardShiftSpikes = 0;
   int revWhileStationaryBlips = 0;
   double maxPedalVelocity = 0;
@@ -79,13 +77,10 @@ class _Accumulators {
     // is high-RPM time, not a shift spike).
     if (cur.rpm - prev.rpm >= _hardShiftRpmSpike) hardShiftSpikes++;
 
-    // Hard accel / brake from the speed derivative.
-    final accelMps2 = (cur.speedKmh - prev.speedKmh) / 3.6 / dt;
-    if (accelMps2 >= kHardAccelThresholdMps2) {
-      hardAccelEvents++;
-    } else if (accelMps2 <= -kHardBrakeThresholdMps2) {
-      hardBrakeEvents++;
-    }
+    // Hard accel / brake are NOT counted here anymore (#2667): they come
+    // from the ONE shared `countAccelEvents` episode gate, passed into
+    // [build], so the score agrees with the harsh detector / insights /
+    // GPS features instead of over-counting per interval.
 
     // Speed efficiency: high-speed band.
     if (prev.speedKmh >= kHighSpeedThresholdKmh) highSpeedSeconds += dt;
@@ -108,6 +103,8 @@ class _Accumulators {
   DrivingScore build({
     required double totalDt,
     required double? secondsBelowOptimalGear,
+    required int hardAccelEvents,
+    required int hardBrakeEvents,
   }) {
     final idlingPenalty =
         _clamp(idleSeconds / totalDt * _idlingCap, 0, _idlingCap);

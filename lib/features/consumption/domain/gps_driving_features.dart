@@ -4,6 +4,7 @@
 import 'dart:math' as math;
 
 import '../../../core/utils/geo_utils.dart' as geo;
+import 'accel_event_gate.dart';
 import 'trip_recorder.dart';
 
 /// Lateral-acceleration threshold (m/s²) above which a turn counts as a
@@ -58,12 +59,15 @@ class GpsDrivingFeatures {
   /// don't dominate a long cruise leg.
   final double highSpeedSeconds;
 
-  /// Count of acceleration events: `d(speed)/dt > 2 m/s²` sustained
-  /// for > 1 s. Counted once per event, not per sample.
+  /// Count of acceleration events from the ONE shared accel-event gate
+  /// (#2667): `d(speed)/dt ≥ kHardAccelThresholdMps2` (3.0) sustained for
+  /// ≥ 1 s, accuracy-/min-speed-gated. One per physical episode — agrees
+  /// with the harsh detector, the score, and the insights analyzer.
   final int accelEvents;
 
-  /// Count of deceleration / brake events: `d(speed)/dt < −2 m/s²`
-  /// sustained for > 1 s. Reserved for the 7-coef expansion.
+  /// Count of deceleration / brake events from the same shared gate
+  /// (#2667): `d(speed)/dt ≤ −kHardBrakeThresholdMps2` (−3.5) sustained
+  /// for ≥ 1 s. Reserved for the 7-coef expansion.
   final int brakeEvents;
 
   /// Peak absolute acceleration in g, sample-to-sample. Provides a
@@ -157,26 +161,36 @@ class GpsDrivingFeatures {
   /// both samples carry lat/lng, falling back to `speedKmh × dt`
   /// for segments where either side is GPS-unfixed.
   ///
-  /// Acceleration events: rolling window detects `> 2 m/s²` (or
-  /// `< -2 m/s²`) sustained for ≥ 1 s — the same threshold the
-  /// trip recorder's harsh-event detector uses, so the two numbers
-  /// agree on what counts as "an event".
+  /// Acceleration / brake events come from the ONE shared accel-event
+  /// gate ([countAccelEvents], #2667): the canonical
+  /// [kHardAccelThresholdMps2] / [kHardBrakeThresholdMps2] sustained ≥ 1 s
+  /// with the accuracy + min-speed gate — so this number is identical to
+  /// the harsh detector, the driving score, and the insights analyzer for
+  /// the same physical event. (Pre-#2667 this file used a divergent
+  /// 2.0 m/s² threshold with no accuracy / min-speed gate.)
   static GpsDrivingFeatures? from(Iterable<TripSample> samples) {
     final list = samples.toList();
     if (list.length < 2) return null;
     list.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
+    // Hard accel / brake EPISODE counts via the shared gate (#2667). The
+    // list is already timestamp-sorted; the gate copies + sorts again
+    // defensively, which is cheap and keeps it the single authority.
+    final accelCounts = countAccelEvents([
+      for (final s in list)
+        AccelSamplePoint(
+          timestamp: s.timestamp,
+          speedKmh: s.speedKmh,
+          hAccuracyM: s.hAccuracyM,
+        ),
+    ]);
+
     double idle = 0, low = 0, cruise = 0, high = 0;
     double distM = 0;
-    int accelEvents = 0, brakeEvents = 0;
     double maxAccelG = 0;
     double climb = 0, descent = 0;
     double cornerLoad = 0;
     int sharpCorners = 0;
-
-    // Acceleration-event detector state.
-    bool inAccelEvent = false, inBrakeEvent = false;
-    double accelEventDur = 0, brakeEventDur = 0;
 
     for (var i = 1; i < list.length; i++) {
       final prev = list[i - 1];
@@ -207,32 +221,12 @@ class GpsDrivingFeatures {
         distM += v / 3.6 * dt;
       }
 
-      // Acceleration in m/s² (signed). speed in km/h → m/s via /3.6.
+      // Peak |acceleration| in g, sample-to-sample (a quick sanity ceiling
+      // for the fit). The accel/brake EVENT counts come from the shared
+      // gate above, not from this per-sample derivative.
       final accelMps2 = (cur.speedKmh - prev.speedKmh) / 3.6 / dt;
       final absG = accelMps2.abs() / 9.81;
       if (absG > maxAccelG) maxAccelG = absG;
-
-      // Sustained > 1 s windowing for accel / brake events.
-      if (accelMps2 > 2.0) {
-        accelEventDur += dt;
-        if (!inAccelEvent && accelEventDur >= 1.0) {
-          accelEvents++;
-          inAccelEvent = true;
-        }
-      } else {
-        accelEventDur = 0;
-        inAccelEvent = false;
-      }
-      if (accelMps2 < -2.0) {
-        brakeEventDur += dt;
-        if (!inBrakeEvent && brakeEventDur >= 1.0) {
-          brakeEvents++;
-          inBrakeEvent = true;
-        }
-      } else {
-        brakeEventDur = 0;
-        inBrakeEvent = false;
-      }
 
       // Altitude delta.
       final pAlt = prev.altitudeM, cAlt = cur.altitudeM;
@@ -279,8 +273,8 @@ class GpsDrivingFeatures {
       lowSpeedSeconds: low,
       cruiseSeconds: cruise,
       highSpeedSeconds: high,
-      accelEvents: accelEvents,
-      brakeEvents: brakeEvents,
+      accelEvents: accelCounts.accelEvents,
+      brakeEvents: accelCounts.brakeEvents,
       maxAccelG: maxAccelG,
       meanSpeedKmh: meanSpeed,
       distanceKm: distKm,

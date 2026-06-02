@@ -99,22 +99,42 @@ void main() {
     });
 
     group('accel / brake events', () {
-      test('a sustained > 2 m/s² ramp for ≥ 1s counts once', () {
-        // Speed goes 0 → 36 km/h over 5s → 2 m/s². Sustained, single
-        // event.
-        final samples = <TripSample>[];
-        for (var i = 0; i <= 5; i++) {
-          // 36 km/h = 10 m/s. Linear ramp.
-          samples.add(_s(t0.add(Duration(seconds: i)), i * 36.0 / 5));
-        }
-        // Then 10s of cruise so the integrator has time after the ramp.
+      // #2667 — accel/brake events now route through the ONE shared gate
+      // at the CANONICAL kHardAccelThresholdMps2 (3.0), not the old
+      // divergent 2.0 m/s² this file used. The ramp below is therefore
+      // 3.6 m/s² (0 → 36 km/h over the first 2.78 s — comfortably above
+      // 3.0); a 2.0 m/s² ramp would no longer count an event, which is the
+      // whole point of the reconciliation.
+      test('a sustained ≥ 3 m/s² ramp for ≥ 1s counts once', () {
+        // Speed goes 0 → 50 km/h over 2 s → 6.94 m/s². Sustained, single
+        // event, then cruise.
+        final samples = <TripSample>[
+          _s(t0, 0),
+          _s(t0.add(const Duration(seconds: 1)), 25),
+          _s(t0.add(const Duration(seconds: 2)), 50),
+        ];
         for (var i = 1; i <= 10; i++) {
-          samples.add(_s(t0.add(Duration(seconds: 5 + i)), 36.0));
+          samples.add(_s(t0.add(Duration(seconds: 2 + i)), 50.0));
         }
         final f = GpsDrivingFeatures.from(samples)!;
         expect(f.accelEvents, 1);
         expect(f.brakeEvents, 0);
         expect(f.maxAccelG, greaterThan(0.1));
+      });
+
+      test('a 2.0 m/s² ramp is below the canonical 3.0 threshold (#2667)',
+          () {
+        // The OLD gps_driving_features fired here at its 2.0 m/s²
+        // threshold; reconciled onto the canonical 3.0 it must NOT.
+        final samples = <TripSample>[];
+        for (var i = 0; i <= 5; i++) {
+          samples.add(_s(t0.add(Duration(seconds: i)), i * 36.0 / 5));
+        }
+        for (var i = 1; i <= 10; i++) {
+          samples.add(_s(t0.add(Duration(seconds: 5 + i)), 36.0));
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.accelEvents, 0);
       });
 
       test('a hard brake (< -2 m/s² for ≥ 1s) counts as brakeEvent', () {
