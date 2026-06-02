@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/station_services/chile/chile_response_parser.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
 
 /// One `data[]` entry from the CNE Bencina en Línea envelope. Mirrors
 /// the documented shape on `ChileStationService` and is intentionally
@@ -330,6 +332,56 @@ void main() {
       expect(dist >= 0, isTrue);
       // Rounded to 1 decimal: re-rounding must equal itself.
       expect(double.parse(dist.toStringAsFixed(1)), dist);
+    });
+
+    // Epic #2707 C8 (#2715): the parse path now threads the structured
+    // WeeklyOpeningHours onto Station.openingHours, while leaving the legacy
+    // boolean isOpen derivation (chile_response_parser.dart:244-250) intact.
+    group('opening hours wiring (#2715)', () {
+      Station only(String horario) => parseChileStationsResponse(
+            _envelope([_cneStation(horario: horario)]),
+            fromLat: -33.45,
+            fromLng: -70.67,
+          ).single;
+
+      test('"24_horas" populates Station.openingHours as whole-week open24h',
+          () {
+        final s = only('24_horas');
+        expect(s.openingHours, isNotNull);
+        expect(s.openingHours!.dayFor(OpeningDay.mon)?.state,
+            DayState.open24h);
+        expect(s.openingHours!.availability, OpeningHoursAvailability.full);
+        // isOpen behaviour unchanged: 24_horas is open.
+        expect(s.isOpen, isTrue);
+      });
+
+      test('a "cerrado" token populates a whole-week closed schedule', () {
+        final s = only('Temporalmente CERRADO por mantenimiento');
+        expect(s.openingHours, isNotNull);
+        expect(
+            s.openingHours!.dayFor(OpeningDay.mon)?.state, DayState.closed);
+        // isOpen behaviour unchanged: cerrado is closed.
+        expect(s.isOpen, isFalse);
+      });
+
+      test('a free-text schedule populates per-day ranges; isOpen unchanged',
+          () {
+        final s = only('Lunes a Domingo 07:00-22:00');
+        expect(s.openingHours, isNotNull);
+        expect(s.openingHours!.dayFor(OpeningDay.mon)?.ranges.single
+            .startMinutes, 7 * 60);
+        expect(s.openingHours!.dayFor(OpeningDay.sun)?.ranges.single
+            .endMinutes, 22 * 60);
+        // No 'cerrado' token → isOpen stays true (existing default).
+        expect(s.isOpen, isTrue);
+      });
+
+      test('a non-schedule horario leaves Station.openingHours null', () {
+        final s = only('Consultar en estación');
+        expect(s.openingHours, isNull);
+        // Still open by default (no cerrado token) — isOpen unchanged.
+        expect(s.isOpen, isTrue);
+      });
     });
   });
 }
