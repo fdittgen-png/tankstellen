@@ -9,6 +9,7 @@ import 'package:tankstellen/features/consumption/data/obd2/'
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_adapter.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 
 /// TDD tests for the Bluetooth OBD2 transport (#716).
@@ -289,6 +290,42 @@ void main() {
       expect(reply.trim(), '41 0D 3C',
           reason: 'the reconnected instance starts with _pending == null + '
               'an empty buffer, so the next command succeeds (#2524)');
+    });
+
+    test(
+        '#2671 — a drop landing DURING the native write surfaces as the '
+        'typed Obd2DisconnectedException and clears _pending (no poisoned '
+        'transport)', () async {
+      final channel = _ScriptedChannel();
+      // The classic channel reclassifies a not-connected platform write
+      // throw into a recoverable Obd2DisconnectedException (#2671 fix b).
+      // Model that: the channel's write throws the typed disconnect.
+      channel.scriptWriteThrows(
+        '010C\r',
+        const Obd2DisconnectedException(),
+      );
+      // The recovery command writes fine and gets a normal reply, proving
+      // _pending was cleared on the throwing write.
+      channel.scriptResponse('010D\r', '41 0D 3C >');
+      final transport = BluetoothObd2Transport(channel);
+      await transport.connect();
+
+      // 1) The failing command surfaces the typed disconnect to its caller
+      //    — the drop detector's `_isTypedDisconnect` routes this through
+      //    pause/reconnect instead of logging an ERROR trace.
+      await expectLater(
+        transport.sendCommand('010C\r'),
+        throwsA(isA<Obd2DisconnectedException>()),
+      );
+
+      // 2) _pending was cleared on the throw, so the NEXT command does not
+      //    trip the concurrent-sendCommand guard (which itself now throws
+      //    Obd2DisconnectedException). A clean reply proves the transport
+      //    is not poisoned.
+      final reply = await transport.sendCommand('010D\r');
+      expect(reply.trim(), '41 0D 3C',
+          reason: 'transport must recover: _pending cleared on the typed '
+              'disconnect write, so the next command proceeds normally');
     });
 
     test('disconnect closes the channel and flips isConnected to false',

@@ -8,6 +8,7 @@ import '../../../../core/logging/error_logger.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'pid_bandwidth_governor.dart';
 import 'pid_scheduler_comm_diagnostics.dart';
+import 'pid_subscription.dart';
 import 'scheduled_pid.dart';
 import 'unresponsive_adapter_diagnostic.dart';
 
@@ -110,9 +111,16 @@ class PidScheduler {
   /// [DateTime.now].
   final DateTime Function() _clock;
 
-  final Map<String, _Subscription> _subs = <String, _Subscription>{};
+  final Map<String, PidSubscription> _subs = <String, PidSubscription>{};
   Timer? _timer;
   bool _running = false;
+
+  /// #2671 — true while a connection drop / flapping link recovers. The
+  /// timer may still run, but a paused tick must NOT dispatch — every write
+  /// into the dead Classic-SPP socket threw `PlatformException(not
+  /// connected)`. Set on `dropDetected`, cleared on reconnect.
+  bool _paused = false;
+
   String? _inFlight;
   int _subscriptionCounter = 0;
 
@@ -168,11 +176,12 @@ class PidScheduler {
     ScheduledPid config,
     void Function(String response) onResult,
   ) {
-    _subs[command] = _Subscription(
+    _subs[command] = PidSubscription(
       command: command,
       config: config,
       onResult: onResult,
       order: _subscriptionCounter++,
+      maxConsecutiveFailures: _maxConsecutiveFailures,
     );
     _governor.register(
       command,
@@ -207,6 +216,26 @@ class PidScheduler {
     _timer = null;
   }
 
+  /// Whether dispatch is currently gated by a connection-drop pause (#2671).
+  @visibleForTesting
+  bool get isPaused => _paused;
+
+  /// #2671 — gate PID dispatch while a drop / flapping link recovers, WITHOUT
+  /// tearing the timer down: a paused [_tick] short-circuits before the
+  /// transport, so no write lands on a dead socket. Idempotent.
+  void pause() => _paused = true;
+
+  /// #2671 — re-open dispatch once the link recovers. Also resets the per-PID
+  /// failure/backoff streaks + the unresponsive-episode latch so the
+  /// reconnected adapter starts clean. Idempotent.
+  void resume() {
+    _paused = false;
+    for (final sub in _subs.values) {
+      sub.consecutiveFailures = 0;
+    }
+    _unresponsiveDiagnostic.reset();
+  }
+
   /// Pure selection: given the current subscription state and [now],
   /// return the command that should fire next — or `null` if nothing is
   /// subscribed. Exposed for tests that need to verify the weighted
@@ -222,7 +251,7 @@ class PidScheduler {
     if (_subs.isEmpty) return null;
 
     String? bestCommand;
-    _Subscription? best;
+    PidSubscription? best;
     var bestWeight = double.negativeInfinity;
 
     for (final entry in _subs.entries) {
@@ -237,7 +266,7 @@ class PidScheduler {
     return bestCommand;
   }
 
-  double _weightFor(_Subscription sub, DateTime now) {
+  double _weightFor(PidSubscription sub, DateTime now) {
     final last = sub.config.lastReadAt;
     if (last == null) return double.infinity;
     final elapsedMs = now.difference(last).inMicroseconds / 1000.0;
@@ -255,7 +284,7 @@ class PidScheduler {
   ///     factor, handing the freed budget to the dynamics tier on a slow
   ///     link.
   /// Backoff dominates (a dead PID stays at [_backoffHz] regardless).
-  double _effectiveHz(_Subscription sub) {
+  double _effectiveHz(PidSubscription sub) {
     if (sub.isBackedOff) return _backoffHz;
     final base = sub.config.hz;
     return _governor.isDemoted(sub.command)
@@ -267,9 +296,9 @@ class PidScheduler {
   /// [currentBestWeight]/[currentBest] as the winner so far.
   bool _beats(
     double candidateWeight,
-    _Subscription candidate,
+    PidSubscription candidate,
     double currentBestWeight,
-    _Subscription? currentBest,
+    PidSubscription? currentBest,
   ) {
     if (currentBest == null) return true;
     if (candidateWeight > currentBestWeight) return true;
@@ -286,6 +315,9 @@ class PidScheduler {
 
   Future<void> _tick() async {
     if (!_running) return;
+    // #2671 — paused while a drop recovers: do NOT dispatch into the dead /
+    // reconnecting socket until [resume] re-opens dispatch.
+    if (_paused) return;
     // Tee EVERY tick (fired or skipped) so back-pressure becomes a rate
     // (#2468). Gated: a pure branch-not-taken in prod (debug-mode off).
     final diag = Obd2CommDiagnostics.instance;
@@ -346,7 +378,9 @@ class PidScheduler {
             consecutiveFailures: sub.consecutiveFailures,
             backedOff: sub.isBackedOff);
       }
-      _maybeEmitUnresponsiveDiagnostic(e, st);
+      // Surface a broadly-unresponsive adapter WITHOUT flooding the log
+      // (#2379 / #2524); a typed disconnect is skipped there (#2671).
+      _unresponsiveDiagnostic.onFailure(backedOffCount, e, st);
     } finally {
       _inFlight = null;
       // Re-evaluate the bandwidth budget after every completed read (the
@@ -360,40 +394,5 @@ class PidScheduler {
       }
     }
   }
-
-  /// Surface a broadly-unresponsive adapter WITHOUT flooding the error log
-  /// (#2379 / #2524). Delegates the log-once-per-episode decision to
-  /// [UnresponsiveAdapterDiagnostic]; see that class for the contract.
-  void _maybeEmitUnresponsiveDiagnostic(Object error, StackTrace stack) {
-    _unresponsiveDiagnostic.onFailure(backedOffCount, error, stack);
-  }
 }
 
-class _Subscription {
-  _Subscription({
-    required this.command,
-    required this.config,
-    required this.onResult,
-    required this.order,
-  });
-
-  /// The OBD-II command this subscription polls (e.g. `'010C'`). Kept so
-  /// the governor can address demotions by command without a reverse map.
-  final String command;
-
-  final ScheduledPid config;
-  final void Function(String response) onResult;
-
-  /// Monotonic subscription index used for FIFO tie-breaking.
-  final int order;
-
-  /// Consecutive transport failures since the last successful read. Reset
-  /// to 0 on any success. Drives the [isBackedOff] state (#2379).
-  int consecutiveFailures = 0;
-
-  /// True once this PID has failed [PidScheduler._maxConsecutiveFailures]
-  /// times in a row — it is then selected at the slow backoff rate until
-  /// it next answers.
-  bool get isBackedOff =>
-      consecutiveFailures >= PidScheduler._maxConsecutiveFailures;
-}

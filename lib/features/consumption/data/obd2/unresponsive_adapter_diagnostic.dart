@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import 'obd2_connection_errors.dart';
 
 /// Owns the "OBD2 adapter broadly unresponsive" diagnostic decision for
 /// the [PidScheduler] (#2379 / #2524), extracted so the scheduler's
@@ -37,10 +38,31 @@ class UnresponsiveAdapterDiagnostic {
   bool _inEpisode = false;
   DateTime? _lastLoggedAt;
 
+  /// Reset the episode latch + rate-limit window so a fresh outage can log a
+  /// fresh ERROR. Called by [PidScheduler.resume] on reconnect (#2671): the
+  /// pre-drop episode state must not suppress the diagnostic for a genuinely
+  /// new outage on the recovered link.
+  void reset() {
+    _inEpisode = false;
+    _lastLoggedAt = null;
+  }
+
   /// Feed the per-tick failure outcome. [backedOffCount] is how many PIDs
   /// are currently backed off; [error]/[stack] are the failure that
   /// triggered this tick (logged only on a fresh episode transition).
   void onFailure(int backedOffCount, Object error, StackTrace stack) {
+    // #2671 — a typed disconnect / not-connected error IS the drop itself,
+    // not an "adapter unresponsive" episode. On a Classic-SPP flap every
+    // write threw `PlatformException(state, not connected)` (category
+    // `platform`) — exactly the field error. Logging it here spooled that
+    // ERROR per drop. The drop is handled by the pause/reconnect path
+    // (PidScheduler.pause + DroppedSessionManager), so skip it entirely and
+    // do NOT touch the episode latch (a real timeout outage must still log).
+    if (_isRecoverableDisconnect(error)) {
+      debugPrint('UnresponsiveAdapterDiagnostic: skipping a recoverable '
+          'disconnect — handled by the drop/reconnect path (#2671): $error');
+      return;
+    }
     if (backedOffCount < _backoffThreshold) {
       _inEpisode = false; // recovered — re-arm for the next outage
       return;
@@ -63,5 +85,16 @@ class UnresponsiveAdapterDiagnostic {
     _lastLoggedAt = now;
     unawaited(errorLogger.log(ErrorLayer.other, error, stack,
         context: {'where': msg, 'backedOffPids': backedOffCount}));
+  }
+
+  /// True for an error that means "the link dropped" rather than "the
+  /// adapter is broadly unresponsive" — the typed [Obd2DisconnectedException]
+  /// the channels now raise, or a raw not-connected platform/state error
+  /// (matched by message so this stays decoupled from `package:flutter`'s
+  /// services library, mirroring `TripDropDetector._isTypedDisconnect`).
+  static bool _isRecoverableDisconnect(Object error) {
+    if (error is Obd2DisconnectedException) return true;
+    final msg = error.toString().toLowerCase();
+    return msg.contains('not connected') || msg.contains('transport closed');
   }
 }

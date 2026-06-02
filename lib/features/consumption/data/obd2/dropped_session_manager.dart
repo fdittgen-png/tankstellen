@@ -148,6 +148,11 @@ class DroppedSessionManager {
       detail: reason.name,
     );
     _host.stopScheduler();
+    // #2671 — also GATE dispatch (not just cancel the timer): if a later
+    // path restarts the scheduler while the link is still flapping, a paused
+    // tick must not write into the dead socket. Resumed only on a confirmed
+    // reconnect (onScannerReconnect).
+    _host.pauseScheduler();
     // #2524 — tear down the now-dead service so its channel closes + any
     // stranded `_pending` fails (else it later trips the concurrent guard).
     _host.disconnectDroppedService();
@@ -277,6 +282,9 @@ class DroppedSessionManager {
         AutoRecordEventKind.silentReconnectSucceeded,
         mac: _pinnedAdapterMac,
       );
+      // #2671 — link confirmed back: re-open dispatch + reset failure
+      // streaks before the scheduler resumes ticking.
+      _host.resumeScheduler();
       if (!_host.paused && !_host.stopped) _host.startScheduler();
       _host.emitState();
       return;
@@ -299,6 +307,9 @@ class DroppedSessionManager {
         AutoRecordEventKind.silentReconnectSucceeded,
         mac: _pinnedAdapterMac,
       );
+      // #2671 — link confirmed back: re-open dispatch + reset failure
+      // streaks before the scheduler resumes ticking.
+      _host.resumeScheduler();
       // Respect a user pause that landed during the silent window.
       if (!_host.paused && !_host.stopped) _host.startScheduler();
       _host.emitState();

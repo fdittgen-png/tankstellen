@@ -549,6 +549,10 @@ class TripRecordingController {
       // the resume transition.
       unawaited(_droppedSession.stopReconnectScanner());
       _droppedSession.clearPausedTripRow();
+      // #2671 — a drop-pause gated the scheduler's dispatch (pauseScheduler);
+      // the link is back, so re-open it + reset the per-PID failure streaks
+      // before the timer resumes ticking.
+      _scheduler?.resume();
     }
     _paused = false;
     _scheduler?.start();
@@ -1535,6 +1539,12 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
 
   @override
   void stopScheduler() => _c._scheduler?.stop();
+
+  @override
+  void pauseScheduler() => _c._scheduler?.pause();
+
+  @override
+  void resumeScheduler() => _c._scheduler?.resume();
 
   @override
   void disconnectDroppedService() {

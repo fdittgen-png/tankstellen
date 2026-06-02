@@ -3,10 +3,13 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Standard Bluetooth Serial Port Profile UUID (#761). Every
@@ -97,6 +100,14 @@ class ClassicElmChannel implements ElmByteChannel {
         _incoming.add(bytes);
       },
       onError: (Object e, StackTrace st) {
+        // #2671 — a Classic-SPP drop raises a socket ERROR on the reader
+        // stream (not stream `done`), so the `onDone` handler below never
+        // runs. Mirror it here: clear `_open` the instant the link errors so
+        // the very next `write()` short-circuits on the `!_open` guard
+        // instead of dispatching into a dead socket and throwing the raw
+        // `PlatformException(state, not connected)` the PidScheduler then
+        // logged as an ERROR (4× in the field log).
+        _open = false;
         // #2295 — forward the socket error onto the byte stream so the
         // transport's pending `sendCommand` completer fails IMMEDIATELY
         // (via `_failPending`) instead of waiting out the read timeout,
@@ -119,9 +130,31 @@ class ClassicElmChannel implements ElmByteChannel {
   @override
   Future<void> write(List<int> bytes) async {
     if (!_open) {
-      throw StateError('ClassicElmChannel: not open');
+      // #2671 — the channel is not open: either never opened, or a drop
+      // cleared `_open` (the `onError` / `onDone` handlers). Surface the
+      // recoverable [Obd2DisconnectedException] so the drop detector's
+      // `_isTypedDisconnect` routes a post-drop write through pause/reconnect
+      // instead of letting a raw error reach the PidScheduler's error log.
+      throw const Obd2DisconnectedException('ClassicElmChannel: not open');
     }
-    await _plugin.write(bytes);
+    // #2671 — a drop can land AFTER the `_open` guard passed but DURING the
+    // native write (the in-flight-write race): the Kotlin side then throws
+    // `PlatformException(state, not connected)`. Reclassify it as the
+    // recoverable [Obd2DisconnectedException] — matching the #2524 precedent
+    // in [BluetoothObd2Transport._sendRaw] — so the drop detector's
+    // `_isTypedDisconnect` routes it through pause/reconnect instead of the
+    // raw platform error being spooled as an ERROR trace. Also flip `_open`
+    // so the next write short-circuits on the guard.
+    try {
+      await _plugin.write(bytes);
+    } catch (e, st) {
+      _open = false;
+      debugPrint('ClassicElmChannel: write failed — reclassifying as a '
+          'recoverable disconnect (#2671): $e\n$st');
+      throw const Obd2DisconnectedException(
+        'ClassicElmChannel: write failed — adapter not connected',
+      );
+    }
   }
 
   /// Bin a Classic-SPP `open()` throw into a stable, low-cardinality

@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -246,6 +249,87 @@ void main() {
       expect(storage.stored.first.category, ErrorCategory.api,
           reason: 'ApiException stays api — layer fallback only fires '
               'when classifier returns unknown');
+    });
+
+    // #2671 — benign offline/cancelled transients are EXPECTED, not errors.
+    // They must NOT be persisted as error traces (no store, no upload) so
+    // the error log stays signal-rich. The filter lives in `record()` so
+    // EVERY caller path (dio interceptor, errorLogger.log, service chain)
+    // is covered.
+    group('benign-transient suppression (#2671)', () {
+      test('a "Failed host lookup" SocketException is NOT persisted',
+          () async {
+        const error =
+            SocketException('Failed host lookup: supabase.co');
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'offline DNS failure must not be stored');
+        expect(uploader.uploadCalled, isFalse,
+            reason: 'offline DNS failure must not be uploaded');
+      });
+
+      test(
+          'a "Failed host lookup" SocketException wrapped in ContextualError '
+          'is NOT persisted (matches on the unwrapped error)', () async {
+        final wrapped = ContextualError(
+          layer: ErrorLayer.services,
+          error: const SocketException('Failed host lookup: supabase.co'),
+          context: null,
+        );
+        await recorder.record(wrapped, StackTrace.current);
+
+        expect(storage.stored, isEmpty);
+        expect(uploader.uploadCalled, isFalse);
+      });
+
+      test('a cancelled DioException is NOT persisted', () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/stations'),
+          type: DioExceptionType.cancel,
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'user-cancelled request must not be stored');
+        expect(uploader.uploadCalled, isFalse,
+            reason: 'user-cancelled request must not be uploaded');
+      });
+
+      test(
+          'a NON-cancel DioException (genuine failure) IS still persisted',
+          () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/stations'),
+          type: DioExceptionType.badResponse,
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, hasLength(1),
+            reason: 'a real API failure must still be recorded');
+        expect(uploader.uploadCalled, isTrue);
+      });
+
+      test('a genuine ApiException still persists (filter is narrow)',
+          () async {
+        const error = ApiException(message: 'boom', statusCode: 500);
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, hasLength(1),
+            reason: 'a genuine API error must still be recorded');
+        expect(uploader.uploadCalled, isTrue);
+      });
+
+      test(
+          'a non-host-lookup SocketException (e.g. connection refused) IS '
+          'still persisted', () async {
+        const error = SocketException('Connection refused');
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, hasLength(1),
+            reason: 'only host-lookup (offline DNS) is benign; a refused '
+                'connection is a real failure worth a trace');
+      });
     });
   });
 }
