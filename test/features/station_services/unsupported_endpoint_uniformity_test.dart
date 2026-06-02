@@ -14,6 +14,12 @@ import 'package:tankstellen/features/station_services/uk/uk_station_service.dart
 /// the shared StationServiceHelpers (throwDetailUnavailable / emptyPricesResult)
 /// instead of inline throws + inline ServiceResults, and Mexico is on the
 /// CachedDatasetMixin like the other bulk-dataset services.
+///
+/// #2714 — Portugal now SERVES getStationDetail (DGEG GetDadosPostoMapa,
+/// parsing HorarioPosto for opening hours), so it is no longer in the
+/// detail-unsupported set; its positive coverage lives in
+/// portugal_station_service_test.dart. PT still has no bulk-prices
+/// endpoint, so it remains in the empty-getPrices set.
 
 void main() {
   group('Mexico migrated onto CachedDatasetMixin (#2264)', () {
@@ -23,13 +29,19 @@ void main() {
   });
 
   group('Shared unsupported-endpoint helpers (#2264)', () {
-    final services = <String, StationService>{
+    // PT dropped here in #2714 — it now returns a real StationDetail.
+    final detailUnsupported = <String, StationService>{
+      'UK': UkStationService(),
+      'MX': MexicoStationService(),
+    };
+    // PT stays — it still has no bulk-prices endpoint.
+    final pricesUnsupported = <String, StationService>{
       'UK': UkStationService(),
       'PT': PortugalStationService(),
       'MX': MexicoStationService(),
     };
 
-    for (final entry in services.entries) {
+    for (final entry in detailUnsupported.entries) {
       test('${entry.key} getStationDetail throws the shared ApiException',
           () async {
         try {
@@ -42,7 +54,9 @@ void main() {
               reason: '${entry.key} must use throwDetailUnavailable');
         }
       });
+    }
 
+    for (final entry in pricesUnsupported.entries) {
       test('${entry.key} getPrices returns the shared empty result', () async {
         final result = await entry.value.getPrices(['${entry.key}-1']);
         expect(result.data, isEmpty);
