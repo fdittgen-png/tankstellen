@@ -5731,6 +5731,63 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2HealthCopied => 'OBD2 diagnostics copied to clipboard.';
 
   @override
+  String get obd2TestRunTitle => 'Run adapter test';
+
+  @override
+  String get obd2TestRunButton => 'Run adapter test';
+
+  @override
+  String get obd2TestRunPassed => 'Adapter test passed';
+
+  @override
+  String get obd2TestRunFailed => 'Adapter test failed';
+
+  @override
+  String obd2TestRunSummary(int passed, int total, int elapsed) {
+    return '$passed of $total steps OK · $elapsed ms';
+  }
+
+  @override
+  String get obd2TestRunCannotWhileRecording =>
+      'Stop the active recording before running the adapter test.';
+
+  @override
+  String get obd2TestStepScan => 'Scan for adapter';
+
+  @override
+  String get obd2TestStepConnect => 'Connect & init';
+
+  @override
+  String get obd2TestStepInfo => 'Adapter info';
+
+  @override
+  String get obd2TestStepSupportedPids => 'Supported PIDs';
+
+  @override
+  String get obd2TestStepSampleReads => 'Sample reads';
+
+  @override
+  String get obd2TestStepReconnect => 'Reconnect test';
+
+  @override
+  String get obd2TestStepDisconnect => 'Disconnect';
+
+  @override
+  String get obd2TestStatusOk => 'OK';
+
+  @override
+  String get obd2TestStatusTimeout => 'Timed out';
+
+  @override
+  String get obd2TestStatusGarbage => 'Unreadable reply';
+
+  @override
+  String get obd2TestStatusNoResponse => 'No response';
+
+  @override
+  String get obd2TestStatusFail => 'Failed';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
   }
@@ -12680,6 +12737,63 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2HealthCopied =>
       '⟦ÓƁĐ2 đîáǧñóšŧîçš çóƥîéđ ŧó çłîƥƀóářđ. ··············⟧';
+
+  @override
+  String get obd2TestRunTitle => '⟦Řúñ áđáƥŧéř ŧéšŧ ······⟧';
+
+  @override
+  String get obd2TestRunButton => '⟦Řúñ áđáƥŧéř ŧéšŧ ······⟧';
+
+  @override
+  String get obd2TestRunPassed => '⟦Áđáƥŧéř ŧéšŧ ƥáššéđ ········⟧';
+
+  @override
+  String get obd2TestRunFailed => '⟦Áđáƥŧéř ŧéšŧ ƒáîłéđ ········⟧';
+
+  @override
+  String obd2TestRunSummary(int passed, int total, int elapsed) {
+    return '⟦$passed óƒ $total šŧéƥš ÓĶ · $elapsed ɱš ·····⟧';
+  }
+
+  @override
+  String get obd2TestRunCannotWhileRecording =>
+      '⟦Šŧóƥ ŧĥé áçŧîṽé řéçóřđîñǧ ƀéƒóřé řúññîñǧ ŧĥé áđáƥŧéř ŧéšŧ. ······················⟧';
+
+  @override
+  String get obd2TestStepScan => '⟦Šçáñ ƒóř áđáƥŧéř ······⟧';
+
+  @override
+  String get obd2TestStepConnect => '⟦Çóññéçŧ & îñîŧ ·····⟧';
+
+  @override
+  String get obd2TestStepInfo => '⟦Áđáƥŧéř îñƒó ·····⟧';
+
+  @override
+  String get obd2TestStepSupportedPids => '⟦Šúƥƥóřŧéđ ƤÎĐš ······⟧';
+
+  @override
+  String get obd2TestStepSampleReads => '⟦Šáɱƥłé řéáđš ·····⟧';
+
+  @override
+  String get obd2TestStepReconnect => '⟦Řéçóññéçŧ ŧéšŧ ······⟧';
+
+  @override
+  String get obd2TestStepDisconnect => '⟦Đîšçóññéçŧ ·····⟧';
+
+  @override
+  String get obd2TestStatusOk => '⟦ÓĶ ·⟧';
+
+  @override
+  String get obd2TestStatusTimeout => '⟦Ŧîɱéđ óúŧ ····⟧';
+
+  @override
+  String get obd2TestStatusGarbage => '⟦Úñřéáđáƀłé řéƥłý ·······⟧';
+
+  @override
+  String get obd2TestStatusNoResponse => '⟦Ñó řéšƥóñšé ·····⟧';
+
+  @override
+  String get obd2TestStatusFail => '⟦Ƒáîłéđ ···⟧';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

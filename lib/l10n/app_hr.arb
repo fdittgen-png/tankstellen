@@ -3501,5 +3501,109 @@
   "@tripRadarShowPrevious": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2TestRunTitle": "Run adapter test",
+  "@obd2TestRunTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestRunButton": "Run adapter test",
+  "@obd2TestRunButton": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestRunPassed": "Adapter test passed",
+  "@obd2TestRunPassed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestRunFailed": "Adapter test failed",
+  "@obd2TestRunFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
+  "@obd2TestRunSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "passed": {
+        "type": "int",
+        "example": "6"
+      },
+      "total": {
+        "type": "int",
+        "example": "7"
+      },
+      "elapsed": {
+        "type": "int",
+        "example": "2480"
+      }
+    }
+  },
+  "obd2TestRunCannotWhileRecording": "Stop the active recording before running the adapter test.",
+  "@obd2TestRunCannotWhileRecording": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepScan": "Scan for adapter",
+  "@obd2TestStepScan": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepConnect": "Connect & init",
+  "@obd2TestStepConnect": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepInfo": "Adapter info",
+  "@obd2TestStepInfo": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepSupportedPids": "Supported PIDs",
+  "@obd2TestStepSupportedPids": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepSampleReads": "Sample reads",
+  "@obd2TestStepSampleReads": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepReconnect": "Reconnect test",
+  "@obd2TestStepReconnect": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepDisconnect": "Disconnect",
+  "@obd2TestStepDisconnect": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStatusOk": "OK",
+  "@obd2TestStatusOk": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStatusTimeout": "Timed out",
+  "@obd2TestStatusTimeout": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStatusGarbage": "Unreadable reply",
+  "@obd2TestStatusGarbage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStatusNoResponse": "No response",
+  "@obd2TestStatusNoResponse": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStatusFail": "Failed",
+  "@obd2TestStatusFail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
