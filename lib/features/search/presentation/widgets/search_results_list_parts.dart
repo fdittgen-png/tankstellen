@@ -126,6 +126,38 @@ class _CollapsibleBrandFilters extends ConsumerWidget {
   }
 }
 
+/// #2675 — header affordance that runs the on-search Fuel Station Radar: a
+/// one-shot, cache-first scan around the user's persisted position whose
+/// stations render in this same list (the polymorphic switch builds them as
+/// fuel cards). Mirrors the map button's Semantics + Tooltip + InkWell pair.
+class _RadarSearchButton extends ConsumerWidget {
+  const _RadarSearchButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final label = l10n?.fuelStationRadarButtonTooltip ??
+        'Search with Fuel Station Radar';
+    return Semantics(
+      label: label,
+      button: true,
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          key: const Key('radarSearchButton'),
+          onTap: () => ref.read(radarSearchProvider.notifier).runRadar(),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            child: Icon(Icons.radar,
+                size: 18, color: Theme.of(context).colorScheme.primary),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Toggle button to switch between compact card view and all-prices detail view.
 class _ViewToggleButton extends ConsumerWidget {
   @override

@@ -11607,6 +11607,12 @@ abstract class AppLocalizations {
   /// **'Farther station'**
   String get fuelStationRadarFarther;
 
+  /// Tooltip / accessibility label on the radar button in the search-results header that runs a cache-first radar scan around the user and shows the nearby stations in the results list (#2675).
+  ///
+  /// In en, this message translates to:
+  /// **'Search with Fuel Station Radar'**
+  String get fuelStationRadarButtonTooltip;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

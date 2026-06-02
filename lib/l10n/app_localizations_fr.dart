@@ -6673,6 +6673,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fuelStationRadarFarther => 'Farther station';
 
   @override
+  String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
+
+  @override
   String get tripRecordingPinTooltip =>
       'L\'épinglage garde l\'écran allumé — consomme plus de batterie';
 

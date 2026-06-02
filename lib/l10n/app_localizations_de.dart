@@ -6650,6 +6650,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fuelStationRadarFarther => 'Weiter entfernte Tankstelle';
 
   @override
+  String get fuelStationRadarButtonTooltip => 'Mit Tankstellen-Radar suchen';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 

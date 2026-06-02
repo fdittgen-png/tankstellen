@@ -2995,6 +2995,10 @@
   "@fuelStationRadarFarther": {
     "description": "Swipe-right hint / screen-reader action on the Fuel Station Radar card: page to the next-farther station in the distance-ranked list (#2661)."
   },
+  "fuelStationRadarButtonTooltip": "Mit Tankstellen-Radar suchen",
+  "@fuelStationRadarButtonTooltip": {
+    "description": "Tooltip / accessibility label on the radar button in the search-results header that runs a cache-first radar scan around the user and shows the nearby stations in the results list (#2675)."
+  },
   "tripRecordingPinTooltip": "Anpinnen hält den Bildschirm an — verbraucht mehr Akku",
   "@tripRecordingPinTooltip": {
     "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."
