@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:dio/dio.dart';
 import '../cache/cache_manager.dart';
 import '../country/country_config.dart';
@@ -16,11 +17,31 @@ class ResolvedLocation {
   final double lng;
   final String? postcode;
 
+  /// Raw Nominatim discriminator fields, used to deduplicate the multiple
+  /// admin-level entities Nominatim returns for one place (e.g. the
+  /// "Barcelona" city node vs. its province boundary). All nullable so
+  /// non-Nominatim / legacy-cached entries stay valid (#2639).
+  final int? osmId;
+  final double? importance;
+  final int? placeRank;
+  final String? addressType;
+
+  /// Country of the place, captured from the raw entry's `address.country`
+  /// (or the full display_name's last segment) before [name] is truncated to
+  /// three segments — so the dedup country guard never compares a truncated
+  /// label (#2639).
+  final String? country;
+
   const ResolvedLocation({
     required this.name,
     required this.lat,
     required this.lng,
     this.postcode,
+    this.osmId,
+    this.importance,
+    this.placeRank,
+    this.addressType,
+    this.country,
   });
 }
 
@@ -94,25 +115,40 @@ class LocationSearchService {
           'format': 'json',
           'limit': '8',
           'addressdetails': '1',
+          // Nominatim's own dedupe does NOT merge a city node with its
+          // province boundary; the client-side _dedupe is the real fix
+          // (#2639). Kept explicit for clarity.
+          'dedupe': '1',
         },
         cancelToken: cancelToken,
       );
 
       if (response.data is! List) return [];
 
-      final results = (response.data as List).map((r) {
+      final mapped = (response.data as List).map((r) {
         final addr = r['address'] as Map<String, dynamic>? ?? {};
         final name = r['display_name']?.toString() ?? '';
         final short = name.split(',').take(3).join(',').trim();
+        // Capture the country from the FULL display_name before truncation —
+        // the city node's truncated [name] drops it (#2639).
+        final country = addr['country']?.toString() ??
+            (name.contains(',') ? name.split(',').last.trim() : null);
         return ResolvedLocation(
           name: short,
           lat: double.tryParse(r['lat']?.toString() ?? '') ?? 0,
           lng: double.tryParse(r['lon']?.toString() ?? '') ?? 0,
           postcode: addr['postcode']?.toString(),
+          osmId: (r['osm_id'] as num?)?.toInt(),
+          importance: (r['importance'] as num?)?.toDouble(),
+          placeRank: (r['place_rank'] as num?)?.toInt(),
+          addressType: r['addresstype']?.toString(),
+          country: country,
         );
       }).toList();
 
-      // Cache the results
+      final results = _dedupe(mapped);
+
+      // Cache the deduped results so cached reads dedup-stably too.
       await _cache.put(
         cacheKey,
         _serializeLocations(results),
@@ -133,6 +169,11 @@ class LocationSearchService {
                   'lat': l.lat,
                   'lng': l.lng,
                   'postcode': l.postcode,
+                  'osmId': l.osmId,
+                  'importance': l.importance,
+                  'placeRank': l.placeRank,
+                  'addressType': l.addressType,
+                  'country': l.country,
                 })
             .toList(),
       };
@@ -147,7 +188,119 @@ class LocationSearchService {
         lat: (m['lat'] as num?)?.toDouble() ?? 0,
         lng: (m['lng'] as num?)?.toDouble() ?? 0,
         postcode: m['postcode'] as String?,
+        osmId: (m['osmId'] as num?)?.toInt(),
+        importance: (m['importance'] as num?)?.toDouble(),
+        placeRank: (m['placeRank'] as num?)?.toInt(),
+        addressType: m['addressType'] as String?,
+        country: m['country'] as String?,
       );
     }).toList();
   }
+
+  /// Address types that represent an actual settlement a user means when they
+  /// type a place name — these win over administrative/boundary entities.
+  static const _settlementTypes = {'city', 'town', 'village', 'hamlet'};
+
+  /// Radius within which a same-name, same-country entry is treated as a
+  /// duplicate of the kept one. Wide enough to bind a city node to its
+  /// province boundary (Barcelona: ~44 km) yet far below the separation of
+  /// genuinely distinct same-country same-name places (Springfield IL↔MO:
+  /// ~427 km), so those stay separate (#2639).
+  static const _nearDuplicateKm = 50.0;
+
+  /// Collapse the multiple admin-level entities Nominatim returns for one
+  /// place into a single best entry (#2639).
+  ///
+  /// Two grouping rules:
+  /// - **A — same `osmId`**: exact OSM identity, always one place.
+  /// - **B — near-duplicate**: equal normalized first display-name token AND
+  ///   equal country AND coordinates within [_nearDuplicateKm] of the kept
+  ///   entry. This binds a city node to its province boundary (different
+  ///   osmIds — Barcelona's are ~44 km apart, the boundary's representative
+  ///   point sitting well outside the city centroid) while the distance +
+  ///   country guards keep genuinely distinct same-name places apart
+  ///   (Barcelona ES vs VE; same-country "Springfield"s are 100s of km apart).
+  ///
+  /// Within each group the *best* entry is kept (see [_isBetter]): a
+  /// settlement type beats an administrative one, then higher importance,
+  /// then lower placeRank.
+  List<ResolvedLocation> _dedupe(List<ResolvedLocation> locs) {
+    final kept = <ResolvedLocation>[];
+    for (final loc in locs) {
+      final idx = kept.indexWhere((k) => _sameGroup(k, loc));
+      if (idx == -1) {
+        kept.add(loc);
+      } else if (_isBetter(loc, kept[idx])) {
+        kept[idx] = loc;
+      }
+    }
+    return kept;
+  }
+
+  bool _sameGroup(ResolvedLocation a, ResolvedLocation b) {
+    // Group A — exact OSM identity.
+    if (a.osmId != null && b.osmId != null && a.osmId == b.osmId) return true;
+    // Group B — same first token + same country + within _nearDuplicateKm.
+    if (_normToken(a.name) != _normToken(b.name)) return false;
+    if (_country(a) != _country(b)) return false;
+    return _distanceKm(a.lat, a.lng, b.lat, b.lng) <= _nearDuplicateKm;
+  }
+
+  /// True if [a] should be preferred over [b] within a dedup group.
+  bool _isBetter(ResolvedLocation a, ResolvedLocation b) {
+    final aSettle = _settlementTypes.contains(a.addressType);
+    final bSettle = _settlementTypes.contains(b.addressType);
+    if (aSettle != bSettle) return aSettle;
+    final ai = a.importance ?? 0;
+    final bi = b.importance ?? 0;
+    if (ai != bi) return ai > bi;
+    final ar = a.placeRank ?? 1 << 30;
+    final br = b.placeRank ?? 1 << 30;
+    return ar < br;
+  }
+
+  /// First display-name segment, trimmed, lowercased, diacritics + punctuation
+  /// stripped, so "Barcelonès" and "barcelones" compare equal.
+  String _normToken(String name) {
+    final first = name.split(',').first;
+    final lower = first.trim().toLowerCase();
+    final folded = _foldDiacritics(lower);
+    return folded.replaceAll(RegExp(r'[^a-z0-9]'), '');
+  }
+
+  /// Normalized country of the place (#2639). Uses the captured [country]
+  /// field; falls back to the (possibly truncated) name's last segment for
+  /// legacy-cached entries that predate the field.
+  String _country(ResolvedLocation l) {
+    final raw = l.country ?? l.name.split(',').last;
+    return _foldDiacritics(raw.trim().toLowerCase());
+  }
+
+  static const _diacriticsSrc = 'àáâãäåçèéêëìíîïñòóôõöùúûüýÿ';
+  static const _diacriticsDst = 'aaaaaaceeeeiiiinooooouuuuyy';
+
+  String _foldDiacritics(String input) {
+    final buf = StringBuffer();
+    for (final rune in input.runes) {
+      final ch = String.fromCharCode(rune);
+      final i = _diacriticsSrc.indexOf(ch);
+      buf.write(i == -1 ? ch : _diacriticsDst[i]);
+    }
+    return buf.toString();
+  }
+
+  /// Great-circle distance in km (haversine).
+  double _distanceKm(double lat1, double lng1, double lat2, double lng2) {
+    const earthKm = 6371.0;
+    final dLat = _rad(lat2 - lat1);
+    final dLng = _rad(lng2 - lng1);
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_rad(lat1)) *
+            math.cos(_rad(lat2)) *
+            math.sin(dLng / 2) *
+            math.sin(dLng / 2);
+    return earthKm * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+  }
+
+  double _rad(double deg) => deg * math.pi / 180.0;
 }

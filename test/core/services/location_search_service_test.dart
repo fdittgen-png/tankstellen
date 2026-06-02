@@ -11,6 +11,31 @@ import 'package:tankstellen/core/services/service_result.dart';
 
 class MockCacheManager extends Mock implements CacheManager {}
 
+class MockDio extends Mock implements Dio {}
+
+/// One raw Nominatim /search entry, as a JSON map.
+Map<String, dynamic> _raw({
+  required int osmId,
+  required String displayName,
+  required double lat,
+  required double lon,
+  String addressType = 'city',
+  double importance = 0.5,
+  int placeRank = 16,
+  String? postcode,
+}) {
+  return {
+    'osm_id': osmId,
+    'display_name': displayName,
+    'lat': lat.toString(),
+    'lon': lon.toString(),
+    'addresstype': addressType,
+    'importance': importance,
+    'place_rank': placeRank,
+    'address': {'postcode': ?postcode},
+  };
+}
+
 void main() {
   late MockCacheManager mockCache;
   late LocationSearchService service;
@@ -234,6 +259,209 @@ void main() {
         lng: 0.0,
       );
       expect(loc.postcode, isNull);
+    });
+  });
+
+  group('searchCities deduplication', () {
+    late MockDio mockDio;
+    late LocationSearchService dioService;
+
+    setUpAll(() {
+      registerFallbackValue(RequestOptions(path: '/search'));
+      registerFallbackValue(Duration.zero);
+      registerFallbackValue(ServiceSource.nominatimGeocoding);
+    });
+
+    setUp(() {
+      mockDio = MockDio();
+      dioService = LocationSearchService(mockCache, dio: mockDio);
+      // Cache always misses; writes are no-ops.
+      when(() => mockCache.getFresh(any())).thenReturn(null);
+      when(
+        () => mockCache.put(
+          any(),
+          any(),
+          ttl: any(named: 'ttl'),
+          source: any(named: 'source'),
+        ),
+      ).thenAnswer((_) async {});
+    });
+
+    void stubResponse(List<Map<String, dynamic>> raw) {
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(
+          data: raw,
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/search'),
+        ),
+      );
+    }
+
+    test('collapses the city node and its province boundary, keeping the city',
+        () async {
+      // Two real Nominatim entries for "Barcelona" — the city node and the
+      // province boundary share the first display-name token + country and
+      // sit ~42 km apart, but carry DIFFERENT osm_ids.
+      stubResponse([
+        _raw(
+          osmId: 347950,
+          displayName: 'Barcelona, Barcelonès, Barcelona, Catalunya, España',
+          lat: 41.3825,
+          lon: 2.1769,
+          addressType: 'city',
+          importance: 0.804,
+          placeRank: 16,
+        ),
+        _raw(
+          osmId: 349035,
+          displayName: 'Barcelona, Catalunya, España',
+          lat: 41.7646,
+          lon: 2.0357,
+          addressType: 'province',
+          importance: 0.642,
+          placeRank: 12,
+        ),
+      ]);
+
+      final results = await dioService.searchCities('Barcelona');
+
+      expect(results, hasLength(1));
+      expect(results.first.osmId, equals(347950));
+      expect(results.first.addressType, equals('city'));
+      expect(results.first.lat, closeTo(41.3825, 0.0001));
+    });
+
+    test('keeps same-name places in different countries distinct', () async {
+      stubResponse([
+        _raw(
+          osmId: 347950,
+          displayName: 'Barcelona, Catalunya, España',
+          lat: 41.3825,
+          lon: 2.1769,
+          addressType: 'city',
+          importance: 0.804,
+        ),
+        _raw(
+          osmId: 555111,
+          displayName: 'Barcelona, Anzoátegui, Venezuela',
+          lat: 10.1340,
+          lon: -64.6760,
+          addressType: 'city',
+          importance: 0.6,
+        ),
+      ]);
+
+      final results = await dioService.searchCities('Barcelona');
+
+      expect(results, hasLength(2));
+    });
+
+    test('keeps far-apart same-country same-name places distinct', () async {
+      // Two distinct "Springfield" cities in the same country, ~427 km
+      // apart (well beyond the ~50 km near-duplicate guard), with different
+      // osm_ids → must NOT be collapsed.
+      stubResponse([
+        _raw(
+          osmId: 100001,
+          displayName: 'Springfield, Illinois, United States',
+          lat: 39.7817,
+          lon: -89.6501,
+          addressType: 'city',
+          importance: 0.6,
+        ),
+        _raw(
+          osmId: 100002,
+          displayName: 'Springfield, Missouri, United States',
+          lat: 37.2090,
+          lon: -93.2923,
+          addressType: 'city',
+          importance: 0.55,
+        ),
+      ]);
+
+      final results = await dioService.searchCities('Springfield');
+
+      expect(results, hasLength(2));
+    });
+
+    test('collapses entries that share the same osm_id', () async {
+      stubResponse([
+        _raw(
+          osmId: 42,
+          displayName: 'Foo, Bar, Country',
+          lat: 10.0,
+          lon: 10.0,
+          addressType: 'town',
+          importance: 0.5,
+        ),
+        _raw(
+          osmId: 42,
+          displayName: 'Foo, Bar, Country',
+          lat: 10.0,
+          lon: 10.0,
+          addressType: 'administrative',
+          importance: 0.4,
+        ),
+      ]);
+
+      final results = await dioService.searchCities('Foo');
+
+      expect(results, hasLength(1));
+      expect(results.first.osmId, equals(42));
+    });
+
+    test('round-trips discriminator fields through the cache serializer',
+        () async {
+      stubResponse([
+        _raw(
+          osmId: 347950,
+          displayName: 'Barcelona, Catalunya, España',
+          lat: 41.3825,
+          lon: 2.1769,
+          addressType: 'city',
+          importance: 0.804,
+          placeRank: 16,
+          postcode: '08001',
+        ),
+      ]);
+
+      Map<String, dynamic>? captured;
+      when(
+        () => mockCache.put(
+          any(),
+          captureAny(),
+          ttl: any(named: 'ttl'),
+          source: any(named: 'source'),
+        ),
+      ).thenAnswer((inv) async {
+        captured = inv.positionalArguments[1] as Map<String, dynamic>;
+      });
+
+      await dioService.searchCities('Barcelona');
+
+      expect(captured, isNotNull);
+      // Re-deserialize via the cache path and confirm fields survive.
+      when(() => mockCache.getFresh(any())).thenReturn(
+        CacheEntry(
+          payload: captured!,
+          storedAt: DateTime.now(),
+          originalSource: ServiceSource.nominatimGeocoding,
+          ttl: CacheTtl.citySearch,
+        ),
+      );
+      final fromCache = await dioService.searchCities('Barcelona');
+      expect(fromCache, hasLength(1));
+      expect(fromCache.first.osmId, equals(347950));
+      expect(fromCache.first.addressType, equals('city'));
+      expect(fromCache.first.importance, closeTo(0.804, 0.0001));
+      expect(fromCache.first.placeRank, equals(16));
+      expect(fromCache.first.country, equals('España'));
     });
   });
 
