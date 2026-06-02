@@ -4114,6 +4114,39 @@ class AppLocalizationsEn extends AppLocalizations {
       'GPS-only — no fill-ups have anchored the consumption model yet. Add a couple of full fill-ups to improve the accuracy.';
 
   @override
+  String get consumptionStatsPageTitle => 'Consumption statistics';
+
+  @override
+  String get consumptionStatsComparisonTitle => 'This month vs last month';
+
+  @override
+  String get consumptionStatsTrendsTitle => 'Evolution over time';
+
+  @override
+  String get consumptionStatsNeedTwoMonths =>
+      'Log fill-ups across at least two months to compare.';
+
+  @override
+  String get consumptionStatsPricePerLiter => 'Avg price/L';
+
+  @override
+  String consumptionStatsDeltaPercent(String pct) {
+    return '$pct%';
+  }
+
+  @override
+  String get consumptionStatsChartLiters => 'Litres per month';
+
+  @override
+  String get consumptionStatsChartSpend => 'Spend per month';
+
+  @override
+  String get consumptionStatsChartPricePerLiter => 'Price per litre';
+
+  @override
+  String get consumptionStatsChartConsumption => 'L/100km per month';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -11313,6 +11346,40 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get consumptionAccuracyTooltipLow =>
       '⟦ǦƤŠ-óñłý — ñó ƒîłł-úƥš ĥáṽé áñçĥóřéđ ŧĥé çóñšúɱƥŧîóñ ɱóđéł ýéŧ. Áđđ á çóúƥłé óƒ ƒúłł ƒîłł-úƥš ŧó îɱƥřóṽé ŧĥé áççúřáçý. ··········································⟧';
+
+  @override
+  String get consumptionStatsPageTitle => '⟦Çóñšúɱƥŧîóñ šŧáŧîšŧîçš ·········⟧';
+
+  @override
+  String get consumptionStatsComparisonTitle =>
+      '⟦Ŧĥîš ɱóñŧĥ ṽš łášŧ ɱóñŧĥ ·········⟧';
+
+  @override
+  String get consumptionStatsTrendsTitle => '⟦Éṽółúŧîóñ óṽéř ŧîɱé ········⟧';
+
+  @override
+  String get consumptionStatsNeedTwoMonths =>
+      '⟦Łóǧ ƒîłł-úƥš áçřóšš áŧ łéášŧ ŧŵó ɱóñŧĥš ŧó çóɱƥářé. ··················⟧';
+
+  @override
+  String get consumptionStatsPricePerLiter => '⟦Áṽǧ ƥřîçé/Ł ····⟧';
+
+  @override
+  String consumptionStatsDeltaPercent(String pct) {
+    return '⟦$pct%⟧';
+  }
+
+  @override
+  String get consumptionStatsChartLiters => '⟦Łîŧřéš ƥéř ɱóñŧĥ ······⟧';
+
+  @override
+  String get consumptionStatsChartSpend => '⟦Šƥéñđ ƥéř ɱóñŧĥ ······⟧';
+
+  @override
+  String get consumptionStatsChartPricePerLiter => '⟦Ƥřîçé ƥéř łîŧřé ······⟧';
+
+  @override
+  String get consumptionStatsChartConsumption => '⟦Ł/100ķɱ ƥéř ɱóñŧĥ ·····⟧';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {

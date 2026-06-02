@@ -1,0 +1,12 @@
+{
+  "consumptionStatsPageTitle": "Verbrauchsstatistik",
+  "consumptionStatsComparisonTitle": "Dieser Monat vs. letzter Monat",
+  "consumptionStatsTrendsTitle": "Entwicklung über die Zeit",
+  "consumptionStatsNeedTwoMonths": "Erfasse Tankvorgänge über mindestens zwei Monate, um zu vergleichen.",
+  "consumptionStatsPricePerLiter": "Ø Preis/L",
+  "consumptionStatsDeltaPercent": "{pct}%",
+  "consumptionStatsChartLiters": "Liter pro Monat",
+  "consumptionStatsChartSpend": "Ausgaben pro Monat",
+  "consumptionStatsChartPricePerLiter": "Preis pro Liter",
+  "consumptionStatsChartConsumption": "L/100km pro Monat"
+}

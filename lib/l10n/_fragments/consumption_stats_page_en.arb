@@ -1,0 +1,47 @@
+{
+  "consumptionStatsPageTitle": "Consumption statistics",
+  "@consumptionStatsPageTitle": {
+    "description": "App-bar title of the full consumption-statistics detail page opened from the Fuel tab's summary card (#2698)."
+  },
+  "consumptionStatsComparisonTitle": "This month vs last month",
+  "@consumptionStatsComparisonTitle": {
+    "description": "Section title of the month-over-month comparison card on the consumption-statistics page (#2698)."
+  },
+  "consumptionStatsTrendsTitle": "Evolution over time",
+  "@consumptionStatsTrendsTitle": {
+    "description": "Section title above the per-metric monthly evolution bar charts on the consumption-statistics page (#2698)."
+  },
+  "consumptionStatsNeedTwoMonths": "Log fill-ups across at least two months to compare.",
+  "@consumptionStatsNeedTwoMonths": {
+    "description": "Caption shown on the consumption-statistics comparison card when fewer than two calendar months of fill-up data exist, so no previous-month column can be shown (#2698)."
+  },
+  "consumptionStatsPricePerLiter": "Avg price/L",
+  "@consumptionStatsPricePerLiter": {
+    "description": "Label for the average price-per-litre metric (current month spend divided by litres) on the consumption-statistics page (#2698)."
+  },
+  "consumptionStatsDeltaPercent": "{pct}%",
+  "@consumptionStatsDeltaPercent": {
+    "description": "Percentage change of a metric versus the previous month, shown next to the absolute delta on the comparison card (#2698). The sign is included in the value.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionStatsChartLiters": "Litres per month",
+  "@consumptionStatsChartLiters": {
+    "description": "Title of the monthly litres evolution bar chart on the consumption-statistics page (#2698)."
+  },
+  "consumptionStatsChartSpend": "Spend per month",
+  "@consumptionStatsChartSpend": {
+    "description": "Title of the monthly spend evolution bar chart on the consumption-statistics page (#2698)."
+  },
+  "consumptionStatsChartPricePerLiter": "Price per litre",
+  "@consumptionStatsChartPricePerLiter": {
+    "description": "Title of the monthly average price-per-litre evolution bar chart on the consumption-statistics page (#2698)."
+  },
+  "consumptionStatsChartConsumption": "L/100km per month",
+  "@consumptionStatsChartConsumption": {
+    "description": "Title of the monthly average L/100km evolution bar chart on the consumption-statistics page; months without a closed plein-to-plein window are skipped (#2698)."
+  }
+}

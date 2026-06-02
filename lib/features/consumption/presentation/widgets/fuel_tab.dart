@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/storage/storage_keys.dart';
@@ -45,7 +46,8 @@ class FuelTab extends ConsumerWidget {
       return EmptyState(
         icon: Icons.local_gas_station_outlined,
         title: l?.noFillUpsTitle ?? 'No fill-ups yet',
-        subtitle: l?.noFillUpsSubtitle ??
+        subtitle:
+            l?.noFillUpsSubtitle ??
             'Log your first fill-up to start tracking consumption.',
         topBiased: true,
       );
@@ -61,7 +63,8 @@ class FuelTab extends ConsumerWidget {
       HelpBanner(
         storageKey: StorageKeys.helpBannerConsumption,
         icon: Icons.tips_and_updates_outlined,
-        message: l?.helpBannerConsumption ??
+        message:
+            l?.helpBannerConsumption ??
             'Log every fill-up to track your real-world '
                 'consumption and CO₂ footprint. Swipe left '
                 'to delete an entry.',
@@ -71,8 +74,11 @@ class FuelTab extends ConsumerWidget {
       ConsumptionStatsCard(
         stats: stats,
         volumetricEfficiency: activeVehicle?.volumetricEfficiency,
-        volumetricEfficiencySamples:
-            activeVehicle?.volumetricEfficiencySamples,
+        volumetricEfficiencySamples: activeVehicle?.volumetricEfficiencySamples,
+        // #2698 — tapping the summary card opens the full
+        // consumption-statistics detail page (month-over-month
+        // comparison + evolution charts).
+        onTap: () => context.push('/consumption-stats'),
       ),
     ];
 
@@ -93,8 +99,7 @@ class FuelTab extends ConsumerWidget {
         child: FillUpCard(
           fillUp: fillUp,
           ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
-          rawLPer100Km:
-              ref.watch(litersPer100KmForFillUpProvider(fillUp.id)),
+          rawLPer100Km: ref.watch(litersPer100KmForFillUpProvider(fillUp.id)),
           onTap: fillUp.isCorrection
               ? () => _openCorrectionEditor(context, fillUp)
               : null,

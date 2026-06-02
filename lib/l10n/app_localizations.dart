@@ -7494,6 +7494,66 @@ abstract class AppLocalizations {
   /// **'GPS-only — no fill-ups have anchored the consumption model yet. Add a couple of full fill-ups to improve the accuracy.'**
   String get consumptionAccuracyTooltipLow;
 
+  /// App-bar title of the full consumption-statistics detail page opened from the Fuel tab's summary card (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption statistics'**
+  String get consumptionStatsPageTitle;
+
+  /// Section title of the month-over-month comparison card on the consumption-statistics page (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'This month vs last month'**
+  String get consumptionStatsComparisonTitle;
+
+  /// Section title above the per-metric monthly evolution bar charts on the consumption-statistics page (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'Evolution over time'**
+  String get consumptionStatsTrendsTitle;
+
+  /// Caption shown on the consumption-statistics comparison card when fewer than two calendar months of fill-up data exist, so no previous-month column can be shown (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'Log fill-ups across at least two months to compare.'**
+  String get consumptionStatsNeedTwoMonths;
+
+  /// Label for the average price-per-litre metric (current month spend divided by litres) on the consumption-statistics page (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'Avg price/L'**
+  String get consumptionStatsPricePerLiter;
+
+  /// Percentage change of a metric versus the previous month, shown next to the absolute delta on the comparison card (#2698). The sign is included in the value.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}%'**
+  String consumptionStatsDeltaPercent(String pct);
+
+  /// Title of the monthly litres evolution bar chart on the consumption-statistics page (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'Litres per month'**
+  String get consumptionStatsChartLiters;
+
+  /// Title of the monthly spend evolution bar chart on the consumption-statistics page (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'Spend per month'**
+  String get consumptionStatsChartSpend;
+
+  /// Title of the monthly average price-per-litre evolution bar chart on the consumption-statistics page (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'Price per litre'**
+  String get consumptionStatsChartPricePerLiter;
+
+  /// Title of the monthly average L/100km evolution bar chart on the consumption-statistics page; months without a closed plein-to-plein window are skipped (#2698).
+  ///
+  /// In en, this message translates to:
+  /// **'L/100km per month'**
+  String get consumptionStatsChartConsumption;
+
   /// Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.
   ///
   /// In en, this message translates to:

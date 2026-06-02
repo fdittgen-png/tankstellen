@@ -33,24 +33,24 @@ final _debugOn = [featureFlagsProvider.overrideWith(() => _DebugModeOn())];
 class _PendingGap extends PendingReconciliations {
   @override
   PendingReconciliation? build() => PendingReconciliation(
-        correction: FillUp(
-          id: 'correction_x',
-          date: DateTime(2026, 4, 10),
-          liters: 7,
-          totalCost: 0,
-          odometerKm: 10050,
-          fuelType: FuelType.e10,
-          vehicleId: 'veh-a',
-          isCorrection: true,
-          isFullTank: false,
-        ),
-        pumped: 12,
-        consumed: 5,
-        gap: 7,
-        windowMidpointDate: DateTime(2026, 4, 10),
-        windowMidpointOdometerKm: 10050,
-        vehicleId: 'veh-a',
-      );
+    correction: FillUp(
+      id: 'correction_x',
+      date: DateTime(2026, 4, 10),
+      liters: 7,
+      totalCost: 0,
+      odometerKm: 10050,
+      fuelType: FuelType.e10,
+      vehicleId: 'veh-a',
+      isCorrection: true,
+      isFullTank: false,
+    ),
+    pumped: 12,
+    consumed: 5,
+    gap: 7,
+    windowMidpointDate: DateTime(2026, 4, 10),
+    windowMidpointOdometerKm: 10050,
+    vehicleId: 'veh-a',
+  );
 }
 
 final _pendingGapOverride = [
@@ -94,8 +94,9 @@ void main() {
   setUp(() => PriceFormatter.setCountry('GB'));
 
   group('ConsumptionStatsCard — title', () {
-    testWidgets('renders the localized "Consumption stats" title',
-        (tester) async {
+    testWidgets('renders the localized "Consumption stats" title', (
+      tester,
+    ) async {
       await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
 
       expect(find.text('Consumption stats'), findsOneWidget);
@@ -103,8 +104,9 @@ void main() {
   });
 
   group('ConsumptionStatsCard — avg consumption tile', () {
-    testWidgets('formats avgConsumptionL100km to two decimals when set',
-        (tester) async {
+    testWidgets('formats avgConsumptionL100km to two decimals when set', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats(avgConsumptionL100km: 6.789)),
@@ -114,8 +116,9 @@ void main() {
       expect(find.text('6.79'), findsOneWidget);
     });
 
-    testWidgets('renders an em-dash when avgConsumptionL100km is null',
-        (tester) async {
+    testWidgets('renders an em-dash when avgConsumptionL100km is null', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats(avgConsumptionL100km: null)),
@@ -133,8 +136,9 @@ void main() {
   });
 
   group('ConsumptionStatsCard — avg cost-per-km tile', () {
-    testWidgets('formats avgCostPerKm to three decimals when set',
-        (tester) async {
+    testWidgets('formats avgCostPerKm to three decimals when set', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats(avgCostPerKm: 0.12345)),
@@ -144,8 +148,7 @@ void main() {
       expect(find.text('0.123'), findsOneWidget);
     });
 
-    testWidgets('renders an em-dash when avgCostPerKm is null',
-        (tester) async {
+    testWidgets('renders an em-dash when avgCostPerKm is null', (tester) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats(avgCostPerKm: null)),
@@ -209,8 +212,9 @@ void main() {
       expect(find.text('Fill-ups: 5'), findsOneWidget);
     });
 
-    testWidgets('hides the count line when fillUpCount is zero',
-        (tester) async {
+    testWidgets('hides the count line when fillUpCount is zero', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats(fillUpCount: 0)),
@@ -225,15 +229,16 @@ void main() {
 
   group('ConsumptionStatsCard — stat icons', () {
     testWidgets(
-        'renders speed, euro, fuel-pump and payment icons for the four stat tiles',
-        (tester) async {
-      await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
+      'renders speed, euro, fuel-pump and payment icons for the four stat tiles',
+      (tester) async {
+        await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
 
-      expect(find.byIcon(Icons.speed), findsOneWidget);
-      expect(find.byIcon(Icons.euro), findsOneWidget);
-      expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
-      expect(find.byIcon(Icons.payments_outlined), findsOneWidget);
-    });
+        expect(find.byIcon(Icons.speed), findsOneWidget);
+        expect(find.byIcon(Icons.euro), findsOneWidget);
+        expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
+        expect(find.byIcon(Icons.payments_outlined), findsOneWidget);
+      },
+    );
   });
 
   group('ConsumptionStatsCard — structure', () {
@@ -243,8 +248,9 @@ void main() {
       expect(find.byType(Card), findsOneWidget);
     });
 
-    testWidgets('renders a fully-populated stats payload end-to-end',
-        (tester) async {
+    testWidgets('renders a fully-populated stats payload end-to-end', (
+      tester,
+    ) async {
       // Sanity check: every formatted value lands at the expected decimals
       // when all inputs are non-null at once.
       await pumpApp(
@@ -263,7 +269,10 @@ void main() {
       expect(find.text('6.40'), findsOneWidget); // avg L/100km
       expect(find.text('0.105'), findsOneWidget); // avg cost/km (formatPerKm)
       expect(find.text('120.0'), findsOneWidget); // total liters
-      expect(find.text('198.40 £'), findsOneWidget); // total spent (formatTotal)
+      expect(
+        find.text('198.40 £'),
+        findsOneWidget,
+      ); // total spent (formatTotal)
       expect(find.text('Fill-ups: 3'), findsOneWidget);
       expect(find.text('—'), findsNothing); // no nullable fallbacks fired
     });
@@ -278,44 +287,36 @@ void main() {
   // exactly as before.
 
   group('ConsumptionStatsCard — open-window banner', () {
-    testWidgets(
-      'shows the banner when openWindowFillCount > 0',
-      (tester) async {
-        await pumpApp(
-          tester,
-          ConsumptionStatsCard(
-            stats: _stats(
-              fillUpCount: 3,
-              totalLiters: 90,
-              openWindowFillCount: 2,
-              openWindowLiters: 30,
-            ),
+    testWidgets('shows the banner when openWindowFillCount > 0', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(
+            fillUpCount: 3,
+            totalLiters: 90,
+            openWindowFillCount: 2,
+            openWindowLiters: 30,
           ),
-        );
-        expect(
-          find.textContaining('partial fills pending plein complet'),
-          findsOneWidget,
-        );
-      },
-    );
+        ),
+      );
+      expect(
+        find.textContaining('partial fills pending plein complet'),
+        findsOneWidget,
+      );
+    });
 
-    testWidgets(
-      'hides the banner when openWindowFillCount is zero',
-      (tester) async {
-        await pumpApp(
-          tester,
-          ConsumptionStatsCard(stats: _stats(fillUpCount: 2)),
-        );
-        expect(
-          find.textContaining('partial fill'),
-          findsNothing,
-        );
-        expect(
-          find.textContaining('plein complet'),
-          findsNothing,
-        );
-      },
-    );
+    testWidgets('hides the banner when openWindowFillCount is zero', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(stats: _stats(fillUpCount: 2)),
+      );
+      expect(find.textContaining('partial fill'), findsNothing);
+      expect(find.textContaining('plein complet'), findsNothing);
+    });
 
     testWidgets(
       'pluralises to singular when exactly 1 partial fill is pending',
@@ -341,62 +342,49 @@ void main() {
   });
 
   group('ConsumptionStatsCard — correction-share hint', () {
-    testWidgets(
-      'shows the hint when correctionShare > 5 %',
-      (tester) async {
-        await pumpApp(
-          tester,
-          ConsumptionStatsCard(
-            stats: _stats(
-              fillUpCount: 3,
-              totalLiters: 100,
-              correctionLitersTotal: 12,
-              correctionShare: 0.12,
-            ),
+    testWidgets('shows the hint when correctionShare > 5 %', (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(
+            fillUpCount: 3,
+            totalLiters: 100,
+            correctionLitersTotal: 12,
+            correctionShare: 0.12,
           ),
-        );
-        // "12% of fuel from auto-corrections — review entries"
-        expect(
-          find.textContaining('% of fuel from auto-corrections'),
-          findsOneWidget,
-        );
-      },
-    );
+        ),
+      );
+      // "12% of fuel from auto-corrections — review entries"
+      expect(
+        find.textContaining('% of fuel from auto-corrections'),
+        findsOneWidget,
+      );
+    });
 
-    testWidgets(
-      'hides the hint when correctionShare is at the 5 % threshold',
-      (tester) async {
-        await pumpApp(
-          tester,
-          ConsumptionStatsCard(
-            stats: _stats(
-              fillUpCount: 3,
-              totalLiters: 100,
-              correctionLitersTotal: 5,
-              correctionShare: 0.05,
-            ),
+    testWidgets('hides the hint when correctionShare is at the 5 % threshold', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(
+            fillUpCount: 3,
+            totalLiters: 100,
+            correctionLitersTotal: 5,
+            correctionShare: 0.05,
           ),
-        );
-        expect(
-          find.textContaining('auto-corrections'),
-          findsNothing,
-        );
-      },
-    );
+        ),
+      );
+      expect(find.textContaining('auto-corrections'), findsNothing);
+    });
 
-    testWidgets(
-      'hides the hint when correctionShare is zero',
-      (tester) async {
-        await pumpApp(
-          tester,
-          ConsumptionStatsCard(stats: _stats(fillUpCount: 3)),
-        );
-        expect(
-          find.textContaining('auto-corrections'),
-          findsNothing,
-        );
-      },
-    );
+    testWidgets('hides the hint when correctionShare is zero', (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(stats: _stats(fillUpCount: 3)),
+      );
+      expect(find.textContaining('auto-corrections'), findsNothing);
+    });
   });
 
   group(
@@ -438,8 +426,9 @@ void main() {
   // Developer mode (#2262), so the chip tests below pump with `_debugOn`.
 
   group('ConsumptionStatsCard — calibration chip (#1397 / #2262)', () {
-    testWidgets('no chip when volumetricEfficiencySamples == null',
-        (tester) async {
+    testWidgets('no chip when volumetricEfficiencySamples == null', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats()),
@@ -449,82 +438,86 @@ void main() {
     });
 
     testWidgets(
-        'samples == 0 → "no plein-complet yet" pill (#2112, debug on)',
-        (tester) async {
-      await pumpApp(
-        tester,
-        ConsumptionStatsCard(
-          stats: _stats(),
-          volumetricEfficiency: 0.85,
-          volumetricEfficiencySamples: 0,
-        ),
-        overrides: _debugOn,
-      );
-      // #2112 — the calibration pill is no longer a Material `Chip`;
-      // it's a tonal Container so the η_v pill harmonises with the
-      // confidence-tier badge next to it. The label still contains
-      // the no-plein-complet substring.
-      expect(find.textContaining('no plein-complet'), findsOneWidget);
-    });
+      'samples == 0 → "no plein-complet yet" pill (#2112, debug on)',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(),
+            volumetricEfficiency: 0.85,
+            volumetricEfficiencySamples: 0,
+          ),
+          overrides: _debugOn,
+        );
+        // #2112 — the calibration pill is no longer a Material `Chip`;
+        // it's a tonal Container so the η_v pill harmonises with the
+        // confidence-tier badge next to it. The label still contains
+        // the no-plein-complet substring.
+        expect(find.textContaining('no plein-complet'), findsOneWidget);
+      },
+    );
 
     // #2112 — the "learning" vs "calibrated" parenthetical was
     // dropped because the maturity colour is carried by the
     // confidence-tier badge now riding next to it. The η_v pill
     // shows the bare mean + sample count in both cases.
     testWidgets(
-        '0 < samples < 3 → compact η_v pill with sample count (debug on)',
-        (tester) async {
-      await pumpApp(
-        tester,
-        ConsumptionStatsCard(
-          stats: _stats(),
-          volumetricEfficiency: 0.87,
-          volumetricEfficiencySamples: 2,
-        ),
-        overrides: _debugOn,
-      );
-      expect(find.textContaining('0.87'), findsOneWidget);
-      expect(find.textContaining('2 samples'), findsOneWidget);
-    });
+      '0 < samples < 3 → compact η_v pill with sample count (debug on)',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(),
+            volumetricEfficiency: 0.87,
+            volumetricEfficiencySamples: 2,
+          ),
+          overrides: _debugOn,
+        );
+        expect(find.textContaining('0.87'), findsOneWidget);
+        expect(find.textContaining('2 samples'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'samples >= 3 → compact η_v pill (no calibrated wording, debug on)',
-        (tester) async {
-      await pumpApp(
-        tester,
-        ConsumptionStatsCard(
-          stats: _stats(),
-          volumetricEfficiency: 0.91,
-          volumetricEfficiencySamples: 5,
-        ),
-        overrides: _debugOn,
-      );
-      expect(find.textContaining('0.91'), findsOneWidget);
-      expect(find.textContaining('5 samples'), findsOneWidget);
-      // #2112 — old shape removed; if the parenthetical comes back
-      // this fails and forces a deliberate decision.
-      expect(find.textContaining('calibrated'), findsNothing);
-      expect(find.textContaining('learning'), findsNothing);
-    });
+      'samples >= 3 → compact η_v pill (no calibrated wording, debug on)',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(),
+            volumetricEfficiency: 0.91,
+            volumetricEfficiencySamples: 5,
+          ),
+          overrides: _debugOn,
+        );
+        expect(find.textContaining('0.91'), findsOneWidget);
+        expect(find.textContaining('5 samples'), findsOneWidget);
+        // #2112 — old shape removed; if the parenthetical comes back
+        // this fails and forces a deliberate decision.
+        expect(find.textContaining('calibrated'), findsNothing);
+        expect(find.textContaining('learning'), findsNothing);
+      },
+    );
 
     testWidgets(
-        '#2112 — accuracy badge + η_v pill ride a single Wrap (debug on)',
-        (tester) async {
-      await pumpApp(
-        tester,
-        ConsumptionStatsCard(
-          stats: _stats(),
-          volumetricEfficiency: 0.87,
-          volumetricEfficiencySamples: 2,
-        ),
-        overrides: _debugOn,
-      );
-      final wraps = find.byType(Wrap).evaluate();
-      // ConsumptionStatsCard has no other Wrap today; this asserts
-      // the calibration pills group sits in exactly one Wrap so
-      // their layout stays harmonised.
-      expect(wraps.length, greaterThanOrEqualTo(1));
-    });
+      '#2112 — accuracy badge + η_v pill ride a single Wrap (debug on)',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(),
+            volumetricEfficiency: 0.87,
+            volumetricEfficiencySamples: 2,
+          ),
+          overrides: _debugOn,
+        );
+        final wraps = find.byType(Wrap).evaluate();
+        // ConsumptionStatsCard has no other Wrap today; this asserts
+        // the calibration pills group sits in exactly one Wrap so
+        // their layout stays harmonised.
+        expect(wraps.length, greaterThanOrEqualTo(1));
+      },
+    );
   });
 
   // ─── #2445 — 'Resolve gap' deferred-reconciliation affordance ──────
@@ -534,8 +527,9 @@ void main() {
   // gap' banner that REPLACES the accusatory correction-share hint.
 
   group("ConsumptionStatsCard — 'Resolve gap' banner (#2445)", () {
-    testWidgets('shows the tappable banner when a gap is pending',
-        (tester) async {
+    testWidgets('shows the tappable banner when a gap is pending', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats(fillUpCount: 3)),
@@ -546,8 +540,9 @@ void main() {
       expect(find.textContaining('tap to resolve'), findsOneWidget);
     });
 
-    testWidgets('hides the banner when no gap is pending (default state)',
-        (tester) async {
+    testWidgets('hides the banner when no gap is pending (default state)', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(stats: _stats(fillUpCount: 3)),
@@ -556,69 +551,114 @@ void main() {
     });
 
     testWidgets(
-        'the banner REPLACES the correction-share hint while a gap is pending',
-        (tester) async {
-      await pumpApp(
-        tester,
-        ConsumptionStatsCard(
-          stats: _stats(
-            fillUpCount: 3,
-            totalLiters: 100,
-            correctionLitersTotal: 12,
-            correctionShare: 0.12,
+      'the banner REPLACES the correction-share hint while a gap is pending',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(
+              fillUpCount: 3,
+              totalLiters: 100,
+              correctionLitersTotal: 12,
+              correctionShare: 0.12,
+            ),
           ),
-        ),
-        overrides: _pendingGapOverride,
-      );
-      // The actionable affordance supersedes the passive nudge.
-      expect(find.byKey(const Key('resolve-gap-banner')), findsOneWidget);
-      expect(
-        find.textContaining('% of fuel from auto-corrections'),
-        findsNothing,
-      );
-    });
+          overrides: _pendingGapOverride,
+        );
+        // The actionable affordance supersedes the passive nudge.
+        expect(find.byKey(const Key('resolve-gap-banner')), findsOneWidget);
+        expect(
+          find.textContaining('% of fuel from auto-corrections'),
+          findsNothing,
+        );
+      },
+    );
 
     testWidgets(
-        'the correction-share hint still fires when NO gap is pending',
-        (tester) async {
+      'the correction-share hint still fires when NO gap is pending',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(
+              fillUpCount: 3,
+              totalLiters: 100,
+              correctionLitersTotal: 12,
+              correctionShare: 0.12,
+            ),
+          ),
+        );
+        expect(find.byKey(const Key('resolve-gap-banner')), findsNothing);
+        expect(
+          find.textContaining('% of fuel from auto-corrections'),
+          findsOneWidget,
+        );
+      },
+    );
+  });
+
+  // ─── #2698 — tappable link into the consumption-statistics page ────
+  //
+  // When `onTap` is null the card must render byte-identical to its
+  // pre-#2698 shape (no link InkWell, no chevron). When set, the body
+  // becomes a tappable InkWell with a trailing chevron that fires the
+  // callback.
+
+  group("ConsumptionStatsCard — #2698 'open detail page' link", () {
+    testWidgets('onTap == null renders no link InkWell and no chevron', (
+      tester,
+    ) async {
+      await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
+
+      expect(
+        find.byKey(const Key('consumption-stats-card-link')),
+        findsNothing,
+      );
+      expect(find.byIcon(Icons.chevron_right), findsNothing);
+    });
+
+    testWidgets('with onTap, tapping the card fires the callback', (
+      tester,
+    ) async {
+      var taps = 0;
       await pumpApp(
         tester,
-        ConsumptionStatsCard(
-          stats: _stats(
-            fillUpCount: 3,
-            totalLiters: 100,
-            correctionLitersTotal: 12,
-            correctionShare: 0.12,
-          ),
-        ),
+        ConsumptionStatsCard(stats: _stats(), onTap: () => taps++),
       );
-      expect(find.byKey(const Key('resolve-gap-banner')), findsNothing);
+
+      // The chevron affordance + link InkWell render.
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
       expect(
-        find.textContaining('% of fuel from auto-corrections'),
+        find.byKey(const Key('consumption-stats-card-link')),
         findsOneWidget,
       );
+
+      await tester.tap(find.byKey(const Key('consumption-stats-card-link')));
+      await tester.pump();
+      expect(taps, 1);
     });
   });
 
   group('ConsumptionStatsCard — raw η_v chip Developer-mode gate (#2262)', () {
     testWidgets(
-        'η_v chip is HIDDEN for normal users (debugMode off — default)',
-        (tester) async {
-      // No override → manifest default → debugMode off.
-      await pumpApp(
-        tester,
-        ConsumptionStatsCard(
-          stats: _stats(),
-          volumetricEfficiency: 0.87,
-          volumetricEfficiencySamples: 2,
-        ),
-      );
-      // The raw η_v glyph + sample count must not surface.
-      expect(find.textContaining('η_v'), findsNothing);
-      expect(find.textContaining('2 samples'), findsNothing);
-      // …but the plain accuracy indicator (always-on) still renders.
-      expect(find.textContaining('Accuracy:'), findsOneWidget);
-    });
+      'η_v chip is HIDDEN for normal users (debugMode off — default)',
+      (tester) async {
+        // No override → manifest default → debugMode off.
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(),
+            volumetricEfficiency: 0.87,
+            volumetricEfficiencySamples: 2,
+          ),
+        );
+        // The raw η_v glyph + sample count must not surface.
+        expect(find.textContaining('η_v'), findsNothing);
+        expect(find.textContaining('2 samples'), findsNothing);
+        // …but the plain accuracy indicator (always-on) still renders.
+        expect(find.textContaining('Accuracy:'), findsOneWidget);
+      },
+    );
 
     testWidgets('η_v chip is SHOWN when Developer mode is ON', (tester) async {
       await pumpApp(
@@ -637,18 +677,19 @@ void main() {
     });
 
     testWidgets(
-        'samples == 0 raw chip is HIDDEN for normal users (debugMode off)',
-        (tester) async {
-      await pumpApp(
-        tester,
-        ConsumptionStatsCard(
-          stats: _stats(),
-          volumetricEfficiency: 0.85,
-          volumetricEfficiencySamples: 0,
-        ),
-      );
-      expect(find.textContaining('no plein-complet'), findsNothing);
-      expect(find.textContaining('η_v'), findsNothing);
-    });
+      'samples == 0 raw chip is HIDDEN for normal users (debugMode off)',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(),
+            volumetricEfficiency: 0.85,
+            volumetricEfficiencySamples: 0,
+          ),
+        );
+        expect(find.textContaining('no plein-complet'), findsNothing);
+        expect(find.textContaining('η_v'), findsNothing);
+      },
+    );
   });
 }

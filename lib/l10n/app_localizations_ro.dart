@@ -4156,6 +4156,39 @@ class AppLocalizationsRo extends AppLocalizations {
       'Doar GPS — nicio alimentare nu a ancorat încă modelul de consum. Adaugă câteva alimentări complete pentru a îmbunătăți precizia.';
 
   @override
+  String get consumptionStatsPageTitle => 'Consumption statistics';
+
+  @override
+  String get consumptionStatsComparisonTitle => 'This month vs last month';
+
+  @override
+  String get consumptionStatsTrendsTitle => 'Evolution over time';
+
+  @override
+  String get consumptionStatsNeedTwoMonths =>
+      'Log fill-ups across at least two months to compare.';
+
+  @override
+  String get consumptionStatsPricePerLiter => 'Avg price/L';
+
+  @override
+  String consumptionStatsDeltaPercent(String pct) {
+    return '$pct%';
+  }
+
+  @override
+  String get consumptionStatsChartLiters => 'Litres per month';
+
+  @override
+  String get consumptionStatsChartSpend => 'Spend per month';
+
+  @override
+  String get consumptionStatsChartPricePerLiter => 'Price per litre';
+
+  @override
+  String get consumptionStatsChartConsumption => 'L/100km per month';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
