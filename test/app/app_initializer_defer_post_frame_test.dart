@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,27 +20,64 @@ import 'package:tankstellen/app/app_initializer.dart';
 ///     becomes an uncaught async error on the running app.
 ///  3. Multiple deferrals all execute.
 ///
-/// Note: `SchedulerBinding.addPostFrameCallback` needs a frame to fire.
-/// We pump a trivial widget first so the binding produces a frame, then
-/// pump again to drain any follow-up microtasks the helper enqueues.
+/// Determinism (#2729): the helper registers a `SchedulerBinding`
+/// post-frame callback that then `unawaited`s an async `run()` closure.
+/// That closure (`await body()` inside a try/catch) settles on the
+/// microtask queue *after* the frame's post-frame phase — so a test that
+/// merely pumps once and asserts is betting on incidental frame/microtask
+/// timing, which is exactly why this file flaked on loaded CI runners
+/// (failed 3× in a row, blocking unrelated PRs).
+///
+/// Instead of guessing, each test drives the deferred work to a *settled*
+/// state before asserting:
+///
+///  * the body itself completes a `Completer`, so the test has a concrete
+///    future to await — for the throwing case it signals from a `finally`
+///    so the throw still reaches the helper's production catch;
+///  * the pump + the await both run inside `tester.runAsync`, the only
+///    harness primitive that lets the real (non-faked) microtask queue
+///    backing the `unawaited(run())` future actually drain to completion.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<void> pumpAFrame(WidgetTester tester) async {
+  /// Pumps a real frame (so the post-frame callback fires) and then awaits
+  /// [settled] — the future the deferred body completes — so the assertion
+  /// runs against fully-drained deferred work rather than incidental timing.
+  ///
+  /// The frame is pumped via the normal harness path (`addPostFrameCallback`
+  /// fires during `pumpWidget`, which queues the helper's `unawaited(run())`).
+  /// The await then happens inside [WidgetTester.runAsync] — the only harness
+  /// primitive that lets the genuine microtask queue backing that future
+  /// drain to completion. `pump`/`idle` alone advance only the fake async
+  /// clock and do not guarantee that chained `await body()` continuations
+  /// settle, which is the timing the flaky version was betting on (#2729).
+  Future<void> pumpUntilDeferredSettles(
+    WidgetTester tester,
+    Future<void> settled,
+  ) async {
+    // A real frame is required for `addPostFrameCallback` to fire; this also
+    // schedules the helper's `unawaited(run())` onto the microtask queue.
     await tester.pumpWidget(const SizedBox());
+    await tester.runAsync(() async {
+      // Bound the wait so a wiring regression fails fast instead of hanging
+      // the suite; the deferred body should settle near-instantly.
+      await settled.timeout(const Duration(seconds: 5));
+    });
+    // Drain any follow-up frame/microtask the helper enqueued so the binding
+    // is quiescent before we sample `takeException`.
     await tester.pump();
     await tester.idle();
   }
 
   testWidgets('deferPostFirstFrame runs its body after a frame', (tester) async {
-    var ran = false;
+    final ran = Completer<void>();
     AppInitializer.deferPostFirstFrame(() async {
-      ran = true;
+      ran.complete();
     });
 
-    await pumpAFrame(tester);
+    await pumpUntilDeferredSettles(tester, ran.future);
 
-    expect(ran, isTrue,
+    expect(ran.isCompleted, isTrue,
         reason: 'deferred body must run after a frame is produced');
   });
 
@@ -47,11 +86,20 @@ void main() {
     // Register a body that throws. The helper must catch and log, NOT
     // rethrow — otherwise an SDK hiccup inside TankSync would crash the
     // running app post-launch.
+    //
+    // The body signals completion from `finally` so the test can await the
+    // exact settle point, while the `throw` still escapes into the helper's
+    // production try/catch (where it must be trapped).
+    final attempted = Completer<void>();
     AppInitializer.deferPostFirstFrame(() async {
-      throw StateError('simulated post-frame failure');
+      try {
+        throw StateError('simulated post-frame failure');
+      } finally {
+        attempted.complete();
+      }
     });
 
-    await pumpAFrame(tester);
+    await pumpUntilDeferredSettles(tester, attempted.future);
 
     // `takeException` returns the first uncaught exception that reached
     // the binding. The helper must trap the StateError so it never
@@ -64,19 +112,19 @@ void main() {
 
   testWidgets('multiple deferPostFirstFrame calls all run', (tester) async {
     final ran = <int>[];
+    final completers = List.generate(3, (_) => Completer<void>());
     for (var i = 0; i < 3; i++) {
       final captured = i;
       AppInitializer.deferPostFirstFrame(() async {
         ran.add(captured);
+        completers[captured].complete();
       });
     }
 
-    await pumpAFrame(tester);
-    // Follow-up pumps in case some deferrals got scheduled onto a
-    // subsequent frame (each post-frame callback may enqueue a
-    // microtask that chains onto the next frame).
-    await tester.pump();
-    await tester.idle();
+    await pumpUntilDeferredSettles(
+      tester,
+      Future.wait(completers.map((c) => c.future)),
+    );
 
     expect(ran, containsAll([0, 1, 2]),
         reason: 'every scheduled deferred body must run');
