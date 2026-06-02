@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/network/connectivity_service.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../price_history/providers/price_prediction_provider.dart';
@@ -76,6 +77,14 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
           pricePredictionProvider(stationId, fuelType),
         ),
       );
+      // #2703 — the nearest-widget refresh hits the network (the active
+      // country's StationService). When the device is offline the call is
+      // doomed and ERROR-logged (the field-log offline home-widget refresh),
+      // so skip it silently — the favorites variant above is a local-only
+      // read and still ran. The existing stale-fallback in
+      // NearestWidgetDataBuilder remains the safety net once we DO refresh.
+      final isOnline = await ref.read(currentConnectivityProvider.future);
+      if (!isOnline) return;
       await HomeWidgetService.updateNearestWidget(
         storage,
         storage,
