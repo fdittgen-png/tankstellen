@@ -487,4 +487,33 @@ void main() {
       expect(find(analyzeTrip(samples), 'insightLambdaEnrichment'), isNull);
     });
   });
+
+  group('#2692 C4-G — GPS-only (rpm null) raises no rpm-based insight', () {
+    final start = DateTime.utc(2026);
+
+    DrivingInsight? find(List<DrivingInsight> list, String key) {
+      for (final i in list) {
+        if (i.labelKey == key) return i;
+      }
+      return null;
+    }
+
+    test(
+        'a GPS-only stream (rpm null) at standstill + high speed yields '
+        'NO high-RPM and NO idling insight', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 60; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: i.isEven ? 0 : 60,
+            rpm: null, // GPS-only — no engine signal
+          ),
+      ];
+      final insights = analyzeTrip(samples);
+      expect(find(insights, 'insightHighRpm'), isNull,
+          reason: 'rpm null must never trip the high-RPM insight');
+      expect(find(insights, 'insightIdling'), isNull,
+          reason: 'rpm null must never be counted as an idling engine');
+    });
+  });
 }

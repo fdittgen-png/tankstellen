@@ -123,7 +123,9 @@ class Obd2AnalyticsSignals {
     }
     return Obd2SampleSignals(
       timestamp: sample.timestamp,
-      rpmBand: RpmBand.fromRpm(sample.rpm),
+      // #2692 C4-G — GPS-only rpm null reads as 0 (→ idle band, harmless:
+      // only `idling`, gated on a real rpm > 0, drives the idle lesson).
+      rpmBand: RpmBand.fromRpm(sample.rpm ?? 0),
       idling: isIdling(rpm: sample.rpm, speedKmh: sample.speedKmh),
       instantLPer100Km: lPer100,
       accelG: accelG,
@@ -173,8 +175,9 @@ class Obd2AnalyticsSignals {
   /// Idle detection (#2286): the engine is turning ([rpm] > 0) but the
   /// car is effectively stationary (speed within [idleSpeedEpsilonKmh]
   /// of zero) — the fuel-wasting stop-and-go / red-light dwell the idling
-  /// lesson penalises.
-  static bool isIdling({required double rpm, required double speedKmh}) {
-    return rpm > 0 && speedKmh.abs() <= idleSpeedEpsilonKmh;
+  /// lesson penalises. #2692 C4-G — a GPS-only sample carries rpm null
+  /// (no engine signal) and can never be classified as idling.
+  static bool isIdling({required double? rpm, required double speedKmh}) {
+    return rpm != null && rpm > 0 && speedKmh.abs() <= idleSpeedEpsilonKmh;
   }
 }

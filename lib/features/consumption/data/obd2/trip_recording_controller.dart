@@ -1198,7 +1198,7 @@ class TripRecordingController {
       final sample = TripSample(
         timestamp: nowTs,
         speedKmh: speedKmh ?? 0,
-        rpm: rpm ?? 0,
+        rpm: rpm, // #2692 C4-G — keep null (gate above still admits on speed).
         fuelRateLPerHour: fuelRate,
         throttlePercent: throttlePercent,
         engineLoadPercent: engineLoadPercent,
@@ -1473,7 +1473,7 @@ class TripRecordingController {
   @visibleForTesting
   void debugInjectSample({
     required double speedKmh,
-    required double rpm,
+    double? rpm,
     required DateTime at,
     double? fuelRateLPerHour,
   }) {

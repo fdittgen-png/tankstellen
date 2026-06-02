@@ -98,7 +98,9 @@ class TripRecorder {
   void onSample(TripSample sample, {String? distanceSource}) {
     _startedAt ??= sample.timestamp;
     _endedAt = sample.timestamp;
-    _maxRpm = math.max(_maxRpm, sample.rpm);
+    // #2692 C4-G — GPS-only samples carry rpm null (no engine signal); treat
+    // as 0 so they neither raise maxRpm nor count high-RPM / idle time.
+    _maxRpm = math.max(_maxRpm, sample.rpm ?? 0);
 
     // Harsh brake / accel — delegated to the detector, which
     // re-samples speed at ~1 Hz so the 250 ms emit cadence cannot
@@ -167,13 +169,14 @@ class TripRecorder {
     // High-RPM time: count the whole interval when the START sample is
     // above threshold (the polling cadence is short relative to typical
     // gear shifts, so this is a reasonable approximation and keeps the
-    // metric monotone).
-    if (previous.rpm >= highRpmThreshold) {
+    // metric monotone). #2692 C4-G — GPS-only rpm null reads as 0.
+    final prevRpm = previous.rpm ?? 0;
+    if (prevRpm >= highRpmThreshold) {
       _highRpmSeconds += dt;
     }
 
     // Idle time: engine on, car stationary for the whole interval.
-    if (previous.speedKmh <= 0.5 && previous.rpm > 0) {
+    if (previous.speedKmh <= 0.5 && prevRpm > 0) {
       _idleSeconds += dt;
     }
 

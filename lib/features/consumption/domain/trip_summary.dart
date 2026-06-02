@@ -232,10 +232,11 @@ enum TripKind {
   /// classified as `gpsPlusObd2`.
   ///
   /// Heuristic: any sample with `rpm > 0` OR `fuelRateLPerHour != null`
-  /// is an OBD2 sample (GPS-only samples carry `rpm: 0` and a null
-  /// fuel rate by construction). One such sample flips the whole
-  /// trip — that's the "subsequent samples carry OBD2 fields" clause
-  /// from the issue.
+  /// is an OBD2 sample (GPS-only samples carry `rpm: null` (#2692 C4-G;
+  /// formerly `0`) and a null fuel rate by construction — the
+  /// `?? 0` below maps null to 0 so the gate is unchanged). One such
+  /// sample flips the whole trip — that's the "subsequent samples carry
+  /// OBD2 fields" clause from the issue.
   ///
   /// Returns [gpsPlusObd2] for an empty iterable so the historical
   /// default holds when called against legacy data that doesn't

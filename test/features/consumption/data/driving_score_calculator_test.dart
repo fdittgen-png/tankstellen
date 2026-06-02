@@ -646,4 +646,49 @@ void main() {
       expect(DrivingScore.perfect.fullThrottlePenalty, 0);
     });
   });
+
+  group('#2692 C4-G — GPS-only (rpm null) fabricates no rpm-based penalty',
+      () {
+    final start = DateTime.utc(2026);
+
+    test(
+        'a GPS-only stream (rpm null) at standstill + high speed yields ZERO '
+        'idle / high-RPM / hard-shift penalty', () {
+      // A stop-and-go GPS-only trip: half stationary (would have been
+      // counted as idle when GPS-only fabricated `rpm: 0`-but-engine-on, but
+      // the OLD code used `rpm > 0` so 0 never tripped idle — the real risk
+      // is the high-RPM + hard-shift gates once any non-null sneaks in).
+      // With rpm null these gates can never fire.
+      final samples = <TripSample>[
+        for (var i = 0; i <= 30; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i * 2)),
+            // alternate standstill and motion to exercise both gates
+            speedKmh: i.isEven ? 0 : 60,
+            rpm: null, // GPS-only — no engine signal
+          ),
+      ];
+      final score = computeDrivingScore(samples);
+      expect(score.idlingPenalty, 0,
+          reason: 'rpm null must never be read as an idling engine');
+      expect(score.highRpmPenalty, 0,
+          reason: 'rpm null must never trip the high-RPM gate');
+      expect(score.hardShiftPenalty, 0,
+          reason: 'rpm null must never be a hard-shift spike');
+    });
+
+    test('an OBD2 idling stream (rpm > 0, speed 0) still accrues idle penalty',
+        () {
+      // Counter-test: the gates still fire for a real engine signal.
+      final samples = <TripSample>[
+        for (var i = 0; i <= 60; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: 0,
+            rpm: 800, // engine running, stationary → idle
+          ),
+      ];
+      expect(computeDrivingScore(samples).idlingPenalty, greaterThan(0));
+    });
+  });
 }

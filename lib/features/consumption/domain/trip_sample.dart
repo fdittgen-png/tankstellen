@@ -11,7 +11,14 @@
 class TripSample {
   final DateTime timestamp;
   final double speedKmh;
-  final double rpm;
+
+  /// Engine RPM (PID 0x0C). **Null** for a GPS-only / degraded sample
+  /// where no engine signal exists (#2692 C4-G) — previously GPS-only
+  /// samples fabricated `rpm: 0`, which the idle / high-RPM / hard-shift
+  /// analytics misread as a stationary running engine. OBD2 samples
+  /// always carry a real value; consumers treat null as "no engine
+  /// signal", never as zero.
+  final double? rpm;
   final double? fuelRateLPerHour;
 
   /// GPS-physics **estimated** fuel rate in L/h (#2431). Populated ONLY
@@ -146,7 +153,7 @@ class TripSample {
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
-    required this.rpm,
+    this.rpm,
     this.fuelRateLPerHour,
     this.estimatedFuelRateLPerHour,
     this.throttlePercent,

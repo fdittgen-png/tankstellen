@@ -21,7 +21,10 @@ import '../domain/trip_recorder.dart';
 Map<String, dynamic> sampleToJson(TripSample s) => {
       't': s.timestamp.millisecondsSinceEpoch,
       's': s.speedKmh,
-      'r': s.rpm,
+      // #2692 C4-G — 'r' omitted when rpm is null (GPS-only/degraded). OBD2
+      // trips always carry a value, so they round-trip byte-identical; a
+      // legacy trip's stored 'r' still reads back unchanged below.
+      if (s.rpm != null) 'r': s.rpm,
       if (s.fuelRateLPerHour != null) 'f': s.fuelRateLPerHour,
       // #2431 — GPS-physics *estimated* fuel rate (L/h). A distinct key
       // from 'f' so a measured value and an estimate are never confused
@@ -60,7 +63,9 @@ TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
         (j['t'] as num).toInt(),
       ),
       speedKmh: (j['s'] as num).toDouble(),
-      rpm: (j['r'] as num).toDouble(),
+      // #2692 C4-G — nullable read: missing 'r' → null (GPS-only). Legacy
+      // trips always stored 'r', so they deserialise to the same value.
+      rpm: (j['r'] as num?)?.toDouble(),
       fuelRateLPerHour: (j['f'] as num?)?.toDouble(),
       // #2431 — missing 'fe' → null so legacy trips (and trips with a
       // real fuel signal, which never carry an estimate) round-trip clean.

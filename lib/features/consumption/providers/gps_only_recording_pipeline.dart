@@ -165,7 +165,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     final sample = TripSample(
       timestamp: p.timestamp,
       speedKmh: speedMps * 3.6,
-      rpm: 0,
+      rpm: null, // #2692 C4-G — GPS-only has no engine signal.
       latitude: p.latitude.isFinite ? p.latitude : null,
       longitude: p.longitude.isFinite ? p.longitude : null,
       altitudeM: p.altitude.isFinite ? p.altitude : null,

@@ -111,4 +111,33 @@ void main() {
       }
     });
   });
+
+  group('#2692 C4-G — nullable rpm round-trip', () {
+    test('a GPS-only sample (rpm null) omits the "r" key entirely', () {
+      final s = TripSample(timestamp: ts, speedKmh: 50, rpm: null);
+      final json = sampleToJson(s);
+      expect(json.containsKey('r'), isFalse,
+          reason: 'rpm null must add zero bytes (no "r" key)');
+      final back = sampleFromJson(json);
+      expect(back.rpm, isNull);
+      expect(back.speedKmh, 50);
+    });
+
+    test('an OBD2 sample (rpm present) writes "r" and round-trips identically',
+        () {
+      final s = TripSample(timestamp: ts, speedKmh: 80, rpm: 2100);
+      final json = sampleToJson(s);
+      expect(json['r'], 2100);
+      expect(sampleFromJson(json).rpm, 2100);
+    });
+
+    test('a legacy trip with a stored "r" still reads back unchanged', () {
+      final legacy = <String, dynamic>{
+        't': ts.millisecondsSinceEpoch,
+        's': 60.0,
+        'r': 1700.0,
+      };
+      expect(sampleFromJson(legacy).rpm, 1700.0);
+    });
+  });
 }

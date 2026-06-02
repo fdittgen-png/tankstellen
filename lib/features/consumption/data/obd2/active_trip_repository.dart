@@ -203,7 +203,7 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
 Map<String, dynamic> _sampleToJson(TripSample s) => {
       't': s.timestamp.millisecondsSinceEpoch,
       's': s.speedKmh,
-      'r': s.rpm,
+      if (s.rpm != null) 'r': s.rpm, // #2692 C4-G — omit on GPS-only.
       if (s.fuelRateLPerHour != null) 'f': s.fuelRateLPerHour,
       if (s.throttlePercent != null) 'th': s.throttlePercent,
       if (s.engineLoadPercent != null) 'el': s.engineLoadPercent,
@@ -221,7 +221,7 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
         (j['t'] as num).toInt(),
       ),
       speedKmh: (j['s'] as num).toDouble(),
-      rpm: (j['r'] as num).toDouble(),
+      rpm: (j['r'] as num?)?.toDouble(), // #2692 C4-G — missing 'r' → null.
       fuelRateLPerHour: (j['f'] as num?)?.toDouble(),
       throttlePercent: (j['th'] as num?)?.toDouble(),
       engineLoadPercent: (j['el'] as num?)?.toDouble(),

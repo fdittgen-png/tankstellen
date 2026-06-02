@@ -690,7 +690,7 @@ class TripRecording extends _$TripRecording {
     var maxRpm = 0.0;
     for (var i = 0; i < samples.length; i++) {
       final s = samples[i];
-      if (s.rpm > maxRpm) maxRpm = s.rpm;
+      if ((s.rpm ?? 0) > maxRpm) maxRpm = s.rpm ?? 0; // #2692 C4-G null→0
       if (i == 0) continue;
       final prev = samples[i - 1];
       final dtSec = s.timestamp

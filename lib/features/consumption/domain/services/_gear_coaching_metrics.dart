@@ -88,7 +88,11 @@ double? computeSecondsBelowOptimalGear({
     final currentCentroid = centroids[currentIdx];
     if (currentCentroid <= 0) continue;
 
+    // #2692 C4-G — a gear assignment only exists for a sample that carried
+    // a real rpm (gear inference skips rpm-null GPS-only samples), but guard
+    // anyway so a stray null never poisons the prediction.
     final currentRpm = samples[i].rpm;
+    if (currentRpm == null) continue;
     final predictedNextGearRpm =
         currentRpm * centroids[nextIdx] / currentCentroid;
     if (predictedNextGearRpm >= optimalRpmCeiling) {

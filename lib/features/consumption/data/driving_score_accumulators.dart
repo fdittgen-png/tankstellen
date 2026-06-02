@@ -37,13 +37,18 @@ class _Accumulators {
     required double dt,
   }) {
     // Idle vs moving accounting (attribute the interval to its start).
+    // #2692 C4-G — `(prev.rpm ?? 0)`: a GPS-only sample carries rpm null
+    // (no engine signal), so the idle / rev / high-RPM gates below read it
+    // as 0 and never fire — GPS-only trips stop fabricating an idling
+    // engine. OBD2 samples always carry a real value → unchanged.
+    final prevRpm = prev.rpm ?? 0;
     final stationary = prev.speedKmh <= _idleSpeedToleranceKmh;
     final pedal = _pedalOrThrottle(prev);
-    if (stationary && prev.rpm > 0) {
+    if (stationary && prevRpm > 0) {
       idleSeconds += dt;
       // Rev-while-stationary: blipping the pedal or revving in neutral.
       if ((pedal != null && pedal > _revWhileStationaryPedal) ||
-          prev.rpm > _revWhileStationaryRpm) {
+          prevRpm > _revWhileStationaryRpm) {
         revWhileStationaryBlips++;
       }
     } else if (!stationary) {
@@ -51,7 +56,7 @@ class _Accumulators {
       if (pedal != null) _pedalStats.add(pedal);
     }
 
-    if (prev.rpm > kHighRpmThreshold) highRpmSeconds += dt;
+    if (prevRpm > kHighRpmThreshold) highRpmSeconds += dt;
 
     // Full-throttle time-share — NOW FIRES (#2460).
     if (pedal != null && pedal >= kFullThrottlePercent) {
@@ -74,8 +79,16 @@ class _Accumulators {
     }
 
     // Hard-shift: a big RPM spike within one interval (a sustained climb
-    // is high-RPM time, not a shift spike).
-    if (cur.rpm - prev.rpm >= _hardShiftRpmSpike) hardShiftSpikes++;
+    // is high-RPM time, not a shift spike). #2692 C4-G — only when BOTH
+    // endpoints carry a real rpm; a GPS-only interval (either null) has no
+    // engine signal, so it can't be a shift spike.
+    final curRpm = cur.rpm;
+    final prevRpmRaw = prev.rpm;
+    if (curRpm != null &&
+        prevRpmRaw != null &&
+        curRpm - prevRpmRaw >= _hardShiftRpmSpike) {
+      hardShiftSpikes++;
+    }
 
     // Hard accel / brake are NOT counted here anymore (#2667): they come
     // from the ONE shared `countAccelEvents` episode gate, passed into

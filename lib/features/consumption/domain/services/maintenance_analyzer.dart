@@ -190,8 +190,10 @@ double? _medianIdleRpm(List<TripSample> samples) {
     if (s.speedKmh > MaintenanceAnalyzerThresholds.idleSpeedKmhCutoff) {
       continue;
     }
-    if (s.rpm < MaintenanceAnalyzerThresholds.minIdleRpm) continue;
-    idle.add(s.rpm);
+    // #2692 C4-G — GPS-only samples (rpm null) carry no idle-RPM reading.
+    final rpm = s.rpm;
+    if (rpm == null || rpm < MaintenanceAnalyzerThresholds.minIdleRpm) continue;
+    idle.add(rpm);
   }
   if (idle.length < 4) return null;
   return _median(idle);

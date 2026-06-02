@@ -309,7 +309,8 @@ class BackupXmlWriter {
           builder.element('Sample', nest: () {
             _writeText(builder, 'Timestamp', _iso(s.timestamp));
             _writeText(builder, 'SpeedKmh', s.speedKmh.toString());
-            _writeText(builder, 'Rpm', s.rpm.toString());
+            // #2692 C4-G — optional: a GPS-only sample carries no rpm.
+            _writeOptionalNumber(builder, 'Rpm', s.rpm);
             _writeOptionalNumber(
               builder,
               'FuelRateLPerHour',

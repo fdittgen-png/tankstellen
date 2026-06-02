@@ -174,7 +174,7 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
     // convention of attributing the whole interval to the start
     // sample's RPM (the ~1 Hz cadence is short relative to gear
     // shifts).
-    if (prev.rpm > _highRpmThreshold) {
+    if ((prev.rpm ?? 0) > _highRpmThreshold) {
       highRpmSeconds += dt;
       final measuredRate = prev.fuelRateLPerHour;
       if (measuredRate != null && measuredRate > 0) {
@@ -194,7 +194,9 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
     // Idling: engine on (rpm > 0), car stationary (speed == 0) for
     // the whole interval. Use a small tolerance on speed to absorb
     // the OBD2 noise floor.
-    if (prev.speedKmh <= 0.5 && prev.rpm > 0) {
+    // #2692 C4-G — `(prev.rpm ?? 0)`: a GPS-only sample (rpm null, no
+    // engine signal) is never counted as an idling engine.
+    if (prev.speedKmh <= 0.5 && (prev.rpm ?? 0) > 0) {
       idleSeconds += dt;
       final measuredRate = prev.fuelRateLPerHour;
       // Idle wastes 100% of the fuel — there's no counterfactual,

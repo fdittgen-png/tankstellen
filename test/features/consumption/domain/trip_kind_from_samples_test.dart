@@ -5,10 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
 
+// #2692 C4-G — GPS-only samples now carry rpm null (no engine signal),
+// formerly the `rpm: 0` placeholder. `TripKind.fromSamples` maps null → 0
+// (`?? 0`), so the gpsOnly classification is unchanged.
 TripSample _gpsOnlySample(DateTime t, double speedKmh) => TripSample(
       timestamp: t,
       speedKmh: speedKmh,
-      rpm: 0,
+      rpm: null,
     );
 
 TripSample _obd2Sample(
@@ -34,11 +37,13 @@ void main() {
           TripKind.gpsPlusObd2);
     });
 
-    test('all GPS-only samples (rpm=0, fuelRate=null) → gpsOnly', () {
+    test('all GPS-only samples (rpm=null, fuelRate=null) → gpsOnly', () {
       final samples = [
         for (int i = 0; i < 5; i++)
           _gpsOnlySample(t0.add(Duration(seconds: i)), 50.0 + i),
       ];
+      // Regression for #2692 C4-G — the null-rpm GPS-only stream must still
+      // classify as gpsOnly (it must NOT flip to gpsPlusObd2).
       expect(TripKind.fromSamples(samples), TripKind.gpsOnly);
     });
 
