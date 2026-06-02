@@ -79,14 +79,27 @@ echo "pre-push: running local gates (bypass with SKIP_PREPUSH=1)..."
 # --- 1. Clean codegen (HARD RULE #3) -------------------------------------
 # Clean, not incremental: incremental builds keep stale hashes that CI's
 # clean run catches (see feedback_codegen_drift_local_gate memory).
+#
+# Route every pub/build_runner invocation through the FLUTTER toolchain
+# (#2651). This project is Flutter-SDK-pinned, so a bare `dart pub`/`dart
+# run` cannot resolve Flutter-pinned transitive deps (e.g.
+# url_launcher_platform_interface — it errors with "Flutter users should
+# use `flutter pub`"). That bare-dart failure made step 1 always abort in
+# worktrees, so everyone bypassed the whole gate with SKIP_PREPUSH=1 and
+# the local codegen/l10n drift gate never ran. Resolve deps with
+# `flutter pub get` first, then drive build_runner via `flutter pub run`.
 echo "pre-push [1/5]: regenerating code (build_runner clean && build)..."
-if ! dart run build_runner clean >/dev/null 2>&1; then
-  fail "build_runner clean failed" \
-       "Run 'dart run build_runner clean' and read the error."
+if ! flutter pub get; then
+  fail "flutter pub get failed" \
+       "Run 'flutter pub get' and read the error."
 fi
-if ! dart run build_runner build --delete-conflicting-outputs; then
+if ! flutter pub run build_runner clean >/dev/null 2>&1; then
+  fail "build_runner clean failed" \
+       "Run 'flutter pub run build_runner clean' and read the error."
+fi
+if ! flutter pub run build_runner build --delete-conflicting-outputs; then
   fail "build_runner build failed" \
-       "Run 'dart run build_runner build --delete-conflicting-outputs' and fix the error."
+       "Run 'flutter pub run build_runner build --delete-conflicting-outputs' and fix the error."
 fi
 
 # --- 2. No codegen drift -------------------------------------------------
@@ -99,11 +112,14 @@ fi
 # --- 3. No l10n fan-out drift (HARD RULE #4) -----------------------------
 # Every new en key must fan out to all locales via the autofill pipeline.
 echo "pre-push [3/5]: regenerating l10n and checking for drift..."
-if ! dart run tool/build_arb.dart; then
-  fail "tool/build_arb.dart failed" "Run 'dart run tool/build_arb.dart' and fix the error."
+# Route through `flutter pub run` for the same Flutter-pinned-deps reason
+# as step 1 (#2651): a bare `dart run` can't resolve this project's
+# Flutter-pinned package config and aborts the gate.
+if ! flutter pub run tool/build_arb.dart; then
+  fail "tool/build_arb.dart failed" "Run 'flutter pub run tool/build_arb.dart' and fix the error."
 fi
-if ! dart tool/gen_pseudo_arb.dart; then
-  fail "tool/gen_pseudo_arb.dart failed" "Run 'dart tool/gen_pseudo_arb.dart' and fix the error."
+if ! flutter pub run tool/gen_pseudo_arb.dart; then
+  fail "tool/gen_pseudo_arb.dart failed" "Run 'flutter pub run tool/gen_pseudo_arb.dart' and fix the error."
 fi
 if ! flutter gen-l10n; then
   fail "flutter gen-l10n failed" "Run 'flutter gen-l10n' and fix the error."
