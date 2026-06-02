@@ -118,11 +118,19 @@ class _Accumulators {
     required double? secondsBelowOptimalGear,
     required int hardAccelEvents,
     required int hardBrakeEvents,
+    bool gpsOnly = false,
   }) {
     final idlingPenalty =
         _clamp(idleSeconds / totalDt * _idlingCap, 0, _idlingCap);
-    final highRpmPenalty =
-        _clamp(highRpmSeconds / totalDt * _highRpmCap, 0, _highRpmCap);
+    // #2695 C9 — source-aware re-weight. On a GPS-only trip there is no
+    // engine signal, so the engine-derived penalties (high-RPM, lugging,
+    // hard-shift) carry no information — zero them rather than scoring a
+    // trip on terms it can never trip. The speed-only terms (idle, accel,
+    // smoothness, speed efficiency, coast credit) stay fully active. OBD2
+    // trips pass `gpsOnly: false` and are byte-identical to before.
+    final highRpmPenalty = gpsOnly
+        ? 0.0
+        : _clamp(highRpmSeconds / totalDt * _highRpmCap, 0, _highRpmCap);
     final hardAccelPenalty =
         _clamp(hardAccelEvents * _hardAccelPerEvent, 0, _hardAccelCap);
     final hardBrakePenalty =
@@ -137,9 +145,11 @@ class _Accumulators {
       0,
       _pedalVelocityCap,
     );
-    final luggingPenalty = _luggingPenalty(secondsBelowOptimalGear, totalDt);
-    final hardShiftPenalty =
-        _clamp(hardShiftSpikes * _hardShiftPerSpike, 0, _hardShiftCap);
+    final luggingPenalty =
+        gpsOnly ? 0.0 : _luggingPenalty(secondsBelowOptimalGear, totalDt);
+    final hardShiftPenalty = gpsOnly
+        ? 0.0
+        : _clamp(hardShiftSpikes * _hardShiftPerSpike, 0, _hardShiftCap);
     final revWhileStationaryPenalty = _clamp(
       revWhileStationaryBlips * _revWhileStationaryPerBlip,
       0,

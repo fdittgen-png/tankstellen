@@ -166,11 +166,18 @@ DrivingScore computeDrivingScore(
       ),
   ]);
 
+  // #2695 C9 — source-aware re-weight. A GPS-only / degraded trip carries
+  // no engine signal (every sample's rpm is null, #2692 C4-G), so the
+  // engine-derived penalties carry no information and must be zeroed. OBD2
+  // trips have a real rpm on at least one sample and score unchanged.
+  final gpsOnly = sorted.every((s) => s.rpm == null);
+
   return acc.build(
     totalDt: totalDt,
     secondsBelowOptimalGear: secondsBelowOptimalGear,
     hardAccelEvents: accelCounts.accelEvents,
     hardBrakeEvents: accelCounts.brakeEvents,
+    gpsOnly: gpsOnly,
   );
 }
 

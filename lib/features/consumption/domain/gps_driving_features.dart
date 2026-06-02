@@ -109,6 +109,30 @@ class GpsDrivingFeatures {
   /// per qualifying segment; `0` when heading is absent (legacy trips).
   final int sharpCornerEvents;
 
+  /// **RPA** — Relative Positive Acceleration (m/s², #2695 C9). The
+  /// distance-normalised positive-acceleration energy
+  /// `∑(v · a⁺ · dt) / distance` — a standard speed-only eco-driving
+  /// aggressiveness index. Higher = more energy spent accelerating.
+  final double relativePositiveAcceleration;
+
+  /// **PKE** — Positive Kinetic Energy (m/s², #2695 C9). The
+  /// distance-normalised sum of positive kinetic-energy changes
+  /// `∑(v_f² − v_i²)⁺ / distance` over accelerating segments. Speed-only.
+  final double positiveKineticEnergy;
+
+  /// **VAPOS** — mean positive `v · a` (m²/s³, #2695 C9). The average
+  /// instantaneous power-proxy over the time the car was accelerating.
+  final double meanPositiveVa;
+
+  /// Coast share (0.0–1.0, #2695 C9) — fraction of moving time spent
+  /// decelerating gently with no harsh-brake event (engine-braking /
+  /// foot-off coasting). Speed-only, an eco-positive signal.
+  final double coastShare;
+
+  /// Climb energy per km (m/km, #2695 C9) — `gradeClimbMeters / distanceKm`,
+  /// a proxy for the potential-energy work per distance (m·g·Δh ∝ Δh).
+  final double climbEnergyPerKm;
+
   const GpsDrivingFeatures({
     required this.idleSeconds,
     required this.lowSpeedSeconds,
@@ -124,6 +148,11 @@ class GpsDrivingFeatures {
     required this.gradeDescentMeters,
     required this.cornerLoadIntegral,
     this.sharpCornerEvents = 0,
+    this.relativePositiveAcceleration = 0,
+    this.positiveKineticEnergy = 0,
+    this.meanPositiveVa = 0,
+    this.coastShare = 0,
+    this.climbEnergyPerKm = 0,
   });
 
   /// Idle share of the trajet (0.0–1.0). Used by the matrix's
@@ -191,6 +220,13 @@ class GpsDrivingFeatures {
     double climb = 0, descent = 0;
     double cornerLoad = 0;
     int sharpCorners = 0;
+    // #2695 C9 speed-only energy KPIs.
+    double rpaNumerator = 0; // ∑ v · a⁺ · dt   (m·s/s² · s = m²/s²)
+    double pkeNumerator = 0; // ∑ (v_f² − v_i²)⁺ (m²/s²)
+    double vaPosSum = 0; // ∑ v · a⁺ · dt over accel time
+    double vaPosSeconds = 0; // accel time
+    double coastSeconds = 0; // gentle decel time, no harsh brake
+    double movingSeconds = 0;
 
     for (var i = 1; i < list.length; i++) {
       final prev = list[i - 1];
@@ -227,6 +263,26 @@ class GpsDrivingFeatures {
       final accelMps2 = (cur.speedKmh - prev.speedKmh) / 3.6 / dt;
       final absG = accelMps2.abs() / 9.81;
       if (absG > maxAccelG) maxAccelG = absG;
+
+      // #2695 C9 speed-only energy KPIs (all derived from speed alone, so
+      // they work for GPS-only trips that have no engine signal).
+      final vPrevMps = prev.speedKmh / 3.6;
+      final vCurMps = cur.speedKmh / 3.6;
+      if (vPrevMps > 0) movingSeconds += dt;
+      if (accelMps2 > 0) {
+        // RPA / VAPOS positive-acceleration energy.
+        rpaNumerator += vPrevMps * accelMps2 * dt;
+        vaPosSum += vPrevMps * accelMps2 * dt;
+        vaPosSeconds += dt;
+        // PKE positive kinetic-energy change.
+        pkeNumerator += (vCurMps * vCurMps) - (vPrevMps * vPrevMps);
+      } else if (accelMps2 < 0 &&
+          accelMps2 > -kHardBrakeThresholdMps2 &&
+          vPrevMps > 0) {
+        // Gentle deceleration that never reaches the harsh-brake threshold
+        // → coasting (engine-brake / foot-off), an eco-positive signal.
+        coastSeconds += dt;
+      }
 
       // Altitude delta.
       final pAlt = prev.altitudeM, cAlt = cur.altitudeM;
@@ -268,6 +324,13 @@ class GpsDrivingFeatures {
     final distKm = distM / 1000.0;
     final meanSpeed = distKm / (total / 3600.0);
 
+    // #2695 C9 — distance-normalise the energy KPIs (guard zero distance).
+    final rpa = distM > 0 ? rpaNumerator / distM : 0.0;
+    final pke = distM > 0 ? pkeNumerator / distM : 0.0;
+    final vapos = vaPosSeconds > 0 ? vaPosSum / vaPosSeconds : 0.0;
+    final coast = movingSeconds > 0 ? coastSeconds / movingSeconds : 0.0;
+    final climbPerKm = distKm > 0 ? climb / distKm : 0.0;
+
     return GpsDrivingFeatures(
       idleSeconds: idle,
       lowSpeedSeconds: low,
@@ -283,6 +346,11 @@ class GpsDrivingFeatures {
       gradeDescentMeters: descent,
       cornerLoadIntegral: cornerLoad,
       sharpCornerEvents: sharpCorners,
+      relativePositiveAcceleration: rpa,
+      positiveKineticEnergy: pke,
+      meanPositiveVa: vapos,
+      coastShare: coast,
+      climbEnergyPerKm: climbPerKm,
     );
   }
 

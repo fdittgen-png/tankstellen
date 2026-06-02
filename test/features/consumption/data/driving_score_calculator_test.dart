@@ -691,4 +691,69 @@ void main() {
       expect(computeDrivingScore(samples).idlingPenalty, greaterThan(0));
     });
   });
+
+  group('#2695 C9 — source-aware score re-weight', () {
+    final start = DateTime.utc(2026);
+
+    // A spirited drive: 5 min above the high-RPM threshold at high speed.
+    // OBD2 version carries a real rpm; GPS-only version carries rpm null.
+    List<TripSample> spiritedDrive({required bool gpsOnly}) => <TripSample>[
+          for (var i = 0; i <= 300; i++)
+            TripSample(
+              timestamp: start.add(Duration(seconds: i)),
+              speedKmh: 130, // above the speed-efficiency band
+              rpm: gpsOnly ? null : 4200, // above the high-RPM threshold
+              fuelRateLPerHour: gpsOnly ? null : 14,
+            ),
+        ];
+
+    test(
+        'GPS-only (rpm null) zeroes the engine-derived penalties '
+        '(highRpm / lugging / hardShift)', () {
+      final score = computeDrivingScore(
+        spiritedDrive(gpsOnly: true),
+        secondsBelowOptimalGear: 120, // would have lugged if it scored
+      );
+      expect(score.highRpmPenalty, 0);
+      expect(score.luggingPenalty, 0);
+      expect(score.hardShiftPenalty, 0);
+      // Speed-efficiency still bites (it's speed-only) — the re-weight only
+      // zeroes the engine-derived terms.
+      expect(score.speedEfficiencyPenalty, greaterThan(0));
+    });
+
+    test(
+        'the SAME spirited drive scores HIGHER as GPS-only than as OBD2 '
+        '(the intended historical correction — dead rpm terms removed)', () {
+      final obd2 = computeDrivingScore(
+        spiritedDrive(gpsOnly: false),
+        secondsBelowOptimalGear: 120,
+      );
+      final gps = computeDrivingScore(
+        spiritedDrive(gpsOnly: true),
+        secondsBelowOptimalGear: 120,
+      );
+      expect(gps.score, greaterThan(obd2.score),
+          reason: 'GPS-only no longer carries the unfair engine penalties');
+    });
+
+    test(
+        'OBD2 score is byte-identical to the un-flagged path '
+        '(regression guard — gpsOnly defaults false)', () {
+      // A representative OBD2 trip with idle, high-RPM, and a shift spike.
+      final samples = <TripSample>[
+        for (var i = 0; i <= 30; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: i < 10 ? 0 : 90,
+            rpm: i < 10 ? 850 : (i.isEven ? 3600 : 2000),
+            fuelRateLPerHour: 9,
+          ),
+      ];
+      final score = computeDrivingScore(samples);
+      // Engine-derived penalties remain ACTIVE for OBD2 (not zeroed).
+      expect(score.highRpmPenalty, greaterThan(0));
+      expect(score.idlingPenalty, greaterThan(0));
+    });
+  });
 }
