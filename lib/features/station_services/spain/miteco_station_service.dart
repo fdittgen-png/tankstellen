@@ -14,6 +14,8 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../station_detail/domain/opening_hours.dart';
+import 'spain_opening_hours_adapter.dart';
 import 'spain_provinces.dart';
 
 /// Spanish fuel prices from Geoportal Gasolineras (MITECO).
@@ -194,6 +196,13 @@ class MitecoStationService with StationServiceHelpers implements StationService 
       // Determine if open based on schedule (simplistic: assume open if horario is not empty)
       final isOpen = horario.isNotEmpty && horario != 'Cerrado';
 
+      // #2713 — parse the MITECO `Horario` string (e.g. `L-D: 24H`,
+      // `L-V: 06:00-23:00; S-D: 08:00-23:00`) into the common
+      // [WeeklyOpeningHours]. The legacy `openingHoursText` / `isOpen` stay
+      // for back-compat; the structured `weeklyHours` is the canonical
+      // signal the #2706 detail-fallback threads into the detail screen.
+      final weeklyHours = const SpainOpeningHoursAdapter().parse(horario);
+
       // #753 — `es-` prefix so a MITECO `IDEESS` (bare numeric) cannot
       // collide with another country's numeric id space.
       final rawId = r['IDEESS']?.toString() ?? '';
@@ -219,6 +228,10 @@ class MitecoStationService with StationServiceHelpers implements StationService 
         cng: _parseCommaDouble(r['Precio Gas Natural Comprimido']?.toString()),
         isOpen: isOpen,
         openingHoursText: horario.isNotEmpty ? horario : null,
+        openingHours: weeklyHours.availability ==
+                OpeningHoursAvailability.notProvided
+            ? null
+            : weeklyHours,
         stationType: r['Margen']?.toString(),
       );
     } on FormatException catch (e, st) {

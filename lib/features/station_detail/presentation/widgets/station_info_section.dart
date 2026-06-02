@@ -3,13 +3,15 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/presentation/widgets/amenity_chips.dart';
 import '../../../search/presentation/widgets/pay_with_app_button.dart';
 import '../../../search/presentation/widgets/payment_method_chips.dart';
+import '../../domain/legacy_opening_hours_bridge.dart';
+import '../../domain/opening_hours.dart';
+import 'opening_hours_view.dart';
 
 /// Address, opening hours, fuels, services, and location info for a station.
 ///
@@ -46,17 +48,19 @@ class StationInfoSection extends StatelessWidget {
     // sliver-app-bar's brand-header / status row, so dropping the whole
     // block here is purely a compaction win — no information is lost.
     //
-    // The opening-hours section now also short-circuits when there's
-    // nothing meaningful to say (not 24h, no `openingHoursText`, empty
-    // `detail.openingTimes`). The previous behaviour rendered a full
-    // ListTile with a literal `—`, costing ~60 dp of vertical space for
-    // zero user value. With both blocks gone in the common French-API
-    // case (no opening hours surfaced by the upstream feed), the screen
-    // fits inside the viewport on a Pixel-class device.
-    final hasOpeningInfo = station.is24h ||
-        (station.openingHoursText != null &&
-            station.openingHoursText!.isNotEmpty) ||
-        detail.openingTimes.isNotEmpty;
+    // Opening hours (#2709) — the three legacy branches (is24h ListTile /
+    // `openingHoursText` newline-split / `openingTimes`) are replaced by
+    // the structured [OpeningHoursView]. The schedule resolves from the
+    // adapter-populated `detail.openingHours` when present, falling back
+    // through [legacyOpeningHoursBridge] so countries whose opening-hours
+    // adapter has not yet landed still render via the migration bridge.
+    // The whole section is elided when the resolved schedule carries no
+    // data (the common French-API case), so the screen still fits inside
+    // the viewport on a Pixel-class device.
+    final WeeklyOpeningHours hours =
+        detail.openingHours ?? legacyOpeningHoursBridge(detail);
+    final hasOpeningInfo =
+        hours.availability != OpeningHoursAvailability.notProvided;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,27 +72,7 @@ class StationInfoSection extends StatelessWidget {
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
-          if (station.is24h)
-            ListTile(
-              leading:
-                  Icon(Icons.schedule, color: DarkModeColors.success(context)),
-              title: Text(l10n?.automate24h ?? '24h/24 — Automate'),
-            )
-          else if (station.openingHoursText != null &&
-              station.openingHoursText!.isNotEmpty)
-            ...station.openingHoursText!.split('\n').map((line) => ListTile(
-                  dense: true,
-                  leading: const Icon(Icons.schedule),
-                  title: Text(line.trim()),
-                ))
-          else
-            ...detail.openingTimes.map((ot) => ListTile(
-                  dense: true,
-                  leading: const Icon(Icons.schedule),
-                  title: Text(ot.text),
-                  trailing: Text(
-                      '${ot.start.substring(0, 5)} – ${ot.end.substring(0, 5)}'),
-                )),
+          OpeningHoursView(hours: hours),
           const SizedBox(height: 12),
         ],
 
