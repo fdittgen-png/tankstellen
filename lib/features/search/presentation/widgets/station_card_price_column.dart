@@ -54,6 +54,10 @@ class _StationPriceColumn extends StatelessWidget {
     return effective < 0.001 ? 0.001 : effective;
   }
 
+  /// ISO country code inferred from the station id, used to pick the
+  /// right fuel-grade labels (#2717 — `mx-` → PEMEX Magna/Premium).
+  String? get _countryCode => Countries.countryCodeForStationId(station.id);
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -166,20 +170,22 @@ class _StationPriceColumn extends StatelessWidget {
           ),
         if (selectedFuelType == FuelType.all && !isCheapest) ...[
           const SizedBox(height: 2),
+          // #2717 — Mexican (mx-) stations show PEMEX grade names
+          // (Magna/Premium); every other country is unchanged.
           _PriceRow(
-            label: 'E5',
+            label: fuelDisplayLabel(FuelType.e5, countryCode: _countryCode),
             price: station.e5,
             fuelType: FuelType.e5,
             isProfileFuel: profileFuelType is FuelTypeE5,
           ),
           _PriceRow(
-            label: 'E10',
+            label: fuelDisplayLabel(FuelType.e10, countryCode: _countryCode),
             price: station.e10,
             fuelType: FuelType.e10,
             isProfileFuel: profileFuelType is FuelTypeE10,
           ),
           _PriceRow(
-            label: 'Diesel',
+            label: fuelDisplayLabel(FuelType.diesel, countryCode: _countryCode),
             price: station.diesel,
             fuelType: FuelType.diesel,
             isProfileFuel: profileFuelType is FuelTypeDiesel,

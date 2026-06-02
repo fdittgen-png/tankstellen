@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import '../../../../core/country/country_config.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
@@ -179,15 +181,27 @@ class AllPricesStationCard extends StatelessWidget {
   List<Widget> _buildFuelBadges(BuildContext context) {
     final badges = <Widget>[];
 
+    // #2717 — resolve the station's country so Mexican (mx-) stations show
+    // PEMEX grade names (Magna/Premium); every other country falls through
+    // to the language-neutral fuel code unchanged.
+    final cc = Countries.countryCodeForStationId(station.id);
+
     final fuelEntries = <(FuelType, double?, String)>[
-      (FuelType.e5, station.e5, 'E5'),
-      (FuelType.e10, station.e10, 'E10'),
-      (FuelType.e98, station.e98, 'E98'),
-      (FuelType.diesel, station.diesel, 'Diesel'),
-      (FuelType.dieselPremium, station.dieselPremium, 'Diesel+'),
-      (FuelType.e85, station.e85, 'E85'),
-      (FuelType.lpg, station.lpg, 'GPL'),
-      (FuelType.cng, station.cng, 'GNV'),
+      (FuelType.e5, station.e5, fuelDisplayLabel(FuelType.e5, countryCode: cc)),
+      (FuelType.e10, station.e10,
+          fuelDisplayLabel(FuelType.e10, countryCode: cc)),
+      (FuelType.e98, station.e98,
+          fuelDisplayLabel(FuelType.e98, countryCode: cc)),
+      (FuelType.diesel, station.diesel,
+          fuelDisplayLabel(FuelType.diesel, countryCode: cc)),
+      (FuelType.dieselPremium, station.dieselPremium,
+          fuelDisplayLabel(FuelType.dieselPremium, countryCode: cc)),
+      (FuelType.e85, station.e85,
+          fuelDisplayLabel(FuelType.e85, countryCode: cc)),
+      (FuelType.lpg, station.lpg,
+          fuelDisplayLabel(FuelType.lpg, countryCode: cc)),
+      (FuelType.cng, station.cng,
+          fuelDisplayLabel(FuelType.cng, countryCode: cc)),
     ];
 
     for (final (fuelType, price, label) in fuelEntries) {
