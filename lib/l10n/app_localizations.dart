@@ -10731,6 +10731,174 @@ abstract class AppLocalizations {
   /// **'Pick a use mode to continue.'**
   String get onboardingPickUseMode;
 
+  /// Opening-hours status line — station is currently open (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get openNow;
+
+  /// Opening-hours status line — station is currently closed (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get openNowClosed;
+
+  /// Opening-hours status line — the schedule could not be resolved (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Hours unknown'**
+  String get openHoursUnknown;
+
+  /// Opening-hours status detail — when an open station next closes (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Closes {time}'**
+  String closesAt(String time);
+
+  /// Opening-hours status detail — when a closed station next opens on a future day (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Opens {day} {time}'**
+  String opensAt(String day, String time);
+
+  /// Opening-hours status detail — when a closed station next opens later the same day (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Opens {time}'**
+  String opensToday(String time);
+
+  /// Opening-hours row shown when the station is open every day around the clock (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Open 24 hours'**
+  String get open24Hours;
+
+  /// Compact badge shown next to the status for an around-the-clock station (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'24h'**
+  String get badge24h;
+
+  /// Full weekday name — Monday (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get dayMon;
+
+  /// Full weekday name — Tuesday (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get dayTue;
+
+  /// Full weekday name — Wednesday (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get dayWed;
+
+  /// Full weekday name — Thursday (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get dayThu;
+
+  /// Full weekday name — Friday (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get dayFri;
+
+  /// Full weekday name — Saturday (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get daySat;
+
+  /// Full weekday name — Sunday (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get daySun;
+
+  /// Abbreviated weekday name — Monday (collapsed opening-hours range, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get dayShortMon;
+
+  /// Abbreviated weekday name — Tuesday (collapsed opening-hours range, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get dayShortTue;
+
+  /// Abbreviated weekday name — Wednesday (collapsed opening-hours range, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get dayShortWed;
+
+  /// Abbreviated weekday name — Thursday (collapsed opening-hours range, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get dayShortThu;
+
+  /// Abbreviated weekday name — Friday (collapsed opening-hours range, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get dayShortFri;
+
+  /// Abbreviated weekday name — Saturday (collapsed opening-hours range, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get dayShortSat;
+
+  /// Abbreviated weekday name — Sunday (collapsed opening-hours range, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get dayShortSun;
+
+  /// Collapsed weekday span, e.g. "Mon – Fri" (opening-hours table, #2709).
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String dayRange(String from, String to);
+
+  /// Opening-hours table row label for the public-holiday schedule (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Public holidays'**
+  String get publicHolidays;
+
+  /// Opening-hours table value shown for a day the station is closed (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get closedLabel;
+
+  /// Muted message when no opening-hours data was provided for a station (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Opening hours not available'**
+  String get openingHoursNotAvailable;
+
+  /// Expand affordance under the collapsed opening-hours week — reveals the full per-day table (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Show all hours'**
+  String get showAllHours;
+
+  /// Collapse affordance shown when the full opening-hours table is expanded (#2709).
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLessHours;
+
   /// #2393 — unit caption under the big GPS-estimated consumption figure on the PiP tile (the GPS-only branch added by #2390). Marks the value as an estimate ('est.') so it reads distinctly from the OBD2-measured 'L/100 km' caption — the leading '~' on the figure carries the same meaning visually. Short, fits a narrow PiP window.
   ///
   /// In en, this message translates to:

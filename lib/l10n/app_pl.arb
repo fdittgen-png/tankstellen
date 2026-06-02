@@ -3846,5 +3846,171 @@
   "@consumptionMonthlyClimbLabel": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "openNow": "Open",
+  "@openNow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "openNowClosed": "Closed",
+  "@openNowClosed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "openHoursUnknown": "Hours unknown",
+  "@openHoursUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "closesAt": "Closes {time}",
+  "@closesAt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "opensAt": "Opens {day} {time}",
+  "@opensAt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "opensToday": "Opens {time}",
+  "@opensToday": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "open24Hours": "Open 24 hours",
+  "@open24Hours": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "badge24h": "24h",
+  "@badge24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayMon": "Monday",
+  "@dayMon": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayTue": "Tuesday",
+  "@dayTue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayWed": "Wednesday",
+  "@dayWed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayThu": "Thursday",
+  "@dayThu": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayFri": "Friday",
+  "@dayFri": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "daySat": "Saturday",
+  "@daySat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "daySun": "Sunday",
+  "@daySun": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayShortMon": "Mon",
+  "@dayShortMon": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayShortTue": "Tue",
+  "@dayShortTue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayShortWed": "Wed",
+  "@dayShortWed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayShortThu": "Thu",
+  "@dayShortThu": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayShortFri": "Fri",
+  "@dayShortFri": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayShortSat": "Sat",
+  "@dayShortSat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayShortSun": "Sun",
+  "@dayShortSun": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dayRange": "{from} – {to}",
+  "@dayRange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "publicHolidays": "Public holidays",
+  "@publicHolidays": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "closedLabel": "Closed",
+  "@closedLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "openingHoursNotAvailable": "Opening hours not available",
+  "@openingHoursNotAvailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "showAllHours": "Show all hours",
+  "@showAllHours": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "showLessHours": "Show less",
+  "@showLessHours": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
