@@ -402,6 +402,101 @@ void main() {
     });
   });
 
+  // ── #2671 — drop-awareness: pause gates dispatch, resume re-enables ──
+  //
+  // On a detected drop the DroppedSessionManager pauses the scheduler so it
+  // stops dispatching PIDs into a dead/flapping link (the field bug spammed
+  // PlatformException(not connected) while the adapter flapped). The timer
+  // may still be running, but a paused tick must NOT reach the transport.
+  group('PidScheduler — pause/resume drop-awareness (#2671)', () {
+    test(
+        'a paused scheduler does NOT dispatch even with the timer running '
+        '(no transport call)', () async {
+      final transport = _FakeTransport();
+      final scheduler = PidScheduler(
+        transport: transport.call,
+        tickRate: const Duration(milliseconds: 10),
+      );
+      scheduler.subscribe('010C', ScheduledPid(hz: 5.0), (_) {});
+      scheduler
+        ..start()
+        ..pause();
+
+      // Let many ticks fire while paused.
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(transport.calls, isEmpty,
+          reason: 'a paused tick must short-circuit before dispatch');
+      expect(scheduler.inFlightCommand, isNull);
+
+      scheduler.stop();
+    });
+
+    test('resume() re-enables dispatch after a pause', () async {
+      final transport = _FakeTransport();
+      final scheduler = PidScheduler(
+        transport: transport.call,
+        tickRate: const Duration(milliseconds: 10),
+      );
+      scheduler.subscribe('010C', ScheduledPid(hz: 5.0), (_) {});
+      scheduler
+        ..start()
+        ..pause();
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(transport.calls, isEmpty);
+
+      scheduler.resume();
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      await Future<void>.delayed(Duration.zero);
+      scheduler.stop();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(transport.calls, isNotEmpty,
+          reason: 'resume() must re-open dispatch');
+    });
+
+    test(
+        'resume() resets failure / backoff counters so a recovered link '
+        'starts clean', () async {
+      var fakeNow = DateTime(2026, 1, 1, 12);
+      var failing = true;
+      Future<String> transport(String command) async {
+        if (failing) throw Exception('timeout');
+        return '41 0C 00>';
+      }
+
+      final scheduler = PidScheduler(
+        transport: transport,
+        tickRate: const Duration(milliseconds: 5),
+        clock: () => fakeNow,
+      );
+      scheduler.subscribe('010C', ScheduledPid(hz: 5.0), (_) {});
+      scheduler.start();
+
+      // Drive the PID into backoff.
+      for (var i = 0; i < 8 && scheduler.backedOffCount == 0; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 8));
+        await Future<void>.delayed(Duration.zero);
+        fakeNow = fakeNow.add(const Duration(milliseconds: 250));
+      }
+      expect(scheduler.backedOffCount, 1,
+          reason: 'consecutive failures must engage backoff first');
+
+      // Drop → pause; reconnect → resume. resume() must wipe the failure
+      // streak so the recovered link does not start already-backed-off.
+      failing = false;
+      scheduler
+        ..pause()
+        ..resume();
+      expect(scheduler.backedOffCount, 0,
+          reason: 'resume() must reset the per-PID failure/backoff state');
+
+      scheduler.stop();
+      await Future<void>.delayed(Duration.zero);
+    });
+  });
+
   // ── #2379 — transient-failure handling ──────────────────────────────
   //
   // These tests bind a capture recorder so they assert on what reached

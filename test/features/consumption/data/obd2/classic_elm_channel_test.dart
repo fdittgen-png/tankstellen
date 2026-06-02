@@ -4,9 +4,11 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_elm_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_method_channel.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// Captured call to [_FakeObd2ClassicMethodChannel.connect].
@@ -208,9 +210,12 @@ void main() {
       expect(errors, hasLength(1));
       expect(errors.single, same(boom));
 
-      // The broadcast controller is NOT closed by a forwarded error, so
-      // the channel stays functional and later good bytes still flow.
-      expect(channel.isOpen, isTrue);
+      // #2671 — a reader-stream error now also clears `_open` (a classic-SPP
+      // drop raises an ERROR, not stream `done`), so the next write
+      // short-circuits instead of dispatching into a dead socket.
+      expect(channel.isOpen, isFalse);
+      // The broadcast controller is NOT closed by a forwarded error, so any
+      // late good bytes the native side already queued still flow through.
       fake.incomingController.add([0x99]);
       await Future<void>.delayed(Duration.zero);
       expect(received, [
@@ -223,19 +228,14 @@ void main() {
   });
 
   group('ClassicElmChannel.write', () {
-    test('throws StateError when channel is not open; no plugin.write call',
-        () async {
+    test(
+        'throws the recoverable Obd2DisconnectedException when not open; '
+        'no plugin.write call (#2671)', () async {
       final channel = ClassicElmChannel(address: 'AA:BB', plugin: fake);
 
       await expectLater(
         channel.write([0x01, 0x02]),
-        throwsA(
-          isA<StateError>().having(
-            (e) => e.message,
-            'message',
-            contains('not open'),
-          ),
-        ),
+        throwsA(isA<Obd2DisconnectedException>()),
       );
       expect(fake.writeCalls, isEmpty);
     });
@@ -248,6 +248,69 @@ void main() {
 
       expect(fake.writeCalls, hasLength(1));
       expect(fake.writeCalls.single, [0x41, 0x54, 0x5A, 0x0D]);
+
+      await channel.close();
+    });
+  });
+
+  // #2671 — a Classic-SPP drop raises a socket ERROR on the reader stream
+  // (not stream done). The `onError` handler must clear `_open` so the next
+  // write short-circuits, and a `plugin.write` that throws the raw
+  // `PlatformException(state, not connected)` must surface as the
+  // recoverable `Obd2DisconnectedException` the drop detector routes through
+  // pause/reconnect — never the raw platform error logged as an ERROR trace.
+  group('ClassicElmChannel — disconnect on reader-stream error (#2671)', () {
+    test(
+        'a reader-stream error flips isOpen=false so the next write '
+        'short-circuits as Obd2DisconnectedException (no plugin.write call)',
+        () async {
+      final channel = ClassicElmChannel(address: 'AA:BB', plugin: fake);
+      await channel.open();
+      expect(channel.isOpen, isTrue);
+
+      // Swallow the forwarded error on the incoming stream so it doesn't
+      // surface as an unhandled zone error during the test.
+      final sub = channel.incoming.listen((_) {}, onError: (_) {});
+
+      // The native classic-SPP socket drop raises an ERROR on the reader
+      // stream, not stream `done`.
+      fake.incomingController.addError(
+        PlatformException(code: 'state', message: 'not connected'),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(channel.isOpen, isFalse,
+          reason: 'onError must clear _open just like onDone does');
+
+      // The next write must short-circuit on the guard as a recoverable
+      // typed disconnect — NOT a raw StateError, and NOT reaching the plugin.
+      await expectLater(
+        channel.write([0x01, 0x02]),
+        throwsA(isA<Obd2DisconnectedException>()),
+      );
+      expect(fake.writeCalls, isEmpty,
+          reason: 'a closed channel must not reach plugin.write');
+
+      await sub.cancel();
+      await channel.close();
+    });
+
+    test(
+        'a plugin.write that throws PlatformException(not connected) is '
+        'rethrown as the recoverable Obd2DisconnectedException', () async {
+      // Models the in-flight-write race: the drop lands DURING the native
+      // write, so the guard passed but the plugin write throws raw.
+      fake.writeError =
+          PlatformException(code: 'state', message: 'not connected');
+      final channel = ClassicElmChannel(address: 'AA:BB', plugin: fake);
+      await channel.open();
+
+      await expectLater(
+        channel.write([0x41, 0x54, 0x5A, 0x0D]),
+        throwsA(isA<Obd2DisconnectedException>()),
+        reason: 'the raw PlatformException must be reclassified as a '
+            'recoverable typed disconnect (matching the #2524 precedent)',
+      );
 
       await channel.close();
     });

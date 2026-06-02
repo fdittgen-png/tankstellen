@@ -21,6 +21,19 @@ abstract class DroppedSessionHost {
   /// so no further transport chatter happens while we recover.
   void stopScheduler();
 
+  /// #2671 — gate PID dispatch the instant a drop is detected, WITHOUT
+  /// tearing the scheduler down. Belt-and-braces with [stopScheduler]: even
+  /// if the timer is later restarted while the link is still flapping, a
+  /// paused tick will not write into the dead/reconnecting socket (which
+  /// threw `PlatformException(state, not connected)` 4× in the field log).
+  void pauseScheduler();
+
+  /// #2671 — re-open PID dispatch once the link has genuinely recovered.
+  /// Also resets the per-PID failure/backoff streaks + the unresponsive
+  /// diagnostic so the reconnected adapter starts clean. Called only on a
+  /// confirmed reconnect, never while still flapping.
+  void resumeScheduler();
+
   /// Tear down the CURRENT (now-dead) OBD2 service the instant a drop is
   /// detected (#2524). Closes its transport channel and fails any command
   /// stranded in the transport's `_pending` via `_failPending`, so the

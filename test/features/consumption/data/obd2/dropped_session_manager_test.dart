@@ -84,6 +84,9 @@ void main() {
       expect(mgr.dropReason, TripDropReason.transportError);
       expect(host.stopSchedulerCalls, 1,
           reason: 'the scheduler must be stopped the instant a drop fires');
+      expect(host.pauseSchedulerCalls, 1,
+          reason: '#2671 — dispatch must also be GATED on drop so a later '
+              'tick never writes into the dead/flapping link');
       expect(host.clearErrorWindowCalls, 1);
       expect(host.emitStateCalls, greaterThanOrEqualTo(1));
       final saved = pausedRepo.loadAll();
@@ -296,6 +299,9 @@ void main() {
             reason: 'the user never saw a pause');
         expect(host.startSchedulerCalls, 1,
             reason: 'a silent reconnect must restart the polling loop');
+        expect(host.resumeSchedulerCalls, 1,
+            reason: '#2671 — a confirmed reconnect must re-open dispatch + '
+                'reset failure streaks before the loop resumes ticking');
         expect(host.resetDropDetectorCalls, 1);
         expect(pausedRepo.loadAll(), isEmpty,
             reason: 'a silent reconnect must clear the stranded partial');
@@ -549,6 +555,8 @@ void main() {
 /// be asserted end-to-end.
 class _FakeHost implements DroppedSessionHost {
   int stopSchedulerCalls = 0;
+  int pauseSchedulerCalls = 0;
+  int resumeSchedulerCalls = 0;
   int disconnectDroppedServiceCalls = 0;
   int startSchedulerCalls = 0;
   int resetDropDetectorCalls = 0;
@@ -593,6 +601,12 @@ class _FakeHost implements DroppedSessionHost {
 
   @override
   void stopScheduler() => stopSchedulerCalls++;
+
+  @override
+  void pauseScheduler() => pauseSchedulerCalls++;
+
+  @override
+  void resumeScheduler() => resumeSchedulerCalls++;
 
   @override
   void disconnectDroppedService() => disconnectDroppedServiceCalls++;

@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -60,6 +63,21 @@ class TraceRecorder {
       effectiveError = error;
     }
 
+    // #2671 — benign offline/cancelled transients are EXPECTED, not errors.
+    // A no-network DNS failure (`SocketException: Failed host lookup …`) and
+    // a user-cancelled request (`DioException [request cancelled]`) reached
+    // the trace store with NO suppression, polluting a signal-rich error
+    // log. Skip them with a breadcrumb only — no store, no upload. Placed in
+    // `record()` (not the classifier) so EVERY caller path (dio interceptor,
+    // `errorLogger.log`, the service chain) is covered, and matched against
+    // the UNWRAPPED [effectiveError] so a ContextualError-wrapped transient
+    // is suppressed too.
+    if (_isBenignTransient(effectiveError)) {
+      debugPrint('TraceRecorder: skipping benign transient (offline/'
+          'cancelled), not persisting (#2671): $effectiveError');
+      return;
+    }
+
     // Build chain snapshot from ServiceChainExhaustedException
     var chain = serviceChainState;
     if (chain == null && effectiveError is ServiceChainExhaustedException) {
@@ -116,6 +134,24 @@ class TraceRecorder {
 
     await _storage.store(trace);
     await _uploader.uploadIfEnabled(trace);
+  }
+
+  /// #2671 — true for an EXPECTED offline/cancelled transient that must not
+  /// be persisted as an error trace:
+  ///   1. a [SocketException] whose message reports a failed host lookup
+  ///      (the device is simply offline — DNS can't resolve the API host);
+  ///   2. a [DioException] of type [DioExceptionType.cancel] (the user
+  ///      navigated away / a newer request superseded this one).
+  /// Narrow by construction: a connection-refused [SocketException] or any
+  /// non-cancel Dio failure is a real error and still persists.
+  static bool _isBenignTransient(Object error) {
+    if (error is SocketException) {
+      return error.message.toUpperCase().contains('FAILED HOST LOOKUP');
+    }
+    if (error is DioException) {
+      return error.type == DioExceptionType.cancel;
+    }
+    return false;
   }
 }
 
