@@ -46,8 +46,15 @@ Future<ServiceResult<StationDetail>> stationDetail(
         .where((r) => r.station.id == stationId)
         .firstOrNull;
     if (fromSearch != null) {
+      // Carry any structured weekly hours the search-result station already
+      // holds (Epic C4 — e.g. AT E-Control, which has no detail endpoint)
+      // into `StationDetail.openingHours` so the display layer renders them
+      // directly instead of falling through `legacyOpeningHoursBridge`.
       return ServiceResult(
-        data: StationDetail(station: fromSearch.station),
+        data: StationDetail(
+          station: fromSearch.station,
+          openingHours: fromSearch.station.openingHours,
+        ),
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );

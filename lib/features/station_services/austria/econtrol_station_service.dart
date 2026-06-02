@@ -11,6 +11,8 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../station_detail/domain/opening_hours.dart';
+import 'austria_opening_hours_adapter.dart';
 
 /// Austrian fuel prices from E-Control Spritpreisrechner.
 /// Free, no API key, no registration.
@@ -131,8 +133,13 @@ class EControlStationService with StationServiceHelpers implements StationServic
         }
       }
 
-      // Opening hours text
+      // Opening hours — parse the structured E-Control `openingHours[]`
+      // rows into the common [WeeklyOpeningHours] (Epic C4, #2711) instead of
+      // the legacy German paragraph. The structured `weeklyHours` is the
+      // canonical signal; `openingHoursText` is kept (best-effort) for
+      // back-compat with any consumer still reading the legacy string.
       final openingHours = r['openingHours'] as List<dynamic>? ?? [];
+      final weeklyHours = const AustriaOpeningHoursAdapter().parse(openingHours);
       final hoursText = openingHours.map((oh) {
         if (oh is Map<String, dynamic>) {
           return '${oh['label'] ?? oh['day']}: ${oh['from']}-${oh['to']}';
@@ -165,6 +172,10 @@ class EControlStationService with StationServiceHelpers implements StationServic
         lpg: fuelType == 'GAS' ? price : null,
         isOpen: isOpen,
         openingHoursText: hoursText.isNotEmpty ? hoursText : null,
+        openingHours: weeklyHours.availability ==
+                OpeningHoursAvailability.notProvided
+            ? null
+            : weeklyHours,
       );
     } on FormatException catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'E-Control station parse failed'}));

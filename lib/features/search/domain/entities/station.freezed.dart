@@ -16,7 +16,12 @@ T _$identity<T>(T value) => value;
 mixin _$Station {
 
  String get id; String get name; String get brand; String get street; String? get houseNumber;@JsonKey(fromJson: _postCodeToString) String get postCode; String get place; double get lat; double get lng; double get dist;@JsonKey(fromJson: _priceFromJson) double? get e5;@JsonKey(fromJson: _priceFromJson) double? get e10;@JsonKey(fromJson: _priceFromJson) double? get e98;@JsonKey(fromJson: _priceFromJson) double? get diesel;@JsonKey(fromJson: _priceFromJson) double? get dieselPremium;@JsonKey(fromJson: _priceFromJson) double? get e85;@JsonKey(fromJson: _priceFromJson) double? get lpg;@JsonKey(fromJson: _priceFromJson) double? get cng; bool get isOpen; String? get updatedAt; String? get openingHoursText;// "Lun 07:00-18:30, Mar 07:00-18:30..."
- bool get is24h; List<String> get services; List<String> get availableFuels; List<String> get unavailableFuels; String? get stationType;// "R" retail, "A" autoroute
+// Epic C4 — structured weekly hours from a per-country
+// [OpeningHoursAdapter], carried on the search-result station so a
+// country whose service has no detail endpoint (e.g. AT E-Control)
+// still surfaces structured hours via `StationDetail(station:…)`.
+// ADDITIVE: `openingHoursText` / `is24h` stay for back-compat.
+@JsonKey(includeFromJson: false, includeToJson: false) WeeklyOpeningHours? get openingHours; bool get is24h; List<String> get services; List<String> get availableFuels; List<String> get unavailableFuels; String? get stationType;// "R" retail, "A" autoroute
  String? get department; String? get region;@JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson) Set<StationAmenity> get amenities;
 /// Create a copy of Station
 /// with the given fields replaced by the non-null parameter values.
@@ -30,16 +35,16 @@ $StationCopyWith<Station> get copyWith => _$StationCopyWithImpl<Station>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Station&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.street, street) || other.street == street)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.e5, e5) || other.e5 == e5)&&(identical(other.e10, e10) || other.e10 == e10)&&(identical(other.e98, e98) || other.e98 == e98)&&(identical(other.diesel, diesel) || other.diesel == diesel)&&(identical(other.dieselPremium, dieselPremium) || other.dieselPremium == dieselPremium)&&(identical(other.e85, e85) || other.e85 == e85)&&(identical(other.lpg, lpg) || other.lpg == lpg)&&(identical(other.cng, cng) || other.cng == cng)&&(identical(other.isOpen, isOpen) || other.isOpen == isOpen)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.openingHoursText, openingHoursText) || other.openingHoursText == openingHoursText)&&(identical(other.is24h, is24h) || other.is24h == is24h)&&const DeepCollectionEquality().equals(other.services, services)&&const DeepCollectionEquality().equals(other.availableFuels, availableFuels)&&const DeepCollectionEquality().equals(other.unavailableFuels, unavailableFuels)&&(identical(other.stationType, stationType) || other.stationType == stationType)&&(identical(other.department, department) || other.department == department)&&(identical(other.region, region) || other.region == region)&&const DeepCollectionEquality().equals(other.amenities, amenities));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Station&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.street, street) || other.street == street)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.e5, e5) || other.e5 == e5)&&(identical(other.e10, e10) || other.e10 == e10)&&(identical(other.e98, e98) || other.e98 == e98)&&(identical(other.diesel, diesel) || other.diesel == diesel)&&(identical(other.dieselPremium, dieselPremium) || other.dieselPremium == dieselPremium)&&(identical(other.e85, e85) || other.e85 == e85)&&(identical(other.lpg, lpg) || other.lpg == lpg)&&(identical(other.cng, cng) || other.cng == cng)&&(identical(other.isOpen, isOpen) || other.isOpen == isOpen)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.openingHoursText, openingHoursText) || other.openingHoursText == openingHoursText)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours)&&(identical(other.is24h, is24h) || other.is24h == is24h)&&const DeepCollectionEquality().equals(other.services, services)&&const DeepCollectionEquality().equals(other.availableFuels, availableFuels)&&const DeepCollectionEquality().equals(other.unavailableFuels, unavailableFuels)&&(identical(other.stationType, stationType) || other.stationType == stationType)&&(identical(other.department, department) || other.department == department)&&(identical(other.region, region) || other.region == region)&&const DeepCollectionEquality().equals(other.amenities, amenities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,name,brand,street,houseNumber,postCode,place,lat,lng,dist,e5,e10,e98,diesel,dieselPremium,e85,lpg,cng,isOpen,updatedAt,openingHoursText,is24h,const DeepCollectionEquality().hash(services),const DeepCollectionEquality().hash(availableFuels),const DeepCollectionEquality().hash(unavailableFuels),stationType,department,region,const DeepCollectionEquality().hash(amenities)]);
+int get hashCode => Object.hashAll([runtimeType,id,name,brand,street,houseNumber,postCode,place,lat,lng,dist,e5,e10,e98,diesel,dieselPremium,e85,lpg,cng,isOpen,updatedAt,openingHoursText,openingHours,is24h,const DeepCollectionEquality().hash(services),const DeepCollectionEquality().hash(availableFuels),const DeepCollectionEquality().hash(unavailableFuels),stationType,department,region,const DeepCollectionEquality().hash(amenities)]);
 
 @override
 String toString() {
-  return 'Station(id: $id, name: $name, brand: $brand, street: $street, houseNumber: $houseNumber, postCode: $postCode, place: $place, lat: $lat, lng: $lng, dist: $dist, e5: $e5, e10: $e10, e98: $e98, diesel: $diesel, dieselPremium: $dieselPremium, e85: $e85, lpg: $lpg, cng: $cng, isOpen: $isOpen, updatedAt: $updatedAt, openingHoursText: $openingHoursText, is24h: $is24h, services: $services, availableFuels: $availableFuels, unavailableFuels: $unavailableFuels, stationType: $stationType, department: $department, region: $region, amenities: $amenities)';
+  return 'Station(id: $id, name: $name, brand: $brand, street: $street, houseNumber: $houseNumber, postCode: $postCode, place: $place, lat: $lat, lng: $lng, dist: $dist, e5: $e5, e10: $e10, e98: $e98, diesel: $diesel, dieselPremium: $dieselPremium, e85: $e85, lpg: $lpg, cng: $cng, isOpen: $isOpen, updatedAt: $updatedAt, openingHoursText: $openingHoursText, openingHours: $openingHours, is24h: $is24h, services: $services, availableFuels: $availableFuels, unavailableFuels: $unavailableFuels, stationType: $stationType, department: $department, region: $region, amenities: $amenities)';
 }
 
 
@@ -50,11 +55,11 @@ abstract mixin class $StationCopyWith<$Res>  {
   factory $StationCopyWith(Station value, $Res Function(Station) _then) = _$StationCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String brand, String street, String? houseNumber,@JsonKey(fromJson: _postCodeToString) String postCode, String place, double lat, double lng, double dist,@JsonKey(fromJson: _priceFromJson) double? e5,@JsonKey(fromJson: _priceFromJson) double? e10,@JsonKey(fromJson: _priceFromJson) double? e98,@JsonKey(fromJson: _priceFromJson) double? diesel,@JsonKey(fromJson: _priceFromJson) double? dieselPremium,@JsonKey(fromJson: _priceFromJson) double? e85,@JsonKey(fromJson: _priceFromJson) double? lpg,@JsonKey(fromJson: _priceFromJson) double? cng, bool isOpen, String? updatedAt, String? openingHoursText, bool is24h, List<String> services, List<String> availableFuels, List<String> unavailableFuels, String? stationType, String? department, String? region,@JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson) Set<StationAmenity> amenities
+ String id, String name, String brand, String street, String? houseNumber,@JsonKey(fromJson: _postCodeToString) String postCode, String place, double lat, double lng, double dist,@JsonKey(fromJson: _priceFromJson) double? e5,@JsonKey(fromJson: _priceFromJson) double? e10,@JsonKey(fromJson: _priceFromJson) double? e98,@JsonKey(fromJson: _priceFromJson) double? diesel,@JsonKey(fromJson: _priceFromJson) double? dieselPremium,@JsonKey(fromJson: _priceFromJson) double? e85,@JsonKey(fromJson: _priceFromJson) double? lpg,@JsonKey(fromJson: _priceFromJson) double? cng, bool isOpen, String? updatedAt, String? openingHoursText,@JsonKey(includeFromJson: false, includeToJson: false) WeeklyOpeningHours? openingHours, bool is24h, List<String> services, List<String> availableFuels, List<String> unavailableFuels, String? stationType, String? department, String? region,@JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson) Set<StationAmenity> amenities
 });
 
 
-
+$WeeklyOpeningHoursCopyWith<$Res>? get openingHours;
 
 }
 /// @nodoc
@@ -67,7 +72,7 @@ class _$StationCopyWithImpl<$Res>
 
 /// Create a copy of Station
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? brand = null,Object? street = null,Object? houseNumber = freezed,Object? postCode = null,Object? place = null,Object? lat = null,Object? lng = null,Object? dist = null,Object? e5 = freezed,Object? e10 = freezed,Object? e98 = freezed,Object? diesel = freezed,Object? dieselPremium = freezed,Object? e85 = freezed,Object? lpg = freezed,Object? cng = freezed,Object? isOpen = null,Object? updatedAt = freezed,Object? openingHoursText = freezed,Object? is24h = null,Object? services = null,Object? availableFuels = null,Object? unavailableFuels = null,Object? stationType = freezed,Object? department = freezed,Object? region = freezed,Object? amenities = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? brand = null,Object? street = null,Object? houseNumber = freezed,Object? postCode = null,Object? place = null,Object? lat = null,Object? lng = null,Object? dist = null,Object? e5 = freezed,Object? e10 = freezed,Object? e98 = freezed,Object? diesel = freezed,Object? dieselPremium = freezed,Object? e85 = freezed,Object? lpg = freezed,Object? cng = freezed,Object? isOpen = null,Object? updatedAt = freezed,Object? openingHoursText = freezed,Object? openingHours = freezed,Object? is24h = null,Object? services = null,Object? availableFuels = null,Object? unavailableFuels = null,Object? stationType = freezed,Object? department = freezed,Object? region = freezed,Object? amenities = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -90,7 +95,8 @@ as double?,cng: freezed == cng ? _self.cng : cng // ignore: cast_nullable_to_non
 as double?,isOpen: null == isOpen ? _self.isOpen : isOpen // ignore: cast_nullable_to_non_nullable
 as bool,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as String?,openingHoursText: freezed == openingHoursText ? _self.openingHoursText : openingHoursText // ignore: cast_nullable_to_non_nullable
-as String?,is24h: null == is24h ? _self.is24h : is24h // ignore: cast_nullable_to_non_nullable
+as String?,openingHours: freezed == openingHours ? _self.openingHours : openingHours // ignore: cast_nullable_to_non_nullable
+as WeeklyOpeningHours?,is24h: null == is24h ? _self.is24h : is24h // ignore: cast_nullable_to_non_nullable
 as bool,services: null == services ? _self.services : services // ignore: cast_nullable_to_non_nullable
 as List<String>,availableFuels: null == availableFuels ? _self.availableFuels : availableFuels // ignore: cast_nullable_to_non_nullable
 as List<String>,unavailableFuels: null == unavailableFuels ? _self.unavailableFuels : unavailableFuels // ignore: cast_nullable_to_non_nullable
@@ -101,7 +107,19 @@ as String?,amenities: null == amenities ? _self.amenities : amenities // ignore:
 as Set<StationAmenity>,
   ));
 }
+/// Create a copy of Station
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WeeklyOpeningHoursCopyWith<$Res>? get openingHours {
+    if (_self.openingHours == null) {
+    return null;
+  }
 
+  return $WeeklyOpeningHoursCopyWith<$Res>(_self.openingHours!, (value) {
+    return _then(_self.copyWith(openingHours: value));
+  });
+}
 }
 
 
@@ -183,10 +201,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String brand,  String street,  String? houseNumber, @JsonKey(fromJson: _postCodeToString)  String postCode,  String place,  double lat,  double lng,  double dist, @JsonKey(fromJson: _priceFromJson)  double? e5, @JsonKey(fromJson: _priceFromJson)  double? e10, @JsonKey(fromJson: _priceFromJson)  double? e98, @JsonKey(fromJson: _priceFromJson)  double? diesel, @JsonKey(fromJson: _priceFromJson)  double? dieselPremium, @JsonKey(fromJson: _priceFromJson)  double? e85, @JsonKey(fromJson: _priceFromJson)  double? lpg, @JsonKey(fromJson: _priceFromJson)  double? cng,  bool isOpen,  String? updatedAt,  String? openingHoursText,  bool is24h,  List<String> services,  List<String> availableFuels,  List<String> unavailableFuels,  String? stationType,  String? department,  String? region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson)  Set<StationAmenity> amenities)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String brand,  String street,  String? houseNumber, @JsonKey(fromJson: _postCodeToString)  String postCode,  String place,  double lat,  double lng,  double dist, @JsonKey(fromJson: _priceFromJson)  double? e5, @JsonKey(fromJson: _priceFromJson)  double? e10, @JsonKey(fromJson: _priceFromJson)  double? e98, @JsonKey(fromJson: _priceFromJson)  double? diesel, @JsonKey(fromJson: _priceFromJson)  double? dieselPremium, @JsonKey(fromJson: _priceFromJson)  double? e85, @JsonKey(fromJson: _priceFromJson)  double? lpg, @JsonKey(fromJson: _priceFromJson)  double? cng,  bool isOpen,  String? updatedAt,  String? openingHoursText, @JsonKey(includeFromJson: false, includeToJson: false)  WeeklyOpeningHours? openingHours,  bool is24h,  List<String> services,  List<String> availableFuels,  List<String> unavailableFuels,  String? stationType,  String? department,  String? region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson)  Set<StationAmenity> amenities)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Station() when $default != null:
-return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_that.postCode,_that.place,_that.lat,_that.lng,_that.dist,_that.e5,_that.e10,_that.e98,_that.diesel,_that.dieselPremium,_that.e85,_that.lpg,_that.cng,_that.isOpen,_that.updatedAt,_that.openingHoursText,_that.is24h,_that.services,_that.availableFuels,_that.unavailableFuels,_that.stationType,_that.department,_that.region,_that.amenities);case _:
+return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_that.postCode,_that.place,_that.lat,_that.lng,_that.dist,_that.e5,_that.e10,_that.e98,_that.diesel,_that.dieselPremium,_that.e85,_that.lpg,_that.cng,_that.isOpen,_that.updatedAt,_that.openingHoursText,_that.openingHours,_that.is24h,_that.services,_that.availableFuels,_that.unavailableFuels,_that.stationType,_that.department,_that.region,_that.amenities);case _:
   return orElse();
 
 }
@@ -204,10 +222,10 @@ return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String brand,  String street,  String? houseNumber, @JsonKey(fromJson: _postCodeToString)  String postCode,  String place,  double lat,  double lng,  double dist, @JsonKey(fromJson: _priceFromJson)  double? e5, @JsonKey(fromJson: _priceFromJson)  double? e10, @JsonKey(fromJson: _priceFromJson)  double? e98, @JsonKey(fromJson: _priceFromJson)  double? diesel, @JsonKey(fromJson: _priceFromJson)  double? dieselPremium, @JsonKey(fromJson: _priceFromJson)  double? e85, @JsonKey(fromJson: _priceFromJson)  double? lpg, @JsonKey(fromJson: _priceFromJson)  double? cng,  bool isOpen,  String? updatedAt,  String? openingHoursText,  bool is24h,  List<String> services,  List<String> availableFuels,  List<String> unavailableFuels,  String? stationType,  String? department,  String? region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson)  Set<StationAmenity> amenities)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String brand,  String street,  String? houseNumber, @JsonKey(fromJson: _postCodeToString)  String postCode,  String place,  double lat,  double lng,  double dist, @JsonKey(fromJson: _priceFromJson)  double? e5, @JsonKey(fromJson: _priceFromJson)  double? e10, @JsonKey(fromJson: _priceFromJson)  double? e98, @JsonKey(fromJson: _priceFromJson)  double? diesel, @JsonKey(fromJson: _priceFromJson)  double? dieselPremium, @JsonKey(fromJson: _priceFromJson)  double? e85, @JsonKey(fromJson: _priceFromJson)  double? lpg, @JsonKey(fromJson: _priceFromJson)  double? cng,  bool isOpen,  String? updatedAt,  String? openingHoursText, @JsonKey(includeFromJson: false, includeToJson: false)  WeeklyOpeningHours? openingHours,  bool is24h,  List<String> services,  List<String> availableFuels,  List<String> unavailableFuels,  String? stationType,  String? department,  String? region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson)  Set<StationAmenity> amenities)  $default,) {final _that = this;
 switch (_that) {
 case _Station():
-return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_that.postCode,_that.place,_that.lat,_that.lng,_that.dist,_that.e5,_that.e10,_that.e98,_that.diesel,_that.dieselPremium,_that.e85,_that.lpg,_that.cng,_that.isOpen,_that.updatedAt,_that.openingHoursText,_that.is24h,_that.services,_that.availableFuels,_that.unavailableFuels,_that.stationType,_that.department,_that.region,_that.amenities);case _:
+return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_that.postCode,_that.place,_that.lat,_that.lng,_that.dist,_that.e5,_that.e10,_that.e98,_that.diesel,_that.dieselPremium,_that.e85,_that.lpg,_that.cng,_that.isOpen,_that.updatedAt,_that.openingHoursText,_that.openingHours,_that.is24h,_that.services,_that.availableFuels,_that.unavailableFuels,_that.stationType,_that.department,_that.region,_that.amenities);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -224,10 +242,10 @@ return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String brand,  String street,  String? houseNumber, @JsonKey(fromJson: _postCodeToString)  String postCode,  String place,  double lat,  double lng,  double dist, @JsonKey(fromJson: _priceFromJson)  double? e5, @JsonKey(fromJson: _priceFromJson)  double? e10, @JsonKey(fromJson: _priceFromJson)  double? e98, @JsonKey(fromJson: _priceFromJson)  double? diesel, @JsonKey(fromJson: _priceFromJson)  double? dieselPremium, @JsonKey(fromJson: _priceFromJson)  double? e85, @JsonKey(fromJson: _priceFromJson)  double? lpg, @JsonKey(fromJson: _priceFromJson)  double? cng,  bool isOpen,  String? updatedAt,  String? openingHoursText,  bool is24h,  List<String> services,  List<String> availableFuels,  List<String> unavailableFuels,  String? stationType,  String? department,  String? region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson)  Set<StationAmenity> amenities)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String brand,  String street,  String? houseNumber, @JsonKey(fromJson: _postCodeToString)  String postCode,  String place,  double lat,  double lng,  double dist, @JsonKey(fromJson: _priceFromJson)  double? e5, @JsonKey(fromJson: _priceFromJson)  double? e10, @JsonKey(fromJson: _priceFromJson)  double? e98, @JsonKey(fromJson: _priceFromJson)  double? diesel, @JsonKey(fromJson: _priceFromJson)  double? dieselPremium, @JsonKey(fromJson: _priceFromJson)  double? e85, @JsonKey(fromJson: _priceFromJson)  double? lpg, @JsonKey(fromJson: _priceFromJson)  double? cng,  bool isOpen,  String? updatedAt,  String? openingHoursText, @JsonKey(includeFromJson: false, includeToJson: false)  WeeklyOpeningHours? openingHours,  bool is24h,  List<String> services,  List<String> availableFuels,  List<String> unavailableFuels,  String? stationType,  String? department,  String? region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson)  Set<StationAmenity> amenities)?  $default,) {final _that = this;
 switch (_that) {
 case _Station() when $default != null:
-return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_that.postCode,_that.place,_that.lat,_that.lng,_that.dist,_that.e5,_that.e10,_that.e98,_that.diesel,_that.dieselPremium,_that.e85,_that.lpg,_that.cng,_that.isOpen,_that.updatedAt,_that.openingHoursText,_that.is24h,_that.services,_that.availableFuels,_that.unavailableFuels,_that.stationType,_that.department,_that.region,_that.amenities);case _:
+return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_that.postCode,_that.place,_that.lat,_that.lng,_that.dist,_that.e5,_that.e10,_that.e98,_that.diesel,_that.dieselPremium,_that.e85,_that.lpg,_that.cng,_that.isOpen,_that.updatedAt,_that.openingHoursText,_that.openingHours,_that.is24h,_that.services,_that.availableFuels,_that.unavailableFuels,_that.stationType,_that.department,_that.region,_that.amenities);case _:
   return null;
 
 }
@@ -239,7 +257,7 @@ return $default(_that.id,_that.name,_that.brand,_that.street,_that.houseNumber,_
 @JsonSerializable()
 
 class _Station implements Station {
-  const _Station({required this.id, required this.name, required this.brand, required this.street, this.houseNumber, @JsonKey(fromJson: _postCodeToString) required this.postCode, required this.place, required this.lat, required this.lng, this.dist = 0, @JsonKey(fromJson: _priceFromJson) this.e5, @JsonKey(fromJson: _priceFromJson) this.e10, @JsonKey(fromJson: _priceFromJson) this.e98, @JsonKey(fromJson: _priceFromJson) this.diesel, @JsonKey(fromJson: _priceFromJson) this.dieselPremium, @JsonKey(fromJson: _priceFromJson) this.e85, @JsonKey(fromJson: _priceFromJson) this.lpg, @JsonKey(fromJson: _priceFromJson) this.cng, required this.isOpen, this.updatedAt, this.openingHoursText, this.is24h = false, final  List<String> services = const [], final  List<String> availableFuels = const [], final  List<String> unavailableFuels = const [], this.stationType, this.department, this.region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson) final  Set<StationAmenity> amenities = const {}}): _services = services,_availableFuels = availableFuels,_unavailableFuels = unavailableFuels,_amenities = amenities;
+  const _Station({required this.id, required this.name, required this.brand, required this.street, this.houseNumber, @JsonKey(fromJson: _postCodeToString) required this.postCode, required this.place, required this.lat, required this.lng, this.dist = 0, @JsonKey(fromJson: _priceFromJson) this.e5, @JsonKey(fromJson: _priceFromJson) this.e10, @JsonKey(fromJson: _priceFromJson) this.e98, @JsonKey(fromJson: _priceFromJson) this.diesel, @JsonKey(fromJson: _priceFromJson) this.dieselPremium, @JsonKey(fromJson: _priceFromJson) this.e85, @JsonKey(fromJson: _priceFromJson) this.lpg, @JsonKey(fromJson: _priceFromJson) this.cng, required this.isOpen, this.updatedAt, this.openingHoursText, @JsonKey(includeFromJson: false, includeToJson: false) this.openingHours, this.is24h = false, final  List<String> services = const [], final  List<String> availableFuels = const [], final  List<String> unavailableFuels = const [], this.stationType, this.department, this.region, @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson) final  Set<StationAmenity> amenities = const {}}): _services = services,_availableFuels = availableFuels,_unavailableFuels = unavailableFuels,_amenities = amenities;
   factory _Station.fromJson(Map<String, dynamic> json) => _$StationFromJson(json);
 
 @override final  String id;
@@ -264,6 +282,12 @@ class _Station implements Station {
 @override final  String? updatedAt;
 @override final  String? openingHoursText;
 // "Lun 07:00-18:30, Mar 07:00-18:30..."
+// Epic C4 — structured weekly hours from a per-country
+// [OpeningHoursAdapter], carried on the search-result station so a
+// country whose service has no detail endpoint (e.g. AT E-Control)
+// still surfaces structured hours via `StationDetail(station:…)`.
+// ADDITIVE: `openingHoursText` / `is24h` stay for back-compat.
+@override@JsonKey(includeFromJson: false, includeToJson: false) final  WeeklyOpeningHours? openingHours;
 @override@JsonKey() final  bool is24h;
  final  List<String> _services;
 @override@JsonKey() List<String> get services {
@@ -311,16 +335,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Station&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.street, street) || other.street == street)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.e5, e5) || other.e5 == e5)&&(identical(other.e10, e10) || other.e10 == e10)&&(identical(other.e98, e98) || other.e98 == e98)&&(identical(other.diesel, diesel) || other.diesel == diesel)&&(identical(other.dieselPremium, dieselPremium) || other.dieselPremium == dieselPremium)&&(identical(other.e85, e85) || other.e85 == e85)&&(identical(other.lpg, lpg) || other.lpg == lpg)&&(identical(other.cng, cng) || other.cng == cng)&&(identical(other.isOpen, isOpen) || other.isOpen == isOpen)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.openingHoursText, openingHoursText) || other.openingHoursText == openingHoursText)&&(identical(other.is24h, is24h) || other.is24h == is24h)&&const DeepCollectionEquality().equals(other._services, _services)&&const DeepCollectionEquality().equals(other._availableFuels, _availableFuels)&&const DeepCollectionEquality().equals(other._unavailableFuels, _unavailableFuels)&&(identical(other.stationType, stationType) || other.stationType == stationType)&&(identical(other.department, department) || other.department == department)&&(identical(other.region, region) || other.region == region)&&const DeepCollectionEquality().equals(other._amenities, _amenities));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Station&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.street, street) || other.street == street)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.postCode, postCode) || other.postCode == postCode)&&(identical(other.place, place) || other.place == place)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.dist, dist) || other.dist == dist)&&(identical(other.e5, e5) || other.e5 == e5)&&(identical(other.e10, e10) || other.e10 == e10)&&(identical(other.e98, e98) || other.e98 == e98)&&(identical(other.diesel, diesel) || other.diesel == diesel)&&(identical(other.dieselPremium, dieselPremium) || other.dieselPremium == dieselPremium)&&(identical(other.e85, e85) || other.e85 == e85)&&(identical(other.lpg, lpg) || other.lpg == lpg)&&(identical(other.cng, cng) || other.cng == cng)&&(identical(other.isOpen, isOpen) || other.isOpen == isOpen)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.openingHoursText, openingHoursText) || other.openingHoursText == openingHoursText)&&(identical(other.openingHours, openingHours) || other.openingHours == openingHours)&&(identical(other.is24h, is24h) || other.is24h == is24h)&&const DeepCollectionEquality().equals(other._services, _services)&&const DeepCollectionEquality().equals(other._availableFuels, _availableFuels)&&const DeepCollectionEquality().equals(other._unavailableFuels, _unavailableFuels)&&(identical(other.stationType, stationType) || other.stationType == stationType)&&(identical(other.department, department) || other.department == department)&&(identical(other.region, region) || other.region == region)&&const DeepCollectionEquality().equals(other._amenities, _amenities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,name,brand,street,houseNumber,postCode,place,lat,lng,dist,e5,e10,e98,diesel,dieselPremium,e85,lpg,cng,isOpen,updatedAt,openingHoursText,is24h,const DeepCollectionEquality().hash(_services),const DeepCollectionEquality().hash(_availableFuels),const DeepCollectionEquality().hash(_unavailableFuels),stationType,department,region,const DeepCollectionEquality().hash(_amenities)]);
+int get hashCode => Object.hashAll([runtimeType,id,name,brand,street,houseNumber,postCode,place,lat,lng,dist,e5,e10,e98,diesel,dieselPremium,e85,lpg,cng,isOpen,updatedAt,openingHoursText,openingHours,is24h,const DeepCollectionEquality().hash(_services),const DeepCollectionEquality().hash(_availableFuels),const DeepCollectionEquality().hash(_unavailableFuels),stationType,department,region,const DeepCollectionEquality().hash(_amenities)]);
 
 @override
 String toString() {
-  return 'Station(id: $id, name: $name, brand: $brand, street: $street, houseNumber: $houseNumber, postCode: $postCode, place: $place, lat: $lat, lng: $lng, dist: $dist, e5: $e5, e10: $e10, e98: $e98, diesel: $diesel, dieselPremium: $dieselPremium, e85: $e85, lpg: $lpg, cng: $cng, isOpen: $isOpen, updatedAt: $updatedAt, openingHoursText: $openingHoursText, is24h: $is24h, services: $services, availableFuels: $availableFuels, unavailableFuels: $unavailableFuels, stationType: $stationType, department: $department, region: $region, amenities: $amenities)';
+  return 'Station(id: $id, name: $name, brand: $brand, street: $street, houseNumber: $houseNumber, postCode: $postCode, place: $place, lat: $lat, lng: $lng, dist: $dist, e5: $e5, e10: $e10, e98: $e98, diesel: $diesel, dieselPremium: $dieselPremium, e85: $e85, lpg: $lpg, cng: $cng, isOpen: $isOpen, updatedAt: $updatedAt, openingHoursText: $openingHoursText, openingHours: $openingHours, is24h: $is24h, services: $services, availableFuels: $availableFuels, unavailableFuels: $unavailableFuels, stationType: $stationType, department: $department, region: $region, amenities: $amenities)';
 }
 
 
@@ -331,11 +355,11 @@ abstract mixin class _$StationCopyWith<$Res> implements $StationCopyWith<$Res> {
   factory _$StationCopyWith(_Station value, $Res Function(_Station) _then) = __$StationCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String brand, String street, String? houseNumber,@JsonKey(fromJson: _postCodeToString) String postCode, String place, double lat, double lng, double dist,@JsonKey(fromJson: _priceFromJson) double? e5,@JsonKey(fromJson: _priceFromJson) double? e10,@JsonKey(fromJson: _priceFromJson) double? e98,@JsonKey(fromJson: _priceFromJson) double? diesel,@JsonKey(fromJson: _priceFromJson) double? dieselPremium,@JsonKey(fromJson: _priceFromJson) double? e85,@JsonKey(fromJson: _priceFromJson) double? lpg,@JsonKey(fromJson: _priceFromJson) double? cng, bool isOpen, String? updatedAt, String? openingHoursText, bool is24h, List<String> services, List<String> availableFuels, List<String> unavailableFuels, String? stationType, String? department, String? region,@JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson) Set<StationAmenity> amenities
+ String id, String name, String brand, String street, String? houseNumber,@JsonKey(fromJson: _postCodeToString) String postCode, String place, double lat, double lng, double dist,@JsonKey(fromJson: _priceFromJson) double? e5,@JsonKey(fromJson: _priceFromJson) double? e10,@JsonKey(fromJson: _priceFromJson) double? e98,@JsonKey(fromJson: _priceFromJson) double? diesel,@JsonKey(fromJson: _priceFromJson) double? dieselPremium,@JsonKey(fromJson: _priceFromJson) double? e85,@JsonKey(fromJson: _priceFromJson) double? lpg,@JsonKey(fromJson: _priceFromJson) double? cng, bool isOpen, String? updatedAt, String? openingHoursText,@JsonKey(includeFromJson: false, includeToJson: false) WeeklyOpeningHours? openingHours, bool is24h, List<String> services, List<String> availableFuels, List<String> unavailableFuels, String? stationType, String? department, String? region,@JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson) Set<StationAmenity> amenities
 });
 
 
-
+@override $WeeklyOpeningHoursCopyWith<$Res>? get openingHours;
 
 }
 /// @nodoc
@@ -348,7 +372,7 @@ class __$StationCopyWithImpl<$Res>
 
 /// Create a copy of Station
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? brand = null,Object? street = null,Object? houseNumber = freezed,Object? postCode = null,Object? place = null,Object? lat = null,Object? lng = null,Object? dist = null,Object? e5 = freezed,Object? e10 = freezed,Object? e98 = freezed,Object? diesel = freezed,Object? dieselPremium = freezed,Object? e85 = freezed,Object? lpg = freezed,Object? cng = freezed,Object? isOpen = null,Object? updatedAt = freezed,Object? openingHoursText = freezed,Object? is24h = null,Object? services = null,Object? availableFuels = null,Object? unavailableFuels = null,Object? stationType = freezed,Object? department = freezed,Object? region = freezed,Object? amenities = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? brand = null,Object? street = null,Object? houseNumber = freezed,Object? postCode = null,Object? place = null,Object? lat = null,Object? lng = null,Object? dist = null,Object? e5 = freezed,Object? e10 = freezed,Object? e98 = freezed,Object? diesel = freezed,Object? dieselPremium = freezed,Object? e85 = freezed,Object? lpg = freezed,Object? cng = freezed,Object? isOpen = null,Object? updatedAt = freezed,Object? openingHoursText = freezed,Object? openingHours = freezed,Object? is24h = null,Object? services = null,Object? availableFuels = null,Object? unavailableFuels = null,Object? stationType = freezed,Object? department = freezed,Object? region = freezed,Object? amenities = null,}) {
   return _then(_Station(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -371,7 +395,8 @@ as double?,cng: freezed == cng ? _self.cng : cng // ignore: cast_nullable_to_non
 as double?,isOpen: null == isOpen ? _self.isOpen : isOpen // ignore: cast_nullable_to_non_nullable
 as bool,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as String?,openingHoursText: freezed == openingHoursText ? _self.openingHoursText : openingHoursText // ignore: cast_nullable_to_non_nullable
-as String?,is24h: null == is24h ? _self.is24h : is24h // ignore: cast_nullable_to_non_nullable
+as String?,openingHours: freezed == openingHours ? _self.openingHours : openingHours // ignore: cast_nullable_to_non_nullable
+as WeeklyOpeningHours?,is24h: null == is24h ? _self.is24h : is24h // ignore: cast_nullable_to_non_nullable
 as bool,services: null == services ? _self._services : services // ignore: cast_nullable_to_non_nullable
 as List<String>,availableFuels: null == availableFuels ? _self._availableFuels : availableFuels // ignore: cast_nullable_to_non_nullable
 as List<String>,unavailableFuels: null == unavailableFuels ? _self._unavailableFuels : unavailableFuels // ignore: cast_nullable_to_non_nullable
@@ -383,7 +408,19 @@ as Set<StationAmenity>,
   ));
 }
 
+/// Create a copy of Station
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WeeklyOpeningHoursCopyWith<$Res>? get openingHours {
+    if (_self.openingHours == null) {
+    return null;
+  }
 
+  return $WeeklyOpeningHoursCopyWith<$Res>(_self.openingHours!, (value) {
+    return _then(_self.copyWith(openingHours: value));
+  });
+}
 }
 
 /// @nodoc

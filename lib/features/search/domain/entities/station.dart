@@ -33,6 +33,13 @@ abstract class Station with _$Station {
     required bool isOpen,
     String? updatedAt,
     String? openingHoursText,  // "Lun 07:00-18:30, Mar 07:00-18:30..."
+    // Epic C4 — structured weekly hours from a per-country
+    // [OpeningHoursAdapter], carried on the search-result station so a
+    // country whose service has no detail endpoint (e.g. AT E-Control)
+    // still surfaces structured hours via `StationDetail(station:…)`.
+    // ADDITIVE: `openingHoursText` / `is24h` stay for back-compat.
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    WeeklyOpeningHours? openingHours,
     @Default(false) bool is24h,
     @Default([]) List<String> services,
     @Default([]) List<String> availableFuels,
