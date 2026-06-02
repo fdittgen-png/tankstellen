@@ -19,8 +19,7 @@ part of 'radar_candidate_list_provider.dart';
 /// Like [nearestStationRadarProvider] this fires ONLY on the polling
 /// fallback path: while the driver is still approaching the detector
 /// emits [ApproachPolling] carrying the live GPS fix it polls against.
-/// We reuse **that same** position — no new geolocator subscription —
-/// and query the search chain for the surrounding stations.
+/// We reuse **that same** position — no new geolocator subscription.
 ///
 /// Returns:
 /// - `const []` for any non-[ApproachPolling] state — the in-radius /
@@ -32,8 +31,22 @@ part of 'radar_candidate_list_provider.dart';
 ///   — the same priced filter as `approach_detector.dart` and
 ///   [nearestStationRadarProvider], so the card never pages onto a `--`
 ///   placeholder price the driver can't compare (#2583).
-/// - `const []` on a network / chain failure (the provider re-runs on
-///   the next approach-state tick).
+/// - `const []` on a radar / chain failure (the provider re-runs on the
+///   next approach-state tick).
+///
+/// ### Data source (#2664)
+///
+/// The page-set routes through the cache-first [fuelStationRadarProvider]
+/// — the SAME three-tier engine the in-radius detector uses
+/// (`approach_state_provider.dart`): tier-1 cached corridor LOCATIONS
+/// (zero network inside a covered tile / a bulk-file country) + tier-3
+/// JIT price for only the imminent station(s). It runs at the user's
+/// **default radar radius** (`profile.approachRadiusKm`, the same radius
+/// the trip detector geofences against), not a hard-coded 10 km — so a
+/// warm corridor tile costs zero station-network calls and at most one
+/// JIT price per imminent station instead of re-pricing a whole 10 km set
+/// on every poll. The ranked page-set therefore matches exactly what the
+/// in-radius layout would surface.
 
 @ProviderFor(radarCandidateList)
 final radarCandidateListProvider = RadarCandidateListProvider._();
@@ -49,8 +62,7 @@ final radarCandidateListProvider = RadarCandidateListProvider._();
 /// Like [nearestStationRadarProvider] this fires ONLY on the polling
 /// fallback path: while the driver is still approaching the detector
 /// emits [ApproachPolling] carrying the live GPS fix it polls against.
-/// We reuse **that same** position — no new geolocator subscription —
-/// and query the search chain for the surrounding stations.
+/// We reuse **that same** position — no new geolocator subscription.
 ///
 /// Returns:
 /// - `const []` for any non-[ApproachPolling] state — the in-radius /
@@ -62,8 +74,22 @@ final radarCandidateListProvider = RadarCandidateListProvider._();
 ///   — the same priced filter as `approach_detector.dart` and
 ///   [nearestStationRadarProvider], so the card never pages onto a `--`
 ///   placeholder price the driver can't compare (#2583).
-/// - `const []` on a network / chain failure (the provider re-runs on
-///   the next approach-state tick).
+/// - `const []` on a radar / chain failure (the provider re-runs on the
+///   next approach-state tick).
+///
+/// ### Data source (#2664)
+///
+/// The page-set routes through the cache-first [fuelStationRadarProvider]
+/// — the SAME three-tier engine the in-radius detector uses
+/// (`approach_state_provider.dart`): tier-1 cached corridor LOCATIONS
+/// (zero network inside a covered tile / a bulk-file country) + tier-3
+/// JIT price for only the imminent station(s). It runs at the user's
+/// **default radar radius** (`profile.approachRadiusKm`, the same radius
+/// the trip detector geofences against), not a hard-coded 10 km — so a
+/// warm corridor tile costs zero station-network calls and at most one
+/// JIT price per imminent station instead of re-pricing a whole 10 km set
+/// on every poll. The ranked page-set therefore matches exactly what the
+/// in-radius layout would surface.
 
 final class RadarCandidateListProvider
     extends
@@ -84,8 +110,7 @@ final class RadarCandidateListProvider
   /// Like [nearestStationRadarProvider] this fires ONLY on the polling
   /// fallback path: while the driver is still approaching the detector
   /// emits [ApproachPolling] carrying the live GPS fix it polls against.
-  /// We reuse **that same** position — no new geolocator subscription —
-  /// and query the search chain for the surrounding stations.
+  /// We reuse **that same** position — no new geolocator subscription.
   ///
   /// Returns:
   /// - `const []` for any non-[ApproachPolling] state — the in-radius /
@@ -97,8 +122,22 @@ final class RadarCandidateListProvider
   ///   — the same priced filter as `approach_detector.dart` and
   ///   [nearestStationRadarProvider], so the card never pages onto a `--`
   ///   placeholder price the driver can't compare (#2583).
-  /// - `const []` on a network / chain failure (the provider re-runs on
-  ///   the next approach-state tick).
+  /// - `const []` on a radar / chain failure (the provider re-runs on the
+  ///   next approach-state tick).
+  ///
+  /// ### Data source (#2664)
+  ///
+  /// The page-set routes through the cache-first [fuelStationRadarProvider]
+  /// — the SAME three-tier engine the in-radius detector uses
+  /// (`approach_state_provider.dart`): tier-1 cached corridor LOCATIONS
+  /// (zero network inside a covered tile / a bulk-file country) + tier-3
+  /// JIT price for only the imminent station(s). It runs at the user's
+  /// **default radar radius** (`profile.approachRadiusKm`, the same radius
+  /// the trip detector geofences against), not a hard-coded 10 km — so a
+  /// warm corridor tile costs zero station-network calls and at most one
+  /// JIT price per imminent station instead of re-pricing a whole 10 km set
+  /// on every poll. The ranked page-set therefore matches exactly what the
+  /// in-radius layout would surface.
   RadarCandidateListProvider._()
     : super(
         from: null,
@@ -126,4 +165,4 @@ final class RadarCandidateListProvider
 }
 
 String _$radarCandidateListHash() =>
-    r'7e735b064c72868f438544da96760992fe9c690c';
+    r'1d6dbe2341ea09cb25004f189ddd76ce95629173';

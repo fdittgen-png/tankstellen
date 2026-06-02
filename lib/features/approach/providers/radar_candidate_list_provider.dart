@@ -4,12 +4,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/services/approach_detector.dart';
-import '../../../core/services/service_providers.dart';
+import '../../../core/utils/geo_utils.dart' as geo;
 import '../../../core/utils/station_extensions.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
-import '../../search/data/models/search_params.dart';
+import '../../profile/providers/profile_provider.dart';
 import '../../search/domain/entities/station.dart';
 import 'effective_approach_state_provider.dart';
+import 'fuel_station_radar_provider.dart';
 
 part 'radar_candidate_list_provider.g.dart';
 
@@ -24,8 +25,7 @@ part 'radar_candidate_list_provider.g.dart';
 /// Like [nearestStationRadarProvider] this fires ONLY on the polling
 /// fallback path: while the driver is still approaching the detector
 /// emits [ApproachPolling] carrying the live GPS fix it polls against.
-/// We reuse **that same** position — no new geolocator subscription —
-/// and query the search chain for the surrounding stations.
+/// We reuse **that same** position — no new geolocator subscription.
 ///
 /// Returns:
 /// - `const []` for any non-[ApproachPolling] state — the in-radius /
@@ -37,8 +37,22 @@ part 'radar_candidate_list_provider.g.dart';
 ///   — the same priced filter as `approach_detector.dart` and
 ///   [nearestStationRadarProvider], so the card never pages onto a `--`
 ///   placeholder price the driver can't compare (#2583).
-/// - `const []` on a network / chain failure (the provider re-runs on
-///   the next approach-state tick).
+/// - `const []` on a radar / chain failure (the provider re-runs on the
+///   next approach-state tick).
+///
+/// ### Data source (#2664)
+///
+/// The page-set routes through the cache-first [fuelStationRadarProvider]
+/// — the SAME three-tier engine the in-radius detector uses
+/// (`approach_state_provider.dart`): tier-1 cached corridor LOCATIONS
+/// (zero network inside a covered tile / a bulk-file country) + tier-3
+/// JIT price for only the imminent station(s). It runs at the user's
+/// **default radar radius** (`profile.approachRadiusKm`, the same radius
+/// the trip detector geofences against), not a hard-coded 10 km — so a
+/// warm corridor tile costs zero station-network calls and at most one
+/// JIT price per imminent station instead of re-pricing a whole 10 km set
+/// on every poll. The ranked page-set therefore matches exactly what the
+/// in-radius layout would surface.
 @riverpod
 Future<List<Station>> radarCandidateList(Ref ref) async {
   final approach = ref.watch(effectiveApproachStateProvider);
@@ -49,32 +63,39 @@ Future<List<Station>> radarCandidateList(Ref ref) async {
 
   final gps = approach.gps;
   final fuel = ref.watch(effectiveFuelTypeProvider);
-  final svc = ref.read(stationServiceProvider);
+  final profile = ref.watch(activeProfileProvider);
+  if (profile == null) return const [];
+  final radar = ref.read(fuelStationRadarProvider);
 
-  // Radius mirrors the approach detector's search window (10 km), so the
-  // ranked page-set matches what the in-radius layout would surface.
   try {
-    final result = await svc.searchStations(
-      SearchParams(
-        lat: gps.latitude,
-        lng: gps.longitude,
-        radiusKm: 10.0,
-        fuelType: fuel,
-        sortBy: SortBy.distance,
-      ),
+    // Cache-first corridor (tier-1) + JIT price for the imminent station(s)
+    // (tier-3), at the user's default radar radius — the same envelope the
+    // in-radius detector polls with. Zero network on a warm tile / a
+    // bulk-file country.
+    final stations = await radar.fetchStations(
+      gps.latitude,
+      gps.longitude,
+      profile.approachRadiusKm,
+      fuel.apiValue,
     );
-    // Already distance-sorted; keep only stations the driver can actually
-    // price-compare (a non-null, positive [priceFor] for the effective
-    // fuel) so a swipe never lands on a `--` price row (#2583).
-    return result.data
+    // The corridor set is cached in fetch order, not distance order — sort
+    // by distance from the live fix, then keep only stations the driver can
+    // actually price-compare (a non-null, positive [priceFor] for the
+    // effective fuel) so a swipe never lands on a `--` price row (#2583).
+    return (stations
         .where((s) {
           final price = s.priceFor(fuel);
           return price != null && price > 0;
         })
-        .toList(growable: false);
+        .toList(growable: false)
+      ..sort((a, b) => geo
+          .distanceMeters(gps.latitude, gps.longitude, a.lat, a.lng)
+          .compareTo(
+            geo.distanceMeters(gps.latitude, gps.longitude, b.lat, b.lng),
+          )));
   } on Object {
-    // Network / chain failure — treat as "no stations nearby". The
-    // provider re-runs on the next approach-state tick.
+    // Radar / chain failure — treat as "no stations nearby". The provider
+    // re-runs on the next approach-state tick.
     return const [];
   }
 }
