@@ -587,4 +587,117 @@ void main() {
         reason: 'the cheapest Spanish station must appear in Best Stops, '
             'priced by its E5 grade via the sibling fallback (#2641)');
   });
+
+  // #2680 — THE attribution-banner bug. On a cross-border E85 route the top
+  // source-attribution banner credited EVERY country the corridor queried
+  // (`corridorCountryCodes` = corridor span), not the countries that actually
+  // produced a displayable station. Spain sells NO E85 — every MITECO row's
+  // `Precio Bioetanol` is empty (and there is no E85 sibling fallback, unlike
+  // E5↔E10) — so an E85 search returns Spanish stations that all show "--".
+  // The banner must therefore drop "España — MITECO" and credit France only.
+  //
+  // Reuse-fidelity (HARD rule, no request-echoing fakes): drives the REAL
+  // MitecoStationService + the production ES StationServiceChain against the
+  // recorded province-08 fixture (the same seam #2641 uses), so the ES leg's
+  // empty-E85 shape is the genuine field data, not a fake that echoes E85.
+  // RED on master: `corridorCountryCodes` feeds the banner → {FR, ES}.
+  // GREEN: `contributingCountryCodes(E85)` → {FR}, while `corridorCountryCodes`
+  // still carries ES (the contributing-vs-corridor distinction).
+  test(
+      'cross-border E85 banner credits FR only — ES produced no E85 station '
+      'so contributingCountryCodes is {FR} while corridorCountryCodes ⊇ {ES} '
+      '(#2680)', () async {
+    final fixture =
+        File('test/fixtures/miteco_barcelona_08.json').readAsStringSync();
+
+    // Pézenas (FR) → Barcelona (ES) — the bug-report corridor. 4 FR sample
+    // points (lat ≥ 42) + Barcelona at index 4 hit province 08 → the fixture.
+    const frA = LatLng(43.50, 3.50);
+    const frB = LatLng(43.30, 3.30);
+    const frC = LatLng(43.10, 3.10);
+    const frD = LatLng(42.90, 2.90);
+    const esPoint = LatLng(41.39, 2.17); // Barcelona — INSIDE FR's bbox too
+    const route = RouteInfo(
+      geometry: [frA, frB, frC, frD, LatLng(42.10, 2.40), esPoint],
+      distanceKm: 400,
+      durationMinutes: 240,
+      samplePoints: [frA, frB, frC, frD, esPoint],
+    );
+
+    // REAL ES service: a genuine MitecoStationService whose Dio adapter serves
+    // the recorded fixture, wrapped in the production StationServiceChain as
+    // `_createMiteco` → `buildService` builds it for ES.
+    final mitecoDio = Dio()
+      ..httpClientAdapter = _MitecoFixtureAdapter(fixture);
+    final esChain = StationServiceChain(
+      MitecoStationService(dio: mitecoDio),
+      _MemoryCache(),
+      errorSource: ServiceSource.mitecoApi,
+      countryCode: 'ES',
+      policy: _esBulkPolicy,
+    );
+
+    // FR sells E85 (region-gated to lat ≥ 42 so it never bleeds into Spain),
+    // so France genuinely contributes a priced E85 station.
+    final frService = _RegionGatedStationService('Total FR',
+        idPrefix: 'fr-', minLat: 42.0, maxLat: 90.0, price: 1.20);
+
+    final container = ProviderContainer(
+      overrides: [
+        storageRepositoryProvider.overrideWith((ref) => _NoKeyStorage()),
+        perCountryStationServiceProvider('FR')
+            .overrideWith((ref) => frService),
+        perCountryStationServiceProvider('ES')
+            .overrideWith((ref) => esChain),
+        // The field case: an E85 driver crossing FR→ES. BOTH profiles use
+        // E85 — so the ES leg is queried + priced for E85, which Spain lacks.
+        allProfilesProvider.overrideWith((ref) => const [
+              UserProfile(
+                  id: 'fr', name: 'Standard',
+                  countryCode: 'FR', preferredFuelType: FuelType.e85),
+              UserProfile(
+                  id: 'es', name: 'Espagne',
+                  countryCode: 'ES', preferredFuelType: FuelType.e85),
+            ]),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final notifier = container.read(routeSearchStateProvider.notifier);
+    final result = await notifier.searchAlongPrebuiltRouteForTest(
+      route: route,
+      fuelType: FuelType.e85, // active fuel is E85.
+    );
+
+    // Sanity: the corridor DID query Spain — real MITECO rows arrived (id
+    // `es-…`), they just carry no E85 price. This is what makes the bug real:
+    // ES stations ARE in the found set, only unpriced for the chosen fuel.
+    final esRows = result.stations
+        .whereType<FuelStationResult>()
+        .where((r) => r.station.id.startsWith('es-'))
+        .toList();
+    expect(esRows, isNotEmpty,
+        reason: 'real MITECO rows must arrive in the corridor result');
+    expect(esRows.every((r) => r.station.e85 == null), isTrue,
+        reason: 'Spain sells no E85 — every fixture row Bioetanol is empty');
+
+    // FR genuinely contributed a priced E85 station.
+    expect(
+        result.stations
+            .whereType<FuelStationResult>()
+            .any((r) => r.station.brand == 'Total FR'),
+        isTrue,
+        reason: 'the French leg produced a priced E85 station');
+
+    // THE distinction: the corridor queried BOTH countries…
+    expect(result.corridorCountryCodes, containsAll(<String>{'FR', 'ES'}),
+        reason: 'corridorCountryCodes records the full queried span (#2622)');
+
+    // …but only France produced a DISPLAYABLE (priced) E85 station, so the
+    // attribution banner credits France ONLY. RED on master (no
+    // contributingCountryCodes → banner shows both); GREEN after.
+    expect(result.contributingCountryCodes(FuelType.e85), <String>{'FR'},
+        reason: 'ES produced no E85-priced station → dropped from the banner '
+            '(#2680)');
+  });
 }

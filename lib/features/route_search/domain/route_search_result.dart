@@ -3,6 +3,7 @@
 
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/search_result_item.dart';
+import '../data/cross_border_corridor.dart' show contributingCountryCodesFor;
 import 'entities/route_info.dart';
 import 'route_search_strategy.dart';
 
@@ -35,6 +36,24 @@ class RouteSearchResult {
   /// empty (an entirely mid-sea route), in which case the UI falls back to
   /// the single-country attribution.
   final Set<String> corridorCountryCodes;
+
+  /// #2680 — the upper-cased ISO codes of the countries that ACTUALLY produced
+  /// a *displayable* fuel station in [stations], a SUBSET of
+  /// [corridorCountryCodes].
+  ///
+  /// The attribution banner consumes THIS (not [corridorCountryCodes]) so a
+  /// cross-border search for a fuel a country doesn't sell (E85 in Spain —
+  /// every MITECO row's `Precio Bioetanol` is empty) credits only the data
+  /// sources that produced a priced station, never a leg shown entirely as
+  /// "--". Each station's displayed grade is resolved exactly as the list/map
+  /// resolve it — [contributingCountryCodesFor] runs [fuelForStation] with
+  /// THIS result's [profileFuelByCountry] and the caller's active [fuelType]
+  /// fallback. Derived from the full found set [stations] (not the Best-Stops
+  /// display subset), so the banner is stable across the All / Best toggle.
+  /// [corridorCountryCodes] is retained for diagnostics (it records the full
+  /// geographic span the search queried).
+  Set<String> contributingCountryCodes(FuelType fuelType) =>
+      contributingCountryCodesFor(stations, profileFuelByCountry, fuelType);
 
   /// #2631 — profile fuel keyed by upper-cased country code (the same map
   /// `buildCorridorServiceMap` was built from). The map + list display
