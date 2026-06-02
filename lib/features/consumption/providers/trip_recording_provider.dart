@@ -28,6 +28,7 @@ import '../domain/trip_recorder.dart';
 import 'gps_only_recording_pipeline.dart';
 import 'obd2_recording_pipeline.dart';
 import 'recording_pipeline.dart';
+import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
 import 'trip_haptic_controller.dart';
@@ -954,23 +955,14 @@ class TripRecording extends _$TripRecording {
     String? adapterFirmware,
     int gpsFixCount = 0,
   }) async {
-    // Skip stub trips so they never clutter history (#1923) — but ONLY
-    // when there was genuinely no movement and no usable signal.
-    //
-    // #2509 — the pre-fix guard `startedAt == null || distanceKm < 0.01`
-    // was a *disjunction*, so a real GPS-tracked drive whose OBD2 link was
-    // dead the whole session was silently discarded: no speed/RPM sample
-    // ever reached the recorder, so its `startedAt` stayed null even
-    // though GPS fixes integrated into a real resolver distance. The
-    // controller now back-fills `startedAt` from the first GPS fix
-    // ([_finaliseSummary]); here we tighten the guard to the conjunction
-    // #1923 actually intends — discard only when there is no meaningful
-    // signal at all: zero distance AND (no start time OR no samples and no
-    // GPS fixes). A trip with distance ≥ 0.01 km always persists, even
-    // when its `startedAt` came from GPS rather than an OBD2 sample.
-    final hasNoSignal = summary.startedAt == null ||
-        (samples.isEmpty && gpsFixCount == 0);
-    if (summary.distanceKm < 0.01 && hasNoSignal) {
+    // Skip stub / ghost trips so they never clutter history (#1923 / #2509
+    // no-movement guard + #2692 C4-H virtual-ghost guard). The full decision
+    // lives in the pure [shouldDiscardAsNoMovement] helper.
+    if (shouldDiscardAsNoMovement(
+      summary: summary,
+      sampleCount: samples.length,
+      gpsFixCount: gpsFixCount,
+    )) {
       // No silent discard (#2509): record WHY so a regression of the
       // silent-data-loss bug surfaces in the error log, and let the caller
       // surface a "no movement detected" notice to the user.
