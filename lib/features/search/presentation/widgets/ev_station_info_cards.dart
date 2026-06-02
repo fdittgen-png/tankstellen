@@ -8,6 +8,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_station.dart';
 import '../../../ev/domain/entities/ev_access_cost.dart';
+import '../../../ev/domain/entities/ev_price.dart';
 import 'ev_connector_tile.dart';
 
 /// Address card for an EV charging station.
@@ -109,6 +110,16 @@ class EVPricingCard extends StatelessWidget {
     final usageCost = station.usageCost?.trim() ?? '';
     final hasUsageCost = usageCost.isNotEmpty;
 
+    // #2616 — structured per-kWh / per-session price hint, mirroring the
+    // list-card pattern (`ev_station_card.dart`). `EvPrice.label` returns null
+    // for free / unparseable strings, so those keep falling through to the
+    // existing neutral raw-text rendering below.
+    final evPrice = EvPrice.parse(usageCost);
+    final priceLabel = evPrice.label(
+      perKwhUnit: l10n?.refuelUnitPerKwh ?? '/kWh',
+      perSessionUnit: l10n?.refuelUnitPerSession ?? '/session',
+    );
+
     // Honest-UX (#2618): the structured free/paid/membership chip is the
     // only confirmed signal — it gets the leading badge. The raw scraped
     // `usageCost` text is rendered NEUTRALLY (never as a bold colored
@@ -137,6 +148,22 @@ class EVPricingCard extends StatelessWidget {
                 _EvPriceBadge(kind: cost.kind),
               ],
               if (hasUsageCost) ...[
+                // #2616 — when the raw text parses to a structured per-kWh /
+                // per-session amount, surface it as a prominent labelled line
+                // (prefixed with the "Indicative price" qualifier) ABOVE the
+                // neutral raw text. Free / unparseable strings leave
+                // [priceLabel] null and skip straight to the raw rendering.
+                if (priceLabel != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    '${l10n?.evPriceIndicative ?? 'Indicative price'}: '
+                    '$priceLabel',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: evColor,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 Text(
                   usageCost,
@@ -153,6 +180,22 @@ class EVPricingCard extends StatelessWidget {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
+                // #2616 — best-effort attribution for OCM-sourced pricing. The
+                // IRVE line (below) and this caption are mutually exclusive:
+                // IRVE stations carry the IRVE attribution, every other usage-
+                // cost station gets this best-effort line.
+                if (!station.isFranceIrveEnriched) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n?.evPriceBestEffortOcm ??
+                        'Best-effort pricing from OpenChargeMap '
+                            '— sparse and may be incomplete.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ],
               if (station.isFranceIrveEnriched) ...[
                 const SizedBox(height: 8),

@@ -369,6 +369,7 @@
   "evPriceIndicative": "Richtpreis",
   "evPriceDeclaredByOperator": "Richtpreis laut Betreiber — vor Ort prüfen",
   "evPriceFranceAttribution": "Preise: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "evPriceBestEffortOcm": "Bestmögliche Preisangabe von OpenChargeMap — lückenhaft und ggf. unvollständig.",
   "evLastUpdated": "Zuletzt aktualisiert",
   "evUnknown": "Unbekannt",
   "evDataAttribution": "Daten von OpenChargeMap (Community-basiert)",

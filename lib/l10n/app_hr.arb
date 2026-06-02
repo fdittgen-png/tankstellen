@@ -3757,5 +3757,10 @@
   "@fuelStationRadarStart": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "@evPriceBestEffortOcm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

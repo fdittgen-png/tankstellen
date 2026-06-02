@@ -1629,6 +1629,12 @@ abstract class AppLocalizations {
   /// **'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ'**
   String get evPriceFranceAttribution;
 
+  /// Best-effort pricing caption shown on non-IRVE EV stations whose usage cost came from OpenChargeMap's community-sourced (and sparse) UsageCost field (#2616). Mutually exclusive with the France IRVE attribution. OpenChargeMap is a proper noun within the localized sentence.
+  ///
+  /// In en, this message translates to:
+  /// **'Best-effort pricing from OpenChargeMap — sparse and may be incomplete.'**
+  String get evPriceBestEffortOcm;
+
   /// No description provided for @evLastUpdated.
   ///
   /// In en, this message translates to:

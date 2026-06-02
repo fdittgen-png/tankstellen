@@ -817,6 +817,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
 
   @override
+  String get evPriceBestEffortOcm =>
+      'Best-effort pricing from OpenChargeMap — sparse and may be incomplete.';
+
+  @override
   String get evLastUpdated => 'Последна актуализация';
 
   @override

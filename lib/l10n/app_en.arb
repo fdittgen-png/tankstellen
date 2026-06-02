@@ -406,6 +406,10 @@
   "@evPriceFranceAttribution": {
     "description": "Data attribution shown only on French EV stations enriched from the IRVE open dataset (Etalab / data.gouv.fr / ODRÉ) (#2618). Brand/source names are proper nouns."
   },
+  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "@evPriceBestEffortOcm": {
+    "description": "Best-effort pricing caption shown on non-IRVE EV stations whose usage cost came from OpenChargeMap's community-sourced (and sparse) UsageCost field (#2616). Mutually exclusive with the France IRVE attribution. OpenChargeMap is a proper noun within the localized sentence."
+  },
   "evLastUpdated": "Last updated",
   "evUnknown": "Unknown",
   "evDataAttribution": "Data from OpenChargeMap (community-sourced)",
