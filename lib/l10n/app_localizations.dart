@@ -10079,6 +10079,114 @@ abstract class AppLocalizations {
   /// **'OBD2 diagnostics copied to clipboard.'**
   String get obd2HealthCopied;
 
+  /// Section header above the on-demand OBD2 adapter self-test on the dev-tools communication-health screen (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Run adapter test'**
+  String get obd2TestRunTitle;
+
+  /// Label for the button that starts the on-demand OBD2 adapter self-test (scan, connect, info, PIDs, reconnect) on the communication-health screen (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Run adapter test'**
+  String get obd2TestRunButton;
+
+  /// Pass banner shown when every step of the OBD2 adapter self-test succeeded (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter test passed'**
+  String get obd2TestRunPassed;
+
+  /// Fail banner shown when one or more steps of the OBD2 adapter self-test did not succeed (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter test failed'**
+  String get obd2TestRunFailed;
+
+  /// Summary line under the OBD2 adapter self-test pass/fail banner: passed-step count, total steps, and total elapsed milliseconds (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'{passed} of {total} steps OK · {elapsed} ms'**
+  String obd2TestRunSummary(int passed, int total, int elapsed);
+
+  /// Notice shown when the user tries to run the OBD2 adapter self-test while a trip recording owns the single-link adapter (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the active recording before running the adapter test.'**
+  String get obd2TestRunCannotWhileRecording;
+
+  /// Step label in the OBD2 adapter self-test progress list: discover the Bluetooth adapter (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan for adapter'**
+  String get obd2TestStepScan;
+
+  /// Step label in the OBD2 adapter self-test progress list: open the link and run the ELM327 init handshake (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Connect & init'**
+  String get obd2TestStepConnect;
+
+  /// Step label in the OBD2 adapter self-test progress list: read the adapter description and battery voltage (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter info'**
+  String get obd2TestStepInfo;
+
+  /// Step label in the OBD2 adapter self-test progress list: request the supported-PID bitmask (0100) (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Supported PIDs'**
+  String get obd2TestStepSupportedPids;
+
+  /// Step label in the OBD2 adapter self-test progress list: sample-read RPM, speed and coolant (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Sample reads'**
+  String get obd2TestStepSampleReads;
+
+  /// Step label in the OBD2 adapter self-test progress list: deliberately disconnect and reconnect, timing the recovery (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect test'**
+  String get obd2TestStepReconnect;
+
+  /// Step label in the OBD2 adapter self-test progress list: clean teardown of the link (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get obd2TestStepDisconnect;
+
+  /// Accessible status / icon label for a passed step in the OBD2 adapter self-test progress list (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get obd2TestStatusOk;
+
+  /// Accessible status / icon label for a step that timed out in the OBD2 adapter self-test progress list (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Timed out'**
+  String get obd2TestStatusTimeout;
+
+  /// Accessible status / icon label for a step whose adapter reply was garbage / unrecognised in the OBD2 adapter self-test progress list (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Unreadable reply'**
+  String get obd2TestStatusGarbage;
+
+  /// Accessible status / icon label for a step where the ECU answered NO DATA / nothing in the OBD2 adapter self-test progress list (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'No response'**
+  String get obd2TestStatusNoResponse;
+
+  /// Accessible status / icon label for a failed (or skipped after abort) step in the OBD2 adapter self-test progress list (#2645).
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get obd2TestStatusFail;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

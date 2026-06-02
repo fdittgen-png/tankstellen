@@ -5791,6 +5791,63 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2HealthCopied => 'OBD2-Diagnose in die Zwischenablage kopiert.';
 
   @override
+  String get obd2TestRunTitle => 'Adaptertest ausführen';
+
+  @override
+  String get obd2TestRunButton => 'Adaptertest ausführen';
+
+  @override
+  String get obd2TestRunPassed => 'Adaptertest bestanden';
+
+  @override
+  String get obd2TestRunFailed => 'Adaptertest fehlgeschlagen';
+
+  @override
+  String obd2TestRunSummary(int passed, int total, int elapsed) {
+    return '$passed von $total Schritten OK · $elapsed ms';
+  }
+
+  @override
+  String get obd2TestRunCannotWhileRecording =>
+      'Beende die laufende Aufzeichnung, bevor du den Adaptertest startest.';
+
+  @override
+  String get obd2TestStepScan => 'Adapter suchen';
+
+  @override
+  String get obd2TestStepConnect => 'Verbinden & Init';
+
+  @override
+  String get obd2TestStepInfo => 'Adapterinfo';
+
+  @override
+  String get obd2TestStepSupportedPids => 'Unterstützte PIDs';
+
+  @override
+  String get obd2TestStepSampleReads => 'Beispiel-Abfragen';
+
+  @override
+  String get obd2TestStepReconnect => 'Reconnect-Test';
+
+  @override
+  String get obd2TestStepDisconnect => 'Trennen';
+
+  @override
+  String get obd2TestStatusOk => 'OK';
+
+  @override
+  String get obd2TestStatusTimeout => 'Zeitüberschreitung';
+
+  @override
+  String get obd2TestStatusGarbage => 'Unlesbare Antwort';
+
+  @override
+  String get obd2TestStatusNoResponse => 'Keine Antwort';
+
+  @override
+  String get obd2TestStatusFail => 'Fehlgeschlagen';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

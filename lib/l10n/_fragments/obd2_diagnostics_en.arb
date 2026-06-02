@@ -286,5 +286,91 @@
   "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
   "@obd2HealthCopied": {
     "description": "Confirmation snackbar after the OBD2 communication-health screen copies the session diagnostics JSON to the clipboard (#2471)."
+  },
+  "obd2TestRunTitle": "Run adapter test",
+  "@obd2TestRunTitle": {
+    "description": "Section header above the on-demand OBD2 adapter self-test on the dev-tools communication-health screen (#2645)."
+  },
+  "obd2TestRunButton": "Run adapter test",
+  "@obd2TestRunButton": {
+    "description": "Label for the button that starts the on-demand OBD2 adapter self-test (scan, connect, info, PIDs, reconnect) on the communication-health screen (#2645)."
+  },
+  "obd2TestRunPassed": "Adapter test passed",
+  "@obd2TestRunPassed": {
+    "description": "Pass banner shown when every step of the OBD2 adapter self-test succeeded (#2645)."
+  },
+  "obd2TestRunFailed": "Adapter test failed",
+  "@obd2TestRunFailed": {
+    "description": "Fail banner shown when one or more steps of the OBD2 adapter self-test did not succeed (#2645)."
+  },
+  "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
+  "@obd2TestRunSummary": {
+    "description": "Summary line under the OBD2 adapter self-test pass/fail banner: passed-step count, total steps, and total elapsed milliseconds (#2645).",
+    "placeholders": {
+      "passed": {
+        "type": "int",
+        "example": "6"
+      },
+      "total": {
+        "type": "int",
+        "example": "7"
+      },
+      "elapsed": {
+        "type": "int",
+        "example": "2480"
+      }
+    }
+  },
+  "obd2TestRunCannotWhileRecording": "Stop the active recording before running the adapter test.",
+  "@obd2TestRunCannotWhileRecording": {
+    "description": "Notice shown when the user tries to run the OBD2 adapter self-test while a trip recording owns the single-link adapter (#2645)."
+  },
+  "obd2TestStepScan": "Scan for adapter",
+  "@obd2TestStepScan": {
+    "description": "Step label in the OBD2 adapter self-test progress list: discover the Bluetooth adapter (#2645)."
+  },
+  "obd2TestStepConnect": "Connect & init",
+  "@obd2TestStepConnect": {
+    "description": "Step label in the OBD2 adapter self-test progress list: open the link and run the ELM327 init handshake (#2645)."
+  },
+  "obd2TestStepInfo": "Adapter info",
+  "@obd2TestStepInfo": {
+    "description": "Step label in the OBD2 adapter self-test progress list: read the adapter description and battery voltage (#2645)."
+  },
+  "obd2TestStepSupportedPids": "Supported PIDs",
+  "@obd2TestStepSupportedPids": {
+    "description": "Step label in the OBD2 adapter self-test progress list: request the supported-PID bitmask (0100) (#2645)."
+  },
+  "obd2TestStepSampleReads": "Sample reads",
+  "@obd2TestStepSampleReads": {
+    "description": "Step label in the OBD2 adapter self-test progress list: sample-read RPM, speed and coolant (#2645)."
+  },
+  "obd2TestStepReconnect": "Reconnect test",
+  "@obd2TestStepReconnect": {
+    "description": "Step label in the OBD2 adapter self-test progress list: deliberately disconnect and reconnect, timing the recovery (#2645)."
+  },
+  "obd2TestStepDisconnect": "Disconnect",
+  "@obd2TestStepDisconnect": {
+    "description": "Step label in the OBD2 adapter self-test progress list: clean teardown of the link (#2645)."
+  },
+  "obd2TestStatusOk": "OK",
+  "@obd2TestStatusOk": {
+    "description": "Accessible status / icon label for a passed step in the OBD2 adapter self-test progress list (#2645)."
+  },
+  "obd2TestStatusTimeout": "Timed out",
+  "@obd2TestStatusTimeout": {
+    "description": "Accessible status / icon label for a step that timed out in the OBD2 adapter self-test progress list (#2645)."
+  },
+  "obd2TestStatusGarbage": "Unreadable reply",
+  "@obd2TestStatusGarbage": {
+    "description": "Accessible status / icon label for a step whose adapter reply was garbage / unrecognised in the OBD2 adapter self-test progress list (#2645)."
+  },
+  "obd2TestStatusNoResponse": "No response",
+  "@obd2TestStatusNoResponse": {
+    "description": "Accessible status / icon label for a step where the ECU answered NO DATA / nothing in the OBD2 adapter self-test progress list (#2645)."
+  },
+  "obd2TestStatusFail": "Failed",
+  "@obd2TestStatusFail": {
+    "description": "Accessible status / icon label for a failed (or skipped after abort) step in the OBD2 adapter self-test progress list (#2645)."
   }
 }
