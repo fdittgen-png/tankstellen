@@ -8,6 +8,7 @@ import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_pip_view.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -190,6 +191,104 @@ void main() {
         expect(find.text('Diesel-only'), findsOneWidget);
       },
     );
+  });
+
+  group('TripRecordingPipView (#2661) — polling radar price + km layout', () {
+    testWidgets(
+        'polling with a radar station → leads with its price + km (not consumption)',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          TripRecordingPipView(
+            state: _activeState(),
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            // No in-radius hit; the radar surfaced the nearest priced station
+            // 2.4 km out while still approaching.
+            radarStation: _stationE10.copyWith(dist: 2.4),
+            radarDistanceMeters: 2400,
+            radiusMeters: 5000,
+            fuelType: FuelType.e10,
+          ),
+        ),
+      );
+
+      // Leads with the station price + name (not L/100 km consumption).
+      expect(find.text('Carrefour Pézenas'), findsOneWidget);
+      expect(find.text('L/100 km'), findsNothing);
+      // Distance reads in KM (not metres).
+      expect(find.textContaining('2.4 km'), findsOneWidget);
+      expect(find.textContaining(' m away'), findsNothing);
+    });
+
+    testWidgets(
+        'no radar station (null) → falls back to the consumption layout',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          TripRecordingPipView(
+            state: _activeState(),
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            radarStation: null,
+            fuelType: FuelType.e10,
+          ),
+        ),
+      );
+      // Falls back to consumption — never blank.
+      expect(find.text('L/100 km'), findsOneWidget);
+      expect(find.text('Carrefour Pézenas'), findsNothing);
+    });
+
+    testWidgets('an in-radius hit still wins over a radar station',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          TripRecordingPipView(
+            state: _activeState(),
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            approachState: const ApproachInRadius(
+              station: _stationE10,
+              distanceMeters: 350,
+            ),
+            // A different radar candidate must NOT override the locked target.
+            radarStation: _stationE10.copyWith(name: 'Other Station'),
+            radarDistanceMeters: 2400,
+            fuelType: FuelType.e10,
+          ),
+        ),
+      );
+      // In-radius target shows in metres; the radar candidate is suppressed.
+      expect(find.text('Carrefour Pézenas'), findsOneWidget);
+      expect(find.text('Other Station'), findsNothing);
+      expect(find.textContaining('350'), findsWidgets);
+    });
+
+    testWidgets('radar layout renders the corporate-green proximity bar',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          TripRecordingPipView(
+            state: _activeState(),
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            radarStation: _stationE10.copyWith(dist: 2.4),
+            radarDistanceMeters: 2400,
+            radiusMeters: 5000,
+            fuelType: FuelType.e10,
+          ),
+        ),
+      );
+      final bar = tester.widget<ProximityFillBar>(find.byType(ProximityFillBar));
+      expect(bar.distanceMeters, 2400);
+      expect(bar.radiusMeters, 5000);
+      // fill = 1 - 2400/5000 = 0.52.
+      expect(
+        ProximityFillBar.fillFor(bar.distanceMeters, bar.radiusMeters!),
+        closeTo(0.52, 1e-9),
+      );
+    });
   });
 
   group('TripRecordingPipView (#2086) — state-machine transitions', () {

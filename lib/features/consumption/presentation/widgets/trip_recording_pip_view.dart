@@ -4,13 +4,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/services/approach_detector.dart';
-import '../../../../core/utils/navigation_utils.dart';
-import '../../../../core/utils/price_formatter.dart';
-import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
+import '../../../search/domain/entities/station.dart';
 import '../../domain/driving_coaching.dart';
 import '../../providers/trip_recording_provider.dart';
+import 'trip_recording_pip_price_layout.dart';
 
 /// The compact view rendered when the OS shrinks the app into a
 /// Picture-in-Picture tile (#2068 — replaces the prior dense
@@ -47,9 +46,24 @@ class TripRecordingPipView extends StatelessWidget {
 
   /// Driver's preferred fuel type — resolved by the caller from
   /// (vehicle's fuel, falling back to profile's preferred). Used by
-  /// the approach-price layout to pick the right price column off
-  /// the in-radius station. Falls back to E10 when null.
+  /// the price layouts to pick the right price column off the station.
+  /// Falls back to E10 when null.
   final FuelType? fuelType;
+
+  /// #2661 — nearest priced radar station off the polling fallback (the
+  /// `nearestStationRadarProvider`, resolved by the banner). When set AND no
+  /// in-radius / leaving hit is active, the tile leads with this station's
+  /// price + km instead of consumption — surfacing the radar EARLIER than the
+  /// (smaller) geo-fence flip. Null falls back to the consumption layout.
+  final Station? radarStation;
+
+  /// Great-circle distance to [radarStation] in metres (the radar km line +
+  /// the proximity bar). Null hides the caption.
+  final double? radarDistanceMeters;
+
+  /// Radar radius in metres (`profile.approachRadiusKm * 1000`) — the
+  /// proximity fill bar's "indicated radius" (#2661). Null collapses the bar.
+  final double? radiusMeters;
 
   const TripRecordingPipView({
     super.key,
@@ -58,16 +72,50 @@ class TripRecordingPipView extends StatelessWidget {
     required this.foregroundColor,
     this.approachState,
     this.fuelType,
+    this.radarStation,
+    this.radarDistanceMeters,
+    this.radiusMeters,
   });
 
   @override
   Widget build(BuildContext context) {
-    // #2084 — approach mode wins over the default L/100 km view.
+    final fuel = fuelType ?? FuelType.e10;
+    // #2084 — in-radius / leaving wins: lead with the locked target's price
+    // (metres caption).
     final approach = approachState;
     if (approach is ApproachInRadius || approach is ApproachLeaving) {
-      return _buildApproachPriceLayout(context, approach!);
+      final station = approach is ApproachInRadius
+          ? approach.station
+          : (approach as ApproachLeaving).lastStation;
+      final dist =
+          approach is ApproachInRadius ? approach.distanceMeters : null;
+      return TripRecordingPipPriceLayout(
+        station: station,
+        fuel: fuel,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        distanceMeters: dist,
+        kmCaption: false,
+        radiusMeters: radiusMeters,
+      );
     }
 
+    // #2661 — still approaching: if the radar found a nearest priced station,
+    // lead with ITS price + km (the radar surfaces earlier than the fence).
+    final radar = radarStation;
+    if (radar != null) {
+      return TripRecordingPipPriceLayout(
+        station: radar,
+        fuel: fuel,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        distanceMeters: radarDistanceMeters,
+        kmCaption: true,
+        radiusMeters: radiusMeters,
+      );
+    }
+
+    // Nothing priced in range yet → consumption fallback (never blank).
     return _buildDefaultLayout(context);
   }
 
@@ -265,100 +313,6 @@ class TripRecordingPipView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Center(
             child: FittedBox(fit: BoxFit.scaleDown, child: child),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Approach-radius layout (#2084 / Epic #2065): huge price for the
-  /// driver's fuel type at the targeted station + station name +
-  /// distance underneath. Active when `approachState is
-  /// ApproachInRadius` OR `ApproachLeaving` (Leaving keeps the price
-  /// visible through the 5 s grace before the overlay collapses
-  /// back to L/100 km).
-  Widget _buildApproachPriceLayout(
-    BuildContext context,
-    ApproachState approach,
-  ) {
-    final l = AppLocalizations.of(context);
-    final station = approach is ApproachInRadius
-        ? approach.station
-        : (approach as ApproachLeaving).lastStation;
-    final distanceMeters = approach is ApproachInRadius
-        ? approach.distanceMeters
-        : null;
-    final fuel = fuelType ?? FuelType.e10;
-    final price = station.priceFor(fuel);
-
-    final priceText = price != null ? PriceFormatter.formatPrice(price) : '—';
-    final fuelLabel = fuel.displayName;
-
-    // #2601 — tap the approach-price tile to navigate to the station in
-    // the user's maps app (reuses NavigationUtils #2546). Only this layout
-    // is tappable; the default L/100 km layout stays non-tappable.
-    final navigateLabel = l?.navigate ?? 'Navigate';
-    return Tooltip(
-      message: navigateLabel,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => NavigationUtils.openInMaps(
-          station.lat,
-          station.lng,
-          label: station.navLabel,
-        ),
-        child: _pipStack(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // #2620 — plain Text; the outer `_pipStack` FittedBox scales
-              // the whole price stack so the distance line never clips.
-              Text(
-                priceText,
-                style: TextStyle(
-                  color: foregroundColor,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 56,
-                  height: 1.0,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                fuelLabel,
-                style: TextStyle(
-                  color: foregroundColor.withValues(alpha: 0.85),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                station.name.isNotEmpty ? station.name : station.brand,
-                style: TextStyle(
-                  color: foregroundColor.withValues(alpha: 0.95),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (distanceMeters != null) ...[
-                const SizedBox(height: 2),
-                Text(
-                  l?.approachStationDistance(
-                        distanceMeters.toStringAsFixed(0),
-                      ) ??
-                      '${distanceMeters.toStringAsFixed(0)} m',
-                  style: TextStyle(
-                    color: foregroundColor.withValues(alpha: 0.85),
-                    fontSize: 12,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ],
-            ],
           ),
         ),
       ),
