@@ -31,8 +31,31 @@ TripSummary _summary({
 void main() {
   group('#2692 C4-H shouldDiscardAsNoMovement', () {
     test(
-        'virtual distance 0.5 km with NO samples and NO fixes is DISCARDED '
-        '(escaped the < 0.01 km guard before the fix)', () {
+        'virtual distance 0.5 km with NO samples, NO fixes and a null '
+        'startedAt is DISCARDED (the true field-ghost shape — the recorder '
+        'never saw a sample so startedAt stayed null; escaped the < 0.01 km '
+        'guard before the fix)', () {
+      final discard = shouldDiscardAsNoMovement(
+        // A ghost has startedAt == null: the recorder sets startedAt on its
+        // first onSample, so a trip whose only distance came from the 5 Hz
+        // dead-reckoning odometer (recorder never ran) carries a null
+        // startedAt. That is the discriminator the virtual-ghost clause keys
+        // on, so a real virtual drive (startedAt set, see the counter-test
+        // below) is never mistaken for a ghost.
+        summary: _summary(
+          distanceKm: 0.5,
+          distanceSource: kDistanceSourceVirtual,
+        ),
+        sampleCount: 0,
+        gpsFixCount: 0,
+      );
+      expect(discard, isTrue);
+    });
+
+    test(
+        'a real virtual drive — recorder saw samples (startedAt set) but '
+        'chart-decimation left capturedSamples empty — is SAVED, even with '
+        'NO fixes (no over-discard of a genuine no-odometer drive)', () {
       final discard = shouldDiscardAsNoMovement(
         summary: _summary(
           distanceKm: 0.5,
@@ -42,7 +65,7 @@ void main() {
         sampleCount: 0,
         gpsFixCount: 0,
       );
-      expect(discard, isTrue);
+      expect(discard, isFalse);
     });
 
     test(

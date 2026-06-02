@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/lessons/driving_lesson_registry.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/climbing_cost_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/full_throttle_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/hard_accel_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/high_rpm_rule.dart';
@@ -10,6 +11,7 @@ import 'package:tankstellen/features/consumption/data/lessons/rules/high_speed_b
 import 'package:tankstellen/features/consumption/data/lessons/rules/idling_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/lambda_enrichment_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/low_gear_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/restart_cost_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/smooth_driving_rule.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -91,6 +93,8 @@ void main() {
           highSpeedBandLessonId,
           fullThrottleLessonId,
           lambdaEnrichmentLessonId,
+          climbingCostLessonId,
+          restartCostLessonId,
           smoothDrivingLessonId,
         ],
       );
