@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/services/impl/osm_brand_enricher.dart';
+import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_parsers.dart' as parser;
 import '../../../core/network/dio_offline.dart';
 import '../../../core/services/dio_factory.dart';
@@ -252,8 +253,20 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
 
     final is24h = r['horaires_automate_24_24'] == 'Oui';
 
+    // #2710 — populate the structured weekly schedule from the FR adapter
+    // (Epic C3). The adapter is pure + total: a missing / unparseable
+    // `horaires_jour` yields `notAvailable`, so the display layer falls back
+    // through `legacyOpeningHoursBridge` exactly as before. Legacy
+    // `Station.is24h` / `openingHoursText` stay populated for back-compat.
+    const openingHoursAdapter = FranceOpeningHoursAdapter();
+    final openingHours = openingHoursAdapter.parse(r);
+
     return ServiceResult(
-      data: StationDetail(station: enriched, wholeDay: is24h),
+      data: StationDetail(
+        station: enriched,
+        wholeDay: is24h,
+        openingHours: openingHours,
+      ),
       source: ServiceSource.prixCarburantsApi,
       fetchedAt: DateTime.now(),
     );

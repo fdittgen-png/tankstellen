@@ -12,6 +12,7 @@ import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
 import '../../../fakes/fake_storage_repository.dart';
 import '../../../helpers/silence_error_logger.dart';
 
@@ -306,7 +307,9 @@ void main() {
         'Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30',
       );
       expect(hours, isNotNull);
-      expect(hours, contains('Lundi07:00-18:30'));
+      // #2710 — the day name is un-glued from its first clock.
+      expect(hours, contains('Lundi 07:00-18:30'));
+      expect(hours, isNot(contains('Lundi07:00')));
       expect(hours, isNot(contains('Automate-24-24')));
     });
 
@@ -497,6 +500,76 @@ void main() {
 
       // No enricher → falls back to the address heuristic (sentinel here).
       expect(result.data.station.brand, BrandRegistry.independentLabel);
+    });
+  });
+
+  // #2710 (Epic C3) — getStationDetail now populates the structured
+  // StationDetail.openingHours via FranceOpeningHoursAdapter, while the legacy
+  // is24h / openingHoursText stay for back-compat.
+  group('PrixCarburantsStationService getStationDetail opening hours (#2710)',
+      () {
+    test('populates structured openingHours from horaires_jour', () async {
+      final response = {
+        'results': [
+          {
+            'id': '34550043',
+            'adresse': 'ROUTE NATIONALE',
+            'ville': 'BESSAN',
+            'cp': '34550',
+            'geom': {'lat': 43.36, 'lon': 3.43},
+            'gazole_prix': 1.659,
+            'horaires_automate_24_24': 'Non',
+            'horaires_jour':
+                'Lundi07.00-18.30, Mardi08.00-12.00, Mardi14.00-19.00',
+          },
+        ],
+      };
+      final adapter = _TrackingMockAdapter()..addResponse(response);
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio, enricher: null);
+
+      final result = await svc.getStationDetail('fr-34550043');
+      final hours = result.data.openingHours;
+
+      expect(hours, isNotNull);
+      // Monday: a single staffed range, day un-glued from the clock.
+      final monday = hours!.dayFor(OpeningDay.mon);
+      expect(monday?.state, DayState.openRanges);
+      expect(monday?.ranges.single.startMinutes, 7 * 60);
+      // Tuesday: split shift coalesced into two ranges.
+      final tuesday = hours.dayFor(OpeningDay.tue);
+      expect(tuesday?.ranges, hasLength(2));
+      // Legacy back-compat fields preserved.
+      expect(result.data.station.openingHoursText, contains('Lundi 07:00'));
+      expect(result.data.station.is24h, isFalse);
+    });
+
+    test('24/7 automate → all-week open24h structured schedule', () async {
+      final response = {
+        'results': [
+          {
+            'id': '34550044',
+            'adresse': 'AIRE AUTOROUTE',
+            'ville': 'BEZIERS',
+            'cp': '34500',
+            'geom': {'lat': 43.34, 'lon': 3.21},
+            'gazole_prix': 1.7,
+            'horaires_automate_24_24': 'Oui',
+            'horaires_jour': 'Automate-24-24, Lundi07.00-18.30',
+          },
+        ],
+      };
+      final adapter = _TrackingMockAdapter()..addResponse(response);
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio, enricher: null);
+
+      final result = await svc.getStationDetail('fr-34550044');
+      final hours = result.data.openingHours;
+
+      expect(hours?.availability, OpeningHoursAvailability.full);
+      expect(hours?.dayFor(OpeningDay.sun)?.state, DayState.open24h);
+      expect(result.data.wholeDay, isTrue);
+      expect(result.data.station.is24h, isTrue);
     });
   });
 
@@ -1489,6 +1562,8 @@ class _TestablePrixCarburantsService {
     if (s.isEmpty) return null;
     return s
         .replaceAll('Automate-24-24, ', '')
+        .replaceAllMapped(RegExp(r'([A-Za-zÀ-ÿ])(\d{1,2}\.\d{2})'),
+            (m) => '${m[1]} ${m[2]}')
         .replaceAllMapped(RegExp(r'(\d{2})\.(\d{2})-(\d{2})\.(\d{2})'),
             (m) => '${m[1]}:${m[2]}-${m[3]}:${m[4]}')
         .replaceAllMapped(RegExp(r'(\d{2})\.(\d{2})'),

@@ -157,20 +157,27 @@ String? parsePrixCarburantsMostRecentUpdate(Map<String, dynamic> r) {
   }
 }
 
-/// Clean up the Prix-Carburants opening-hours string.
+/// Clean up the Prix-Carburants opening-hours string (legacy back-compat
+/// text; the structured schedule now comes from [FranceOpeningHoursAdapter]).
 ///
 /// Source format: `"Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30..."`
-/// Output: one day per line, with `HH:MM` instead of `HH.MM`. Returns
-/// `null` for `null` or empty input so the caller can suppress the
-/// row entirely.
+/// Output: one day per line, with `HH:MM` instead of `HH.MM` and — fixing the
+/// missing-space bug (#2710) — a space between the day name and the first
+/// clock (`Lundi 07:00-18:30`, not the old glued `Lundi07:00-18:30`). Returns
+/// `null` for `null` or empty input so the caller can suppress the row.
 String? parsePrixCarburantsOpeningHours(dynamic hoursStr) {
   if (hoursStr == null) return null;
   final s = hoursStr.toString();
   if (s.isEmpty) return null;
   // Format: "Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30..."
-  // Clean up: add spaces around times
+  // Clean up: strip the automate prefix, separate the glued day↔clock,
+  // convert `HH.MM` → `HH:MM`, one day per line.
   return s
       .replaceAll('Automate-24-24, ', '')
+      // #2710 — insert a space between a glued day name and its first clock
+      // (`Lundi07.00` → `Lundi 07.00`) so the legacy text reads correctly too.
+      .replaceAllMapped(RegExp(r'([A-Za-zÀ-ÿ])(\d{1,2}\.\d{2})'),
+          (m) => '${m[1]} ${m[2]}')
       .replaceAllMapped(RegExp(r'(\d{2})\.(\d{2})-(\d{2})\.(\d{2})'),
           (m) => '${m[1]}:${m[2]}-${m[3]}:${m[4]}')
       .replaceAllMapped(RegExp(r'(\d{2})\.(\d{2})'),

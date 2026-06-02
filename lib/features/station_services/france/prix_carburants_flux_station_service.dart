@@ -15,6 +15,7 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_flux_parser.dart' as flux;
 
 /// French Prix-Carburants **bulk-file** service (#2277).
@@ -178,8 +179,18 @@ class PrixCarburantsFluxStationService
     if (all != null) {
       for (final s in all) {
         if (s.id == stationId) {
+          // #2710 — build the structured weekly schedule from the SAME FR
+          // adapter the polling path uses, fed the legacy fields the flux
+          // parser flattened onto the Station (`openingHoursText` carries the
+          // `horaires_jour`-shaped string, `is24h` the automate flag). Pure +
+          // total: no hours → `notAvailable`, display falls back to the bridge.
+          const adapter = FranceOpeningHoursAdapter();
+          final openingHours = adapter.parse(<String, dynamic>{
+            'horaires_jour': s.openingHoursText,
+            'horaires_automate_24_24': s.is24h ? 'Oui' : 'Non',
+          });
           return ServiceResult(
-            data: StationDetail(station: s),
+            data: StationDetail(station: s, openingHours: openingHours),
             source: ServiceSource.prixCarburantsApi,
             fetchedAt: DateTime.now(),
           );

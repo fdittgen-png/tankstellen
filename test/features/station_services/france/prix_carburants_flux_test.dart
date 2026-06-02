@@ -35,6 +35,22 @@ String _fluxXml(List<Map<String, dynamic>> pdvs) {
       buf.write('<prix nom="$nom" valeur="$valeur" '
           'maj="2026-05-29T08:00:00+00:00"/>');
     });
+    // #2710 — optional opening-hours block, mirroring the real gouv.fr flux
+    // schema: `<horaires automate-24-24="0"><jour nom="Lundi"><horaire
+    // ouverture="07.00" fermeture="18.30"/></jour>...</horaires>`. `hours` is
+    // `automate?,List<(nom, ouverture, fermeture)>`.
+    if (p['hours'] != null) {
+      final hours = p['hours'] as Map<String, dynamic>;
+      final automate = hours['automate'] as bool? ?? false;
+      buf.write('<horaires automate-24-24="${automate ? '1' : '0'}">');
+      final jours = hours['jours'] as List<dynamic>? ?? const [];
+      for (final j in jours) {
+        final row = j as List<dynamic>;
+        buf.write('<jour nom="${row[0]}"><horaire '
+            'ouverture="${row[1]}" fermeture="${row[2]}"/></jour>');
+      }
+      buf.write('</horaires>');
+    }
     buf.write('</pdv>');
   }
   buf.write('</pdv_liste>');
@@ -194,6 +210,60 @@ void main() {
       final stations = flux.parseFluxZip(zip);
       expect(stations, hasLength(1));
       expect(stations.first.id, 'fr-9');
+    });
+
+    test('omits opening hours when the pdv carries no <horaires> (#2710)', () {
+      final s = flux.parseFluxXml(_fluxXml([
+        _pdv(id: '34200002', lat: 43.45, lng: 3.52),
+      ])).first;
+      expect(s.openingHoursText, isNull);
+      expect(s.is24h, isFalse);
+    });
+
+    test('flattens <horaires> into the legacy openingHoursText (#2710)', () {
+      final s = flux.parseFluxXml(_fluxXml([
+        {
+          'id': '34200002',
+          'lat': 4345000,
+          'lng': 352000,
+          'adresse': '120 RUE LECLERC',
+          'ville': 'CASTELNAU',
+          'cp': '34290',
+          'prices': {'SP95': 1.879},
+          'hours': {
+            'automate': false,
+            'jours': [
+              ['Lundi', '07.00', '18.30'],
+              // split shift: same day, two <jour> rows
+              ['Mardi', '08.00', '12.00'],
+              ['Mardi', '14.00', '19.00'],
+            ],
+          },
+        },
+      ])).first;
+
+      // Legacy text reads like the polling path — day un-glued, `.`→`:`.
+      expect(s.openingHoursText, contains('Lundi 07:00-18:30'));
+      expect(s.openingHoursText, isNot(contains('Lundi07')));
+      expect(s.is24h, isFalse);
+    });
+
+    test('automate-24-24="1" sets is24h on the flux Station (#2710)', () {
+      final s = flux.parseFluxXml(_fluxXml([
+        {
+          'id': '7',
+          'lat': 4345000,
+          'lng': 352000,
+          'prices': {'Gazole': 1.7},
+          'hours': {
+            'automate': true,
+            'jours': [
+              ['Lundi', '07.00', '18.30'],
+            ],
+          },
+        },
+      ])).first;
+      expect(s.is24h, isTrue);
     });
   });
 
