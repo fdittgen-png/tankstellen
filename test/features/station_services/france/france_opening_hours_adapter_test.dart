@@ -124,5 +124,16 @@ void main() {
       expect(monday?.state, DayState.openRanges);
       expect(monday?.ranges.single.startMinutes, 6 * 60 + 30);
     });
+
+    test('never throws on a malformed shape — returns normally (#2349)', () {
+      // Fault injection: feed shapes the parser must shape-narrow + catch,
+      // asserting the call RETURNS NORMALLY (the documented never-throws
+      // contract), not merely that the value is notAvailable.
+      expect(() => adapter.parse(42), returnsNormally);
+      expect(() => adapter.parse(null), returnsNormally);
+      expect(() => adapter.parse(<int>[1, 2, 3]), returnsNormally);
+      expect(() => adapter.parse({'horaires_jour': 12345}), returnsNormally);
+      expect(adapter.parse(<int>[1, 2, 3]), WeeklyOpeningHours.notAvailable);
+    });
   });
 }
