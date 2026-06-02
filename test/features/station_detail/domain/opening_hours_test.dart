@@ -57,8 +57,8 @@ void main() {
     });
 
     test('dayFor returns null for an uncovered day', () {
-      final w = WeeklyOpeningHours(
-        days: const [DayHours(day: OpeningDay.mon, state: DayState.open24h)],
+      const w = WeeklyOpeningHours(
+        days: [DayHours(day: OpeningDay.mon, state: DayState.open24h)],
         availability: OpeningHoursAvailability.partial,
       );
       expect(w.dayFor(OpeningDay.tue), isNull);
@@ -172,8 +172,8 @@ void main() {
     });
 
     test('degenerate-only day is not open', () {
-      final w = WeeklyOpeningHours(
-        days: const [
+      const w = WeeklyOpeningHours(
+        days: [
           DayHours(
             day: OpeningDay.mon,
             state: DayState.openRanges,
