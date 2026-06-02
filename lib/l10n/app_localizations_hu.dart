@@ -6653,6 +6653,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
 
   @override
+  String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
+
+  @override
   String get tripRecordingPinTooltip =>
       'A rögzítés bekapcsolva tartja a képernyőt — több akkumulátort használ';
 

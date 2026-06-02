@@ -12,6 +12,7 @@ import '../../../route_search/providers/route_search_params_provider.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
+import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../screens/search_criteria_screen.dart';
@@ -53,6 +54,16 @@ class SearchSummaryBar extends ConsumerWidget {
     AppLocalizations? l10n,
     SearchMode mode,
   ) {
+    // #2676 — while the on-search Fuel Station Radar owns the results, the
+    // radius chip is meaningless (the radar scans its own cached corridor);
+    // replace it with a "radar result" badge so the grey bar signals the
+    // list is a radar scan, not a regular search.
+    if (ref.watch(radarSearchProvider).active) {
+      return _SummaryChip(
+        icon: const Icon(Icons.radar, size: 16),
+        label: l10n?.fuelStationRadarResultBadge ?? 'Fuel Station Radar result',
+      );
+    }
     if (mode != SearchMode.route) {
       final kmText = ref.watch(searchRadiusProvider).round().toString();
       return _SummaryChip(

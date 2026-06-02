@@ -22,5 +22,9 @@
   "fuelStationRadarButtonTooltip": "Mit Tankstellen-Radar suchen",
   "@fuelStationRadarButtonTooltip": {
     "description": "Tooltip / accessibility label on the radar button in the search-results header that runs a cache-first radar scan around the user and shows the nearby stations in the results list (#2675)."
+  },
+  "fuelStationRadarResultBadge": "Tankstellen-Radar-Ergebnis",
+  "@fuelStationRadarResultBadge": {
+    "description": "Label of the grey summary-bar chip shown above the results list while the on-search Fuel Station Radar owns the results, replacing the radius chip to signal the list is a radar scan rather than a regular search (#2676)."
   }
 }

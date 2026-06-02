@@ -6631,6 +6631,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
 
   @override
+  String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Prikačivanje drži ekran uključenim — troši više baterije';
 

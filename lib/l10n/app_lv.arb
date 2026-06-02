@@ -3692,5 +3692,10 @@
   "@fuelStationRadarButtonTooltip": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelStationRadarResultBadge": "Fuel Station Radar result",
+  "@fuelStationRadarResultBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

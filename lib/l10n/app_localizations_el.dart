@@ -6667,6 +6667,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
 
   @override
+  String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Η καρφίτσωση κρατά την οθόνη αναμμένη — χρησιμοποιεί περισσότερη μπαταρία';
 

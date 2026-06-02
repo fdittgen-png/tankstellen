@@ -9,8 +9,10 @@ import 'package:tankstellen/features/route_search/domain/entities/route_info.dar
 import 'package:tankstellen/features/route_search/domain/route_search_result.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/search_mode.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_criteria_screen.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
+import 'package:tankstellen/features/search/providers/radar_search_provider.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
@@ -171,5 +173,55 @@ void main() {
       expect(find.text('Searching the route…'), findsNothing);
       expect(find.text('Within 10 km'), findsNothing);
     });
+
+    // #2676 — while the on-search Fuel Station Radar owns the results, the
+    // grey bar's second chip becomes a "radar result" badge instead of the
+    // (now meaningless) radius chip.
+    testWidgets('radar active replaces the radius chip with the radar badge',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchSummaryBar(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(10),
+          radarSearchProvider.overrideWith(_ActiveRadar.new),
+        ],
+      );
+
+      expect(find.text('Fuel Station Radar result'), findsOneWidget);
+      expect(find.text('Within 10 km'), findsNothing);
+    });
+
+    testWidgets('radar inactive keeps the radius chip (badge absent)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchSummaryBar(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(10),
+        ],
+      );
+
+      expect(find.text('Within 10 km'), findsOneWidget);
+      expect(find.text('Fuel Station Radar result'), findsNothing);
+    });
   });
+}
+
+class _ActiveRadar extends RadarSearch {
+  @override
+  RadarSearchState build() => const RadarSearchState(
+        active: true,
+        stations: AsyncData<List<Station>>(<Station>[]),
+      );
 }

@@ -6581,6 +6581,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
 
   @override
+  String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 
@@ -13667,6 +13670,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get fuelStationRadarButtonTooltip =>
       '⟦Šéářçĥ ŵîŧĥ Ƒúéł Šŧáŧîóñ Řáđář ············⟧';
+
+  @override
+  String get fuelStationRadarResultBadge =>
+      '⟦Ƒúéł Šŧáŧîóñ Řáđář řéšúłŧ ··········⟧';
 
   @override
   String get tripRecordingPinTooltip =>
