@@ -11,6 +11,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../data/receipt_scan_service.dart';
 import '../screens/pump_display_camera_screen.dart';
 import 'bad_scan_report_sheet.dart';
+import 'fill_up_share_scan_handlers.dart';
 import 'pump_scan_failure_sheet.dart';
 
 /// Pure UI-side scan flows extracted from `add_fill_up_screen.dart`
@@ -119,9 +120,8 @@ Future<void> runReceiptScan(
       brand: state.stationBrand,
     );
     if (outcome == null || !state.isMounted()) return;
-    final result = outcome.parse;
 
-    if (!result.hasData) {
+    if (!outcome.parse.hasData) {
       if (context.mounted) {
         SnackBarHelper.show(
           context,
@@ -131,36 +131,10 @@ Future<void> runReceiptScan(
       return;
     }
 
-    if (result.liters != null) {
-      state.litersCtrl.text = result.liters!.toStringAsFixed(2);
-    }
-    if (result.totalCost != null) {
-      state.costCtrl.text = result.totalCost!.toStringAsFixed(2);
-    }
-    if (result.date != null) {
-      state.setDate(result.date!);
-    }
-    // #2689 — keep the exact scanned unit price so the saved FillUp
-    // preserves it verbatim rather than re-deriving totalCost / liters
-    // (which rounds differently and drifts if either field is edited).
-    if (result.pricePerLiter != null) {
-      state.setScannedPricePerLiter(result.pricePerLiter!);
-    }
-    // Only pre-select the fuel when there is no vehicle bound — the
-    // vehicle's configured fuel always wins (#698 single source of
-    // truth for fuel).
-    if (result.fuelType != null && state.vehicleId == null) {
-      state.setFuelType(result.fuelType!);
-    }
-    state.setLastScan(outcome);
+    applyReceiptOutcome(state, outcome);
 
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.show(
-        context,
-        l?.scanReceiptSuccess ??
-            'Receipt scanned — verify values. Tap "Report scan error" '
-                'below if anything is off.',
-      );
+      SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
   } catch (e, st) { // ignore: unused_catch_stack
     if (state.isMounted() && context.mounted) {
