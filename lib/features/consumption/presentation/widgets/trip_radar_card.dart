@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,8 +13,10 @@ import '../../../approach/providers/effective_approach_state_provider.dart';
 import '../../../approach/providers/radar_candidate_list_provider.dart';
 import '../../../approach/providers/radar_swipe_provider.dart';
 import '../../../profile/providers/effective_fuel_type_provider.dart';
+import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
+import 'proximity_fill_bar.dart';
 import 'radar_swipe_wrapper.dart';
 
 /// "Closest station" radar card pinned to the TOP of the active
@@ -35,10 +36,10 @@ import 'radar_swipe_wrapper.dart';
 ///    the live GPS fix; the fallback reuses it to query the search
 ///    chain for the ranked priced stations so the card isn't empty
 ///    before the geo-fence is crossed. The driver can swipe LEFT to
-///    ignore the current station and page to the next-nearest, or
-///    swipe RIGHT to restore the last-ignored one (#2633) — the active
-///    candidate is derived (first ranked station not in the ignore
-///    stack held by [radarSwipeProvider]) and the swipe wiring lives in
+///    page to the NEARER station and swipe RIGHT to page to the FARTHER
+///    one (#2661) — the shown candidate is the distance-ranked list
+///    indexed by [radarSwipeProvider]'s `currentIndex` (clamped against
+///    the live list length), and the swipe wiring lives in
 ///    [RadarSwipeWrapper]. The in-radius target is a single locked
 ///    station and is NOT swipeable.
 ///
@@ -79,7 +80,18 @@ class TripRadarCard extends ConsumerWidget {
     final double? distanceMeters =
         approach is ApproachInRadius ? approach.distanceMeters : null;
 
-    final title = l?.tripRadarClosestStation ?? 'Closest station';
+    final title = l?.tripRadarClosestStation ?? 'Fuel Station Radar';
+
+    // The proximity fill bar's "indicated radius" is the user's default
+    // radar radius (the same `profile.approachRadiusKm` the detector fences
+    // against, #2661). Watched here so the bar re-scales if the slider moves.
+    double? radiusMeters;
+    try {
+      final profile = ref.watch(activeProfileProvider);
+      if (profile != null) radiusMeters = profile.approachRadiusKm * 1000.0;
+    } on Object {
+      radiusMeters = null;
+    }
 
     if (inRadiusStation != null) {
       // The in-radius target is a single locked station — NOT swipeable.
@@ -89,11 +101,12 @@ class TripRadarCard extends ConsumerWidget {
         fuel: fuel,
         distanceMeters: distanceMeters,
         live: true,
+        radiusMeters: radiusMeters,
       );
     }
 
     // 2. Fallback — ranked priced stations off the live polling GPS, with
-    //    swipe-to-page (#2633).
+    //    swipe-to-page distance pagination (#2661).
     //
     // `skipLoadingOnReload: true` routes a *re-run* (the provider goes
     // AsyncLoading carrying its previous value via copyWithPrevious on
@@ -105,7 +118,7 @@ class TripRadarCard extends ConsumerWidget {
     // and never a blanked row.
     final fallback = ref.watch(radarCandidateListProvider);
     final scanning = fallback.isLoading;
-    final ignored = ref.watch(radarSwipeProvider).ignoredStationIds;
+    final swipeIndex = ref.watch(radarSwipeProvider).currentIndex;
     return fallback.when(
       skipLoadingOnReload: true,
       data: (candidates) {
@@ -116,18 +129,17 @@ class TripRadarCard extends ConsumerWidget {
             message: l?.tripRadarNoStationNearby ?? 'No station nearby',
           );
         }
-        // Derived current: the first ranked station the driver hasn't
-        // swiped past. `null` when every candidate is ignored (the
-        // exhausted case the wrapper recovers from — never blank, #2583).
-        final current =
-            candidates.firstWhereOrNull((s) => !ignored.contains(s.id));
+        // Clamp the page index against the live list length — a stale index
+        // from a list that shrank between scans self-heals to the farthest
+        // remaining station rather than going blank (#2661). 0 = nearest.
+        final idx = swipeIndex.clamp(0, candidates.length - 1);
         return RadarSwipeWrapper(
           title: title,
           candidates: candidates,
-          current: current,
-          ignored: ignored,
+          current: candidates[idx],
           fuel: fuel,
           scanning: scanning,
+          radiusMeters: radiusMeters,
         );
       },
       // FIRST load only (no retained value) — the row is genuinely empty.
@@ -165,10 +177,14 @@ class RadarCard extends StatelessWidget {
   final bool scanning;
 
   /// True when the swipe-to-page affordance is available (more than one
-  /// candidate, or something ignored to restore) — surfaces a faint
-  /// `swap_horiz` glyph by the title so the gesture is discoverable
-  /// (#2633). The fallback path sets this; the in-radius path never does.
+  /// candidate) — surfaces a faint `swap_horiz` glyph by the title so the
+  /// gesture is discoverable (#2661). The fallback path sets this; the
+  /// in-radius path never does.
   final bool swipeable;
+
+  /// Radar radius in metres (`profile.approachRadiusKm * 1000`) — the
+  /// proximity fill bar's "indicated radius" (#2661). Null collapses the bar.
+  final double? radiusMeters;
 
   const RadarCard({
     super.key,
@@ -179,6 +195,7 @@ class RadarCard extends StatelessWidget {
     required this.live,
     this.scanning = false,
     this.swipeable = false,
+    this.radiusMeters,
   });
 
   @override
@@ -191,11 +208,20 @@ class RadarCard extends StatelessWidget {
     final name =
         station.name.isNotEmpty ? station.name : station.brand;
 
+    // In-radius shows sub-km precision (metres); the fallback radar page-set
+    // shows km — the great-circle distance the driver still has to cover
+    // (#2661).
+    final String? distanceLabel = distanceMeters == null
+        ? null
+        : live
+            ? (l?.approachStationDistance(distanceMeters!.toStringAsFixed(0)) ??
+                '${distanceMeters!.toStringAsFixed(0)} m')
+            : (l?.fuelStationRadarDistanceKm(
+                    (distanceMeters! / 1000.0).toStringAsFixed(1)) ??
+                '${(distanceMeters! / 1000.0).toStringAsFixed(1)} km');
     final subtitleParts = <String>[
       fuel.displayName,
-      if (distanceMeters != null)
-        l?.approachStationDistance(distanceMeters!.toStringAsFixed(0)) ??
-            '${distanceMeters!.toStringAsFixed(0)} m',
+      ?distanceLabel,
     ];
 
     // Tap → hand the station's coords to the SSoT navigation util, which
@@ -260,11 +286,27 @@ class RadarCard extends StatelessWidget {
               ),
             ],
           ),
-          subtitle: Text(
-            subtitleParts.join(' · '),
-            style: theme.textTheme.bodySmall,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                subtitleParts.join(' · '),
+                style: theme.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              // #2661 — corporate-green battery-style proximity bar: fills as
+              // the driver nears the station (100% at the station, 0% at the
+              // radar radius edge). Collapses when distance/radius unknown.
+              if (distanceMeters != null && radiusMeters != null) ...[
+                const SizedBox(height: 4),
+                ProximityFillBar(
+                  distanceMeters: distanceMeters!,
+                  radiusMeters: radiusMeters,
+                ),
+              ],
+            ],
           ),
           trailing: Text(
             priceText,

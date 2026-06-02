@@ -14,10 +14,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RadarSwipeState {
 
-/// Stations the driver swiped LEFT past, most-recent last (the stack
-/// top). The derived "current" candidate is the first ranked station
-/// whose id is NOT in this list.
- List<String> get ignoredStationIds;
+/// Index into the distance-ranked candidate list. 0 = the nearest
+/// station. The card clamps this against the live list length on every
+/// build, so a stale index from a shrunk list never points past the end.
+ int get currentIndex;
 /// Create a copy of RadarSwipeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $RadarSwipeStateCopyWith<RadarSwipeState> get copyWith => _$RadarSwipeStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RadarSwipeState&&const DeepCollectionEquality().equals(other.ignoredStationIds, ignoredStationIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RadarSwipeState&&(identical(other.currentIndex, currentIndex) || other.currentIndex == currentIndex));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(ignoredStationIds));
+int get hashCode => Object.hash(runtimeType,currentIndex);
 
 @override
 String toString() {
-  return 'RadarSwipeState(ignoredStationIds: $ignoredStationIds)';
+  return 'RadarSwipeState(currentIndex: $currentIndex)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $RadarSwipeStateCopyWith<$Res>  {
   factory $RadarSwipeStateCopyWith(RadarSwipeState value, $Res Function(RadarSwipeState) _then) = _$RadarSwipeStateCopyWithImpl;
 @useResult
 $Res call({
- List<String> ignoredStationIds
+ int currentIndex
 });
 
 
@@ -65,10 +65,10 @@ class _$RadarSwipeStateCopyWithImpl<$Res>
 
 /// Create a copy of RadarSwipeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? ignoredStationIds = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentIndex = null,}) {
   return _then(_self.copyWith(
-ignoredStationIds: null == ignoredStationIds ? _self.ignoredStationIds : ignoredStationIds // ignore: cast_nullable_to_non_nullable
-as List<String>,
+currentIndex: null == currentIndex ? _self.currentIndex : currentIndex // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -153,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<String> ignoredStationIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int currentIndex)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RadarSwipeState() when $default != null:
-return $default(_that.ignoredStationIds);case _:
+return $default(_that.currentIndex);case _:
   return orElse();
 
 }
@@ -174,10 +174,10 @@ return $default(_that.ignoredStationIds);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<String> ignoredStationIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int currentIndex)  $default,) {final _that = this;
 switch (_that) {
 case _RadarSwipeState():
-return $default(_that.ignoredStationIds);case _:
+return $default(_that.currentIndex);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +194,10 @@ return $default(_that.ignoredStationIds);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<String> ignoredStationIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int currentIndex)?  $default,) {final _that = this;
 switch (_that) {
 case _RadarSwipeState() when $default != null:
-return $default(_that.ignoredStationIds);case _:
+return $default(_that.currentIndex);case _:
   return null;
 
 }
@@ -209,22 +209,13 @@ return $default(_that.ignoredStationIds);case _:
 
 
 class _RadarSwipeState implements RadarSwipeState {
-  const _RadarSwipeState({final  List<String> ignoredStationIds = const <String>[]}): _ignoredStationIds = ignoredStationIds;
+  const _RadarSwipeState({this.currentIndex = 0});
   
 
-/// Stations the driver swiped LEFT past, most-recent last (the stack
-/// top). The derived "current" candidate is the first ranked station
-/// whose id is NOT in this list.
- final  List<String> _ignoredStationIds;
-/// Stations the driver swiped LEFT past, most-recent last (the stack
-/// top). The derived "current" candidate is the first ranked station
-/// whose id is NOT in this list.
-@override@JsonKey() List<String> get ignoredStationIds {
-  if (_ignoredStationIds is EqualUnmodifiableListView) return _ignoredStationIds;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_ignoredStationIds);
-}
-
+/// Index into the distance-ranked candidate list. 0 = the nearest
+/// station. The card clamps this against the live list length on every
+/// build, so a stale index from a shrunk list never points past the end.
+@override@JsonKey() final  int currentIndex;
 
 /// Create a copy of RadarSwipeState
 /// with the given fields replaced by the non-null parameter values.
@@ -236,16 +227,16 @@ _$RadarSwipeStateCopyWith<_RadarSwipeState> get copyWith => __$RadarSwipeStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RadarSwipeState&&const DeepCollectionEquality().equals(other._ignoredStationIds, _ignoredStationIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RadarSwipeState&&(identical(other.currentIndex, currentIndex) || other.currentIndex == currentIndex));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_ignoredStationIds));
+int get hashCode => Object.hash(runtimeType,currentIndex);
 
 @override
 String toString() {
-  return 'RadarSwipeState(ignoredStationIds: $ignoredStationIds)';
+  return 'RadarSwipeState(currentIndex: $currentIndex)';
 }
 
 
@@ -256,7 +247,7 @@ abstract mixin class _$RadarSwipeStateCopyWith<$Res> implements $RadarSwipeState
   factory _$RadarSwipeStateCopyWith(_RadarSwipeState value, $Res Function(_RadarSwipeState) _then) = __$RadarSwipeStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<String> ignoredStationIds
+ int currentIndex
 });
 
 
@@ -273,10 +264,10 @@ class __$RadarSwipeStateCopyWithImpl<$Res>
 
 /// Create a copy of RadarSwipeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? ignoredStationIds = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentIndex = null,}) {
   return _then(_RadarSwipeState(
-ignoredStationIds: null == ignoredStationIds ? _self._ignoredStationIds : ignoredStationIds // ignore: cast_nullable_to_non_nullable
-as List<String>,
+currentIndex: null == currentIndex ? _self.currentIndex : currentIndex // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

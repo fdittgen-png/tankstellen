@@ -1,61 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/approach/providers/radar_swipe_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
 
-/// #2633 — the LIFO ignore stack behind the swipe-to-page radar card.
-/// The card derives the current candidate as the first ranked station
-/// not in [RadarSwipeState.ignoredStationIds]; these unit tests assert
-/// the stack semantics and the trip-stop reset.
-
-/// Mirrors the card's derivation of the "current" candidate: the first
-/// ranked station whose id is NOT on the ignore stack.
-Station? _current(List<Station> candidates, List<String> ignored) =>
-    candidates.firstWhereOrNull((s) => !ignored.contains(s.id));
-
-const _s1 = Station(
-  id: 's1',
-  name: 'One',
-  brand: 'Aral',
-  street: 'a',
-  postCode: '10000',
-  place: 'X',
-  lat: 1,
-  lng: 1,
-  e10: 1.5,
-  isOpen: true,
-);
-const _s2 = Station(
-  id: 's2',
-  name: 'Two',
-  brand: 'Shell',
-  street: 'b',
-  postCode: '10001',
-  place: 'X',
-  lat: 2,
-  lng: 2,
-  e10: 1.6,
-  isOpen: true,
-);
-const _s3 = Station(
-  id: 's3',
-  name: 'Three',
-  brand: 'Total',
-  street: 'c',
-  postCode: '10002',
-  place: 'X',
-  lat: 3,
-  lng: 3,
-  e10: 1.7,
-  isOpen: true,
-);
-
-const _candidates = [_s1, _s2, _s3];
+/// #2661 — the distance-pagination index behind the swipe-to-page Fuel
+/// Station Radar card (replacing the #2633 ignore stack). The card shows
+/// `candidates[currentIndex]` (clamped); these unit tests assert the index
+/// walk (nearer = decrement, farther = increment, both clamped + idempotent
+/// at the ends) and the trip-stop reset to the nearest (index 0).
 
 /// Drives the trip phase from a test so the [RadarSwipe.reset]-on-stop
 /// `ref.listen` can be exercised without the real recorder.
@@ -86,83 +41,67 @@ void main() {
     return container;
   }
 
-  test('starts with an empty ignore stack → current is the first ranked',
-      () {
+  test('starts at the nearest station (index 0)', () {
     final container = makeContainer();
-    final ignored =
-        container.read(radarSwipeProvider).ignoredStationIds;
-    expect(ignored, isEmpty);
-    expect(_current(_candidates, ignored), _s1);
+    expect(container.read(radarSwipeProvider).currentIndex, 0);
   });
 
-  test('ignore pushes the id → derived current advances to the next', () {
+  test('farther increments the index toward the farther end (clamped)', () {
     final container = makeContainer();
     final notifier = container.read(radarSwipeProvider.notifier);
 
-    notifier.ignore('s1');
-    var ignored = container.read(radarSwipeProvider).ignoredStationIds;
-    expect(ignored, ['s1']);
-    expect(_current(_candidates, ignored), _s2);
-
-    notifier.ignore('s2');
-    ignored = container.read(radarSwipeProvider).ignoredStationIds;
-    expect(ignored, ['s1', 's2']);
-    expect(_current(_candidates, ignored), _s3);
+    // 3 candidates → maxIndex 2.
+    notifier.farther(2);
+    expect(container.read(radarSwipeProvider).currentIndex, 1);
+    notifier.farther(2);
+    expect(container.read(radarSwipeProvider).currentIndex, 2);
+    // At the farthest — idempotent no-op.
+    notifier.farther(2);
+    expect(container.read(radarSwipeProvider).currentIndex, 2);
   });
 
-  test('restore pops LIFO → brings the last-ignored station back', () {
+  test('nearer decrements the index toward the nearest (clamped at 0)', () {
     final container = makeContainer();
     final notifier = container.read(radarSwipeProvider.notifier);
 
-    notifier.ignore('s1');
-    notifier.ignore('s2');
-    expect(_current(_candidates,
-            container.read(radarSwipeProvider).ignoredStationIds),
-        _s3);
+    notifier.farther(2);
+    notifier.farther(2);
+    expect(container.read(radarSwipeProvider).currentIndex, 2);
 
-    // Pop s2 first (LIFO) → current returns to s2.
-    notifier.restore();
-    var ignored = container.read(radarSwipeProvider).ignoredStationIds;
-    expect(ignored, ['s1']);
-    expect(_current(_candidates, ignored), _s2);
-
-    // Pop s1 → back to the top of the list.
-    notifier.restore();
-    ignored = container.read(radarSwipeProvider).ignoredStationIds;
-    expect(ignored, isEmpty);
-    expect(_current(_candidates, ignored), _s1);
+    notifier.nearer();
+    expect(container.read(radarSwipeProvider).currentIndex, 1);
+    notifier.nearer();
+    expect(container.read(radarSwipeProvider).currentIndex, 0);
+    // At the nearest — idempotent no-op.
+    notifier.nearer();
+    expect(container.read(radarSwipeProvider).currentIndex, 0);
   });
 
-  test('restore on an empty stack is a no-op', () {
+  test('farther clamps to a shrunk list ceiling', () {
     final container = makeContainer();
     final notifier = container.read(radarSwipeProvider.notifier);
 
-    notifier.restore();
-    expect(container.read(radarSwipeProvider).ignoredStationIds, isEmpty);
+    // Advance with a 3-element list, then a later scan shrinks to 1 element
+    // (maxIndex 0) — farther can never walk past the new ceiling.
+    notifier.farther(2);
+    notifier.farther(2);
+    expect(container.read(radarSwipeProvider).currentIndex, 2);
+
+    notifier.farther(0);
+    expect(container.read(radarSwipeProvider).currentIndex, 0);
   });
 
-  test('reset empties the stack', () {
+  test('reset returns to the nearest (index 0)', () {
     final container = makeContainer();
     final notifier = container.read(radarSwipeProvider.notifier);
 
-    notifier.ignore('s1');
-    notifier.ignore('s2');
+    notifier.farther(3);
+    notifier.farther(3);
     notifier.reset();
-    expect(container.read(radarSwipeProvider).ignoredStationIds, isEmpty);
+    expect(container.read(radarSwipeProvider).currentIndex, 0);
   });
 
-  test('exhausted (every candidate ignored) → derived current is null', () {
-    final container = makeContainer();
-    final notifier = container.read(radarSwipeProvider.notifier);
-
-    notifier.ignore('s1');
-    notifier.ignore('s2');
-    notifier.ignore('s3');
-    final ignored = container.read(radarSwipeProvider).ignoredStationIds;
-    expect(_current(_candidates, ignored), isNull);
-  });
-
-  test('stopping an active trip resets the ignore stack', () {
+  test('stopping an active trip resets the index to the nearest', () {
     late _FakeTripRecording fake;
     final container = makeContainer(
       recordingFactory: () {
@@ -175,14 +114,13 @@ void main() {
 
     // Instantiate the keepAlive notifier so its build()'s ref.listen arms.
     final notifier = container.read(radarSwipeProvider.notifier);
-    notifier.ignore('s1');
-    notifier.ignore('s2');
-    expect(container.read(radarSwipeProvider).ignoredStationIds,
-        ['s1', 's2']);
+    notifier.farther(3);
+    notifier.farther(3);
+    expect(container.read(radarSwipeProvider).currentIndex, 2);
 
     // Flip the active trip to a terminal (inactive) phase → reset fires.
     fake.setPhase(TripRecordingPhase.finished);
 
-    expect(container.read(radarSwipeProvider).ignoredStationIds, isEmpty);
+    expect(container.read(radarSwipeProvider).currentIndex, 0);
   });
 }
