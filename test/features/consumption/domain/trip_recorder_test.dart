@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/trip_distance_source.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 /// Pure-logic tests for the trip recorder (#718).
@@ -499,6 +500,122 @@ void main() {
           rpm: 2000,
         ));
         expect(r.buildSummary().distanceKm, closeTo(60 * 20 / 60, 1e-6));
+      });
+    });
+
+    group('harsh-event de-noising by distance source (#2653)', () {
+      // A backup-like VIRTUAL (dead-reckoning) speed series: the recorder
+      // ticks at 1 Hz, but the 1 km/h-quantised virtual speed only steps
+      // to a new value every 6 s, bouncing ±15 km/h around a 45 km/h
+      // cruise — the classic integrator over/undershoot. The 15 km/h
+      // step compressed into a single ~1 s eval window manufactures a
+      // phantom harsh event at almost every bounce.
+      //
+      // On master (source-blind, no sustained/min-speed gate) this
+      // measured ~13.3 phantom events/km — far above even the field
+      // backup's 4.78 median / 43.4 peak on virtual trips, and orders of
+      // magnitude above the 1.06/km of genuine GPS-sourced trips.
+      const bounce = <double>[45, 60, 45, 30];
+
+      void feedBounce(TripRecorder r, {required String distanceSource}) {
+        final start = DateTime.utc(2026);
+        var latched = bounce[0];
+        var stepIdx = 0;
+        var lastStepSec = 0;
+        for (var i = 0; i < 1200; i++) {
+          if (i - lastStepSec >= 6) {
+            stepIdx++;
+            latched = bounce[stepIdx % bounce.length];
+            lastStepSec = i;
+          }
+          r.onSample(
+            TripSample(
+              timestamp: start.add(Duration(seconds: i)),
+              speedKmh: latched,
+              rpm: 0,
+            ),
+            distanceSource: distanceSource,
+          );
+        }
+      }
+
+      test(
+          'VIRTUAL source: the dead-reckoning staircase yields < 1.5 '
+          'events/km (master ≈ 13.3, suppressed here)', () {
+        final r = TripRecorder();
+        feedBounce(r, distanceSource: kDistanceSourceVirtual);
+        final s = r.buildSummary();
+        final total = s.harshBrakes + s.harshAccelerations;
+        final perKm = total / s.distanceKm;
+        expect(s.distanceKm, greaterThan(10),
+            reason: 'sanity: the series should cover ~15 km');
+        expect(perKm, lessThan(1.5),
+            reason: 'virtual dead-reckoning must not manufacture harsh '
+                'events — master counted ~13.3/km here');
+        expect(total, 0,
+            reason: 'the virtual source is suppressed entirely');
+      });
+
+      test(
+          'GPS source: the SAME staircase is gated, not suppressed, and '
+          'a genuine GPS-fed signal still scores', () {
+        // The 6 s-step staircase is an artefact of a coarse virtual
+        // odometer; a real GPS Doppler signal does not look like this.
+        // We still assert the gps path is NOT wholesale-suppressed by
+        // feeding a genuine, well-spaced hard brake on the gps source
+        // and confirming it counts.
+        final r = TripRecorder();
+        final start = DateTime.utc(2026);
+        r.onSample(
+          TripSample(timestamp: start, speedKmh: 90, rpm: 0, hAccuracyM: 5),
+          distanceSource: kDistanceSourceGps,
+        );
+        r.onSample(
+          TripSample(
+            timestamp: start.add(const Duration(seconds: 2)),
+            speedKmh: 30,
+            rpm: 0,
+            hAccuracyM: 5,
+          ),
+          distanceSource: kDistanceSourceGps,
+        );
+        expect(r.buildSummary().harshBrakes, 1,
+            reason: 'gps source must stay enabled-but-gated');
+      });
+
+      test('a bad-accuracy GPS fix (> 10 m) is rejected end-to-end', () {
+        final r = TripRecorder();
+        final start = DateTime.utc(2026);
+        r.onSample(
+          TripSample(timestamp: start, speedKmh: 90, rpm: 0, hAccuracyM: 4),
+          distanceSource: kDistanceSourceGps,
+        );
+        r.onSample(
+          TripSample(
+            timestamp: start.add(const Duration(seconds: 2)),
+            speedKmh: 30,
+            rpm: 0,
+            hAccuracyM: 30, // jittery urban-canyon fix
+          ),
+          distanceSource: kDistanceSourceGps,
+        );
+        expect(r.buildSummary().harshBrakes, 0,
+            reason: 'a bad fix is worse than no fix — not differentiated');
+      });
+
+      test('no distanceSource keeps harsh scoring enabled (legacy default)',
+          () {
+        // The legacy / OBD-speed call site passes no source — the genuine
+        // hard brake must still count exactly as before #2653.
+        final r = TripRecorder();
+        final start = DateTime.utc(2026);
+        r.onSample(TripSample(timestamp: start, speedKmh: 90, rpm: 3000));
+        r.onSample(TripSample(
+          timestamp: start.add(const Duration(seconds: 2)),
+          speedKmh: 30,
+          rpm: 1500,
+        ));
+        expect(r.buildSummary().harshBrakes, 1);
       });
     });
   });

@@ -1229,7 +1229,9 @@ class TripRecordingController {
         stft: captureRaw ? snap.latestStft : null,
         ltft: captureRaw ? snap.latestLtft : null,
       );
-      _recorder.onSample(sample);
+      // #2653 — thread the live distance provenance so the detector
+      // suppresses harsh scoring on the `virtual` dead-reckoning source.
+      _recorder.onSample(sample, distanceSource: distanceSource);
       _lastSampleAt = nowTs;
       // #1925 — ping the opt-in debug recorder so a stretch of silence
       // surfaces as a data-gap event in the exported session log.

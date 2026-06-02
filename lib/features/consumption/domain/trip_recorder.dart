@@ -3,6 +3,7 @@
 
 import 'dart:math' as math;
 
+import '../data/obd2/trip_distance_source.dart' show kDistanceSourceVirtual;
 import 'harsh_event_detector.dart';
 import 'trip_sample.dart';
 import 'trip_summary.dart';
@@ -78,16 +79,33 @@ class TripRecorder {
 
   /// Feed one sample. Safe to call with arbitrary cadence; the
   /// recorder derives Δt internally.
-  void onSample(TripSample sample) {
+  ///
+  /// [distanceSource] is the trip's live distance provenance
+  /// (`kDistanceSourceReal` / `kDistanceSourceGps` /
+  /// `kDistanceSourceVirtual`, #2653). On a `virtual` (dead-reckoning)
+  /// source the speed signal is unfit for differentiation, so harsh
+  /// scoring is suppressed for that sample. Null leaves harsh scoring
+  /// enabled — the safe default for legacy / test call sites and the
+  /// OBD speed path.
+  void onSample(TripSample sample, {String? distanceSource}) {
     _startedAt ??= sample.timestamp;
     _endedAt = sample.timestamp;
     _maxRpm = math.max(_maxRpm, sample.rpm);
 
     // Harsh brake / accel — delegated to the detector, which
     // re-samples speed at ~1 Hz so the 250 ms emit cadence cannot
-    // inflate the count (#1922). Fed every sample, including the
-    // first, so its anchor is seeded from trip start.
-    _harshDetector.onSample(sample.speedKmh, sample.timestamp);
+    // inflate the count (#1922), then de-noises with a sustained-window
+    // + accuracy + min-speed + source-aware gate (#2653). Fed every
+    // sample, including the first, so its anchor is seeded from trip
+    // start. On the `virtual` dead-reckoning source the detector
+    // suppresses scoring entirely (median 4.78 / peak 43.4 phantom
+    // events/km in the field backup).
+    _harshDetector.onSample(
+      sample.speedKmh,
+      sample.timestamp,
+      hAccuracyM: sample.hAccuracyM,
+      suppress: distanceSource == kDistanceSourceVirtual,
+    );
 
     // Track coolant samples for the cold-start surcharge heuristic
     // (#1262 phase 2). Cars without PID 0x05 carry coolantTempC ==

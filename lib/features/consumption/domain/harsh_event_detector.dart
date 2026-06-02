@@ -4,7 +4,8 @@
 import 'harsh_event.dart';
 
 /// Detects harsh-braking / harsh-acceleration events from a stream of
-/// speed samples, decoupled from the sample-feed cadence (#1922).
+/// speed samples, decoupled from the sample-feed cadence (#1922) and
+/// de-noised against jittery / dead-reckoning speed signals (#2653).
 ///
 /// Extracted from [TripRecorder]: the recorder is fed a `TripSample`
 /// every 250 ms, but the OBD speed PID (0x0D, integer km/h) refreshes
@@ -14,12 +15,41 @@ import 'harsh_event.dart';
 /// acceleration ~4x: a real device backup showed 428 "harsh brakes"
 /// on a single 157 km motorway drive.
 ///
-/// The fix is to re-sample speed at ~1 Hz before taking the
+/// The first fix (#1922) re-samples speed at ~1 Hz before taking the
 /// derivative: the threshold is evaluated only between samples at
 /// least [_evalIntervalSec] apart, so Δt is always a real ~1 s window.
-/// Genuine hard braking (a large Δspeed within ~1 s) still trips the
-/// threshold; the staircase no longer does; and the count is
-/// independent of how fast samples are fed.
+///
+/// #2653 adds four de-noising gates on top, because the resample alone
+/// still over-detected on the **virtual** (dead-reckoning) distance
+/// source — a real 77-trip backup measured a median of 4.78 and a peak
+/// of 43.4 phantom events/km on virtual trips, versus 1.06/km on
+/// GPS-sourced trips (43.4/km is physically impossible → it is noise
+/// counted as events). The gates:
+///   1. **Sustained-window** — the derivative must be measured over a
+///      window of at least [minSustainedSec] (≈1 s, matching
+///      `gps_driving_features.dart`). A single sub-1 s spike (the
+///      phasing artefact a coarse staircase produces against the
+///      ~0.9 s resample) can no longer fire.
+///   2. **Accuracy gate** — a fix whose reported horizontal accuracy
+///      exceeds [maxHAccuracyM] (~10 m) is dropped *and* breaks the
+///      anchor, so the derivative is never taken across a bad fix
+///      ("a bad fix is worse than no fix"). Possible since #2648/#2650
+///      persist `hAccuracyM`.
+///   3. **Min-speed floor** — intervals whose mean speed is below
+///      [minSpeedKmh] (~5 km/h) are not scored; dead-reckoning noise at
+///      a near-standstill manufactures phantom events.
+///   4. **Source-aware suppression** — when [onSample] is told the
+///      sample came from a suppressed source (the `virtual`
+///      dead-reckoning odometer, and GPS-only trips that also default
+///      to `virtual`), harsh scoring is skipped entirely. A
+///      1 km/h-quantised dead-reckoning speed signal is unfit for
+///      differentiation; suppressing it is honest, where counting its
+///      phasing artefacts is not.
+///
+/// An optional 3-sample moving-average pre-smoothing on speed (the same
+/// low-pass already proven in `gps_live_fuel_estimator.dart`) further
+/// damps quantisation jitter before the derivative; off by default so
+/// the canonical OBD path is unchanged.
 ///
 /// Since #2029 the detector also records a [HarshEvent] per crossing
 /// — the integer counters stay as cheap getters for legacy consumers,
@@ -29,6 +59,10 @@ class HarshEventDetector {
   HarshEventDetector({
     this.brakeThresholdMps2 = 3.5,
     this.accelThresholdMps2 = 3.0,
+    this.minSustainedSec = 1.0,
+    this.minSpeedKmh = 5.0,
+    this.maxHAccuracyM = 10.0,
+    this.smoothSpeed = false,
   });
 
   /// Deceleration magnitude (m/s², positive number) at or above which
@@ -39,13 +73,41 @@ class HarshEventDetector {
   /// harsh acceleration.
   final double accelThresholdMps2;
 
+  /// Minimum window length (seconds) the derivative must span before a
+  /// crossing is counted (#2653). A single sub-[minSustainedSec]
+  /// interval — the phasing artefact a coarse speed staircase produces
+  /// against the [_evalIntervalSec] resample — is rejected, matching the
+  /// "sustained ≥ 1 s" convention in `gps_driving_features.dart`.
+  final double minSustainedSec;
+
+  /// Minimum mean interval speed (km/h) below which an interval is not
+  /// scored (#2653). Dead-reckoning noise at a near-standstill produces
+  /// phantom events; genuine harsh manoeuvres happen above a walking
+  /// pace.
+  final double minSpeedKmh;
+
+  /// Reported horizontal GPS accuracy (metres) above which a sample is
+  /// dropped *and* the anchor reset, so the derivative is never taken
+  /// across a bad fix (#2653). A non-finite or null accuracy is treated
+  /// as "unknown, accept" so OBD-speed-only samples (no GPS) still flow.
+  final double maxHAccuracyM;
+
+  /// When true, speed is passed through a 3-sample moving average before
+  /// differentiation (#2653), damping 1 km/h quantisation jitter. Off by
+  /// default — the canonical OBD path keeps its raw-speed behaviour.
+  final bool smoothSpeed;
+
   /// Minimum spacing (seconds) between two evaluated samples — this is
   /// what re-samples the speed signal at ~1 Hz. 0.9 rather than 1.0 so
   /// a nominally-1 Hz feed with minor jitter still evaluates every
   /// sample instead of skipping to a 2 s window.
   static const double _evalIntervalSec = 0.9;
 
+  /// Window length for the optional speed moving average.
+  static const int _smoothWindow = 3;
+
   final List<HarshEvent> _events = [];
+  final List<double> _speedWindow = [];
 
   // The last sample an evaluation was anchored on. Advances only when
   // an evaluation actually fires, so a burst of sub-second samples
@@ -72,43 +134,90 @@ class HarshEventDetector {
   /// Feed one speed sample. Safe to call at any cadence; samples
   /// closer together than [_evalIntervalSec] are folded into the next
   /// evaluated window rather than each producing a derivative.
-  void onSample(double speedKmh, DateTime timestamp) {
+  ///
+  /// [hAccuracyM] is the sample's reported horizontal GPS accuracy (null
+  /// / non-finite when unknown, e.g. an OBD-speed-only sample); a fix
+  /// worse than [maxHAccuracyM] is dropped and resets the anchor.
+  /// [suppress] is true when the sample's distance source is unfit for
+  /// speed differentiation (the `virtual` dead-reckoning odometer) — the
+  /// detector then ignores the sample entirely (#2653).
+  void onSample(
+    double speedKmh,
+    DateTime timestamp, {
+    double? hAccuracyM,
+    bool suppress = false,
+  }) {
+    // Source-aware suppression: a dead-reckoning speed signal is unfit
+    // for differentiation. Don't even seed the anchor from it.
+    if (suppress) return;
+
+    // Accuracy gate: a bad fix is worse than no fix — drop it and break
+    // the anchor so the derivative is never taken across it.
+    if (hAccuracyM != null && hAccuracyM.isFinite && hAccuracyM > maxHAccuracyM) {
+      _anchorAt = null;
+      _anchorSpeedKmh = null;
+      _speedWindow.clear();
+      return;
+    }
+
+    final speed = smoothSpeed ? _smooth(speedKmh) : speedKmh;
+
     final anchorAt = _anchorAt;
     final anchorSpeed = _anchorSpeedKmh;
     if (anchorAt == null || anchorSpeed == null) {
       _anchorAt = timestamp;
-      _anchorSpeedKmh = speedKmh;
+      _anchorSpeedKmh = speed;
       return;
     }
     final dt = timestamp.difference(anchorAt).inMicroseconds /
         Duration.microsecondsPerSecond;
     if (dt < _evalIntervalSec) return;
 
+    // Sustained-window gate: only count a crossing whose derivative was
+    // measured over a real ≥ minSustainedSec window. A single sub-1 s
+    // spike (the staircase phasing artefact) is rejected here.
+    // Min-speed floor: skip intervals at a near-standstill.
+    final meanSpeedKmh = (speed + anchorSpeed) / 2.0;
+    final scorable = dt >= minSustainedSec && meanSpeedKmh >= minSpeedKmh;
+
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
-    final accelMps2 = ((speedKmh - anchorSpeed) / 3.6) / dt;
-    if (accelMps2 <= -brakeThresholdMps2) {
+    final accelMps2 = ((speed - anchorSpeed) / 3.6) / dt;
+    if (scorable && accelMps2 <= -brakeThresholdMps2) {
       _events.add(HarshEvent(
         timestamp: timestamp,
         magnitudeG: (-accelMps2) / standardGravityMps2,
-        speedKmh: speedKmh,
+        speedKmh: speed,
         type: HarshEventType.brake,
       ));
-    } else if (accelMps2 >= accelThresholdMps2) {
+    } else if (scorable && accelMps2 >= accelThresholdMps2) {
       _events.add(HarshEvent(
         timestamp: timestamp,
         magnitudeG: accelMps2 / standardGravityMps2,
-        speedKmh: speedKmh,
+        speedKmh: speed,
         type: HarshEventType.acceleration,
       ));
     }
     _anchorAt = timestamp;
-    _anchorSpeedKmh = speedKmh;
+    _anchorSpeedKmh = speed;
+  }
+
+  /// Push [raw] into the moving-average window and return the smoothed
+  /// value (mean of the last up-to-[_smoothWindow] samples). Mirrors the
+  /// low-pass in `gps_live_fuel_estimator.dart`.
+  double _smooth(double raw) {
+    _speedWindow.add(raw);
+    if (_speedWindow.length > _smoothWindow) {
+      _speedWindow.removeAt(0);
+    }
+    final sum = _speedWindow.reduce((a, b) => a + b);
+    return sum / _speedWindow.length;
   }
 
   /// Reset the counters and anchor — used before recording a fresh
   /// trip without discarding the detector instance.
   void reset() {
     _events.clear();
+    _speedWindow.clear();
     _anchorSpeedKmh = null;
     _anchorAt = null;
   }

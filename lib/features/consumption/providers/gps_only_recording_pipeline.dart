@@ -11,6 +11,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
+import '../data/obd2/trip_distance_source.dart' show kDistanceSourceGps;
 import '../data/obd2/trip_live_reading.dart';
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/gps_driving_features.dart';
@@ -158,7 +159,13 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
     _samples.add(sample);
-    recorder.onSample(sample);
+    // #2653 — a GPS-only trip's speed is the device's Doppler ground
+    // speed (genuine ~1 Hz, not 1 km/h-quantised dead reckoning), so it
+    // is differentiable; the detector's accuracy + min-speed +
+    // sustained-window gates de-noise it without the wholesale
+    // suppression the `virtual` source needs. Tag it `gps` so harsh
+    // scoring stays enabled-but-gated rather than suppressed.
+    recorder.onSample(sample, distanceSource: kDistanceSourceGps);
     final summary = recorder.buildSummary();
     // #2389 / #2506 — fold this fix into the SHARED estimate + coaching
     // folder (also used by the OBD2 live path). The folder does its own
