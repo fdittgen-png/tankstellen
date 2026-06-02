@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/services/dio_factory.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
 import '../../domain/entities/charging_station.dart';
+import 'ocm_poi_parser.dart';
 
 /// Abstract contract for an EV charging station backend.
 ///
@@ -24,22 +27,34 @@ abstract class EvStationService {
 
 /// Open Charge Map-backed [EvStationService].
 ///
-/// Currently a stub: if no API key is configured, it transparently falls
-/// back to [DemoEvStationService]. The real HTTP integration is tracked
-/// separately so this PR can ship the client end-to-end without coupling
-/// to network flakiness.
-///
-/// TODO(#177-followup): implement real https://api.openchargemap.io/v3
-/// REST call using Dio with a Bearer API key, cache TTL, and full
-/// connector/tariff mapping.
+/// Performs a live OCM `/poi/` query around the viewport centre and
+/// parses each result via the shared [OcmPoiParser] — the *same* logic
+/// (including the `UsageType` access-cost signal, #2618) the search-side
+/// `EVChargingService` uses (#2634). [DemoEvStationService] remains the
+/// safety net: no API key, a network/parse error, or tests/offline all
+/// transparently fall back to the deterministic demo dataset, so map
+/// markers degrade gracefully instead of vanishing.
 class OpenChargeMapService implements EvStationService {
   final String? apiKey;
   final EvStationService _fallback;
+  final Dio _dio;
+
+  /// Default Dio — separate so tests can inject a capturing/recorded Dio
+  /// without re-implementing the BaseOptions (mirrors EVChargingService).
+  static Dio _defaultDio() => DioFactory.create(
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 15),
+      );
 
   OpenChargeMapService({
     this.apiKey,
     EvStationService? fallback,
-  }) : _fallback = fallback ?? const DemoEvStationService();
+    Dio? dio,
+  })  : _fallback = fallback ?? const DemoEvStationService(),
+        _dio = dio ?? _defaultDio();
+
+  /// Same OCM POI endpoint the search-side service hits.
+  static const _baseUrl = 'https://api.openchargemap.io/v3/poi/';
 
   @override
   Future<List<ChargingStation>> fetchStations({
@@ -47,21 +62,54 @@ class OpenChargeMapService implements EvStationService {
     required double centerLng,
     required double radiusKm,
   }) async {
-    if (apiKey == null || apiKey!.trim().isEmpty) {
+    final key = apiKey?.trim();
+    if (key == null || key.isEmpty) {
       debugPrint('OpenChargeMapService: no API key, using demo data');
-      return _fallback.fetchStations(
+      return _demo(centerLat, centerLng, radiusKm);
+    }
+
+    try {
+      final response = await _dio.get<dynamic>(
+        _baseUrl,
+        queryParameters: {
+          'output': 'json',
+          'latitude': centerLat,
+          'longitude': centerLng,
+          'distance': radiusKm,
+          'distanceunit': 'KM',
+          'maxresults': 100,
+          'compact': true,
+          'verbose': false,
+          // 'countrycode' intentionally omitted — OCM's strict country
+          // filter drops legitimate border-region chargers (#697); the
+          // lat/lng + distance bbox is the geographic constraint we need.
+          'key': key,
+        },
+      );
+
+      final data = response.data;
+      if (data is! List) {
+        return _demo(centerLat, centerLng, radiusKm);
+      }
+      return OcmPoiParser.parsePoiList(data, centerLat, centerLng);
+    } on DioException catch (e, st) {
+      // Network error / non-2xx / cancel — degrade to demo so the map
+      // overlay still renders something rather than throwing (#2634).
+      debugPrint('OpenChargeMapService: OCM fetch failed ($e); using demo. $st');
+      return _demo(centerLat, centerLng, radiusKm);
+    }
+  }
+
+  Future<List<ChargingStation>> _demo(
+    double centerLat,
+    double centerLng,
+    double radiusKm,
+  ) =>
+      _fallback.fetchStations(
         centerLat: centerLat,
         centerLng: centerLng,
         radiusKm: radiusKm,
       );
-    }
-    // Real call intentionally unimplemented — see class docs.
-    return _fallback.fetchStations(
-      centerLat: centerLat,
-      centerLng: centerLng,
-      radiusKm: radiusKm,
-    );
-  }
 }
 
 /// Deterministic demo dataset used when no API key is configured.
