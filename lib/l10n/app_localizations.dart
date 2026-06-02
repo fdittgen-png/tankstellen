@@ -4844,6 +4844,66 @@ abstract class AppLocalizations {
   /// **'Ease off'**
   String get coachingEasePedal;
 
+  /// Spoken driving-coach cue (#2663) when a harsh acceleration event is detected during recording. Full sentence — distinct from the glanceable tile label coachingEasePedal.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy on the accelerator'**
+  String get coachingVoiceHardAcceleration;
+
+  /// Spoken driving-coach cue (#2663) when a harsh braking event is detected during recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Try to brake more gently'**
+  String get coachingVoiceHarshBraking;
+
+  /// Spoken driving-coach cue (#2663) when the engine is revving high in cruise — full spoken phrasing of the coachingShiftUp tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift up a gear to save fuel'**
+  String get coachingVoiceShiftUp;
+
+  /// Spoken driving-coach cue (#2663) when the engine is lugging at low RPM under load — full spoken phrasing of the coachingShiftDown tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift down, the engine is labouring'**
+  String get coachingVoiceShiftDown;
+
+  /// Spoken driving-coach cue (#2663) when the throttle is wide open during a heavy-consumption cruise — full spoken phrasing of the coachingEasePedal tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Ease off the pedal to cut your fuel use'**
+  String get coachingVoiceEasePedal;
+
+  /// Spoken driving-coach cue (#2663) when cruising downhill with no recent braking — full spoken phrasing of the coachingGpsLiftOff tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Lift off the accelerator and coast'**
+  String get coachingVoiceLiftOff;
+
+  /// Spoken driving-coach cue (#2663) after a braking event — full spoken phrasing of the coachingGpsAnticipateBrake tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Look further ahead and lift off earlier'**
+  String get coachingVoiceAnticipateBrake;
+
+  /// Spoken driving-coach cue (#2663) after a sharp acceleration on a GPS-only trip — full spoken phrasing of the coachingGpsSmoothAccel tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Accelerate more smoothly'**
+  String get coachingVoiceSmoothAccel;
+
+  /// Title of the toggle (#2663) in the coaching settings section that turns spoken driving cues (hard acceleration, harsh braking, shift hints) on or off. On by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Spoken driving coaching'**
+  String get voiceCoachingSettingTitle;
+
+  /// Subtitle of the spoken-driving-coaching toggle (#2663) describing what the cues cover.
+  ///
+  /// In en, this message translates to:
+  /// **'Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints'**
+  String get voiceCoachingSettingSubtitle;
+
   /// No description provided for @tooltipUseGps.
   ///
   /// In en, this message translates to:

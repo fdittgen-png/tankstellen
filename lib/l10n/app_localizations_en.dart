@@ -2588,6 +2588,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coachingEasePedal => 'Ease off';
 
   @override
+  String get coachingVoiceHardAcceleration => 'Easy on the accelerator';
+
+  @override
+  String get coachingVoiceHarshBraking => 'Try to brake more gently';
+
+  @override
+  String get coachingVoiceShiftUp => 'Shift up a gear to save fuel';
+
+  @override
+  String get coachingVoiceShiftDown => 'Shift down, the engine is labouring';
+
+  @override
+  String get coachingVoiceEasePedal =>
+      'Ease off the pedal to cut your fuel use';
+
+  @override
+  String get coachingVoiceLiftOff => 'Lift off the accelerator and coast';
+
+  @override
+  String get coachingVoiceAnticipateBrake =>
+      'Look further ahead and lift off earlier';
+
+  @override
+  String get coachingVoiceSmoothAccel => 'Accelerate more smoothly';
+
+  @override
+  String get voiceCoachingSettingTitle => 'Spoken driving coaching';
+
+  @override
+  String get voiceCoachingSettingSubtitle =>
+      'Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints';
+
+  @override
   String get tooltipUseGps => 'Use GPS location';
 
   @override
@@ -9504,6 +9537,45 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get coachingEasePedal => '⟦Éášé óƒƒ ···⟧';
+
+  @override
+  String get coachingVoiceHardAcceleration =>
+      '⟦Éášý óñ ŧĥé áççéłéřáŧóř ·········⟧';
+
+  @override
+  String get coachingVoiceHarshBraking =>
+      '⟦Ŧřý ŧó ƀřáķé ɱóřé ǧéñŧłý ·········⟧';
+
+  @override
+  String get coachingVoiceShiftUp =>
+      '⟦Šĥîƒŧ úƥ á ǧéář ŧó šáṽé ƒúéł ··········⟧';
+
+  @override
+  String get coachingVoiceShiftDown =>
+      '⟦Šĥîƒŧ đóŵñ, ŧĥé éñǧîñé îš łáƀóúřîñǧ ·············⟧';
+
+  @override
+  String get coachingVoiceEasePedal =>
+      '⟦Éášé óƒƒ ŧĥé ƥéđáł ŧó çúŧ ýóúř ƒúéł úšé ··············⟧';
+
+  @override
+  String get coachingVoiceLiftOff =>
+      '⟦Łîƒŧ óƒƒ ŧĥé áççéłéřáŧóř áñđ çóášŧ ·············⟧';
+
+  @override
+  String get coachingVoiceAnticipateBrake =>
+      '⟦Łóóķ ƒúřŧĥéř áĥéáđ áñđ łîƒŧ óƒƒ éářłîéř ···············⟧';
+
+  @override
+  String get coachingVoiceSmoothAccel =>
+      '⟦Áççéłéřáŧé ɱóřé šɱóóŧĥłý ··········⟧';
+
+  @override
+  String get voiceCoachingSettingTitle => '⟦Šƥóķéñ đřîṽîñǧ çóáçĥîñǧ ·········⟧';
+
+  @override
+  String get voiceCoachingSettingSubtitle =>
+      '⟦Ĥéář šƥóķéñ ŧîƥš ŵĥîłé ýóú đřîṽé — ĥářđ áççéłéřáŧîóñ, ĥářšĥ ƀřáķîñǧ áñđ ǧéář ĥîñŧš ······························⟧';
 
   @override
   String get tooltipUseGps => '⟦Úšé ǦƤŠ łóçáŧîóñ ······⟧';

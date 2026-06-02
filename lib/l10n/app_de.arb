@@ -1159,6 +1159,46 @@
   "coachingShiftUp": "Hochschalten",
   "coachingShiftDown": "Runterschalten",
   "coachingEasePedal": "Gas zurücknehmen",
+  "coachingVoiceHardAcceleration": "Sanfter Gas geben",
+  "@coachingVoiceHardAcceleration": {
+    "description": "Spoken driving-coach cue (#2663) when a harsh acceleration event is detected during recording. Full sentence — distinct from the glanceable tile label coachingEasePedal."
+  },
+  "coachingVoiceHarshBraking": "Versuche, sanfter zu bremsen",
+  "@coachingVoiceHarshBraking": {
+    "description": "Spoken driving-coach cue (#2663) when a harsh braking event is detected during recording."
+  },
+  "coachingVoiceShiftUp": "Hochschalten spart Kraftstoff",
+  "@coachingVoiceShiftUp": {
+    "description": "Spoken driving-coach cue (#2663) when the engine is revving high in cruise — full spoken phrasing of the coachingShiftUp tile."
+  },
+  "coachingVoiceShiftDown": "Runterschalten, der Motor müht sich",
+  "@coachingVoiceShiftDown": {
+    "description": "Spoken driving-coach cue (#2663) when the engine is lugging at low RPM under load — full spoken phrasing of the coachingShiftDown tile."
+  },
+  "coachingVoiceEasePedal": "Nimm das Gas zurück, das spart Kraftstoff",
+  "@coachingVoiceEasePedal": {
+    "description": "Spoken driving-coach cue (#2663) when the throttle is wide open during a heavy-consumption cruise — full spoken phrasing of the coachingEasePedal tile."
+  },
+  "coachingVoiceLiftOff": "Geh vom Gas und lass rollen",
+  "@coachingVoiceLiftOff": {
+    "description": "Spoken driving-coach cue (#2663) when cruising downhill with no recent braking — full spoken phrasing of the coachingGpsLiftOff tile."
+  },
+  "coachingVoiceAnticipateBrake": "Schau weiter voraus und geh früher vom Gas",
+  "@coachingVoiceAnticipateBrake": {
+    "description": "Spoken driving-coach cue (#2663) after a braking event — full spoken phrasing of the coachingGpsAnticipateBrake tile."
+  },
+  "coachingVoiceSmoothAccel": "Beschleunige gleichmäßiger",
+  "@coachingVoiceSmoothAccel": {
+    "description": "Spoken driving-coach cue (#2663) after a sharp acceleration on a GPS-only trip — full spoken phrasing of the coachingGpsSmoothAccel tile."
+  },
+  "voiceCoachingSettingTitle": "Gesprochenes Fahrcoaching",
+  "@voiceCoachingSettingTitle": {
+    "description": "Title of the toggle (#2663) in the coaching settings section that turns spoken driving cues (hard acceleration, harsh braking, shift hints) on or off. On by default."
+  },
+  "voiceCoachingSettingSubtitle": "Höre Fahrtipps während der Fahrt — starkes Beschleunigen, hartes Bremsen und Schalthinweise",
+  "@voiceCoachingSettingSubtitle": {
+    "description": "Subtitle of the spoken-driving-coaching toggle (#2663) describing what the cues cover."
+  },
   "tooltipUseGps": "GPS-Standort verwenden",
   "tooltipShowPassword": "Passwort anzeigen",
   "tooltipHidePassword": "Passwort verbergen",
