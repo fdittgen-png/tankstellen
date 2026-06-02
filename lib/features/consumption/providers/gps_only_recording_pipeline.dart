@@ -113,9 +113,17 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // precision. Permission failure is non-fatal: the stream errors
     // and we log; the user sees an unmoving recording until they
     // grant permission or stop.
+    // #2646 — subscribe to the SHARED, refcounted broadcast position source
+    // rather than a fresh per-call `getPositionStream`. The live
+    // ApproachDetector subscribes to the same source the instant the trip
+    // flips active (approach_state_provider.dart); two independent
+    // `getPositionStream` listeners contend on geolocator's single platform
+    // EventChannel and starve one of them, which broke the fuel-station radar
+    // + swipe in GPS-only recording. One underlying subscription, multiplexed,
+    // feeds every fix to both consumers.
     final geo = _ref.read(geolocatorWrapperProvider);
     _sub = geo
-        .getPositionStream(
+        .sharedPositionStream(
           locationSettings: const LocationSettings(
             accuracy: LocationAccuracy.high,
           ),
