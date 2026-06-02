@@ -66,7 +66,7 @@ jobs:
       - uses: actions/checkout@v6
       - id: probe
         if: github.event_name == 'pull_request'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: .green-marker
           key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
@@ -781,7 +781,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: mkdir -p .green-marker && echo "$GITHUB_SHA" > .green-marker/sha
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/save@v5
         with:
           path: .green-marker
           key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
