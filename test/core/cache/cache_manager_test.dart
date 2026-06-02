@@ -1,10 +1,26 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
+
+/// No-op recorder so the closed-box tests can drive `errorLogger.log`
+/// without a Hive-backed spool (which would need platform init).
+class _NoopRecorder implements TraceRecorder {
+  @override
+  Future<void> record(Object error, StackTrace stackTrace,
+      {ServiceChainSnapshot? serviceChainState}) async {}
+
+  @override
+  noSuchMethod(Invocation invocation) => null;
+}
 
 /// In-memory fake implementing [CacheStorage] for testing [CacheManager]
 /// without Hive platform initialization.
@@ -56,6 +72,34 @@ class FakeCacheStorage implements CacheStorage {
 
   @override
   Future<void> deleteCacheEntry(String key) async => _cache.remove(key);
+}
+
+/// A [CacheStorage] whose reads/writes throw [FileSystemException] — exactly
+/// what the real Hive store does when its `cache.hive` box is closed
+/// mid-flight by a foreground background scan (#2670). Drives the
+/// CacheManager-level resilience guard.
+class ClosedBoxCacheStorage implements CacheStorage {
+  static const _closed = FileSystemException(
+      'File closed', '/tmp/cache.hive');
+
+  @override
+  Future<void> cacheData(String key, dynamic data) async => throw _closed;
+
+  @override
+  Map<String, dynamic>? getCachedData(String key, {Duration? maxAge}) =>
+      throw _closed;
+
+  @override
+  Future<void> clearCache() async => throw _closed;
+
+  @override
+  int get cacheEntryCount => throw _closed;
+
+  @override
+  Iterable<dynamic> get cacheKeys => throw _closed;
+
+  @override
+  Future<void> deleteCacheEntry(String key) async => throw _closed;
 }
 
 void main() {
@@ -660,6 +704,43 @@ void main() {
           ttl: const Duration(hours: 1), source: ServiceSource.cache);
       final evicted = await cache.evictBounded();
       expect(evicted, equals(0));
+    });
+  });
+
+  // #2670 — when the underlying Hive box was closed mid-flight a read/write
+  // throws FileSystemException. The CacheManager must treat that as a clean
+  // miss / no-op so StationServiceChain falls through to the API + stale
+  // path instead of surfacing a crash on a routine cached search.
+  group('CacheManager - closed box resilience (#2670)', () {
+    late CacheManager closedCache;
+
+    setUp(() {
+      // Route the defensive errorLogger.log through a no-op recorder so the
+      // unit test doesn't reach the Hive-backed isolate spool.
+      errorLogger.testRecorderOverride = _NoopRecorder();
+      closedCache = CacheManager(ClosedBoxCacheStorage());
+    });
+
+    tearDown(() => errorLogger.resetForTest());
+
+    test('get treats a closed box as a cache miss (returns null, no throw)',
+        () {
+      expect(() => closedCache.get('search:FR:x'), returnsNormally);
+      expect(closedCache.get('search:FR:x'), isNull);
+    });
+
+    test('getFresh treats a closed box as a cache miss', () {
+      expect(() => closedCache.getFresh('search:FR:x'), returnsNormally);
+      expect(closedCache.getFresh('search:FR:x'), isNull);
+    });
+
+    test('put swallows the closed-box write failure (never throws)',
+        () async {
+      await expectLater(
+        closedCache.put('search:FR:x', {'v': 1},
+            ttl: const Duration(minutes: 5), source: ServiceSource.cache),
+        completes,
+      );
     });
   });
 }

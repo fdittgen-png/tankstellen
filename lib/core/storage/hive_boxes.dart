@@ -7,6 +7,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'hive_isolate_ownership.dart';
+import 'hive_legacy_migration.dart';
+
 /// Thrown by [HiveBoxes.init] when a persistent box cannot be opened —
 /// its file is damaged beyond Hive's own crash recovery (#1686).
 ///
@@ -150,65 +153,11 @@ class HiveBoxes {
     return HiveAesCipher(key);
   }
 
-  /// One-time migration of a pre-encryption plaintext [boxName] into an
-  /// encrypted box (#1686).
-  ///
-  /// A box already written with the cipher opens cleanly — nothing to
-  /// do. When the cipher open fails, a plaintext open is attempted: a
-  /// box that still carries plaintext data is migrated; one that fails
-  /// the plaintext open too is damaged and is **left on disk
-  /// untouched** — corruption is never resolved by deleting user data.
-  /// A box Hive cannot open at all then surfaces in [init]'s Phase 2 as
-  /// a [HiveCorruptionException].
-  static Future<void> _migrateLegacyPlaintextBox(
-      String boxName, HiveAesCipher cipher) async {
-    try {
-      final box = await Hive.openBox(boxName, encryptionCipher: cipher);
-      await box.close();
-      return; // Already encrypted, or a fresh install.
-    } catch (_) {
-      // Fall through — the box may be a pre-encryption plaintext box.
-    }
-
-    Box<dynamic> plain;
-    try {
-      plain = await Hive.openBox(boxName);
-    } catch (e, st) { // ignore: unused_catch_stack
-      debugPrint('Hive: "$boxName" unreadable during the migration probe '
-          '— left on disk for Phase 2 to surface.');
-      return;
-    }
-
-    await _migrateToEncrypted(boxName, plain, cipher);
-  }
-
-  /// Copies an already-open plaintext [plain] box into an encrypted box
-  /// of the same name (#1686).
-  ///
-  /// The plaintext file is deleted only *after* its entries are held in
-  /// memory, so an interruption mid-migration cannot lose data — a
-  /// crash leaves the still-intact plaintext box, never an empty one.
-  static Future<void> _migrateToEncrypted(
-      String boxName, Box<dynamic> plain, HiveAesCipher cipher) async {
-    final entries = Map<dynamic, dynamic>.from(plain.toMap());
-    await plain.close();
-
-    await Hive.deleteBoxFromDisk(boxName);
-    final encryptedBox =
-        await Hive.openBox(boxName, encryptionCipher: cipher);
-    if (entries.isNotEmpty) {
-      await encryptedBox.putAll(entries);
-    }
-    await encryptedBox.close();
-    debugPrint('Hive: migrated "$boxName" to encrypted storage '
-        '(${entries.length} entries)');
-  }
-
-  /// Test hook for [_migrateToEncrypted] (#1686).
+  /// Test hook for [HiveLegacyMigration.migrateToEncrypted] (#1686).
   @visibleForTesting
   static Future<void> migrateToEncryptedForTest(
           String boxName, Box<dynamic> plain, HiveAesCipher cipher) =>
-      _migrateToEncrypted(boxName, plain, cipher);
+      HiveLegacyMigration.migrateToEncrypted(boxName, plain, cipher);
 
   /// Boxes only read by deep OBD2 / trip / badge / snapshot / glide
   /// features — none is needed to paint the landing search screen, so
@@ -245,8 +194,8 @@ class HiveBoxes {
     // Phase 1 — migrate any pre-encryption plaintext boxes. The probes
     // are independent, so they (and any migration) run in parallel.
     await Future.wait<void>(
-      _encryptedBoxes
-          .map((boxName) => _migrateLegacyPlaintextBox(boxName, cipher)),
+      _encryptedBoxes.map((boxName) =>
+          HiveLegacyMigration.migrateLegacyPlaintextBox(boxName, cipher)),
     );
 
     // Phase 2 — open the first-frame-critical boxes in one parallel
@@ -276,6 +225,13 @@ class HiveBoxes {
       throw HiveCorruptionException(
           'a storage box could not be opened (${e.message})');
     }
+
+    // #2670 — the main isolate owns these for the whole app lifetime; a
+    // foreground background scan's closeIsolateBoxes() must never close them.
+    HiveIsolateOwnership.markOwned(const [
+      settings, profiles, favorites, cache, priceHistory, alerts,
+      isolateErrorSpool, featureFlags, appProfile, boxSchema,
+    ]);
 
     // #1686 — stamp the current schema version for any box that lacks
     // one, so a future release can detect and migrate old on-disk data.
@@ -310,7 +266,7 @@ class HiveBoxes {
   /// be sure its box is open without re-running the opens.
   static Future<void> initDeferred() => _deferredInit ??= Future.wait(
         _deferredBoxes.map((name) => Hive.openBox<String>(name)),
-      );
+      ).whenComplete(() => HiveIsolateOwnership.markOwned(_deferredBoxes));
 
   /// Initialize Hive in a background isolate with proper encryption.
   static Future<void> initInIsolate() async {
@@ -331,13 +287,20 @@ class HiveBoxes {
     await Hive.openBox<String>(isolateErrorSpool);
   }
 
-  /// Close all Hive boxes opened by [initInIsolate].
+  /// Close the Hive boxes opened by [initInIsolate] at the end of a
+  /// background task to release file handles.
   ///
-  /// Must be called at the end of every background task to release file
-  /// handles and prevent race conditions with the main isolate.
+  /// #2670 — boxes [HiveIsolateOwnership] records as main-isolate-owned (from
+  /// [init] / [initDeferred] / [initForTest]) are **skipped**: when the scan
+  /// ran inside the foreground isolate these are the live, shared global
+  /// handles the rest of the app still uses, and closing them produced the
+  /// `FileSystemException: File closed, path='…/cache.hive'` field crash. A
+  /// true spawned `dart:isolate` worker never ran [init], so its registry is
+  /// empty and every [initInIsolate] handle is still closed.
   static Future<void> closeIsolateBoxes() async {
     final boxNames = [settings, favorites, alerts, cache, priceHistory, priceSnapshots, isolateErrorSpool];
     for (final name in boxNames) {
+      if (HiveIsolateOwnership.isOwned(name)) continue;
       try {
         if (Hive.isBoxOpen(name)) {
           await Hive.box(name).close();
@@ -370,6 +333,14 @@ class HiveBoxes {
     await Hive.openBox<String>(priceSnapshots);
     // #1686 — schema-version meta box, mirrors the runtime open.
     await Hive.openBox<int>(boxSchema);
+    // #2670 — initForTest stands in for the main isolate's init(): the boxes
+    // it opens are main-isolate-owned, so closeIsolateBoxes() leaves them open
+    // (mirroring the production foreground-isolate scenario).
+    HiveIsolateOwnership.markOwned(const [
+      settings, favorites, cache, profiles, priceHistory, alerts,
+      serviceReminders, obd2PausedTrips, obd2NegotiatedProtocol,
+      obd2ActiveTrip, priceSnapshots, boxSchema,
+    ]);
   }
 
   /// Safely converts any Hive map to a typed map.

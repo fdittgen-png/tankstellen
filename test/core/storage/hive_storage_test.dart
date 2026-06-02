@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/storage/hive_isolate_ownership.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 
 /// HiveStorage tests use real Hive boxes initialized with a temp directory.
@@ -562,41 +563,61 @@ void main() {
   // Isolate Box Lifecycle
   // ---------------------------------------------------------------------------
   group('Isolate Box Lifecycle', () {
-    test('closeIsolateBoxes closes all open boxes without error', () async {
-      // Boxes are already open from setUp via initForTest
+    // #2670 — initForTest stands in for the main isolate's init(): the boxes
+    // it opens are main-isolate-owned, so closeIsolateBoxes() (which runs in
+    // a foreground background scan's finally) must NOT close them. Before the
+    // fix it closed the live `cache` handle and the next StationServiceChain
+    // read threw `FileSystemException: File closed` (43× in field).
+    test('closeIsolateBoxes does NOT close the live cache box the main '
+        'isolate opened (root #2670)', () async {
+      // Boxes are already open from setUp via initForTest.
       await HiveStorage.closeIsolateBoxes();
 
-      // After closing, boxes should not be accessible
-      // Re-open for other tests in tearDown
-      expect(Hive.isBoxOpen('settings'), isFalse);
-      expect(Hive.isBoxOpen('favorites'), isFalse);
-      expect(Hive.isBoxOpen('alerts'), isFalse);
-      expect(Hive.isBoxOpen('cache'), isFalse);
-      expect(Hive.isBoxOpen('price_history'), isFalse);
-
-      // Re-open boxes so tearDown (Hive.close()) works cleanly
-      await HiveStorage.initForTest();
+      expect(Hive.isBoxOpen('cache'), isTrue,
+          reason: 'the main-isolate cache box must stay open for in-flight '
+              'StationServiceChain reads');
+      expect(Hive.isBoxOpen('settings'), isTrue);
+      expect(Hive.isBoxOpen('favorites'), isTrue);
+      expect(Hive.isBoxOpen('alerts'), isTrue);
+      expect(Hive.isBoxOpen('price_history'), isTrue);
     });
 
-    test('closeIsolateBoxes is safe to call when boxes are already closed', () async {
+    test('closeIsolateBoxes is safe to call when boxes are already closed',
+        () async {
+      HiveIsolateOwnership.resetForTest();
       await HiveStorage.closeIsolateBoxes();
 
-      // Calling again should not throw
+      // Calling again should not throw.
       await HiveStorage.closeIsolateBoxes();
 
-      // Re-open for other tests
+      // Re-open for other tests.
       await HiveStorage.initForTest();
     });
 
     test('closeIsolateBoxes does not close profiles box', () async {
-      // profiles box is only opened by main isolate init, not initInIsolate
-      // closeIsolateBoxes should only close the 5 boxes that initInIsolate opens
+      // profiles box is only opened by main isolate init, not initInIsolate.
       await HiveStorage.closeIsolateBoxes();
 
-      // profiles box should still be open (it was opened by initForTest)
       expect(Hive.isBoxOpen('profiles'), isTrue);
+    });
 
-      // Re-open for other tests
+    test('a spawned-worker isolate (init never ran) still closes its '
+        'initInIsolate handles to release file descriptors (#2670)', () async {
+      // Simulate a TRUE separate dart:isolate where init() never marked
+      // ownership: closeIsolateBoxes MUST close the boxes so the OS file
+      // handles a real worker opened are released.
+      HiveIsolateOwnership.resetForTest();
+
+      expect(Hive.isBoxOpen('cache'), isTrue);
+      await HiveStorage.closeIsolateBoxes();
+
+      expect(Hive.isBoxOpen('cache'), isFalse,
+          reason: 'a worker-isolate handle must still be closed');
+      expect(Hive.isBoxOpen('settings'), isFalse);
+      expect(Hive.isBoxOpen('alerts'), isFalse);
+      expect(Hive.isBoxOpen('price_history'), isFalse);
+
+      // Re-open boxes so tearDown (Hive.close()) runs cleanly.
       await HiveStorage.initForTest();
     });
   });
