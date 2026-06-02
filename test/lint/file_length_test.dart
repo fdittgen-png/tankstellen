@@ -97,7 +97,12 @@ void main() {
     // persists onto each TripSample (#2459), + the bank-2 fold into
     // `_applyTrim`. Each is a one-line `_sub` call carrying its own gate.
     // Decomposition is tracked separately by #2187/#2188.
-    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 652,
+    // #2648 — re-grandfathered 652 → 673: GPS horizontal accuracy +
+    // bearing latches (2 fields + 2 getters + 2 updateGpsFix params, all
+    // null-guarded like altitude) so the OBD2 emit path stops dropping
+    // them (they reached only 0.3 % of samples). Net +21; decomposition
+    // is still tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 673,
     // #2379 — re-grandfathered 1457 → 1468: threaded the
     // `logFailureAsError` flag through `connect()` (param + doc + the
     // guarded `if` around the now-conditional connect-failed trace) so a
@@ -180,7 +185,14 @@ void main() {
     // plumbing + the host/state-machine seam that must live on the
     // controller. Decomposition of this god-class stays tracked by
     // #2187/#2188/#2190.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1595,
+    // #2648 — re-grandfathered 1595 → 1621: GPS horizontal accuracy +
+    // bearing now thread through the controller's `updateGpsFix` (2
+    // params + doc) → `_liveSampleSnapshot.updateGpsFix`, are stamped in
+    // `_emit` + the degraded-emit call site, and exposed via two
+    // `@visibleForTesting` debug getters. Net +26; the field plumbing
+    // must live on the controller seam. Decomposition stays tracked by
+    // #2187/#2188/#2190.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1621,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted

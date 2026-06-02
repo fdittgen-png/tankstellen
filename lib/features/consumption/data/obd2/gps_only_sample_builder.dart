@@ -27,6 +27,8 @@ class GpsOnlySampleBuilder {
     double? latitude,
     double? longitude,
     double? altitudeM,
+    double? hAccuracyM,
+    double? bearingDeg,
   }) {
     return TripSample(
       timestamp: timestamp,
@@ -35,6 +37,11 @@ class GpsOnlySampleBuilder {
       latitude: latitude,
       longitude: longitude,
       altitudeM: altitudeM,
+      // #2648 — the degraded GPS-only path used to drop horizontal
+      // accuracy + bearing too; stamp them so a trip that degrades to
+      // GPS-only still feeds the cornering analytic + accuracy-gate.
+      hAccuracyM: hAccuracyM,
+      bearingDeg: bearingDeg,
     );
   }
 

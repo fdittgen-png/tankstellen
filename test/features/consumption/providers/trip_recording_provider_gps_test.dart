@@ -229,6 +229,99 @@ void main() {
       await notifier.stop();
     });
   });
+
+  group('#2648 OBD2 path forwards GPS accuracy + bearing (no longer dropped)',
+      () {
+    test(
+        'flag ON — each fix\'s accuracy (pos.accuracy) + bearing '
+        '(pos.heading) reach the controller latch, not just lat/lon/alt',
+        () async {
+      final fakeGeo = _RecordingGeolocator();
+      final container = ProviderContainer(overrides: [
+        geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+      ]);
+      addTearDown(container.dispose);
+      addTearDown(fakeGeo.dispose);
+
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.obd2TripRecording);
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.gpsTripPath);
+
+      final service = Obd2Service(FakeObd2Transport(_elmOk()));
+      await service.connect();
+
+      final notifier = container.read(tripRecordingProvider.notifier);
+      await notifier.start(service);
+      await Future<void>.delayed(Duration.zero);
+
+      // A real fix carrying a finite accuracy + heading. Before #2648 the
+      // OBD2 stream path threaded only lat/lon/alt + speed and dropped
+      // these two on the floor (heading was even read again ~100 lines
+      // later for the glide-coach, then discarded).
+      fakeGeo.emit(_pos(43.40, 3.50,
+          altitude: 100, accuracy: 4.5, heading: 231.0));
+      await Future<void>.delayed(Duration.zero);
+
+      final ctl = notifier.debugController;
+      expect(ctl, isNotNull);
+      expect(ctl!.debugLatestHAccuracyM, closeTo(4.5, 1e-9),
+          reason: 'pos.accuracy must reach the latch (revives the '
+              'harsh-event accuracy-gate)');
+      expect(ctl.debugLatestBearingDeg, closeTo(231.0, 1e-9),
+          reason: 'pos.heading must reach the latch (revives the '
+              'cornering analytic)');
+
+      await notifier.stop();
+    });
+
+    test(
+        'flag ON — a NaN altitude / accuracy / heading is dropped to null '
+        'by the isFinite guards (Fix B), not propagated', () async {
+      final fakeGeo = _RecordingGeolocator();
+      final container = ProviderContainer(overrides: [
+        geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+      ]);
+      addTearDown(container.dispose);
+      addTearDown(fakeGeo.dispose);
+
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.obd2TripRecording);
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.gpsTripPath);
+
+      final service = Obd2Service(FakeObd2Transport(_elmOk()));
+      await service.connect();
+
+      final notifier = container.read(tripRecordingProvider.notifier);
+      await notifier.start(service);
+      await Future<void>.delayed(Duration.zero);
+
+      // Some OS / mock fixes report a garbage (NaN) altitude / accuracy /
+      // heading. The isFinite guards must drop them to null rather than
+      // poison the grade math or the accuracy-gate.
+      fakeGeo.emit(_pos(43.40, 3.50,
+          altitude: double.nan,
+          accuracy: double.nan,
+          heading: double.nan));
+      await Future<void>.delayed(Duration.zero);
+
+      final ctl = notifier.debugController;
+      expect(ctl, isNotNull);
+      expect(ctl!.debugLatestAltitudeM, isNull,
+          reason: 'a NaN altitude must be guarded to null (Fix B)');
+      expect(ctl.debugLatestHAccuracyM, isNull,
+          reason: 'a NaN accuracy must be guarded to null');
+      expect(ctl.debugLatestBearingDeg, isNull,
+          reason: 'a NaN heading must be guarded to null');
+
+      await notifier.stop();
+    });
+  });
 }
 
 Map<String, String> _elmOk() => const {
@@ -240,14 +333,21 @@ Map<String, String> _elmOk() => const {
       '01A6': '41 A6 00 01 6A 2C>',
     };
 
-Position _pos(double lat, double lng, {double altitude = 0}) => Position(
+Position _pos(
+  double lat,
+  double lng, {
+  double altitude = 0,
+  double accuracy = 5,
+  double heading = 0,
+}) =>
+    Position(
       latitude: lat,
       longitude: lng,
       timestamp: DateTime.now(),
-      accuracy: 5,
+      accuracy: accuracy,
       altitude: altitude,
       altitudeAccuracy: 0,
-      heading: 0,
+      heading: heading,
       headingAccuracy: 0,
       speed: 0,
       speedAccuracy: 0,

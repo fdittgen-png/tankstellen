@@ -68,6 +68,10 @@ class DegradedGpsEmitter {
     required double? latitude,
     required double? longitude,
     required double? altitudeM,
+    // #2648 — most recent GPS horizontal accuracy + bearing, forwarded
+    // into the GPS-only sample so the degraded path stops dropping them.
+    double? hAccuracyM,
+    double? bearingDeg,
     required DateTime? lastGpsFixAt,
     required DateTime? startedAt,
     required double resolverDistanceKm,
@@ -91,6 +95,10 @@ class DegradedGpsEmitter {
         latitude: latitude,
         longitude: longitude,
         altitudeM: altitudeM,
+        // #2648 — carry accuracy + bearing into the degraded GPS-only
+        // sample so they aren't dropped when OBD2 falls away mid-trip.
+        hAccuracyM: hAccuracyM,
+        bearingDeg: bearingDeg,
       );
       _recorder.onSample(sample);
       _onSampleAt(nowTs);

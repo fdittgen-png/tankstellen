@@ -608,12 +608,20 @@ class TripRecordingController {
     double? latitude,
     double? longitude,
     double? altitudeM,
+    double? hAccuracyM,
+    double? bearingDeg,
     double? speedKmh,
   }) {
     _liveSampleSnapshot.updateGpsFix(
       latitude: latitude,
       longitude: longitude,
       altitudeM: altitudeM,
+      // #2648 — forward GPS horizontal accuracy + bearing so the next
+      // emit stamps them onto the TripSample. The OBD2 / degraded paths
+      // used to drop these (the `Position` carried them but they were
+      // never threaded through), so they reached only 0.3 % of samples.
+      hAccuracyM: hAccuracyM,
+      bearingDeg: bearingDeg,
     );
     // #2506 — latch the GPS ground-speed for the live speed fallback. A
     // null / non-finite / negative speed (cold GPS warm-up) is ignored so
@@ -705,6 +713,14 @@ class TripRecordingController {
   /// [debugLatestLatitude].
   @visibleForTesting
   double? get debugLatestAltitudeM => _liveSampleSnapshot.latestAltitudeM;
+
+  /// Read-only snapshots of the most recent GPS horizontal accuracy
+  /// (metres) + bearing (compass degrees) pushed in via [updateGpsFix]
+  /// (#2648). Same caveats as [debugLatestLatitude].
+  @visibleForTesting
+  double? get debugLatestHAccuracyM => _liveSampleSnapshot.latestHAccuracyM;
+  @visibleForTesting
+  double? get debugLatestBearingDeg => _liveSampleSnapshot.latestBearingDeg;
 
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
   /// identity; subsequent ticks are scheduled per-PID by
@@ -1188,6 +1204,13 @@ class TripRecordingController {
         latitude: snap.latestLatitude,
         longitude: snap.latestLongitude,
         altitudeM: snap.latestAltitudeM,
+        // #2648 — GPS horizontal accuracy + bearing. Both already
+        // round-trip through the codec ('ha' / 'be') and TripSample has
+        // had the fields; the OBD2 path simply dropped them. Stamping
+        // them here revives the cornering analytic (bearing) and the
+        // harsh-event accuracy-gate. Null when no GPS fix has landed.
+        hAccuracyM: snap.latestHAccuracyM,
+        bearingDeg: snap.latestBearingDeg,
         // #2459 — the consumed-but-previously-unstored signals, stamped
         // from the snapshot latest-value getters exactly like throttle.
         // Each stays null on cars that don't expose the PID, so the
@@ -1338,6 +1361,9 @@ class TripRecordingController {
       latitude: snap.latestLatitude,
       longitude: snap.latestLongitude,
       altitudeM: snap.latestAltitudeM,
+      // #2648 — carry accuracy + bearing through the degraded path too.
+      hAccuracyM: snap.latestHAccuracyM,
+      bearingDeg: snap.latestBearingDeg,
       lastGpsFixAt: _gpsEndedAt,
       startedAt: _startedAt,
       resolverDistanceKm: currentDistanceKm,
