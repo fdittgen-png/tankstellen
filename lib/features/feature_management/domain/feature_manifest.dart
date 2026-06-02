@@ -341,10 +341,14 @@ class FeatureManifest {
     Feature.approachOverlay: FeatureManifestEntry.allChannels(
       feature: Feature.approachOverlay,
       defaultOn: false,
-      displayName: 'Approach overlay',
+      // #2681 — renamed "Approach overlay" → "Fuel Station Radar" to match
+      // the #2661 trip-radar wording (value-only; the enum value + Hive
+      // persistence key `approachOverlay` are unchanged).
+      displayName: 'Fuel Station Radar',
       description:
-          'During a recorded trip, flip the floating tile to the fuel '
-              'type\'s colour and show the price as you near a fuel station.',
+          'Turn the floating trip tile into a live Fuel Station Radar — '
+              'as you near a fuel station it flips to the fuel type\'s '
+              'colour and shows the price.',
     ),
     // Default-off on every channel (#2569) — speaking aloud while driving
     // is strictly opt-in and is in no AppProfile preset bundle.
