@@ -1986,15 +1986,15 @@
   "@alertGatingRadiusGermanyOnlyNote": {
     "description": "Informational note in the radius-alert create sheet that the on-device background runner only evaluates German (Tankerkönig) stations today (#2246)."
   },
-  "approachOverlaySection": "Approach-station overlay",
+  "approachOverlaySection": "Fuel Station Radar",
   "@approachOverlaySection": {
-    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+    "description": "Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661)."
   },
   "approachRadiusLabel": "Radius",
   "@approachRadiusLabel": {
-    "description": "Slider label for the approach-overlay radius (km)."
+    "description": "Slider label for the Fuel Station Radar radius (km)."
   },
-  "approachRadiusCaption": "Overlay grows + shows the price when within {km} km of a fuel station",
+  "approachRadiusCaption": "Radar leads with the price when within {km} km of a fuel station",
   "@approachRadiusCaption": {
     "description": "Caption under the approach-radius slider.",
     "placeholders": {
@@ -2030,15 +2030,15 @@
       }
     }
   },
-  "approachTestSimulateButton": "Test approach overlay",
+  "approachTestSimulateButton": "Test Fuel Station Radar",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
   },
   "approachTestStopButton": "Stop test",
   "@approachTestStopButton": {
-    "description": "Button that aborts the in-app approach-overlay simulation (#2163)."
+    "description": "Button that aborts the in-app Fuel Station Radar simulation (#2163)."
   },
-  "approachTestActiveCaption": "Test active — overlay shows the price for {station}",
+  "approachTestActiveCaption": "Test active — radar shows the price for {station}",
   "@approachTestActiveCaption": {
     "description": "Caption shown under the test button while a simulated approach is running (#2163).",
     "placeholders": {
@@ -2048,7 +2048,7 @@
       }
     }
   },
-  "approachTestUnavailable": "Add a favorite station to test the approach overlay",
+  "approachTestUnavailable": "Add a favorite station to test the Fuel Station Radar",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
   },
@@ -2059,6 +2059,26 @@
       "meters": {
         "type": "String",
         "example": "350"
+      }
+    }
+  },
+  "fuelStationRadarDistanceKm": "{km} km away",
+  "@fuelStationRadarDistanceKm": {
+    "description": "Fuel Station Radar caption (#2661) showing how far the driver is from the radar station while still approaching, in kilometres.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "2.4"
+      }
+    }
+  },
+  "fuelStationRadarProximity": "Proximity {percent}%",
+  "@fuelStationRadarProximity": {
+    "description": "Accessibility label for the battery-style proximity fill bar (#2661): how close the driver is to the radar station, as a percentage (100% at the station, 0% at the radar radius edge).",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "60"
       }
     }
   },
@@ -5832,9 +5852,9 @@
   "@tripPathLegendWasteful": {
     "description": "Legend entry for the red heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is at least 10."
   },
-  "tripRadarClosestStation": "Closest station",
+  "tripRadarClosestStation": "Fuel Station Radar",
   "@tripRadarClosestStation": {
-    "description": "Title of the closest-station radar card at the top of the active trip-recording screen (#2380)."
+    "description": "Title of the Fuel Station Radar card at the top of the active trip-recording screen (#2380 / #2661)."
   },
   "tripRadarScanning": "Scanning for nearby stations",
   "@tripRadarScanning": {
@@ -5844,17 +5864,13 @@
   "@tripRadarNoStationNearby": {
     "description": "Placeholder shown on the trip-recording radar card when no fuel station is within range of the live GPS fix (#2380)."
   },
-  "tripRadarNoOtherStation": "No other station nearby",
-  "@tripRadarNoOtherStation": {
-    "description": "Toast shown on the trip-recording radar card when the driver swipes past every nearby station and there is no further candidate to advance to (#2633)."
+  "fuelStationRadarNearer": "Nearer station",
+  "@fuelStationRadarNearer": {
+    "description": "Swipe-left hint / screen-reader action on the Fuel Station Radar card: page to the next-nearer station in the distance-ranked list (#2661)."
   },
-  "tripRadarIgnoreStation": "Ignore this station",
-  "@tripRadarIgnoreStation": {
-    "description": "Swipe-left hint / screen-reader action on the trip-recording radar card: ignore the currently shown station and advance to the next nearby candidate (#2633)."
-  },
-  "tripRadarShowPrevious": "Show previous station",
-  "@tripRadarShowPrevious": {
-    "description": "Swipe-right hint / screen-reader action on the trip-recording radar card: restore the most-recently-ignored station (#2633)."
+  "fuelStationRadarFarther": "Farther station",
+  "@fuelStationRadarFarther": {
+    "description": "Swipe-right hint / screen-reader action on the Fuel Station Radar card: page to the next-farther station in the distance-ranked list (#2661)."
   },
   "tripRecordingPinTooltip": "Pinning keeps the screen on — uses more battery",
   "@tripRecordingPinTooltip": {

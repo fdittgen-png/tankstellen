@@ -82,7 +82,7 @@ void main() {
     );
 
     // Card title + station name + the e10 price are all on screen.
-    expect(find.text('Closest station'), findsOneWidget);
+    expect(find.text('Fuel Station Radar'), findsOneWidget);
     expect(find.text('Tankstelle Mitte'), findsOneWidget);
     expect(find.text(expectedPrice), findsOneWidget);
 

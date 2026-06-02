@@ -5,124 +5,89 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/radar_swipe_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import 'trip_radar_card.dart';
 
-/// Swipe-to-page wrapper around the fallback [RadarCard] (#2633).
+/// Swipe-to-page wrapper around the fallback [RadarCard] (#2661, replacing
+/// the #2633 ignore/restore mapping with distance pagination).
 ///
 /// Extracted from `trip_radar_card.dart` to keep that file under the
-/// 400-line cap. Wraps the currently-derived candidate in a
-/// [Dismissible] that pages the radar in place WITHOUT ever dismissing
-/// (every `confirmDismiss` returns `false`):
+/// 400-line cap. Wraps the currently-paged candidate in a [Dismissible]
+/// that pages the radar in place WITHOUT ever dismissing (every
+/// `confirmDismiss` returns `false`):
 ///
-/// - swipe-LEFT (`endToStart`) → `ignore(current.id)` so the derived
-///   current advances to the next ranked station;
-/// - swipe-RIGHT (`startToEnd`) → `restore()` pops the last-ignored
-///   station back (no-op when the stack is empty).
+/// - swipe-LEFT (`endToStart`) → `nearer()` — page toward the NEARER
+///   station (toward index 0, the nearest);
+/// - swipe-RIGHT (`startToEnd`) → `farther(maxIndex)` — page toward the
+///   FARTHER station (toward the end of the distance-ranked list).
 ///
-/// The same two actions are exposed as `customSemanticsActions` so
-/// screen-reader users — for whom the horizontal swipe is invisible —
-/// get the capability. The existing tap-to-navigate (`RadarCard`'s
-/// `Tooltip` + `ListTile.onTap`) is preserved untouched inside the
-/// wrapped card.
-///
-/// Exhausted case ([current] == null but candidates exist — every
-/// station ignored): keeps the last station on screen, shows a
-/// "no other station" toast, and resets the ignore stack so the card
-/// recovers to the nearest station rather than going blank (#2583).
-class RadarSwipeWrapper extends ConsumerStatefulWidget {
+/// Both actions clamp at the ends (idempotent no-ops), so paging never goes
+/// blank — the index walk over the ranked [candidates] always lands on a
+/// real station. The same two actions are exposed as
+/// `customSemanticsActions` so screen-reader users — for whom the
+/// horizontal swipe is invisible — get the capability. The existing
+/// tap-to-navigate (`RadarCard`'s `Tooltip` + `ListTile.onTap`) is preserved
+/// untouched inside the wrapped card.
+class RadarSwipeWrapper extends ConsumerWidget {
   final String title;
+
+  /// The distance-ranked priced candidate list (index 0 = nearest).
   final List<Station> candidates;
 
-  /// The derived current candidate (first ranked station not ignored), or
-  /// `null` when every candidate has been swiped past (exhausted).
-  final Station? current;
-  final List<String> ignored;
+  /// The station at the current page index (already clamped against
+  /// [candidates] by the caller). Tapped to navigate; paged on swipe.
+  final Station current;
   final FuelType fuel;
   final bool scanning;
+
+  /// Radar radius in metres (`profile.approachRadiusKm * 1000`) — the
+  /// proximity fill bar's "indicated radius" (#2661). Null collapses the bar.
+  final double? radiusMeters;
 
   const RadarSwipeWrapper({
     super.key,
     required this.title,
     required this.candidates,
     required this.current,
-    required this.ignored,
     required this.fuel,
     required this.scanning,
+    this.radiusMeters,
   });
 
   @override
-  ConsumerState<RadarSwipeWrapper> createState() => _RadarSwipeWrapperState();
-}
-
-class _RadarSwipeWrapperState extends ConsumerState<RadarSwipeWrapper> {
-  @override
-  void didUpdateWidget(covariant RadarSwipeWrapper oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _handleExhausted();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _handleExhausted();
-  }
-
-  /// When the list is exhausted (every candidate ignored) recover the
-  /// stack to the nearest station and tell the driver there's nothing
-  /// further — deferred to a post-frame callback so it never mutates
-  /// providers / shows a SnackBar mid-build (#2583).
-  void _handleExhausted() {
-    if (widget.current != null || widget.candidates.isEmpty) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final l = AppLocalizations.of(context);
-      SnackBarHelper.show(
-        context,
-        l?.tripRadarNoOtherStation ?? 'No other station nearby',
-      );
-      ref.read(radarSwipeProvider.notifier).reset();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
 
-    // Exhausted: keep showing the LAST candidate (never blank, #2583) —
-    // the post-frame callback resets the stack so the next frame derives
-    // the nearest station again.
-    final station = widget.current ?? widget.candidates.last;
-    final swipeable = widget.candidates.length > 1 || widget.ignored.isNotEmpty;
+    final station = current;
+    final swipeable = candidates.length > 1;
+    final maxIndex = candidates.length - 1;
 
-    final ignoreLabel = l?.tripRadarIgnoreStation ?? 'Ignore this station';
-    final showPreviousLabel =
-        l?.tripRadarShowPrevious ?? 'Show previous station';
+    final nearerLabel = l?.fuelStationRadarNearer ?? 'Nearer station';
+    final fartherLabel = l?.fuelStationRadarFarther ?? 'Farther station';
 
     final card = RadarCard(
-      title: widget.title,
+      title: title,
       station: station,
-      fuel: widget.fuel,
+      fuel: fuel,
       distanceMeters: station.dist > 0 ? station.dist * 1000.0 : null,
       live: false,
-      scanning: widget.scanning,
+      scanning: scanning,
       swipeable: swipeable,
+      radiusMeters: radiusMeters,
     );
 
     // Screen-reader actions — the horizontal swipe is invisible to
-    // TalkBack/VoiceOver, so expose the same capability explicitly.
+    // TalkBack/VoiceOver, so expose the same capability explicitly. Both are
+    // always available (clamped no-ops at the ends).
     final semanticActions = <CustomSemanticsAction, VoidCallback>{
-      CustomSemanticsAction(label: ignoreLabel): () =>
-          ref.read(radarSwipeProvider.notifier).ignore(station.id),
-      if (widget.ignored.isNotEmpty)
-        CustomSemanticsAction(label: showPreviousLabel): () =>
-            ref.read(radarSwipeProvider.notifier).restore(),
+      CustomSemanticsAction(label: nearerLabel): () =>
+          ref.read(radarSwipeProvider.notifier).nearer(),
+      CustomSemanticsAction(label: fartherLabel): () =>
+          ref.read(radarSwipeProvider.notifier).farther(maxIndex),
     };
 
     return Semantics(
@@ -136,31 +101,34 @@ class _RadarSwipeWrapperState extends ConsumerState<RadarSwipeWrapper> {
         confirmDismiss: (dir) async {
           final notifier = ref.read(radarSwipeProvider.notifier);
           if (dir == DismissDirection.endToStart) {
-            notifier.ignore(station.id);
+            // Left swipe → toward the nearer station.
+            notifier.nearer();
           } else {
-            notifier.restore();
+            // Right swipe → toward the farther station.
+            notifier.farther(maxIndex);
           }
           return false;
         },
-        // Swipe-RIGHT reveal → restore the previous station.
+        // Swipe-RIGHT reveal → farther. Pagination is non-destructive, so
+        // both hints wear the primary accent (no warning hue).
         background: _SwipeHint(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.only(left: 24),
           color: theme.colorScheme.primary,
-          icon: Icons.undo,
-          label: showPreviousLabel,
+          icon: Icons.chevron_right,
+          label: fartherLabel,
           iconFirst: true,
         ),
-        // Swipe-LEFT reveal → ignore + advance.
+        // Swipe-LEFT reveal → nearer.
         secondaryBackground: _SwipeHint(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 24),
-          color: DarkModeColors.warning(context),
-          icon: Icons.skip_next,
-          label: ignoreLabel,
+          color: theme.colorScheme.primary,
+          icon: Icons.chevron_left,
+          label: nearerLabel,
           iconFirst: false,
         ),
-        // Fade the new station in as the page advances/restores.
+        // Fade the new station in as the page advances.
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: KeyedSubtree(
@@ -181,7 +149,7 @@ class _SwipeHint extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  /// True → icon leads the label (swipe-right hint), false → label leads.
+  /// True → icon leads the label (farther hint), false → label leads.
   final bool iconFirst;
 
   const _SwipeHint({

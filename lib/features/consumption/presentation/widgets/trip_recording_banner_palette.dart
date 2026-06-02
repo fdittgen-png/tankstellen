@@ -21,12 +21,12 @@ class BannerPalette {
   const BannerPalette({required this.background, required this.foreground});
 }
 
-/// Fuel-type-coloured palette for the approach overlay (#2382). The
-/// background is [FuelColors.forType]; the foreground is whichever of
-/// black / white wins the WCAG contrast against it, so the huge price
-/// figure stays legible on every fuel hue (each tone is muted/dark, so
+/// Fuel-type-coloured palette for the Fuel Station Radar PiP tile (#2382 /
+/// #2661). The background is [FuelColors.forType]; the foreground is
+/// whichever of black / white wins the WCAG contrast against it, so the huge
+/// price figure stays legible on every fuel hue (each tone is muted/dark, so
 /// white wins in practice, but the check keeps the choice principled).
-BannerPalette approachOverlayPalette(FuelType fuelType) {
+BannerPalette fuelStationRadarPalette(FuelType fuelType) {
   final background = FuelColors.forType(fuelType);
   final onWhite = ContrastUtils.contrastRatio(Colors.white, background);
   final onBlack = ContrastUtils.contrastRatio(Colors.black, background);

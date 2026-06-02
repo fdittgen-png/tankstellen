@@ -3706,6 +3706,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String fuelStationRadarDistanceKm(String km) {
+    return '$km km away';
+  }
+
+  @override
+  String fuelStationRadarProximity(int percent) {
+    return 'Proximity $percent%';
+  }
+
+  @override
   String get authErrorNoNetwork =>
       'Pas de connexion réseau. Veuillez réessayer plus tard.';
 
@@ -6657,13 +6667,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripRadarNoStationNearby => 'No station nearby';
 
   @override
-  String get tripRadarNoOtherStation => 'No other station nearby';
+  String get fuelStationRadarNearer => 'Nearer station';
 
   @override
-  String get tripRadarIgnoreStation => 'Ignore this station';
-
-  @override
-  String get tripRadarShowPrevious => 'Show previous station';
+  String get fuelStationRadarFarther => 'Farther station';
 
   @override
   String get tripRecordingPinTooltip =>

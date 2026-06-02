@@ -6660,13 +6660,13 @@ abstract class AppLocalizations {
   /// **'Radius alerts currently only check stations in Germany.'**
   String get alertGatingRadiusGermanyOnlyNote;
 
-  /// Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065).
+  /// Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661).
   ///
   /// In en, this message translates to:
-  /// **'Approach-station overlay'**
+  /// **'Fuel Station Radar'**
   String get approachOverlaySection;
 
-  /// Slider label for the approach-overlay radius (km).
+  /// Slider label for the Fuel Station Radar radius (km).
   ///
   /// In en, this message translates to:
   /// **'Radius'**
@@ -6675,7 +6675,7 @@ abstract class AppLocalizations {
   /// Caption under the approach-radius slider.
   ///
   /// In en, this message translates to:
-  /// **'Overlay grows + shows the price when within {km} km of a fuel station'**
+  /// **'Radar leads with the price when within {km} km of a fuel station'**
   String approachRadiusCaption(String km);
 
   /// Title above the nearest/cheapest-in-radius choice chips.
@@ -6711,10 +6711,10 @@ abstract class AppLocalizations {
   /// Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163).
   ///
   /// In en, this message translates to:
-  /// **'Test approach overlay'**
+  /// **'Test Fuel Station Radar'**
   String get approachTestSimulateButton;
 
-  /// Button that aborts the in-app approach-overlay simulation (#2163).
+  /// Button that aborts the in-app Fuel Station Radar simulation (#2163).
   ///
   /// In en, this message translates to:
   /// **'Stop test'**
@@ -6723,13 +6723,13 @@ abstract class AppLocalizations {
   /// Caption shown under the test button while a simulated approach is running (#2163).
   ///
   /// In en, this message translates to:
-  /// **'Test active — overlay shows the price for {station}'**
+  /// **'Test active — radar shows the price for {station}'**
   String approachTestActiveCaption(String station);
 
   /// Caption shown when the test button is disabled because no favorite station is available as a target (#2163).
   ///
   /// In en, this message translates to:
-  /// **'Add a favorite station to test the approach overlay'**
+  /// **'Add a favorite station to test the Fuel Station Radar'**
   String get approachTestUnavailable;
 
   /// PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.
@@ -6737,6 +6737,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{meters} m away'**
   String approachStationDistance(String meters);
+
+  /// Fuel Station Radar caption (#2661) showing how far the driver is from the radar station while still approaching, in kilometres.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km away'**
+  String fuelStationRadarDistanceKm(String km);
+
+  /// Accessibility label for the battery-style proximity fill bar (#2661): how close the driver is to the radar station, as a percentage (100% at the station, 0% at the radar radius edge).
+  ///
+  /// In en, this message translates to:
+  /// **'Proximity {percent}%'**
+  String fuelStationRadarProximity(int percent);
 
   /// Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186.
   ///
@@ -11565,10 +11577,10 @@ abstract class AppLocalizations {
   /// **'Wasteful (≥ 10 L/100km)'**
   String get tripPathLegendWasteful;
 
-  /// Title of the closest-station radar card at the top of the active trip-recording screen (#2380).
+  /// Title of the Fuel Station Radar card at the top of the active trip-recording screen (#2380 / #2661).
   ///
   /// In en, this message translates to:
-  /// **'Closest station'**
+  /// **'Fuel Station Radar'**
   String get tripRadarClosestStation;
 
   /// Placeholder shown on the trip-recording radar card while the nearest-station lookup is in flight (#2380).
@@ -11583,23 +11595,17 @@ abstract class AppLocalizations {
   /// **'No station nearby'**
   String get tripRadarNoStationNearby;
 
-  /// Toast shown on the trip-recording radar card when the driver swipes past every nearby station and there is no further candidate to advance to (#2633).
+  /// Swipe-left hint / screen-reader action on the Fuel Station Radar card: page to the next-nearer station in the distance-ranked list (#2661).
   ///
   /// In en, this message translates to:
-  /// **'No other station nearby'**
-  String get tripRadarNoOtherStation;
+  /// **'Nearer station'**
+  String get fuelStationRadarNearer;
 
-  /// Swipe-left hint / screen-reader action on the trip-recording radar card: ignore the currently shown station and advance to the next nearby candidate (#2633).
+  /// Swipe-right hint / screen-reader action on the Fuel Station Radar card: page to the next-farther station in the distance-ranked list (#2661).
   ///
   /// In en, this message translates to:
-  /// **'Ignore this station'**
-  String get tripRadarIgnoreStation;
-
-  /// Swipe-right hint / screen-reader action on the trip-recording radar card: restore the most-recently-ignored station (#2633).
-  ///
-  /// In en, this message translates to:
-  /// **'Show previous station'**
-  String get tripRadarShowPrevious;
+  /// **'Farther station'**
+  String get fuelStationRadarFarther;
 
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///

@@ -1,13 +1,13 @@
 {
-  "approachOverlaySection": "Approach-station overlay",
+  "approachOverlaySection": "Fuel Station Radar",
   "@approachOverlaySection": {
-    "description": "Section title in the profile edit sheet for the in-trip approach overlay settings (#2067 / Epic #2065)."
+    "description": "Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661)."
   },
   "approachRadiusLabel": "Radius",
   "@approachRadiusLabel": {
-    "description": "Slider label for the approach-overlay radius (km)."
+    "description": "Slider label for the Fuel Station Radar radius (km)."
   },
-  "approachRadiusCaption": "Overlay grows + shows the price when within {km} km of a fuel station",
+  "approachRadiusCaption": "Radar leads with the price when within {km} km of a fuel station",
   "@approachRadiusCaption": {
     "description": "Caption under the approach-radius slider.",
     "placeholders": {
@@ -43,15 +43,15 @@
       }
     }
   },
-  "approachTestSimulateButton": "Test approach overlay",
+  "approachTestSimulateButton": "Test Fuel Station Radar",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
   },
   "approachTestStopButton": "Stop test",
   "@approachTestStopButton": {
-    "description": "Button that aborts the in-app approach-overlay simulation (#2163)."
+    "description": "Button that aborts the in-app Fuel Station Radar simulation (#2163)."
   },
-  "approachTestActiveCaption": "Test active — overlay shows the price for {station}",
+  "approachTestActiveCaption": "Test active — radar shows the price for {station}",
   "@approachTestActiveCaption": {
     "description": "Caption shown under the test button while a simulated approach is running (#2163).",
     "placeholders": {
@@ -61,7 +61,7 @@
       }
     }
   },
-  "approachTestUnavailable": "Add a favorite station to test the approach overlay",
+  "approachTestUnavailable": "Add a favorite station to test the Fuel Station Radar",
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
   }

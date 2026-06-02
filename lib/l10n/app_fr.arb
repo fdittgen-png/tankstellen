@@ -3573,21 +3573,6 @@
       }
     }
   },
-  "tripRadarNoOtherStation": "No other station nearby",
-  "@tripRadarNoOtherStation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripRadarIgnoreStation": "Ignore this station",
-  "@tripRadarIgnoreStation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripRadarShowPrevious": "Show previous station",
-  "@tripRadarShowPrevious": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "obd2TestRunTitle": "Run adapter test",
   "@obd2TestRunTitle": {
     "x-mt": "needs-native-review",
@@ -3754,6 +3739,38 @@
   },
   "voiceCoachingSettingSubtitle": "Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints",
   "@voiceCoachingSettingSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelStationRadarDistanceKm": "{km} km away",
+  "@fuelStationRadarDistanceKm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "2.4"
+      }
+    }
+  },
+  "fuelStationRadarProximity": "Proximity {percent}%",
+  "@fuelStationRadarProximity": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+  "fuelStationRadarNearer": "Nearer station",
+  "@fuelStationRadarNearer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelStationRadarFarther": "Farther station",
+  "@fuelStationRadarFarther": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

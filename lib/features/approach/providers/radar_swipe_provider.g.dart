@@ -8,36 +8,36 @@ part of 'radar_swipe_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Holds the swipe-to-page ignore stack for the trip-recording radar
-/// card (#2633).
+/// Holds the swipe-to-page distance index for the trip-recording radar
+/// card (#2661).
 ///
-/// `keepAlive` so the stack survives the card rebuilding on every
-/// approach-state / candidate-list tick (otherwise an autoDispose
-/// notifier would reset the moment the list re-runs). The stack is
-/// cleared when the trip stops so the next trip starts fresh — there is
-/// no persistence across trajets.
+/// `keepAlive` so the index survives the card rebuilding on every
+/// approach-state / candidate-list tick (otherwise an autoDispose notifier
+/// would reset the moment the list re-runs). The index is reset to the
+/// nearest station (0) when the trip stops so the next trip starts fresh —
+/// there is no persistence across trajets.
 
 @ProviderFor(RadarSwipe)
 final radarSwipeProvider = RadarSwipeProvider._();
 
-/// Holds the swipe-to-page ignore stack for the trip-recording radar
-/// card (#2633).
+/// Holds the swipe-to-page distance index for the trip-recording radar
+/// card (#2661).
 ///
-/// `keepAlive` so the stack survives the card rebuilding on every
-/// approach-state / candidate-list tick (otherwise an autoDispose
-/// notifier would reset the moment the list re-runs). The stack is
-/// cleared when the trip stops so the next trip starts fresh — there is
-/// no persistence across trajets.
+/// `keepAlive` so the index survives the card rebuilding on every
+/// approach-state / candidate-list tick (otherwise an autoDispose notifier
+/// would reset the moment the list re-runs). The index is reset to the
+/// nearest station (0) when the trip stops so the next trip starts fresh —
+/// there is no persistence across trajets.
 final class RadarSwipeProvider
     extends $NotifierProvider<RadarSwipe, RadarSwipeState> {
-  /// Holds the swipe-to-page ignore stack for the trip-recording radar
-  /// card (#2633).
+  /// Holds the swipe-to-page distance index for the trip-recording radar
+  /// card (#2661).
   ///
-  /// `keepAlive` so the stack survives the card rebuilding on every
-  /// approach-state / candidate-list tick (otherwise an autoDispose
-  /// notifier would reset the moment the list re-runs). The stack is
-  /// cleared when the trip stops so the next trip starts fresh — there is
-  /// no persistence across trajets.
+  /// `keepAlive` so the index survives the card rebuilding on every
+  /// approach-state / candidate-list tick (otherwise an autoDispose notifier
+  /// would reset the moment the list re-runs). The index is reset to the
+  /// nearest station (0) when the trip stops so the next trip starts fresh —
+  /// there is no persistence across trajets.
   RadarSwipeProvider._()
     : super(
         from: null,
@@ -65,16 +65,16 @@ final class RadarSwipeProvider
   }
 }
 
-String _$radarSwipeHash() => r'a07253b81a90bc06b66a39402379b20718fda2d9';
+String _$radarSwipeHash() => r'cb4faaeccd379993e71fc60c52d5bb5371a65254';
 
-/// Holds the swipe-to-page ignore stack for the trip-recording radar
-/// card (#2633).
+/// Holds the swipe-to-page distance index for the trip-recording radar
+/// card (#2661).
 ///
-/// `keepAlive` so the stack survives the card rebuilding on every
-/// approach-state / candidate-list tick (otherwise an autoDispose
-/// notifier would reset the moment the list re-runs). The stack is
-/// cleared when the trip stops so the next trip starts fresh — there is
-/// no persistence across trajets.
+/// `keepAlive` so the index survives the card rebuilding on every
+/// approach-state / candidate-list tick (otherwise an autoDispose notifier
+/// would reset the moment the list re-runs). The index is reset to the
+/// nearest station (0) when the trip stops so the next trip starts fresh —
+/// there is no persistence across trajets.
 
 abstract class _$RadarSwipe extends $Notifier<RadarSwipeState> {
   RadarSwipeState build();

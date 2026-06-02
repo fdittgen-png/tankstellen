@@ -11,8 +11,11 @@ import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
 import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_radar_card.dart';
+import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
+import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -28,11 +31,11 @@ import '../../../../helpers/pump_app.dart';
 /// effective-fuel price column, and that the empty/placeholder state has NO
 /// tap target.
 ///
-/// #2633 — the fallback (polling) path is also swipe-to-page: swipe-left
-/// ignores the current station and advances to the next ranked candidate;
-/// swipe-right restores the last-ignored one. The swipe must never break
-/// the tap-to-navigate target, and the same two actions are exposed as
-/// `customSemanticsActions` for screen readers.
+/// #2661 — the fallback (polling) path is swipe-to-page DISTANCE pagination:
+/// swipe-LEFT pages to the NEARER station (toward index 0, the nearest);
+/// swipe-RIGHT pages to the FARTHER station. Both clamp at the ends (no-op),
+/// the swipe must never break the tap-to-navigate target, and the same two
+/// actions are exposed as `customSemanticsActions` for screen readers.
 
 /// Records every launchUrl call without touching a real platform channel, so
 /// we can assert the geo: URI the card built without emulator-only intent
@@ -67,6 +70,16 @@ class _FakeUrlLauncher extends UrlLauncherPlatform
     launchedUrls.add(url);
     return true;
   }
+}
+
+/// Feeds a fixed profile into [activeProfileProvider] so the proximity bar's
+/// indicated radius (`approachRadiusKm`) is deterministic without booting the
+/// Hive-backed profile repository (#2661).
+class _StubActiveProfile extends ActiveProfile {
+  _StubActiveProfile(this._profile);
+  final UserProfile? _profile;
+  @override
+  UserProfile? build() => _profile;
 }
 
 const _pricedStation = Station(
@@ -269,15 +282,15 @@ void main() {
     });
   });
 
-  // --- #2633: swipe-to-page on the fallback path ----------------------------
-  group('TripRadarCard — swipe-to-page (#2633)', () {
+  // --- #2661: swipe-to-page distance pagination on the fallback path --------
+  group('TripRadarCard — swipe-to-page distance pagination (#2661)', () {
     List<Object> overridesFor(List<Station> candidates, FuelType fuel) => [
           effectiveApproachStateProvider.overrideWithValue(null),
           effectiveFuelTypeProvider.overrideWithValue(fuel),
           radarCandidateListProvider.overrideWith((ref) async => candidates),
         ];
 
-    testWidgets('swipe-LEFT ignores the current station + advances to next',
+    testWidgets('swipe-RIGHT pages to the FARTHER station (index + 1)',
         (tester) async {
       await pumpApp(
         tester,
@@ -288,12 +301,12 @@ void main() {
         ),
       );
 
-      // The first ranked station leads.
+      // The nearest (index 0) station leads.
       expect(find.text('Tankstelle Mitte'), findsOneWidget);
       expect(find.text(PriceFormatter.formatPrice(1.789)), findsOneWidget);
 
-      // Swipe LEFT (endToStart) → ignore + advance to the next candidate.
-      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      // Swipe RIGHT (startToEnd) → farther → the next candidate.
+      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
       await tester.pumpAndSettle();
 
       expect(find.text('Tankstelle Nord'), findsOneWidget);
@@ -301,7 +314,7 @@ void main() {
       expect(find.text('Tankstelle Mitte'), findsNothing);
     });
 
-    testWidgets('swipe-RIGHT restores the previously-ignored station',
+    testWidgets('swipe-LEFT pages back to the NEARER station (index - 1)',
         (tester) async {
       await pumpApp(
         tester,
@@ -312,19 +325,19 @@ void main() {
         ),
       );
 
-      // Advance once: Mitte → Nord.
-      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      // Advance once (right → farther): Mitte → Nord.
+      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
       await tester.pumpAndSettle();
       expect(find.text('Tankstelle Nord'), findsOneWidget);
 
-      // Swipe RIGHT (startToEnd) → restore the previously-ignored Mitte.
-      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+      // Swipe LEFT (endToStart) → nearer → back to Mitte.
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
       await tester.pumpAndSettle();
       expect(find.text('Tankstelle Mitte'), findsOneWidget);
       expect(find.text('Tankstelle Nord'), findsNothing);
     });
 
-    testWidgets('swipe-RIGHT with nothing ignored is a no-op',
+    testWidgets('swipe-LEFT at the nearest (index 0) is a no-op',
         (tester) async {
       await pumpApp(
         tester,
@@ -337,10 +350,32 @@ void main() {
 
       expect(find.text('Tankstelle Mitte'), findsOneWidget);
 
-      // Nothing ignored yet → swipe-right does nothing, still on Mitte.
-      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+      // Already nearest → swipe-left clamps to 0, still Mitte.
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
       await tester.pumpAndSettle();
       expect(find.text('Tankstelle Mitte'), findsOneWidget);
+    });
+
+    testWidgets('swipe-RIGHT at the farthest end clamps (no-op)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: overridesFor(
+          const [_pricedStation, _pricedStation2],
+          FuelType.e10,
+        ),
+      );
+
+      // Page to the farthest (Nord), then a further right-swipe is a no-op —
+      // never blank (#2661).
+      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Tankstelle Nord'), findsOneWidget);
+
+      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Tankstelle Nord'), findsOneWidget);
     });
 
     testWidgets('tap STILL launches the geo: URI after a swipe',
@@ -357,9 +392,9 @@ void main() {
         ),
       );
 
-      // Advance to Nord, then tap — the page-in-place must preserve the
-      // tap-to-navigate target.
-      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      // Page to Nord (right → farther), then tap — the page-in-place must
+      // preserve the tap-to-navigate target.
+      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
       await tester.pumpAndSettle();
       expect(find.text('Tankstelle Nord'), findsOneWidget);
 
@@ -369,13 +404,13 @@ void main() {
       expect(fake.launchedUrls, isNotEmpty);
       final launched = fake.launchedUrls.last;
       expect(launched, startsWith('geo:'));
-      // Nord's coords / brand, proving the advanced station is the tap target.
+      // Nord's coords / brand, proving the paged station is the tap target.
       expect(launched, contains('52.55'));
       expect(launched, contains(Uri.encodeComponent('Shell')));
     });
 
     testWidgets(
-        'Semantics exposes the ignore/show-previous customSemanticsActions',
+        'Semantics exposes the nearer/farther customSemanticsActions',
         (tester) async {
       await pumpApp(
         tester,
@@ -386,54 +421,74 @@ void main() {
         ),
       );
 
-      // Before any ignore: only the "Ignore this station" action exists.
+      // Both pagination actions are always available (clamped no-ops at the
+      // ends) — simpler than the conditional restore.
       Semantics semantics() => tester.widgetList<Semantics>(
             find.byType(Semantics),
           ).firstWhere(
             (s) => (s.properties.customSemanticsActions ?? {})
                 .keys
-                .any((a) => a.label == 'Ignore this station'),
+                .any((a) => a.label == 'Nearer station'),
           );
 
-      final actionsBefore =
-          semantics().properties.customSemanticsActions ?? {};
-      final labelsBefore = actionsBefore.keys.map((a) => a.label).toSet();
-      expect(labelsBefore, contains('Ignore this station'));
-      expect(labelsBefore, isNot(contains('Show previous station')));
-
-      // After ignoring one, the "Show previous station" action appears.
-      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
-      await tester.pumpAndSettle();
-
-      final actionsAfter =
-          semantics().properties.customSemanticsActions ?? {};
-      final labelsAfter = actionsAfter.keys.map((a) => a.label).toSet();
-      expect(labelsAfter, contains('Ignore this station'));
-      expect(labelsAfter, contains('Show previous station'));
+      final actions = semantics().properties.customSemanticsActions ?? {};
+      final labels = actions.keys.map((a) => a.label).toSet();
+      expect(labels, contains('Nearer station'));
+      expect(labels, contains('Farther station'));
     });
+  });
 
+  // --- #2661: corporate-green proximity fill bar ----------------------------
+  group('TripRadarCard — proximity fill bar (#2661)', () {
     testWidgets(
-        'exhausting the list keeps the last station + toasts "no other"',
+        'renders the fill bar with fill = 1 - d/r when a profile radius is set',
         (tester) async {
+      // 1 km radar radius; the candidate sits 0.4 km away (dist field) →
+      // fill = 1 - 400/1000 = 0.6.
+      const near = Station(
+        id: 'radar-near',
+        name: 'Nahe Tankstelle',
+        brand: 'Aral',
+        street: 'Weg',
+        postCode: '10115',
+        place: 'Berlin',
+        lat: 52.5,
+        lng: 13.4,
+        e10: 1.789,
+        isOpen: true,
+        dist: 0.4,
+      );
       await pumpApp(
         tester,
         const TripRadarCard(),
-        overrides: overridesFor(
-          const [_pricedStation, _pricedStation2],
-          FuelType.e10,
-        ),
+        overrides: [
+          effectiveApproachStateProvider.overrideWithValue(null),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+          radarCandidateListProvider.overrideWith((ref) async => const [near]),
+          activeProfileProvider.overrideWith(
+            () => _StubActiveProfile(
+              const UserProfile(id: 'p1', name: 'Test', approachRadiusKm: 1.0),
+            ),
+          ),
+        ],
       );
 
-      // Ignore both candidates: Mitte → Nord → exhausted.
-      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
-      await tester.pumpAndSettle();
-      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
-      await tester.pumpAndSettle();
+      final bar = tester.widget<ProximityFillBar>(find.byType(ProximityFillBar));
+      expect(bar.radiusMeters, 1000.0);
+      expect(bar.distanceMeters, 400.0);
+      expect(
+        ProximityFillBar.fillFor(bar.distanceMeters, bar.radiusMeters!),
+        closeTo(0.6, 1e-9),
+      );
+    });
 
-      // The "no other station nearby" toast fires (never blanks, #2583)...
-      expect(find.text('No other station nearby'), findsOneWidget);
-      // ...and the stack resets so the nearest station is shown again.
-      expect(find.text('Tankstelle Mitte'), findsOneWidget);
+    test('fill is 0 at the radius edge and 1 at the station', () {
+      // Pure math guard — no widget pump needed.
+      expect(ProximityFillBar.fillFor(1000, 1000), 0.0);
+      expect(ProximityFillBar.fillFor(0, 1000), 1.0);
+      // Beyond the edge clamps to 0; negative distance clamps to 1.
+      expect(ProximityFillBar.fillFor(2000, 1000), 0.0);
+      expect(ProximityFillBar.fillFor(250, 1000), closeTo(0.75, 1e-9));
     });
   });
 
