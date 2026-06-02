@@ -6457,6 +6457,15 @@ class AppLocalizationsNb extends AppLocalizations {
   String get trajetDetailShareError => 'Kunne ikke generere delbart bilde';
 
   @override
+  String get trajetDetailDownloadCsvOption => 'Download telemetry (CSV)';
+
+  @override
+  String get trajetDetailDownloadJsonOption => 'Download telemetry (JSON)';
+
+  @override
+  String get trajetDetailDownloadError => 'Couldn\'t save the file';
+
+  @override
   String get trajetDetailDeleteAction => 'Slett';
 
   @override

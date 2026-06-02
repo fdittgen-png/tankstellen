@@ -3691,5 +3691,20 @@
   "@obd2TestStatusFail": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "trajetDetailDownloadCsvOption": "Download telemetry (CSV)",
+  "@trajetDetailDownloadCsvOption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailDownloadJsonOption": "Download telemetry (JSON)",
+  "@trajetDetailDownloadJsonOption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailDownloadError": "Couldn't save the file",
+  "@trajetDetailDownloadError": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

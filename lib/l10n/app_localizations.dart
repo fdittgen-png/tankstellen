@@ -11349,6 +11349,24 @@ abstract class AppLocalizations {
   /// **'Couldn\'t generate share image'**
   String get trajetDetailShareError;
 
+  /// Menu option on the Trip detail share button (#2652). Selecting it serialises the trip's full OBD2 + GPS sample stream as a CSV file and saves it to the device's Downloads folder for spreadsheet / pandas analysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Download telemetry (CSV)'**
+  String get trajetDetailDownloadCsvOption;
+
+  /// Menu option on the Trip detail share button (#2652). Selecting it saves the trip in its persisted, re-importable JSON form to the device's Downloads folder for power users / backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Download telemetry (JSON)'**
+  String get trajetDetailDownloadJsonOption;
+
+  /// Snackbar shown when a trip-detail telemetry download (CSV / JSON) fails to write to the Downloads folder (#2652).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the file'**
+  String get trajetDetailDownloadError;
+
   /// AppBar action tooltip for the delete-trip button on the Trip detail screen (#890).
   ///
   /// In en, this message translates to:
