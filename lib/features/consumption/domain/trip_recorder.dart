@@ -49,6 +49,12 @@ class TripRecorder {
   double _idleSeconds = 0;
   double _fuelLiters = 0;
   bool _hadFuelRate = false;
+  // #2692 C4-E — last non-null fuel-rate reading, carried forward across a
+  // single transient null PID. The pre-fix "both endpoints non-null" gate
+  // zeroed the whole interval on any single null read (~11 % of intervals
+  // in the 77-trip backup), under-counting consumption. The existing
+  // `maxIntegrationGapSeconds` skip still bounds how far it carries.
+  double? _lastKnownFuelRate;
   DateTime? _startedAt;
   DateTime? _endedAt;
 
@@ -129,6 +135,9 @@ class TripRecorder {
 
     final previous = _previous;
     if (previous == null) {
+      // #2692 C4-E — seed the carry-forward latch from the first sample so a
+      // transient null on the very next sample still resolves a rate.
+      _lastKnownFuelRate = sample.fuelRateLPerHour ?? _lastKnownFuelRate;
       _previous = sample;
       return;
     }
@@ -168,14 +177,19 @@ class TripRecorder {
       _idleSeconds += dt;
     }
 
-    // Fuel: integrate fuel rate across the interval. Only counts when
-    // BOTH endpoints carry a fuel-rate reading (average the two).
-    if (previous.fuelRateLPerHour != null && sample.fuelRateLPerHour != null) {
-      final avgRate =
-          (previous.fuelRateLPerHour! + sample.fuelRateLPerHour!) / 2.0;
+    // Fuel: integrate fuel rate across the interval. #2692 C4-E — resolve
+    // each endpoint to its own reading or, failing that, the last non-null
+    // rate carried forward (a single transient null PID no longer zeroes the
+    // interval). Both ends must resolve before we integrate; the
+    // `maxIntegrationGapSeconds` skip above bounds how far a stale rate rides.
+    final pRate = previous.fuelRateLPerHour ?? _lastKnownFuelRate;
+    final cRate = sample.fuelRateLPerHour ?? _lastKnownFuelRate;
+    if (pRate != null && cRate != null) {
+      final avgRate = (pRate + cRate) / 2.0;
       _fuelLiters += avgRate * dt / 3600.0;
       _hadFuelRate = true;
     }
+    _lastKnownFuelRate = sample.fuelRateLPerHour ?? _lastKnownFuelRate;
 
     _previous = sample;
   }
@@ -251,6 +265,7 @@ class TripRecorder {
     _harshDetector.reset();
     _fuelLiters = 0;
     _hadFuelRate = false;
+    _lastKnownFuelRate = null;
     _startedAt = null;
     _endedAt = null;
     _minCoolantTempC = null;
