@@ -6604,6 +6604,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fuelStationRadarFarther => 'Farther station';
 
   @override
+  String get fuelStationRadarButtonTooltip => 'Search with Fuel Station Radar';
+
+  @override
+  String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Nålning håller skärmen på – förbrukar mer batteri';
 

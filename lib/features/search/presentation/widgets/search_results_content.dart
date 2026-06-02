@@ -4,12 +4,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../domain/entities/search_mode.dart';
+import '../../domain/entities/search_result_item.dart';
+import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import 'nearest_shortcut_card.dart';
@@ -42,6 +45,27 @@ class SearchResultsContent extends ConsumerWidget {
     if (searchMode == SearchMode.route) {
       return const CustomScrollView(
         slivers: [RouteResultsView()],
+      );
+    }
+
+    // #2675 — when the on-search Fuel Station Radar is active it OWNS the
+    // results list (mirrors the route early-return above): its
+    // distance-sorted, priced stations are wrapped as FuelStationResult into
+    // a cache-sourced ServiceResult and handed to the same SearchResultsList,
+    // so the polymorphic switch renders them as ordinary fuel cards. The
+    // regular searchStateProvider is left untouched — dismissing the radar
+    // hands the list straight back to it.
+    final radar = ref.watch(radarSearchProvider);
+    if (radar.active) {
+      final stations = radar.stations.value ?? const [];
+      final radarResult = ServiceResult<List<SearchResultItem>>(
+        data: [for (final s in stations) FuelStationResult(s)],
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+      return SearchResultsList(
+        result: radarResult,
+        onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
       );
     }
 

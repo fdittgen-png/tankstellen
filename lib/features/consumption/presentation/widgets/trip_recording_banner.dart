@@ -13,6 +13,8 @@ import '../../../profile/providers/effective_fuel_type_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
+import '../../../search/providers/radar_search_provider.dart';
+import '../../../search/providers/search_filters_provider.dart';
 import '../../domain/driving_coaching.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/obd2_connection_state_provider.dart';
@@ -23,6 +25,7 @@ import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
 import 'trip_recording_banner_content.dart';
 import 'trip_recording_banner_palette.dart';
+import 'trip_recording_pip_price_layout.dart';
 import 'trip_recording_pip_view.dart';
 
 /// Persistent indicator of an active OBD2 trip (#726 + #768).
@@ -64,6 +67,22 @@ class TripRecordingBanner extends ConsumerWidget {
         final p = ref.watch(activeProfileProvider);
         if (p != null) radiusMeters = p.approachRadiusKm * 1000.0;
       } on Object { /* no radius */ }
+      // #2677 — guarded fallback for the on-search Fuel Station Radar PiP
+      // (no trip required): when the trip radar found nothing AND the
+      // on-search radar is active, feed its nearest priced station into the
+      // SAME price layout (the search radius is the proximity bar's radius).
+      // Reuses TripRecordingPipPriceLayout + fuelStationRadarPalette unchanged
+      // — no parallel PiP host.
+      var searchRadarActive = false;
+      if (radarStation == null) {
+        try {
+          if (ref.watch(radarSearchProvider).active) {
+            searchRadarActive = true;
+            radarStation = ref.watch(radarSearchNearestProvider);
+            radiusMeters = ref.watch(searchRadiusProvider) * 1000.0;
+          }
+        } on Object { /* no on-search radar */ }
+      }
       return _pipView(
         context,
         state,
@@ -71,6 +90,7 @@ class TripRecordingBanner extends ConsumerWidget {
         fuelType: fuel,
         radarStation: radarStation,
         radiusMeters: radiusMeters,
+        searchRadarActive: searchRadarActive,
       );
     }
 
@@ -164,8 +184,28 @@ class TripRecordingBanner extends ConsumerWidget {
     required FuelType fuelType,
     required Station? radarStation,
     required double? radiusMeters,
+    bool searchRadarActive = false,
   }) {
     if (!state.isActive) {
+      // #2677 — the on-search Fuel Station Radar runs WITHOUT a trip. When it
+      // owns the PiP tile and has a nearest priced station, render the SAME
+      // price layout (no trip state needed — the layout is paint-only) instead
+      // of the neutral panel. Reuses TripRecordingPipPriceLayout +
+      // fuelStationRadarPalette unchanged.
+      if (searchRadarActive && radarStation != null) {
+        final palette = fuelStationRadarPalette(fuelType);
+        return TripRecordingPipPriceLayout(
+          station: radarStation,
+          fuel: fuelType,
+          backgroundColor: palette.background,
+          foregroundColor: palette.foreground,
+          distanceMeters: radarStation.dist > 0
+              ? radarStation.dist * 1000.0
+              : null,
+          kmCaption: true,
+          radiusMeters: radiusMeters,
+        );
+      }
       // A trip ended while the app sat in PiP — the OS restores the
       // full window momentarily; a neutral panel avoids flashing the
       // shell (and its nav bar) back into the tile in the meantime.
