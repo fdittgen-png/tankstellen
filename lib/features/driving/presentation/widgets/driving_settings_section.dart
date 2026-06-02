@@ -21,6 +21,7 @@ import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
 import '../../../profile/providers/voice_announcements_enabled_provider.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
 import '../../providers/voice_announcement_settings_provider.dart';
+import '../../providers/voice_coaching_enabled_provider.dart';
 
 /// Consumption / driving settings group on the profile screen.
 ///
@@ -123,6 +124,11 @@ class DrivingSettingsSection extends ConsumerWidget {
               : null,
           contentPadding: EdgeInsets.zero,
         ),
+        // #2663 — spoken driving coaching (hard accel, harsh braking, gear
+        // hints). Default ON and decoupled from any Feature flag — it works
+        // in OBD2 *and* GPS-only trips and is unrelated to the station
+        // overlay. Always visible so the user can mute it.
+        const _VoiceCoachingToggleTile(),
         if (ref.watch(glideCoachEnabledProvider))
           const _GlideCoachToggleTile(),
         // #2569 — spoken nearby-cheap-fuel announcements. Visible only
@@ -196,6 +202,37 @@ class _GlideCoachToggleTile extends ConsumerWidget {
       onChanged: (v) => ref
           .read(glideCoachSettingsProvider.notifier)
           .setEnabled(v),
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+}
+
+/// Spoken-driving-coaching toggle (#2663).
+///
+/// Always rendered in the coaching group — spoken cues (hard acceleration,
+/// harsh braking, shift hints) work in both OBD2 and GPS-only trips and are
+/// not gated by any `Feature` flag. Default ON; this is the user's single
+/// mute switch. Backed by [voiceCoachingEnabledProvider].
+class _VoiceCoachingToggleTile extends ConsumerWidget {
+  const _VoiceCoachingToggleTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final enabled = ref.watch(voiceCoachingEnabledProvider);
+    return SwitchListTile(
+      key: const Key('voiceCoachingToggle'),
+      value: enabled,
+      title: Text(l?.voiceCoachingSettingTitle ?? 'Spoken driving coaching'),
+      subtitle: Text(
+        l?.voiceCoachingSettingSubtitle ??
+            'Hear spoken tips while you drive — hard acceleration, harsh '
+                'braking and gear hints',
+        style: theme.textTheme.bodySmall,
+      ),
+      onChanged: (v) =>
+          ref.read(voiceCoachingEnabledProvider.notifier).setEnabled(v),
       contentPadding: EdgeInsets.zero,
     );
   }

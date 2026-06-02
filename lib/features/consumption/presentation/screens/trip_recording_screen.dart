@@ -16,6 +16,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/haptic_eco_coach.dart';
+import '../../../driving/providers/driving_coach_voice_listener_provider.dart';
 import '../../../driving/providers/haptic_eco_coach_provider.dart';
 import '../../../driving/providers/voice_announcement_listener_provider.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -634,6 +635,15 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     // but its internal `ref.listen` fires only while the provider itself
     // has a live watcher — so we `watch` (not `read`) it here.
     ref.watch(voiceAnnouncementListenerProvider);
+
+    // #2663 — keep the driving-coach voice listener mounted while this
+    // screen is up. Like the announcement listener it is keepAlive +
+    // self-gating (subscribes to the live harsh-event bus and coaching-hint
+    // transitions only while the `voiceCoaching` toggle is on), and its
+    // internal subscriptions fire only while the provider has a live
+    // watcher — so we `watch` (not `read`) it here. This is the missing
+    // event→coach→speak wire: before it, every driving cue was silent.
+    ref.watch(drivingCoachVoiceListenerProvider);
 
     // #2274 concern 1 — the screen may have mounted in the connecting
     // phase (concern 2) before any trip was active, so the initState
