@@ -19,8 +19,10 @@ library;
 
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
+import '../../station_detail/domain/opening_hours.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
+import 'chile_opening_hours_adapter.dart';
 
 /// CNE product keys → our canonical [FuelType].
 ///
@@ -129,6 +131,13 @@ Station? _parseOneStation(
   // Stable 'cl-' prefix so the favorites currency lookup finds CL.
   final id = idRaw.startsWith('cl-') ? idRaw : 'cl-$idRaw';
 
+  // Structured weekly hours from the CNE `horario_atencion` field (Epic
+  // #2707 C8, #2715). ADDITIVE: the boolean `isOpen` derivation below is
+  // unchanged. `notProvided` → carry null so the no-data UI path stays
+  // uniform.
+  final weeklyHours =
+      const ChileOpeningHoursAdapter().parse(raw['horario_atencion']);
+
   return Station(
     id: id,
     name: name,
@@ -144,6 +153,10 @@ Station? _parseOneStation(
     diesel: prices[FuelType.diesel],
     lpg: prices[FuelType.lpg],
     isOpen: _isOpen(raw),
+    openingHours:
+        weeklyHours.availability == OpeningHoursAvailability.notProvided
+            ? null
+            : weeklyHours,
   );
 }
 
