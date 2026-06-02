@@ -31,10 +31,19 @@ part of 'nearest_station_radar_provider.dart';
 ///   skipped so the card only ever surfaces a station the driver can
 ///   actually price-compare — never a `--` placeholder price.
 ///
-/// The lookup mirrors the detector's own `fetchStations` callback
-/// ([approachStateProvider]) — same `searchStations` chain, same
-/// effective fuel type — so the price column the card reads matches
-/// what the in-radius layout would show.
+/// ### Data source (#2664)
+///
+/// The lookup routes through the cache-first [fuelStationRadarProvider] —
+/// the SAME three-tier engine the in-radius detector uses
+/// (`approach_state_provider.dart`): tier-1 cached corridor LOCATIONS
+/// (zero network inside a covered tile / a bulk-file country) + tier-3
+/// JIT price for only the imminent station(s). It runs at the user's
+/// **default radar radius** (`profile.approachRadiusKm`, the same radius
+/// the trip detector geofences against), not a hard-coded 10 km — so a
+/// warm corridor tile costs zero station-network calls and at most one
+/// JIT price per imminent station instead of re-pricing a whole 10 km
+/// set on every poll. The price column the card reads therefore matches
+/// exactly what the in-radius layout would show.
 
 @ProviderFor(nearestStationRadar)
 final nearestStationRadarProvider = NearestStationRadarProvider._();
@@ -62,10 +71,19 @@ final nearestStationRadarProvider = NearestStationRadarProvider._();
 ///   skipped so the card only ever surfaces a station the driver can
 ///   actually price-compare — never a `--` placeholder price.
 ///
-/// The lookup mirrors the detector's own `fetchStations` callback
-/// ([approachStateProvider]) — same `searchStations` chain, same
-/// effective fuel type — so the price column the card reads matches
-/// what the in-radius layout would show.
+/// ### Data source (#2664)
+///
+/// The lookup routes through the cache-first [fuelStationRadarProvider] —
+/// the SAME three-tier engine the in-radius detector uses
+/// (`approach_state_provider.dart`): tier-1 cached corridor LOCATIONS
+/// (zero network inside a covered tile / a bulk-file country) + tier-3
+/// JIT price for only the imminent station(s). It runs at the user's
+/// **default radar radius** (`profile.approachRadiusKm`, the same radius
+/// the trip detector geofences against), not a hard-coded 10 km — so a
+/// warm corridor tile costs zero station-network calls and at most one
+/// JIT price per imminent station instead of re-pricing a whole 10 km
+/// set on every poll. The price column the card reads therefore matches
+/// exactly what the in-radius layout would show.
 
 final class NearestStationRadarProvider
     extends
@@ -94,10 +112,19 @@ final class NearestStationRadarProvider
   ///   skipped so the card only ever surfaces a station the driver can
   ///   actually price-compare — never a `--` placeholder price.
   ///
-  /// The lookup mirrors the detector's own `fetchStations` callback
-  /// ([approachStateProvider]) — same `searchStations` chain, same
-  /// effective fuel type — so the price column the card reads matches
-  /// what the in-radius layout would show.
+  /// ### Data source (#2664)
+  ///
+  /// The lookup routes through the cache-first [fuelStationRadarProvider] —
+  /// the SAME three-tier engine the in-radius detector uses
+  /// (`approach_state_provider.dart`): tier-1 cached corridor LOCATIONS
+  /// (zero network inside a covered tile / a bulk-file country) + tier-3
+  /// JIT price for only the imminent station(s). It runs at the user's
+  /// **default radar radius** (`profile.approachRadiusKm`, the same radius
+  /// the trip detector geofences against), not a hard-coded 10 km — so a
+  /// warm corridor tile costs zero station-network calls and at most one
+  /// JIT price per imminent station instead of re-pricing a whole 10 km
+  /// set on every poll. The price column the card reads therefore matches
+  /// exactly what the in-radius layout would show.
   NearestStationRadarProvider._()
     : super(
         from: null,
@@ -124,4 +151,4 @@ final class NearestStationRadarProvider
 }
 
 String _$nearestStationRadarHash() =>
-    r'04dd547eb264fa9dd992356631288e17eb4666fb';
+    r'db89908c8f773bb6ade53920cde57bebc6689f08';

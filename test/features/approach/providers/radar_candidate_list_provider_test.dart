@@ -9,19 +9,19 @@ import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
-import 'package:tankstellen/features/approach/providers/nearest_station_radar_provider.dart';
+import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
-/// #2664 — the nearest-station radar fallback routes through the cache-first
+/// #2664 — the swipe-to-page candidate list routes through the cache-first
 /// [FuelStationRadar] at the user's **default radar radius**
 /// (`profile.approachRadiusKm`), NOT a hard-coded 10 km, and NOT the search
-/// chain directly. It keeps the #2583 priced-only contract: surface the
-/// nearest station carrying a non-null, positive price for the effective fuel,
-/// skipping any nearer-but-unpriced station rather than showing a `--` price.
+/// chain directly. It keeps the #2633/#2583 contract: the FULL distance-ranked
+/// set filtered to stations carrying a non-null, positive price for the
+/// effective fuel, and `const []` for any non-[ApproachPolling] state.
 
 /// Sentinel distinguishing "approach arg not passed" (use the default polling
 /// fix) from an explicit `null` override (no GPS fix yet).
@@ -65,7 +65,6 @@ const _profile = UserProfile(
   id: 'p1',
   name: 'Test Driver',
   // Default radar radius — the value the trip detector geofences against.
-  // The provider must pass THIS to `fetchStations`, never a hard-coded 10 km.
   approachRadiusKm: 1.5,
   approachMinPollSeconds: 5,
 );
@@ -141,7 +140,7 @@ void main() {
       final container = _container(radar: radar);
       addTearDown(container.dispose);
 
-      await container.read(nearestStationRadarProvider.future);
+      await container.read(radarCandidateListProvider.future);
 
       expect(radar.radiusCalls, [1.5],
           reason: 'fetchStations is called ONCE at the default radar radius '
@@ -165,8 +164,8 @@ void main() {
           fetchCorridor: (lat, lng, r) async {
             corridorCalls++;
             return [
-              _station('NEAR', lat: lat, lng: lng), // ~0 m — imminent
-              _station('FAR', lat: lat + 0.05, lng: lng), // ~5.5 km — corridor
+              _station('NEAR', lat: lat, lng: lng, e10: 1.5), // imminent+priced
+              _station('FAR', lat: lat + 0.05, lng: lng), // ~5.5 km corridor
             ];
           },
         ),
@@ -180,101 +179,90 @@ void main() {
       final container = _container(radar: radar);
       addTearDown(container.dispose);
 
-      // First poll seeds the corridor + JIT-prices the imminent station.
-      final first = await container.read(nearestStationRadarProvider.future);
-      expect(first?.id, 'NEAR');
+      final first = await container.read(radarCandidateListProvider.future);
+      // Only the imminent NEAR station is priced; FAR stays location-only and
+      // is filtered out of the page-set.
+      expect(first.map((s) => s.id), ['NEAR']);
       expect(corridorCalls, 1, reason: '≤1 corridor fetch per poll');
       expect(priceCalls, 1, reason: '≤1 JIT price per imminent station');
 
       // A second poll at the same spot is a pure cache hit: NO new corridor
       // fetch (warm tile → zero station-network calls), price deduped in TTL.
-      container.invalidate(nearestStationRadarProvider);
-      await container.read(nearestStationRadarProvider.future);
+      container.invalidate(radarCandidateListProvider);
+      await container.read(radarCandidateListProvider.future);
       expect(corridorCalls, 1,
           reason: 'warm corridor tile → zero station-network re-query');
       expect(priceCalls, 1, reason: 'JIT price deduped within TTL');
     });
   });
 
-  group('priced-only nearest contract preserved (#2583)', () {
-    test('skips the nearer UNPRICED station and returns the nearest PRICED one',
+  group('distance-ranked priced page-set preserved (#2633/#2583)', () {
+    test('returns the FULL priced set, distance-sorted from the live fix',
         () async {
-      // The nearest (lat 48.0) has no e10 price; the next is farther but priced.
+      // Fed out of distance order and with one unpriced station mixed in.
       final radar = _CapturingRadar([
+        _station('FAR_PRICED', lat: 48.03, lng: 2.0, e10: 1.5),
         _station('NEAR_UNPRICED', lat: 48.0, lng: 2.0, diesel: 1.65),
-        _station('FAR_PRICED', lat: 48.01, lng: 2.0, e10: 1.789),
+        _station('MID_PRICED', lat: 48.01, lng: 2.0, e10: 1.6),
       ]);
       final container = _container(radar: radar);
       addTearDown(container.dispose);
 
-      final out = await container.read(nearestStationRadarProvider.future);
-      expect(out, isNotNull);
-      expect(out!.id, 'FAR_PRICED',
-          reason: 'unpriced nearest is skipped for the nearest priced station');
+      final out = await container.read(radarCandidateListProvider.future);
+      expect(out.map((s) => s.id), ['MID_PRICED', 'FAR_PRICED'],
+          reason: 'distance-sorted, unpriced dropped (#2583), full set (#2633)');
     });
 
-    test('returns null when NO station in range is priced for the fuel',
-        () async {
+    test('empty when no station in range is priced for the fuel', () async {
       final radar = _CapturingRadar([
         _station('A', lat: 48.0, lng: 2.0, diesel: 1.65),
-        _station('B', lat: 48.02, lng: 2.0, diesel: 1.70),
+        _station('B', lat: 48.02, lng: 2.0, e10: 0), // non-positive → unpriced
       ]);
       final container = _container(radar: radar, fuel: FuelType.e10);
       addTearDown(container.dispose);
 
-      final out = await container.read(nearestStationRadarProvider.future);
-      expect(out, isNull,
-          reason: 'none priced for e10 → genuine "no station nearby"');
-    });
-
-    test('treats a non-positive price as unpriced (<= 0 skipped)', () async {
-      final radar = _CapturingRadar([
-        _station('ZERO', lat: 48.0, lng: 2.0, e10: 0),
-        _station('REAL', lat: 48.005, lng: 2.0, e10: 1.5),
-      ]);
-      final container = _container(radar: radar);
-      addTearDown(container.dispose);
-
-      final out = await container.read(nearestStationRadarProvider.future);
-      expect(out!.id, 'REAL', reason: 'a <= 0 price counts as no price');
-    });
-
-    test('returns the nearest priced station, sorted by distance from the fix',
-        () async {
-      // Fed out of distance order — the provider must distance-sort the cached
-      // corridor set against the live fix before picking the nearest priced.
-      final radar = _CapturingRadar([
-        _station('FAR_PRICED', lat: 48.03, lng: 2.0, e10: 1.5),
-        _station('NEAR_PRICED', lat: 48.0, lng: 2.0, e10: 1.6),
-      ]);
-      final container = _container(radar: radar);
-      addTearDown(container.dispose);
-
-      final out = await container.read(nearestStationRadarProvider.future);
-      expect(out!.id, 'NEAR_PRICED');
+      final out = await container.read(radarCandidateListProvider.future);
+      expect(out, isEmpty);
     });
   });
 
-  test('non-polling approach state → null (fallback stays out of the way)',
+  test('non-polling approach state → const [] (page-set stays out of the way)',
       () async {
     final radar = _CapturingRadar([_station('X', e10: 1.5)]);
     final container = _container(radar: radar, approach: null);
     addTearDown(container.dispose);
 
-    final out = await container.read(nearestStationRadarProvider.future);
-    expect(out, isNull);
+    final out = await container.read(radarCandidateListProvider.future);
+    expect(out, isEmpty);
     expect(radar.radiusCalls, isEmpty,
         reason: 'no radar query for a non-polling state');
   });
 
-  test('null profile → null (no radar query without a default radius)',
+  test('in-radius approach state → const [] (single locked target renders)',
+      () async {
+    final radar = _CapturingRadar([_station('X', e10: 1.5)]);
+    final container = _container(
+      radar: radar,
+      approach: ApproachInRadius(
+        station: _station('LOCKED', e10: 1.4),
+        distanceMeters: 500,
+      ),
+    );
+    addTearDown(container.dispose);
+
+    final out = await container.read(radarCandidateListProvider.future);
+    expect(out, isEmpty);
+    expect(radar.radiusCalls, isEmpty);
+  });
+
+  test('null profile → const [] (no radar query without a default radius)',
       () async {
     final radar = _CapturingRadar([_station('X', e10: 1.5)]);
     final container = _container(radar: radar, profile: null);
     addTearDown(container.dispose);
 
-    final out = await container.read(nearestStationRadarProvider.future);
-    expect(out, isNull);
+    final out = await container.read(radarCandidateListProvider.future);
+    expect(out, isEmpty);
     expect(radar.radiusCalls, isEmpty);
   });
 }
