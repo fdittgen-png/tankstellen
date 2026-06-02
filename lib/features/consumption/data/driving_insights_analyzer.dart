@@ -329,6 +329,23 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
     ));
   }
 
+  // Stop-and-go restart cost line (#2694 C8). Counts genuine
+  // stop→accelerate restarts (distinguished from a rolling start) and
+  // attributes the extra litres of accelerating a stopped car from rest.
+  final restart = detectRestartCost(sorted);
+  if (restart.restartLiters >= _noiseFloorLiters) {
+    candidates.add(DrivingInsight(
+      labelKey: 'insightRestartCost',
+      litersWasted: restart.restartLiters,
+      // percentOfTrip is not meaningful for a count-based category; the
+      // metadata carries the restart count for the subtitle.
+      percentOfTrip: 0,
+      metadata: {
+        'restartCount': restart.restartCount,
+      },
+    ));
+  }
+
   // Sort by wasted litres descending and cap at [_topN].
   candidates.sort((a, b) => b.litersWasted.compareTo(a.litersWasted));
   if (candidates.length <= _topN) return candidates;

@@ -85,6 +85,18 @@ peak confident grade for the subtitle. The detector is a pure helper,
 `lib/features/consumption/domain/climb_restart_detector.dart`, so the
 analyzer stays under its line guard.
 
+### Stop-and-go restart cost (`labelKey: insightRestartCost`, #2694 C8)
+
+Counts genuine stop→accelerate **restarts** — the car drops below the
+stop threshold (**1.5 km/h**) and then recovers past the restart
+threshold (**12 km/h**). The restart speed threshold distinguishes a
+real pull-away from a brief creep, and a `wasStopped` latch counts each
+restart once rather than per accelerating sample. Each restart is
+attributed a flat **0.04 L** — pulling a stopped car back up to speed is
+the thirstiest part of stop-and-go traffic. The `metadata.restartCount`
+carries the count for the subtitle. Lives in the same pure helper as the
+climb detector.
+
 ## Noise floor
 
 Categories below **0.05 L** are dropped — they're indistinguishable

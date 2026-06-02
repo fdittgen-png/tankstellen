@@ -5,10 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/climb_restart_detector.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
-/// #2693 C6 — pure climb detection. The climb detector recomputes
-/// confident road grade with the SAME RoadGradeCalculator config the live
-/// folder uses (150 m / 0.2 / 5) and attributes the extra fuel. (#2694 C8
-/// adds the stop-and-go-restart detector + its tests.)
+/// #2693 C6 / #2694 C8 — pure climb + stop-and-go-restart detection. The
+/// climb detector recomputes confident road grade with the SAME
+/// RoadGradeCalculator config the live folder uses (150 m / 0.2 / 5) and
+/// attributes the extra fuel; the restart detector counts genuine
+/// stop→accelerate restarts (distinguished from a rolling start).
 void main() {
   final start = DateTime.utc(2026);
 
@@ -67,6 +68,69 @@ void main() {
 
     test('fewer than two samples → none', () {
       expect(detectClimbCost(const []), ClimbCostResult.none);
+    });
+  });
+
+  group('#2694 C8 detectRestartCost', () {
+    List<TripSample> stopGoStream(int restarts) {
+      final samples = <TripSample>[];
+      var t = start;
+      for (var r = 0; r < restarts; r++) {
+        // stopped
+        for (var i = 0; i < 3; i++) {
+          samples.add(TripSample(timestamp: t, speedKmh: 0, rpm: 800));
+          t = t.add(const Duration(seconds: 1));
+        }
+        // accelerate away past the restart threshold
+        for (final v in [5.0, 15.0, 30.0]) {
+          samples.add(TripSample(timestamp: t, speedKmh: v, rpm: 2500));
+          t = t.add(const Duration(seconds: 1));
+        }
+      }
+      return samples;
+    }
+
+    test('N stop→accelerate restarts → restartCount == N', () {
+      final result = detectRestartCost(stopGoStream(4));
+      expect(result.restartCount, 4);
+      expect(result.restartLiters, greaterThan(0));
+    });
+
+    test('a rolling start that never fully stops → no restart', () {
+      final samples = <TripSample>[
+        for (var i = 0; i < 10; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: 20 + i * 2, // 20 → 38 km/h, never stops
+            rpm: 2000,
+          ),
+      ];
+      expect(detectRestartCost(samples).restartCount, 0);
+    });
+
+    test('a stop with only a brief creep (below restart speed) → no restart',
+        () {
+      final samples = <TripSample>[
+        TripSample(timestamp: start, speedKmh: 0, rpm: 800),
+        TripSample(
+            timestamp: start.add(const Duration(seconds: 1)),
+            speedKmh: 0,
+            rpm: 800),
+        // creep forward but never past the 12 km/h restart threshold
+        TripSample(
+            timestamp: start.add(const Duration(seconds: 2)),
+            speedKmh: 4,
+            rpm: 1000),
+        TripSample(
+            timestamp: start.add(const Duration(seconds: 3)),
+            speedKmh: 6,
+            rpm: 1000),
+      ];
+      expect(detectRestartCost(samples).restartCount, 0);
+    });
+
+    test('fewer than two samples → none', () {
+      expect(detectRestartCost(const []), RestartCostResult.none);
     });
   });
 }

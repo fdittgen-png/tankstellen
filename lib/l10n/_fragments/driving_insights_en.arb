@@ -169,5 +169,21 @@
   "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
   "@lessonAdviceClimbingCost": {
     "description": "How-to-improve advice for the climbing-fuel lesson (#2693 C6). Embedded in the GPX recording export."
+  },
+  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "@insightRestartCost": {
+    "description": "Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "@lessonAdviceRestartCost": {
+    "description": "How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export."
   }
 }

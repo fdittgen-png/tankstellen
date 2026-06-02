@@ -557,4 +557,50 @@ void main() {
       expect(find(analyzeTrip(climb(0.0)), 'insightClimbingCost'), isNull);
     });
   });
+
+  group('#2694 C8 — stop-and-go restart insight', () {
+    final start = DateTime.utc(2026);
+
+    DrivingInsight? find(List<DrivingInsight> list, String key) {
+      for (final i in list) {
+        if (i.labelKey == key) return i;
+      }
+      return null;
+    }
+
+    List<TripSample> stopGo(int restarts) {
+      final samples = <TripSample>[];
+      var t = start;
+      for (var r = 0; r < restarts; r++) {
+        for (var i = 0; i < 3; i++) {
+          samples.add(TripSample(timestamp: t, speedKmh: 0, rpm: 800));
+          t = t.add(const Duration(seconds: 1));
+        }
+        for (final v in [5.0, 15.0, 30.0]) {
+          samples.add(TripSample(timestamp: t, speedKmh: v, rpm: 2500));
+          t = t.add(const Duration(seconds: 1));
+        }
+      }
+      return samples;
+    }
+
+    test('several restarts surface an insightRestartCost with the count', () {
+      final insight = find(analyzeTrip(stopGo(3)), 'insightRestartCost');
+      expect(insight, isNotNull);
+      expect(insight!.metadata['restartCount'], 3);
+      expect(insight.litersWasted, greaterThan(0));
+    });
+
+    test('a steady cruise (no stops) raises NO restart insight', () {
+      final samples = <TripSample>[
+        for (var i = 0; i <= 30; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: 80,
+            rpm: 2000,
+          ),
+      ];
+      expect(find(analyzeTrip(samples), 'insightRestartCost'), isNull);
+    });
+  });
 }

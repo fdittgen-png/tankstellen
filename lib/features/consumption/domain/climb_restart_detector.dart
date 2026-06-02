@@ -3,14 +3,15 @@
 
 /// Pure climb + stop-and-go-restart detection over a trip's [TripSample]
 /// stream, extracted from `driving_insights_analyzer.dart` so the analyzer
-/// stays under its 400-line guard (#2693 C6 climb; #2694 C8 adds restart).
+/// stays under its 400-line guard (#2693 C6 climb; #2694 C8 restart).
 ///
 /// The climb detector folds the samples ONCE, recomputing road grade inline
 /// with the IDENTICAL [RoadGradeCalculator] configuration the live GPS
 /// folder uses (`gps_live_estimate_folder.dart`: 150 m window / 0.2
 /// smoothing / minSamplesInWindow 5) and the SAME `speedMps · dt` distance
 /// integral, so the post-trip figure lines up with what the live estimator
-/// saw.
+/// saw. The restart detector counts speed zero-crossings (stop→accelerate)
+/// distinguished from a rolling start that never fully stopped.
 ///
 /// The counterfactual model is documented in
 /// `docs/guides/driving-insights.md`. Numbers are intentionally rough —
@@ -33,6 +34,18 @@ const double _climbCounterfactualRatio = 0.7;
 /// (GPS-only / no fuel PID) — a moderately high load figure.
 const double _climbFallbackLPerHour = 9.0;
 
+/// Speed (km/h) below which the car is considered stopped for restart
+/// detection — absorbs GPS / wheel-speed jitter around a standstill.
+const double _stopSpeedKmh = 1.5;
+
+/// Speed (km/h) a restart must reach after a stop to count as a genuine
+/// stop→accelerate restart (distinguishes it from a brief roll / creep).
+const double _restartSpeedKmh = 12.0;
+
+/// Estimated extra litres burned per stop-and-go restart — accelerating a
+/// stopped car from rest is the costliest part of stop-and-go traffic.
+const double _wastedLitersPerRestart = 0.04;
+
 /// Outcome of [detectClimbCost]: the litres of fuel attributable to
 /// climbing, the seconds spent on a confident climb, and the peak confident
 /// grade as a percentage (for the insight subtitle / metadata).
@@ -49,6 +62,21 @@ class ClimbCostResult {
 
   static const ClimbCostResult none =
       ClimbCostResult(climbingLiters: 0, climbSeconds: 0, peakGradePercent: 0);
+}
+
+/// Outcome of [detectRestartCost]: the number of stop→accelerate restarts
+/// and the litres attributable to them.
+class RestartCostResult {
+  const RestartCostResult({
+    required this.restartCount,
+    required this.restartLiters,
+  });
+
+  final int restartCount;
+  final double restartLiters;
+
+  static const RestartCostResult none =
+      RestartCostResult(restartCount: 0, restartLiters: 0);
 }
 
 /// Recompute confident road grade over [sortedSamples] (must be sorted by
@@ -97,5 +125,32 @@ ClimbCostResult detectClimbCost(List<TripSample> sortedSamples) {
     climbingLiters: climbingLiters,
     climbSeconds: climbSeconds,
     peakGradePercent: peakGradePercent,
+  );
+}
+
+/// Count stop→accelerate restarts (speed zero-crossings that recover past
+/// [_restartSpeedKmh], distinguished from a rolling start that never fully
+/// stopped) over [sortedSamples] and attribute the extra fuel. Pure.
+RestartCostResult detectRestartCost(List<TripSample> sortedSamples) {
+  if (sortedSamples.length < 2) return RestartCostResult.none;
+
+  var restartCount = 0;
+  // The car must come to a stop (below _stopSpeedKmh) and then climb back
+  // above _restartSpeedKmh to count one restart. `wasStopped` latches the
+  // stop so a single restart is counted once, not per accelerating sample.
+  var wasStopped = sortedSamples.first.speedKmh <= _stopSpeedKmh;
+
+  for (final s in sortedSamples.skip(1)) {
+    if (s.speedKmh <= _stopSpeedKmh) {
+      wasStopped = true;
+    } else if (wasStopped && s.speedKmh >= _restartSpeedKmh) {
+      restartCount++;
+      wasStopped = false;
+    }
+  }
+
+  return RestartCostResult(
+    restartCount: restartCount,
+    restartLiters: restartCount * _wastedLitersPerRestart,
   );
 }
