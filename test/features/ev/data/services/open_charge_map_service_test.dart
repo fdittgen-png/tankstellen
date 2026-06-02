@@ -1,11 +1,19 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/ev/data/services/open_charge_map_service.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/ev_access_cost.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
+
+class _MockDio extends Mock implements Dio {}
 
 /// Recording fake that captures every fetchStations call so the test can
 /// assert the wrapping [OpenChargeMapService] forwards parameters
@@ -25,6 +33,22 @@ class _RecordingFallback implements EvStationService {
     calls.add((lat: centerLat, lng: centerLng, radius: radiusKm));
     return response;
   }
+}
+
+/// Dio whose `get` replays the recorded OCM `/poi/` fixture verbatim.
+_MockDio _fixtureDio() {
+  final raw = File('test/fixtures/ocm_poi_response.json').readAsStringSync();
+  final data = jsonDecode(raw) as List<dynamic>;
+  final dio = _MockDio();
+  when(() => dio.get<dynamic>(
+        any(),
+        queryParameters: any(named: 'queryParameters'),
+      )).thenAnswer((_) async => Response<dynamic>(
+        requestOptions: RequestOptions(path: '/poi/'),
+        statusCode: 200,
+        data: data,
+      ));
+  return dio;
 }
 
 void main() {
@@ -114,25 +138,111 @@ void main() {
     });
 
     test(
-        'non-empty apiKey still delegates to fallback (real call '
-        'unimplemented)', () async {
+        'with a key + recorded OCM fixture, returns REAL parsed stations '
+        '(carrying UsageType), NOT demo data', () async {
+      // RED on master: the stub ignored the key/Dio and always returned
+      // the 4 demo stations. GREEN after #2634: it parses the fixture.
       final fallback = _RecordingFallback(response: [marker]);
       final service = OpenChargeMapService(
         apiKey: 'real-looking-key',
         fallback: fallback,
+        dio: _fixtureDio(),
       );
 
       final out = await service.fetchStations(
-        centerLat: 51.5,
-        centerLng: -0.1,
-        radiusKm: 12,
+        centerLat: 47.0,
+        centerLng: 4.85,
+        radiusKm: 25,
+      );
+
+      // Fallback never touched — real fetch path served the result.
+      expect(fallback.calls, isEmpty);
+
+      // Two real OCM POIs from the fixture, not the demo dataset.
+      expect(out, hasLength(2));
+      expect(out.map((s) => s.id), containsAll(['ocm-12345', 'ocm-22222']));
+      expect(out.every((s) => s.id.startsWith('ocm-')), isTrue);
+
+      final ionity = out.firstWhere((s) => s.id == 'ocm-12345');
+      // UsageType parsed → paid access badge.
+      expect(ionity.usageTypeId, 4);
+      expect(ionity.usageTypeTitle, 'Public - Pay At Location');
+      expect(ionity.isPayAtLocation, isTrue);
+      expect(ionity.isMembershipRequired, isFalse);
+      expect(ionity.accessCost.kind, EvAccessCostKind.paid);
+      expect(ionity.name, 'Ionity Aire de Beaune');
+      expect(ionity.countryCode, 'FR');
+      // CCS Type 2 @ 350 kW from the recorded Connections block.
+      expect(ionity.connectors, isNotEmpty);
+      expect(ionity.maxPowerKw, 350);
+      expect(
+        ionity.connectors.map((c) => c.type),
+        contains(ConnectorType.ccs),
+      );
+
+      final free = out.firstWhere((s) => s.id == 'ocm-22222');
+      // Free UsageType resolves to a free access badge.
+      expect(free.usageTypeId, 1);
+      expect(free.accessCost.kind, EvAccessCostKind.free);
+    });
+
+    test('with a key but a network error, falls back to demo data',
+        () async {
+      final dio = _MockDio();
+      when(() => dio.get<dynamic>(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).thenThrow(DioException(
+        requestOptions: RequestOptions(path: '/poi/'),
+        type: DioExceptionType.connectionError,
+      ));
+      final fallback = _RecordingFallback(response: [marker]);
+      final service = OpenChargeMapService(
+        apiKey: 'real-looking-key',
+        fallback: fallback,
+        dio: dio,
+      );
+
+      final out = await service.fetchStations(
+        centerLat: 1.0,
+        centerLng: 2.0,
+        radiusKm: 5,
+      );
+
+      // Network failure → demo fallback served, with the original args.
+      expect(out, [marker]);
+      expect(fallback.calls, hasLength(1));
+      expect(fallback.calls.single.lat, 1.0);
+      expect(fallback.calls.single.lng, 2.0);
+      expect(fallback.calls.single.radius, 5);
+    });
+
+    test('with a key but a non-list response body, falls back to demo',
+        () async {
+      final dio = _MockDio();
+      when(() => dio.get<dynamic>(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).thenAnswer((_) async => Response<dynamic>(
+            requestOptions: RequestOptions(path: '/poi/'),
+            statusCode: 200,
+            data: <String, dynamic>{'error': 'bad request'},
+          ));
+      final fallback = _RecordingFallback(response: [marker]);
+      final service = OpenChargeMapService(
+        apiKey: 'real-looking-key',
+        fallback: fallback,
+        dio: dio,
+      );
+
+      final out = await service.fetchStations(
+        centerLat: 5.0,
+        centerLng: 6.0,
+        radiusKm: 3,
       );
 
       expect(out, [marker]);
       expect(fallback.calls, hasLength(1));
-      expect(fallback.calls.single.lat, 51.5);
-      expect(fallback.calls.single.lng, -0.1);
-      expect(fallback.calls.single.radius, 12);
     });
 
     test('forwards arguments unchanged on every call', () async {
