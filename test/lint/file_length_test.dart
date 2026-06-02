@@ -204,7 +204,14 @@ void main() {
     // the existing trip_recorder re-export, no new import); the wiring must
     // live where the controller builds its recorder. Decomposition stays
     // tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1626,
+    // #2671 — re-grandfathered 1626 → 1636: the OBD2 drop-pause fix wires the
+    // scheduler's new pause()/resume() through the DroppedSessionHost adapter
+    // (two thin wrappers mirroring the existing stopScheduler) + a resume()
+    // call on the drop→reconnect transition with a rationale comment, so a
+    // flapping link no longer dispatches PIDs into a dead channel. Net +10;
+    // the wiring must live at the controller's host adapter + resume site.
+    // Decomposition stays tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1636,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
