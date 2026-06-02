@@ -121,6 +121,13 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   ReceiptScanOutcome? _lastScan;
   FillUpAutoCostCalculator? _autoCostCalc;
 
+  /// Unit price per litre read off the last receipt scan (#2689). Set by
+  /// the scan handler when the OCR parser extracts a `pricePerLiter`, and
+  /// persisted into the saved [FillUp.scannedPricePerLiter] so the exact
+  /// quoted price survives instead of the `totalCost / liters` quotient.
+  /// Null until a scan reads a price; manual entries leave it null.
+  double? _scannedPricePerLiter;
+
   /// Adapter-captured tank level (litres) snapshotted at form-open
   /// (#1434). Closes the producer-wiring gap from #1401 — paired with
   /// [_fuelLevelAfterL] (captured at save) so the persisted [FillUp]
@@ -250,6 +257,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         setScanningPump: (v) => setState(() => _scanningPump = v),
         setDate: (d) => setState(() => _date = d),
         setFuelType: (f) => setState(() => _fuelType = f),
+        setScannedPricePerLiter: (p) =>
+            setState(() => _scannedPricePerLiter = p),
         setLastScan: (o) => setState(() => _lastScan = o),
         isMounted: () => mounted,
         capturePumpImage: widget.pumpImageCapture ?? _capturePumpImage,
@@ -349,6 +358,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       isFullTank: _isFullTank,
       fuelLevelBeforeL: _fuelLevelBeforeL,
       fuelLevelAfterL: afterL,
+      // #2689 — persist the receipt-scanned unit price verbatim when one
+      // was read; null for manual entries falls back to the computed
+      // pricePerLiter getter.
+      scannedPricePerLiter: _scannedPricePerLiter,
     );
 
     // #1401 phase 7b — when both adapter fuel-level captures are

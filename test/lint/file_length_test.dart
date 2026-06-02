@@ -219,8 +219,14 @@ void main() {
     // comment). The workflow + apply logic itself lives in the extracted
     // launcher/widget; only the trigger call stays on the screen.
     // Decomposition of this god-class is tracked under #2187/#2188/#2190.
+    // #2689 — re-grandfathered 513 → 526: the e-receipt Phase 1 plumbing
+    // adds the `_scannedPricePerLiter` state field (+ dartdoc), its
+    // `setScannedPricePerLiter` wiring in `_buildScanHostState`, and the
+    // `scannedPricePerLiter:` arg on the saved `FillUp` (+ rationale) so the
+    // exact receipt-scanned unit price is persisted instead of discarded.
+    // Pure field plumbing; decomposition stays tracked under #2187/#2188/#2190.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        513,
+        526,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
