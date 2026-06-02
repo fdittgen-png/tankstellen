@@ -7902,6 +7902,34 @@ abstract class AppLocalizations {
   /// **'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.'**
   String get lessonAdviceLambdaEnrichment;
 
+  /// Cost-line copy for the climbing-fuel insight on the Trip detail screen (#2693 C6) — extra fuel burned over a flat-road counterfactual while on a confident uphill grade. Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L'**
+  String insightClimbingCost(
+    String gradePercent,
+    String pctTime,
+    String liters,
+  );
+
+  /// How-to-improve advice for the climbing-fuel lesson (#2693 C6). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.'**
+  String get lessonAdviceClimbingCost;
+
+  /// Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stop-and-go restarts: wasted {liters} L'**
+  String insightRestartCost(String count, String liters);
+
+  /// How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.'**
+  String get lessonAdviceRestartCost;
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:
@@ -8009,6 +8037,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rich mixture'**
   String get drivingScorePenaltyLambda;
+
+  /// Title of the GPS-only efficiency KPI card on the Trip detail screen (#2695 C9) — shown for trips recorded without an engine signal.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS efficiency'**
+  String get gpsKpiCardTitle;
+
+  /// Label for the Relative Positive Acceleration KPI on the GPS efficiency card (#2695 C9) — a speed-only eco-driving aggressiveness index.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive acceleration (RPA)'**
+  String get gpsKpiRpa;
+
+  /// Label for the Positive Kinetic Energy KPI on the GPS efficiency card (#2695 C9) — distance-normalised positive kinetic-energy changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Kinetic energy demand (PKE)'**
+  String get gpsKpiPke;
+
+  /// Label for the mean positive v·a KPI on the GPS efficiency card (#2695 C9) — average power-proxy while accelerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Acceleration intensity (VAPOS)'**
+  String get gpsKpiVapos;
+
+  /// Label for the coasting-share KPI on the GPS efficiency card (#2695 C9) — fraction of moving time spent coasting, an eco-positive signal.
+  ///
+  /// In en, this message translates to:
+  /// **'Coasting share'**
+  String get gpsKpiCoast;
+
+  /// Label for the climb-energy-per-km KPI on the GPS efficiency card (#2695 C9) — metres climbed per kilometre, a potential-energy work proxy.
+  ///
+  /// In en, this message translates to:
+  /// **'Climb energy'**
+  String get gpsKpiClimbEnergy;
+
+  /// Trip-detail line comparing this trip's average consumption to the driver's synced efficient baseline (#2696 C10). The placeholder is a pre-formatted signed percentage (e.g. '+8%' worse, '-5%' better). Hidden when there is no learned baseline yet.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct} vs your efficient baseline'**
+  String drivingScoreBaselineDelta(String pct);
 
   /// Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time.
   ///
@@ -9910,6 +9980,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Need at least 3 trips per month for comparison'**
   String get consumptionMonthlyComparisonNotReliable;
+
+  /// Row label on the monthly-insights card for total metres climbed across the month (#2697 P3) — now trustworthy that altitude is guarded + persisted. Rendered only when at least one trip carried altitude samples.
+  ///
+  /// In en, this message translates to:
+  /// **'Climbed'**
+  String get consumptionMonthlyClimbLabel;
 
   /// Title of the card on the vehicle settings screen that surfaces the connected OBD2 adapter's runtime capability tier (#1401 phase 6).
   ///

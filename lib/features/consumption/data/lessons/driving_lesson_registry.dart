@@ -9,6 +9,7 @@ import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/trip_recorder.dart';
 import '../driving_insights_analyzer.dart';
 import '../driving_score_calculator.dart';
+import 'rules/climbing_cost_rule.dart';
 import 'rules/full_throttle_rule.dart';
 import 'rules/hard_accel_rule.dart';
 import 'rules/high_rpm_rule.dart';
@@ -16,6 +17,7 @@ import 'rules/high_speed_band_rule.dart';
 import 'rules/idling_rule.dart';
 import 'rules/lambda_enrichment_rule.dart';
 import 'rules/low_gear_rule.dart';
+import 'rules/restart_cost_rule.dart';
 import 'rules/smooth_driving_rule.dart';
 
 /// Holds the post-trip [DrivingLessonRule]s and turns a trip into its
@@ -67,6 +69,8 @@ class DrivingLessonRegistry {
         HighSpeedBandRule(),
         FullThrottleRule(),
         LambdaEnrichmentRule(),
+        ClimbingCostRule(),
+        RestartCostRule(),
         SmoothDrivingRule(),
       ]);
 

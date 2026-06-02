@@ -4,5 +4,6 @@
   "consumptionMonthlyDriveTimeLabel": "Fahrzeit",
   "consumptionMonthlyDistanceLabel": "Strecke",
   "consumptionMonthlyAvgConsumptionLabel": "Ø Verbrauch",
-  "consumptionMonthlyComparisonNotReliable": "Mindestens 3 Fahrten pro Monat für den Vergleich nötig"
+  "consumptionMonthlyComparisonNotReliable": "Mindestens 3 Fahrten pro Monat für den Vergleich nötig",
+  "consumptionMonthlyClimbLabel": "Anstieg"
 }

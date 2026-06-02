@@ -4379,6 +4379,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.';
 
   @override
+  String insightClimbingCost(
+    String gradePercent,
+    String pctTime,
+    String liters,
+  ) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceClimbingCost =>
+      'Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.';
+
+  @override
+  String insightRestartCost(String count, String liters) {
+    return '$count stop-and-go restarts: wasted $liters L';
+  }
+
+  @override
+  String get lessonAdviceRestartCost =>
+      'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.';
+
+  @override
   String get drivingScoreCardTitle => 'Driving score';
 
   @override
@@ -4434,6 +4456,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get drivingScorePenaltyLambda => 'Rich mixture';
+
+  @override
+  String get gpsKpiCardTitle => 'GPS efficiency';
+
+  @override
+  String get gpsKpiRpa => 'Positive acceleration (RPA)';
+
+  @override
+  String get gpsKpiPke => 'Kinetic energy demand (PKE)';
+
+  @override
+  String get gpsKpiVapos => 'Acceleration intensity (VAPOS)';
+
+  @override
+  String get gpsKpiCoast => 'Coasting share';
+
+  @override
+  String get gpsKpiClimbEnergy => 'Climb energy';
+
+  @override
+  String drivingScoreBaselineDelta(String pct) {
+    return '$pct vs your efficient baseline';
+  }
 
   @override
   String get ecoRouteOption => 'Eco';
@@ -5601,6 +5646,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get consumptionMonthlyComparisonNotReliable =>
       'Need at least 3 trips per month for comparison';
+
+  @override
+  String get consumptionMonthlyClimbLabel => 'Climbed';
 
   @override
   String get obd2CapabilitySectionTitle => 'Adapter capabilities';
@@ -11451,6 +11499,28 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ĥéáṽý, šúšŧáîñéđ łóáđ ɱáķéš ŧĥé éñǧîñé řúñ řîçĥ — šĥóřŧ-šĥîƒŧ áñđ ƀáçķ óƒƒ óñ łóñǧ çłîɱƀš ŧó ķééƥ ŧĥé ɱîẋŧúřé łéáñ. ·········································⟧';
 
   @override
+  String insightClimbingCost(
+    String gradePercent,
+    String pctTime,
+    String liters,
+  ) {
+    return '⟦Çłîɱƀîñǧ áŧ $gradePercent% ǧřáđé ($pctTime% óƒ ŧřîƥ): ŵášŧéđ $liters Ł ·············⟧';
+  }
+
+  @override
+  String get lessonAdviceClimbingCost =>
+      '⟦Çářřý ɱóɱéñŧúɱ îñŧó á ĥîłł áñđ ƒééđ ŧĥé ŧĥřóŧŧłé šɱóóŧĥłý — šúřǧîñǧ óñ á çłîɱƀ ƀúřñš éẋŧřá ƒúéł. ···································⟧';
+
+  @override
+  String insightRestartCost(String count, String liters) {
+    return '⟦$count šŧóƥ-áñđ-ǧó řéšŧářŧš: ŵášŧéđ $liters Ł ···········⟧';
+  }
+
+  @override
+  String get lessonAdviceRestartCost =>
+      '⟦Áñŧîçîƥáŧé ŧřáƒƒîç áñđ çóášŧ ŧóŵářđ šŧóƥš šó ýóú řółł řáŧĥéř ŧĥáñ řéšŧářŧ — ƥúłłîñǧ áŵáý ƒřóɱ á đéáđ šŧóƥ îš ŧĥé ŧĥîřšŧîéšŧ ƥářŧ óƒ šŧóƥ-áñđ-ǧó. ····················································⟧';
+
+  @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';
 
   @override
@@ -11506,6 +11576,29 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get drivingScorePenaltyLambda => '⟦Řîçĥ ɱîẋŧúřé ·····⟧';
+
+  @override
+  String get gpsKpiCardTitle => '⟦ǦƤŠ éƒƒîçîéñçý ······⟧';
+
+  @override
+  String get gpsKpiRpa => '⟦Ƥóšîŧîṽé áççéłéřáŧîóñ (ŘƤÁ) ··········⟧';
+
+  @override
+  String get gpsKpiPke => '⟦Ķîñéŧîç éñéřǧý đéɱáñđ (ƤĶÉ) ··········⟧';
+
+  @override
+  String get gpsKpiVapos => '⟦Áççéłéřáŧîóñ îñŧéñšîŧý (ṼÁƤÓŠ) ············⟧';
+
+  @override
+  String get gpsKpiCoast => '⟦Çóášŧîñǧ šĥářé ······⟧';
+
+  @override
+  String get gpsKpiClimbEnergy => '⟦Çłîɱƀ éñéřǧý ·····⟧';
+
+  @override
+  String drivingScoreBaselineDelta(String pct) {
+    return '⟦$pct ṽš ýóúř éƒƒîçîéñŧ ƀášéłîñé ··········⟧';
+  }
 
   @override
   String get ecoRouteOption => '⟦Éçó ·⟧';
@@ -12713,6 +12806,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get consumptionMonthlyComparisonNotReliable =>
       '⟦Ñééđ áŧ łéášŧ 3 ŧřîƥš ƥéř ɱóñŧĥ ƒóř çóɱƥářîšóñ ·················⟧';
+
+  @override
+  String get consumptionMonthlyClimbLabel => '⟦Çłîɱƀéđ ···⟧';
 
   @override
   String get obd2CapabilitySectionTitle => '⟦Áđáƥŧéř çáƥáƀîłîŧîéš ·········⟧';

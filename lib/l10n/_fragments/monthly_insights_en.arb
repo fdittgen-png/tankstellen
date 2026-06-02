@@ -22,5 +22,9 @@
   "consumptionMonthlyComparisonNotReliable": "Need at least 3 trips per month for comparison",
   "@consumptionMonthlyComparisonNotReliable": {
     "description": "Caption shown on the monthly-insights card when one or both months has fewer than 3 trips. The card still shows the current-month numbers but skips the previous-month column and the delta arrows (#1041 phase 4)."
+  },
+  "consumptionMonthlyClimbLabel": "Climbed",
+  "@consumptionMonthlyClimbLabel": {
+    "description": "Row label on the monthly-insights card for total metres climbed across the month (#2697 P3) — now trustworthy that altitude is guarded + persisted. Rendered only when at least one trip carried altitude samples."
   }
 }

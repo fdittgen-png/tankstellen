@@ -3762,5 +3762,89 @@
   "@evPriceBestEffortOcm": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "@insightClimbingCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "gradePercent": {
+        "type": "String"
+      },
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "@lessonAdviceClimbingCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "@insightRestartCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "@lessonAdviceRestartCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiCardTitle": "GPS efficiency",
+  "@gpsKpiCardTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "@gpsKpiRpa": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "@gpsKpiPke": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "@gpsKpiVapos": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiCoast": "Coasting share",
+  "@gpsKpiCoast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiClimbEnergy": "Climb energy",
+  "@gpsKpiClimbEnergy": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "@drivingScoreBaselineDelta": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionMonthlyClimbLabel": "Climbed",
+  "@consumptionMonthlyClimbLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

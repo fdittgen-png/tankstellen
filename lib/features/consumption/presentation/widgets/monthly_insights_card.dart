@@ -73,6 +73,20 @@ class MonthlyInsightsCard extends StatelessWidget {
       showPrevious: reliable,
     );
 
+    // Climbed metres (#2697 P3) — only when this month recorded any
+    // altitude-bearing trips. Neutral sentiment: terrain, not behaviour.
+    final showClimbRow = summary.currentMonthClimbMeters > 0;
+    final climbRow = showClimbRow
+        ? _MetricRow(
+            label: l?.consumptionMonthlyClimbLabel ?? 'Climbed',
+            currentValue: _fmtClimb(summary.currentMonthClimbMeters),
+            previousValue: _fmtClimb(summary.previousMonthClimbMeters),
+            delta: summary.climbMetersDelta.round(),
+            sentiment: _Sentiment.neutral,
+            showPrevious: reliable,
+          )
+        : null;
+
     // Avg consumption: only render when at least the current month has
     // a figure. When previous is null too, hide the previous column.
     final showConsumptionRow =
@@ -125,6 +139,10 @@ class MonthlyInsightsCard extends StatelessWidget {
             driveTimeRow,
             const SizedBox(height: 6),
             distanceRow,
+            if (climbRow != null) ...[
+              const SizedBox(height: 6),
+              climbRow,
+            ],
             if (consumptionRow != null) ...[
               const SizedBox(height: 6),
               consumptionRow,
@@ -260,3 +278,5 @@ String _fmtConsumption(double? lPer100Km) {
   if (lPer100Km == null) return '—';
   return '${lPer100Km.toStringAsFixed(1)} L/100';
 }
+
+String _fmtClimb(double meters) => '${meters.toStringAsFixed(0)} m';
