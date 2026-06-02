@@ -6437,6 +6437,25 @@ class AppLocalizationsRo extends AppLocalizations {
   String get refuelUnitPerSession => '/sesiune';
 
   @override
+  String get shareReceiptImporting => 'Importing shared receipt…';
+
+  @override
+  String get shareReceiptUnsupportedFormat =>
+      'That file type can\'t be imported yet — share a photo of the receipt instead.';
+
+  @override
+  String get shareReceiptFailed =>
+      'Couldn\'t read the shared receipt — try sharing it again or add the fill-up manually.';
+
+  @override
+  String get featureLabel_addFillUpShareIntentReceipt =>
+      'Share receipt to import';
+
+  @override
+  String get featureDescription_addFillUpShareIntentReceipt =>
+      'Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.';
+
+  @override
   String get speedConsumptionCardTitle => 'Consum pe viteză';
 
   @override

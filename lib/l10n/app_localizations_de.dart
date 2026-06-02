@@ -6436,6 +6436,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get refuelUnitPerSession => '/Sitzung';
 
   @override
+  String get shareReceiptImporting => 'Geteilte Quittung wird importiert …';
+
+  @override
+  String get shareReceiptUnsupportedFormat =>
+      'Dieser Dateityp kann noch nicht importiert werden — teile stattdessen ein Foto der Quittung.';
+
+  @override
+  String get shareReceiptFailed =>
+      'Die geteilte Quittung konnte nicht gelesen werden — teile sie erneut oder füge den Tankvorgang manuell hinzu.';
+
+  @override
+  String get featureLabel_addFillUpShareIntentReceipt =>
+      'Quittung zum Importieren teilen';
+
+  @override
+  String get featureDescription_addFillUpShareIntentReceipt =>
+      'Teile ein Quittungsfoto aus einer anderen App, um einen Tankvorgang vorauszufüllen — Datum, Liter, Gesamtbetrag und Tankstelle werden auf dem Gerät erkannt.';
+
+  @override
   String get speedConsumptionCardTitle => 'Verbrauch nach Geschwindigkeit';
 
   @override

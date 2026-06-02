@@ -6368,6 +6368,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refuelUnitPerSession => '/session';
 
   @override
+  String get shareReceiptImporting => 'Importing shared receipt…';
+
+  @override
+  String get shareReceiptUnsupportedFormat =>
+      'That file type can\'t be imported yet — share a photo of the receipt instead.';
+
+  @override
+  String get shareReceiptFailed =>
+      'Couldn\'t read the shared receipt — try sharing it again or add the fill-up manually.';
+
+  @override
+  String get featureLabel_addFillUpShareIntentReceipt =>
+      'Share receipt to import';
+
+  @override
+  String get featureDescription_addFillUpShareIntentReceipt =>
+      'Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.';
+
+  @override
   String get speedConsumptionCardTitle => 'Consumption by speed';
 
   @override
@@ -13665,6 +13684,25 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get refuelUnitPerSession => '⟦/šéššîóñ ···⟧';
+
+  @override
+  String get shareReceiptImporting => '⟦Îɱƥóřŧîñǧ šĥářéđ řéçéîƥŧ… ··········⟧';
+
+  @override
+  String get shareReceiptUnsupportedFormat =>
+      '⟦Ŧĥáŧ ƒîłé ŧýƥé çáñ\'ŧ ƀé îɱƥóřŧéđ ýéŧ — šĥářé á ƥĥóŧó óƒ ŧĥé řéçéîƥŧ îñšŧéáđ. ···························⟧';
+
+  @override
+  String get shareReceiptFailed =>
+      '⟦Çóúłđñ\'ŧ řéáđ ŧĥé šĥářéđ řéçéîƥŧ — ŧřý šĥářîñǧ îŧ áǧáîñ óř áđđ ŧĥé ƒîłł-úƥ ɱáñúáłłý. ······························⟧';
+
+  @override
+  String get featureLabel_addFillUpShareIntentReceipt =>
+      '⟦Šĥářé řéçéîƥŧ ŧó îɱƥóřŧ ·········⟧';
+
+  @override
+  String get featureDescription_addFillUpShareIntentReceipt =>
+      '⟦Šĥářé á řéçéîƥŧ ƥĥóŧó ƒřóɱ áñóŧĥéř áƥƥ ŧó ƥřé-ƒîłł á ƒîłł-úƥ — đáŧé, łîŧřéš, ŧóŧáł, áñđ šŧáŧîóñ ářé řéáđ óñ-đéṽîçé. ········································⟧';
 
   @override
   String get speedConsumptionCardTitle => '⟦Çóñšúɱƥŧîóñ ƀý šƥééđ ········⟧';

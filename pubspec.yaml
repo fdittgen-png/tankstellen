@@ -84,6 +84,14 @@ dependencies:
   # Pinned to 12.x — share_plus 13.x is a major bump; deferred to its
   # own migration pass (#1684).
   share_plus: ^12.0.2
+  # Inbound OS share-intent receiver (#2735 / Epic #2687) — a receipt
+  # image shared from another app lands in Sparkilo and prefills the
+  # Add fill-up form. OS-native + GMS-free (no Play Services / ML Kit),
+  # MIT-licensed. Android intent-filters are declared in
+  # AndroidManifest.xml; the iOS Share Extension target + App Group are
+  # deferred to #2736, so on iOS the share path simply receives nothing
+  # until that target ships — the package still builds without it.
+  share_handler: ^0.0.25
   # Pinned to 1.x — flutter_blue_plus 2.x is a major BLE-API rewrite,
   # and BLE is core to OBD2 trip recording. The 2.x upgrade is tracked
   # separately as part of #1542; do NOT bump it as routine drift.

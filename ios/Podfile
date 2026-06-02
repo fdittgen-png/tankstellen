@@ -33,6 +33,20 @@ target 'Runner' do
   use_frameworks!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  # #2735 — share_handler's iOS plugin (share_handler_ios) declares a
+  # dependency on the `share_handler_ios_models` pod, whose podspec lives
+  # in the plugin's own ios/Models/ subdir and is NOT auto-registered by
+  # Flutter's podhelper. Without this explicit path CocoaPods can't
+  # resolve it and `pod install` (hence the whole iOS build) fails. This
+  # one line is the MINIMUM to make the main app build with the share
+  # dependency present; it does NOT create the Share Extension target or
+  # the App Group entitlement — those (and the in-extension consumer of
+  # this shared model code) are owned by #2736. Until then the share path
+  # simply receives nothing on iOS, which is by design for this PR.
+  pod 'share_handler_ios_models',
+      :path => '.symlinks/plugins/share_handler_ios/ios/Models'
+
   target 'RunnerTests' do
     inherit! :search_paths
   end

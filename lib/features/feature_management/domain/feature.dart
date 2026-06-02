@@ -158,6 +158,14 @@ enum Feature {
   /// flag will be flipped on by default once the model matures.
   addFillUpOcrPump,
 
+  /// Inbound OS share-intent receipt import (#2735 / Epic #2687).
+  /// Default-off — opt-in. When on, a receipt image shared from another
+  /// app (gallery, files, scanner) lands in Sparkilo, routes to the Add
+  /// fill-up screen, and pre-fills date, litres, total, and station via
+  /// the same on-device OCR the Receipt-OCR button uses (#2734). No
+  /// prerequisites — the receiver registers regardless of OBD2.
+  addFillUpShareIntentReceipt,
+
   /// Developer-mode GitHub PAT entry for bad-scan reports (#2116-6).
   /// Default-off — 99 % of users will never paste a GitHub Personal
   /// Access Token, and the SharePlus fallback already covers them.

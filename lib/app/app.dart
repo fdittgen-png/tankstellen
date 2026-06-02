@@ -9,6 +9,7 @@ import '../core/country/country_switch_listener.dart';
 import '../core/language/language_provider.dart';
 import '../core/notifications/notification_launch_listener.dart';
 import '../core/theme/theme_mode_provider.dart';
+import '../features/consumption/presentation/widgets/share_receipt_listener.dart';
 import '../features/consumption/presentation/widgets/trip_recording_banner.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
 import '../features/widget/presentation/widget_click_listener.dart';
@@ -126,9 +127,18 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
         // post-builder navigation context.
         return NotificationLaunchListener(
           child: WidgetClickListener(
-            child: CountrySwitchListener(
-              child: TripRecordingBanner(
-                child: child ?? const SizedBox.shrink(),
+            // #2735 — inbound OS share-intent receiver. Sits beside the
+            // notification + widget deep-link listeners so all three
+            // deep-link sources share the same post-builder navigation
+            // context. A receipt image shared from another app is
+            // stashed + routed to /consumption/add, where the form is
+            // prefilled from its OCR (#2734). Opt-in via
+            // Feature.addFillUpShareIntentReceipt (gated in the handler).
+            child: ShareReceiptListener(
+              child: CountrySwitchListener(
+                child: TripRecordingBanner(
+                  child: child ?? const SizedBox.shrink(),
+                ),
               ),
             ),
           ),

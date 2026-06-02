@@ -32,6 +32,7 @@ import '../widgets/fill_up_no_vehicle_cta.dart';
 import '../widgets/fill_up_pinned_save_bar.dart';
 import '../widgets/fill_up_reconciliation_launcher.dart';
 import '../widgets/fill_up_scan_handlers.dart';
+import '../widgets/fill_up_share_scan_handlers.dart';
 import '../widgets/fill_up_variance_prompt.dart';
 import 'pump_display_camera_screen.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -159,6 +160,15 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     // value without spinning up the trip-recording graph.
     _fuelLevelBeforeL =
         widget.initialFuelLevelBeforeL ?? _readObd2FuelLevelLitres();
+    // #2735 — when an OS share intent routed the user here with a receipt
+    // image, OCR + prefill it after the first frame (helper lives in
+    // `fill_up_share_scan_handlers.dart` to keep this file lean, #1680).
+    scheduleSharedReceiptScanIfPending(
+      ref,
+      context,
+      _buildScanHostState,
+      () => mounted,
+    );
   }
 
   /// One-shot read of the OBD2 fuel-level provider at the current

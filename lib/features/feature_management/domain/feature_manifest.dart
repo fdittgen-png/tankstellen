@@ -314,6 +314,17 @@ class FeatureManifest {
           'Scan a fuel pump display to pre-fill the form. Recognition '
               'is unreliable today — opt in only if you want to test.',
     ),
+    Feature.addFillUpShareIntentReceipt: FeatureManifestEntry.allChannels(
+      feature: Feature.addFillUpShareIntentReceipt,
+      // Default-off (#2735): opt-in. When on, Sparkilo appears in the OS
+      // share sheet for images and a shared receipt prefills the Add
+      // fill-up form via on-device OCR. No prerequisites.
+      defaultOn: false,
+      displayName: 'Share receipt to import',
+      description:
+          'Share a receipt photo from another app to pre-fill a fill-up '
+              '— date, litres, total, and station are read on-device.',
+    ),
     // Default-off (#2116-6): the PAT entry is power-user / contributor
     // territory. SharePlus fallback covers everyone else.
     Feature.developerPatToken: FeatureManifestEntry.allChannels(

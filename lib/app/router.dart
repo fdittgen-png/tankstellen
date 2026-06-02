@@ -10,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
+import '../features/consumption/providers/pending_shared_receipt_provider.dart';
 import '../features/widget/presentation/widget_uri_parser.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'routes/consumption_routes.dart';
@@ -42,6 +43,26 @@ String? _consumePendingWidgetPath(Ref ref) {
       .consumeDeferred();
   if (pending == null) return null;
   return widgetUriToPath(pending);
+}
+
+/// Resolves the route for a pending inbound-share receipt (stashed by
+/// `ShareReceiptHandler` from an OS share intent, #2735). Returns
+/// `/consumption/add` when an image path is pending AND we are not
+/// already on that route; otherwise `null` so callers fall back to their
+/// default landing behaviour.
+///
+/// Unlike [_consumePendingWidgetPath], this PEEKS rather than consumes:
+/// the home-widget URI is self-contained, but here `AddFillUpScreen`
+/// must still read the same stashed path on open to OCR the receipt
+/// (`runSharedReceiptScan`, #2734). The screen owns clearing the stash;
+/// the `state.matchedLocation` guard stops the redirect re-firing once
+/// the user has landed on the form (the stash is cleared a frame later
+/// by the screen, so without the guard the redirect would route to
+/// `/consumption/add` again on the very next evaluation).
+String? _resolvePendingSharedReceiptPath(Ref ref, GoRouterState state) {
+  if (state.matchedLocation == '/consumption/add') return null;
+  final pending = ref.read(pendingSharedReceiptProvider);
+  return pending != null ? '/consumption/add' : null;
 }
 
 /// Resolves the route to land on based on the active profile's
@@ -133,6 +154,13 @@ GoRouter router(Ref ref) {
       // by the consent/setup branches once the user lands past those
       // walls.
       if (hasConsent && isReady && !isConsent && !isSetup) {
+        // #2735 — an inbound shared receipt routes the user to the
+        // Add-fill-up form before the landing flow, same precedence /
+        // safety rationale as the widget-URI consume above. Checked
+        // first: a deliberate "share this receipt" gesture outranks a
+        // pending widget deep-link.
+        final sharePath = _resolvePendingSharedReceiptPath(ref, state);
+        if (sharePath != null) return sharePath;
         final widgetPath = _consumePendingWidgetPath(ref);
         if (widgetPath != null) return widgetPath;
       }
@@ -148,6 +176,8 @@ GoRouter router(Ref ref) {
         // writes during a widget-tree build) so a subsequent redirect
         // — e.g. the user backing out of the detail — falls through to
         // the normal landing flow.
+        final sharePath = _resolvePendingSharedReceiptPath(ref, state);
+        if (sharePath != null) return sharePath;
         final widgetPath = _consumePendingWidgetPath(ref);
         if (widgetPath != null) return widgetPath;
         return resolveLandingLocation(storage);
@@ -164,6 +194,8 @@ GoRouter router(Ref ref) {
         // Same widget-URI precedence as the consent->landing step above:
         // a fresh-install user who completes setup AND has a pending
         // widget URI should also land on the station detail.
+        final sharePath = _resolvePendingSharedReceiptPath(ref, state);
+        if (sharePath != null) return sharePath;
         final widgetPath = _consumePendingWidgetPath(ref);
         if (widgetPath != null) return widgetPath;
         return resolveLandingLocation(storage);

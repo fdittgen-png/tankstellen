@@ -11221,6 +11221,36 @@ abstract class AppLocalizations {
   /// **'/session'**
   String get refuelUnitPerSession;
 
+  /// Shown briefly while an inbound shared receipt image is being OCR'd on the Add fill-up screen (#2735).
+  ///
+  /// In en, this message translates to:
+  /// **'Importing shared receipt…'**
+  String get shareReceiptImporting;
+
+  /// Snackbar shown when the user shares an unsupported file (e.g. a PDF) into the app. Image receipts work today; PDF rasterisation arrives in #2737 (#2735).
+  ///
+  /// In en, this message translates to:
+  /// **'That file type can\'t be imported yet — share a photo of the receipt instead.'**
+  String get shareReceiptUnsupportedFormat;
+
+  /// Snackbar shown when reading / OCR'ing an inbound shared receipt image failed (#2735).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read the shared receipt — try sharing it again or add the fill-up manually.'**
+  String get shareReceiptFailed;
+
+  /// Settings toggle label for the inbound OS share-intent receipt importer (#2735). Default-off — opt-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Share receipt to import'**
+  String get featureLabel_addFillUpShareIntentReceipt;
+
+  /// Settings toggle description for the inbound OS share-intent receipt importer (#2735).
+  ///
+  /// In en, this message translates to:
+  /// **'Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.'**
+  String get featureDescription_addFillUpShareIntentReceipt;
+
   /// Title of the consumption-by-speed card on the Carbon dashboard Charts tab — bins per-second OBD2 samples by speed band so the user can see what motorway speed is costing them per 100 km (#1192).
   ///
   /// In en, this message translates to:
