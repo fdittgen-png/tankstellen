@@ -142,6 +142,77 @@ void main() {
     });
   });
 
+  group('gpxtpx TrackPointExtension (#2652)', () {
+    test('emits speed (m/s) + course when a sample carries a bearing', () {
+      final entry = _entry(
+        startedAt: DateTime.utc(2026, 5, 24, 14, 0),
+        samples: [
+          TripSample(
+            timestamp: DateTime.utc(2026, 5, 24, 14, 0, 1),
+            speedKmh: 36, // → 10.000 m/s
+            rpm: 2000,
+            latitude: 48.0,
+            longitude: 2.0,
+            bearingDeg: 90.0,
+          ),
+        ],
+      );
+
+      final gpx = buildGpxXml(entry);
+
+      // Namespace declared on the root only because a bearing is present.
+      expect(gpx, contains('xmlns:gpxtpx='));
+      final doc = XmlDocument.parse(gpx);
+      final ext = doc.findAllElements('gpxtpx:TrackPointExtension').single;
+      expect(ext.findElements('gpxtpx:speed').single.innerText, '10.000');
+      expect(ext.findElements('gpxtpx:course').single.innerText, '90.0');
+    });
+
+    test('no bearing → byte-identical to the pre-#2652 document', () {
+      // A GPS-bearing-free trip must produce exactly the same bytes as
+      // before the extension landed: no gpxtpx namespace, no
+      // <extensions> inside trkpt.
+      final entry = _entry(
+        startedAt: DateTime.utc(2026, 5, 24, 14, 0),
+        samples: [
+          _sample(DateTime.utc(2026, 5, 24, 14, 0, 1),
+              lat: 48.0, lon: 2.0, alt: 35.0),
+          _sample(DateTime.utc(2026, 5, 24, 14, 0, 2), lat: 48.1, lon: 2.1),
+        ],
+      );
+
+      final gpx = buildGpxXml(entry);
+      expect(gpx, isNot(contains('gpxtpx')));
+      expect(gpx, isNot(contains('<extensions>')));
+      // Still a valid GPS-bearing document.
+      final doc = XmlDocument.parse(gpx);
+      expect(doc.findAllElements('trkpt').length, 2);
+    });
+
+    test('only bearing-bearing samples carry the extension', () {
+      final entry = _entry(
+        startedAt: DateTime.utc(2026, 5, 24, 14, 0),
+        samples: [
+          TripSample(
+            timestamp: DateTime.utc(2026, 5, 24, 14, 0, 1),
+            speedKmh: 50,
+            rpm: 2000,
+            latitude: 48.0,
+            longitude: 2.0,
+            bearingDeg: 45.0,
+          ),
+          // No bearing → no extension on this trkpt.
+          _sample(DateTime.utc(2026, 5, 24, 14, 0, 2), lat: 48.1, lon: 2.1),
+        ],
+      );
+
+      final gpx = buildGpxXml(entry);
+      final doc = XmlDocument.parse(gpx);
+      expect(doc.findAllElements('trkpt').length, 2);
+      expect(doc.findAllElements('gpxtpx:TrackPointExtension').length, 1);
+    });
+  });
+
   group('buildAggregateGpxXml (#2032)', () {
     test('emits one <trk> per trip', () {
       final t1 = _entry(

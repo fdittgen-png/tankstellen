@@ -5,6 +5,7 @@ import 'package:xml/xml.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/trip_recorder.dart';
 import '../lessons/driving_lesson_registry.dart';
 import '../trip_history_repository.dart';
 
@@ -15,6 +16,15 @@ import '../trip_history_repository.dart';
 /// on the `<gpx>` root and used on every lesson element.
 // i18n-ignore: namespace URI, not user-facing text
 const String tankstellenGpxNamespace = 'https://tankstellen.de/gpx/1';
+
+/// Namespace URI for the de-facto Garmin TrackPointExtension v1 (#2652).
+/// Consuming tools (Garmin BaseCamp, Strava, GPSBabel) read per-trkpt
+/// `<gpxtpx:speed>` / `<gpxtpx:course>` from this namespace. Declared on
+/// the `<gpx>` root only when at least one sample carries a bearing, so a
+/// no-heading trip stays byte-identical to the pre-#2652 document.
+// i18n-ignore: namespace URI, not user-facing text
+const String garminTrackPointExtensionNamespace =
+    'http://www.garmin.com/xmlschemas/TrackPointExtension/v1';
 
 /// Builds a GPX 1.1 document from a single [TripHistoryEntry].
 ///
@@ -48,7 +58,11 @@ String buildGpxXml(
   final lessons = _lessonsFor(entry, l, registry);
   builder.element(
     'gpx',
-    attributes: _gpxRootAttributes(creatorAttr, includeLessonsNs: lessons.isNotEmpty),
+    attributes: _gpxRootAttributes(
+      creatorAttr,
+      includeLessonsNs: lessons.isNotEmpty,
+      includeTrackPointExtensionNs: _anyBearing(entry.samples),
+    ),
     nest: () {
       builder.element('metadata', nest: () {
         builder.element('name', nest: () {
@@ -67,25 +81,7 @@ String buildGpxXml(
         });
         _appendLessonsExtensions(builder, lessons);
         builder.element('trkseg', nest: () {
-          for (final s in entry.samples) {
-            final lat = s.latitude;
-            final lon = s.longitude;
-            if (lat == null || lon == null) continue;
-            builder.element('trkpt', attributes: <String, String>{
-              'lat': lat.toStringAsFixed(7),
-              'lon': lon.toStringAsFixed(7),
-            }, nest: () {
-              final alt = s.altitudeM;
-              if (alt != null) {
-                builder.element('ele', nest: () {
-                  builder.text(alt.toStringAsFixed(1));
-                });
-              }
-              builder.element('time', nest: () {
-                builder.text(s.timestamp.toUtc().toIso8601String());
-              });
-            });
-          }
+          _appendTrkpts(builder, entry.samples);
         });
       });
     },
@@ -99,6 +95,7 @@ String buildGpxXml(
 Map<String, String> _gpxRootAttributes(
   String creatorAttr, {
   required bool includeLessonsNs,
+  bool includeTrackPointExtensionNs = false,
 }) {
   final attrs = <String, String>{
     'version': '1.1',
@@ -111,7 +108,59 @@ Map<String, String> _gpxRootAttributes(
   if (includeLessonsNs) {
     attrs['xmlns:tankstellen'] = tankstellenGpxNamespace;
   }
+  if (includeTrackPointExtensionNs) {
+    attrs['xmlns:gpxtpx'] = garminTrackPointExtensionNamespace;
+  }
   return attrs;
+}
+
+/// True when at least one sample carries a bearing, gating the
+/// `xmlns:gpxtpx` root declaration (#2652) so a no-heading trip stays
+/// byte-identical to the pre-#2652 document.
+bool _anyBearing(Iterable<TripSample> samples) =>
+    samples.any((s) => s.bearingDeg != null);
+
+/// Appends one `<trkpt>` per GPS-fixed sample to the open `<trkseg>`.
+/// Samples without a lat/lon fix are skipped (they would render as a
+/// teleport). `<ele>` is emitted when altitude is present; a Garmin
+/// `<extensions><gpxtpx:TrackPointExtension>` carrying `<gpxtpx:speed>`
+/// (m/s — GPX uses SI) and `<gpxtpx:course>` (degrees) is emitted only
+/// when the sample has a bearing (#2652), so a no-heading trip's output
+/// is unchanged from before.
+void _appendTrkpts(XmlBuilder builder, Iterable<TripSample> samples) {
+  for (final s in samples) {
+    final lat = s.latitude;
+    final lon = s.longitude;
+    if (lat == null || lon == null) continue;
+    builder.element('trkpt', attributes: <String, String>{
+      'lat': lat.toStringAsFixed(7),
+      'lon': lon.toStringAsFixed(7),
+    }, nest: () {
+      final alt = s.altitudeM;
+      if (alt != null) {
+        builder.element('ele', nest: () {
+          builder.text(alt.toStringAsFixed(1));
+        });
+      }
+      builder.element('time', nest: () {
+        builder.text(s.timestamp.toUtc().toIso8601String());
+      });
+      final bearing = s.bearingDeg;
+      if (bearing != null) {
+        builder.element('extensions', nest: () {
+          builder.element('gpxtpx:TrackPointExtension', nest: () {
+            // GPX speed is metres/second; trip samples store km/h.
+            builder.element('gpxtpx:speed', nest: () {
+              builder.text((s.speedKmh / 3.6).toStringAsFixed(3));
+            });
+            builder.element('gpxtpx:course', nest: () {
+              builder.text(bearing.toStringAsFixed(1));
+            });
+          });
+        });
+      }
+    });
+  }
 }
 
 /// Computes the post-trip lessons for [entry] via [registry] (defaulting
@@ -176,9 +225,14 @@ String buildAggregateGpxXml(
     for (final entry in entries) entry: _lessonsFor(entry, l, registry),
   };
   final anyLessons = lessonsByEntry.values.any((v) => v.isNotEmpty);
+  final anyBearing = entries.any((e) => _anyBearing(e.samples));
   builder.element(
     'gpx',
-    attributes: _gpxRootAttributes(creatorAttr, includeLessonsNs: anyLessons),
+    attributes: _gpxRootAttributes(
+      creatorAttr,
+      includeLessonsNs: anyLessons,
+      includeTrackPointExtensionNs: anyBearing,
+    ),
     nest: () {
       builder.element('metadata', nest: () {
         builder.element('name', nest: () {
@@ -195,25 +249,7 @@ String buildAggregateGpxXml(
             lessonsByEntry[entry] ?? const [],
           );
           builder.element('trkseg', nest: () {
-            for (final s in entry.samples) {
-              final lat = s.latitude;
-              final lon = s.longitude;
-              if (lat == null || lon == null) continue;
-              builder.element('trkpt', attributes: <String, String>{
-                'lat': lat.toStringAsFixed(7),
-                'lon': lon.toStringAsFixed(7),
-              }, nest: () {
-                final alt = s.altitudeM;
-                if (alt != null) {
-                  builder.element('ele', nest: () {
-                    builder.text(alt.toStringAsFixed(1));
-                  });
-                }
-                builder.element('time', nest: () {
-                  builder.text(s.timestamp.toUtc().toIso8601String());
-                });
-              });
-            }
+            _appendTrkpts(builder, entry.samples);
           });
         });
       }
