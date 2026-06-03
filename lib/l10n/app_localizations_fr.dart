@@ -4505,12 +4505,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String insightRestartCost(String count, String liters) {
-    return '$count stop-and-go restarts: wasted $liters L';
+    return '$count redémarrages stop-and-go : $liters L gaspillés';
   }
 
   @override
   String get lessonAdviceRestartCost =>
-      'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.';
+      'Anticipez le trafic et laissez rouler vers les arrêts pour éviter de redémarrer — repartir d\'un arrêt complet est la phase la plus gourmande du stop-and-go.';
 
   @override
   String get drivingScoreCardTitle => 'Score de conduite';
@@ -4570,22 +4570,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get drivingScorePenaltyLambda => 'Rich mixture';
 
   @override
-  String get gpsKpiCardTitle => 'GPS efficiency';
+  String get gpsKpiCardTitle => 'Efficacité GPS';
 
   @override
-  String get gpsKpiRpa => 'Positive acceleration (RPA)';
+  String get gpsKpiRpa => 'Accélération positive (RPA)';
 
   @override
-  String get gpsKpiPke => 'Kinetic energy demand (PKE)';
+  String get gpsKpiPke => 'Demande d\'énergie cinétique (PKE)';
 
   @override
-  String get gpsKpiVapos => 'Acceleration intensity (VAPOS)';
+  String get gpsKpiVapos => 'Intensité d\'accélération (VAPOS)';
 
   @override
-  String get gpsKpiCoast => 'Coasting share';
+  String get gpsKpiCoast => 'Part en roue libre';
 
   @override
-  String get gpsKpiClimbEnergy => 'Climb energy';
+  String get gpsKpiClimbEnergy => 'Énergie de montée';
 
   @override
   String drivingScoreBaselineDelta(String pct) {
@@ -5795,7 +5795,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Au moins 3 trajets par mois sont nécessaires pour la comparaison';
 
   @override
-  String get consumptionMonthlyClimbLabel => 'Climbed';
+  String get consumptionMonthlyClimbLabel => 'Dénivelé';
 
   @override
   String get obd2CapabilitySectionTitle => 'Capacités de l\'adaptateur';
@@ -5989,7 +5989,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get obd2DiagnosticsEmpty =>
-      'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.';
+      'Aucune session OBD2 enregistrée — connectez un adaptateur et enregistrez un trajet avec le mode développeur activé.';
 
   @override
   String get obd2DiagnosticsExplain =>

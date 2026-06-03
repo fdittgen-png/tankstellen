@@ -2887,10 +2887,9 @@
       }
     }
   },
-  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "obd2DiagnosticsEmpty": "Aucune session OBD2 enregistrée — connectez un adaptateur et enregistrez un trajet avec le mode développeur activé.",
   "@obd2DiagnosticsEmpty": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet."
   },
   "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
   "@obd2DiagnosticsExplain": {
@@ -3870,10 +3869,9 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "insightRestartCost": "{count} redémarrages stop-and-go : {liters} L gaspillés",
   "@insightRestartCost": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
+    "description": "Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.",
     "placeholders": {
       "count": {
         "type": "String"
@@ -3883,40 +3881,33 @@
       }
     }
   },
-  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "lessonAdviceRestartCost": "Anticipez le trafic et laissez rouler vers les arrêts pour éviter de redémarrer — repartir d'un arrêt complet est la phase la plus gourmande du stop-and-go.",
   "@lessonAdviceRestartCost": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export."
   },
-  "gpsKpiCardTitle": "GPS efficiency",
+  "gpsKpiCardTitle": "Efficacité GPS",
   "@gpsKpiCardTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Title of the GPS-only efficiency KPI card on the Trip detail screen (#2695 C9) — shown for trips recorded without an engine signal."
   },
-  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "gpsKpiRpa": "Accélération positive (RPA)",
   "@gpsKpiRpa": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Label for the Relative Positive Acceleration KPI on the GPS efficiency card (#2695 C9) — a speed-only eco-driving aggressiveness index."
   },
-  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "gpsKpiPke": "Demande d'énergie cinétique (PKE)",
   "@gpsKpiPke": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Label for the Positive Kinetic Energy KPI on the GPS efficiency card (#2695 C9) — distance-normalised positive kinetic-energy changes."
   },
-  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "gpsKpiVapos": "Intensité d'accélération (VAPOS)",
   "@gpsKpiVapos": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Label for the mean positive v·a KPI on the GPS efficiency card (#2695 C9) — average power-proxy while accelerating."
   },
-  "gpsKpiCoast": "Coasting share",
+  "gpsKpiCoast": "Part en roue libre",
   "@gpsKpiCoast": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Label for the coasting-share KPI on the GPS efficiency card (#2695 C9) — fraction of moving time spent coasting, an eco-positive signal."
   },
-  "gpsKpiClimbEnergy": "Climb energy",
+  "gpsKpiClimbEnergy": "Énergie de montée",
   "@gpsKpiClimbEnergy": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Label for the climb-energy-per-km KPI on the GPS efficiency card (#2695 C9) — metres climbed per kilometre, a potential-energy work proxy."
   },
   "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
   "@drivingScoreBaselineDelta": {
@@ -3928,10 +3919,9 @@
       }
     }
   },
-  "consumptionMonthlyClimbLabel": "Climbed",
+  "consumptionMonthlyClimbLabel": "Dénivelé",
   "@consumptionMonthlyClimbLabel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "Row label on the monthly-insights card for total metres climbed across the month (#2697 P3) — now trustworthy that altitude is guarded + persisted. Rendered only when at least one trip carried altitude samples."
   },
   "openNow": "Open",
   "@openNow": {
