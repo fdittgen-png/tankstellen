@@ -30,5 +30,26 @@
   "gpsDiagnosticsExplain": "Wird während der Aufzeichnung erfasst, um die GPS-Abtastung im Standby-Modus zu prüfen.",
   "@gpsDiagnosticsExplain": {
     "description": "Subtle one-line explanation at the bottom of the GPS diagnostics card (#1458 phase 2.5)."
+  },
+  "gpsDiagnosticsLargestGap": "Größte Lücke: {seconds} s",
+  "@gpsDiagnosticsLargestGap": {
+    "description": "Expanded-body line on the GPS diagnostics card (#1458 phase 2.5 / #2765).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsLifecycleResumed": "Aktiv",
+  "@gpsLifecycleResumed": {
+    "description": "Localized label for the 'resumed' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
+  "gpsLifecyclePaused": "Pausiert",
+  "@gpsLifecyclePaused": {
+    "description": "Localized label for the 'paused' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
+  "gpsLifecycleInactive": "Inaktiv",
+  "@gpsLifecycleInactive": {
+    "description": "Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
   }
 }

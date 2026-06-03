@@ -82,7 +82,7 @@ class GpsDiagnosticsCard extends StatelessWidget {
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              _formatLifecycleBreakdown(summary.lifecyclePercent),
+              _formatLifecycleBreakdown(summary.lifecyclePercent, l),
               style: theme.textTheme.bodyMedium,
             ),
           ),
@@ -90,7 +90,8 @@ class GpsDiagnosticsCard extends StatelessWidget {
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              'Largest gap: ${summary.largestGap.inSeconds} s',
+              l?.gpsDiagnosticsLargestGap(summary.largestGap.inSeconds) ??
+                  'Largest gap: ${summary.largestGap.inSeconds} s',
               style: theme.textTheme.bodyMedium,
             ),
           ),
@@ -311,11 +312,35 @@ String _pluralizeGaps(int gapCount) {
   return '$gapCount gaps';
 }
 
-/// Format the lifecycle-percent map into a "resumed 92% · paused 5% · …"
-/// line. The map is already sorted by count desc by the helper.
-String _formatLifecycleBreakdown(Map<String, int> lifecyclePercent) {
+/// Format the lifecycle-percent map into a "Resumed 92% · Paused 5% · …"
+/// line. The map is already sorted by count desc by the helper. Each
+/// lifecycle key is mapped to a localized label via [_lifecycleLabel];
+/// without this the raw enum keys ("resumed"/"inactive"/"paused") leaked
+/// onto every non-English locale (#2765).
+String _formatLifecycleBreakdown(
+  Map<String, int> lifecyclePercent,
+  AppLocalizations? l,
+) {
   if (lifecyclePercent.isEmpty) return '';
   return lifecyclePercent.entries
-      .map((e) => '${e.key} ${e.value}%')
+      .map((e) => '${_lifecycleLabel(e.key, l)} ${e.value}%')
       .join(' · ');
+}
+
+/// Map a raw [AppLifecycleState]-derived key (e.g. `'resumed'`,
+/// `'paused'`, `'inactive'`) to its localized label (#2765). Unknown
+/// keys fall back to the raw key so a future lifecycle value never
+/// renders as a blank — but the three states the recorder actually
+/// captures are all covered.
+String _lifecycleLabel(String key, AppLocalizations? l) {
+  switch (key) {
+    case 'resumed':
+      return l?.gpsLifecycleResumed ?? 'Resumed';
+    case 'paused':
+      return l?.gpsLifecyclePaused ?? 'Paused';
+    case 'inactive':
+      return l?.gpsLifecycleInactive ?? 'Inactive';
+    default:
+      return key;
+  }
 }
