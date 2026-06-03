@@ -354,7 +354,12 @@ void main() {
     // `_resolvedRange` helper that colours cross-border markers by each
     // station's own country fuel. Lets a Spanish station show its E10 price
     // instead of '--' on an E85 route. Decomposition tracked by #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 604,
+    // #2755 — re-grandfathered 604 → 622: the optional `cameraFitBounds`
+    // field + its dartdoc and constructor param, plus the `_fitBounds`
+    // getter / `initialCameraFit` substitution that frames the explicit
+    // bounds (route mode: the full itinerary) instead of the search circle.
+    // Null path unchanged (nearby mode). Decomposition tracked by #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 622,
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,

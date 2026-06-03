@@ -49,10 +49,49 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   RouteViewMode _viewMode = RouteViewMode.allStations;
   final Set<String> _selectedStationIds = {};
 
+  /// #2755 — the camera target: the bounds of the FULL route polyline,
+  /// unioned with every along-route fuel station, computed ONCE from the
+  /// immutable result. Framing these (instead of a ~5 km circle around the
+  /// polyline midpoint) makes the camera show the COMPLETE itinerary; being
+  /// constant across the All/Best toggle, it keeps `StationMapLayers`'
+  /// value-`==` `_lastFitBounds` guard a no-op so the camera holds and never
+  /// re-zooms to the changed station subset.
+  late final LatLngBounds _routeBounds = _computeRouteBounds();
+
+  /// Pre-layout camera fallback used by `MapOptions.initialCenter` /
+  /// `initialZoom` before the first layout pass runs `initialCameraFit`
+  /// (which frames `_routeBounds`). Mirrors `trip_path_map_card.dart`.
+  late final LatLng _initialCenter = _routeBounds.center;
+
   List<Station> get _allFuelStations => widget.routeResult.stations
       .whereType<FuelStationResult>()
       .map((r) => r.station)
       .toList();
+
+  /// Build the route-framing bounds from the polyline geometry unioned
+  /// with the along-route fuel stations. A degenerate single-point set
+  /// gets a tiny epsilon box so `CameraFit.bounds` can't divide-by-zero
+  /// (the same fallback as `trip_path_map_card.dart`).
+  LatLngBounds _computeRouteBounds() {
+    final points = <LatLng>[
+      ...widget.routeResult.route.geometry,
+      for (final s in _allFuelStations) LatLng(s.lat, s.lng),
+    ];
+    if (points.isEmpty) {
+      // No geometry and no stations — fall back to a Paris-centred box.
+      // (The build method renders an EmptyState in this case anyway.)
+      points.add(const LatLng(48.8566, 2.3522));
+    }
+    if (points.length == 1) {
+      final p = points.first;
+      const eps = 0.0005; // ~50 m at the equator; fine for any latitude.
+      return LatLngBounds(
+        LatLng(p.latitude - eps, p.longitude - eps),
+        LatLng(p.latitude + eps, p.longitude + eps),
+      );
+    }
+    return LatLngBounds.fromPoints(points);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,11 +112,14 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         ? _getBestStopStations(allFuelStations, result)
         : allFuelStations;
 
-    final midIdx = result.route.geometry.length ~/ 2;
-    final center = result.route.geometry.isNotEmpty
-        ? result.route.geometry[midIdx]
-        : const LatLng(48.8566, 2.3522);
-    final zoom = _zoomForRoute(result.route.distanceKm);
+    // #2755 — frame the COMPLETE itinerary. `center`/`zoom` are only the
+    // pre-layout fallback (`MapOptions.initialCenter`/`initialZoom`); the
+    // real first-paint viewport is framed by `initialCameraFit` to
+    // `_routeBounds` inside `StationMapLayers`. The recenter button and
+    // the toggle therefore always refit to the SAME route bounds, so the
+    // camera holds across the All/Best toggle (no random re-zoom).
+    final center = _initialCenter;
+    const zoom = 6.0;
 
     // #2631 — price each station by ITS country's profile fuel (offline,
     // from lat/lng) so a cross-border Spanish station shows the E10 price
@@ -116,7 +158,15 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             searchRadiusKm: 5,
             selectedFuel: widget.selectedFuel,
             showRecenterButton: true,
-            onRecenter: () => widget.mapController.move(center, zoom),
+            // #2755 — recenter refits to the same full-route bounds the
+            // camera was framed to, never the (changing) station subset.
+            onRecenter: () => widget.mapController.fitCamera(
+              CameraFit.bounds(
+                bounds: _routeBounds,
+                padding: const EdgeInsets.all(32),
+              ),
+            ),
+            cameraFitBounds: _routeBounds,
             routePolyline: result.route.geometry,
             showSearchRadius: false,
             selectedStationIds:
@@ -269,13 +319,5 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       }
     }
     return bestIdx;
-  }
-  double _zoomForRoute(double distanceKm) {
-    if (distanceKm <= 50) return 10;
-    if (distanceKm <= 100) return 9;
-    if (distanceKm <= 200) return 8;
-    if (distanceKm <= 500) return 7;
-    if (distanceKm <= 1000) return 6;
-    return 5;
   }
 }
