@@ -75,8 +75,15 @@ class SearchSummaryBar extends ConsumerWidget {
     final searching =
         routeState.isLoading || routeState.value?.isPartial == true;
     if (searching) {
+      // #2783 — a live spinner (not the static route icon) so a route search
+      // in progress — including the progressive/partial phase where real
+      // cards are already showing — clearly reads as still ongoing.
       return _SummaryChip(
-        icon: const Icon(Icons.route, size: 16),
+        icon: const SizedBox(
+          width: 14,
+          height: 14,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
         label: l10n?.routeSearchingChip ?? 'Searching the route…',
       );
     }

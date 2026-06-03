@@ -17,6 +17,7 @@ Future<void> pumpApp(
   List<Object>? overrides,
   Locale locale = const Locale('en'),
   TextDirection? textDirection,
+  bool settle = true,
 }) async {
   Widget body = child;
   if (textDirection != null) {
@@ -37,7 +38,14 @@ Future<void> pumpApp(
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  // `settle: false` for screens with an indefinite animation (e.g. a loading
+  // spinner / shimmer) that `pumpAndSettle` would wait on forever — pump a
+  // single frame so the first paint is asserted without hanging.
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
 }
 
 /// Convenience wrapper that pumps a widget with a custom [TextScaler].

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
@@ -110,9 +111,14 @@ void main() {
             const AsyncValue<RouteSearchResult?>.loading(),
           ),
         ],
+        // #2783 — the searching chip now carries an indefinite spinner;
+        // pumpAndSettle would hang, so pump a single frame.
+        settle: false,
       );
 
       expect(find.text('Searching the route…'), findsOneWidget);
+      // #2783 — a live spinner signals the search is ongoing.
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('Within 10 km'), findsNothing);
       expect(find.text('Every 50 km'), findsNothing);
     });
@@ -141,9 +147,12 @@ void main() {
             ),
           ),
         ],
+        // #2783 — spinner animates indefinitely during the partial phase too.
+        settle: false,
       );
 
       expect(find.text('Searching the route…'), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('Every 50 km'), findsNothing);
     });
 
