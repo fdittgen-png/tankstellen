@@ -107,9 +107,16 @@ class ReceiptPdfRasterizer {
           '(${image.bytes.length} bytes)');
       return jpegPath;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'ReceiptPdfRasterizer.rasterize',
-      }));
+      // A never-throws boundary must not let its OWN error logging turn a
+      // caught failure back into a throw — e.g. headless, where the absent
+      // pdfx platform channel is the very failure being absorbed.
+      try {
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+          'where': 'ReceiptPdfRasterizer.rasterize',
+        }));
+      } catch (_) {
+        // best-effort logging; swallow so `null` is always returned
+      }
       return null;
     } finally {
       // Close in reverse order; each close is itself best-effort so a

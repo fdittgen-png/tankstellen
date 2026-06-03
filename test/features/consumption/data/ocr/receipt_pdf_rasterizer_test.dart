@@ -42,22 +42,25 @@ void main() {
   group('ReceiptPdfRasterizer.rasterize — never throws (#2349)', () {
     test('a missing file returns null, not a throw', () async {
       final badPath = '${tempDir.path}/does_not_exist.pdf';
-      expect(
-        () async => rasterizer.rasterize(badPath),
-        returnsNormally,
+      // Await the result. An unawaited `returnsNormally` on an async fn leaks
+      // the future — if it later completes with an error (e.g. headless,
+      // where the absent pdfx platform channel throws) that surfaces as an
+      // *unhandled* async error and fails the test. `completion(isNull)`
+      // awaits + asserts the documented null fault path without leaking.
+      await expectLater(
+        rasterizer.rasterize(badPath),
+        completion(isNull),
         reason: 'a missing PDF must be caught + logged, never propagated',
       );
-      expect(await rasterizer.rasterize(badPath), isNull);
     });
 
     test('a zero-byte file returns null, not a throw', () async {
       final zeroByte = File('${tempDir.path}/empty.pdf')..createSync();
       expect(zeroByte.lengthSync(), 0);
-      expect(
-        () async => rasterizer.rasterize(zeroByte.path),
-        returnsNormally,
+      await expectLater(
+        rasterizer.rasterize(zeroByte.path),
+        completion(isNull),
       );
-      expect(await rasterizer.rasterize(zeroByte.path), isNull);
     });
 
     test('a corrupt (non-PDF) file returns null, not a throw', () async {
@@ -65,11 +68,10 @@ void main() {
       // (or, headless, the channel is absent); either way → null.
       final corrupt = File('${tempDir.path}/garbage.pdf')
         ..writeAsStringSync('this is definitely not a PDF document');
-      expect(
-        () async => rasterizer.rasterize(corrupt.path),
-        returnsNormally,
+      await expectLater(
+        rasterizer.rasterize(corrupt.path),
+        completion(isNull),
       );
-      expect(await rasterizer.rasterize(corrupt.path), isNull);
     });
 
     test('a file with a PDF magic header but garbage body returns null',
@@ -81,11 +83,10 @@ void main() {
           0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a, // %PDF-1.4\n
           ...List<int>.filled(64, 0x00),
         ]);
-      expect(
-        () async => rasterizer.rasterize(header.path),
-        returnsNormally,
+      await expectLater(
+        rasterizer.rasterize(header.path),
+        completion(isNull),
       );
-      expect(await rasterizer.rasterize(header.path), isNull);
     });
   });
 }
