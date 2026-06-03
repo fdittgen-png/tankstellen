@@ -49,13 +49,16 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   RouteViewMode _viewMode = RouteViewMode.allStations;
   final Set<String> _selectedStationIds = {};
 
-  /// #2755 — the camera target: the bounds of the FULL route polyline,
-  /// unioned with every along-route fuel station, computed ONCE from the
-  /// immutable result. Framing these (instead of a ~5 km circle around the
-  /// polyline midpoint) makes the camera show the COMPLETE itinerary; being
-  /// constant across the All/Best toggle, it keeps `StationMapLayers`'
-  /// value-`==` `_lastFitBounds` guard a no-op so the camera holds and never
-  /// re-zooms to the changed station subset.
+  /// #2782 — the camera target: the bounds of the along-route fuel STATIONS
+  /// (the search results), computed ONCE from the immutable result. #2755
+  /// originally framed the full route polyline so the camera showed the
+  /// COMPLETE itinerary, but for a cross-border itinerary that polyline spans
+  /// both countries and the camera zooms far out ("shows far too much").
+  /// Framing the results keeps the scope fit to what the user is actually
+  /// looking at. Computed from ALL result stations (not the displayed
+  /// All/Best subset), so it stays constant across the toggle and keeps
+  /// `StationMapLayers`' value-`==` `_lastFitBounds` guard a no-op — the
+  /// camera holds and never re-zooms to the changed subset.
   late final LatLngBounds _routeBounds = _computeRouteBounds();
 
   /// Pre-layout camera fallback used by `MapOptions.initialCenter` /
@@ -68,18 +71,23 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       .map((r) => r.station)
       .toList();
 
-  /// Build the route-framing bounds from the polyline geometry unioned
-  /// with the along-route fuel stations. A degenerate single-point set
-  /// gets a tiny epsilon box so `CameraFit.bounds` can't divide-by-zero
-  /// (the same fallback as `trip_path_map_card.dart`).
+  /// Build the framing bounds from the along-route fuel STATIONS (the search
+  /// results) so the camera scope fits what was found (#2782). Falls back to
+  /// the full route polyline only when there are no stations (so an empty
+  /// route still frames something), then to a Paris box if there is no
+  /// geometry either. A degenerate single-point set gets a tiny epsilon box so
+  /// `CameraFit.bounds` can't divide-by-zero (as in `trip_path_map_card.dart`).
   LatLngBounds _computeRouteBounds() {
     final points = <LatLng>[
-      ...widget.routeResult.route.geometry,
       for (final s in _allFuelStations) LatLng(s.lat, s.lng),
     ];
     if (points.isEmpty) {
-      // No geometry and no stations — fall back to a Paris-centred box.
-      // (The build method renders an EmptyState in this case anyway.)
+      // No results to frame — fall back to the route geometry so the
+      // itinerary is still visible (the build method renders an EmptyState
+      // in this case anyway), then to a Paris-centred box.
+      points.addAll(widget.routeResult.route.geometry);
+    }
+    if (points.isEmpty) {
       points.add(const LatLng(48.8566, 2.3522));
     }
     if (points.length == 1) {

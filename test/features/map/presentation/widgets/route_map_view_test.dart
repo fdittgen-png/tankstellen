@@ -275,19 +275,20 @@ void main() {
       stationAt('c', 52.78, 13.95), // east of the polyline's max lng
     ];
 
-    /// Expected camera target: bounds of the polyline UNIONED with every
-    /// station — exactly what `RouteMapView._computeRouteBounds` builds.
-    LatLngBounds unionBounds(List<LatLng> geometry, List<Station> stations) {
+    /// Expected camera target (#2782): bounds of the STATIONS (the search
+    /// results) only — exactly what `RouteMapView._computeRouteBounds` now
+    /// builds. The polyline geometry is intentionally NOT unioned in, so a
+    /// long cross-border route no longer drags the camera far out.
+    LatLngBounds stationBounds(List<Station> stations) {
       return LatLngBounds.fromPoints([
-        ...geometry,
         for (final s in stations) LatLng(s.lat, s.lng),
       ]);
     }
 
     testWidgets(
-      'frames the whole route: visibleBounds contains every polyline point '
-      'and every station; camera centre ≈ union-bounds centre (NOT the '
-      'polyline midpoint)',
+      'frames the SEARCH RESULTS: fit target is the station bounds, and the '
+      'far polyline start (SW of the station cluster) is NOT framed — the '
+      'cross-border over-zoom fix (#2782)',
       (tester) async {
         final controller = MapController();
         addTearDown(controller.dispose);
@@ -306,39 +307,36 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final expected = unionBounds(asymmetricRoute, routeStations);
+        final expected = stationBounds(routeStations);
 
-        // The StationMapLayers explicit fit target IS the union bounds —
-        // not a 5 km circle around any midpoint (approach (a) contract).
+        // The StationMapLayers explicit fit target IS the station (results)
+        // bounds — NOT the polyline∪stations union (#2782).
         final layers =
             tester.widget<StationMapLayers>(find.byType(StationMapLayers));
         expect(layers.cameraFitBounds, expected,
-            reason: 'route mode frames the polyline∪stations bounds');
+            reason: 'route mode frames the search-result stations, not the '
+                'full route polyline');
 
-        // The real camera frames the whole itinerary: every polyline point
-        // and every station is inside the visible viewport.
+        // The far polyline START (p0, SW of the station cluster) is OUTSIDE
+        // the fit bounds — this is the whole point of #2782: a long
+        // cross-border route no longer drags the camera out to the geometry.
+        final polylineStart = asymmetricRoute.first; // 52.40, 13.20
+        expect(expected.contains(polylineStart), isFalse,
+            reason: 'the fit target must exclude the far route geometry so a '
+                'cross-border itinerary does not over-zoom');
+
+        // Every station (result) is inside the visible viewport.
         final visible = controller.camera.visibleBounds;
-        for (final p in asymmetricRoute) {
-          expect(visible.contains(p), isTrue,
-              reason: 'polyline point $p must be in view');
-        }
         for (final s in routeStations) {
           expect(visible.contains(LatLng(s.lat, s.lng)), isTrue,
               reason: 'station ${s.id} must be in view');
         }
 
-        // The camera centre is the union-bounds centre, NOT geometry[mid].
-        final midIdx = asymmetricRoute.length ~/ 2;
-        final mid = asymmetricRoute[midIdx];
+        // The camera centre is the station-bounds centre.
         expect(controller.camera.center.latitude,
             closeTo(expected.center.latitude, 0.02));
         expect(controller.camera.center.longitude,
             closeTo(expected.center.longitude, 0.02));
-        expect(
-          (controller.camera.center.longitude - mid.longitude).abs(),
-          greaterThan(0.1),
-          reason: 'must NOT centre on the polyline midpoint (the #2755 bug)',
-        );
 
         expect(tester.takeException(), isNull);
       },
