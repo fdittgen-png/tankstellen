@@ -16,7 +16,6 @@ import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
