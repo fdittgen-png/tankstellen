@@ -8,14 +8,11 @@ import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../profile/domain/entities/user_profile.dart';
-import '../../../profile/providers/profile_provider.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../domain/entities/search_result_item.dart';
 import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
-import 'nearest_shortcut_card.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
 
@@ -69,14 +66,6 @@ class SearchResultsContent extends ConsumerWidget {
       );
     }
 
-    // #494 — the nearest-stations shortcut only makes sense for users
-    // whose preferred landing screen is "nearest". If they picked
-    // favorites / cheapest / map, pushing "Stations les plus proches"
-    // at them ignores their explicit preference.
-    final profile = ref.watch(activeProfileProvider);
-    final showNearestShortcut =
-        profile == null || profile.landingScreen == LandingScreen.nearest;
-
     return searchState.when(
       data: (result) {
         if (result.data.isEmpty) {
@@ -85,10 +74,13 @@ class SearchResultsContent extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (showNearestShortcut) ...[
-                    NearestShortcutCard(onTap: onGpsRetry),
-                    const SizedBox(height: 16),
-                  ],
+                  // #2743 — the redundant "Stations les plus proches" CTA
+                  // card was removed; it duplicated the always-visible
+                  // central search FAB and the Fuel Station Radar button.
+                  // #2131 — the empty-state inline "Search" CTA moved to
+                  // the central FAB. The shell's FAB is always visible
+                  // on this screen, so the empty state is no longer a
+                  // dead-end even without an inline button.
                   Text(
                     l10n?.startSearch ?? 'Search to find fuel stations.',
                     style: TextStyle(
@@ -96,10 +88,6 @@ class SearchResultsContent extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  // #2131 — the empty-state inline "Search" CTA moved to
-                  // the central FAB. The shell's FAB is always visible
-                  // on this screen, so the empty state is no longer a
-                  // dead-end even without an inline button.
                 ],
               ),
             ),
