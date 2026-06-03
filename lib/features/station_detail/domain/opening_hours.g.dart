@@ -65,6 +65,7 @@ _WeeklyOpeningHours _$WeeklyOpeningHoursFromJson(Map<String, dynamic> json) =>
           ) ??
           OpeningHoursAvailability.notProvided,
       rawSource: json['rawSource'] as String?,
+      automate24h: json['automate24h'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$WeeklyOpeningHoursToJson(_WeeklyOpeningHours instance) =>
@@ -72,6 +73,7 @@ Map<String, dynamic> _$WeeklyOpeningHoursToJson(_WeeklyOpeningHours instance) =>
       'days': instance.days.map((e) => e.toJson()).toList(),
       'availability': _$OpeningHoursAvailabilityEnumMap[instance.availability]!,
       'rawSource': instance.rawSource,
+      'automate24h': instance.automate24h,
     };
 
 const _$OpeningHoursAvailabilityEnumMap = {

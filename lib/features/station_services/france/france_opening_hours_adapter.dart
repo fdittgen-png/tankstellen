@@ -17,22 +17,26 @@ import '../opening_hours/opening_hours_adapter.dart';
 /// A bare `String` is also accepted as a convenience (treated as the
 /// `horaires_jour` value with no automate flag).
 ///
-/// ## Normalisation rules (the four feed quirks this adapter owns)
-/// 1. **`Automate-24-24` prefix** — stripped. When the automate flag is set
-///    the whole week is [WeeklyOpeningHours.allWeek24h] regardless of the
-///    per-day ranges (the unattended pump is open 24/7).
+/// ## Normalisation rules (the feed quirks this adapter owns)
+/// 1. **`Automate : 24/24`** — the unattended pump runs 24/7. This is an
+///    *orthogonal* indicator surfaced as [WeeklyOpeningHours.automate24h];
+///    the **staffed boutique/guichet per-day ranges are still parsed and
+///    kept** (#2742). Only when the automate flag is set *and there is no
+///    staffed schedule at all* does the whole week fall back to
+///    [WeeklyOpeningHours.allWeek24h] (pump-only).
 /// 2. **The missing-space bug** — the feed glues the day name onto the first
-///    clock (`Lundi07.00-18.30`). The legacy `replaceAll(', ', '\n')` flattener
-///    never separated them. Here a single regex captures the day name and the
-///    `HH.MM-HH.MM` range as **separate groups**, so the structural split is
-///    correct by construction.
-/// 3. **The `01:00-01:00` degenerate sentinel** — the feed emits an
-///    open==close range to mean "no real interval". Such a day resolves to
-///    [DayState.unknown] (the literal range is dropped), never a real interval
-///    and never 24h ([TimeRange.isDegenerate]).
-/// 4. **Split shifts** — a lunch break is published as two entries for the
-///    same day (`Mardi08.00-12.00, Mardi14.00-19.00`); both ranges coalesce
-///    into that day's [DayHours.ranges].
+///    clock (`Lundi07.00-18.30`). The parser tokenises on the seven day
+///    words, so the day label is split off its clock by construction (#2710).
+/// 3. **A day name with NO range** — a bare `Lundi` / a trailing `Dimanche`
+///    means *closed that day* (Prix-Carburants `Fermé`). It resolves to
+///    [DayState.closed], never dropped (#2742).
+/// 4. **The `01:00-01:00` degenerate sentinel** — the feed emits an
+///    open==close range to mean "no real interval". A day whose only token is
+///    such a range resolves to [DayState.unknown] (the literal range is
+///    dropped), never a real interval and never 24h ([TimeRange.isDegenerate]).
+/// 5. **Split shifts / lunch breaks** — a day publishes two ranges joined by
+///    ` et ` (`Lundi 08.00-12.00 et 14.00-18.00`) or, rarely, as two same-day
+///    entries; both ranges coalesce into that day's [DayHours.ranges].
 ///
 /// A day the feed omits is left out of [WeeklyOpeningHours.days] (implicitly
 /// unknown). Empty / unparseable input returns [WeeklyOpeningHours.notAvailable].
@@ -58,12 +62,21 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
     'dimanche': OpeningDay.sun,
   };
 
-  /// Captures `<DayName><HH.MM>-<HH.MM>` (the glued feed form) in three
-  /// groups: day label, start clock, end clock. The day label is letters only
-  /// (incl. accents), so the regex cleanly splits `Lundi07.00-18.30` without a
-  /// separating space — the structural fix for the missing-space bug (#2710).
-  static final RegExp _dayRangeRe = RegExp(
-    r'([A-Za-zÀ-ÿ]+)\s*(\d{1,2})[.:](\d{2})\s*-\s*(\d{1,2})[.:](\d{2})',
+  /// Matches a French weekday word anywhere in the string (case/accent
+  /// tolerated by the alternation + the `i` flag). Used to tokenise the feed
+  /// into one segment per day — the structural split that survives the
+  /// missing-space glue (`Lundi07.00`), bare days (`Lundi,`), and ` et `
+  /// split shifts alike (#2710, #2742).
+  static final RegExp _dayWordRe = RegExp(
+    'lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche',
+    caseSensitive: false,
+  );
+
+  /// Matches one `HH.MM-HH.MM` (or `HH:MM-HH:MM`) clock range within a day's
+  /// segment. `allMatches` picks up both halves of a ` et `-joined split
+  /// shift.
+  static final RegExp _clockRangeRe = RegExp(
+    r'(\d{1,2})[.:](\d{2})\s*-\s*(\d{1,2})[.:](\d{2})',
   );
 
   @override
@@ -72,57 +85,87 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
       final (raw, automate24h) = _narrow(rawProviderData);
       if (raw == null) return WeeklyOpeningHours.notAvailable;
 
-      // The 24/7-automate flag wins outright: the unattended pump is open all
-      // week regardless of the staffed per-day ranges.
-      if (automate24h) {
-        return WeeklyOpeningHours.allWeek24h(rawSource: raw);
-      }
-
       final trimmed = raw.trim();
-      if (trimmed.isEmpty) return WeeklyOpeningHours.notAvailable;
-
-      // Accumulate ranges per day (split shifts coalesce). A day that appears
-      // only as a degenerate `01:00-01:00` sentinel lands here with an empty
-      // range list → resolved to `unknown` below.
-      final ranges = <OpeningDay, List<TimeRange>>{};
-      final seen = <OpeningDay>{};
-      var matchedAny = false;
-
-      for (final m in _dayRangeRe.allMatches(trimmed)) {
-        matchedAny = true;
-        final day = _dayByLabel[_fold(m.group(1)!)];
-        if (day == null) continue;
-        seen.add(day);
-
-        final range = TimeRange.fromClock(
-          startHour: int.parse(m.group(2)!),
-          startMinute: int.parse(m.group(3)!),
-          endHour: int.parse(m.group(4)!),
-          endMinute: int.parse(m.group(5)!),
-        );
-        // Degenerate `01:00-01:00` → no real interval. Drop the range; the day
-        // is recorded as `seen` so it resolves to `unknown`, never 24h.
-        if (range.isDegenerate) continue;
-        (ranges[day] ??= <TimeRange>[]).add(range);
+      // No usable schedule text. A pure automate flag with no schedule still
+      // means the pump is open 24/7 (#2742); without it there is no data.
+      if (trimmed.isEmpty) {
+        return automate24h
+            ? WeeklyOpeningHours.allWeek24h(rawSource: raw, automate24h: true)
+            : WeeklyOpeningHours.notAvailable;
       }
 
-      if (!matchedAny) return WeeklyOpeningHours.notAvailable;
+      // Tokenise on the day words: each day's segment runs from just after its
+      // label to the start of the next day label (or end of string). This
+      // splits `Lundi07.00-18.30` (glued), `Lundi,` (bare → closed), and
+      // `Lundi 08.00-12.00 et 14.00-18.00` (split shift) uniformly.
+      final matches = _dayWordRe.allMatches(trimmed).toList();
+      // Per-day accumulators. `closed` = a bare day token with no clock at
+      // all; `unknown` = a day whose only clock was the degenerate sentinel.
+      final ranges = <OpeningDay, List<TimeRange>>{};
+      final closed = <OpeningDay>{};
+      final degenerateOnly = <OpeningDay>{};
 
-      final days = <DayHours>[];
-      for (final day in kRegularWeekdays) {
-        if (!seen.contains(day)) continue; // omitted → implicitly unknown
-        final dayRanges = ranges[day];
-        if (dayRanges == null || dayRanges.isEmpty) {
-          // The day appeared but carried only a degenerate sentinel.
-          days.add(DayHours(day: day, state: DayState.unknown));
-        } else {
-          days.add(
-            DayHours(day: day, state: DayState.openRanges, ranges: dayRanges),
+      for (var i = 0; i < matches.length; i++) {
+        final m = matches[i];
+        final day = _dayByLabel[_fold(m.group(0)!)];
+        if (day == null) continue;
+        final segEnd =
+            i + 1 < matches.length ? matches[i + 1].start : trimmed.length;
+        final segment = trimmed.substring(m.end, segEnd);
+
+        var sawClock = false;
+        var sawUsable = false;
+        for (final c in _clockRangeRe.allMatches(segment)) {
+          sawClock = true;
+          final range = TimeRange.fromClock(
+            startHour: int.parse(c.group(1)!),
+            startMinute: int.parse(c.group(2)!),
+            endHour: int.parse(c.group(3)!),
+            endMinute: int.parse(c.group(4)!),
           );
+          // Degenerate `01:00-01:00` carries no real interval — drop it.
+          if (range.isDegenerate) continue;
+          sawUsable = true;
+          (ranges[day] ??= <TimeRange>[]).add(range);
+        }
+
+        if (sawUsable) {
+          continue; // real ranges recorded above
+        } else if (sawClock) {
+          // Only a degenerate sentinel → "no real interval" → unknown.
+          degenerateOnly.add(day);
+        } else {
+          // Bare day name, no clock at all → closed (Fermé).
+          closed.add(day);
         }
       }
 
-      if (days.isEmpty) return WeeklyOpeningHours.notAvailable;
+      final days = <DayHours>[];
+      for (final day in kRegularWeekdays) {
+        final dayRanges = ranges[day];
+        if (dayRanges != null && dayRanges.isNotEmpty) {
+          days.add(
+            DayHours(day: day, state: DayState.openRanges, ranges: dayRanges),
+          );
+        } else if (closed.contains(day)) {
+          days.add(DayHours(day: day, state: DayState.closed));
+        } else if (degenerateOnly.contains(day)) {
+          days.add(DayHours(day: day, state: DayState.unknown));
+        }
+        // else: omitted → implicitly unknown (left out of `days`).
+      }
+
+      // Whether any staffed signal at all was resolved (open/closed/unknown).
+      final hasSchedule = days.isNotEmpty;
+      final hasStaffedRanges = days.any((d) => d.state == DayState.openRanges);
+
+      // Automate-only: the flag is set but the feed gave no real staffed
+      // ranges (every day is closed/unknown/omitted) → pump-only 24/7.
+      if (automate24h && !hasStaffedRanges) {
+        return WeeklyOpeningHours.allWeek24h(rawSource: raw, automate24h: true);
+      }
+
+      if (!hasSchedule) return WeeklyOpeningHours.notAvailable;
 
       // `full` when every regular weekday is resolved, else `partial`.
       final availability = days.length == kRegularWeekdays.length
@@ -132,6 +175,7 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
         days: days,
         availability: availability,
         rawSource: raw,
+        automate24h: automate24h,
       );
     } catch (_) {
       // Contract: never throw — degrade to no-data.

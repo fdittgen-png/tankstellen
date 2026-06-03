@@ -143,6 +143,15 @@ enum OpeningHoursAvailability { full, partial, notProvided }
 /// the schedule the source actually provided, and [rawSource] keeps the
 /// untouched provider string (OSM `opening_hours` value, etc.) for debugging
 /// / round-tripping. Use [notAvailable] for the graceful no-data state.
+///
+/// [automate24h] is an *orthogonal* indicator: some sites (the FR
+/// Prix-Carburants `Automate : 24/24` flag, #2742) run an unattended pump
+/// around the clock **while the staffed boutique keeps its own per-day
+/// [days] schedule**. It is true only for those sites; a plain whole-station
+/// 24/7 schedule (every day [DayState.open24h]) leaves it false. The display
+/// layer renders a "24/7 automate" badge from it *in addition to* the
+/// staffed table, instead of collapsing everything to a single "Open 24
+/// hours" row.
 @freezed
 abstract class WeeklyOpeningHours with _$WeeklyOpeningHours {
   const WeeklyOpeningHours._();
@@ -152,6 +161,7 @@ abstract class WeeklyOpeningHours with _$WeeklyOpeningHours {
     @Default(OpeningHoursAvailability.notProvided)
     OpeningHoursAvailability availability,
     String? rawSource,
+    @Default(false) bool automate24h,
   }) = _WeeklyOpeningHours;
 
   factory WeeklyOpeningHours.fromJson(Map<String, dynamic> json) =>
@@ -163,11 +173,20 @@ abstract class WeeklyOpeningHours with _$WeeklyOpeningHours {
   static const WeeklyOpeningHours notAvailable = WeeklyOpeningHours();
 
   /// A whole-station 24/7 schedule: all seven regular weekdays open24h.
-  factory WeeklyOpeningHours.allWeek24h({String? rawSource}) =>
+  ///
+  /// Pass [automate24h] `true` for a pump-only 24/7 site that carries no
+  /// staffed per-day schedule (the FR `Automate : 24/24` feed with no
+  /// boutique hours, #2742) — the display still shows the "24/7 automate"
+  /// badge.
+  factory WeeklyOpeningHours.allWeek24h({
+    String? rawSource,
+    bool automate24h = false,
+  }) =>
       WeeklyOpeningHours(
         days: [for (final d in kRegularWeekdays) DayHours.allDay(d)],
         availability: OpeningHoursAvailability.full,
         rawSource: rawSource,
+        automate24h: automate24h,
       );
 
   /// The [DayHours] for [day], or `null` when the source did not cover it

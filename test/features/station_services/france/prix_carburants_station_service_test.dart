@@ -544,7 +544,9 @@ void main() {
       expect(result.data.station.is24h, isFalse);
     });
 
-    test('24/7 automate → all-week open24h structured schedule', () async {
+    test(
+        '24/7 automate + staffed boutique → keeps the staffed schedule and '
+        'flags automate24h, not collapsed to all-24h (#2742)', () async {
       final response = {
         'results': [
           {
@@ -566,7 +568,40 @@ void main() {
       final result = await svc.getStationDetail('fr-34550044');
       final hours = result.data.openingHours;
 
+      // The orthogonal 24/7-automate indicator is set …
+      expect(hours?.automate24h, isTrue);
+      // … and the staffed Monday is PRESERVED, not turned into open24h (#2742).
+      expect(hours?.dayFor(OpeningDay.mon)?.state, DayState.openRanges);
+      expect(hours?.dayFor(OpeningDay.mon)?.ranges.single.startMinutes, 7 * 60);
+      // The legacy pump flag still reflects the automate.
+      expect(result.data.station.is24h, isTrue);
+    });
+
+    test('24/7 automate with NO staffed schedule → pump-only all-week open24h',
+        () async {
+      final response = {
+        'results': [
+          {
+            'id': '34550045',
+            'adresse': 'AIRE AUTOROUTE',
+            'ville': 'BEZIERS',
+            'cp': '34500',
+            'geom': {'lat': 43.34, 'lon': 3.21},
+            'gazole_prix': 1.7,
+            'horaires_automate_24_24': 'Oui',
+            'horaires_jour': 'Automate-24-24',
+          },
+        ],
+      };
+      final adapter = _TrackingMockAdapter()..addResponse(response);
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio, enricher: null);
+
+      final result = await svc.getStationDetail('fr-34550045');
+      final hours = result.data.openingHours;
+
       expect(hours?.availability, OpeningHoursAvailability.full);
+      expect(hours?.automate24h, isTrue);
       expect(hours?.dayFor(OpeningDay.sun)?.state, DayState.open24h);
       expect(result.data.wholeDay, isTrue);
       expect(result.data.station.is24h, isTrue);
