@@ -1761,6 +1761,22 @@
   },
   {
     "make": "Peugeot",
+    "model": "107",
+    "generation": "I (2005-2014)",
+    "yearStart": 2005,
+    "yearEnd": 2014,
+    "displacementCc": 998,
+    "fuelType": "petrol",
+    "transmission": "manual",
+    "volumetricEfficiency": 0.85,
+    "odometerPidStrategy": "psaUds",
+    "inductionType": "naturallyAspirated",
+    "directInjection": false,
+    "atkinsonCycle": false,
+    "notes": "1.0 12v city car (PSA/Toyota triplet with C1/Aygo)"
+  },
+  {
+    "make": "Peugeot",
     "model": "108",
     "generation": "I (2014-2021)",
     "yearStart": 2014,
