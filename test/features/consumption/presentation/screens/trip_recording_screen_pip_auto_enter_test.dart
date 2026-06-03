@@ -13,6 +13,7 @@ import 'package:tankstellen/features/consumption/providers/pip_mode_provider.dar
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
 import '../../../../helpers/silence_error_logger.dart';
+import '../../../../helpers/recording_profile_override.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// #2274 concern 4 — foreground-then-PiP auto-enter (Android). With the
@@ -93,6 +94,7 @@ void main() {
       overrides: [
         tripRecordingProvider.overrideWith(() => _ActiveTripRecording()),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
         pipControllerProvider.overrideWithValue(pip),
       ],
     );

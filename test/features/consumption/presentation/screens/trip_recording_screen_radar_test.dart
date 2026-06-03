@@ -20,6 +20,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/silence_error_logger.dart';
+import '../../../../helpers/recording_profile_override.dart';
 
 /// #2380 — the closest-station radar card leads the active recording
 /// column and the consumption/coaching card (MinimalDriveSummary) is
@@ -67,6 +68,7 @@ void main() {
       overrides: [
         tripRecordingProvider.overrideWith(_LiveFakeTripRecording.new),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
         // Fake provider override pushing an in-radius approach hit —
         // the radar card renders this station directly (no GPS / search
         // chain needed) at the top of the column.
@@ -110,6 +112,7 @@ void main() {
       overrides: [
         tripRecordingProvider.overrideWith(_LiveFakeTripRecording.new),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
         effectiveApproachStateProvider.overrideWithValue(null),
         effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
         radarCandidateListProvider.overrideWith((ref) async => const []),

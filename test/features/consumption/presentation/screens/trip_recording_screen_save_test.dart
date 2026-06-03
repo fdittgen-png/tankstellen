@@ -13,6 +13,7 @@ import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart'
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/recording_profile_override.dart';
 
 /// Regression coverage for #1185 — the Trip-summary CTA must save a
 /// trip as a consumption record, NOT pretend to be a fill-up.
@@ -114,6 +115,7 @@ Future<void> _pumpAndStop(
     overrides: [
       tripRecordingProvider.overrideWith(() => notifier),
       wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+            recordingProfileOverride(),
     ],
   );
 
@@ -176,6 +178,7 @@ void main() {
         overrides: [
           tripRecordingProvider.overrideWith(() => notifier),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+            recordingProfileOverride(),
         ],
       );
 
@@ -247,6 +250,7 @@ void main() {
         overrides: [
           tripRecordingProvider.overrideWith(() => notifier),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+            recordingProfileOverride(),
         ],
       );
 

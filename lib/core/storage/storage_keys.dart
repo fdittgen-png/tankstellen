@@ -125,6 +125,11 @@ class StorageKeys {
   static const String defaultBrands = 'default_brands';
   static const String defaultExcludeHighway = 'default_exclude_highway';
 
+  /// #2785 — "always pin when the fuel-station radar starts" preference.
+  /// Defaults to true (absent key → on), mirroring the trip-recording
+  /// auto-pin default; the radar pin-help sheet's toggle persists it.
+  static const String radarAutoPin = 'radar_auto_pin';
+
   /// #2274 concern 1 — JSON-encoded global [RecordingProfile]
   /// (autoPin / autoEnterReducedOnStart / keepScreenAwake). Absent ⇒
   /// every field off (the opt-in-each-drive default). Applied on the

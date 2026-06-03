@@ -17,6 +17,7 @@ import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart'
 import 'package:tankstellen/features/driving/haptic_eco_coach.dart';
 import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider.dart';
 import '../../../../helpers/silence_error_logger.dart';
+import '../../../../helpers/recording_profile_override.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -120,6 +121,7 @@ Future<void> _pumpRecordingScreen(
         () => _FakeTripRecording(state ?? _recordingState()),
       ),
       wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
       hapticEcoCoachLifecycleProvider
           .overrideWith(() => _FakeHapticEcoCoachLifecycle(
                 coachEventsController,
@@ -198,6 +200,7 @@ void main() {
             () => _FakeTripRecording(_recordingState()),
           ),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
           hapticEcoCoachLifecycleProvider
               .overrideWith(() => _FakeHapticEcoCoachLifecycle(events)),
         ],
@@ -342,6 +345,7 @@ void main() {
             () => _FakeTripRecording(_recordingState()),
           ),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
           hapticEcoCoachLifecycleProvider
               .overrideWith(() => _FakeHapticEcoCoachLifecycle(events)),
           settingsStorageProvider.overrideWithValue(settings),
@@ -409,6 +413,7 @@ void main() {
             () => _FakeTripRecording(_recordingState()),
           ),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
           hapticEcoCoachLifecycleProvider
               .overrideWith(() => _FakeHapticEcoCoachLifecycle(events)),
           settingsStorageProvider.overrideWithValue(settings),

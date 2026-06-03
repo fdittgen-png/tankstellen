@@ -16,8 +16,9 @@ import '../../../../helpers/pump_app.dart';
 
 /// #2274 concern 1 — the persisted [RecordingProfile.autoPin], when ON,
 /// must pin the recording form automatically on the screen's mount
-/// (wake lock acquired, no user tap). Default OFF must NOT auto-pin —
-/// preserving the deliberate opt-in-each-drive design of #891.
+/// (wake lock acquired, no user tap). #2785 — autoPin now defaults ON, so
+/// the default profile auto-pins; an explicit opt-out (autoPin: false) must
+/// NOT auto-pin.
 
 class _FakeWakelockFacade implements WakelockFacade {
   int enableCalls = 0;
@@ -104,13 +105,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('TripRecordingScreen auto-pin (#2274 concern 1)', () {
-    testWidgets('autoPin ON pins on mount — wake lock + filled pin icon',
+    testWidgets('autoPin ON (default) pins on mount — wake lock + filled icon',
         (tester) async {
       final facade = _FakeWakelockFacade();
       await _pump(
         tester,
         facade: facade,
-        profile: const RecordingProfile(autoPin: true),
+        // The default profile (#2785) has autoPin ON.
+        profile: RecordingProfile.defaults,
       );
 
       expect(facade.enableCalls, 1,
@@ -126,17 +128,17 @@ void main() {
       );
     });
 
-    testWidgets('autoPin OFF (default) does NOT pin — preserves opt-in',
+    testWidgets('autoPin explicitly OFF does NOT pin — honours the opt-out',
         (tester) async {
       final facade = _FakeWakelockFacade();
       await _pump(
         tester,
         facade: facade,
-        profile: RecordingProfile.defaults,
+        profile: const RecordingProfile(autoPin: false),
       );
 
       expect(facade.enableCalls, 0,
-          reason: 'default autoPin OFF must not auto-acquire the wake lock');
+          reason: 'an explicit autoPin OFF must not auto-acquire the wake lock');
       await _openOverflow(tester);
       expect(
         find.descendant(

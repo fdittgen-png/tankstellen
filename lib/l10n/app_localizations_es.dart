@@ -6329,6 +6329,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'transcurrido';
 
   @override
+  String get radarPinHelpTitle => 'About pin';
+
+  @override
+  String get radarPinHelpBody =>
+      'Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.';
+
+  @override
+  String get radarAutoPinTitle => 'Always pin when the radar starts';
+
+  @override
+  String get radarAutoPinSubtitle =>
+      'Pin the radar automatically every time instead of tapping each time. Uses more battery.';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frecuencia de comprobación';
 
   @override

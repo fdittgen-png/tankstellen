@@ -5455,6 +5455,22 @@
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
+  "radarPinHelpTitle": "About pin",
+  "@radarPinHelpTitle": {
+    "description": "Title of the bottom sheet explaining the pin button on the fuel-station radar (search) screen (#2785). Opened by long-pressing the pin in the AppBar."
+  },
+  "radarPinHelpBody": "Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.",
+  "@radarPinHelpBody": {
+    "description": "Body text in the radar pin-help bottom sheet (#2785). Explains what pinning does and that it releases when the radar stops."
+  },
+  "radarAutoPinTitle": "Always pin when the radar starts",
+  "@radarAutoPinTitle": {
+    "description": "Title of the opt-in switch in the radar pin-help bottom sheet (#2785). When on, the search screen pins itself (screen stays on, system bars hidden) automatically the moment the fuel-station radar starts, instead of the user tapping the pin each time. On by default."
+  },
+  "radarAutoPinSubtitle": "Pin the radar automatically every time instead of tapping each time. Uses more battery.",
+  "@radarAutoPinSubtitle": {
+    "description": "Subtitle under the always-pin opt-in switch in the radar pin-help bottom sheet (#2785). Explains the trade-off: convenience vs battery cost."
+  },
   "alertsRadiusFrequencyLabel": "Check frequency",
   "@alertsRadiusFrequencyLabel": {
     "description": "Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert."

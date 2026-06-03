@@ -12,6 +12,7 @@ import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart'
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/recording_profile_override.dart';
 
 /// #891 — pin toggle on the active-recording screen must:
 /// - swap the icon (outlined ↔ filled) and flip the semantic label.
@@ -94,6 +95,9 @@ Future<void> _pumpRecordingScreen(
         () => _FakeTripRecording(_recordingState()),
       ),
       wakelockFacadeProvider.overrideWithValue(facade),
+      // #2785 — these tests exercise the MANUAL pin toggle from an unpinned
+      // start, so pin the profile to auto-pin OFF (the global default is now ON).
+      recordingProfileOverride(),
     ],
   );
 }
