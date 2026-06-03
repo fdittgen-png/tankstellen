@@ -70,6 +70,18 @@ class StationMapLayers extends StatefulWidget {
   final List<LatLng>? routePolyline;
   final bool showSearchRadius;
 
+  /// #2755 — when non-null, the camera frames THESE bounds (both the
+  /// first-paint [MapOptions.initialCameraFit] and the post-ready re-fit)
+  /// instead of the [boundsForRadius] circle around [center]. Route mode
+  /// passes the full route-polyline bounds (unioned with the along-route
+  /// stations) so the camera frames the COMPLETE itinerary rather than a
+  /// ~5 km circle around the polyline midpoint, and the bounds stay
+  /// identical across the All/Best toggle so the camera holds.
+  ///
+  /// Null on a nearby/radius search → the [boundsForRadius] path is used,
+  /// byte-identical to the pre-#2755 behaviour (#2399 / #2510 unchanged).
+  final LatLngBounds? cameraFitBounds;
+
   /// When non-null, stations NOT in this set are rendered in pastel.
   /// Stations IN this set use vivid/flashy colors for quick identification.
   final Set<String>? selectedStationIds;
@@ -99,6 +111,7 @@ class StationMapLayers extends StatefulWidget {
     this.onRecenter,
     this.routePolyline,
     this.showSearchRadius = true,
+    this.cameraFitBounds,
     this.selectedStationIds,
     this.extraLayers = const [],
     this.fuelResolver,
@@ -268,9 +281,13 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// so this only handles the stations-arrived / centre-moved transition.
   LatLngBounds? _lastFitBounds;
 
-  /// Bounds of the search circle around the current centre — the camera
-  /// target for both `initialCameraFit` and the post-ready re-fit.
+  /// The camera target for both `initialCameraFit` and the post-ready
+  /// re-fit. #2755 — when an explicit [cameraFitBounds] is supplied (route
+  /// mode), frame exactly those bounds; otherwise (nearby mode) fall back
+  /// to the search circle around the current centre, byte-identical to the
+  /// pre-#2755 behaviour.
   LatLngBounds get _fitBounds =>
+      widget.cameraFitBounds ??
       StationMapLayers.boundsForRadius(widget.center, widget.searchRadiusKm);
 
   /// Recompute the memoised price range + marker list from the current
@@ -413,16 +430,17 @@ class _StationMapLayersState extends State<StationMapLayers> {
           options: MapOptions(
             initialCenter: widget.center,
             initialZoom: widget.zoom,
-            // #2399 — frame the search circle during the FIRST layout
+            // #2399 — frame the camera target during the FIRST layout
             // pass, not via a post-frame `fitCamera`. The old post-frame
             // fit raced the (now-deleted) cold-start reset window and
             // could land on a degenerate viewport. Positioning the
             // camera as part of layout means the very first tile fetch
             // already targets the right viewport — no reset needed.
+            // #2755 — `_fitBounds` is the explicit [cameraFitBounds] (route
+            // mode: the full itinerary) when supplied, else the search
+            // circle (nearby mode, unchanged).
             initialCameraFit: CameraFit.bounds(
-              bounds:
-                  StationMapLayers.boundsForRadius(
-                      widget.center, widget.searchRadiusKm),
+              bounds: _fitBounds,
               padding: const EdgeInsets.all(32),
             ),
             // #2399 — keep the FlutterMap (and its loaded tiles) alive

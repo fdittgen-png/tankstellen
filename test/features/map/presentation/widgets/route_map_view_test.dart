@@ -12,6 +12,7 @@ import 'package:tankstellen/features/itinerary/providers/itinerary_provider.dart
 import 'package:tankstellen/features/map/presentation/widgets/route_best_stops_list.dart';
 import 'package:tankstellen/features/map/presentation/widgets/route_info_bar.dart';
 import 'package:tankstellen/features/map/presentation/widgets/route_map_view.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/core/widgets/selectable_pill.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
@@ -236,6 +237,203 @@ void main() {
 
         // Two segments → two best stations.
         expect(find.text('2 best'), findsOneWidget);
+      },
+    );
+  });
+
+  // #2755 — route mode must frame the COMPLETE itinerary and hold the
+  // camera across the All/Best toggle (the radius circle around the
+  // polyline midpoint was the bug).
+  group('RouteMapView camera framing (#2755)', () {
+    // An ASYMMETRIC polyline: the midpoint index (geometry[mid] = p1) sits
+    // near the dense start, far from the centroid of the full span — so a
+    // route-bounds fit is provably distinct from the old midpoint centre.
+    final asymmetricRoute = <LatLng>[
+      const LatLng(52.40, 13.20), // p0 — south-west start
+      const LatLng(52.42, 13.25), // p1 — midpoint index (mid = 1)
+      const LatLng(52.80, 13.90), // p2 — far north-east end
+    ];
+
+    // Stations spread along the route, including one beyond the polyline's
+    // own longitude span so the UNION bounds differ from the polyline-only
+    // bounds and we can assert the union is what gets framed.
+    Station stationAt(String id, double lat, double lng) => Station(
+          id: id,
+          name: 'S-$id',
+          brand: 'Brand',
+          street: 'Street',
+          postCode: '00000',
+          place: 'Place',
+          lat: lat,
+          lng: lng,
+          isOpen: true,
+          e10: 1.70,
+        );
+    final routeStations = <Station>[
+      stationAt('a', 52.45, 13.30),
+      stationAt('b', 52.60, 13.55),
+      stationAt('c', 52.78, 13.95), // east of the polyline's max lng
+    ];
+
+    /// Expected camera target: bounds of the polyline UNIONED with every
+    /// station — exactly what `RouteMapView._computeRouteBounds` builds.
+    LatLngBounds unionBounds(List<LatLng> geometry, List<Station> stations) {
+      return LatLngBounds.fromPoints([
+        ...geometry,
+        for (final s in stations) LatLng(s.lat, s.lng),
+      ]);
+    }
+
+    testWidgets(
+      'frames the whole route: visibleBounds contains every polyline point '
+      'and every station; camera centre ≈ union-bounds centre (NOT the '
+      'polyline midpoint)',
+      (tester) async {
+        final controller = MapController();
+        addTearDown(controller.dispose);
+
+        final overrides = standardTestOverrides();
+        when(() => overrides.mockStorage.getActiveProfileId())
+            .thenReturn(null);
+
+        await pumpApp(
+          tester,
+          buildHost(
+            buildResult(stations: routeStations, geometry: asymmetricRoute),
+            controller,
+          ),
+          overrides: overrides.overrides,
+        );
+        await tester.pumpAndSettle();
+
+        final expected = unionBounds(asymmetricRoute, routeStations);
+
+        // The StationMapLayers explicit fit target IS the union bounds —
+        // not a 5 km circle around any midpoint (approach (a) contract).
+        final layers =
+            tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+        expect(layers.cameraFitBounds, expected,
+            reason: 'route mode frames the polyline∪stations bounds');
+
+        // The real camera frames the whole itinerary: every polyline point
+        // and every station is inside the visible viewport.
+        final visible = controller.camera.visibleBounds;
+        for (final p in asymmetricRoute) {
+          expect(visible.contains(p), isTrue,
+              reason: 'polyline point $p must be in view');
+        }
+        for (final s in routeStations) {
+          expect(visible.contains(LatLng(s.lat, s.lng)), isTrue,
+              reason: 'station ${s.id} must be in view');
+        }
+
+        // The camera centre is the union-bounds centre, NOT geometry[mid].
+        final midIdx = asymmetricRoute.length ~/ 2;
+        final mid = asymmetricRoute[midIdx];
+        expect(controller.camera.center.latitude,
+            closeTo(expected.center.latitude, 0.02));
+        expect(controller.camera.center.longitude,
+            closeTo(expected.center.longitude, 0.02));
+        expect(
+          (controller.camera.center.longitude - mid.longitude).abs(),
+          greaterThan(0.1),
+          reason: 'must NOT centre on the polyline midpoint (the #2755 bug)',
+        );
+
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'STABILITY: after a manual zoom-out, toggling Best ↔ All does NOT '
+      're-zoom — centre/zoom are identical across the two taps (#2755 lock)',
+      (tester) async {
+        final controller = MapController();
+        addTearDown(controller.dispose);
+
+        final overrides = standardTestOverrides();
+        when(() => overrides.mockStorage.getActiveProfileId())
+            .thenReturn(null);
+
+        await pumpApp(
+          tester,
+          buildHost(
+            buildResult(
+              stations: routeStations,
+              geometry: asymmetricRoute,
+              cheapestId: routeStations.first.id,
+            ),
+            controller,
+          ),
+          overrides: overrides.overrides,
+        );
+        await tester.pumpAndSettle();
+
+        // Simulate the user zooming out / panning away from the fitted view.
+        final fitted = controller.camera;
+        controller.move(fitted.center, fitted.zoom - 3);
+        await tester.pumpAndSettle();
+        final movedCenter = controller.camera.center;
+        final movedZoom = controller.camera.zoom;
+
+        // Toggle to Best stops: the marker subset shrinks, but the camera
+        // must stay exactly where the user left it (no random snap).
+        await tester.tap(find.text('Best stops'));
+        await tester.pumpAndSettle();
+        final afterBestCenter = controller.camera.center;
+        final afterBestZoom = controller.camera.zoom;
+
+        // Toggle back to All stations: again, no camera movement.
+        await tester.tap(find.text('All stations'));
+        await tester.pumpAndSettle();
+        final afterAllCenter = controller.camera.center;
+        final afterAllZoom = controller.camera.zoom;
+
+        // The camera held through BOTH toggles — no re-zoom, no snap to a
+        // station/cluster. The two taps produce IDENTICAL camera state.
+        expect(afterBestZoom, movedZoom,
+            reason: 'Best toggle must not re-zoom');
+        expect(afterAllZoom, movedZoom,
+            reason: 'All toggle must not re-zoom');
+        expect(afterAllZoom, afterBestZoom, reason: 'no randomness');
+        expect(afterBestCenter.latitude, closeTo(movedCenter.latitude, 1e-9));
+        expect(afterBestCenter.longitude, closeTo(movedCenter.longitude, 1e-9));
+        expect(afterAllCenter.latitude,
+            closeTo(afterBestCenter.latitude, 1e-9));
+        expect(afterAllCenter.longitude,
+            closeTo(afterBestCenter.longitude, 1e-9));
+
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'degenerate single-point route → no exception (epsilon box), camera '
+      'centred on the point',
+      (tester) async {
+        final controller = MapController();
+        addTearDown(controller.dispose);
+
+        final overrides = standardTestOverrides();
+        when(() => overrides.mockStorage.getActiveProfileId())
+            .thenReturn(null);
+
+        const point = LatLng(48.8566, 2.3522);
+        await pumpApp(
+          tester,
+          buildHost(
+            buildResult(stations: const [], geometry: const [point]),
+            controller,
+          ),
+          overrides: overrides.overrides,
+        );
+        await tester.pumpAndSettle();
+
+        // No CameraFit divide-by-zero on a single-point polyline.
+        expect(tester.takeException(), isNull);
+        expect(controller.camera.center.latitude, closeTo(point.latitude, 0.01));
+        expect(
+            controller.camera.center.longitude, closeTo(point.longitude, 0.01));
       },
     );
   });

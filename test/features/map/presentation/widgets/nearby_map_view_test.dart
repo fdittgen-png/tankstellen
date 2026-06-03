@@ -12,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/map/presentation/widgets/nearby_map_view.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -163,6 +164,45 @@ void main() {
 
         expect(controller.fitCount, baseline,
             reason: 'an unchanged fit target must NOT re-fit the camera');
+      },
+    );
+
+    testWidgets(
+      '#2755 — nearby stays on the boundsForRadius path: StationMapLayers '
+      'receives cameraFitBounds == null and the camera frames the search '
+      'circle (NOT the route-mode bounds), guarding #2399/#2510',
+      (tester) async {
+        final controller = _CountingMapController();
+        addTearDown(controller.dispose);
+
+        await pumpApp(
+          tester,
+          _Rebuildable(
+            controller: controller,
+            viewFor: viewFor,
+            initial: resultFor(parisStations),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // The #2755 contract: nearby mode passes NO explicit fit bounds, so
+        // `StationMapLayers._fitBounds` falls back to `boundsForRadius`,
+        // byte-identical to the pre-#2755 behaviour.
+        final layers =
+            tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+        expect(layers.cameraFitBounds, isNull,
+            reason: 'nearby must leave cameraFitBounds null (#2399/#2510)');
+
+        // And the first-paint fit target IS the search circle around the
+        // station centroid at the 19 km radius — not a route bound.
+        final expected = StationMapLayers.boundsForRadius(
+          StationMapLayers.centerOf(parisStations),
+          19,
+        );
+        final flutterMap = tester.widget<FlutterMap>(find.byType(FlutterMap));
+        final fit = flutterMap.options.initialCameraFit as FitBounds;
+        expect(fit.bounds, expected,
+            reason: 'nearby first paint frames boundsForRadius, unchanged');
       },
     );
 
