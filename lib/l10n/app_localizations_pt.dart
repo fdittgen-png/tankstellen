@@ -5649,6 +5649,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get home => 'Início';
 
   @override
+  String get accelBrakeCardTitle => 'Acceleration & braking';
+
+  @override
+  String get accelBrakeHardAccel => 'Hard accelerations';
+
+  @override
+  String get accelBrakeHardBrake => 'Hard braking';
+
+  @override
+  String get accelBrakeSharpCorner => 'Sharp corners';
+
+  @override
+  String get accelBrakeSource => 'From the phone\'s motion sensors';
+
+  @override
   String get locationConsentTitle => 'Acesso à localização';
 
   @override

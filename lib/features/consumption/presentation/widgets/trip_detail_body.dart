@@ -23,6 +23,7 @@ import 'driving_score_card.dart';
 import 'gps_diagnostics_card.dart';
 import 'gps_efficiency_kpi_card.dart';
 import 'obd2_diagnostics_trip_card.dart';
+import 'imu_accel_brake_card.dart';
 import 'throttle_rpm_histogram_card.dart';
 import 'trip_chart_section.dart';
 import 'trip_detail_charts.dart';
@@ -284,6 +285,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // GPS-only efficiency KPIs (#2697 P3) — only for engine-signal-less trips.
         if (_gpsFeatures != null)
           GpsEfficiencyKpiCard(features: _gpsFeatures),
+        // #2792 — dongle-less hard-accel/brake/sharp-corner counts the phone IMU
+        // detected on a GPS-only trip (persisted but previously surfaced
+        // nowhere). Shown only when at least one harsh event was recorded.
+        if (ImuAccelBrakeCard.summaryFor(widget.entry.summary) != null)
+          ImuAccelBrakeCard(summary: widget.entry.summary),
         // GPS sample diagnostics inspector (#1458 phase 2.5).
         // Read-only — rendered only when at least one diagnostic was
         // captured (legacy trips and flag-off trips skip this card so

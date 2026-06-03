@@ -4209,5 +4209,30 @@
   "@radarAutoPinSubtitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "accelBrakeCardTitle": "Acceleration & braking",
+  "@accelBrakeCardTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "accelBrakeHardAccel": "Hard accelerations",
+  "@accelBrakeHardAccel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "accelBrakeHardBrake": "Hard braking",
+  "@accelBrakeHardBrake": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "accelBrakeSharpCorner": "Sharp corners",
+  "@accelBrakeSharpCorner": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "accelBrakeSource": "From the phone's motion sensors",
+  "@accelBrakeSource": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
