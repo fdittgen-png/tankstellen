@@ -9903,6 +9903,30 @@ abstract class AppLocalizations {
   /// **'From the phone\'s motion sensors'**
   String get accelBrakeSource;
 
+  /// Trip-detail lesson headline (#2793) for hard braking detected by the phone IMU on a GPS-only trip. Placeholder is the integer episode count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hard braking events'**
+  String lessonHardBrake(String count);
+
+  /// Advice sub-line under the hard-braking lesson (#2793).
+  ///
+  /// In en, this message translates to:
+  /// **'Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.'**
+  String get lessonAdviceHardBrake;
+
+  /// Trip-detail lesson headline (#2793) for sharp cornering detected by the phone IMU. Placeholder is the integer episode count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sharp corners'**
+  String lessonSharpCornering(String count);
+
+  /// Advice sub-line under the sharp-cornering lesson (#2793).
+  ///
+  /// In en, this message translates to:
+  /// **'Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.'**
+  String get lessonAdviceSharpCornering;
+
   /// Title of the GDPR location-consent dialog (#2306). Replaces the legacy _ConsentTexts map that only covered 10 of 23 locales for the title.
   ///
   /// In en, this message translates to:

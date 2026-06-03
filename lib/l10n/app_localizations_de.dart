@@ -5660,6 +5660,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get accelBrakeSource => 'Aus den Bewegungssensoren des Telefons';
 
   @override
+  String lessonHardBrake(String count) {
+    return '$count starke Bremsvorgänge';
+  }
+
+  @override
+  String get lessonAdviceHardBrake =>
+      'Bremse vorausschauend und gehe früher vom Gas — starkes Bremsen verschwendet den Kraftstoff, den du gerade fürs Beschleunigen verbraucht hast.';
+
+  @override
+  String lessonSharpCornering(String count) {
+    return '$count enge Kurven';
+  }
+
+  @override
+  String get lessonAdviceSharpCornering =>
+      'Bremse vor der Kurve, nicht in ihr — hartes Kurvenfahren baut Geschwindigkeit ab, die du danach wieder aufbauen musst.';
+
+  @override
   String get locationConsentTitle => 'Standortfreigabe';
 
   @override

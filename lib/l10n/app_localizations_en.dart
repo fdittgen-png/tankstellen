@@ -5597,6 +5597,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accelBrakeSource => 'From the phone\'s motion sensors';
 
   @override
+  String lessonHardBrake(String count) {
+    return '$count hard braking events';
+  }
+
+  @override
+  String get lessonAdviceHardBrake =>
+      'Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.';
+
+  @override
+  String lessonSharpCornering(String count) {
+    return '$count sharp corners';
+  }
+
+  @override
+  String get lessonAdviceSharpCornering =>
+      'Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.';
+
+  @override
   String get locationConsentTitle => 'Location Access';
 
   @override
@@ -12980,6 +12998,24 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get accelBrakeSource =>
       '⟦Ƒřóɱ ŧĥé ƥĥóñé\'š ɱóŧîóñ šéñšóřš ············⟧';
+
+  @override
+  String lessonHardBrake(String count) {
+    return '⟦$count ĥářđ ƀřáķîñǧ éṽéñŧš ········⟧';
+  }
+
+  @override
+  String get lessonAdviceHardBrake =>
+      '⟦Áñŧîçîƥáŧé šŧóƥš áñđ éášé óƒƒ ŧĥé áççéłéřáŧóř éářłîéř — ĥářđ ƀřáķîñǧ ŧĥřóŵš áŵáý ŧĥé ƒúéł ýóú ĵúšŧ šƥéñŧ ǧéŧŧîñǧ úƥ ŧó šƥééđ. ··············································⟧';
+
+  @override
+  String lessonSharpCornering(String count) {
+    return '⟦$count šĥářƥ çóřñéřš ·····⟧';
+  }
+
+  @override
+  String get lessonAdviceSharpCornering =>
+      '⟦Šłóŵ ƀéƒóřé ŧĥé ƀéñđ, ñóŧ îñ îŧ — ĥářđ çóřñéřîñǧ šçřúƀš óƒƒ šƥééđ ýóú ŧĥéñ ĥáṽé ŧó řéƀúîłđ. ································⟧';
 
   @override
   String get locationConsentTitle => '⟦Łóçáŧîóñ Áççéšš ······⟧';
