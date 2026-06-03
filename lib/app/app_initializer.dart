@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
@@ -767,7 +768,10 @@ class AppInitializer {
     // Capture Flutter framework errors (build, layout, paint).
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
-      if (_isTileFetchNoise(details.exception)) return;
+      if (_isTileFetchNoise(details.exception) ||
+          isBenignStreamCancel(details.exception)) {
+        return;
+      }
       errorLogger.log(
         ErrorLayer.ui,
         details.exception,
@@ -780,7 +784,7 @@ class AppInitializer {
     };
     // Capture async / platform errors that escape the framework.
     PlatformDispatcher.instance.onError = (error, stack) {
-      if (_isTileFetchNoise(error)) return true;
+      if (_isTileFetchNoise(error) || isBenignStreamCancel(error)) return true;
       errorLogger.log(ErrorLayer.other, error, stack);
       return true;
     };
@@ -803,6 +807,15 @@ class AppInitializer {
     if (msg.contains('failed host lookup')) return true;
     return false;
   }
+
+  /// Benign EventChannel teardown ("No active stream to cancel"), a lifecycle
+  /// race that safeCancel covers at app sites but can escape via plugins —
+  /// never a real crash, must not pollute the error log (#2772).
+  @visibleForTesting
+  static bool isBenignStreamCancel(Object error) =>
+      error is PlatformException &&
+      (error.message?.toLowerCase().contains('no active stream to cancel') ??
+          false);
 
   static void _launch(
     ProviderContainer container,
