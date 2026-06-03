@@ -808,12 +808,9 @@ class AppInitializer {
     return false;
   }
 
-  /// Whether [error] is the benign EventChannel teardown PlatformException
-  /// ("No active stream to cancel") — a lifecycle race when the platform
-  /// broadcast was already cleared. `safeCancel` (event_channel_cancel.dart)
-  /// swallows it at the app's own cancel sites, but a plugin-internal / async
-  /// teardown can still surface it through this global handler; it is never a
-  /// real crash, so it must not pollute the error log (#2772).
+  /// Benign EventChannel teardown ("No active stream to cancel"), a lifecycle
+  /// race that safeCancel covers at app sites but can escape via plugins —
+  /// never a real crash, must not pollute the error log (#2772).
   @visibleForTesting
   static bool isBenignStreamCancel(Object error) =>
       error is PlatformException &&
