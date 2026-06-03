@@ -4579,6 +4579,23 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get drivingTraceCardTitle => 'Driving-analysis trace (dev)';
+
+  @override
+  String get drivingTraceCardBody =>
+      'Export this trip\'s GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.';
+
+  @override
+  String get drivingTraceExportAction => 'Export analysis trace';
+
+  @override
+  String get drivingTraceExported =>
+      'Analysis trace saved to Downloads — add your verdict in the comment field and share it back.';
+
+  @override
+  String get drivingTraceExportFailed => 'Couldn\'t export the analysis trace.';
+
+  @override
   String get ecoRouteOption => 'Eco';
 
   @override

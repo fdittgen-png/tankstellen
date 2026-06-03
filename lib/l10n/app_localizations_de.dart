@@ -4579,6 +4579,24 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get drivingTraceCardTitle => 'Fahranalyse-Trace (Dev)';
+
+  @override
+  String get drivingTraceCardBody =>
+      'Exportiere die GPS-Kennzahlen, die Bewertung und die Hinweise dieser Fahrt als JSON, trage im Kommentarfeld ein, wie sich die Fahrt tatsächlich angefühlt hat, und sende es zurück, damit die Fahrstil-Schwellenwerte an echten Fahrten kalibriert werden können.';
+
+  @override
+  String get drivingTraceExportAction => 'Analyse-Trace exportieren';
+
+  @override
+  String get drivingTraceExported =>
+      'Analyse-Trace im Downloads-Ordner gespeichert — trage dein Urteil im Kommentarfeld ein und sende es zurück.';
+
+  @override
+  String get drivingTraceExportFailed =>
+      'Analyse-Trace konnte nicht exportiert werden.';
+
+  @override
   String get ecoRouteOption => 'Sparsam';
 
   @override

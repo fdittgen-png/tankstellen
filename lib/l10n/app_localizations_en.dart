@@ -4529,6 +4529,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get drivingTraceCardTitle => 'Driving-analysis trace (dev)';
+
+  @override
+  String get drivingTraceCardBody =>
+      'Export this trip\'s GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.';
+
+  @override
+  String get drivingTraceExportAction => 'Export analysis trace';
+
+  @override
+  String get drivingTraceExported =>
+      'Analysis trace saved to Downloads — add your verdict in the comment field and share it back.';
+
+  @override
+  String get drivingTraceExportFailed => 'Couldn\'t export the analysis trace.';
+
+  @override
   String get ecoRouteOption => 'Eco';
 
   @override
@@ -11892,6 +11909,25 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String drivingScoreBaselineDelta(String pct) {
     return '⟦$pct ṽš ýóúř éƒƒîçîéñŧ ƀášéłîñé ··········⟧';
   }
+
+  @override
+  String get drivingTraceCardTitle =>
+      '⟦Đřîṽîñǧ-áñáłýšîš ŧřáçé (đéṽ) ··········⟧';
+
+  @override
+  String get drivingTraceCardBody =>
+      '⟦Éẋƥóřŧ ŧĥîš ŧřîƥ\'š ǦƤŠ ĶƤÎš, šçóřé áñđ łéššóñš áš ĴŠÓÑ, ŵřîŧé ĥóŵ ŧĥé đřîṽé áçŧúáłłý ƒéłŧ îñ ŧĥé çóɱɱéñŧ ƒîéłđ, áñđ šĥářé îŧ ƀáçķ šó ŧĥé đřîṽîñǧ-šŧýłé ŧĥřéšĥółđš çáñ ƀé çáłîƀřáŧéđ áǧáîñšŧ řéáł ŧřîƥš. ········································································⟧';
+
+  @override
+  String get drivingTraceExportAction => '⟦Éẋƥóřŧ áñáłýšîš ŧřáçé ·········⟧';
+
+  @override
+  String get drivingTraceExported =>
+      '⟦Áñáłýšîš ŧřáçé šáṽéđ ŧó Đóŵñłóáđš — áđđ ýóúř ṽéřđîçŧ îñ ŧĥé çóɱɱéñŧ ƒîéłđ áñđ šĥářé îŧ ƀáçķ. ·································⟧';
+
+  @override
+  String get drivingTraceExportFailed =>
+      '⟦Çóúłđñ\'ŧ éẋƥóřŧ ŧĥé áñáłýšîš ŧřáçé. ·············⟧';
 
   @override
   String get ecoRouteOption => '⟦Éçó ·⟧';

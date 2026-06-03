@@ -1983,6 +1983,26 @@
   "gpsKpiCoast": "Anteil Ausrollen",
   "gpsKpiClimbEnergy": "Steigungsenergie",
   "drivingScoreBaselineDelta": "{pct} gegenüber deinem Sparwert",
+  "drivingTraceCardTitle": "Fahranalyse-Trace (Dev)",
+  "@drivingTraceCardTitle": {
+    "description": "Title of the developer-only card on the trip-detail screen that exports the trip's driving-analysis trace for threshold calibration (#2804, Epic #2789). Only visible in Developer / Debug mode."
+  },
+  "drivingTraceCardBody": "Exportiere die GPS-Kennzahlen, die Bewertung und die Hinweise dieser Fahrt als JSON, trage im Kommentarfeld ein, wie sich die Fahrt tatsächlich angefühlt hat, und sende es zurück, damit die Fahrstil-Schwellenwerte an echten Fahrten kalibriert werden können.",
+  "@drivingTraceCardBody": {
+    "description": "One-line explanation under the driving-analysis trace card title clarifying it is a gated developer calibration tool (#2804)."
+  },
+  "drivingTraceExportAction": "Analyse-Trace exportieren",
+  "@drivingTraceExportAction": {
+    "description": "Button that exports the trip's driving-analysis trace as JSON to Downloads and opens the share sheet on the trip-detail screen (#2804)."
+  },
+  "drivingTraceExported": "Analyse-Trace im Downloads-Ordner gespeichert — trage dein Urteil im Kommentarfeld ein und sende es zurück.",
+  "@drivingTraceExported": {
+    "description": "Snackbar confirming the driving-analysis trace JSON was saved to the Downloads folder and the share sheet was opened (#2804)."
+  },
+  "drivingTraceExportFailed": "Analyse-Trace konnte nicht exportiert werden.",
+  "@drivingTraceExportFailed": {
+    "description": "Snackbar shown when exporting the driving-analysis trace JSON failed (#2804)."
+  },
   "ecoRouteOption": "Sparsam",
   "@ecoRouteOption": {
     "description": "Label für den Eco-Routing-Chip in den Routensuche-Bedienelementen (#1123). Wählt Routen aus, die Kraftstoff statt Zeit minimieren."

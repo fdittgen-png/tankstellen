@@ -8170,6 +8170,36 @@ abstract class AppLocalizations {
   /// **'{pct} vs your efficient baseline'**
   String drivingScoreBaselineDelta(String pct);
 
+  /// Title of the developer-only card on the trip-detail screen that exports the trip's driving-analysis trace for threshold calibration (#2804, Epic #2789). Only visible in Developer / Debug mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving-analysis trace (dev)'**
+  String get drivingTraceCardTitle;
+
+  /// One-line explanation under the driving-analysis trace card title clarifying it is a gated developer calibration tool (#2804).
+  ///
+  /// In en, this message translates to:
+  /// **'Export this trip\'s GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.'**
+  String get drivingTraceCardBody;
+
+  /// Button that exports the trip's driving-analysis trace as JSON to Downloads and opens the share sheet on the trip-detail screen (#2804).
+  ///
+  /// In en, this message translates to:
+  /// **'Export analysis trace'**
+  String get drivingTraceExportAction;
+
+  /// Snackbar confirming the driving-analysis trace JSON was saved to the Downloads folder and the share sheet was opened (#2804).
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis trace saved to Downloads — add your verdict in the comment field and share it back.'**
+  String get drivingTraceExported;
+
+  /// Snackbar shown when exporting the driving-analysis trace JSON failed (#2804).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t export the analysis trace.'**
+  String get drivingTraceExportFailed;
+
   /// Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time.
   ///
   /// In en, this message translates to:
