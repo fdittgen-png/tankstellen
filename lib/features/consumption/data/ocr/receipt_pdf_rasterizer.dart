@@ -54,9 +54,19 @@ class ReceiptPdfRasterizer {
   /// from `path_provider`.
   final Future<Directory> Function() _temporaryDirectory;
 
+  /// PDF opener, overridable in tests. Production uses pdfx's
+  /// `PdfDocument.openFile`. Under `flutter test` the native PdfRenderer is
+  /// absent and pdfx's `assertHasPdfSupport` throws in a way the catch cannot
+  /// reliably absorb on a non-mobile host, so tests inject a failing opener to
+  /// exercise the never-throws fault path deterministically — real
+  /// rasterisation can only run on a device/emulator.
+  final Future<PdfDocument> Function(String path) _openDocument;
+
   const ReceiptPdfRasterizer({
     Future<Directory> Function()? temporaryDirectory,
-  }) : _temporaryDirectory = temporaryDirectory ?? getTemporaryDirectory;
+    Future<PdfDocument> Function(String path)? openDocument,
+  })  : _temporaryDirectory = temporaryDirectory ?? getTemporaryDirectory,
+        _openDocument = openDocument ?? PdfDocument.openFile;
 
   /// Rasterises the first page of the PDF at [path] to a temp JPEG and
   /// returns that JPEG's path, or `null` on ANY failure (never throws).
@@ -74,7 +84,7 @@ class ReceiptPdfRasterizer {
       // which the catch below turns into the documented `null` fault path;
       // no separate existence pre-check is needed (and an async
       // `File.exists` would trip `avoid_slow_async_io`).
-      document = await PdfDocument.openFile(path);
+      document = await _openDocument(path);
       final pageCount = document.pagesCount;
       if (pageCount < 1 || pageCount > maxPages) {
         // No pages, or implausibly many for a receipt — silently decline
