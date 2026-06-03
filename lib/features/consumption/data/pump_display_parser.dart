@@ -164,6 +164,19 @@ class PumpDisplayParser {
         return ct / 100.0;
       }
     }
+    // #2798 — last-resort salvage of a glare-garbled unit price: a 7-segment
+    // LCD shows €/L as "1.999" but the dot is frequently lost and the leading
+    // "1" reads as a 1-lookalike letter ("L999"). Reconstruct X.XXX and accept
+    // it ONLY inside the plausible fuel unit-price band so a stray token can
+    // never fabricate an out-of-range price. Letter-led by construction (see
+    // kGarbledPricePerLiterPattern), so bare-digit totals/volumes never match.
+    final garbled = kGarbledPricePerLiterPattern.firstMatch(text);
+    if (garbled != null) {
+      final value = parseDecimalFromOcr('1.${garbled.group(2)!}');
+      if (value != null && value >= 0.8 && value <= 3.5) {
+        return value;
+      }
+    }
     return null;
   }
 

@@ -61,6 +61,7 @@ Uint8List? preprocessPumpDisplayForOcr(
   Uint8List jpegBytes, {
   OcrNormalizedRect? roi,
   OcrImagePreprocessor preprocessor = const OcrImagePreprocessor(),
+  bool binarize = true,
 }) {
   try {
     final decoded = img.decodeJpg(jpegBytes);
@@ -70,6 +71,17 @@ Uint8List? preprocessPumpDisplayForOcr(
         roi != null ? preprocessor.cropToRoi(upright, roi) : upright;
     final gray = preprocessor.toGrayscale(cropped);
     final denoised = preprocessor.denoise(gray);
+    if (!binarize) {
+      // #2798 — contrast-stretched GRAYSCALE (the originally-documented #1860
+      // intent). ML Kit is trained on natural/grayscale images, not 1-bit line
+      // art: the #2275 Sauvola binarization, run with a fixed window against a
+      // large crop, fits inside one fat 7-segment stroke and dissolves the
+      // value digits to background — only the thin printed labels survive. The
+      // pump path retries with this grayscale variant when the binarized pass
+      // recovers nothing.
+      return img.encodeJpg(img.normalize(denoised, min: 0, max: 255),
+          quality: 90);
+    }
     final binary = preprocessor.sauvolaBinarize(denoised);
     final closed = preprocessor.morphologicalClose(binary);
     return img.encodeJpg(closed, quality: 90);

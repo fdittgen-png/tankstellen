@@ -226,6 +226,12 @@ void main() {
     // the wiring must live at the controller's host adapter + resume site.
     // Decomposition stays tracked by #2187/#2188.
     'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1636,
+    // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
+    // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
+    // recovers nothing (the binarization erased faint 7-seg value digits). The
+    // retry + its parseFor helper + the threaded `binarize` flag push this just
+    // past 400; further compression would hurt readability of a real fix.
+    'lib/features/consumption/data/receipt_scan_service.dart': 408,
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted

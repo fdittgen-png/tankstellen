@@ -202,23 +202,39 @@ class ReceiptScanService {
     // block geometry (#2478) — not just the flat string — so the
     // label-anchored extractor can tell which number sits under which
     // label and recover the dropped unit price.
-    final recognised = await _recognisePump(path, roi: roi);
+    var recognised = await _recognisePump(path, roi: roi);
     if (recognised == null) {
       await _tryDelete(path);
       return null;
     }
+    // #2478 PRIMARY label-anchored read (recovers the dropped PRIX DU LITRE),
+    // flat-string fallback, then the gate.
+    PumpDisplayParseResult parseFor(
+            ({String text, List<RecognizedTextBlock> blocks}) r) =>
+        orchestratePumpDisplayParse(
+            blocks: r.blocks,
+            text: r.text,
+            profile: profile,
+            parser: _pumpParser,
+            gate: _pumpGate,
+            trace: trace);
+    var parse = parseFor(recognised);
+
+    // #2798 — the #2275 binarization can dissolve faint 7-seg value digits
+    // (ML Kit returns only labels → nothing derived). When the binarized pass
+    // recovers nothing, retry once with grayscale and keep it only if it reads
+    // more — non-regressive: a usable binarized read is never replaced.
+    if (!parse.hasUsableData) {
+      final gray = await _recognisePump(path, roi: roi, binarize: false);
+      final grayParse = gray == null ? null : parseFor(gray);
+      if (gray != null && grayParse!.hasUsableData) {
+        recognised = gray;
+        parse = grayParse;
+      }
+    }
     trace?.blocks(recognised.text, recognised.blocks);
     return PumpDisplayScanOutcome(
-      // #2478 — PRIMARY label-anchored read (recovers the dropped PRIX DU
-      // LITRE unit price), flat-string parser fallback, then the gate.
-      parse: orchestratePumpDisplayParse(
-        blocks: recognised.blocks,
-        text: recognised.text,
-        profile: profile,
-        parser: _pumpParser,
-        gate: _pumpGate,
-        trace: trace,
-      ),
+      parse: parse,
       ocrText: recognised.text,
       imagePath: path,
     );
@@ -304,8 +320,10 @@ class ReceiptScanService {
   Future<({String text, List<RecognizedTextBlock> blocks})?> _recognisePump(
     String path, {
     OcrNormalizedRect? roi,
+    bool binarize = true,
   }) async {
-    final recognized = await _recogniseRaw(path, enhanceContrast: true, roi: roi);
+    final recognized = await _recogniseRaw(path,
+        enhanceContrast: true, roi: roi, binarize: binarize);
     if (recognized == null) return null;
     final blocks = mapRecognizedText(recognized);
     debugPrint('Pump OCR: ${recognized.text.length} chars, ${blocks.length} blocks');
@@ -321,11 +339,12 @@ class ReceiptScanService {
     String path, {
     bool enhanceContrast = false,
     OcrNormalizedRect? roi,
+    bool binarize = true,
   }) async {
     String? uprightTemp;
     try {
-      uprightTemp =
-          await _writeUprightCopy(path, enhanceContrast: enhanceContrast, roi: roi);
+      uprightTemp = await _writeUprightCopy(path,
+          enhanceContrast: enhanceContrast, roi: roi, binarize: binarize);
       final inputImage = InputImage.fromFilePath(uprightTemp ?? path);
       return await _recognizer.processImage(inputImage);
     } catch (e, st) {
@@ -342,18 +361,22 @@ class ReceiptScanService {
   /// returns that temp path, or null when the image cannot be decoded
   /// (the caller then OCRs the original unchanged).
   ///
-  /// #1860 — with [enhanceContrast] the temp copy is additionally run
-  /// through [preprocessPumpDisplayForOcr] (grayscale + normalise +
-  /// contrast); otherwise it is the plain [bakeImageOrientation] path.
+  /// #1860/#2275/#2798 — with [enhanceContrast] the temp copy is run through
+  /// [preprocessPumpDisplayForOcr]: by default a #2275 Sauvola binarization;
+  /// with [binarize] false a contrast-stretched grayscale (the pump path's
+  /// #2798 retry when binarization erased the faint 7-seg value digits).
+  /// Without [enhanceContrast] it is the plain [bakeImageOrientation] path.
   Future<String?> _writeUprightCopy(
     String path, {
     bool enhanceContrast = false,
     OcrNormalizedRect? roi,
+    bool binarize = true,
   }) async {
     try {
       final bytes = await File(path).readAsBytes();
       final upright = enhanceContrast
-          ? preprocessPumpDisplayForOcr(bytes, roi: roi, preprocessor: _preprocessor)
+          ? preprocessPumpDisplayForOcr(bytes,
+              roi: roi, preprocessor: _preprocessor, binarize: binarize)
           : bakeImageOrientation(bytes);
       if (upright == null) return null;
       final tempPath = '$path.upright.jpg';

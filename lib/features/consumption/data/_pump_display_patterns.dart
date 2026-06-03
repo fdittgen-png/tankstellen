@@ -106,6 +106,16 @@ final List<RegExp> kPricePerLiterPatterns = <RegExp>[
 final RegExp kCentsPerLiterPattern =
     RegExp(r'\bCT\b\s*[:=]?\s*(\d{2,3}[.,]?\d?)', caseSensitive: false);
 
+/// #2798 — a glare-garbled unit price whose 7-segment decimal dot was lost AND
+/// whose leading "1" misread as a 1-lookalike LETTER ("L999"/"l999"/"I999" for
+/// 1,999 €/L). Deliberately requires a LEADING LETTER (not a bare digit) +
+/// exactly three digits, so a separator-less total/volume run of bare digits
+/// (e.g. "1049", "5277") can never match — only the unambiguous "letter then
+/// three digits" garble. The parser still band-checks the recovered value to a
+/// plausible fuel unit price before accepting it.
+final RegExp kGarbledPricePerLiterPattern =
+    RegExp(r'(?:^|\s)([LlIi])(\d{3})(?=\s|€|/|$)');
+
 /// Matches a lone digit 1-9 on a line — the large pump-number glyph
 /// printed on the cabinet.
 final RegExp kLonePumpDigitPattern = RegExp(r'^[1-9]$');

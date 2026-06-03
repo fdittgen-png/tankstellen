@@ -520,6 +520,34 @@ void main() {
               'from the lighter field so a washed-out LCD becomes legible.');
     });
 
+    test('binarize:false keeps a continuous-tone grayscale (#2798 retry — not '
+        'a 1-bit mask, so ML Kit can read the 7-seg digits)', () {
+      // A smooth luminance ramp stands in for the soft gradients of a glary
+      // LCD photo. The default Sauvola pass collapses tone to ink+background;
+      // the grayscale retry must instead preserve the intermediate tones ML
+      // Kit is trained on.
+      final src = img.Image(width: 64, height: 64);
+      for (final p in src) {
+        final v = p.x * 255 ~/ 63;
+        p.setRgb(v, v, v);
+      }
+      int distinctLevels(img.Image im) {
+        final seen = <int>{};
+        for (final p in im) {
+          seen.add(p.r.round());
+        }
+        return seen.length;
+      }
+
+      final gray = preprocessPumpDisplayForOcr(
+          Uint8List.fromList(img.encodeJpg(src)),
+          binarize: false);
+      expect(gray, isNotNull);
+      expect(distinctLevels(img.decodeJpg(gray!)!), greaterThan(16),
+          reason: 'the grayscale retry preserves continuous tone, '
+              'not a two-cluster 1-bit mask');
+    });
+
     test('bakes EXIF orientation upright — dimensions swap, like #1711',
         () {
       // An 80×40 image tagged orientation 6 displays as 40×80; the
