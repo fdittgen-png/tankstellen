@@ -7,11 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
-import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
-import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/search/presentation/widgets/nearest_shortcut_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_content.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_list.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -53,26 +50,8 @@ void main() {
     });
 
     testWidgets(
-        'shows the nearest-shortcut card and start-search hint when the '
-        'data branch is empty', (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        SearchResultsContent(onGpsRetry: noopRetry),
-        overrides: [
-          ...test.overrides,
-          searchStateProvider.overrideWith(() => _EmptySearchState()),
-        ].cast(),
-      );
-
-      expect(find.byType(NearestShortcutCard), findsOneWidget);
-      expect(find.text('Search to find fuel stations.'), findsOneWidget);
-    });
-
-    testWidgets(
-        '#494 — hides NearestShortcutCard when landing screen is NOT nearest',
+        '#2743 — empty state shows the start-search hint and NO longer '
+        'renders the redundant "Stations les plus proches" CTA card',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -83,65 +62,19 @@ void main() {
         overrides: [
           ...test.overrides,
           searchStateProvider.overrideWith(() => _EmptySearchState()),
-          activeProfileProvider.overrideWith(
-            () => _FakeActiveProfile(LandingScreen.cheapest),
-          ),
         ].cast(),
       );
 
-      expect(find.byType(NearestShortcutCard), findsNothing,
-          reason: 'Shortcut must not push "nearest" at a user who chose '
-              'cheapest as their landing screen');
-      // Empty-state hint text still visible.
+      // The empty-state hint remains; the central search FAB + Fuel
+      // Station Radar button (owned by the shell) now carry the CTA.
       expect(find.text('Search to find fuel stations.'), findsOneWidget);
-    });
-
-    testWidgets(
-        '#1695 / #2131 — empty state shows the start-search hint even '
-        'when the nearest shortcut is hidden (FAB now owns the CTA)',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        SearchResultsContent(onGpsRetry: noopRetry),
-        overrides: [
-          ...test.overrides,
-          searchStateProvider.overrideWith(() => _EmptySearchState()),
-          activeProfileProvider.overrideWith(
-            () => _FakeActiveProfile(LandingScreen.cheapest),
-          ),
-        ].cast(),
+      // #2743 — the removed CTA card is gone (title + subtitle absent).
+      expect(find.text('Nearest stations'), findsNothing);
+      expect(
+        find.text('Find the closest stations using your current location'),
+        findsNothing,
       );
-
-      // Shortcut card hidden (cheapest landing). The inline empty-state
-      // CTA moved to the shell FAB (#2131); the hint text remains so
-      // the user still knows what to do.
-      expect(find.byType(NearestShortcutCard), findsNothing);
-      expect(find.byKey(const Key('emptySearchCta')), findsNothing);
-      expect(find.text('Search to find fuel stations.'), findsOneWidget);
-    });
-
-    testWidgets(
-        '#494 — shows NearestShortcutCard when landing screen IS nearest',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        SearchResultsContent(onGpsRetry: noopRetry),
-        overrides: [
-          ...test.overrides,
-          searchStateProvider.overrideWith(() => _EmptySearchState()),
-          activeProfileProvider.overrideWith(
-            () => _FakeActiveProfile(LandingScreen.nearest),
-          ),
-        ].cast(),
-      );
-
-      expect(find.byType(NearestShortcutCard), findsOneWidget);
+      expect(find.byIcon(Icons.chevron_right), findsNothing);
     });
 
     testWidgets('shows the SearchResultsList when stations are loaded',
@@ -196,17 +129,5 @@ class _LoadedSearchState extends SearchState {
           source: ServiceSource.cache,
           fetchedAt: DateTime.now(),
         ),
-      );
-}
-
-class _FakeActiveProfile extends ActiveProfile {
-  _FakeActiveProfile(this._landingScreen);
-  final LandingScreen _landingScreen;
-
-  @override
-  UserProfile? build() => UserProfile(
-        id: 'test',
-        name: 'Test',
-        landingScreen: _landingScreen,
       );
 }
