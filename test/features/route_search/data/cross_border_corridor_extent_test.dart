@@ -1,18 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-// #2703 — corridor over-inclusion. `countriesTouchingRouteExtent` credited a
-// user-PROFILE country whenever its bounding box overlapped the route's single
-// coarse whole-route AABB. The AABB's corners are synthetic points the polyline
-// never visits: a southern-France route whose extreme NW vertex reaches toward
-// the Channel makes the AABB's (maxLat, minLng) corner clip GB's box
-// [49.5+, ≤2.0] even with NO actual GB vertex — so the flaky UK feed
-// (api2.krlmedia.com) was queried, producing the field-log timeouts.
-//
-// The fix keeps the AABB as a cheap pre-filter and CONFIRMS with per-vertex
-// containment. RED on master: GB is credited (AABB corner clips it). GREEN:
-// GB is dropped (no vertex inside it). CONTROL: a route with a real GB vertex
-// still includes GB (the #2621 recovery intent is preserved).
+// #2703 — corridor over-inclusion (originally `countriesTouchingRouteExtent`).
+// A southern-France route whose whole-route AABB corner clipped GB's box (even
+// with NO actual GB vertex) had the flaky UK feed queried, producing field-log
+// timeouts. #2741 superseded the bbox-extent helper with the genuine-entry gate
+// in `corridorCountries` + a profile intersection in `buildCorridorServiceMap`,
+// so this now asserts the END-TO-END corridor map: GB is dropped when no vertex
+// genuinely enters it, and kept when a real GB vertex is on the polyline
+// (the #2621 recovery intent is preserved).
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -64,36 +60,7 @@ void main() {
     samplePoints: [],
   );
 
-  group('countriesTouchingRouteExtent — vertex-containment confirm (#2703)',
-      () {
-    test(
-        'a GB profile is NOT credited when only the synthetic AABB corner '
-        'clips GB and no vertex is inside it (RED on master)', () {
-      final touched =
-          countriesTouchingRouteExtent(noGbVertexRoute, const ['GB']);
-      expect(touched, isNot(contains('GB')),
-          reason: 'no route vertex is in GB — the AABB corner clip must not '
-              'credit the flaky UK feed (#2703)');
-    });
-
-    test(
-        'a profile country the route genuinely touches IS still credited '
-        '(CONTROL — preserves #2621 recovery)', () {
-      final touched =
-          countriesTouchingRouteExtent(gbVertexRoute, const ['GB']);
-      expect(touched, contains('GB'),
-          reason: 'a real GB vertex (London) must keep GB in the set');
-    });
-
-    test('FR is credited on both routes (every vertex is in FR)', () {
-      expect(countriesTouchingRouteExtent(noGbVertexRoute, const ['FR']),
-          contains('FR'));
-      expect(countriesTouchingRouteExtent(gbVertexRoute, const ['FR']),
-          contains('FR'));
-    });
-  });
-
-  group('buildCorridorServiceMap — GB dropped end-to-end (#2703)', () {
+  group('buildCorridorServiceMap — GB dropped end-to-end (#2703 / #2741)', () {
     test(
         'a GB profile does NOT enter the corridor service map for a '
         'southern-France route with no GB vertex (RED on master)', () {
