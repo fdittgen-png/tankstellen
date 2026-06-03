@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_handler/share_handler.dart';
 import 'package:tankstellen/app/router.dart';
+import 'package:tankstellen/features/consumption/data/ocr/'
+    'receipt_pdf_rasterizer.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/'
     'share_receipt_handler.dart';
 import 'package:tankstellen/features/consumption/providers/'
@@ -42,11 +44,39 @@ SharedMedia _imageMedia(String path) => SharedMedia(
       ],
     );
 
+/// A shared PDF arrives via `share_handler` as a `file` attachment (the
+/// package has no `pdf` type and carries no MIME) — the handler keys off
+/// the `.pdf` extension.
 SharedMedia _pdfMedia(String path) => SharedMedia(
       attachments: [
         SharedAttachment(path: path, type: SharedAttachmentType.file),
       ],
     );
+
+/// A genuinely-unsupported share (video, or a non-PDF arbitrary file).
+SharedMedia _fileMedia(String path) => SharedMedia(
+      attachments: [
+        SharedAttachment(path: path, type: SharedAttachmentType.file),
+      ],
+    );
+
+/// Test double for the on-device PDF rasteriser (#2737) — the native
+/// PdfRenderer is unavailable under `flutter test`, so the PDF branch is
+/// driven with an injected fake that records the path it was asked to
+/// rasterise and returns a canned result.
+class _FakeRasterizer extends ReceiptPdfRasterizer {
+  _FakeRasterizer(this._result);
+
+  /// The JPEG path the rasteriser "produced", or null to model failure.
+  final String? _result;
+  String? receivedPdfPath;
+
+  @override
+  Future<String?> rasterize(String path) async {
+    receivedPdfPath = path;
+    return _result;
+  }
+}
 
 void main() {
   silenceErrorLoggerSpool();
@@ -57,11 +87,14 @@ void main() {
     WidgetTester tester, {
     required GoRouter router,
     required Set<Feature> enabled,
+    ReceiptPdfRasterizer? rasterizer,
   }) async {
     final container = ProviderContainer(
       overrides: [
         enabledFeaturesProvider.overrideWithValue(enabled),
         routerProvider.overrideWith((_) => router),
+        if (rasterizer != null)
+          receiptPdfRasterizerProvider.overrideWithValue(rasterizer),
       ],
     );
     addTearDown(container.dispose);
@@ -106,18 +139,66 @@ void main() {
       expect(find.text('home'), findsOneWidget);
     });
 
-    testWidgets('a shared PDF does not stash or route (unsupported format)',
-        (tester) async {
+    testWidgets(
+        'a shared PDF is rasterised, then takes the SAME stash+route '
+        'path as an image (#2737)', (tester) async {
       final router = _router();
-      final container = await pump(tester, router: router, enabled: featureOn);
+      final fake = _FakeRasterizer('/tmp/receipt.pdf.page1.jpg');
+      final container = await pump(tester,
+          router: router, enabled: featureOn, rasterizer: fake);
 
       container
           .read(shareReceiptHandlerProvider)
           .handle(_pdfMedia('/tmp/receipt.pdf'));
       await tester.pumpAndSettle();
 
+      expect(fake.receivedPdfPath, '/tmp/receipt.pdf',
+          reason: 'the PDF path must be handed to the rasteriser');
+      expect(container.read(pendingSharedReceiptProvider),
+          '/tmp/receipt.pdf.page1.jpg',
+          reason: 'the rasterised JPEG must be stashed for the SAME OCR path '
+              'an image share uses (#2737)');
+      expect(find.text('add-fill-up'), findsOneWidget,
+          reason: 'a rasterised PDF routes the user to the Add-fill-up form');
+    });
+
+    testWidgets(
+        'a PDF whose rasterisation fails does NOT stash or route '
+        '(graceful fallback)', (tester) async {
+      final router = _router();
+      // A null result models a corrupt PDF / absent native renderer.
+      final fake = _FakeRasterizer(null);
+      final container = await pump(tester,
+          router: router, enabled: featureOn, rasterizer: fake);
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_pdfMedia('/tmp/corrupt.pdf'));
+      await tester.pumpAndSettle();
+
+      expect(fake.receivedPdfPath, '/tmp/corrupt.pdf');
       expect(container.read(pendingSharedReceiptProvider), isNull,
-          reason: 'a PDF must not be stashed as an OCR-able image (#2737)');
+          reason: 'a failed rasterisation must fall back gracefully, not '
+              'stash a non-existent bitmap');
+      expect(find.text('home'), findsOneWidget);
+    });
+
+    testWidgets('a non-PDF file is never sent to the rasteriser (unsupported)',
+        (tester) async {
+      final router = _router();
+      final fake = _FakeRasterizer('/should/not/be/used.jpg');
+      final container = await pump(tester,
+          router: router, enabled: featureOn, rasterizer: fake);
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_fileMedia('/tmp/statement.docx'));
+      await tester.pumpAndSettle();
+
+      expect(fake.receivedPdfPath, isNull,
+          reason: 'only .pdf files are rasterised; other files are '
+              'unsupported');
+      expect(container.read(pendingSharedReceiptProvider), isNull);
       expect(find.text('home'), findsOneWidget);
     });
 

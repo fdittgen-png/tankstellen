@@ -92,6 +92,13 @@ dependencies:
   # deferred to #2736, so on iOS the share path simply receives nothing
   # until that target ships — the package still builds without it.
   share_handler: ^0.0.25
+  # On-device PDF e-receipt rasteriser (#2737 / Epic #2687) — a shared PDF
+  # receipt is rendered to a bitmap so it flows through the SAME ML Kit OCR
+  # path as image shares. MIT-licensed and GMS-FREE: its Android renderer is
+  # the OS-native android.graphics.pdf.PdfRenderer (NOT PdfiumAndroid /
+  # AndroidPdfViewer) and iOS uses CGPDFPage — no Play Services / ML Kit, so
+  # the fdroid GMS audit stays clean. See receipt_pdf_rasterizer.dart.
+  pdfx: ^2.9.2
   # Pinned to 1.x — flutter_blue_plus 2.x is a major BLE-API rewrite,
   # and BLE is core to OBD2 trip recording. The 2.x upgrade is tracked
   # separately as part of #1542; do NOT bump it as routine drift.

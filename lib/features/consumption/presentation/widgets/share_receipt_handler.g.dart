@@ -8,6 +8,73 @@ part of 'share_receipt_handler.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs
+/// through (#2737). Exposed as its own provider so a test can override it
+/// with a fake — the native PdfRenderer is unavailable under `flutter
+/// test`, so the PDF branch is unit-tested by injecting a fake that
+/// returns a known JPEG path (success) or null (graceful fallback),
+/// asserting it routes to the SAME stash+OCR path as an image.
+
+@ProviderFor(receiptPdfRasterizer)
+final receiptPdfRasterizerProvider = ReceiptPdfRasterizerProvider._();
+
+/// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs
+/// through (#2737). Exposed as its own provider so a test can override it
+/// with a fake — the native PdfRenderer is unavailable under `flutter
+/// test`, so the PDF branch is unit-tested by injecting a fake that
+/// returns a known JPEG path (success) or null (graceful fallback),
+/// asserting it routes to the SAME stash+OCR path as an image.
+
+final class ReceiptPdfRasterizerProvider
+    extends
+        $FunctionalProvider<
+          ReceiptPdfRasterizer,
+          ReceiptPdfRasterizer,
+          ReceiptPdfRasterizer
+        >
+    with $Provider<ReceiptPdfRasterizer> {
+  /// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs
+  /// through (#2737). Exposed as its own provider so a test can override it
+  /// with a fake — the native PdfRenderer is unavailable under `flutter
+  /// test`, so the PDF branch is unit-tested by injecting a fake that
+  /// returns a known JPEG path (success) or null (graceful fallback),
+  /// asserting it routes to the SAME stash+OCR path as an image.
+  ReceiptPdfRasterizerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'receiptPdfRasterizerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$receiptPdfRasterizerHash();
+
+  @$internal
+  @override
+  $ProviderElement<ReceiptPdfRasterizer> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  ReceiptPdfRasterizer create(Ref ref) {
+    return receiptPdfRasterizer(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ReceiptPdfRasterizer value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ReceiptPdfRasterizer>(value),
+    );
+  }
+}
+
+String _$receiptPdfRasterizerHash() =>
+    r'2df5feaa52d0f68a13a24268105a7da6914d8dce';
 
 @ProviderFor(shareReceiptHandler)
 final shareReceiptHandlerProvider = ShareReceiptHandlerProvider._();
@@ -55,4 +122,4 @@ final class ShareReceiptHandlerProvider
 }
 
 String _$shareReceiptHandlerHash() =>
-    r'5f4b3c537a335a72ba795dcf8d2f928b8dc58fe9';
+    r'9093dfdd33d210bd3c7228d57debf3f56606d7e3';
