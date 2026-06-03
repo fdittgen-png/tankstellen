@@ -124,6 +124,27 @@ class TripSummary {
   /// fully-counted trajet.
   final bool isVirtual;
 
+  /// Confirmed hard-acceleration episodes detected from the IMU on a
+  /// GPS-only (dongle-less) trip (#2760), via [ImuEventDetector] — the same
+  /// one-event-per-episode semantics the speed-derivative gate uses, but
+  /// sourced from a direct inertial reading rather than the noisy GPS speed
+  /// derivative. Defaults `0`: OBD2 trips and every legacy trip recorded
+  /// before this field landed carry no IMU signal. When non-zero on a
+  /// GPS-only trip the pipeline prefers these counts for [harshAccelerations]
+  /// (the figure the driving score reads), as they are the more accurate
+  /// dongle-less signal.
+  final int imuHardAccelCount;
+
+  /// Confirmed hard-braking episodes detected from the IMU (#2760). See
+  /// [imuHardAccelCount]; the brake analogue.
+  final int imuHardBrakeCount;
+
+  /// Confirmed sharp-cornering episodes detected from the IMU (#2760):
+  /// lateral accel ≥ 3.5 m/s² AND yaw rate ≥ 0.30 rad/s at roughly constant
+  /// speed, sustained ≥ 2 s. Captured + fed into the score/bus; a dedicated
+  /// UI row is an explicit follow-up. Defaults `0` for OBD2 / legacy trips.
+  final int sharpCornerCount;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -143,7 +164,26 @@ class TripSummary {
     this.kind = TripKind.gpsPlusObd2,
     this.harshEvents = const [],
     this.isVirtual = false,
+    this.imuHardAccelCount = 0,
+    this.imuHardBrakeCount = 0,
+    this.sharpCornerCount = 0,
   });
+
+  /// IMU hard-accel episodes per km (#2760). Derived, not stored — the raw
+  /// count + [distanceKm] are persisted; this is the normalised view so a
+  /// long calm motorway leg with one hard accel doesn't read worse than a
+  /// short aggressive drive. Returns 0 for zero-distance trips.
+  double get imuHardAccelPerKm =>
+      distanceKm > 0 ? imuHardAccelCount / distanceKm : 0.0;
+
+  /// IMU hard-brake episodes per km (#2760). Derived; see [imuHardAccelPerKm].
+  double get imuHardBrakePerKm =>
+      distanceKm > 0 ? imuHardBrakeCount / distanceKm : 0.0;
+
+  /// IMU sharp-corner episodes per km (#2760). Derived; see
+  /// [imuHardAccelPerKm].
+  double get sharpCornersPerKm =>
+      distanceKm > 0 ? sharpCornerCount / distanceKm : 0.0;
 
   /// Returns a copy with the given fields replaced (#1858). Used by the
   /// retroactive η_v recompute to rescale `fuelLitersConsumed` /
@@ -169,6 +209,9 @@ class TripSummary {
     TripKind? kind,
     List<HarshEvent>? harshEvents,
     bool? isVirtual,
+    int? imuHardAccelCount,
+    int? imuHardBrakeCount,
+    int? sharpCornerCount,
   }) =>
       TripSummary(
         distanceKm: distanceKm ?? this.distanceKm,
@@ -191,6 +234,9 @@ class TripSummary {
         kind: kind ?? this.kind,
         harshEvents: harshEvents ?? this.harshEvents,
         isVirtual: isVirtual ?? this.isVirtual,
+        imuHardAccelCount: imuHardAccelCount ?? this.imuHardAccelCount,
+        imuHardBrakeCount: imuHardBrakeCount ?? this.imuHardBrakeCount,
+        sharpCornerCount: sharpCornerCount ?? this.sharpCornerCount,
       );
 }
 

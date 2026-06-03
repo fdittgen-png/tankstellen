@@ -31,6 +31,7 @@ import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
+import '../../../helpers/empty_imu_source.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #2646 integration regression — the fuel-station radar + swipe must work in
@@ -250,6 +251,9 @@ void main() {
 
     final container = ProviderContainer(overrides: [
       geolocatorWrapperProvider.overrideWithValue(geo),
+      // #2760 — quiet IMU source so the GPS-only pipeline's new fusion attach
+      // doesn't reach the real sensors_plus platform channel.
+      imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       tripRecordingProvider.overrideWith(_RecordingTrip.new),
       activeProfileProvider.overrideWith(_FixedProfile.new),
       effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),

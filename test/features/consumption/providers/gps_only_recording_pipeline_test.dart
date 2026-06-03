@@ -18,6 +18,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_state.
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../helpers/empty_imu_source.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Direct unit tests for the #2190 [GpsOnlyRecordingPipeline] strategy,
@@ -287,6 +288,11 @@ class _Harness {
       : host = _FakeHost(activeVehicleId: activeVehicleId) {
     container = ProviderContainer(overrides: [
       geolocatorWrapperProvider.overrideWithValue(geo),
+      // #2760 — the pipeline now attaches IMU fusion in start(); stub it with
+      // an empty source so these GPS-focused tests don't touch the real
+      // sensors_plus platform channel. (Dedicated IMU coverage lives in
+      // gps_only_imu_fusion_test.dart + imu_event_detector_test.dart.)
+      imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       // No active vehicle → the #2080 GPS-fuel imputation branch sees a
       // null profile and leaves avg / litres null, mirroring a fresh
       // install. (Production reads the real provider here.) When
