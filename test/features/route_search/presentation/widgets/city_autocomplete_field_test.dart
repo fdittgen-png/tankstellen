@@ -102,6 +102,38 @@ void main() {
     expect(find.byIcon(Icons.place), findsOneWidget);
   });
 
+  testWidgets(
+      'selecting a suggestion cancels the pending search + clears the spinner '
+      '(#2753)', (tester) async {
+    service.results = const [berlin];
+    await tester.pumpWidget(_harness(controller: controller, service: service));
+
+    // First search resolves → suggestion shows in the overlay.
+    await tester.enterText(find.byType(TextField), 'Ber');
+    await tester.pump(const Duration(milliseconds: 850));
+    await tester.pump();
+    expect(find.text('Berlin, Germany'), findsOneWidget);
+
+    // User types one more char (schedules a NEW debounce), but taps the
+    // suggestion before it fires. Make that next search HANG so a leaked
+    // search would spin the suffix indicator forever.
+    service.completer = Completer<List<ResolvedLocation>>();
+    await tester.enterText(find.byType(TextField), 'Berl');
+    await tester.tap(find.text('Berlin, Germany'));
+    await tester.pump();
+
+    // Elapse the (now-cancelled) debounce window.
+    await tester.pump(const Duration(milliseconds: 850));
+    await tester.pump();
+
+    // FIX (#2753): selection cancels the debounce and clears `_isLoading`.
+    // On master the debounce fired, the hung search set `_isLoading=true`,
+    // and the suffix CircularProgressIndicator spun indefinitely.
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(service.queries, isNot(contains('Berl')),
+        reason: 'selection must cancel the debounced search');
+  });
+
   testWidgets('debounced search fires after 800ms with the trimmed query',
       (tester) async {
     service.results = const [berlin];
