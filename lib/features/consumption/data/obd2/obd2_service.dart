@@ -1314,10 +1314,7 @@ class Obd2Service implements Obd2RawCommandPort {
       if (vin == null || vin.isEmpty) return null;
       return vin;
     } catch (e, st) {
-      // #2763 — a flaky-comms TimeoutException / StateError / expected
-      // mid-read disconnect on the best-effort VIN read is the documented
-      // (#2428/#2379) swallow-and-return-null contract: record a breadcrumb,
-      // not an ERROR trace. A genuine non-transient fault still ERROR-logs.
+      // #2763 — flaky readVin is expected: breadcrumb, not ERROR (see helper).
       recordObd2ReadFailure(e, st, where: 'OBD2 readVin');
       return null;
     }
