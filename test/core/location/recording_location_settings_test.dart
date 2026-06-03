@@ -25,7 +25,7 @@ void main() {
   final l10n = lookupAppLocalizations(const Locale('en'));
 
   group('recordingLocationSettings (#2766)', () {
-    test('Android → AndroidSettings: 1 s interval, foreground service w/ ARB',
+    test('Android → AndroidSettings: 1 s interval, foreground-only (#2787)',
         () {
       final settings = recordingLocationSettings(
         l10n: l10n,
@@ -40,12 +40,15 @@ void main() {
       expect(android.distanceFilter, 0,
           reason: 'every fix through — dense trace even at a standstill');
 
-      final fg = android.foregroundNotificationConfig;
-      expect(fg, isNotNull,
-          reason: 'the foreground service is the un-throttle lever');
-      expect(fg!.notificationTitle, l10n.tripRecordingGpsNotificationTitle);
-      expect(fg.notificationText, l10n.tripRecordingGpsNotificationText);
-      expect(fg.enableWakeLock, isTrue);
+      // #2787 — the foreground service is gated OFF while the manifest
+      // FOREGROUND_SERVICE permission is removed (#1498); requesting it threw
+      // a startForeground Permission Denial that killed the GPS stream (error
+      // log #17). Foreground-only until the flag + manifest permission return.
+      expect(kGpsRecordingForegroundServiceEnabled, isFalse,
+          reason: 'guards against re-enabling the FGS without the manifest '
+              'permission — flip both together when #1498 lands');
+      expect(android.foregroundNotificationConfig, isNull,
+          reason: 'no startForeground while FOREGROUND_SERVICE is removed');
     });
 
     test('iOS → AppleSettings: automotiveNavigation + background updates', () {
