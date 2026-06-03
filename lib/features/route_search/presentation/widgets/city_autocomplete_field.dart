@@ -88,7 +88,9 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
       if (!mounted) return;
       setState(() => _isLoading = true);
       try {
-        final results = await widget.searchService.searchCities(value.trim());
+        final results = await widget.searchService
+            .searchCities(value.trim())
+            .timeout(const Duration(seconds: 8));
         if (mounted) {
           _suggestions = results.take(5).toList();
           _showSuggestions = _suggestions.isNotEmpty;
@@ -111,10 +113,15 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
   }
 
   void _selectCity(ResolvedLocation city) {
+    // A search may be debounced or in flight (Nominatim is rate-limited) when
+    // the user taps a suggestion — cancel it and clear the spinner so the
+    // suffix progress indicator never lingers after a selection (#2753).
+    _debounce?.cancel();
     widget.controller.text = city.name;
     widget.onCitySelected(city);
     _removeOverlay();
     _focusNode.unfocus();
+    if (_isLoading) setState(() => _isLoading = false);
   }
 
   void _showOverlay() {
