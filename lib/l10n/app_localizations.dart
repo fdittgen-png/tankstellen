@@ -11037,6 +11037,30 @@ abstract class AppLocalizations {
   /// **'elapsed'**
   String get tripRecordingPipElapsedCaption;
 
+  /// Title of the bottom sheet explaining the pin button on the fuel-station radar (search) screen (#2785). Opened by long-pressing the pin in the AppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'About pin'**
+  String get radarPinHelpTitle;
+
+  /// Body text in the radar pin-help bottom sheet (#2785). Explains what pinning does and that it releases when the radar stops.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.'**
+  String get radarPinHelpBody;
+
+  /// Title of the opt-in switch in the radar pin-help bottom sheet (#2785). When on, the search screen pins itself (screen stays on, system bars hidden) automatically the moment the fuel-station radar starts, instead of the user tapping the pin each time. On by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Always pin when the radar starts'**
+  String get radarAutoPinTitle;
+
+  /// Subtitle under the always-pin opt-in switch in the radar pin-help bottom sheet (#2785). Explains the trade-off: convenience vs battery cost.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin the radar automatically every time instead of tapping each time. Uses more battery.'**
+  String get radarAutoPinSubtitle;
+
   /// Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert.
   ///
   /// In en, this message translates to:

@@ -4252,5 +4252,25 @@
         "example": "42"
       }
     }
+  },
+  "radarPinHelpTitle": "About pin",
+  "@radarPinHelpTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radarPinHelpBody": "Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.",
+  "@radarPinHelpBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radarAutoPinTitle": "Always pin when the radar starts",
+  "@radarAutoPinTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radarAutoPinSubtitle": "Pin the radar automatically every time instead of tapping each time. Uses more battery.",
+  "@radarAutoPinSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

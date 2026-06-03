@@ -6256,6 +6256,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'elapsed';
 
   @override
+  String get radarPinHelpTitle => 'About pin';
+
+  @override
+  String get radarPinHelpBody =>
+      'Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.';
+
+  @override
+  String get radarAutoPinTitle => 'Always pin when the radar starts';
+
+  @override
+  String get radarAutoPinSubtitle =>
+      'Pin the radar automatically every time instead of tapping each time. Uses more battery.';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Check frequency';
 
   @override
@@ -13622,6 +13636,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripRecordingPipElapsedCaption => '⟦éłáƥšéđ ···⟧';
+
+  @override
+  String get radarPinHelpTitle => '⟦Áƀóúŧ ƥîñ ····⟧';
+
+  @override
+  String get radarPinHelpBody =>
+      '⟦Ƥîñ ķééƥš ŧĥé šçřééñ óñ áñđ ĥîđéš šýšŧéɱ ƀářš šó ŧĥé çłóšéšŧ-šŧáŧîóñ řéáđóúŧ šŧáýš řéáđáƀłé óñ á đášĥƀóářđ ɱóúñŧ. Ŧáƥ áǧáîñ ŧó řéłéášé. Áúŧó-řéłéášéš ŵĥéñ ŧĥé řáđář šŧóƥš. ·······························································⟧';
+
+  @override
+  String get radarAutoPinTitle =>
+      '⟦Áłŵáýš ƥîñ ŵĥéñ ŧĥé řáđář šŧářŧš ············⟧';
+
+  @override
+  String get radarAutoPinSubtitle =>
+      '⟦Ƥîñ ŧĥé řáđář áúŧóɱáŧîçáłłý éṽéřý ŧîɱé îñšŧéáđ óƒ ŧáƥƥîñǧ éáçĥ ŧîɱé. Úšéš ɱóřé ƀáŧŧéřý. ································⟧';
 
   @override
   String get alertsRadiusFrequencyLabel => '⟦Çĥéçķ ƒřéɋúéñçý ······⟧';

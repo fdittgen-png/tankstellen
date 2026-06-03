@@ -44,13 +44,20 @@ void main() {
   silenceErrorLoggerSpool();
 
   group('RecordingProfile model', () {
-    test('defaults are all OFF — preserves the opt-in-each-drive design', () {
+    test('defaults: autoPin ON (#2785), the rest OFF', () {
       const p = RecordingProfile.defaults;
-      expect(p.autoPin, isFalse);
+      expect(p.autoPin, isTrue);
       expect(p.autoEnterReducedOnStart, isFalse);
       expect(p.keepScreenAwake, isFalse);
       expect(p.isDefault, isTrue);
-      expect(p.wantsScreenAwakeOnStart, isFalse);
+      // autoPin implies the screen stays awake on start.
+      expect(p.wantsScreenAwakeOnStart, isTrue);
+    });
+
+    test('isDefault compares against defaults — an autoPin-OFF profile is '
+        'NOT the default (a real opt-out), so a per-vehicle row persists', () {
+      expect(const RecordingProfile(autoPin: false).isDefault, isFalse);
+      expect(const RecordingProfile().isDefault, isTrue);
     });
 
     test('autoPin OR keepScreenAwake imply wantsScreenAwakeOnStart', () {
@@ -71,22 +78,29 @@ void main() {
       expect(back, p);
     });
 
-    test('fromJson tolerates a partial / legacy payload (missing keys OFF)',
+    test('fromJson: missing autoPin defaults ON (#2785), other missing keys OFF',
         () {
-      final p = RecordingProfile.fromJson(const {'autoPin': true});
-      expect(p.autoPin, isTrue);
+      final p = RecordingProfile.fromJson(const {});
+      expect(p.autoPin, isTrue, reason: 'absent autoPin → the true default');
       expect(p.autoEnterReducedOnStart, isFalse);
       expect(p.keepScreenAwake, isFalse);
+    });
+
+    test('fromJson honours a stored explicit autoPin:false (deliberate opt-out)',
+        () {
+      final p = RecordingProfile.fromJson(const {'autoPin': false});
+      expect(p.autoPin, isFalse,
+          reason: 'an explicitly-saved false must never be coerced back to true');
     });
   });
 
   group('RecordingProfileController persistence (#2274 concern 1)', () {
-    test('absent payload reads the all-default profile', () {
+    test('absent payload reads the default profile (autoPin ON)', () {
       final settings = _FakeSettings();
       final c = _container(settings);
       final profile = c.read(recordingProfileControllerProvider);
       expect(profile, RecordingProfile.defaults);
-      expect(profile.autoPin, isFalse);
+      expect(profile.autoPin, isTrue);
     });
 
     test('setAutoPin persists a JSON payload and republishes state',
@@ -117,29 +131,45 @@ void main() {
       final c = _container(settings);
       final ctrl = c.read(recordingProfileControllerProvider.notifier);
 
-      // Global: autoPin OFF. Vehicle v1: autoPin ON.
+      // Global: autoPin ON (the #2785 default). Vehicle v1 opts OUT
+      // (autoPin OFF — a non-default override, so it is persisted).
       await ctrl.setGlobal(RecordingProfile.defaults);
-      await ctrl.setOverride('v1', const RecordingProfile(autoPin: true));
+      await ctrl.setOverride('v1', const RecordingProfile(autoPin: false));
 
-      expect(ctrl.effectiveFor('v1').autoPin, isTrue,
-          reason: 'vehicle override applies');
-      expect(ctrl.effectiveFor('v2').autoPin, isFalse,
-          reason: 'unconfigured vehicle falls back to the global default');
-      expect(ctrl.effectiveFor(null).autoPin, isFalse);
+      expect(ctrl.effectiveFor('v1').autoPin, isFalse,
+          reason: 'vehicle override applies (opt-out wins over the global ON)');
+      expect(ctrl.effectiveFor('v2').autoPin, isTrue,
+          reason: 'unconfigured vehicle falls back to the global ON default');
+      expect(ctrl.effectiveFor(null).autoPin, isTrue);
     });
 
-    test('an all-default override is NOT persisted (clears the row)',
+    test('a matches-default override is NOT persisted (clears the row)',
         () async {
       final settings = _FakeSettings();
       final c = _container(settings);
       final ctrl = c.read(recordingProfileControllerProvider.notifier);
 
-      await ctrl.setOverride('v1', const RecordingProfile(autoPin: true));
+      // A non-default override (keepScreenAwake on) persists.
+      await ctrl.setOverride(
+          'v1', const RecordingProfile(keepScreenAwake: true));
       expect(ctrl.overrideFor('v1'), isNotNull);
 
-      // Resetting to all-default clears the override → falls back to global.
+      // Resetting to the default profile clears the override → global wins.
       await ctrl.setOverride('v1', RecordingProfile.defaults);
       expect(ctrl.overrideFor('v1'), isNull);
+    });
+
+    test('a per-vehicle autoPin:false override IS persisted (#2785 — a real '
+        'opt-out is not mistaken for the default and silently dropped)',
+        () async {
+      final settings = _FakeSettings();
+      final c = _container(settings);
+      final ctrl = c.read(recordingProfileControllerProvider.notifier);
+
+      await ctrl.setOverride('v1', const RecordingProfile(autoPin: false));
+      expect(ctrl.overrideFor('v1'), isNotNull);
+      expect(ctrl.effectiveFor('v1').autoPin, isFalse,
+          reason: 'the vehicle keeps auto-pin OFF despite the global ON default');
     });
   });
 }

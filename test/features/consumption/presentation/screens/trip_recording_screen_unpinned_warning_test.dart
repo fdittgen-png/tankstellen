@@ -11,6 +11,7 @@ import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart'
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/recording_profile_override.dart';
 
 /// Regression coverage for #1458 phase 2 — when the user lands on the
 /// trip-recording screen with the pin toggle OFF AND a recording is
@@ -96,6 +97,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+            recordingProfileOverride(),
           ],
         );
         // The warning is deferred ~600 ms post-mount so it doesn't
@@ -135,6 +137,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+            recordingProfileOverride(),
           ],
         );
         // Pump past the deferred-fire timer so the post-mount path
@@ -176,6 +179,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+            recordingProfileOverride(),
           ],
         );
         await tester.pump();
@@ -211,6 +215,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+            recordingProfileOverride(),
           ],
         );
         await tester.pump();

@@ -6322,6 +6322,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'vergangen';
 
   @override
+  String get radarPinHelpTitle => 'Über das Anpinnen';
+
+  @override
+  String get radarPinHelpBody =>
+      'Anpinnen hält den Bildschirm an und blendet die Systemleisten aus, damit die Anzeige der nächsten Tankstelle auf einer Armaturenhalterung lesbar bleibt. Erneut tippen, um zu lösen. Wird automatisch beendet, wenn der Radar stoppt.';
+
+  @override
+  String get radarAutoPinTitle => 'Beim Radarstart immer anpinnen';
+
+  @override
+  String get radarAutoPinSubtitle =>
+      'Den Radar jedes Mal automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Prüfintervall';
 
   @override

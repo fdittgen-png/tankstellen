@@ -11,6 +11,7 @@ import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart'
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/silence_error_logger.dart';
+import '../../../../helpers/recording_profile_override.dart';
 
 /// #2548 — staged save-progress when a recording is stopped. The screen
 /// renders the inline [TripSaveProgress] card while [phase] is the
@@ -52,6 +53,7 @@ Future<void> _pumpSaving(WidgetTester tester, TripSaveStage stage) async {
           ),
         ),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+      recordingProfileOverride(),
       ],
       child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

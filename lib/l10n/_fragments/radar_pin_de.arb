@@ -1,0 +1,18 @@
+{
+  "radarPinHelpTitle": "Über das Anpinnen",
+  "@radarPinHelpTitle": {
+    "description": "Title of the bottom sheet explaining the pin button on the fuel-station radar (search) screen (#2785). Opened by long-pressing the pin in the AppBar."
+  },
+  "radarPinHelpBody": "Anpinnen hält den Bildschirm an und blendet die Systemleisten aus, damit die Anzeige der nächsten Tankstelle auf einer Armaturenhalterung lesbar bleibt. Erneut tippen, um zu lösen. Wird automatisch beendet, wenn der Radar stoppt.",
+  "@radarPinHelpBody": {
+    "description": "Body text in the radar pin-help bottom sheet (#2785). Explains what pinning does and that it releases when the radar stops."
+  },
+  "radarAutoPinTitle": "Beim Radarstart immer anpinnen",
+  "@radarAutoPinTitle": {
+    "description": "Title of the opt-in switch in the radar pin-help bottom sheet (#2785). When on, the search screen pins itself (screen stays on, system bars hidden) automatically the moment the fuel-station radar starts, instead of the user tapping the pin each time. On by default."
+  },
+  "radarAutoPinSubtitle": "Den Radar jedes Mal automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.",
+  "@radarAutoPinSubtitle": {
+    "description": "Subtitle under the always-pin opt-in switch in the radar pin-help bottom sheet (#2785). Explains the trade-off: convenience vs battery cost."
+  }
+}
