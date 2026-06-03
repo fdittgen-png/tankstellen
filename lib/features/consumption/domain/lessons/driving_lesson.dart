@@ -29,6 +29,13 @@ import 'package:meta/meta.dart';
 /// the same lessons. The registry/strategy split (#2251) means a new
 /// lesson is one new [DrivingLessonRule] file + a registry entry — no
 /// edits to the calculator or the card.
+/// The tone of a [DrivingLesson] — drives the trip-detail card's icon + colour
+/// (#2791). Before this, the card hard-coded `colorScheme.error` for every
+/// tile, so a positive praise line ("Conduite souple — bien joué !") rendered
+/// with a red error (i) icon. Most lessons flag waste ([negative], the default);
+/// praise is [positive]; neutral facts are [info].
+enum LessonPolarity { negative, info, positive }
+
 @immutable
 class DrivingLesson {
   /// Stable, non-localized identifier. Doubles as the GPX
@@ -77,6 +84,12 @@ class DrivingLesson {
   /// written to the GPX.
   final String? trailing;
 
+  /// Tone of this lesson (#2791) — waste vs praise vs neutral. Defaults to
+  /// [LessonPolarity.negative] so every existing waste lesson is unchanged;
+  /// positive rules (e.g. smooth-driving praise) opt into [positive] so the
+  /// card stops painting them error-red.
+  final LessonPolarity polarity;
+
   const DrivingLesson({
     required this.id,
     required this.impact,
@@ -85,6 +98,7 @@ class DrivingLesson {
     this.advice = '',
     this.subtitle,
     this.trailing,
+    this.polarity = LessonPolarity.negative,
   });
 
   @override
@@ -97,12 +111,13 @@ class DrivingLesson {
         other.title == title &&
         other.advice == advice &&
         other.subtitle == subtitle &&
-        other.trailing == trailing;
+        other.trailing == trailing &&
+        other.polarity == polarity;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, impact, metricValue, title, advice, subtitle, trailing);
+  int get hashCode => Object.hash(
+      id, impact, metricValue, title, advice, subtitle, trailing, polarity);
 
   @override
   String toString() => 'DrivingLesson('

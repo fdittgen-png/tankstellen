@@ -65,6 +65,8 @@ class SmoothDrivingRule implements DrivingLessonRule {
       metricValue: 0,
       title: l.lessonSmoothDrivingTitle,
       advice: l.lessonAdviceSmoothDriving,
+      // #2791 — praise, not waste: render green, not the error-red (i) icon.
+      polarity: LessonPolarity.positive,
     );
   }
 }

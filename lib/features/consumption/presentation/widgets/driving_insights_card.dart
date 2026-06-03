@@ -91,8 +91,8 @@ class _LessonTile extends StatelessWidget {
       key: ValueKey('insight_tile_${lesson.id}'),
       contentPadding: EdgeInsets.zero,
       leading: Icon(
-        _iconFor(lesson.id),
-        color: theme.colorScheme.error,
+        _iconFor(lesson),
+        color: _colorFor(lesson.polarity, theme),
       ),
       title: Text(lesson.title),
       subtitle: subtitle == null
@@ -108,15 +108,15 @@ class _LessonTile extends StatelessWidget {
           : Text(
               trailing,
               style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.error,
+                color: _colorFor(lesson.polarity, theme),
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
     );
   }
 
-  IconData _iconFor(String lessonId) {
-    switch (lessonId) {
+  IconData _iconFor(DrivingLesson lesson) {
+    switch (lesson.id) {
       case highRpmLessonId:
         return Icons.speed;
       case hardAccelLessonId:
@@ -126,7 +126,24 @@ class _LessonTile extends StatelessWidget {
       case lowGearLessonId:
         return Icons.swap_vert;
       default:
-        return Icons.info_outline;
+        // #2791 — a positive lesson with no dedicated icon reads as praise
+        // (the eco leaf), not a neutral info glyph.
+        return lesson.polarity == LessonPolarity.positive
+            ? Icons.eco
+            : Icons.info_outline;
+    }
+  }
+
+  /// #2791 — tile tint by tone: praise green (primary), neutral muted, waste
+  /// the error red the card used to hard-code for every lesson.
+  Color _colorFor(LessonPolarity polarity, ThemeData theme) {
+    switch (polarity) {
+      case LessonPolarity.positive:
+        return theme.colorScheme.primary;
+      case LessonPolarity.info:
+        return theme.colorScheme.onSurfaceVariant;
+      case LessonPolarity.negative:
+        return theme.colorScheme.error;
     }
   }
 }
