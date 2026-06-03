@@ -3279,6 +3279,26 @@
       }
     }
   },
+  "drivingTraceCardTitle": "Driving-analysis trace (dev)",
+  "@drivingTraceCardTitle": {
+    "description": "Title of the developer-only card on the trip-detail screen that exports the trip's driving-analysis trace for threshold calibration (#2804, Epic #2789). Only visible in Developer / Debug mode."
+  },
+  "drivingTraceCardBody": "Export this trip's GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.",
+  "@drivingTraceCardBody": {
+    "description": "One-line explanation under the driving-analysis trace card title clarifying it is a gated developer calibration tool (#2804)."
+  },
+  "drivingTraceExportAction": "Export analysis trace",
+  "@drivingTraceExportAction": {
+    "description": "Button that exports the trip's driving-analysis trace as JSON to Downloads and opens the share sheet on the trip-detail screen (#2804)."
+  },
+  "drivingTraceExported": "Analysis trace saved to Downloads — add your verdict in the comment field and share it back.",
+  "@drivingTraceExported": {
+    "description": "Snackbar confirming the driving-analysis trace JSON was saved to the Downloads folder and the share sheet was opened (#2804)."
+  },
+  "drivingTraceExportFailed": "Couldn't export the analysis trace.",
+  "@drivingTraceExportFailed": {
+    "description": "Snackbar shown when exporting the driving-analysis trace JSON failed (#2804)."
+  },
   "ecoRouteOption": "Eco",
   "@ecoRouteOption": {
     "description": "Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time."

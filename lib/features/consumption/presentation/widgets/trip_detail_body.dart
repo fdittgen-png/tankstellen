@@ -18,6 +18,7 @@ import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/services/throttle_rpm_histogram_calculator.dart';
 import '../../domain/trip_recorder.dart';
+import 'driving_analysis_trace_card.dart';
 import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
 import 'gps_diagnostics_card.dart';
@@ -25,8 +26,8 @@ import 'gps_efficiency_kpi_card.dart';
 import 'obd2_diagnostics_trip_card.dart';
 import 'imu_accel_brake_card.dart';
 import 'throttle_rpm_histogram_card.dart';
-import 'trip_chart_section.dart';
 import 'trip_detail_charts.dart';
+import 'trip_detail_charts_section.dart';
 import 'trip_detail_to_trip_sample.dart';
 import 'trip_path_map_card.dart';
 import 'trip_summary_card.dart';
@@ -183,47 +184,6 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // toggling back on instantly restores the score without a re-render.
     final showGamification = ref.watch(gamificationEnabledProvider);
 
-    // RPM section is hidden when every sample reports null (the car's
-    // PID cache flagged RPM as unsupported). The summary card still
-    // shows max-RPM for the trip because that's part of the stored
-    // summary regardless of per-sample availability.
-    final hasRpmSamples = widget.samples.any((s) => s.rpm != null);
-
-    // Fuel-rate section (#2490) follows the same gating rule as RPM /
-    // engine-load: when neither the MEASURED `fuelRateLPerHour` nor the
-    // GPS-physics ESTIMATED series (#2431) has a single non-null sample,
-    // [TripDetailFuelRateChart] would render its 140 px "Keine
-    // Messwerte" empty card. Gate the section here so it disappears
-    // entirely instead — mirroring the chart's own self-suppression
-    // predicate so the section and the chart agree.
-    final hasFuelRateSamples = widget.samples.any(
-      (s) =>
-          s.fuelRateLPerHour != null || s.estimatedFuelRateLPerHour != null,
-    );
-
-    // Engine-load section (#1262 phase 3) follows the same gating
-    // rule as RPM: cars without PID 0x04 emit null on every sample
-    // (legacy trips persisted before #1262 phase 1 also do), and we
-    // silently skip the section header in that case rather than
-    // rendering an empty card.
-    final hasEngineLoadSamples =
-        widget.samples.any((s) => s.engineLoadPercent != null);
-
-    // #2461 — the new driving-signal chart sections follow the same
-    // if-any-non-null gate as RPM / engine-load. Throttle/pedal renders
-    // when EITHER pedal (PID 0x49-0x4B) or throttle (PID 0x11) is
-    // present; coolant / altitude / λ each gate on their own signal.
-    // Cars (and legacy trips) without the PID emit null on every sample,
-    // so the section header is silently skipped.
-    final hasThrottleSamples = widget.samples.any(
-      (s) => s.pedalPercent != null || s.throttlePercent != null,
-    );
-    final hasCoolantSamples =
-        widget.samples.any((s) => s.coolantTempC != null);
-    final hasAltitudeSamples =
-        widget.samples.any((s) => s.altitudeM != null);
-    final hasLambdaSamples = widget.samples.any((s) => s.lambda != null);
-
     // Post-trip lessons (#2251) — resolved here because the localized
     // titles depend on the active locale, but built off the cached
     // [_insights] / [_score] (and the stored summary) so the O(n)
@@ -313,67 +273,22 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // card self-hides unless Feature.debugMode is on AND a session was
         // captured, the OBD2 analogue of the GPS card above.
         const Obd2DiagnosticsTripCard(),
-        // #1895 — the per-trip telemetry charts are folded into one
-        // collapsible section, collapsed by default, so the summary
-        // and insight cards above stay the focus on open. maintainState
-        // keeps the chart widgets in the tree while collapsed — the
-        // Share-to-PNG boundary and the widget tests both rely on every
-        // section being present regardless of fold state.
-        Card(
-          margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-          clipBehavior: Clip.antiAlias,
-          child: ExpansionTile(
-            title: Text(l?.trajetDetailChartsSection ?? 'Charts'),
-            initiallyExpanded: false,
-            maintainState: true,
-            shape: const Border(),
-            collapsedShape: const Border(),
-            childrenPadding: const EdgeInsets.only(bottom: 4),
-            children: [
-              TripChartSection(
-                title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
-                chart: TripDetailSpeedChart(samples: widget.samples),
-              ),
-              if (hasFuelRateSamples)
-                TripChartSection(
-                  title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
-                  chart: TripDetailFuelRateChart(samples: widget.samples),
-                ),
-              if (hasRpmSamples)
-                TripChartSection(
-                  title: l?.trajetDetailChartRpm ?? 'RPM',
-                  chart: TripDetailRpmChart(samples: widget.samples),
-                ),
-              if (hasEngineLoadSamples)
-                TripChartSection(
-                  title: l?.trajetDetailChartEngineLoad ?? 'Engine load (%)',
-                  chart: TripDetailEngineLoadChart(samples: widget.samples),
-                ),
-              // #2461 — driving-signal charts, each gated on its own
-              // if-any-non-null signal (mirrors RPM / engine-load).
-              if (hasThrottleSamples)
-                TripChartSection(
-                  title: l?.trajetDetailChartThrottle ?? 'Throttle / pedal (%)',
-                  chart: TripDetailThrottleChart(samples: widget.samples),
-                ),
-              if (hasCoolantSamples)
-                TripChartSection(
-                  title: l?.trajetDetailChartCoolant ?? 'Coolant (°C)',
-                  chart: TripDetailCoolantChart(samples: widget.samples),
-                ),
-              if (hasAltitudeSamples)
-                TripChartSection(
-                  title: l?.trajetDetailChartAltitude ?? 'Altitude (m)',
-                  chart: TripDetailAltitudeChart(samples: widget.samples),
-                ),
-              if (hasLambdaSamples)
-                TripChartSection(
-                  title: l?.trajetDetailChartLambda ?? 'Commanded λ',
-                  chart: TripDetailLambdaChart(samples: widget.samples),
-                ),
-            ],
+        // Driving-analysis trace export (#2804). Dev-only — self-hides unless
+        // Feature.debugMode is on. Exports this trip's KPIs / score / lessons
+        // as an annotatable JSON so the maintainer can label real trips and
+        // calibrate the GPS verdict thresholds (Epic #2789 C6).
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          DrivingAnalysisTraceCard(
+            summary: widget.entry.summary,
+            score: _score,
+            lessons: lessons,
+            gpsFeatures: _gpsFeatures,
           ),
-        ),
+        // #1895 — the per-trip telemetry charts, folded into one
+        // collapsed-by-default section. Extracted to its own widget (#2804)
+        // so this file stays under the 400-line norm; each chart still
+        // self-gates on its own non-null signal.
+        TripDetailChartsSection(samples: widget.samples),
       ],
     );
 
