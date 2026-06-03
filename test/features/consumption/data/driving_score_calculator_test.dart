@@ -756,4 +756,41 @@ void main() {
       expect(score.idlingPenalty, greaterThan(0));
     });
   });
+
+  group('harsh-event overrides (#2794 — GPS-only IMU-preferred routing)', () {
+    final start = DateTime(2026, 6, 3, 12);
+    // A short GPS-only run (rpm null) with a gentle speed ramp.
+    final samples = <TripSample>[
+      for (var i = 0; i < 20; i++)
+        TripSample(
+            timestamp: start.add(Duration(seconds: i)), speedKmh: 30.0 + i),
+    ];
+
+    test('the accel/brake event overrides drive the penalty, not the '
+        'GPS-derived count', () {
+      final overridden = computeDrivingScore(samples,
+          hardAccelEventsOverride: 4, hardBrakeEventsOverride: 0);
+      final zeroed = computeDrivingScore(samples,
+          hardAccelEventsOverride: 0, hardBrakeEventsOverride: 0);
+
+      expect(overridden.hardAccelPenalty, greaterThan(0),
+          reason: '4 IMU-detected hard accels produce a real penalty');
+      expect(zeroed.hardAccelPenalty, 0,
+          reason: 'a 0 override yields no accel penalty regardless of GPS '
+              'speed-derivative jitter');
+      expect(
+          overridden.hardAccelPenalty, greaterThan(zeroed.hardAccelPenalty));
+    });
+
+    test('a brake override drives the brake penalty', () {
+      final braked = computeDrivingScore(samples,
+          hardAccelEventsOverride: 0, hardBrakeEventsOverride: 3);
+      expect(braked.hardBrakePenalty, greaterThan(0));
+    });
+
+    test('no override → unchanged (GPS-derived events, deterministic)', () {
+      expect(computeDrivingScore(samples),
+          equals(computeDrivingScore(samples)));
+    });
+  });
 }

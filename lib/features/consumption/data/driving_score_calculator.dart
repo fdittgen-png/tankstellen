@@ -135,6 +135,8 @@ const double _smoothnessPedalVarSaturation = 900.0;
 DrivingScore computeDrivingScore(
   List<TripSample> samples, {
   double? secondsBelowOptimalGear,
+  int? hardAccelEventsOverride,
+  int? hardBrakeEventsOverride,
 }) {
   if (samples.length < 2) return DrivingScore.perfect;
 
@@ -172,11 +174,18 @@ DrivingScore computeDrivingScore(
   // trips have a real rpm on at least one sample and score unchanged.
   final gpsOnly = sorted.every((s) => s.rpm == null);
 
+  // #2794 — prefer the caller's resolved accel/brake episode counts when
+  // provided. A GPS-only trip threads in summary.harshAccelerations/harshBrakes,
+  // which the recording pipeline already set to the IMU-detected episodes when
+  // the phone's inertial sensor was the better dongle-less signal — more
+  // accurate than re-deriving from the noisy GPS speed derivative, and it makes
+  // the displayed score match the figure the recorder intended. OBD2 trips pass
+  // null and score from the sample-derived events exactly as before.
   return acc.build(
     totalDt: totalDt,
     secondsBelowOptimalGear: secondsBelowOptimalGear,
-    hardAccelEvents: accelCounts.accelEvents,
-    hardBrakeEvents: accelCounts.brakeEvents,
+    hardAccelEvents: hardAccelEventsOverride ?? accelCounts.accelEvents,
+    hardBrakeEvents: hardBrakeEventsOverride ?? accelCounts.brakeEvents,
     gpsOnly: gpsOnly,
   );
 }

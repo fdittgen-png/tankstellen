@@ -135,12 +135,21 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     final tripSamples = widget.samples.map(tripDetailToTripSample).toList(
           growable: false,
         );
+    final summary = widget.entry.summary;
     // #2460 — thread the trip-end lugging metric stored on the summary
     // into the canonical score so the over-rev/shift family includes it
     // (the calculator can't recompute gear inference from samples alone).
+    //
+    // #2794 — for a GPS-only trip, score against the pipeline's RESOLVED harsh
+    // counts (IMU-preferred when the inertial sensor was the better dongle-less
+    // signal) instead of re-deriving from the noisy GPS speed derivative, so
+    // the displayed score matches the figure the recorder intended.
+    final gpsOnly = summary.kind == TripKind.gpsOnly;
     return computeDrivingScore(
       tripSamples,
-      secondsBelowOptimalGear: widget.entry.summary.secondsBelowOptimalGear,
+      secondsBelowOptimalGear: summary.secondsBelowOptimalGear,
+      hardAccelEventsOverride: gpsOnly ? summary.harshAccelerations : null,
+      hardBrakeEventsOverride: gpsOnly ? summary.harshBrakes : null,
     );
   }
 
