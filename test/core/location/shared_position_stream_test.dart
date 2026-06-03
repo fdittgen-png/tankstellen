@@ -48,10 +48,14 @@ class _CountingGeolocator extends GeolocatorWrapper {
   int openCount = 0;
   int liveSubscriptions = 0;
   final List<StreamController<Position>> _controllers = [];
+  // Every distinct underlying open's settings, in order (#2766 — lets a test
+  // assert the recorder's fine settings reach the shared upstream).
+  final List<LocationSettings?> openedSettings = [];
 
   @override
   Stream<Position> getPositionStream({LocationSettings? locationSettings}) {
     openCount++;
+    openedSettings.add(locationSettings);
     late final StreamController<Position> ctl;
     ctl = StreamController<Position>(
       onListen: () => liveSubscriptions++,
@@ -217,6 +221,93 @@ void main() {
 
       await sub1.cancel();
       await sub2.cancel();
+    });
+  });
+
+  // #2766 — the recorder's fine, foreground-service-promoted settings must
+  // WIN the cadence on the shared upstream regardless of subscription order.
+  group('GeolocatorWrapper.sharedPositionStream recording cadence (#2766)', () {
+    late _CountingGeolocator geo;
+    setUp(() => geo = _CountingGeolocator());
+    tearDown(() => geo.dispose());
+
+    // The fine recording settings the recorder passes; identity-distinct from
+    // the detector's coarse settings so the source can tell them apart.
+    final fine = AndroidSettings(
+      accuracy: LocationAccuracy.high,
+      intervalDuration: const Duration(seconds: 1),
+      distanceFilter: 0,
+    );
+    const coarse = LocationSettings(accuracy: LocationAccuracy.high);
+
+    test('recorder first → upstream opens with the fine recording settings',
+        () async {
+      final sub = geo
+          .sharedPositionStream(locationSettings: fine, recording: true)
+          .listen((_) {});
+      await _pump();
+
+      expect(geo.openCount, 1);
+      expect(geo.openedSettings.single, same(fine),
+          reason: "recorder's fine settings open the upstream");
+
+      await sub.cancel();
+    });
+
+    test(
+        'detector first (coarse) THEN recorder joins → upstream RE-OPENS at '
+        'the fine cadence, so the recording cadence wins', () async {
+      // The detector opens the channel first with coarse settings.
+      final subDetector = geo
+          .sharedPositionStream(locationSettings: coarse)
+          .listen((_) {});
+      await _pump();
+      expect(geo.openCount, 1);
+      expect(geo.openedSettings.single, same(coarse));
+
+      // The recorder joins a frame later, marked recording: the upstream must
+      // re-open with the FINE settings so the trace stays ~1 s, not ~5 s.
+      final got = <Position>[];
+      final subRecorder = geo
+          .sharedPositionStream(locationSettings: fine, recording: true)
+          .listen(got.add);
+      await _pump();
+
+      expect(geo.openCount, 2, reason: 'recorder forces a re-open');
+      expect(geo.openedSettings.last, same(fine),
+          reason: 'the re-opened upstream carries the fine recording settings');
+      // Only the fine subscription is live now (the coarse one was cancelled).
+      expect(geo.liveSubscriptions, 1);
+
+      // Both consumers keep receiving fixes off the re-opened upstream.
+      geo.emit(_pos(52.5, 13.4));
+      await _pump();
+      expect(got, hasLength(1), reason: 'recorder still receives fixes');
+
+      await subDetector.cancel();
+      await subRecorder.cancel();
+    });
+
+    test('a coarse late joiner does NOT downgrade an already-fine upstream',
+        () async {
+      final subRecorder = geo
+          .sharedPositionStream(locationSettings: fine, recording: true)
+          .listen((_) {});
+      await _pump();
+      expect(geo.openCount, 1);
+
+      // The detector joins later with coarse settings — it must NOT re-open
+      // the upstream (the recorder's fine cadence stays authoritative).
+      final subDetector = geo
+          .sharedPositionStream(locationSettings: coarse)
+          .listen((_) {});
+      await _pump();
+
+      expect(geo.openCount, 1, reason: 'no re-open for a coarse joiner');
+      expect(geo.openedSettings.single, same(fine));
+
+      await subRecorder.cancel();
+      await subDetector.cancel();
     });
   });
 }

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
+import '../../../core/location/recording_location_settings.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/sensors/imu_sample.dart';
 import '../../../core/sensors/imu_sensor_source.dart';
@@ -140,12 +141,20 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // EventChannel and starve one of them, which broke the fuel-station radar
     // + swipe in GPS-only recording. One underlying subscription, multiplexed,
     // feeds every fix to both consumers.
+    // #2766 — open the SHARED source with the fine, foreground-service
+    // promoted recording settings (Android ~1 s + foreground service;
+    // iOS automotiveNavigation + background updates) so the OS stops the
+    // ~5 s background batching that coarsened the trace + analytics. Marked
+    // `recording: true` so these settings WIN the cadence on the shared
+    // upstream even if the ApproachDetector opened the channel first with its
+    // coarse settings. The notification copy comes from the already-merged
+    // ARB keys, resolved for the active in-app language without a
+    // BuildContext (this runs from the notifier, not a widget).
     final geo = _ref.read(geolocatorWrapperProvider);
     _sub = geo
         .sharedPositionStream(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.high,
-          ),
+          recording: true,
+          locationSettings: recordingLocationSettingsForRef(_ref),
         )
         .listen(
           _onPosition,

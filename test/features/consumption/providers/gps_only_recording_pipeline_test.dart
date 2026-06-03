@@ -3,9 +3,11 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
 import 'package:tankstellen/features/consumption/domain/entities/trip_save_stage.dart';
@@ -54,6 +56,36 @@ void main() {
       // Identity bookkeeping is delegated back to the host.
       expect(harness.host.lastTripVehicleId, 'veh-42');
       expect(harness.host.lastTripStartedAt, isNotNull);
+    });
+
+    test(
+        '#2766 — start() opens the SHARED source with the fine recording '
+        'settings: Android foreground service + ~1 s interval reach the '
+        'upstream so the OS stops the ~5 s background throttle', () {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+      final harness = _Harness();
+      addTearDown(harness.dispose);
+
+      harness.pipeline.start();
+
+      // The recorder is the first (only) trip subscriber here, so the shared
+      // upstream opens with its settings — and they must be the fine Android
+      // recording settings, not a bare LocationSettings.
+      final opened = harness.geo.lastSettings;
+      expect(opened, isA<AndroidSettings>(),
+          reason: 'recording opens with platform-specific Android settings');
+      final android = opened! as AndroidSettings;
+      expect(android.intervalDuration, const Duration(seconds: 1));
+      expect(android.distanceFilter, 0);
+      expect(android.foregroundNotificationConfig, isNotNull,
+          reason: 'the foreground service is the un-throttle lever');
+      expect(
+        android.foregroundNotificationConfig!.notificationTitle,
+        isNotEmpty,
+        reason: 'ARB notification title carried into the config',
+      );
     });
 
     test('each position fix is synthesised into a GPS sample (rpm 0, '
@@ -293,6 +325,10 @@ class _Harness {
       // sensors_plus platform channel. (Dedicated IMU coverage lives in
       // gps_only_imu_fusion_test.dart + imu_event_detector_test.dart.)
       imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
+      // #2766 — start() resolves AppLocalizations for the active language to
+      // build the recording-notification copy; pin it to English so the test
+      // doesn't pull in the Hive-backed storage / profile graph.
+      activeLanguageProvider.overrideWith(_FixedActiveLanguage.new),
       // No active vehicle → the #2080 GPS-fuel imputation branch sees a
       // null profile and leaves avg / litres null, mirroring a fresh
       // install. (Production reads the real provider here.) When
@@ -324,6 +360,14 @@ final _pipelineProvider =
     Provider.family<GpsOnlyRecordingPipeline, RecordingPipelineHost>(
   (ref, host) => GpsOnlyRecordingPipeline(ref: ref, host: host),
 );
+
+/// #2766 — pins the active language to English so `start()`'s ARB lookup for
+/// the recording-notification copy resolves without the storage / profile
+/// graph. Mirrors the `_FixedActiveLanguage` idiom in app_test.dart.
+class _FixedActiveLanguage extends ActiveLanguage {
+  @override
+  AppLanguage build() => const AppLanguage('en', 'English', 'English');
+}
 
 class _NoActiveVehicle extends ActiveVehicleProfile {
   @override
@@ -429,6 +473,10 @@ Position _pos(
 class _RecordingGeolocator extends GeolocatorWrapper {
   int positionStreamCallCount = 0;
   LocationAccuracy? lastAccuracy;
+  // #2766 — the settings the SHARED source opened the underlying stream with,
+  // so a test can assert the recorder's fine (foreground-service) settings
+  // reached the upstream.
+  LocationSettings? lastSettings;
   StreamController<Position>? _controller;
   int activeListeners = 0;
 
@@ -436,6 +484,7 @@ class _RecordingGeolocator extends GeolocatorWrapper {
   Stream<Position> getPositionStream({LocationSettings? locationSettings}) {
     positionStreamCallCount++;
     lastAccuracy = locationSettings?.accuracy;
+    lastSettings = locationSettings;
     final prev = _controller;
     if (prev != null && !prev.isClosed) prev.close();
     _controller = StreamController<Position>(

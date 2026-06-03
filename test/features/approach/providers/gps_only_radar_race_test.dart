@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
@@ -140,6 +141,13 @@ class _FixedProfile extends ActiveProfile {
       );
 }
 
+/// #2766 — pins the active language so the pipeline's recording-notification
+/// ARB lookup resolves without the storage / profile graph.
+class _FixedActiveLanguage extends ActiveLanguage {
+  @override
+  AppLanguage build() => const AppLanguage('en', 'English', 'English');
+}
+
 /// Radar whose `fetchStations` returns a fixed priced set without network.
 class _FakeRadar extends FuelStationRadar {
   _FakeRadar(this.stations)
@@ -256,6 +264,9 @@ void main() {
       imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       tripRecordingProvider.overrideWith(_RecordingTrip.new),
       activeProfileProvider.overrideWith(_FixedProfile.new),
+      // #2766 — the GPS-only pipeline's start() resolves the recording
+      // notification copy; pin the language off the storage graph.
+      activeLanguageProvider.overrideWith(_FixedActiveLanguage.new),
       effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
       approachOverlayEnabledProvider.overrideWithValue(true),
       fuelStationRadarProvider.overrideWithValue(_FakeRadar(const [_station])),
