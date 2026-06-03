@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/sensors/imu_sample.dart';
 import 'package:tankstellen/core/sensors/imu_sensor_source.dart';
@@ -291,6 +292,9 @@ class _Harness {
       geolocatorWrapperProvider.overrideWithValue(geo),
       imuSensorSourceProvider.overrideWithValue(imu),
       activeVehicleProfileProvider.overrideWith(_NoActiveVehicle.new),
+      // #2766 — start() resolves AppLocalizations for the recording
+      // notification; pin the language so it stays off the storage graph.
+      activeLanguageProvider.overrideWith(_FixedActiveLanguage.new),
     ]);
     pipeline = container.read(_pipelineProvider(host));
   }
@@ -315,6 +319,13 @@ final _pipelineProvider =
 class _NoActiveVehicle extends ActiveVehicleProfile {
   @override
   VehicleProfile? build() => null;
+}
+
+/// #2766 — pins the active language so `start()`'s recording-notification
+/// ARB lookup resolves without the storage / profile graph.
+class _FixedActiveLanguage extends ActiveLanguage {
+  @override
+  AppLanguage build() => const AppLanguage('en', 'English', 'English');
 }
 
 /// A host that writes the finished summary to a REAL repository, so the
@@ -393,7 +404,10 @@ class _RecordingGeolocator extends GeolocatorWrapper {
   int activeListeners = 0;
 
   @override
-  Stream<Position> sharedPositionStream({LocationSettings? locationSettings}) {
+  Stream<Position> sharedPositionStream({
+    LocationSettings? locationSettings,
+    bool recording = false,
+  }) {
     positionStreamCallCount++;
     lastAccuracy = locationSettings?.accuracy;
     final prev = _controller;

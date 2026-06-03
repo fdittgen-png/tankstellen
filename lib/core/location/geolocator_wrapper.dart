@@ -139,19 +139,29 @@ class GeolocatorWrapper {
   /// detector that subscribes a frame after the recorder still leaves
   /// `ApproachIdle` on the most recent fix instead of waiting for the next.
   ///
-  /// [locationSettings] is read only the first time the underlying stream is
-  /// opened (all trip consumers request `LocationAccuracy.high`); subsequent
-  /// listeners join the existing stream regardless of the settings they pass.
+  /// [recording] marks the caller as the trip recorder, whose fine,
+  /// foreground-service-promoted [locationSettings] must win the cadence on
+  /// the shared upstream (#2766). The underlying platform stream is opened
+  /// with the most recent recording subscriber's settings if one is present,
+  /// regardless of subscription order — so even when the live
+  /// [ApproachDetector] opens the channel first with its coarse settings,
+  /// the recorder's join re-opens the upstream at the fine ~1 s cadence.
+  /// Non-recording consumers (the detector) join with whatever settings the
+  /// upstream is already running.
   Stream<Position> sharedPositionStream({
     LocationSettings? locationSettings,
+    bool recording = false,
   }) {
     final source = _shared ??= _SharedPositionSource(
       // Route through [getPositionStream] (not Geolocator directly) so the
       // single override seam tests already use stays intact and the
       // forceLocationManager wrapping (#2574) is applied in exactly one place.
-      open: () => getPositionStream(locationSettings: locationSettings),
+      open: (settings) => getPositionStream(locationSettings: settings),
     );
-    return source.subscribe();
+    return source.subscribe(
+      locationSettings: locationSettings,
+      recording: recording,
+    );
   }
 
   _SharedPositionSource? _shared;
@@ -162,10 +172,11 @@ class GeolocatorWrapper {
 /// listener, cancels it on the last, and replays the latest fix to late
 /// joiners. Constructed lazily by [GeolocatorWrapper.sharedPositionStream].
 class _SharedPositionSource {
-  _SharedPositionSource({required Stream<Position> Function() open})
-      : _open = open;
+  _SharedPositionSource({
+    required Stream<Position> Function(LocationSettings? settings) open,
+  }) : _open = open;
 
-  final Stream<Position> Function() _open;
+  final Stream<Position> Function(LocationSettings? settings) _open;
   // The shared bus lives for the wrapper's (keepAlive, app-lifetime)
   // lifetime — it is reused across trips so the underlying platform
   // subscription can re-open on the next first-listener without rebuilding
@@ -180,6 +191,14 @@ class _SharedPositionSource {
   StreamSubscription<Position>? _upstream;
   Position? _last;
   int _refCount = 0;
+  // The settings the live [_upstream] was opened with, and the recorder's
+  // fine settings to prefer (#2766). The recorder marks itself `recording`,
+  // and we always (re)open the upstream with `_recordingSettings` when one is
+  // present — so the fine ~1 s cadence wins regardless of who opened the
+  // channel first.
+  LocationSettings? _activeSettings;
+  LocationSettings? _recordingSettings;
+  int _recordingRefCount = 0;
 
   /// Hand a consumer a stream that seeds the latest fix (if any) then
   /// forwards every subsequent fix from the shared broadcast. Opening the
@@ -187,7 +206,10 @@ class _SharedPositionSource {
   /// is driven off the refcount kept here rather than the broadcast
   /// controller's own onListen / onCancel, so the seeded late-join replay
   /// does not perturb the refcount.
-  Stream<Position> subscribe() {
+  Stream<Position> subscribe({
+    LocationSettings? locationSettings,
+    bool recording = false,
+  }) {
     // Per-consumer controller. Closed in its own `onCancel` once the
     // consumer detaches, so there is no leak.
     // ignore: close_sinks
@@ -195,7 +217,7 @@ class _SharedPositionSource {
     StreamSubscription<Position>? relay;
     ctl = StreamController<Position>(
       onListen: () {
-        _retain();
+        _retain(locationSettings: locationSettings, recording: recording);
         // Replay the most recent fix so a late joiner (e.g. the detector
         // subscribing a frame after the recorder) acts on it immediately.
         final last = _last;
@@ -212,36 +234,76 @@ class _SharedPositionSource {
       onCancel: () async {
         await relay?.cancel();
         relay = null;
-        await _release();
+        await _release(recording: recording);
         if (!ctl.isClosed) await ctl.close();
       },
     );
     return ctl.stream;
   }
 
-  void _retain() {
+  void _retain({
+    required LocationSettings? locationSettings,
+    required bool recording,
+  }) {
     _refCount++;
+    if (recording) {
+      _recordingRefCount++;
+      _recordingSettings = locationSettings;
+    }
+    // The effective settings: the recorder's fine settings always win while a
+    // recording consumer is present; otherwise the joining consumer's.
+    final wanted = _recordingRefCount > 0 ? _recordingSettings : locationSettings;
     if (_refCount == 1) {
-      // Cancelled in [_release] when the refcount falls back to 0.
-      _upstream = _open().listen(
-        (p) {
-          _last = p;
-          if (!_out.isClosed) _out.add(p);
-        },
-        onError: (Object e, StackTrace st) {
-          if (!_out.isClosed) _out.addError(e, st);
-        },
-      );
+      _openUpstream(wanted);
+      return;
+    }
+    // Already open. If a recording consumer just joined a channel that was
+    // opened with coarser (non-recording) settings, re-open it at the fine
+    // cadence so the recorder's cadence wins even when the detector opened
+    // first (#2766). Identity compare is enough: the same settings object is
+    // never re-passed, and re-opening on every coarse join is harmless but
+    // unwanted, so we gate strictly on the recorder arriving.
+    if (recording && !identical(_activeSettings, wanted)) {
+      _reopenUpstream(wanted);
     }
   }
 
-  Future<void> _release() async {
+  void _openUpstream(LocationSettings? settings) {
+    _activeSettings = settings;
+    // Cancelled in [_release] when the refcount falls back to 0, or replaced
+    // by [_reopenUpstream] when the recorder upgrades the cadence.
+    _upstream = _open(settings).listen(
+      (p) {
+        _last = p;
+        if (!_out.isClosed) _out.add(p);
+      },
+      onError: (Object e, StackTrace st) {
+        if (!_out.isClosed) _out.addError(e, st);
+      },
+    );
+  }
+
+  void _reopenUpstream(LocationSettings? settings) {
+    final old = _upstream;
+    _upstream = null;
+    _openUpstream(settings);
+    // Cancel the superseded coarse subscription after the fine one is live so
+    // there is no gap in fixes; the broadcast bus + `_last` replay bridge it.
+    unawaited(old?.safeCancel());
+  }
+
+  Future<void> _release({required bool recording}) async {
     if (_refCount == 0) return;
     _refCount--;
+    if (recording && _recordingRefCount > 0) {
+      _recordingRefCount--;
+      if (_recordingRefCount == 0) _recordingSettings = null;
+    }
     if (_refCount == 0) {
       final up = _upstream;
       _upstream = null;
       _last = null;
+      _activeSettings = null;
       await up?.safeCancel();
     }
   }
