@@ -6819,6 +6819,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelStationRadarStart => 'Start fuel station radar';
 
   @override
+  String get stopRadar => 'Stop radar';
+
+  @override
   String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
 
   @override
@@ -14151,6 +14154,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fuelStationRadarStart => '⟦Šŧářŧ ƒúéł šŧáŧîóñ řáđář ·········⟧';
+
+  @override
+  String get stopRadar => '⟦Šŧóƥ řáđář ····⟧';
 
   @override
   String get fuelStationRadarResultBadge =>

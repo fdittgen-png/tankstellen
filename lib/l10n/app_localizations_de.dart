@@ -6895,6 +6895,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fuelStationRadarStart => 'Tankstellen-Radar starten';
 
   @override
+  String get stopRadar => 'Tankstellen-Radar stoppen';
+
+  @override
   String get fuelStationRadarResultBadge => 'Tankstellen-Radar-Ergebnis';
 
   @override
