@@ -9406,6 +9406,30 @@ abstract class AppLocalizations {
   /// **'Captured during recording to verify GPS cadence under phone-sleep.'**
   String get gpsDiagnosticsExplain;
 
+  /// Expanded-body line on the GPS diagnostics card (#1458 phase 2.5 / #2765) reporting the single largest interval observed between two GPS fixes, in whole seconds — the worst-case throttling moment of the trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest gap: {seconds} s'**
+  String gpsDiagnosticsLargestGap(int seconds);
+
+  /// Localized label for the 'resumed' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was in the foreground and interactive when these GPS fixes were captured.
+  ///
+  /// In en, this message translates to:
+  /// **'Resumed'**
+  String get gpsLifecycleResumed;
+
+  /// Localized label for the 'paused' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was backgrounded (Android) when these GPS fixes were captured.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get gpsLifecyclePaused;
+
+  /// Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was transitioning / not receiving input (e.g. iOS app switcher) when these GPS fixes were captured.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get gpsLifecycleInactive;
+
   /// Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional.
   ///
   /// In en, this message translates to:
@@ -12162,6 +12186,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recording discarded — no movement detected'**
   String get tripRecordingDiscardedNoMovement;
+
+  /// Title of the Android GPS foreground-service notification shown while a trip is recording (#2766). Reassures the user that location tracking is intentional and tied to the active recording, so the persistent notification reads as expected rather than alarming.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording your trip'**
+  String get tripRecordingGpsNotificationTitle;
+
+  /// Body text of the Android GPS foreground-service notification shown while a trip is recording (#2766). Explains why location is tracked: to compute the route, fuel consumption and driving stats for this trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking your route for fuel & driving stats'**
+  String get tripRecordingGpsNotificationText;
 
   /// Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account.
   ///

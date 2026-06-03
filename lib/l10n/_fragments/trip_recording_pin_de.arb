@@ -22,5 +22,7 @@
   "tripRecordingAutoPinSubtitle": "Das Formular bei jeder Fahrt automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.",
   "tripRecordingConnectingTitle": "Aufnahme wird gestartet …",
   "tripRecordingSavingTitle": "Fahrt wird gespeichert…",
-  "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt"
+  "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt",
+  "tripRecordingGpsNotificationTitle": "Fahrt wird aufgezeichnet",
+  "tripRecordingGpsNotificationText": "GPS-Verfolgung deiner Route für Verbrauchs- & Fahrstatistiken"
 }

@@ -4207,5 +4207,34 @@
   "settingsMenuLabel": "Paramètres",
   "@settingsMenuLabel": {
     "description": "Overflow-menu item label that opens the app-global Settings screen (#2756)."
+  },
+  "gpsDiagnosticsLargestGap": "Plus grand intervalle : {seconds} s",
+  "@gpsDiagnosticsLargestGap": {
+    "description": "Expanded-body line on the GPS diagnostics card (#1458 phase 2.5 / #2765).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsLifecycleResumed": "En cours",
+  "@gpsLifecycleResumed": {
+    "description": "Localized label for the 'resumed' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
+  "gpsLifecyclePaused": "En pause",
+  "@gpsLifecyclePaused": {
+    "description": "Localized label for the 'paused' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
+  "gpsLifecycleInactive": "Inactif",
+  "@gpsLifecycleInactive": {
+    "description": "Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
+  "tripRecordingGpsNotificationTitle": "Enregistrement du trajet en cours",
+  "@tripRecordingGpsNotificationTitle": {
+    "description": "Title of the Android GPS foreground-service notification shown while a trip is recording (#2766)."
+  },
+  "tripRecordingGpsNotificationText": "Suivi GPS de votre itinéraire",
+  "@tripRecordingGpsNotificationText": {
+    "description": "Body text of the Android GPS foreground-service notification shown while a trip is recording (#2766)."
   }
 }

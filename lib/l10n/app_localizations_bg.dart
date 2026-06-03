@@ -5327,6 +5327,20 @@ class AppLocalizationsBg extends AppLocalizations {
       'Заснето по време на записа за проверка на GPS честотата при заспал телефон.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Largest gap: $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'Resumed';
+
+  @override
+  String get gpsLifecyclePaused => 'Paused';
+
+  @override
+  String get gpsLifecycleInactive => 'Inactive';
+
+  @override
   String get gpsMatrixMaturityCold => 'Студена';
 
   @override
@@ -6972,6 +6986,13 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Recording discarded — no movement detected';
+
+  @override
+  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'Tracking your route for fuel & driving stats';
 
   @override
   String get tripShareAction => 'Споделяне с друг акаунт';

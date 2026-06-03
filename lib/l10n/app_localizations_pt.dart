@@ -5319,6 +5319,20 @@ class AppLocalizationsPt extends AppLocalizations {
       'Capturado durante a gravação para verificar a cadência GPS com o telemóvel em repouso.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Largest gap: $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'Resumed';
+
+  @override
+  String get gpsLifecyclePaused => 'Paused';
+
+  @override
+  String get gpsLifecycleInactive => 'Inactive';
+
+  @override
   String get gpsMatrixMaturityCold => 'Fria';
 
   @override
@@ -6965,6 +6979,13 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Recording discarded — no movement detected';
+
+  @override
+  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'Tracking your route for fuel & driving stats';
 
   @override
   String get tripShareAction => 'Partilhar com outra conta';

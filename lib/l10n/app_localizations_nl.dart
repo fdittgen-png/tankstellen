@@ -5300,6 +5300,20 @@ class AppLocalizationsNl extends AppLocalizations {
       'Vastgelegd tijdens opname om GPS-cadans te verifiëren tijdens telefoonscherm-uit.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Largest gap: $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'Resumed';
+
+  @override
+  String get gpsLifecyclePaused => 'Paused';
+
+  @override
+  String get gpsLifecycleInactive => 'Inactive';
+
+  @override
   String get gpsMatrixMaturityCold => 'Koud';
 
   @override
@@ -6942,6 +6956,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Recording discarded — no movement detected';
+
+  @override
+  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'Tracking your route for fuel & driving stats';
 
   @override
   String get tripShareAction => 'Delen met een ander account';

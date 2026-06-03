@@ -5335,6 +5335,20 @@ class AppLocalizationsFr extends AppLocalizations {
       'Capturé pendant l\'enregistrement pour vérifier la cadence GPS en veille.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Plus grand intervalle : $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'En cours';
+
+  @override
+  String get gpsLifecyclePaused => 'En pause';
+
+  @override
+  String get gpsLifecycleInactive => 'Inactif';
+
+  @override
   String get gpsMatrixMaturityCold => 'Froide';
 
   @override
@@ -6988,6 +7002,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Recording discarded — no movement detected';
+
+  @override
+  String get tripRecordingGpsNotificationTitle =>
+      'Enregistrement du trajet en cours';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'Suivi GPS de votre itinéraire';
 
   @override
   String get tripShareAction => 'Partager avec un autre compte';

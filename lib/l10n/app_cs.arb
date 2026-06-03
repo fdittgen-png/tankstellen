@@ -4127,5 +4127,40 @@
   "@settingsMenuLabel": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "@gpsDiagnosticsLargestGap": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsLifecycleResumed": "Resumed",
+  "@gpsLifecycleResumed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsLifecyclePaused": "Paused",
+  "@gpsLifecyclePaused": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsLifecycleInactive": "Inactive",
+  "@gpsLifecycleInactive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "@tripRecordingGpsNotificationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "@tripRecordingGpsNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
