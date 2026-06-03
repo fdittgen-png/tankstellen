@@ -32,6 +32,7 @@ import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
 import '../../search/domain/entities/station.dart';
+import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_parsers.dart' as parser;
 
 /// Decode the flux ZIP [bytes], locate the inner XML entry, and parse every
@@ -167,6 +168,13 @@ Station? parseFluxPdv(XmlElement pdv) {
     stationType: pop.isEmpty ? null : pop,
     is24h: is24h,
     openingHoursText: openingHoursText,
+    // #2751 — carry the structured schedule on the search Station (the
+    // glued `rawHoraires` is the same shape the adapter parses on the
+    // instantané path) so the detail fast path renders staffed hours.
+    openingHours: const FranceOpeningHoursAdapter().parse(<String, dynamic>{
+      'horaires_jour': rawHoraires,
+      'horaires_automate_24_24': is24h ? 'Oui' : 'Non',
+    }),
   );
 }
 
