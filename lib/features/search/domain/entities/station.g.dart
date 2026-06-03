@@ -28,6 +28,11 @@ _Station _$StationFromJson(Map<String, dynamic> json) => _Station(
   isOpen: json['isOpen'] as bool,
   updatedAt: json['updatedAt'] as String?,
   openingHoursText: json['openingHoursText'] as String?,
+  openingHours: json['openingHours'] == null
+      ? null
+      : WeeklyOpeningHours.fromJson(
+          json['openingHours'] as Map<String, dynamic>,
+        ),
   is24h: json['is24h'] as bool? ?? false,
   services:
       (json['services'] as List<dynamic>?)?.map((e) => e as String).toList() ??
@@ -72,6 +77,7 @@ Map<String, dynamic> _$StationToJson(_Station instance) => <String, dynamic>{
   'isOpen': instance.isOpen,
   'updatedAt': instance.updatedAt,
   'openingHoursText': instance.openingHoursText,
+  'openingHours': instance.openingHours?.toJson(),
   'is24h': instance.is24h,
   'services': instance.services,
   'availableFuels': instance.availableFuels,

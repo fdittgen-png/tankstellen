@@ -100,6 +100,10 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
     }
   }
 
+  // #2778 — Tankerkönig list.php (search) carries no hours; openingTimes live
+  // only on detail.php, parsed below. The station-detail fast path fetches
+  // detail for a DE search tap (see _detailOnlyOpeningHoursCountries in
+  // station_detail_provider.dart) instead of serving the hours-less station.
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
