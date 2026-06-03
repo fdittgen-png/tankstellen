@@ -207,12 +207,86 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Median interval: 1000 ms'), findsOneWidget);
-      expect(find.textContaining('resumed 100%'), findsOneWidget);
-      expect(find.textContaining('Largest gap'), findsOneWidget);
+      // Lifecycle label is now localized — "Resumed", not the raw enum
+      // key "resumed" (#2765).
+      expect(find.textContaining('Resumed 100%'), findsOneWidget);
       expect(
         find.textContaining('Captured during recording'),
         findsOneWidget,
       );
+    });
+
+    testWidgets(
+        'largest-gap line + lifecycle labels come from l10n (English) (#2765)',
+        (tester) async {
+      // 6 samples at 1000 ms with a 5000 ms gap, all 'resumed' → the
+      // largest-gap line reads "Largest gap: 5 s" from the ARB.
+      final diagnostics = buildDiagnostics(
+        count: 6,
+        interval: const Duration(milliseconds: 1000),
+        injectedGapAt2: const Duration(milliseconds: 5000),
+      );
+
+      await pumpApp(tester, GpsDiagnosticsCard(diagnostics: diagnostics));
+      await tester.tap(find.byKey(const Key('gps_diagnostics_tile')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Largest gap: 5 s'), findsOneWidget);
+      // Raw enum key must never leak — the breakdown shows "Resumed".
+      expect(find.textContaining('resumed 100%'), findsNothing);
+      expect(find.textContaining('Resumed 100%'), findsOneWidget);
+    });
+
+    testWidgets(
+        'largest-gap line + lifecycle labels come from l10n (French) (#2765)',
+        (tester) async {
+      // Drive the card under the French locale and assert the strings
+      // that were English-on-French / raw-enum before #2765 now render
+      // in French.
+      final diagnostics = buildDiagnostics(
+        count: 6,
+        interval: const Duration(milliseconds: 1000),
+        injectedGapAt2: const Duration(milliseconds: 5000),
+      );
+
+      await pumpApp(
+        tester,
+        GpsDiagnosticsCard(diagnostics: diagnostics),
+        locale: const Locale('fr'),
+      );
+      await tester.tap(find.byKey(const Key('gps_diagnostics_tile')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Plus grand intervalle : 5 s'), findsOneWidget);
+      expect(find.textContaining('En cours 100%'), findsOneWidget);
+      // The raw enum key and the English literal are both gone.
+      expect(find.textContaining('resumed'), findsNothing);
+      expect(find.textContaining('Largest gap'), findsNothing);
+    });
+
+    testWidgets('mixed lifecycle states all render localized (French) (#2765)',
+        (tester) async {
+      // 10 samples: 8 resumed, 2 paused → "En cours 80% · En pause 20%".
+      final start = DateTime.utc(2026, 1, 1);
+      final diagnostics = <GpsSampleDiagnostic>[
+        for (var i = 0; i < 10; i++)
+          GpsSampleDiagnostic(
+            timestamp: start.add(Duration(seconds: i)),
+            lifecycleState: i < 8 ? 'resumed' : 'paused',
+            index: i,
+          ),
+      ];
+
+      await pumpApp(
+        tester,
+        GpsDiagnosticsCard(diagnostics: diagnostics),
+        locale: const Locale('fr'),
+      );
+      await tester.tap(find.byKey(const Key('gps_diagnostics_tile')));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('En cours 80%'), findsOneWidget);
+      expect(find.textContaining('En pause 20%'), findsOneWidget);
     });
   });
 }

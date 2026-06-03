@@ -5278,6 +5278,20 @@ class AppLocalizationsEt extends AppLocalizations {
       'Salvestatud salvestamise ajal, et kontrollida GPS sagedust telefoni une ajal.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Largest gap: $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'Resumed';
+
+  @override
+  String get gpsLifecyclePaused => 'Paused';
+
+  @override
+  String get gpsLifecycleInactive => 'Inactive';
+
+  @override
   String get gpsMatrixMaturityCold => 'Külm';
 
   @override
@@ -6911,6 +6925,13 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Recording discarded — no movement detected';
+
+  @override
+  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'Tracking your route for fuel & driving stats';
 
   @override
   String get tripShareAction => 'Jaga teise kontoga';

@@ -5320,6 +5320,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wird während der Aufzeichnung erfasst, um die GPS-Abtastung im Standby-Modus zu prüfen.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Größte Lücke: $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'Aktiv';
+
+  @override
+  String get gpsLifecyclePaused => 'Pausiert';
+
+  @override
+  String get gpsLifecycleInactive => 'Inaktiv';
+
+  @override
   String get gpsMatrixMaturityCold => 'Kalt';
 
   @override
@@ -6966,6 +6980,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Aufnahme verworfen — keine Bewegung erkannt';
+
+  @override
+  String get tripRecordingGpsNotificationTitle => 'Fahrt wird aufgezeichnet';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'GPS-Verfolgung deiner Route für Verbrauchs- & Fahrstatistiken';
 
   @override
   String get tripShareAction => 'Mit anderem Konto teilen';

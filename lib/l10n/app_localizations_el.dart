@@ -5330,6 +5330,20 @@ class AppLocalizationsEl extends AppLocalizations {
       'Καταγράφηκε κατά τη διάρκεια εγγραφής για επαλήθευση ρυθμού GPS κατά την αδρανοποίηση τηλεφώνου.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Largest gap: $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'Resumed';
+
+  @override
+  String get gpsLifecyclePaused => 'Paused';
+
+  @override
+  String get gpsLifecycleInactive => 'Inactive';
+
+  @override
   String get gpsMatrixMaturityCold => 'Ψυχρή';
 
   @override
@@ -6977,6 +6991,13 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Recording discarded — no movement detected';
+
+  @override
+  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'Tracking your route for fuel & driving stats';
 
   @override
   String get tripShareAction => 'Κοινοποίηση σε άλλον λογαριασμό';

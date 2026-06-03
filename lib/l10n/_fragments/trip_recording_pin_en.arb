@@ -58,5 +58,13 @@
   "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
   "@tripRecordingDiscardedNoMovement": {
     "description": "SnackBar shown after the user stops a recording that covered no distance and captured no usable signal — a genuine false-start / stationary stop (#2509). Tells the user nothing was saved because the car never moved. Never shown when the trip was actually saved."
+  },
+  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "@tripRecordingGpsNotificationTitle": {
+    "description": "Title of the Android GPS foreground-service notification shown while a trip is recording (#2766). Reassures the user that location tracking is intentional and tied to the active recording, so the persistent notification reads as expected rather than alarming."
+  },
+  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "@tripRecordingGpsNotificationText": {
+    "description": "Body text of the Android GPS foreground-service notification shown while a trip is recording (#2766). Explains why location is tracked: to compute the route, fuel consumption and driving stats for this trip."
   }
 }

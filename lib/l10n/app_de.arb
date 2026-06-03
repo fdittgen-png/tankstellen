@@ -2381,6 +2381,27 @@
   "@gpsDiagnosticsExplain": {
     "description": "Subtle one-line explanation at the bottom of the GPS diagnostics card (#1458 phase 2.5)."
   },
+  "gpsDiagnosticsLargestGap": "Größte Lücke: {seconds} s",
+  "@gpsDiagnosticsLargestGap": {
+    "description": "Expanded-body line on the GPS diagnostics card (#1458 phase 2.5 / #2765).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsLifecycleResumed": "Aktiv",
+  "@gpsLifecycleResumed": {
+    "description": "Localized label for the 'resumed' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
+  "gpsLifecyclePaused": "Pausiert",
+  "@gpsLifecyclePaused": {
+    "description": "Localized label for the 'paused' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
+  "gpsLifecycleInactive": "Inaktiv",
+  "@gpsLifecycleInactive": {
+    "description": "Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
+  },
   "gpsMatrixMaturityCold": "Kalt",
   "@gpsMatrixMaturityCold": {
     "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
@@ -3105,6 +3126,8 @@
   "tripRecordingConnectingTitle": "Aufnahme wird gestartet …",
   "tripRecordingSavingTitle": "Fahrt wird gespeichert…",
   "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt",
+  "tripRecordingGpsNotificationTitle": "Fahrt wird aufgezeichnet",
+  "tripRecordingGpsNotificationText": "GPS-Verfolgung deiner Route für Verbrauchs- & Fahrstatistiken",
   "tripShareAction": "Mit anderem Konto teilen",
   "@tripShareAction": {
     "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."

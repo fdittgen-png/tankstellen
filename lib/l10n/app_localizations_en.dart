@@ -5257,6 +5257,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Captured during recording to verify GPS cadence under phone-sleep.';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return 'Largest gap: $seconds s';
+  }
+
+  @override
+  String get gpsLifecycleResumed => 'Resumed';
+
+  @override
+  String get gpsLifecyclePaused => 'Paused';
+
+  @override
+  String get gpsLifecycleInactive => 'Inactive';
+
+  @override
   String get gpsMatrixMaturityCold => 'Cold';
 
   @override
@@ -6890,6 +6904,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tripRecordingDiscardedNoMovement =>
       'Recording discarded — no movement detected';
+
+  @override
+  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      'Tracking your route for fuel & driving stats';
 
   @override
   String get tripShareAction => 'Share with another account';
@@ -12573,6 +12594,20 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Çáƥŧúřéđ đúřîñǧ řéçóřđîñǧ ŧó ṽéřîƒý ǦƤŠ çáđéñçé úñđéř ƥĥóñé-šłééƥ. ·························⟧';
 
   @override
+  String gpsDiagnosticsLargestGap(int seconds) {
+    return '⟦Łářǧéšŧ ǧáƥ: $seconds š ·····⟧';
+  }
+
+  @override
+  String get gpsLifecycleResumed => '⟦Řéšúɱéđ ···⟧';
+
+  @override
+  String get gpsLifecyclePaused => '⟦Ƥáúšéđ ···⟧';
+
+  @override
+  String get gpsLifecycleInactive => '⟦Îñáçŧîṽé ····⟧';
+
+  @override
   String get gpsMatrixMaturityCold => '⟦Çółđ ··⟧';
 
   @override
@@ -14245,6 +14280,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripRecordingDiscardedNoMovement =>
       '⟦Řéçóřđîñǧ đîšçářđéđ — ñó ɱóṽéɱéñŧ đéŧéçŧéđ ················⟧';
+
+  @override
+  String get tripRecordingGpsNotificationTitle =>
+      '⟦Řéçóřđîñǧ ýóúř ŧřîƥ ········⟧';
+
+  @override
+  String get tripRecordingGpsNotificationText =>
+      '⟦Ŧřáçķîñǧ ýóúř řóúŧé ƒóř ƒúéł & đřîṽîñǧ šŧáŧš ················⟧';
 
   @override
   String get tripShareAction => '⟦Šĥářé ŵîŧĥ áñóŧĥéř áççóúñŧ ··········⟧';

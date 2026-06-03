@@ -30,5 +30,26 @@
   "gpsDiagnosticsExplain": "Captured during recording to verify GPS cadence under phone-sleep.",
   "@gpsDiagnosticsExplain": {
     "description": "Subtle one-line explanation at the bottom of the GPS diagnostics card (#1458 phase 2.5) reminding the user why this card exists — they probably opened the trip detail to look at consumption, not GPS plumbing."
+  },
+  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "@gpsDiagnosticsLargestGap": {
+    "description": "Expanded-body line on the GPS diagnostics card (#1458 phase 2.5 / #2765) reporting the single largest interval observed between two GPS fixes, in whole seconds — the worst-case throttling moment of the trip.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsLifecycleResumed": "Resumed",
+  "@gpsLifecycleResumed": {
+    "description": "Localized label for the 'resumed' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was in the foreground and interactive when these GPS fixes were captured."
+  },
+  "gpsLifecyclePaused": "Paused",
+  "@gpsLifecyclePaused": {
+    "description": "Localized label for the 'paused' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was backgrounded (Android) when these GPS fixes were captured."
+  },
+  "gpsLifecycleInactive": "Inactive",
+  "@gpsLifecycleInactive": {
+    "description": "Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was transitioning / not receiving input (e.g. iOS app switcher) when these GPS fixes were captured."
   }
 }

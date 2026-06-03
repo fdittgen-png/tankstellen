@@ -4173,6 +4173,27 @@
   "@gpsDiagnosticsExplain": {
     "description": "Subtle one-line explanation at the bottom of the GPS diagnostics card (#1458 phase 2.5) reminding the user why this card exists — they probably opened the trip detail to look at consumption, not GPS plumbing."
   },
+  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "@gpsDiagnosticsLargestGap": {
+    "description": "Expanded-body line on the GPS diagnostics card (#1458 phase 2.5 / #2765) reporting the single largest interval observed between two GPS fixes, in whole seconds — the worst-case throttling moment of the trip.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsLifecycleResumed": "Resumed",
+  "@gpsLifecycleResumed": {
+    "description": "Localized label for the 'resumed' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was in the foreground and interactive when these GPS fixes were captured."
+  },
+  "gpsLifecyclePaused": "Paused",
+  "@gpsLifecyclePaused": {
+    "description": "Localized label for the 'paused' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was backgrounded (Android) when these GPS fixes were captured."
+  },
+  "gpsLifecycleInactive": "Inactive",
+  "@gpsLifecycleInactive": {
+    "description": "Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was transitioning / not receiving input (e.g. iOS app switcher) when these GPS fixes were captured."
+  },
   "gpsMatrixMaturityCold": "Cold",
   "@gpsMatrixMaturityCold": {
     "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
@@ -6294,6 +6315,14 @@
   "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
   "@tripRecordingDiscardedNoMovement": {
     "description": "SnackBar shown after the user stops a recording that covered no distance and captured no usable signal — a genuine false-start / stationary stop (#2509). Tells the user nothing was saved because the car never moved. Never shown when the trip was actually saved."
+  },
+  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "@tripRecordingGpsNotificationTitle": {
+    "description": "Title of the Android GPS foreground-service notification shown while a trip is recording (#2766). Reassures the user that location tracking is intentional and tied to the active recording, so the persistent notification reads as expected rather than alarming."
+  },
+  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "@tripRecordingGpsNotificationText": {
+    "description": "Body text of the Android GPS foreground-service notification shown while a trip is recording (#2766). Explains why location is tracked: to compute the route, fuel consumption and driving stats for this trip."
   },
   "tripShareAction": "Share with another account",
   "@tripShareAction": {
