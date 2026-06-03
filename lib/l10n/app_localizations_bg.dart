@@ -5672,6 +5672,24 @@ class AppLocalizationsBg extends AppLocalizations {
   String get accelBrakeSource => 'From the phone\'s motion sensors';
 
   @override
+  String lessonHardBrake(String count) {
+    return '$count hard braking events';
+  }
+
+  @override
+  String get lessonAdviceHardBrake =>
+      'Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.';
+
+  @override
+  String lessonSharpCornering(String count) {
+    return '$count sharp corners';
+  }
+
+  @override
+  String get lessonAdviceSharpCornering =>
+      'Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.';
+
+  @override
   String get locationConsentTitle => 'Достъп до местоположението';
 
   @override

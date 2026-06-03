@@ -6,12 +6,14 @@ import 'package:tankstellen/features/consumption/data/lessons/driving_lesson_reg
 import 'package:tankstellen/features/consumption/data/lessons/rules/climbing_cost_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/full_throttle_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/hard_accel_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/hard_brake_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/high_rpm_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/high_speed_band_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/idling_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/lambda_enrichment_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/low_gear_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/restart_cost_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/sharp_cornering_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/smooth_driving_rule.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -95,6 +97,8 @@ void main() {
           lambdaEnrichmentLessonId,
           climbingCostLessonId,
           restartCostLessonId,
+          hardBrakeLessonId,
+          sharpCorneringLessonId,
           smoothDrivingLessonId,
         ],
       );
@@ -135,6 +139,30 @@ void main() {
 
       final onIdle = reg.evaluate(summary(), idleSamples(), l);
       expect(onIdle.map((e) => e.id), isNot(contains(hardAccelLessonId)));
+    });
+
+    test('hard-brake + sharp-cornering fire on a GPS-only trip with IMU '
+        'events (#2793), skipped without them', () {
+      final reg = DrivingLessonRegistry.standard();
+      const withImu = TripSummary(
+        distanceKm: 5,
+        maxRpm: 0,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        kind: TripKind.gpsOnly,
+        imuHardBrakeCount: 3,
+        sharpCornerCount: 2,
+      );
+      final fired = reg.evaluate(withImu, idleSamples(), l).map((e) => e.id);
+      expect(fired, contains(hardBrakeLessonId));
+      expect(fired, contains(sharpCorneringLessonId));
+
+      // A trip with no IMU events → neither lesson fires.
+      final none = reg.evaluate(summary(), idleSamples(), l).map((e) => e.id);
+      expect(none, isNot(contains(hardBrakeLessonId)));
+      expect(none, isNot(contains(sharpCorneringLessonId)));
     });
 
     test('low-gear rule fires only when secondsBelowOptimalGear > 60', () {

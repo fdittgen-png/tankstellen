@@ -1,0 +1,20 @@
+{
+  "lessonHardBrake": "{count} starke Bremsvorgänge",
+  "@lessonHardBrake": {
+    "description": "Trip-detail lesson headline (#2793) for hard braking detected by the phone IMU on a GPS-only trip. Placeholder is the integer episode count.",
+    "placeholders": { "count": { "type": "String" } }
+  },
+  "lessonAdviceHardBrake": "Bremse vorausschauend und gehe früher vom Gas — starkes Bremsen verschwendet den Kraftstoff, den du gerade fürs Beschleunigen verbraucht hast.",
+  "@lessonAdviceHardBrake": {
+    "description": "Advice sub-line under the hard-braking lesson (#2793)."
+  },
+  "lessonSharpCornering": "{count} enge Kurven",
+  "@lessonSharpCornering": {
+    "description": "Trip-detail lesson headline (#2793) for sharp cornering detected by the phone IMU. Placeholder is the integer episode count.",
+    "placeholders": { "count": { "type": "String" } }
+  },
+  "lessonAdviceSharpCornering": "Bremse vor der Kurve, nicht in ihr — hartes Kurvenfahren baut Geschwindigkeit ab, die du danach wieder aufbauen musst.",
+  "@lessonAdviceSharpCornering": {
+    "description": "Advice sub-line under the sharp-cornering lesson (#2793)."
+  }
+}

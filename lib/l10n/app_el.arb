@@ -4234,5 +4234,35 @@
   "@accelBrakeSource": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "lessonHardBrake": "{count} hard braking events",
+  "@lessonHardBrake": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceHardBrake": "Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.",
+  "@lessonAdviceHardBrake": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "lessonSharpCornering": "{count} sharp corners",
+  "@lessonSharpCornering": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceSharpCornering": "Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.",
+  "@lessonAdviceSharpCornering": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -1,0 +1,20 @@
+{
+  "lessonHardBrake": "{count} hard braking events",
+  "@lessonHardBrake": {
+    "description": "Trip-detail lesson headline (#2793) for hard braking detected by the phone IMU on a GPS-only trip. Placeholder is the integer episode count.",
+    "placeholders": { "count": { "type": "String" } }
+  },
+  "lessonAdviceHardBrake": "Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.",
+  "@lessonAdviceHardBrake": {
+    "description": "Advice sub-line under the hard-braking lesson (#2793)."
+  },
+  "lessonSharpCornering": "{count} sharp corners",
+  "@lessonSharpCornering": {
+    "description": "Trip-detail lesson headline (#2793) for sharp cornering detected by the phone IMU. Placeholder is the integer episode count.",
+    "placeholders": { "count": { "type": "String" } }
+  },
+  "lessonAdviceSharpCornering": "Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.",
+  "@lessonAdviceSharpCornering": {
+    "description": "Advice sub-line under the sharp-cornering lesson (#2793)."
+  }
+}
