@@ -7,6 +7,12 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../data/obd2/obd2_connection_errors.dart';
 
+// #2763 — `recordObd2ReadFailure` / `isExpectedObd2ReadTransient` live in the
+// data layer (so `obd2_service` can use them without a presentation→data
+// inversion) but are re-exported here so this file stays the single
+// discoverable home for OBD2 telemetry-level routing.
+export '../data/obd2/obd2_read_telemetry.dart';
+
 /// #2745 — route an OBD2 connect-flow failure to the right telemetry level.
 ///
 /// Error-log #14 trace #5 was an `[ui] Obd2AdapterUnresponsive` ERROR spooled

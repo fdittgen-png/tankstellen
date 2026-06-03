@@ -117,5 +117,42 @@ void main() {
       );
       expect(sub.cancelCallCount, 1);
     });
+
+    // #2763 — error-log #15 also flagged a "No active stream to cancel"
+    // PlatformException. It is ALREADY guarded by safeCancel; this regression
+    // lock proves a DOUBLE cancel of an already-torn-down EventChannel sub
+    // never propagates that benign exception (the lifecycle/tab-nav race),
+    // while a different PlatformException still rethrows on every call.
+    test('double safeCancel of a benign "No active stream" sub never throws',
+        () async {
+      // ignore: cancel_subscriptions
+      final sub = _FakeStreamSubscription<int>(
+        cancelError: PlatformException(
+          code: 'error',
+          message: 'No active stream to cancel',
+        ),
+      );
+
+      // Both calls complete normally — no PlatformException escapes.
+      await sub.safeCancel();
+      await sub.safeCancel();
+
+      expect(sub.cancelCallCount, 2);
+    });
+
+    test('double safeCancel still rethrows a non-benign PlatformException',
+        () async {
+      // ignore: cancel_subscriptions
+      final sub = _FakeStreamSubscription<int>(
+        cancelError: PlatformException(
+          code: 'error',
+          message: 'Some other platform failure',
+        ),
+      );
+
+      await expectLater(sub.safeCancel(), throwsA(isA<PlatformException>()));
+      await expectLater(sub.safeCancel(), throwsA(isA<PlatformException>()));
+      expect(sub.cancelCallCount, 2);
+    });
   });
 }

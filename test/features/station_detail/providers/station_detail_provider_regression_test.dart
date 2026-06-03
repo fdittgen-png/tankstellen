@@ -9,6 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
+import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -171,6 +175,133 @@ void main() {
       });
     });
   });
+
+  // #2763 — a station tapped from the "cheapest along my route" list lives in
+  // `routeSearchStateProvider`, not `searchStateProvider`. Before the fix the
+  // fast path only consulted search state, so a route tap fell through to the
+  // network — and a transient empty feed slice mislabeled as a 404 spammed 8
+  // ERROR traces. The route-state fast path must render it from cache with NO
+  // network call and NO throw.
+  group('stationDetailProvider route-search fast path (#2763)', () {
+    test('renders a route-list station from cache — no network, no throw',
+        () async {
+      var serviceCalled = false;
+      final container = _container(
+        cachedSearchResults: const [],
+        cachedRouteResults: [
+          _station(id: 'fr-11100013', brand: 'Intermarché'),
+        ],
+        apiResult: null,
+        onGetStationDetail: () => serviceCalled = true,
+      );
+      addTearDown(container.dispose);
+
+      final result =
+          await container.read(stationDetailProvider('fr-11100013').future);
+
+      expect(result.data.station.id, 'fr-11100013');
+      expect(result.data.station.brand, 'Intermarché',
+          reason: 'the OSM-enriched brand from the route result must survive');
+      expect(result.source, ServiceSource.cache);
+      expect(serviceCalled, isFalse,
+          reason: 'a route tap must short-circuit the network entirely — '
+              'this is the cure for the 8× "station not found" storm');
+    });
+
+    test('still matches the route id EXACTLY — no cross-country collision',
+        () async {
+      final container = _container(
+        cachedSearchResults: const [],
+        cachedRouteResults: [
+          _station(id: 'fr-111', brand: 'FR 111'),
+          _station(id: 'ar-111', brand: 'AR 111'),
+        ],
+        apiResult: null,
+      );
+      addTearDown(container.dispose);
+
+      final result =
+          await container.read(stationDetailProvider('ar-111').future);
+      expect(result.data.station.brand, 'AR 111',
+          reason: 'exact id match preserves the #753 guarantee on the '
+              'route-state path too');
+    });
+  });
+
+  // #2763 Fix 3 — defense-in-depth. On a cold deep-link race the search/route
+  // state can populate AFTER the fast-path read, so the network call runs and
+  // the chain throws. The provider must re-check state and serve the cached
+  // Station rather than hard-failing the screen — but ONLY when the id is
+  // actually held; otherwise the #2408 error/retry branch must still surface.
+  group('stationDetailProvider network-branch last-resort fallback (#2763)',
+      () {
+    test(
+        'id absent at fast-path read but present when the chain throws → '
+        'serves the cached Station instead of rethrowing', () async {
+      // Cold deep-link race: route state is EMPTY when the fast path reads it,
+      // so the provider proceeds to the network. The async fetch yields; while
+      // it is suspended the route search resolves (modelled by the service
+      // populating route state right before it throws). The provider's catch
+      // must re-read the now-populated state and serve the Station.
+      // Unprefixed id → the fallback takes the `originCountry == null` branch
+      // (just `stationServiceProvider`), so the test needs no Hive / active-
+      // country override — the same convention the #2408 test uses.
+      late ProviderContainer container;
+      container = _container(
+        cachedSearchResults: const [],
+        cachedRouteResults: const [], // EMPTY at fast-path read
+        apiResult: null,
+        onGetStationDetail: () {
+          // The route search "finished" mid-fetch — populate state now.
+          (container.read(routeSearchStateProvider.notifier)
+                  as _SeededRouteState)
+              .seedLate(_station(id: 'late-22200099', brand: 'Esso'));
+        },
+        apiError: const ServiceChainExhaustedException(errors: []),
+      );
+      addTearDown(container.dispose);
+
+      final result =
+          await container.read(stationDetailProvider('late-22200099').future);
+      expect(result.data.station.brand, 'Esso',
+          reason: 'the chain threw, but the app already holds the station — '
+              'the screen must never hard-fail in that case');
+      expect(result.source, ServiceSource.cache);
+    });
+
+    test(
+        'rethrows when the chain throws AND neither search nor route holds '
+        'the id (preserves the #2408 error/retry branch)', () async {
+      final container = _container(
+        cachedSearchResults: const [],
+        cachedRouteResults: const [],
+        apiResult: null,
+        apiError: const ServiceChainExhaustedException(errors: []),
+      );
+      addTearDown(container.dispose);
+
+      final sub = container.listen(
+        stationDetailProvider('absent-99999999'),
+        (_, _) {},
+        fireImmediately: true,
+      );
+      addTearDown(sub.close);
+
+      // Pump until the provider leaves the loading state (the rejected fetch
+      // future settles within a few microtasks — the fake throws eagerly).
+      AsyncValue<ServiceResult<StationDetail>> value = sub.read();
+      for (var i = 0; i < 100 && value.isLoading; i++) {
+        await Future<void>.delayed(Duration.zero);
+        value = sub.read();
+      }
+
+      expect(value.hasError, isTrue);
+      expect(value.error, isA<ServiceChainExhaustedException>(),
+          reason: 'when neither search nor route holds the id, the chain error '
+              'must surface so the screen shows its error/retry branch — the '
+              'cache fallback only fires when state holds it');
+    });
+  });
 }
 
 /// A station service whose detail fetch never completes — models a
@@ -202,7 +333,9 @@ class _HangingStationService implements StationService {
 ProviderContainer _container({
   required List<Station> cachedSearchResults,
   required ServiceResult<StationDetail>? apiResult,
+  List<Station> cachedRouteResults = const [],
   void Function()? onGetStationDetail,
+  Object? apiError,
 }) {
   return ProviderContainer(
     overrides: [
@@ -210,10 +343,14 @@ ProviderContainer _container({
         (_) => _FakeStationService(
           apiResult: apiResult,
           onGetStationDetail: onGetStationDetail,
+          apiError: apiError,
         ),
       ),
       searchStateProvider.overrideWith(
         () => _SeededSearchState(cachedSearchResults),
+      ),
+      routeSearchStateProvider.overrideWith(
+        () => _SeededRouteState(cachedRouteResults),
       ),
     ],
   );
@@ -247,15 +384,49 @@ class _SeededSearchState extends SearchState {
   }
 }
 
+/// Seeds `routeSearchStateProvider` with a [RouteSearchResult] whose
+/// `stations` are the given fuel stations — models a tap from the
+/// "cheapest along my route" list (#2763).
+class _SeededRouteState extends RouteSearchState {
+  final List<Station> seeded;
+  _SeededRouteState(this.seeded);
+
+  @override
+  AsyncValue<RouteSearchResult?> build() => _resultFor(seeded);
+
+  /// Models a route search that resolves AFTER the provider's fast-path
+  /// read — the #2763 Fix-3 cold-deep-link race.
+  void seedLate(Station station) {
+    state = _resultFor([station]);
+  }
+
+  static AsyncValue<RouteSearchResult?> _resultFor(List<Station> stations) {
+    if (stations.isEmpty) return const AsyncValue.data(null);
+    return AsyncValue.data(
+      RouteSearchResult(
+        route: const RouteInfo(
+          geometry: <LatLng>[],
+          distanceKm: 0,
+          durationMinutes: 0,
+          samplePoints: <LatLng>[],
+        ),
+        stations: stations.map((s) => FuelStationResult(s)).toList(),
+      ),
+    );
+  }
+}
+
 class _FakeStationService implements StationService {
   final ServiceResult<StationDetail>? apiResult;
   final void Function()? onGetStationDetail;
-  _FakeStationService({this.apiResult, this.onGetStationDetail});
+  final Object? apiError;
+  _FakeStationService({this.apiResult, this.onGetStationDetail, this.apiError});
 
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
       String stationId) async {
     onGetStationDetail?.call();
+    if (apiError != null) throw apiError!;
     if (apiResult != null) return apiResult!;
     throw StateError('no api fixture for $stationId');
   }
