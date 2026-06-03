@@ -6914,6 +6914,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fuelStationRadarStart => 'Start fuel station radar';
 
   @override
+  String get stopRadar => 'Arrêter le radar';
+
+  @override
   String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
 
   @override

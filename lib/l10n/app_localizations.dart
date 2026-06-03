@@ -12031,6 +12031,12 @@ abstract class AppLocalizations {
   /// **'Start fuel station radar'**
   String get fuelStationRadarStart;
 
+  /// Label on the extended floating-action button when the Fuel Station Radar is active: tapping it ends the radar session and hands the results list back to the regular search. Replaces the ambiguous shared 'stop' key (FR 'Étape') that read as a route-waypoint label, not a radar-off affordance (#2744).
+  ///
+  /// In en, this message translates to:
+  /// **'Stop radar'**
+  String get stopRadar;
+
   /// Label of the grey summary-bar chip shown above the results list while the on-search Fuel Station Radar owns the results, replacing the radius chip to signal the list is a radar scan rather than a regular search (#2676).
   ///
   /// In en, this message translates to:

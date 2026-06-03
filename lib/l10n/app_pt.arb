@@ -4097,5 +4097,10 @@
   "@openingHoursAutomate24h": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "stopRadar": "Stop radar",
+  "@stopRadar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

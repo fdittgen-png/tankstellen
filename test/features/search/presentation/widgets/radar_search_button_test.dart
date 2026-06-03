@@ -151,11 +151,16 @@ void main() {
         ].cast(),
       );
 
-      // Active → stop label + close icon, not the start label.
-      expect(find.text('Stop'), findsOneWidget);
+      // Active → a clear "Stop radar" label + a meaningful stop_circle icon
+      // (#2744 — not the ambiguous "Étape"/close treatment), not the start
+      // label.
+      expect(find.text('Stop radar'), findsOneWidget);
+      expect(find.text('Stop'), findsNothing);
       expect(find.text('Start fuel station radar'), findsNothing);
-      expect(find.widgetWithIcon(FloatingActionButton, Icons.close),
+      expect(find.widgetWithIcon(FloatingActionButton, Icons.stop_circle),
           findsOneWidget);
+      expect(
+          find.widgetWithIcon(FloatingActionButton, Icons.close), findsNothing);
 
       // Tapping it dismisses the radar (flips back to the start treatment).
       await tester.tap(find.byKey(const Key('radarSearchButton')));

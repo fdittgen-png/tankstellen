@@ -6869,6 +6869,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fuelStationRadarStart => 'Start fuel station radar';
 
   @override
+  String get stopRadar => 'Stop radar';
+
+  @override
   String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
 
   @override

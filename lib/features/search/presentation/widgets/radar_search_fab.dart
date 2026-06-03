@@ -31,7 +31,7 @@ class RadarSearchFab extends ConsumerWidget {
     final active = ref.watch(radarSearchProvider).active;
 
     final label = active
-        ? (l10n?.stop ?? 'Stop')
+        ? (l10n?.stopRadar ?? 'Stop radar')
         : (l10n?.fuelStationRadarStart ?? 'Start fuel station radar');
 
     return FloatingActionButton.extended(
@@ -46,7 +46,7 @@ class RadarSearchFab extends ConsumerWidget {
           notifier.runRadar();
         }
       },
-      icon: Icon(active ? Icons.close : Icons.radar),
+      icon: Icon(active ? Icons.stop_circle : Icons.radar),
       label: Text(label),
     );
   }

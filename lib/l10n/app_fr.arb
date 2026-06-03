@@ -4183,5 +4183,9 @@
   "@openingHoursAutomate24h": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "stopRadar": "Arrêter le radar",
+  "@stopRadar": {
+    "description": "Label on the extended floating-action button when the Fuel Station Radar is active: tapping it ends the radar session and hands the results list back to the regular search. Replaces the ambiguous shared 'stop' key (FR 'Étape') that read as a route-waypoint label, not a radar-off affordance (#2744)."
   }
 }
