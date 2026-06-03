@@ -4170,6 +4170,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'GPS uniquement — aucun plein n\'a encore ancré le modèle de consommation. Ajoutez quelques pleins complets pour améliorer la précision.';
 
   @override
+  String get moreActionsTooltip => 'Plus';
+
+  @override
+  String get exportBackupMenuLabel => 'Exporter la sauvegarde';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restaurer la sauvegarde';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Tableau de bord carbone';
+
+  @override
+  String get settingsMenuLabel => 'Paramètres';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

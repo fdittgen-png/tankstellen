@@ -4130,6 +4130,21 @@ class AppLocalizationsNb extends AppLocalizations {
       'Kun GPS — ingen fyllinger har ennå forankret forbruksmodellen. Legg til et par fulle fyllinger for å forbedre nøyaktigheten.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

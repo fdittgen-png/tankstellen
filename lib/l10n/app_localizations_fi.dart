@@ -4131,6 +4131,21 @@ class AppLocalizationsFi extends AppLocalizations {
       'Vain GPS — yksikään tankkaus ei ole vielä ankkuroinut kulutusmallia. Lisää pari täyttä tankkausta parantaaksesi tarkkuutta.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

@@ -4156,6 +4156,21 @@ class AppLocalizationsEs extends AppLocalizations {
       'Solo GPS — ningún repostaje ha anclado todavía el modelo de consumo. Añade un par de repostajes completos para mejorar la precisión.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

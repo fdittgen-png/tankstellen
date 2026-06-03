@@ -7,28 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../feature_management/application/feature_flags_provider.dart';
-import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/backup/full_backup_exporter.dart';
 import '../../providers/charging_logs_provider.dart';
 import '../../providers/consumption_providers.dart';
 import '../../providers/trip_history_provider.dart';
-import '../widgets/backup_restore_flow.dart';
 import '../widgets/charging_tab.dart';
+import '../widgets/consumption_app_bar_actions.dart';
 import '../widgets/fuel_tab.dart';
-import '../widgets/obd2_status_chip.dart';
 import '../widgets/trajets_record_fab.dart';
 import '../widgets/trajets_tab.dart';
 import 'add_charging_log_screen.dart';
-import 'trajets_map_screen.dart';
-import '../../../../core/logging/error_logger.dart';
 
 /// Which slice of the consumption feature a [ConsumptionScreen] renders.
 ///
@@ -115,115 +109,6 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     super.dispose();
   }
 
-  /// Run the full XML-in-ZIP backup export pipeline (#1317).
-  ///
-  /// Pulls the latest vehicles / fill-ups / trips / charging-log
-  /// snapshots from the Riverpod graph, hands them to
-  /// [FullBackupExporter], and surfaces a confirmation snackbar on
-  /// success or a styled error snack on failure. The exporter itself
-  /// owns the temp-file write + share-sheet handoff, so the screen
-  /// stays purely orchestration.
-  Future<void> _runBackupExport() async {
-    final l = AppLocalizations.of(context);
-    try {
-      final vehicles = ref.read(vehicleProfileListProvider);
-      final fillUps = ref.read(fillUpListProvider);
-      final tripsRepo = ref.read(tripHistoryRepositoryProvider);
-      final trips = tripsRepo?.loadAll() ?? const [];
-      final chargingLogs =
-          ref.read(chargingLogsProvider).asData?.value ?? const [];
-
-      final exporter =
-          ConsumptionScreen.debugExporterOverride ?? FullBackupExporter();
-      final result = await exporter.export(
-        vehicles: vehicles,
-        fillUps: fillUps,
-        trips: trips,
-        chargingLogs: chargingLogs,
-      );
-
-      if (!mounted) return;
-      // #2014 — when the exporter also wrote a copy to the device's
-      // public Downloads folder, confirm with a folder-level snackbar.
-      // The exact path / content URI varies per platform (MediaStore on
-      // Android Q+) and is not useful for users to read — just point
-      // them at "your Downloads folder". Falls back to the legacy
-      // "Backup ready" snackbar when the save-to-Downloads step bailed.
-      final message = (result.savedPath != null)
-          ? (l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder')
-          : (l?.exportBackupReady ?? 'Backup ready — pick a destination');
-      SnackBarHelper.showSuccess(context, message);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'ConsumptionScreen._runBackupExport failed'}));
-      if (!mounted) return;
-      SnackBarHelper.showError(
-        context,
-        l?.exportBackupFailed ?? 'Backup export failed — please try again',
-      );
-    }
-  }
-
-  /// AppBar actions shared by both sections (#1901): the OBD2 status
-  /// chip, the backup export button, the gated Carbon dashboard entry
-  /// point, and the Settings action.
-  ///
-  /// When [tripIds] is non-null (Trajets section only, #2374) a map
-  /// IconButton is inserted immediately before the download button so
-  /// the user can reach the all-trips map without scrolling past the
-  /// monthly-comparison card.
-  ///
-  /// #2433 — the consumption-confidence indicator no longer rides the
-  /// Fuel app-bar (the #2383 placement). It now lives in the
-  /// Verbrauchsstatistik card next to the figures it qualifies, so the
-  /// app-bar keeps only the OBD2 chip, the export/download action, the
-  /// gated Carbon entry point and Settings.
-  List<Widget> _appBarActions(AppLocalizations? l,
-      {List<String>? tripIds}) =>
-      [
-        // #797 phase 3 — title-bar chip announcing "OBD2 connected".
-        const Obd2StatusChip(),
-        // #2374 — map action visible only on the Trajets section.
-        if (tripIds != null)
-          IconButton(
-            key: const Key('trajets_view_all_on_map'),
-            tooltip: l?.trajetsViewAllOnMap ?? 'View all on map',
-            icon: const Icon(Icons.map_outlined),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => TrajetsMapScreen(tripIds: tripIds),
-              ),
-            ),
-          ),
-        IconButton(
-          key: const Key('export_backup'),
-          tooltip: l?.exportBackupTooltip ?? 'Export backup',
-          icon: const Icon(Icons.download_outlined),
-          onPressed: () => unawaited(_runBackupExport()),
-        ),
-        // #2571 — full-backup RESTORE, paired with the export button.
-        // The whole flow (pick .zip → merge/replace confirm → import →
-        // feedback) lives in [BackupRestoreFlow] so this screen stays
-        // under the 400-line guard.
-        IconButton(
-          key: const Key('restore_backup'),
-          tooltip: l?.restoreBackupTooltip ?? 'Restore backup',
-          icon: const Icon(Icons.restore_outlined),
-          onPressed: () => unawaited(BackupRestoreFlow.run(context, ref)),
-        ),
-        // #1613 — the Carbon dashboard entry point is gated on the
-        // central Feature enum so it can be toggled per profile.
-        if (ref
-            .watch(enabledFeaturesProvider)
-            .contains(Feature.carbonDashboard))
-          IconButton(
-            key: const Key('open_carbon_dashboard'),
-            tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',
-            icon: const Icon(Icons.eco_outlined),
-            onPressed: () => context.push('/carbon'),
-          ),
-        const SettingsAppBarAction(),
-      ];
-
   /// #2223 — the vehicles entry point, relocated from the trailing
   /// actions to the app-bar leading slot so the car icon reads as part
   /// of the title. Shared by every [ConsumptionSection] so the Trajets
@@ -289,7 +174,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       title: l?.trajetsTabLabel ?? 'Trips',
       leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
-      actions: _appBarActions(l, tripIds: tripIds),
+      actions: [ConsumptionAppBarActions(tripIds: tripIds)],
       floatingActionButton: const TrajetsRecordFab(),
       body: TrajetsTab(vehicleId: vehicleId),
     );
@@ -314,7 +199,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
         title: l?.consumptionTabFuel ?? 'Fuel',
         leading: _vehiclesLeading(l),
         bodyPadding: EdgeInsets.zero,
-        actions: _appBarActions(l),
+        actions: const [ConsumptionAppBarActions()],
         floatingActionButton: _addFillUpFab(context, l),
         body: fuelView,
       );
@@ -328,7 +213,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       title: l?.consumptionTabFuel ?? 'Fuel',
       leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
-      actions: _appBarActions(l),
+      actions: const [ConsumptionAppBarActions()],
       floatingActionButton: isCharging
           ? _addChargingFab(context, l)
           : _addFillUpFab(context, l),

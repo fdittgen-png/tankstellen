@@ -4140,6 +4140,21 @@ class AppLocalizationsHr extends AppLocalizations {
       'Samo GPS — još nijedno točenje nije usidrilo model potrošnje. Dodajte nekoliko punih točenja da biste poboljšali točnost.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

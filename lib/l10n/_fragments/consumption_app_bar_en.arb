@@ -1,0 +1,22 @@
+{
+  "moreActionsTooltip": "More",
+  "@moreActionsTooltip": {
+    "description": "Tooltip on the consumption app-bar overflow (kebab) menu button that holds the secondary actions — export/restore backup, the gated carbon dashboard and Settings (#2756)."
+  },
+  "exportBackupMenuLabel": "Export backup",
+  "@exportBackupMenuLabel": {
+    "description": "Overflow-menu item label on the consumption app bar that runs the full XML-in-ZIP backup export (#2756)."
+  },
+  "restoreBackupMenuLabel": "Restore backup",
+  "@restoreBackupMenuLabel": {
+    "description": "Overflow-menu item label on the consumption app bar that opens the backup-restore flow — pick a .zip, confirm merge/replace, import (#2756)."
+  },
+  "carbonDashboardMenuLabel": "Carbon dashboard",
+  "@carbonDashboardMenuLabel": {
+    "description": "Overflow-menu item label on the consumption app bar that opens the carbon dashboard. Only shown when Feature.carbonDashboard is enabled (#2756)."
+  },
+  "settingsMenuLabel": "Settings",
+  "@settingsMenuLabel": {
+    "description": "Overflow-menu item label on the consumption app bar that opens the app-global Settings screen. Sits below a divider, separated from the consumption-specific items above (#2756)."
+  }
+}
