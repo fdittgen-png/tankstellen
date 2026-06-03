@@ -5582,6 +5582,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String get accelBrakeCardTitle => 'Acceleration & braking';
+
+  @override
+  String get accelBrakeHardAccel => 'Hard accelerations';
+
+  @override
+  String get accelBrakeHardBrake => 'Hard braking';
+
+  @override
+  String get accelBrakeSharpCorner => 'Sharp corners';
+
+  @override
+  String get accelBrakeSource => 'From the phone\'s motion sensors';
+
+  @override
   String get locationConsentTitle => 'Location Access';
 
   @override
@@ -12949,6 +12964,22 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get home => '⟦Ĥóɱé ··⟧';
+
+  @override
+  String get accelBrakeCardTitle => '⟦Áççéłéřáŧîóñ & ƀřáķîñǧ ·········⟧';
+
+  @override
+  String get accelBrakeHardAccel => '⟦Ĥářđ áççéłéřáŧîóñš ········⟧';
+
+  @override
+  String get accelBrakeHardBrake => '⟦Ĥářđ ƀřáķîñǧ ·····⟧';
+
+  @override
+  String get accelBrakeSharpCorner => '⟦Šĥářƥ çóřñéřš ·····⟧';
+
+  @override
+  String get accelBrakeSource =>
+      '⟦Ƒřóɱ ŧĥé ƥĥóñé\'š ɱóŧîóñ šéñšóřš ············⟧';
 
   @override
   String get locationConsentTitle => '⟦Łóçáŧîóñ Áççéšš ······⟧';

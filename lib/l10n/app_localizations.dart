@@ -9873,6 +9873,36 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// Title of the trip-detail card (#2792) that surfaces the phone-IMU-detected hard-acceleration / hard-braking / sharp-cornering episode counts on a GPS-only (dongle-less) trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Acceleration & braking'**
+  String get accelBrakeCardTitle;
+
+  /// Row label on the acceleration & braking card (#2792): count (and per-km) of confirmed hard-acceleration episodes detected by the phone's accelerometer.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard accelerations'**
+  String get accelBrakeHardAccel;
+
+  /// Row label on the acceleration & braking card (#2792): count (and per-km) of confirmed hard-braking episodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard braking'**
+  String get accelBrakeHardBrake;
+
+  /// Row label on the acceleration & braking card (#2792): count (and per-km) of sharp-cornering episodes (high lateral acceleration + yaw).
+  ///
+  /// In en, this message translates to:
+  /// **'Sharp corners'**
+  String get accelBrakeSharpCorner;
+
+  /// Footnote on the acceleration & braking card (#2792) clarifying the counts come from the phone's inertial sensors (no OBD2 dongle needed).
+  ///
+  /// In en, this message translates to:
+  /// **'From the phone\'s motion sensors'**
+  String get accelBrakeSource;
+
   /// Title of the GDPR location-consent dialog (#2306). Replaces the legacy _ConsentTexts map that only covered 10 of 23 locales for the title.
   ///
   /// In en, this message translates to:

@@ -4489,6 +4489,26 @@
     }
   },
   "home": "Home",
+  "accelBrakeCardTitle": "Acceleration & braking",
+  "@accelBrakeCardTitle": {
+    "description": "Title of the trip-detail card (#2792) that surfaces the phone-IMU-detected hard-acceleration / hard-braking / sharp-cornering episode counts on a GPS-only (dongle-less) trip."
+  },
+  "accelBrakeHardAccel": "Hard accelerations",
+  "@accelBrakeHardAccel": {
+    "description": "Row label on the acceleration & braking card (#2792): count (and per-km) of confirmed hard-acceleration episodes detected by the phone's accelerometer."
+  },
+  "accelBrakeHardBrake": "Hard braking",
+  "@accelBrakeHardBrake": {
+    "description": "Row label on the acceleration & braking card (#2792): count (and per-km) of confirmed hard-braking episodes."
+  },
+  "accelBrakeSharpCorner": "Sharp corners",
+  "@accelBrakeSharpCorner": {
+    "description": "Row label on the acceleration & braking card (#2792): count (and per-km) of sharp-cornering episodes (high lateral acceleration + yaw)."
+  },
+  "accelBrakeSource": "From the phone's motion sensors",
+  "@accelBrakeSource": {
+    "description": "Footnote on the acceleration & braking card (#2792) clarifying the counts come from the phone's inertial sensors (no OBD2 dongle needed)."
+  },
   "locationConsentTitle": "Location Access",
   "@locationConsentTitle": {
     "description": "Title of the GDPR location-consent dialog (#2306). Replaces the legacy _ConsentTexts map that only covered 10 of 23 locales for the title."

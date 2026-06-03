@@ -5645,6 +5645,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get home => 'Startseite';
 
   @override
+  String get accelBrakeCardTitle => 'Beschleunigung & Bremsen';
+
+  @override
+  String get accelBrakeHardAccel => 'Starke Beschleunigungen';
+
+  @override
+  String get accelBrakeHardBrake => 'Starkes Bremsen';
+
+  @override
+  String get accelBrakeSharpCorner => 'Enge Kurven';
+
+  @override
+  String get accelBrakeSource => 'Aus den Bewegungssensoren des Telefons';
+
+  @override
   String get locationConsentTitle => 'Standortfreigabe';
 
   @override

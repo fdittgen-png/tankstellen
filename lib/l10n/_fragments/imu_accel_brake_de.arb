@@ -1,0 +1,22 @@
+{
+  "accelBrakeCardTitle": "Beschleunigung & Bremsen",
+  "@accelBrakeCardTitle": {
+    "description": "Title of the trip-detail card (#2792) that surfaces the phone-IMU-detected hard-acceleration / hard-braking / sharp-cornering episode counts on a GPS-only (dongle-less) trip."
+  },
+  "accelBrakeHardAccel": "Starke Beschleunigungen",
+  "@accelBrakeHardAccel": {
+    "description": "Row label on the acceleration & braking card (#2792): count (and per-km) of confirmed hard-acceleration episodes detected by the phone's accelerometer."
+  },
+  "accelBrakeHardBrake": "Starkes Bremsen",
+  "@accelBrakeHardBrake": {
+    "description": "Row label on the acceleration & braking card (#2792): count (and per-km) of confirmed hard-braking episodes."
+  },
+  "accelBrakeSharpCorner": "Enge Kurven",
+  "@accelBrakeSharpCorner": {
+    "description": "Row label on the acceleration & braking card (#2792): count (and per-km) of sharp-cornering episodes (high lateral acceleration + yaw)."
+  },
+  "accelBrakeSource": "Aus den Bewegungssensoren des Telefons",
+  "@accelBrakeSource": {
+    "description": "Footnote on the acceleration & braking card (#2792) clarifying the counts come from the phone's inertial sensors (no OBD2 dongle needed)."
+  }
+}
