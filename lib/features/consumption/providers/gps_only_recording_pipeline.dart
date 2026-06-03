@@ -8,6 +8,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/sensors/imu_sample.dart';
+import '../../../core/sensors/imu_sensor_source.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
@@ -18,6 +20,7 @@ import '../domain/entities/trip_save_stage.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
+import '../domain/services/imu_event_detector.dart';
 import '../domain/trip_recorder.dart';
 import 'recording_pipeline.dart';
 import 'trip_recording_phase.dart';
@@ -79,6 +82,15 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   StreamSubscription<Position>? _sub;
   final List<TripSample> _samples = [];
   DateTime? _startedAt;
+
+  /// #2760 — IMU sensor-fusion attaches ONLY here, in the dongle-less
+  /// pipeline (the OBD2 path is behaviour-preserving). The detector folds
+  /// the ~50 Hz inertial stream into a handful of in-memory counters — it
+  /// NEVER buffers raw samples (the aggregate-only constraint). Both are
+  /// null between trips; the subscription opens on [start] and is cancelled
+  /// on [stop], mirroring the Geolocator [_sub] lifecycle.
+  StreamSubscription<ImuSample>? _imuSub;
+  ImuEventDetector? _imuDetector;
 
   /// #2389 / #2506 — shared GPS-physics live-estimate + coaching folder.
   /// Turns the same GPS speed stream into a live L/100 km figure (instant
@@ -144,6 +156,27 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
                 }));
           },
         );
+    // #2760 — attach IMU sensor fusion (this dongle-less pipeline ONLY).
+    // The detector feeds confirmed accel/brake episodes onto the SAME live
+    // harsh-event bus the OBD2 / GPS-speed paths use (mirroring the recorder's
+    // onHarshEvent above), so spoken coaching fires without a dongle. Sensor
+    // failure is non-fatal — we log and the trip still records off GPS alone.
+    final imuDetector = ImuEventDetector(
+      onEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
+    );
+    _imuDetector = imuDetector;
+    _imuSub = _ref
+        .read(imuSensorSourceProvider)
+        .stream()
+        .listen(
+          imuDetector.onSample,
+          onError: (Object e, StackTrace st) {
+            unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+                context: const {
+                  'where': 'GpsOnlyRecordingPipeline.start: IMU stream error'
+                }));
+          },
+        );
     // Seed the state so the recording screen renders immediately
     // (the first GPS fix can be 1-3 s away on a cold start).
     _host.state = _host.state.copyWith(
@@ -173,6 +206,10 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
     _samples.add(sample);
+    // #2760 — feed the latest GPS ground speed to the IMU detector so its
+    // min-speed gate and accel-vs-brake direction classification track the
+    // real vehicle speed (the inertial stream alone has no speed).
+    _imuDetector?.currentSpeedKmh = sample.speedKmh;
     // #2653 — a GPS-only trip's speed is the device's Doppler ground
     // speed (genuine ~1 Hz, not 1 km/h-quantised dead reckoning), so it
     // is differentiable; the detector's accuracy + min-speed +
@@ -210,6 +247,12 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     final recorder = _recorder;
     await _sub?.cancel();
     _sub = null;
+    // #2760 — tear down the IMU stream alongside the GPS one so no inertial
+    // subscription survives between trips (the battery / lifecycle bound).
+    await _imuSub?.cancel();
+    _imuSub = null;
+    final imuDetector = _imuDetector;
+    _imuDetector = null;
     if (recorder == null) {
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
@@ -225,8 +268,26 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // hardcoding `gpsOnly`. If [appendObd2Sample] (or any future
     // mid-trip path) injected OBD2 samples into the buffer, the
     // resulting kind correctly flips to `gpsPlusObd2`.
+    final kind = TripKind.fromSamples(samples);
+    // #2760 — stamp the aggregate-only IMU event counts. THREE scalars; the
+    // raw ~50 Hz inertial stream was folded into them in real time and is
+    // never persisted. When the IMU produced events on a dongle-less trip,
+    // PREFER them for the `harshAccelerations` / `harshBrakes` the driving
+    // score reads (`driving_score_calculator.dart`): a direct inertial
+    // reading is a more accurate harsh-manoeuvre signal than the GPS
+    // speed-derivative the recorder's [HarshEventDetector] used. The
+    // speed-derived counts stay the fallback when the IMU saw nothing.
+    final imuAccel = imuDetector?.hardAccelCount ?? 0;
+    final imuBrake = imuDetector?.hardBrakeCount ?? 0;
+    final imuCorners = imuDetector?.sharpCornerCount ?? 0;
+    final preferImu = kind == TripKind.gpsOnly && (imuAccel > 0 || imuBrake > 0);
     var summary = recorder.buildSummary().copyWith(
-          kind: TripKind.fromSamples(samples),
+          kind: kind,
+          imuHardAccelCount: imuAccel,
+          imuHardBrakeCount: imuBrake,
+          sharpCornerCount: imuCorners,
+          harshAccelerations: preferImu ? imuAccel : null,
+          harshBrakes: preferImu ? imuBrake : null,
         );
     // #2080 — for GPS-only / hybrid trips (no OBD2 fuel-rate
     // coverage), feed the sample stream through GpsDrivingFeatures +

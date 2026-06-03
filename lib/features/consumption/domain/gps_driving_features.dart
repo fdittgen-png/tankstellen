@@ -14,6 +14,15 @@ import 'trip_recorder.dart';
 /// band so a brisk-but-controlled bend doesn't trip it.
 const double kSharpCornerThresholdMps2 = 3.5;
 
+/// Minimum yaw rate (rad/s) the gyroscope must report for an IMU-detected
+/// sharp corner (#2760). ≈0.30 rad/s ≈ 17 °/s — a brisk-but-real turn rate;
+/// a steering correction or lane change yaws well below this. Paired with
+/// the [kSharpCornerThresholdMps2] lateral-accel floor and a ~constant-speed
+/// gate so only a genuine sustained bend (not a bump or a straight-line
+/// jolt) trips the IMU corner counter. Lives beside the GPS corner threshold
+/// so the two cornering signals share one source of truth.
+const double kSharpCornerYawRateRadPerSec = 0.30;
+
 /// Horizontal-accuracy ceiling (m) for trusting a fix's bearing in the
 /// corner-load integral. A jittery fix (urban canyon / cold start)
 /// reports a noisy heading that would manufacture a phantom corner, so

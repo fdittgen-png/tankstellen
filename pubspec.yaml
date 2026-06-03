@@ -35,6 +35,12 @@ dependencies:
   latlong2: ^0.9.1
   geolocator: ^14.0.2
   geocoding: ^4.0.0
+  # IMU sensor fusion for dongle-optional driving analytics (#2760).
+  # Pure-platform accelerometer + gyroscope (Android SensorManager /
+  # iOS CoreMotion) — no GMS / Play Services dependency, so it ships on
+  # the F-Droid flavour unchanged (ADR 0003). Only imported by
+  # lib/core/sensors/imu_sensor_source.dart (loosely-coupled plugin idiom).
+  sensors_plus: ^7.0.0
 
   # Routing
   go_router: ^17.2.3

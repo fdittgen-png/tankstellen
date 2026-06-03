@@ -13,6 +13,8 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 
+import '../../../helpers/empty_imu_source.dart';
+
 /// Verifies the [Feature.gpsTripPath]-gated GPS subscription wiring
 /// inside [TripRecording.start] (#1374 phase 1).
 ///
@@ -40,6 +42,7 @@ void main() {
       final fakeGeo = _RecordingGeolocator();
       final container = ProviderContainer(overrides: [
         geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+        imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       ]);
       addTearDown(container.dispose);
       addTearDown(fakeGeo.dispose);
@@ -81,6 +84,7 @@ void main() {
       final fakeGeo = _RecordingGeolocator();
       final container = ProviderContainer(overrides: [
         geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+        imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       ]);
       addTearDown(container.dispose);
       addTearDown(fakeGeo.dispose);
@@ -158,6 +162,7 @@ void main() {
       final fakeGeo = _RecordingGeolocator();
       final container = ProviderContainer(overrides: [
         geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+        imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       ]);
       addTearDown(container.dispose);
       addTearDown(fakeGeo.dispose);
@@ -202,6 +207,7 @@ void main() {
         ..permission = LocationPermission.denied;
       final container = ProviderContainer(overrides: [
         geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+        imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       ]);
       addTearDown(container.dispose);
       addTearDown(fakeGeo.dispose);
@@ -239,6 +245,7 @@ void main() {
       final fakeGeo = _RecordingGeolocator();
       final container = ProviderContainer(overrides: [
         geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+        imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       ]);
       addTearDown(container.dispose);
       addTearDown(fakeGeo.dispose);
@@ -283,6 +290,7 @@ void main() {
       final fakeGeo = _RecordingGeolocator();
       final container = ProviderContainer(overrides: [
         geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+        imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
       ]);
       addTearDown(container.dispose);
       addTearDown(fakeGeo.dispose);
