@@ -6152,6 +6152,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get badge24h => '24h';
 
   @override
+  String get openingHoursAutomate24h => '24/7 automate';
+
+  @override
   String get dayMon => 'Monday';
 
   @override
@@ -13464,6 +13467,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get badge24h => '⟦24ĥ⟧';
+
+  @override
+  String get openingHoursAutomate24h => '⟦24/7 áúŧóɱáŧé ····⟧';
 
   @override
   String get dayMon => '⟦Ṁóñđáý ···⟧';

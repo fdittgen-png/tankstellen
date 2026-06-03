@@ -268,6 +268,65 @@ void main() {
     });
   });
 
+  group('OpeningHoursView — 24/7 automate (#2742)', () {
+    testWidgets(
+        'automate + staffed → "24/7 automate" line AND the staffed schedule '
+        'AND Sunday "Closed", never a lone "Open 24 hours" row', (tester) async {
+      // The Esso 34120008 shape: pump 24/7, boutique Mon–Sat staffed, Sun
+      // closed. automate24h is the orthogonal indicator.
+      final esso = businessWeek().copyWith(automate24h: true);
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(hours: esso, now: wednesday),
+        ),
+      );
+
+      // The new 24/7-automate line is present …
+      expect(find.byKey(const ValueKey('opening-hours-automate-24h')),
+          findsOneWidget);
+      expect(find.text('24/7 automate'), findsOneWidget);
+      // … alongside the staffed schedule (not collapsed to a single row) …
+      expect(find.byKey(const ValueKey('opening-hours-24h-row')), findsNothing);
+      expect(find.text('06:30–19:30'), findsOneWidget);
+      expect(find.text('07:00–13:00'), findsOneWidget);
+      // … and Sunday renders as Closed (Fermé).
+      expect(find.text('Closed'), findsOneWidget);
+    });
+
+    testWidgets('pump-only all-week-24h + automate → single row + both badges',
+        (tester) async {
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(
+            hours: WeeklyOpeningHours.allWeek24h(automate24h: true),
+            now: wednesday,
+          ),
+        ),
+      );
+      // Pump-only: the single 24h row + 24h badge are kept …
+      expect(find.byKey(const ValueKey('opening-hours-24h-row')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('opening-hours-24h-badge')),
+          findsOneWidget);
+      // … plus the explicit automate line.
+      expect(find.byKey(const ValueKey('opening-hours-automate-24h')),
+          findsOneWidget);
+    });
+
+    testWidgets('no automate → no "24/7 automate" line', (tester) async {
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(hours: businessWeek(), now: wednesday),
+        ),
+      );
+      expect(find.byKey(const ValueKey('opening-hours-automate-24h')),
+          findsNothing);
+    });
+  });
+
   group('OpeningHoursView — today emphasis', () {
     testWidgets('today (Wed) row is bold via its accent bar', (tester) async {
       await pumpApp(

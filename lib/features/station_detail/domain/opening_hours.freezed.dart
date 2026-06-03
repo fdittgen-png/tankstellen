@@ -556,7 +556,7 @@ as List<TimeRange>,
 /// @nodoc
 mixin _$WeeklyOpeningHours {
 
- List<DayHours> get days; OpeningHoursAvailability get availability; String? get rawSource;
+ List<DayHours> get days; OpeningHoursAvailability get availability; String? get rawSource; bool get automate24h;
 /// Create a copy of WeeklyOpeningHours
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -569,16 +569,16 @@ $WeeklyOpeningHoursCopyWith<WeeklyOpeningHours> get copyWith => _$WeeklyOpeningH
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeeklyOpeningHours&&const DeepCollectionEquality().equals(other.days, days)&&(identical(other.availability, availability) || other.availability == availability)&&(identical(other.rawSource, rawSource) || other.rawSource == rawSource));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeeklyOpeningHours&&const DeepCollectionEquality().equals(other.days, days)&&(identical(other.availability, availability) || other.availability == availability)&&(identical(other.rawSource, rawSource) || other.rawSource == rawSource)&&(identical(other.automate24h, automate24h) || other.automate24h == automate24h));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(days),availability,rawSource);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(days),availability,rawSource,automate24h);
 
 @override
 String toString() {
-  return 'WeeklyOpeningHours(days: $days, availability: $availability, rawSource: $rawSource)';
+  return 'WeeklyOpeningHours(days: $days, availability: $availability, rawSource: $rawSource, automate24h: $automate24h)';
 }
 
 
@@ -589,7 +589,7 @@ abstract mixin class $WeeklyOpeningHoursCopyWith<$Res>  {
   factory $WeeklyOpeningHoursCopyWith(WeeklyOpeningHours value, $Res Function(WeeklyOpeningHours) _then) = _$WeeklyOpeningHoursCopyWithImpl;
 @useResult
 $Res call({
- List<DayHours> days, OpeningHoursAvailability availability, String? rawSource
+ List<DayHours> days, OpeningHoursAvailability availability, String? rawSource, bool automate24h
 });
 
 
@@ -606,12 +606,13 @@ class _$WeeklyOpeningHoursCopyWithImpl<$Res>
 
 /// Create a copy of WeeklyOpeningHours
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? days = null,Object? availability = null,Object? rawSource = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? days = null,Object? availability = null,Object? rawSource = freezed,Object? automate24h = null,}) {
   return _then(_self.copyWith(
 days: null == days ? _self.days : days // ignore: cast_nullable_to_non_nullable
 as List<DayHours>,availability: null == availability ? _self.availability : availability // ignore: cast_nullable_to_non_nullable
 as OpeningHoursAvailability,rawSource: freezed == rawSource ? _self.rawSource : rawSource // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,automate24h: null == automate24h ? _self.automate24h : automate24h // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -696,10 +697,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<DayHours> days,  OpeningHoursAvailability availability,  String? rawSource)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<DayHours> days,  OpeningHoursAvailability availability,  String? rawSource,  bool automate24h)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WeeklyOpeningHours() when $default != null:
-return $default(_that.days,_that.availability,_that.rawSource);case _:
+return $default(_that.days,_that.availability,_that.rawSource,_that.automate24h);case _:
   return orElse();
 
 }
@@ -717,10 +718,10 @@ return $default(_that.days,_that.availability,_that.rawSource);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<DayHours> days,  OpeningHoursAvailability availability,  String? rawSource)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<DayHours> days,  OpeningHoursAvailability availability,  String? rawSource,  bool automate24h)  $default,) {final _that = this;
 switch (_that) {
 case _WeeklyOpeningHours():
-return $default(_that.days,_that.availability,_that.rawSource);case _:
+return $default(_that.days,_that.availability,_that.rawSource,_that.automate24h);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -737,10 +738,10 @@ return $default(_that.days,_that.availability,_that.rawSource);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<DayHours> days,  OpeningHoursAvailability availability,  String? rawSource)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<DayHours> days,  OpeningHoursAvailability availability,  String? rawSource,  bool automate24h)?  $default,) {final _that = this;
 switch (_that) {
 case _WeeklyOpeningHours() when $default != null:
-return $default(_that.days,_that.availability,_that.rawSource);case _:
+return $default(_that.days,_that.availability,_that.rawSource,_that.automate24h);case _:
   return null;
 
 }
@@ -752,7 +753,7 @@ return $default(_that.days,_that.availability,_that.rawSource);case _:
 @JsonSerializable()
 
 class _WeeklyOpeningHours extends WeeklyOpeningHours {
-  const _WeeklyOpeningHours({final  List<DayHours> days = const [], this.availability = OpeningHoursAvailability.notProvided, this.rawSource}): _days = days,super._();
+  const _WeeklyOpeningHours({final  List<DayHours> days = const [], this.availability = OpeningHoursAvailability.notProvided, this.rawSource, this.automate24h = false}): _days = days,super._();
   factory _WeeklyOpeningHours.fromJson(Map<String, dynamic> json) => _$WeeklyOpeningHoursFromJson(json);
 
  final  List<DayHours> _days;
@@ -764,6 +765,7 @@ class _WeeklyOpeningHours extends WeeklyOpeningHours {
 
 @override@JsonKey() final  OpeningHoursAvailability availability;
 @override final  String? rawSource;
+@override@JsonKey() final  bool automate24h;
 
 /// Create a copy of WeeklyOpeningHours
 /// with the given fields replaced by the non-null parameter values.
@@ -778,16 +780,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeeklyOpeningHours&&const DeepCollectionEquality().equals(other._days, _days)&&(identical(other.availability, availability) || other.availability == availability)&&(identical(other.rawSource, rawSource) || other.rawSource == rawSource));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeeklyOpeningHours&&const DeepCollectionEquality().equals(other._days, _days)&&(identical(other.availability, availability) || other.availability == availability)&&(identical(other.rawSource, rawSource) || other.rawSource == rawSource)&&(identical(other.automate24h, automate24h) || other.automate24h == automate24h));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_days),availability,rawSource);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_days),availability,rawSource,automate24h);
 
 @override
 String toString() {
-  return 'WeeklyOpeningHours(days: $days, availability: $availability, rawSource: $rawSource)';
+  return 'WeeklyOpeningHours(days: $days, availability: $availability, rawSource: $rawSource, automate24h: $automate24h)';
 }
 
 
@@ -798,7 +800,7 @@ abstract mixin class _$WeeklyOpeningHoursCopyWith<$Res> implements $WeeklyOpenin
   factory _$WeeklyOpeningHoursCopyWith(_WeeklyOpeningHours value, $Res Function(_WeeklyOpeningHours) _then) = __$WeeklyOpeningHoursCopyWithImpl;
 @override @useResult
 $Res call({
- List<DayHours> days, OpeningHoursAvailability availability, String? rawSource
+ List<DayHours> days, OpeningHoursAvailability availability, String? rawSource, bool automate24h
 });
 
 
@@ -815,12 +817,13 @@ class __$WeeklyOpeningHoursCopyWithImpl<$Res>
 
 /// Create a copy of WeeklyOpeningHours
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? days = null,Object? availability = null,Object? rawSource = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? days = null,Object? availability = null,Object? rawSource = freezed,Object? automate24h = null,}) {
   return _then(_WeeklyOpeningHours(
 days: null == days ? _self._days : days // ignore: cast_nullable_to_non_nullable
 as List<DayHours>,availability: null == availability ? _self.availability : availability // ignore: cast_nullable_to_non_nullable
 as OpeningHoursAvailability,rawSource: freezed == rawSource ? _self.rawSource : rawSource // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,automate24h: null == automate24h ? _self.automate24h : automate24h // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

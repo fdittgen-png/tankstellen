@@ -17,6 +17,131 @@ void main() {
   const adapter = FranceOpeningHoursAdapter();
 
   group('FranceOpeningHoursAdapter', () {
+    test(
+        'automate + staffed (the real Esso 34120008 case) → keeps the staffed '
+        'boutique schedule AND flags automate24h, never all-24h (#2742)', () {
+      // The EXACT live `horaires_jour` for SARL L'ATELIER STATION ESSO,
+      // 34120 Pézenas (CRE id 34120008), verified against the gouv.fr feed:
+      // automate pump 24/7, boutique Mon–Fri 07:00–18:30, Sat 08:00–14:00,
+      // Sun closed (trailing `Dimanche` with no range).
+      final out = adapter.parse({
+        'horaires_jour':
+            'Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30, '
+                'Mercredi07.00-18.30, Jeudi07.00-18.30, Vendredi07.00-18.30, '
+                'Samedi08.00-14.00, Dimanche',
+        'horaires_automate_24_24': 'Oui',
+      });
+
+      // The orthogonal 24/7-automate indicator is set …
+      expect(out.automate24h, isTrue);
+      // … and the staffed schedule is PRESERVED, not collapsed to all-24h.
+      for (final day in [
+        OpeningDay.mon,
+        OpeningDay.tue,
+        OpeningDay.wed,
+        OpeningDay.thu,
+        OpeningDay.fri,
+      ]) {
+        final dh = out.dayFor(day);
+        expect(dh?.state, DayState.openRanges,
+            reason: 'staffed weekday must keep its ranges, not become 24h');
+        expect(dh?.ranges.single.startMinutes, 7 * 60);
+        expect(dh?.ranges.single.endMinutes, 18 * 60 + 30);
+      }
+      final sat = out.dayFor(OpeningDay.sat);
+      expect(sat?.state, DayState.openRanges);
+      expect(sat?.ranges.single.startMinutes, 8 * 60);
+      expect(sat?.ranges.single.endMinutes, 14 * 60);
+      // Trailing `Dimanche` with no range → CLOSED (Fermé), not dropped.
+      expect(out.dayFor(OpeningDay.sun)?.state, DayState.closed);
+      // No day is open24h — the schedule is staffed, the pump is the automate.
+      expect(
+        kRegularWeekdays.any((d) => out.dayFor(d)?.state == DayState.open24h),
+        isFalse,
+      );
+      expect(out.availability, OpeningHoursAvailability.full);
+    });
+
+    test(
+        'automate flag with NO staffed ranges at all → pump-only all-week '
+        '24h + automate24h (#2742)', () {
+      final out = adapter.parse({
+        // Every day bare / closed, only the pump runs.
+        'horaires_jour':
+            'Automate-24-24, Lundi, Mardi, Mercredi, Jeudi, Vendredi, '
+                'Samedi, Dimanche',
+        'horaires_automate_24_24': 'Oui',
+      });
+
+      expect(out.automate24h, isTrue);
+      expect(out.availability, OpeningHoursAvailability.full);
+      for (final day in kRegularWeekdays) {
+        expect(out.dayFor(day)?.state, DayState.open24h);
+      }
+    });
+
+    test(
+        'automate flag with empty schedule string → pump-only all-week 24h '
+        '+ automate24h (#2742)', () {
+      final out = adapter.parse({
+        'horaires_jour': 'Automate-24-24',
+        'horaires_automate_24_24': 'Oui',
+      });
+      expect(out.automate24h, isTrue);
+      for (final day in kRegularWeekdays) {
+        expect(out.dayFor(day)?.state, DayState.open24h);
+      }
+    });
+
+    test('pure staffed (automate Non) → staffed days, automate24h false', () {
+      final out = adapter.parse({
+        'horaires_jour':
+            'Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30',
+        'horaires_automate_24_24': 'Non',
+      });
+
+      expect(out.automate24h, isFalse);
+      expect(out.dayFor(OpeningDay.mon)?.state, DayState.openRanges);
+    });
+
+    test(
+        'a bare interior day name → DayState.closed (Fermé), not dropped '
+        '(#2742)', () {
+      // Real 57100008 shape: Mon + Wed bare (closed), Tue/Thu/Fri/Sat open,
+      // Sun trailing bare (closed).
+      final out = adapter.parse({
+        'horaires_jour': 'Lundi, Mardi07.00-20.00, Mercredi, Jeudi07.00-20.00, '
+            'Vendredi07.00-20.00, Samedi07.00-20.00, Dimanche',
+        'horaires_automate_24_24': 'Non',
+      });
+
+      expect(out.dayFor(OpeningDay.mon)?.state, DayState.closed);
+      expect(out.dayFor(OpeningDay.wed)?.state, DayState.closed);
+      expect(out.dayFor(OpeningDay.sun)?.state, DayState.closed);
+      expect(out.dayFor(OpeningDay.tue)?.state, DayState.openRanges);
+      expect(out.dayFor(OpeningDay.tue)?.ranges.single.endMinutes, 20 * 60);
+      expect(out.availability, OpeningHoursAvailability.full);
+    });
+
+    test(
+        'real " et "-joined split shift → two ranges on that day (#2742)', () {
+      // Real 34360001 shape: `Lundi 08.00-12.00 et 14.00-18.00` — the lunch
+      // break is one day, two ranges joined by " et ".
+      final out = adapter.parse({
+        'horaires_jour':
+            'Lundi 08.00-12.00 et 14.00-18.00, Mardi 08.00-12.00 et 14.00-18.00',
+        'horaires_automate_24_24': 'Non',
+      });
+
+      final monday = out.dayFor(OpeningDay.mon);
+      expect(monday?.state, DayState.openRanges);
+      expect(monday?.ranges, hasLength(2));
+      expect(monday?.ranges[0].startMinutes, 8 * 60);
+      expect(monday?.ranges[0].endMinutes, 12 * 60);
+      expect(monday?.ranges[1].startMinutes, 14 * 60);
+      expect(monday?.ranges[1].endMinutes, 18 * 60);
+    });
+
     test('automate flag → all week open24h, availability full', () {
       final out = adapter.parse({
         'horaires_jour':
@@ -24,11 +149,11 @@ void main() {
         'horaires_automate_24_24': 'Oui',
       });
 
-      expect(out.availability, OpeningHoursAvailability.full);
-      expect(out.days, hasLength(kRegularWeekdays.length));
-      for (final day in kRegularWeekdays) {
-        expect(out.dayFor(day)?.state, DayState.open24h);
-      }
+      // With staffed days present this is NOT collapsed to all-24h (#2742);
+      // the automate indicator is set and the staffed days are kept.
+      expect(out.automate24h, isTrue);
+      expect(out.dayFor(OpeningDay.mon)?.state, DayState.openRanges);
+      expect(out.dayFor(OpeningDay.tue)?.state, DayState.openRanges);
     });
 
     test(

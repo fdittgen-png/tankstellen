@@ -64,6 +64,14 @@ class _OpeningHoursViewState extends State<OpeningHoursView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OpeningHoursStatusLine(hours: hours, now: now, badge24h: all24h),
+        // The 24/7-automate indicator is orthogonal to the staffed schedule:
+        // an unattended pump open round-the-clock while the boutique keeps its
+        // own per-day hours (FR `Automate : 24/24`, #2742). Shown in addition
+        // to — never instead of — the staffed table below.
+        if (hours.automate24h) ...[
+          const SizedBox(height: Spacing.sm),
+          _Automate24Line(l10n: l10n),
+        ],
         const SizedBox(height: Spacing.md),
         if (all24h)
           _Open24Row(key: const ValueKey('opening-hours-24h-row'), l10n: l10n)
@@ -252,6 +260,37 @@ class _Open24Row extends StatelessWidget {
           Text(
             l10n?.open24Hours ?? 'Open 24 hours',
             style: theme.textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The "24/7 automate" indicator: an unattended pump open round-the-clock
+/// alongside the staffed boutique schedule (FR `Automate : 24/24`, #2742).
+class _Automate24Line extends StatelessWidget {
+  final AppLocalizations? l10n;
+
+  const _Automate24Line({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      key: const ValueKey('opening-hours-automate-24h'),
+      padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
+      child: Row(
+        children: [
+          Icon(Icons.local_gas_station,
+              size: 18, color: DarkModeColors.success(context)),
+          const SizedBox(width: Spacing.lg),
+          Text(
+            l10n?.openingHoursAutomate24h ?? '24/7 automate',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: DarkModeColors.success(context),
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),

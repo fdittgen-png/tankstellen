@@ -10839,6 +10839,12 @@ abstract class AppLocalizations {
   /// **'24h'**
   String get badge24h;
 
+  /// Opening-hours indicator shown alongside the staffed schedule when an unattended pump is open round-the-clock (FR Automate : 24/24, #2742).
+  ///
+  /// In en, this message translates to:
+  /// **'24/7 automate'**
+  String get openingHoursAutomate24h;
+
   /// Full weekday name — Monday (opening-hours table, #2709).
   ///
   /// In en, this message translates to:

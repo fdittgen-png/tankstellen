@@ -5310,6 +5310,10 @@
   "@badge24h": {
     "description": "Compact badge shown next to the status for an around-the-clock station (#2709)."
   },
+  "openingHoursAutomate24h": "24/7 automate",
+  "@openingHoursAutomate24h": {
+    "description": "Opening-hours indicator shown alongside the staffed schedule when an unattended pump is open round-the-clock (FR Automate : 24/24, #2742)."
+  },
   "dayMon": "Monday",
   "@dayMon": {
     "description": "Full weekday name — Monday (opening-hours table, #2709)."

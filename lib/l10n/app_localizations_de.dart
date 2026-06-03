@@ -6218,6 +6218,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get badge24h => '24h';
 
   @override
+  String get openingHoursAutomate24h => 'Automat 24/7';
+
+  @override
   String get dayMon => 'Montag';
 
   @override

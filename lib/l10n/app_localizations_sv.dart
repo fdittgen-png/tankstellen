@@ -6178,6 +6178,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get badge24h => '24h';
 
   @override
+  String get openingHoursAutomate24h => '24/7 automate';
+
+  @override
   String get dayMon => 'Monday';
 
   @override
