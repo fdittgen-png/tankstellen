@@ -92,6 +92,13 @@ Future<void> _pump(
   );
 }
 
+/// #2764 — Pin lives inside the trailing overflow kebab now; open it so
+/// the pin item (with its icon) is mounted before asserting the icon.
+Future<void> _openOverflow(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('recording_overflow_menu')));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -108,6 +115,7 @@ void main() {
 
       expect(facade.enableCalls, 1,
           reason: 'autoPin must acquire the wake lock without a user tap');
+      await _openOverflow(tester);
       expect(
         find.descendant(
           of: find.byKey(const Key('tripPinButton')),
@@ -129,6 +137,7 @@ void main() {
 
       expect(facade.enableCalls, 0,
           reason: 'default autoPin OFF must not auto-acquire the wake lock');
+      await _openOverflow(tester);
       expect(
         find.descendant(
           of: find.byKey(const Key('tripPinButton')),

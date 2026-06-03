@@ -123,15 +123,30 @@ class TripAvgConsumptionCard extends ConsumerWidget {
     return Card(
       key: const Key('tripAvgConsumptionCard'),
       margin: EdgeInsets.zero,
-      child: ListTile(
-        leading: const Icon(Icons.eco, size: 28),
-        title: Text(
-          l?.tripMetricAvgConsumption ?? 'Avg',
-          style: theme.textTheme.bodySmall,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: trailing,
+      // #2764 — an explicit Row (not a ListTile title/trailing split):
+      // ListTile hands the wide trailing Row (tooltip + badge + value)
+      // its full intrinsic width, squeezing the label to ~1 char so it
+      // wrapped one letter per line. The label now lives in an
+      // `Expanded` that ellipsizes, and the trailing keeps its min width.
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            const Icon(Icons.eco, size: 28),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                l?.tripMetricAvgConsumption ?? 'Avg',
+                style: theme.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: trailing,
+            ),
+          ],
         ),
       ),
     );

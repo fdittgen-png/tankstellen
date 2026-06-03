@@ -20,6 +20,12 @@ import '../../../../helpers/pump_app.dart';
 /// - auto-release the lock when the recording stops, even if the user
 ///   never tapped unpin.
 /// - hit the 48dp Material tap-target guideline.
+///
+/// #2764 — Pin now lives inside the trailing overflow kebab
+/// (`recording_overflow_menu`) rather than as a primary AppBar
+/// IconButton, so these tests open the kebab before reaching the pin
+/// item. The item keeps its `tripPinButton` key + the Pin/Unpin
+/// semantics, so the behavioural assertions are unchanged.
 
 class _FakeWakelockFacade implements WakelockFacade {
   int enableCalls = 0;
@@ -92,6 +98,12 @@ Future<void> _pumpRecordingScreen(
   );
 }
 
+/// #2764 — open the trailing overflow kebab so the Pin item is mounted.
+Future<void> _openOverflow(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('recording_overflow_menu')));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -101,6 +113,7 @@ void main() {
         (tester) async {
       final facade = _FakeWakelockFacade();
       await _pumpRecordingScreen(tester, facade: facade);
+      await _openOverflow(tester);
 
       final pinButton = find.byKey(const Key('tripPinButton'));
       expect(pinButton, findsOneWidget);
@@ -121,9 +134,13 @@ void main() {
       final facade = _FakeWakelockFacade();
       await _pumpRecordingScreen(tester, facade: facade);
 
+      await _openOverflow(tester);
       await tester.tap(find.byKey(const Key('tripPinButton')));
       await tester.pumpAndSettle();
 
+      // Selecting the item closes the menu; re-open to read the icon,
+      // which must now be the filled (pinned) variant.
+      await _openOverflow(tester);
       expect(
         find.descendant(
           of: find.byKey(const Key('tripPinButton')),
@@ -141,11 +158,16 @@ void main() {
       await _pumpRecordingScreen(tester, facade: facade);
 
       final pin = find.byKey(const Key('tripPinButton'));
+      await _openOverflow(tester);
       await tester.tap(pin);
       await tester.pumpAndSettle();
+      // Re-open the menu for the second toggle (the first selection
+      // closed it).
+      await _openOverflow(tester);
       await tester.tap(pin);
       await tester.pumpAndSettle();
 
+      await _openOverflow(tester);
       expect(
         find.descendant(
           of: pin,
@@ -162,14 +184,15 @@ void main() {
       final facade = _FakeWakelockFacade();
       await _pumpRecordingScreen(tester, facade: facade);
 
-      // Pin first.
+      // Pin first (via the overflow kebab).
+      await _openOverflow(tester);
       await tester.tap(find.byKey(const Key('tripPinButton')));
       await tester.pumpAndSettle();
       expect(facade.enableCalls, 1);
       expect(facade.disableCalls, 0);
 
-      // Stop the recording — this should auto-release without a
-      // second user gesture on the pin toggle.
+      // Stop the recording (a primary, always-visible action) — this
+      // should auto-release without a second user gesture on the pin.
       await tester.tap(find.byKey(const Key('tripStopButton')));
       await tester.pumpAndSettle();
 
@@ -182,6 +205,7 @@ void main() {
       final facade = _FakeWakelockFacade();
       await _pumpRecordingScreen(tester, facade: facade);
 
+      await _openOverflow(tester);
       await tester.tap(find.byKey(const Key('tripPinButton')));
       await tester.pumpAndSettle();
       expect(facade.disableCalls, 0);
@@ -198,6 +222,8 @@ void main() {
         (tester) async {
       final facade = _FakeWakelockFacade();
       await _pumpRecordingScreen(tester, facade: facade);
+      // Open the kebab so the pin item is on screen and audited.
+      await _openOverflow(tester);
 
       await expectLater(
         tester,
@@ -212,6 +238,7 @@ void main() {
 
       // When unpinned, Semantics label should read "Pin recording form".
       final handle = tester.ensureSemantics();
+      await _openOverflow(tester);
       expect(
         find.bySemanticsLabel('Pin recording form'),
         findsOneWidget,
@@ -221,6 +248,8 @@ void main() {
       await tester.tap(find.byKey(const Key('tripPinButton')));
       await tester.pumpAndSettle();
 
+      // Re-open the kebab; the item must now read "Unpin recording form".
+      await _openOverflow(tester);
       expect(
         find.bySemanticsLabel('Unpin recording form'),
         findsOneWidget,
