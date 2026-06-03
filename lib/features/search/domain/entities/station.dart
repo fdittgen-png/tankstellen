@@ -38,7 +38,15 @@ abstract class Station with _$Station {
     // country whose service has no detail endpoint (e.g. AT E-Control)
     // still surfaces structured hours via `StationDetail(station:…)`.
     // ADDITIVE: `openingHoursText` / `is24h` stay for back-compat.
-    @JsonKey(includeFromJson: false, includeToJson: false)
+    //
+    // #2777 — MUST serialize: the search-list cache codec
+    // (serializeStationList/deserializeStationList) and the favorites/widget/
+    // deep-link `station.toJson()` paths all round-trip through JSON. With the
+    // field JSON-excluded, a cache-hit search (the dominant repeat path for the
+    // polled FR/AT/CL sources) rehydrated stations with `openingHours == null`
+    // and the detail fast path rendered empty hours. `WeeklyOpeningHours` has
+    // to/fromJson; older cache entries lack the key → null, the same graceful
+    // back-compat fallback the structured `StationDetail.openingHours` uses.
     WeeklyOpeningHours? openingHours,
     @Default(false) bool is24h,
     @Default([]) List<String> services,
