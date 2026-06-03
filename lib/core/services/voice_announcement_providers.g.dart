@@ -116,7 +116,7 @@ final class VoiceAnnouncementServiceProvider
 }
 
 String _$voiceAnnouncementServiceHash() =>
-    r'da1d9950c472a9074975e98d2951bd8b62ac3347';
+    r'c6a125849af265ba60002e3921c64a47c66f9833';
 
 /// Provides the announcement engine that evaluates nearby stations.
 ///
