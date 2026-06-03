@@ -7219,6 +7219,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Aplicar';
 
   @override
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  ) {
+    return '$name, $distanceKm kilometers ahead, $fuelType $euros euros $cents';
+  }
+
+  @override
   String get widgetHelpSectionTitle => 'Widget de pantalla de inicio';
 
   @override

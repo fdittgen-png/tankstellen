@@ -74,6 +74,25 @@ void main() {
       verify(() => tts.setPitch(1.0)).called(1);
     });
 
+    test('pushes a BCP-47 voice for the bound locale on init (#2762)',
+        () async {
+      // Default locale is English until setAppLocale wires the real one.
+      await service.initialize();
+
+      verify(() => tts.setLanguage('en-US')).called(1);
+    });
+
+    test('uses the selected app locale for the native voice on init (#2762)',
+        () async {
+      // The provider calls setAppLocale BEFORE the engine warms up; the
+      // stored code must drive the native voice at init time.
+      await service.setAppLocale('fr');
+
+      await service.initialize();
+
+      verify(() => tts.setLanguage('fr-FR')).called(1);
+    });
+
     test('subsequent calls are no-ops (idempotent)', () async {
       await service.initialize();
       clearInteractions(tts);
@@ -87,6 +106,33 @@ void main() {
     });
   });
 
+  group('setAppLocale() (#2762)', () {
+    test('re-applies the native voice immediately when already initialized',
+        () async {
+      await service.initialize();
+      clearInteractions(tts);
+
+      await service.setAppLocale('de');
+
+      verify(() => tts.setLanguage('de-DE')).called(1);
+    });
+
+    test('does not crash when the native locale is unavailable (fallback)',
+        () async {
+      // Simulate an engine that rejects an unavailable voice.
+      when(() => tts.setLanguage(any())).thenThrow(Exception('no voice'));
+
+      // initialize() applies the locale; the failure must be swallowed so
+      // the service still comes up and can speak with the default voice.
+      await expectLater(service.initialize(), completes);
+
+      await service.setAppLocale('fr');
+      // A localized announce must still work despite the voice failure.
+      when(() => tts.speak(any())).thenAnswer((_) async => 1);
+      await expectLater(service.announce(_candidate()), completes);
+    });
+  });
+
   group('announce()', () {
     test('skips speak when not initialized', () async {
       await service.announce(_candidate());
@@ -94,7 +140,7 @@ void main() {
       verifyNever(() => tts.speak(any()));
     });
 
-    test('speaks formatted text after initialize', () async {
+    test('speaks the localized (English) text after initialize', () async {
       await service.initialize();
 
       await service.announce(_candidate(
@@ -104,8 +150,28 @@ void main() {
       ));
 
       // testStation has brand "STAR" and price 1.42 splits to "1" / "42".
-      verify(() => tts.speak('STAR, 1.2 kilometers ahead, Diesel 1 euro 42'))
+      // Words now come from the ARB key voiceStationAnnouncement (en).
+      verify(() => tts.speak('STAR, 1.2 kilometers ahead, Diesel 1 euros 42'))
           .called(1);
+    });
+
+    test('speaks the FRENCH sentence when bound to the fr locale (#2762)',
+        () async {
+      await service.setAppLocale('fr');
+      await service.initialize();
+
+      await service.announce(_candidate(
+        fuelType: 'Diesel',
+        price: 1.42,
+        distanceKm: 1.2,
+      ));
+
+      // FR ARB value: "{name}, à {distanceKm} kilomètres, {fuelType} ...".
+      verify(() => tts.speak('STAR, à 1.2 kilomètres, Diesel 1 euros 42'))
+          .called(1);
+      // And NOT the hardcoded English wording.
+      verifyNever(
+          () => tts.speak(any(that: contains('kilometers ahead'))));
     });
 
     test('uses brand when brand is non-empty', () async {
@@ -131,7 +197,7 @@ void main() {
         distanceKm: 0.5,
       ));
 
-      verify(() => tts.speak('Shell, 0.5 kilometers ahead, E10 1 euro 79'))
+      verify(() => tts.speak('Shell, 0.5 kilometers ahead, E10 1 euros 79'))
           .called(1);
     });
 
@@ -159,7 +225,7 @@ void main() {
       ));
 
       verify(() => tts.speak(
-              'Independent Garage, 0.5 kilometers ahead, Diesel 1 euro 50'))
+              'Independent Garage, 0.5 kilometers ahead, Diesel 1 euros 50'))
           .called(1);
     });
 
@@ -191,8 +257,8 @@ void main() {
 
       await service.announce(_candidate(price: 1.05));
 
-      // 1.05 -> "1 euro 05" (zero-padded cents from toStringAsFixed(2)).
-      verify(() => tts.speak(any(that: endsWith('1 euro 05')))).called(1);
+      // 1.05 -> "1 euros 05" (zero-padded cents from toStringAsFixed(2)).
+      verify(() => tts.speak(any(that: endsWith('1 euros 05')))).called(1);
     });
   });
 

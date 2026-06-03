@@ -7177,6 +7177,17 @@ class AppLocalizationsCs extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Použít';
 
   @override
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  ) {
+    return '$name, $distanceKm kilometers ahead, $fuelType $euros euros $cents';
+  }
+
+  @override
   String get widgetHelpSectionTitle => 'Widget domovské obrazovky';
 
   @override

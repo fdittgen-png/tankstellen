@@ -42,6 +42,10 @@ class _FakeVoiceAnnouncementService implements VoiceAnnouncementService {
   @override
   Future<void> setLanguage(String languageCode) async =>
       language = languageCode;
+
+  @override
+  Future<void> setAppLocale(String languageCode) async =>
+      language = languageCode;
 }
 
 // ---------------------------------------------------------------------------

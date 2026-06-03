@@ -50,6 +50,9 @@ class _FakeVoiceAnnouncementService implements VoiceAnnouncementService {
 
   @override
   Future<void> setLanguage(String languageCode) async {}
+
+  @override
+  Future<void> setAppLocale(String languageCode) async {}
 }
 
 /// Settings notifier stub returning a fixed [AnnouncementConfig].

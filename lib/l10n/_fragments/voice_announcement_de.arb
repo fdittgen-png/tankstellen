@@ -1,0 +1,3 @@
+{
+  "voiceStationAnnouncement": "{name}, in {distanceKm} Kilometern, {fuelType} {euros} Euro {cents}"
+}

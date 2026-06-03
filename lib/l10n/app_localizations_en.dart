@@ -7137,6 +7137,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Apply';
 
   @override
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  ) {
+    return '$name, $distanceKm kilometers ahead, $fuelType $euros euros $cents';
+  }
+
+  @override
   String get widgetHelpSectionTitle => 'Home-screen widget';
 
   @override
@@ -14517,6 +14528,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get vehicleDetectedFromVinApply => '⟦Áƥƥłý ··⟧';
+
+  @override
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  ) {
+    return '⟦$name, $distanceKm ķîłóɱéŧéřš áĥéáđ, $fuelType $euros éúřóš $cents ·········⟧';
+  }
 
   @override
   String get widgetHelpSectionTitle => '⟦Ĥóɱé-šçřééñ ŵîđǧéŧ ·······⟧';

@@ -11,6 +11,23 @@ part of 'voice_announcement_providers.dart';
 /// Provides the platform TTS service singleton.
 ///
 /// Kept alive for the app lifetime so the TTS engine is initialized once.
+///
+/// Binds the service to the app's SELECTED locale (#2762): the initial
+/// language is read from [activeLanguageProvider] (the persisted/profile
+/// language the rest of the app uses), and a [Ref.listen] re-applies it
+/// whenever the user changes language — so both the native TTS voice and
+/// the spoken sentence follow the app language rather than the device
+/// default voice + hardcoded English words.
+///
+/// The locale binding is best-effort by design: this is an app-lifetime
+/// singleton, so it MUST NOT make every transitive consumer (e.g. the active
+/// driving screen) depend on the Hive-backed profile store being open. During
+/// early startup — and in widget tests that don't open the profile box —
+/// [activeLanguageProvider] (which watches the profile) may still be in error
+/// state; reading it would otherwise poison this provider and every consumer.
+/// We therefore read defensively and start on the device-default voice, then
+/// let the [Ref.listen] below snap the locale to the app language the instant
+/// the profile resolves (and on every later language change).
 
 @ProviderFor(voiceAnnouncementService)
 final voiceAnnouncementServiceProvider = VoiceAnnouncementServiceProvider._();
@@ -18,6 +35,23 @@ final voiceAnnouncementServiceProvider = VoiceAnnouncementServiceProvider._();
 /// Provides the platform TTS service singleton.
 ///
 /// Kept alive for the app lifetime so the TTS engine is initialized once.
+///
+/// Binds the service to the app's SELECTED locale (#2762): the initial
+/// language is read from [activeLanguageProvider] (the persisted/profile
+/// language the rest of the app uses), and a [Ref.listen] re-applies it
+/// whenever the user changes language — so both the native TTS voice and
+/// the spoken sentence follow the app language rather than the device
+/// default voice + hardcoded English words.
+///
+/// The locale binding is best-effort by design: this is an app-lifetime
+/// singleton, so it MUST NOT make every transitive consumer (e.g. the active
+/// driving screen) depend on the Hive-backed profile store being open. During
+/// early startup — and in widget tests that don't open the profile box —
+/// [activeLanguageProvider] (which watches the profile) may still be in error
+/// state; reading it would otherwise poison this provider and every consumer.
+/// We therefore read defensively and start on the device-default voice, then
+/// let the [Ref.listen] below snap the locale to the app language the instant
+/// the profile resolves (and on every later language change).
 
 final class VoiceAnnouncementServiceProvider
     extends
@@ -30,6 +64,23 @@ final class VoiceAnnouncementServiceProvider
   /// Provides the platform TTS service singleton.
   ///
   /// Kept alive for the app lifetime so the TTS engine is initialized once.
+  ///
+  /// Binds the service to the app's SELECTED locale (#2762): the initial
+  /// language is read from [activeLanguageProvider] (the persisted/profile
+  /// language the rest of the app uses), and a [Ref.listen] re-applies it
+  /// whenever the user changes language — so both the native TTS voice and
+  /// the spoken sentence follow the app language rather than the device
+  /// default voice + hardcoded English words.
+  ///
+  /// The locale binding is best-effort by design: this is an app-lifetime
+  /// singleton, so it MUST NOT make every transitive consumer (e.g. the active
+  /// driving screen) depend on the Hive-backed profile store being open. During
+  /// early startup — and in widget tests that don't open the profile box —
+  /// [activeLanguageProvider] (which watches the profile) may still be in error
+  /// state; reading it would otherwise poison this provider and every consumer.
+  /// We therefore read defensively and start on the device-default voice, then
+  /// let the [Ref.listen] below snap the locale to the app language the instant
+  /// the profile resolves (and on every later language change).
   VoiceAnnouncementServiceProvider._()
     : super(
         from: null,
@@ -65,7 +116,7 @@ final class VoiceAnnouncementServiceProvider
 }
 
 String _$voiceAnnouncementServiceHash() =>
-    r'3b79a24d1173eb979132dd6be801e98ba462dd3c';
+    r'c6a125849af265ba60002e3921c64a47c66f9833';
 
 /// Provides the announcement engine that evaluates nearby stations.
 ///
