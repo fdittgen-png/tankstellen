@@ -9,6 +9,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import '../../error/exceptions.dart';
+import '../../network/dio_offline.dart';
+import '../../telemetry/collectors/breadcrumb_collector.dart';
 import '../geocoding_provider.dart';
 import '../service_result.dart';
 import '../../../core/logging/error_logger.dart';
@@ -66,6 +68,18 @@ class NativeGeocodingProvider implements GeocodingProvider {
       if (placemarks.isEmpty) return null;
       return placemarks.first.isoCountryCode;
     } on Exception catch (e, st) {
+      // #2745 — the on-device geocoder raises `PlatformException(IO_ERROR,
+      // …UNAVAILABLE…)` when its backend can't be reached offline (field
+      // trace #7). This already falls back to Nominatim, so drop the
+      // expected offline failure to a breadcrumb rather than an ERROR trace.
+      // A genuine native-geocoder fault still ERROR-logs.
+      if (isOfflineError(e)) {
+        BreadcrumbCollector.add(
+          'Native country detection skipped — offline',
+          detail: 'lat=$lat lng=$lng type=${e.runtimeType}',
+        );
+        return null;
+      }
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Native country detection failed'}));
       return null;
     }
@@ -84,6 +98,16 @@ class NativeGeocodingProvider implements GeocodingProvider {
           .where((s) => s != null && s.isNotEmpty)
           .join(' ');
     } on Exception catch (e, st) {
+      // #2745 — see [coordinatesToCountryCode]: an offline platform-geocoder
+      // failure is expected (falls back to "lat, lng"), so breadcrumb it
+      // rather than ERROR-log. A genuine fault still persists.
+      if (isOfflineError(e)) {
+        BreadcrumbCollector.add(
+          'Native reverse geocoding skipped — offline',
+          detail: 'lat=$lat lng=$lng type=${e.runtimeType}',
+        );
+        return '$lat, $lng';
+      }
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Native reverse geocoding failed'}));
       return '$lat, $lng';
     }

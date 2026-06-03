@@ -130,8 +130,11 @@ void main() {
     });
 
     test(
-        'throws StateError when plugin.connect returns false; isOpen stays '
-        'false and no subscription is installed', () async {
+        'throws the typed Obd2AdapterUnresponsive when plugin.connect returns '
+        'false; isOpen stays false and no subscription is installed (#2745)',
+        () async {
+      // #2745 — was a raw StateError (field trace #6, ERROR-logged as
+      // `[unknown]`). Now a typed, expected, user-surfaced connect condition.
       fake.connectResult = false;
       final channel = ClassicElmChannel(
         address: 'AA:BB:CC:DD:EE:99',
@@ -140,16 +143,7 @@ void main() {
 
       await expectLater(
         channel.open(),
-        throwsA(
-          isA<StateError>().having(
-            (e) => e.message,
-            'message',
-            allOf(
-              contains('failed to open'),
-              contains('AA:BB:CC:DD:EE:99'),
-            ),
-          ),
-        ),
+        throwsA(isA<Obd2AdapterUnresponsive>()),
       );
       expect(channel.isOpen, isFalse);
 

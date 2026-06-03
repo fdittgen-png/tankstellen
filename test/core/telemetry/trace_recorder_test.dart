@@ -59,6 +59,28 @@ class _FakeSettingsStorage implements SettingsStorage {
   Future<void> resetSetupSkip() async {}
 }
 
+/// #2745 — a stand-in for the supabase `AuthRetryableFetchException`. The
+/// de-noise gate classifies it by RUNTIME-TYPE NAME + offline substring (so
+/// the core telemetry layer carries no supabase import), hence the class
+/// name literally matches the real one and its `toString()` carries the
+/// wrapped socket message. (A separate fidelity test in
+/// `test/core/network/dio_offline_test.dart` drives the REAL supabase class.)
+class _FakeAuthRetryableFetchException implements Exception {
+  final String _message;
+  const _FakeAuthRetryableFetchException(this._message);
+
+  @override
+  Type get runtimeType => AuthRetryableFetchException;
+
+  @override
+  String toString() =>
+      'AuthRetryableFetchException(message: $_message, statusCode: null)';
+}
+
+/// Marker type whose NAME the de-noise gate matches on (`runtimeType
+/// .toString()`). Declaring it here keeps the telemetry test supabase-free.
+class AuthRetryableFetchException {}
+
 /// Fake TraceUploader that does nothing.
 class _FakeTraceUploader extends TraceUploader {
   bool uploadCalled = false;
@@ -418,6 +440,85 @@ void main() {
         expect(storage.stored, hasLength(1),
             reason: 'a 5xx is a real server error and must persist (#2703)');
         expect(uploader.uploadCalled, isTrue);
+      });
+    });
+
+    // #2745 — error-log #14: offline host-lookup shapes that arrive WITHOUT a
+    // Dio wrapper slipped through the #2703 gate and ERROR-logged. The central
+    // de-noise gate now suppresses them via the broadened `isOfflineError`
+    // superset: a supabase `AuthRetryableFetchException(host lookup)` (traces
+    // #2–4), an on-device geocoder `PlatformException(IO_ERROR/UNAVAILABLE)`
+    // (trace #7), and a `DioException[unknown]` wrapping an `HttpException`
+    // connection-abort (FR trace #1). The guard: a GENUINE failure persists.
+    group('offline-without-Dio-wrapper suppression (#2745)', () {
+      test(
+          'a supabase AuthRetryableFetchException wrapping a host lookup is '
+          'NOT persisted (traces #2–4)', () async {
+        const error = SocketException(
+          'Failed host lookup: abc.supabase.co '
+          '(OS Error: No address associated with hostname, errno = 7)',
+        );
+        // The supabase client surfaces this as an AuthRetryableFetchException
+        // carrying the socket message; match the field shape via toString.
+        final wrapped = _FakeAuthRetryableFetchException(error.toString());
+        await recorder.record(wrapped, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'an offline supabase retryable fetch is a transient');
+        expect(uploader.uploadCalled, isFalse);
+      });
+
+      test(
+          'an on-device geocoder PlatformException(IO_ERROR, UNAVAILABLE) is '
+          'NOT persisted (trace #7)', () async {
+        final error = PlatformException(
+          code: 'IO_ERROR',
+          message: 'grpc failed: UNAVAILABLE: Unable to resolve host',
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'the offline native geocoder IO error is a transient');
+      });
+
+      test(
+          'a DioException[unknown] wrapping an HttpException connection-abort '
+          'is NOT persisted (FR trace #1)', () async {
+        final error = DioException(
+          requestOptions: RequestOptions(path: '/records'),
+          type: DioExceptionType.unknown,
+          error: const HttpException('Software caused connection abort'),
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, isEmpty,
+            reason: 'an unknown Dio error wrapping a connection-abort is '
+                'offline (the FR feed dropped the socket)');
+      });
+
+      test(
+          'a GENUINE AuthRetryableFetchException (real 5xx, no offline '
+          'substring) IS still persisted', () async {
+        const error =
+            _FakeAuthRetryableFetchException('Internal Server Error (500)');
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, hasLength(1),
+            reason: 'a non-offline retryable fetch is a real failure');
+        expect(uploader.uploadCalled, isTrue);
+      });
+
+      test(
+          'a GENUINE PlatformException (not an offline IO error) IS still '
+          'persisted', () async {
+        final error = PlatformException(
+          code: 'PARSE_ERROR',
+          message: 'malformed placemark payload',
+        );
+        await recorder.record(error, StackTrace.current);
+
+        expect(storage.stored, hasLength(1),
+            reason: 'a real platform fault must still ERROR-log');
       });
     });
 

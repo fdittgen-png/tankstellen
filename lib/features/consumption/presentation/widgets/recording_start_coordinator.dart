@@ -11,6 +11,7 @@ import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/obd2_connection_service.dart';
 import '../../data/obd2/obd2_service.dart';
+import '../obd2_connect_telemetry.dart';
 import '../../providers/trip_recording_provider.dart';
 
 /// Owns the #2274 recording-start orchestration that the trajets tab
@@ -136,8 +137,10 @@ class RecordingStartCoordinator {
     } catch (e, st) {
       notifier.cancelConnecting();
       onConnectionError(e);
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'RecordingStart connectAndStart'}));
+      // #2745 — the `onConnectionError` snackbar already surfaced this, so an
+      // EXPECTED OBD2 connect condition is a breadcrumb, not an ERROR trace
+      // (field trace #5); a genuine fault still ERROR-logs.
+      recordObd2ConnectFailure(e, st, where: 'RecordingStart connectAndStart');
     }
   }
 

@@ -6,9 +6,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
@@ -235,6 +240,89 @@ void main() {
       await completer.future;
     });
   });
+
+  // #2745 — error-log #14 trace #5: an `[ui] Obd2AdapterUnresponsive` ERROR
+  // was spooled for the pinned-connect failure even though the same condition
+  // is already surfaced to the user (the fall-through sheet + snackbar). The
+  // EXPECTED, user-actionable connect conditions must be a breadcrumb, NOT an
+  // ERROR trace; a GENUINE fault (permission denied) must still ERROR-log.
+  group('pinned-connect telemetry de-noise (#2745)', () {
+    late _CaptureRecorder rec;
+
+    setUp(() {
+      rec = _CaptureRecorder();
+      errorLogger.testRecorderOverride = rec;
+      BreadcrumbCollector.clear();
+    });
+
+    Future<void> pumpAndOpen(WidgetTester tester, Object thrown) async {
+      final svc = _RecordingFakeConnection(connectByMacError: thrown);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (ctx) => ElevatedButton(
+                  onPressed: () => showObd2AdapterPicker(ctx,
+                      pinnedMac: 'AA:BB:CC:DD:EE:FF',
+                      pinnedAdapterName: 'vLinker FS'),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+
+    testWidgets(
+        'an expected Obd2AdapterUnresponsive is a breadcrumb, NOT an ERROR',
+        (tester) async {
+      await pumpAndOpen(tester, const Obd2AdapterUnresponsive());
+
+      expect(rec.errors, isEmpty,
+          reason: 'an already-user-surfaced condition must NOT ERROR-log');
+      expect(
+        BreadcrumbCollector.snapshot().map((b) => b.action),
+        contains('OBD2 connect failed — expected user condition'),
+      );
+
+      Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('a genuine Obd2PermissionDenied STILL ERROR-logs (the guard)',
+        (tester) async {
+      await pumpAndOpen(tester, const Obd2PermissionDenied());
+
+      expect(rec.errors, hasLength(1),
+          reason: 'permission denial is a genuine, diagnostic-worthy fault');
+      expect(rec.errors.single.toString(), contains('pinned connect failed'));
+
+      Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
+      await tester.pumpAndSettle();
+    });
+  });
+}
+
+/// Captures every `errorLogger.log` -> `record` call so the de-noise tests
+/// can assert an expected condition was NOT ERROR-logged.
+class _CaptureRecorder implements TraceRecorder {
+  final errors = <Object>[];
+  @override
+  Future<void> record(Object error, StackTrace stackTrace,
+      {ServiceChainSnapshot? serviceChainState}) async {
+    errors.add(error);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 /// Recording fake for [Obd2ConnectionService] that lets the pinned-MAC
@@ -245,7 +333,7 @@ void main() {
 /// indefinitely, which is exactly what the tests need to assert
 /// "the sheet IS rendered" without chasing further state transitions.
 class _RecordingFakeConnection extends Obd2ConnectionService {
-  _RecordingFakeConnection({this.connectByMacResult})
+  _RecordingFakeConnection({this.connectByMacResult, this.connectByMacError})
       : super(
           registry: Obd2AdapterRegistry.defaults(),
           permissions: _FakePermissions(Obd2PermissionState.granted),
@@ -255,6 +343,7 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
       _RecordingFakeConnection(connectByMacResult: _NoopObd2Service());
 
   final Obd2Service? connectByMacResult;
+  final Object? connectByMacError;
   final List<String> connectByMacCalls = [];
 
   @override
@@ -263,6 +352,7 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
     Duration timeout = const Duration(seconds: 5),
   }) async {
     connectByMacCalls.add(mac);
+    if (connectByMacError != null) throw connectByMacError!;
     return connectByMacResult;
   }
 

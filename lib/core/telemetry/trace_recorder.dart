@@ -153,11 +153,13 @@ class TraceRecorder {
   ///      (the device is simply offline — DNS can't resolve the API host);
   ///   2. a [DioException] of type [DioExceptionType.cancel] (the user
   ///      navigated away / a newer request superseded this one);
-  ///   3. (#2703) a connection-LAYER Dio transient or a bare [HttpException]
-  ///      — classified by the shared [isOfflineDioException] util so this
-  ///      and the FR service can't drift (`connectionError` /
-  ///      `connectionTimeout` / `sendTimeout` / `receiveTimeout`, an
-  ///      `unknown` wrapping a SocketException, a connection abort);
+  ///   3. (#2703/#2745) a connection-LAYER Dio transient, a bare
+  ///      [HttpException], OR an offline host-lookup shape that arrives
+  ///      without a Dio wrapper (a supabase `AuthRetryableFetchException`
+  ///      wrapping a host-lookup SocketException, an on-device geocoder
+  ///      `PlatformException(IO_ERROR/UNAVAILABLE)`) — classified by the
+  ///      shared [isOfflineError] superset so this and the offline-tolerant
+  ///      service sites can't drift;
   ///   4. (#2703) when [isOnline] is `false`, any other network-category
   ///      exception (`SocketException` / `TimeoutException` / `HttpException`)
   ///      — a doomed call made while the device has no connection.
@@ -177,7 +179,14 @@ class TraceRecorder {
       return true;
     }
     // #2703 — shared connection-layer classification (PRIMARY signal).
-    if (isOfflineDioException(error)) return true;
+    // #2745 — broadened to the offline SUPERSET so the host-lookup shapes
+    // that arrive WITHOUT a Dio wrapper are suppressed too: the supabase
+    // `AuthRetryableFetchException(SocketException: Failed host lookup …)`
+    // (traces #2–4) and the on-device geocoder's `PlatformException(IO_ERROR,
+    // …UNAVAILABLE…)` (trace #7). Still NARROW — `isOfflineError` matches by
+    // shape + offline substring, never by HTTP status, so a real 5xx /
+    // non-offline `PlatformException` / non-offline retryable fetch persists.
+    if (isOfflineError(error)) return true;
     // #2703 — secondary offline signal: a doomed network call while offline.
     if (!isOnline && _isNetworkCategory(error)) return true;
     return false;

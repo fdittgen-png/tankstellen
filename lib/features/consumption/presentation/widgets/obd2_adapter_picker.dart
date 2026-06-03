@@ -16,6 +16,7 @@ import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/obd2/obd2_connection_service.dart';
 import '../../data/obd2/obd2_service.dart';
 import '../obd2_connection_error_l10n.dart';
+import '../obd2_connect_telemetry.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Modal bottom sheet that drives the full scan → pick → connect flow
@@ -49,14 +50,13 @@ Future<Obd2Service?> showObd2AdapterPicker(
     final container = ProviderScope.containerOf(context, listen: false);
     Obd2Service? service;
     try {
-      service = await container.read(obd2ConnectionProvider).connectByMac(
-            pinnedMac,
-          );
+      service =
+          await container.read(obd2ConnectionProvider).connectByMac(pinnedMac);
     } on Obd2ConnectionError catch (e, st) {
-      // Real connect failure (permission denied, init timeout). Drop
-      // through to the sheet so the user can pick another adapter;
-      // the snackbar surfaces the mishap.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'showObd2AdapterPicker pinned connect failed'}));
+      // Drop through to the sheet so the user can pick another adapter; the
+      // fall-through snackbar surfaces it. #2745 — an expected, user-surfaced
+      // condition is a breadcrumb, a genuine fault still ERROR-logs.
+      recordObd2ConnectFailure(e, st, where: 'pinned connect failed');
     }
     if (service != null) {
       return service;
