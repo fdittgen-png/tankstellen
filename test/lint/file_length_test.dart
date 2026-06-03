@@ -336,7 +336,10 @@ void main() {
     // switch gained the `degradedGpsOnly` case (mapped to 'recording' — a
     // degraded trip is still actively recording) + its rationale comment.
     // Pure mapping; decomposition still tracked by #2187/#2188/#2190.
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1240,
+    // #2787 — 1240 → 1246: the no-movement discard now only error-logs when
+    // captured signal is actually dropped (the droppedCapturedSignal guard +
+    // its comment), so an empty stop no longer spams the error log.
+    'lib/features/consumption/providers/trip_recording_provider.dart': 1246,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
     // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
     // hides results behind count-clusters. Adds the `rankForEmphasis`

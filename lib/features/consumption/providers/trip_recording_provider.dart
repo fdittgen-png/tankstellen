@@ -966,20 +966,31 @@ class TripRecording extends _$TripRecording {
       // No silent discard (#2509): record WHY so a regression of the
       // silent-data-loss bug surfaces in the error log, and let the caller
       // surface a "no movement detected" notice to the user.
-      unawaited(errorLogger.log(
-        ErrorLayer.providers,
-        StateError('trip discarded — no movement detected'),
-        StackTrace.current,
-        context: {
-          'where': 'TripRecording._saveToHistory discard',
-          'reason': 'no-movement',
-          'distanceKm': summary.distanceKm.toStringAsFixed(4),
-          'distanceSource': summary.distanceSource,
-          'sampleCount': samples.length.toString(),
-          'gpsFixCount': gpsFixCount.toString(),
-          'hadStartedAt': (summary.startedAt != null).toString(),
-        },
-      ));
+      //
+      // #2787 — but only error-log when captured SIGNAL is actually being
+      // dropped (the silent-data-loss regression this guard exists to catch).
+      // A genuinely empty stop — no samples AND no GPS fixes, e.g. the user
+      // stopped without moving, or the foreground GPS stream never started
+      // (the #2766 FGS-permission case, error log #17) — has no data to lose,
+      // so logging it as an error trace is pure noise. The user-facing "no
+      // movement detected" notice (the returned outcome) is unchanged.
+      final droppedCapturedSignal = samples.isNotEmpty || gpsFixCount > 0;
+      if (droppedCapturedSignal) {
+        unawaited(errorLogger.log(
+          ErrorLayer.providers,
+          StateError('trip discarded — no movement detected'),
+          StackTrace.current,
+          context: {
+            'where': 'TripRecording._saveToHistory discard',
+            'reason': 'no-movement',
+            'distanceKm': summary.distanceKm.toStringAsFixed(4),
+            'distanceSource': summary.distanceSource,
+            'sampleCount': samples.length.toString(),
+            'gpsFixCount': gpsFixCount.toString(),
+            'hadStartedAt': (summary.startedAt != null).toString(),
+          },
+        ));
+      }
       return TripPersistOutcome.discardedNoMovement;
     }
     try {

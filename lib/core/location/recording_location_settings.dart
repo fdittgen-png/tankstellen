@@ -10,6 +10,28 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../l10n/app_localizations.dart';
 import '../language/language_provider.dart';
 
+/// #2787/#1498 — whether the GPS-recording foreground service may be requested.
+///
+/// #2766 promotes the recording GPS stream to an Android foreground service to
+/// beat the OS's ~5 s background batching. But the `FOREGROUND_SERVICE`
+/// permission is `tools:node="remove"`'d from AndroidManifest.xml for the Open
+/// Testing release (#1498 — ship without triggering Google Play's "Foreground
+/// Service Use" form). With the permission gone, geolocator's `startForeground`
+/// throws `Permission Denial: startForeground … requires FOREGROUND_SERVICE`
+/// and the GPS stream never starts — the trip captures zero fixes and is
+/// discarded as "no movement" (error log #17).
+///
+/// While this is `false` the recorder streams **foreground-only**, which is
+/// reliable because the recording screen pins itself (screen-on by default,
+/// #2785). Flip to `true` **together with** re-adding the manifest
+/// `FOREGROUND_SERVICE` permission once #1498's Play form is approved.
+///
+/// Deliberately `final` (not `const`): a non-const flag keeps the analyzer
+/// from marking the gated `ForegroundNotificationConfig` branch as dead code
+/// while the flag is `false`, so the restore path stays compiled + visible.
+// ignore: prefer_const_declarations
+final bool kGpsRecordingForegroundServiceEnabled = false;
+
 /// #2766 — the platform-specific [LocationSettings] used while a trip is
 /// **actively recording**, so the GPS trace stays fine-grained (~1 s) instead
 /// of the ~5 s the OS batches a backgrounded `getPositionStream` down to.
@@ -65,15 +87,20 @@ LocationSettings recordingLocationSettings({
         // even at a standstill / in stop-and-go traffic.
         intervalDuration: const Duration(seconds: 1),
         distanceFilter: 0,
-        // The un-throttle lever: promote geolocator to a foreground service
-        // so the OS stops the ~5 s background batching for the duration of
-        // the trip. Title/text are the already-merged ARB keys (#2766).
-        foregroundNotificationConfig: ForegroundNotificationConfig(
-          notificationTitle: l10n.tripRecordingGpsNotificationTitle,
-          notificationText: l10n.tripRecordingGpsNotificationText,
-          enableWakeLock: true,
-          setOngoing: true,
-        ),
+        // The un-throttle lever: promote geolocator to a foreground service so
+        // the OS stops the ~5 s background batching for the trip. Gated by
+        // [kGpsRecordingForegroundServiceEnabled] — OFF while the manifest
+        // FOREGROUND_SERVICE permission is removed (#1498), so we pass `null`
+        // and stream foreground-only rather than crash on startForeground
+        // (error log #17 / #2787). Title/text are the already-merged ARB keys.
+        foregroundNotificationConfig: kGpsRecordingForegroundServiceEnabled
+            ? ForegroundNotificationConfig(
+                notificationTitle: l10n.tripRecordingGpsNotificationTitle,
+                notificationText: l10n.tripRecordingGpsNotificationText,
+                enableWakeLock: true,
+                setOngoing: true,
+              )
+            : null,
       );
     case TargetPlatform.iOS:
       return AppleSettings(

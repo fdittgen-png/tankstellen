@@ -79,13 +79,13 @@ void main() {
       final android = opened! as AndroidSettings;
       expect(android.intervalDuration, const Duration(seconds: 1));
       expect(android.distanceFilter, 0);
-      expect(android.foregroundNotificationConfig, isNotNull,
-          reason: 'the foreground service is the un-throttle lever');
-      expect(
-        android.foregroundNotificationConfig!.notificationTitle,
-        isNotEmpty,
-        reason: 'ARB notification title carried into the config',
-      );
+      // #2787 — the foreground service is gated OFF while the manifest
+      // FOREGROUND_SERVICE permission is removed (#1498); requesting it threw a
+      // startForeground Permission Denial that killed the GPS stream (error
+      // log #17). The fine 1 s / distanceFilter-0 cadence still applies; the
+      // recorder streams foreground-only (the screen is pinned, #2785).
+      expect(android.foregroundNotificationConfig, isNull,
+          reason: 'no startForeground while FOREGROUND_SERVICE is removed');
     });
 
     test('each position fix is synthesised into a GPS sample (rpm 0, '
