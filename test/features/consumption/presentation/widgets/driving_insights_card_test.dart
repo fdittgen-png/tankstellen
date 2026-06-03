@@ -178,4 +178,49 @@ void main() {
       expect((tiles[1].title as Text).data, contains('hard accelerations'));
     });
   });
+
+  group('DrivingInsightsCard — polarity (#2791)', () {
+    testWidgets('a positive lesson renders green (eco icon, primary colour) — '
+        'NOT the error-red used for waste', (tester) async {
+      await pumpApp(
+        tester,
+        const DrivingInsightsCard(lessons: [
+          DrivingLesson(
+            id: 'smoothDriving',
+            impact: 1,
+            metricValue: 0,
+            title: 'Smooth driving — well done!',
+            polarity: LessonPolarity.positive,
+          ),
+          DrivingLesson(
+            id: 'highRpm',
+            impact: 0.6,
+            metricValue: 0.6,
+            title: 'Engine over 3000 RPM',
+            trailing: '+0.6 L',
+          ),
+        ]),
+      );
+
+      final theme = Theme.of(tester.element(find.byType(DrivingInsightsCard)));
+
+      final positiveIcon = tester.widget<Icon>(find.descendant(
+        of: find.byKey(const ValueKey('insight_tile_smoothDriving')),
+        matching: find.byType(Icon),
+      ));
+      expect(positiveIcon.icon, Icons.eco,
+          reason: 'praise uses the eco leaf, not the info glyph');
+      expect(positiveIcon.color, theme.colorScheme.primary,
+          reason: 'praise renders green');
+      expect(positiveIcon.color, isNot(theme.colorScheme.error),
+          reason: 'the #2791 bug: praise must NOT be error-red');
+
+      final wasteIcon = tester.widget<Icon>(find.descendant(
+        of: find.byKey(const ValueKey('insight_tile_highRpm')),
+        matching: find.byType(Icon),
+      ));
+      expect(wasteIcon.color, theme.colorScheme.error,
+          reason: 'waste lessons stay error-red (default polarity unchanged)');
+    });
+  });
 }
