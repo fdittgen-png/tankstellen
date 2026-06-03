@@ -135,7 +135,10 @@ void main() {
     // updated `applyFuelTrimCorrection` static forwarder + three new read
     // helpers (bank-2 STFT/LTFT, absolute load 0x43). Decomposition tracked
     // by #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1599,
+    // #2763 — 1599 → 1603: route the best-effort readVin catch through
+    // recordObd2ReadFailure (de-noise flaky-comms timeouts to breadcrumbs) +
+    // its import. Decomposition still tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1603,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb

@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/error/exceptions.dart';
 import '../../../core/services/impl/osm_brand_enricher.dart';
 import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_parsers.dart' as parser;
@@ -240,7 +241,21 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     });
 
     final results = parser.extractPrixCarburantsResults(response.data);
-    if (results.isEmpty) throw Exception('Station $stationId not found');
+    // #2763 — an empty feed slice is a TRANSIENT condition (the every-10-min
+    // bulk feed occasionally drops a record between refreshes), NOT a
+    // permanent 404. Throw a typed [ApiException] with [FailureKind.network]
+    // so the chain's `_callWithTransientRetry` does ONE 500ms retry and
+    // carries the kind into the accumulated `ServiceError` — instead of the
+    // plain `Exception` that bypassed the `on ApiException` retry gate and
+    // re-ran the whole chain 8× (one ERROR trace per provider/retry tap). A
+    // genuine Dio `badResponse` 404 still maps to [FailureKind.notFound]
+    // (terminal, not retried) via `throwApiException`.
+    if (results.isEmpty) {
+      throw ApiException(
+        message: 'Station $stationId not found (empty feed slice)',
+        kind: FailureKind.network,
+      );
+    }
 
     final r = results[0];
     final station = parser.parsePrixCarburantsStation(r, 0, 0);

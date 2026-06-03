@@ -17,6 +17,7 @@ import 'fuel_rate_estimator.dart' as estimator;
 import 'negotiated_protocol_cache.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_read_telemetry.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
@@ -1313,7 +1314,8 @@ class Obd2Service implements Obd2RawCommandPort {
       if (vin == null || vin.isEmpty) return null;
       return vin;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OBD2 readVin failed'}));
+      // #2763 — flaky readVin is expected: breadcrumb, not ERROR (see helper).
+      recordObd2ReadFailure(e, st, where: 'OBD2 readVin');
       return null;
     }
   }

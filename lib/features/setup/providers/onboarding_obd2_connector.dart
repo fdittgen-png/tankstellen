@@ -1,15 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../consumption/data/obd2/elm327_protocol.dart';
+import '../../consumption/data/obd2/obd2_read_telemetry.dart';
 import '../../consumption/data/obd2/obd2_service.dart';
 import '../../consumption/presentation/widgets/obd2_adapter_picker.dart';
-import '../../../core/logging/error_logger.dart';
 
 part 'onboarding_obd2_connector.g.dart';
 
@@ -83,7 +81,10 @@ class DefaultOnboardingObd2Connector implements OnboardingObd2Connector {
       final raw = await service.sendCommand(Elm327Protocol.vinCommand);
       return Elm327Protocol.parseVin(raw);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'OnboardingObd2Connector.readVin failed'}));
+      // #2763 — same best-effort VIN-read contract as `Obd2Service.readVin`:
+      // an expected flaky-comms transient is a breadcrumb, a genuine fault
+      // still ERROR-logs (via the shared `recordObd2ReadFailure` router).
+      recordObd2ReadFailure(e, st, where: 'OnboardingObd2Connector.readVin');
       return null;
     }
   }
