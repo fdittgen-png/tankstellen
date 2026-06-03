@@ -24,4 +24,12 @@ TripSample tripDetailToTripSample(TripDetailSample s) => TripSample(
       throttlePercent: s.throttlePercent,
       pedalPercent: s.pedalPercent,
       lambda: s.lambda,
+      // #2790 — carry the geo/altitude signals so the recomputed GPS features
+      // are not silently zeroed. Without these the climb-energy block sees no
+      // altitude (→ 0 m/km despite a real climb) and distance falls back to
+      // speed×dt instead of haversine. The forward converter (toDetailSample)
+      // already preserves them; the reverse must too.
+      latitude: s.latitude,
+      longitude: s.longitude,
+      altitudeM: s.altitudeM,
     );
