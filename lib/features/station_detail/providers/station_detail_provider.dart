@@ -26,6 +26,16 @@ part 'station_detail_provider.g.dart';
 /// path below is untouched — it returns synchronously and never hits this.
 const Duration _fallbackFetchTimeout = Duration(seconds: 12);
 
+/// #2778 — country codes (as returned by [Countries.countryCodeForStationId])
+/// whose opening hours live ONLY on the detail endpoint, never in the search
+/// payload: DE Tankerkönig (`list.php` has no hours, `detail.php` does) and PT
+/// DGEG (`PesquisarPostos` has none, `GetDadosPostoMapa` carries `HorarioPosto`).
+/// For a search tap on these, the fast path below fetches [getStationDetail] to
+/// surface hours instead of serving the hours-less cached station. Every other
+/// provider carries hours in the search result (FR/AT/CL/ES via #2777) or has
+/// none to show, so none of them pays an extra fetch on a search tap.
+const _detailOnlyOpeningHoursCountries = {'DE', 'PT'};
+
 @riverpod
 Future<ServiceResult<StationDetail>> stationDetail(
   Ref ref,
@@ -36,7 +46,27 @@ Future<ServiceResult<StationDetail>> stationDetail(
   // hours. This avoids a re-fetch, preserves the brand name, and — for a
   // route tap (#2763) — short-circuits the network entirely.
   final cached = _cachedDetail(ref, stationId);
-  if (cached != null) return cached;
+
+  // `originCountry` is a pure id-prefix parse (#753) — no provider read, no
+  // Hive — so it is safe to resolve before deciding whether to touch the
+  // country service. We need it for two things: the #2778 detail-only-hours
+  // decision below, and the fallback service resolution further down.
+  final originCountry = Countries.countryCodeForStationId(stationId);
+
+  // #2778 — DE Tankerkönig / PT DGEG carry opening hours ONLY on the detail
+  // endpoint; their search payload has none, so a cached search station has
+  // `openingHours == null`. For those, fall through to fetch the real detail;
+  // every other cached station is served instantly below.
+  final needsDetailHoursFetch = cached != null &&
+      cached.data.openingHours == null &&
+      originCountry != null &&
+      _detailOnlyOpeningHoursCountries.contains(originCountry);
+
+  // Common path: serve the cached station instantly WITHOUT touching the
+  // country service (no `activeCountryProvider` read → no Hive). Covers every
+  // cached tap except the DE/PT hours upgrade — FR/AT/CL/ES carry hours via the
+  // search parse + #2777 codec, route taps short-circuit the network (#2763).
+  if (cached != null && !needsDetailHoursFetch) return cached;
 
   // Fallback: fetch from the country whose id prefix the [stationId]
   // carries (#753) — not the active profile country. Widget rows live
@@ -53,7 +83,6 @@ Future<ServiceResult<StationDetail>> stationDetail(
   // unprefixed legacy ids skip the comparison entirely so existing
   // unit tests that overrode just `stationServiceProvider` keep
   // working without standing up Hive.
-  final originCountry = Countries.countryCodeForStationId(stationId);
   final StationService service;
   if (originCountry == null) {
     service = ref.watch(stationServiceProvider);
@@ -62,6 +91,18 @@ Future<ServiceResult<StationDetail>> stationDetail(
     service = (originCountry == activeCountry)
         ? ref.watch(stationServiceProvider)
         : stationServiceForCountry(ref, originCountry);
+  }
+
+  // #2778 — DE/PT hours upgrade: fetch the real detail to surface hours; on any
+  // failure keep the instant cached result so the screen never regresses.
+  if (cached != null) {
+    try {
+      return await service
+          .getStationDetail(stationId)
+          .timeout(_fallbackFetchTimeout);
+    } on Object {
+      return cached;
+    }
   }
 
   try {

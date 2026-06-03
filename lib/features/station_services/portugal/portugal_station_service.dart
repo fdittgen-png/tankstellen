@@ -279,6 +279,11 @@ class PortugalStationService
   /// coordinates, so [PortugalDetailParser] merges its payload onto the cached
   /// search row (coords + prices) — see that helper for the split-endpoint
   /// rationale.
+  // #2778 — DGEG PesquisarPostos (search) carries no hours; HorarioPosto lives
+  // only on the GetDadosPostoMapa detail endpoint, parsed below. The
+  // station-detail fast path fetches detail for a PT search tap (see
+  // _detailOnlyOpeningHoursCountries in station_detail_provider.dart) instead
+  // of serving the hours-less cached station.
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
