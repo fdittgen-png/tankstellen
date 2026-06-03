@@ -4157,6 +4157,21 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nur GPS – noch keine Tankfüllungen haben das Verbrauchsmodell verankert. Füge ein paar volle Tankfüllungen hinzu, um die Genauigkeit zu verbessern.';
 
   @override
+  String get moreActionsTooltip => 'Mehr';
+
+  @override
+  String get exportBackupMenuLabel => 'Sicherung exportieren';
+
+  @override
+  String get restoreBackupMenuLabel => 'Sicherung wiederherstellen';
+
+  @override
+  String get carbonDashboardMenuLabel => 'CO₂-Dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Einstellungen';
+
+  @override
   String get consumptionStatsPageTitle => 'Verbrauchsstatistik';
 
   @override

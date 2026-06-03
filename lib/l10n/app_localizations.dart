@@ -7494,6 +7494,36 @@ abstract class AppLocalizations {
   /// **'GPS-only — no fill-ups have anchored the consumption model yet. Add a couple of full fill-ups to improve the accuracy.'**
   String get consumptionAccuracyTooltipLow;
 
+  /// Tooltip on the consumption app-bar overflow (kebab) menu button that holds the secondary actions — export/restore backup, the gated carbon dashboard and Settings (#2756).
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreActionsTooltip;
+
+  /// Overflow-menu item label on the consumption app bar that runs the full XML-in-ZIP backup export (#2756).
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup'**
+  String get exportBackupMenuLabel;
+
+  /// Overflow-menu item label on the consumption app bar that opens the backup-restore flow — pick a .zip, confirm merge/replace, import (#2756).
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get restoreBackupMenuLabel;
+
+  /// Overflow-menu item label on the consumption app bar that opens the carbon dashboard. Only shown when Feature.carbonDashboard is enabled (#2756).
+  ///
+  /// In en, this message translates to:
+  /// **'Carbon dashboard'**
+  String get carbonDashboardMenuLabel;
+
+  /// Overflow-menu item label on the consumption app bar that opens the app-global Settings screen. Sits below a divider, separated from the consumption-specific items above (#2756).
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsMenuLabel;
+
   /// App-bar title of the full consumption-statistics detail page opened from the Fuel tab's summary card (#2698).
   ///
   /// In en, this message translates to:

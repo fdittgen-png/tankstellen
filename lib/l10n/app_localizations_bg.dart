@@ -4159,6 +4159,21 @@ class AppLocalizationsBg extends AppLocalizations {
       'Само GPS — все още няма зареждания, които да фиксират модела на разход. Добавете няколко пълни зареждания, за да подобрите точността.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

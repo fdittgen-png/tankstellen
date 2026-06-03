@@ -134,14 +134,23 @@ void main() {
       await _pumpTrajets(tester);
       final iconX =
           tester.getCenter(find.byKey(const Key('open_vehicles'))).dx;
-      final exportX =
-          tester.getCenter(find.byKey(const Key('export_backup'))).dx;
-      // Leading is on the start (left) side; export is a trailing action.
-      expect(iconX, lessThan(exportX));
+      // #2756 — export moved into the overflow kebab; the kebab is now
+      // the right-most trailing action. The car icon must still sit
+      // left of it.
+      final kebabX = tester
+          .getCenter(find.byKey(const Key('consumption_overflow_menu')))
+          .dx;
+      expect(iconX, lessThan(kebabX));
     });
 
-    testWidgets('trailing export action is unaffected', (tester) async {
+    testWidgets('the overflow kebab carries the export action (#2756)',
+        (tester) async {
       await _pumpTrajets(tester);
+      // Export is no longer a visible trailing button — it lives in the
+      // overflow kebab and appears once the menu is opened.
+      expect(find.byKey(const Key('export_backup')), findsNothing);
+      await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
+      await tester.pumpAndSettle();
       expect(find.byKey(const Key('export_backup')), findsOneWidget);
     });
 

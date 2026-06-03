@@ -4160,6 +4160,21 @@ class AppLocalizationsHu extends AppLocalizations {
       'Csak GPS — még egyetlen tankolás sem rögzítette a fogyasztási modellt. Adj hozzá néhány teljes tankolást a pontosság javításához.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

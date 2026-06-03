@@ -4148,6 +4148,21 @@ class AppLocalizationsIt extends AppLocalizations {
       'Solo GPS — nessun rifornimento ha ancora ancorato il modello di consumo. Aggiungi un paio di rifornimenti completi per migliorare la precisione.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

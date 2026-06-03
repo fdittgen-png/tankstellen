@@ -4187,5 +4187,25 @@
   "stopRadar": "Arrêter le radar",
   "@stopRadar": {
     "description": "Label on the extended floating-action button when the Fuel Station Radar is active: tapping it ends the radar session and hands the results list back to the regular search. Replaces the ambiguous shared 'stop' key (FR 'Étape') that read as a route-waypoint label, not a radar-off affordance (#2744)."
+  },
+  "moreActionsTooltip": "Plus",
+  "@moreActionsTooltip": {
+    "description": "Tooltip on the consumption app-bar overflow (kebab) menu button (#2756)."
+  },
+  "exportBackupMenuLabel": "Exporter la sauvegarde",
+  "@exportBackupMenuLabel": {
+    "description": "Overflow-menu item label that runs the full backup export (#2756)."
+  },
+  "restoreBackupMenuLabel": "Restaurer la sauvegarde",
+  "@restoreBackupMenuLabel": {
+    "description": "Overflow-menu item label that opens the backup-restore flow (#2756)."
+  },
+  "carbonDashboardMenuLabel": "Tableau de bord carbone",
+  "@carbonDashboardMenuLabel": {
+    "description": "Overflow-menu item label that opens the carbon dashboard (#2756)."
+  },
+  "settingsMenuLabel": "Paramètres",
+  "@settingsMenuLabel": {
+    "description": "Overflow-menu item label that opens the app-global Settings screen (#2756)."
   }
 }

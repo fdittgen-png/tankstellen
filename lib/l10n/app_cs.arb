@@ -4102,5 +4102,30 @@
   "@stopRadar": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "moreActionsTooltip": "More",
+  "@moreActionsTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "exportBackupMenuLabel": "Export backup",
+  "@exportBackupMenuLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupMenuLabel": "Restore backup",
+  "@restoreBackupMenuLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "carbonDashboardMenuLabel": "Carbon dashboard",
+  "@carbonDashboardMenuLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settingsMenuLabel": "Settings",
+  "@settingsMenuLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

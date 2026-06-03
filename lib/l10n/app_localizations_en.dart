@@ -4114,6 +4114,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'GPS-only — no fill-ups have anchored the consumption model yet. Add a couple of full fill-ups to improve the accuracy.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override
@@ -11371,6 +11386,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get consumptionAccuracyTooltipLow =>
       '⟦ǦƤŠ-óñłý — ñó ƒîłł-úƥš ĥáṽé áñçĥóřéđ ŧĥé çóñšúɱƥŧîóñ ɱóđéł ýéŧ. Áđđ á çóúƥłé óƒ ƒúłł ƒîłł-úƥš ŧó îɱƥřóṽé ŧĥé áççúřáçý. ··········································⟧';
+
+  @override
+  String get moreActionsTooltip => '⟦Ṁóřé ··⟧';
+
+  @override
+  String get exportBackupMenuLabel => '⟦Éẋƥóřŧ ƀáçķúƥ ·····⟧';
+
+  @override
+  String get restoreBackupMenuLabel => '⟦Řéšŧóřé ƀáçķúƥ ······⟧';
+
+  @override
+  String get carbonDashboardMenuLabel => '⟦Çářƀóñ đášĥƀóářđ ·······⟧';
+
+  @override
+  String get settingsMenuLabel => '⟦Šéŧŧîñǧš ····⟧';
 
   @override
   String get consumptionStatsPageTitle => '⟦Çóñšúɱƥŧîóñ šŧáŧîšŧîçš ·········⟧';

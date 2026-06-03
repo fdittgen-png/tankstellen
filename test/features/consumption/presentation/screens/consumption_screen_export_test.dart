@@ -127,21 +127,33 @@ void main() {
     debugBackupAppVersionOverride = null;
   });
 
+  // #2756 — export moved from a visible trailing IconButton into the
+  // overflow kebab; every flow now opens the kebab first, then taps the
+  // `export_backup` PopupMenuItem.
+  Future<void> openExport(WidgetTester tester) async {
+    expect(find.byKey(const Key('export_backup')), findsNothing);
+    await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('export_backup')));
+    await tester.pumpAndSettle();
+  }
+
   group('ConsumptionScreen full-backup export (#1317)', () {
-    testWidgets('export button is enabled even with no fill-ups', (tester) async {
+    testWidgets('export lives in the overflow kebab (#2756)', (tester) async {
       // The full-backup export covers vehicles + trips + charging logs
       // too, so an empty fill-up list is no longer a reason to disable
-      // the button. (CSV export was fill-up-only and gated on emptiness;
-      // the new flow is not.)
+      // the action. (CSV export was fill-up-only and gated on emptiness;
+      // the new flow is not.) It is no longer a visible trailing button —
+      // only the kebab is — and surfaces once the menu opens.
       await _pumpScreen(tester, fillUps: const []);
 
-      final button = tester.widget<IconButton>(
-        find.byKey(const Key('export_backup')),
-      );
-      expect(button.onPressed, isNotNull);
+      expect(find.byKey(const Key('export_backup')), findsNothing);
+      await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('export_backup')), findsOneWidget);
     });
 
-    testWidgets('tapping the button invokes the FullBackupExporter',
+    testWidgets('tapping the kebab item invokes the FullBackupExporter',
         (tester) async {
       final exporter = _RecordingExporter();
       ConsumptionScreen.debugExporterOverride = exporter;
@@ -157,11 +169,10 @@ void main() {
       );
       await _pumpScreen(tester, fillUps: [fillUp]);
 
-      await tester.tap(find.byKey(const Key('export_backup')));
-      await tester.pumpAndSettle();
+      await openExport(tester);
 
       expect(exporter.callCount, 1);
-      // The screen must hand the active fill-up snapshot through.
+      // The action must hand the active fill-up snapshot through.
       expect(exporter.lastFillUps, isNotNull);
       expect(exporter.lastFillUps!.single.id, '1');
     });
@@ -180,8 +191,7 @@ void main() {
       );
       await _pumpScreen(tester, fillUps: [fillUp]);
 
-      await tester.tap(find.byKey(const Key('export_backup')));
-      await tester.pumpAndSettle();
+      await openExport(tester);
 
       expect(
         find.textContaining('Backup ready'),
@@ -203,8 +213,7 @@ void main() {
       );
       await _pumpScreen(tester, fillUps: [fillUp]);
 
-      await tester.tap(find.byKey(const Key('export_backup')));
-      await tester.pumpAndSettle();
+      await openExport(tester);
 
       expect(
         find.textContaining('Backup export failed'),
@@ -258,7 +267,7 @@ void main() {
       );
     });
 
-    testWidgets('keeps the download/export action in the app-bar',
+    testWidgets('keeps the export action reachable via the overflow kebab',
         (tester) async {
       final fillUp = FillUp(
         id: '1',
@@ -270,6 +279,12 @@ void main() {
       );
       await _pumpScreen(tester, fillUps: [fillUp]);
 
+      // #2756 — export moved into the kebab; the kebab itself is the
+      // app-bar action and export appears once it is opened.
+      expect(find.byKey(const Key('consumption_overflow_menu')), findsOneWidget);
+      expect(find.byKey(const Key('export_backup')), findsNothing);
+      await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
+      await tester.pumpAndSettle();
       expect(find.byKey(const Key('export_backup')), findsOneWidget);
     });
   });

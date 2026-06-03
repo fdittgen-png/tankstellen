@@ -4149,6 +4149,21 @@ class AppLocalizationsSk extends AppLocalizations {
       'Iba GPS — model spotreby zatiaľ neukotvilo žiadne tankovanie. Pridajte niekoľko plných tankovaní na zlepšenie presnosti.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

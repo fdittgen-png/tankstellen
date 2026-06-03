@@ -92,10 +92,25 @@ void main() {
     BackupRestoreFlow.debugImporterOverride = null;
   });
 
+  // #2756 — restore moved from a visible trailing IconButton into the
+  // overflow kebab. Open the kebab, then tap the `restore_backup` item.
+  Future<void> openRestore(WidgetTester tester) async {
+    await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('restore_backup')));
+    await tester.pumpAndSettle();
+  }
+
   group('ConsumptionScreen full-backup restore (#2571)', () {
-    testWidgets('a Restore button sits in the app-bar next to Export',
+    testWidgets('Restore and Export both appear in the overflow kebab (#2756)',
         (tester) async {
       await _pumpScreen(tester);
+      // Neither is a visible trailing button anymore.
+      expect(find.byKey(const Key('restore_backup')), findsNothing);
+      expect(find.byKey(const Key('export_backup')), findsNothing);
+      // Both surface once the kebab opens.
+      await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
+      await tester.pumpAndSettle();
       expect(find.byKey(const Key('restore_backup')), findsOneWidget);
       expect(find.byKey(const Key('export_backup')), findsOneWidget);
     });
@@ -106,8 +121,7 @@ void main() {
           () async => _sampleBackupBytes();
       await _pumpScreen(tester);
 
-      await tester.tap(find.byKey(const Key('restore_backup')));
-      await tester.pumpAndSettle();
+      await openRestore(tester);
 
       // Both choices + cancel are offered.
       expect(find.text('Merge'), findsOneWidget);
@@ -120,8 +134,7 @@ void main() {
       BackupRestoreFlow.debugFilePickerOverride = () async => null;
       await _pumpScreen(tester);
 
-      await tester.tap(find.byKey(const Key('restore_backup')));
-      await tester.pumpAndSettle();
+      await openRestore(tester);
 
       expect(find.text('Merge'), findsNothing);
     });
@@ -132,8 +145,7 @@ void main() {
           () async => _sampleBackupBytes();
       await _pumpScreen(tester);
 
-      await tester.tap(find.byKey(const Key('restore_backup')));
-      await tester.pumpAndSettle();
+      await openRestore(tester);
       await tester.tap(find.text('Merge'));
       await tester.pumpAndSettle();
 
@@ -147,8 +159,7 @@ void main() {
           () async => Uint8List.fromList([1, 2, 3, 4]);
       await _pumpScreen(tester);
 
-      await tester.tap(find.byKey(const Key('restore_backup')));
-      await tester.pumpAndSettle();
+      await openRestore(tester);
       await tester.tap(find.text('Merge'));
       await tester.pumpAndSettle();
 

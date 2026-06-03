@@ -4147,6 +4147,21 @@ class AppLocalizationsNl extends AppLocalizations {
       'Alleen GPS — nog geen tankbeurten hebben het verbruiksmodel verankerd. Voeg een paar volle tankbeurten toe om de nauwkeurigheid te verbeteren.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override

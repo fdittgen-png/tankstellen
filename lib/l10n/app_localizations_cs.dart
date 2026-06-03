@@ -4139,6 +4139,21 @@ class AppLocalizationsCs extends AppLocalizations {
       'Pouze GPS — model spotřeby zatím neukotvilo žádné tankování. Přidejte několik plných tankování pro zlepšení přesnosti.';
 
   @override
+  String get moreActionsTooltip => 'More';
+
+  @override
+  String get exportBackupMenuLabel => 'Export backup';
+
+  @override
+  String get restoreBackupMenuLabel => 'Restore backup';
+
+  @override
+  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+
+  @override
+  String get settingsMenuLabel => 'Settings';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override
