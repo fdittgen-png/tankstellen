@@ -271,8 +271,11 @@ void main() {
     // event→coach→speak wire — keeps the keepAlive listener mounted while
     // the screen is up) plus its import + an explaining comment. Pure
     // wiring; decomposition still tracked under #2187/#2188.
+    // #2764 — shrank 1123 → 1090: the 5 inline app-bar IconButtons moved
+    // into the new RecordingAppBarActions widget (Pause + Stop primary,
+    // Pin/Help/PiP folded into an overflow kebab). Net -33 lines here.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1123,
+        1090,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':

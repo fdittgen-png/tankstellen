@@ -73,13 +73,19 @@ void main() {
       expect(find.text('Recording trip'), findsOneWidget);
     });
 
-    testWidgets('pause / stop / pin action buttons survive the migration',
+    testWidgets('pause / stop primary + pin (via overflow kebab) survive',
         (tester) async {
       await _pumpRecordingScreen(tester);
 
-      expect(find.byKey(const Key('tripPinButton')), findsOneWidget);
+      // Pause + Stop stay primary, visible actions.
       expect(find.byKey(const Key('tripPauseButton')), findsOneWidget);
       expect(find.byKey(const Key('tripStopButton')), findsOneWidget);
+      // #2764 — Pin moved into the trailing overflow kebab; it's reachable
+      // once the kebab is opened (the pin item keeps its key).
+      expect(find.byKey(const Key('recording_overflow_menu')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('recording_overflow_menu')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('tripPinButton')), findsOneWidget);
     });
   });
 }

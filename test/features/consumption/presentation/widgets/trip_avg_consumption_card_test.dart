@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
@@ -30,7 +31,13 @@ void main() {
     required TripLiveReading? live,
     String? brokenMapOverride,
     GpsCalibrationMatrix? matrix,
+    Locale? locale,
+    double? cardWidth,
   }) {
+    final card = TripAvgConsumptionCard(
+      live: live,
+      brokenMapOverride: brokenMapOverride,
+    );
     return ProviderScope(
       overrides: [
         activeVehicleProfileProvider.overrideWith(
@@ -44,12 +51,19 @@ void main() {
         ),
       ],
       child: MaterialApp(
+        locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
-          body: TripAvgConsumptionCard(
-            live: live,
-            brokenMapOverride: brokenMapOverride,
+          body: Align(
+            alignment: Alignment.topCenter,
+            // #2764 — pin a realistically narrow card width so the wide
+            // trailing Row (tooltip + badge + value) competes with the
+            // label for space, reproducing the per-letter wrap if the
+            // label ever loses its Expanded/ellipsis.
+            child: cardWidth == null
+                ? card
+                : SizedBox(width: cardWidth, child: card),
           ),
         ),
       ),
@@ -190,6 +204,106 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(find.text(l.gpsMatrixMaturityConverged), findsOneWidget);
+    });
+  });
+
+  // #2764 — the label must keep its flexible space + ellipsize on a
+  // single line even when the wide trailing Row (tooltip + maturity
+  // badge + value) is present. The old ListTile title/trailing split
+  // gave the trailing its full intrinsic width, squeezing 'Moyenne' to
+  // ~1 char per line. A narrow card width forces the competition.
+  group('label single-line, no per-letter wrap (#2764)', () {
+    // A GPS-estimate reading → the WIDEST trailing (tooltip + badge +
+    // ~value); the worst case for the label's remaining space.
+    const wideTrailingLive = TripLiveReading(
+      elapsed: Duration(minutes: 5),
+      distanceKmSoFar: 10.0,
+      gpsEstimatedAvgLPer100Km: 6.4,
+    );
+
+    Finder labelFinder(String text) => find.descendant(
+          of: find.byKey(const Key('tripAvgConsumptionCard')),
+          matching: find.text(text),
+        );
+
+    // Visual line count of a Text: distinct box `top` offsets over the
+    // full string. A single ellipsized line ⇒ 1; the #2764 per-letter
+    // wrap ⇒ one per character.
+    int renderedLineCount(WidgetTester tester, Finder f, String text) {
+      final para = tester.renderObject<RenderParagraph>(f);
+      final boxes = para.getBoxesForSelection(
+        TextSelection(baseOffset: 0, extentOffset: text.length),
+      );
+      final tops = boxes.map((b) => b.top.round()).toSet();
+      return tops.isEmpty ? 1 : tops.length;
+    }
+
+    // The structural contract that PREVENTS the per-letter wrap: the
+    // label lives inside an Expanded (so it claims the flexible space
+    // rather than being squeezed by the wide trailing) and is single-
+    // line + ellipsizing. This is the direct regression guard — the old
+    // ListTile title/trailing split had neither.
+    void expectLabelIsExpandedSingleLineEllipsis(
+        WidgetTester tester, Finder labelText) {
+      final textWidget = tester.widget<Text>(labelText);
+      expect(textWidget.maxLines, 1,
+          reason: 'label must be capped to a single line (#2764)');
+      expect(textWidget.overflow, TextOverflow.ellipsis,
+          reason: 'label must ellipsize, never wrap per character (#2764)');
+      expect(
+        find.ancestor(of: labelText, matching: find.byType(Expanded)),
+        findsOneWidget,
+        reason: 'label must sit in an Expanded so the wide trailing '
+            "(tooltip + badge + value) can't squeeze it to ~1 char.",
+      );
+    }
+
+    testWidgets('FR "Moyenne" is a single-line, ellipsizing, Expanded label '
+        'beside the full trailing', (tester) async {
+      await tester.pumpWidget(harness(
+        live: wideTrailingLive,
+        matrix: const GpsCalibrationMatrix(),
+        locale: const Locale('fr'),
+        // Bounded but roomy enough that the wide value Text doesn't
+        // overflow — the structural assertions below are what guard the
+        // bug, not a pixel-precise squeeze.
+        cardWidth: 600,
+      ));
+      await tester.pumpAndSettle();
+
+      final label = labelFinder('Moyenne');
+      expect(label, findsOneWidget, reason: 'FR label resolves to "Moyenne".');
+      expectLabelIsExpandedSingleLineEllipsis(tester, label);
+      expect(renderedLineCount(tester, label, 'Moyenne'), 1,
+          reason: 'The label renders on ONE line, not one letter per line.');
+
+      // The value + maturity badge must still be present alongside it.
+      expect(find.byKey(const Key('tripAvgConsumptionValue')), findsOneWidget);
+      expect(valueText(tester).data, '~6.4 L/100 km');
+      expect(find.byType(GpsMatrixMaturityBadge), findsOneWidget);
+    });
+
+    testWidgets('en_XA pseudo-locale (text expansion) keeps the label single '
+        'line', (tester) async {
+      await tester.pumpWidget(harness(
+        live: wideTrailingLive,
+        matrix: const GpsCalibrationMatrix(),
+        // The #1699 expansion pseudo-locale stresses the label width.
+        locale: const Locale('en', 'XA'),
+        cardWidth: 600,
+      ));
+      await tester.pumpAndSettle();
+
+      final l = await AppLocalizations.delegate.load(const Locale('en', 'XA'));
+      final labelText = l.tripMetricAvgConsumption;
+      final label = labelFinder(labelText);
+      expect(label, findsOneWidget);
+      expectLabelIsExpandedSingleLineEllipsis(tester, label);
+      expect(renderedLineCount(tester, label, labelText), 1,
+          reason: 'Even the expanded pseudo-locale label stays on one line '
+              'rather than wrapping per character.');
+      expect(find.byKey(const Key('tripAvgConsumptionValue')), findsOneWidget);
+      expect(find.byType(GpsMatrixMaturityBadge), findsOneWidget);
     });
   });
 }

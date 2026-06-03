@@ -33,6 +33,7 @@ import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
 import '../widgets/minimal_drive_summary.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
+import '../widgets/recording_app_bar_actions.dart';
 import '../widgets/trip_avg_consumption_card.dart';
 import '../widgets/trip_radar_card.dart';
 import '../widgets/trip_save_progress.dart';
@@ -763,73 +764,23 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         // recording fires a one-time tooltip pointing at the banner.
         onPressed: _onBackPressed,
       ),
+      // #2764 — the 5 inline IconButtons truncated the title to "Enr…".
+      // Pause + Stop stay primary; Pin / Help / PiP fold into a single
+      // overflow kebab (see [RecordingAppBarActions]).
       actions: stopped != null
           ? null
           : [
-              // #891 — wrap in Semantics so TalkBack announces the
-              // *next* action (Pin / Unpin) in addition to the
-              // tooltip's battery-cost hint. `container: true`
-              // merges the IconButton's tap semantics into the label.
-              Semantics(
-                container: true,
-                button: true,
-                toggled: _pinned,
-                label: _pinned
-                    ? (l?.tripRecordingPinSemanticOn ??
-                        'Unpin recording form')
-                    : (l?.tripRecordingPinSemanticOff ??
-                        'Pin recording form'),
-                child: IconButton(
-                  key: const Key('tripPinButton'),
-                  icon: Icon(
-                    _pinned ? Icons.push_pin : Icons.push_pin_outlined,
-                    color: _pinned
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                  ),
-                  tooltip: l?.tripRecordingPinTooltip ??
-                      'Pinning keeps the screen on — uses more battery',
-                  isSelected: _pinned,
-                  onPressed: _togglePin,
-                ),
-              ),
-              // #1273 — `?` icon adjacent to the pin button. Always
-              // visible (no toggle gating); first-launch users need
-              // a path to "what does this button do" without leaving
-              // the recording screen.
-              IconButton(
-                key: const Key('tripPinHelpButton'),
-                icon: const Icon(Icons.help_outline),
-                tooltip: l?.tripRecordingPinHelpTooltip ??
-                    'What does pin do?',
-                onPressed: _showPinHelp,
-              ),
-              // #1884 — minimise the recording into a floating
-              // Picture-in-Picture tile. Android-only; the button is
-              // absent where PiP can't host app UI.
-              if (_pip.isSupported)
-                IconButton(
-                  key: const Key('tripMinimiseButton'),
-                  icon: const Icon(Icons.picture_in_picture_alt),
-                  tooltip: l?.tripRecordingMinimiseTooltip ??
-                      'Minimise to a floating tile',
-                  onPressed: () => _pip.enterPip(),
-                ),
-              IconButton(
-                key: const Key('tripPauseButton'),
-                icon: Icon(state.phase == TripRecordingPhase.paused
-                    ? Icons.play_arrow
-                    : Icons.pause),
-                tooltip: state.phase == TripRecordingPhase.paused
-                    ? (l?.tripResume ?? 'Resume')
-                    : (l?.tripPause ?? 'Pause'),
-                onPressed: state.isActive ? _togglePause : null,
-              ),
-              IconButton(
-                key: const Key('tripStopButton'),
-                icon: const Icon(Icons.stop_circle_outlined),
-                tooltip: l?.tripStop ?? 'Stop recording',
-                onPressed: _stopping || !state.isActive ? null : _onStop,
+              RecordingAppBarActions(
+                pinned: _pinned,
+                pipSupported: _pip.isSupported,
+                isActive: state.isActive,
+                isPaused: state.phase == TripRecordingPhase.paused,
+                stopping: _stopping,
+                onTogglePin: _togglePin,
+                onShowPinHelp: _showPinHelp,
+                onEnterPip: () => _pip.enterPip(),
+                onTogglePause: _togglePause,
+                onStop: _onStop,
               ),
             ],
       bodyPadding: EdgeInsets.zero,
@@ -1112,13 +1063,29 @@ class _MetricCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       margin: EdgeInsets.zero,
-      child: ListTile(
-        leading: Icon(icon, size: 28),
-        title: Text(label, style: theme.textTheme.bodySmall),
-        trailing: Text(
-          value,
-          style: theme.textTheme.titleLarge
-              ?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
+      // #2764 — explicit Row over a ListTile title/trailing split: the
+      // label gets the flexible space and ellipsizes, the value keeps
+      // its intrinsic width (mirrors TripAvgConsumptionCard's fix).
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            Icon(icon, size: 28),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                label,
+                style: theme.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              value,
+              style: theme.textTheme.titleLarge?.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()]),
+            ),
+          ],
         ),
       ),
     );

@@ -220,10 +220,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Pop back to the launcher — disposes the recording screen.
-      Navigator.of(tester.element(find.byKey(const Key('tripPinButton'))))
+      // #2764 — Stop is a primary, always-visible action; use it as the
+      // recording-screen anchor (Pin moved into the overflow kebab).
+      Navigator.of(tester.element(find.byKey(const Key('tripStopButton'))))
           .pop();
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('tripPinButton')), findsNothing,
+      expect(find.byKey(const Key('tripStopButton')), findsNothing,
           reason: 'recording screen must be off-screen now');
 
       // Emit another event — nothing should show on the launcher
@@ -256,9 +258,12 @@ void main() {
         'copy', (tester) async {
       await _pumpRecordingScreen(tester, coachEventsController: events);
 
+      // #2764 — Help lives in the overflow kebab now; open it first.
+      await tester.tap(find.byKey(const Key('recording_overflow_menu')));
+      await tester.pumpAndSettle();
       final helpButton = find.byKey(const Key('tripPinHelpButton'));
       expect(helpButton, findsOneWidget,
-          reason: 'pin help button must be in the AppBar actions');
+          reason: 'pin help item must be in the overflow kebab');
 
       await tester.tap(helpButton);
       await tester.pumpAndSettle();
@@ -274,15 +279,19 @@ void main() {
       );
     });
 
-    testWidgets('? icon is visible regardless of whether the pin is on or off',
+    testWidgets('help item is present regardless of whether pin is on or off',
         (tester) async {
       await _pumpRecordingScreen(tester, coachEventsController: events);
 
-      // Unpinned: help button visible.
+      // Unpinned: open the kebab → Help item present alongside Pin.
+      await tester.tap(find.byKey(const Key('recording_overflow_menu')));
+      await tester.pumpAndSettle();
       expect(find.byKey(const Key('tripPinHelpButton')), findsOneWidget);
 
-      // Pin → help still visible.
+      // Tap Pin (this closes the menu) → re-open → Help still present.
       await tester.tap(find.byKey(const Key('tripPinButton')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('recording_overflow_menu')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('tripPinHelpButton')), findsOneWidget);
     });
