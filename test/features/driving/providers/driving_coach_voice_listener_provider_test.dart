@@ -51,6 +51,9 @@ class _FakeVoiceAnnouncementService implements VoiceAnnouncementService {
 
   @override
   Future<void> setLanguage(String languageCode) async {}
+
+  @override
+  Future<void> setAppLocale(String languageCode) async {}
 }
 
 /// Toggle stub returning a fixed enabled value (default-ON or forced OFF)

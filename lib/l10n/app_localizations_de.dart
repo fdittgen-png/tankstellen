@@ -7215,6 +7215,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Übernehmen';
 
   @override
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  ) {
+    return '$name, in $distanceKm Kilometern, $fuelType $euros Euro $cents';
+  }
+
+  @override
   String get widgetHelpSectionTitle => 'Homescreen-Widget';
 
   @override

@@ -4162,5 +4162,32 @@
   "@tripRecordingGpsNotificationText": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "voiceStationAnnouncement": "{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}",
+  "@voiceStationAnnouncement": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Shell"
+      },
+      "distanceKm": {
+        "type": "String",
+        "example": "1.2"
+      },
+      "fuelType": {
+        "type": "String",
+        "example": "Diesel"
+      },
+      "euros": {
+        "type": "String",
+        "example": "1"
+      },
+      "cents": {
+        "type": "String",
+        "example": "42"
+      }
+    }
   }
 }

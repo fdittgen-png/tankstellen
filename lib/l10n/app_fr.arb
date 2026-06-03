@@ -4226,5 +4226,31 @@
   "tripRecordingGpsNotificationText": "Suivi GPS de votre itinéraire",
   "@tripRecordingGpsNotificationText": {
     "description": "Body text of the Android GPS foreground-service notification shown while a trip is recording (#2766)."
+  },
+  "voiceStationAnnouncement": "{name}, à {distanceKm} kilomètres, {fuelType} {euros} euros {cents}",
+  "@voiceStationAnnouncement": {
+    "description": "Spoken text-to-speech announcement for a nearby cheap fuel station while in driving/approach mode (#2762), spoken in French. distanceKm is pre-formatted to one decimal place; euros/cents are the price halves.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Shell"
+      },
+      "distanceKm": {
+        "type": "String",
+        "example": "1.2"
+      },
+      "fuelType": {
+        "type": "String",
+        "example": "Diesel"
+      },
+      "euros": {
+        "type": "String",
+        "example": "1"
+      },
+      "cents": {
+        "type": "String",
+        "example": "42"
+      }
+    }
   }
 }

@@ -11,6 +11,13 @@ part of 'voice_announcement_providers.dart';
 /// Provides the platform TTS service singleton.
 ///
 /// Kept alive for the app lifetime so the TTS engine is initialized once.
+///
+/// Binds the service to the app's SELECTED locale (#2762): the initial
+/// language is read from [activeLanguageProvider] (the persisted/profile
+/// language the rest of the app uses), and a [Ref.listen] re-applies it
+/// whenever the user changes language — so both the native TTS voice and
+/// the spoken sentence follow the app language rather than the device
+/// default voice + hardcoded English words.
 
 @ProviderFor(voiceAnnouncementService)
 final voiceAnnouncementServiceProvider = VoiceAnnouncementServiceProvider._();
@@ -18,6 +25,13 @@ final voiceAnnouncementServiceProvider = VoiceAnnouncementServiceProvider._();
 /// Provides the platform TTS service singleton.
 ///
 /// Kept alive for the app lifetime so the TTS engine is initialized once.
+///
+/// Binds the service to the app's SELECTED locale (#2762): the initial
+/// language is read from [activeLanguageProvider] (the persisted/profile
+/// language the rest of the app uses), and a [Ref.listen] re-applies it
+/// whenever the user changes language — so both the native TTS voice and
+/// the spoken sentence follow the app language rather than the device
+/// default voice + hardcoded English words.
 
 final class VoiceAnnouncementServiceProvider
     extends
@@ -30,6 +44,13 @@ final class VoiceAnnouncementServiceProvider
   /// Provides the platform TTS service singleton.
   ///
   /// Kept alive for the app lifetime so the TTS engine is initialized once.
+  ///
+  /// Binds the service to the app's SELECTED locale (#2762): the initial
+  /// language is read from [activeLanguageProvider] (the persisted/profile
+  /// language the rest of the app uses), and a [Ref.listen] re-applies it
+  /// whenever the user changes language — so both the native TTS voice and
+  /// the spoken sentence follow the app language rather than the device
+  /// default voice + hardcoded English words.
   VoiceAnnouncementServiceProvider._()
     : super(
         from: null,
@@ -65,7 +86,7 @@ final class VoiceAnnouncementServiceProvider
 }
 
 String _$voiceAnnouncementServiceHash() =>
-    r'3b79a24d1173eb979132dd6be801e98ba462dd3c';
+    r'63837cec11699ecb41ee0563b8bfb0b0900283a5';
 
 /// Provides the announcement engine that evaluates nearby stations.
 ///

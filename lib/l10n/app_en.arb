@@ -6603,6 +6603,32 @@
   "@vehicleDetectedFromVinApply": {
     "description": "Snackbar action button label — confirm applying the VIN-decoded values to the vehicle profile (#1399)."
   },
+  "voiceStationAnnouncement": "{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}",
+  "@voiceStationAnnouncement": {
+    "description": "Spoken text-to-speech announcement for a nearby cheap fuel station while in driving/approach mode (#2762). Resolved for the app's SELECTED locale (not the widget tree) and spoken by FlutterTtsAnnouncementService. name is the station brand or name; distanceKm is pre-formatted to one decimal place; fuelType is the fuel grade; euros/cents are the whole-euro and two-digit cents halves of the price. Keep this idiomatic for a driver hearing it aloud.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Shell"
+      },
+      "distanceKm": {
+        "type": "String",
+        "example": "1.2"
+      },
+      "fuelType": {
+        "type": "String",
+        "example": "Diesel"
+      },
+      "euros": {
+        "type": "String",
+        "example": "1"
+      },
+      "cents": {
+        "type": "String",
+        "example": "42"
+      }
+    }
+  },
   "widgetHelpSectionTitle": "Home-screen widget",
   "@widgetHelpSectionTitle": {
     "description": "Title of the home-screen widget help section in Settings (#1806)."

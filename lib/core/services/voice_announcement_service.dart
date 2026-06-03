@@ -47,4 +47,15 @@ abstract class VoiceAnnouncementService {
 
   /// Set the language for announcements (BCP-47 code, e.g. "de-DE").
   Future<void> setLanguage(String languageCode);
+
+  /// Bind the service to the app's currently SELECTED locale (#2762).
+  ///
+  /// [languageCode] is the app two-letter language code (e.g. `fr`, `de`,
+  /// `en`). This both (a) drives the native TTS voice — the code is mapped
+  /// to a BCP-47 tag and pushed via [setLanguage] so a French user hears a
+  /// French voice instead of the device default — and (b) selects which
+  /// [AppLocalizations] the spoken sentence in [announce] is resolved
+  /// against. Safe to call repeatedly when the user changes language; an
+  /// unavailable native locale is swallowed so the engine keeps working.
+  Future<void> setAppLocale(String languageCode);
 }

@@ -12583,6 +12583,18 @@ abstract class AppLocalizations {
   /// **'Apply'**
   String get vehicleDetectedFromVinApply;
 
+  /// Spoken text-to-speech announcement for a nearby cheap fuel station while in driving/approach mode (#2762). Resolved for the app's SELECTED locale (not the widget tree) and spoken by FlutterTtsAnnouncementService. name is the station brand or name; distanceKm is pre-formatted to one decimal place; fuelType is the fuel grade; euros/cents are the whole-euro and two-digit cents halves of the price. Keep this idiomatic for a driver hearing it aloud.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}'**
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  );
+
   /// Title of the home-screen widget help section in Settings (#1806).
   ///
   /// In en, this message translates to:

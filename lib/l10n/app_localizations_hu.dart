@@ -7213,6 +7213,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Alkalmazás';
 
   @override
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  ) {
+    return '$name, $distanceKm kilometers ahead, $fuelType $euros euros $cents';
+  }
+
+  @override
   String get widgetHelpSectionTitle => 'Kezdőképernyő-widget';
 
   @override

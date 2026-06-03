@@ -7165,6 +7165,17 @@ class AppLocalizationsFi extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Sovella';
 
   @override
+  String voiceStationAnnouncement(
+    String name,
+    String distanceKm,
+    String fuelType,
+    String euros,
+    String cents,
+  ) {
+    return '$name, $distanceKm kilometers ahead, $fuelType $euros euros $cents';
+  }
+
+  @override
   String get widgetHelpSectionTitle => 'Aloitusnäytön widget';
 
   @override

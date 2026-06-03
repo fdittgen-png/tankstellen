@@ -2062,6 +2062,7 @@
   "vehicleDetectedFromVinBadge": "⟦(đéŧéçŧéđ) ····⟧",
   "vehicleDetectedFromVinSnackbar": "⟦Đéŧéçŧéđ ƒřóɱ ṼÎÑ: {summary}. Áƥƥłý? ·········⟧",
   "vehicleDetectedFromVinApply": "⟦Áƥƥłý ··⟧",
+  "voiceStationAnnouncement": "⟦{name}, {distanceKm} ķîłóɱéŧéřš áĥéáđ, {fuelType} {euros} éúřóš {cents} ·········⟧",
   "widgetHelpSectionTitle": "⟦Ĥóɱé-šçřééñ ŵîđǧéŧ ·······⟧",
   "widgetHelpIntro": "⟦Áđđ ŧĥé ŠƥářĶîłó ŵîđǧéŧ ŧó ýóúř ĥóɱé šçřééñ ŧó šéé ƒúéł áñđ çĥářǧîñǧ ƥřîçéš áŧ á ǧłáñçé. ································⟧",
   "widgetHelpAdd": "⟦Áđđ îŧ ƒřóɱ ýóúř łáúñçĥéř'š ŵîđǧéŧ ƥîçķéř — łóñǧ-ƥřéšš áñ éɱƥŧý ářéá óƒ ŧĥé ĥóɱé šçřééñ, çĥóóšé Ŵîđǧéŧš, áñđ ƒîñđ ŠƥářĶîłó. ············································⟧",
