@@ -13,6 +13,26 @@ sealed class Obd2ConnectionError implements Exception {
 
   @override
   String toString() => '$runtimeType: $message';
+
+  /// #2745 — whether this is an EXPECTED, already-user-surfaced connect
+  /// condition that the UI handles with a localized snackbar + a fall-through
+  /// to the picker, and so must NOT also spool an ERROR trace (the field
+  /// trace #5 was an `[ui] Obd2AdapterUnresponsive` ERROR for exactly this).
+  ///
+  /// `true` for the "adapter off / out of range / ignition off / not bonded"
+  /// family ([Obd2AdapterUnresponsive], [Obd2ScanTimeout], [Obd2BluetoothOff],
+  /// [Obd2DisconnectedException]) — all of which the user can act on directly.
+  /// `false` for [Obd2PermissionDenied] (needs a settings deep-link) and
+  /// [Obd2ProtocolInitFailed] (a counterfeit-clone diagnostic worth keeping),
+  /// which still ERROR-log so a genuine, actionable fault stays visible.
+  bool get isExpectedUserCondition => switch (this) {
+        Obd2AdapterUnresponsive() => true,
+        Obd2ScanTimeout() => true,
+        Obd2BluetoothOff() => true,
+        Obd2DisconnectedException() => true,
+        Obd2PermissionDenied() => false,
+        Obd2ProtocolInitFailed() => false,
+      };
 }
 
 /// User refused to grant BLUETOOTH_SCAN / BLUETOOTH_CONNECT on

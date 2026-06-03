@@ -45,3 +45,71 @@ bool isOfflineDioException(Object error) {
   if (error is HttpException) return true;
   return false;
 }
+
+/// Whether [error] is an OFFLINE / no-network / host-lookup transient — a
+/// SUPERSET of [isOfflineDioException] that also recognises the offline
+/// shapes which arrive WITHOUT a Dio wrapper (#2745):
+///
+///  - a [SocketException] (or a Dio one) whose message reports a failed
+///    host lookup / unreachable network — the device simply has no DNS;
+///  - the supabase_flutter `AuthRetryableFetchException`, which wraps a
+///    `SocketException` ("Failed host lookup" / "No address associated with
+///    hostname") when the device is offline (#2745 traces #2–4);
+///  - a `PlatformException(IO_ERROR / UNAVAILABLE)` from the on-device
+///    geocoder, which the OS raises when the geocoding backend can't be
+///    reached offline (#2745 trace #7).
+///
+/// Used by the [TraceRecorder] de-noise gate and the offline-tolerant
+/// fallback sites (Nominatim / native geocoder) so a genuinely offline
+/// device does not spool an ERROR for a call it was always going to lose.
+///
+/// Deliberately NARROW by shape + message, NOT by exception family: a
+/// `PlatformException` that is NOT an offline IO error, an
+/// `AuthRetryableFetchException` whose cause is a real 5xx (no offline
+/// substring), and any non-offline failure return `false` so a GENUINE
+/// failure still ERROR-logs. The match is the broadest offline signal that
+/// stays free of false positives — it never inspects HTTP status codes.
+bool isOfflineError(Object error) {
+  if (isOfflineDioException(error)) return true;
+  // A `DioException[unknown]` can wrap a raw [HttpException] connection-abort
+  // (the FR feed field trace #1) — `isOfflineDioException` only inspects a
+  // wrapped SocketException for the `unknown` type, so unwrap + re-classify
+  // the inner error here (#2745).
+  if (error is DioException) {
+    final inner = error.error;
+    if (inner != null && inner != error && isOfflineError(inner)) return true;
+  }
+  if (error is SocketException) return _looksOffline(error.toString());
+  final typeName = error.runtimeType.toString();
+  // The supabase_flutter retryable-fetch wrapper carries the underlying
+  // socket message in its `toString()` (#2745). Match by type name + the
+  // offline substring so a retryable fetch caused by a real server blip
+  // (no offline substring) still persists.
+  // i18n-ignore: matching a platform/library exception class name, not UI.
+  if (typeName.contains('AuthRetryableFetchException')) {
+    return _looksOffline(error.toString());
+  }
+  // On-device geocoder offline: `PlatformException(IO_ERROR, …UNAVAILABLE…)`
+  // / a no-network platform-channel IO error (#2745 trace #7).
+  // i18n-ignore: matching a platform exception class name, not UI text.
+  if (typeName.contains('PlatformException')) {
+    final msg = error.toString().toUpperCase();
+    return msg.contains('UNAVAILABLE') ||
+        (msg.contains('IO_ERROR') && msg.contains('NETWORK'));
+  }
+  return false;
+}
+
+/// True when [message] carries one of the offline / no-network / failed
+/// host-lookup substrings. Matched case-insensitively. Kept in sync with
+/// `friendlyAuthError`'s network-family substrings (#2745).
+bool _looksOffline(String message) {
+  final m = message.toUpperCase();
+  return m.contains('FAILED HOST LOOKUP') ||
+      m.contains('NO ADDRESS ASSOCIATED WITH HOSTNAME') ||
+      m.contains('NETWORK IS UNREACHABLE') ||
+      m.contains('SOFTWARE CAUSED CONNECTION ABORT') ||
+      m.contains('CONNECTION CLOSED') ||
+      m.contains('CONNECTION RESET') ||
+      m.contains('ERRNO = 7');
+}

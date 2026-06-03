@@ -6,6 +6,8 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../error/exceptions.dart';
+import '../../network/dio_offline.dart';
+import '../../telemetry/collectors/breadcrumb_collector.dart';
 import '../dio_factory.dart';
 import '../geocoding_provider.dart';
 import '../service_config.dart';
@@ -130,6 +132,17 @@ class NominatimGeocodingProvider implements GeocodingProvider {
           .where((s) => s != null && s.toString().isNotEmpty)
           .join(' ');
     } on DioException catch (e, st) {
+      // #2745 — an offline host-lookup failure to nominatim.openstreetmap.org
+      // is expected (the method already falls back to "lat, lng"), so drop it
+      // to a breadcrumb rather than an ERROR trace (field traces #8/#9). A
+      // genuine API error (4xx/5xx, parse) still ERROR-logs.
+      if (isOfflineError(e)) {
+        BreadcrumbCollector.add(
+          'Nominatim reverse geocoding skipped — offline',
+          detail: 'lat=$lat lng=$lng type=${e.type}',
+        );
+        return '$lat, $lng';
+      }
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Nominatim reverse geocoding failed'}));
       return '$lat, $lng';
     }
@@ -155,6 +168,16 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       final code = address?['country_code'] as String?;
       return code?.toUpperCase();
     } on DioException catch (e, st) {
+      // #2745 — offline host-lookup failure is expected (the geocoding chain
+      // already falls back to the next provider / null), so breadcrumb it
+      // rather than ERROR-log (field traces #8/#9). Genuine errors persist.
+      if (isOfflineError(e)) {
+        BreadcrumbCollector.add(
+          'Nominatim country detection skipped — offline',
+          detail: 'lat=$lat lng=$lng type=${e.type}',
+        );
+        return null;
+      }
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Nominatim country detection failed'}));
       return null;
     }

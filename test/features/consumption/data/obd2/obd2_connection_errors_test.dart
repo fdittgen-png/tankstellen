@@ -39,4 +39,26 @@ void main() {
       expect(const Obd2ProtocolInitFailed('x'), isA<Exception>());
     });
   });
+
+  group('isExpectedUserCondition — telemetry de-noise gate (#2745)', () {
+    test(
+        'the "adapter off / out of range / ignition off" family is an '
+        'expected user condition (breadcrumb, not ERROR)', () {
+      expect(const Obd2AdapterUnresponsive().isExpectedUserCondition, isTrue);
+      expect(const Obd2ScanTimeout().isExpectedUserCondition, isTrue);
+      expect(const Obd2BluetoothOff().isExpectedUserCondition, isTrue);
+      expect(
+          const Obd2DisconnectedException().isExpectedUserCondition, isTrue);
+    });
+
+    test(
+        'permission-denied + protocol-init-failed stay ERROR-worthy (the '
+        'guard)', () {
+      expect(const Obd2PermissionDenied().isExpectedUserCondition, isFalse,
+          reason: 'permission denial needs a settings deep-link diagnostic');
+      expect(const Obd2ProtocolInitFailed('GARBAGE>').isExpectedUserCondition,
+          isFalse,
+          reason: 'a counterfeit-clone init string is worth keeping');
+    });
+  });
 }

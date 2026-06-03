@@ -11,6 +11,7 @@ import '../../../core/services/impl/osm_brand_enricher.dart';
 import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_parsers.dart' as parser;
 import '../../../core/network/dio_offline.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
@@ -171,6 +172,15 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       // #2524 — see [_queryByPostalCode]: an offline failure is expected and
       // swallowed (returns []); only a real API error gets an ERROR trace.
       if (_isOffline(e)) {
+        // #2745 — the field trace #1 was a `DioException[unknown]` wrapping
+        // an `HttpException('Software caused connection abort')` from
+        // data.economie.gouv.fr while the device was offline. Drop it to a
+        // diagnostic breadcrumb (still triageable from any surviving trace)
+        // instead of an ERROR — it is an expected no-network condition.
+        BreadcrumbCollector.add(
+          'Prix-Carburants geo fetch skipped — offline',
+          detail: 'lat=$lat lng=$lng type=${e.type}',
+        );
         debugPrint('Prix-Carburants geo fetch skipped — offline ($e)');
         return [];
       }
@@ -180,10 +190,13 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
   }
 
   /// Whether [e] is an offline / no-network failure rather than a real
-  /// API error (#2524). Delegates to the shared [isOfflineDioException]
-  /// classifier (#2703) so this and the trace-recorder de-noise gate
-  /// classify connection-layer transients identically and can't drift.
-  static bool _isOffline(DioException e) => isOfflineDioException(e);
+  /// API error (#2524). Delegates to the shared [isOfflineError] classifier
+  /// (#2703/#2745) so this and the trace-recorder de-noise gate classify
+  /// offline transients identically and can't drift. #2745 broadened from
+  /// [isOfflineDioException] to [isOfflineError] so a `DioException[unknown]`
+  /// wrapping an `HttpException` connection-abort (the field trace #1) is
+  /// recognised as offline at the call site too.
+  static bool _isOffline(DioException e) => isOfflineError(e);
 
   /// Merge two raw API result lists, deduplicating by station id.
   /// Stations from [primary] win when an id collides.

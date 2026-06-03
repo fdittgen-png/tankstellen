@@ -78,10 +78,14 @@ class ClassicElmChannel implements ElmByteChannel {
       if (diag.enabled) {
         diag.noteConnectionEvent(failureReason: 'rfcomm-open-fail');
       }
-      throw StateError(
-        'ClassicElmChannel: failed to open RFCOMM socket to $address '
-        '(plugin returned false). Adapter may not be bonded or is out '
-        'of range.',
+      // #2745 — this was a raw `StateError`, which the connect flow logged as
+      // an `[unknown]` ERROR trace (field trace #6) even though it is an
+      // EXPECTED, user-surfaced "adapter not reachable" condition (the dongle
+      // is unbonded or out of range). Raise the TYPED [Obd2AdapterUnresponsive]
+      // instead so the connect flow treats it as the breadcrumb-level user
+      // condition it already handles for the BLE init path — not an ERROR.
+      throw const Obd2AdapterUnresponsive(
+        'Adapter did not answer — turn the ignition on and retry',
       );
     }
     if (connectSw != null) {

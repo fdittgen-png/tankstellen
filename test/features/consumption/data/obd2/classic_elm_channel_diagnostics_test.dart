@@ -10,6 +10,7 @@ import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_elm_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_method_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_comm_diagnostics.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 
 /// Captures every `errorLogger.log` call routed through the foreground
 /// recorder seam, retaining the [ContextualError] so the test can assert
@@ -117,7 +118,11 @@ void main() {
       fake.connectResult = false;
 
       final channel = ClassicElmChannel(address: 'AA:BB', plugin: fake);
-      await expectLater(channel.open(), throwsA(isA<StateError>()));
+      // #2745 — connect→false now raises the typed Obd2AdapterUnresponsive
+      // (was a raw StateError) so the connect flow treats it as an expected,
+      // breadcrumb-level user condition. The diagnostics binning is unchanged.
+      await expectLater(
+          channel.open(), throwsA(isA<Obd2AdapterUnresponsive>()));
 
       final conn = Obd2CommDiagnostics.instance.snapshot().connection;
       expect(conn.attempts, 1);
