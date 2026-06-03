@@ -35,6 +35,7 @@ import '../../search/domain/entities/station.dart';
 import '../../search/domain/entities/station_amenity.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/logging/error_logger.dart';
+import 'france_opening_hours_adapter.dart';
 
 /// Extract the `results` list from a Prix-Carburants API envelope.
 ///
@@ -115,6 +116,13 @@ Station? parsePrixCarburantsStation(
       updatedAt: parsePrixCarburantsMostRecentUpdate(r),
       is24h: r['horaires_automate_24_24'] == 'Oui',
       openingHoursText: parsePrixCarburantsOpeningHours(r['horaires_jour']),
+      // #2751 — carry the STRUCTURED schedule on the search Station so the
+      // detail provider's search-cache fast path renders the staffed
+      // boutique hours (+ the 24/7-automate badge) directly, instead of
+      // falling through `legacyOpeningHoursBridge` (which collapses an
+      // automate station to "Open 24 hours" and loses the staffed hours).
+      // Same adapter call the cold `getStationDetail` path already uses.
+      openingHours: const FranceOpeningHoursAdapter().parse(r),
       services: parsePrixCarburantsServices(r['services_service']),
       amenities: parseAmenitiesFromServices(
         parsePrixCarburantsServices(r['services_service']),
