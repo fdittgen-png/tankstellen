@@ -16,16 +16,17 @@ import '../../features/alerts/data/velocity_alert_runner.dart';
 import '../../features/alerts/domain/radius_alert_evaluator.dart';
 import '../../features/alerts/domain/velocity_alert_detector.dart';
 import '../../features/search/data/models/search_params.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
 import '../constants/field_names.dart';
 import '../logging/error_logger.dart';
 import '../notifications/local_notification_service.dart';
+import '../notifications/notification_service.dart';
 import '../services/country_service_registry.dart';
 import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
 import '../telemetry/storage/isolate_error_spool.dart';
 import '../utils/json_extensions.dart';
 import 'country_alert_strategy_resolver.dart';
+import 'fuel_price_fields.dart';
 import 'notification_templates.dart';
 
 /// Alert-evaluation runners invoked by [BackgroundAlertScanCoordinator]
@@ -44,14 +45,22 @@ class BackgroundScanRunners {
   /// Do not re-fire the same per-station price alert within this window.
   static const priceAlertRetriggerCooldown = Duration(hours: 4);
 
-  /// #2246 — the switch intentionally stays at e5/e10/diesel: those are the
-  /// only fuels Tankerkönig's prices feed exposes.
+  /// #2864 — per-station price-alert evaluation is now country/currency/fuel
+  /// aware. Each alert's country is derived from its station-id prefix
+  /// ([CountryServiceRegistry.countryForStationId], falling back to
+  /// [fallbackCountryCode] for prefix-less legacy ids); the current price is
+  /// read via the per-country fuel mapping ([priceFieldKeyForCountry]) so an
+  /// LPG / CNG / E98 alert in a country whose provider exposes that fuel fires,
+  /// and the notification renders in that country's currency. DE e5/e10/diesel
+  /// resolution + the euro are unchanged.
   static Future<void> runPerStationAlerts({
     required AlertRepository repo,
     required List<PriceAlert> alerts,
     required Map<String, Map<String, dynamic>> prices,
     required DateTime now,
     required BackgroundNotificationTemplates templates,
+    String? fallbackCountryCode,
+    @visibleForTesting NotificationService? notifier,
   }) async {
     final activeAlerts = alerts.where((a) => a.isActive).toList();
     if (activeAlerts.isEmpty || prices.isEmpty) {
@@ -64,8 +73,8 @@ class BackgroundScanRunners {
       return;
     }
 
-    final notifier = LocalNotificationService();
-    await notifier.initialize();
+    final notify = notifier ?? LocalNotificationService();
+    await notify.initialize();
     var notificationCount = 0;
 
     for (final alert in activeAlerts) {
@@ -75,17 +84,14 @@ class BackgroundScanRunners {
               TankerkoenigFields.statusNoPrices) {
         continue;
       }
-      double? currentPrice;
-      switch (alert.fuelType) {
-        case FuelTypeE5():
-          currentPrice = stationPrices.getDouble(TankerkoenigFields.e5);
-        case FuelTypeE10():
-          currentPrice = stationPrices.getDouble(TankerkoenigFields.e10);
-        case FuelTypeDiesel():
-          currentPrice = stationPrices.getDouble(TankerkoenigFields.diesel);
-        default:
-          continue;
-      }
+      final country =
+          CountryServiceRegistry.countryForStationId(alert.stationId) ??
+              fallbackCountryCode;
+      final fuelKey = country == null
+          ? priceFieldKeyFor(alert.fuelType)
+          : priceFieldKeyForCountry(alert.fuelType, country);
+      if (fuelKey == null) continue;
+      final currentPrice = stationPrices.getDouble(fuelKey);
       if (currentPrice == null || currentPrice > alert.targetPrice) continue;
 
       if (alert.lastTriggeredAt != null &&
@@ -97,7 +103,7 @@ class BackgroundScanRunners {
         continue;
       }
 
-      await notifier.showPriceAlert(
+      await notify.showPriceAlert(
         id: alert.stationId.hashCode,
         title: templates.renderPriceAlertTitle(
           station: alert.stationName,
@@ -106,6 +112,7 @@ class BackgroundScanRunners {
         body: templates.renderPriceAlertBody(
           price: currentPrice.toStringAsFixed(3),
           target: alert.targetPrice.toStringAsFixed(3),
+          currency: templates.currencyForCountry(country),
         ),
       );
       notificationCount++;
@@ -115,11 +122,17 @@ class BackgroundScanRunners {
   }
 
   /// #579 — velocity detector across nearby stations.
+  ///
+  /// #2864 — the velocity fuel is now read via the per-country fuel mapping for
+  /// the active country ([fallbackCountryCode]), so the detector runs on the
+  /// fuel the user's country actually exposes (e.g. an LPG velocity alert in FR)
+  /// rather than the DE-only e5/e10/diesel switch.
   static Future<void> runVelocity({
     required HiveStorage storage,
     required Map<String, Map<String, dynamic>> prices,
     required DateTime now,
     required BackgroundNotificationTemplates templates,
+    String? fallbackCountryCode,
   }) async {
     try {
       final notifier = LocalNotificationService();
@@ -131,10 +144,12 @@ class BackgroundScanRunners {
         copyBuilder: (event) => buildVelocityCopy(event, templates),
       );
       final config = await runner.loadConfig();
-      final fuelKey = tankerkoenigKeyFor(config.fuelType);
+      final fuelKey = fallbackCountryCode == null
+          ? priceFieldKeyFor(config.fuelType)
+          : priceFieldKeyForCountry(config.fuelType, fallbackCountryCode);
       if (fuelKey == null) {
         debugPrint('BackgroundScanRunners: velocity skipped — '
-            '${config.fuelType.apiValue} not in Tankerkoenig response');
+            '${config.fuelType.apiValue} not in the active country feed');
         return;
       }
       final observations = <VelocityStationObservation>[];
@@ -222,7 +237,13 @@ class BackgroundScanRunners {
         store: store,
         dedup: RadiusAlertDedup(),
         notifier: notifier,
+        // #2864 — currency comes from the centre's country, so a GB / DK / …
+        // radius alert renders in £ / kr instead of a forced euro.
         copyBuilder: (event) => buildRadiusAlertCopy(event, templates),
+        // #2864 — the deep-link payload country is the centre's country, not a
+        // hardcoded 'de'.
+        countryResolver: (alert) => CountryServiceRegistry.countryForLatLng(
+            alert.centerLat, alert.centerLng),
       );
       final fired = await runner.run(
         now: now,
@@ -260,18 +281,6 @@ class BackgroundScanRunners {
   }
 }
 
-/// Map [FuelType] → Tankerkoenig JSON key. The BG isolate only fetches
-/// E5/E10/diesel today so other fuels return `null` and skip velocity
-/// detection. Top-level + visible-for-testing so the copy/format helpers
-/// stay testable without a coordinator instance.
-@visibleForTesting
-String? tankerkoenigKeyFor(FuelType fuelType) => switch (fuelType) {
-      FuelTypeE5() => TankerkoenigFields.e5,
-      FuelTypeE10() => TankerkoenigFields.e10,
-      FuelTypeDiesel() => TankerkoenigFields.diesel,
-      _ => null,
-    };
-
 /// Build notification copy for a velocity event. #2306 — copy comes from the
 /// localized [BackgroundNotificationTemplates] the main isolate resolved for
 /// the active in-app language.
@@ -292,6 +301,11 @@ VelocityAlertCopy buildVelocityCopy(
 
 /// Build notification copy for a grouped radius alert (#1012 phase 2). #2306
 /// — copy comes from the localized [BackgroundNotificationTemplates].
+///
+/// #2864 — the currency is resolved from the radius centre's country (via the
+/// registry bounding box), so a GB / DK / … radius alert renders in £ / kr
+/// instead of a forced euro. A centre outside every registered box falls back
+/// to the template's default (euro).
 @visibleForTesting
 RadiusAlertCopy buildRadiusAlertCopy(
   RadiusAlertGroupedEvent event,
@@ -299,7 +313,9 @@ RadiusAlertCopy buildRadiusAlertCopy(
 ) {
   final threshold = event.alert.threshold.toStringAsFixed(3);
   final label = event.alert.label;
-  final currency = templates.currencySymbol;
+  final country = CountryServiceRegistry.countryForLatLng(
+      event.alert.centerLat, event.alert.centerLng);
+  final currency = templates.currencyForCountry(country);
   final total = event.matches.length + event.truncatedMoreCount;
   final lines = event.matches
       // #2211 — show the station name, not the raw id. The per-line
@@ -314,6 +330,7 @@ RadiusAlertCopy buildRadiusAlertCopy(
       label: label,
       count: total,
       threshold: threshold,
+      currency: currency,
     ),
     body: lines.join('\n'),
   );

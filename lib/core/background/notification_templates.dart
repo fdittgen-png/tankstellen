@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:ui' as ui;
 
 import '../../l10n/app_localizations.dart';
+import '../country/country_config.dart';
 
 /// #2306 — localized notification copy resolved IN THE MAIN ISOLATE and
 /// handed to the WorkManager background isolate.
@@ -45,10 +46,14 @@ class BackgroundNotificationTemplates {
   /// `+ {count} more` — trailing line of the radius body when truncated.
   final String radiusGroupedMore;
 
-  /// Currency symbol for the locale's market. The background isolate only
-  /// queries Tankerkönig (German) stations today, so this is the euro
-  /// sign; kept as a field so a future multi-currency BG path resolves it
-  /// once in the main isolate rather than baking `€` into the isolate.
+  /// Default currency symbol — the euro — used when a render call does not
+  /// supply a per-alert currency (the fallback / legacy path).
+  ///
+  /// #2864 — the BG scan now spans every country, so the currency is no longer
+  /// a single market value: it is resolved **per alert** from the alert's
+  /// country (`CountryConfig.byCode(code).currencySymbol`) and passed to each
+  /// render call. This field stays as the safe default (euro) for when no
+  /// country resolves, so DE / EUR-zone behaviour is byte-identical.
   final String currencySymbol;
 
   const BackgroundNotificationTemplates({
@@ -147,14 +152,22 @@ class BackgroundNotificationTemplates {
   }) =>
       _fill(priceAlertTitle, {'station': station, 'fuelType': fuelType});
 
-  /// Per-station price-alert body: current price + the user's target,
-  /// both with the local currency symbol.
+  /// Per-station price-alert body: current price + the user's target, both
+  /// with the alert's currency symbol.
+  ///
+  /// #2864 — [currency] is the per-alert symbol resolved from the alert's
+  /// country; it defaults to [currencySymbol] (euro) when the caller has no
+  /// country to resolve.
   String renderPriceAlertBody({
     required String price,
     required String target,
+    String? currency,
   }) =>
-      _fill(priceAlertBody,
-          {'price': price, 'currency': currencySymbol, 'target': target});
+      _fill(priceAlertBody, {
+        'price': price,
+        'currency': currency ?? currencySymbol,
+        'target': target,
+      });
 
   /// Velocity-drop title.
   String renderVelocityTitle({required String fuelLabel}) =>
@@ -165,21 +178,37 @@ class BackgroundNotificationTemplates {
       _fill(velocityBody, {'count': '$count', 'cents': '$cents'});
 
   /// Radius-alert grouped title.
+  ///
+  /// #2864 — [currency] is the per-alert symbol resolved from the radius
+  /// centre's country; defaults to [currencySymbol] (euro) when unresolved.
   String renderRadiusTitle({
     required String label,
     required int count,
     required String threshold,
+    String? currency,
   }) =>
       _fill(radiusGroupedTitle, {
         'label': label,
         'count': '$count',
         'threshold': threshold,
-        'currency': currencySymbol,
+        'currency': currency ?? currencySymbol,
       });
 
   /// Trailing `+ N more` line of the radius body.
   String renderRadiusMore({required int count}) =>
       _fill(radiusGroupedMore, {'count': '$count'});
+
+  /// Resolve the currency symbol for [countryCode] from its [CountryConfig]
+  /// (#2864), falling back to this template's default ([currencySymbol], euro)
+  /// when the code is null or unregistered.
+  ///
+  /// This is the one place the BG render paths turn a derived alert country
+  /// into a currency symbol, so a GB radius alert reads `£`, an AR per-station
+  /// alert reads `$`, and a prefix-less DE id stays `€`.
+  String currencyForCountry(String? countryCode) {
+    if (countryCode == null) return currencySymbol;
+    return Countries.byCode(countryCode)?.currencySymbol ?? currencySymbol;
+  }
 
   /// Literal-replace every `{key}` token. ARB placeholders never overlap,
   /// so order does not matter.

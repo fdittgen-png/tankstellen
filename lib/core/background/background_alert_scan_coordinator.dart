@@ -292,11 +292,17 @@ class BackgroundAlertScanCoordinator {
       prices: prices,
       now: now,
       templates: templates,
+      fallbackCountryCode: activeCountry,
     );
 
     if (prices.isNotEmpty) {
       await BackgroundScanRunners.runVelocity(
-          storage: storage, prices: prices, now: now, templates: templates);
+        storage: storage,
+        prices: prices,
+        now: now,
+        templates: templates,
+        fallbackCountryCode: activeCountry,
+      );
     }
 
     await BackgroundScanRunners.runRadiusAlerts(

@@ -68,9 +68,21 @@ class RadiusAlertRunner {
 
   /// 2-letter country code stamped into the deep-link payload so the
   /// tap resolver can disambiguate id collisions across countries
-  /// (#1012 phase 3). Today the BG isolate only wires Tankerkönig, so
-  /// this is `'de'` in production. Tests inject whatever they need.
+  /// (#1012 phase 3).
+  ///
+  /// #2864 — this is the *fallback* country, used only when
+  /// [countryResolver] is null or returns null for an alert. The BG
+  /// scan now derives each radius alert's country from its centre's
+  /// bounding box ([countryResolver]) so a UK / AT / … radius alert
+  /// deep-links into the right country; the fallback stays `'de'` for
+  /// legacy / test callers that pass no resolver.
   final String country;
+
+  /// #2864 — resolves the deep-link country for a given radius alert
+  /// from its centre (the BG path passes
+  /// `CountryServiceRegistry.countryForLatLng`). When null, or when it
+  /// returns null for an alert, the runner falls back to [country].
+  final String? Function(RadiusAlert alert)? countryResolver;
 
   RadiusAlertRunner({
     required this.store,
@@ -78,6 +90,7 @@ class RadiusAlertRunner {
     required this.notifier,
     required this.copyBuilder,
     this.country = 'de',
+    this.countryResolver,
     RadiusAlertEvaluator? evaluator,
   }) : evaluator = evaluator ?? const RadiusAlertEvaluator();
 
@@ -159,7 +172,7 @@ class RadiusAlertRunner {
         final payload = NotificationPayload(
           kind: NotificationPayload.kindRadius,
           stationId: topMatches.first.stationId,
-          country: country,
+          country: countryResolver?.call(alert) ?? country,
         ).encode();
         await notifier.showPriceAlert(
           id: _notificationId(alert.id),

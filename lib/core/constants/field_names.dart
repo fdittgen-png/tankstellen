@@ -19,6 +19,17 @@ class TankerkoenigFields {
   static const e10 = 'e10';
   static const diesel = 'diesel';
   static const isOpen = 'isOpen';
+
+  // #2864 — extended fuel grades non-DE providers expose. The
+  // country-agnostic price map (background_price_shape.dart) already carries
+  // these keys; naming them here keeps the FuelType→field mapping
+  // (fuel_price_fields.dart) and the price-history writer off string
+  // literals. The status quo for DE stays e5/e10/diesel — these are additive.
+  static const e98 = 'e98';
+  static const dieselPremium = 'dieselPremium';
+  static const e85 = 'e85';
+  static const lpg = 'lpg';
+  static const cng = 'cng';
 }
 
 /// Supabase table and column names for TankSync.
