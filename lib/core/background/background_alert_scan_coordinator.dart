@@ -11,13 +11,12 @@ import '../logging/error_logger.dart';
 import '../storage/hive_storage.dart';
 import '../telemetry/storage/isolate_error_spool.dart';
 import '../cache/cache_manager.dart';
-import '../services/country_service_registry.dart';
 import 'background_price_history_writer.dart';
 import 'background_price_source.dart';
 import 'background_scan_dedup_store.dart';
 import 'background_scan_runners.dart';
 import 'background_scan_tracer.dart';
-import 'bulk_dataset_alert_strategy.dart';
+import 'bulk_alert_price_merge.dart';
 import 'country_alert_strategy_resolver.dart';
 import 'daily_collection.dart';
 import 'hive_isolate_lock.dart';
@@ -278,7 +277,7 @@ class BackgroundAlertScanCoordinator {
       recorder: tracer.recorder,
       budget: budget,
     );
-    prices.addAll(await _fetchBulkAlertPrices(
+    prices.addAll(await fetchBulkAlertPrices(
       alertStationIds: alertStationIds,
       fallbackCountryCode: activeCountry,
       resolver: resolver,
@@ -321,41 +320,6 @@ class BackgroundAlertScanCoordinator {
     // #2866 — dev-gated: snapshot + export this scan's data-access trace so the
     // maintainer reads `aggregates().compliant` per provider (no-op otherwise).
     await tracer.exportIfEnabled();
-  }
-
-  /// #2863 — fetch per-station alert prices for **bulk-dataset** countries via
-  /// their [BulkDatasetAlertStrategy] (resolved per country by [resolver]).
-  ///
-  /// Groups the alert station ids by derived country (the same lazy derivation
-  /// the polled grouping uses), keeps only the bulk-policy countries (polled
-  /// ones were already fetched by [BackgroundPriceSource]), and asks each
-  /// country's strategy for its prices — answered by local geo-filter over the
-  /// cached whole-country dataset (≤1 dataset download per country per scan,
-  /// then zero per-alert network). Each strategy swallows + spools its own
-  /// faults (its documented boundary, fault-tested in
-  /// `country_alert_strategy_test.dart`), so a bulk-country fault degrades to
-  /// "no fresh prices this scan" rather than failing the scan.
-  Future<Map<String, Map<String, dynamic>>> _fetchBulkAlertPrices({
-    required Set<String> alertStationIds,
-    required String? fallbackCountryCode,
-    required CountryAlertStrategyResolver resolver,
-  }) async {
-    final byCountry = <String, Set<String>>{};
-    for (final id in alertStationIds) {
-      final code =
-          CountryServiceRegistry.countryForStationId(id) ?? fallbackCountryCode;
-      // Only the bulk-dataset countries; polled ids were already fetched.
-      if (code == null || !BulkDatasetAlertStrategy.isBulk(code)) continue;
-      byCountry.putIfAbsent(code, () => <String>{}).add(id);
-    }
-
-    final merged = <String, Map<String, dynamic>>{};
-    for (final entry in byCountry.entries) {
-      final strategy = resolver.strategyFor(entry.key);
-      if (strategy == null) continue;
-      merged.addAll(await strategy.fetchPrices(entry.value));
-    }
-    return merged;
   }
 
   /// #609 — nearest-widget refresh from a real search (or legacy fallback).
