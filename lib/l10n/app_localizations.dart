@@ -6279,6 +6279,12 @@ abstract class AppLocalizations {
   /// **'Recording with GPS — OBD2 reconnecting'**
   String get obd2GpsDegradedBannerTitle;
 
+  /// Calmer variant of obd2GpsDegradedBannerTitle shown (#2767) once the reconnect scanner has exhausted its active-scan attempts and switched to a low-power passive wait for the adapter to power back up. The trip is still recording on GPS and the app still re-arms an active scan periodically, so the wording is reassuring ("waiting for") rather than urgent ("reconnecting").
+  ///
+  /// In en, this message translates to:
+  /// **'Recording with GPS — waiting for the OBD2 adapter'**
+  String get obd2GpsDegradedPassiveWaitingBanner;
+
   /// Snackbar shown after #815 reconciles OBD2 integrated fuel against the pump receipt and learns a new volumetric-efficiency scalar for the vehicle.
   ///
   /// In en, this message translates to:

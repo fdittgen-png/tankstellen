@@ -27,6 +27,13 @@ class _FakeTripRecording extends TripRecording {
     state = _initial;
   }
 
+  /// #2767 — flip the passive-waiting signal so the test can prove the
+  /// banner swaps its copy.
+  void setPassiveWaiting(bool value) {
+    _initial = _initial.copyWith(reconnectPassiveWaiting: value);
+    state = _initial;
+  }
+
   @override
   void resume() => resumeCalls++;
 
@@ -143,6 +150,57 @@ void main() {
       const state =
           TripRecordingState(phase: TripRecordingPhase.degradedGpsOnly);
       expect(state.isActive, isTrue);
+    });
+
+    testWidgets(
+        'while active-scanning shows the busy "OBD2 reconnecting" copy '
+        '(#2767)', (tester) async {
+      final fake = _FakeTripRecording(
+        const TripRecordingState(
+          phase: TripRecordingPhase.degradedGpsOnly,
+          // Default false — the scanner is still active-scanning.
+        ),
+      );
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [tripRecordingProvider.overrideWith(() => fake)],
+      );
+
+      expect(find.text('Recording with GPS — OBD2 reconnecting'),
+          findsOneWidget);
+      expect(find.text('Recording with GPS — waiting for the OBD2 adapter'),
+          findsNothing);
+    });
+
+    testWidgets(
+        'once the scanner gives up active scanning it swaps to the calmer '
+        '"waiting for the OBD2 adapter" copy (#2767)', (tester) async {
+      final fake = _FakeTripRecording(
+        const TripRecordingState(phase: TripRecordingPhase.degradedGpsOnly),
+      );
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [tripRecordingProvider.overrideWith(() => fake)],
+      );
+      // Starts busy.
+      expect(find.text('Recording with GPS — OBD2 reconnecting'),
+          findsOneWidget);
+
+      // The reconnect scanner exhausts its active-scan ceiling → passive wait.
+      fake.setPassiveWaiting(true);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Recording with GPS — waiting for the OBD2 adapter'),
+          findsOneWidget,
+          reason: 'a distinct, calmer banner must surface so the user knows '
+              'reconnect is still trying passively, not stuck (#2767)');
+      expect(find.text('Recording with GPS — OBD2 reconnecting'), findsNothing,
+          reason: 'the busy copy must give way — the two are distinct states');
+      // The banner stays action-free in either copy — recording continues.
+      expect(find.byKey(const Key('obd2PauseBannerResume')), findsNothing);
+      expect(find.byKey(const Key('obd2PauseBannerEnd')), findsNothing);
     });
   });
 }

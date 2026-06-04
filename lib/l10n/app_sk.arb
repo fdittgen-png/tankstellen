@@ -4363,6 +4363,41 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
+  "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
+  "@obd2GpsDegradedPassiveWaitingBanner": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiVerdictGood": "Efficient",
+  "@gpsKpiVerdictGood": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiVerdictModerate": "Moderate",
+  "@gpsKpiVerdictModerate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiVerdictAggressive": "Aggressive",
+  "@gpsKpiVerdictAggressive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiInterpretationGood": "Smooth, energy-light driving — this is what efficient looks like.",
+  "@gpsKpiInterpretationGood": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiInterpretationModerate": "Fairly typical driving — a little smoother on the throttle would save more.",
+  "@gpsKpiInterpretationModerate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiInterpretationAggressive": "Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.",
+  "@gpsKpiInterpretationAggressive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
   "gpsRoadUseCardTitle": "How you used the road",
   "@gpsRoadUseCardTitle": {
     "x-mt": "needs-native-review",
@@ -4431,36 +4466,6 @@
   },
   "gpsRoadUseSource": "From your GPS track",
   "@gpsRoadUseSource": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "gpsKpiVerdictGood": "Efficient",
-  "@gpsKpiVerdictGood": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "gpsKpiVerdictModerate": "Moderate",
-  "@gpsKpiVerdictModerate": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "gpsKpiVerdictAggressive": "Aggressive",
-  "@gpsKpiVerdictAggressive": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "gpsKpiInterpretationGood": "Smooth, energy-light driving — this is what efficient looks like.",
-  "@gpsKpiInterpretationGood": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "gpsKpiInterpretationModerate": "Fairly typical driving — a little smoother on the throttle would save more.",
-  "@gpsKpiInterpretationModerate": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "gpsKpiInterpretationAggressive": "Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.",
-  "@gpsKpiInterpretationAggressive": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -671,6 +671,9 @@ class _FakeScanner implements AdapterReconnectScanner {
   bool get isPassiveWaiting => false;
 
   @override
+  VoidCallback? onPassiveWait;
+
+  @override
   int get consecutiveMisses => 0;
 
   @override

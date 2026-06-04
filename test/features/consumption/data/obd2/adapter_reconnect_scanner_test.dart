@@ -363,6 +363,124 @@ void main() {
       });
     });
 
+    group('re-arm active scan after the passive ceiling (#2767)', () {
+      test(
+          'after passiveReArmEvery timed-out passive waits, re-arms an active '
+          'scan instead of staying passive forever', () async {
+        var activeConnectCalls = 0;
+        var passiveConnectCalls = 0;
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          // In-range probe + an always-failing active connect drives the
+          // ceiling; the passive wait always times out so we can observe the
+          // re-arm cadence rather than a reconnect.
+          probe: (_) async => true,
+          connect: (_) async {
+            activeConnectCalls++;
+            return false;
+          },
+          passiveConnect: (_) async {
+            passiveConnectCalls++;
+            return false;
+          },
+          onReconnect: () {},
+          missCeiling: 2,
+          passiveReArmEvery: 2,
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+
+        // First reach passive mode (2 active misses).
+        await _waitFor(() => scanner.isPassiveWaiting,
+            timeout: const Duration(seconds: 3));
+        expect(activeConnectCalls, 2,
+            reason: 'missCeiling active attempts before the first passive flip');
+
+        final activeAtCeiling = activeConnectCalls;
+        // After 2 timed-out passive waits the scanner must re-arm an active
+        // scan — observed as a fresh active connect attempt beyond the ceiling.
+        await _waitFor(
+            () =>
+                passiveConnectCalls >= 2 &&
+                activeConnectCalls > activeAtCeiling,
+            timeout: const Duration(seconds: 4));
+        expect(activeConnectCalls, greaterThan(activeAtCeiling),
+            reason: 'the scanner must drop back to an active scan every '
+                'passiveReArmEvery passive waits — never stuck passive forever '
+                '(#2767)');
+        await scanner.stop();
+      });
+
+      test(
+          'a re-armed active scan that finds the adapter reconnects + '
+          'self-stops', () async {
+        var activeConnectCalls = 0;
+        var reconnects = 0;
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          probe: (_) async => true,
+          // The adapter is dead through the ceiling + the first passive
+          // window, then powers back up: the FIRST re-armed active connect
+          // (the 3rd active call) lands.
+          connect: (_) async {
+            activeConnectCalls++;
+            return activeConnectCalls >= 3;
+          },
+          passiveConnect: (_) async => false, // passive wait keeps timing out
+          onReconnect: () => reconnects++,
+          missCeiling: 2,
+          passiveReArmEvery: 1, // re-arm after a single passive wait
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+
+        await _waitFor(() => reconnects > 0,
+            timeout: const Duration(seconds: 4));
+        expect(reconnects, 1,
+            reason: 'the late adapter power-cycle is caught by the re-armed '
+                'active scan, not missed (#2767)');
+        expect(activeConnectCalls, greaterThanOrEqualTo(3),
+            reason: 'reconnect landed on a re-armed active attempt past the '
+                'ceiling, proving the scanner left passive mode');
+        expect(scanner.isScanning, isFalse);
+        await scanner.stop();
+      });
+
+      test(
+          'fires onPassiveWait exactly once on the first passive flip, not on '
+          'each re-arm', () async {
+        var passiveWaitNotifications = 0;
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          probe: (_) async => true,
+          connect: (_) async => false,
+          passiveConnect: (_) async => false,
+          onReconnect: () {},
+          onPassiveWait: () => passiveWaitNotifications++,
+          missCeiling: 2,
+          passiveReArmEvery: 1, // re-arm aggressively so we'd over-fire if buggy
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+
+        await _waitFor(() => passiveWaitNotifications >= 1,
+            timeout: const Duration(seconds: 3));
+        // Let several re-arm → passive flips elapse; the notification must
+        // still have fired only once (the banner copy flips a single time).
+        await Future<void>.delayed(_kMax * 3);
+        expect(passiveWaitNotifications, 1,
+            reason: 'onPassiveWait is a one-shot per drop — re-arm cycles must '
+                'not re-fire it (#2767)');
+        await scanner.stop();
+      });
+    });
+
     group('classic-direct reconnect pacing (#2565)', () {
       test(
           'repeated classic-direct failures still pace via the existing '

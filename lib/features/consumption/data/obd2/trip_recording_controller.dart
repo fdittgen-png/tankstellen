@@ -304,6 +304,10 @@ class TripRecordingController {
   /// drop-recovery state machine (#2188).
   TripDropReason? get dropReason => _droppedSession.dropReason;
 
+  /// #2767 — true while the reconnect scanner has given up active scanning and
+  /// is passive-waiting; surfaced into the UI for the calmer banner copy.
+  bool get reconnectPassiveWaiting => _droppedSession.reconnectPassiveWaiting;
+
   /// Owns the trip's distance-resolution concern — the three-tier
   /// odometer-delta / GPS-track / virtual-odometer selection and the two
   /// rolling sample buffers it integrates over — extracted into a focused

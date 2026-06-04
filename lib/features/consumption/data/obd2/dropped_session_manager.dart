@@ -131,6 +131,12 @@ class DroppedSessionManager {
   /// `debugReconnectScanner` test hook.
   AdapterReconnectScanner? get reconnectScanner => _reconnectScanner;
 
+  /// #2767 — true while the in-flight reconnect scanner has given up active
+  /// scanning and is passive-waiting for the adapter to power back up. Drives
+  /// the calmer "passive-waiting" banner copy. False when no scanner runs.
+  bool get reconnectPassiveWaiting =>
+      _reconnectScanner?.isPassiveWaiting ?? false;
+
   /// React to a detected connection drop (#797 / #1904). A `transportError`
   /// drop first enters the invisible reconnect window (scheduler stopped,
   /// scanner probing, host still `recording`); only if [_silentReconnectWindow]
@@ -142,11 +148,7 @@ class DroppedSessionManager {
     if (_host.pausedDueToDrop || _silentlyReconnecting) return;
     // #1920 — trace every detected drop so a failed recording session
     // can be analysed from the exportable OBD2 diagnostic log.
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.dropDetected,
-      mac: _pinnedAdapterMac,
-      detail: reason.name,
-    );
+    _trace(AutoRecordEventKind.dropDetected, detail: reason.name);
     _host.stopScheduler();
     // #2671 — also GATE dispatch (not just cancel the timer): if a later
     // path restarts the scheduler while the link is still flapping, a paused
@@ -172,10 +174,7 @@ class DroppedSessionManager {
       _silentlyReconnecting = true;
       _dropReason = reason;
       // #1920 — record entry into the #1904 invisible reconnect window.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.silentReconnectStarted,
-        mac: _pinnedAdapterMac,
-      );
+      _trace(AutoRecordEventKind.silentReconnectStarted);
       _startReconnectScanner();
       _silentReconnectTimer?.cancel();
       _silentReconnectTimer =
@@ -209,10 +208,7 @@ class DroppedSessionManager {
   void _enterDegradedGpsOnly(TripDropReason reason) {
     _host.degradedGpsOnly = true;
     _dropReason = reason;
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.silentReconnectStarted,
-      mac: _pinnedAdapterMac,
-    );
+    _trace(AutoRecordEventKind.silentReconnectStarted);
     if (_reconnectScanner == null) _startReconnectScanner();
     _host.emitState();
   }
@@ -224,10 +220,7 @@ class DroppedSessionManager {
   void escalateDegradedToPaused() {
     if (!_host.degradedGpsOnly || _host.stopped) return;
     _host.degradedGpsOnly = false;
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.dropEscalatedToVisible,
-      mac: _pinnedAdapterMac,
-    );
+    _trace(AutoRecordEventKind.dropEscalatedToVisible);
     _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
   }
 
@@ -241,10 +234,7 @@ class DroppedSessionManager {
     _silentlyReconnecting = false;
     // #1920 — record the escalation: the silent window elapsed without
     // the adapter coming back, so the drop is now visible to the user.
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.dropEscalatedToVisible,
-      mac: _pinnedAdapterMac,
-    );
+    _trace(AutoRecordEventKind.dropEscalatedToVisible);
     _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
   }
 
@@ -257,6 +247,10 @@ class DroppedSessionManager {
     if (mac == null || factory == null) return;
     final scanner = factory(mac, onScannerReconnect);
     if (scanner == null) return;
+    // #2767 — re-emit on the active→passive switch so the UI can swap to the
+    // calmer "passive-waiting" copy. Wired here (not via the factory
+    // signature) so the `(mac, onReconnect)` factory contract stays untouched.
+    scanner.onPassiveWait = _onScannerPassiveWait;
     _reconnectScanner = scanner;
     // Fire-and-forget — start() is an async scheduler boot that
     // shouldn't block the drop handler. Errors inside the scanner are
@@ -264,68 +258,65 @@ class DroppedSessionManager {
     unawaited(scanner.start());
   }
 
+  /// #2767 — the reconnect scanner gave up active scanning and dropped to a
+  /// passive autoConnect wait. Recording continues unchanged; we only re-emit
+  /// so the UI can swap the busy "reconnecting" banner for the calmer
+  /// "passive-waiting" one. A pure notification — no state transition, and the
+  /// scanner still periodically re-arms an active scan on its own.
+  void _onScannerPassiveWait() {
+    if (_host.stopped) return;
+    _trace(AutoRecordEventKind.reconnectPassiveWaiting);
+    _host.emitState();
+  }
+
   /// Reaction when the reconnect scanner finds the adapter again. The
   /// scanner self-stops before firing this callback.
   void onScannerReconnect() {
     _reconnectScanner = null;
     if (_host.degradedGpsOnly) {
-      // #2565 — OBD2 re-attached while recording GPS-only: drop back to
-      // full OBD2 recording. The trip never paused, so there is no grace
-      // timer to cancel and no pause-banner teardown; just clear the
-      // degrade flag, re-arm the detector, restart the scheduler and
-      // emit. The drop-window samples stay honestly GPS-only.
+      // #2565 — OBD2 re-attached while recording GPS-only: drop back to full
+      // OBD2 recording. The trip never paused, so there is no grace timer to
+      // cancel and no pause-banner teardown; clear the degrade flag then
+      // resume polling cleanly. The drop-window samples stay honestly GPS-only.
       _host.degradedGpsOnly = false;
-      _dropReason = null;
-      _host.resetDropDetector();
-      clearPausedTripRow();
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.silentReconnectSucceeded,
-        mac: _pinnedAdapterMac,
-      );
-      // #2671 — link confirmed back: re-open dispatch + reset failure
-      // streaks before the scheduler resumes ticking.
-      _host.resumeScheduler();
-      if (!_host.paused && !_host.stopped) _host.startScheduler();
-      _host.emitState();
+      _resumePollingAfterSilentReconnect();
       return;
     }
     if (_silentlyReconnecting) {
-      // #1904 — reconnected inside the silent window: resume polling
-      // without the user ever having seen a pause. Mirrors the
-      // drop-recovery half of resume() but skips the pausedDueToDrop
-      // teardown (it was never set) and the emitState pause-banner
-      // churn — the state was `recording` throughout.
+      // #1904 — reconnected inside the silent window: resume polling without
+      // the user ever having seen a pause. Mirrors the drop-recovery half of
+      // resume() but skips the pausedDueToDrop teardown (it was never set) and
+      // the emitState pause-banner churn — the state was `recording`.
       _silentReconnectTimer?.cancel();
       _silentReconnectTimer = null;
       _silentlyReconnecting = false;
-      _dropReason = null;
-      _host.resetDropDetector();
-      clearPausedTripRow();
-      // #1920 — record the silent-path recovery: the adapter came back
-      // inside the #1904 window and the user never saw a pause.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.silentReconnectSucceeded,
-        mac: _pinnedAdapterMac,
-      );
-      // #2671 — link confirmed back: re-open dispatch + reset failure
-      // streaks before the scheduler resumes ticking.
-      _host.resumeScheduler();
-      // Respect a user pause that landed during the silent window.
-      if (!_host.paused && !_host.stopped) _host.startScheduler();
-      _host.emitState();
+      _resumePollingAfterSilentReconnect();
       return;
     }
-    // Reconnected after the drop went visible — the ordinary resume()
-    // path cancels the grace timer and clears the paused-trips row.
+    // Reconnected after the drop went visible — the ordinary resume() path
+    // cancels the grace timer and clears the paused-trips row.
     if (_host.pausedDueToDrop) {
-      // #1920 — record the visible-path recovery: the adapter came back
-      // after the pause banner had already been shown.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.reconnectSucceeded,
-        mac: _pinnedAdapterMac,
-      );
+      // #1920 — record the visible-path recovery: the adapter came back after
+      // the pause banner had already been shown.
+      _trace(AutoRecordEventKind.reconnectSucceeded);
       _host.resumeFromReconnect();
     }
+  }
+
+  /// Shared tail of the two no-pause reconnect paths (#2565 GPS-degrade +
+  /// #1904 silent window): the adapter came back without the user ever
+  /// seeing a pause, so clear the drop reason, re-arm the detector, drop the
+  /// paused row, trace the silent recovery, and resume polling (#2671 — re-open
+  /// dispatch + reset failure streaks first). Respects a user pause that
+  /// landed during the window.
+  void _resumePollingAfterSilentReconnect() {
+    _dropReason = null;
+    _host.resetDropDetector();
+    clearPausedTripRow();
+    _trace(AutoRecordEventKind.silentReconnectSucceeded);
+    _host.resumeScheduler();
+    if (!_host.paused && !_host.stopped) _host.startScheduler();
+    _host.emitState();
   }
 
   /// Tear down the in-flight reconnect scanner. Best-effort; safe to
@@ -353,6 +344,12 @@ class DroppedSessionManager {
   /// live again, so leaving the partial behind would let a later pause
   /// stomp the in-memory state. Best-effort.
   void clearPausedTripRow() => _repos.deletePausedRow(_host.sessionId);
+
+  /// Append one auto-record trace event for this drop episode (#1920),
+  /// always tagged with the pinned adapter MAC. A thin wrapper that keeps the
+  /// eight call sites one-liners.
+  void _trace(AutoRecordEventKind kind, {String? detail}) =>
+      AutoRecordTraceLog.add(kind, mac: _pinnedAdapterMac, detail: detail);
 
   /// Grace-window auto-finalise (#797). Stops the scanner first (so a late
   /// reconnect can't race an already-finalised trip), finalises the partial
