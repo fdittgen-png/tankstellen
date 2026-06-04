@@ -248,10 +248,19 @@ class Reconciler {
     // (which may be the previous plein, a partial top-up, or the
     // closing plein itself in degenerate one-fill windows).
     final firstFill = windowFills.first;
-    final midDateMs = (firstFill.date.millisecondsSinceEpoch +
-            closingPlein.date.millisecondsSinceEpoch) ~/
+    // #2834 — midpoint at MICROSECOND precision. The old
+    // `millisecondsSinceEpoch` math truncated sub-millisecond digits
+    // (e.g. `.389565Z` → `.389Z`), so a correction's date diverged from
+    // its closing plein's, destabilising any date-based dedup key. The
+    // `correction_<closingPleinId>` id is the primary key, but keeping the
+    // date faithful means a re-derived correction is byte-identical.
+    final midDateUs = (firstFill.date.microsecondsSinceEpoch +
+            closingPlein.date.microsecondsSinceEpoch) ~/
         2;
-    final midDate = DateTime.fromMillisecondsSinceEpoch(midDateMs);
+    final midDate = DateTime.fromMicrosecondsSinceEpoch(
+      midDateUs,
+      isUtc: closingPlein.date.isUtc,
+    );
     final midOdo =
         (firstFill.odometerKm + closingPlein.odometerKm) / 2.0;
 

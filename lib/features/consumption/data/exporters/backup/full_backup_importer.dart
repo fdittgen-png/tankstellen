@@ -5,7 +5,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../domain/correction_fill_up.dart';
 import '../../../domain/entities/fill_up.dart';
+import '../../trip_dedup.dart';
 import '../../trip_history_repository.dart';
 import 'backup_xml_reader.dart';
 import 'backup_zip_reader.dart';
@@ -116,6 +118,18 @@ class FullBackupImporter {
     final xml = zipReader.readXml(bytes);
     final payload = xmlReader.read(xml);
 
+    // #2834 — drop OBD2-reconciliation correction records before they
+    // reach the store. They are derived data (TotalCost 0, IsFullTank
+    // false, unrounded litres); a v1 backup loses the `isCorrection` flag
+    // so the durable `correction_` id prefix is what identifies them. Left
+    // in, they resurface as phantom zero-cost fill-ups and re-export
+    // forever.
+    final fillUps = withoutReconciliationCorrections(payload.fillUps);
+    // #2833 — drop ghost 0-sample trips whose sampled twin is also in the
+    // backup (a finalisation double-save artefact), so the import neither
+    // restores nor counts the duplicate.
+    final trips = dedupeGhostTrips(payload.trips);
+
     if (mode == BackupImportMode.replace) {
       // Wipe up front so a record the backup omits is removed exactly
       // once. Order is immaterial — the stores are independent.
@@ -128,10 +142,10 @@ class FullBackupImporter {
     for (final v in payload.vehicles) {
       await sinks.saveVehicle(v);
     }
-    for (final f in payload.fillUps) {
+    for (final f in fillUps) {
       await sinks.saveFillUp(f);
     }
-    for (final t in payload.trips) {
+    for (final t in trips) {
       await sinks.saveTrip(t);
     }
     for (final c in payload.chargingLogs) {
@@ -141,8 +155,8 @@ class FullBackupImporter {
     return FullBackupImportResult(
       mode: mode,
       vehicles: payload.vehicles.length,
-      fillUps: payload.fillUps.length,
-      trips: payload.trips.length,
+      fillUps: fillUps.length,
+      trips: trips.length,
       chargingLogs: payload.chargingLogs.length,
     );
   }
