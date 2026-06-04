@@ -19,9 +19,11 @@ import '../../../../l10n/app_localizations.dart';
 /// 100% (full) at the station, 0% (empty) at / beyond the radar radius edge.
 /// The fill grows as the driver nears — a glanceable "battery charging"
 /// metaphor — and animates over ~300 ms so the change is visible rather than
-/// snapping. The fill is ALWAYS the corporate brand green
-/// ([DarkModeColors.brandGreen]) even when the host tile wears a fuel hue, so
-/// the proximity signal reads consistently as "charge / getting close".
+/// snapping. The fill is a green→blue-violet gradient
+/// ([DarkModeColors.brandGreen] → [DarkModeColors.proximityAccent], #2808) so
+/// it reads as two colours with its leading edge in the accent hue — kept
+/// consistent even when the host tile wears a fuel hue, so the proximity
+/// signal always reads as "getting close".
 ///
 /// Paint-only: distance + radius come in as params (the PiP is paint-only and
 /// the card threads them from `activeProfileProvider`). When [radiusMeters]
@@ -66,6 +68,7 @@ class ProximityFillBar extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final fill = fillFor(distanceMeters, radius);
     final green = DarkModeColors.brandGreen(context);
+    final accent = DarkModeColors.proximityAccent(context);
     final track = (onColor ?? Theme.of(context).colorScheme.onSurface)
         .withValues(alpha: 0.2);
     final percent = (fill * 100).round();
@@ -87,7 +90,7 @@ class ProximityFillBar extends StatelessWidget {
               widthFactor: value,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: green,
+                  gradient: LinearGradient(colors: [green, accent]),
                   borderRadius: AppRadius.sm,
                 ),
               ),

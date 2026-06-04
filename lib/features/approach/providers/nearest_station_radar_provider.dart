@@ -87,10 +87,24 @@ Future<Station?> nearestStationRadar(Ref ref) async {
           .compareTo(
             geo.distanceMeters(gps.latitude, gps.longitude, b.lat, b.lng),
           ));
-    return sorted.firstWhereOrNull((s) {
+    final nearest = sorted.firstWhereOrNull((s) {
       final price = s.priceFor(fuel);
       return price != null && price > 0;
     });
+    if (nearest == null) return null;
+    // #2808 — re-stamp the LIVE distance (km) from the current fix. The
+    // corridor station carries a `dist` frozen at the corridor-fetch centre
+    // (stamped once at parse time), so without this the PiP proximity bar +
+    // distance caption never move as the driver approaches. Mirrors the
+    // on-search radar (radar_search_provider.dart).
+    final distKm = geo.distanceMeters(
+          gps.latitude,
+          gps.longitude,
+          nearest.lat,
+          nearest.lng,
+        ) /
+        1000.0;
+    return nearest.copyWith(dist: distKm);
   } on Object {
     // Radar / chain failure — treat as "no station nearby". The provider
     // re-runs on the next approach-state tick.

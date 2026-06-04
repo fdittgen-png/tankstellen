@@ -119,26 +119,29 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
             ),
           ),
         ],
-        // #2661 — corporate-green battery-style proximity bar: fills as the
-        // driver nears (100% at the station, 0% at the radar radius edge).
-        if (distance != null && radiusMeters != null) ...[
-          const SizedBox(height: 4),
-          SizedBox(
-            width: 120,
-            child: ProximityFillBar(
-              distanceMeters: distance,
-              radiusMeters: radiusMeters,
-              height: 5,
-              onColor: foregroundColor,
-            ),
-          ),
-        ],
       ],
     );
 
+    // #2808 — the proximity bar is a full-bleed band at the BOTTOM of the
+    // tile, OUTSIDE the scaleDown so it isn't shrunk to a hairline. It spans
+    // the complete PiP width (`width: infinity`, bounded by the tile) and is
+    // taller (10 pt) so the "getting close" signal is glanceable.
+    final Widget? proximityBand = (distance != null && radiusMeters != null)
+        ? SizedBox(
+            width: double.infinity,
+            child: ProximityFillBar(
+              distanceMeters: distance,
+              radiusMeters: radiusMeters,
+              height: 10,
+              onColor: foregroundColor,
+            ),
+          )
+        : null;
+
     // #2601 — tap to navigate to the station in the user's maps app. #2620 —
-    // one outer FittedBox(scaleDown) shrinks the whole stack so the bottom
-    // line + fill bar never bleed past the small 2:1 tile.
+    // one outer FittedBox(scaleDown) shrinks the price stack so it never
+    // bleeds past the small 2:1 tile; the proximity band sits below it at the
+    // tile's full width (#2808).
     return Tooltip(
       message: l?.navigate ?? 'Navigate',
       child: GestureDetector(
@@ -151,11 +154,20 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
         child: Material(
           color: backgroundColor,
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Center(
-                child: FittedBox(fit: BoxFit.scaleDown, child: content),
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Center(
+                      child: FittedBox(fit: BoxFit.scaleDown, child: content),
+                    ),
+                  ),
+                ),
+                ?proximityBand,
+              ],
             ),
           ),
         ),

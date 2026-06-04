@@ -255,6 +255,28 @@ void main() {
     });
   });
 
+  group('live distance re-stamp (#2808 — PiP proximity bar)', () {
+    test('re-stamps dist from the live fix, not the frozen corridor dist',
+        () async {
+      // ~1.11 km from the fix (48.0,2.0), but carrying a STALE `dist` (99 km)
+      // baked in at corridor-fetch time. The PiP proximity bar reads
+      // `station.dist`, so the provider must overwrite it with the LIVE
+      // distance or the bar never moves as the driver approaches.
+      final stale =
+          _station('S', lat: 48.01, lng: 2.0, e10: 1.5).copyWith(dist: 99.0);
+      final radar = _CapturingRadar([stale]);
+      final container = _container(radar: radar);
+      addTearDown(container.dispose);
+
+      final out = await container.read(nearestStationRadarProvider.future);
+      expect(out, isNotNull);
+      // RED on master (passes the frozen 99 km through); GREEN after the
+      // re-stamp. 0.01° lat ≈ 1.11 km.
+      expect(out!.dist, closeTo(1.11, 0.1),
+          reason: '#2808 — live distance re-stamped, not the frozen 99 km');
+    });
+  });
+
   test('non-polling approach state → null (fallback stays out of the way)',
       () async {
     final radar = _CapturingRadar([_station('X', e10: 1.5)]);
