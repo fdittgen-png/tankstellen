@@ -4282,6 +4282,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get developerToolsSectionTitle => 'Developer tools';
 
   @override
+  String get dataAccessTracerExport => 'Export data-access trace';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      'Data-access trace saved to Downloads.';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      'Couldn\'t export the data-access trace.';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      'No data-access events recorded yet — search or open stations first, then export.';
+
+  @override
   String get developerToolsSubtitle =>
       'Diagnostics and tools for debugging — only visible in Developer / Debug mode.';
 
@@ -11784,6 +11799,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get developerToolsSectionTitle => '⟦Đéṽéłóƥéř ŧóółš ······⟧';
+
+  @override
+  String get dataAccessTracerExport => '⟦Éẋƥóřŧ đáŧá-áççéšš ŧřáçé ·········⟧';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      '⟦Đáŧá-áççéšš ŧřáçé šáṽéđ ŧó Đóŵñłóáđš. ··············⟧';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      '⟦Çóúłđñ\'ŧ éẋƥóřŧ ŧĥé đáŧá-áççéšš ŧřáçé. ··············⟧';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      '⟦Ñó đáŧá-áççéšš éṽéñŧš řéçóřđéđ ýéŧ — šéářçĥ óř óƥéñ šŧáŧîóñš ƒîřšŧ, ŧĥéñ éẋƥóřŧ. ·····························⟧';
 
   @override
   String get developerToolsSubtitle =>

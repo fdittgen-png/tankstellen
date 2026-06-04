@@ -4469,6 +4469,31 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
+  "dataAccessTracerExport": "Export data-access trace",
+  "@dataAccessTracerExport": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataAccessTracerExportSuccess": "Data-access trace saved to Downloads.",
+  "@dataAccessTracerExportSuccess": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataAccessTracerExportFailure": "Couldn't export the data-access trace.",
+  "@dataAccessTracerExportFailure": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataAccessTracerEmpty": "No data-access events recorded yet — search or open stations first, then export.",
+  "@dataAccessTracerEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calibrationDirectFuelRateNote": "This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.",
+  "@calibrationDirectFuelRateNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
   "fillUpWarningDialogTitle": "Check this fill-up",
   "@fillUpWarningDialogTitle": {
     "x-mt": "needs-native-review",
@@ -4507,11 +4532,6 @@
   },
   "fillUpWarningSaveAnyway": "Save anyway",
   "@fillUpWarningSaveAnyway": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "calibrationDirectFuelRateNote": "This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.",
-  "@calibrationDirectFuelRateNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
