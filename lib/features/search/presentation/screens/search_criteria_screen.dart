@@ -34,6 +34,25 @@ import '../widgets/search_criteria_form.dart';
 /// Full-screen modal for editing search criteria (mode, location, fuel, radius,
 /// filters, equipment). Pops on submission and delegates to the relevant
 /// state providers.
+/// Stable route name for the search-criteria modal (#2810). The shell's three
+/// push paths tag the route with this so they can detect it is already current
+/// and refuse to stack a duplicate (the "search just re-opens the same form
+/// again and again" bug).
+const String kSearchCriteriaRouteName = 'search-criteria';
+
+/// Whether the [kSearchCriteriaRouteName] modal is the current (top) route on
+/// [nav] (#2810). Every push site calls this and bails when it returns true,
+/// so a repeat tap can never stack a second criteria screen. `popUntil` with an
+/// always-true predicate inspects the top route without popping anything.
+bool searchCriteriaRouteIsCurrent(NavigatorState nav) {
+  var current = false;
+  nav.popUntil((r) {
+    current = r.settings.name == kSearchCriteriaRouteName;
+    return true;
+  });
+  return current;
+}
+
 class SearchCriteriaScreen extends ConsumerStatefulWidget {
   const SearchCriteriaScreen({super.key});
 
@@ -85,6 +104,13 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
 
   void _updateFabAction() {
     if (!mounted) return;
+    // #2810 — only the CURRENTLY-displayed criteria screen may own the FAB
+    // action. Without this an offstage instance (the user swiped to another
+    // branch, its dispose hasn't fired) can re-register its action — sometimes
+    // disabled — via this post-frame / ref.listen callback AFTER the shell
+    // cleared the FAB on the branch change, leaving the centre FAB looking
+    // faded/dead on Map/Favoris.
+    if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
     final l10n = AppLocalizations.of(context);
     final mode = ref.read(activeSearchModeProvider);
     final manifest = ref.read(featureManifestProvider);

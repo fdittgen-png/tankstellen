@@ -11,6 +11,7 @@ import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/features/search/presentation/screens/search_criteria_screen.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../fixtures/stations.dart';
@@ -256,6 +257,36 @@ void main() {
       await tester.pump();
 
       expect(taps, [0, 2]);
+    });
+
+    testWidgets(
+        'no branch nav: the FAB degrades to onTap and never root-pushes a '
+        'fullscreen route over the shell (#2811)', (tester) async {
+      // The branch navigator key is not mounted in this isolated harness
+      // (searchBranchNavigatorKey.currentState == null). The OLD fallback
+      // root-pushed a fullscreen SearchCriteriaScreen onto the local
+      // Navigator — covering the whole shell incl. the bottom bar, which
+      // could strand the bar until an app restart. It must now degrade to a
+      // branch jump instead.
+      final taps = <int>[];
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 1, // Search selected → onSearchBranch → opens criteria
+        iconControllers: controllers(3),
+        isLandscape: false,
+        onTap: taps.add,
+      );
+
+      await tester.tap(find.byIcon(Icons.search)); // the centre FAB
+      await tester.pump();
+
+      expect(taps, contains(1),
+          reason: '#2811 — degrades to a branch jump (onTap), not a push');
+      expect(find.byType(SearchCriteriaScreen), findsNothing,
+          reason: '#2811 — must NOT root-push a fullscreen route over the '
+              'shell when the branch nav is unmounted');
     });
   });
 

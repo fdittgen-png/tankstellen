@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/logging/error_logger.dart';
 import '../../features/route_search/providers/route_search_provider.dart';
 import '../../features/search/presentation/screens/search_criteria_screen.dart';
 import '../../features/search/providers/search_provider.dart';
@@ -266,32 +269,42 @@ class ShellBottomBar extends ConsumerWidget {
     void openCriteriaOnSearchBranch() {
       if (i != currentIndex) onTap(i);
       final searchNav = searchBranchNavigatorKey.currentState;
-      if (searchNav != null) {
-        searchNav.push<void>(
-          MaterialPageRoute<void>(
-            builder: (_) => const SearchCriteriaScreen(),
-            fullscreenDialog: true,
-          ),
-        );
-      } else {
-        // Defensive fallback for environments where the branch nav
-        // isn't mounted yet (very early frame, widget tests without
-        // the shell wired). Use the local context's Navigator.
-        // #2553 — if even that Navigator is torn down, degrade to a
-        // branch jump rather than throw uncaught: the FAB must never
-        // crash, only ever open criteria or jump to Search.
-        try {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const SearchCriteriaScreen(),
-              fullscreenDialog: true,
-            ),
-          );
-        } catch (e, st) {
-          debugPrint('shell FAB default fallback: $e\n$st');
-          onTap(i);
-        }
+      if (searchNav == null) {
+        // #2811 — branch nav unmounted (early frame / unwired test). Do NOT
+        // root-push here: from the bar's context `Navigator.of(context)` is the
+        // ROOT navigator, and a fullscreen route there covers the whole shell —
+        // bar included — stranding it until restart if orphaned. Degrade to a
+        // branch jump, and trace it (a missing nav on a user tap is abnormal).
+        unawaited(errorLogger.log(
+          ErrorLayer.ui,
+          'search branch navigator not mounted on FAB tap — degraded to '
+              'branch jump (no root push)',
+          StackTrace.current,
+          context: {'source': 'openCriteriaOnSearchBranch', 'branch': i},
+        ));
+        onTap(i);
+        return;
       }
+      // #2810 — refuse to stack a duplicate criteria modal: the FAB stays
+      // visible while it is open (branch-push keeps the shell mounted), so a
+      // repeat tap would push a second copy ("search just re-opens the same
+      // form again and again"). Bail if it is already current.
+      if (searchCriteriaRouteIsCurrent(searchNav)) {
+        unawaited(errorLogger.log(
+          ErrorLayer.ui,
+          'search criteria re-open suppressed (already current)',
+          StackTrace.current,
+          context: {'source': 'openCriteriaOnSearchBranch', 'branch': i},
+        ));
+        return;
+      }
+      searchNav.push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => const SearchCriteriaScreen(),
+          fullscreenDialog: true,
+          settings: const RouteSettings(name: kSearchCriteriaRouteName),
+        ),
+      );
     }
 
     void defaultOnTap() {

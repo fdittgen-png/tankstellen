@@ -29,10 +29,16 @@ class SearchSummaryBar extends ConsumerWidget {
   const SearchSummaryBar({super.key});
 
   Future<void> _openCriteria(BuildContext context) async {
-    await Navigator.of(context).push<void>(
+    final nav = Navigator.of(context);
+    // #2810 — don't stack a duplicate criteria modal if one is already on top
+    // (the summary bar stays visible behind the modal). The shared guard +
+    // tagged route name keep every push path consistent.
+    if (searchCriteriaRouteIsCurrent(nav)) return;
+    await nav.push<void>(
       MaterialPageRoute<void>(
         fullscreenDialog: true,
         builder: (_) => const SearchCriteriaScreen(),
+        settings: const RouteSettings(name: kSearchCriteriaRouteName),
       ),
     );
   }
