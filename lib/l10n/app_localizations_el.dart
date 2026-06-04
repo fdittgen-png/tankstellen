@@ -5154,6 +5154,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Πάρα πολλή αντανάκλαση στην οθόνη — δοκιμάστε ξανά υπό μικρή γωνία ώστε οι αριθμοί να μην ξεθωριάζουν.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Αποτυχία σάρωσης αντλίας: $error';
   }

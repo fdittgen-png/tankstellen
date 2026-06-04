@@ -4357,5 +4357,10 @@
   "@alertsStationAdd": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
+  "@scanPumpInconsistent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

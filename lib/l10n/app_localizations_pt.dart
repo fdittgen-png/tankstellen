@@ -5145,6 +5145,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Reflexo em excesso no visor — tente novamente num ângulo ligeiro para que os números não fiquem apagados.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Leitura da bomba falhada: $error';
   }

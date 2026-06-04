@@ -5127,6 +5127,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Te veel weerschijn op het display — probeer het opnieuw onder een lichte hoek zodat de cijfers niet overstraald zijn.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pompscan mislukt: $error';
   }

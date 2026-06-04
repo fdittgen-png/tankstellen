@@ -5105,6 +5105,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'For meget genskin på displayet — prøv igen i en let vinkel, så tallene ikke bliver overstrålet.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumpe-scanning mislykkedes: $error';
   }

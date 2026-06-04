@@ -5134,6 +5134,10 @@ class AppLocalizationsSk extends AppLocalizations {
       'Príliš veľa odleskov na displeji — skús to znova z mierneho uhla, aby čísla neboli prežiarené.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skenovanie pumpy zlyhalo: $error';
   }

@@ -5118,6 +5118,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Příliš mnoho odlesků na displeji — zkuste to znovu z mírného úhlu, aby čísla nebyla přezářená.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skenování pumpy selhalo: $error';
   }

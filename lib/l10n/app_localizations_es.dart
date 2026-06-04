@@ -5148,6 +5148,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Demasiado reflejo en la pantalla — inténtalo de nuevo desde un ángulo ligeramente distinto para que los números no se vean lavados.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Error al escanear el surtidor: $error';
   }

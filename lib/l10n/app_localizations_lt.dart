@@ -5135,6 +5135,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Per daug atspindžių ekrane — bandykite dar kartą šiek tiek kampu, kad skaičiai nebūtų peršviesti.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Siurblio nuskaitymas nepavyko: $error';
   }

@@ -5146,6 +5146,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Zu viel Blendung auf der Anzeige — bitte leicht schräg erneut versuchen, damit die Zahlen nicht überstrahlt werden.';
 
   @override
+  String get scanPumpInconsistent =>
+      'Die gescannten Werte passen nicht zusammen — bitte manuell eingeben.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Zapfsäulen-Scan fehlgeschlagen: $error';
   }

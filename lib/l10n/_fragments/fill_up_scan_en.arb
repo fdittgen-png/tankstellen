@@ -28,6 +28,10 @@
   "@scanPumpGlare": {
     "description": "Snackbar shown when the pump-display capture is rejected for excessive glare and the user is asked to re-angle (#2275)."
   },
+  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
+  "@scanPumpInconsistent": {
+    "description": "Snackbar shown when the pump-display scan read values that failed the country validation gate (the numbers don't reconcile or are out of range), so the app declines to auto-fill a plausible-but-wrong pair (#2828)."
+  },
   "scanPumpFailed": "Pump scan failed: {error}",
   "@scanPumpFailed": {
     "description": "Snackbar shown when the pump-display scan throws (#751).",

@@ -9092,6 +9092,12 @@ abstract class AppLocalizations {
   /// **'Too much glare on the display — try again at a slight angle so the numbers aren\'t washed out.'**
   String get scanPumpGlare;
 
+  /// Snackbar shown when the pump-display scan read values that failed the country validation gate (the numbers don't reconcile or are out of range), so the app declines to auto-fill a plausible-but-wrong pair (#2828).
+  ///
+  /// In en, this message translates to:
+  /// **'The scanned values don\'t add up — please enter them manually.'**
+  String get scanPumpInconsistent;
+
   /// Snackbar shown when the pump-display scan throws (#751).
   ///
   /// In en, this message translates to:
