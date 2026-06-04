@@ -819,7 +819,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(Elm327Protocol.vehicleSpeedCommand);
       return Elm327Protocol.parseVehicleSpeed(response);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OBD2 readSpeed failed'}));
+      recordObd2ReadFailure(e, st, where: 'OBD2 readSpeed failed'); // #2855
       return null;
     }
   }
@@ -856,7 +856,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(Elm327Protocol.engineRpmCommand);
       return Elm327Protocol.parseEngineRpm(response);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OBD2 readRpm failed'}));
+      recordObd2ReadFailure(e, st, where: 'OBD2 readRpm failed'); // #2855
       return null;
     }
   }
@@ -1285,7 +1285,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(Elm327Protocol.fuelTypeCommand);
       return Elm327Protocol.parseFuelType(response);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OBD2 readFuelType failed'}));
+      recordObd2ReadFailure(e, st, where: 'OBD2 readFuelType failed'); // #2855
       return null;
     }
   }
@@ -1552,7 +1552,7 @@ class Obd2Service implements Obd2RawCommandPort {
       final response = await _send(command);
       return parser(response);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'OBD2 read $label failed'}));
+      recordObd2ReadFailure(e, st, where: 'OBD2 read $label failed'); // #2855
       return null;
     }
   }
