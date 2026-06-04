@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/logging/error_logger.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../core/widgets/snackbar_helper.dart';
@@ -150,11 +153,27 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // and make the central FAB dead on the tab the user switched to.
     ref.read(searchFabActionControllerProvider.notifier).set(null);
 
-    // Navigate via go_router — this preserves each branch's state
-    widget.navigationShell.goBranch(
-      index,
-      initialLocation: index == widget.navigationShell.currentIndex,
-    );
+    // Navigate via go_router — this preserves each branch's state.
+    // #2811 — guard + trace: a goBranch throw must not silently leave the
+    // shell mid-transition (bar present but no tab highlighted) with nothing
+    // in the error log.
+    try {
+      widget.navigationShell.goBranch(
+        index,
+        initialLocation: index == widget.navigationShell.currentIndex,
+      );
+    } catch (e, st) {
+      unawaited(errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: {
+          'source': 'ShellScreen.goBranch',
+          'index': index,
+          'currentIndex': widget.navigationShell.currentIndex,
+        },
+      ));
+    }
   }
 
   void _onHorizontalDragEnd(DragEndDetails details) {
