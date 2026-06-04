@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/background_price_source.dart';
@@ -58,6 +60,22 @@ class _RecordingService implements StationService {
     );
   }
 
+  @override
+  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
+      throw UnimplementedError();
+}
+
+/// A [StationService] whose calls all throw — for the #2349 never-throws
+/// fault-injection: the BG isolate must spool, never rethrow, a provider fault.
+class _ThrowingService implements StationService {
+  @override
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+          List<String> ids) async =>
+      throw const SocketException('injected fault');
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(SearchParams params,
+          {CancelToken? cancelToken}) async =>
+      throw const SocketException('injected fault');
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
       throw UnimplementedError();
@@ -190,6 +208,37 @@ void main() {
         stationIds: List.generate(50, (i) => 'de-$i'),
       );
       expect(services['DE']!.priceCalls, 1);
+    });
+  });
+
+  group('never throws — a provider fault is spooled, not propagated (#2349)', () {
+    BackgroundPriceSource throwingSource() => BackgroundPriceSource(
+          storage: FakeStorageRepository(),
+          serviceBuilder: (code, {String? apiKey}) => _ThrowingService(),
+        );
+
+    test('fetchPricesGrouped completes (spools the fault) when the provider '
+        'throws — never rethrows into the OS-spawned isolate', () async {
+      // The documented never-throws boundary (background_price_source.dart):
+      // a throwing per-country service must be caught + spooled, never bubble.
+      await expectLater(
+        throwingSource().fetchPricesGrouped(stationIds: ['de-1', 'at-1']),
+        completes,
+      );
+      final prices =
+          await throwingSource().fetchPricesGrouped(stationIds: ['de-1']);
+      expect(prices, isEmpty,
+          reason: 'a thrown fetch yields no prices, not a crash');
+    });
+
+    test('searchStations swallows a throwing provider', () {
+      expect(
+        () => throwingSource().searchStations(
+          countryCode: 'DE',
+          params: const SearchParams(lat: 52.5, lng: 13.4, radiusKm: 5),
+        ),
+        returnsNormally,
+      );
     });
   });
 }
