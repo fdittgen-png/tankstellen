@@ -320,6 +320,85 @@ void main() {
       });
     });
 
+    group('refractory-window debounce (#2846)', () {
+      // Real-data root cause (Skoda-diesel backup): 2 734 harsh brakes +
+      // 3 882 harsh accels across 33 trips (~10/km). The ~1 Hz integer
+      // speed PID arrives as a "drop, hold, drop, hold" staircase whose
+      // derivative dips below the threshold for a single ~1 s hold inside
+      // ONE braking manoeuvre and then crosses it again; the old
+      // "re-arm after one sub-threshold interval" latch counted each pulse
+      // as a separate event. A refractory window of kAccelEventRefractorySec
+      // collapses the manoeuvre into ONE event.
+
+      test('one braking manoeuvre crossing the threshold N times within the '
+          'refractory window → exactly ONE brake', () {
+        // 90 → 20 km/h, one continuous hard brake, but delivered as a
+        // coarse staircase: each 15 km/h pulse over 1 s is -4.17 m/s²
+        // (harsh) with a 1 s "hold" interval between (derivative 0, below
+        // threshold). The old latch fired on every pulse (4×); the
+        // refractory window makes it ONE.
+        const oneBrake = <double>[90, 75, 75, 60, 60, 45, 45, 30, 30, 20];
+        for (var i = 0; i < oneBrake.length; i++) {
+          detector.onSample(oneBrake[i], start.add(Duration(seconds: i)));
+        }
+        expect(detector.brakes, 1,
+            reason: 'a single manoeuvre is ONE event, not N pulses');
+        expect(detector.accelerations, 0);
+      });
+
+      test('a clean steady cruise → ZERO events', () {
+        for (var s = 0; s <= 20; s++) {
+          detector.onSample(90, start.add(Duration(seconds: s)));
+        }
+        expect(detector.brakes, 0);
+        expect(detector.accelerations, 0);
+      });
+
+      test('two genuinely separate braking manoeuvres → TWO', () {
+        // Brake #1 (90 → 50), a long cruise far beyond the refractory
+        // window, then brake #2 (80 → 40). Each must count once.
+        detector.onSample(90, start);
+        detector.onSample(60, start.add(const Duration(seconds: 1)));
+        detector.onSample(50, start.add(const Duration(seconds: 2)));
+        // Cruise plateau (10 s, well past kAccelEventRefractorySec).
+        for (var s = 3; s <= 12; s++) {
+          detector.onSample(50, start.add(Duration(seconds: s)));
+        }
+        // Re-accelerate to 80, then brake #2.
+        detector.onSample(80, start.add(const Duration(seconds: 13)));
+        for (var s = 14; s <= 18; s++) {
+          detector.onSample(80, start.add(Duration(seconds: s)));
+        }
+        detector.onSample(50, start.add(const Duration(seconds: 19)));
+        detector.onSample(40, start.add(const Duration(seconds: 20)));
+        expect(detector.brakes, 2,
+            reason: 'two manoeuvres parted by a long cruise count twice');
+      });
+
+      test('a sub-refractory dip inside one manoeuvre does NOT re-arm', () {
+        // One long hard brake 100 → 30 with a single 1 s hold in the
+        // middle (sub-refractory). The hold must not split it into two.
+        const speeds = <double>[100, 84, 84, 68, 52, 36, 30];
+        for (var i = 0; i < speeds.length; i++) {
+          detector.onSample(speeds[i], start.add(Duration(seconds: i)));
+        }
+        expect(detector.brakes, 1);
+      });
+
+      test('refractorySec is configurable', () {
+        // Drop the refractory window to 0 and the staircase holds re-arm
+        // again — proving the window is the only thing collapsing the
+        // pulses above (and that the default is what debounces them).
+        final eager = HarshEventDetector(refractorySec: 0);
+        const oneBrake = <double>[90, 75, 75, 60, 60, 45, 45, 30, 30, 20];
+        for (var i = 0; i < oneBrake.length; i++) {
+          eager.onSample(oneBrake[i], start.add(Duration(seconds: i)));
+        }
+        expect(eager.brakes, greaterThan(1),
+            reason: 'with no refractory window the holds re-arm per pulse');
+      });
+    });
+
     group('live onEvent callback (#2663)', () {
       test('fires onEvent the instant a de-noised event is detected', () {
         final fired = <HarshEvent>[];
