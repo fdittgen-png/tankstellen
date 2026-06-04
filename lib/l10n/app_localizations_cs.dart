@@ -3416,6 +3416,12 @@ class AppLocalizationsCs extends AppLocalizations {
       'Tímto se zruší naučená volumetrická účinnost (η_v) a obnoví se výchozí hodnota (0,85). Odhady průtoku paliva na úrovni cesty se vrátí na konstantu výrobce, dokud kalibrátor nenasbírá nové vzorky z nadcházejících cest.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Polohová upozornění';
 
   @override

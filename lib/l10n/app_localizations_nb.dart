@@ -3404,6 +3404,12 @@ class AppLocalizationsNb extends AppLocalizations {
       'Dette vil forkaste den innlærte volumetriske effektiviteten (η_v) og gjenopprette standardverdien (0.85). Drivstoffstrømsestimater på turoppdrag vil falle tilbake til produsentkonstanten til kalibratoren samler nye prøver fra kommende turer.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Radiusvarsler';
 
   @override

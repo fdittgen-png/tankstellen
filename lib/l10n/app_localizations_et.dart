@@ -3403,6 +3403,12 @@ class AppLocalizationsEt extends AppLocalizations {
       'See hülgab õpitud mahulise efektiivsuse (η_v) ja taastab vaikeväärtuse (0,85). Reisitaseme kütusevoo hinnangud lähevad tagasi tootja konstandile, kuni kalibreerimistööriist kogub tulevaste reiside uued näidised.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Raadiusteteatised';
 
   @override

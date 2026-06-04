@@ -3423,6 +3423,12 @@ class AppLocalizationsSk extends AppLocalizations {
       'Toto zahodí naučenú volumetrickú účinnosť (η_v) a obnoví predvolenú hodnotu (0,85). Odhady prietoku paliva na úrovni jazdy sa vrátia k výrobnej konštante, kým kalibrátor nezhromaždí nové vzorky z nasledujúcich jázd.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Upozornenia v okruhu';
 
   @override

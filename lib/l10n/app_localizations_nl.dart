@@ -3421,6 +3421,12 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit verwijdert het geleerde volumetrisch rendement (η_v) en herstelt de standaardwaarde (0.85). Brandstofstroominschattingen per rit vallen terug op de fabrikantconstante totdat de kalibratie nieuwe steekproeven uit aankomende ritten heeft verzameld.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Straalwaarschuwingen';
 
   @override

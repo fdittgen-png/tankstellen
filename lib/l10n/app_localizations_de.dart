@@ -3427,6 +3427,12 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dies verwirft den gelernten volumetrischen Wirkungsgrad (η_v) und stellt den Standardwert (0,85) wieder her. Fahrt-bezogene Verbrauchsschätzungen fallen auf die Herstellerkonstante zurück, bis der Kalibrator aus kommenden Fahrten neue Messwerte sammelt.';
 
   @override
+  String get alertsStationSectionTitle => 'Stations-Alarme';
+
+  @override
+  String get alertsStationAdd => 'Stations-Alarm hinzufügen';
+
+  @override
   String get alertsRadiusSectionTitle => 'Umkreis-Alarme';
 
   @override

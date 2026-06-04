@@ -3423,6 +3423,12 @@ class AppLocalizationsLt extends AppLocalizations {
       'Tai atmes išmoktą tūrinį efektyvumą (η_v) ir atkurs numatytąją reikšmę (0,85). Kelionės lygio kuro srauto įverčiai grįš prie gamintojo konstantos, kol kalibravimo priemonė surinks naujų pavyzdžių iš būsimų kelionių.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Spindulio įspėjimai';
 
   @override

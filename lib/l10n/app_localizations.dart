@@ -6297,6 +6297,18 @@ abstract class AppLocalizations {
   /// **'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.'**
   String get veResetConfirmBody;
 
+  /// Header of the per-station price-alert section on the alerts screen, symmetric with the radius/zone section (#2819).
+  ///
+  /// In en, this message translates to:
+  /// **'Station alerts'**
+  String get alertsStationSectionTitle;
+
+  /// Tooltip of the add button on the Station alerts section header; tapping it explains that station alerts are created from a station's detail page (#2819).
+  ///
+  /// In en, this message translates to:
+  /// **'Add a station alert'**
+  String get alertsStationAdd;
+
   /// Header of the radius-based watchlist section on the alerts screen (#578).
   ///
   /// In en, this message translates to:

@@ -3406,6 +3406,12 @@ class AppLocalizationsSv extends AppLocalizations {
       'Det här kasserar den inlärda volymetriska effektiviteten (η_v) och återställer standardvärdet (0,85). Bränsleflödesuppskattningar på resenivå faller tillbaka på tillverkarens konstant tills kalibratorn samlar nya prover från kommande resor.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Radiebaserade aviseringar';
 
   @override

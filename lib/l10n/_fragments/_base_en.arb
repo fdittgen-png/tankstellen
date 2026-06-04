@@ -1657,6 +1657,14 @@
   "@veResetConfirmBody": {
     "description": "Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
   },
+  "alertsStationSectionTitle": "Station alerts",
+  "@alertsStationSectionTitle": {
+    "description": "Header of the per-station price-alert section on the alerts screen, symmetric with the radius/zone section (#2819)."
+  },
+  "alertsStationAdd": "Add a station alert",
+  "@alertsStationAdd": {
+    "description": "Tooltip of the add button on the Station alerts section header; tapping it explains that station alerts are created from a station's detail page (#2819)."
+  },
   "alertsRadiusSectionTitle": "Radius alerts",
   "@alertsRadiusSectionTitle": {
     "description": "Header of the radius-based watchlist section on the alerts screen (#578)."

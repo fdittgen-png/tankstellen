@@ -3428,6 +3428,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'Isto irá descartar a eficiência volumétrica aprendida (η_v) e restaurar o valor predefinido (0,85). As estimativas de caudal de combustível por viagem voltarão à constante do fabricante até o calibrador recolher novas amostras de próximas viagens.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Alertas de raio';
 
   @override

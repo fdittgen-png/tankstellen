@@ -3405,6 +3405,12 @@ class AppLocalizationsDa extends AppLocalizations {
       'Dette vil kassere den lærte volumetriske effektivitet (η_v) og gendanne standardværdien (0.85). Turbaserede brændstofstrømsestimater falder tilbage til fabrikantens konstant, indtil kalibroren indsamler nye prøver fra kommende ture.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Radiusadvarsler';
 
   @override
