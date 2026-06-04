@@ -2007,14 +2007,12 @@
   "countryInfoFuelTypes": "Bränsletyper: {fuelTypes}",
   "countryInfoDemoSource": "Demo",
   "languageChipSemantic": "{selected, select, true{Språk {name}, vald} false{Språk {name}} other{Språk {name}}}",
-  "fillUpGuidanceTitle": "Best time to fill up",
+  "fillUpGuidanceTitle": "Bästa tid att tanka",
   "@fillUpGuidanceTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceGoodTimeNow": "The current price is among the cheapest of the last {days} days — a good time to fill up.",
+  "fillUpGuidanceGoodTimeNow": "Nuvarande pris tillhör de billigaste de senaste {days} dagarna — ett bra tillfälle att tanka.",
   "@fillUpGuidanceGoodTimeNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2023,9 +2021,8 @@
       }
     }
   },
-  "fillUpGuidanceWaitCheaper": "Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.",
+  "fillUpGuidanceWaitCheaper": "Priserna ligger nära sitt {days}-dagarsmaximum. De brukar vara billigare {window} — överväg att vänta.",
   "@fillUpGuidanceWaitCheaper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2038,14 +2035,12 @@
       }
     }
   },
-  "fillUpGuidanceFillSoon": "Prices are trending up — consider filling up soon.",
+  "fillUpGuidanceFillSoon": "Priserna stiger — överväg att tanka snart.",
   "@fillUpGuidanceFillSoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceNeutral": "Today's price is around the {days}-day average.",
+  "fillUpGuidanceNeutral": "Dagens pris ligger runt {days}-dagarssnittet.",
   "@fillUpGuidanceNeutral": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2054,9 +2049,8 @@
       }
     }
   },
-  "fillUpGuidanceSaving": "Could save about {amount}/L by timing your fill-up.",
+  "fillUpGuidanceSaving": "Kan spara ungefär {amount}/L genom att tajma tankningen.",
   "@fillUpGuidanceSaving": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "amount": {
@@ -2065,9 +2059,8 @@
       }
     }
   },
-  "fillUpGuidanceSampleNote": "{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}",
+  "fillUpGuidanceSampleNote": "{count, plural, =1{Baserat på 1 prisavläsning} other{Baserat på {count} prisavläsningar}}",
   "@fillUpGuidanceSampleNote": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -2078,7 +2071,6 @@
   },
   "fillUpGuidanceWindowDayAndPart": "{day} {part}",
   "@fillUpGuidanceWindowDayAndPart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2091,9 +2083,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowDayOnly": "on {day}",
+  "fillUpGuidanceWindowDayOnly": "på {day}",
   "@fillUpGuidanceWindowDayOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2102,9 +2093,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowPartOnly": "in the {part}",
+  "fillUpGuidanceWindowPartOnly": "på {part}",
   "@fillUpGuidanceWindowPartOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "part": {
@@ -2113,74 +2103,60 @@
       }
     }
   },
-  "fillUpGuidanceWindowGeneric": "at other times",
+  "fillUpGuidanceWindowGeneric": "vid andra tider",
   "@fillUpGuidanceWindowGeneric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday1": "Mondays",
+  "fillUpGuidanceWeekday1": "Måndagar",
   "@fillUpGuidanceWeekday1": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday2": "Tuesdays",
+  "fillUpGuidanceWeekday2": "Tisdagar",
   "@fillUpGuidanceWeekday2": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday3": "Wednesdays",
+  "fillUpGuidanceWeekday3": "Onsdagar",
   "@fillUpGuidanceWeekday3": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday4": "Thursdays",
+  "fillUpGuidanceWeekday4": "Torsdagar",
   "@fillUpGuidanceWeekday4": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday5": "Fridays",
+  "fillUpGuidanceWeekday5": "Fredagar",
   "@fillUpGuidanceWeekday5": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday6": "Saturdays",
+  "fillUpGuidanceWeekday6": "Lördagar",
   "@fillUpGuidanceWeekday6": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday7": "Sundays",
+  "fillUpGuidanceWeekday7": "Söndagar",
   "@fillUpGuidanceWeekday7": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEarlyMorning": "early mornings",
+  "fillUpGuidancePartEarlyMorning": "tidigt på morgonen",
   "@fillUpGuidancePartEarlyMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartMorning": "mornings",
+  "fillUpGuidancePartMorning": "på morgnarna",
   "@fillUpGuidancePartMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartAfternoon": "afternoons",
+  "fillUpGuidancePartAfternoon": "på eftermiddagarna",
   "@fillUpGuidancePartAfternoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEvening": "evenings",
+  "fillUpGuidancePartEvening": "på kvällarna",
   "@fillUpGuidancePartEvening": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartNight": "nights",
+  "fillUpGuidancePartNight": "på nätterna",
   "@fillUpGuidancePartNight": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "dataSourceLinkSemantic": "Öppna datakällan {source} ({license}) i din webbläsare",
   "@dataSourceLinkSemantic": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "source": {
@@ -2193,54 +2169,44 @@
       }
     }
   },
-  "tripRadarClosestStation": "Closest station",
+  "tripRadarClosestStation": "Bensinmack-radar",
   "@tripRadarClosestStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarScanning": "Scanning for nearby stations",
+  "tripRadarScanning": "Söker efter närliggande stationer",
   "@tripRadarScanning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarNoStationNearby": "No station nearby",
+  "tripRadarNoStationNearby": "Ingen station i närheten",
   "@tripRadarNoStationNearby": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "developerToolsTestAlertNoStation": "Search for stations first, then run the test alert so the notification can open a real station.",
+  "developerToolsTestAlertNoStation": "Sök efter stationer först, kör sedan testalerten så att notisen kan öppna en riktig station.",
   "@developerToolsTestAlertNoStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_approachOverlay": "Approach overlay",
+  "featureLabel_approachOverlay": "Bensinmack-radar",
   "@featureLabel_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "featureDescription_approachOverlay": "Förvandlar den flytande resepanelen till en live-bensinmack-radar — när du närmar dig en bensinstation byter den färg till bränsletypens färg och visar priset.",
   "@featureDescription_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripAvgGpsEstimateTooltip": "GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle's calibration; accuracy improves as the matrix matures.",
+  "tripAvgGpsEstimateTooltip": "GPS-uppskattning (~) — ingen bränslesensor på denna resa. Värdet modelleras utifrån hastighet och ditt fordons kalibrering; noggrannheten förbättras allteftersom matrisen mognar.",
   "@tripAvgGpsEstimateTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingPipEstConsumptionCaption": "est. L/100 km",
+  "tripRecordingPipEstConsumptionCaption": "uppsk. L/100 km",
   "@tripRecordingPipEstConsumptionCaption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingEstimatedInfo": "Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle's calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.",
+  "tripRecordingEstimatedInfo": "Uppskattat värde (~) — ingen bränslesensor på denna resa, så L/100 km-värdet modelleras utifrån GPS-hastighet och ditt fordons kalibrering. Det är ungefärligt (vanligtvis ±10–30 %, förbättras när kalibreringen mognar), inte en uppmätt avläsning.",
   "@tripRecordingEstimatedInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "mapAttributionOsm": "© {brand} contributors",
   "@mapAttributionOsm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "brand": {
@@ -2249,14 +2215,12 @@
       }
     }
   },
-  "trajetDetailChartEstimatedBadge": "estimated",
+  "trajetDetailChartEstimatedBadge": "uppskattat",
   "@trajetDetailChartEstimatedBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "statCorrectionLiters": "Corrections: +{liters} L",
+  "statCorrectionLiters": "Korrigeringar: +{liters} L",
   "@statCorrectionLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "liters": {
@@ -2264,14 +2228,12 @@
       }
     }
   },
-  "reconcileWorkflowTitle": "Reconcile your fuel",
+  "reconcileWorkflowTitle": "Stäm av ditt bränsle",
   "@reconcileWorkflowTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainHeadline": "We found a {gap} L gap",
+  "reconcileWorkflowExplainHeadline": "Vi hittade en lucka på {gap} L",
   "@reconcileWorkflowExplainHeadline": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2279,9 +2241,8 @@
       }
     }
   },
-  "reconcileWorkflowExplainBody": "You pumped {pumped} L, but your recorded trips only account for {consumed} L. That leaves {gap} L unexplained.",
+  "reconcileWorkflowExplainBody": "Du pumpade {pumped} L, men dina registrerade resor redovisar bara {consumed} L. Det lämnar {gap} L oförklarade.",
   "@reconcileWorkflowExplainBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pumped": {
@@ -2295,104 +2256,84 @@
       }
     }
   },
-  "reconcileWorkflowExplainCauses": "This usually means a drive wasn't recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.",
+  "reconcileWorkflowExplainCauses": "Det beror vanligtvis på att en körning inte registrerades (adaptern kopplades ur eller appen stängdes), eller att en tankning saknas eller är felinmatad.",
   "@reconcileWorkflowExplainCauses": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainConsequence": "Until this is resolved, your fuel total and your trips total won't match.",
+  "reconcileWorkflowExplainConsequence": "Tills detta är löst kommer ditt bränsletotal och ditt resetotal inte att stämma.",
   "@reconcileWorkflowExplainConsequence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAttributeQuestion": "Help us attribute the gap",
+  "reconcileWorkflowAttributeQuestion": "Hjälp oss att fördela luckan",
   "@reconcileWorkflowAttributeQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowFillUpsCompleteQuestion": "Are all your fill-ups for this tank complete and correct?",
+  "reconcileWorkflowFillUpsCompleteQuestion": "Är alla dina tankningar för denna tank fullständiga och korrekta?",
   "@reconcileWorkflowFillUpsCompleteQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDrivesRecordedQuestion": "Are all your drives recorded?",
+  "reconcileWorkflowDrivesRecordedQuestion": "Är alla dina körningar registrerade?",
   "@reconcileWorkflowDrivesRecordedQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerYes": "Yes",
+  "reconcileWorkflowAnswerYes": "Ja",
   "@reconcileWorkflowAnswerYes": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerNo": "No",
+  "reconcileWorkflowAnswerNo": "Nej",
   "@reconcileWorkflowAnswerNo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathAHint": "A fill-up is missing or wrong — we'll add a correction so your fill-ups add up.",
+  "reconcileWorkflowPathAHint": "En tankning saknas eller är felaktig — vi lägger till en korrigering så att dina tankningar stämmer.",
   "@reconcileWorkflowPathAHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathBHint": "Your fill-ups are right and a drive went unrecorded — we'll add a virtual trip for the missing distance.",
+  "reconcileWorkflowPathBHint": "Dina tankningar stämmer och en körning inte registrerades — vi lägger till en virtuell resa för den saknade sträckan.",
   "@reconcileWorkflowPathBHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowCorrectionLitersLabel": "Correction litres",
+  "reconcileWorkflowCorrectionLitersLabel": "Korrigeringsliter",
   "@reconcileWorkflowCorrectionLitersLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowVirtualDistanceLabel": "How far was the unrecorded drive? (km)",
+  "reconcileWorkflowVirtualDistanceLabel": "Hur lång var den oregistrerade körningen? (km)",
   "@reconcileWorkflowVirtualDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDecideLater": "Decide later",
+  "reconcileWorkflowDecideLater": "Bestäm senare",
   "@reconcileWorkflowDecideLater": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowBack": "Back",
+  "reconcileWorkflowBack": "Tillbaka",
   "@reconcileWorkflowBack": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowNext": "Next",
+  "reconcileWorkflowNext": "Nästa",
   "@reconcileWorkflowNext": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowApply": "Apply",
+  "reconcileWorkflowApply": "Tillämpa",
   "@reconcileWorkflowApply": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetLabel": "Virtual trip — tap to edit",
+  "reconcileVirtualTrajetLabel": "Virtuell resa — tryck för att redigera",
   "@reconcileVirtualTrajetLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditTitle": "Edit virtual trip",
+  "reconcileVirtualTrajetEditTitle": "Redigera virtuell resa",
   "@reconcileVirtualTrajetEditTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditExplainer": "This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.",
+  "reconcileVirtualTrajetEditExplainer": "Den här resan lades till för att redovisa bränsle du använde under körning utan inspelning. Justera sträckan eller bränslet, eller ta bort den.",
   "@reconcileVirtualTrajetEditExplainer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetDelete": "Delete virtual trip",
+  "reconcileVirtualTrajetDelete": "Ta bort virtuell resa",
   "@reconcileVirtualTrajetDelete": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileResolveGapBanner": "Unresolved fuel/trip gap of {gap} L — tap to resolve",
+  "reconcileResolveGapBanner": "Olöst bränsle-/reselucka på {gap} L — tryck för att lösa",
   "@reconcileResolveGapBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2400,19 +2341,16 @@
       }
     }
   },
-  "reconcileResolveGapSemanticLabel": "Resolve unresolved fuel and trip gap",
+  "reconcileResolveGapSemanticLabel": "Lös olöst bränsle- och reselucka",
   "@reconcileResolveGapSemanticLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
+  "pumpCameraRotateToLandscape": "Vänd telefonen sidledes — pumpdisplayen är bred, så siffrorna blir större och rättvänta",
   "@pumpCameraRotateToLandscape": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "insightFullThrottle": "Fullt gas ({pctTime}% av resan): slösade {liters} L",
   "@insightFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2423,14 +2361,12 @@
       }
     }
   },
-  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "lessonAdviceFullThrottle": "Tryck varsamt på pedalen — ett mjukare tryck på 70 % av gasen tar dig upp i fart med mycket mindre bränsle.",
   "@lessonAdviceFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "insightLambdaEnrichment": "Fet blandning under belastning ({pctTime}% av resan): slösade {liters} L",
   "@insightLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2441,84 +2377,68 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "lessonAdviceLambdaEnrichment": "Tung, ihållande belastning gör att motorn kör med fet blandning — korta upp och dra av vid långa uppförsbackar för att hålla blandningen mager.",
   "@lessonAdviceLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassVeryGood": "Very good",
+  "drivingScoreClassVeryGood": "Mycket bra",
   "@drivingScoreClassVeryGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassGood": "Good",
+  "drivingScoreClassGood": "Bra",
   "@drivingScoreClassGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassAverage": "Average",
+  "drivingScoreClassAverage": "Genomsnittlig",
   "@drivingScoreClassAverage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassBad": "Needs work",
+  "drivingScoreClassBad": "Behöver förbättras",
   "@drivingScoreClassBad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLugging": "Lugging",
+  "drivingScorePenaltyLugging": "Motorstressning",
   "@drivingScorePenaltyLugging": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltySmoothness": "Jerky driving",
+  "drivingScorePenaltySmoothness": "Ryckig körning",
   "@drivingScorePenaltySmoothness": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyHighSpeed": "High speed",
+  "drivingScorePenaltyHighSpeed": "Hög hastighet",
   "@drivingScorePenaltyHighSpeed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "drivingScorePenaltyPedalVelocity": "Aggressiv gaspedal",
   "@drivingScorePenaltyPedalVelocity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLambda": "Rich mixture",
+  "drivingScorePenaltyLambda": "Fet blandning",
   "@drivingScorePenaltyLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "trajetDetailChartThrottle": "Gas/pedal (%)",
   "@trajetDetailChartThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartCoolant": "Coolant (°C)",
+  "trajetDetailChartCoolant": "Kylvätska (°C)",
   "@trajetDetailChartCoolant": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Altitude (m)",
+  "trajetDetailChartAltitude": "Höjd (m)",
   "@trajetDetailChartAltitude": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartLambda": "Commanded λ",
+  "trajetDetailChartLambda": "Kommanderad λ",
   "@trajetDetailChartLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTitle": "OBD2 communication health",
+  "obd2DiagnosticsTitle": "OBD2-kommunikationshälsa",
   "@obd2DiagnosticsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsHeader": "{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}",
+  "obd2DiagnosticsHeader": "{percent}% färdig · {duty}% aktiv · {drops, plural, =0{inga avbrott} =1{1 avbrott} other{{drops} avbrott}}",
   "@obd2DiagnosticsHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2534,42 +2454,34 @@
   },
   "obd2DiagnosticsAdapterSection": "Adapter",
   "@obd2DiagnosticsAdapterSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsConnectionSection": "Connection lifecycle",
+  "obd2DiagnosticsConnectionSection": "Anslutningslivscykel",
   "@obd2DiagnosticsConnectionSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsPidSection": "Per-PID outcomes",
+  "obd2DiagnosticsPidSection": "Utfall per PID",
   "@obd2DiagnosticsPidSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSchedulerSection": "Scheduler health",
+  "obd2DiagnosticsSchedulerSection": "Schemaläggarhälsa",
   "@obd2DiagnosticsSchedulerSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessSection": "Completeness",
+  "obd2DiagnosticsCompletenessSection": "Fullständighet",
   "@obd2DiagnosticsCompletenessSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSupportSection": "Discovered-supported PIDs",
+  "obd2DiagnosticsSupportSection": "Upptäckta stödda PID:ar",
   "@obd2DiagnosticsSupportSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsFuelSection": "Fuel-tier rollup",
+  "obd2DiagnosticsFuelSection": "Bränslenivåöversikt",
   "@obd2DiagnosticsFuelSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocol {protocol} · MTU {mtu}",
+  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protokoll {protocol} · MTU {mtu}",
   "@obd2DiagnosticsAdapterIdentity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "mac": {
@@ -2586,9 +2498,8 @@
       }
     }
   },
-  "obd2DiagnosticsConnectionLine": "{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}",
+  "obd2DiagnosticsConnectionLine": "{attempts} försök · {successes} ok · {drops} avbrott · tid-till-anslutning p50 {p50} / p95 {p95}",
   "@obd2DiagnosticsConnectionLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "attempts": {
@@ -2608,9 +2519,8 @@
       }
     }
   },
-  "obd2DiagnosticsReconnectLine": "Reconnects: {silent} silent · {visible} visible",
+  "obd2DiagnosticsReconnectLine": "Återanslutningar: {silent} tysta · {visible} synliga",
   "@obd2DiagnosticsReconnectLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "silent": {
@@ -2621,9 +2531,8 @@
       }
     }
   },
-  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions",
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} bakåttryckshoppningar · {demotions} degraderingar",
   "@obd2DiagnosticsSchedulerLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tickRate": {
@@ -2637,14 +2546,12 @@
       }
     }
   },
-  "obd2DiagnosticsStarved": "Dynamics tier starved — RPM / speed fell below the governor floor.",
+  "obd2DiagnosticsStarved": "Dynamiksnivån utsvulten — RPM/hastighet sjönk under regleratorsgolvet.",
   "@obd2DiagnosticsStarved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessLine": "Overall {percent}% · active duty {duty}%",
+  "obd2DiagnosticsCompletenessLine": "Totalt {percent}% · aktiv tjänstgöring {duty}%",
   "@obd2DiagnosticsCompletenessLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2657,7 +2564,6 @@
   },
   "obd2DiagnosticsTierLine": "{tier}: {percent}%",
   "@obd2DiagnosticsTierLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tier": {
@@ -2668,9 +2574,8 @@
       }
     }
   },
-  "obd2DiagnosticsSupportLine": "{supported} supported · {unsupported} unsupported · {unknown} unknown",
+  "obd2DiagnosticsSupportLine": "{supported} stödda · {unsupported} ej stödda · {unknown} okända",
   "@obd2DiagnosticsSupportLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "supported": {
@@ -2684,9 +2589,8 @@
       }
     }
   },
-  "obd2DiagnosticsFuelLine": "Suspicious {suspicious} of {total} samples",
+  "obd2DiagnosticsFuelLine": "Misstänkta {suspicious} av {total} prover",
   "@obd2DiagnosticsFuelLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "suspicious": {
@@ -2697,9 +2601,8 @@
       }
     }
   },
-  "obd2DiagnosticsPidRow": "{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "obd2DiagnosticsPidRow": "{pid}: {polled} pollad · {ok} ok · {noData} ND · {timeout} TO · {error} fel · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
   "@obd2DiagnosticsPidRow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pid": {
@@ -2734,54 +2637,44 @@
       }
     }
   },
-  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "obd2DiagnosticsEmpty": "Ingen OBD2-session inspelad ännu — anslut en adapter och spela in en resa med Utvecklarläge aktivt.",
   "@obd2DiagnosticsEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
+  "obd2DiagnosticsExplain": "Insamlat under inspelning för att felsöka dongel↔app-kommunikationen — samlas bara in i Utvecklarläge.",
   "@obd2DiagnosticsExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthScreenTitle": "OBD2 communication health",
+  "obd2HealthScreenTitle": "OBD2-kommunikationshälsa",
   "@obd2HealthScreenTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthNavLabel": "OBD2 communication health",
+  "obd2HealthNavLabel": "OBD2-kommunikationshälsa",
   "@obd2HealthNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthLiveSection": "Live session",
+  "obd2HealthLiveSection": "Live-session",
   "@obd2HealthLiveSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthHistorySection": "Recent sessions",
+  "obd2HealthHistorySection": "Senaste sessioner",
   "@obd2HealthHistorySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Copy as JSON",
+  "obd2HealthCopyJson": "Kopiera som JSON",
   "@obd2HealthCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
+  "obd2HealthCopied": "OBD2-diagnostik kopierad till urklipp.",
   "@obd2HealthCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evStatusPartial": "Partly available",
+  "evStatusPartial": "Delvis tillgänglig",
   "@evStatusPartial": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
+  "radiusAlertDeleted": "Radiusavisering \"{name}\" raderad",
   "@radiusAlertDeleted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -2789,54 +2682,44 @@
       }
     }
   },
-  "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
+  "tripRecordingDiscardedNoMovement": "Inspelning avbruten — ingen rörelse registrerades",
   "@tripRecordingDiscardedNoMovement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionSetupDataSources": "Setup & data sources",
+  "sectionSetupDataSources": "Installation och datakällor",
   "@sectionSetupDataSources": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionFeaturesUsage": "Features & usage",
+  "sectionFeaturesUsage": "Funktioner och användning",
   "@sectionFeaturesUsage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAccountSync": "Account & sync",
+  "sectionAccountSync": "Konto och synkronisering",
   "@sectionAccountSync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAppearanceWidgets": "Appearance & widgets",
+  "sectionAppearanceWidgets": "Utseende och widgetar",
   "@sectionAppearanceWidgets": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionPrivacyData": "Privacy & data",
+  "sectionPrivacyData": "Integritet och data",
   "@sectionPrivacyData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAdvancedDeveloper": "Advanced & developer",
+  "sectionAdvancedDeveloper": "Avancerat och utvecklare",
   "@sectionAdvancedDeveloper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineShowDetails": "Show per-situation breakdown",
+  "vehicleBaselineShowDetails": "Visa uppdelning per situation",
   "@vehicleBaselineShowDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineHideDetails": "Hide per-situation breakdown",
+  "vehicleBaselineHideDetails": "Dölj uppdelning per situation",
   "@vehicleBaselineHideDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineMissingWarning": "Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.",
+  "vehicleBaselineMissingWarning": "Ej registrerat ännu: {situations}. Dessa körsituationer har fortfarande 0 prover, så basvärdet är ofullständigt.",
   "@vehicleBaselineMissingWarning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "situations": {
@@ -2845,224 +2728,180 @@
       }
     }
   },
-  "ocrTesterTitle": "OCR tester",
+  "ocrTesterTitle": "OCR-testare",
   "@ocrTesterTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNavLabel": "OCR tester",
+  "ocrTesterNavLabel": "OCR-testare",
   "@ocrTesterNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExplain": "Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.",
+  "ocrTesterExplain": "Kör pump-/kvitto-OCR-pipelinen på ett valt foto och granska varje steg — endast tillgänglig i Utvecklarläge.",
   "@ocrTesterExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterModePump": "Pump",
   "@ocrTesterModePump": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModeReceipt": "Receipt",
+  "ocrTesterModeReceipt": "Kvitto",
   "@ocrTesterModeReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCapture": "Capture",
+  "ocrTesterCapture": "Ta bild",
   "@ocrTesterCapture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterPickImage": "Pick image",
+  "ocrTesterPickImage": "Välj bild",
   "@ocrTesterPickImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRun": "Run",
+  "ocrTesterRun": "Kör",
   "@ocrTesterRun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountry": "Country",
+  "ocrTesterCountry": "Land",
   "@ocrTesterCountry": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountryNone": "Default (no profile)",
+  "ocrTesterCountryNone": "Standard (ingen profil)",
   "@ocrTesterCountryNone": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoImage": "Pick or capture an image, then Run.",
+  "ocrTesterNoImage": "Välj eller ta en bild, kör sedan.",
   "@ocrTesterNoImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRunning": "Running OCR…",
+  "ocrTesterRunning": "Kör OCR…",
   "@ocrTesterRunning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoResult": "OCR produced no readable result.",
+  "ocrTesterNoResult": "OCR gav inget läsbart resultat.",
   "@ocrTesterNoResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterOverlaySection": "Block overlay",
+  "ocrTesterOverlaySection": "Blocköverlager",
   "@ocrTesterOverlaySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStepsSection": "Pipeline steps",
+  "ocrTesterStepsSection": "Pipelinesteg",
   "@ocrTesterStepsSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendLabel": "Label",
+  "ocrTesterLegendLabel": "Etikett",
   "@ocrTesterLegendLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNumeric": "Numeric",
+  "ocrTesterLegendNumeric": "Numerisk",
   "@ocrTesterLegendNumeric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNoise": "Noise",
+  "ocrTesterLegendNoise": "Brus",
   "@ocrTesterLegendNoise": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendDerived": "Derived",
+  "ocrTesterLegendDerived": "Härledd",
   "@ocrTesterLegendDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGlare": "Capture / glare",
+  "ocrTesterStageGlare": "Fotografering / bländning",
   "@ocrTesterStageGlare": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterStageMlkit": "ML Kit",
   "@ocrTesterStageMlkit": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageClassify": "Classify",
+  "ocrTesterStageClassify": "Klassificera",
   "@ocrTesterStageClassify": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAssemble": "Assemble",
+  "ocrTesterStageAssemble": "Sammanfoga",
   "@ocrTesterStageAssemble": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAnchor": "Anchor",
+  "ocrTesterStageAnchor": "Ankarpunkt",
   "@ocrTesterStageAnchor": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageFallback": "Fallback",
+  "ocrTesterStageFallback": "Reservalternativ",
   "@ocrTesterStageFallback": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageCrossCheck": "Cross-check",
+  "ocrTesterStageCrossCheck": "Korskontroll",
   "@ocrTesterStageCrossCheck": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageConfidence": "Confidence",
+  "ocrTesterStageConfidence": "Konfidensgrad",
   "@ocrTesterStageConfidence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGate": "Gate",
+  "ocrTesterStageGate": "Grind",
   "@ocrTesterStageGate": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageBrand": "Brand",
+  "ocrTesterStageBrand": "Varumärke",
   "@ocrTesterStageBrand": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageOverrides": "Overrides",
+  "ocrTesterStageOverrides": "Överskridanden",
   "@ocrTesterStageOverrides": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageReconcile": "Reconcile",
+  "ocrTesterStageReconcile": "Stämning",
   "@ocrTesterStageReconcile": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageResult": "Result",
+  "ocrTesterStageResult": "Resultat",
   "@ocrTesterStageResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipRead": "READ",
+  "ocrTesterChipRead": "LÄST",
   "@ocrTesterChipRead": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipDerived": "DERIVED",
+  "ocrTesterChipDerived": "HÄRLEDD",
   "@ocrTesterChipDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateAccepted": "Accepted",
+  "ocrTesterGateAccepted": "Godkänd",
   "@ocrTesterGateAccepted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateRejected": "Rejected",
+  "ocrTesterGateRejected": "Avvisad",
   "@ocrTesterGateRejected": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFallbackBanner": "A field was recovered via magnitude fallback — verify it.",
+  "ocrTesterFallbackBanner": "Ett fält återställdes via storleksreserv — kontrollera det.",
   "@ocrTesterFallbackBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageNoData": "Stage did not run.",
+  "ocrTesterStageNoData": "Steget kördes inte.",
   "@ocrTesterStageNoData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopyJson": "Copy as JSON",
+  "ocrTesterCopyJson": "Kopiera som JSON",
   "@ocrTesterCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExportPackage": "Export package",
+  "ocrTesterExportPackage": "Exportera paket",
   "@ocrTesterExportPackage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopied": "OCR trace copied to clipboard.",
+  "ocrTesterCopied": "OCR-spårning kopierad till urklipp.",
   "@ocrTesterCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExported": "OCR package saved to your Downloads folder.",
+  "ocrTesterExported": "OCR-paket sparat i Hämtningar.",
   "@ocrTesterExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitSection": "Dongle init transcript",
+  "obd2DiagnosticsInitSection": "Dongel-initieringsutskrift",
   "@obd2DiagnosticsInitSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
+  "obd2DiagnosticsInitHeader": "Protokoll {protocol} · {start} · firmware {firmware} · {tier} · {pids} PID:ar",
   "@obd2DiagnosticsInitHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "protocol": {
@@ -3084,7 +2923,6 @@
   },
   "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
   "@obd2DiagnosticsInitLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "cmd": {
@@ -3098,49 +2936,40 @@
       }
     }
   },
-  "obd2DiagnosticsInitWarm": "warm",
+  "obd2DiagnosticsInitWarm": "varm",
   "@obd2DiagnosticsInitWarm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitCold": "cold",
+  "obd2DiagnosticsInitCold": "kall",
   "@obd2DiagnosticsInitCold": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Copy init transcript only",
+  "obd2HealthCopyInitTranscript": "Kopiera bara initieringsutskriften",
   "@obd2HealthCopyInitTranscript": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterSaveFixture": "Save as fixture",
+  "ocrTesterSaveFixture": "Spara som testfixtur",
   "@ocrTesterSaveFixture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "ocrTesterFixtureSaved": "Fixtur sparad i Hämtningar. Flytta den till test/fixtures och kör tool/promote_ocr_fixture.dart.",
   "@ocrTesterFixtureSaved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationColdStart": "Cold start",
+  "situationColdStart": "Kallstart",
   "@situationColdStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationSustainedLoad": "Sustained load / towing",
+  "situationSustainedLoad": "Ihållande belastning / bogserande",
   "@situationSustainedLoad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationPartialDecel": "Coasting",
+  "situationPartialDecel": "Frihjuling",
   "@situationPartialDecel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorDistanceLabel": "Distance ({unit})",
+  "calculatorDistanceLabel": "Sträcka ({unit})",
   "@calculatorDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3148,9 +2977,8 @@
       }
     }
   },
-  "calculatorConsumptionLabel": "Consumption ({unit})",
+  "calculatorConsumptionLabel": "Förbrukning ({unit})",
   "@calculatorConsumptionLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3158,9 +2986,8 @@
       }
     }
   },
-  "calculatorPriceLabel": "Fuel price ({unit})",
+  "calculatorPriceLabel": "Bränslepris ({unit})",
   "@calculatorPriceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3168,164 +2995,132 @@
       }
     }
   },
-  "calculatorUseMine": "Use",
+  "calculatorUseMine": "Använd",
   "@calculatorUseMine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorApplied": "Applied",
+  "calculatorApplied": "Tillämpad",
   "@calculatorApplied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripDetails": "Trip details",
+  "tripDetails": "Reseinformation",
   "@tripDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorRoundTrip": "Round trip",
+  "calculatorRoundTrip": "Tur och retur",
   "@calculatorRoundTrip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "roundTripTotal": "Round trip",
+  "roundTripTotal": "Tur och retur",
   "@roundTripTotal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerDistance": "Cost per km",
+  "costPerDistance": "Kostnad per km",
   "@costPerDistance": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerMonth": "Cost per month",
+  "costPerMonth": "Kostnad per månad",
   "@costPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorEstimateMonthly": "Estimate monthly cost",
+  "calculatorEstimateMonthly": "Uppskatta månadskostnad",
   "@calculatorEstimateMonthly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonth": "Trips per month",
+  "calculatorTripsPerMonth": "Resor per månad",
   "@calculatorTripsPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonthHint": "e.g. 20",
+  "calculatorTripsPerMonthHint": "t.ex. 20",
   "@calculatorTripsPerMonthHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorReset": "Reset",
+  "calculatorReset": "Återställ",
   "@calculatorReset": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
+  "calculatorResultPlaceholder": "Fyll i sträcka, förbrukning och pris för att se din resekostnad",
   "@calculatorResultPlaceholder": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressFinalizingSummary": "Finalizing summary…",
+  "tripSaveProgressFinalizingSummary": "Slutför sammanfattning…",
   "@tripSaveProgressFinalizingSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSavingToHistory": "Saving to history…",
+  "tripSaveProgressSavingToHistory": "Sparar till historik…",
   "@tripSaveProgressSavingToHistory": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSyncingToCloud": "Syncing in background…",
+  "tripSaveProgressSyncingToCloud": "Synkroniserar i bakgrunden…",
   "@tripSaveProgressSyncingToCloud": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingSavingTitle": "Saving trip…",
+  "tripRecordingSavingTitle": "Sparar resa…",
   "@tripRecordingSavingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionDisplayStations": "Display & stations",
+  "profileSectionDisplayStations": "Visning och stationer",
   "@profileSectionDisplayStations": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupVehicles": "Vehicles",
+  "consoGroupVehicles": "Fordon",
   "@consoGroupVehicles": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupCoaching": "Coaching while driving",
+  "consoGroupCoaching": "Körcoachning",
   "@consoGroupCoaching": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupRewards": "Rewards & savings",
+  "consoGroupRewards": "Belöningar och besparingar",
   "@consoGroupRewards": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupTroubleshooting": "Troubleshooting",
+  "consoGroupTroubleshooting": "Felsökning",
   "@consoGroupTroubleshooting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_voiceAnnouncements": "Voice announcements",
+  "featureLabel_voiceAnnouncements": "Röstmeddelanden",
   "@featureLabel_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_voiceAnnouncements": "Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.",
+  "featureDescription_voiceAnnouncements": "Tala om billiga bensinstationer i närheten när du kör, så att du kan hålla blicken på vägen.",
   "@featureDescription_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "featureBlockedEnable_voiceAnnouncements": "Aktivera bensinmack-radarn först",
   "@featureBlockedEnable_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2GpsDegradedBannerTitle": "Recording with GPS — OBD2 reconnecting",
+  "obd2GpsDegradedBannerTitle": "Spelar in med GPS — OBD2 återansluter",
   "@obd2GpsDegradedBannerTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Restore backup",
+  "restoreBackupTooltip": "Återställ säkerhetskopia",
   "@restoreBackupTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogTitle": "Restore backup",
+  "restoreBackupDialogTitle": "Återställ säkerhetskopia",
   "@restoreBackupDialogTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogBody": "Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.",
+  "restoreBackupDialogBody": "Sammanfoga lägger till och uppdaterar poster från säkerhetskopian och behåller allt som redan finns på enheten. Ersätt raderar all nuvarande data först och återställer sedan bara säkerhetskopian — detta kan inte ångras.",
   "@restoreBackupDialogBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergeAction": "Merge",
+  "restoreBackupMergeAction": "Sammanfoga",
   "@restoreBackupMergeAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupReplaceAction": "Replace all",
+  "restoreBackupReplaceAction": "Ersätt allt",
   "@restoreBackupReplaceAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupSuccess": "Backup restored — {count} records imported",
+  "restoreBackupSuccess": "Säkerhetskopia återställd — {count} poster importerade",
   "@restoreBackupSuccess": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3333,29 +3128,24 @@
       }
     }
   },
-  "restoreBackupEmpty": "Backup restored — it contained no records",
+  "restoreBackupEmpty": "Säkerhetskopia återställd — den innehöll inga poster",
   "@restoreBackupEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupCorrupt": "Restore failed — this file is not a valid Tankstellen backup",
+  "restoreBackupCorrupt": "Återställning misslyckades — den här filen är inte en giltig Tankstellen-säkerhetskopia",
   "@restoreBackupCorrupt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupFailed": "Restore failed — the file could not be read",
+  "restoreBackupFailed": "Återställning misslyckades — filen kunde inte läsas",
   "@restoreBackupFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSearchingChip": "Searching the route…",
+  "routeSearchingChip": "Söker rutten…",
   "@routeSearchingChip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Every {km} km",
+  "routeSegmentSummaryBadge": "Var {km} km",
   "@routeSegmentSummaryBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3363,9 +3153,8 @@
       }
     }
   },
-  "profileSwitchedTo": "Switched to {profile}",
+  "profileSwitchedTo": "Bytte till {profile}",
   "@profileSwitchedTo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "profile": {
@@ -3373,9 +3162,8 @@
       }
     }
   },
-  "profileCreatedNamed": "Profile {name} created",
+  "profileCreatedNamed": "Profilen {name} skapad",
   "@profileCreatedNamed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -3383,9 +3171,8 @@
       }
     }
   },
-  "profileCountryTaken": "A profile for {country} already exists — edit it instead.",
+  "profileCountryTaken": "En profil för {country} finns redan — redigera den istället.",
   "@profileCountryTaken": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "country": {
@@ -3393,39 +3180,32 @@
       }
     }
   },
-  "evPriceFree": "Free",
+  "evPriceFree": "Gratis",
   "@evPriceFree": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPricePayAtLocation": "Pay at location",
+  "evPricePayAtLocation": "Betalning på plats",
   "@evPricePayAtLocation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceMembership": "Membership required",
+  "evPriceMembership": "Medlemskap krävs",
   "@evPriceMembership": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceIndicative": "Indicative price",
+  "evPriceIndicative": "Vägledande pris",
   "@evPriceIndicative": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceDeclaredByOperator": "Indicative price declared by the operator — verify on site",
+  "evPriceDeclaredByOperator": "Vägledande pris uppgivet av operatören — kontrollera på plats",
   "@evPriceDeclaredByOperator": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceFranceAttribution": "Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "evPriceFranceAttribution": "Prissättning: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
   "@evPriceFranceAttribution": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "routeStationCount": "{count, plural, =1{1 station} other{{count} stationer}}",
   "@routeStationCount": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3433,9 +3213,8 @@
       }
     }
   },
-  "stationUpdatedLabel": "Updated {time}",
+  "stationUpdatedLabel": "Uppdaterad {time}",
   "@stationUpdatedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3444,9 +3223,8 @@
       }
     }
   },
-  "amenityMoreTooltip": "Also: {names}",
+  "amenityMoreTooltip": "Även: {names}",
   "@amenityMoreTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "names": {
@@ -3455,19 +3233,16 @@
       }
     }
   },
-  "favoriteAdd": "Add to favorites",
+  "favoriteAdd": "Lägg till i favoriter",
   "@favoriteAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "favoriteRemove": "Remove from favorites",
+  "favoriteRemove": "Ta bort från favoriter",
   "@favoriteRemove": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "loyaltyRawPriceTooltip": "Raw: {price}",
+  "loyaltyRawPriceTooltip": "Rå: {price}",
   "@loyaltyRawPriceTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "price": {
@@ -3478,7 +3253,6 @@
   },
   "routeDataSourceMulti": "{sources}",
   "@routeDataSourceMulti": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "sources": {
@@ -3487,29 +3261,24 @@
       }
     }
   },
-  "obd2TestRunTitle": "Run adapter test",
+  "obd2TestRunTitle": "Kör adaptertest",
   "@obd2TestRunTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunButton": "Run adapter test",
+  "obd2TestRunButton": "Kör adaptertest",
   "@obd2TestRunButton": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunPassed": "Adapter test passed",
+  "obd2TestRunPassed": "Adaptertest godkänt",
   "@obd2TestRunPassed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunFailed": "Adapter test failed",
+  "obd2TestRunFailed": "Adaptertest misslyckades",
   "@obd2TestRunFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
+  "obd2TestRunSummary": "{passed} av {total} steg OK · {elapsed} ms",
   "@obd2TestRunSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "passed": {
@@ -3526,139 +3295,112 @@
       }
     }
   },
-  "obd2TestRunCannotWhileRecording": "Stop the active recording before running the adapter test.",
+  "obd2TestRunCannotWhileRecording": "Stoppa aktiv inspelning innan du kör adaptertestet.",
   "@obd2TestRunCannotWhileRecording": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepScan": "Scan for adapter",
+  "obd2TestStepScan": "Sök efter adapter",
   "@obd2TestStepScan": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepConnect": "Connect & init",
+  "obd2TestStepConnect": "Anslut och initiera",
   "@obd2TestStepConnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepInfo": "Adapter info",
+  "obd2TestStepInfo": "Adapterinfo",
   "@obd2TestStepInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSupportedPids": "Supported PIDs",
+  "obd2TestStepSupportedPids": "Stödda PID:ar",
   "@obd2TestStepSupportedPids": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSampleReads": "Sample reads",
+  "obd2TestStepSampleReads": "Provavläsningar",
   "@obd2TestStepSampleReads": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepReconnect": "Reconnect test",
+  "obd2TestStepReconnect": "Återanslutningstest",
   "@obd2TestStepReconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepDisconnect": "Disconnect",
+  "obd2TestStepDisconnect": "Koppla från",
   "@obd2TestStepDisconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2TestStatusOk": "OK",
   "@obd2TestStatusOk": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusTimeout": "Timed out",
+  "obd2TestStatusTimeout": "Timeout",
   "@obd2TestStatusTimeout": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusGarbage": "Unreadable reply",
+  "obd2TestStatusGarbage": "Oläsbart svar",
   "@obd2TestStatusGarbage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusNoResponse": "No response",
+  "obd2TestStatusNoResponse": "Inget svar",
   "@obd2TestStatusNoResponse": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusFail": "Failed",
+  "obd2TestStatusFail": "Misslyckades",
   "@obd2TestStatusFail": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadCsvOption": "Download telemetry (CSV)",
+  "trajetDetailDownloadCsvOption": "Ladda ner telemetri (CSV)",
   "@trajetDetailDownloadCsvOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadJsonOption": "Download telemetry (JSON)",
+  "trajetDetailDownloadJsonOption": "Ladda ner telemetri (JSON)",
   "@trajetDetailDownloadJsonOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadError": "Couldn't save the file",
+  "trajetDetailDownloadError": "Kunde inte spara filen",
   "@trajetDetailDownloadError": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHardAcceleration": "Easy on the accelerator",
+  "coachingVoiceHardAcceleration": "Lugn med gaspedalen",
   "@coachingVoiceHardAcceleration": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHarshBraking": "Try to brake more gently",
+  "coachingVoiceHarshBraking": "Försök bromsa mjukare",
   "@coachingVoiceHarshBraking": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftUp": "Shift up a gear to save fuel",
+  "coachingVoiceShiftUp": "Växla upp för att spara bränsle",
   "@coachingVoiceShiftUp": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftDown": "Shift down, the engine is labouring",
+  "coachingVoiceShiftDown": "Växla ner, motorn anstränger sig",
   "@coachingVoiceShiftDown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceEasePedal": "Ease off the pedal to cut your fuel use",
+  "coachingVoiceEasePedal": "Lätta på pedalen för att minska bränsleförbrukningen",
   "@coachingVoiceEasePedal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceLiftOff": "Lift off the accelerator and coast",
+  "coachingVoiceLiftOff": "Lyft foten från gaspedalen och frihjula",
   "@coachingVoiceLiftOff": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceAnticipateBrake": "Look further ahead and lift off earlier",
+  "coachingVoiceAnticipateBrake": "Titta längre fram och lyft foten tidigare",
   "@coachingVoiceAnticipateBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceSmoothAccel": "Accelerate more smoothly",
+  "coachingVoiceSmoothAccel": "Accelerera mjukare",
   "@coachingVoiceSmoothAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingTitle": "Spoken driving coaching",
+  "voiceCoachingSettingTitle": "Talad körcoachning",
   "@voiceCoachingSettingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingSubtitle": "Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints",
+  "voiceCoachingSettingSubtitle": "Hör talade tips medan du kör — hård acceleration, hård bromsning och växlingstips",
   "@voiceCoachingSettingSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarDistanceKm": "{km} km away",
+  "fuelStationRadarDistanceKm": "{km} km bort",
   "@fuelStationRadarDistanceKm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3667,9 +3409,8 @@
       }
     }
   },
-  "fuelStationRadarProximity": "Proximity {percent}%",
+  "fuelStationRadarProximity": "Närhet {percent}%",
   "@fuelStationRadarProximity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -3678,94 +3419,76 @@
       }
     }
   },
-  "fuelStationRadarNearer": "Nearer station",
+  "fuelStationRadarNearer": "Närmre station",
   "@fuelStationRadarNearer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarFarther": "Farther station",
+  "fuelStationRadarFarther": "Längre bort station",
   "@fuelStationRadarFarther": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarResultBadge": "Fuel Station Radar result",
+  "fuelStationRadarResultBadge": "Bensinmack-radarresultat",
   "@fuelStationRadarResultBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_finding": "Finding & map",
+  "featureGroupTitle_finding": "Hitta och karta",
   "@featureGroupTitle_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_finding": "Where to fuel up or charge — search, map, routing.",
+  "featureGroupDescription_finding": "Var man tankar eller laddar — sökning, karta, ruttplanering.",
   "@featureGroupDescription_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_prices": "Prices & alerts",
+  "featureGroupTitle_prices": "Priser och aviseringar",
   "@featureGroupTitle_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_prices": "Price drops, history, and reporting.",
+  "featureGroupDescription_prices": "Prissänkningar, historik och rapportering.",
   "@featureGroupDescription_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_radar": "Fuel Station Radar",
+  "featureGroupTitle_radar": "Bensinmack-radar",
   "@featureGroupTitle_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_radar": "Live price nudges as you drive.",
+  "featureGroupDescription_radar": "Live-prisnudgar när du kör.",
   "@featureGroupDescription_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_sync": "Sync & backup",
+  "featureGroupTitle_sync": "Synkronisering och säkerhetskopiering",
   "@featureGroupTitle_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_sync": "Keep your data across devices.",
+  "featureGroupDescription_sync": "Håll din data på alla enheter.",
   "@featureGroupDescription_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_input": "Input & scanning",
+  "featureGroupTitle_input": "Inmatning och skanning",
   "@featureGroupTitle_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_input": "Helpers for logging fill-ups.",
+  "featureGroupDescription_input": "Hjälpmedel för att logga tankningar.",
   "@featureGroupDescription_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_developer": "Developer & experimental",
+  "featureGroupTitle_developer": "Utvecklare och experimentellt",
   "@featureGroupTitle_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_developer": "Power-user and contributor tools.",
+  "featureGroupDescription_developer": "Verktyg för avancerade användare och bidragsgivare.",
   "@featureGroupDescription_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarStart": "Start fuel station radar",
+  "fuelStationRadarStart": "Starta bensinmack-radar",
   "@fuelStationRadarStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "evPriceBestEffortOcm": "Bästa möjliga prissättning från OpenChargeMap — sparsam och kan vara ofullständig.",
   "@evPriceBestEffortOcm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "insightClimbingCost": "Klättring i {gradePercent}% stigning ({pctTime}% av resan): slösade {liters} L",
   "@insightClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gradePercent": {
@@ -3779,14 +3502,12 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "lessonAdviceClimbingCost": "Ta med fart in i en backe och tryck varsamt på gasen — att rusa i en uppförsbacke bränner extra bränsle.",
   "@lessonAdviceClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "insightRestartCost": "{count} stopp-och-körningar: slösade {liters} L",
   "@insightRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3797,44 +3518,36 @@
       }
     }
   },
-  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "lessonAdviceRestartCost": "Förutse trafiken och frihjula mot stoppen så att du rullar istället för att starta om — att köra iväg från stillastående är den mest bränsletörstiga delen av stopp-och-körning.",
   "@lessonAdviceRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCardTitle": "GPS efficiency",
+  "gpsKpiCardTitle": "GPS-effektivitet",
   "@gpsKpiCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "gpsKpiRpa": "Positiv acceleration (RPA)",
   "@gpsKpiRpa": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "gpsKpiPke": "Kinetisk energiefterfrågan (PKE)",
   "@gpsKpiPke": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "gpsKpiVapos": "Accelerationsintensitet (VAPOS)",
   "@gpsKpiVapos": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCoast": "Coasting share",
+  "gpsKpiCoast": "Frihjulingsandel",
   "@gpsKpiCoast": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiClimbEnergy": "Climb energy",
+  "gpsKpiClimbEnergy": "Klättringsenergi",
   "@gpsKpiClimbEnergy": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "drivingScoreBaselineDelta": "{pct} jämfört med ditt effektiva basvärde",
   "@drivingScoreBaselineDelta": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -3842,29 +3555,24 @@
       }
     }
   },
-  "consumptionMonthlyClimbLabel": "Climbed",
+  "consumptionMonthlyClimbLabel": "Klättrat",
   "@consumptionMonthlyClimbLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNow": "Open",
+  "openNow": "Öppen",
   "@openNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNowClosed": "Closed",
+  "openNowClosed": "Stängd",
   "@openNowClosed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openHoursUnknown": "Hours unknown",
+  "openHoursUnknown": "Okända öppettider",
   "@openHoursUnknown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closesAt": "Closes {time}",
+  "closesAt": "Stänger {time}",
   "@closesAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3872,9 +3580,8 @@
       }
     }
   },
-  "opensAt": "Opens {day} {time}",
+  "opensAt": "Öppnar {day} {time}",
   "@opensAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -3885,9 +3592,8 @@
       }
     }
   },
-  "opensToday": "Opens {time}",
+  "opensToday": "Öppnar {time}",
   "@opensToday": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3895,89 +3601,72 @@
       }
     }
   },
-  "open24Hours": "Open 24 hours",
+  "open24Hours": "Öppen dygnet runt",
   "@open24Hours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "badge24h": "24h",
   "@badge24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayMon": "Monday",
+  "dayMon": "Måndag",
   "@dayMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayTue": "Tuesday",
+  "dayTue": "Tisdag",
   "@dayTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayWed": "Wednesday",
+  "dayWed": "Onsdag",
   "@dayWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayThu": "Thursday",
+  "dayThu": "Torsdag",
   "@dayThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayFri": "Friday",
+  "dayFri": "Fredag",
   "@dayFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySat": "Saturday",
+  "daySat": "Lördag",
   "@daySat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySun": "Sunday",
+  "daySun": "Söndag",
   "@daySun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortMon": "Mon",
+  "dayShortMon": "Mån",
   "@dayShortMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortTue": "Tue",
+  "dayShortTue": "Tis",
   "@dayShortTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortWed": "Wed",
+  "dayShortWed": "Ons",
   "@dayShortWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortThu": "Thu",
+  "dayShortThu": "Tor",
   "@dayShortThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortFri": "Fri",
+  "dayShortFri": "Fre",
   "@dayShortFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSat": "Sat",
+  "dayShortSat": "Lör",
   "@dayShortSat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSun": "Sun",
+  "dayShortSun": "Sön",
   "@dayShortSun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "dayRange": "{from} – {to}",
   "@dayRange": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "from": {
@@ -3988,59 +3677,48 @@
       }
     }
   },
-  "publicHolidays": "Public holidays",
+  "publicHolidays": "Helgdagar",
   "@publicHolidays": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closedLabel": "Closed",
+  "closedLabel": "Stängd",
   "@closedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursNotAvailable": "Opening hours not available",
+  "openingHoursNotAvailable": "Öppettider ej tillgängliga",
   "@openingHoursNotAvailable": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showAllHours": "Show all hours",
+  "showAllHours": "Visa alla öppettider",
   "@showAllHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showLessHours": "Show less",
+  "showLessHours": "Visa mindre",
   "@showLessHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPageTitle": "Consumption statistics",
+  "consumptionStatsPageTitle": "Förbrukningsstatistik",
   "@consumptionStatsPageTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsComparisonTitle": "This month vs last month",
+  "consumptionStatsComparisonTitle": "Denna månad vs förra månaden",
   "@consumptionStatsComparisonTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsTrendsTitle": "Evolution over time",
+  "consumptionStatsTrendsTitle": "Utveckling över tid",
   "@consumptionStatsTrendsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsNeedTwoMonths": "Log fill-ups across at least two months to compare.",
+  "consumptionStatsNeedTwoMonths": "Logga tankningar under minst två månader för att jämföra.",
   "@consumptionStatsNeedTwoMonths": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPricePerLiter": "Avg price/L",
+  "consumptionStatsPricePerLiter": "Snittpris/L",
   "@consumptionStatsPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "consumptionStatsDeltaPercent": "{pct}%",
   "@consumptionStatsDeltaPercent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -4048,89 +3726,72 @@
       }
     }
   },
-  "consumptionStatsChartLiters": "Litres per month",
+  "consumptionStatsChartLiters": "Liter per månad",
   "@consumptionStatsChartLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartSpend": "Spend per month",
+  "consumptionStatsChartSpend": "Utgifter per månad",
   "@consumptionStatsChartSpend": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartPricePerLiter": "Price per litre",
+  "consumptionStatsChartPricePerLiter": "Pris per liter",
   "@consumptionStatsChartPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartConsumption": "L/100km per month",
+  "consumptionStatsChartConsumption": "L/100km per månad",
   "@consumptionStatsChartConsumption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptImporting": "Importing shared receipt…",
+  "shareReceiptImporting": "Importerar delat kvitto…",
   "@shareReceiptImporting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
+  "shareReceiptUnsupportedFormat": "Den filtypen kan inte importeras ännu — dela ett foto av kvittot istället.",
   "@shareReceiptUnsupportedFormat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptFailed": "Couldn't read the shared receipt — try sharing it again or add the fill-up manually.",
+  "shareReceiptFailed": "Kunde inte läsa det delade kvittot — försök dela det igen eller lägg till tankningen manuellt.",
   "@shareReceiptFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_addFillUpShareIntentReceipt": "Share receipt to import",
+  "featureLabel_addFillUpShareIntentReceipt": "Dela kvitto för import",
   "@featureLabel_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_addFillUpShareIntentReceipt": "Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.",
+  "featureDescription_addFillUpShareIntentReceipt": "Dela ett kvittofoto från en annan app för att förifyll en tankning — datum, liter, totalt och station läses på enheten.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "24/7 automate",
+  "openingHoursAutomate24h": "Automatisera 24/7",
   "@openingHoursAutomate24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "stopRadar": "Stop radar",
+  "stopRadar": "Stoppa radar",
   "@stopRadar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "moreActionsTooltip": "More",
+  "moreActionsTooltip": "Mer",
   "@moreActionsTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupMenuLabel": "Export backup",
+  "exportBackupMenuLabel": "Exportera säkerhetskopia",
   "@exportBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMenuLabel": "Restore backup",
+  "restoreBackupMenuLabel": "Återställ säkerhetskopia",
   "@restoreBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "carbonDashboardMenuLabel": "Carbon dashboard",
+  "carbonDashboardMenuLabel": "Koldioxidöversikt",
   "@carbonDashboardMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "settingsMenuLabel": "Settings",
+  "settingsMenuLabel": "Inställningar",
   "@settingsMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "gpsDiagnosticsLargestGap": "Största lucka: {seconds} s",
   "@gpsDiagnosticsLargestGap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "seconds": {
@@ -4138,34 +3799,28 @@
       }
     }
   },
-  "gpsLifecycleResumed": "Resumed",
+  "gpsLifecycleResumed": "Återupptagen",
   "@gpsLifecycleResumed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecyclePaused": "Paused",
+  "gpsLifecyclePaused": "Pausad",
   "@gpsLifecyclePaused": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecycleInactive": "Inactive",
+  "gpsLifecycleInactive": "Inaktiv",
   "@gpsLifecycleInactive": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "tripRecordingGpsNotificationTitle": "Spelar in din resa",
   "@tripRecordingGpsNotificationTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "tripRecordingGpsNotificationText": "Spårar din rutt för bränsle- och körstatistik",
   "@tripRecordingGpsNotificationText": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceStationAnnouncement": "{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}",
+  "voiceStationAnnouncement": "{name}, {distanceKm} kilometer framåt, {fuelType} {euros} euro {cents}",
   "@voiceStationAnnouncement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -4190,54 +3845,44 @@
       }
     }
   },
-  "radarPinHelpTitle": "About pin",
+  "radarPinHelpTitle": "Om nålning",
   "@radarPinHelpTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarPinHelpBody": "Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.",
+  "radarPinHelpBody": "Nålning håller skärmen på och döljer systemfälten så att avläsningen av närmaste station förblir läsbar på en instrumentbrädemontering. Tryck igen för att frigöra. Frigörs automatiskt när radarn stannar.",
   "@radarPinHelpBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinTitle": "Always pin when the radar starts",
+  "radarAutoPinTitle": "Nåla alltid när radarn startar",
   "@radarAutoPinTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinSubtitle": "Pin the radar automatically every time instead of tapping each time. Uses more battery.",
+  "radarAutoPinSubtitle": "Nåla radarn automatiskt varje gång istället för att trycka varje gång. Använder mer batteri.",
   "@radarAutoPinSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeCardTitle": "Acceleration & braking",
+  "accelBrakeCardTitle": "Acceleration och bromsning",
   "@accelBrakeCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardAccel": "Hard accelerations",
+  "accelBrakeHardAccel": "Hård acceleration",
   "@accelBrakeHardAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardBrake": "Hard braking",
+  "accelBrakeHardBrake": "Hård bromsning",
   "@accelBrakeHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSharpCorner": "Sharp corners",
+  "accelBrakeSharpCorner": "Skarpa kurvor",
   "@accelBrakeSharpCorner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSource": "From the phone's motion sensors",
+  "accelBrakeSource": "Från telefonens rörelsesensorer",
   "@accelBrakeSource": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonHardBrake": "{count} hard braking events",
+  "lessonHardBrake": "{count} hårda bromshändelser",
   "@lessonHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4245,14 +3890,12 @@
       }
     }
   },
-  "lessonAdviceHardBrake": "Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.",
+  "lessonAdviceHardBrake": "Förutse stopp och lyft foten från gaspedalen tidigare — hård bromsning kastar bort det bränsle du just spenderade på att komma upp i fart.",
   "@lessonAdviceHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonSharpCornering": "{count} sharp corners",
+  "lessonSharpCornering": "{count} skarpa kurvor",
   "@lessonSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4260,44 +3903,36 @@
       }
     }
   },
-  "lessonAdviceSharpCornering": "Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.",
+  "lessonAdviceSharpCornering": "Sakta ner före kurvan, inte i den — hård kurvtagning skrapar av fart som du sedan måste bygga upp igen.",
   "@lessonAdviceSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardTitle": "Driving-analysis trace (dev)",
+  "drivingTraceCardTitle": "Köranalys-spårning (dev)",
   "@drivingTraceCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardBody": "Export this trip's GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.",
+  "drivingTraceCardBody": "Exportera den här resans GPS-KPI:er, poäng och lärdomar som JSON, skriv hur körningen faktiskt kändes i kommentarsfältet och dela tillbaka det så att tröskelvärdena för körstil kan kalibreras mot riktiga resor.",
   "@drivingTraceCardBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportAction": "Export analysis trace",
+  "drivingTraceExportAction": "Exportera analysspårning",
   "@drivingTraceExportAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExported": "Analysis trace saved to Downloads — add your verdict in the comment field and share it back.",
+  "drivingTraceExported": "Analysspårning sparad i Hämtningar — lägg till ditt omdöme i kommentarsfältet och dela tillbaka det.",
   "@drivingTraceExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportFailed": "Couldn't export the analysis trace.",
+  "drivingTraceExportFailed": "Kunde inte exportera analysspårningen.",
   "@drivingTraceExportFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "backupExportProgress": "Exporting your backup…",
+  "backupExportProgress": "Exporterar din säkerhetskopia…",
   "@backupExportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "exportBackupSavedAs": "Sparad i Hämtningar som {fileName}",
   "@exportBackupSavedAs": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fileName": {
@@ -4305,14 +3940,12 @@
       }
     }
   },
-  "backupImportProgress": "Restoring your backup…",
+  "backupImportProgress": "Återställer din säkerhetskopia…",
   "@backupImportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupMergedSummary": "Sammanfogade {vehicles} fordon, {fillUps} tankningar, {trips} resor, {chargingLogs} laddningsloggar",
   "@restoreBackupMergedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4329,9 +3962,8 @@
       }
     }
   },
-  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupReplacedSummary": "Ersatte all data med {vehicles} fordon, {fillUps} tankningar, {trips} resor, {chargingLogs} laddningsloggar",
   "@restoreBackupReplacedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4348,19 +3980,16 @@
       }
     }
   },
-  "alertsStationSectionTitle": "Station alerts",
+  "alertsStationSectionTitle": "Stationsaviseringar",
   "@alertsStationSectionTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "alertsStationAdd": "Add a station alert",
+  "alertsStationAdd": "Lägg till en stationsavisering",
   "@alertsStationAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
+  "scanPumpInconsistent": "De skannade värdena stämmer inte — ange dem manuellt.",
   "@scanPumpInconsistent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

@@ -2007,14 +2007,12 @@
   "countryInfoFuelTypes": "Vrste goriva: {fuelTypes}",
   "countryInfoDemoSource": "Demo",
   "languageChipSemantic": "{selected, select, true{Jezik {name}, odabrano} false{Jezik {name}} other{Jezik {name}}}",
-  "fillUpGuidanceTitle": "Best time to fill up",
+  "fillUpGuidanceTitle": "Najbolje vrijeme za punjenje",
   "@fillUpGuidanceTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceGoodTimeNow": "The current price is among the cheapest of the last {days} days — a good time to fill up.",
+  "fillUpGuidanceGoodTimeNow": "Trenutna cijena je među najjeftinijima zadnjih {days} dana — dobro je vrijeme za punjenje.",
   "@fillUpGuidanceGoodTimeNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2023,9 +2021,8 @@
       }
     }
   },
-  "fillUpGuidanceWaitCheaper": "Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.",
+  "fillUpGuidanceWaitCheaper": "Cijene su blizu {days}-dnevnog maksimuma. Obično su jeftinije {window} — razmislite o čekanju.",
   "@fillUpGuidanceWaitCheaper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2038,14 +2035,12 @@
       }
     }
   },
-  "fillUpGuidanceFillSoon": "Prices are trending up — consider filling up soon.",
+  "fillUpGuidanceFillSoon": "Cijene rastu — razmislite o punjenju uskoro.",
   "@fillUpGuidanceFillSoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceNeutral": "Today's price is around the {days}-day average.",
+  "fillUpGuidanceNeutral": "Današnja cijena je oko {days}-dnevnog prosjeka.",
   "@fillUpGuidanceNeutral": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2054,9 +2049,8 @@
       }
     }
   },
-  "fillUpGuidanceSaving": "Could save about {amount}/L by timing your fill-up.",
+  "fillUpGuidanceSaving": "Mogla bi se uštedjeti oko {amount}/L pravovremenim punjenjem.",
   "@fillUpGuidanceSaving": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "amount": {
@@ -2065,9 +2059,8 @@
       }
     }
   },
-  "fillUpGuidanceSampleNote": "{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}",
+  "fillUpGuidanceSampleNote": "{count, plural, =1{Na temelju 1 očitanja cijene} other{Na temelju {count} očitanja cijene}}",
   "@fillUpGuidanceSampleNote": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -2078,7 +2071,6 @@
   },
   "fillUpGuidanceWindowDayAndPart": "{day} {part}",
   "@fillUpGuidanceWindowDayAndPart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2091,9 +2083,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowDayOnly": "on {day}",
+  "fillUpGuidanceWindowDayOnly": "u {day}",
   "@fillUpGuidanceWindowDayOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2102,9 +2093,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowPartOnly": "in the {part}",
+  "fillUpGuidanceWindowPartOnly": "{part}",
   "@fillUpGuidanceWindowPartOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "part": {
@@ -2113,74 +2103,60 @@
       }
     }
   },
-  "fillUpGuidanceWindowGeneric": "at other times",
+  "fillUpGuidanceWindowGeneric": "u ostalim vremenima",
   "@fillUpGuidanceWindowGeneric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday1": "Mondays",
+  "fillUpGuidanceWeekday1": "Ponedjeljkom",
   "@fillUpGuidanceWeekday1": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday2": "Tuesdays",
+  "fillUpGuidanceWeekday2": "Utorkom",
   "@fillUpGuidanceWeekday2": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday3": "Wednesdays",
+  "fillUpGuidanceWeekday3": "Srijedom",
   "@fillUpGuidanceWeekday3": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday4": "Thursdays",
+  "fillUpGuidanceWeekday4": "Četvrtkom",
   "@fillUpGuidanceWeekday4": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday5": "Fridays",
+  "fillUpGuidanceWeekday5": "Petkom",
   "@fillUpGuidanceWeekday5": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday6": "Saturdays",
+  "fillUpGuidanceWeekday6": "Subotom",
   "@fillUpGuidanceWeekday6": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday7": "Sundays",
+  "fillUpGuidanceWeekday7": "Nedjeljom",
   "@fillUpGuidanceWeekday7": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEarlyMorning": "early mornings",
+  "fillUpGuidancePartEarlyMorning": "rano ujutro",
   "@fillUpGuidancePartEarlyMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartMorning": "mornings",
+  "fillUpGuidancePartMorning": "ujutro",
   "@fillUpGuidancePartMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartAfternoon": "afternoons",
+  "fillUpGuidancePartAfternoon": "poslijepodne",
   "@fillUpGuidancePartAfternoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEvening": "evenings",
+  "fillUpGuidancePartEvening": "navečer",
   "@fillUpGuidancePartEvening": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartNight": "nights",
+  "fillUpGuidancePartNight": "noću",
   "@fillUpGuidancePartNight": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "dataSourceLinkSemantic": "Otvori izvor podataka {source} ({license}) u pregledniku",
   "@dataSourceLinkSemantic": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "source": {
@@ -2193,54 +2169,44 @@
       }
     }
   },
-  "tripRadarClosestStation": "Closest station",
+  "tripRadarClosestStation": "Radar benzinskih postaja",
   "@tripRadarClosestStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarScanning": "Scanning for nearby stations",
+  "tripRadarScanning": "Traženje obližnjih postaja",
   "@tripRadarScanning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarNoStationNearby": "No station nearby",
+  "tripRadarNoStationNearby": "Nema obližnje postaje",
   "@tripRadarNoStationNearby": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "developerToolsTestAlertNoStation": "Search for stations first, then run the test alert so the notification can open a real station.",
+  "developerToolsTestAlertNoStation": "Prvo pretražite postaje, zatim pokrenite testno upozorenje kako bi obavijest mogla otvoriti stvarnu postaju.",
   "@developerToolsTestAlertNoStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_approachOverlay": "Approach overlay",
+  "featureLabel_approachOverlay": "Radar benzinskih postaja",
   "@featureLabel_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "featureDescription_approachOverlay": "Pretvara plutajuću pločicu putovanja u živi radar benzinskih postaja — kako se približavate benzinskoj postaji, pločica mijenja boju prema vrsti goriva i prikazuje cijenu.",
   "@featureDescription_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripAvgGpsEstimateTooltip": "GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle's calibration; accuracy improves as the matrix matures.",
+  "tripAvgGpsEstimateTooltip": "GPS procjena (~) — nema senzora goriva na ovom putu. Iznos je modeliran na temelju brzine i kalibracije vašeg vozila; točnost se poboljšava kako matrica sazrijeva.",
   "@tripAvgGpsEstimateTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingPipEstConsumptionCaption": "est. L/100 km",
+  "tripRecordingPipEstConsumptionCaption": "proci. L/100 km",
   "@tripRecordingPipEstConsumptionCaption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingEstimatedInfo": "Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle's calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.",
+  "tripRecordingEstimatedInfo": "Procijenjena vrijednost (~) — nema senzora goriva na ovom putu, pa je L/100 km modeliran iz GPS brzine i kalibracije vašeg vozila. Vrijednost je aproksimativna (tipično ±10–30 %, poboljšava se kako kalibracija sazrijeva), nije izmjereno očitanje.",
   "@tripRecordingEstimatedInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "mapAttributionOsm": "© {brand} contributors",
+  "mapAttributionOsm": "© {brand} suradnici",
   "@mapAttributionOsm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "brand": {
@@ -2249,14 +2215,12 @@
       }
     }
   },
-  "trajetDetailChartEstimatedBadge": "estimated",
+  "trajetDetailChartEstimatedBadge": "procijenjeno",
   "@trajetDetailChartEstimatedBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "statCorrectionLiters": "Corrections: +{liters} L",
+  "statCorrectionLiters": "Korekcije: +{liters} L",
   "@statCorrectionLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "liters": {
@@ -2264,14 +2228,12 @@
       }
     }
   },
-  "reconcileWorkflowTitle": "Reconcile your fuel",
+  "reconcileWorkflowTitle": "Uskladi gorivo",
   "@reconcileWorkflowTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainHeadline": "We found a {gap} L gap",
+  "reconcileWorkflowExplainHeadline": "Pronašli smo razliku od {gap} L",
   "@reconcileWorkflowExplainHeadline": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2279,9 +2241,8 @@
       }
     }
   },
-  "reconcileWorkflowExplainBody": "You pumped {pumped} L, but your recorded trips only account for {consumed} L. That leaves {gap} L unexplained.",
+  "reconcileWorkflowExplainBody": "Natočili ste {pumped} L, ali vaša snimljena putovanja bilježe samo {consumed} L. Preostaje {gap} L neobjašnjenih.",
   "@reconcileWorkflowExplainBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pumped": {
@@ -2295,104 +2256,84 @@
       }
     }
   },
-  "reconcileWorkflowExplainCauses": "This usually means a drive wasn't recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.",
+  "reconcileWorkflowExplainCauses": "To obično znači da neko vožnje nije snimljeno (adapter je bio odspojeni ili aplikacija zatvorena), ili nedostaje punjenje goriva ili je pogrešno uneseno.",
   "@reconcileWorkflowExplainCauses": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainConsequence": "Until this is resolved, your fuel total and your trips total won't match.",
+  "reconcileWorkflowExplainConsequence": "Dok se ovo ne razriješi, ukupno gorivo i ukupno putovanja neće se slagati.",
   "@reconcileWorkflowExplainConsequence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAttributeQuestion": "Help us attribute the gap",
+  "reconcileWorkflowAttributeQuestion": "Pomozite nam pripisati razliku",
   "@reconcileWorkflowAttributeQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowFillUpsCompleteQuestion": "Are all your fill-ups for this tank complete and correct?",
+  "reconcileWorkflowFillUpsCompleteQuestion": "Jesu li sva punjena goriva za ovaj rezervoar potpuna i točna?",
   "@reconcileWorkflowFillUpsCompleteQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDrivesRecordedQuestion": "Are all your drives recorded?",
+  "reconcileWorkflowDrivesRecordedQuestion": "Jesu li sve vožnje snimljene?",
   "@reconcileWorkflowDrivesRecordedQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerYes": "Yes",
+  "reconcileWorkflowAnswerYes": "Da",
   "@reconcileWorkflowAnswerYes": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerNo": "No",
+  "reconcileWorkflowAnswerNo": "Ne",
   "@reconcileWorkflowAnswerNo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathAHint": "A fill-up is missing or wrong — we'll add a correction so your fill-ups add up.",
+  "reconcileWorkflowPathAHint": "Nedostaje punjenje ili je pogrešno — dodajemo korekciju kako bi punjenja bila točna.",
   "@reconcileWorkflowPathAHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathBHint": "Your fill-ups are right and a drive went unrecorded — we'll add a virtual trip for the missing distance.",
+  "reconcileWorkflowPathBHint": "Punjenja su točna, ali neka vožnja nije snimljena — dodajemo virtualni put za propuštenu udaljenost.",
   "@reconcileWorkflowPathBHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowCorrectionLitersLabel": "Correction litres",
+  "reconcileWorkflowCorrectionLitersLabel": "Korekcija litara",
   "@reconcileWorkflowCorrectionLitersLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowVirtualDistanceLabel": "How far was the unrecorded drive? (km)",
+  "reconcileWorkflowVirtualDistanceLabel": "Koliko daleko je bila nesnimljena vožnja? (km)",
   "@reconcileWorkflowVirtualDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDecideLater": "Decide later",
+  "reconcileWorkflowDecideLater": "Odluči kasnije",
   "@reconcileWorkflowDecideLater": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowBack": "Back",
+  "reconcileWorkflowBack": "Natrag",
   "@reconcileWorkflowBack": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowNext": "Next",
+  "reconcileWorkflowNext": "Dalje",
   "@reconcileWorkflowNext": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowApply": "Apply",
+  "reconcileWorkflowApply": "Primijeni",
   "@reconcileWorkflowApply": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetLabel": "Virtual trip — tap to edit",
+  "reconcileVirtualTrajetLabel": "Virtualni put — dodirnite za uređivanje",
   "@reconcileVirtualTrajetLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditTitle": "Edit virtual trip",
+  "reconcileVirtualTrajetEditTitle": "Uredi virtualni put",
   "@reconcileVirtualTrajetEditTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditExplainer": "This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.",
+  "reconcileVirtualTrajetEditExplainer": "Ovaj put je dodan kako bi se prikazalo gorivo korišteno tijekom vožnje bez snimanja. Prilagodite udaljenost ili gorivo, ili ga izbrišite.",
   "@reconcileVirtualTrajetEditExplainer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetDelete": "Delete virtual trip",
+  "reconcileVirtualTrajetDelete": "Izbriši virtualni put",
   "@reconcileVirtualTrajetDelete": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileResolveGapBanner": "Unresolved fuel/trip gap of {gap} L — tap to resolve",
+  "reconcileResolveGapBanner": "Nerazriješena razlika goriva/puta od {gap} L — dodirnite za razrješavanje",
   "@reconcileResolveGapBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2400,19 +2341,16 @@
       }
     }
   },
-  "reconcileResolveGapSemanticLabel": "Resolve unresolved fuel and trip gap",
+  "reconcileResolveGapSemanticLabel": "Razriješi nerazriješenu razliku goriva i puta",
   "@reconcileResolveGapSemanticLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
+  "pumpCameraRotateToLandscape": "Okrenite telefon bočno — zaslon pumpe je širok, pa su brojevi veći i uspravni",
   "@pumpCameraRotateToLandscape": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "insightFullThrottle": "Puni gas ({pctTime}% puta): izgubljeno {liters} L",
   "@insightFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2423,14 +2361,12 @@
       }
     }
   },
-  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "lessonAdviceFullThrottle": "Polako na pedalu — blaži pritisak od 70 % papučice dovoljno vas ubrzava uz puno manje goriva.",
   "@lessonAdviceFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "insightLambdaEnrichment": "Bogata smjesa pod opterećenjem ({pctTime}% puta): izgubljeno {liters} L",
   "@insightLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2441,84 +2377,68 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "lessonAdviceLambdaEnrichment": "Jako, dugotrajno opterećenje čini motor prebogatim — kratko mjenjajte brzinu i pустите na dugim usponima da smjesa ostane siromašna.",
   "@lessonAdviceLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassVeryGood": "Very good",
+  "drivingScoreClassVeryGood": "Odlično",
   "@drivingScoreClassVeryGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassGood": "Good",
+  "drivingScoreClassGood": "Dobro",
   "@drivingScoreClassGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassAverage": "Average",
+  "drivingScoreClassAverage": "Prosječno",
   "@drivingScoreClassAverage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassBad": "Needs work",
+  "drivingScoreClassBad": "Potrebno poboljšanje",
   "@drivingScoreClassBad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLugging": "Lugging",
+  "drivingScorePenaltyLugging": "Vučenje motora",
   "@drivingScorePenaltyLugging": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltySmoothness": "Jerky driving",
+  "drivingScorePenaltySmoothness": "Trzava vožnja",
   "@drivingScorePenaltySmoothness": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyHighSpeed": "High speed",
+  "drivingScorePenaltyHighSpeed": "Visoka brzina",
   "@drivingScorePenaltyHighSpeed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "drivingScorePenaltyPedalVelocity": "Agresivna papučica",
   "@drivingScorePenaltyPedalVelocity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLambda": "Rich mixture",
+  "drivingScorePenaltyLambda": "Bogata smjesa",
   "@drivingScorePenaltyLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "trajetDetailChartThrottle": "Papučica gasa (%)",
   "@trajetDetailChartThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartCoolant": "Coolant (°C)",
+  "trajetDetailChartCoolant": "Rashladna tekućina (°C)",
   "@trajetDetailChartCoolant": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Altitude (m)",
+  "trajetDetailChartAltitude": "Nadmorska visina (m)",
   "@trajetDetailChartAltitude": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartLambda": "Commanded λ",
+  "trajetDetailChartLambda": "Komandirana λ",
   "@trajetDetailChartLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTitle": "OBD2 communication health",
+  "obd2DiagnosticsTitle": "OBD2 zdravlje komunikacije",
   "@obd2DiagnosticsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsHeader": "{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}",
+  "obd2DiagnosticsHeader": "{percent}% dovršeno · {duty}% korištenosti · {drops, plural, =0{bez prekida} =1{1 prekid} other{{drops} prekida}}",
   "@obd2DiagnosticsHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2534,42 +2454,34 @@
   },
   "obd2DiagnosticsAdapterSection": "Adapter",
   "@obd2DiagnosticsAdapterSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsConnectionSection": "Connection lifecycle",
+  "obd2DiagnosticsConnectionSection": "Životni ciklus veze",
   "@obd2DiagnosticsConnectionSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsPidSection": "Per-PID outcomes",
+  "obd2DiagnosticsPidSection": "Ishodi po PID-u",
   "@obd2DiagnosticsPidSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSchedulerSection": "Scheduler health",
+  "obd2DiagnosticsSchedulerSection": "Zdravlje raspoređivača",
   "@obd2DiagnosticsSchedulerSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessSection": "Completeness",
+  "obd2DiagnosticsCompletenessSection": "Potpunost",
   "@obd2DiagnosticsCompletenessSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSupportSection": "Discovered-supported PIDs",
+  "obd2DiagnosticsSupportSection": "Otkriveni podržani PID-ovi",
   "@obd2DiagnosticsSupportSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsFuelSection": "Fuel-tier rollup",
+  "obd2DiagnosticsFuelSection": "Sažetak razine goriva",
   "@obd2DiagnosticsFuelSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocol {protocol} · MTU {mtu}",
+  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protokol {protocol} · MTU {mtu}",
   "@obd2DiagnosticsAdapterIdentity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "mac": {
@@ -2586,9 +2498,8 @@
       }
     }
   },
-  "obd2DiagnosticsConnectionLine": "{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}",
+  "obd2DiagnosticsConnectionLine": "{attempts} pokušaja · {successes} uspješnih · {drops} prekida · vrijeme spajanja p50 {p50} / p95 {p95}",
   "@obd2DiagnosticsConnectionLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "attempts": {
@@ -2608,9 +2519,8 @@
       }
     }
   },
-  "obd2DiagnosticsReconnectLine": "Reconnects: {silent} silent · {visible} visible",
+  "obd2DiagnosticsReconnectLine": "Ponovno spajanje: {silent} tih · {visible} vidljivih",
   "@obd2DiagnosticsReconnectLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "silent": {
@@ -2621,9 +2531,8 @@
       }
     }
   },
-  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions",
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz takt · {skips} preskakanja protupritiska · {demotions} degradacija",
   "@obd2DiagnosticsSchedulerLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tickRate": {
@@ -2637,14 +2546,12 @@
       }
     }
   },
-  "obd2DiagnosticsStarved": "Dynamics tier starved — RPM / speed fell below the governor floor.",
+  "obd2DiagnosticsStarved": "Razina dinamike izgladnjela — RPM / brzina pala ispod praga upravljača.",
   "@obd2DiagnosticsStarved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessLine": "Overall {percent}% · active duty {duty}%",
+  "obd2DiagnosticsCompletenessLine": "Ukupno {percent}% · aktivno korištenost {duty}%",
   "@obd2DiagnosticsCompletenessLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2657,7 +2564,6 @@
   },
   "obd2DiagnosticsTierLine": "{tier}: {percent}%",
   "@obd2DiagnosticsTierLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tier": {
@@ -2668,9 +2574,8 @@
       }
     }
   },
-  "obd2DiagnosticsSupportLine": "{supported} supported · {unsupported} unsupported · {unknown} unknown",
+  "obd2DiagnosticsSupportLine": "{supported} podržano · {unsupported} nije podržano · {unknown} nepoznato",
   "@obd2DiagnosticsSupportLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "supported": {
@@ -2684,9 +2589,8 @@
       }
     }
   },
-  "obd2DiagnosticsFuelLine": "Suspicious {suspicious} of {total} samples",
+  "obd2DiagnosticsFuelLine": "Sumnjivo {suspicious} od {total} uzoraka",
   "@obd2DiagnosticsFuelLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "suspicious": {
@@ -2697,9 +2601,8 @@
       }
     }
   },
-  "obd2DiagnosticsPidRow": "{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "obd2DiagnosticsPidRow": "{pid}: {polled} ispitano · {ok} uspješno · {noData} ND · {timeout} TO · {error} pogrešaka · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
   "@obd2DiagnosticsPidRow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pid": {
@@ -2734,54 +2637,44 @@
       }
     }
   },
-  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "obd2DiagnosticsEmpty": "Još nije snimljena OBD2 sesija — spojite adapter i snimite put s uključenim načinom Razvijatelj.",
   "@obd2DiagnosticsEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
+  "obd2DiagnosticsExplain": "Snimljeno za vrijeme snimanja radi debugiranja komunikacije ključ↔aplikacija — prikuplja se samo u načinu Razvijatelj.",
   "@obd2DiagnosticsExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthScreenTitle": "OBD2 communication health",
+  "obd2HealthScreenTitle": "OBD2 zdravlje komunikacije",
   "@obd2HealthScreenTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthNavLabel": "OBD2 communication health",
+  "obd2HealthNavLabel": "OBD2 zdravlje komunikacije",
   "@obd2HealthNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthLiveSection": "Live session",
+  "obd2HealthLiveSection": "Živa sesija",
   "@obd2HealthLiveSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthHistorySection": "Recent sessions",
+  "obd2HealthHistorySection": "Nedavne sesije",
   "@obd2HealthHistorySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Copy as JSON",
+  "obd2HealthCopyJson": "Kopiraj kao JSON",
   "@obd2HealthCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
+  "obd2HealthCopied": "OBD2 dijagnostika kopirana u međuspremnik.",
   "@obd2HealthCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evStatusPartial": "Partly available",
+  "evStatusPartial": "Djelomično dostupno",
   "@evStatusPartial": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
+  "radiusAlertDeleted": "Upozorenje za radijus \"{name}\" izbrisano",
   "@radiusAlertDeleted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -2789,54 +2682,44 @@
       }
     }
   },
-  "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
+  "tripRecordingDiscardedNoMovement": "Snimanje odbačeno — nije otkriveno kretanje",
   "@tripRecordingDiscardedNoMovement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionSetupDataSources": "Setup & data sources",
+  "sectionSetupDataSources": "Postavljanje i izvori podataka",
   "@sectionSetupDataSources": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionFeaturesUsage": "Features & usage",
+  "sectionFeaturesUsage": "Značajke i upotreba",
   "@sectionFeaturesUsage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAccountSync": "Account & sync",
+  "sectionAccountSync": "Račun i sinkronizacija",
   "@sectionAccountSync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAppearanceWidgets": "Appearance & widgets",
+  "sectionAppearanceWidgets": "Izgled i widgeti",
   "@sectionAppearanceWidgets": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionPrivacyData": "Privacy & data",
+  "sectionPrivacyData": "Privatnost i podaci",
   "@sectionPrivacyData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAdvancedDeveloper": "Advanced & developer",
+  "sectionAdvancedDeveloper": "Napredno i razvijatelj",
   "@sectionAdvancedDeveloper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineShowDetails": "Show per-situation breakdown",
+  "vehicleBaselineShowDetails": "Prikaži razčlambu po situacijama",
   "@vehicleBaselineShowDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineHideDetails": "Hide per-situation breakdown",
+  "vehicleBaselineHideDetails": "Sakrij razčlambu po situacijama",
   "@vehicleBaselineHideDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineMissingWarning": "Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.",
+  "vehicleBaselineMissingWarning": "Još nije otkriveno: {situations}. Ove situacije vožnje još imaju 0 uzoraka, pa je osnovna linija nepotpuna.",
   "@vehicleBaselineMissingWarning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "situations": {
@@ -2847,222 +2730,178 @@
   },
   "ocrTesterTitle": "OCR tester",
   "@ocrTesterTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterNavLabel": "OCR tester",
   "@ocrTesterNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExplain": "Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.",
+  "ocrTesterExplain": "Pokrenite OCR cjevovod pumpe/računa na odabranoj fotografiji i pregledajte svaki korak — dostupno samo u načinu Razvijatelj.",
   "@ocrTesterExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pump",
+  "ocrTesterModePump": "Pumpa",
   "@ocrTesterModePump": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModeReceipt": "Receipt",
+  "ocrTesterModeReceipt": "Račun",
   "@ocrTesterModeReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCapture": "Capture",
+  "ocrTesterCapture": "Snimi",
   "@ocrTesterCapture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterPickImage": "Pick image",
+  "ocrTesterPickImage": "Odaberi sliku",
   "@ocrTesterPickImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRun": "Run",
+  "ocrTesterRun": "Pokreni",
   "@ocrTesterRun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountry": "Country",
+  "ocrTesterCountry": "Država",
   "@ocrTesterCountry": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountryNone": "Default (no profile)",
+  "ocrTesterCountryNone": "Zadano (bez profila)",
   "@ocrTesterCountryNone": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoImage": "Pick or capture an image, then Run.",
+  "ocrTesterNoImage": "Odaberite ili snimite sliku, zatim Pokrenite.",
   "@ocrTesterNoImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRunning": "Running OCR…",
+  "ocrTesterRunning": "Pokretanje OCR-a…",
   "@ocrTesterRunning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoResult": "OCR produced no readable result.",
+  "ocrTesterNoResult": "OCR nije dao čitljiv rezultat.",
   "@ocrTesterNoResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterOverlaySection": "Block overlay",
+  "ocrTesterOverlaySection": "Prekrivač blokova",
   "@ocrTesterOverlaySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStepsSection": "Pipeline steps",
+  "ocrTesterStepsSection": "Koraci cjevovoda",
   "@ocrTesterStepsSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendLabel": "Label",
+  "ocrTesterLegendLabel": "Oznaka",
   "@ocrTesterLegendLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNumeric": "Numeric",
+  "ocrTesterLegendNumeric": "Numeričko",
   "@ocrTesterLegendNumeric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNoise": "Noise",
+  "ocrTesterLegendNoise": "Šum",
   "@ocrTesterLegendNoise": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendDerived": "Derived",
+  "ocrTesterLegendDerived": "Izvedeno",
   "@ocrTesterLegendDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGlare": "Capture / glare",
+  "ocrTesterStageGlare": "Snimanje / sjaj",
   "@ocrTesterStageGlare": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterStageMlkit": "ML Kit",
   "@ocrTesterStageMlkit": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageClassify": "Classify",
+  "ocrTesterStageClassify": "Klasificiraj",
   "@ocrTesterStageClassify": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAssemble": "Assemble",
+  "ocrTesterStageAssemble": "Sastavi",
   "@ocrTesterStageAssemble": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAnchor": "Anchor",
+  "ocrTesterStageAnchor": "Sidro",
   "@ocrTesterStageAnchor": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageFallback": "Fallback",
+  "ocrTesterStageFallback": "Pričuva",
   "@ocrTesterStageFallback": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageCrossCheck": "Cross-check",
+  "ocrTesterStageCrossCheck": "Unakrsna provjera",
   "@ocrTesterStageCrossCheck": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageConfidence": "Confidence",
+  "ocrTesterStageConfidence": "Pouzdanost",
   "@ocrTesterStageConfidence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGate": "Gate",
+  "ocrTesterStageGate": "Prolaz",
   "@ocrTesterStageGate": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageBrand": "Brand",
+  "ocrTesterStageBrand": "Brend",
   "@ocrTesterStageBrand": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageOverrides": "Overrides",
+  "ocrTesterStageOverrides": "Prepisivanja",
   "@ocrTesterStageOverrides": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageReconcile": "Reconcile",
+  "ocrTesterStageReconcile": "Uskladi",
   "@ocrTesterStageReconcile": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageResult": "Result",
+  "ocrTesterStageResult": "Rezultat",
   "@ocrTesterStageResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipRead": "READ",
+  "ocrTesterChipRead": "PROČITANO",
   "@ocrTesterChipRead": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipDerived": "DERIVED",
+  "ocrTesterChipDerived": "IZVEDENO",
   "@ocrTesterChipDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateAccepted": "Accepted",
+  "ocrTesterGateAccepted": "Prihvaćeno",
   "@ocrTesterGateAccepted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateRejected": "Rejected",
+  "ocrTesterGateRejected": "Odbijeno",
   "@ocrTesterGateRejected": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFallbackBanner": "A field was recovered via magnitude fallback — verify it.",
+  "ocrTesterFallbackBanner": "Polje je oporavljeno pričuvnom metodom magnitude — provjerite ga.",
   "@ocrTesterFallbackBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageNoData": "Stage did not run.",
+  "ocrTesterStageNoData": "Faza nije pokrenuta.",
   "@ocrTesterStageNoData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopyJson": "Copy as JSON",
+  "ocrTesterCopyJson": "Kopiraj kao JSON",
   "@ocrTesterCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExportPackage": "Export package",
+  "ocrTesterExportPackage": "Izvezi paket",
   "@ocrTesterExportPackage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopied": "OCR trace copied to clipboard.",
+  "ocrTesterCopied": "OCR trag kopiran u međuspremnik.",
   "@ocrTesterCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExported": "OCR package saved to your Downloads folder.",
+  "ocrTesterExported": "OCR paket spreman u mapu Downloads.",
   "@ocrTesterExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitSection": "Dongle init transcript",
+  "obd2DiagnosticsInitSection": "Transkript inicijalizacije ključa",
   "@obd2DiagnosticsInitSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
+  "obd2DiagnosticsInitHeader": "Protokol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PID-ova",
   "@obd2DiagnosticsInitHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "protocol": {
@@ -3084,7 +2923,6 @@
   },
   "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
   "@obd2DiagnosticsInitLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "cmd": {
@@ -3098,49 +2936,40 @@
       }
     }
   },
-  "obd2DiagnosticsInitWarm": "warm",
+  "obd2DiagnosticsInitWarm": "toplo",
   "@obd2DiagnosticsInitWarm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitCold": "cold",
+  "obd2DiagnosticsInitCold": "hladno",
   "@obd2DiagnosticsInitCold": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Copy init transcript only",
+  "obd2HealthCopyInitTranscript": "Kopiraj samo transkript inicijalizacije",
   "@obd2HealthCopyInitTranscript": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterSaveFixture": "Save as fixture",
+  "ocrTesterSaveFixture": "Spremi kao fixture",
   "@ocrTesterSaveFixture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "ocrTesterFixtureSaved": "Fixture spreman u mapu Downloads. Premjestite ga pod test/fixtures i pokrenite tool/promote_ocr_fixture.dart.",
   "@ocrTesterFixtureSaved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationColdStart": "Cold start",
+  "situationColdStart": "Hladan start",
   "@situationColdStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationSustainedLoad": "Sustained load / towing",
+  "situationSustainedLoad": "Trajno opterećenje / vuča",
   "@situationSustainedLoad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationPartialDecel": "Coasting",
+  "situationPartialDecel": "Klizanje inercijom",
   "@situationPartialDecel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorDistanceLabel": "Distance ({unit})",
+  "calculatorDistanceLabel": "Udaljenost ({unit})",
   "@calculatorDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3148,9 +2977,8 @@
       }
     }
   },
-  "calculatorConsumptionLabel": "Consumption ({unit})",
+  "calculatorConsumptionLabel": "Potrošnja ({unit})",
   "@calculatorConsumptionLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3158,9 +2986,8 @@
       }
     }
   },
-  "calculatorPriceLabel": "Fuel price ({unit})",
+  "calculatorPriceLabel": "Cijena goriva ({unit})",
   "@calculatorPriceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3168,164 +2995,132 @@
       }
     }
   },
-  "calculatorUseMine": "Use",
+  "calculatorUseMine": "Upotrijebi",
   "@calculatorUseMine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorApplied": "Applied",
+  "calculatorApplied": "Primijenjeno",
   "@calculatorApplied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripDetails": "Trip details",
+  "tripDetails": "Detalji puta",
   "@tripDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorRoundTrip": "Round trip",
+  "calculatorRoundTrip": "Povratno putovanje",
   "@calculatorRoundTrip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "roundTripTotal": "Round trip",
+  "roundTripTotal": "Povratno putovanje",
   "@roundTripTotal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerDistance": "Cost per km",
+  "costPerDistance": "Trošak po km",
   "@costPerDistance": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerMonth": "Cost per month",
+  "costPerMonth": "Trošak po mjesecu",
   "@costPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorEstimateMonthly": "Estimate monthly cost",
+  "calculatorEstimateMonthly": "Procijeni mjesečni trošak",
   "@calculatorEstimateMonthly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonth": "Trips per month",
+  "calculatorTripsPerMonth": "Putova po mjesecu",
   "@calculatorTripsPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonthHint": "e.g. 20",
+  "calculatorTripsPerMonthHint": "npr. 20",
   "@calculatorTripsPerMonthHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorReset": "Reset",
+  "calculatorReset": "Poništi",
   "@calculatorReset": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
+  "calculatorResultPlaceholder": "Unesite udaljenost, potrošnju i cijenu da biste vidjeli trošak puta",
   "@calculatorResultPlaceholder": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressFinalizingSummary": "Finalizing summary…",
+  "tripSaveProgressFinalizingSummary": "Dovršavanje sažetka…",
   "@tripSaveProgressFinalizingSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSavingToHistory": "Saving to history…",
+  "tripSaveProgressSavingToHistory": "Spremanje u povijest…",
   "@tripSaveProgressSavingToHistory": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSyncingToCloud": "Syncing in background…",
+  "tripSaveProgressSyncingToCloud": "Sinkronizacija u pozadini…",
   "@tripSaveProgressSyncingToCloud": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingSavingTitle": "Saving trip…",
+  "tripRecordingSavingTitle": "Spremanje puta…",
   "@tripRecordingSavingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionDisplayStations": "Display & stations",
+  "profileSectionDisplayStations": "Prikaz i postaje",
   "@profileSectionDisplayStations": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionRegion": "Region",
+  "profileSectionRegion": "Regija",
   "@profileSectionRegion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupVehicles": "Vehicles",
+  "consoGroupVehicles": "Vozila",
   "@consoGroupVehicles": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupCoaching": "Coaching while driving",
+  "consoGroupCoaching": "Coaching za vrijeme vožnje",
   "@consoGroupCoaching": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupRewards": "Rewards & savings",
+  "consoGroupRewards": "Nagrade i uštedine",
   "@consoGroupRewards": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupTroubleshooting": "Troubleshooting",
+  "consoGroupTroubleshooting": "Rješavanje problema",
   "@consoGroupTroubleshooting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_voiceAnnouncements": "Voice announcements",
+  "featureLabel_voiceAnnouncements": "Glasovne objave",
   "@featureLabel_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_voiceAnnouncements": "Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.",
+  "featureDescription_voiceAnnouncements": "Glasovno najavljuje obližnje jeftine benzinske postaje dok vozite, kako biste mogli zadržati pogled na cesti.",
   "@featureDescription_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "featureBlockedEnable_voiceAnnouncements": "Prvo omogućite Radar benzinskih postaja",
   "@featureBlockedEnable_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2GpsDegradedBannerTitle": "Recording with GPS — OBD2 reconnecting",
+  "obd2GpsDegradedBannerTitle": "Snimanje s GPS-om — OBD2 se ponovno spaja",
   "@obd2GpsDegradedBannerTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Restore backup",
+  "restoreBackupTooltip": "Obnovi sigurnosnu kopiju",
   "@restoreBackupTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogTitle": "Restore backup",
+  "restoreBackupDialogTitle": "Obnovi sigurnosnu kopiju",
   "@restoreBackupDialogTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogBody": "Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.",
+  "restoreBackupDialogBody": "Spajanje dodaje i ažurira zapise iz sigurnosne kopije i zadržava sve što je već na ovom uređaju. Zamjena briše sve trenutne podatke, a zatim obnavlja samo sigurnosnu kopiju — ovo se ne može poništiti.",
   "@restoreBackupDialogBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergeAction": "Merge",
+  "restoreBackupMergeAction": "Spoji",
   "@restoreBackupMergeAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupReplaceAction": "Replace all",
+  "restoreBackupReplaceAction": "Zamijeni sve",
   "@restoreBackupReplaceAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupSuccess": "Backup restored — {count} records imported",
+  "restoreBackupSuccess": "Sigurnosna kopija obnovljena — uvezeno {count} zapisa",
   "@restoreBackupSuccess": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3333,29 +3128,24 @@
       }
     }
   },
-  "restoreBackupEmpty": "Backup restored — it contained no records",
+  "restoreBackupEmpty": "Sigurnosna kopija obnovljena — nije sadržavala zapise",
   "@restoreBackupEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupCorrupt": "Restore failed — this file is not a valid Tankstellen backup",
+  "restoreBackupCorrupt": "Obnavljanje nije uspjelo — ova datoteka nije valjana Tankstellen sigurnosna kopija",
   "@restoreBackupCorrupt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupFailed": "Restore failed — the file could not be read",
+  "restoreBackupFailed": "Obnavljanje nije uspjelo — datoteka se nije mogla pročitati",
   "@restoreBackupFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSearchingChip": "Searching the route…",
+  "routeSearchingChip": "Pretraživanje rute…",
   "@routeSearchingChip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Every {km} km",
+  "routeSegmentSummaryBadge": "Svakih {km} km",
   "@routeSegmentSummaryBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3363,9 +3153,8 @@
       }
     }
   },
-  "profileSwitchedTo": "Switched to {profile}",
+  "profileSwitchedTo": "Prebačeno na {profile}",
   "@profileSwitchedTo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "profile": {
@@ -3373,9 +3162,8 @@
       }
     }
   },
-  "profileCreatedNamed": "Profile {name} created",
+  "profileCreatedNamed": "Profil {name} stvoren",
   "@profileCreatedNamed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -3383,9 +3171,8 @@
       }
     }
   },
-  "profileCountryTaken": "A profile for {country} already exists — edit it instead.",
+  "profileCountryTaken": "Profil za {country} već postoji — umjesto toga uredite ga.",
   "@profileCountryTaken": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "country": {
@@ -3393,39 +3180,32 @@
       }
     }
   },
-  "evPriceFree": "Free",
+  "evPriceFree": "Besplatno",
   "@evPriceFree": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPricePayAtLocation": "Pay at location",
+  "evPricePayAtLocation": "Plaćanje na lokaciji",
   "@evPricePayAtLocation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceMembership": "Membership required",
+  "evPriceMembership": "Potrebno članstvo",
   "@evPriceMembership": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceIndicative": "Indicative price",
+  "evPriceIndicative": "Indikativna cijena",
   "@evPriceIndicative": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceDeclaredByOperator": "Indicative price declared by the operator — verify on site",
+  "evPriceDeclaredByOperator": "Indikativna cijena koju je naveo operater — provjerite na licu mjesta",
   "@evPriceDeclaredByOperator": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceFranceAttribution": "Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "evPriceFranceAttribution": "Cijene: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
   "@evPriceFranceAttribution": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "routeStationCount": "{count, plural, =1{1 postaja} other{{count} postaje}}",
   "@routeStationCount": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3433,9 +3213,8 @@
       }
     }
   },
-  "stationUpdatedLabel": "Updated {time}",
+  "stationUpdatedLabel": "Ažurirano {time}",
   "@stationUpdatedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3444,9 +3223,8 @@
       }
     }
   },
-  "amenityMoreTooltip": "Also: {names}",
+  "amenityMoreTooltip": "Također: {names}",
   "@amenityMoreTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "names": {
@@ -3455,19 +3233,16 @@
       }
     }
   },
-  "favoriteAdd": "Add to favorites",
+  "favoriteAdd": "Dodaj u favorite",
   "@favoriteAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "favoriteRemove": "Remove from favorites",
+  "favoriteRemove": "Ukloni iz favorita",
   "@favoriteRemove": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "loyaltyRawPriceTooltip": "Raw: {price}",
+  "loyaltyRawPriceTooltip": "Izvorno: {price}",
   "@loyaltyRawPriceTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "price": {
@@ -3478,7 +3253,6 @@
   },
   "routeDataSourceMulti": "{sources}",
   "@routeDataSourceMulti": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "sources": {
@@ -3487,29 +3261,24 @@
       }
     }
   },
-  "obd2TestRunTitle": "Run adapter test",
+  "obd2TestRunTitle": "Pokreni test adaptera",
   "@obd2TestRunTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunButton": "Run adapter test",
+  "obd2TestRunButton": "Pokreni test adaptera",
   "@obd2TestRunButton": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunPassed": "Adapter test passed",
+  "obd2TestRunPassed": "Test adaptera prošao",
   "@obd2TestRunPassed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunFailed": "Adapter test failed",
+  "obd2TestRunFailed": "Test adaptera nije prošao",
   "@obd2TestRunFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
+  "obd2TestRunSummary": "{passed} od {total} koraka uspješno · {elapsed} ms",
   "@obd2TestRunSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "passed": {
@@ -3526,139 +3295,112 @@
       }
     }
   },
-  "obd2TestRunCannotWhileRecording": "Stop the active recording before running the adapter test.",
+  "obd2TestRunCannotWhileRecording": "Zaustavite aktivno snimanje prije pokretanja testa adaptera.",
   "@obd2TestRunCannotWhileRecording": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepScan": "Scan for adapter",
+  "obd2TestStepScan": "Skeniraj adapter",
   "@obd2TestStepScan": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepConnect": "Connect & init",
+  "obd2TestStepConnect": "Spoji i inicijaliziraj",
   "@obd2TestStepConnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepInfo": "Adapter info",
+  "obd2TestStepInfo": "Info o adapteru",
   "@obd2TestStepInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSupportedPids": "Supported PIDs",
+  "obd2TestStepSupportedPids": "Podržani PID-ovi",
   "@obd2TestStepSupportedPids": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSampleReads": "Sample reads",
+  "obd2TestStepSampleReads": "Uzorci očitavanja",
   "@obd2TestStepSampleReads": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepReconnect": "Reconnect test",
+  "obd2TestStepReconnect": "Test ponovnog spajanja",
   "@obd2TestStepReconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepDisconnect": "Disconnect",
+  "obd2TestStepDisconnect": "Odspoji",
   "@obd2TestStepDisconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusOk": "OK",
+  "obd2TestStatusOk": "U redu",
   "@obd2TestStatusOk": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusTimeout": "Timed out",
+  "obd2TestStatusTimeout": "Vremenski odmak",
   "@obd2TestStatusTimeout": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusGarbage": "Unreadable reply",
+  "obd2TestStatusGarbage": "Nečitljiv odgovor",
   "@obd2TestStatusGarbage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusNoResponse": "No response",
+  "obd2TestStatusNoResponse": "Nema odgovora",
   "@obd2TestStatusNoResponse": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusFail": "Failed",
+  "obd2TestStatusFail": "Neuspješno",
   "@obd2TestStatusFail": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadCsvOption": "Download telemetry (CSV)",
+  "trajetDetailDownloadCsvOption": "Preuzmi telemetriju (CSV)",
   "@trajetDetailDownloadCsvOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadJsonOption": "Download telemetry (JSON)",
+  "trajetDetailDownloadJsonOption": "Preuzmi telemetriju (JSON)",
   "@trajetDetailDownloadJsonOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadError": "Couldn't save the file",
+  "trajetDetailDownloadError": "Datoteka se nije mogla spremiti",
   "@trajetDetailDownloadError": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHardAcceleration": "Easy on the accelerator",
+  "coachingVoiceHardAcceleration": "Polako s papučicom gasa",
   "@coachingVoiceHardAcceleration": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHarshBraking": "Try to brake more gently",
+  "coachingVoiceHarshBraking": "Pokušajte kočiti blaže",
   "@coachingVoiceHarshBraking": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftUp": "Shift up a gear to save fuel",
+  "coachingVoiceShiftUp": "Ubacite višu brzinu za uštedu goriva",
   "@coachingVoiceShiftUp": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftDown": "Shift down, the engine is labouring",
+  "coachingVoiceShiftDown": "Ubacite nižu brzinu, motor naporno radi",
   "@coachingVoiceShiftDown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceEasePedal": "Ease off the pedal to cut your fuel use",
+  "coachingVoiceEasePedal": "Popustite papučicu kako biste smanjili potrošnju goriva",
   "@coachingVoiceEasePedal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceLiftOff": "Lift off the accelerator and coast",
+  "coachingVoiceLiftOff": "Dignite nogu s papučice i kližite inercijom",
   "@coachingVoiceLiftOff": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceAnticipateBrake": "Look further ahead and lift off earlier",
+  "coachingVoiceAnticipateBrake": "Gledajte dalje naprijed i dignite nogu ranije",
   "@coachingVoiceAnticipateBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceSmoothAccel": "Accelerate more smoothly",
+  "coachingVoiceSmoothAccel": "Ubrzavajte ravnomjernije",
   "@coachingVoiceSmoothAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingTitle": "Spoken driving coaching",
+  "voiceCoachingSettingTitle": "Glasovni coaching za vožnju",
   "@voiceCoachingSettingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingSubtitle": "Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints",
+  "voiceCoachingSettingSubtitle": "Slušajte glasovne savjete za vrijeme vožnje — jako ubrzavanje, naglo kočenje i savjeti za mijenjanje brzina",
   "@voiceCoachingSettingSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarDistanceKm": "{km} km away",
+  "fuelStationRadarDistanceKm": "{km} km daleko",
   "@fuelStationRadarDistanceKm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3667,9 +3409,8 @@
       }
     }
   },
-  "fuelStationRadarProximity": "Proximity {percent}%",
+  "fuelStationRadarProximity": "Blizina {percent}%",
   "@fuelStationRadarProximity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -3678,94 +3419,76 @@
       }
     }
   },
-  "fuelStationRadarNearer": "Nearer station",
+  "fuelStationRadarNearer": "Bliža postaja",
   "@fuelStationRadarNearer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarFarther": "Farther station",
+  "fuelStationRadarFarther": "Dalja postaja",
   "@fuelStationRadarFarther": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarResultBadge": "Fuel Station Radar result",
+  "fuelStationRadarResultBadge": "Rezultat radara benzinskih postaja",
   "@fuelStationRadarResultBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_finding": "Finding & map",
+  "featureGroupTitle_finding": "Traženje i karta",
   "@featureGroupTitle_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_finding": "Where to fuel up or charge — search, map, routing.",
+  "featureGroupDescription_finding": "Gdje se natočiti ili napuniti — pretraživanje, karta, navigacija.",
   "@featureGroupDescription_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_prices": "Prices & alerts",
+  "featureGroupTitle_prices": "Cijene i upozorenja",
   "@featureGroupTitle_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_prices": "Price drops, history, and reporting.",
+  "featureGroupDescription_prices": "Padovi cijena, povijest i prijave.",
   "@featureGroupDescription_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_radar": "Fuel Station Radar",
+  "featureGroupTitle_radar": "Radar benzinskih postaja",
   "@featureGroupTitle_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_radar": "Live price nudges as you drive.",
+  "featureGroupDescription_radar": "Žive obavijesti o cijenama za vrijeme vožnje.",
   "@featureGroupDescription_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_sync": "Sync & backup",
+  "featureGroupTitle_sync": "Sinkronizacija i sigurnosne kopije",
   "@featureGroupTitle_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_sync": "Keep your data across devices.",
+  "featureGroupDescription_sync": "Čuvajte podatke na svim uređajima.",
   "@featureGroupDescription_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_input": "Input & scanning",
+  "featureGroupTitle_input": "Unos i skeniranje",
   "@featureGroupTitle_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_input": "Helpers for logging fill-ups.",
+  "featureGroupDescription_input": "Pomoćni alati za bilježenje punjenja goriva.",
   "@featureGroupDescription_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_developer": "Developer & experimental",
+  "featureGroupTitle_developer": "Razvijatelj i eksperimentalno",
   "@featureGroupTitle_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_developer": "Power-user and contributor tools.",
+  "featureGroupDescription_developer": "Alati za napredne korisnike i suradnike.",
   "@featureGroupDescription_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarStart": "Start fuel station radar",
+  "fuelStationRadarStart": "Pokreni radar benzinskih postaja",
   "@fuelStationRadarStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "evPriceBestEffortOcm": "Cijene po najboljoj mogućnosti iz OpenChargeMap — nepotpune i mogu biti neprecizne.",
   "@evPriceBestEffortOcm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "insightClimbingCost": "Vožnja uz {gradePercent}% nagib ({pctTime}% puta): izgubljeno {liters} L",
   "@insightClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gradePercent": {
@@ -3779,14 +3502,12 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "lessonAdviceClimbingCost": "Zadržite zamah pri ulasku u uspon i ravnomjerno povećavajte gas — nagle promjene na usponu troše više goriva.",
   "@lessonAdviceClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "insightRestartCost": "{count} zaustavljanja i ponovnih kretanja: izgubljeno {liters} L",
   "@insightRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3797,44 +3518,36 @@
       }
     }
   },
-  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "lessonAdviceRestartCost": "Predvidite promet i kližite prema zaustavljanjima kako biste klizali, a ne stajali — kretanje s mjesta najtroši više goriva u stop-start vožnji.",
   "@lessonAdviceRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCardTitle": "GPS efficiency",
+  "gpsKpiCardTitle": "GPS učinkovitost",
   "@gpsKpiCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "gpsKpiRpa": "Pozitivno ubrzanje (RPA)",
   "@gpsKpiRpa": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "gpsKpiPke": "Potražnja kinetičke energije (PKE)",
   "@gpsKpiPke": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "gpsKpiVapos": "Intenzitet ubrzanja (VAPOS)",
   "@gpsKpiVapos": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCoast": "Coasting share",
+  "gpsKpiCoast": "Udio klizanja inercijom",
   "@gpsKpiCoast": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiClimbEnergy": "Climb energy",
+  "gpsKpiClimbEnergy": "Energija uspona",
   "@gpsKpiClimbEnergy": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "drivingScoreBaselineDelta": "{pct} vs vaša učinkovita osnova",
   "@drivingScoreBaselineDelta": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -3842,29 +3555,24 @@
       }
     }
   },
-  "consumptionMonthlyClimbLabel": "Climbed",
+  "consumptionMonthlyClimbLabel": "Uspon",
   "@consumptionMonthlyClimbLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNow": "Open",
+  "openNow": "Otvoreno",
   "@openNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNowClosed": "Closed",
+  "openNowClosed": "Zatvoreno",
   "@openNowClosed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openHoursUnknown": "Hours unknown",
+  "openHoursUnknown": "Radno vrijeme nepoznato",
   "@openHoursUnknown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closesAt": "Closes {time}",
+  "closesAt": "Zatvara se {time}",
   "@closesAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3872,9 +3580,8 @@
       }
     }
   },
-  "opensAt": "Opens {day} {time}",
+  "opensAt": "Otvara se {day} {time}",
   "@opensAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -3885,9 +3592,8 @@
       }
     }
   },
-  "opensToday": "Opens {time}",
+  "opensToday": "Otvara se {time}",
   "@opensToday": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3895,89 +3601,72 @@
       }
     }
   },
-  "open24Hours": "Open 24 hours",
+  "open24Hours": "Otvoreno 24 sata",
   "@open24Hours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "badge24h": "24h",
   "@badge24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayMon": "Monday",
+  "dayMon": "Ponedjeljak",
   "@dayMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayTue": "Tuesday",
+  "dayTue": "Utorak",
   "@dayTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayWed": "Wednesday",
+  "dayWed": "Srijeda",
   "@dayWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayThu": "Thursday",
+  "dayThu": "Četvrtak",
   "@dayThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayFri": "Friday",
+  "dayFri": "Petak",
   "@dayFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySat": "Saturday",
+  "daySat": "Subota",
   "@daySat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySun": "Sunday",
+  "daySun": "Nedjelja",
   "@daySun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortMon": "Mon",
+  "dayShortMon": "Pon",
   "@dayShortMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortTue": "Tue",
+  "dayShortTue": "Uto",
   "@dayShortTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortWed": "Wed",
+  "dayShortWed": "Sri",
   "@dayShortWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortThu": "Thu",
+  "dayShortThu": "Čet",
   "@dayShortThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortFri": "Fri",
+  "dayShortFri": "Pet",
   "@dayShortFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSat": "Sat",
+  "dayShortSat": "Sub",
   "@dayShortSat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSun": "Sun",
+  "dayShortSun": "Ned",
   "@dayShortSun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "dayRange": "{from} – {to}",
   "@dayRange": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "from": {
@@ -3988,59 +3677,48 @@
       }
     }
   },
-  "publicHolidays": "Public holidays",
+  "publicHolidays": "Državni praznici",
   "@publicHolidays": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closedLabel": "Closed",
+  "closedLabel": "Zatvoreno",
   "@closedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursNotAvailable": "Opening hours not available",
+  "openingHoursNotAvailable": "Radno vrijeme nije dostupno",
   "@openingHoursNotAvailable": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showAllHours": "Show all hours",
+  "showAllHours": "Prikaži sva radna vremena",
   "@showAllHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showLessHours": "Show less",
+  "showLessHours": "Prikaži manje",
   "@showLessHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPageTitle": "Consumption statistics",
+  "consumptionStatsPageTitle": "Statistika potrošnje",
   "@consumptionStatsPageTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsComparisonTitle": "This month vs last month",
+  "consumptionStatsComparisonTitle": "Ovaj mjesec u usporedbi s prošlim",
   "@consumptionStatsComparisonTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsTrendsTitle": "Evolution over time",
+  "consumptionStatsTrendsTitle": "Razvoj kroz vrijeme",
   "@consumptionStatsTrendsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsNeedTwoMonths": "Log fill-ups across at least two months to compare.",
+  "consumptionStatsNeedTwoMonths": "Bilježite punjenja goriva kroz najmanje dva mjeseca za usporedbu.",
   "@consumptionStatsNeedTwoMonths": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPricePerLiter": "Avg price/L",
+  "consumptionStatsPricePerLiter": "Prosj. cijena/L",
   "@consumptionStatsPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "consumptionStatsDeltaPercent": "{pct}%",
   "@consumptionStatsDeltaPercent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -4048,89 +3726,72 @@
       }
     }
   },
-  "consumptionStatsChartLiters": "Litres per month",
+  "consumptionStatsChartLiters": "Litara po mjesecu",
   "@consumptionStatsChartLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartSpend": "Spend per month",
+  "consumptionStatsChartSpend": "Potrošnja po mjesecu",
   "@consumptionStatsChartSpend": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartPricePerLiter": "Price per litre",
+  "consumptionStatsChartPricePerLiter": "Cijena po litri",
   "@consumptionStatsChartPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartConsumption": "L/100km per month",
+  "consumptionStatsChartConsumption": "L/100km po mjesecu",
   "@consumptionStatsChartConsumption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptImporting": "Importing shared receipt…",
+  "shareReceiptImporting": "Uvoz dijeljenol računa…",
   "@shareReceiptImporting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
+  "shareReceiptUnsupportedFormat": "Ovaj format datoteke još se ne može uvesti — umjesto toga podijelite fotografiju računa.",
   "@shareReceiptUnsupportedFormat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptFailed": "Couldn't read the shared receipt — try sharing it again or add the fill-up manually.",
+  "shareReceiptFailed": "Dijeljeni račun se nije mogao pročitati — pokušajte ga dijeliti ponovo ili ručno dodajte punjenje.",
   "@shareReceiptFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_addFillUpShareIntentReceipt": "Share receipt to import",
+  "featureLabel_addFillUpShareIntentReceipt": "Podijeli račun za uvoz",
   "@featureLabel_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_addFillUpShareIntentReceipt": "Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.",
+  "featureDescription_addFillUpShareIntentReceipt": "Podijelite fotografiju računa iz druge aplikacije za prethodno popunjavanje punjenja — datum, litri, ukupno i postaja se čitaju na uređaju.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "24/7 automate",
+  "openingHoursAutomate24h": "Automatiziraj 24/7",
   "@openingHoursAutomate24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "stopRadar": "Stop radar",
+  "stopRadar": "Zaustavi radar",
   "@stopRadar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "moreActionsTooltip": "More",
+  "moreActionsTooltip": "Više",
   "@moreActionsTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupMenuLabel": "Export backup",
+  "exportBackupMenuLabel": "Izvezi sigurnosnu kopiju",
   "@exportBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMenuLabel": "Restore backup",
+  "restoreBackupMenuLabel": "Obnovi sigurnosnu kopiju",
   "@restoreBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "carbonDashboardMenuLabel": "Carbon dashboard",
+  "carbonDashboardMenuLabel": "Ugljična nadzorna ploča",
   "@carbonDashboardMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "settingsMenuLabel": "Settings",
+  "settingsMenuLabel": "Postavke",
   "@settingsMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "gpsDiagnosticsLargestGap": "Najveći razmak: {seconds} s",
   "@gpsDiagnosticsLargestGap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "seconds": {
@@ -4138,34 +3799,28 @@
       }
     }
   },
-  "gpsLifecycleResumed": "Resumed",
+  "gpsLifecycleResumed": "Nastavljeno",
   "@gpsLifecycleResumed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecyclePaused": "Paused",
+  "gpsLifecyclePaused": "Pauzirano",
   "@gpsLifecyclePaused": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecycleInactive": "Inactive",
+  "gpsLifecycleInactive": "Neaktivno",
   "@gpsLifecycleInactive": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "tripRecordingGpsNotificationTitle": "Snimanje vašeg puta",
   "@tripRecordingGpsNotificationTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "tripRecordingGpsNotificationText": "Praćenje vaše rute za statistiku goriva i vožnje",
   "@tripRecordingGpsNotificationText": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceStationAnnouncement": "{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}",
+  "voiceStationAnnouncement": "{name}, {distanceKm} kilometara naprijed, {fuelType} {euros} eura {cents}",
   "@voiceStationAnnouncement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -4190,54 +3845,44 @@
       }
     }
   },
-  "radarPinHelpTitle": "About pin",
+  "radarPinHelpTitle": "O prikačivanju",
   "@radarPinHelpTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarPinHelpBody": "Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.",
+  "radarPinHelpBody": "Prikačivanje drži zaslon uključenim i skriva sistemske trake kako bi prikaz najbliže postaje ostao čitljiv na nosaču upravljačke ploče. Dodirnite ponovo za otpuštanje. Automatski se otpušta kad radar stane.",
   "@radarPinHelpBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinTitle": "Always pin when the radar starts",
+  "radarAutoPinTitle": "Uvijek prikači kad se radar pokrene",
   "@radarAutoPinTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinSubtitle": "Pin the radar automatically every time instead of tapping each time. Uses more battery.",
+  "radarAutoPinSubtitle": "Automatski prikači radar svaki put umjesto da ga svaki put dodirnete. Troši više baterije.",
   "@radarAutoPinSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeCardTitle": "Acceleration & braking",
+  "accelBrakeCardTitle": "Ubrzavanje i kočenje",
   "@accelBrakeCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardAccel": "Hard accelerations",
+  "accelBrakeHardAccel": "Nagla ubrzavanja",
   "@accelBrakeHardAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardBrake": "Hard braking",
+  "accelBrakeHardBrake": "Naglo kočenje",
   "@accelBrakeHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSharpCorner": "Sharp corners",
+  "accelBrakeSharpCorner": "Oštri zavoji",
   "@accelBrakeSharpCorner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSource": "From the phone's motion sensors",
+  "accelBrakeSource": "Iz senzora kretanja telefona",
   "@accelBrakeSource": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonHardBrake": "{count} hard braking events",
+  "lessonHardBrake": "{count} događaja naglog kočenja",
   "@lessonHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4245,14 +3890,12 @@
       }
     }
   },
-  "lessonAdviceHardBrake": "Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.",
+  "lessonAdviceHardBrake": "Predvidite zaustavljanja i ranije dignite nogu s papučice — naglo kočenje baca gorivo koje ste upravo potrošili za ubrzavanje.",
   "@lessonAdviceHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonSharpCornering": "{count} sharp corners",
+  "lessonSharpCornering": "{count} oštrih zavoja",
   "@lessonSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4260,44 +3903,36 @@
       }
     }
   },
-  "lessonAdviceSharpCornering": "Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.",
+  "lessonAdviceSharpCornering": "Usporite prije zavoja, ne u njemu — naglo skretanje gubi brzinu koju zatim morate obnavljati.",
   "@lessonAdviceSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardTitle": "Driving-analysis trace (dev)",
+  "drivingTraceCardTitle": "Trag analize vožnje (dev)",
   "@drivingTraceCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardBody": "Export this trip's GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.",
+  "drivingTraceCardBody": "Izvezite GPS KPI-je ovog puta, rezultat i lekcije kao JSON, napišite kako se vožnja zapravo osjećala u polju za komentar i podijelite natrag kako bi se pragovi stila vožnje mogli kalibrirati prema stvarnim putovanjima.",
   "@drivingTraceCardBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportAction": "Export analysis trace",
+  "drivingTraceExportAction": "Izvezi trag analize",
   "@drivingTraceExportAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExported": "Analysis trace saved to Downloads — add your verdict in the comment field and share it back.",
+  "drivingTraceExported": "Trag analize spreman u Downloads — dodajte svoju procjenu u polje za komentar i podijelite ga natrag.",
   "@drivingTraceExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportFailed": "Couldn't export the analysis trace.",
+  "drivingTraceExportFailed": "Trag analize se nije mogao izvesti.",
   "@drivingTraceExportFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "backupExportProgress": "Exporting your backup…",
+  "backupExportProgress": "Izvoz sigurnosne kopije…",
   "@backupExportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "exportBackupSavedAs": "Spremljeno u Downloads kao {fileName}",
   "@exportBackupSavedAs": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fileName": {
@@ -4305,14 +3940,12 @@
       }
     }
   },
-  "backupImportProgress": "Restoring your backup…",
+  "backupImportProgress": "Obnavljanje sigurnosne kopije…",
   "@backupImportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupMergedSummary": "Spojeno {vehicles} vozila, {fillUps} punjenja, {trips} putova, {chargingLogs} zapisa punjenja",
   "@restoreBackupMergedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4329,9 +3962,8 @@
       }
     }
   },
-  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupReplacedSummary": "Svi podaci zamijenjeni s {vehicles} vozila, {fillUps} punjenja, {trips} putova, {chargingLogs} zapisa punjenja",
   "@restoreBackupReplacedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4348,19 +3980,16 @@
       }
     }
   },
-  "alertsStationSectionTitle": "Station alerts",
+  "alertsStationSectionTitle": "Upozorenja za postaje",
   "@alertsStationSectionTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "alertsStationAdd": "Add a station alert",
+  "alertsStationAdd": "Dodaj upozorenje za postaju",
   "@alertsStationAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
+  "scanPumpInconsistent": "Skenirane vrijednosti se ne podudaraju — unesite ih ručno.",
   "@scanPumpInconsistent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

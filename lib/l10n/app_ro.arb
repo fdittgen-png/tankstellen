@@ -2007,14 +2007,12 @@
   "countryInfoFuelTypes": "Tipuri de carburant: {fuelTypes}",
   "countryInfoDemoSource": "Demo",
   "languageChipSemantic": "{selected, select, true{Limbă {name}, selectat} false{Limbă {name}} other{Limbă {name}}}",
-  "fillUpGuidanceTitle": "Best time to fill up",
+  "fillUpGuidanceTitle": "Cel mai bun moment pentru realimentare",
   "@fillUpGuidanceTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceGoodTimeNow": "The current price is among the cheapest of the last {days} days — a good time to fill up.",
+  "fillUpGuidanceGoodTimeNow": "Prețul actual se numără printre cele mai mici din ultimele {days} zile — un moment bun pentru realimentare.",
   "@fillUpGuidanceGoodTimeNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2023,9 +2021,8 @@
       }
     }
   },
-  "fillUpGuidanceWaitCheaper": "Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.",
+  "fillUpGuidanceWaitCheaper": "Prețurile sunt aproape de maximul ultimelor {days} zile. De obicei sunt mai ieftine {window} — luați în considerare să așteptați.",
   "@fillUpGuidanceWaitCheaper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2038,14 +2035,12 @@
       }
     }
   },
-  "fillUpGuidanceFillSoon": "Prices are trending up — consider filling up soon.",
+  "fillUpGuidanceFillSoon": "Prețurile sunt în creștere — luați în considerare să vă realimentați curând.",
   "@fillUpGuidanceFillSoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceNeutral": "Today's price is around the {days}-day average.",
+  "fillUpGuidanceNeutral": "Prețul de astăzi este în jurul mediei de {days} zile.",
   "@fillUpGuidanceNeutral": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2054,9 +2049,8 @@
       }
     }
   },
-  "fillUpGuidanceSaving": "Could save about {amount}/L by timing your fill-up.",
+  "fillUpGuidanceSaving": "Ați putea economisi aproximativ {amount}/L alegând momentul potrivit.",
   "@fillUpGuidanceSaving": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "amount": {
@@ -2065,9 +2059,8 @@
       }
     }
   },
-  "fillUpGuidanceSampleNote": "{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}",
+  "fillUpGuidanceSampleNote": "{count, plural, =1{Bazat pe 1 citire de preț} other{Bazat pe {count} citiri de preț}}",
   "@fillUpGuidanceSampleNote": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -2078,7 +2071,6 @@
   },
   "fillUpGuidanceWindowDayAndPart": "{day} {part}",
   "@fillUpGuidanceWindowDayAndPart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2091,9 +2083,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowDayOnly": "on {day}",
+  "fillUpGuidanceWindowDayOnly": "{day}",
   "@fillUpGuidanceWindowDayOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2102,9 +2093,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowPartOnly": "in the {part}",
+  "fillUpGuidanceWindowPartOnly": "{part}",
   "@fillUpGuidanceWindowPartOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "part": {
@@ -2113,74 +2103,60 @@
       }
     }
   },
-  "fillUpGuidanceWindowGeneric": "at other times",
+  "fillUpGuidanceWindowGeneric": "în alte momente",
   "@fillUpGuidanceWindowGeneric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday1": "Mondays",
+  "fillUpGuidanceWeekday1": "Lunea",
   "@fillUpGuidanceWeekday1": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday2": "Tuesdays",
+  "fillUpGuidanceWeekday2": "Marțea",
   "@fillUpGuidanceWeekday2": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday3": "Wednesdays",
+  "fillUpGuidanceWeekday3": "Miercurea",
   "@fillUpGuidanceWeekday3": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday4": "Thursdays",
+  "fillUpGuidanceWeekday4": "Joia",
   "@fillUpGuidanceWeekday4": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday5": "Fridays",
+  "fillUpGuidanceWeekday5": "Vinerea",
   "@fillUpGuidanceWeekday5": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday6": "Saturdays",
+  "fillUpGuidanceWeekday6": "Sâmbăta",
   "@fillUpGuidanceWeekday6": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday7": "Sundays",
+  "fillUpGuidanceWeekday7": "Duminica",
   "@fillUpGuidanceWeekday7": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEarlyMorning": "early mornings",
+  "fillUpGuidancePartEarlyMorning": "dimineața devreme",
   "@fillUpGuidancePartEarlyMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartMorning": "mornings",
+  "fillUpGuidancePartMorning": "dimineața",
   "@fillUpGuidancePartMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartAfternoon": "afternoons",
+  "fillUpGuidancePartAfternoon": "după-amiaza",
   "@fillUpGuidancePartAfternoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEvening": "evenings",
+  "fillUpGuidancePartEvening": "seara",
   "@fillUpGuidancePartEvening": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartNight": "nights",
+  "fillUpGuidancePartNight": "noaptea",
   "@fillUpGuidancePartNight": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "dataSourceLinkSemantic": "Deschideți sursa de date {source} ({license}) în browser",
   "@dataSourceLinkSemantic": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "source": {
@@ -2193,54 +2169,44 @@
       }
     }
   },
-  "tripRadarClosestStation": "Closest station",
+  "tripRadarClosestStation": "Radar stații de carburant",
   "@tripRadarClosestStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarScanning": "Scanning for nearby stations",
+  "tripRadarScanning": "Scanare stații din apropiere",
   "@tripRadarScanning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarNoStationNearby": "No station nearby",
+  "tripRadarNoStationNearby": "Nicio stație în apropiere",
   "@tripRadarNoStationNearby": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "developerToolsTestAlertNoStation": "Search for stations first, then run the test alert so the notification can open a real station.",
+  "developerToolsTestAlertNoStation": "Căutați mai întâi stații, apoi rulați alerta de test pentru ca notificarea să poată deschide o stație reală.",
   "@developerToolsTestAlertNoStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_approachOverlay": "Approach overlay",
+  "featureLabel_approachOverlay": "Radar stații de carburant",
   "@featureLabel_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "featureDescription_approachOverlay": "Transformă panoul de călătorie plutitor într-un Radar stații de carburant live — pe măsură ce vă apropiați de o stație, aceasta se întoarce la culoarea tipului de carburant și afișează prețul.",
   "@featureDescription_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripAvgGpsEstimateTooltip": "GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle's calibration; accuracy improves as the matrix matures.",
+  "tripAvgGpsEstimateTooltip": "Estimare GPS (~) — niciun senzor de carburant pe această călătorie. Valoarea este modelată din viteză și calibrarea vehiculului dvs.; precizia se îmbunătățește pe măsură ce matricea se maturizează.",
   "@tripAvgGpsEstimateTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "tripRecordingPipEstConsumptionCaption": "est. L/100 km",
   "@tripRecordingPipEstConsumptionCaption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingEstimatedInfo": "Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle's calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.",
+  "tripRecordingEstimatedInfo": "Valoare estimată (~) — niciun senzor de carburant pe această călătorie, deci valoarea L/100 km este modelată din viteza GPS și calibrarea vehiculului dvs. Este aproximativă (de obicei ±10–30 %, se îmbunătățește pe măsură ce calibrarea se maturizează), nu o citire măsurată.",
   "@tripRecordingEstimatedInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "mapAttributionOsm": "© {brand} contributors",
+  "mapAttributionOsm": "© {brand} contribuitori",
   "@mapAttributionOsm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "brand": {
@@ -2249,14 +2215,12 @@
       }
     }
   },
-  "trajetDetailChartEstimatedBadge": "estimated",
+  "trajetDetailChartEstimatedBadge": "estimat",
   "@trajetDetailChartEstimatedBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "statCorrectionLiters": "Corrections: +{liters} L",
+  "statCorrectionLiters": "Corecții: +{liters} L",
   "@statCorrectionLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "liters": {
@@ -2264,14 +2228,12 @@
       }
     }
   },
-  "reconcileWorkflowTitle": "Reconcile your fuel",
+  "reconcileWorkflowTitle": "Reconciliere carburant",
   "@reconcileWorkflowTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainHeadline": "We found a {gap} L gap",
+  "reconcileWorkflowExplainHeadline": "Am găsit o diferență de {gap} L",
   "@reconcileWorkflowExplainHeadline": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2279,9 +2241,8 @@
       }
     }
   },
-  "reconcileWorkflowExplainBody": "You pumped {pumped} L, but your recorded trips only account for {consumed} L. That leaves {gap} L unexplained.",
+  "reconcileWorkflowExplainBody": "Ați pompat {pumped} L, dar călătoriile înregistrate contabilizează doar {consumed} L. Rămân {gap} L neexplicate.",
   "@reconcileWorkflowExplainBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pumped": {
@@ -2295,104 +2256,84 @@
       }
     }
   },
-  "reconcileWorkflowExplainCauses": "This usually means a drive wasn't recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.",
+  "reconcileWorkflowExplainCauses": "De obicei, aceasta înseamnă că o deplasare nu a fost înregistrată (adaptorul a fost deconectat sau aplicația a fost închisă), sau o realimentare lipsește sau a fost introdusă greșit.",
   "@reconcileWorkflowExplainCauses": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainConsequence": "Until this is resolved, your fuel total and your trips total won't match.",
+  "reconcileWorkflowExplainConsequence": "Până când aceasta este rezolvată, totalul carburantului și totalul călătoriilor nu se vor potrivi.",
   "@reconcileWorkflowExplainConsequence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAttributeQuestion": "Help us attribute the gap",
+  "reconcileWorkflowAttributeQuestion": "Ajutați-ne să atribuim diferența",
   "@reconcileWorkflowAttributeQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowFillUpsCompleteQuestion": "Are all your fill-ups for this tank complete and correct?",
+  "reconcileWorkflowFillUpsCompleteQuestion": "Toate realimentările pentru acest rezervor sunt complete și corecte?",
   "@reconcileWorkflowFillUpsCompleteQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDrivesRecordedQuestion": "Are all your drives recorded?",
+  "reconcileWorkflowDrivesRecordedQuestion": "Toate deplasările sunt înregistrate?",
   "@reconcileWorkflowDrivesRecordedQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerYes": "Yes",
+  "reconcileWorkflowAnswerYes": "Da",
   "@reconcileWorkflowAnswerYes": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerNo": "No",
+  "reconcileWorkflowAnswerNo": "Nu",
   "@reconcileWorkflowAnswerNo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathAHint": "A fill-up is missing or wrong — we'll add a correction so your fill-ups add up.",
+  "reconcileWorkflowPathAHint": "O realimentare lipsește sau este greșită — vom adăuga o corecție pentru ca realimentările să se adune corect.",
   "@reconcileWorkflowPathAHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathBHint": "Your fill-ups are right and a drive went unrecorded — we'll add a virtual trip for the missing distance.",
+  "reconcileWorkflowPathBHint": "Realimentările sunt corecte și o deplasare nu a fost înregistrată — vom adăuga o călătorie virtuală pentru distanța lipsă.",
   "@reconcileWorkflowPathBHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowCorrectionLitersLabel": "Correction litres",
+  "reconcileWorkflowCorrectionLitersLabel": "Litri de corecție",
   "@reconcileWorkflowCorrectionLitersLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowVirtualDistanceLabel": "How far was the unrecorded drive? (km)",
+  "reconcileWorkflowVirtualDistanceLabel": "Cât de departe a fost deplasarea neînregistrată? (km)",
   "@reconcileWorkflowVirtualDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDecideLater": "Decide later",
+  "reconcileWorkflowDecideLater": "Decid mai târziu",
   "@reconcileWorkflowDecideLater": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowBack": "Back",
+  "reconcileWorkflowBack": "Înapoi",
   "@reconcileWorkflowBack": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowNext": "Next",
+  "reconcileWorkflowNext": "Înainte",
   "@reconcileWorkflowNext": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowApply": "Apply",
+  "reconcileWorkflowApply": "Aplică",
   "@reconcileWorkflowApply": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetLabel": "Virtual trip — tap to edit",
+  "reconcileVirtualTrajetLabel": "Călătorie virtuală — apăsați pentru a edita",
   "@reconcileVirtualTrajetLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditTitle": "Edit virtual trip",
+  "reconcileVirtualTrajetEditTitle": "Editare călătorie virtuală",
   "@reconcileVirtualTrajetEditTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditExplainer": "This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.",
+  "reconcileVirtualTrajetEditExplainer": "Această călătorie a fost adăugată pentru a contabiliza carburantul consumat în timp ce conduceați fără înregistrare. Ajustați distanța sau carburantul, sau ștergeți-o.",
   "@reconcileVirtualTrajetEditExplainer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetDelete": "Delete virtual trip",
+  "reconcileVirtualTrajetDelete": "Șterge călătoria virtuală",
   "@reconcileVirtualTrajetDelete": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileResolveGapBanner": "Unresolved fuel/trip gap of {gap} L — tap to resolve",
+  "reconcileResolveGapBanner": "Diferență nerezolvată carburant/călătorie de {gap} L — apăsați pentru a rezolva",
   "@reconcileResolveGapBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2400,19 +2341,16 @@
       }
     }
   },
-  "reconcileResolveGapSemanticLabel": "Resolve unresolved fuel and trip gap",
+  "reconcileResolveGapSemanticLabel": "Rezolvați diferența nerezolvată de carburant și călătorie",
   "@reconcileResolveGapSemanticLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
+  "pumpCameraRotateToLandscape": "Întoarceți telefonul pe orizontală — ecranul pompei este lat, astfel cifrele vor fi mai mari și drepte",
   "@pumpCameraRotateToLandscape": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "insightFullThrottle": "Accelerație completă ({pctTime}% din călătorie): risipit {liters} L",
   "@insightFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2423,14 +2361,12 @@
       }
     }
   },
-  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "lessonAdviceFullThrottle": "Apăsați pedala treptat — o accelerație blândă de 70 % vă aduce la viteză cu mult mai puțin carburant.",
   "@lessonAdviceFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "insightLambdaEnrichment": "Amestec bogat sub sarcină ({pctTime}% din călătorie): risipit {liters} L",
   "@insightLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2441,84 +2377,68 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "lessonAdviceLambdaEnrichment": "Sarcina mare și susținută face motorul să ruleze bogat — schimbați treapta devreme și reduceți pe urcări lungi pentru a menține amestecul sărac.",
   "@lessonAdviceLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassVeryGood": "Very good",
+  "drivingScoreClassVeryGood": "Foarte bun",
   "@drivingScoreClassVeryGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassGood": "Good",
+  "drivingScoreClassGood": "Bun",
   "@drivingScoreClassGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassAverage": "Average",
+  "drivingScoreClassAverage": "Mediu",
   "@drivingScoreClassAverage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassBad": "Needs work",
+  "drivingScoreClassBad": "Necesită îmbunătățiri",
   "@drivingScoreClassBad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLugging": "Lugging",
+  "drivingScorePenaltyLugging": "Motor în sarcină redusă",
   "@drivingScorePenaltyLugging": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltySmoothness": "Jerky driving",
+  "drivingScorePenaltySmoothness": "Condus agitat",
   "@drivingScorePenaltySmoothness": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyHighSpeed": "High speed",
+  "drivingScorePenaltyHighSpeed": "Viteză mare",
   "@drivingScorePenaltyHighSpeed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "drivingScorePenaltyPedalVelocity": "Pedală agresivă",
   "@drivingScorePenaltyPedalVelocity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLambda": "Rich mixture",
+  "drivingScorePenaltyLambda": "Amestec bogat",
   "@drivingScorePenaltyLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "trajetDetailChartThrottle": "Accelerație / pedală (%)",
   "@trajetDetailChartThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartCoolant": "Coolant (°C)",
+  "trajetDetailChartCoolant": "Răcire (°C)",
   "@trajetDetailChartCoolant": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Altitude (m)",
+  "trajetDetailChartAltitude": "Altitudine (m)",
   "@trajetDetailChartAltitude": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartLambda": "Commanded λ",
+  "trajetDetailChartLambda": "λ comandat",
   "@trajetDetailChartLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTitle": "OBD2 communication health",
+  "obd2DiagnosticsTitle": "Stare comunicare OBD2",
   "@obd2DiagnosticsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsHeader": "{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}",
+  "obd2DiagnosticsHeader": "{percent}% complet · {duty}% duty · {drops, plural, =0{nicio întrerupere} =1{1 întrerupere} other{{drops} întreruperi}}",
   "@obd2DiagnosticsHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2532,44 +2452,36 @@
       }
     }
   },
-  "obd2DiagnosticsAdapterSection": "Adapter",
+  "obd2DiagnosticsAdapterSection": "Adaptor",
   "@obd2DiagnosticsAdapterSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsConnectionSection": "Connection lifecycle",
+  "obd2DiagnosticsConnectionSection": "Ciclu de viață conexiune",
   "@obd2DiagnosticsConnectionSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsPidSection": "Per-PID outcomes",
+  "obd2DiagnosticsPidSection": "Rezultate per PID",
   "@obd2DiagnosticsPidSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSchedulerSection": "Scheduler health",
+  "obd2DiagnosticsSchedulerSection": "Stare planificator",
   "@obd2DiagnosticsSchedulerSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessSection": "Completeness",
+  "obd2DiagnosticsCompletenessSection": "Completitudine",
   "@obd2DiagnosticsCompletenessSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSupportSection": "Discovered-supported PIDs",
+  "obd2DiagnosticsSupportSection": "PID-uri descoperite și acceptate",
   "@obd2DiagnosticsSupportSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsFuelSection": "Fuel-tier rollup",
+  "obd2DiagnosticsFuelSection": "Rezumat nivel carburant",
   "@obd2DiagnosticsFuelSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocol {protocol} · MTU {mtu}",
   "@obd2DiagnosticsAdapterIdentity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "mac": {
@@ -2586,9 +2498,8 @@
       }
     }
   },
-  "obd2DiagnosticsConnectionLine": "{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}",
+  "obd2DiagnosticsConnectionLine": "{attempts} încercări · {successes} reușite · {drops} întreruperi · timp-până-la-conectare p50 {p50} / p95 {p95}",
   "@obd2DiagnosticsConnectionLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "attempts": {
@@ -2608,9 +2519,8 @@
       }
     }
   },
-  "obd2DiagnosticsReconnectLine": "Reconnects: {silent} silent · {visible} visible",
+  "obd2DiagnosticsReconnectLine": "Reconectări: {silent} silențioase · {visible} vizibile",
   "@obd2DiagnosticsReconnectLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "silent": {
@@ -2621,9 +2531,8 @@
       }
     }
   },
-  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions",
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz ciclu · {skips} omisiuni presiune · {demotions} retrogradări",
   "@obd2DiagnosticsSchedulerLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tickRate": {
@@ -2637,14 +2546,12 @@
       }
     }
   },
-  "obd2DiagnosticsStarved": "Dynamics tier starved — RPM / speed fell below the governor floor.",
+  "obd2DiagnosticsStarved": "Nivelul Dynamics lipsit de date — RPM / viteza a scăzut sub limita guvernorului.",
   "@obd2DiagnosticsStarved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessLine": "Overall {percent}% · active duty {duty}%",
+  "obd2DiagnosticsCompletenessLine": "Global {percent}% · duty activ {duty}%",
   "@obd2DiagnosticsCompletenessLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2657,7 +2564,6 @@
   },
   "obd2DiagnosticsTierLine": "{tier}: {percent}%",
   "@obd2DiagnosticsTierLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tier": {
@@ -2668,9 +2574,8 @@
       }
     }
   },
-  "obd2DiagnosticsSupportLine": "{supported} supported · {unsupported} unsupported · {unknown} unknown",
+  "obd2DiagnosticsSupportLine": "{supported} acceptate · {unsupported} neacceptate · {unknown} necunoscute",
   "@obd2DiagnosticsSupportLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "supported": {
@@ -2684,9 +2589,8 @@
       }
     }
   },
-  "obd2DiagnosticsFuelLine": "Suspicious {suspicious} of {total} samples",
+  "obd2DiagnosticsFuelLine": "Suspecte {suspicious} din {total} eșantioane",
   "@obd2DiagnosticsFuelLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "suspicious": {
@@ -2697,9 +2601,8 @@
       }
     }
   },
-  "obd2DiagnosticsPidRow": "{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "obd2DiagnosticsPidRow": "{pid}: {polled} interogări · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
   "@obd2DiagnosticsPidRow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pid": {
@@ -2734,54 +2637,44 @@
       }
     }
   },
-  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "obd2DiagnosticsEmpty": "Nicio sesiune OBD2 înregistrată — conectați un adaptor și înregistrați o călătorie cu modul Dezvoltator activat.",
   "@obd2DiagnosticsEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
+  "obd2DiagnosticsExplain": "Capturat în timpul înregistrării pentru a depana comunicarea dongle↔aplicație — colectat doar în modul Dezvoltator.",
   "@obd2DiagnosticsExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthScreenTitle": "OBD2 communication health",
+  "obd2HealthScreenTitle": "Stare comunicare OBD2",
   "@obd2HealthScreenTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthNavLabel": "OBD2 communication health",
+  "obd2HealthNavLabel": "Stare comunicare OBD2",
   "@obd2HealthNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthLiveSection": "Live session",
+  "obd2HealthLiveSection": "Sesiune live",
   "@obd2HealthLiveSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthHistorySection": "Recent sessions",
+  "obd2HealthHistorySection": "Sesiuni recente",
   "@obd2HealthHistorySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Copy as JSON",
+  "obd2HealthCopyJson": "Copiați ca JSON",
   "@obd2HealthCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
+  "obd2HealthCopied": "Diagnosticele OBD2 au fost copiate în clipboard.",
   "@obd2HealthCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evStatusPartial": "Partly available",
+  "evStatusPartial": "Parțial disponibil",
   "@evStatusPartial": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
+  "radiusAlertDeleted": "Alertă de rază \"{name}\" ștearsă",
   "@radiusAlertDeleted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -2789,54 +2682,44 @@
       }
     }
   },
-  "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
+  "tripRecordingDiscardedNoMovement": "Înregistrare anulată — nicio mișcare detectată",
   "@tripRecordingDiscardedNoMovement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionSetupDataSources": "Setup & data sources",
+  "sectionSetupDataSources": "Configurare și surse de date",
   "@sectionSetupDataSources": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionFeaturesUsage": "Features & usage",
+  "sectionFeaturesUsage": "Funcții și utilizare",
   "@sectionFeaturesUsage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAccountSync": "Account & sync",
+  "sectionAccountSync": "Cont și sincronizare",
   "@sectionAccountSync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAppearanceWidgets": "Appearance & widgets",
+  "sectionAppearanceWidgets": "Aspect și widgeturi",
   "@sectionAppearanceWidgets": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionPrivacyData": "Privacy & data",
+  "sectionPrivacyData": "Confidențialitate și date",
   "@sectionPrivacyData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAdvancedDeveloper": "Advanced & developer",
+  "sectionAdvancedDeveloper": "Avansat și dezvoltator",
   "@sectionAdvancedDeveloper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineShowDetails": "Show per-situation breakdown",
+  "vehicleBaselineShowDetails": "Afișați detalii pe situații",
   "@vehicleBaselineShowDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineHideDetails": "Hide per-situation breakdown",
+  "vehicleBaselineHideDetails": "Ascundeți detalii pe situații",
   "@vehicleBaselineHideDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineMissingWarning": "Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.",
+  "vehicleBaselineMissingWarning": "Nedetectat încă: {situations}. Aceste situații de condus au încă 0 eșantioane, deci valoarea de referință este incompletă.",
   "@vehicleBaselineMissingWarning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "situations": {
@@ -2845,224 +2728,180 @@
       }
     }
   },
-  "ocrTesterTitle": "OCR tester",
+  "ocrTesterTitle": "Tester OCR",
   "@ocrTesterTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNavLabel": "OCR tester",
+  "ocrTesterNavLabel": "Tester OCR",
   "@ocrTesterNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExplain": "Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.",
+  "ocrTesterExplain": "Rulați pipeline-ul OCR pentru pompă / bon pe o fotografie aleasă și inspectați fiecare pas — disponibil doar în modul Dezvoltator.",
   "@ocrTesterExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pump",
+  "ocrTesterModePump": "Pompă",
   "@ocrTesterModePump": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModeReceipt": "Receipt",
+  "ocrTesterModeReceipt": "Bon",
   "@ocrTesterModeReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCapture": "Capture",
+  "ocrTesterCapture": "Captură",
   "@ocrTesterCapture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterPickImage": "Pick image",
+  "ocrTesterPickImage": "Selectați imagine",
   "@ocrTesterPickImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRun": "Run",
+  "ocrTesterRun": "Rulați",
   "@ocrTesterRun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountry": "Country",
+  "ocrTesterCountry": "Țară",
   "@ocrTesterCountry": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountryNone": "Default (no profile)",
+  "ocrTesterCountryNone": "Implicit (fără profil)",
   "@ocrTesterCountryNone": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoImage": "Pick or capture an image, then Run.",
+  "ocrTesterNoImage": "Selectați sau capturați o imagine, apoi apăsați Rulați.",
   "@ocrTesterNoImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRunning": "Running OCR…",
+  "ocrTesterRunning": "Se rulează OCR…",
   "@ocrTesterRunning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoResult": "OCR produced no readable result.",
+  "ocrTesterNoResult": "OCR nu a produs niciun rezultat lizibil.",
   "@ocrTesterNoResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterOverlaySection": "Block overlay",
+  "ocrTesterOverlaySection": "Suprapunere blocuri",
   "@ocrTesterOverlaySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStepsSection": "Pipeline steps",
+  "ocrTesterStepsSection": "Pași pipeline",
   "@ocrTesterStepsSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendLabel": "Label",
+  "ocrTesterLegendLabel": "Etichetă",
   "@ocrTesterLegendLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterLegendNumeric": "Numeric",
   "@ocrTesterLegendNumeric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNoise": "Noise",
+  "ocrTesterLegendNoise": "Zgomot",
   "@ocrTesterLegendNoise": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendDerived": "Derived",
+  "ocrTesterLegendDerived": "Derivat",
   "@ocrTesterLegendDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGlare": "Capture / glare",
+  "ocrTesterStageGlare": "Captură / reflexie",
   "@ocrTesterStageGlare": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterStageMlkit": "ML Kit",
   "@ocrTesterStageMlkit": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageClassify": "Classify",
+  "ocrTesterStageClassify": "Clasificare",
   "@ocrTesterStageClassify": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAssemble": "Assemble",
+  "ocrTesterStageAssemble": "Asamblare",
   "@ocrTesterStageAssemble": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAnchor": "Anchor",
+  "ocrTesterStageAnchor": "Ancoră",
   "@ocrTesterStageAnchor": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageFallback": "Fallback",
+  "ocrTesterStageFallback": "Rezervă",
   "@ocrTesterStageFallback": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageCrossCheck": "Cross-check",
+  "ocrTesterStageCrossCheck": "Verificare încrucișată",
   "@ocrTesterStageCrossCheck": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageConfidence": "Confidence",
+  "ocrTesterStageConfidence": "Încredere",
   "@ocrTesterStageConfidence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGate": "Gate",
+  "ocrTesterStageGate": "Poartă",
   "@ocrTesterStageGate": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterStageBrand": "Brand",
   "@ocrTesterStageBrand": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageOverrides": "Overrides",
+  "ocrTesterStageOverrides": "Suprascrieri",
   "@ocrTesterStageOverrides": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageReconcile": "Reconcile",
+  "ocrTesterStageReconcile": "Reconciliere",
   "@ocrTesterStageReconcile": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageResult": "Result",
+  "ocrTesterStageResult": "Rezultat",
   "@ocrTesterStageResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipRead": "READ",
+  "ocrTesterChipRead": "CITIT",
   "@ocrTesterChipRead": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipDerived": "DERIVED",
+  "ocrTesterChipDerived": "DERIVAT",
   "@ocrTesterChipDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateAccepted": "Accepted",
+  "ocrTesterGateAccepted": "Acceptat",
   "@ocrTesterGateAccepted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateRejected": "Rejected",
+  "ocrTesterGateRejected": "Respins",
   "@ocrTesterGateRejected": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFallbackBanner": "A field was recovered via magnitude fallback — verify it.",
+  "ocrTesterFallbackBanner": "Un câmp a fost recuperat prin fallback de magnitudine — verificați-l.",
   "@ocrTesterFallbackBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageNoData": "Stage did not run.",
+  "ocrTesterStageNoData": "Etapa nu a rulat.",
   "@ocrTesterStageNoData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopyJson": "Copy as JSON",
+  "ocrTesterCopyJson": "Copiați ca JSON",
   "@ocrTesterCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExportPackage": "Export package",
+  "ocrTesterExportPackage": "Exportați pachet",
   "@ocrTesterExportPackage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopied": "OCR trace copied to clipboard.",
+  "ocrTesterCopied": "Urmărirea OCR copiată în clipboard.",
   "@ocrTesterCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExported": "OCR package saved to your Downloads folder.",
+  "ocrTesterExported": "Pachetul OCR salvat în folderul Descărcări.",
   "@ocrTesterExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitSection": "Dongle init transcript",
+  "obd2DiagnosticsInitSection": "Transcript inițializare dongle",
   "@obd2DiagnosticsInitSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
+  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PID-uri",
   "@obd2DiagnosticsInitHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "protocol": {
@@ -3084,7 +2923,6 @@
   },
   "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
   "@obd2DiagnosticsInitLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "cmd": {
@@ -3098,49 +2936,40 @@
       }
     }
   },
-  "obd2DiagnosticsInitWarm": "warm",
+  "obd2DiagnosticsInitWarm": "cald",
   "@obd2DiagnosticsInitWarm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitCold": "cold",
+  "obd2DiagnosticsInitCold": "rece",
   "@obd2DiagnosticsInitCold": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Copy init transcript only",
+  "obd2HealthCopyInitTranscript": "Copiați doar transcriptul de inițializare",
   "@obd2HealthCopyInitTranscript": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterSaveFixture": "Save as fixture",
+  "ocrTesterSaveFixture": "Salvați ca fixture",
   "@ocrTesterSaveFixture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "ocrTesterFixtureSaved": "Fixture salvat în folderul Descărcări. Mutați-l sub test/fixtures și rulați tool/promote_ocr_fixture.dart.",
   "@ocrTesterFixtureSaved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationColdStart": "Cold start",
+  "situationColdStart": "Pornire la rece",
   "@situationColdStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationSustainedLoad": "Sustained load / towing",
+  "situationSustainedLoad": "Sarcină susținută / remorcare",
   "@situationSustainedLoad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationPartialDecel": "Coasting",
+  "situationPartialDecel": "Rulare liberă",
   "@situationPartialDecel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorDistanceLabel": "Distance ({unit})",
+  "calculatorDistanceLabel": "Distanță ({unit})",
   "@calculatorDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3148,9 +2977,8 @@
       }
     }
   },
-  "calculatorConsumptionLabel": "Consumption ({unit})",
+  "calculatorConsumptionLabel": "Consum ({unit})",
   "@calculatorConsumptionLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3158,9 +2986,8 @@
       }
     }
   },
-  "calculatorPriceLabel": "Fuel price ({unit})",
+  "calculatorPriceLabel": "Prețul carburantului ({unit})",
   "@calculatorPriceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3168,164 +2995,132 @@
       }
     }
   },
-  "calculatorUseMine": "Use",
+  "calculatorUseMine": "Folosiți",
   "@calculatorUseMine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorApplied": "Applied",
+  "calculatorApplied": "Aplicat",
   "@calculatorApplied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripDetails": "Trip details",
+  "tripDetails": "Detalii călătorie",
   "@tripDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorRoundTrip": "Round trip",
+  "calculatorRoundTrip": "Dus-întors",
   "@calculatorRoundTrip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "roundTripTotal": "Round trip",
+  "roundTripTotal": "Dus-întors",
   "@roundTripTotal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "costPerDistance": "Cost per km",
   "@costPerDistance": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerMonth": "Cost per month",
+  "costPerMonth": "Cost pe lună",
   "@costPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorEstimateMonthly": "Estimate monthly cost",
+  "calculatorEstimateMonthly": "Estimați costul lunar",
   "@calculatorEstimateMonthly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonth": "Trips per month",
+  "calculatorTripsPerMonth": "Călătorii pe lună",
   "@calculatorTripsPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonthHint": "e.g. 20",
+  "calculatorTripsPerMonthHint": "ex. 20",
   "@calculatorTripsPerMonthHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorReset": "Reset",
+  "calculatorReset": "Resetați",
   "@calculatorReset": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
+  "calculatorResultPlaceholder": "Completați distanța, consumul și prețul pentru a vedea costul călătoriei",
   "@calculatorResultPlaceholder": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressFinalizingSummary": "Finalizing summary…",
+  "tripSaveProgressFinalizingSummary": "Se finalizează rezumatul…",
   "@tripSaveProgressFinalizingSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSavingToHistory": "Saving to history…",
+  "tripSaveProgressSavingToHistory": "Se salvează în istoric…",
   "@tripSaveProgressSavingToHistory": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSyncingToCloud": "Syncing in background…",
+  "tripSaveProgressSyncingToCloud": "Sincronizare în fundal…",
   "@tripSaveProgressSyncingToCloud": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingSavingTitle": "Saving trip…",
+  "tripRecordingSavingTitle": "Se salvează călătoria…",
   "@tripRecordingSavingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionDisplayStations": "Display & stations",
+  "profileSectionDisplayStations": "Afișaj și stații",
   "@profileSectionDisplayStations": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionRegion": "Region",
+  "profileSectionRegion": "Regiune",
   "@profileSectionRegion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupVehicles": "Vehicles",
+  "consoGroupVehicles": "Vehicule",
   "@consoGroupVehicles": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupCoaching": "Coaching while driving",
+  "consoGroupCoaching": "Coaching în timpul conducerii",
   "@consoGroupCoaching": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupRewards": "Rewards & savings",
+  "consoGroupRewards": "Recompense și economii",
   "@consoGroupRewards": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupTroubleshooting": "Troubleshooting",
+  "consoGroupTroubleshooting": "Depanare",
   "@consoGroupTroubleshooting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_voiceAnnouncements": "Voice announcements",
+  "featureLabel_voiceAnnouncements": "Anunțuri vocale",
   "@featureLabel_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_voiceAnnouncements": "Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.",
+  "featureDescription_voiceAnnouncements": "Anunță cu voce tare stațiile de carburant ieftine din apropiere pe măsură ce conduceți, astfel puteți ține ochii pe drum.",
   "@featureDescription_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "featureBlockedEnable_voiceAnnouncements": "Activați mai întâi Radarul stațiilor de carburant",
   "@featureBlockedEnable_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2GpsDegradedBannerTitle": "Recording with GPS — OBD2 reconnecting",
+  "obd2GpsDegradedBannerTitle": "Înregistrare cu GPS — OBD2 se reconectează",
   "@obd2GpsDegradedBannerTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Restore backup",
+  "restoreBackupTooltip": "Restaurați backup",
   "@restoreBackupTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogTitle": "Restore backup",
+  "restoreBackupDialogTitle": "Restaurați backup",
   "@restoreBackupDialogTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogBody": "Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.",
+  "restoreBackupDialogBody": "Îmbinarea adaugă și actualizează înregistrări din backup și păstrează tot ce există deja pe acest dispozitiv. Înlocuirea șterge mai întâi toate datele curente, apoi restaurează doar backup-ul — această acțiune nu poate fi anulată.",
   "@restoreBackupDialogBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergeAction": "Merge",
+  "restoreBackupMergeAction": "Îmbinare",
   "@restoreBackupMergeAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupReplaceAction": "Replace all",
+  "restoreBackupReplaceAction": "Înlocuiți tot",
   "@restoreBackupReplaceAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupSuccess": "Backup restored — {count} records imported",
+  "restoreBackupSuccess": "Backup restaurat — {count} înregistrări importate",
   "@restoreBackupSuccess": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3333,29 +3128,24 @@
       }
     }
   },
-  "restoreBackupEmpty": "Backup restored — it contained no records",
+  "restoreBackupEmpty": "Backup restaurat — nu conținea înregistrări",
   "@restoreBackupEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupCorrupt": "Restore failed — this file is not a valid Tankstellen backup",
+  "restoreBackupCorrupt": "Restaurare eșuată — acest fișier nu este un backup Tankstellen valid",
   "@restoreBackupCorrupt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupFailed": "Restore failed — the file could not be read",
+  "restoreBackupFailed": "Restaurare eșuată — fișierul nu a putut fi citit",
   "@restoreBackupFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSearchingChip": "Searching the route…",
+  "routeSearchingChip": "Se caută ruta…",
   "@routeSearchingChip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Every {km} km",
+  "routeSegmentSummaryBadge": "La fiecare {km} km",
   "@routeSegmentSummaryBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3363,9 +3153,8 @@
       }
     }
   },
-  "profileSwitchedTo": "Switched to {profile}",
+  "profileSwitchedTo": "Comutat la {profile}",
   "@profileSwitchedTo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "profile": {
@@ -3373,9 +3162,8 @@
       }
     }
   },
-  "profileCreatedNamed": "Profile {name} created",
+  "profileCreatedNamed": "Profilul {name} a fost creat",
   "@profileCreatedNamed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -3383,9 +3171,8 @@
       }
     }
   },
-  "profileCountryTaken": "A profile for {country} already exists — edit it instead.",
+  "profileCountryTaken": "Există deja un profil pentru {country} — editați-l.",
   "@profileCountryTaken": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "country": {
@@ -3393,39 +3180,32 @@
       }
     }
   },
-  "evPriceFree": "Free",
+  "evPriceFree": "Gratuit",
   "@evPriceFree": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPricePayAtLocation": "Pay at location",
+  "evPricePayAtLocation": "Plată la locație",
   "@evPricePayAtLocation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceMembership": "Membership required",
+  "evPriceMembership": "Necesită abonament",
   "@evPriceMembership": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceIndicative": "Indicative price",
+  "evPriceIndicative": "Preț indicativ",
   "@evPriceIndicative": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceDeclaredByOperator": "Indicative price declared by the operator — verify on site",
+  "evPriceDeclaredByOperator": "Preț indicativ declarat de operator — verificați la fața locului",
   "@evPriceDeclaredByOperator": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceFranceAttribution": "Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "evPriceFranceAttribution": "Prețuri: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
   "@evPriceFranceAttribution": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "routeStationCount": "{count, plural, =1{1 stație} other{{count} stații}}",
   "@routeStationCount": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3433,9 +3213,8 @@
       }
     }
   },
-  "stationUpdatedLabel": "Updated {time}",
+  "stationUpdatedLabel": "Actualizat {time}",
   "@stationUpdatedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3444,9 +3223,8 @@
       }
     }
   },
-  "amenityMoreTooltip": "Also: {names}",
+  "amenityMoreTooltip": "De asemenea: {names}",
   "@amenityMoreTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "names": {
@@ -3455,19 +3233,16 @@
       }
     }
   },
-  "favoriteAdd": "Add to favorites",
+  "favoriteAdd": "Adăugați la favorite",
   "@favoriteAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "favoriteRemove": "Remove from favorites",
+  "favoriteRemove": "Eliminați din favorite",
   "@favoriteRemove": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "loyaltyRawPriceTooltip": "Raw: {price}",
+  "loyaltyRawPriceTooltip": "Prețul brut: {price}",
   "@loyaltyRawPriceTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "price": {
@@ -3478,7 +3253,6 @@
   },
   "routeDataSourceMulti": "{sources}",
   "@routeDataSourceMulti": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "sources": {
@@ -3487,29 +3261,24 @@
       }
     }
   },
-  "obd2TestRunTitle": "Run adapter test",
+  "obd2TestRunTitle": "Rulați testul adaptorului",
   "@obd2TestRunTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunButton": "Run adapter test",
+  "obd2TestRunButton": "Rulați testul adaptorului",
   "@obd2TestRunButton": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunPassed": "Adapter test passed",
+  "obd2TestRunPassed": "Testul adaptorului a trecut",
   "@obd2TestRunPassed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunFailed": "Adapter test failed",
+  "obd2TestRunFailed": "Testul adaptorului a eșuat",
   "@obd2TestRunFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
+  "obd2TestRunSummary": "{passed} din {total} pași OK · {elapsed} ms",
   "@obd2TestRunSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "passed": {
@@ -3526,139 +3295,112 @@
       }
     }
   },
-  "obd2TestRunCannotWhileRecording": "Stop the active recording before running the adapter test.",
+  "obd2TestRunCannotWhileRecording": "Opriți înregistrarea activă înainte de a rula testul adaptorului.",
   "@obd2TestRunCannotWhileRecording": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepScan": "Scan for adapter",
+  "obd2TestStepScan": "Scanare adaptor",
   "@obd2TestStepScan": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepConnect": "Connect & init",
+  "obd2TestStepConnect": "Conectare și inițializare",
   "@obd2TestStepConnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepInfo": "Adapter info",
+  "obd2TestStepInfo": "Informații adaptor",
   "@obd2TestStepInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSupportedPids": "Supported PIDs",
+  "obd2TestStepSupportedPids": "PID-uri acceptate",
   "@obd2TestStepSupportedPids": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSampleReads": "Sample reads",
+  "obd2TestStepSampleReads": "Citiri eșantion",
   "@obd2TestStepSampleReads": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepReconnect": "Reconnect test",
+  "obd2TestStepReconnect": "Test reconectare",
   "@obd2TestStepReconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepDisconnect": "Disconnect",
+  "obd2TestStepDisconnect": "Deconectare",
   "@obd2TestStepDisconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2TestStatusOk": "OK",
   "@obd2TestStatusOk": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusTimeout": "Timed out",
+  "obd2TestStatusTimeout": "Expirat",
   "@obd2TestStatusTimeout": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusGarbage": "Unreadable reply",
+  "obd2TestStatusGarbage": "Răspuns ilizibil",
   "@obd2TestStatusGarbage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusNoResponse": "No response",
+  "obd2TestStatusNoResponse": "Niciun răspuns",
   "@obd2TestStatusNoResponse": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusFail": "Failed",
+  "obd2TestStatusFail": "Eșuat",
   "@obd2TestStatusFail": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadCsvOption": "Download telemetry (CSV)",
+  "trajetDetailDownloadCsvOption": "Descărcați telemetria (CSV)",
   "@trajetDetailDownloadCsvOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadJsonOption": "Download telemetry (JSON)",
+  "trajetDetailDownloadJsonOption": "Descărcați telemetria (JSON)",
   "@trajetDetailDownloadJsonOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadError": "Couldn't save the file",
+  "trajetDetailDownloadError": "Nu s-a putut salva fișierul",
   "@trajetDetailDownloadError": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHardAcceleration": "Easy on the accelerator",
+  "coachingVoiceHardAcceleration": "Ușor cu acceleratorul",
   "@coachingVoiceHardAcceleration": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHarshBraking": "Try to brake more gently",
+  "coachingVoiceHarshBraking": "Încercați să frânați mai ușor",
   "@coachingVoiceHarshBraking": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftUp": "Shift up a gear to save fuel",
+  "coachingVoiceShiftUp": "Schimbați la o treaptă superioară pentru a economisi carburant",
   "@coachingVoiceShiftUp": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftDown": "Shift down, the engine is labouring",
+  "coachingVoiceShiftDown": "Schimbați la o treaptă inferioară, motorul forțează",
   "@coachingVoiceShiftDown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceEasePedal": "Ease off the pedal to cut your fuel use",
+  "coachingVoiceEasePedal": "Reduceți pedala pentru a scădea consumul",
   "@coachingVoiceEasePedal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceLiftOff": "Lift off the accelerator and coast",
+  "coachingVoiceLiftOff": "Ridicați piciorul de pe accelerator și rulați liber",
   "@coachingVoiceLiftOff": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceAnticipateBrake": "Look further ahead and lift off earlier",
+  "coachingVoiceAnticipateBrake": "Privați mai departe înainte și ridicați piciorul mai devreme",
   "@coachingVoiceAnticipateBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceSmoothAccel": "Accelerate more smoothly",
+  "coachingVoiceSmoothAccel": "Accelerați mai lin",
   "@coachingVoiceSmoothAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingTitle": "Spoken driving coaching",
+  "voiceCoachingSettingTitle": "Coaching vocal în timpul conducerii",
   "@voiceCoachingSettingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingSubtitle": "Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints",
+  "voiceCoachingSettingSubtitle": "Primiți sfaturi vocale în timp ce conduceți — accelerare bruscă, frânare dură și indicii de schimbare a treptelor",
   "@voiceCoachingSettingSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarDistanceKm": "{km} km away",
+  "fuelStationRadarDistanceKm": "{km} km distanță",
   "@fuelStationRadarDistanceKm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3667,9 +3409,8 @@
       }
     }
   },
-  "fuelStationRadarProximity": "Proximity {percent}%",
+  "fuelStationRadarProximity": "Proximitate {percent}%",
   "@fuelStationRadarProximity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -3678,94 +3419,76 @@
       }
     }
   },
-  "fuelStationRadarNearer": "Nearer station",
+  "fuelStationRadarNearer": "Stație mai aproape",
   "@fuelStationRadarNearer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarFarther": "Farther station",
+  "fuelStationRadarFarther": "Stație mai departe",
   "@fuelStationRadarFarther": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarResultBadge": "Fuel Station Radar result",
+  "fuelStationRadarResultBadge": "Rezultat Radar stații de carburant",
   "@fuelStationRadarResultBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_finding": "Finding & map",
+  "featureGroupTitle_finding": "Găsire și hartă",
   "@featureGroupTitle_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_finding": "Where to fuel up or charge — search, map, routing.",
+  "featureGroupDescription_finding": "Unde să alimentați sau să încărcați — căutare, hartă, rutare.",
   "@featureGroupDescription_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_prices": "Prices & alerts",
+  "featureGroupTitle_prices": "Prețuri și alerte",
   "@featureGroupTitle_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_prices": "Price drops, history, and reporting.",
+  "featureGroupDescription_prices": "Scăderi de prețuri, istoric și raportare.",
   "@featureGroupDescription_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_radar": "Fuel Station Radar",
+  "featureGroupTitle_radar": "Radar stații de carburant",
   "@featureGroupTitle_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_radar": "Live price nudges as you drive.",
+  "featureGroupDescription_radar": "Notificări live de prețuri pe măsură ce conduceți.",
   "@featureGroupDescription_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_sync": "Sync & backup",
+  "featureGroupTitle_sync": "Sincronizare și backup",
   "@featureGroupTitle_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_sync": "Keep your data across devices.",
+  "featureGroupDescription_sync": "Păstrați datele pe mai multe dispozitive.",
   "@featureGroupDescription_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_input": "Input & scanning",
+  "featureGroupTitle_input": "Introducere și scanare",
   "@featureGroupTitle_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_input": "Helpers for logging fill-ups.",
+  "featureGroupDescription_input": "Instrumente ajutătoare pentru înregistrarea realimentărilor.",
   "@featureGroupDescription_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_developer": "Developer & experimental",
+  "featureGroupTitle_developer": "Dezvoltator și experimental",
   "@featureGroupTitle_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_developer": "Power-user and contributor tools.",
+  "featureGroupDescription_developer": "Instrumente pentru utilizatori avansați și contribuitori.",
   "@featureGroupDescription_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarStart": "Start fuel station radar",
+  "fuelStationRadarStart": "Porniți radarul stațiilor de carburant",
   "@fuelStationRadarStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "evPriceBestEffortOcm": "Prețuri oferite cu eforturi maxime din OpenChargeMap — incomplete și pot lipsi date.",
   "@evPriceBestEffortOcm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "insightClimbingCost": "Urcare la {gradePercent}% pantă ({pctTime}% din călătorie): risipit {liters} L",
   "@insightClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gradePercent": {
@@ -3779,14 +3502,12 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "lessonAdviceClimbingCost": "Mențineți viteza la intrarea pe deal și apăsați pedala treptat — accelerările brusce pe o urcare ard carburant suplimentar.",
   "@lessonAdviceClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "insightRestartCost": "{count} porniri în trafic stop-and-go: risipit {liters} L",
   "@insightRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3797,44 +3518,36 @@
       }
     }
   },
-  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "lessonAdviceRestartCost": "Anticipați traficul și rulați liber spre opriri pentru a merge pe inerție mai degrabă decât să reporniți — pornirea de pe loc este cea mai consumatoare parte din circulația stop-and-go.",
   "@lessonAdviceRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCardTitle": "GPS efficiency",
+  "gpsKpiCardTitle": "Eficiență GPS",
   "@gpsKpiCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "gpsKpiRpa": "Accelerație pozitivă (RPA)",
   "@gpsKpiRpa": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "gpsKpiPke": "Cerere de energie cinetică (PKE)",
   "@gpsKpiPke": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "gpsKpiVapos": "Intensitate accelerație (VAPOS)",
   "@gpsKpiVapos": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCoast": "Coasting share",
+  "gpsKpiCoast": "Pondere rulare liberă",
   "@gpsKpiCoast": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiClimbEnergy": "Climb energy",
+  "gpsKpiClimbEnergy": "Energie urcare",
   "@gpsKpiClimbEnergy": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "drivingScoreBaselineDelta": "{pct} față de valoarea dvs. de referință eficientă",
   "@drivingScoreBaselineDelta": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -3842,29 +3555,24 @@
       }
     }
   },
-  "consumptionMonthlyClimbLabel": "Climbed",
+  "consumptionMonthlyClimbLabel": "Urcat",
   "@consumptionMonthlyClimbLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNow": "Open",
+  "openNow": "Deschis",
   "@openNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNowClosed": "Closed",
+  "openNowClosed": "Închis",
   "@openNowClosed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openHoursUnknown": "Hours unknown",
+  "openHoursUnknown": "Program necunoscut",
   "@openHoursUnknown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closesAt": "Closes {time}",
+  "closesAt": "Se închide la {time}",
   "@closesAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3872,9 +3580,8 @@
       }
     }
   },
-  "opensAt": "Opens {day} {time}",
+  "opensAt": "Se deschide {day} {time}",
   "@opensAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -3885,9 +3592,8 @@
       }
     }
   },
-  "opensToday": "Opens {time}",
+  "opensToday": "Se deschide la {time}",
   "@opensToday": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3895,89 +3601,72 @@
       }
     }
   },
-  "open24Hours": "Open 24 hours",
+  "open24Hours": "Deschis 24 de ore",
   "@open24Hours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "badge24h": "24h",
   "@badge24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayMon": "Monday",
+  "dayMon": "Luni",
   "@dayMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayTue": "Tuesday",
+  "dayTue": "Marți",
   "@dayTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayWed": "Wednesday",
+  "dayWed": "Miercuri",
   "@dayWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayThu": "Thursday",
+  "dayThu": "Joi",
   "@dayThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayFri": "Friday",
+  "dayFri": "Vineri",
   "@dayFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySat": "Saturday",
+  "daySat": "Sâmbătă",
   "@daySat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySun": "Sunday",
+  "daySun": "Duminică",
   "@daySun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortMon": "Mon",
+  "dayShortMon": "Lu",
   "@dayShortMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortTue": "Tue",
+  "dayShortTue": "Ma",
   "@dayShortTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortWed": "Wed",
+  "dayShortWed": "Mi",
   "@dayShortWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortThu": "Thu",
+  "dayShortThu": "Jo",
   "@dayShortThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortFri": "Fri",
+  "dayShortFri": "Vi",
   "@dayShortFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSat": "Sat",
+  "dayShortSat": "Sâ",
   "@dayShortSat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSun": "Sun",
+  "dayShortSun": "Du",
   "@dayShortSun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "dayRange": "{from} – {to}",
   "@dayRange": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "from": {
@@ -3988,59 +3677,48 @@
       }
     }
   },
-  "publicHolidays": "Public holidays",
+  "publicHolidays": "Sărbători legale",
   "@publicHolidays": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closedLabel": "Closed",
+  "closedLabel": "Închis",
   "@closedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursNotAvailable": "Opening hours not available",
+  "openingHoursNotAvailable": "Programul de funcționare nu este disponibil",
   "@openingHoursNotAvailable": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showAllHours": "Show all hours",
+  "showAllHours": "Afișați tot programul",
   "@showAllHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showLessHours": "Show less",
+  "showLessHours": "Afișați mai puțin",
   "@showLessHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPageTitle": "Consumption statistics",
+  "consumptionStatsPageTitle": "Statistici consum",
   "@consumptionStatsPageTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsComparisonTitle": "This month vs last month",
+  "consumptionStatsComparisonTitle": "Luna aceasta față de luna trecută",
   "@consumptionStatsComparisonTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsTrendsTitle": "Evolution over time",
+  "consumptionStatsTrendsTitle": "Evoluție în timp",
   "@consumptionStatsTrendsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsNeedTwoMonths": "Log fill-ups across at least two months to compare.",
+  "consumptionStatsNeedTwoMonths": "Înregistrați realimentări pe cel puțin două luni pentru a compara.",
   "@consumptionStatsNeedTwoMonths": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPricePerLiter": "Avg price/L",
+  "consumptionStatsPricePerLiter": "Preț mediu/L",
   "@consumptionStatsPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "consumptionStatsDeltaPercent": "{pct}%",
   "@consumptionStatsDeltaPercent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -4048,89 +3726,72 @@
       }
     }
   },
-  "consumptionStatsChartLiters": "Litres per month",
+  "consumptionStatsChartLiters": "Litri pe lună",
   "@consumptionStatsChartLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartSpend": "Spend per month",
+  "consumptionStatsChartSpend": "Cheltuieli pe lună",
   "@consumptionStatsChartSpend": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartPricePerLiter": "Price per litre",
+  "consumptionStatsChartPricePerLiter": "Preț per litru",
   "@consumptionStatsChartPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartConsumption": "L/100km per month",
+  "consumptionStatsChartConsumption": "L/100km pe lună",
   "@consumptionStatsChartConsumption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptImporting": "Importing shared receipt…",
+  "shareReceiptImporting": "Se importă bonul partajat…",
   "@shareReceiptImporting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
+  "shareReceiptUnsupportedFormat": "Acest tip de fișier nu poate fi importat încă — partajați o fotografie a bonului.",
   "@shareReceiptUnsupportedFormat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptFailed": "Couldn't read the shared receipt — try sharing it again or add the fill-up manually.",
+  "shareReceiptFailed": "Nu s-a putut citi bonul partajat — încercați din nou sau adăugați realimentarea manual.",
   "@shareReceiptFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_addFillUpShareIntentReceipt": "Share receipt to import",
+  "featureLabel_addFillUpShareIntentReceipt": "Partajați bon pentru a importa",
   "@featureLabel_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_addFillUpShareIntentReceipt": "Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.",
+  "featureDescription_addFillUpShareIntentReceipt": "Partajați o fotografie a bonului din altă aplicație pentru a completa o realimentare — data, litrii, totalul și stația sunt citite pe dispozitiv.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "24/7 automate",
+  "openingHoursAutomate24h": "Automat 24/7",
   "@openingHoursAutomate24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "stopRadar": "Stop radar",
+  "stopRadar": "Opriți radarul",
   "@stopRadar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "moreActionsTooltip": "More",
+  "moreActionsTooltip": "Mai mult",
   "@moreActionsTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupMenuLabel": "Export backup",
+  "exportBackupMenuLabel": "Exportați backup",
   "@exportBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMenuLabel": "Restore backup",
+  "restoreBackupMenuLabel": "Restaurați backup",
   "@restoreBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "carbonDashboardMenuLabel": "Carbon dashboard",
+  "carbonDashboardMenuLabel": "Tablou de bord carbon",
   "@carbonDashboardMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "settingsMenuLabel": "Settings",
+  "settingsMenuLabel": "Setări",
   "@settingsMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "gpsDiagnosticsLargestGap": "Cea mai mare pauză: {seconds} s",
   "@gpsDiagnosticsLargestGap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "seconds": {
@@ -4138,34 +3799,28 @@
       }
     }
   },
-  "gpsLifecycleResumed": "Resumed",
+  "gpsLifecycleResumed": "Reluat",
   "@gpsLifecycleResumed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecyclePaused": "Paused",
+  "gpsLifecyclePaused": "Pauză",
   "@gpsLifecyclePaused": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecycleInactive": "Inactive",
+  "gpsLifecycleInactive": "Inactiv",
   "@gpsLifecycleInactive": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "tripRecordingGpsNotificationTitle": "Se înregistrează călătoria",
   "@tripRecordingGpsNotificationTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "tripRecordingGpsNotificationText": "Se urmărește ruta dvs. pentru statistici de carburant și condus",
   "@tripRecordingGpsNotificationText": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceStationAnnouncement": "{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}",
+  "voiceStationAnnouncement": "{name}, {distanceKm} kilometri înainte, {fuelType} {euros} euro {cents}",
   "@voiceStationAnnouncement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -4190,54 +3845,44 @@
       }
     }
   },
-  "radarPinHelpTitle": "About pin",
+  "radarPinHelpTitle": "Despre fixare",
   "@radarPinHelpTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarPinHelpBody": "Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.",
+  "radarPinHelpBody": "Fixarea menține ecranul pornit și ascunde barele sistemului astfel încât afișajul cu cea mai apropiată stație rămâne vizibil pe un suport de bord. Apăsați din nou pentru a elibera. Se eliberează automat când radarul se oprește.",
   "@radarPinHelpBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinTitle": "Always pin when the radar starts",
+  "radarAutoPinTitle": "Fixați întotdeauna când pornește radarul",
   "@radarAutoPinTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinSubtitle": "Pin the radar automatically every time instead of tapping each time. Uses more battery.",
+  "radarAutoPinSubtitle": "Fixați radarul automat de fiecare dată în loc să apăsați de fiecare dată. Consumă mai multă baterie.",
   "@radarAutoPinSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeCardTitle": "Acceleration & braking",
+  "accelBrakeCardTitle": "Accelerație și frânare",
   "@accelBrakeCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardAccel": "Hard accelerations",
+  "accelBrakeHardAccel": "Accelerații brusce",
   "@accelBrakeHardAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardBrake": "Hard braking",
+  "accelBrakeHardBrake": "Frânări brusce",
   "@accelBrakeHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSharpCorner": "Sharp corners",
+  "accelBrakeSharpCorner": "Viraje strânse",
   "@accelBrakeSharpCorner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSource": "From the phone's motion sensors",
+  "accelBrakeSource": "De la senzorii de mișcare ai telefonului",
   "@accelBrakeSource": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonHardBrake": "{count} hard braking events",
+  "lessonHardBrake": "{count} evenimente de frânare bruscă",
   "@lessonHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4245,14 +3890,12 @@
       }
     }
   },
-  "lessonAdviceHardBrake": "Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.",
+  "lessonAdviceHardBrake": "Anticipați opririle și ridicați piciorul de pe accelerator mai devreme — frânarea bruscă risipește carburantul consumat pentru a ajunge la viteză.",
   "@lessonAdviceHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonSharpCornering": "{count} sharp corners",
+  "lessonSharpCornering": "{count} viraje strânse",
   "@lessonSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4260,44 +3903,36 @@
       }
     }
   },
-  "lessonAdviceSharpCornering": "Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.",
+  "lessonAdviceSharpCornering": "Reduceți viteza înainte de curbă, nu în ea — virajele strânse frânează viteza pe care trebuie apoi să o recâștigați.",
   "@lessonAdviceSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardTitle": "Driving-analysis trace (dev)",
+  "drivingTraceCardTitle": "Urmă analiză condus (dev)",
   "@drivingTraceCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardBody": "Export this trip's GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.",
+  "drivingTraceCardBody": "Exportați KPI-urile GPS ale acestei călătorii, scorul și lecțiile ca JSON, scrieți cum s-a simțit condusul în câmpul de comentarii și trimiteți-l înapoi astfel pragurile de stil de condus pot fi calibrate față de călătorii reale.",
   "@drivingTraceCardBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportAction": "Export analysis trace",
+  "drivingTraceExportAction": "Exportați urmă analiză",
   "@drivingTraceExportAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExported": "Analysis trace saved to Downloads — add your verdict in the comment field and share it back.",
+  "drivingTraceExported": "Urma de analiză salvată în Descărcări — adăugați verdictul dvs. în câmpul de comentarii și trimiteți-l înapoi.",
   "@drivingTraceExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportFailed": "Couldn't export the analysis trace.",
+  "drivingTraceExportFailed": "Nu s-a putut exporta urma de analiză.",
   "@drivingTraceExportFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "backupExportProgress": "Exporting your backup…",
+  "backupExportProgress": "Se exportează backup-ul dvs.…",
   "@backupExportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "exportBackupSavedAs": "Salvat în Descărcări ca {fileName}",
   "@exportBackupSavedAs": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fileName": {
@@ -4305,14 +3940,12 @@
       }
     }
   },
-  "backupImportProgress": "Restoring your backup…",
+  "backupImportProgress": "Se restaurează backup-ul dvs.…",
   "@backupImportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupMergedSummary": "Îmbinat {vehicles} vehicule, {fillUps} realimentări, {trips} călătorii, {chargingLogs} jurnale de încărcare",
   "@restoreBackupMergedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4329,9 +3962,8 @@
       }
     }
   },
-  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupReplacedSummary": "Înlocuit toate datele cu {vehicles} vehicule, {fillUps} realimentări, {trips} călătorii, {chargingLogs} jurnale de încărcare",
   "@restoreBackupReplacedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4348,19 +3980,16 @@
       }
     }
   },
-  "alertsStationSectionTitle": "Station alerts",
+  "alertsStationSectionTitle": "Alerte stații",
   "@alertsStationSectionTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "alertsStationAdd": "Add a station alert",
+  "alertsStationAdd": "Adăugați o alertă de stație",
   "@alertsStationAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
+  "scanPumpInconsistent": "Valorile scanate nu se adună — introduceți-le manual.",
   "@scanPumpInconsistent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

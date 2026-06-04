@@ -2007,14 +2007,12 @@
   "countryInfoFuelTypes": "Tipos de combustible: {fuelTypes}",
   "countryInfoDemoSource": "Demo",
   "languageChipSemantic": "{selected, select, true{Idioma {name}, seleccionado} false{Idioma {name}} other{Idioma {name}}}",
-  "fillUpGuidanceTitle": "Best time to fill up",
+  "fillUpGuidanceTitle": "El mejor momento para repostar",
   "@fillUpGuidanceTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceGoodTimeNow": "The current price is among the cheapest of the last {days} days — a good time to fill up.",
+  "fillUpGuidanceGoodTimeNow": "El precio actual está entre los más baratos de los últimos {days} días — es un buen momento para repostar.",
   "@fillUpGuidanceGoodTimeNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2023,9 +2021,8 @@
       }
     }
   },
-  "fillUpGuidanceWaitCheaper": "Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.",
+  "fillUpGuidanceWaitCheaper": "Los precios están cerca de su máximo de los últimos {days} días. Suelen ser más baratos {window} — considera esperar.",
   "@fillUpGuidanceWaitCheaper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2038,14 +2035,12 @@
       }
     }
   },
-  "fillUpGuidanceFillSoon": "Prices are trending up — consider filling up soon.",
+  "fillUpGuidanceFillSoon": "Los precios están subiendo — considera repostar pronto.",
   "@fillUpGuidanceFillSoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceNeutral": "Today's price is around the {days}-day average.",
+  "fillUpGuidanceNeutral": "El precio de hoy está en torno a la media de los últimos {days} días.",
   "@fillUpGuidanceNeutral": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2054,9 +2049,8 @@
       }
     }
   },
-  "fillUpGuidanceSaving": "Could save about {amount}/L by timing your fill-up.",
+  "fillUpGuidanceSaving": "Podrías ahorrar unos {amount}/L eligiendo bien el momento.",
   "@fillUpGuidanceSaving": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "amount": {
@@ -2065,9 +2059,8 @@
       }
     }
   },
-  "fillUpGuidanceSampleNote": "{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}",
+  "fillUpGuidanceSampleNote": "{count, plural, =1{Basado en 1 lectura de precio} other{Basado en {count} lecturas de precio}}",
   "@fillUpGuidanceSampleNote": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -2078,7 +2071,6 @@
   },
   "fillUpGuidanceWindowDayAndPart": "{day} {part}",
   "@fillUpGuidanceWindowDayAndPart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2091,9 +2083,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowDayOnly": "on {day}",
+  "fillUpGuidanceWindowDayOnly": "los {day}",
   "@fillUpGuidanceWindowDayOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2102,9 +2093,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowPartOnly": "in the {part}",
+  "fillUpGuidanceWindowPartOnly": "por las {part}",
   "@fillUpGuidanceWindowPartOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "part": {
@@ -2113,74 +2103,60 @@
       }
     }
   },
-  "fillUpGuidanceWindowGeneric": "at other times",
+  "fillUpGuidanceWindowGeneric": "en otros momentos",
   "@fillUpGuidanceWindowGeneric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday1": "Mondays",
+  "fillUpGuidanceWeekday1": "Los lunes",
   "@fillUpGuidanceWeekday1": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday2": "Tuesdays",
+  "fillUpGuidanceWeekday2": "Los martes",
   "@fillUpGuidanceWeekday2": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday3": "Wednesdays",
+  "fillUpGuidanceWeekday3": "Los miércoles",
   "@fillUpGuidanceWeekday3": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday4": "Thursdays",
+  "fillUpGuidanceWeekday4": "Los jueves",
   "@fillUpGuidanceWeekday4": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday5": "Fridays",
+  "fillUpGuidanceWeekday5": "Los viernes",
   "@fillUpGuidanceWeekday5": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday6": "Saturdays",
+  "fillUpGuidanceWeekday6": "Los sábados",
   "@fillUpGuidanceWeekday6": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday7": "Sundays",
+  "fillUpGuidanceWeekday7": "Los domingos",
   "@fillUpGuidanceWeekday7": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEarlyMorning": "early mornings",
+  "fillUpGuidancePartEarlyMorning": "madrugadas",
   "@fillUpGuidancePartEarlyMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartMorning": "mornings",
+  "fillUpGuidancePartMorning": "mañanas",
   "@fillUpGuidancePartMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartAfternoon": "afternoons",
+  "fillUpGuidancePartAfternoon": "tardes",
   "@fillUpGuidancePartAfternoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEvening": "evenings",
+  "fillUpGuidancePartEvening": "primeras horas de la noche",
   "@fillUpGuidancePartEvening": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartNight": "nights",
+  "fillUpGuidancePartNight": "noches",
   "@fillUpGuidancePartNight": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "dataSourceLinkSemantic": "Abrir la fuente de datos {source} ({license}) en el navegador",
   "@dataSourceLinkSemantic": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "source": {
@@ -2193,54 +2169,44 @@
       }
     }
   },
-  "tripRadarClosestStation": "Closest station",
+  "tripRadarClosestStation": "Radar de gasolineras",
   "@tripRadarClosestStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarScanning": "Scanning for nearby stations",
+  "tripRadarScanning": "Buscando gasolineras cercanas",
   "@tripRadarScanning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarNoStationNearby": "No station nearby",
+  "tripRadarNoStationNearby": "No hay ninguna gasolinera cerca",
   "@tripRadarNoStationNearby": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "developerToolsTestAlertNoStation": "Search for stations first, then run the test alert so the notification can open a real station.",
+  "developerToolsTestAlertNoStation": "Busca gasolineras primero y luego ejecuta la alerta de prueba para que la notificación pueda abrir una gasolinera real.",
   "@developerToolsTestAlertNoStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_approachOverlay": "Approach overlay",
+  "featureLabel_approachOverlay": "Radar de gasolineras",
   "@featureLabel_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "featureDescription_approachOverlay": "Convierte el panel de viaje flotante en un radar de gasolineras en directo — al acercarte a una gasolinera, cambia al color del tipo de combustible y muestra el precio.",
   "@featureDescription_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripAvgGpsEstimateTooltip": "GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle's calibration; accuracy improves as the matrix matures.",
+  "tripAvgGpsEstimateTooltip": "Estimación GPS (~) — sin sensor de combustible en este viaje. La cifra se modela a partir de la velocidad y la calibración de tu vehículo; la precisión mejora a medida que la matriz madura.",
   "@tripAvgGpsEstimateTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "tripRecordingPipEstConsumptionCaption": "est. L/100 km",
   "@tripRecordingPipEstConsumptionCaption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingEstimatedInfo": "Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle's calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.",
+  "tripRecordingEstimatedInfo": "Valor estimado (~) — sin sensor de combustible en este viaje, por lo que la cifra de L/100 km se modela a partir de la velocidad GPS y la calibración de tu vehículo. Es aproximada (típicamente ±10–30 %, mejorando con la calibración), no una lectura medida.",
   "@tripRecordingEstimatedInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "mapAttributionOsm": "© {brand} contributors",
+  "mapAttributionOsm": "© contribuidores de {brand}",
   "@mapAttributionOsm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "brand": {
@@ -2249,14 +2215,12 @@
       }
     }
   },
-  "trajetDetailChartEstimatedBadge": "estimated",
+  "trajetDetailChartEstimatedBadge": "estimado",
   "@trajetDetailChartEstimatedBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "statCorrectionLiters": "Corrections: +{liters} L",
+  "statCorrectionLiters": "Correcciones: +{liters} L",
   "@statCorrectionLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "liters": {
@@ -2264,14 +2228,12 @@
       }
     }
   },
-  "reconcileWorkflowTitle": "Reconcile your fuel",
+  "reconcileWorkflowTitle": "Reconciliar tu combustible",
   "@reconcileWorkflowTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainHeadline": "We found a {gap} L gap",
+  "reconcileWorkflowExplainHeadline": "Encontramos una diferencia de {gap} L",
   "@reconcileWorkflowExplainHeadline": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2279,9 +2241,8 @@
       }
     }
   },
-  "reconcileWorkflowExplainBody": "You pumped {pumped} L, but your recorded trips only account for {consumed} L. That leaves {gap} L unexplained.",
+  "reconcileWorkflowExplainBody": "Repostaste {pumped} L, pero tus viajes registrados solo acumulan {consumed} L. Quedan {gap} L sin explicar.",
   "@reconcileWorkflowExplainBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pumped": {
@@ -2295,104 +2256,84 @@
       }
     }
   },
-  "reconcileWorkflowExplainCauses": "This usually means a drive wasn't recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.",
+  "reconcileWorkflowExplainCauses": "Normalmente significa que un trayecto no se grabó (el adaptador estaba desconectado o la app estaba cerrada), o falta un repostaje o está mal introducido.",
   "@reconcileWorkflowExplainCauses": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainConsequence": "Until this is resolved, your fuel total and your trips total won't match.",
+  "reconcileWorkflowExplainConsequence": "Hasta que se resuelva, el total de combustible y el total de viajes no coincidirán.",
   "@reconcileWorkflowExplainConsequence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAttributeQuestion": "Help us attribute the gap",
+  "reconcileWorkflowAttributeQuestion": "Ayúdanos a atribuir la diferencia",
   "@reconcileWorkflowAttributeQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowFillUpsCompleteQuestion": "Are all your fill-ups for this tank complete and correct?",
+  "reconcileWorkflowFillUpsCompleteQuestion": "¿Están completos y correctos todos tus repostajes de este depósito?",
   "@reconcileWorkflowFillUpsCompleteQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDrivesRecordedQuestion": "Are all your drives recorded?",
+  "reconcileWorkflowDrivesRecordedQuestion": "¿Están registrados todos tus trayectos?",
   "@reconcileWorkflowDrivesRecordedQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerYes": "Yes",
+  "reconcileWorkflowAnswerYes": "Sí",
   "@reconcileWorkflowAnswerYes": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "reconcileWorkflowAnswerNo": "No",
   "@reconcileWorkflowAnswerNo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathAHint": "A fill-up is missing or wrong — we'll add a correction so your fill-ups add up.",
+  "reconcileWorkflowPathAHint": "Falta un repostaje o está mal — añadiremos una corrección para que los repostajes cuadren.",
   "@reconcileWorkflowPathAHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathBHint": "Your fill-ups are right and a drive went unrecorded — we'll add a virtual trip for the missing distance.",
+  "reconcileWorkflowPathBHint": "Tus repostajes son correctos y falta un trayecto grabado — añadiremos un viaje virtual para la distancia que falta.",
   "@reconcileWorkflowPathBHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowCorrectionLitersLabel": "Correction litres",
+  "reconcileWorkflowCorrectionLitersLabel": "Litros de corrección",
   "@reconcileWorkflowCorrectionLitersLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowVirtualDistanceLabel": "How far was the unrecorded drive? (km)",
+  "reconcileWorkflowVirtualDistanceLabel": "¿Cuánto fue el trayecto no registrado? (km)",
   "@reconcileWorkflowVirtualDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDecideLater": "Decide later",
+  "reconcileWorkflowDecideLater": "Decidir más tarde",
   "@reconcileWorkflowDecideLater": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowBack": "Back",
+  "reconcileWorkflowBack": "Atrás",
   "@reconcileWorkflowBack": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowNext": "Next",
+  "reconcileWorkflowNext": "Siguiente",
   "@reconcileWorkflowNext": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowApply": "Apply",
+  "reconcileWorkflowApply": "Aplicar",
   "@reconcileWorkflowApply": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetLabel": "Virtual trip — tap to edit",
+  "reconcileVirtualTrajetLabel": "Viaje virtual — toca para editar",
   "@reconcileVirtualTrajetLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditTitle": "Edit virtual trip",
+  "reconcileVirtualTrajetEditTitle": "Editar viaje virtual",
   "@reconcileVirtualTrajetEditTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditExplainer": "This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.",
+  "reconcileVirtualTrajetEditExplainer": "Este viaje se añadió para compensar el combustible usado mientras conducías sin grabar. Ajusta la distancia o el combustible, o elimínalo.",
   "@reconcileVirtualTrajetEditExplainer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetDelete": "Delete virtual trip",
+  "reconcileVirtualTrajetDelete": "Eliminar viaje virtual",
   "@reconcileVirtualTrajetDelete": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileResolveGapBanner": "Unresolved fuel/trip gap of {gap} L — tap to resolve",
+  "reconcileResolveGapBanner": "Diferencia de combustible/viaje sin resolver de {gap} L — toca para resolver",
   "@reconcileResolveGapBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2400,19 +2341,16 @@
       }
     }
   },
-  "reconcileResolveGapSemanticLabel": "Resolve unresolved fuel and trip gap",
+  "reconcileResolveGapSemanticLabel": "Resolver la diferencia de combustible y viajes sin resolver",
   "@reconcileResolveGapSemanticLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
+  "pumpCameraRotateToLandscape": "Gira el móvil — la pantalla del surtidor es ancha, así los números salen más grandes y rectos",
   "@pumpCameraRotateToLandscape": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "insightFullThrottle": "Aceleración a fondo ({pctTime}% del viaje): malgastados {liters} L",
   "@insightFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2423,14 +2361,12 @@
       }
     }
   },
-  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "lessonAdviceFullThrottle": "Acelera con suavidad — un 70 % del acelerador te lleva a velocidad con mucho menos combustible.",
   "@lessonAdviceFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "insightLambdaEnrichment": "Mezcla rica bajo carga ({pctTime}% del viaje): malgastados {liters} L",
   "@insightLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2441,84 +2377,68 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "lessonAdviceLambdaEnrichment": "Una carga pesada y sostenida enriquece la mezcla — cambia de marcha pronto y afloja en subidas largas para mantener la mezcla estequiométrica.",
   "@lessonAdviceLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassVeryGood": "Very good",
+  "drivingScoreClassVeryGood": "Muy bueno",
   "@drivingScoreClassVeryGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassGood": "Good",
+  "drivingScoreClassGood": "Bueno",
   "@drivingScoreClassGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassAverage": "Average",
+  "drivingScoreClassAverage": "Regular",
   "@drivingScoreClassAverage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassBad": "Needs work",
+  "drivingScoreClassBad": "Mejorable",
   "@drivingScoreClassBad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLugging": "Lugging",
+  "drivingScorePenaltyLugging": "Motor ahogado",
   "@drivingScorePenaltyLugging": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltySmoothness": "Jerky driving",
+  "drivingScorePenaltySmoothness": "Conducción brusca",
   "@drivingScorePenaltySmoothness": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyHighSpeed": "High speed",
+  "drivingScorePenaltyHighSpeed": "Alta velocidad",
   "@drivingScorePenaltyHighSpeed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "drivingScorePenaltyPedalVelocity": "Pedal agresivo",
   "@drivingScorePenaltyPedalVelocity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLambda": "Rich mixture",
+  "drivingScorePenaltyLambda": "Mezcla rica",
   "@drivingScorePenaltyLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "trajetDetailChartThrottle": "Acelerador / pedal (%)",
   "@trajetDetailChartThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartCoolant": "Coolant (°C)",
+  "trajetDetailChartCoolant": "Refrigerante (°C)",
   "@trajetDetailChartCoolant": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Altitude (m)",
+  "trajetDetailChartAltitude": "Altitud (m)",
   "@trajetDetailChartAltitude": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartLambda": "Commanded λ",
+  "trajetDetailChartLambda": "λ demandada",
   "@trajetDetailChartLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTitle": "OBD2 communication health",
+  "obd2DiagnosticsTitle": "Estado de comunicación OBD2",
   "@obd2DiagnosticsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsHeader": "{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}",
+  "obd2DiagnosticsHeader": "{percent}% completo · {duty}% de actividad · {drops, plural, =0{sin cortes} =1{1 corte} other{{drops} cortes}}",
   "@obd2DiagnosticsHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2532,44 +2452,36 @@
       }
     }
   },
-  "obd2DiagnosticsAdapterSection": "Adapter",
+  "obd2DiagnosticsAdapterSection": "Adaptador",
   "@obd2DiagnosticsAdapterSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsConnectionSection": "Connection lifecycle",
+  "obd2DiagnosticsConnectionSection": "Ciclo de vida de la conexión",
   "@obd2DiagnosticsConnectionSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsPidSection": "Per-PID outcomes",
+  "obd2DiagnosticsPidSection": "Resultados por PID",
   "@obd2DiagnosticsPidSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSchedulerSection": "Scheduler health",
+  "obd2DiagnosticsSchedulerSection": "Estado del planificador",
   "@obd2DiagnosticsSchedulerSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessSection": "Completeness",
+  "obd2DiagnosticsCompletenessSection": "Completitud",
   "@obd2DiagnosticsCompletenessSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSupportSection": "Discovered-supported PIDs",
+  "obd2DiagnosticsSupportSection": "PIDs descubiertos y soportados",
   "@obd2DiagnosticsSupportSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsFuelSection": "Fuel-tier rollup",
+  "obd2DiagnosticsFuelSection": "Resumen de nivel de combustible",
   "@obd2DiagnosticsFuelSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocol {protocol} · MTU {mtu}",
+  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocolo {protocol} · MTU {mtu}",
   "@obd2DiagnosticsAdapterIdentity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "mac": {
@@ -2586,9 +2498,8 @@
       }
     }
   },
-  "obd2DiagnosticsConnectionLine": "{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}",
+  "obd2DiagnosticsConnectionLine": "{attempts} intentos · {successes} correctos · {drops} cortes · tiempo de conexión p50 {p50} / p95 {p95}",
   "@obd2DiagnosticsConnectionLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "attempts": {
@@ -2608,9 +2519,8 @@
       }
     }
   },
-  "obd2DiagnosticsReconnectLine": "Reconnects: {silent} silent · {visible} visible",
+  "obd2DiagnosticsReconnectLine": "Reconexiones: {silent} silenciosas · {visible} visibles",
   "@obd2DiagnosticsReconnectLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "silent": {
@@ -2621,9 +2531,8 @@
       }
     }
   },
-  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions",
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} saltos por contrapresión · {demotions} degradaciones",
   "@obd2DiagnosticsSchedulerLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tickRate": {
@@ -2637,14 +2546,12 @@
       }
     }
   },
-  "obd2DiagnosticsStarved": "Dynamics tier starved — RPM / speed fell below the governor floor.",
+  "obd2DiagnosticsStarved": "Nivel dinámico sin datos — RPM / velocidad cayeron por debajo del umbral del regulador.",
   "@obd2DiagnosticsStarved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessLine": "Overall {percent}% · active duty {duty}%",
+  "obd2DiagnosticsCompletenessLine": "Global {percent}% · actividad efectiva {duty}%",
   "@obd2DiagnosticsCompletenessLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2657,7 +2564,6 @@
   },
   "obd2DiagnosticsTierLine": "{tier}: {percent}%",
   "@obd2DiagnosticsTierLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tier": {
@@ -2668,9 +2574,8 @@
       }
     }
   },
-  "obd2DiagnosticsSupportLine": "{supported} supported · {unsupported} unsupported · {unknown} unknown",
+  "obd2DiagnosticsSupportLine": "{supported} soportados · {unsupported} no soportados · {unknown} desconocidos",
   "@obd2DiagnosticsSupportLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "supported": {
@@ -2684,9 +2589,8 @@
       }
     }
   },
-  "obd2DiagnosticsFuelLine": "Suspicious {suspicious} of {total} samples",
+  "obd2DiagnosticsFuelLine": "{suspicious} muestras sospechosas de {total}",
   "@obd2DiagnosticsFuelLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "suspicious": {
@@ -2697,9 +2601,8 @@
       }
     }
   },
-  "obd2DiagnosticsPidRow": "{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "obd2DiagnosticsPidRow": "{pid}: {polled} consultados · {ok} correctos · {noData} SD · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
   "@obd2DiagnosticsPidRow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pid": {
@@ -2734,54 +2637,44 @@
       }
     }
   },
-  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "obd2DiagnosticsEmpty": "No hay ninguna sesión OBD2 registrada — conecta un adaptador y graba un viaje con el modo Desarrollador activado.",
   "@obd2DiagnosticsEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
+  "obd2DiagnosticsExplain": "Capturado durante la grabación para depurar la comunicación dongle↔app — solo se recopila en modo Desarrollador.",
   "@obd2DiagnosticsExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthScreenTitle": "OBD2 communication health",
+  "obd2HealthScreenTitle": "Estado de comunicación OBD2",
   "@obd2HealthScreenTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthNavLabel": "OBD2 communication health",
+  "obd2HealthNavLabel": "Estado de comunicación OBD2",
   "@obd2HealthNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthLiveSection": "Live session",
+  "obd2HealthLiveSection": "Sesión en directo",
   "@obd2HealthLiveSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthHistorySection": "Recent sessions",
+  "obd2HealthHistorySection": "Sesiones recientes",
   "@obd2HealthHistorySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Copy as JSON",
+  "obd2HealthCopyJson": "Copiar como JSON",
   "@obd2HealthCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
+  "obd2HealthCopied": "Diagnósticos OBD2 copiados al portapapeles.",
   "@obd2HealthCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evStatusPartial": "Partly available",
+  "evStatusPartial": "Disponibilidad parcial",
   "@evStatusPartial": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
+  "radiusAlertDeleted": "Alerta de radio \"{name}\" eliminada",
   "@radiusAlertDeleted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -2789,54 +2682,44 @@
       }
     }
   },
-  "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
+  "tripRecordingDiscardedNoMovement": "Grabación descartada — no se detectó movimiento",
   "@tripRecordingDiscardedNoMovement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionSetupDataSources": "Setup & data sources",
+  "sectionSetupDataSources": "Configuración y fuentes de datos",
   "@sectionSetupDataSources": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionFeaturesUsage": "Features & usage",
+  "sectionFeaturesUsage": "Funciones y uso",
   "@sectionFeaturesUsage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAccountSync": "Account & sync",
+  "sectionAccountSync": "Cuenta y sincronización",
   "@sectionAccountSync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAppearanceWidgets": "Appearance & widgets",
+  "sectionAppearanceWidgets": "Apariencia y widgets",
   "@sectionAppearanceWidgets": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionPrivacyData": "Privacy & data",
+  "sectionPrivacyData": "Privacidad y datos",
   "@sectionPrivacyData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAdvancedDeveloper": "Advanced & developer",
+  "sectionAdvancedDeveloper": "Avanzado y desarrollador",
   "@sectionAdvancedDeveloper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineShowDetails": "Show per-situation breakdown",
+  "vehicleBaselineShowDetails": "Mostrar desglose por situación",
   "@vehicleBaselineShowDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineHideDetails": "Hide per-situation breakdown",
+  "vehicleBaselineHideDetails": "Ocultar desglose por situación",
   "@vehicleBaselineHideDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineMissingWarning": "Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.",
+  "vehicleBaselineMissingWarning": "Aún no detectado: {situations}. Estas situaciones de conducción todavía tienen 0 muestras, por lo que la línea base está incompleta.",
   "@vehicleBaselineMissingWarning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "situations": {
@@ -2845,224 +2728,180 @@
       }
     }
   },
-  "ocrTesterTitle": "OCR tester",
+  "ocrTesterTitle": "Probador OCR",
   "@ocrTesterTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNavLabel": "OCR tester",
+  "ocrTesterNavLabel": "Probador OCR",
   "@ocrTesterNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExplain": "Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.",
+  "ocrTesterExplain": "Ejecuta el proceso OCR de surtidor/ticket en una foto seleccionada e inspecciona cada paso — solo disponible en modo Desarrollador.",
   "@ocrTesterExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pump",
+  "ocrTesterModePump": "Surtidor",
   "@ocrTesterModePump": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModeReceipt": "Receipt",
+  "ocrTesterModeReceipt": "Ticket",
   "@ocrTesterModeReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCapture": "Capture",
+  "ocrTesterCapture": "Capturar",
   "@ocrTesterCapture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterPickImage": "Pick image",
+  "ocrTesterPickImage": "Seleccionar imagen",
   "@ocrTesterPickImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRun": "Run",
+  "ocrTesterRun": "Ejecutar",
   "@ocrTesterRun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountry": "Country",
+  "ocrTesterCountry": "País",
   "@ocrTesterCountry": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountryNone": "Default (no profile)",
+  "ocrTesterCountryNone": "Predeterminado (sin perfil)",
   "@ocrTesterCountryNone": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoImage": "Pick or capture an image, then Run.",
+  "ocrTesterNoImage": "Selecciona o captura una imagen y luego ejecuta.",
   "@ocrTesterNoImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRunning": "Running OCR…",
+  "ocrTesterRunning": "Ejecutando OCR…",
   "@ocrTesterRunning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoResult": "OCR produced no readable result.",
+  "ocrTesterNoResult": "OCR no produjo ningún resultado legible.",
   "@ocrTesterNoResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterOverlaySection": "Block overlay",
+  "ocrTesterOverlaySection": "Superposición de bloques",
   "@ocrTesterOverlaySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStepsSection": "Pipeline steps",
+  "ocrTesterStepsSection": "Pasos del proceso",
   "@ocrTesterStepsSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendLabel": "Label",
+  "ocrTesterLegendLabel": "Etiqueta",
   "@ocrTesterLegendLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNumeric": "Numeric",
+  "ocrTesterLegendNumeric": "Numérico",
   "@ocrTesterLegendNumeric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNoise": "Noise",
+  "ocrTesterLegendNoise": "Ruido",
   "@ocrTesterLegendNoise": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendDerived": "Derived",
+  "ocrTesterLegendDerived": "Derivado",
   "@ocrTesterLegendDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGlare": "Capture / glare",
+  "ocrTesterStageGlare": "Captura / deslumbramiento",
   "@ocrTesterStageGlare": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterStageMlkit": "ML Kit",
   "@ocrTesterStageMlkit": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageClassify": "Classify",
+  "ocrTesterStageClassify": "Clasificar",
   "@ocrTesterStageClassify": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAssemble": "Assemble",
+  "ocrTesterStageAssemble": "Ensamblar",
   "@ocrTesterStageAssemble": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAnchor": "Anchor",
+  "ocrTesterStageAnchor": "Ancla",
   "@ocrTesterStageAnchor": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageFallback": "Fallback",
+  "ocrTesterStageFallback": "Alternativa",
   "@ocrTesterStageFallback": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageCrossCheck": "Cross-check",
+  "ocrTesterStageCrossCheck": "Verificación cruzada",
   "@ocrTesterStageCrossCheck": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageConfidence": "Confidence",
+  "ocrTesterStageConfidence": "Confianza",
   "@ocrTesterStageConfidence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGate": "Gate",
+  "ocrTesterStageGate": "Filtro",
   "@ocrTesterStageGate": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageBrand": "Brand",
+  "ocrTesterStageBrand": "Marca",
   "@ocrTesterStageBrand": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageOverrides": "Overrides",
+  "ocrTesterStageOverrides": "Sobreescrituras",
   "@ocrTesterStageOverrides": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageReconcile": "Reconcile",
+  "ocrTesterStageReconcile": "Reconciliar",
   "@ocrTesterStageReconcile": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageResult": "Result",
+  "ocrTesterStageResult": "Resultado",
   "@ocrTesterStageResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipRead": "READ",
+  "ocrTesterChipRead": "LEÍDO",
   "@ocrTesterChipRead": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipDerived": "DERIVED",
+  "ocrTesterChipDerived": "DERIVADO",
   "@ocrTesterChipDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateAccepted": "Accepted",
+  "ocrTesterGateAccepted": "Aceptado",
   "@ocrTesterGateAccepted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateRejected": "Rejected",
+  "ocrTesterGateRejected": "Rechazado",
   "@ocrTesterGateRejected": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFallbackBanner": "A field was recovered via magnitude fallback — verify it.",
+  "ocrTesterFallbackBanner": "Un campo se recuperó mediante el método alternativo de magnitud — verifícalo.",
   "@ocrTesterFallbackBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageNoData": "Stage did not run.",
+  "ocrTesterStageNoData": "La etapa no se ejecutó.",
   "@ocrTesterStageNoData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopyJson": "Copy as JSON",
+  "ocrTesterCopyJson": "Copiar como JSON",
   "@ocrTesterCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExportPackage": "Export package",
+  "ocrTesterExportPackage": "Exportar paquete",
   "@ocrTesterExportPackage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopied": "OCR trace copied to clipboard.",
+  "ocrTesterCopied": "Traza OCR copiada al portapapeles.",
   "@ocrTesterCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExported": "OCR package saved to your Downloads folder.",
+  "ocrTesterExported": "Paquete OCR guardado en la carpeta Descargas.",
   "@ocrTesterExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitSection": "Dongle init transcript",
+  "obd2DiagnosticsInitSection": "Transcripción de inicio del dongle",
   "@obd2DiagnosticsInitSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
+  "obd2DiagnosticsInitHeader": "Protocolo {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
   "@obd2DiagnosticsInitHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "protocol": {
@@ -3084,7 +2923,6 @@
   },
   "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
   "@obd2DiagnosticsInitLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "cmd": {
@@ -3098,49 +2936,40 @@
       }
     }
   },
-  "obd2DiagnosticsInitWarm": "warm",
+  "obd2DiagnosticsInitWarm": "caliente",
   "@obd2DiagnosticsInitWarm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitCold": "cold",
+  "obd2DiagnosticsInitCold": "frío",
   "@obd2DiagnosticsInitCold": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Copy init transcript only",
+  "obd2HealthCopyInitTranscript": "Copiar solo la transcripción de inicio",
   "@obd2HealthCopyInitTranscript": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterSaveFixture": "Save as fixture",
+  "ocrTesterSaveFixture": "Guardar como fixture",
   "@ocrTesterSaveFixture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "ocrTesterFixtureSaved": "Fixture guardado en la carpeta Descargas. Muévelo a test/fixtures y ejecuta tool/promote_ocr_fixture.dart.",
   "@ocrTesterFixtureSaved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationColdStart": "Cold start",
+  "situationColdStart": "Arranque en frío",
   "@situationColdStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationSustainedLoad": "Sustained load / towing",
+  "situationSustainedLoad": "Carga sostenida / remolque",
   "@situationSustainedLoad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationPartialDecel": "Coasting",
+  "situationPartialDecel": "Inercia / deceleración",
   "@situationPartialDecel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorDistanceLabel": "Distance ({unit})",
+  "calculatorDistanceLabel": "Distancia ({unit})",
   "@calculatorDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3148,9 +2977,8 @@
       }
     }
   },
-  "calculatorConsumptionLabel": "Consumption ({unit})",
+  "calculatorConsumptionLabel": "Consumo ({unit})",
   "@calculatorConsumptionLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3158,9 +2986,8 @@
       }
     }
   },
-  "calculatorPriceLabel": "Fuel price ({unit})",
+  "calculatorPriceLabel": "Precio del combustible ({unit})",
   "@calculatorPriceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3168,164 +2995,132 @@
       }
     }
   },
-  "calculatorUseMine": "Use",
+  "calculatorUseMine": "Usar",
   "@calculatorUseMine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorApplied": "Applied",
+  "calculatorApplied": "Aplicado",
   "@calculatorApplied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripDetails": "Trip details",
+  "tripDetails": "Detalles del viaje",
   "@tripDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorRoundTrip": "Round trip",
+  "calculatorRoundTrip": "Ida y vuelta",
   "@calculatorRoundTrip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "roundTripTotal": "Round trip",
+  "roundTripTotal": "Ida y vuelta",
   "@roundTripTotal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerDistance": "Cost per km",
+  "costPerDistance": "Coste por km",
   "@costPerDistance": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerMonth": "Cost per month",
+  "costPerMonth": "Coste mensual",
   "@costPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorEstimateMonthly": "Estimate monthly cost",
+  "calculatorEstimateMonthly": "Estimar coste mensual",
   "@calculatorEstimateMonthly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonth": "Trips per month",
+  "calculatorTripsPerMonth": "Viajes por mes",
   "@calculatorTripsPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonthHint": "e.g. 20",
+  "calculatorTripsPerMonthHint": "p. ej. 20",
   "@calculatorTripsPerMonthHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorReset": "Reset",
+  "calculatorReset": "Restablecer",
   "@calculatorReset": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
+  "calculatorResultPlaceholder": "Introduce distancia, consumo y precio para ver el coste de tu viaje",
   "@calculatorResultPlaceholder": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressFinalizingSummary": "Finalizing summary…",
+  "tripSaveProgressFinalizingSummary": "Finalizando resumen…",
   "@tripSaveProgressFinalizingSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSavingToHistory": "Saving to history…",
+  "tripSaveProgressSavingToHistory": "Guardando en el historial…",
   "@tripSaveProgressSavingToHistory": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSyncingToCloud": "Syncing in background…",
+  "tripSaveProgressSyncingToCloud": "Sincronizando en segundo plano…",
   "@tripSaveProgressSyncingToCloud": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingSavingTitle": "Saving trip…",
+  "tripRecordingSavingTitle": "Guardando viaje…",
   "@tripRecordingSavingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionDisplayStations": "Display & stations",
+  "profileSectionDisplayStations": "Pantalla y gasolineras",
   "@profileSectionDisplayStations": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionRegion": "Region",
+  "profileSectionRegion": "Región",
   "@profileSectionRegion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupVehicles": "Vehicles",
+  "consoGroupVehicles": "Vehículos",
   "@consoGroupVehicles": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupCoaching": "Coaching while driving",
+  "consoGroupCoaching": "Asistencia mientras conduces",
   "@consoGroupCoaching": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupRewards": "Rewards & savings",
+  "consoGroupRewards": "Recompensas y ahorros",
   "@consoGroupRewards": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupTroubleshooting": "Troubleshooting",
+  "consoGroupTroubleshooting": "Resolución de problemas",
   "@consoGroupTroubleshooting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_voiceAnnouncements": "Voice announcements",
+  "featureLabel_voiceAnnouncements": "Avisos de voz",
   "@featureLabel_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_voiceAnnouncements": "Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.",
+  "featureDescription_voiceAnnouncements": "Anuncia en voz alta las gasolineras baratas cercanas mientras conduces, para que puedas mantener los ojos en la carretera.",
   "@featureDescription_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "featureBlockedEnable_voiceAnnouncements": "Activa primero el Radar de gasolineras",
   "@featureBlockedEnable_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2GpsDegradedBannerTitle": "Recording with GPS — OBD2 reconnecting",
+  "obd2GpsDegradedBannerTitle": "Grabando con GPS — OBD2 reconectando",
   "@obd2GpsDegradedBannerTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Restore backup",
+  "restoreBackupTooltip": "Restaurar copia de seguridad",
   "@restoreBackupTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogTitle": "Restore backup",
+  "restoreBackupDialogTitle": "Restaurar copia de seguridad",
   "@restoreBackupDialogTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogBody": "Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.",
+  "restoreBackupDialogBody": "La fusión añade y actualiza los registros de la copia de seguridad y conserva todo lo que ya hay en este dispositivo. Reemplazar elimina todos los datos actuales y luego restaura solo la copia de seguridad — esta acción no se puede deshacer.",
   "@restoreBackupDialogBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergeAction": "Merge",
+  "restoreBackupMergeAction": "Fusionar",
   "@restoreBackupMergeAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupReplaceAction": "Replace all",
+  "restoreBackupReplaceAction": "Reemplazar todo",
   "@restoreBackupReplaceAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupSuccess": "Backup restored — {count} records imported",
+  "restoreBackupSuccess": "Copia de seguridad restaurada — {count} registros importados",
   "@restoreBackupSuccess": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3333,29 +3128,24 @@
       }
     }
   },
-  "restoreBackupEmpty": "Backup restored — it contained no records",
+  "restoreBackupEmpty": "Copia de seguridad restaurada — no contenía ningún registro",
   "@restoreBackupEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupCorrupt": "Restore failed — this file is not a valid Tankstellen backup",
+  "restoreBackupCorrupt": "Error al restaurar — este archivo no es una copia de seguridad válida de Tankstellen",
   "@restoreBackupCorrupt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupFailed": "Restore failed — the file could not be read",
+  "restoreBackupFailed": "Error al restaurar — no se pudo leer el archivo",
   "@restoreBackupFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSearchingChip": "Searching the route…",
+  "routeSearchingChip": "Buscando la ruta…",
   "@routeSearchingChip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Every {km} km",
+  "routeSegmentSummaryBadge": "Cada {km} km",
   "@routeSegmentSummaryBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3363,9 +3153,8 @@
       }
     }
   },
-  "profileSwitchedTo": "Switched to {profile}",
+  "profileSwitchedTo": "Cambiado a {profile}",
   "@profileSwitchedTo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "profile": {
@@ -3373,9 +3162,8 @@
       }
     }
   },
-  "profileCreatedNamed": "Profile {name} created",
+  "profileCreatedNamed": "Perfil {name} creado",
   "@profileCreatedNamed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -3383,9 +3171,8 @@
       }
     }
   },
-  "profileCountryTaken": "A profile for {country} already exists — edit it instead.",
+  "profileCountryTaken": "Ya existe un perfil para {country} — edítalo en su lugar.",
   "@profileCountryTaken": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "country": {
@@ -3393,39 +3180,32 @@
       }
     }
   },
-  "evPriceFree": "Free",
+  "evPriceFree": "Gratis",
   "@evPriceFree": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPricePayAtLocation": "Pay at location",
+  "evPricePayAtLocation": "Pago en el lugar",
   "@evPricePayAtLocation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceMembership": "Membership required",
+  "evPriceMembership": "Se requiere membresía",
   "@evPriceMembership": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceIndicative": "Indicative price",
+  "evPriceIndicative": "Precio orientativo",
   "@evPriceIndicative": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceDeclaredByOperator": "Indicative price declared by the operator — verify on site",
+  "evPriceDeclaredByOperator": "Precio orientativo declarado por el operador — verifica in situ",
   "@evPriceDeclaredByOperator": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceFranceAttribution": "Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "evPriceFranceAttribution": "Precios: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
   "@evPriceFranceAttribution": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "routeStationCount": "{count, plural, =1{1 gasolinera} other{{count} gasolineras}}",
   "@routeStationCount": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3433,9 +3213,8 @@
       }
     }
   },
-  "stationUpdatedLabel": "Updated {time}",
+  "stationUpdatedLabel": "Actualizado {time}",
   "@stationUpdatedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3444,9 +3223,8 @@
       }
     }
   },
-  "amenityMoreTooltip": "Also: {names}",
+  "amenityMoreTooltip": "También: {names}",
   "@amenityMoreTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "names": {
@@ -3455,19 +3233,16 @@
       }
     }
   },
-  "favoriteAdd": "Add to favorites",
+  "favoriteAdd": "Añadir a favoritos",
   "@favoriteAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "favoriteRemove": "Remove from favorites",
+  "favoriteRemove": "Eliminar de favoritos",
   "@favoriteRemove": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "loyaltyRawPriceTooltip": "Raw: {price}",
+  "loyaltyRawPriceTooltip": "Precio bruto: {price}",
   "@loyaltyRawPriceTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "price": {
@@ -3478,7 +3253,6 @@
   },
   "routeDataSourceMulti": "{sources}",
   "@routeDataSourceMulti": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "sources": {
@@ -3487,29 +3261,24 @@
       }
     }
   },
-  "obd2TestRunTitle": "Run adapter test",
+  "obd2TestRunTitle": "Ejecutar prueba del adaptador",
   "@obd2TestRunTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunButton": "Run adapter test",
+  "obd2TestRunButton": "Ejecutar prueba del adaptador",
   "@obd2TestRunButton": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunPassed": "Adapter test passed",
+  "obd2TestRunPassed": "Prueba del adaptador superada",
   "@obd2TestRunPassed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunFailed": "Adapter test failed",
+  "obd2TestRunFailed": "Prueba del adaptador fallida",
   "@obd2TestRunFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
+  "obd2TestRunSummary": "{passed} de {total} pasos correctos · {elapsed} ms",
   "@obd2TestRunSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "passed": {
@@ -3526,139 +3295,112 @@
       }
     }
   },
-  "obd2TestRunCannotWhileRecording": "Stop the active recording before running the adapter test.",
+  "obd2TestRunCannotWhileRecording": "Detén la grabación activa antes de ejecutar la prueba del adaptador.",
   "@obd2TestRunCannotWhileRecording": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepScan": "Scan for adapter",
+  "obd2TestStepScan": "Buscar adaptador",
   "@obd2TestStepScan": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepConnect": "Connect & init",
+  "obd2TestStepConnect": "Conectar e iniciar",
   "@obd2TestStepConnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepInfo": "Adapter info",
+  "obd2TestStepInfo": "Info del adaptador",
   "@obd2TestStepInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSupportedPids": "Supported PIDs",
+  "obd2TestStepSupportedPids": "PIDs soportados",
   "@obd2TestStepSupportedPids": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSampleReads": "Sample reads",
+  "obd2TestStepSampleReads": "Lecturas de muestra",
   "@obd2TestStepSampleReads": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepReconnect": "Reconnect test",
+  "obd2TestStepReconnect": "Prueba de reconexión",
   "@obd2TestStepReconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepDisconnect": "Disconnect",
+  "obd2TestStepDisconnect": "Desconectar",
   "@obd2TestStepDisconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2TestStatusOk": "OK",
   "@obd2TestStatusOk": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusTimeout": "Timed out",
+  "obd2TestStatusTimeout": "Tiempo agotado",
   "@obd2TestStatusTimeout": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusGarbage": "Unreadable reply",
+  "obd2TestStatusGarbage": "Respuesta ilegible",
   "@obd2TestStatusGarbage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusNoResponse": "No response",
+  "obd2TestStatusNoResponse": "Sin respuesta",
   "@obd2TestStatusNoResponse": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusFail": "Failed",
+  "obd2TestStatusFail": "Fallido",
   "@obd2TestStatusFail": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadCsvOption": "Download telemetry (CSV)",
+  "trajetDetailDownloadCsvOption": "Descargar telemetría (CSV)",
   "@trajetDetailDownloadCsvOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadJsonOption": "Download telemetry (JSON)",
+  "trajetDetailDownloadJsonOption": "Descargar telemetría (JSON)",
   "@trajetDetailDownloadJsonOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadError": "Couldn't save the file",
+  "trajetDetailDownloadError": "No se pudo guardar el archivo",
   "@trajetDetailDownloadError": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHardAcceleration": "Easy on the accelerator",
+  "coachingVoiceHardAcceleration": "Suaviza el acelerador",
   "@coachingVoiceHardAcceleration": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHarshBraking": "Try to brake more gently",
+  "coachingVoiceHarshBraking": "Intenta frenar con más suavidad",
   "@coachingVoiceHarshBraking": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftUp": "Shift up a gear to save fuel",
+  "coachingVoiceShiftUp": "Sube una marcha para ahorrar combustible",
   "@coachingVoiceShiftUp": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftDown": "Shift down, the engine is labouring",
+  "coachingVoiceShiftDown": "Baja una marcha, el motor está forzando",
   "@coachingVoiceShiftDown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceEasePedal": "Ease off the pedal to cut your fuel use",
+  "coachingVoiceEasePedal": "Suelta el pedal para reducir el consumo",
   "@coachingVoiceEasePedal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceLiftOff": "Lift off the accelerator and coast",
+  "coachingVoiceLiftOff": "Suelta el acelerador y rueda por inercia",
   "@coachingVoiceLiftOff": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceAnticipateBrake": "Look further ahead and lift off earlier",
+  "coachingVoiceAnticipateBrake": "Mira más adelante y levanta el pie antes",
   "@coachingVoiceAnticipateBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceSmoothAccel": "Accelerate more smoothly",
+  "coachingVoiceSmoothAccel": "Acelera con más suavidad",
   "@coachingVoiceSmoothAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingTitle": "Spoken driving coaching",
+  "voiceCoachingSettingTitle": "Asistencia de conducción por voz",
   "@voiceCoachingSettingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingSubtitle": "Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints",
+  "voiceCoachingSettingSubtitle": "Recibe consejos en voz alta mientras conduces — aceleración brusca, frenada fuerte y sugerencias de cambio de marcha",
   "@voiceCoachingSettingSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarDistanceKm": "{km} km away",
+  "fuelStationRadarDistanceKm": "{km} km",
   "@fuelStationRadarDistanceKm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3667,9 +3409,8 @@
       }
     }
   },
-  "fuelStationRadarProximity": "Proximity {percent}%",
+  "fuelStationRadarProximity": "Proximidad {percent}%",
   "@fuelStationRadarProximity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -3678,94 +3419,76 @@
       }
     }
   },
-  "fuelStationRadarNearer": "Nearer station",
+  "fuelStationRadarNearer": "Gasolinera más cercana",
   "@fuelStationRadarNearer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarFarther": "Farther station",
+  "fuelStationRadarFarther": "Gasolinera más lejana",
   "@fuelStationRadarFarther": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarResultBadge": "Fuel Station Radar result",
+  "fuelStationRadarResultBadge": "Resultado del Radar de gasolineras",
   "@fuelStationRadarResultBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_finding": "Finding & map",
+  "featureGroupTitle_finding": "Búsqueda y mapa",
   "@featureGroupTitle_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_finding": "Where to fuel up or charge — search, map, routing.",
+  "featureGroupDescription_finding": "Dónde repostar o cargar — búsqueda, mapa y rutas.",
   "@featureGroupDescription_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_prices": "Prices & alerts",
+  "featureGroupTitle_prices": "Precios y alertas",
   "@featureGroupTitle_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_prices": "Price drops, history, and reporting.",
+  "featureGroupDescription_prices": "Bajadas de precio, historial e informes.",
   "@featureGroupDescription_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_radar": "Fuel Station Radar",
+  "featureGroupTitle_radar": "Radar de gasolineras",
   "@featureGroupTitle_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_radar": "Live price nudges as you drive.",
+  "featureGroupDescription_radar": "Avisos de precio en directo mientras conduces.",
   "@featureGroupDescription_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_sync": "Sync & backup",
+  "featureGroupTitle_sync": "Sincronización y copia de seguridad",
   "@featureGroupTitle_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_sync": "Keep your data across devices.",
+  "featureGroupDescription_sync": "Mantén tus datos en todos los dispositivos.",
   "@featureGroupDescription_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_input": "Input & scanning",
+  "featureGroupTitle_input": "Entrada y escaneado",
   "@featureGroupTitle_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_input": "Helpers for logging fill-ups.",
+  "featureGroupDescription_input": "Ayudas para registrar repostajes.",
   "@featureGroupDescription_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_developer": "Developer & experimental",
+  "featureGroupTitle_developer": "Desarrollador y experimental",
   "@featureGroupTitle_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_developer": "Power-user and contributor tools.",
+  "featureGroupDescription_developer": "Herramientas para usuarios avanzados y colaboradores.",
   "@featureGroupDescription_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarStart": "Start fuel station radar",
+  "fuelStationRadarStart": "Iniciar radar de gasolineras",
   "@fuelStationRadarStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "evPriceBestEffortOcm": "Precios de OpenChargeMap sin garantía de completitud — pueden ser escasos o incompletos.",
   "@evPriceBestEffortOcm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "insightClimbingCost": "Subida al {gradePercent}% de pendiente ({pctTime}% del viaje): malgastados {liters} L",
   "@insightClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gradePercent": {
@@ -3779,14 +3502,12 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "lessonAdviceClimbingCost": "Toma impulso antes de la subida y alimenta el acelerador con suavidad — acelerar a fondo en una cuesta quema combustible extra.",
   "@lessonAdviceClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "insightRestartCost": "{count} arranques en stop-and-go: malgastados {liters} L",
   "@insightRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3797,44 +3518,36 @@
       }
     }
   },
-  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "lessonAdviceRestartCost": "Anticípate al tráfico y rueda por inercia hacia las paradas para rodar en lugar de arrancar — arrancar desde parado es la parte que más combustible consume.",
   "@lessonAdviceRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCardTitle": "GPS efficiency",
+  "gpsKpiCardTitle": "Eficiencia GPS",
   "@gpsKpiCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "gpsKpiRpa": "Aceleración positiva (RPA)",
   "@gpsKpiRpa": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "gpsKpiPke": "Demanda de energía cinética (PKE)",
   "@gpsKpiPke": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "gpsKpiVapos": "Intensidad de aceleración (VAPOS)",
   "@gpsKpiVapos": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCoast": "Coasting share",
+  "gpsKpiCoast": "Porcentaje en inercia",
   "@gpsKpiCoast": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiClimbEnergy": "Climb energy",
+  "gpsKpiClimbEnergy": "Energía en subida",
   "@gpsKpiClimbEnergy": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "drivingScoreBaselineDelta": "{pct} respecto a tu línea base eficiente",
   "@drivingScoreBaselineDelta": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -3842,29 +3555,24 @@
       }
     }
   },
-  "consumptionMonthlyClimbLabel": "Climbed",
+  "consumptionMonthlyClimbLabel": "Desnivel acumulado",
   "@consumptionMonthlyClimbLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNow": "Open",
+  "openNow": "Abierto",
   "@openNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNowClosed": "Closed",
+  "openNowClosed": "Cerrado",
   "@openNowClosed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openHoursUnknown": "Hours unknown",
+  "openHoursUnknown": "Horario desconocido",
   "@openHoursUnknown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closesAt": "Closes {time}",
+  "closesAt": "Cierra a las {time}",
   "@closesAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3872,9 +3580,8 @@
       }
     }
   },
-  "opensAt": "Opens {day} {time}",
+  "opensAt": "Abre el {day} a las {time}",
   "@opensAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -3885,9 +3592,8 @@
       }
     }
   },
-  "opensToday": "Opens {time}",
+  "opensToday": "Abre a las {time}",
   "@opensToday": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3895,89 +3601,72 @@
       }
     }
   },
-  "open24Hours": "Open 24 hours",
+  "open24Hours": "Abierto 24 horas",
   "@open24Hours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "badge24h": "24h",
   "@badge24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayMon": "Monday",
+  "dayMon": "Lunes",
   "@dayMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayTue": "Tuesday",
+  "dayTue": "Martes",
   "@dayTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayWed": "Wednesday",
+  "dayWed": "Miércoles",
   "@dayWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayThu": "Thursday",
+  "dayThu": "Jueves",
   "@dayThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayFri": "Friday",
+  "dayFri": "Viernes",
   "@dayFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySat": "Saturday",
+  "daySat": "Sábado",
   "@daySat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySun": "Sunday",
+  "daySun": "Domingo",
   "@daySun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortMon": "Mon",
+  "dayShortMon": "Lun",
   "@dayShortMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortTue": "Tue",
+  "dayShortTue": "Mar",
   "@dayShortTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortWed": "Wed",
+  "dayShortWed": "Mié",
   "@dayShortWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortThu": "Thu",
+  "dayShortThu": "Jue",
   "@dayShortThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortFri": "Fri",
+  "dayShortFri": "Vie",
   "@dayShortFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSat": "Sat",
+  "dayShortSat": "Sáb",
   "@dayShortSat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSun": "Sun",
+  "dayShortSun": "Dom",
   "@dayShortSun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "dayRange": "{from} – {to}",
   "@dayRange": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "from": {
@@ -3988,59 +3677,48 @@
       }
     }
   },
-  "publicHolidays": "Public holidays",
+  "publicHolidays": "Festivos",
   "@publicHolidays": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closedLabel": "Closed",
+  "closedLabel": "Cerrado",
   "@closedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursNotAvailable": "Opening hours not available",
+  "openingHoursNotAvailable": "Horario no disponible",
   "@openingHoursNotAvailable": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showAllHours": "Show all hours",
+  "showAllHours": "Mostrar todo el horario",
   "@showAllHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showLessHours": "Show less",
+  "showLessHours": "Mostrar menos",
   "@showLessHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPageTitle": "Consumption statistics",
+  "consumptionStatsPageTitle": "Estadísticas de consumo",
   "@consumptionStatsPageTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsComparisonTitle": "This month vs last month",
+  "consumptionStatsComparisonTitle": "Este mes vs el mes pasado",
   "@consumptionStatsComparisonTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsTrendsTitle": "Evolution over time",
+  "consumptionStatsTrendsTitle": "Evolución a lo largo del tiempo",
   "@consumptionStatsTrendsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsNeedTwoMonths": "Log fill-ups across at least two months to compare.",
+  "consumptionStatsNeedTwoMonths": "Registra repostajes durante al menos dos meses para comparar.",
   "@consumptionStatsNeedTwoMonths": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPricePerLiter": "Avg price/L",
+  "consumptionStatsPricePerLiter": "Precio medio/L",
   "@consumptionStatsPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "consumptionStatsDeltaPercent": "{pct}%",
   "@consumptionStatsDeltaPercent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -4048,89 +3726,72 @@
       }
     }
   },
-  "consumptionStatsChartLiters": "Litres per month",
+  "consumptionStatsChartLiters": "Litros por mes",
   "@consumptionStatsChartLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartSpend": "Spend per month",
+  "consumptionStatsChartSpend": "Gasto por mes",
   "@consumptionStatsChartSpend": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartPricePerLiter": "Price per litre",
+  "consumptionStatsChartPricePerLiter": "Precio por litro",
   "@consumptionStatsChartPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartConsumption": "L/100km per month",
+  "consumptionStatsChartConsumption": "L/100km por mes",
   "@consumptionStatsChartConsumption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptImporting": "Importing shared receipt…",
+  "shareReceiptImporting": "Importando ticket compartido…",
   "@shareReceiptImporting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
+  "shareReceiptUnsupportedFormat": "Este tipo de archivo no puede importarse todavía — comparte una foto del ticket.",
   "@shareReceiptUnsupportedFormat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptFailed": "Couldn't read the shared receipt — try sharing it again or add the fill-up manually.",
+  "shareReceiptFailed": "No se pudo leer el ticket compartido — inténtalo de nuevo o añade el repostaje manualmente.",
   "@shareReceiptFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_addFillUpShareIntentReceipt": "Share receipt to import",
+  "featureLabel_addFillUpShareIntentReceipt": "Compartir ticket para importar",
   "@featureLabel_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_addFillUpShareIntentReceipt": "Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.",
+  "featureDescription_addFillUpShareIntentReceipt": "Comparte una foto del ticket desde otra app para rellenar automáticamente un repostaje — fecha, litros, total y gasolinera se leen en el dispositivo.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "24/7 automate",
+  "openingHoursAutomate24h": "Automatizar 24/7",
   "@openingHoursAutomate24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "stopRadar": "Stop radar",
+  "stopRadar": "Detener radar",
   "@stopRadar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "moreActionsTooltip": "More",
+  "moreActionsTooltip": "Más",
   "@moreActionsTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupMenuLabel": "Export backup",
+  "exportBackupMenuLabel": "Exportar copia de seguridad",
   "@exportBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMenuLabel": "Restore backup",
+  "restoreBackupMenuLabel": "Restaurar copia de seguridad",
   "@restoreBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "carbonDashboardMenuLabel": "Carbon dashboard",
+  "carbonDashboardMenuLabel": "Panel de carbono",
   "@carbonDashboardMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "settingsMenuLabel": "Settings",
+  "settingsMenuLabel": "Ajustes",
   "@settingsMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "gpsDiagnosticsLargestGap": "Mayor intervalo: {seconds} s",
   "@gpsDiagnosticsLargestGap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "seconds": {
@@ -4138,34 +3799,28 @@
       }
     }
   },
-  "gpsLifecycleResumed": "Resumed",
+  "gpsLifecycleResumed": "Reanudado",
   "@gpsLifecycleResumed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecyclePaused": "Paused",
+  "gpsLifecyclePaused": "Pausado",
   "@gpsLifecyclePaused": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecycleInactive": "Inactive",
+  "gpsLifecycleInactive": "Inactivo",
   "@gpsLifecycleInactive": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "tripRecordingGpsNotificationTitle": "Grabando tu viaje",
   "@tripRecordingGpsNotificationTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "tripRecordingGpsNotificationText": "Rastreando tu ruta para las estadísticas de combustible y conducción",
   "@tripRecordingGpsNotificationText": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceStationAnnouncement": "{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}",
+  "voiceStationAnnouncement": "{name}, a {distanceKm} kilómetros, {fuelType} {euros} euros con {cents}",
   "@voiceStationAnnouncement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -4190,54 +3845,44 @@
       }
     }
   },
-  "radarPinHelpTitle": "About pin",
+  "radarPinHelpTitle": "Acerca de fijar",
   "@radarPinHelpTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarPinHelpBody": "Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.",
+  "radarPinHelpBody": "Fijar mantiene la pantalla encendida y oculta las barras del sistema para que la lectura de la gasolinera más cercana sea legible en el soporte del salpicadero. Toca de nuevo para soltar. Se libera automáticamente cuando el radar se detiene.",
   "@radarPinHelpBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinTitle": "Always pin when the radar starts",
+  "radarAutoPinTitle": "Fijar siempre al iniciar el radar",
   "@radarAutoPinTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinSubtitle": "Pin the radar automatically every time instead of tapping each time. Uses more battery.",
+  "radarAutoPinSubtitle": "Fija el radar automáticamente cada vez en lugar de tocar cada vez. Consume más batería.",
   "@radarAutoPinSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeCardTitle": "Acceleration & braking",
+  "accelBrakeCardTitle": "Aceleración y frenada",
   "@accelBrakeCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardAccel": "Hard accelerations",
+  "accelBrakeHardAccel": "Aceleraciones bruscas",
   "@accelBrakeHardAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardBrake": "Hard braking",
+  "accelBrakeHardBrake": "Frenadas bruscas",
   "@accelBrakeHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSharpCorner": "Sharp corners",
+  "accelBrakeSharpCorner": "Curvas cerradas",
   "@accelBrakeSharpCorner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSource": "From the phone's motion sensors",
+  "accelBrakeSource": "De los sensores de movimiento del teléfono",
   "@accelBrakeSource": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonHardBrake": "{count} hard braking events",
+  "lessonHardBrake": "{count} eventos de frenada brusca",
   "@lessonHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4245,14 +3890,12 @@
       }
     }
   },
-  "lessonAdviceHardBrake": "Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.",
+  "lessonAdviceHardBrake": "Anticípate a las paradas y suelta el acelerador antes — la frenada brusca desperdicia el combustible que acabas de gastar para coger velocidad.",
   "@lessonAdviceHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonSharpCornering": "{count} sharp corners",
+  "lessonSharpCornering": "{count} curvas cerradas",
   "@lessonSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4260,44 +3903,36 @@
       }
     }
   },
-  "lessonAdviceSharpCornering": "Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.",
+  "lessonAdviceSharpCornering": "Frena antes de la curva, no en ella — tomar las curvas con fuerza reduce la velocidad que luego hay que recuperar.",
   "@lessonAdviceSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardTitle": "Driving-analysis trace (dev)",
+  "drivingTraceCardTitle": "Traza de análisis de conducción (dev)",
   "@drivingTraceCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardBody": "Export this trip's GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.",
+  "drivingTraceCardBody": "Exporta los KPIs GPS, la puntuación y las lecciones de este viaje como JSON, escribe cómo se sintió realmente la conducción en el campo de comentarios y compártelo para calibrar los umbrales de estilo de conducción con viajes reales.",
   "@drivingTraceCardBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportAction": "Export analysis trace",
+  "drivingTraceExportAction": "Exportar traza de análisis",
   "@drivingTraceExportAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExported": "Analysis trace saved to Downloads — add your verdict in the comment field and share it back.",
+  "drivingTraceExported": "Traza de análisis guardada en Descargas — añade tu valoración en el campo de comentarios y compártela.",
   "@drivingTraceExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportFailed": "Couldn't export the analysis trace.",
+  "drivingTraceExportFailed": "No se pudo exportar la traza de análisis.",
   "@drivingTraceExportFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "backupExportProgress": "Exporting your backup…",
+  "backupExportProgress": "Exportando tu copia de seguridad…",
   "@backupExportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "exportBackupSavedAs": "Guardado en Descargas como {fileName}",
   "@exportBackupSavedAs": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fileName": {
@@ -4305,14 +3940,12 @@
       }
     }
   },
-  "backupImportProgress": "Restoring your backup…",
+  "backupImportProgress": "Restaurando tu copia de seguridad…",
   "@backupImportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupMergedSummary": "Fusionados {vehicles} vehículos, {fillUps} repostajes, {trips} viajes, {chargingLogs} registros de carga",
   "@restoreBackupMergedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4329,9 +3962,8 @@
       }
     }
   },
-  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupReplacedSummary": "Todos los datos reemplazados por {vehicles} vehículos, {fillUps} repostajes, {trips} viajes, {chargingLogs} registros de carga",
   "@restoreBackupReplacedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4348,19 +3980,16 @@
       }
     }
   },
-  "alertsStationSectionTitle": "Station alerts",
+  "alertsStationSectionTitle": "Alertas de gasolinera",
   "@alertsStationSectionTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "alertsStationAdd": "Add a station alert",
+  "alertsStationAdd": "Añadir una alerta de gasolinera",
   "@alertsStationAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
+  "scanPumpInconsistent": "Los valores escaneados no cuadran — introdúcelos manualmente.",
   "@scanPumpInconsistent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

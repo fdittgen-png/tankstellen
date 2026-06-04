@@ -2007,14 +2007,12 @@
   "countryInfoFuelTypes": "Üzemanyagtípusok: {fuelTypes}",
   "countryInfoDemoSource": "Demó",
   "languageChipSemantic": "{selected, select, true{Nyelv: {name}, kiválasztva} false{Nyelv: {name}} other{Nyelv: {name}}}",
-  "fillUpGuidanceTitle": "Best time to fill up",
+  "fillUpGuidanceTitle": "Legjobb idő tankolni",
   "@fillUpGuidanceTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceGoodTimeNow": "The current price is among the cheapest of the last {days} days — a good time to fill up.",
+  "fillUpGuidanceGoodTimeNow": "A jelenlegi ár az elmúlt {days} nap legolcsóbbjai közé tartozik — jó alkalom tankolni.",
   "@fillUpGuidanceGoodTimeNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2023,9 +2021,8 @@
       }
     }
   },
-  "fillUpGuidanceWaitCheaper": "Prices are near their {days}-day high. They are usually cheaper {window} — consider waiting.",
+  "fillUpGuidanceWaitCheaper": "Az árak közel vannak a {days} napos csúcshoz. Általában olcsóbb {window} — érdemes megvárni.",
   "@fillUpGuidanceWaitCheaper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2038,14 +2035,12 @@
       }
     }
   },
-  "fillUpGuidanceFillSoon": "Prices are trending up — consider filling up soon.",
+  "fillUpGuidanceFillSoon": "Az árak emelkedő tendenciát mutatnak — tankoljon hamarosan.",
   "@fillUpGuidanceFillSoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceNeutral": "Today's price is around the {days}-day average.",
+  "fillUpGuidanceNeutral": "A mai ár a {days} napos átlag körül van.",
   "@fillUpGuidanceNeutral": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "days": {
@@ -2054,9 +2049,8 @@
       }
     }
   },
-  "fillUpGuidanceSaving": "Could save about {amount}/L by timing your fill-up.",
+  "fillUpGuidanceSaving": "A tankolás időzítésével kb. {amount}/L megtakarítás lehetséges.",
   "@fillUpGuidanceSaving": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "amount": {
@@ -2065,9 +2059,8 @@
       }
     }
   },
-  "fillUpGuidanceSampleNote": "{count, plural, =1{Based on 1 price reading} other{Based on {count} price readings}}",
+  "fillUpGuidanceSampleNote": "{count, plural, =1{1 áradat alapján} other{{count} áradat alapján}}",
   "@fillUpGuidanceSampleNote": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -2078,7 +2071,6 @@
   },
   "fillUpGuidanceWindowDayAndPart": "{day} {part}",
   "@fillUpGuidanceWindowDayAndPart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2091,9 +2083,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowDayOnly": "on {day}",
+  "fillUpGuidanceWindowDayOnly": "{day}",
   "@fillUpGuidanceWindowDayOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -2102,9 +2093,8 @@
       }
     }
   },
-  "fillUpGuidanceWindowPartOnly": "in the {part}",
+  "fillUpGuidanceWindowPartOnly": "{part}",
   "@fillUpGuidanceWindowPartOnly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "part": {
@@ -2113,74 +2103,60 @@
       }
     }
   },
-  "fillUpGuidanceWindowGeneric": "at other times",
+  "fillUpGuidanceWindowGeneric": "más időpontokban",
   "@fillUpGuidanceWindowGeneric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday1": "Mondays",
+  "fillUpGuidanceWeekday1": "Hétfőn",
   "@fillUpGuidanceWeekday1": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday2": "Tuesdays",
+  "fillUpGuidanceWeekday2": "Kedden",
   "@fillUpGuidanceWeekday2": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday3": "Wednesdays",
+  "fillUpGuidanceWeekday3": "Szerdán",
   "@fillUpGuidanceWeekday3": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday4": "Thursdays",
+  "fillUpGuidanceWeekday4": "Csütörtökön",
   "@fillUpGuidanceWeekday4": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday5": "Fridays",
+  "fillUpGuidanceWeekday5": "Pénteken",
   "@fillUpGuidanceWeekday5": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday6": "Saturdays",
+  "fillUpGuidanceWeekday6": "Szombaton",
   "@fillUpGuidanceWeekday6": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidanceWeekday7": "Sundays",
+  "fillUpGuidanceWeekday7": "Vasárnap",
   "@fillUpGuidanceWeekday7": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEarlyMorning": "early mornings",
+  "fillUpGuidancePartEarlyMorning": "kora reggel",
   "@fillUpGuidancePartEarlyMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartMorning": "mornings",
+  "fillUpGuidancePartMorning": "reggel",
   "@fillUpGuidancePartMorning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartAfternoon": "afternoons",
+  "fillUpGuidancePartAfternoon": "délután",
   "@fillUpGuidancePartAfternoon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartEvening": "evenings",
+  "fillUpGuidancePartEvening": "este",
   "@fillUpGuidancePartEvening": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fillUpGuidancePartNight": "nights",
+  "fillUpGuidancePartNight": "éjjel",
   "@fillUpGuidancePartNight": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dataSourceLinkSemantic": "Open the {source} data source ({license}) in your browser",
+  "dataSourceLinkSemantic": "Nyissa meg a {source} adatforrást ({license}) a böngészőben",
   "@dataSourceLinkSemantic": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "source": {
@@ -2193,54 +2169,44 @@
       }
     }
   },
-  "tripRadarClosestStation": "Closest station",
+  "tripRadarClosestStation": "Töltőállomás-radar",
   "@tripRadarClosestStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarScanning": "Scanning for nearby stations",
+  "tripRadarScanning": "Közeli állomások keresése",
   "@tripRadarScanning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRadarNoStationNearby": "No station nearby",
+  "tripRadarNoStationNearby": "Nincs közeli állomás",
   "@tripRadarNoStationNearby": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "developerToolsTestAlertNoStation": "Search for stations first, then run the test alert so the notification can open a real station.",
+  "developerToolsTestAlertNoStation": "Először keressen állomásokat, majd futtassa a tesztriadót, hogy az értesítés valódi állomást nyithasson meg.",
   "@developerToolsTestAlertNoStation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_approachOverlay": "Approach overlay",
+  "featureLabel_approachOverlay": "Töltőállomás-radar",
   "@featureLabel_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_approachOverlay": "During a recorded trip, flip the floating tile to the fuel type's colour and show the price as you near a fuel station.",
+  "featureDescription_approachOverlay": "Az úszó utazáscsempét élő töltőállomás-radárrá alakítja — ahogy közeledik egy töltőállomáshoz, az üzemanyag típusának színére vált, és megjeleníti az árat.",
   "@featureDescription_approachOverlay": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripAvgGpsEstimateTooltip": "GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle's calibration; accuracy improves as the matrix matures.",
+  "tripAvgGpsEstimateTooltip": "GPS-becslés (~) — ezen az úton nincs üzemanyag-szenzor. Az érték sebességből és a jármű kalibrálásából van modellezve; a pontosság javul, ahogy a mátrix érik.",
   "@tripAvgGpsEstimateTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingPipEstConsumptionCaption": "est. L/100 km",
+  "tripRecordingPipEstConsumptionCaption": "becsült L/100 km",
   "@tripRecordingPipEstConsumptionCaption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingEstimatedInfo": "Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle's calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.",
+  "tripRecordingEstimatedInfo": "Becsült érték (~) — ezen az úton nincs üzemanyag-szenzor, ezért a L/100 km értéket GPS-sebesség és a jármű kalibrálása alapján modellezi a rendszer. Hozzávetőleges (általában ±10–30%, szűkülve a kalibráció érettségével), nem mért adat.",
   "@tripRecordingEstimatedInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "mapAttributionOsm": "© {brand} contributors",
+  "mapAttributionOsm": "© {brand} közreműködők",
   "@mapAttributionOsm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "brand": {
@@ -2249,14 +2215,12 @@
       }
     }
   },
-  "trajetDetailChartEstimatedBadge": "estimated",
+  "trajetDetailChartEstimatedBadge": "becsült",
   "@trajetDetailChartEstimatedBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "statCorrectionLiters": "Corrections: +{liters} L",
+  "statCorrectionLiters": "Korrekciók: +{liters} L",
   "@statCorrectionLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "liters": {
@@ -2264,14 +2228,12 @@
       }
     }
   },
-  "reconcileWorkflowTitle": "Reconcile your fuel",
+  "reconcileWorkflowTitle": "Üzemanyag-egyeztetés",
   "@reconcileWorkflowTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainHeadline": "We found a {gap} L gap",
+  "reconcileWorkflowExplainHeadline": "{gap} L eltérést találtunk",
   "@reconcileWorkflowExplainHeadline": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2279,9 +2241,8 @@
       }
     }
   },
-  "reconcileWorkflowExplainBody": "You pumped {pumped} L, but your recorded trips only account for {consumed} L. That leaves {gap} L unexplained.",
+  "reconcileWorkflowExplainBody": "{pumped} L-t tankolt, de a rögzített utak csak {consumed} L-t magyaráznak meg. Ez {gap} L megmagyarázatlan eltérést hagy.",
   "@reconcileWorkflowExplainBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pumped": {
@@ -2295,104 +2256,84 @@
       }
     }
   },
-  "reconcileWorkflowExplainCauses": "This usually means a drive wasn't recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.",
+  "reconcileWorkflowExplainCauses": "Ez általában azt jelenti, hogy egy menetet nem rögzítettek (az adapter ki volt húzva vagy az alkalmazás zárva volt), vagy hiányzik illetve tévesen szerepel egy tankolt adat.",
   "@reconcileWorkflowExplainCauses": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowExplainConsequence": "Until this is resolved, your fuel total and your trips total won't match.",
+  "reconcileWorkflowExplainConsequence": "Amíg ez nincs feloldva, az üzemanyag-összesítő és az utak összesítője nem fog egyezni.",
   "@reconcileWorkflowExplainConsequence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAttributeQuestion": "Help us attribute the gap",
+  "reconcileWorkflowAttributeQuestion": "Segítsen az eltérés azonosításában",
   "@reconcileWorkflowAttributeQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowFillUpsCompleteQuestion": "Are all your fill-ups for this tank complete and correct?",
+  "reconcileWorkflowFillUpsCompleteQuestion": "Minden tankolt adat teljes és helyes ehhez a tartályhoz?",
   "@reconcileWorkflowFillUpsCompleteQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDrivesRecordedQuestion": "Are all your drives recorded?",
+  "reconcileWorkflowDrivesRecordedQuestion": "Minden menet rögzítve van?",
   "@reconcileWorkflowDrivesRecordedQuestion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerYes": "Yes",
+  "reconcileWorkflowAnswerYes": "Igen",
   "@reconcileWorkflowAnswerYes": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowAnswerNo": "No",
+  "reconcileWorkflowAnswerNo": "Nem",
   "@reconcileWorkflowAnswerNo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathAHint": "A fill-up is missing or wrong — we'll add a correction so your fill-ups add up.",
+  "reconcileWorkflowPathAHint": "Hiányzik vagy hibás egy tankolás — korrekciót adunk hozzá, hogy a tankolások összeadódjanak.",
   "@reconcileWorkflowPathAHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowPathBHint": "Your fill-ups are right and a drive went unrecorded — we'll add a virtual trip for the missing distance.",
+  "reconcileWorkflowPathBHint": "A tankolások helyesek, de egy menet nem lett rögzítve — virtuális utat adunk hozzá a hiányzó távolságra.",
   "@reconcileWorkflowPathBHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowCorrectionLitersLabel": "Correction litres",
+  "reconcileWorkflowCorrectionLitersLabel": "Korrekció literben",
   "@reconcileWorkflowCorrectionLitersLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowVirtualDistanceLabel": "How far was the unrecorded drive? (km)",
+  "reconcileWorkflowVirtualDistanceLabel": "Mekkora volt a nem rögzített menet? (km)",
   "@reconcileWorkflowVirtualDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowDecideLater": "Decide later",
+  "reconcileWorkflowDecideLater": "Döntök később",
   "@reconcileWorkflowDecideLater": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowBack": "Back",
+  "reconcileWorkflowBack": "Vissza",
   "@reconcileWorkflowBack": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowNext": "Next",
+  "reconcileWorkflowNext": "Tovább",
   "@reconcileWorkflowNext": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileWorkflowApply": "Apply",
+  "reconcileWorkflowApply": "Alkalmaz",
   "@reconcileWorkflowApply": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetLabel": "Virtual trip — tap to edit",
+  "reconcileVirtualTrajetLabel": "Virtuális út — érintse meg a szerkesztéshez",
   "@reconcileVirtualTrajetLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditTitle": "Edit virtual trip",
+  "reconcileVirtualTrajetEditTitle": "Virtuális út szerkesztése",
   "@reconcileVirtualTrajetEditTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetEditExplainer": "This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.",
+  "reconcileVirtualTrajetEditExplainer": "Ez az út azért lett hozzáadva, hogy elszámolja a rögzítés nélkül felhasznált üzemanyagot. Módosítsa a távolságot vagy az üzemanyagot, vagy törölje.",
   "@reconcileVirtualTrajetEditExplainer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileVirtualTrajetDelete": "Delete virtual trip",
+  "reconcileVirtualTrajetDelete": "Virtuális út törlése",
   "@reconcileVirtualTrajetDelete": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "reconcileResolveGapBanner": "Unresolved fuel/trip gap of {gap} L — tap to resolve",
+  "reconcileResolveGapBanner": "Feloldatlan üzemanyag/út eltérés: {gap} L — érintse meg a feloldáshoz",
   "@reconcileResolveGapBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gap": {
@@ -2400,19 +2341,16 @@
       }
     }
   },
-  "reconcileResolveGapSemanticLabel": "Resolve unresolved fuel and trip gap",
+  "reconcileResolveGapSemanticLabel": "Feloldatlan üzemanyag- és úteltérés feloldása",
   "@reconcileResolveGapSemanticLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
+  "pumpCameraRotateToLandscape": "Fordítsa oldalra a telefont — a kút kijelzője széles, így a számok nagyobbak és egyenesek lesznek",
   "@pumpCameraRotateToLandscape": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightFullThrottle": "Full throttle ({pctTime}% of trip): wasted {liters} L",
+  "insightFullThrottle": "Teljes gáz (az út {pctTime}%-a): {liters} L pazarlás",
   "@insightFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2423,14 +2361,12 @@
       }
     }
   },
-  "lessonAdviceFullThrottle": "Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.",
+  "lessonAdviceFullThrottle": "Nyomja le finoman a pedált — kíméletes, 70%-os gáznyomással sokkal kevesebb üzemanyaggal éri el a kívánt sebességet.",
   "@lessonAdviceFullThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightLambdaEnrichment": "Rich mixture under load ({pctTime}% of trip): wasted {liters} L",
+  "insightLambdaEnrichment": "Gazdag keverék terhelés alatt (az út {pctTime}%-a): {liters} L pazarlás",
   "@insightLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
@@ -2441,84 +2377,68 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
+  "lessonAdviceLambdaEnrichment": "A nagy, tartós terhelés gazdag keveréket okoz — korai sebességváltással és visszafogással hosszú emelkedőkön tartsa soványan a keveréket.",
   "@lessonAdviceLambdaEnrichment": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassVeryGood": "Very good",
+  "drivingScoreClassVeryGood": "Kiváló",
   "@drivingScoreClassVeryGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassGood": "Good",
+  "drivingScoreClassGood": "Jó",
   "@drivingScoreClassGood": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassAverage": "Average",
+  "drivingScoreClassAverage": "Átlagos",
   "@drivingScoreClassAverage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreClassBad": "Needs work",
+  "drivingScoreClassBad": "Fejlesztésre szorul",
   "@drivingScoreClassBad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLugging": "Lugging",
+  "drivingScorePenaltyLugging": "Túlterhelés",
   "@drivingScorePenaltyLugging": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltySmoothness": "Jerky driving",
+  "drivingScorePenaltySmoothness": "Rázós vezetés",
   "@drivingScorePenaltySmoothness": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyHighSpeed": "High speed",
+  "drivingScorePenaltyHighSpeed": "Nagy sebesség",
   "@drivingScorePenaltyHighSpeed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyPedalVelocity": "Aggressive pedal",
+  "drivingScorePenaltyPedalVelocity": "Agresszív pedál",
   "@drivingScorePenaltyPedalVelocity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScorePenaltyLambda": "Rich mixture",
+  "drivingScorePenaltyLambda": "Gazdag keverék",
   "@drivingScorePenaltyLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartThrottle": "Throttle / pedal (%)",
+  "trajetDetailChartThrottle": "Gáz / pedál (%)",
   "@trajetDetailChartThrottle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartCoolant": "Coolant (°C)",
+  "trajetDetailChartCoolant": "Hűtőfolyadék (°C)",
   "@trajetDetailChartCoolant": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Altitude (m)",
+  "trajetDetailChartAltitude": "Magasság (m)",
   "@trajetDetailChartAltitude": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailChartLambda": "Commanded λ",
+  "trajetDetailChartLambda": "Parancsolt λ",
   "@trajetDetailChartLambda": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTitle": "OBD2 communication health",
+  "obd2DiagnosticsTitle": "OBD2 kommunikáció állapota",
   "@obd2DiagnosticsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsHeader": "{percent}% complete · {duty}% duty · {drops, plural, =0{no drops} =1{1 drop} other{{drops} drops}}",
+  "obd2DiagnosticsHeader": "{percent}% kész · {duty}% terhelés · {drops, plural, =0{nincs kiesés} =1{1 kiesés} other{{drops} kiesés}}",
   "@obd2DiagnosticsHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2534,42 +2454,34 @@
   },
   "obd2DiagnosticsAdapterSection": "Adapter",
   "@obd2DiagnosticsAdapterSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsConnectionSection": "Connection lifecycle",
+  "obd2DiagnosticsConnectionSection": "Kapcsolat életciklusa",
   "@obd2DiagnosticsConnectionSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsPidSection": "Per-PID outcomes",
+  "obd2DiagnosticsPidSection": "PID-enkénti eredmények",
   "@obd2DiagnosticsPidSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSchedulerSection": "Scheduler health",
+  "obd2DiagnosticsSchedulerSection": "Ütemező állapota",
   "@obd2DiagnosticsSchedulerSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessSection": "Completeness",
+  "obd2DiagnosticsCompletenessSection": "Teljesség",
   "@obd2DiagnosticsCompletenessSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsSupportSection": "Discovered-supported PIDs",
+  "obd2DiagnosticsSupportSection": "Felismert támogatott PID-ek",
   "@obd2DiagnosticsSupportSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsFuelSection": "Fuel-tier rollup",
+  "obd2DiagnosticsFuelSection": "Üzemanyag-szint összesítő",
   "@obd2DiagnosticsFuelSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protocol {protocol} · MTU {mtu}",
+  "obd2DiagnosticsAdapterIdentity": "{mac} · {firmware} · protokoll: {protocol} · MTU {mtu}",
   "@obd2DiagnosticsAdapterIdentity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "mac": {
@@ -2586,9 +2498,8 @@
       }
     }
   },
-  "obd2DiagnosticsConnectionLine": "{attempts} attempts · {successes} ok · {drops} drops · time-to-connect p50 {p50} / p95 {p95}",
+  "obd2DiagnosticsConnectionLine": "{attempts} kísérlet · {successes} ok · {drops} kiesés · csatlakozási idő p50 {p50} / p95 {p95}",
   "@obd2DiagnosticsConnectionLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "attempts": {
@@ -2608,9 +2519,8 @@
       }
     }
   },
-  "obd2DiagnosticsReconnectLine": "Reconnects: {silent} silent · {visible} visible",
+  "obd2DiagnosticsReconnectLine": "Újracsatlakozások: {silent} néma · {visible} látható",
   "@obd2DiagnosticsReconnectLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "silent": {
@@ -2621,9 +2531,8 @@
       }
     }
   },
-  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz tick · {skips} back-pressure skips · {demotions} demotions",
+  "obd2DiagnosticsSchedulerLine": "{tickRate} Hz ütem · {skips} visszaterhelési kihagyás · {demotions} lefokozás",
   "@obd2DiagnosticsSchedulerLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tickRate": {
@@ -2637,14 +2546,12 @@
       }
     }
   },
-  "obd2DiagnosticsStarved": "Dynamics tier starved — RPM / speed fell below the governor floor.",
+  "obd2DiagnosticsStarved": "A dinamikus szint kiéhezett — az RPM / sebesség a szabályozó küszöbe alá esett.",
   "@obd2DiagnosticsStarved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsCompletenessLine": "Overall {percent}% · active duty {duty}%",
+  "obd2DiagnosticsCompletenessLine": "Összesített {percent}% · aktív terhelés {duty}%",
   "@obd2DiagnosticsCompletenessLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -2657,7 +2564,6 @@
   },
   "obd2DiagnosticsTierLine": "{tier}: {percent}%",
   "@obd2DiagnosticsTierLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "tier": {
@@ -2668,9 +2574,8 @@
       }
     }
   },
-  "obd2DiagnosticsSupportLine": "{supported} supported · {unsupported} unsupported · {unknown} unknown",
+  "obd2DiagnosticsSupportLine": "{supported} támogatott · {unsupported} nem támogatott · {unknown} ismeretlen",
   "@obd2DiagnosticsSupportLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "supported": {
@@ -2684,9 +2589,8 @@
       }
     }
   },
-  "obd2DiagnosticsFuelLine": "Suspicious {suspicious} of {total} samples",
+  "obd2DiagnosticsFuelLine": "Gyanús {suspicious} / {total} minta",
   "@obd2DiagnosticsFuelLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "suspicious": {
@@ -2697,9 +2601,8 @@
       }
     }
   },
-  "obd2DiagnosticsPidRow": "{pid}: {polled} polled · {ok} ok · {noData} ND · {timeout} TO · {error} err · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
+  "obd2DiagnosticsPidRow": "{pid}: {polled} lekérdezve · {ok} ok · {noData} ND · {timeout} TO · {error} hiba · p50 {p50} / p95 {p95} ms · {effectiveHz}/{targetHz} Hz",
   "@obd2DiagnosticsPidRow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pid": {
@@ -2734,54 +2637,44 @@
       }
     }
   },
-  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "obd2DiagnosticsEmpty": "Még nem rögzített OBD2-munkamenet — csatlakoztasson adaptert, és rögzítsen egy utat Fejlesztői módban.",
   "@obd2DiagnosticsEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
+  "obd2DiagnosticsExplain": "Rögzítés közben gyűjtve a dongle↔alkalmazás kommunikáció hibakeresésére — csak Fejlesztői módban gyűjtött adat.",
   "@obd2DiagnosticsExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthScreenTitle": "OBD2 communication health",
+  "obd2HealthScreenTitle": "OBD2 kommunikáció állapota",
   "@obd2HealthScreenTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthNavLabel": "OBD2 communication health",
+  "obd2HealthNavLabel": "OBD2 kommunikáció állapota",
   "@obd2HealthNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthLiveSection": "Live session",
+  "obd2HealthLiveSection": "Élő munkamenet",
   "@obd2HealthLiveSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthHistorySection": "Recent sessions",
+  "obd2HealthHistorySection": "Legutóbbi munkamenetek",
   "@obd2HealthHistorySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Copy as JSON",
+  "obd2HealthCopyJson": "Másolás JSON-ként",
   "@obd2HealthCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
+  "obd2HealthCopied": "OBD2-diagnosztika másolva a vágólapra.",
   "@obd2HealthCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evStatusPartial": "Partly available",
+  "evStatusPartial": "Részlegesen elérhető",
   "@evStatusPartial": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
+  "radiusAlertDeleted": "\"{name}\" sugaras riasztás törölve",
   "@radiusAlertDeleted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -2789,54 +2682,44 @@
       }
     }
   },
-  "tripRecordingDiscardedNoMovement": "Recording discarded — no movement detected",
+  "tripRecordingDiscardedNoMovement": "Rögzítés elvetve — nem észlelt mozgás",
   "@tripRecordingDiscardedNoMovement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionSetupDataSources": "Setup & data sources",
+  "sectionSetupDataSources": "Beállítás és adatforrások",
   "@sectionSetupDataSources": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionFeaturesUsage": "Features & usage",
+  "sectionFeaturesUsage": "Funkciók és használat",
   "@sectionFeaturesUsage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAccountSync": "Account & sync",
+  "sectionAccountSync": "Fiók és szinkronizálás",
   "@sectionAccountSync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAppearanceWidgets": "Appearance & widgets",
+  "sectionAppearanceWidgets": "Megjelenés és widgetek",
   "@sectionAppearanceWidgets": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionPrivacyData": "Privacy & data",
+  "sectionPrivacyData": "Adatvédelem és adatok",
   "@sectionPrivacyData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "sectionAdvancedDeveloper": "Advanced & developer",
+  "sectionAdvancedDeveloper": "Haladó és fejlesztői",
   "@sectionAdvancedDeveloper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineShowDetails": "Show per-situation breakdown",
+  "vehicleBaselineShowDetails": "Helyzetenkénti bontás mutatása",
   "@vehicleBaselineShowDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineHideDetails": "Hide per-situation breakdown",
+  "vehicleBaselineHideDetails": "Helyzetenkénti bontás elrejtése",
   "@vehicleBaselineHideDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "vehicleBaselineMissingWarning": "Not detected yet: {situations}. These driving situations still read 0 samples, so the baseline is incomplete.",
+  "vehicleBaselineMissingWarning": "Még nem észlelt: {situations}. Ezek a vezetési helyzetek még 0 mintát tartalmaznak, így az alap hiányos.",
   "@vehicleBaselineMissingWarning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "situations": {
@@ -2845,224 +2728,180 @@
       }
     }
   },
-  "ocrTesterTitle": "OCR tester",
+  "ocrTesterTitle": "OCR tesztelő",
   "@ocrTesterTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNavLabel": "OCR tester",
+  "ocrTesterNavLabel": "OCR tesztelő",
   "@ocrTesterNavLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExplain": "Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.",
+  "ocrTesterExplain": "Futtassa a kút/blokk OCR-folyamatot egy kiválasztott fotón, és vizsgálja meg minden lépést — csak Fejlesztői módban érhető el.",
   "@ocrTesterExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pump",
+  "ocrTesterModePump": "Kút",
   "@ocrTesterModePump": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterModeReceipt": "Receipt",
+  "ocrTesterModeReceipt": "Bizonylat",
   "@ocrTesterModeReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCapture": "Capture",
+  "ocrTesterCapture": "Fénykép",
   "@ocrTesterCapture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterPickImage": "Pick image",
+  "ocrTesterPickImage": "Kép kiválasztása",
   "@ocrTesterPickImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRun": "Run",
+  "ocrTesterRun": "Futtatás",
   "@ocrTesterRun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountry": "Country",
+  "ocrTesterCountry": "Ország",
   "@ocrTesterCountry": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCountryNone": "Default (no profile)",
+  "ocrTesterCountryNone": "Alapértelmezett (nincs profil)",
   "@ocrTesterCountryNone": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoImage": "Pick or capture an image, then Run.",
+  "ocrTesterNoImage": "Válasszon vagy készítsen képet, majd futtassa.",
   "@ocrTesterNoImage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterRunning": "Running OCR…",
+  "ocrTesterRunning": "OCR futtatása…",
   "@ocrTesterRunning": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterNoResult": "OCR produced no readable result.",
+  "ocrTesterNoResult": "Az OCR nem hozott olvasható eredményt.",
   "@ocrTesterNoResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterOverlaySection": "Block overlay",
+  "ocrTesterOverlaySection": "Blokk-réteg",
   "@ocrTesterOverlaySection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStepsSection": "Pipeline steps",
+  "ocrTesterStepsSection": "Folyamat lépései",
   "@ocrTesterStepsSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendLabel": "Label",
+  "ocrTesterLegendLabel": "Címke",
   "@ocrTesterLegendLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNumeric": "Numeric",
+  "ocrTesterLegendNumeric": "Numerikus",
   "@ocrTesterLegendNumeric": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendNoise": "Noise",
+  "ocrTesterLegendNoise": "Zaj",
   "@ocrTesterLegendNoise": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterLegendDerived": "Derived",
+  "ocrTesterLegendDerived": "Levezetett",
   "@ocrTesterLegendDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGlare": "Capture / glare",
+  "ocrTesterStageGlare": "Felvétel / fényvisszaverődés",
   "@ocrTesterStageGlare": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "ocrTesterStageMlkit": "ML Kit",
   "@ocrTesterStageMlkit": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageClassify": "Classify",
+  "ocrTesterStageClassify": "Osztályozás",
   "@ocrTesterStageClassify": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAssemble": "Assemble",
+  "ocrTesterStageAssemble": "Összeállítás",
   "@ocrTesterStageAssemble": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageAnchor": "Anchor",
+  "ocrTesterStageAnchor": "Horgony",
   "@ocrTesterStageAnchor": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageFallback": "Fallback",
+  "ocrTesterStageFallback": "Tartalék",
   "@ocrTesterStageFallback": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageCrossCheck": "Cross-check",
+  "ocrTesterStageCrossCheck": "Keresztellenőrzés",
   "@ocrTesterStageCrossCheck": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageConfidence": "Confidence",
+  "ocrTesterStageConfidence": "Konfidencia",
   "@ocrTesterStageConfidence": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageGate": "Gate",
+  "ocrTesterStageGate": "Kapu",
   "@ocrTesterStageGate": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageBrand": "Brand",
+  "ocrTesterStageBrand": "Márka",
   "@ocrTesterStageBrand": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageOverrides": "Overrides",
+  "ocrTesterStageOverrides": "Felülírások",
   "@ocrTesterStageOverrides": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageReconcile": "Reconcile",
+  "ocrTesterStageReconcile": "Egyeztetés",
   "@ocrTesterStageReconcile": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageResult": "Result",
+  "ocrTesterStageResult": "Eredmény",
   "@ocrTesterStageResult": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipRead": "READ",
+  "ocrTesterChipRead": "OLVASVA",
   "@ocrTesterChipRead": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterChipDerived": "DERIVED",
+  "ocrTesterChipDerived": "LEVEZETETT",
   "@ocrTesterChipDerived": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateAccepted": "Accepted",
+  "ocrTesterGateAccepted": "Elfogadva",
   "@ocrTesterGateAccepted": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterGateRejected": "Rejected",
+  "ocrTesterGateRejected": "Visszautasítva",
   "@ocrTesterGateRejected": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFallbackBanner": "A field was recovered via magnitude fallback — verify it.",
+  "ocrTesterFallbackBanner": "Egy mezőt magnitúdó-tartalékkal állítottak helyre — ellenőrizze.",
   "@ocrTesterFallbackBanner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterStageNoData": "Stage did not run.",
+  "ocrTesterStageNoData": "A lépés nem futott le.",
   "@ocrTesterStageNoData": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopyJson": "Copy as JSON",
+  "ocrTesterCopyJson": "Másolás JSON-ként",
   "@ocrTesterCopyJson": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExportPackage": "Export package",
+  "ocrTesterExportPackage": "Csomag exportálása",
   "@ocrTesterExportPackage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterCopied": "OCR trace copied to clipboard.",
+  "ocrTesterCopied": "OCR-nyomkövetés másolva a vágólapra.",
   "@ocrTesterCopied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterExported": "OCR package saved to your Downloads folder.",
+  "ocrTesterExported": "OCR-csomag mentve a Letöltések mappába.",
   "@ocrTesterExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitSection": "Dongle init transcript",
+  "obd2DiagnosticsInitSection": "Dongle inicializálási napló",
   "@obd2DiagnosticsInitSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitHeader": "Protocol {protocol} · {start} · firmware {firmware} · {tier} · {pids} PIDs",
+  "obd2DiagnosticsInitHeader": "Protokoll {protocol} · {start} · firmware {firmware} · {tier} · {pids} PID",
   "@obd2DiagnosticsInitHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "protocol": {
@@ -3084,7 +2923,6 @@
   },
   "obd2DiagnosticsInitLine": "{cmd} → {response} ({latency} ms)",
   "@obd2DiagnosticsInitLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "cmd": {
@@ -3098,49 +2936,40 @@
       }
     }
   },
-  "obd2DiagnosticsInitWarm": "warm",
+  "obd2DiagnosticsInitWarm": "meleg",
   "@obd2DiagnosticsInitWarm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsInitCold": "cold",
+  "obd2DiagnosticsInitCold": "hideg",
   "@obd2DiagnosticsInitCold": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Copy init transcript only",
+  "obd2HealthCopyInitTranscript": "Csak inicializálási napló másolása",
   "@obd2HealthCopyInitTranscript": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterSaveFixture": "Save as fixture",
+  "ocrTesterSaveFixture": "Mentés fixture-ként",
   "@ocrTesterSaveFixture": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
+  "ocrTesterFixtureSaved": "Fixture mentve a Letöltések mappába. Helyezze a test/fixtures alá, és futtassa a tool/promote_ocr_fixture.dart-ot.",
   "@ocrTesterFixtureSaved": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationColdStart": "Cold start",
+  "situationColdStart": "Hidegindítás",
   "@situationColdStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationSustainedLoad": "Sustained load / towing",
+  "situationSustainedLoad": "Tartós terhelés / vontatás",
   "@situationSustainedLoad": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "situationPartialDecel": "Coasting",
+  "situationPartialDecel": "Gurulás",
   "@situationPartialDecel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorDistanceLabel": "Distance ({unit})",
+  "calculatorDistanceLabel": "Távolság ({unit})",
   "@calculatorDistanceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3148,9 +2977,8 @@
       }
     }
   },
-  "calculatorConsumptionLabel": "Consumption ({unit})",
+  "calculatorConsumptionLabel": "Fogyasztás ({unit})",
   "@calculatorConsumptionLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3158,9 +2986,8 @@
       }
     }
   },
-  "calculatorPriceLabel": "Fuel price ({unit})",
+  "calculatorPriceLabel": "Üzemanyag ára ({unit})",
   "@calculatorPriceLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "unit": {
@@ -3168,164 +2995,132 @@
       }
     }
   },
-  "calculatorUseMine": "Use",
+  "calculatorUseMine": "Használat",
   "@calculatorUseMine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorApplied": "Applied",
+  "calculatorApplied": "Alkalmazva",
   "@calculatorApplied": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripDetails": "Trip details",
+  "tripDetails": "Út részletei",
   "@tripDetails": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorRoundTrip": "Round trip",
+  "calculatorRoundTrip": "Oda-vissza",
   "@calculatorRoundTrip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "roundTripTotal": "Round trip",
+  "roundTripTotal": "Oda-vissza összesen",
   "@roundTripTotal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerDistance": "Cost per km",
+  "costPerDistance": "Költség km-enként",
   "@costPerDistance": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "costPerMonth": "Cost per month",
+  "costPerMonth": "Havi költség",
   "@costPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorEstimateMonthly": "Estimate monthly cost",
+  "calculatorEstimateMonthly": "Havi költség becslése",
   "@calculatorEstimateMonthly": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonth": "Trips per month",
+  "calculatorTripsPerMonth": "Utak száma havonta",
   "@calculatorTripsPerMonth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorTripsPerMonthHint": "e.g. 20",
+  "calculatorTripsPerMonthHint": "pl. 20",
   "@calculatorTripsPerMonthHint": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorReset": "Reset",
+  "calculatorReset": "Visszaállítás",
   "@calculatorReset": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
+  "calculatorResultPlaceholder": "Adja meg a távolságot, fogyasztást és árat az út költségének megtekintéséhez",
   "@calculatorResultPlaceholder": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressFinalizingSummary": "Finalizing summary…",
+  "tripSaveProgressFinalizingSummary": "Összesítés véglegesítése…",
   "@tripSaveProgressFinalizingSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSavingToHistory": "Saving to history…",
+  "tripSaveProgressSavingToHistory": "Mentés az előzményekbe…",
   "@tripSaveProgressSavingToHistory": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripSaveProgressSyncingToCloud": "Syncing in background…",
+  "tripSaveProgressSyncingToCloud": "Szinkronizálás a háttérben…",
   "@tripSaveProgressSyncingToCloud": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingSavingTitle": "Saving trip…",
+  "tripRecordingSavingTitle": "Út mentése…",
   "@tripRecordingSavingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionDisplayStations": "Display & stations",
+  "profileSectionDisplayStations": "Megjelenítés és állomások",
   "@profileSectionDisplayStations": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "profileSectionRegion": "Region",
+  "profileSectionRegion": "Régió",
   "@profileSectionRegion": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupVehicles": "Vehicles",
+  "consoGroupVehicles": "Járművek",
   "@consoGroupVehicles": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupCoaching": "Coaching while driving",
+  "consoGroupCoaching": "Vezetés közbeni coaching",
   "@consoGroupCoaching": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupRewards": "Rewards & savings",
+  "consoGroupRewards": "Jutalmak és megtakarítások",
   "@consoGroupRewards": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consoGroupTroubleshooting": "Troubleshooting",
+  "consoGroupTroubleshooting": "Hibaelhárítás",
   "@consoGroupTroubleshooting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_voiceAnnouncements": "Voice announcements",
+  "featureLabel_voiceAnnouncements": "Hangos bejelentések",
   "@featureLabel_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_voiceAnnouncements": "Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.",
+  "featureDescription_voiceAnnouncements": "Hangosan bejelenti a közeli olcsó töltőállomásokat vezetés közben, hogy szemét az úton tartsa.",
   "@featureDescription_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureBlockedEnable_voiceAnnouncements": "Enable the approach overlay first",
+  "featureBlockedEnable_voiceAnnouncements": "Először engedélyezze a töltőállomás-radart",
   "@featureBlockedEnable_voiceAnnouncements": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2GpsDegradedBannerTitle": "Recording with GPS — OBD2 reconnecting",
+  "obd2GpsDegradedBannerTitle": "Rögzítés GPS-sel — OBD2 újracsatlakozik",
   "@obd2GpsDegradedBannerTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Restore backup",
+  "restoreBackupTooltip": "Biztonsági mentés visszaállítása",
   "@restoreBackupTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogTitle": "Restore backup",
+  "restoreBackupDialogTitle": "Biztonsági mentés visszaállítása",
   "@restoreBackupDialogTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupDialogBody": "Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.",
+  "restoreBackupDialogBody": "Az összevonás hozzáadja és frissíti a biztonsági mentés rekordjait, és megőriz mindent, ami már az eszközön van. A csere először törli az összes jelenlegi adatot, majd csak a biztonsági mentést állítja vissza — ez nem vonható vissza.",
   "@restoreBackupDialogBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergeAction": "Merge",
+  "restoreBackupMergeAction": "Összevonás",
   "@restoreBackupMergeAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupReplaceAction": "Replace all",
+  "restoreBackupReplaceAction": "Összes cseréje",
   "@restoreBackupReplaceAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupSuccess": "Backup restored — {count} records imported",
+  "restoreBackupSuccess": "Biztonsági mentés visszaállítva — {count} rekord importálva",
   "@restoreBackupSuccess": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3333,29 +3128,24 @@
       }
     }
   },
-  "restoreBackupEmpty": "Backup restored — it contained no records",
+  "restoreBackupEmpty": "Biztonsági mentés visszaállítva — nem tartalmazott rekordokat",
   "@restoreBackupEmpty": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupCorrupt": "Restore failed — this file is not a valid Tankstellen backup",
+  "restoreBackupCorrupt": "Visszaállítás sikertelen — ez a fájl nem érvényes Tankstellen biztonsági mentés",
   "@restoreBackupCorrupt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupFailed": "Restore failed — the file could not be read",
+  "restoreBackupFailed": "Visszaállítás sikertelen — a fájl nem olvasható",
   "@restoreBackupFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSearchingChip": "Searching the route…",
+  "routeSearchingChip": "Az útvonal keresése…",
   "@routeSearchingChip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Every {km} km",
+  "routeSegmentSummaryBadge": "Minden {km} km-ben",
   "@routeSegmentSummaryBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3363,9 +3153,8 @@
       }
     }
   },
-  "profileSwitchedTo": "Switched to {profile}",
+  "profileSwitchedTo": "Átváltva: {profile}",
   "@profileSwitchedTo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "profile": {
@@ -3373,9 +3162,8 @@
       }
     }
   },
-  "profileCreatedNamed": "Profile {name} created",
+  "profileCreatedNamed": "{name} profil létrehozva",
   "@profileCreatedNamed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -3383,9 +3171,8 @@
       }
     }
   },
-  "profileCountryTaken": "A profile for {country} already exists — edit it instead.",
+  "profileCountryTaken": "{country} profilja már létezik — szerkessze helyette.",
   "@profileCountryTaken": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "country": {
@@ -3393,39 +3180,32 @@
       }
     }
   },
-  "evPriceFree": "Free",
+  "evPriceFree": "Ingyenes",
   "@evPriceFree": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPricePayAtLocation": "Pay at location",
+  "evPricePayAtLocation": "Helyszíni fizetés",
   "@evPricePayAtLocation": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceMembership": "Membership required",
+  "evPriceMembership": "Tagság szükséges",
   "@evPriceMembership": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceIndicative": "Indicative price",
+  "evPriceIndicative": "Tájékoztató ár",
   "@evPriceIndicative": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceDeclaredByOperator": "Indicative price declared by the operator — verify on site",
+  "evPriceDeclaredByOperator": "Az üzemeltető által megadott tájékoztató ár — ellenőrizze a helyszínen",
   "@evPriceDeclaredByOperator": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceFranceAttribution": "Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
+  "evPriceFranceAttribution": "Árazás: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ",
   "@evPriceFranceAttribution": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "routeStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "routeStationCount": "{count, plural, =1{1 állomás} other{{count} állomás}}",
   "@routeStationCount": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3433,9 +3213,8 @@
       }
     }
   },
-  "stationUpdatedLabel": "Updated {time}",
+  "stationUpdatedLabel": "Frissítve: {time}",
   "@stationUpdatedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3444,9 +3223,8 @@
       }
     }
   },
-  "amenityMoreTooltip": "Also: {names}",
+  "amenityMoreTooltip": "Továbbá: {names}",
   "@amenityMoreTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "names": {
@@ -3455,19 +3233,16 @@
       }
     }
   },
-  "favoriteAdd": "Add to favorites",
+  "favoriteAdd": "Hozzáadás a kedvencekhez",
   "@favoriteAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "favoriteRemove": "Remove from favorites",
+  "favoriteRemove": "Eltávolítás a kedvencekből",
   "@favoriteRemove": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "loyaltyRawPriceTooltip": "Raw: {price}",
+  "loyaltyRawPriceTooltip": "Alap: {price}",
   "@loyaltyRawPriceTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "price": {
@@ -3478,7 +3253,6 @@
   },
   "routeDataSourceMulti": "{sources}",
   "@routeDataSourceMulti": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "sources": {
@@ -3487,29 +3261,24 @@
       }
     }
   },
-  "obd2TestRunTitle": "Run adapter test",
+  "obd2TestRunTitle": "Adapterteszt futtatása",
   "@obd2TestRunTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunButton": "Run adapter test",
+  "obd2TestRunButton": "Adapterteszt futtatása",
   "@obd2TestRunButton": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunPassed": "Adapter test passed",
+  "obd2TestRunPassed": "Adapterteszt sikeres",
   "@obd2TestRunPassed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunFailed": "Adapter test failed",
+  "obd2TestRunFailed": "Adapterteszt sikertelen",
   "@obd2TestRunFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
+  "obd2TestRunSummary": "{passed} / {total} lépés OK · {elapsed} ms",
   "@obd2TestRunSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "passed": {
@@ -3526,139 +3295,112 @@
       }
     }
   },
-  "obd2TestRunCannotWhileRecording": "Stop the active recording before running the adapter test.",
+  "obd2TestRunCannotWhileRecording": "Állítsa le az aktív rögzítést az adapterteszt futtatása előtt.",
   "@obd2TestRunCannotWhileRecording": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepScan": "Scan for adapter",
+  "obd2TestStepScan": "Adapter keresése",
   "@obd2TestStepScan": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepConnect": "Connect & init",
+  "obd2TestStepConnect": "Csatlakozás és inicializálás",
   "@obd2TestStepConnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepInfo": "Adapter info",
+  "obd2TestStepInfo": "Adapter adatai",
   "@obd2TestStepInfo": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSupportedPids": "Supported PIDs",
+  "obd2TestStepSupportedPids": "Támogatott PID-ek",
   "@obd2TestStepSupportedPids": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepSampleReads": "Sample reads",
+  "obd2TestStepSampleReads": "Mintaolvasások",
   "@obd2TestStepSampleReads": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepReconnect": "Reconnect test",
+  "obd2TestStepReconnect": "Újracsatlakozás teszt",
   "@obd2TestStepReconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStepDisconnect": "Disconnect",
+  "obd2TestStepDisconnect": "Lecsatlakozás",
   "@obd2TestStepDisconnect": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2TestStatusOk": "OK",
   "@obd2TestStatusOk": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusTimeout": "Timed out",
+  "obd2TestStatusTimeout": "Időtúllépés",
   "@obd2TestStatusTimeout": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusGarbage": "Unreadable reply",
+  "obd2TestStatusGarbage": "Olvashatatlan válasz",
   "@obd2TestStatusGarbage": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusNoResponse": "No response",
+  "obd2TestStatusNoResponse": "Nincs válasz",
   "@obd2TestStatusNoResponse": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2TestStatusFail": "Failed",
+  "obd2TestStatusFail": "Sikertelen",
   "@obd2TestStatusFail": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadCsvOption": "Download telemetry (CSV)",
+  "trajetDetailDownloadCsvOption": "Telemetria letöltése (CSV)",
   "@trajetDetailDownloadCsvOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadJsonOption": "Download telemetry (JSON)",
+  "trajetDetailDownloadJsonOption": "Telemetria letöltése (JSON)",
   "@trajetDetailDownloadJsonOption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "trajetDetailDownloadError": "Couldn't save the file",
+  "trajetDetailDownloadError": "Nem sikerült menteni a fájlt",
   "@trajetDetailDownloadError": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHardAcceleration": "Easy on the accelerator",
+  "coachingVoiceHardAcceleration": "Óvatosan a gázpedállal",
   "@coachingVoiceHardAcceleration": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceHarshBraking": "Try to brake more gently",
+  "coachingVoiceHarshBraking": "Próbáljon lassabban fékezni",
   "@coachingVoiceHarshBraking": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftUp": "Shift up a gear to save fuel",
+  "coachingVoiceShiftUp": "Kapcsoljon felsőbb fokozatba az üzemanyag-megtakarításhoz",
   "@coachingVoiceShiftUp": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceShiftDown": "Shift down, the engine is labouring",
+  "coachingVoiceShiftDown": "Váltson alacsonyabb fokozatba, a motor túl sokat dolgozik",
   "@coachingVoiceShiftDown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceEasePedal": "Ease off the pedal to cut your fuel use",
+  "coachingVoiceEasePedal": "Engedje fel a pedált az üzemanyag-fogyasztás csökkentéséhez",
   "@coachingVoiceEasePedal": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceLiftOff": "Lift off the accelerator and coast",
+  "coachingVoiceLiftOff": "Engedje fel a gázpedált és guruljon",
   "@coachingVoiceLiftOff": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceAnticipateBrake": "Look further ahead and lift off earlier",
+  "coachingVoiceAnticipateBrake": "Nézzen távolabbra és emelje fel korábban a lábát",
   "@coachingVoiceAnticipateBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "coachingVoiceSmoothAccel": "Accelerate more smoothly",
+  "coachingVoiceSmoothAccel": "Gyorsítson simábban",
   "@coachingVoiceSmoothAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingTitle": "Spoken driving coaching",
+  "voiceCoachingSettingTitle": "Hangos vezetési coaching",
   "@voiceCoachingSettingTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceCoachingSettingSubtitle": "Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints",
+  "voiceCoachingSettingSubtitle": "Halljon hangos tippeket vezetés közben — erős gyorsítás, hirtelen fékezés és sebességváltó-javaslatok",
   "@voiceCoachingSettingSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarDistanceKm": "{km} km away",
+  "fuelStationRadarDistanceKm": "{km} km-re",
   "@fuelStationRadarDistanceKm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "km": {
@@ -3667,9 +3409,8 @@
       }
     }
   },
-  "fuelStationRadarProximity": "Proximity {percent}%",
+  "fuelStationRadarProximity": "Közelség: {percent}%",
   "@fuelStationRadarProximity": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "percent": {
@@ -3678,94 +3419,76 @@
       }
     }
   },
-  "fuelStationRadarNearer": "Nearer station",
+  "fuelStationRadarNearer": "Közelebbi állomás",
   "@fuelStationRadarNearer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarFarther": "Farther station",
+  "fuelStationRadarFarther": "Távolabbi állomás",
   "@fuelStationRadarFarther": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarResultBadge": "Fuel Station Radar result",
+  "fuelStationRadarResultBadge": "Töltőállomás-radar eredménye",
   "@fuelStationRadarResultBadge": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_finding": "Finding & map",
+  "featureGroupTitle_finding": "Keresés és térkép",
   "@featureGroupTitle_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_finding": "Where to fuel up or charge — search, map, routing.",
+  "featureGroupDescription_finding": "Hol tankoljon vagy töltsön — keresés, térkép, útvonaltervezés.",
   "@featureGroupDescription_finding": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_prices": "Prices & alerts",
+  "featureGroupTitle_prices": "Árak és riasztások",
   "@featureGroupTitle_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_prices": "Price drops, history, and reporting.",
+  "featureGroupDescription_prices": "Áresések, előzmények és bejelentések.",
   "@featureGroupDescription_prices": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_radar": "Fuel Station Radar",
+  "featureGroupTitle_radar": "Töltőállomás-radar",
   "@featureGroupTitle_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_radar": "Live price nudges as you drive.",
+  "featureGroupDescription_radar": "Élő árnudge-ok vezetés közben.",
   "@featureGroupDescription_radar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_sync": "Sync & backup",
+  "featureGroupTitle_sync": "Szinkronizálás és biztonsági mentés",
   "@featureGroupTitle_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_sync": "Keep your data across devices.",
+  "featureGroupDescription_sync": "Tartsa meg adatait minden eszközön.",
   "@featureGroupDescription_sync": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_input": "Input & scanning",
+  "featureGroupTitle_input": "Bevitel és szkennelés",
   "@featureGroupTitle_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_input": "Helpers for logging fill-ups.",
+  "featureGroupDescription_input": "Segédeszközök a tankolások naplózásához.",
   "@featureGroupDescription_input": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupTitle_developer": "Developer & experimental",
+  "featureGroupTitle_developer": "Fejlesztői és kísérleti",
   "@featureGroupTitle_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureGroupDescription_developer": "Power-user and contributor tools.",
+  "featureGroupDescription_developer": "Haladó és közreműködői eszközök.",
   "@featureGroupDescription_developer": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelStationRadarStart": "Start fuel station radar",
+  "fuelStationRadarStart": "Töltőállomás-radar indítása",
   "@fuelStationRadarStart": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "evPriceBestEffortOcm": "Best-effort pricing from OpenChargeMap — sparse and may be incomplete.",
+  "evPriceBestEffortOcm": "Legjobb erőfeszítéssel megadott ár az OpenChargeMap-ből — ritka és hiányos lehet.",
   "@evPriceBestEffortOcm": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
+  "insightClimbingCost": "Emelkedő mászása {gradePercent}%-os lejtőn (az út {pctTime}%-a): {liters} L pazarlás",
   "@insightClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "gradePercent": {
@@ -3779,14 +3502,12 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
+  "lessonAdviceClimbingCost": "Vigyen lendületet a dombra, és adagolja finoman a gázt — emelkedőn való hirtelen gyorsítás extra üzemanyagot éget.",
   "@lessonAdviceClimbingCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
+  "insightRestartCost": "{count} stop-and-go újraindulás: {liters} L pazarlás",
   "@insightRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -3797,44 +3518,36 @@
       }
     }
   },
-  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
+  "lessonAdviceRestartCost": "Számolja előre a forgalmat, és guruljon a megállók felé, hogy guruljon inkább, mint megálljon teljesen — a holttpontról való elindulás a legfogyasztóbb része a stop-and-go-nak.",
   "@lessonAdviceRestartCost": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCardTitle": "GPS efficiency",
+  "gpsKpiCardTitle": "GPS-hatékonyság",
   "@gpsKpiCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiRpa": "Positive acceleration (RPA)",
+  "gpsKpiRpa": "Pozitív gyorsulás (RPA)",
   "@gpsKpiRpa": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiPke": "Kinetic energy demand (PKE)",
+  "gpsKpiPke": "Mozgási energia igény (PKE)",
   "@gpsKpiPke": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiVapos": "Acceleration intensity (VAPOS)",
+  "gpsKpiVapos": "Gyorsulási intenzitás (VAPOS)",
   "@gpsKpiVapos": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiCoast": "Coasting share",
+  "gpsKpiCoast": "Gurulás aránya",
   "@gpsKpiCoast": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsKpiClimbEnergy": "Climb energy",
+  "gpsKpiClimbEnergy": "Emelkedési energia",
   "@gpsKpiClimbEnergy": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingScoreBaselineDelta": "{pct} vs your efficient baseline",
+  "drivingScoreBaselineDelta": "{pct} az Ön hatékony alapjához képest",
   "@drivingScoreBaselineDelta": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -3842,29 +3555,24 @@
       }
     }
   },
-  "consumptionMonthlyClimbLabel": "Climbed",
+  "consumptionMonthlyClimbLabel": "Mászott",
   "@consumptionMonthlyClimbLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNow": "Open",
+  "openNow": "Nyitva",
   "@openNow": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openNowClosed": "Closed",
+  "openNowClosed": "Zárva",
   "@openNowClosed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openHoursUnknown": "Hours unknown",
+  "openHoursUnknown": "Nyitvatartás ismeretlen",
   "@openHoursUnknown": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closesAt": "Closes {time}",
+  "closesAt": "Zár: {time}",
   "@closesAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3872,9 +3580,8 @@
       }
     }
   },
-  "opensAt": "Opens {day} {time}",
+  "opensAt": "Nyit: {day} {time}",
   "@opensAt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "day": {
@@ -3885,9 +3592,8 @@
       }
     }
   },
-  "opensToday": "Opens {time}",
+  "opensToday": "Nyit: {time}",
   "@opensToday": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "time": {
@@ -3895,89 +3601,72 @@
       }
     }
   },
-  "open24Hours": "Open 24 hours",
+  "open24Hours": "Éjjel-nappal nyitva",
   "@open24Hours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "badge24h": "24h",
   "@badge24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayMon": "Monday",
+  "dayMon": "Hétfő",
   "@dayMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayTue": "Tuesday",
+  "dayTue": "Kedd",
   "@dayTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayWed": "Wednesday",
+  "dayWed": "Szerda",
   "@dayWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayThu": "Thursday",
+  "dayThu": "Csütörtök",
   "@dayThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayFri": "Friday",
+  "dayFri": "Péntek",
   "@dayFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySat": "Saturday",
+  "daySat": "Szombat",
   "@daySat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "daySun": "Sunday",
+  "daySun": "Vasárnap",
   "@daySun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortMon": "Mon",
+  "dayShortMon": "H",
   "@dayShortMon": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortTue": "Tue",
+  "dayShortTue": "K",
   "@dayShortTue": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortWed": "Wed",
+  "dayShortWed": "Sze",
   "@dayShortWed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortThu": "Thu",
+  "dayShortThu": "Cs",
   "@dayShortThu": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortFri": "Fri",
+  "dayShortFri": "P",
   "@dayShortFri": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSat": "Sat",
+  "dayShortSat": "Szo",
   "@dayShortSat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "dayShortSun": "Sun",
+  "dayShortSun": "V",
   "@dayShortSun": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "dayRange": "{from} – {to}",
   "@dayRange": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "from": {
@@ -3988,59 +3677,48 @@
       }
     }
   },
-  "publicHolidays": "Public holidays",
+  "publicHolidays": "Állami ünnepek",
   "@publicHolidays": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "closedLabel": "Closed",
+  "closedLabel": "Zárva",
   "@closedLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursNotAvailable": "Opening hours not available",
+  "openingHoursNotAvailable": "A nyitvatartási idő nem elérhető",
   "@openingHoursNotAvailable": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showAllHours": "Show all hours",
+  "showAllHours": "Összes óra megjelenítése",
   "@showAllHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "showLessHours": "Show less",
+  "showLessHours": "Kevesebb megjelenítése",
   "@showLessHours": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPageTitle": "Consumption statistics",
+  "consumptionStatsPageTitle": "Fogyasztási statisztikák",
   "@consumptionStatsPageTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsComparisonTitle": "This month vs last month",
+  "consumptionStatsComparisonTitle": "Ez a hónap vs. múlt hónap",
   "@consumptionStatsComparisonTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsTrendsTitle": "Evolution over time",
+  "consumptionStatsTrendsTitle": "Időbeli fejlődés",
   "@consumptionStatsTrendsTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsNeedTwoMonths": "Log fill-ups across at least two months to compare.",
+  "consumptionStatsNeedTwoMonths": "Legalább két hónap tankolásait naplózza az összehasonlításhoz.",
   "@consumptionStatsNeedTwoMonths": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsPricePerLiter": "Avg price/L",
+  "consumptionStatsPricePerLiter": "Átlagos ár/L",
   "@consumptionStatsPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "consumptionStatsDeltaPercent": "{pct}%",
   "@consumptionStatsDeltaPercent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "pct": {
@@ -4048,89 +3726,72 @@
       }
     }
   },
-  "consumptionStatsChartLiters": "Litres per month",
+  "consumptionStatsChartLiters": "Liter havonta",
   "@consumptionStatsChartLiters": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartSpend": "Spend per month",
+  "consumptionStatsChartSpend": "Kiadás havonta",
   "@consumptionStatsChartSpend": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartPricePerLiter": "Price per litre",
+  "consumptionStatsChartPricePerLiter": "Ár literenként",
   "@consumptionStatsChartPricePerLiter": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "consumptionStatsChartConsumption": "L/100km per month",
+  "consumptionStatsChartConsumption": "L/100km havonta",
   "@consumptionStatsChartConsumption": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptImporting": "Importing shared receipt…",
+  "shareReceiptImporting": "Megosztott bizonylat importálása…",
   "@shareReceiptImporting": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
+  "shareReceiptUnsupportedFormat": "Ez a fájltípus még nem importálható — osszon meg helyette egy fényképet a bizonylatról.",
   "@shareReceiptUnsupportedFormat": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shareReceiptFailed": "Couldn't read the shared receipt — try sharing it again or add the fill-up manually.",
+  "shareReceiptFailed": "Nem sikerült olvasni a megosztott bizonylatot — próbálja meg újra megosztani, vagy adja hozzá a tankolást manuálisan.",
   "@shareReceiptFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureLabel_addFillUpShareIntentReceipt": "Share receipt to import",
+  "featureLabel_addFillUpShareIntentReceipt": "Bizonylat megosztása importáláshoz",
   "@featureLabel_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "featureDescription_addFillUpShareIntentReceipt": "Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.",
+  "featureDescription_addFillUpShareIntentReceipt": "Osszon meg egy bizonylat fotót egy másik alkalmazásból a tankolás előkitöltéséhez — dátum, liter, összeg és állomás az eszközön kerül beolvasásra.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "24/7 automate",
+  "openingHoursAutomate24h": "24/7 automatizálás",
   "@openingHoursAutomate24h": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "stopRadar": "Stop radar",
+  "stopRadar": "Radar leállítása",
   "@stopRadar": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "moreActionsTooltip": "More",
+  "moreActionsTooltip": "Több",
   "@moreActionsTooltip": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupMenuLabel": "Export backup",
+  "exportBackupMenuLabel": "Biztonsági mentés exportálása",
   "@exportBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMenuLabel": "Restore backup",
+  "restoreBackupMenuLabel": "Biztonsági mentés visszaállítása",
   "@restoreBackupMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "carbonDashboardMenuLabel": "Carbon dashboard",
+  "carbonDashboardMenuLabel": "Szén-dioxid irányítópult",
   "@carbonDashboardMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "settingsMenuLabel": "Settings",
+  "settingsMenuLabel": "Beállítások",
   "@settingsMenuLabel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsDiagnosticsLargestGap": "Largest gap: {seconds} s",
+  "gpsDiagnosticsLargestGap": "Legnagyobb rés: {seconds} s",
   "@gpsDiagnosticsLargestGap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "seconds": {
@@ -4138,34 +3799,28 @@
       }
     }
   },
-  "gpsLifecycleResumed": "Resumed",
+  "gpsLifecycleResumed": "Folytatva",
   "@gpsLifecycleResumed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecyclePaused": "Paused",
+  "gpsLifecyclePaused": "Szüneteltetve",
   "@gpsLifecyclePaused": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "gpsLifecycleInactive": "Inactive",
+  "gpsLifecycleInactive": "Inaktív",
   "@gpsLifecycleInactive": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationTitle": "Recording your trip",
+  "tripRecordingGpsNotificationTitle": "Az út rögzítése",
   "@tripRecordingGpsNotificationTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "tripRecordingGpsNotificationText": "Tracking your route for fuel & driving stats",
+  "tripRecordingGpsNotificationText": "Az útvonal követése üzemanyag- és vezetési statisztikákhoz",
   "@tripRecordingGpsNotificationText": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "voiceStationAnnouncement": "{name}, {distanceKm} kilometers ahead, {fuelType} {euros} euros {cents}",
+  "voiceStationAnnouncement": "{name}, {distanceKm} kilométerre előre, {fuelType} {euros} euró {cents}",
   "@voiceStationAnnouncement": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "name": {
@@ -4190,54 +3845,44 @@
       }
     }
   },
-  "radarPinHelpTitle": "About pin",
+  "radarPinHelpTitle": "A rögzítésről",
   "@radarPinHelpTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarPinHelpBody": "Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.",
+  "radarPinHelpBody": "A rögzítés bekapcsolva tartja a képernyőt, és elrejti a rendszersávokat, hogy a legközelebbi állomás kijelzője olvasható maradjon a műszerfalon. Érintse meg újra a feloldáshoz. Automatikusan feloldódik, amikor a radar leáll.",
   "@radarPinHelpBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinTitle": "Always pin when the radar starts",
+  "radarAutoPinTitle": "Mindig rögzít, amikor a radar elindul",
   "@radarAutoPinTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "radarAutoPinSubtitle": "Pin the radar automatically every time instead of tapping each time. Uses more battery.",
+  "radarAutoPinSubtitle": "Automatikusan rögzíti a radart minden alkalommal, ahelyett, hogy minden alkalommal meg kellene érinteni. Több akkumulátort használ.",
   "@radarAutoPinSubtitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeCardTitle": "Acceleration & braking",
+  "accelBrakeCardTitle": "Gyorsítás és fékezés",
   "@accelBrakeCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardAccel": "Hard accelerations",
+  "accelBrakeHardAccel": "Erős gyorsítások",
   "@accelBrakeHardAccel": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeHardBrake": "Hard braking",
+  "accelBrakeHardBrake": "Hirtelen fékezések",
   "@accelBrakeHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSharpCorner": "Sharp corners",
+  "accelBrakeSharpCorner": "Éles kanyarok",
   "@accelBrakeSharpCorner": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "accelBrakeSource": "From the phone's motion sensors",
+  "accelBrakeSource": "A telefon mozgásérzékelőiből",
   "@accelBrakeSource": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonHardBrake": "{count} hard braking events",
+  "lessonHardBrake": "{count} hirtelen fékezési esemény",
   "@lessonHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4245,14 +3890,12 @@
       }
     }
   },
-  "lessonAdviceHardBrake": "Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.",
+  "lessonAdviceHardBrake": "Számolja előre a megállásokat, és korábban emelje fel a lábát a gázpedálról — a hirtelen fékezés elveszíti a sebességre fordított üzemanyagot.",
   "@lessonAdviceHardBrake": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "lessonSharpCornering": "{count} sharp corners",
+  "lessonSharpCornering": "{count} éles kanyar",
   "@lessonSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -4260,44 +3903,36 @@
       }
     }
   },
-  "lessonAdviceSharpCornering": "Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.",
+  "lessonAdviceSharpCornering": "Lassítson a kanyar előtt, ne benne — az éles kanyar elveszi a sebességet, amelyet aztán vissza kell nyerni.",
   "@lessonAdviceSharpCornering": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardTitle": "Driving-analysis trace (dev)",
+  "drivingTraceCardTitle": "Vezetéselemzési nyomkövetés (fejl.)",
   "@drivingTraceCardTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceCardBody": "Export this trip's GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.",
+  "drivingTraceCardBody": "Exportálja az út GPS KPI-jeit, pontszámát és leckéit JSON-ként, írja le, hogyan érezte ténylegesen a menetet a megjegyzés mezőbe, és ossza meg vissza, hogy a vezetési stílus küszöbértékei valódi utakkal kalibrálhatók legyenek.",
   "@drivingTraceCardBody": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportAction": "Export analysis trace",
+  "drivingTraceExportAction": "Elemzési nyomkövetés exportálása",
   "@drivingTraceExportAction": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExported": "Analysis trace saved to Downloads — add your verdict in the comment field and share it back.",
+  "drivingTraceExported": "Elemzési nyomkövetés mentve a Letöltésekbe — adja hozzá véleményét a megjegyzés mezőbe, és ossza meg vissza.",
   "@drivingTraceExported": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "drivingTraceExportFailed": "Couldn't export the analysis trace.",
+  "drivingTraceExportFailed": "Nem sikerült exportálni az elemzési nyomkövetést.",
   "@drivingTraceExportFailed": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "backupExportProgress": "Exporting your backup…",
+  "backupExportProgress": "Biztonsági mentés exportálása…",
   "@backupExportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "exportBackupSavedAs": "Mentve a Letöltésekbe: {fileName}",
   "@exportBackupSavedAs": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fileName": {
@@ -4305,14 +3940,12 @@
       }
     }
   },
-  "backupImportProgress": "Restoring your backup…",
+  "backupImportProgress": "Biztonsági mentés visszaállítása…",
   "@backupImportProgress": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupMergedSummary": "{vehicles} jármű, {fillUps} tankolás, {trips} út, {chargingLogs} töltési napló összevonva",
   "@restoreBackupMergedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4329,9 +3962,8 @@
       }
     }
   },
-  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "restoreBackupReplacedSummary": "Minden adat felváltva: {vehicles} jármű, {fillUps} tankolás, {trips} út, {chargingLogs} töltési napló",
   "@restoreBackupReplacedSummary": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "vehicles": {
@@ -4348,19 +3980,16 @@
       }
     }
   },
-  "alertsStationSectionTitle": "Station alerts",
+  "alertsStationSectionTitle": "Állomásriasztások",
   "@alertsStationSectionTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "alertsStationAdd": "Add a station alert",
+  "alertsStationAdd": "Állomásriasztás hozzáadása",
   "@alertsStationAdd": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
+  "scanPumpInconsistent": "A beolvasott értékek nem adnak össze — adja meg manuálisan.",
   "@scanPumpInconsistent": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
