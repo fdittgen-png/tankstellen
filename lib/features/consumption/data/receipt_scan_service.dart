@@ -15,6 +15,7 @@ import 'ocr/ocr_image_preprocessor.dart';
 import 'ocr/ocr_trace_recorder.dart';
 import 'ocr/pump_display_orchestrator.dart';
 import 'ocr/pump_ocr_config.dart';
+import 'ocr/pump_recognizer_source.dart';
 import 'ocr/pump_validation_gate.dart';
 import 'ocr/recognized_text_adapter.dart';
 import 'ocr/recognized_text_block.dart';
@@ -195,20 +196,22 @@ class ReceiptScanService {
         glareRejected: true,
       );
     }
-    // Crop to the reticle ROI FIRST, then run the 7-segment
-    // preprocessing pass (adaptive Sauvola binarization, replacing the
-    // glare-amplifying #1860 global contrast). ML Kit reads the printed
-    // PRIX/VOLUME/PRIX-DU-LITRE labels off the cleaned crop; we keep its
-    // block geometry (#2478) — not just the flat string — so the
-    // label-anchored extractor can tell which number sits under which
-    // label and recover the dropped unit price.
+    // Crop to the reticle ROI FIRST, then the #2275 Sauvola pass; ML Kit
+    // reads the printed PRIX/VOLUME/PRIX-DU-LITRE labels off the cleaned
+    // crop and we keep its block geometry (#2478) so the label-anchored
+    // extractor can recover the dropped unit price.
     var recognised = await _recognisePump(path, roi: roi);
     if (recognised == null) {
       await _tryDelete(path);
       return null;
     }
+    // #2830 — the STRICTLY-ADDITIVE 3rd source: non-null only when a
+    // brand template with pumpDisplay ROIs matches (FR/Tokheim today);
+    // null elsewhere so production is unchanged (see resolveRecognizerSource).
+    final src = await resolveRecognizerSource(path, country, brand, roi,
+        config: _ocrConfig, preprocessor: _preprocessor);
     // #2478 PRIMARY label-anchored read (recovers the dropped PRIX DU LITRE),
-    // flat-string fallback, then the gate.
+    // flat-string fallback, then the gate; #2830 recognizer source last.
     PumpDisplayParseResult parseFor(
             ({String text, List<RecognizedTextBlock> blocks}) r) =>
         orchestratePumpDisplayParse(
@@ -217,13 +220,14 @@ class ReceiptScanService {
             profile: profile,
             parser: _pumpParser,
             gate: _pumpGate,
-            trace: trace);
+            trace: trace,
+            frame: src.frame,
+            recognizerFields: src.fields);
     var parse = parseFor(recognised);
 
-    // #2798 — the #2275 binarization can dissolve faint 7-seg value digits
-    // (ML Kit returns only labels → nothing derived). When the binarized pass
-    // recovers nothing, retry once with grayscale and keep it only if it reads
-    // more — non-regressive: a usable binarized read is never replaced.
+    // #2798 — the #2275 binarization can dissolve faint 7-seg digits; when
+    // the binarized pass recovers nothing, retry once with grayscale and
+    // keep it only if it reads more (a usable binarized read is never lost).
     if (!parse.hasUsableData) {
       final gray = await _recognisePump(path, roi: roi, binarize: false);
       final grayParse = gray == null ? null : parseFor(gray);
@@ -280,13 +284,11 @@ class ReceiptScanService {
 
   /// Runs ML Kit text recognition on the capture at [path].
   ///
-  /// #1711 — `InputImage.fromFilePath` does not reliably honour a
-  /// JPEG's EXIF orientation tag, so a phone held in portrait while
-  /// photographing a landscape pump display delivered the image to the
-  /// recognizer rotated 90° — which ML Kit's general recognizer cannot
-  /// read, the dominant cause of the pump-display OCR failures. We OCR
-  /// an EXIF-upright temp copy and delete it immediately; the original
-  /// [path] is untouched for the bad-scan reporting flow.
+  /// #1711 — `InputImage.fromFilePath` does not reliably honour a JPEG's
+  /// EXIF orientation tag, so a portrait-held shot of a landscape pump
+  /// arrived rotated 90° (unreadable by ML Kit). We OCR an EXIF-upright
+  /// temp copy and delete it immediately; [path] is untouched for the
+  /// bad-scan reporting flow.
   ///
   /// #1860 — when [enhanceContrast] is set (the pump-display path) the
   /// temp copy also gets a grayscale + histogram-normalise + contrast
@@ -310,13 +312,10 @@ class ReceiptScanService {
   }
 
   /// Runs ML Kit on the pump-display crop and returns BOTH the flat text
-  /// and the per-line block geometry (#2478).
-  ///
-  /// The pump path needs the boxes — discarding them (the old behaviour)
-  /// is exactly why the unit price could not be anchored to its label.
-  /// Same EXIF-upright + #2275 Sauvola preprocessing as [_recognise]; the
-  /// flat text is retained for the legacy fallback parser. Returns null
-  /// when OCR recognises nothing.
+  /// and the per-line block geometry (#2478) — the pump path needs the
+  /// boxes to anchor the unit price to its label. Same EXIF-upright +
+  /// #2275 Sauvola preprocessing as [_recognise]; the flat text is kept
+  /// for the legacy fallback parser. Returns null when OCR reads nothing.
   Future<({String text, List<RecognizedTextBlock> blocks})?> _recognisePump(
     String path, {
     OcrNormalizedRect? roi,
