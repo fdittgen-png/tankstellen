@@ -13,8 +13,10 @@ import '../error/exceptions.dart';
 import '../logging/error_logger.dart';
 import 'fuel_service_policy.dart';
 import 'service_result.dart';
+import 'station_failure_classifier.dart';
 import 'station_service.dart';
 import 'station_service_chain_codec.dart';
+import 'station_transient_retry.dart';
 
 /// Orchestrates station data retrieval with fallback:
 ///
@@ -158,7 +160,7 @@ class StationServiceChain implements StationService {
     // first-byte triggering Dio's connect timeout). Both recover on a
     // second attempt within a second.
     try {
-      final result = await _callWithTransientRetry(apiCall);
+      final result = await callWithTransientRetry(apiCall);
       await _cache.put(
         cacheKey,
         serialize(result.data),
@@ -178,7 +180,7 @@ class StationServiceChain implements StationService {
         source: _errorSource,
         message: e.toString(),
         statusCode: e is ApiException ? e.statusCode : null,
-        kind: e is ApiException ? _effectiveKind(e) : FailureKind.unknown,
+        kind: e is ApiException ? effectiveFailureKind(e) : FailureKind.unknown,
         retryAfter: e is ApiException ? e.retryAfter : null,
         occurredAt: DateTime.now(),
       ));
@@ -203,92 +205,16 @@ class StationServiceChain implements StationService {
     throw ServiceChainExhaustedException(errors: errors);
   }
 
-  /// Delay between the first and second attempt of [_callWithTransientRetry].
-  /// 500 ms keeps the user-visible latency tight (most browsers stall ≥1 s
-  /// before a user even notices), and is long enough for an overloaded
-  /// upstream to clear a 503 burst. Exposed as `@visibleForTesting` so the
-  /// retry test can run without sleeping a real half-second.
+  /// Delay between the first and second attempt of the in-chain transient
+  /// retry. Re-exports the single source of truth in
+  /// `station_transient_retry.dart` (#2842) so the existing test surface
+  /// (`StationServiceChain.transientRetryDelay = …`) keeps working unchanged.
   @visibleForTesting
-  static Duration transientRetryDelay = const Duration(milliseconds: 500);
+  static Duration get transientRetryDelay => stationTransientRetryDelay;
 
-  /// Wraps a single [apiCall] with one retry on transient remote errors.
-  /// Transience is decided by [FailureKind] (#2255): a network blip, a
-  /// timeout, or a rate-limit response are the kinds a short retry could
-  /// plausibly recover from. One retry only — the goal is to absorb a
-  /// transient blip, not to mask sustained outages from the chain's
-  /// fall-through to stale cache or to the user-visible error dialog.
-  ///
-  /// Returns the second attempt's result on success; rethrows the second
-  /// attempt's exception on failure so the caller observes the same
-  /// `on Exception` semantics as a plain `await apiCall()`. Non-transient
-  /// errors (auth, notFound, parse, unsupported, unknown) skip the retry —
-  /// those are not going to fix themselves in 500 ms.
-  Future<ServiceResult<T>> _callWithTransientRetry<T>(
-    Future<ServiceResult<T>> Function() apiCall,
-  ) async {
-    try {
-      return await apiCall();
-    } on ApiException catch (e, st) {
-      if (!_isTransient(e)) rethrow;
-      // Single retry — dev-console only (no production listener). Stack
-      // included to satisfy `catch_block_stacktrace_coverage` (#1103).
-      debugPrint(
-        'StationServiceChain: retrying after transient error '
-        '(status=${e.statusCode}, kind=${_effectiveKind(e).name})\n$st',
-      );
-      // Honour an upstream Retry-After (#2255) but cap it at
-      // [transientRetryDelay] so a long server hint never stretches the
-      // in-chain retry latency — sustained rate-limits fall through to cache.
-      final delay = e.retryAfter != null && e.retryAfter! < transientRetryDelay
-          ? e.retryAfter!
-          : transientRetryDelay;
-      await Future<void>.delayed(delay);
-      return apiCall();
-    }
-  }
-
-  /// `true` when [e] is a transient failure a single short retry could
-  /// plausibly recover from. Routes on [FailureKind] (#2255) instead of
-  /// sniffing the English [ApiException.message] prefix:
-  /// network / timeout / rateLimited → transient;
-  /// auth / notFound / parse / unsupported / unknown → terminal.
-  static bool _isTransient(ApiException e) {
-    switch (_effectiveKind(e)) {
-      case FailureKind.network:
-      case FailureKind.timeout:
-      case FailureKind.rateLimited:
-        return true;
-      case FailureKind.auth:
-      case FailureKind.notFound:
-      case FailureKind.parse:
-      case FailureKind.unsupported:
-      case FailureKind.unknown:
-        return false;
-    }
-  }
-
-  /// Resolve the [FailureKind] for [e], preserving the pre-#2255 classification
-  /// for exceptions that predate typed kinds (or were constructed without one).
-  /// When [ApiException.kind] is explicitly set (anything but
-  /// [FailureKind.unknown]) it wins; otherwise we fall back to the legacy
-  /// signals — HTTP status (5xx → network, matching the old transient-5xx
-  /// rule) then the Dio-type message prefix stamped by `throwApiException`.
-  static FailureKind _effectiveKind(ApiException e) {
-    if (e.kind != FailureKind.unknown) return e.kind;
-    final code = e.statusCode;
-    if (code != null) {
-      final fromStatus = failureKindFromStatus(code);
-      if (fromStatus != FailureKind.unknown) return fromStatus;
-    }
-    final msg = e.message;
-    if (msg.startsWith('connectionTimeout') ||
-        msg.startsWith('receiveTimeout') ||
-        msg.startsWith('sendTimeout')) {
-      return FailureKind.timeout;
-    }
-    if (msg.startsWith('connectionError')) return FailureKind.network;
-    return FailureKind.unknown;
-  }
+  @visibleForTesting
+  static set transientRetryDelay(Duration value) =>
+      stationTransientRetryDelay = value;
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -348,7 +274,7 @@ class StationServiceChain implements StationService {
       }
     }
 
-    final future = _callWithTransientRetry(
+    final future = callWithTransientRetry(
       () => _primary.searchStations(params, cancelToken: cancelToken),
     );
     _inFlight[key] = future;
