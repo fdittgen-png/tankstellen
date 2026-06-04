@@ -231,7 +231,12 @@ void main() {
     // banner copy. Net +4 (getter + 2-line dartdoc); a pure read-through that
     // must live on the controller's public surface. Decomposition stays
     // tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1640,
+    // #2835 — re-grandfathered 1640 → 1641: one import of the shared
+    // trip-consumption-reliability gate so `_finaliseSummary` re-applies
+    // the tiny-distance L/100 km floor against the swapped odometer
+    // distance (the code change itself is net-zero). Decomposition stays
+    // tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1641,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The

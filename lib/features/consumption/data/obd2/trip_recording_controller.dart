@@ -11,6 +11,7 @@ import '../../domain/driving_coaching.dart' show DrivingCoachingHint;
 import '../../domain/entities/gps_sample_diagnostic.dart';
 import '../../domain/services/gear_inference.dart';
 import '../../domain/services/gps_live_estimate_folder.dart';
+import '../../domain/services/trip_consumption_reliability.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
@@ -827,14 +828,14 @@ class TripRecordingController {
     final base = _recorder.buildSummary();
     final distanceKm = currentDistanceKm;
     final source = distanceSource;
-    // Recompute avgLPer100Km if we swapped the distance out — the
-    // recorder's value was keyed to its own integrated distance.
-    double? avg = base.avgLPer100Km;
-    if (base.fuelLitersConsumed != null && distanceKm > 0.001) {
-      avg = base.fuelLitersConsumed! / distanceKm * 100.0;
-    } else if (base.fuelLitersConsumed == null) {
-      avg = null;
-    }
+    // Recompute avgLPer100Km against the swapped distance. #2835 —
+    // re-apply the tiny-distance floor (ratio blows up below it; the
+    // measured litres are kept). Sparse-cadence trips already arrive
+    // with `base.fuelLitersConsumed == null` from the recorder.
+    final avg = (base.fuelLitersConsumed != null &&
+            isDistanceReliableForRatio(distanceKm))
+        ? base.fuelLitersConsumed! / distanceKm * 100.0
+        : null;
     // #1395 — roll the running breadcrumb flag-counts into a single
     // suspect bit on the trip summary. Threshold matches the spec:
     // when more than 30 % of fuel-rate samples tripped a sanity flag

@@ -88,10 +88,15 @@ void main() {
       expect(ctl, isNotNull,
           reason: 'provider must own a controller while recording');
       final start = DateTime(2026, 5, 17, 9);
-      // 0→90 km/h over 10 s, cruise 90 for 10 s, 90→0 over 10 s.
+      // 0→90 km/h over 10 s, cruise 90 for 90 s, 90→0 over 10 s. The long
+      // cruise integrates to ~2.5 km — comfortably over the #2835
+      // min-distance floor (1 km) below which avgLPer100Km is suppressed,
+      // so this realistic drive still asserts a reliable consumption
+      // figure. The 1 s sample cadence keeps it under the sparse-cadence
+      // gate too.
       final speeds = <double>[
         for (var i = 0; i <= 10; i++) i * 9.0, // accelerate
-        for (var i = 0; i < 10; i++) 90.0, // cruise
+        for (var i = 0; i < 90; i++) 90.0, // cruise
         for (var i = 10; i >= 0; i--) i * 9.0, // decelerate
       ];
       for (var i = 0; i < speeds.length; i++) {
