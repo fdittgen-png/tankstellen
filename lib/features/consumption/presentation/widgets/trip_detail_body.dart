@@ -23,6 +23,7 @@ import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
 import 'gps_diagnostics_card.dart';
 import 'gps_efficiency_kpi_card.dart';
+import 'gps_road_usage_card.dart';
 import 'obd2_diagnostics_trip_card.dart';
 import 'imu_accel_brake_card.dart';
 import 'throttle_rpm_histogram_card.dart';
@@ -247,13 +248,27 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
         // right below the insights card so the user reads "what was
         // wasteful" then immediately sees "here's the engine
-        // distribution that produced that". Mirrors the EV-skip and
-        // empty-samples-skip rules.
-        if (!widget.isEv && widget.samples.isNotEmpty)
+        // distribution that produced that".
+        //
+        // #2796 C7 — gated to OBD2/engine-signal trips only. On a GPS-only
+        // trip (`_gpsFeatures != null`) throttle % and RPM are absent on
+        // every sample, so the card could only ever render its "no samples"
+        // empty state — dead UI. `_gpsFeatures != null` is the exact
+        // complement [GpsEfficiencyKpiCard.featuresFor] already computed
+        // (it returns features only when NO sample carried an engine RPM),
+        // so the two cards are mutually exclusive without re-scanning the
+        // samples. EV / empty trips still skip both.
+        if (!widget.isEv && widget.samples.isNotEmpty && _gpsFeatures == null)
           ThrottleRpmHistogramCard(histogram: _histogram),
         // GPS-only efficiency KPIs (#2697 P3) — only for engine-signal-less trips.
         if (_gpsFeatures != null)
           GpsEfficiencyKpiCard(features: _gpsFeatures),
+        // #2796 C7 — the GPS-only replacement for the throttle/RPM card: a
+        // speed-only "how you used the road" panel (speed-band + movement-
+        // phase shares + a positive coasting line). Same gate as the KPI
+        // card above so the GPS-only trip gets the road-use view exactly
+        // where the engine card would have sat for an OBD2 trip.
+        if (_gpsFeatures != null) GpsRoadUsageCard(features: _gpsFeatures),
         // #2792 — dongle-less hard-accel/brake/sharp-corner counts the phone IMU
         // detected on a GPS-only trip (persisted but previously surfaced
         // nowhere). Shown only when at least one harsh event was recorded.

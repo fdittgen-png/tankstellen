@@ -5392,6 +5392,48 @@ class AppLocalizationsSl extends AppLocalizations {
       'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.';
 
   @override
+  String get gpsRoadUseCardTitle => 'How you used the road';
+
+  @override
+  String get gpsRoadUseSpeedSection => 'Where you spent your time';
+
+  @override
+  String get gpsRoadUseSpeedIdle => 'Stopped (<5 km/h)';
+
+  @override
+  String get gpsRoadUseSpeedLow => 'Town (5–50 km/h)';
+
+  @override
+  String get gpsRoadUseSpeedCruise => 'Cruise (50–110 km/h)';
+
+  @override
+  String get gpsRoadUseSpeedHigh => 'Fast (≥110 km/h)';
+
+  @override
+  String get gpsRoadUsePhaseSection => 'How you moved';
+
+  @override
+  String get gpsRoadUsePhaseAccel => 'Accelerating';
+
+  @override
+  String get gpsRoadUsePhaseSteady => 'Holding speed';
+
+  @override
+  String get gpsRoadUsePhaseCoast => 'Coasting';
+
+  @override
+  String gpsRoadUseShare(String pct) {
+    return '$pct%';
+  }
+
+  @override
+  String get gpsRoadUseCoastPraise =>
+      'Lots of coasting — letting the car roll instead of braking saves fuel. Nice.';
+
+  @override
+  String get gpsRoadUseSource => 'From your GPS track';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Vožnja';
 
   @override

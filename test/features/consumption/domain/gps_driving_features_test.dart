@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/gps_driving_features.dart';
+import 'package:tankstellen/features/consumption/domain/gps_driving_features_shares.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 TripSample _s(
@@ -402,6 +403,69 @@ void main() {
         expect(f.positiveKineticEnergy, 0);
         expect(f.meanPositiveVa, 0);
         expect(f.climbEnergyPerKm, 0);
+      });
+    });
+
+    group('#2796 C7 movement-phase shares', () {
+      test('a pure acceleration ramp is dominated by the accel phase', () {
+        // 0 → 36 km/h in 1 m/s² steps — every interior interval accelerates.
+        final samples = <TripSample>[
+          for (var i = 0; i <= 10; i++) _s(t0.add(Duration(seconds: i)), i * 3.6),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.accelShare, greaterThan(0.5));
+        expect(f.coastShare, 0);
+      });
+
+      test('accel + steady + coast shares sum to ~1 over moving time', () {
+        // Accelerate 0→50, hold 50 for 20 s, then gently coast 50→40.
+        final samples = <TripSample>[
+          for (var i = 0; i <= 5; i++) _s(t0.add(Duration(seconds: i)), i * 10.0),
+          for (var i = 6; i <= 25; i++) _s(t0.add(Duration(seconds: i)), 50),
+          _s(t0.add(const Duration(seconds: 30)), 40),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.accelShare, greaterThan(0));
+        expect(f.steadyShare, greaterThan(0));
+        expect(f.coastShare, greaterThan(0));
+        expect(
+          f.accelShare + f.steadyShare + f.coastShare,
+          closeTo(1.0, 0.001),
+        );
+      });
+
+      test('low/cruise/high speed-band shares match the integration edges', () {
+        // 30 s in town (30 km/h), 30 s cruise (80 km/h), 30 s fast (120 km/h).
+        final samples = <TripSample>[
+          for (var i = 0; i < 30; i++) _s(t0.add(Duration(seconds: i)), 30),
+          for (var i = 30; i < 60; i++) _s(t0.add(Duration(seconds: i)), 80),
+          for (var i = 60; i <= 90; i++) _s(t0.add(Duration(seconds: i)), 120),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.lowSpeedShare, closeTo(1 / 3, 0.05));
+        expect(f.cruiseShare, closeTo(1 / 3, 0.05));
+        expect(f.highSpeedShare, closeTo(1 / 3, 0.05));
+        expect(f.idleShare, closeTo(0, 0.05));
+      });
+
+      test('all phase/band shares default to 0 on the const constructor', () {
+        const f = GpsDrivingFeatures(
+          idleSeconds: 0,
+          lowSpeedSeconds: 0,
+          cruiseSeconds: 0,
+          highSpeedSeconds: 0,
+          accelEvents: 0,
+          brakeEvents: 0,
+          maxAccelG: 0,
+          meanSpeedKmh: 0,
+          distanceKm: 0,
+          totalSeconds: 0,
+          gradeClimbMeters: 0,
+          gradeDescentMeters: 0,
+          cornerLoadIntegral: 0,
+        );
+        expect(f.accelShare, 0);
+        expect(f.steadyShare, 0);
       });
     });
   });

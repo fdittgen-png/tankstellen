@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/gps_road_usage_card.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/throttle_rpm_histogram_card.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_body.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_summary_card.dart';
@@ -484,6 +486,77 @@ void main() {
       expect(summaryY, lessThan(speedY));
       expect(speedY, lessThan(fuelY));
       expect(fuelY, lessThan(rpmY));
+    });
+  });
+
+  // #2796 C7 — the throttle/RPM histogram is now gated to OBD2/engine-signal
+  // trips only. A GPS-only trip (no sample carries RPM) instead gets the
+  // speed-only "how you used the road" panel where the engine card would sit.
+  group('TripDetailBody — throttle card gated to OBD2, road-use for GPS-only',
+      () {
+    testWidgets(
+        'shows the throttle/RPM card and NOT the road-use panel when a sample '
+        'carries RPM (OBD2 trip)', (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: [
+            _sampleWithRpm(0, 30, 1500.0),
+            _sampleWithRpm(1, 35, 1700.0),
+            _sampleWithRpm(2, 40, 1900.0),
+          ],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(ThrottleRpmHistogramCard), findsOneWidget);
+      expect(find.byType(GpsRoadUsageCard), findsNothing);
+    });
+
+    testWidgets(
+        'hides the throttle/RPM card and shows the road-use panel when NO '
+        'sample carries RPM (GPS-only trip)', (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          // GPS-only: speed track, no engine RPM on any sample, enough
+          // samples for GpsDrivingFeatures.from to produce an aggregate.
+          samples: [
+            _sampleNoRpm(0, 20),
+            _sampleNoRpm(1, 35),
+            _sampleNoRpm(2, 50),
+            _sampleNoRpm(3, 45),
+          ],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(ThrottleRpmHistogramCard), findsNothing);
+      expect(find.byType(GpsRoadUsageCard), findsOneWidget);
+      expect(find.text('How you used the road'), findsOneWidget);
+    });
+
+    testWidgets('hides BOTH cards for an EV trip', (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: [
+            _sampleNoRpm(0, 20),
+            _sampleNoRpm(1, 35),
+            _sampleNoRpm(2, 50),
+          ],
+          isEv: true,
+        ),
+      );
+
+      expect(find.byType(ThrottleRpmHistogramCard), findsNothing);
+      expect(find.byType(GpsRoadUsageCard), findsNothing);
     });
   });
 

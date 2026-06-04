@@ -9560,6 +9560,84 @@ abstract class AppLocalizations {
   /// **'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.'**
   String get tripAvgGpsEstimateTooltip;
 
+  /// Title of the GPS-only trip-detail panel (#2796) that replaces the engine throttle/RPM card on dongle-less trips, showing the speed-band and movement-phase split derived from the GPS track.
+  ///
+  /// In en, this message translates to:
+  /// **'How you used the road'**
+  String get gpsRoadUseCardTitle;
+
+  /// Section header on the road-use panel (#2796) above the speed-band bars (stopped / town / cruise / fast).
+  ///
+  /// In en, this message translates to:
+  /// **'Where you spent your time'**
+  String get gpsRoadUseSpeedSection;
+
+  /// Speed-band bar label on the road-use panel (#2796): time spent stationary or crawling below 5 km/h. The 5 km/h edge matches the GPS feature integration.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped (<5 km/h)'**
+  String get gpsRoadUseSpeedIdle;
+
+  /// Speed-band bar label on the road-use panel (#2796): urban / start-stop driving between 5 and 50 km/h.
+  ///
+  /// In en, this message translates to:
+  /// **'Town (5–50 km/h)'**
+  String get gpsRoadUseSpeedLow;
+
+  /// Speed-band bar label on the road-use panel (#2796): extra-urban cruising between 50 and 110 km/h.
+  ///
+  /// In en, this message translates to:
+  /// **'Cruise (50–110 km/h)'**
+  String get gpsRoadUseSpeedCruise;
+
+  /// Speed-band bar label on the road-use panel (#2796): highway driving at or above 110 km/h, the fuel-cost band.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast (≥110 km/h)'**
+  String get gpsRoadUseSpeedHigh;
+
+  /// Section header on the road-use panel (#2796) above the movement-phase bars (accelerating / holding speed / coasting).
+  ///
+  /// In en, this message translates to:
+  /// **'How you moved'**
+  String get gpsRoadUsePhaseSection;
+
+  /// Movement-phase bar label on the road-use panel (#2796): share of moving time spent speeding up (putting energy in).
+  ///
+  /// In en, this message translates to:
+  /// **'Accelerating'**
+  String get gpsRoadUsePhaseAccel;
+
+  /// Movement-phase bar label on the road-use panel (#2796): share of moving time spent at a roughly constant speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Holding speed'**
+  String get gpsRoadUsePhaseSteady;
+
+  /// Movement-phase bar label on the road-use panel (#2796): share of moving time spent coasting (foot off, gentle deceleration), the eco-positive phase.
+  ///
+  /// In en, this message translates to:
+  /// **'Coasting'**
+  String get gpsRoadUsePhaseCoast;
+
+  /// Trailing percent share for a road-use bar (#2796), e.g. "42%". Language-neutral percent mask.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}%'**
+  String gpsRoadUseShare(String pct);
+
+  /// Positive coaching line on the road-use panel (#2796), shown in green when the coasting share is high (≥ ~25%): praises the driver for coasting / engine-braking instead of accelerating then braking.
+  ///
+  /// In en, this message translates to:
+  /// **'Lots of coasting — letting the car roll instead of braking saves fuel. Nice.'**
+  String get gpsRoadUseCoastPraise;
+
+  /// Footnote on the road-use panel (#2796) clarifying the shares come from the GPS speed/position track (no OBD2 dongle needed).
+  ///
+  /// In en, this message translates to:
+  /// **'From your GPS track'**
+  String get gpsRoadUseSource;
+
   /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
   ///
   /// In en, this message translates to:

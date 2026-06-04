@@ -5421,6 +5421,48 @@ class AppLocalizationsDe extends AppLocalizations {
       'GPS-Schätzung (~) — auf dieser Fahrt kein Kraftstoffsensor. Der Wert wird aus Geschwindigkeit und der Kalibrierung deines Fahrzeugs modelliert; die Genauigkeit steigt mit zunehmender Reife der Matrix.';
 
   @override
+  String get gpsRoadUseCardTitle => 'So hast du die Straße genutzt';
+
+  @override
+  String get gpsRoadUseSpeedSection => 'Wo du deine Zeit verbracht hast';
+
+  @override
+  String get gpsRoadUseSpeedIdle => 'Gestanden (<5 km/h)';
+
+  @override
+  String get gpsRoadUseSpeedLow => 'Stadt (5–50 km/h)';
+
+  @override
+  String get gpsRoadUseSpeedCruise => 'Überland (50–110 km/h)';
+
+  @override
+  String get gpsRoadUseSpeedHigh => 'Schnell (≥110 km/h)';
+
+  @override
+  String get gpsRoadUsePhaseSection => 'Wie du dich bewegt hast';
+
+  @override
+  String get gpsRoadUsePhaseAccel => 'Beschleunigen';
+
+  @override
+  String get gpsRoadUsePhaseSteady => 'Tempo halten';
+
+  @override
+  String get gpsRoadUsePhaseCoast => 'Ausrollen';
+
+  @override
+  String gpsRoadUseShare(String pct) {
+    return '$pct%';
+  }
+
+  @override
+  String get gpsRoadUseCoastPraise =>
+      'Viel ausgerollt – das Auto rollen lassen statt zu bremsen spart Sprit. Stark.';
+
+  @override
+  String get gpsRoadUseSource => 'Aus deiner GPS-Aufzeichnung';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Fahrweise';
 
   @override
