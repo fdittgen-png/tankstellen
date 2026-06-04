@@ -31,6 +31,14 @@ class TripRecordingState {
   /// connected but not returning data" for silent failure.
   final TripDropReason? dropReason;
 
+  /// #2767 — true while the reconnect scanner has exhausted its active-scan
+  /// attempts and is passive-waiting for the adapter to power back up
+  /// (typically while [phase] is [TripRecordingPhase.degradedGpsOnly]). Drives
+  /// the GPS-degraded banner's calmer "passive-waiting" copy vs the busy
+  /// "OBD2 reconnecting" one. False while the scanner is still active-scanning
+  /// or no drop is being recovered.
+  final bool reconnectPassiveWaiting;
+
   /// GPS-only live coaching hint (#2058) — derived from the rolling
   /// window of the last ~5 s of GPS samples on every recorder emit.
   /// Null when the trajet has OBD2 fuel-rate data (the standard
@@ -59,6 +67,7 @@ class TripRecordingState {
     this.band = ConsumptionBand.normal,
     this.liveDeltaFraction,
     this.dropReason,
+    this.reconnectPassiveWaiting = false,
     this.gpsCoachingHint,
     this.connectStage,
     this.saveStage,
@@ -73,6 +82,7 @@ class TripRecordingState {
     bool clearDelta = false,
     TripDropReason? dropReason,
     bool clearDropReason = false,
+    bool? reconnectPassiveWaiting,
     DrivingCoachingHint? gpsCoachingHint,
     bool clearGpsCoachingHint = false,
     TripStartStage? connectStage,
@@ -91,6 +101,8 @@ class TripRecordingState {
         dropReason: clearDropReason
             ? null
             : (dropReason ?? this.dropReason),
+        reconnectPassiveWaiting:
+            reconnectPassiveWaiting ?? this.reconnectPassiveWaiting,
         gpsCoachingHint: clearGpsCoachingHint
             ? null
             : (gpsCoachingHint ?? this.gpsCoachingHint),

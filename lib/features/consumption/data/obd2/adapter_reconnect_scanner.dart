@@ -76,6 +76,27 @@ class AdapterReconnectScanner {
   /// is null.
   final int _missCeiling;
 
+  /// #2767 — number of consecutive passive-wait cycles after which the
+  /// scanner RE-ARMS one active scan (resets [_passiveMode] +
+  /// [_consecutiveMisses]) instead of staying passive forever. The pre-#2767
+  /// scanner latched passive-only at the ceiling and never re-escalated, so a
+  /// late adapter power-cycle (dropped at min 10, back at min 25) could be
+  /// missed: a passive autoConnect GATT wait can go stale on some stacks, and
+  /// only a fresh active scan reliably re-discovers an adapter that toggled
+  /// its advertising. Re-arming periodically keeps the radio mostly quiet
+  /// (one active burst every [_passiveReArmEvery] long passive waits) while
+  /// guaranteeing the link is re-probed. Ignored when [_passiveConnect] is
+  /// null (the scanner never enters passive mode then).
+  final int _passiveReArmEvery;
+
+  /// Fired ONCE per drop the instant the scanner latches passive mode at the
+  /// active-scan miss ceiling (#2767). Settable (not a constructor arg) so
+  /// the manager can wire it after the injected factory builds the scanner,
+  /// without rippling the factory's `(mac, onReconnect)` signature into every
+  /// test. Null ⇒ the caller doesn't surface the active-vs-passive
+  /// distinction (behaviour unchanged from before #2767).
+  VoidCallback? onPassiveWait;
+
   /// Delay before the FIRST probe after a drop (#1991). A fresh drop is
   /// most often a transient BLE blip; probing near-immediately — rather
   /// than after the full [_currentBackoff] — lets the reconnect land
@@ -93,8 +114,19 @@ class AdapterReconnectScanner {
   int _consecutiveMisses = 0;
 
   /// Latches `true` once [_missCeiling] is reached, so every later cycle
-  /// uses the cheap passive wait instead of an active scan (#2261).
+  /// uses the cheap passive wait instead of an active scan (#2261). #2767 —
+  /// no longer a permanent latch: it is reset to `false` every
+  /// [_passiveReArmEvery] passive cycles to re-arm one active scan.
   bool _passiveMode = false;
+
+  /// #2767 — consecutive passive-wait cycles since passive mode was last
+  /// (re-)entered. Reset to 0 each time the scanner re-arms an active scan.
+  int _passiveCycles = 0;
+
+  /// #2767 — guards the one-shot [onPassiveWait] callback so it fires only
+  /// on the FIRST transition into passive mode this drop, not on every
+  /// re-arm → passive flip. The UI banner copy only needs to flip once.
+  bool _notifiedPassiveWait = false;
 
   /// #2466 — measures elapsed time from [start] to the successful
   /// reconnect, fed into the gated comm-diagnostics time-to-reconnect
@@ -117,7 +149,9 @@ class AdapterReconnectScanner {
     required AdapterConnectAttempt connect,
     required VoidCallback onReconnect,
     AdapterConnectAttempt? passiveConnect,
+    this.onPassiveWait,
     int missCeiling = 5,
+    int passiveReArmEvery = 4,
     Duration initialBackoff = const Duration(seconds: 5),
     Duration maxBackoff = const Duration(seconds: 60),
     Duration firstProbeDelay = const Duration(seconds: 1),
@@ -126,6 +160,7 @@ class AdapterReconnectScanner {
         _connect = connect,
         _passiveConnect = passiveConnect,
         _missCeiling = missCeiling,
+        _passiveReArmEvery = passiveReArmEvery,
         _onReconnect = onReconnect,
         _maxBackoff = maxBackoff,
         _firstProbeDelay = firstProbeDelay,
@@ -148,8 +183,10 @@ class AdapterReconnectScanner {
 
   /// `true` once the active-scan miss ceiling was reached and the
   /// scanner switched to the passive autoConnect GATT wait (#2261
-  /// concern 2). Exposed for tests + diagnostics.
-  @visibleForTesting
+  /// concern 2). #2767 — read in production by the [DroppedSessionManager]
+  /// to drive the calmer "passive-waiting" banner copy, so this is a public
+  /// signal, not a test-only one. Note it can flip back to `false` when the
+  /// scanner periodically re-arms an active scan from passive mode.
   bool get isPassiveWaiting => _passiveMode;
 
   /// Consecutive active-scan misses recorded this drop (#2261). Exposed
@@ -168,6 +205,13 @@ class AdapterReconnectScanner {
     // Stopwatch when the collector is armed). The episode begins now: the
     // controller constructs + starts the scanner the moment a drop fires.
     _backoffEscalated = false;
+    // #2767 — a fresh drop episode starts in active mode; clear the passive
+    // latch + re-arm bookkeeping so a reused scanner instance doesn't inherit
+    // a stale passive state.
+    _consecutiveMisses = 0;
+    _passiveMode = false;
+    _passiveCycles = 0;
+    _notifiedPassiveWait = false;
     _sinceStart =
         Obd2CommDiagnostics.instance.enabled ? (Stopwatch()..start()) : null;
     // #1991 — first probe fast (a transient drop recovers quickest with
@@ -237,7 +281,8 @@ class AdapterReconnectScanner {
 
   /// A passive-mode cycle: wait on a passive autoConnect GATT connect
   /// (no active scan). On success, fire [onReconnect] + self-stop; on a
-  /// timeout, reschedule another passive wait at the capped backoff.
+  /// timeout, either re-arm an active scan (every [_passiveReArmEvery]
+  /// passive cycles, #2767) or reschedule another passive wait.
   Future<void> _runPassiveCycle() async {
     final ok = await _connectSafely(passive: true);
     if (!_scanning) return; // stop() raced during the passive wait
@@ -250,9 +295,26 @@ class AdapterReconnectScanner {
       _onReconnect();
       return;
     }
-    // Passive wait timed out within its window — schedule the next one.
-    // Backoff is already pinned at maxBackoff (passive mode latched
-    // there), so this just paces the re-arm.
+    // Passive wait timed out within its window.
+    _passiveCycles++;
+    // #2767 — never stay passive forever: every [_passiveReArmEvery] timed-out
+    // passive waits, drop back to a single active scan so a late adapter
+    // power-cycle (which may have stale/dead passive autoConnect state) is
+    // re-discovered. Reset the miss counter so the active path runs the full
+    // [_missCeiling] attempts again before it re-enters passive mode.
+    if (_passiveReArmEvery > 0 && _passiveCycles >= _passiveReArmEvery) {
+      _passiveMode = false;
+      _passiveCycles = 0;
+      _consecutiveMisses = 0;
+      // Probe promptly so the re-armed active scan lands quickly rather than
+      // after another capped-backoff wait. Backoff stays pinned at maxBackoff
+      // so the active retries that follow stay paced.
+      _timer?.cancel();
+      _timer = Timer(_firstProbeDelay, _runCycle);
+      return;
+    }
+    // Otherwise reschedule another passive wait. Backoff is already pinned at
+    // maxBackoff (passive mode latched there), so this just paces the re-arm.
     _scheduleNext();
   }
 
@@ -267,8 +329,16 @@ class AdapterReconnectScanner {
       // ceiling so the passive-wait re-arm is paced, and run the first
       // passive wait promptly.
       _passiveMode = true;
+      _passiveCycles = 0; // #2767 — fresh re-arm window
       _backoffEscalated = true; // #2466 — past the ceiling ⇒ visible
       _currentBackoff = _maxBackoff;
+      // #2767 — tell the caller the scanner gave up active scanning and is
+      // now passive-waiting, so the UI can surface a calmer banner. Fired
+      // once per drop (not on every active→passive re-arm flip).
+      if (!_notifiedPassiveWait) {
+        _notifiedPassiveWait = true;
+        onPassiveWait?.call();
+      }
       _timer?.cancel();
       _timer = Timer(_firstProbeDelay, _runCycle);
       return;

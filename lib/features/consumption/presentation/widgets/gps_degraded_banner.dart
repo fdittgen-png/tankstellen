@@ -40,6 +40,14 @@ class GpsDegradedBanner extends ConsumerWidget {
     if (phase != TripRecordingPhase.degradedGpsOnly) {
       return const SizedBox.shrink();
     }
+    // #2767 — once the reconnect scanner exhausts its active-scan attempts it
+    // drops to a passive autoConnect wait (it still periodically re-arms an
+    // active scan). The trip keeps recording on GPS regardless, so this is a
+    // calmer "we're still waiting" state, not a failure — surface a distinct,
+    // less-urgent copy so the user isn't left reading "reconnecting" forever.
+    final passiveWaiting = ref.watch(
+      tripRecordingProvider.select((s) => s.reconnectPassiveWaiting),
+    );
 
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
@@ -52,12 +60,17 @@ class GpsDegradedBanner extends ConsumerWidget {
         color: theme.colorScheme.onSecondaryContainer,
       ),
       leading: Icon(
-        Icons.gps_fixed,
+        // A steady "fix held" glyph for the busy reconnect, a quieter
+        // "still listening" glyph once we've dropped to the passive wait.
+        passiveWaiting ? Icons.bluetooth_searching : Icons.gps_fixed,
         color: theme.colorScheme.onSecondaryContainer,
       ),
       content: Text(
-        l?.obd2GpsDegradedBannerTitle ??
-            'Recording with GPS — OBD2 reconnecting',
+        passiveWaiting
+            ? (l?.obd2GpsDegradedPassiveWaitingBanner ??
+                'Recording with GPS — waiting for the OBD2 adapter')
+            : (l?.obd2GpsDegradedBannerTitle ??
+                'Recording with GPS — OBD2 reconnecting'),
       ),
       // No Resume / End: recording continues automatically. A
       // MaterialBanner requires a non-empty actions list, so a single

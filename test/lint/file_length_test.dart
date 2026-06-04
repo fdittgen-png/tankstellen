@@ -225,7 +225,13 @@ void main() {
     // flapping link no longer dispatches PIDs into a dead channel. Net +10;
     // the wiring must live at the controller's host adapter + resume site.
     // Decomposition stays tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1636,
+    // #2767 — re-grandfathered 1636 → 1640: a thin `reconnectPassiveWaiting`
+    // getter (delegating to the DroppedSessionManager) surfaces the reconnect
+    // scanner's give-up-and-passive-wait state into the UI for the calmer
+    // banner copy. Net +4 (getter + 2-line dartdoc); a pure read-through that
+    // must live on the controller's public surface. Decomposition stays
+    // tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1640,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The

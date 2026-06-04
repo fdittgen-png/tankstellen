@@ -11,6 +11,7 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_reconnect_scanner.dart';
+import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
@@ -648,6 +649,95 @@ void main() {
         await ctl.stop();
       });
     });
+
+    group('long-gap reconnect — passive-waiting then late power-cycle (#2767)',
+        () {
+      test(
+          'scanner gives up active scanning → reconnectPassiveWaiting surfaces '
+          '+ a trace entry; a LATE reconnect still resumes OBD2', () async {
+        AutoRecordTraceLog.clear();
+        var clock = DateTime(2026, 6, 1, 9);
+        final transport = FakeObd2Transport(initResponses());
+        await transport.connect();
+        VoidCallback? capturedOnReconnect;
+        _ObservableScanner? builtScanner;
+
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          now: () => clock,
+          vehicleId: 'car-longgap',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          // No grace timer fires in degraded GPS-only mode, but keep it long
+          // anyway so nothing auto-finalises mid-test.
+          pauseGraceWindow: const Duration(hours: 1),
+          silentReconnectWindow: const Duration(seconds: 6),
+          pinnedAdapterMac: 'AA:BB',
+          reconnectScannerFactory: (mac, onReconnect) {
+            capturedOnReconnect = onReconnect;
+            builtScanner = _ObservableScanner(
+              pinnedMac: mac,
+              onReconnect: onReconnect,
+              onStart: () {},
+              onStop: () {},
+            );
+            return builtScanner;
+          },
+        );
+
+        await ctl.start();
+        // A live GPS fix so the OBD2 drop degrades (keeps recording) rather
+        // than pausing — the path where the never-resolving banner lived.
+        ctl.updateGpsFix(
+          latitude: 48.0,
+          longitude: 7.0,
+          altitudeM: 200,
+          speedKmh: 70,
+        );
+        ctl.debugTriggerDrop();
+        expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly);
+        expect(ctl.reconnectPassiveWaiting, isFalse,
+            reason: 'still active-scanning right after the drop');
+
+        // The adapter stays away long enough that the scanner exhausts its
+        // active-scan ceiling and drops to a passive wait. The real scanner
+        // fires onPassiveWait; the fake reproduces that contract.
+        builtScanner!.isPassiveWaiting = true;
+        builtScanner!.onPassiveWait?.call();
+
+        expect(ctl.reconnectPassiveWaiting, isTrue,
+            reason: 'once the scanner gives up active scanning the controller '
+                'must surface the passive-waiting signal so the UI swaps the '
+                'banner copy (#2767)');
+        expect(
+          AutoRecordTraceLog.snapshot()
+              .map((e) => e.kind)
+              .contains(AutoRecordEventKind.reconnectPassiveWaiting),
+          isTrue,
+          reason: 'the passive-waiting transition must be traced for the '
+              'exportable diagnostic log',
+        );
+        // Still recording — passive-waiting is NOT a pause.
+        expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly);
+
+        // A LATE adapter power-cycle (dropped early, back much later): the
+        // scanner — having re-armed an active scan from passive mode — finds
+        // it and fires onReconnect. OBD2 recording must resume cleanly.
+        clock = clock.add(const Duration(minutes: 14));
+        builtScanner!.isPassiveWaiting = false;
+        capturedOnReconnect!.call();
+
+        expect(ctl.currentState, TripRecordingControllerState.recording,
+            reason: 'a late reconnect after passive-waiting must resume full '
+                'OBD2 recording, not be missed (#2767)');
+        expect(ctl.reconnectPassiveWaiting, isFalse,
+            reason: 'the passive-waiting flag clears the moment OBD2 is back');
+
+        await ctl.stop();
+        AutoRecordTraceLog.clear();
+      });
+    });
   });
 }
 
@@ -815,8 +905,14 @@ class _ObservableScanner implements AdapterReconnectScanner {
   @override
   bool get isScanning => _scanning;
 
+  /// #2767 — mutable so a test can flip the fake into passive-waiting (then
+  /// invoke [onPassiveWait]) to drive the manager's re-emit + the
+  /// controller's `reconnectPassiveWaiting` flag.
   @override
-  bool get isPassiveWaiting => false;
+  bool isPassiveWaiting = false;
+
+  @override
+  VoidCallback? onPassiveWait;
 
   @override
   int get consecutiveMisses => 0;

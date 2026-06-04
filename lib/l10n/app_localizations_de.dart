@@ -3415,6 +3415,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aufzeichnung per GPS — OBD2 verbindet erneut';
 
   @override
+  String get obd2GpsDegradedPassiveWaitingBanner =>
+      'Aufzeichnung per GPS — warte auf den OBD2-Adapter';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Verbrauchsberechnung für $vehicleName kalibriert — Genauigkeit verbessert um $percent%';
   }

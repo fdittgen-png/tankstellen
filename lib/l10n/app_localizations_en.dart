@@ -3380,6 +3380,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Recording with GPS — OBD2 reconnecting';
 
   @override
+  String get obd2GpsDegradedPassiveWaitingBanner =>
+      'Recording with GPS — waiting for the OBD2 adapter';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
   }
@@ -10830,6 +10834,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2GpsDegradedBannerTitle =>
       '⟦Řéçóřđîñǧ ŵîŧĥ ǦƤŠ — ÓƁĐ2 řéçóññéçŧîñǧ ··············⟧';
+
+  @override
+  String get obd2GpsDegradedPassiveWaitingBanner =>
+      '⟦Řéçóřđîñǧ ŵîŧĥ ǦƤŠ — ŵáîŧîñǧ ƒóř ŧĥé ÓƁĐ2 áđáƥŧéř ··················⟧';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {

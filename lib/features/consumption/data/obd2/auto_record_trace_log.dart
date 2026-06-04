@@ -126,6 +126,13 @@ enum AutoRecordEventKind {
   /// pause-with-grace state was cleared and polling resumed (#1920).
   reconnectSucceeded,
 
+  /// The reconnect scanner exhausted its active-scan miss ceiling and
+  /// dropped to a passive autoConnect wait (#2767). Recording continues
+  /// unchanged; logged so a missed late-power-cycle reconnect can be traced
+  /// in the exportable diagnostic log. The scanner still periodically re-arms
+  /// an active scan from passive mode.
+  reconnectPassiveWaiting,
+
   /// The coordinator attempted a foreground-active direct connect on an
   /// app resume (#2282 concern 1) — the disabled-FGS fallback that wakes
   /// the paired adapter from the live engine.

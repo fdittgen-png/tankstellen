@@ -1635,6 +1635,10 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "Lightweight banner shown (#2565) when the OBD2 link drops mid-trip but GPS is still alive. Recording continues automatically from GPS, so there are no Resume/End actions — the app keeps capturing the trip while it tries to re-attach the dongle."
   },
+  "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
+  "@obd2GpsDegradedPassiveWaitingBanner": {
+    "description": "Calmer variant of obd2GpsDegradedBannerTitle shown (#2767) once the reconnect scanner has exhausted its active-scan attempts and switched to a low-power passive wait for the adapter to power back up. The trip is still recording on GPS and the app still re-arms an active scan periodically, so the wording is reassuring (\"waiting for\") rather than urgent (\"reconnecting\")."
+  },
   "veCalibratedTitle": "Consumption calibration updated for {vehicleName} — accuracy improved by {percent}%",
   "@veCalibratedTitle": {
     "description": "Snackbar shown after #815 reconciles OBD2 integrated fuel against the pump receipt and learns a new volumetric-efficiency scalar for the vehicle.",

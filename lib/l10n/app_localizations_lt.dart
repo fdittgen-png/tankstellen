@@ -3411,6 +3411,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Recording with GPS — OBD2 reconnecting';
 
   @override
+  String get obd2GpsDegradedPassiveWaitingBanner =>
+      'Recording with GPS — waiting for the OBD2 adapter';
+
+  @override
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Suvartojimo kalibracija atnaujinta $vehicleName — tikslumas pagerintas $percent%';
   }

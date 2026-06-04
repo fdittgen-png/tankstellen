@@ -226,17 +226,27 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // "pausedDueToDrop" even when no TripLiveReading lands.
     _stateSub = ctl.stateChanges.listen((_) {
       final newPhase = phaseForController(ctl);
+      // #2767 — surface whether the reconnect scanner has given up active
+      // scanning and is passive-waiting, so the GPS-degraded banner can swap
+      // its copy. Only meaningful while a drop is being recovered; false in
+      // every other phase so a fresh recording / save never inherits a stale
+      // flag.
+      final passiveWaiting = (newPhase == TripRecordingPhase.degradedGpsOnly ||
+              newPhase == TripRecordingPhase.pausedDueToDrop) &&
+          ctl.reconnectPassiveWaiting;
       // #1330 phase 3 — surface the controller's drop reason. Cleared
       // when leaving the drop state.
       if (newPhase == TripRecordingPhase.pausedDueToDrop) {
         _host.state = _host.state.copyWith(
           phase: newPhase,
           dropReason: ctl.dropReason,
+          reconnectPassiveWaiting: passiveWaiting,
         );
       } else {
         _host.state = _host.state.copyWith(
           phase: newPhase,
           clearDropReason: true,
+          reconnectPassiveWaiting: passiveWaiting,
         );
       }
       // #1303 — phase transitions force an immediate snapshot.
