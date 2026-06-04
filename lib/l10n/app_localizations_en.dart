@@ -5085,6 +5085,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too much glare on the display — try again at a slight angle so the numbers aren\'t washed out.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pump scan failed: $error';
   }
@@ -12527,6 +12531,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get scanPumpGlare =>
       '⟦Ŧóó ɱúçĥ ǧłářé óñ ŧĥé đîšƥłáý — ŧřý áǧáîñ áŧ á šłîǧĥŧ áñǧłé šó ŧĥé ñúɱƀéřš ářéñ\'ŧ ŵášĥéđ óúŧ. ································⟧';
+
+  @override
+  String get scanPumpInconsistent =>
+      '⟦Ŧĥé šçáññéđ ṽáłúéš đóñ\'ŧ áđđ úƥ — ƥłéášé éñŧéř ŧĥéɱ ɱáñúáłłý. ······················⟧';
 
   @override
   String scanPumpFailed(String error) {

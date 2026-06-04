@@ -5149,6 +5149,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Твърде много отблясъци по дисплея — опитайте отново под лек ъгъл, за да не са преекспонирани цифрите.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Сканирането на помпата не успя: $error';
   }

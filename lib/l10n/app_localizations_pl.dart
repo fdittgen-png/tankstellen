@@ -5130,6 +5130,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zbyt duże odbicie na wyświetlaczu — spróbuj ponownie pod lekkim kątem, aby cyfry nie były prześwietlone.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skanowanie dystrybutora nie powiodło się: $error';
   }

@@ -5105,6 +5105,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Ekraanil on liiga palju peegeldust — proovige uuesti väikese nurga alt, et numbrid ei oleks ülevalgustatud.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumba skaneerimineen ebaõnnestus: $error';
   }

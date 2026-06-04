@@ -5106,6 +5106,10 @@ class AppLocalizationsSv extends AppLocalizations {
       'För mycket reflexer på displayen — försök igen i en liten vinkel så att siffrorna inte bleks ut.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumpskanning misslyckades: $error';
   }

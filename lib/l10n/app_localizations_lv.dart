@@ -5139,6 +5139,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Pārāk daudz atspīduma uz displeja — mēģiniet vēlreiz nelielā leņķī, lai cipari nebūtu pārgaismoti.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Sūkņa skenēšana neizdevās: $error';
   }

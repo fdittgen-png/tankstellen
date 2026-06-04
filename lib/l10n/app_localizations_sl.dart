@@ -5118,6 +5118,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Preveč bleščanja na zaslonu — poskusite znova pod rahlim kotom, da številke ne bodo presvetljene.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skeniranje črpalke ni uspelo: $error';
   }

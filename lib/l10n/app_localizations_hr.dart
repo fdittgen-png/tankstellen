@@ -5124,6 +5124,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Previše odsjaja na zaslonu — pokušajte ponovno pod blagim kutom kako brojevi ne bi bili izblijedjeli.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Skeniranje pumpe nije uspjelo: $error';
   }

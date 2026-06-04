@@ -40,6 +40,14 @@ class PumpDisplayParseResult {
   /// user-facing) — e.g. `consistent`, `price-out-of-range`.
   final String? validationReason;
 
+  /// `true` when a country profile actually drove the validation gate
+  /// (#2828). Distinguishes "the gate ran and *rejected* this read"
+  /// (`validationApplied && !validated` → don't auto-fill a
+  /// plausible-but-wrong pair) from "no profile, so the gate couldn't
+  /// range-check" (`!validationApplied` → stay permissive on
+  /// [hasUsableData] so profile-less regions stay non-regressive).
+  final bool validationApplied;
+
   /// Field names (`'totalCost'` / `'liters'` / `'pricePerLiter'`) whose
   /// value was DERIVED from the other two via `total ≈ liters × €/L`
   /// rather than read directly off the display (#2478).
@@ -59,6 +67,7 @@ class PumpDisplayParseResult {
     this.confidence = 0,
     this.validated = false,
     this.validationReason,
+    this.validationApplied = false,
     this.derived = const {},
   });
 

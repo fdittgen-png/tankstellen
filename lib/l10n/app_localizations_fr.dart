@@ -5160,6 +5160,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Trop de reflets sur l\'afficheur — réessayez en vous plaçant légèrement de biais pour que les chiffres ne soient pas surexposés.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Échec du scan de la pompe : $error';
   }

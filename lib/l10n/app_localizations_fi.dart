@@ -5107,6 +5107,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Näytössä on liikaa heijastusta — yritä uudelleen hieman vinosta kulmasta, jotta numerot eivät pala puhki.';
 
   @override
+  String get scanPumpInconsistent =>
+      'The scanned values don\'t add up — please enter them manually.';
+
+  @override
   String scanPumpFailed(String error) {
     return 'Pumpun skannaus epäonnistui: $error';
   }
