@@ -6,15 +6,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../features/alerts/data/repositories/alert_repository.dart';
-import '../../features/station_services/germany/tankerkoenig_batch_price_fetcher.dart';
-import '../../features/station_services/germany/tankerkoenig_station_service.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../logging/error_logger.dart';
-import '../services/dio_factory.dart';
 import '../storage/hive_storage.dart';
 import '../telemetry/storage/isolate_error_spool.dart';
 import 'background_price_history_writer.dart';
-import 'background_retry.dart';
+import 'background_price_source.dart';
 import 'background_scan_dedup_store.dart';
 import 'background_scan_runners.dart';
 import 'daily_collection.dart';
@@ -237,22 +234,26 @@ class BackgroundAlertScanCoordinator {
       return;
     }
 
-    // 2. Fetch prices via the shared Tankerkoenig batch fetcher (chunking +
-    //    parsing + retry). #2249 — DioFactory so the BG batch fetch inherits
-    //    the rate-limit + conditional-GET interceptors, not a raw request.
-    final dio = DioFactory.create(
+    // 2. Fetch prices via the registry-driven per-country source (#2862).
+    //    The source groups the mixed-country id set by derived country and
+    //    queries each polled provider at most once, within that provider's
+    //    minInterval; a prefix-less id falls back to the active country (DE
+    //    today). This replaces the hardcoded Tankerkönig batch fetch — DE
+    //    still goes through its Tankerkönig batch service, the other ten
+    //    polled countries now go through their own. Bulk-dataset countries
+    //    (ES/IT/AR/DK) are scanned by child #2863, not here.
+    final activeCountry =
+        storage.getSetting('active_country_code') as String? ?? 'DE';
+    final source = BackgroundPriceSource(
+      storage: storage,
       connectTimeout: bgConnectTimeout,
       receiveTimeout: bgReceiveTimeout,
     );
-    final fetcher = TankerkoenigBatchPriceFetcher(
-      dio: dio,
-      batchSize: tankerkoenigBatchSize,
-      retryConfig: const BackgroundRetryConfig(
-        maxAttempts: maxRetryAttempts,
-        baseDelay: retryBaseDelay,
-      ),
+    final prices = await source.fetchPricesGrouped(
+      stationIds: allStationIds,
+      fallbackCountryCode: activeCountry,
+      apiKey: apiKey,
     );
-    final prices = await fetcher.fetchBatch(ids: allStationIds, apiKey: apiKey);
     debugPrint('BackgroundAlertScanCoordinator: fetched prices for '
         '${prices.length} stations');
 
@@ -275,42 +276,53 @@ class BackgroundAlertScanCoordinator {
     }
 
     await BackgroundScanRunners.runRadiusAlerts(
-        now: now, apiKey: apiKey, templates: templates);
+      now: now,
+      source: source,
+      apiKey: apiKey,
+      templates: templates,
+    );
 
     await HomeWidgetService.updateWidget(
       storage,
       profileStorage: storage,
       settingsStorage: storage,
     );
-    await _refreshNearestWidgetFromSearch(storage);
+    await _refreshNearestWidgetFromSearch(storage, source: source);
   }
 
   /// #609 — nearest-widget refresh from a real search (or legacy fallback).
-  Future<void> _refreshNearestWidgetFromSearch(HiveStorage storage) async {
+  ///
+  /// #2862 — the nearest-widget search now goes through the registry-driven
+  /// [BackgroundPriceSource] for the active country instead of a hardcoded
+  /// Tankerkönig service, so a non-DE user's widget shows nearby stations
+  /// from their own country's provider. A [source] is reused when the scan
+  /// body already built one (so its per-country services are shared); the
+  /// empty-favorites early-return builds a throwaway one.
+  Future<void> _refreshNearestWidgetFromSearch(
+    HiveStorage storage, {
+    BackgroundPriceSource? source,
+  }) async {
     try {
       final apiKey = storage.getApiKey();
-      final hasKey = apiKey != null && apiKey.isNotEmpty;
-      if (hasKey) {
-        // #2249 — rate-limited + conditional-GET Dio (nearest-widget search).
-        final dio = DioFactory.create(
-          baseUrl: 'https://creativecommons.tankerkoenig.de/json',
-          connectTimeout: bgConnectTimeout,
-          receiveTimeout: bgReceiveTimeout,
-        )..options.queryParameters = {'apikey': apiKey};
-        final service = TankerkoenigStationService(dio);
-        await HomeWidgetService.updateNearestWidget(
-          storage,
-          storage,
-          profileStorage: storage,
-          stationService: service,
-        );
-      } else {
-        await HomeWidgetService.updateNearestWidget(
-          storage,
-          storage,
-          profileStorage: storage,
-        );
-      }
+      final activeCountry =
+          storage.getSetting('active_country_code') as String? ?? 'DE';
+      final priceSource = source ??
+          BackgroundPriceSource(
+            storage: storage,
+            connectTimeout: bgConnectTimeout,
+            receiveTimeout: bgReceiveTimeout,
+          );
+      final service =
+          priceSource.serviceFor(activeCountry, apiKey: apiKey);
+      // A null service means the active country is not a polled provider
+      // (e.g. a bulk-dataset country — child #2863) or has no configured key;
+      // fall back to the cache-only nearest-widget path.
+      await HomeWidgetService.updateNearestWidget(
+        storage,
+        storage,
+        profileStorage: storage,
+        stationService: service,
+      );
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
         'where': 'BackgroundAlertScanCoordinator: nearest widget refresh failed'

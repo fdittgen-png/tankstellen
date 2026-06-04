@@ -480,33 +480,45 @@ void main() {
   // inside top-level isolate entrypoints that can't be exercised without a
   // platform engine.
   group('background isolate Dio construction (#2249)', () {
-    // #2415 — the Dio construction moved into the coordinator with the
-    // scan body. The #2249 invariant (rate-limited factory, never raw Dio)
-    // still applies; the source-scan now reads the coordinator.
-    final source =
+    // #2415 — the Dio construction moved into the coordinator with the scan
+    // body. #2862 — it moved again, into the registry-driven
+    // BackgroundPriceSource (which builds each polled country's Dio). The
+    // #2249 invariant (rate-limited factory, never raw Dio) still applies;
+    // the source-scan now reads the price source + the coordinator, and
+    // neither may hand-roll a Dio.
+    final priceSource =
+        File('lib/core/background/background_price_source.dart')
+            .readAsStringSync();
+    final coordinator =
         File('lib/core/background/background_alert_scan_coordinator.dart')
+            .readAsStringSync();
+    final runners =
+        File('lib/core/background/background_scan_runners.dart')
             .readAsStringSync();
 
     test('routes every Dio through DioFactory', () {
       expect(
-        source.contains("import '../services/dio_factory.dart';"),
+        priceSource.contains("import '../services/dio_factory.dart';"),
         isTrue,
-        reason: 'coordinator must import DioFactory',
+        reason: 'the background price source must import DioFactory',
       );
       expect(
-        source.contains('DioFactory.create('),
+        priceSource.contains('DioFactory.create('),
         isTrue,
-        reason: 'background isolate must build its Dio via DioFactory.create',
+        reason: 'the background isolate must build its Dio via '
+            'DioFactory.create',
       );
     });
 
     test('constructs no raw Dio(BaseOptions(...)) instances', () {
-      expect(
-        source.contains('Dio(BaseOptions('),
-        isFalse,
-        reason: 'raw Dio bypasses the rate-limit + conditional-GET '
-            'interceptors — use DioFactory.create instead',
-      );
+      for (final source in [priceSource, coordinator, runners]) {
+        expect(
+          source.contains('Dio(BaseOptions('),
+          isFalse,
+          reason: 'raw Dio bypasses the rate-limit + conditional-GET '
+              'interceptors — use DioFactory.create instead',
+        );
+      }
     });
   });
 
