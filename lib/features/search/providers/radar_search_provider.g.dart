@@ -10,12 +10,14 @@ part of 'radar_search_provider.dart';
 // ignore_for_file: type=lint, type=warning
 /// The on-search Fuel Station Radar (#2659).
 ///
-/// A one-shot, cache-first radar fetch around the user's persisted position
-/// ([userPositionProvider], NOT the trip-only shared GPS stream), surfaced in
-/// the search results list like a regular search. It reuses the #2661 radar
-/// data layer ([fuelStationRadarProvider]) — the tier-1 corridor location
-/// cache (1 h) + tier-3 JIT price cache (5 min) — so a repeat run nearby costs
-/// zero network.
+/// A one-shot radar fetch around the user's CURRENT position
+/// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
+/// the trip-only shared GPS stream), surfaced in the search results list like
+/// a regular search. It reuses the #2661 radar data layer
+/// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
+/// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
+/// in-radius fetch so the result is always a superset of the regular search
+/// (#2806).
 ///
 /// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
 /// approach detector: those only fire while a trip records (gated on
@@ -27,12 +29,14 @@ final radarSearchProvider = RadarSearchProvider._();
 
 /// The on-search Fuel Station Radar (#2659).
 ///
-/// A one-shot, cache-first radar fetch around the user's persisted position
-/// ([userPositionProvider], NOT the trip-only shared GPS stream), surfaced in
-/// the search results list like a regular search. It reuses the #2661 radar
-/// data layer ([fuelStationRadarProvider]) — the tier-1 corridor location
-/// cache (1 h) + tier-3 JIT price cache (5 min) — so a repeat run nearby costs
-/// zero network.
+/// A one-shot radar fetch around the user's CURRENT position
+/// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
+/// the trip-only shared GPS stream), surfaced in the search results list like
+/// a regular search. It reuses the #2661 radar data layer
+/// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
+/// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
+/// in-radius fetch so the result is always a superset of the regular search
+/// (#2806).
 ///
 /// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
 /// approach detector: those only fire while a trip records (gated on
@@ -42,12 +46,14 @@ final class RadarSearchProvider
     extends $NotifierProvider<RadarSearch, RadarSearchState> {
   /// The on-search Fuel Station Radar (#2659).
   ///
-  /// A one-shot, cache-first radar fetch around the user's persisted position
-  /// ([userPositionProvider], NOT the trip-only shared GPS stream), surfaced in
-  /// the search results list like a regular search. It reuses the #2661 radar
-  /// data layer ([fuelStationRadarProvider]) — the tier-1 corridor location
-  /// cache (1 h) + tier-3 JIT price cache (5 min) — so a repeat run nearby costs
-  /// zero network.
+  /// A one-shot radar fetch around the user's CURRENT position
+  /// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
+  /// the trip-only shared GPS stream), surfaced in the search results list like
+  /// a regular search. It reuses the #2661 radar data layer
+  /// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
+  /// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
+  /// in-radius fetch so the result is always a superset of the regular search
+  /// (#2806).
   ///
   /// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
   /// approach detector: those only fire while a trip records (gated on
@@ -80,16 +86,18 @@ final class RadarSearchProvider
   }
 }
 
-String _$radarSearchHash() => r'17dd6df0b132ba4d0e25ba88cbf293769ccf71a7';
+String _$radarSearchHash() => r'4f901087ffd4a6848b0616e88e0d3b71e2b623bf';
 
 /// The on-search Fuel Station Radar (#2659).
 ///
-/// A one-shot, cache-first radar fetch around the user's persisted position
-/// ([userPositionProvider], NOT the trip-only shared GPS stream), surfaced in
-/// the search results list like a regular search. It reuses the #2661 radar
-/// data layer ([fuelStationRadarProvider]) — the tier-1 corridor location
-/// cache (1 h) + tier-3 JIT price cache (5 min) — so a repeat run nearby costs
-/// zero network.
+/// A one-shot radar fetch around the user's CURRENT position
+/// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
+/// the trip-only shared GPS stream), surfaced in the search results list like
+/// a regular search. It reuses the #2661 radar data layer
+/// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
+/// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
+/// in-radius fetch so the result is always a superset of the regular search
+/// (#2806).
 ///
 /// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
 /// approach detector: those only fire while a trip records (gated on

@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:dio/dio.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
+import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/radar_search_fab.dart';
@@ -52,6 +56,37 @@ class _FixedUserPosition extends UserPosition {
         updatedAt: DateTime.now(),
         source: 'test',
       );
+
+  // #2806 — runRadar now refreshes the live fix first; keep the fixed point
+  // (and off the geolocator method channel) in the widget test.
+  @override
+  Future<void> updateFromGps() async {}
+}
+
+/// #2806 — runRadar now merges a direct in-radius fetch; this empty service
+/// keeps that merge deterministic (and off the network) so the recorded
+/// corridor remains the only source under test.
+class _EmptyStationService implements StationService {
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async =>
+      ServiceResult(
+        data: const <Station>[],
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+
+  @override
+  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+    List<String> ids,
+  ) =>
+      throw UnimplementedError();
 }
 
 FuelStationRadar _recordedRadar(List<Station> corridor) => FuelStationRadar(
@@ -113,6 +148,7 @@ void main() {
           fuelStationRadarProvider.overrideWithValue(
             _recordedRadar([_station('RADAR-NEAR', 48.0, 2.0)]),
           ),
+          stationServiceProvider.overrideWithValue(_EmptyStationService()),
           // A regular search result the radar must SUPPLANT, not mutate.
           searchStateProvider
               .overrideWith(() => _LoadedSearchState([testStation])),
