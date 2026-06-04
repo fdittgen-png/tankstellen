@@ -6,7 +6,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/features/consumption/data/analysis/driving_analysis_trace.dart';
 import 'package:tankstellen/features/consumption/data/analysis/driving_analysis_trace_export.dart';
@@ -40,14 +39,10 @@ DrivingAnalysisTrace _trace() => DrivingAnalysisTrace(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late Directory tempDir;
   late List<({String fileName, String mimeType, Uint8List bytes})> writes;
-  late List<ShareParams> shares;
 
-  setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('driving-trace-export');
+  setUp(() {
     writes = [];
-    shares = [];
     debugPublicFileExporterOverride = ({
       required bytes,
       required fileName,
@@ -56,21 +51,18 @@ void main() {
       writes.add((fileName: fileName, mimeType: mimeType, bytes: bytes));
       return 'content://downloads/$fileName';
     };
-    debugDrivingTraceTempDirectoryOverride = () async => tempDir;
-    debugDrivingTraceShareSinkOverride = (params) async => shares.add(params);
   });
 
-  tearDown(() async {
+  tearDown(() {
     debugPublicFileExporterOverride = null;
-    debugDrivingTraceTempDirectoryOverride = null;
-    debugDrivingTraceShareSinkOverride = null;
-    if (tempDir.existsSync()) await tempDir.delete(recursive: true);
   });
 
-  test('writes a stamped JSON to Downloads and returns true', () async {
+  test('#2817 — writes a stamped JSON FILE to Downloads and returns true',
+      () async {
     final ok = await DrivingAnalysisTraceExport.export(_trace());
 
     expect(ok, isTrue);
+    // Exactly one Downloads write — no share-sheet detour.
     expect(writes, hasLength(1));
     final write = writes.single;
     // Stamp derives from capturedAt with `:`/`.` swapped for `-`.
@@ -82,22 +74,7 @@ void main() {
     expect(decoded['comment'], kDrivingAnalysisCommentPrompt);
   });
 
-  test('hands a .json XFile to the share sheet so it can be sent back',
-      () async {
-    await DrivingAnalysisTraceExport.export(_trace());
-
-    expect(shares, hasLength(1));
-    final params = shares.single;
-    expect(params.files, hasLength(1));
-    final file = params.files!.single;
-    expect(file.path, endsWith('.json'));
-    expect(file.mimeType, 'application/json');
-    // The temp file was actually written before sharing.
-    expect(File(file.path).existsSync(), isTrue);
-  });
-
-  test('a Downloads-write failure still returns false but does not throw',
-      () async {
+  test('a Downloads-write failure returns false and does not throw', () async {
     debugPublicFileExporterOverride = ({
       required bytes,
       required fileName,
@@ -106,9 +83,6 @@ void main() {
         throw const FileSystemException('no Downloads access');
 
     final ok = await DrivingAnalysisTraceExport.export(_trace());
-
     expect(ok, isFalse);
-    // The share handoff is independent of the Downloads write.
-    expect(shares, hasLength(1));
   });
 }
